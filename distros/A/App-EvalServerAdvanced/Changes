@@ -1,3 +1,9 @@
+0.020 - Aug 28th 2017
+  * Add chmod to seccomp rules for temp files
+
+0.019 - Aug 28th 2017
+  * Add getrandom and mkdir to seccomp rules
+
 0.018 - July 27th 2017
   * Fix a bug where the server would drop messages if given all at once
 

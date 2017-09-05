@@ -4,7 +4,7 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
          "web" : "https://github.com/fayland/perl-WebService-2Captcha"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023",
    "x_static_install" : 1
 }

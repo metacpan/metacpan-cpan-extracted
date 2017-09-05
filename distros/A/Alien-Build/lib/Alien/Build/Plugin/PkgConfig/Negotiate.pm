@@ -7,7 +7,7 @@ use Config;
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -74,7 +74,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
                                              Grootboek
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                      EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                      EekBoek, 2013-12-31
 
  GrBk  Grootboek/Boekstuk              Datum           Debet     Credit  BoekstukNr      Relatie
 ---------------------------------------------------------------------------------------------------
@@ -15,18 +15,18 @@ EekBoek Demo Administratie                                                      
  3100  Totaal Kapitaal de                                       2443,18
        heer/mevrouw
  4100  Totaal Crediteuren                               0,00
- 4200  Totaal BTW Verkoop Hoog                                  1463,00
- 4220  Totaal BTW Inkoop Hoog                         148,13
+ 4200  Totaal BTW Verkoop Hoog                                  1590,28
+ 4220  Totaal BTW Inkoop Hoog                         161,06
  6800  Totaal Afschr. kosten inv. &                   411,26
        inr.
  6810  Totaal Afschr. kosten                          396,82
        computers
- 6900  Totaal Telefoon- en faxkosten                  510,29
- 6905  Totaal Internetkosten                          269,42
+ 6900  Totaal Telefoon- en faxkosten                  501,86
+ 6905  Totaal Internetkosten                          264,92
  6980  Totaal Bankkosten                               32,40
- 8100  Totaal Omzet advisering                                  1200,00
+ 8100  Totaal Omzet advisering                                  1180,16
  8300  Totaal Omzet editing                                     1000,00
- 8400  Totaal Omzet cursussen                                   6500,00
+ 8400  Totaal Omzet cursussen                                   6392,56
 
        Totaal mutaties                              10971,08   10971,08
 ---------------------------------------------------------------------------------------------------

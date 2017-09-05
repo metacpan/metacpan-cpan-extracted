@@ -16,7 +16,7 @@ private:
     ptime_t hmsDiff () const;
 
 public: 
-    err_t set (const char* str, size_t len = 0);
+    err_t set (string_view str);
 
     void set (ptime_t from, ptime_t till) {
         _from.set(from);
@@ -31,7 +31,7 @@ public:
     DateInt ()                                   : _from((ptime_t) 0), _till((ptime_t) 0)       {}
     DateInt (ptime_t from, ptime_t till)         : _from((ptime_t) from), _till((ptime_t) till) {}
     DateInt (const Date* from, const Date* till) : _from(from), _till(till)                     {}
-    DateInt (const char* str, size_t len = 0)    : _from((ptime_t) 0), _till((ptime_t) 0)       { set(str, len); }
+    DateInt (string_view str)                    : _from((ptime_t) 0), _till((ptime_t) 0)       { set(str); }
 
     err_t error () const { return _from.error() == E_OK ? _till.error() : _from.error(); }
     

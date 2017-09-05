@@ -1,0 +1,57 @@
+---
+abstract: 'Alien package for the FontForge library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Gather::Dino: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Gather::Dino: '0'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-FontForge
+requires:
+  Alien::Base: '0.038'
+  Alien::Role::Dino: '0'
+  File::Spec: '0'
+  Role::Tiny::With: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/project-renard/p5-Alien-FontForge
+  repository: https://github.com/project-renard/p5-Alien-FontForge.git
+version: '0.001'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::Dino: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Net::SSLeay: '1.49'
+      Path::Tiny: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system:
+      Alien::Build::Plugin::Gather::Dino: '0'
+      Path::Tiny: '0'
+x_serialization_backend: 'YAML::Tiny version 1.70'

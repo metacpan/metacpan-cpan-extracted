@@ -4,13 +4,14 @@
 
 namespace panda { namespace date {
 
-err_t DateInt::set (const char* str, size_t len) {
-    if (len < 1) len = strlen(str);
+err_t DateInt::set (string_view data) {
+    auto len = data.length();
+    auto str = data.data();
     const char* delim = strchr(str, '~');
     if (delim == NULL || delim >= str + len - 2) return E_UNPARSABLE;
-    err_t error1 = _from.set(str, delim - str);
+    err_t error1 = _from.set(string_view(str, delim - str));
     const char* till_starts = delim + 2;
-    err_t error2 = _till.set(till_starts, str + len - till_starts);
+    err_t error2 = _till.set(string_view(till_starts, str + len - till_starts));
     if (error1 != E_OK) return error1;
     else if (error2 != E_OK) return error2;
     return E_OK;

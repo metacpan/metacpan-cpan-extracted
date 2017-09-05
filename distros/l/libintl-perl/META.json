@@ -50,6 +50,6 @@
          "url" : "git://git.guido-flohr.net/perl/libintl-perl.git"
       }
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -67,6 +67,60 @@ char **token_names;
 #endif
 
 
+#ifndef HAVE_STRLCAT
+/********************************* AMBS **********************/
+/*
+ * Appends src to string dst of size dsize (unlike strlcat, dsize is the
+ * full size of dst, not space left).  At most dsize-1 characters
+ * will be copied.  Always NUL terminates (unless dsize <= strlen(dst)).
+ * Returns strlen(src) + MIN(dsize, strlen(initial dst)).
+ * If retval >= dsize, truncation occurred.
+ */
+static size_t
+strlcat(char *dst, const char *src, size_t dsize)
+{
+        const char *odst = dst;
+        const char *osrc = src;
+        size_t n = dsize;
+        size_t dlen;
+
+        /* Find the end of dst and adjust bytes left but don't go past end. */
+        while (n-- != 0 && *dst != '\0')
+                dst++;
+        dlen = dst - odst;
+        n = dsize - dlen;
+
+        if (n-- == 0)
+                return(dlen + strlen(src));
+        while (*src != '\0') {
+                if (n != 0) {
+                        *dst++ = *src;
+                        n--;
+                }
+                src++;
+        }
+        *dst = '\0';
+
+        return(dlen + (src - osrc));    /* count does not include NUL */
+}
+/********************************* AMBS **********************/
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void
 fix_token_names (void)
 {
@@ -120,12 +174,12 @@ append_token_set (char *msg, SetWordType *a)
       {
          if (t & *b)
          {
-            strcat (msg, zztokens[e]);
+            strlcat (msg, zztokens[e], MAX_ERROR);
             tokens_printed++;
             if (tokens_printed < zzset_deg (a) - 1)
-               strcat (msg, ", ");
+               strlcat (msg, ", ", MAX_ERROR);
             else if (tokens_printed == zzset_deg (a) - 1)
-               strcat (msg, " or ");
+               strlcat (msg, " or ", MAX_ERROR);
          }
          e++;
       } while (++b < &(bitmask[sizeof(SetWordType)*8]));
@@ -153,7 +207,7 @@ zzsyn(char *        text,
 
    msg[0] = (char) 0;           /* make sure string is empty to start! */
    if (tok == zzEOF_TOKEN)
-      strcat (msg, "at end of input");
+      strlcat (msg, "at end of input", MAX_ERROR);
    else
      snprintf (msg, MAX_ERROR - 1, "found \"%s\"", bad_text);
 
@@ -169,7 +223,7 @@ zzsyn(char *        text,
    }
    else
    {
-      strcat (msg, ", ");
+      strlcat (msg, ", ", MAX_ERROR);
       len += 2;
    }
 
@@ -178,7 +232,7 @@ zzsyn(char *        text,
    
    if (k != 1)
    {
-      sprintf (msg+len, "; \"%s\" not", bad_text);
+      snprintf (msg+len, MAX_ERROR - len - 1, "; \"%s\" not", bad_text);
       if (zzset_deg (eset) > 1) strcat (msg, " in");
       len = strlen (msg);
    }
@@ -189,25 +243,26 @@ zzsyn(char *        text,
    if (zzset_deg (eset) > 0) 
    {
       if (zzset_deg (eset) == 1)
-         strcat (msg, "expected ");
+         strlcat (msg, "expected ", MAX_ERROR);
       else
-         strcat (msg, "expected one of: ");
+         strlcat (msg, "expected one of: ", MAX_ERROR);
 
       append_token_set (msg, eset);
    }
    else
    {
-      sprintf (msg+len, "expected %s", zztokens[etok]);
+      if (MAX_ERROR - len > 0)  // Check if we have space for more info...
+         snprintf (msg+len, MAX_ERROR - len - 1, "expected %s", zztokens[etok]);
       if (etok == ENTRY_CLOSE)
       {
-         strcat (msg, " (skipping to next \"@\")");
+         strlcat (msg, " (skipping to next \"@\")", MAX_ERROR);
          initialize_lexer_state ();
       }
    }
 
    len = strlen (msg);
    if (egroup && strlen (egroup) > 0) 
-      sprintf (msg+len, " in %s", egroup);
+      snprintf (msg+len, MAX_ERROR - len - 1, " in %s", egroup);
 
    syntax_error (msg);
 

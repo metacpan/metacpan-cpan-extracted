@@ -1,5 +1,10 @@
 Revision history for Alien-m4
 
+0.17      2017-08-30 11:08:35 -0400
+  - Improved probe for system m4
+    finds gm4, gnum4, $ENV{M4} as autoconf does
+    finds GNU m4 1.4.6 that comes with darwin / OS X
+
 0.16      2017-08-14 08:31:07 -0400
   - Workaround for old mingw/gcc
 

@@ -46,13 +46,13 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
                                       'Dist::Zilla::Plugin::PodWeaver' => '4.006',
                                       'Dist::Zilla::Plugin::Prereqs' => '0',
-                                      'Dist::Zilla::Plugin::PromptIfStale' => '0.053',
+                                      'Dist::Zilla::Plugin::PromptIfStale' => '0.054',
                                       'Dist::Zilla::Plugin::Readme' => '0',
                                       'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.163250',
                                       'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.007',
                                       'Dist::Zilla::Plugin::RunExtraTests' => '0.028',
                                       'Dist::Zilla::Plugin::ShareDir' => '0',
-                                      'Dist::Zilla::Plugin::Test::Compile' => '2.056',
+                                      'Dist::Zilla::Plugin::Test::Compile' => '2.057',
                                       'Dist::Zilla::Plugin::Test::EOF' => '0.0501',
                                       'Dist::Zilla::Plugin::Test::EOL' => '0.18',
                                       'Dist::Zilla::Plugin::Test::NoTabs' => '0.15',
@@ -86,7 +86,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Iller' => '0.1408',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0318'
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0319'
                                     }
                     },
        'runtime' => {

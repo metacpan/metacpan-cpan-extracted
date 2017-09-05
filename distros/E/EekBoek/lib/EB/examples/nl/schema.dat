@@ -1,6 +1,4 @@
-# $Id: schema.dat,v 1.15 2010/01/09 21:36:28 jv Exp $ -*- coding: utf-8 -*-
 # EekBoek Rekeningschema voor eekboek_sample
-# Content-Type: text/plain; charset = UTF-8
 
 # Dit bestand definiëert alle vaste gegevens van een administratie of
 # groep administraties: het rekeningschema (balansrekeningen en
@@ -204,8 +202,8 @@ Resultaatrekeningen
 # tegenrekening worden opgegeven, voor de overige dagboeken mag een
 # tegenrekening worden opgegeven.
 # De optie :dc kan worden gebruikt om aan te geven dat het journaal
-# voor dit dagboek de boekstuktotalen in gescheiden debet en credit
-# moet tonen.
+# en het grootboek voor dit dagboek de boekstuktotalen in gescheiden
+# debet en credit moet tonen.
 
 Dagboeken
 
@@ -223,13 +221,12 @@ Dagboeken
 # betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
-# In de eerste kolom wordt de (numerieke) code voor dit tarief
-# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
-# van groep "nul") moet het percentage worden opgegeven. Met de
-# aanduiding :exclusief kan worden opgegeven dat boekingen op
-# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
-# aangeven.
+# In de eerste kolom wordt de code voor dit tarief opgegeven. Deze kan
+# o.m. worden gebruikt om expliciet een BTW tarief op te geven bij het
+# boeken. Voor elk gebruikt tarief (behalve die van groep "nul") moet
+# het percentage worden opgegeven. Met de aanduiding :exclusief kan
+# worden opgegeven dat boekingen op rekeningen met deze tariefgroep
+# standaard het bedrag exclusief BTW aangeven.
 #
 # Indien een BTW-tarief niet geldig is op de boekingsdatum wordt
 # gekeken naar de configuratiesetting [strategy] btw_adapt. Indien
@@ -246,13 +243,8 @@ Dagboeken
 
 BTW Tarieven
 
-   0  BTW 0%                 :tariefgroep=nul
-   1  BTW 19% incl.          :tariefgroep=hoog :perc=19,00 :tot=2012-10-01
-   2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief :tot=2012-10-01
-   3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
-   4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
-   5  BTW Privé 12% ex.	     :tariefgroep=privé :perc=12,00 :exclusief
-   6  BTW 21% incl.          :tariefgroep=hoog :perc=21,00 :vanaf=2012-10-01
-   7  BTW 21% excl.          :tariefgroep=hoog :perc=21,00 :exclusief :vanaf=2012-10-01
+   H21  BTW 21%          :tariefgroep=hoog  :perc=21,00
+   L06  BTW 6,0%         :tariefgroep=laag  :perc=06,00
+   P12  BTW Privé 12%    :tariefgroep=privé :perc=12,00
 
 # Einde EekBoek schema

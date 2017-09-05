@@ -1,6 +1,6 @@
 package Crypt::Affine::Params;
 
-$Crypt::Affine::Params::VERSION   = '0.12';
+$Crypt::Affine::Params::VERSION   = '0.13';
 $Crypt::Affine::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Affine::Params - Placeholder for parameters for Crypt::Affine.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -81,7 +81,7 @@ L<http://search.cpan.org/dist/Crypt-Affine/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 - 2016 Mohammad S Anwar.
+Copyright (C) 2011 - 2017 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

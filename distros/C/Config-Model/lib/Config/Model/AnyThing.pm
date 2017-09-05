@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyThing;
-$Config::Model::AnyThing::VERSION = '2.106';
+$Config::Model::AnyThing::VERSION = '2.108';
 use Mouse;
 
 # FIXME: must cleanup warp mechanism to implement this
@@ -92,9 +92,10 @@ sub notify_change {
 
     return if $self->instance->initial_load and not $args{really};
 
-    $change_logger->trace( "called for ", $self->name, " from ", join( ' ', caller ),
-        " with ", join( ' ', %args ) )
-        if $change_logger->is_trace;
+    if ($change_logger->is_trace) {
+        my @with = map { "'$_' -> '". ($args{$_} // '<undef>') ."'"  } sort keys %args;
+        $change_logger->trace("called for ", $self->name, " from ", join( ' ', caller ), " with ", join( ' ', @with ));
+    }
 
     # needs_save may be overridden by caller
     $args{needs_save} //= 1;
@@ -326,7 +327,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.106
+version 2.108
 
 =head1 SYNOPSIS
 

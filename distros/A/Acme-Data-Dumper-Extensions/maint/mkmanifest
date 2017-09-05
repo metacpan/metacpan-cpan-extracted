@@ -1,0 +1,50 @@
+#!perl
+use strict;
+use warnings;
+
+use ExtUtils::Manifest qw( maniread );
+
+my $MANIFEST = 'MANIFEST';
+
+my %manifest;
+
+if ( -f $MANIFEST ) {
+    %manifest = %{ maniread() };
+}
+
+unless ( exists $manifest{$MANIFEST} ) {
+    $manifest{$MANIFEST} = "This list of files";
+    warn "Adding to $MANIFEST: $MANIFEST\n";
+}
+
+for my $file ( split qq/\0/, qx/git ls-files -z/ ) {
+    next if exists $manifest{$file};
+    next if $file eq q[README.pod];
+    warn "Adding to $MANIFEST: $file\n";
+    $manifest{$file} = undef;
+}
+
+rename $MANIFEST, "$MANIFEST.bak" if -f $MANIFEST;
+open my $manifh, '>', $MANIFEST or die "Can't open $MANIFEST: $!";
+binmode $manifh, ':raw';
+
+for my $file ( sort keys %manifest ) {
+    my $tabs = ( 5 - ( length($file) + 1 ) / 8 );
+    $tabs = 1 if $tabs < 1;
+    my $text = $manifest{$file};
+    $tabs = 0  unless $text;
+    $text = "" unless defined $text;
+    if ( $file =~ /\s/ ) {
+        $file =~ s/([\\'])/\\$1/g;
+        $file = "'$file'";
+    }
+    print $manifh $file, "\t" x $tabs, $text, "\n";
+}
+
+close $manifh;
+
+for my $file ( sort keys %manifest ) {
+    next if -e $file;
+    warn "File in $MANIFEST no longer exists: $file\n";
+}
+

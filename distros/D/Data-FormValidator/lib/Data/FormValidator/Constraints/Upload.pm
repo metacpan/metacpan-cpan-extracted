@@ -24,7 +24,7 @@ our @EXPORT_OK = qw(
     image_min_dimensions
 );
 
-our $VERSION = 4.86;
+our $VERSION = 4.88;
 
 sub file_format {
     my %params = @_;

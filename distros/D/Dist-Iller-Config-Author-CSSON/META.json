@@ -71,13 +71,13 @@
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "4.006",
             "Dist::Zilla::Plugin::Prereqs" : "0",
-            "Dist::Zilla::Plugin::PromptIfStale" : "0.053",
+            "Dist::Zilla::Plugin::PromptIfStale" : "0.054",
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.163250",
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.007",
             "Dist::Zilla::Plugin::RunExtraTests" : "0.028",
             "Dist::Zilla::Plugin::ShareDir" : "0",
-            "Dist::Zilla::Plugin::Test::Compile" : "2.056",
+            "Dist::Zilla::Plugin::Test::Compile" : "2.057",
             "Dist::Zilla::Plugin::Test::EOF" : "0.0501",
             "Dist::Zilla::Plugin::Test::EOL" : "0.18",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0.15",
@@ -111,7 +111,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0318"
+            "Dist::Iller::Config::Author::CSSON" : "0.0319"
          }
       },
       "runtime" : {
@@ -142,11 +142,11 @@
    "provides" : {
       "Dist::Iller::Config::Author::CSSON" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON.pm",
-         "version" : "0.0318"
+         "version" : "0.0319"
       },
       "Dist::Iller::Config::Author::CSSON::MapMetro" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm",
-         "version" : "0.0318"
+         "version" : "0.0319"
       }
    },
    "release_status" : "stable",
@@ -161,7 +161,7 @@
          "web" : "https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON"
       }
    },
-   "version" : "0.0318",
+   "version" : "0.0319",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -204,7 +204,7 @@
                }
             },
             "name" : "PromptIfStale",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -541,7 +541,7 @@
                }
             },
             "name" : "Test::Compile",
-            "version" : "2.056"
+            "version" : "2.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -664,7 +664,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0318",
+                  "tag" : "0.0319",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },

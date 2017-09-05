@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionHandler::ExplicitVersions;
-$DBIx::Class::DeploymentHandler::VersionHandler::ExplicitVersions::VERSION = '0.002219';
+$DBIx::Class::DeploymentHandler::VersionHandler::ExplicitVersions::VERSION = '0.002220';
 use Moose;
 
 # ABSTRACT: Define your own list of versions to use for migrations
@@ -9,7 +9,6 @@ use Carp 'croak';
 with 'DBIx::Class::DeploymentHandler::HandlesVersioning';
 
 has schema_version => (
-  isa      => 'Str',
   is       => 'ro',
   required => 1,
 );

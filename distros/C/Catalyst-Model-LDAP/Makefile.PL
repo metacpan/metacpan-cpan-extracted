@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Data::Page" => 0,
     "MRO::Compat" => 0,
+    "Module::Runtime" => "0.015",
     "Net::LDAP" => "0.65",
     "Net::LDAP::Constant" => 0,
     "Net::LDAP::Control::ProxyAuth" => "1.09",
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Data::Page" => 0,
   "FindBin" => 0,
   "MRO::Compat" => 0,
+  "Module::Runtime" => "0.015",
   "Net::LDAP" => "0.65",
   "Net::LDAP::Constant" => 0,
   "Net::LDAP::Control::ProxyAuth" => "1.09",

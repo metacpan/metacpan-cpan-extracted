@@ -43,8 +43,7 @@ do { my $x = {
                                    'Test::More' => '0.88',
                                    'Test::Most' => '0',
                                    'Test::Requires' => '0',
-                                   'base' => '0',
-                                   'blib' => '1.01'
+                                   'base' => '0'
                                  }
                  }
      };

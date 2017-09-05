@@ -3,30 +3,42 @@
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Win32-Shortcut-Readlink",
+   "no_index" : {
+      "directory" : [
+         "lib/Win32/Shortcut/Readlink"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "develop" : {
          "requires" : {
-            "Devel::PPPort" : "3.23"
+            "Devel::PPPort" : "3.23",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -36,22 +48,25 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.82"
+            "Test2::Require" : "0.000060",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::V0" : "0.000060"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/win32-shortcut-readlink/issues"
+         "web" : "https://github.com/plicease/Win32-Shortcut-Readlink/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Win32-Shortcut-Readlink/",
+      "homepage" : "https://metacpan.org/pod/Win32::Shortcut::Readlink",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/win32-shortcut-readlink.git",
-         "web" : "https://github.com/plicease/win32-shortcut-readlink"
+         "url" : "git://github.com/plicease/Win32-Shortcut-Readlink.git",
+         "web" : "https://github.com/plicease/Win32-Shortcut-Readlink"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

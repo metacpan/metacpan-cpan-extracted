@@ -49,14 +49,14 @@ sub authLogout {
 sub authForce {
     my $self = shift;
     $self->_sub('authInit');
-    my $s    = $self->{_multi}->{last}->[0] . "::authForce";
+    my $s = $self->{_multi}->{last}->[0] . "::authForce";
     return &{$s}($self);
 }
 
 sub getDisplayType {
     my $self = shift;
     return unless defined $self->{_multi}->{last};
-    my $s    = $self->{_multi}->{last}->[0] . "::getDisplayType";
+    my $s = $self->{_multi}->{last}->[0] . "::getDisplayType";
     return &{$s};
 }
 

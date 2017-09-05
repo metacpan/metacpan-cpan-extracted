@@ -1,325 +1,349 @@
 package Statistics::Distribution::Generator;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
+
+BEGIN {
+  if ($] lt '5.012') {
+    use strict;
+    use warnings;
+  }
+}
+
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '@{}' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '@{}' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 use List::AllUtils qw( reduce );
 use Exporter qw( import );
 use vars qw( $VERSION );
 
-$VERSION = '0.013';
+$VERSION = '1.003';
 
 sub logistic ();
 
-our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential );
+our @EXPORT_OK = qw( gaussian uniform logistic supplied gamma exponential dice );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $pi = 3.14159265358979323846264338327950288419716939937510;
+our $pi = 3.1415926535897932384626433832795028841971693993751;
 our $two_pi = 2 * $pi;
 our $e = exp 1;
 
 sub _render {
-    my $self = shift;
-    if ($self->{ dims }) {
-        return [ map { $_->_render } @{$self->{ dims }} ];
+  my $self = shift;
+  if ($self->{ dims }) {
+    return [ map { $_->_render } @{$self->{ dims }} ];
+  }
+  elsif ($self->{ alts }) {
+    my $accum = reduce { $a + $b } map { $_->{ weight } // 1 } @{$self->{ alts }};
+    my $n = rand() * $accum;
+    my $answer;
+    for my $alt (@{$self->{ alts }}) {
+      $n -= ($alt->{ weight } // 1);
+      if ($n <= 0) {
+        $answer = $alt->_render;
+        last;
+      }
     }
-    elsif ($self->{ alts }) {
-        my $accum = reduce { $a + $b } map { $_->{ weight } // 1 } @{$self->{ alts }};
-        my $n = rand() * $accum;
-        my $answer;
-        for my $alt (@{$self->{ alts }}) {
-            $n -= ($alt->{ weight } // 1);
-            if ($n <= 0) {
-                $answer = $alt->_render;
-                last;
-            }
-        }
-        return $answer;
-    }
-    else {
-        die "Something horrible has happened";
-    }
+    return $answer;
+  }
+  die("Can't render a(n) " . (ref($self)||$self));
 }
 
 sub gaussian {
-    my ($mean, $sigma) = @_;
-    $mean //= 0;
-    $sigma //= 1;
-    return bless { mean => $mean, sigma => $sigma }, 'Statistics::Distribution::Generator::gaussian';
+  my ($mean, $sigma) = @_;
+  $mean //= 0;
+  $sigma //= 1;
+  return bless { mean => $mean, sigma => $sigma }, 'Statistics::Distribution::Generator::gaussian';
 }
 
 sub uniform {
-    my ($min, $max) = @_;
-    $min //= 0;
-    $max //= 1;
-    return bless { min => $min, max => $max }, 'Statistics::Distribution::Generator::uniform';
+  my ($min, $max) = @_;
+  $min //= 0;
+  $max //= 1;
+  return bless { min => $min, max => $max }, 'Statistics::Distribution::Generator::uniform';
 }
 
 sub logistic () {
-    return bless { }, 'Statistics::Distribution::Generator::logistic';
+  return bless { }, 'Statistics::Distribution::Generator::logistic';
 }
 
 sub supplied {
-    my ($iv) = @_;
-    my $rv;
-    if (ref $iv eq 'CODE') {
-        $rv = { code => $iv };
-    }
-    else {
-        $rv = { code => sub { return $iv } };
-    }
-    return bless $rv, 'Statistics::Distribution::Generator::supplied';
+  my ($iv) = @_;
+  my $rv;
+  if (ref $iv eq 'CODE') {
+    $rv = { code => $iv };
+  }
+  else {
+    $rv = { code => sub { return $iv } };
+  }
+  return bless $rv, 'Statistics::Distribution::Generator::supplied';
 }
 
 sub gamma {
-    my ($order, $scale) = map { $_ // 1 } @_;
-    return bless {
-        order => $order,
-        scale => $scale,
-        norder => int($order),
-    }, 'Statistics::Distribution::Generator::gamma';
+  my ($order, $scale) = map { $_ // 1 } @_;
+  return bless {
+    order => $order,
+    scale => $scale,
+    norder => int($order),
+  }, 'Statistics::Distribution::Generator::gamma';
 }
 
 sub exponential {
-    my ($lambda) = map { $_ // 1 } @_;
-    return bless { lambda => $lambda }, 'Statistics::Distribution::Generator::exponential';
+  my ($lambda) = map { $_ // 1 } @_;
+  return bless { lambda => $lambda }, 'Statistics::Distribution::Generator::exponential';
+}
+
+sub dice {
+  my ($numdice, $numsides) = @_;
+  return bless {
+    numdice => $numdice,
+    numsides => $numsides,
+  } => 'Statistics::Distribution::Generator::dice';
 }
 
 sub _rand_nonzero {
-    my $rv;
-    1 while (!($rv = rand));
-    return $rv;
-}
-
-sub _gamma_int {
-    my $order = shift;
-    if ($order < 12){
-        my $prod = 1;
-        for (my $i=0; $i<$order; $i++){
-            $prod *= _rand_nonzero();
-        }
-        return -log($prod);
-    }
-    else {
-        return _gamma_large_int($order);
-    }
-}
-
-sub _tan { sin($_[0]) / cos($_[0]); }
-
-sub _gamma_large_int {
-    my $order = shift;
-    my $sqrt = sqrt(2 * $order - 1);
-    my ($x,$y,$v);
-    do {
-        do {
-            $y = _tan($pi * rand);
-            $x = $sqrt * $y + $order - 1;
-        } while ($x <= 0);
-        $v = rand;
-    } while ($v > (1 + $y * $y) * exp(($order - 1) * log($x / ($order - 1)) - $sqrt * $y));
-    return $x;
-}
-
-sub _gamma_frac {
-    my $order = shift;
-    my $p = $e / ($order + $e);
-    my ($q, $x, $u, $v);
-    do {
-        $u = rand;
-        $v = _rand_nonzero();
-        if ($u < $p){
-            $x = exp((1 / $order) * log($v));
-            $q = exp(-$x);
-        }
-        else {
-            $x = 1 - log($v);
-            $q = exp(($order - 1) * log($x));
-        }
-    } while (rand >= $q);
-    return $x;
+  my $rv;
+  1 while (!($rv = rand));
+  return $rv;
 }
 
 sub _add_alternative {
-    my ($lhs, $rhs, $swapped) = @_;
-    ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
-    $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
-    my $self
-        = ref($lhs) eq 'Statistics::Distribution::Generator'
-        ? { %$lhs }
-        : { alts => [ $lhs ] }
-        ;
-    bless $self, 'Statistics::Distribution::Generator';
-    push @{$self->{ alts }}, $rhs;
-    return $self;
+  my ($lhs, $rhs, $swapped) = @_;
+  ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
+  $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
+  if (!exists($lhs->{ alts })) {
+    $lhs = {
+      alts => [ $lhs ],
+    };
+  }
+  if (!exists($rhs->{ alts })) {
+    $rhs = {
+      alts => [ $rhs ],
+    };
+  }
+  push @{$lhs->{ alts }}, @{$rhs->{ alts }};
+  return bless $lhs, 'Statistics::Distribution::Generator';
 }
 
 sub _add_dimension {
-    my ($lhs, $rhs, $swapped) = @_;
-    ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
-    $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
-    my $self
-        = ref($lhs) eq 'Statistics::Distribution::Generator'
-        ? { %$lhs }
-        : { dims => [ $lhs ] }
-        ;
-    bless $self, 'Statistics::Distribution::Generator';
-    push @{$self->{ dims }}, $rhs;
-    return $self;
+  my ($lhs, $rhs, $swapped) = @_;
+  ($lhs, $rhs) = ($rhs, $lhs) if $swapped;
+  $rhs = supplied($rhs) unless ref($rhs) =~ /^Statistics::Distribution::Generator/;
+  if (!exists($lhs->{ dims })) {
+    $lhs = {
+      dims => [ $lhs ],
+    };
+  }
+  if (!exists($rhs->{ dims })) {
+    $rhs = {
+      dims => [ $rhs ],
+    };
+  }
+  push @{$lhs->{ dims }}, @{$rhs->{ dims }};
+  return bless $lhs, 'Statistics::Distribution::Generator';
 }
 
 1;
 
 package Statistics::Distribution::Generator::gaussian;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 sub _render {
-    my $self = shift;
-    my $U = rand;
-    my $V = rand;
-    return $self->{ mean } + (sqrt(-2 * log $U) * cos($two_pi * $V) * $self->{ sigma });
+  my $self = shift;
+  my $U = rand;
+  my $V = rand;
+  return $self->{ mean } + (sqrt(-2 * log $U) * cos($two_pi * $V) * $self->{ sigma });
 }
 
 1;
 
 package Statistics::Distribution::Generator::uniform;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 sub _render {
-    my $self = shift;
-    return ($self->{ max } - $self->{ min }) * rand() + $self->{ min };
+  my $self = shift;
+  return ($self->{ max } - $self->{ min }) * rand() + $self->{ min };
 }
 
 1;
 
 package Statistics::Distribution::Generator::logistic;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 sub _render {
-    my $self = shift;
-    return -log((1 / _rand_nonzero()) - 1);
+  my $self = shift;
+  return -log((1 / _rand_nonzero()) - 1);
 }
 
 1;
 
 package Statistics::Distribution::Generator::supplied;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 sub _render {
-    my $self = shift;
-    return $self->{ code }->();
+  my $self = shift;
+  return $self->{ code }->();
 }
 
 1;
 
 package Statistics::Distribution::Generator::gamma;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
-sub _render {
-    my $self = shift;
-    my $rv;
-    if ($self->{ order } == $self->{ norder }) {
-        $rv = $self->{ scale } * _gamma_int($self->{ norder });
+sub _gamma_int {
+  my $order = shift;
+  if ($order < 12){
+    my $prod = 1;
+    for (my $i=0; $i<$order; $i++){
+      $prod *= _rand_nonzero();
     }
-    elsif ($self->{ norder } == 0) {
-        $rv = $self->{ scale } * _gamma_frac($self->{ order });
+    return -log($prod);
+  }
+  else {
+    return _gamma_large_int($order);
+  }
+}
+
+sub _tan { sin($_[0]) / cos($_[0]); }
+
+sub _gamma_large_int {
+  my $order = shift;
+  my $sqrt = sqrt(2 * $order - 1);
+  my ($x,$y,$v);
+  do {
+    do {
+      $y = _tan($pi * rand);
+      $x = $sqrt * $y + $order - 1;
+    } while ($x <= 0);
+    $v = rand;
+  } while ($v > (1 + $y * $y) * exp(($order - 1) * log($x / ($order - 1)) - $sqrt * $y));
+  return $x;
+}
+
+sub _gamma_frac {
+  my $order = shift;
+  my $p = $e / ($order + $e);
+  my ($q, $x, $u, $v);
+  do {
+    $u = rand;
+    $v = _rand_nonzero();
+    if ($u < $p){
+      $x = exp((1 / $order) * log($v));
+      $q = exp(-$x);
     }
     else {
-        $rv = $self->{ scale } * (_gamma_int($self->{ norder }) + _gamma_frac($self->{ norder } - $self->{ order }));
+      $x = 1 - log($v);
+      $q = exp(($order - 1) * log($x));
     }
-    return $rv;
+  } while (rand >= $q);
+  return $x;
+}
+
+sub _render {
+  my $self = shift;
+  my $rv;
+  if ($self->{ order } == $self->{ norder }) {
+    $rv = $self->{ scale } * _gamma_int($self->{ norder });
+  }
+  elsif ($self->{ norder } == 0) {
+    $rv = $self->{ scale } * _gamma_frac($self->{ order });
+  }
+  else {
+    $rv = $self->{ scale } * (_gamma_int($self->{ norder }) + _gamma_frac($self->{ norder } - $self->{ order }));
+  }
+  return $rv;
 }
 
 1;
 
 package Statistics::Distribution::Generator::exponential;
 
-use strict;
-use warnings;
-use 5.018;
-use utf8;
+use 5.010;
 use base qw( Statistics::Distribution::Generator );
 use overload (
-    '0+' => '_render',
-    '""' => '_render',
-    '|' => '_add_alternative',
-    'x' => '_add_dimension',
-    fallback => 1,
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
 );
 
 sub _render {
-    my $self = shift;
-    my $rv = -log(rand) / $self->{ lambda };
+  my $self = shift;
+  my $rv = -log(rand) / $self->{ lambda };
+}
+
+1;
+
+package Statistics::Distribution::Generator::dice;
+
+use 5.010;
+use base qw( Statistics::Distribution::Generator );
+use overload (
+  '0+' => '_render',
+  '""' => '_render',
+  '|' => '_add_alternative',
+  'x' => '_add_dimension',
+  fallback => 1,
+);
+
+sub _render {
+  my $self = shift;
+  my $rv;
+  for (1 .. $self->{ numdice }) {
+    $rv += int(1 + rand($self->{ numsides }));
+  }
+  return $rv;
 }
 
 1;
@@ -333,16 +357,25 @@ functions
 
 =head1 VERSION
 
-Version 0.013
+Version 1.003
 
 =head1 SYNOPSIS
 
-    use Statistics::Distribution::Generator qw( :all );
-    my $g = gaussian(3, 1);
-    say $g; # something almost certainly between -3 and 9, but probably about 2 .. 4-ish
-    my $cloud = gaussian(0, 1) x gaussian(0, 1) x gaussian(0, 1);
-    say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 2, +/- 2, +/- 2)
-    my $combo = gaussian(100, 15) | uniform(0, 200); # one answer with an equal chance of being picked from either distribution
+  use Statistics::Distribution::Generator qw( :all );
+  my $g = gaussian(3, 1);
+  say $g; # something almost certainly between -3 and 9, but probably about 2 .. 4-ish
+  my $cloud = gaussian(0, 1) x gaussian(0, 1) x gaussian(0, 1);
+  say @$cloud; # a 3D vector almost certainly within (+/- 6, +/- 6, +/- 6) and probably within (+/- 2, +/- 2, +/- 2)
+  my $combo = gaussian(100, 15) | uniform(0, 200); # one answer with an equal chance of being picked from either distribution
+
+=head1 A NOTE ON TEST FAILURES
+
+The test suite for this module is imperfect, precisely because it's hard to 
+predict what random numbers will do, so you may run into unrepeatable test 
+"failures" that are merely the result of something very unlikely happening, 
+rather than something being broken. I can only recommend retrying the test
+suite / installation process, though if it takes more than a couple of tries,
+you've probably found a real bug, which should be reported through CPAN RT.
 
 =head1 DESCRIPTION
 
@@ -378,14 +411,14 @@ many levels deep (within the usual memory & CPU limits of your computer, of
 course). You could, for instance, compose multiple "vectors" of different sizes
 using B<x> to form each one, and select between them at random with X<|>, e.g.
 
-    my $forwards = gaussian(0, 0.5) x gaussian(3, 1) x gaussian(0, 0.5);
-    my $backwards = gaussian(0, 0.5) x gaussian(-3, 1) x gaussian(0, 0.5);
-    my $left = gaussian(-3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
-    my $right = gaussian(3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
-    my $up = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(3, 1);
-    my $down = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(-3, 1);
-    my $direction = $forwards | $backwards | $left | $right | $up | $down;
-    $robot->move(@$direction);
+  my $forwards = gaussian(0, 0.5) x gaussian(3, 1) x gaussian(0, 0.5);
+  my $backwards = gaussian(0, 0.5) x gaussian(-3, 1) x gaussian(0, 0.5);
+  my $left = gaussian(-3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
+  my $right = gaussian(3, 1) x gaussian(0, 0.5) x gaussian(0, 0.5);
+  my $up = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(3, 1);
+  my $down = gaussian(0, 0.5) x gaussian(0, 0.5) x gaussian(-3, 1);
+  my $direction = $forwards | $backwards | $left | $right | $up | $down;
+  $robot->move(@$direction);
 
 You are strongly encouraged to seek further elucidation at Wikipedia or any
 other available reference site / material.
@@ -398,7 +431,7 @@ other available reference site / material.
 
 Gaussian Normal Distribution. This is the classic "bell curve" shape. Numbers
 close to the MEAN are more likely to be selected, and the value of SIGMA is
-used to determine how unlikely more-distant values are. For instance, about 2/3
+used to determine how likely more-distant values are. For instance, about 2/3
 of the "answers" will be in the range (MEAN - SIGMA) Z<><= N Z<><= (MEAN +
 SIGMA), and around 99.5% of the "answers" will be in the range (MEAN - 3 * SIGMA)
 Z<><= N Z<><= (MEAN + 3 * SIGMA). "Answers" as far away as 6 * SIGMA are
@@ -439,7 +472,7 @@ returned as is, or a coderef CALLBACK that may use any algorithm you like to
 generate a suitable random number. For now, B<this is the main plugin methodology>
 for this module. The supplied CALLBACK is given no arguments, and B<SHOULD>
 return a numeric answer. If it returns something non-numeric, you are entirely
-on your own in how to interpret that, and you are probably doing it wrongly.
+on your own in how to interpret that, and you are I<probably> doing it wrongly.
 
 =back
 
@@ -450,8 +483,8 @@ on your own in how to interpret that, and you are probably doing it wrongly.
 The Gamma Distribution function is a generalization of the chi-squared and
 exponential distributions, and may be given by
 
-    p(x) dx = {1 \over \Gamma(a) b^a} x^{a-1} e^{-x/b} dx
-    for x > 0.
+  p(x) dx = {1 \over \Gamma(a) b^a} x^{a-1} e^{-x/b} dx
+  for x > 0.
 
 The ORDER argument corresponds to what is also known as the "shape parameter"
 I<k>, and the SCALE argument corresponds to the "scale parameter" I<theta>.
@@ -471,6 +504,15 @@ in reliability theory and the Barometric formula in physics.
 
 =back
 
+=over
+
+=item dice(COUNT, SIDES)
+
+The dice distribution mimics what you'd get when rolling I<COUNT> dice, each 
+with I<SIDES> sides (numbered sequentially starting at 1), and summing the result.
+
+=back
+
 =head1 OVERLOADED OPERATORS
 
 =over
@@ -479,7 +521,7 @@ in reliability theory and the Barometric formula in physics.
 
 Allows you to compose multi-dimensional random vectors.
 
-    $randvect = $foo x $bar x $baz; # generate a three-dimensional vector
+  $randvect = $foo x $bar x $baz; # generate a three-dimensional vector
 
 =back
 
@@ -490,7 +532,7 @@ Allows you to compose multi-dimensional random vectors.
 Allows you to pick a single (optionally weighted) generator from some set of
 generators.
 
-    $cointoss = supplied 0 | supplied 1; # fair 50:50 result of either 0 or 1
+  $cointoss = supplied 0 | supplied 1; # fair 50:50 result of either 0 or 1
 
 =back
 
@@ -505,10 +547,10 @@ outcomes more (or less) than the remaining outcomes. The default weight for all
 outcomes is 1. Weights are relative, not absolute, so may be scaled however you
 need.
 
-    $foo = exponential 1.5;
-    $bar = gaussian 20, 1.25;
-    $foo->{ weight } = 6;
-    $quux = $foo | $bar; # 6:1 chance of picking $foo instead of $bar
+  $foo = exponential 1.5;
+  $bar = gaussian 20, 1.25;
+  $foo->{ weight } = 6;
+  $quux = $foo | $bar; # 6:1 chance of picking $foo instead of $bar
 
 =back
 
@@ -520,19 +562,47 @@ The idea of composing probabilities together is inspired by work done by Sooraj
 Bhat, Ashish Agarwal, Richard Vuduc, and Alexander Gray at Georgia Tech and
 NYU, published around the end of 2011.
 
-The implementation of the Gamma Distribution is by Nigel Wetters Gourlay.
+The implementation of the Gamma Distribution is by L<NWETTERS|https://metacpan.org/author/NWETTERS> and is used with permission.
 
 =head1 CAVEATS
 
 Almost no error checking is done. Garbage in I<will> result in garbage out.
 
-This is B<ALPHA> quality software. Any aspect of it, including the API and core functionality, is likely to change at any time.
+Although this has finally reached a version Z<>>= 1.x, and I will keep the API
+as backwards-compatible as possible, be aware that the internals I<are> still
+open for change, and subsequent changes I<may> introduce regression failures.
+
+=head1 WISHLIST
+
+If you know statistics and you know how to model distributions not listed 
+herein, you're encouraged to open a CPAN RT ticket describing how to do those
+probability distribution functions.
+
+=head1 ULTRA-WISHLIST
+
+If you know how to take the first I<k> moments (and/or the first I<l> L-moments)
+of a distribution, and reverse engineer it into a generator, please, B<please>
+get in touch via CPAN RT. I am I<painfully> aware that this is something sorely
+missing from this module.
 
 =head1 TODO
 
+=over
+
+=item More PDFs
+
 Build in more probability density functions.
 
-Tests. Lots of very clever tests.
+=item More Tests
+
+Lots of very clever tests. Probably something with L<Data::IEEE754::Tools> 
+and more use of L<Statistics::Descriptive>.
+
+=item Give it some Acme?
+
+Enhance the C<dice()> distribution to take the same args as L<Acme::Dice>?
+
+=back
 
 =head1 LICENSE
 

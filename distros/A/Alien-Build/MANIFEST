@@ -200,6 +200,7 @@ t/alien_build_plugin_download_negotiate.t
 t/alien_build_plugin_extract_archivetar.t
 t/alien_build_plugin_extract_archivezip.t
 t/alien_build_plugin_extract_commandline.t
+t/alien_build_plugin_extract_commandline__tar_can.t
 t/alien_build_plugin_extract_directory.t
 t/alien_build_plugin_extract_negotiate.t
 t/alien_build_plugin_fetch_httptiny.t

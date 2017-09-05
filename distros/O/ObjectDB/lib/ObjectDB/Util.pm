@@ -5,11 +5,11 @@ use warnings;
 
 use base 'Exporter';
 
-our $VERSION   = '3.20';
-our @EXPORT_OK = qw(load_class execute merge merge_rows filter_columns);
+our $VERSION   = '3.21';
+our @EXPORT_OK = qw(load_class execute to_array merge_rows filter_columns);
 
 require Carp;
-use Hash::Merge ();
+require Storable;
 use ObjectDB::Exception;
 
 sub load_class {
@@ -73,16 +73,34 @@ sub execute {
     return wantarray ? ($rv, $sth) : $rv;
 }
 
-my $merge;
+sub force_arrayrefs {
+    my ($data, $defaults) = @_;
 
-sub merge {
-    $merge ||= do {
-        my $merge = Hash::Merge->new();
-        $merge->set_behavior('STORAGE_PRECEDENT');
-        $merge->set_clone_behavior(1);
-        $merge;
-    };
-    $merge->merge(@_);
+    my $clone = Storable::dclone($data);
+
+    foreach my $key (keys %$defaults) {
+        if (!exists $clone->{$key}) {
+            $clone->{$key} = [ @{ $defaults->{$key} } ];
+        }
+        elsif (!ref $clone->{$key}) {
+            $clone->{$key} = [ $clone->{$key} ];
+        }
+
+        push @{ $clone->{$key} }, @{ $defaults->{$key} };
+
+    }
+
+    return $clone;
+}
+
+sub to_array {
+    my ($data) = @_;
+
+    return () unless defined $data;
+
+    return @$data if ref $data eq 'ARRAY';
+
+    return ($data);
 }
 
 sub merge_rows {
@@ -122,14 +140,14 @@ sub merge_rows {
               ? $prev->{$key}->[-1]
               : $prev->{$key};
 
-            my $merged = merge_rows([$prev_row, $row->{$key}]);
+            my $merged = merge_rows([ $prev_row, $row->{$key} ]);
             if (@$merged > 1) {
                 my $prev_rows =
                   ref $prev->{$key} eq 'ARRAY'
                   ? $prev->{$key}
-                  : [$prev->{$key}];
+                  : [ $prev->{$key} ];
                 pop @$prev_rows;
-                $prev->{$key} = [@$prev_rows, @$merged];
+                $prev->{$key} = [ @$prev_rows, @$merged ];
             }
         }
     }
@@ -140,18 +158,22 @@ sub merge_rows {
 sub filter_columns {
     my ($meta_columns, $params) = @_;
 
-    my $columns = $params->{columns} || $meta_columns;
-    $columns = [$columns] unless ref $columns eq 'ARRAY';
-
-    push @$columns, @{$params->{'+columns'}} if $params->{'+columns'};
-    if ($params->{'-columns'}) {
-        my $minus_columns = {map { $_ => 1 } @{$params->{'-columns'}}};
-        $columns =
-          [grep { !exists $minus_columns->{ref($_) ? $_->{'-col'} : $_} }
-              @$columns];
+    my @columns;
+    if ($params->{columns}) {
+        push @columns, to_array($params->{columns}) if $params->{columns};
+    }
+    else {
+        push @columns, @$meta_columns;
     }
 
-    return $columns;
+    push @columns, to_array($params->{'+columns'}) if $params->{'+columns'};
+    if ($params->{'-columns'}) {
+        my $minus_columns = { map { $_ => 1 } to_array($params->{'-columns'}) };
+
+        @columns = grep { !exists $minus_columns->{ ref($_) ? $_->{'-col'} : $_ } } @columns;
+    }
+
+    return \@columns;
 }
 
 1;

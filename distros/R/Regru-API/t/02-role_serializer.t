@@ -103,7 +103,7 @@ subtest 'Serializer can not encode/decode' => sub {
 };
 
 subtest 'Github issue #5 (support_by_pp)' => sub {
-    plan tests => 4;
+    plan tests => 3;
 
     {
         package Fake::Dancer::Serializer::Factory;
@@ -121,12 +121,6 @@ subtest 'Github issue #5 (support_by_pp)' => sub {
     my $instance = Fake::Dancer::Serializer::Factory->instance();
 
     my $foo;
-
-    isa_ok(
-        $instance,
-        'JSON::Backend::XS::Supportable',
-        'instance',
-    );
 
     is(
         exception { $foo = Foo::Bar->new(serializer => $instance) },

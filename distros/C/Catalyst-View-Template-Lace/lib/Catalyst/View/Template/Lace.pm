@@ -1,6 +1,6 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Module::Runtime;
 use Catalyst::View::Template::Lace::Renderer;

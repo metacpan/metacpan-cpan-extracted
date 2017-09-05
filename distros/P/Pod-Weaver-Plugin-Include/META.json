@@ -1,0 +1,67 @@
+{
+   "abstract" : "Support for including segments of Pod from other files",
+   "author" : [
+      "Vadim Belman <vrurg@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-Weaver-Plugin-Include",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find::Rule" : "0",
+            "Moose" : "0",
+            "Pod::Elemental" : "0.103004",
+            "Pod::Elemental::Transformer" : "0",
+            "Pod::Elemental::Transformer::Pod5" : "0",
+            "Pod::Find" : "0",
+            "Pod::Weaver" : "4.000",
+            "Pod::Weaver::Role::Dialect" : "0",
+            "Pod::Weaver::Role::Preparer" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "PPI" : "0",
+            "Pod::Elemental" : "0.103004",
+            "Pod::Elemental::Selectors" : "0",
+            "Pod::Elemental::Transformer::Nester" : "0",
+            "Pod::Weaver" : "4.000",
+            "Software::License::BSD" : "0",
+            "Test::Differences" : "0.500",
+            "Test::MockObject" : "1.09",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "perl" : "v5.24.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

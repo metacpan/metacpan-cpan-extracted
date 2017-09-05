@@ -20,7 +20,7 @@ if ($ENV{PATRO_SERVER_DEBUG}) {
     *sxdiag = *::xdiag;
 }
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our @SERVERS :shared;
 our %OPTS = ( # XXX - needs documentation
     keep_alive => 30,
@@ -61,8 +61,11 @@ sub new {
 	style => $threads_avail ? 'threaded' : 'forked',
 
 	keep_alive => $OPTS{keep_alive},
-	idle_timeout => $OPTS{idle_timeout}
+	idle_timeout => $OPTS{idle_timeout},
+	version => $Patro::Server::VERSION,
     };
+
+    $Patro::SERVER_VERSION = $Patro::Server::VERSION;
 
     my $obj = {};
     my @store;
@@ -74,8 +77,7 @@ sub new {
 		Patro::CODE::Shareable->import;
 	    }
 	    local $threads::shared::clone_warn = undef;
-	    # hmmmm. shared_clone doesn't work on, say, a dispatch table
-	    # that contains code references under a HASH or ARRAY?
+
 	    eval { $_ = shared_clone($_) };
 	    if ($@ =~ /CODE/) {
 		require Patro::CODE::Shareable;
@@ -97,7 +99,7 @@ sub new {
 	my $reftype = Scalar::Util::reftype($o);
 	my $ref = CORE::ref($o);
 	if ($ref eq 'Patro::CODE::Shareable') {
-	    $ref = $reftype = 'CODE';
+	    $ref = $reftype = 'CODE*';
 	}
 	my $store = {
 	    ref => $ref,
@@ -105,7 +107,7 @@ sub new {
 	    id => $num
 	};
 	if (overload::Overloaded($o)) {
-	    if ($ref ne 'CODE') {
+	    if ($ref ne 'CODE' && $ref ne 'CODE*') {
 		$store->{overload} = _overloads($o);
 	    }
 	}
@@ -214,7 +216,48 @@ sub config {
 	style => $self->{meta}{style},
 	version => $Patro::Server::VERSION
     };
-    return $config_data;
+    return bless $config_data, 'Patro::Config';
+}
+
+sub Patro::Config::to_string {
+    my ($self) = @_;
+    return Patro::LeumJelly::serialize({%$self});
+}
+
+sub Patro::Config::to_file {
+    my ($self,$file) = @_;
+    if (!$file) {
+	# TODO: select a temp filename
+    }
+    my $fh;
+    if (!open($fh, '>', $file)) {
+	croak "Patro::Config::to_file: could not write cfga file '$file': $!";
+    }
+    print $fh $self->to_string;
+    close $fh;
+    return $file;
+}
+
+sub Patro::Config::from_string {
+    my ($self, $string) = @_;
+    my $cfg = Patro::LeumJelly::deserialize($string);
+    return bless $cfg, 'Patro::Config';
+}
+
+sub Patro::Config::from_file {
+    my ($self, $file) = @_;
+    if (!defined($file) && !ref($self) && $self ne 'Patro::Config') {
+	$file = $self;
+    }
+    my $fh;
+    if (ref($file) eq 'GLOB') {
+	$fh = $file;
+    } elsif (!open $fh, '<' ,$file) {
+	croak "Patro::Config::fron_file: could not read cfg file '$file': $!";
+    }
+    my $data = <$fh>;
+    close $fh;
+    return Patro::Config->from_string($data);
 }
 
 sub accept_clients {
@@ -491,6 +534,10 @@ sub process_request {
     elsif ($topic eq 'CODE') {
 	my $sub = $self->{obj}{$id};
 	my @r;
+	if (ref($sub) eq 'Patro::CODE::Shareable') {
+	    # not necessary if server uses perl >=v5.18
+	    $sub = $sub->_invoke;
+	}
 	if ($ctx < 2) {
 	    @r = scalar eval { $has_args ? $sub->(@$args) : $sub->() };
 	} else {
@@ -540,7 +587,7 @@ sub process_request_OVERLOAD {
         $z = eval { qr/$x/ };
     } elsif ($op eq 'atan2') {
         $z = eval { atan2($x,$y) };
-   } elsif ($op eq 'cos' || $op eq 'sin' || $op eq 'exp' || $op eq 'abs' ||
+    } elsif ($op eq 'cos' || $op eq 'sin' || $op eq 'exp' || $op eq 'abs' ||
              $op eq 'int' || $op eq 'sqrt' || $op eq 'log') {
         $z = eval "$op(\$x)";
     } elsif ($op eq 'bool') {
@@ -828,7 +875,7 @@ Patro::Server - remote object server for Patro
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 DESCRIPTION
 

@@ -6,6 +6,7 @@ build_requires:
   Encode: '0'
   Test::LWP::UserAgent: '0.025'
   Test::More: '0.99'
+  Test::Pod: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -25,7 +26,8 @@ no_index:
     - examples
 requires:
   Catmandu: '0.9209'
-  RDF::LDF: '0.19'
+  IRI: '0.008'
+  RDF::LDF: '0.23'
   RDF::NS: '20140910'
   RDF::Query: '2.913'
   RDF::Trine: '1.013'
@@ -35,7 +37,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-RDF/issues
   homepage: https://github.com/LibreCat/Catmandu-RDF
   repository: https://github.com/LibreCat/Catmandu-RDF.git
-version: '0.31'
+version: '0.32'
 x_contributors:
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

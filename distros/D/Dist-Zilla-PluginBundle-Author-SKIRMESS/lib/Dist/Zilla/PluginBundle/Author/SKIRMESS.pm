@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 use Moose 0.99;
 use namespace::autoclean 0.09;
@@ -13,7 +13,7 @@ with qw(
   Dist::Zilla::Role::PluginBundle::Easy
 );
 
-sub mvp_multivalue_args { return qw/stopwords/ }
+sub mvp_multivalue_args { return qw(stopwords travis_ci_ignore_perl) }
 
 has stopwords => (
     is      => 'ro',
@@ -21,6 +21,15 @@ has stopwords => (
     lazy    => 1,
     default => sub {
         exists $_[0]->payload->{stopwords} ? $_[0]->payload->{stopwords} : undef;
+    },
+);
+
+has travis_ci_ignore_perl => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    lazy    => 1,
+    default => sub {
+        exists $_[0]->payload->{travis_ci_ignore_perl} ? $_[0]->payload->{travis_ci_ignore_perl} : undef;
     },
 );
 
@@ -38,9 +47,12 @@ sub configure {
             }
         ],
 
+        'Author::SKIRMESS::Test::XT::Test::Changes',
+        'Author::SKIRMESS::Test::XT::Test::CleanNamespaces',
         'Author::SKIRMESS::Test::XT::Test::CPAN::Meta',
         'Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON',
         'Author::SKIRMESS::Test::XT::Test::DistManifest',
+        'Author::SKIRMESS::Test::XT::Test::EOL',
         'Author::SKIRMESS::Test::XT::Test::Kwalitee',
         'Author::SKIRMESS::Test::XT::Test::MinimumVersion',
         'Author::SKIRMESS::Test::XT::Test::Mojibake',
@@ -51,6 +63,15 @@ sub configure {
         'Author::SKIRMESS::Test::XT::Test::Portability::Files',
         [ 'Author::SKIRMESS::Test::XT::Test::Spelling', { stopwords => $self->stopwords } ],
         'Author::SKIRMESS::Test::XT::Test::Version',
+
+        [
+            'Author::SKIRMESS::TravisCI',
+            {
+                travis_ci_ignore_perl => $self->travis_ci_ignore_perl,
+            }
+        ],
+
+        'Author::SKIRMESS::Perl::Tidy::RC',
 
         # Check at build/release time if modules are out of date
         [
@@ -115,7 +136,7 @@ sub configure {
         [
             'PruneCruft',
             {
-                except => [qw( \.perltidyrc )],
+                except => [qw( \.perlcriticrc \.perltidyrc )],
             }
         ],
 
@@ -129,6 +150,9 @@ sub configure {
                 skip => [qw( ^t::lib )],
             }
         ],
+
+        # automatically extract Perl::Critic policy prereqs
+        'AutoPrereqs::Perl::Critic',
 
         # Add the $AUTHORITY variable and metadata to your distribution
         [

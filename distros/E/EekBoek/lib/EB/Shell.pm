@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Jul 14 12:54:08 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May 18 20:55:27 2012
-# Update Count    : 228
+# Last Modified On: Fri Feb  3 21:09:54 2017
+# Update Count    : 269
 # Status          : Unknown, Use with caution!
 
 use utf8;
@@ -25,6 +25,8 @@ use EB;
 my $bky;			# current boekjaar (if set)
 
 use base qw(EB::Shell::DeLuxe);
+
+use EB::Tools::Attachments;
 
 sub new {
     my $class = shift;
@@ -302,7 +304,7 @@ sub _help {
 
     if ( $dbk_type == DBKTYPE_INKOOP ) {
 	$text .= _T( <<EOS );
-  <dagboek>[:nr] [ <datum> ] <boekstukomschrijving> <crediteur>
+  <dagboek>[:<nr>] [ <datum> ] <boekstukomschrijving> <crediteur>
 
 gevolgd door een of meer:
 
@@ -314,7 +316,7 @@ EOS
     }
     elsif ( $dbk_type == DBKTYPE_VERKOOP ) {
 	$text .= _T( <<EOS );
-  <dagboek>[:nr] [ <datum> ] <boekstukomschrijving> <debiteur>
+  <dagboek>[:<nr>] [ <datum> ] <boekstukomschrijving> <debiteur>
 
 gevolgd door een of meer
 
@@ -328,7 +330,7 @@ EOS
 	    || $dbk_type == DBKTYPE_MEMORIAAL
 	  ) {
 	$text .= _T( <<EOS );
-  <dagboek>[:nr] [ <datum> ] <boekstukomschrijving>
+  <dagboek>[:<nr>] [ <datum> ] <boekstukomschrijving>
 
 gevolgd door een of meer:
 
@@ -483,6 +485,7 @@ sub _add {
 		 ? ( __xt('cmo:boeking:saldo').'=s' => \$opts->{saldo},
 		     __xt('cmo:boeking:beginsaldo').'=s' => \$opts->{beginsaldo} )
 		 : (),
+		 'bijlage=s' => \$opts->{bijlage},
 	       ], $opts);
 
     $opts->{boekjaar} = $opts->{d_boekjaar} unless defined $opts->{boekjaar};
@@ -506,6 +509,7 @@ sub do_journaal {
     parse_args(\@args,
 	       [ __xt('cmo:journaal:detail|details').'!' => \$opts->{journal},
 		 __xt('cmo:journaal:totaal') => sub { $opts->{detail} = 0 },
+		 __xt('cmo:journaal:bkstsort') => \$opts->{bkstsort},
 		 __xt('cmo:journaal:boekjaar').'=s' => \$opts->{boekjaar},
 		 __xt('cmo:journaal:periode').'=s' => sub { periode_arg($opts, "periode", $_[1]) },
 		 EB::Report::GenBase->backend_options(EB::Report::Journal::, $opts),
@@ -533,6 +537,7 @@ Opties
 
   --[no]detail		Mate van detail, standaard is met details
   --totaal		Alleen het totaal (detail = 0)
+  --bkstsort		Sorteer op boekstuk, standaard is sorteren op datum
   --periode=XXX		Alleen over deze periode
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
@@ -573,6 +578,7 @@ sub help_balans {
 Toont de balansrekening.
 
 Opties:
+
   <geen>		Balans op grootboekrekening
   --verdicht		Verdicht, gedetailleerd
   --detail=<n>		Verdicht, mate van detail <n> = 0, 1 of 2
@@ -612,6 +618,7 @@ sub help_result {
 Toont de resultatenrekening.
 
 Opties:
+
   <geen>		Overzicht op grootboekrekening
   --verdicht		Verdicht, gedetailleerd
   --detail=<n>		Verdicht, mate van detail <n> = 0,1,2
@@ -650,6 +657,7 @@ sub help_proefensaldibalans {
 Toont de Proef- en Saldibalans.
 
 Opties:
+
   <geen>		Proef- en Saldibalans op grootboekrekening
   --verdicht		Verdicht, gedetailleerd (hetzelfde als --detail=2)
   --detail=<n>		Verdicht, mate van detail <n> = 0,1,2
@@ -724,9 +732,22 @@ sub do_grootboek {
 	    }
 	    next;
 	}
-	warn("?".__x("Ongeldig rekeningnummer: {acct}",
-		     acct => $_)."\n");
-	$fail++;
+      else {
+          # Search on Account name.
+          my $sth = $dbh->sql_exec
+	    ( "SELECT acc_id from Accounts ".
+              "WHERE acc_desc ILIKE ? ".
+              "ORDER BY acc_id DESC", '%' . $_ . '%' );
+          while ( my $rr = $sth->fetch ) {
+              unshift( @accts, $rr->[0] );
+          }
+          if ( @accts == 0 ) {
+              warn("?".__x("Onbekende rekeningnaam: {acct}",
+			   acct => $_)."\n");
+              $fail++;
+          }
+          next;
+      }
     }
     return if $fail;
 
@@ -740,7 +761,7 @@ sub help_grootboek {
     _T( <<EOS );
 Toont het Grootboek, of een selectie daaruit.
 
-  grootboek [ <nr> ... ]
+  grootboek [ <nr> | <naam> ] ...
 
 Opties:
 
@@ -748,7 +769,8 @@ Opties:
   --periode=<periode>	Alleen over deze periode
 
 Naast rekeningnummers kunnen ook nummers van verdichtingen en
-hoofdverdichtingen worden opgegeven.
+hoofdverdichtingen worden opgegeven, en gehele of gedeeltelijke namen
+van de rekeningen.
 
 Zie verder "help rapporten" voor algemene informatie over aan te maken
 rapporten.
@@ -1057,16 +1079,18 @@ Aanmaken grootboekrekening
 
   schema gbk <rekening> [ <type> <omschrijving> <verdichting> ]
 
-     <rekening>		de gewenste grootboekrekening
-     <type>		D/C voor Debet / Credit
-			K/O/N voor Kosten / Omzet / Neutraal
-			Eventueel gevolgd door ! als deze 
-			balansrekening vast staat aan één kant
-     <omschrijving>	De omschrijving van deze grootboekrekening
-     <verdichting>	De verdichting waaronder deze rekening valt
+Opties:
 
-     Wanneer enkel een nummer wordt opgegeven dan worden de gegevens
-     van de betreffende grootboekrekening getoond.
+  <rekening>	    de gewenste grootboekrekening
+  <type>	    D/C voor Debet / Credit
+		    K/O/N voor Kosten / Omzet / Neutraal
+		    Eventueel gevolgd door ! als deze
+		    balansrekening vast staat aan één kant
+  <omschrijving>    De omschrijving van deze grootboekrekening
+  <verdichting>	    De verdichting waaronder deze rekening valt
+
+Wanneer enkel een nummer wordt opgegeven dan worden de gegevens
+van de betreffende grootboekrekening getoond.
 EOS
 }
 
@@ -1113,7 +1137,6 @@ EOS
   --btw=<type>		BTW type: normaal, verlegd, intra, extra
 
 *** BTW type 'verlegd' wordt nog niet ondersteund ***
-*** BTW type 'intra' wordt nog niet geheel ondersteund ***
 EOS
     $ret;
 }
@@ -1419,6 +1442,62 @@ Opties:
 Het getoonde boekstuk wordt in de commando-historie geplaatst.
 Met een pijltje-omhoog kan dit worden teruggehaald en na eventuele
 wijziging opnieuw ingevoerd.
+EOS
+}
+
+sub do_bijlage {
+    my ($self, @args) = @_;
+    my $b = $bsk;
+    my $opts = { verbose      => 0,
+		 d_boekjaar   => $bky || $dbh->adm("bky"),
+	       };
+
+    return unless
+    parse_args(\@args,
+	       [ 'boekjaar=s',
+		 'export=s',
+		 'output=s',
+		 'verbose!',
+		 'trace!',
+	       ], $opts);
+
+    $opts->{boekjaar} = $opts->{d_boekjaar} unless defined $opts->{boekjaar};
+
+    @args = ($bsk) if $bsk && !@args;
+    return _T("Gaarne een boekstuk") unless @args == 1;
+    my ($bsk_id, $dbs, $err) = $dbh->bskid($args[0], $opts->{boekjaar});
+    unless ( defined($bsk_id) ) {
+	warn("?".$err."\n");
+	return;
+    }
+
+    require EB::Booking;
+    my ( $att_id ) = EB::Booking->find_attachment($bsk_id);
+    unless ( defined($att_id) ) {
+	warn("?".__x("Geen bijlage gevonden voor boekstuk {bsk}",
+		     bsk => $args[0])."\n");
+	return;
+    }
+
+    if ( $opts->{export} ) {
+	EB::Tools::Attachments->new->save_to_file( $opts->{export}, $att_id );
+	return $opts->{verbose} ? __x("Bijlage opgeslagen in {file}", file => $opts->{export}) : "";
+    }
+
+    EB::Tools::Attachments->new( id => $att_id )->open( undef, $opts->{output} );
+    "";
+}
+
+sub help_bijlage {
+    _T( <<EOS );
+Toont de bijlage van een boekstuk, indien aanwezig.
+
+  bijlage [ <opties> ] <boekstuk>
+
+Opties:
+
+  --boekjaar=<code>	Selekteer boekjaar
+  --output=<bestand>	Schrijf de bijlage naar dit bestand i.p.v. deze te tonen
 EOS
 }
 

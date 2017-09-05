@@ -1,7 +1,7 @@
 package MediaWiki::Table::Tiny;
 
-our $DATE = '2015-06-18'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2017-09-03'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,13 +10,14 @@ use warnings;
 sub table {
     my %args = @_;
 
-    my $rows = $args{rows};
-
+    my $rows   = $args{rows};
+    my $class  = $args{class} // "wikitable";
+    my $style  = $args{style} // "text-align:center";
+    my $border = ($args{border} // 1) ? 1 : 0;
     my @res;
 
-    push @res, '{| class="wikitable" style="text-align:center" border="1"',
-        "\n";
-    push @res, '{+', $args{caption}, "\n" if $args{caption};
+    push @res, '{| class="$class" style="$style" border="$border"', "\n";
+    push @res, '|+', $args{caption}, "\n" if $args{caption};
     push @res, '|-', "\n";
     my $i = 0;
     for my $row (@$rows) {
@@ -47,7 +48,7 @@ MediaWiki::Table::Tiny - Generate MediaWiki table from table data
 
 =head1 VERSION
 
-This document describes version 0.01 of MediaWiki::Table::Tiny (from Perl distribution MediaWiki-Table-Tiny), released on 2015-06-18.
+This document describes version 0.020 of MediaWiki::Table::Tiny (from Perl distribution MediaWiki-Table-Tiny), released on 2017-09-03.
 
 =head1 SYNOPSIS
 
@@ -61,7 +62,13 @@ This document describes version 0.01 of MediaWiki::Table::Tiny (from Perl distri
      ['bob',   'cpl', '98765321'],
      ['carol', 'brig gen', '8745'],
  ];
- print MediaWiki::Table::Tiny::table(rows => $rows);
+ print MediaWiki::Table::Tiny::table(
+     rows     => $rows,
+     #caption => "foo", # optional, default is none. if set will add "|+foo" row
+     #class   => "wikitable", # optional
+     #style   => "text-align:center", # optional
+     #border  => 1, # optional
+ );
 
 Result:
 
@@ -94,6 +101,12 @@ Generate table in MediaWiki format. Arguments (C<*> marks required argument):
 
 =item * caption => str
 
+=item * style => str
+
+=item * class => str
+
+=item * border => bool
+
 =back
 
 =head1 HOMEPAGE
@@ -118,7 +131,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

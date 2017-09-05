@@ -81,7 +81,8 @@ sub extractFormInfo {
         # Forward hidden fields
         if ( exists $self->{portalHiddenFormValues} ) {
 
-            $self->lmLog( "Add hidden values to Twitter redirect URL", 'debug' );
+            $self->lmLog( "Add hidden values to Twitter redirect URL",
+                'debug' );
 
             foreach ( keys %{ $self->{portalHiddenFormValues} } ) {
                 $callback_url .=

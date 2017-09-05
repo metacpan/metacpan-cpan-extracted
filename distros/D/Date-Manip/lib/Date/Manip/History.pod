@@ -119,7 +119,7 @@ Date::Manip was once again very much alive.
 This period featured 13 releases (6.00 to 6.14) with an additional
 2 maintenance releases of version 5.
 
-=item Active maintenance (2010-2016)
+=item Active maintenance (2010-present)
 
 Although primarily in maintenance mode (due to the fact
 that Date::Manip does pretty much everything that it was designed to do),
@@ -133,7 +133,7 @@ and add the occasional new features.
 For the foreseeable future, Date::Manip will remain active, and fully
 capable of handling any common date operation.
 
-Since 6.14, there have been 30 releases to date (6.20 to 6.53) which is
+Since 6.14, there have been 36 releases to date (6.20 to 6.59) which is
 averaging about 5 releases per year.
 
 =back
@@ -157,6 +157,7 @@ I found that at the time Date-Manip 4.2 was released there were
    32 authors
    70 packages
 
+There are currently (Aug 2017) over 190,000 modules by over 13,000 authors.
 So Date::Manip got involved in CPAN very early.
 
 Next, I tried to determine which of those authors and packages are
@@ -180,16 +181,17 @@ The 7 packages which are older than Date::Manip and are still actively
 maintained by their original author (though they may have been renamed)
 are:
 
-   ANDK   Symdump
-   GAAS   libwww-perl
-   ILYAZ  MathPari
-   LDS    GD
-   MEWP   sybperl
-   PMQS   Filter
-   TOMZO  Quota
+   ILYAZ  MathPari     23-Jan-1995
+   ANDK   Symdump      16-Aug-1995
+   PMQS   Filter       28-Aug-1995
+   GAAS   libwww-perl  16-Sep-1995
+   LDS    GD           17-Sep-1995
+   MEWP   sybperl      02-Oct-1995
+   TOMZO  Quota        10-Oct-1995
 
 Congratulations to those authors who have been with perl since the
-beginning.
+beginning.  I'm proud to be in their company!  And congratulations to
+ILYAZ for having the oldest module in CPAN!
 
 Again, if I have missed anyone, please let me know.
 

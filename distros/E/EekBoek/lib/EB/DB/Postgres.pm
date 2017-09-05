@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Jan 24 10:43:00 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Sep 18 13:42:09 2012
-# Update Count    : 194
+# Last Modified On: Tue Oct 13 15:42:37 2015
+# Update Count    : 243
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -141,7 +141,9 @@ sub clear {
     for my $tbl ( qw(Boekstukregels Journal Boekjaarbalans
 		     Metadata Standaardrekeningen Relaties
 		     Boekstukken Dagboeken Boekjaren Constants
-		     Accounts Btwtabel Verdichtingen Taccounts) ) {
+		     Accounts Btwtabel Verdichtingen Taccounts
+		     Attachments
+		   ) ) {
 	warn("+ DROP TABLE $tbl\n") if $trace;
 	eval { $dbh->do("DROP TABLE $tbl") };
     }
@@ -251,6 +253,44 @@ sub set_sequence {
     $value;
 }
 
+################ Attachments ################
+
+# PostgreSQL stores the data into the database, base64 encoded.
+
+use MIME::Base64 ();
+
+sub get_attachment {
+    my ( $self, $id ) = @_;
+
+    my $rr = $dbh->selectrow_arrayref("SELECT att_name,att_encoding,att_content".
+				      " FROM Attachments".
+				      " WHERE att_id = ?", {}, $id );
+    my ( $name, $enc, $data ) = @{ $rr };
+    $data = MIME::Base64::decode_base64($data) if $enc == ATTENCODING_BASE64;
+    return { name => $name, encoding => $enc, content => \$data };
+}
+
+sub store_attachment {
+    my ( $self, $atts ) = @_;
+
+    my @fields = qw( id name size encoding content );
+    my $enc = defined $atts->{encoding}
+      ? $atts->{encoding} : ATTENCODING_BASE64;
+    $dbh->do("INSERT INTO Attachments" .
+	     " (" . join(",", map { +"att_$_" } @fields ) . ") ".
+	     " VALUES (" . join(",", ("?") x @fields) . ")", {},
+	     $atts->{id}, $atts->{name}, $atts->{size}, $enc,
+	     $enc == ATTENCODING_BASE64
+	     ? MIME::Base64::encode( ${ $atts->{content} }, "" )
+	     : ${ $atts->{content} },
+	    );
+}
+
+sub drop_attachment {
+    my ( $self, $id ) = @_;
+    $dbh->do("DELETE FROM Attachments WHERE att_id = ?", {}, $id );
+}
+
 ################ Interactive SQL ################
 
 # API: Interactive SQL.
@@ -311,6 +351,8 @@ sub feature {
     return 1 if $feat eq "import";
 
     return 1 if $feat eq "test";
+
+    return 1 if $feat eq "blob";
 
     # Return false for all others.
     return;

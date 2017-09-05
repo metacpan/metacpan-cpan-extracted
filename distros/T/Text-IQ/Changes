@@ -1,5 +1,11 @@
 Revision history for Text-IQ
 
+0.007   01 Sept 2017
+ - tweek test counts in t/03-bible
+
+0.006   28 Aug 2017
+ - switch spelling counts to fuzzy match with cmp_ok
+
 0.005   16 Aug 2017
  - tweek test counts
 

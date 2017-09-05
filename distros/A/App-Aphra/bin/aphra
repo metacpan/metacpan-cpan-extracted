@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+aphra - Simple static sitebuilder in Perl
+
+=head1 SYNOPSIS
+
+    $ aphra build
+
+=head1 DESCRIPTION
+
+C<aphra> is a simple static sitebuilder written in Perl. It takes a directory
+tree of input template, processes them using the Template Toolkit and outputs
+a directory tree of expanded templates.
+
+=head1 OPTIONS
+
+C<aphra> takes a number of command line options which alter the way that it
+works.
+
+=over 4
+
+=item B<source>
+
+The main directory that contains the input files. Any file that is found in
+this directory will be processed and an equivalent output file will be
+created in the B<target> directory. The default value for this option is "in".
+
+    $ aphra --in some/other/directory
+
+=item B<fragments>
+
+A directory that contains other templates which are used in the processing
+of the source templates. For example, you might have a template in the source
+directory called C<index.html.tt> which includes other templates called
+C<menu.html.tt> and C<footer.html.tt>. These templates shouldn't be put in
+the source directory (as they would then be processed and written to the
+target directory, but if they are put in the fragments directory, they will
+be found by the template processor. The default value for this option is
+"fragments".
+
+    $ aphra --fragments some/directory/of/fragments
+
+=item B<layouts>
+
+A directory that contains templates which are used to control the layout of
+the files which are produced. These are typically used with the C<WRAPPER>
+directive in the Template Toolkit. There's really no difference in handling
+the layouts and fragments directories, but I find it useful to keep the two
+types of template separate. The default value for this option is "layouts".
+
+    $ aphra --layouts some/directory/of/layouts
+
+=item B<wrapper>
+
+The name of a template that will be used as the main C<WRAPPER> for the rest
+of the templates. This template should usually contain a C<[% content %]> tag
+and will normally be stored in the layouts directory. See the L<Template
+Toolkit> documentation for more details of the C<WRAPPER> directive. The
+default value for this option is "page".
+
+    $ aphra --wrapper my_awesome_layput
+
+=item B<target>
+
+The name of the top-level directory where the output files will be written.
+Any directory structure under the source directory will be recreated under
+this directory. The default value for this option is "docs" (as that works
+well with Github pages).
+
+    $ aphra --target some/output/directory
+
+=item B<output>
+
+The output format that pages will be created in. This can be any output
+format that C<pandoc> understands. The default value is "html" and as long
+as you're creating web sites, there's going to be very little reason to change
+that.
+
+    $ aphra --output docx
+
+=item B<extensions>
+
+Allows you to configure the extensions that are recognised as templates by
+the program. See L<Processing Templates> below for more details of this. By
+default, templates with the extension C<.tt> are processed by the standard
+Template Toolkit processor and templates with the extension C<.md> are
+converted from Markdown to the output format (see above) using C<pandoc>
+before they are processed by the Template Toolkit.
+
+Extensions options are more complex than other options. They consist of the
+name of a text format as recognised by C<pandoc> and an extension string.
+These two parts are separated by an equals sign. This option can be
+repeated in order to define multiple extensions.
+
+    $ aphra --extensions markdown=md --extensions template=tt
+
+=back
+
+=head1 PROCESSING TEMPLATES
+
+I've tried to make the template processing as simple as possible. Here's how it
+works.
+
+The program finds all the files under the source directory. For each file it
+finds, it examines the extension of the file. If the extension doesn't match
+any of the defined extensions, then the file is copied to a mirror directory
+under the output directory.
+
+If the extension does match one of the defined extensions, then one of two
+things is true.
+
+The extension matches the special format "template". In this case, the
+template is just processed by the Template Toolkit.
+
+The extension matches some other format name. In this case, the template is
+processed by C<pandoc> to convert the named format to the output format
+(html by default) before being processed by the Template Toolkit.
+
+In both cases where the Template Toolkit is involved, the output file is
+placed under the output directory in a position that mirrors the position
+of the input file under the iput directory. The output file is also renamed
+to remove the extension that marked the input file as a template.
+
+An example might make this clearer. Imagine we have all of the default
+configuration options and the following directory tree.
+
+    src/index.html.tt
+    src/style.css
+    src/about/index.html.tt
+    fragments/index_text.md
+    fragments/about_text.md
+
+And assume that C<index.html.tt> includes the Template Toolkit directive
+C<[% INCLUDE index_text.md %]> and C<about/index.html.tt> contains a similar
+directive refering to C<about_text.md>. Here's what will happen.
+
+=over 4
+
+=item *
+
+C<src/index.html.tt> is found. Its extension, C<.tt>, matches one of the
+defined extensions, so it is processed by the Template Toolkit.
+
+=item *
+
+As part of this processing, the Template Toolkit needs to process
+C<index_text.md>. This template is found in the fragments directory, but
+its extension, C<.md>, means that it is pre-processed by C<pandoc> (converting
+Markdown to HTML) before it is processed by the Template Toolkit.
+
+=item *
+
+The output from processing C<src/index.html.tt> is written to
+C<docs/index.html>. The C<.tt> extension is removed.
+
+=item *
+
+C<src/style.css> is found. As its extension is not one of the defined ones,
+it is simply copied to C<docs/style.css>.
+
+=item *
+
+C<src/about/index.html.tt> is found. It is processed in a very similar way
+to C<src/index.html> (including the processing of C<fragments/about_text.md>
+and the output is written to C<docs/about/index.html>.
+
+=back
+
+After the processing is complete, we have the following in the C<docs>
+directory:
+
+    docs/index.html
+    docs/style.css
+    docs/about/index.html
+
+=cut
+
+use strict;
+use warnings;
+use 5.014;
+
+use App::Aphra;
+
+App::Aphra->new->run;
+
+=head1 AUTHOR
+
+Dave Cross <dave@perlhacks.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2017, Magnum Solutions Ltd. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

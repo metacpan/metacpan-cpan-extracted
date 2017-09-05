@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Help role for FTP server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 my %cmds;
@@ -73,7 +73,7 @@ AnyEvent::FTP::Server::Role::Help - Help role for FTP server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 

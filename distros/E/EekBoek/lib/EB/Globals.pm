@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Jul 14 12:54:08 200
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue May 29 12:40:13 2012
-# Update Count    : 104
+# Last Modified On: Thu Sep 24 22:27:58 2015
+# Update Count    : 113
 # Status          : Unknown, Use with caution!
 
 use utf8;
@@ -47,7 +47,7 @@ sub N__($) { $_[0] }
 
 _newconst("SCM_MAJVERSION",  1);
 _newconst("SCM_MINVERSION",  0);
-_newconst("SCM_REVISION",   16);
+_newconst("SCM_REVISION",   17);
 
 _newconst("AMTPRECISION",    2);
 _newconst("AMTWIDTH",        9);
@@ -86,6 +86,9 @@ eval( 'sub BTWKLASSE($$$) {'.
       ' | ($_[2] ? BTWKLASSE_KO_BIT : 0);'.
       '}' );
 push(@EXPORT, qw(BTWKLASSE));
+
+_newconst("ATTENCODINGS", "[qw(".N__("none uri base64").")]");
+_enumconst("ATTENCODING_", qw( NONE=0 URI BASE64 ));
 
 unless ( caller ) {
     print STDOUT ("-- Constants\n\n",

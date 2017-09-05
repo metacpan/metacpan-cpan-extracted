@@ -9,7 +9,7 @@ use Carp qw( croak );
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp client
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 with 'AnyEvent::FTP::Role::Event';
@@ -338,7 +338,7 @@ AnyEvent::FTP::Client - Simple asynchronous ftp client
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -546,7 +546,9 @@ command:
    }
  });
 
-=head2 $client-E<gt>connect(@remote_host)
+=head2 connect
+
+ $client->connect(@remote_host);
 
 Connect to the FTP server.  The remote host may be specified in one
 of these ways:
@@ -571,12 +573,16 @@ in that directory.
 
 =back
 
-=head2 $client-E<gt>login($user, $pass)
+=head2 login
+
+ $client->login($user, $pass);
 
 Attempt to login to the FTP server which has already been connected to using
 the C<connect> method.  This is not necessary if you used C<connect> with a URI.
 
-=head2 $client-E<gt>retr($filename, $local, %options)
+=head2 retr
+
+ $client->retr($filename, $local, %options)
 
 Retrieve the given file from the server and use C<$local> to store the results.
 
@@ -635,7 +641,9 @@ C<$local> argument.  Here is an example:
  binmode $fh;
  $client->retr($filename, $fh, restart => tell $fh);
 
-=head2 $client-E<gt>stor($filename, $local)
+=head2 stor
+
+ $client->stor($filename, $local);
 
 Send a file to the server with the given remote filename (C<$filename>)
 and using C<$local> as a source.
@@ -673,7 +681,9 @@ the server.
 
 =back
 
-=head2 $client-E<gt>stou($filename, $local)
+=head2 stou
+
+ $client->stou($filename, $local)
 
 Works exactly like the C<stor> method, except use the FTP C<STOU> command instead of
 C<STOR>.  Since the remote filename is optional for C<STOU> you may pass in C<undef>
@@ -685,7 +695,9 @@ C<remote_name> method.
    my $remote_filename = $xfer->remote_name;
  });
 
-=head2 $client-E<gt>appe($filename, $local)
+=head2 appe
+
+ $client->appe($filename, $local);
 
 Works exactly like the C<stor> method, except use the FTP C<APPE> command instead of
 C<STOR>.  This method will append C<$local> to the remote file.  One way to resume an
@@ -707,7 +719,9 @@ with C<$local> as that file handle, as in this example:
 Note that the C<SIZE> command is an extension to FTP, and may not be available on all
 servers.
 
-=head2 $client-E<gt>list($location)
+=head2 list
+
+ $client->list($location)
 
 Execute the FTP C<LIST> command.  The results will be sent as a list reference
 (instead of a L<AnyEvent::FTP::Client::Response> object) to the returned condition
@@ -736,12 +750,16 @@ variable.
  
  $cv->recv;
 
-=head2 $client-E<gt>nlst($location)
+=head2 nlst
+
+ $client->nlst($location);
 
 Works exactly like the C<list> method, except the FTP C<NLST> command is used.
 The main difference is that this method returns filenames only.
 
-=head2 $client-E<gt>rename($from, $to)
+=head2 rename
+
+ $client->rename($from, $to);
 
 This method renames the remote file from C<$from> to C<$to>.
 It uses the FTP C<RNFR> and C<RNTO> commands and thus this:
@@ -757,99 +775,142 @@ is a short cut for:
 
 Although C<$cv> may not be defined right away, so use the second with care.
 
-=head2 $client-E<gt>cwd( $dir )
+=head2 cwd
+
+ $client->cwd( $dir );
 
 Change to the given directory on the remote server.
 
-=head2 $client-E<gt>pwd
+=head2 pwd
+
+ $client->pwd;
 
 Gets the current working directory on the remote server.  This gets just the string
 representing the directory path instead of a L<AnyEvent::FTP::Client::Response> object.
 
-=head2 $client-E<gt>cdup
+=head2 cdup
+
+ $client->cdup
 
 Change to the parent directory on the remote server.  This is usually the same
 as
 
  $client->cwd('..');
 
-=head2 $client-E<gt>type
+=head2 type
+
+ $client->type
 
 Set the transfer type.  You almost always want to set to binary mode immediately
 after logging on:
 
  $client->type('I');
 
-=head2 $client-E<gt>rest
+=head2 rest
+
+ $client->rest
 
 This command is used to resume a download transfer.  Typically you would
 not use this method directly, but instead add a C<restart> option on
 the C<retr> method instead.
 
-=head2 $client-E<gt>mkd( $path )
+=head2 mkd
+
+ $client->mkd( $path );
 
 Create a directory on the remote server.
 
-=head2 $client-E<gt>rmd( $path )
+=head2 rmd
+
+ $client->rmd( $path );
 
 Remove a directory on the remote server.
 
-=head2 $client-E<gt>help
+=head2 help
+
+ $client->help;
 
 Gets a list of commands understood by the server.
 The actual format depends on the server.
 
-=head2 $client-E<gt>dele( $path )
+=head2 dele
+
+ $client->dele( $path );
 
 Delete the file on the remote server.
 
-=head2 $client-E<gt>rnfr
+=head2 rnfr
+
+ $client->rnfr;
 
 Specify the old name for renaming a file.  See C<rename> method for a shortcut.
 
-=head2 $client-E<gt>rnto
+=head2 rnto
+
+ $client->rnto;
 
 Specify the new name for renaming a file.  See C<rename> method for a shortcut.
 
-=head2 $client-E<gt>noop
+=head2 noop
+
+ $client->noop;
 
 Don't do anything.  The server will send an OK reply.
 
-=head2 $client-E<gt>allo( $size )
+=head2 allo
+
+ $client->allo( $size );
 
 Send the FTP C<ALLO> command.  Is not used by modern FTP servers.  See RFC959 for details.
 
-=head2 $client-E<gt>syst
+=head2 syst
+
+ $client->syst;
 
 Returns the type of operating system used by the server.
 
-=head2 $client-E<gt>stru
+=head2 stru
+
+ $client->stru;
 
 Specify the file structure mode.  This is not used by modern FTP servers.  See RFC959 for details.
 
-=head2 $client-E<gt>mode
+=head2 mode
+
+ $client->mode
 
 Specify the transfer mode.  This is not used by modern FTP servers.  See RFC959 for details.
 
-=head2 $client-E<gt>stat( [ $path ] )
+=head2 stat
+
+ $client->stat;
+ $client->stat($path);
 
 Get information about a file or directory on the remote server.  The actual format is totally
 server dependent.
 
-=head2 $client-E<gt>user( $username )
+=head2 user
+
+ $client->user( $username );
 
 Specify the user to login as.  See C<connect> or C<login> methods for a shortcut.
 
-=head2 $client-E<gt>pass
+=head2 pass
+
+ $client->pass( $pass );
 
 Specify the password to use for login.  See C<connect> or C<login> methods for a shortcut.
 
-=head2 $client-E<gt>acct
+=head2 acct
+
+ $client->acct( $acct );
 
 Specify user's account.  This is sometimes used for authentication and authorization when you login
 to some servers, but is seldom used today in practice.  See RFC959 for details.
 
-=head2 $client-E<gt>size( $path )
+=head2 size
+
+ $client->size( $path );
 
 Get the size of the remote file specified by C<$path>.  This is an extension to the FTP
 standard specified in RFC3659, and may not be implemented by older (or even newer)
@@ -857,16 +918,22 @@ servers.
 
 Send the size of the file on success, instead of the response object.
 
-=head2 $client-E<gt>mdtm( $path )
+=head2 mdtm
+
+ $client->mdtm( $path );
 
 Get the modification time of the remote file specified by C<$path>.  This is an extension to the FTP standard
 specified in RFC3659, and may not be implemented by older (or even newer) servers.
 
-=head2 $client-E<gt>quit
+=head2 quit
+
+ $client->quit;
 
 Send the FTP C<QUIT> command and close the connection to the remote server.
 
-=head2 $client-E<gt>site
+=head2 site
+
+ $client->site;
 
 The C<site> method provides an interface to site specific FTP commands.  Many
 FTP servers will support an extended set of commands using the standard FTP

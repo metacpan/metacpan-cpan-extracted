@@ -1,4 +1,4 @@
-# $Id: CHANGES 23 2017-05-08 13:44:30Z abalama $
+# $Id: CHANGES 25 2017-08-29 09:21:01Z abalama $
 # Version/Revision history.
 
 1.00 Sat Oct  4 10:52:42 2014 GMT
@@ -21,4 +21,8 @@
 
 1.04 Mon May  8 16:00:47 2017 BT
 
-    * Removed timeout. See #515
+    * Removed timeout. See #530
+
+1.05 Tue Aug 29 12:09:08 2017 BT
+
+    * Added perl-version as 5.12 requires

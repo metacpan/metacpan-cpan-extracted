@@ -6,7 +6,7 @@ use 5.010;
 use base qw( AnyEvent::FTP::Response );
 
 # ABSTRACT: Response class for asynchronous ftp client
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub get_address_and_port
@@ -47,7 +47,7 @@ AnyEvent::FTP::Client::Response - Response class for asynchronous ftp client
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 DESCRIPTION
 
@@ -60,21 +60,23 @@ L<AnyEvent::FTP::Response>
 
 =head1 METHODS
 
-=head2 $res-E<gt>get_address_and_port
+=head2 get_address_and_port
+
+ my($ip, $port) = $res->get_address_and_port
 
 This method is used to parse the response to the C<PASV> command to extract the IP address
-and port number.  It returns these as a list:
+and port number.
 
- my($ip, $port) = $res->get_address_and_port;
+=head2 get_dir
 
-=head2 $res-E<gt>get_dir
+ my $dir = $res->get_dir
 
 This method is used to extract the path from  a response to the C<PWD> command.
-It returns the path as a simple string:
+It returns the path as a simple string.
 
- my $dir = $res->get_dir;
+=head2 get_file
 
-=head2 $res-E<gt>get_file
+ my $filename = $res->get_file;
 
 Returns the filename from a response to the C<STOU> command.
 

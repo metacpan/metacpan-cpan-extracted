@@ -2,71 +2,82 @@ package Web::Request::Role::JSON;
 
 # ABSTRACT: Make handling JSON easier in Web::Request
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 use 5.010;
-use Moose::Role;
+use MooseX::Role::Parameterized;
 use JSON::MaybeXS;
 use Encode;
 
-sub json_payload {
-    my $self = shift;
+parameter 'content_type' => (
+    isa      => 'Str',
+    required => 0,
+    default  => 'application/json; charset=utf-8',
+);
 
-    return unless my $raw = $self->content;
+role {
+    my $p            = shift;
+    my $content_type = $p->content_type;
 
-    # Web::Request->content will decode content based on
-    # $req->encoding, which is utf8 for JSON. So $content has UTF8 flag
-    # on, which means we have to tell JSON::MaybeXS to turn
-    # utf8-handling OFF
+    method json_payload => sub {
+        my $self = shift;
 
-    return JSON::MaybeXS->new(utf8=>0)->decode($raw);
+        return unless my $raw = $self->content;
 
-    # Alternatives:
-    # - reencode the content (stupid because double the work)
-    #   decode_json(encode_utf8($self->content))
-    # - set $self->encoding(undef), and set it back after decoding
-}
+        # Web::Request->content will decode content based on
+        # $req->encoding, which is utf8 for JSON. So $content has UTF8 flag
+        # on, which means we have to tell JSON::MaybeXS to turn
+        # utf8-handling OFF
 
-sub json_response {
-    my ( $self, $data, $header_ref, $status ) = @_;
+        return JSON::MaybeXS->new( utf8 => 0 )->decode($raw);
 
-    $status ||= 200;
-    my $headers;
-    if ($header_ref) {
-        if (ref($header_ref) eq 'ARRAY') {
-            $headers = HTTP::Headers->new(@$header_ref);
+        # Alternatives:
+        # - reencode the content (stupid because double the work)
+        #   decode_json(encode_utf8($self->content))
+        # - set $self->encoding(undef), and set it back after decoding
+    };
+
+    method json_response => sub {
+        my ( $self, $data, $header_ref, $status ) = @_;
+
+        $status ||= 200;
+        my $headers;
+        if ($header_ref) {
+            if ( ref($header_ref) eq 'ARRAY' ) {
+                $headers = HTTP::Headers->new(@$header_ref);
+            }
+            elsif ( ref($header_ref) eq 'HASH' ) {
+                $headers = HTTP::Headers->new(%$header_ref);
+            }
         }
-        elsif (ref($header_ref) eq 'HASH') {
-            $headers = HTTP::Headers->new(%$header_ref);
+        $headers ||= HTTP::Headers->new;
+        $headers->header( 'content-type' => $content_type );
+
+        return $self->new_response(
+            headers => $headers,
+            status  => $status,
+            content => decode_utf8( encode_json($data) ),
+        );
+    };
+
+    method json_error => sub {
+        my ( $self, $message, $status ) = @_;
+        $status ||= 400;
+        my $body;
+        if ( ref($message) ) {
+            $body = $message;
         }
-    }
-    $headers ||= HTTP::Headers->new;
-    $headers->header( 'content-type' => 'application/json' );
+        else {
+            $body = { status => 'error', message => "$message" };
+        }
 
-    return $self->new_response(
-        headers => $headers,
-        status  => $status,
-        content => decode_utf8( encode_json($data) ),
-    );
-}
-
-sub json_error {
-    my ( $self, $message, $status ) = @_;
-    $status ||= 400;
-    my $body;
-    if ( ref($message) ) {
-        $body = $message;
-    }
-    else {
-        $body = { status => 'error', message => "$message" };
-    }
-
-    return $self->new_response(
-        headers => [ content_type => 'application/json' ],
-        status  => $status,
-        content => decode_utf8( encode_json($body) ),
-    );
-}
+        return $self->new_response(
+            headers => [ content_type => $content_type ],
+            status  => $status,
+            content => decode_utf8( encode_json($body) ),
+        );
+    };
+};
 
 1;
 
@@ -82,7 +93,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -152,6 +163,18 @@ Per default, HTTP status is set to C<400>, but you can pass any other
 status as a second argument. (Yes, there is no checking if you pass a
 valid status code or not. You're old enough to not do stupid things..)
 
+=head2 PARAMETERS
+
+An optional C<content_type> parameter can be added on role application to
+restore previous behaviour. Browsers tend to like the 'charset=utf-8' better,
+but you might have your reasons. 
+
+    package MyRequest;
+    extends 'OX::Request';
+    with (
+        'Web::Request::Role::JSON' => { content_type => 'application/json' },
+    );
+
 =head1 THANKS
 
 Thanks to
@@ -164,9 +187,19 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Thomas Klausner <domm@cpan.org>
+
+=item *
+
+Klaus Ita <koki@itascraft.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

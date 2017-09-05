@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Wed Dec 14 16:22:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Dec  4 20:42:13 2010
-# Update Count    : 13
+# Last Modified On: Mon Nov 19 13:37:53 2012
+# Update Count    : 14
 #
 # Content-Type: text/plain; charset = UTF-8
 #
@@ -463,13 +463,12 @@ Dagboeken
 # betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
-# In de eerste kolom wordt de (numerieke) code voor dit tarief
-# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
-# van groep "nul") moet het percentage worden opgegeven. Met de
-# aanduiding :exclusief kan worden opgegeven dat boekingen op
-# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
-# aangeven.
+# In de eerste kolom wordt de code voor dit tarief opgegeven. Deze kan
+# o.m. worden gebruikt om expliciet een BTW tarief op te geven bij het
+# boeken. Voor elk gebruikt tarief (behalve die van groep "nul") moet
+# het percentage worden opgegeven. Met de aanduiding :exclusief kan
+# worden opgegeven dat boekingen op rekeningen met deze tariefgroep
+# standaard het bedrag exclusief BTW aangeven.
 #
 # BELANGRIJK: Mutaties die middels de command line shell of de API
 # worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
@@ -478,11 +477,9 @@ Dagboeken
 
 BTW Tarieven
 
-   0  BTW 0%                 :tariefgroep=nul
-   1  BTW 19% incl.          :tariefgroep=hoog :perc=19,00
-   2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief
-   3  BTW 6% incl.           :tariefgroep=laag :perc=6,00
-   4  BTW 6% excl.           :tariefgroep=laag :perc=6,00 :exclusief
-   5  BTW 12% autokostenvergoeding     :tariefgroep=hoog :perc=12,00 :exclusief
-   6  BTW privégebruik auto 12%        :tariefgroep=nul
-   7  BTW kleine ondernemersregeling   :tariefgroep=nul
+   H19  BTW 19%          :tariefgroep=hoog :perc=19,00
+   H21  BTW 19%          :tariefgroep=hoog :perc=21,00
+   L06  BTW 6%           :tariefgroep=laag :perc=6,00
+   P12  BTW 12% autokostenvergoeding     :tariefgroep=hoog :perc=12,00
+   X01  BTW privégebruik auto 12%        :tariefgroep=nul
+   X02  BTW kleine ondernemersregeling   :tariefgroep=nul

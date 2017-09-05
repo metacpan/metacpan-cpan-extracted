@@ -17,9 +17,9 @@ Test::NoWarnings->import;
 
 my @data = (
     {
-        test   => '11_extract_perl',
+        test   => '11_extract_perl_filter_ignore',
         path   => 'example',
-        script => '-I../lib 11_extract_perl.pl',
+        script => '-I../lib 11_extract_perl_filter_ignore.pl',
         result => <<'EOT',
 $lexicon_ref = {
   "i-default::" => {
@@ -32,7 +32,7 @@ $lexicon_ref = {
     "' quoted text with \\\\." => {
       reference => {
         "files_to_extract/gettext.pl:83" => undef,
-        "files_to_extract/gettext_loc.pl:93" => undef
+        "files_to_extract/gettext_loc.pl:84" => undef
       }
     },
     January => {
@@ -121,12 +121,6 @@ $lexicon_ref = {
         "files_to_extract/maketext_localize.pl:28" => undef
       }
     },
-    date => {
-      automatic => "foo => 'bar',",
-      reference => {
-        "files_to_extract/gettext_loc.pl:81" => undef
-      }
-    },
     "date\0dates\4appointment" => {
       automatic => 1,
       reference => {
@@ -140,7 +134,6 @@ $lexicon_ref = {
       reference => {
         "files_to_extract/gettext.pl:46" => undef,
         "files_to_extract/gettext_loc.pl:46" => undef,
-        "files_to_extract/gettext_loc.pl:85" => undef,
         "files_to_extract/maketext.pl:32" => undef,
         "files_to_extract/maketext_loc.pl:32" => undef,
         "files_to_extract/maketext_localise.pl:32" => undef,
@@ -150,13 +143,13 @@ $lexicon_ref = {
     "quoted text." => {
       reference => {
         "files_to_extract/gettext.pl:89" => undef,
-        "files_to_extract/gettext_loc.pl:99" => undef
+        "files_to_extract/gettext_loc.pl:90" => undef
       }
     },
     "q{ quoted text with {placeholders}}." => {
       reference => {
         "files_to_extract/gettext.pl:86" => undef,
-        "files_to_extract/gettext_loc.pl:96" => undef
+        "files_to_extract/gettext_loc.pl:87" => undef
       }
     },
     "text of no domain and no category" => {
@@ -164,9 +157,9 @@ $lexicon_ref = {
         "files_to_extract/gettext.pl:108" => undef,
         "files_to_extract/gettext.pl:116" => undef,
         "files_to_extract/gettext.pl:120" => undef,
-        "files_to_extract/gettext_loc.pl:118" => undef,
-        "files_to_extract/gettext_loc.pl:126" => undef,
-        "files_to_extract/gettext_loc.pl:130" => undef
+        "files_to_extract/gettext_loc.pl:109" => undef,
+        "files_to_extract/gettext_loc.pl:117" => undef,
+        "files_to_extract/gettext_loc.pl:121" => undef
       }
     },
     "{name} is programming {language}." => {
@@ -213,32 +206,32 @@ $lexicon_ref = {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:96" => undef,
-        "files_to_extract/gettext_loc.pl:106" => undef
+        "files_to_extract/gettext_loc.pl:97" => undef
       }
     },
     "singular dnp\0plural dnp\4context dnp" => {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:97" => undef,
-        "files_to_extract/gettext_loc.pl:107" => undef
+        "files_to_extract/gettext_loc.pl:98" => undef
       }
     },
     "text d" => {
       reference => {
         "files_to_extract/gettext.pl:94" => undef,
-        "files_to_extract/gettext_loc.pl:104" => undef
+        "files_to_extract/gettext_loc.pl:95" => undef
       }
     },
     "text dp\4context dp" => {
       reference => {
         "files_to_extract/gettext.pl:95" => undef,
-        "files_to_extract/gettext_loc.pl:105" => undef
+        "files_to_extract/gettext_loc.pl:96" => undef
       }
     },
     "text of domain d and no category" => {
       reference => {
         "files_to_extract/gettext.pl:110" => undef,
-        "files_to_extract/gettext_loc.pl:120" => undef
+        "files_to_extract/gettext_loc.pl:111" => undef
       }
     }
   },
@@ -253,32 +246,32 @@ $lexicon_ref = {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:99" => undef,
-        "files_to_extract/gettext_loc.pl:109" => undef
+        "files_to_extract/gettext_loc.pl:100" => undef
       }
     },
     "singular cnp\0plural cnp\4context cnp" => {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:101" => undef,
-        "files_to_extract/gettext_loc.pl:111" => undef
+        "files_to_extract/gettext_loc.pl:102" => undef
       }
     },
     "text c" => {
       reference => {
         "files_to_extract/gettext.pl:98" => undef,
-        "files_to_extract/gettext_loc.pl:108" => undef
+        "files_to_extract/gettext_loc.pl:99" => undef
       }
     },
     "text cp\4context cp" => {
       reference => {
         "files_to_extract/gettext.pl:100" => undef,
-        "files_to_extract/gettext_loc.pl:110" => undef
+        "files_to_extract/gettext_loc.pl:101" => undef
       }
     },
     "text of no domain and category c" => {
       reference => {
         "files_to_extract/gettext.pl:114" => undef,
-        "files_to_extract/gettext_loc.pl:124" => undef
+        "files_to_extract/gettext_loc.pl:115" => undef
       }
     }
   },
@@ -293,34 +286,242 @@ $lexicon_ref = {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:103" => undef,
-        "files_to_extract/gettext_loc.pl:113" => undef
+        "files_to_extract/gettext_loc.pl:104" => undef
       }
     },
     "singular dcnp\0plural dcnp\4context dcnp" => {
       automatic => 0,
       reference => {
         "files_to_extract/gettext.pl:105" => undef,
-        "files_to_extract/gettext_loc.pl:115" => undef
+        "files_to_extract/gettext_loc.pl:106" => undef
       }
     },
     "text dc" => {
       reference => {
         "files_to_extract/gettext.pl:102" => undef,
-        "files_to_extract/gettext_loc.pl:112" => undef
+        "files_to_extract/gettext_loc.pl:103" => undef
       }
     },
     "text dcp\4context dcp" => {
       reference => {
         "files_to_extract/gettext.pl:104" => undef,
-        "files_to_extract/gettext_loc.pl:114" => undef
+        "files_to_extract/gettext_loc.pl:105" => undef
       }
     },
     "text of domain d and category c" => {
       reference => {
         "files_to_extract/gettext.pl:112" => undef,
         "files_to_extract/gettext.pl:118" => undef,
-        "files_to_extract/gettext_loc.pl:122" => undef,
-        "files_to_extract/gettext_loc.pl:128" => undef
+        "files_to_extract/gettext_loc.pl:113" => undef,
+        "files_to_extract/gettext_loc.pl:119" => undef
+      }
+    }
+  }
+};
+EOT
+    },
+    {
+        test   => '11_extract_perl_filter_only_babelfish',
+        path   => 'example',
+        script => '-I../lib 11_extract_perl_filter_only_babelfish.pl',
+        result => <<'EOT',
+$lexicon_ref = {
+  "i-default::" => {
+    "" => {
+      msgstr => {
+        nplurals => 2,
+        plural => "n != 1"
+      }
+    },
+    "#{count :num} ((date|dates))" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:32" => undef,
+        "files_to_extract/babelfish_loc.pl:36" => undef
+      }
+    },
+    "#{name} is programming #{language}." => {
+      automatic => "name => 'Steffen', language => 'Perl',",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:19" => undef
+      }
+    },
+    "#{num} ((date|dates)):num\4appointment" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:59" => undef,
+        "files_to_extract/babelfish_loc.pl:64" => undef
+      }
+    },
+    "#{num} date\4appointment" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:44" => undef
+      }
+    },
+    "' quoted text with \\\\." => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:72" => undef
+      }
+    },
+    "((Singular|Plural))" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:24" => undef,
+        "files_to_extract/babelfish_loc.pl:28" => undef
+      }
+    },
+    "((date|dates)):num\4appointment" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.pl:49" => undef,
+        "files_to_extract/babelfish_loc.pl:54" => undef
+      }
+    },
+    "This is a text." => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:16" => undef
+      }
+    },
+    "category c" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:100" => undef
+      }
+    },
+    "date\4appointment" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:40" => undef
+      }
+    },
+    "quoted text." => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:78" => undef
+      }
+    },
+    "q{ quoted text with #{placeholders}}." => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:75" => undef
+      }
+    },
+    "text of domain d and category c" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:101" => undef,
+        "files_to_extract/babelfish_loc.pl:107" => undef
+      }
+    },
+    "text of domain d and no category" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:99" => undef
+      }
+    },
+    "text of no domain and category c" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:103" => undef
+      }
+    },
+    "text of no domain and no category" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:105" => undef,
+        "files_to_extract/babelfish_loc.pl:109" => undef,
+        "files_to_extract/babelfish_loc.pl:97" => undef
+      }
+    }
+  },
+  "i-default::domain d" => {
+    "" => {
+      msgstr => {
+        nplurals => 2,
+        plural => "n != 1"
+      },
+      reference => {
+        "files_to_extract/babelfish_loc.pl:98" => undef
+      }
+    },
+    "((singular dp|plural dp))\4context dp" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:86" => undef
+      }
+    },
+    "((singular d|plural d))" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:85" => undef
+      }
+    },
+    "category c" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:106" => undef
+      }
+    },
+    "text d" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:83" => undef
+      }
+    },
+    "text dp\4context dp" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:84" => undef
+      }
+    }
+  },
+  "i-default:category c:" => {
+    "" => {
+      msgstr => {
+        nplurals => 2,
+        plural => "n != 1"
+      }
+    },
+    "((singular cp|plural cp))\4context cp" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:90" => undef
+      }
+    },
+    "((singular c|plural c))" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:88" => undef
+      }
+    },
+    "text c" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:87" => undef
+      }
+    },
+    "text cp\4context cp" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:89" => undef
+      }
+    }
+  },
+  "i-default:category c:domain d" => {
+    "" => {
+      msgstr => {
+        nplurals => 2,
+        plural => "n != 1"
+      }
+    },
+    "((singular dcp|plural dcp))\4context dcp" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:94" => undef
+      }
+    },
+    "((singular dc|plural dc))" => {
+      automatic => 0,
+      reference => {
+        "files_to_extract/babelfish_loc.pl:92" => undef
+      }
+    },
+    "text dc" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:91" => undef
+      }
+    },
+    "text dcp\4context dcp" => {
+      reference => {
+        "files_to_extract/babelfish_loc.pl:93" => undef
       }
     }
   }
@@ -340,6 +541,44 @@ $lexicon_ref = {
         plural => "n != 1"
       }
     },
+    "#{name} is programming #{language}." => {
+      automatic => "name => 'Steffen', language => 'Perl',",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:22" => undef
+      }
+    },
+    "#{num :num} ((date|dates))" => {
+      automatic => "num => 2,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:39" => undef
+      }
+    },
+    "#{num} ((date|dates)):num" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:35" => undef
+      }
+    },
+    "#{num} date\4appointment" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:47" => undef
+      }
+    },
+    "((Singular|Plural))" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:27" => undef,
+        "files_to_extract/babelfish_loc.tt:31" => undef
+      }
+    },
+    "((date|dates))\4appointment" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:52" => undef,
+        "files_to_extract/babelfish_loc.tt:57" => undef
+      }
+    },
     "Singular\0Plural" => {
       automatic => 1,
       reference => {
@@ -351,6 +590,7 @@ $lexicon_ref = {
     },
     "Text \x{c4}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:9" => undef,
         "files_to_extract/gettext.tt:9" => undef,
         "files_to_extract/gettext_loc.tt:9" => undef,
         "files_to_extract/maketext_l.tt:9" => undef
@@ -358,6 +598,7 @@ $lexicon_ref = {
     },
     "Text \x{d6}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:13" => undef,
         "files_to_extract/gettext.tt:13" => undef,
         "files_to_extract/gettext_loc.tt:13" => undef,
         "files_to_extract/maketext_l.tt:13" => undef
@@ -365,6 +606,7 @@ $lexicon_ref = {
     },
     "Text \x{dc}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:16" => undef,
         "files_to_extract/gettext.tt:16" => undef,
         "files_to_extract/gettext_loc.tt:16" => undef,
         "files_to_extract/maketext_l.tt:16" => undef
@@ -372,13 +614,9 @@ $lexicon_ref = {
     },
     "This is a text." => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:21" => undef,
         "files_to_extract/gettext.tt:21" => undef,
         "files_to_extract/gettext_loc.tt:21" => undef
-      }
-    },
-    date => {
-      reference => {
-        "files_to_extract/gettext_loc.tt:84" => undef
       }
     },
     "date\0dates\4appointment" => {
@@ -392,9 +630,9 @@ $lexicon_ref = {
     },
     "date\4appointment" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:43" => undef,
         "files_to_extract/gettext.tt:49" => undef,
-        "files_to_extract/gettext_loc.tt:49" => undef,
-        "files_to_extract/gettext_loc.tt:87" => undef
+        "files_to_extract/gettext_loc.tt:49" => undef
       }
     },
     "{name} is programming {language}." => {
@@ -951,6 +1189,55 @@ $lexicon_ref = {
         "files_to_extract/gettext_loc.html:13" => undef,
         "files_to_extract/maketext_loc.html:10" => undef,
         "files_to_extract/maketext_loc.html:13" => undef
+      }
+    }
+  }
+};
+EOT
+    },
+    {
+        test   => '15_extract_yaml',
+        path   => 'example',
+        script => '-I../lib 15_extract_yaml.pl',
+        result => <<'EOT',
+$lexicon_ref = {
+  "i-default::" => {
+    "" => {
+      msgstr => {
+        nplurals => 2,
+        plural => "n != 1"
+      }
+    },
+    " " => {
+      reference => {
+        "files_to_extract/babelfish_loc.yml:21" => undef,
+        "files_to_extract/gettext.yml:21" => undef,
+        "files_to_extract/gettext_loc.yml:21" => undef,
+        "files_to_extract/maketext_loc.yml:21" => undef
+      }
+    },
+    Password => {
+      reference => {
+        "files_to_extract/babelfish_loc.yml:15" => undef,
+        "files_to_extract/gettext.yml:15" => undef,
+        "files_to_extract/gettext_loc.yml:15" => undef,
+        "files_to_extract/maketext_loc.yml:15" => undef
+      }
+    },
+    Username => {
+      reference => {
+        "files_to_extract/babelfish_loc.yml:10" => undef,
+        "files_to_extract/gettext.yml:10" => undef,
+        "files_to_extract/gettext_loc.yml:10" => undef,
+        "files_to_extract/maketext_loc.yml:10" => undef
+      }
+    },
+    login => {
+      reference => {
+        "files_to_extract/babelfish_loc.yml:23" => undef,
+        "files_to_extract/gettext.yml:23" => undef,
+        "files_to_extract/gettext_loc.yml:23" => undef,
+        "files_to_extract/maketext_loc.yml:23" => undef
       }
     }
   }

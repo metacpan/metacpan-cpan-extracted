@@ -379,8 +379,7 @@ sub loadSPs {
         }
 
         # Store SP entityID and Organization Name
-        my ( $tmp, $entityID ) =
-          ( $sp_metadata =~ /entityID=(['"])(.+?)\1/si );
+        my ( $tmp, $entityID ) = ( $sp_metadata =~ /entityID=(['"])(.+?)\1/si );
         my $name =
           $self->getOrganizationName( $self->{_lassoServer}, $entityID )
           || ucfirst($_);

@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sat May  7 09:18:15 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jan 31 12:01:50 2017
-# Update Count    : 450
+# Last Modified On: Thu Aug 31 10:01:13 2017
+# Update Count    : 457
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -22,7 +22,6 @@ use warnings;
 
 use EB;
 use DBI;
-use File::Glob ( $] >= 5.016 ? ":bsd_glob" : ":glob" );
 
 my $dbh;			# singleton for DB
 
@@ -572,6 +571,33 @@ sub set_sequence {
     $self->connectdb;
     Carp::confess("DB backend setup failed") unless $dbpkg;
     $dbpkg->set_sequence(@_);
+}
+
+sub store_attachment {
+    my ($self) = shift;
+    warn("=> STORE-ATTACHMENT ", $_[0], "\n") if $trace;
+    $self->connectdb;
+    Carp::confess("DB backend setup failed") unless $dbpkg;
+    Carp::croak("INTERNAL ERROR: store_attachment takes one argument") if @_ != 1;
+    $dbpkg->store_attachment(@_);
+}
+
+sub get_attachment {
+    my ($self) = shift;
+    warn("=> GET-ATTACHMENT ", $_[0], "\n") if $trace;
+    $self->connectdb;
+    Carp::confess("DB backend setup failed") unless $dbpkg;
+    Carp::croak("INTERNAL ERROR: get_attachment takes one or two arguments") if @_ < 1 || @_ > 2;
+    $dbpkg->get_attachment(@_);
+}
+
+sub drop_attachment {
+    my ($self) = shift;
+    warn("=> DROP-ATTACHMENT ", $_[0], "\n") if $trace;
+    $self->connectdb;
+    Carp::confess("DB backend setup failed") unless $dbpkg;
+    Carp::croak("INTERNAL ERROR: get_attachment takes only one argument") if @_ != 1;
+    $dbpkg->drop_attachment(@_);
 }
 
 sub _loaddbbackend {

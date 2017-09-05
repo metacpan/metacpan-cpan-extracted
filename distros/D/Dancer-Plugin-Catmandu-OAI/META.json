@@ -38,7 +38,7 @@
       "runtime" : {
          "requires" : {
             "Catmandu" : "1.0",
-            "Catmandu::Exporter::Template" : "0.03",
+            "Catmandu::Exporter::Template" : "0.11",
             "Clone" : "0.36",
             "Dancer" : "1.3123",
             "DateTime" : "1.08",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI"
       }
    },
-   "version" : "0.0403",
+   "version" : "0.0501",
    "x_contributors" : [
       "Nicolas Franck <Nicolas.Franck@ugent.be>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
@@ -76,6 +76,6 @@
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

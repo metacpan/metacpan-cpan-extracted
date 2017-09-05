@@ -6,10 +6,10 @@ SYNOPSIS
 
         Plack::Middleeare::Timeout->wrap(
             $app,
-            timeout  => sub { ... } || 60,
+            timeout  => 120,
             # optional callback to set the custom response 
             response => sub {
-                my ($response_obj,$execution_time) = @_;
+                my ($response_obj) = @_;
 
                 $response_obj->code(HTTP_REQUEST_TIMEOUT);
                 $response_obj->body( encode_json({
@@ -26,16 +26,17 @@ DESCRIPTION
 
 PARAMETERS
     timeout
-        Determines how we're going to get the timeout value, either subref
-        returning a value or any value accepted by subroutine defined in
-        Time::HiRes::alarm, default 120 seconds.
+        Numeric value accepted by subroutine defined in Time::HiRes::alarm,
+        default: 120 seconds.
 
     response
-        Optional subroutine that receives two parameters, a Plack::Response
-        object that we can further modify to fit our needs, if none is
-        provided the middleware resolves to emitting a warning:
+        Optional subroutine which will be exeuted when timeout is reached. The
+        subref receives a Plack::Response object as argument. If the response
+        subref isn't defined, we resolve to emitting a warning:
 
             'Terminated request for uri '%s' due to timeout (%ds)'
+
+        and return a response code 504 (HTTP_GATEWAY_TIMEOUT).
 
     soft_timeout
         Same as timeout, except this value will be checked after the call to

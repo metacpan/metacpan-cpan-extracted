@@ -1,16 +1,6 @@
 API-Drip
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
-
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
-
+API::Drip::Request is a module to interact with the REST API provided by getdrip.com.
 
 INSTALLATION
 
@@ -34,7 +24,10 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
+    Github repository (please report bugs here)
+        https://github.com/dwright/API-Drip
+
+    RT, CPAN's request tracker (if you send bugs here, it may be a long time before I see them)
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=API-Drip
 
     AnnoCPAN, Annotated CPAN documentation

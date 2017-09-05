@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "JSON::XS" : "0",
-            "List::Util" : "0",
+            "List::MoreUtils" : "0",
             "perl" : "5.012"
          }
       }
@@ -35,13 +35,19 @@
    "provides" : {
       "Spp" : {
          "file" : "lib/Spp.pm",
-         "version" : "1.02"
+         "version" : "1.13"
       },
-      "Spp::Ast::SppAst" : {
-         "file" : "lib/Spp/Ast/SppAst.pm"
+      "Spp::Ast" : {
+         "file" : "lib/Spp/Ast.pm"
+      },
+      "Spp::Builtin" : {
+         "file" : "lib/Spp/Builtin.pm"
       },
       "Spp::Cursor" : {
          "file" : "lib/Spp/Cursor.pm"
+      },
+      "Spp::Grammar" : {
+         "file" : "lib/Spp/Grammar.pm"
       },
       "Spp::IsAtom" : {
          "file" : "lib/Spp/IsAtom.pm"
@@ -49,20 +55,17 @@
       "Spp::IsChar" : {
          "file" : "lib/Spp/IsChar.pm"
       },
-      "Spp::LintAst" : {
-         "file" : "lib/Spp/LintAst.pm"
+      "Spp::LintParser" : {
+         "file" : "lib/Spp/LintParser.pm"
       },
-      "Spp::MatchGrammar" : {
-         "file" : "lib/Spp/MatchGrammar.pm"
+      "Spp::Match" : {
+         "file" : "lib/Spp/Match.pm"
       },
-      "Spp::Rule::SppRule" : {
-         "file" : "lib/Spp/Rule/SppRule.pm"
+      "Spp::OptSppAst" : {
+         "file" : "lib/Spp/OptSppAst.pm"
       },
       "Spp::ToSpp" : {
          "file" : "lib/Spp/ToSpp.pm"
-      },
-      "Spp::Tools" : {
-         "file" : "lib/Spp/Tools.pm"
       }
    },
    "release_status" : "stable",
@@ -71,6 +74,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.02",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

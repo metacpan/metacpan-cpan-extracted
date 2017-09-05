@@ -1,6 +1,6 @@
                                    Proef- en Saldibalans
-Periode: t/m 2007-12-31
-EekBoek Demo Administratie                                               EekBoek, 2007-12-31
+Periode: t/m 2013-12-31
+EekBoek Demo Administratie                                               EekBoek, 2013-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit   Saldo Db   Saldo Cr
 --------------------------------------------------------------------------------------------
@@ -19,18 +19,18 @@ RekNr   Verdichting/Grootboekrekening                 Debet     Credit   Saldo D
 
 4       Vreemd vermogen
 41       Totaal Leveranciers kredieten               927,84     927,84
-42       Totaal Belastingen & soc. lasten            148,93    1463,80               1314,87
-4       Totaal Vreemd vermogen                      1076,77    2391,64               1314,87
+42       Totaal Belastingen & soc. lasten            161,93    1591,15               1429,22
+4       Totaal Vreemd vermogen                      1089,77    2518,99               1429,22
 
 6       Kosten
 68       Totaal Afschrijvingen                       808,08                808,08
-69       Totaal Algemene kosten                      812,11                812,11
-6       Totaal Kosten                               1620,19               1620,19
+69       Totaal Algemene kosten                      799,18                799,18
+6       Totaal Kosten                               1607,26               1607,26
 
 8       Bedrijfsopbrengsten
-81       Totaal Omzet Consultancy                              1200,00               1200,00
+81       Totaal Omzet Consultancy                              1180,16               1180,16
 83       Totaal Omzet Editing                                  1000,00               1000,00
-84       Totaal Omzet Cursussen                        4,20    6504,20               6500,00
-8       Totaal Bedrijfsopbrengsten                     4,20    8704,20               8700,00
+84       Totaal Omzet Cursussen                        4,13    6396,69               6392,56
+8       Totaal Bedrijfsopbrengsten                     4,13    8576,85               8572,72
 --------------------------------------------------------------------------------------------
-        TOTAAL                                     38560,69   38560,69   12458,05   12458,05
+        TOTAAL                                     38560,69   38560,69   12445,12   12445,12

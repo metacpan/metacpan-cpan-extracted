@@ -78,7 +78,7 @@ L<Unix::Processors::Info>, L<Sys::Sysconf>
 package Unix::Processors;
 use Unix::Processors::Info;
 
-$VERSION = '2.045';
+$VERSION = '2.046';
 
 require DynaLoader;
 @ISA = qw(DynaLoader);

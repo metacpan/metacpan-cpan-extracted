@@ -15,11 +15,7 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
-                      'recommends' => {
-                                      'Term::ANSIScreen' => '0'
-                                    },
                       'requires' => {
-                                      'Term::ANSIColor' => '0',
                                       'perl' => '5.010'
                                     }
                     },

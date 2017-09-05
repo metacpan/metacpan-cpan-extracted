@@ -402,7 +402,7 @@ continue {
 }
 
 $leak = BSD::Resource::getrusage()->{"maxrss"} - $measure;
-my $leak_ok = $leak < 100;
+my $leak_ok = $leak < 500;
 warn("LEAK DETECTED: ${leak}Kb") unless $leak_ok;
 ok($leak_ok);
 

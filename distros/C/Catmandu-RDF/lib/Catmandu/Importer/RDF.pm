@@ -14,9 +14,11 @@ use RDF::LDF;
 use RDF::aREF;
 use RDF::aREF::Encoder;
 use RDF::NS;
+use IO::Pipe;
+use JSON;
 use LWP::UserAgent::CHICaching;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 with 'Catmandu::RDF';
 with 'Catmandu::Importer';
@@ -26,8 +28,8 @@ has url => (
 );
 
 has base => (
-    is      => 'ro', 
-    lazy    => 1, 
+    is      => 'ro',
+    lazy    => 1,
     builder => sub {
         defined $_[0]->file ? "file://".$_[0]->file : "http://example.org/";
     }
@@ -38,7 +40,7 @@ has encoder => (
     lazy    => 1,
     builder => sub {
         my $ns = $_[0]->ns;
-        RDF::aREF::Encoder->new( 
+        RDF::aREF::Encoder->new(
             ns => (($ns // 1) ? $ns : { }),
             subject_map => !$_[0]->predicate_map,
         );
@@ -80,10 +82,14 @@ has cache => (
 has cache_options => (
     is      => 'ro',
     default => sub { +{
-        driver => 'Memory', 
-        global => 1 , 
-        max_size => 1024*1024 
+        driver => 'Memory',
+        global => 1 ,
+        max_size => 1024*1024
     } }
+);
+
+has speed => (
+    is      => 'ro',
 );
 
 sub BUILD {
@@ -122,7 +128,7 @@ sub sparql_generator {
                 my $ref = {};
                 for (keys %$row) {
                     my $val = $row->{$_};
-                    $ref->{$_} = $self->sparql_result eq 'aref' 
+                    $ref->{$_} = $self->sparql_result eq 'aref'
                                ? $encoder->object($val) : do { # TODO: clean up
                                   if ( $val->is_resource ) {
                                      $val->uri_value;
@@ -146,23 +152,27 @@ sub sparql_generator {
 sub rdf_generator {
     my ($self) = @_;
     sub {
-        state $stream = $self->_rdf_stream;
+        state $stream = $self->_hashref_stream;
         return unless $stream;
 
         my $aref = { };
+
         if ($self->triples) {
-            if (my $triple = $stream->next) {
-                $aref = $self->encoder->triple(
-                        $triple->subject,
-                        $triple->predicate,
-                        $triple->object
-                );
-            } else {
+            if (my $hashref = $stream->()) {
+                $self->encoder->add_hashref($hashref, $aref);
+            }
+            else {
                 return ($stream = undef);
             }
-        } else {
+        }
+        else {
             # TODO: include namespace mappings if requested
-            $self->encoder->add_hashref( $stream->as_hashref, $aref );
+            while (my $hashref = $stream->()) {
+              $self->encoder->add_hashref(
+                  $hashref,
+                  $aref
+              );
+            }
 
             if ($self->url) {
                 $aref->{_url} = $self->url;
@@ -241,31 +251,100 @@ sub _sparql_stream {
     }
 }
 
-sub _rdf_stream {
-    my ($self) = @_;
+sub _hashref_stream {
+  my ($self) = @_;
 
-    my $model  = RDF::Trine::Model->new;
-    my $parser = $self->type 
+  # Create a pipe stream to convert a callback handler into an iterator
+  my $pipe = IO::Pipe->new();
+
+  if (my $pid = fork()) {
+    # parent
+    $pipe->reader();
+
+    binmode($pipe,':encoding(UTF-8)');
+
+    return sub {
+      state $line = <$pipe>;
+
+      return decode_json($line) if defined($line);
+
+      waitpid($pid,0);
+
+      return undef;
+    };
+  }
+  else {
+    # child
+    $pipe->writer();
+
+    binmode($pipe,':encoding(UTF-8)');
+
+    my $parser = $self->type
                ? RDF::Trine::Parser->new( $self->type ) : 'RDF::Trine::Parser';
 
-    if ($self->url) {
-        $parser->parse_url_into_model( $self->url, $model );
-    } else {
-        my $from_scalar = (ref $self->file // '') eq 'SCALAR';
-        if (!$self->type and $self->file and !$from_scalar) {
-            $parser = $parser->guess_parser_by_filename($self->file);
+    my $handler = sub {
+        my $triple    = shift;
+        state $start  = time;
+        state $count  = 0;
+
+        my $subject   = $triple->subject->is_blank ?
+                            '_:' . $triple->subject->blank_identifier :
+                            $triple->subject->uri_value;
+        my $predicate = $triple->predicate->is_blank ?
+                            '_:' . $triple->predicate->blank_identifier :
+                            $triple->predicate->value;
+        my $value     = $triple->object->is_literal ?
+                            $triple->object->literal_value :
+                            $triple->object->is_blank ?
+                              '_:' . $triple->object->blank_identifier :
+                              $triple->object->uri_value;
+        my $type      = lc $triple->object->type;
+        $type         = 'bnode' if $type eq 'blank';
+        my $lang      = $triple->object->is_literal ? $triple->object->literal_value_language : undef;
+        my $datatype  = $triple->object->is_literal ? $triple->object->literal_datatype : undef;
+
+        # Create the RDF::Trine type RDF/JSON RDF::aREF can parse
+        my $hashref = {};
+
+        $hashref->{$subject}->{$predicate}->[0]->{type}     = $type;
+        $hashref->{$subject}->{$predicate}->[0]->{datatype} = $datatype if $datatype;
+        $hashref->{$subject}->{$predicate}->[0]->{lang}     = $lang if $lang;
+        $hashref->{$subject}->{$predicate}->[0]->{value}    = $value;
+
+        print $pipe encode_json($hashref) , "\n";
+
+        $count++;
+
+        if ($self->speed && ($count % 100 == 0) && (my $elapsed = time - $start) ) {
+          printf STDERR "triples %9d (%d/sec)\n" , $count , $count/$elapsed;
         }
+    };
+
+    if ($self->url) {
+        $parser->parse_url( $self->url, $handler);
+    }
+    else {
+        my $from_scalar = (ref $self->file // '') eq 'SCALAR';
+
+        if (!$self->type and $self->file and !$from_scalar) {
+            $parser = $parser->guess_parser_by_filename($self->file)->new;
+        }
+
         if ($from_scalar) {
-            $parser->parse_into_model( $self->base, ${$self->file}, $model );
-        } else {
-            $parser->parse_file_into_model( $self->base, $self->file // $self->fh, $model );
+            $parser->parse( $self->base, ${$self->file}, $handler );
+        }
+        else {
+            $parser->parse_file( $self->base, $self->file // $self->fh, $handler );
         }
     }
-    
-    return $model->as_stream;
+
+    exit(0);
+  }
 }
 
+
 1;
+
 __END__
 
 =head1 NAME
@@ -280,8 +359,16 @@ Command line client C<catmandu>:
 
   catmandu convert RDF --file rdfdump.ttl to JSON
 
+  # Parse the input into on JSON document per triplet. This is the
+  # most memory efficient (and fastest) way to parse RDF input.
+  catmandu convert RDF --triples 1 --file rdfdump.ttl to JSON
+
+  # Transform back into NTriples (conversions to and from triples is the
+  # most efficient way to process RDF)
+  catmandu convert RDF --triples 1 --file rdfdump.ttl to RDF --type NTriples
+
   # Query a SPARQL endpoint
-  catmandu convert RDF --url http://dbpedia.org/sparql 
+  catmandu convert RDF --url http://dbpedia.org/sparql
                        --sparql "SELECT ?film WHERE { ?film dct:subject <http://dbpedia.org/resource/Category:French_films> }"
 
   catmandu convert RDF --url http://example.org/sparql --sparql query.rq
@@ -329,7 +416,8 @@ Set to a specific date to get stable namespace prefix mappings.
 =item triples
 
 Import each RDF triple as one aREF subject map (default) or predicate map
-(option C<predicate_map>), if enabled.
+(option C<predicate_map>), if enabled. This is the most efficient way to
+process large input files. All the processing can be streamed.
 
 =item predicate_map
 
@@ -343,7 +431,7 @@ Import RDF as aREF predicate map, if possible.
 
 =item fix
 
-Default configuration options of L<Catmandu::Importer>. 
+Default configuration options of L<Catmandu::Importer>.
 
 =item sparql
 
@@ -368,13 +456,18 @@ Set to a true value to cache repeated URL responses in a L<CHI> based backend.
 Provide the L<CHI> based options for caching result sets. By default a memory store of
 1MB size is used. This is equal to:
 
-    Catamandu::Importer::RDF->new( ..., 
-        cache => 1, 
+    Catamandu::Importer::RDF->new( ...,
+        cache => 1,
         cache_options => {
             driver => 'Memory',
-            global => 1, 
+            global => 1,
             max_size => 1024*1024
         });
+
+=item speed
+
+If set to a true value, then write RDF file processing speed on the STDERR as
+number of triples parsed per second.
 
 =back
 

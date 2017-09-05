@@ -7,13 +7,13 @@
       "Christopher J. Madsen <perl@cjmweb.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-Repository",
    "no_index" : {
@@ -24,7 +24,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -54,6 +54,7 @@
          "web" : "https://github.com/fayland/dist-zilla-plugin-repository"
       }
    },
-   "version" : "0.20"
+   "version" : "0.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

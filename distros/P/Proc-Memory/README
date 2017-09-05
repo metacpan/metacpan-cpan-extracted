@@ -14,17 +14,26 @@ SYNOPSIS
 
 DESCRIPTION
 
-    PEEK/POKE are a BASIC programming language extension for
-    reading/writing memory at a specified address. This module brings
-    similiar capability to Perl.
+    PEEK/POKE are a BASIC programming language extension for reading and
+    writing memory at a specified address across process boundaries. This
+    module brings similiar capability to Perl.
 
     Eventually, Memory searching capability will also be added.
 
 IMPLEMENTATION
 
     The module is a Perlish wrapper for Alien::libvas and doesn't expose
-    any extra functionality. libvas <http://github.com/a3f/libvas>
-    currently supports Win32, macOS and Linux.
+    any extra functionality. libvas <http://github.com/a3f/libvas> claims
+    support for following backends:
+
+        • win32      - Windows API's {Read,Write}ProcessMemory
+        • mach       - Mach Virtual Memory API (vm_copy) - macOS and GNU Hurd
+        • process_vm - process_vm_{readv, writev} on Linux 3.2+
+        • procfs     - /proc/$pid/mem on Linux and some BSDs, /proc/$pid/as on SunOS
+        • ptrace     - ptrace(2), available on many Unices
+        • memcpy     - Trivial implementation that doesn't supports foreign address spaces
+
+    Bug reports and contributions are welcome. :-)
 
 METHODS AND ARGUMENTS
 

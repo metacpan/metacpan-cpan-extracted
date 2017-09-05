@@ -1,6 +1,6 @@
 package App::EvalServerAdvanced::JobManager;
 use v5.24.0;
-our $VERSION = '0.018';
+our $VERSION = '0.020';
 
 use strict;
 use warnings;

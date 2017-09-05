@@ -2,7 +2,7 @@ use Test::More;
 use Carp 'verbose';
 use Patro ':test';
 use Scalar::Util 'reftype';
-use 5.012;
+use 5.010;
 
 my $r0 = { abc => "xyz", def => "foo",
 	   ghi => { jkl => [ 'm','n','o','p',['qrs','tuv']],
@@ -12,8 +12,14 @@ ok($r0 && ref($r0) eq 'HASH', 'created remote var');
 
 my $cfg = patronize($r0);
 ok($cfg, 'got config for patronize hash');
-my ($r1,$null) = Patro->new($cfg)->getProxies;
-ok($r1, 'client as boolean');
+
+unlink 't/patro-03.cfg';
+$cfg->to_file('t/patro-03.cfg');
+ok(-f 't/patro-03.cfg', 'wrote Patro config to file');
+
+my ($r1,$null) = Patro->new('t/patro-03.cfg')->getProxies;
+ok($r1, 'client as boolean, loaded from file');
+ok(unlink 't/patro-03.cfg', 'clean up config file');
 ok(!$null, 'extra client as boolean');
 is(CORE::ref($r1), 'Patro::N1', 'client ref');
 is(Patro::ref($r1), 'HASH', 'remote ref');

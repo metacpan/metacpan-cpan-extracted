@@ -1923,7 +1923,8 @@ sub controlExistingSession {
               );
             if ( $self->{portalErrorOnExpiredSession} ) {
                 return PE_SESSIONEXPIRED;
-            } else {
+            }
+            else {
                 return PE_OK;
             }
         }

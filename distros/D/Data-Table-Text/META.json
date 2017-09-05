@@ -1,7 +1,7 @@
 {
    "abstract" : "Write data in tabular text format",
    "author" : [
-      "philiprbrenan@gmail.com"
+      "L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -29,7 +29,6 @@
             "File::Temp" : "0",
             "POSIX" : "0",
             "Test::More" : "0",
-            "perl" : "v5.16.0",
             "utf8" : "0"
          }
       }
@@ -37,7 +36,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20170824"
+         "version" : "20170901"
       }
    },
    "release_status" : "stable",
@@ -46,5 +45,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170824"
+   "version" : "20170901"
 }

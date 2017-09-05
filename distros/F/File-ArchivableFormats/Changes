@@ -1,0 +1,21 @@
+Revision history for Finance::Loan::Repayment
+
+1.3       2017-08-30 23:44:30Z
+
+    * Add gitlab CI configuration (Rudolf)
+    * Fix Changes file
+
+1.2       2017-08-30 22:28:34Z
+
+    * First release to CPAN.
+    * Add Archive::Zip as a dependency
+    * Be able to plugin other plugins
+
+1.1
+
+    * Use ExifTools for MS Office files
+
+1.0
+
+    * Internal release at Zaaksysteem.nl
+    * First version with DANS plugin

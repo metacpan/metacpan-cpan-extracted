@@ -2,7 +2,7 @@ package Net::PMP::Profile::MediaEnclosure;
 use Moose;
 use Net::PMP::Profile::TypeConstraints;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 has 'href' => ( is => 'rw', isa => 'Net::PMP::Type::Href', required => 1, );
 has 'type' =>

@@ -1,0 +1,47 @@
+==================================================
+Changes from 2016-09-03 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2017-09-03 19:06:08 +0000
+------------------------------------------
+
+  Change: 5572b50ac4929e8c414da1a17b0073cd8f152f4c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-03 21:01:07 +0000
+
+    fix .gitignore 
+
+  Change: a0090dc7549bff2637c62e5527d82ef95b99dd12
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-03 20:56:14 +0000
+
+    added dist.ini 
+
+  Change: cfacccdb2364bd470dbcf7fe4f9080052e9a8072
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-03 20:51:57 +0000
+
+    added folder debian and documentation 
+
+  Change: 482be3377a0b172352ca13d63360724cd9af1d32
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-28 00:07:57 +0000
+
+    added calc_rows 
+
+  Change: ba5c482438aef1255b84e1e402e2d7b4f22c2055
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-27 14:22:51 +0000
+
+    fix 
+
+  Change: bd24639bebb1df019a5e007494890a21cb9f0940
+  Author: blizzard <blizzard@yandex-team.ru>
+  Date : 2017-08-17 13:18:46 +0000
+
+    DB::clickhouse 
+
+================
+End of releases.
+================

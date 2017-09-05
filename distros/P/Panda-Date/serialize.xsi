@@ -43,10 +43,8 @@ const char* DateRel::STORABLE_freeze (bool cloning) {
     PERL_UNUSED_VAR(cloning);
 }
 
-DateRel* STORABLE_attach (const char* CLASS, bool cloning, SV* serialized) {
-    STRLEN len;
-    const char* str = SvPV(serialized, len);
-    RETVAL = new DateRel(str, len);
+DateRel* STORABLE_attach (const char* CLASS, bool cloning, string_view serialized) {
+    RETVAL = new DateRel(serialized);
     PERL_UNUSED_VAR(cloning);
 }
 

@@ -1,5 +1,10 @@
 Changelog for HTML-Tree
 
+5.07     2017-08-31
+   Release by Kent Fredric
+    [FIXES]
+    * Workaround more @INC issues with Module::Build and sudo RT#122199
+
 5.06     2017-04-28
    Release by Kent Fredric
 
@@ -30,6 +35,8 @@ Changelog for HTML-Tree
     * Speed up is_inside method RT #113415
       - From Todd Rinaldo https://github.com/madsen/HTML-Tree/pull/5
     * Fix extra spaces being added to comments RT #94311
+      - From Tomaz Solc
+    * Don't needlessly escape characters in element content RT #93431
       - From Tomaz Solc
 
 5.03     2012-09-22

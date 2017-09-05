@@ -5,8 +5,9 @@ use strict;
 use warnings;
 use base qw/Catalyst::Model/;
 use Carp qw/croak/;
+use Module::Runtime qw/ require_module /;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 sub ACCEPT_CONTEXT {
@@ -19,8 +20,7 @@ sub ACCEPT_CONTEXT {
     delete $args{$_} for ( grep { /^_?catalyst/ } keys %args );
 
     my $class = $args{connection_class} || 'Catalyst::Model::LDAP::Connection';
-    eval { require $class };
-    die $@ if $@;
+    require_module($class);
 
     my $conn = $class->new(%args);
     my $mesg = $conn->bind(%args);
@@ -44,7 +44,7 @@ Catalyst::Model::LDAP - LDAP model class for Catalyst
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

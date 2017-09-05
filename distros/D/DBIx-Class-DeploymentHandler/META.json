@@ -67,7 +67,7 @@
          "web" : "https://github.com/frioux/DBIx-Class-DeploymentHandler"
       }
    },
-   "version" : "0.002219",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.002220",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

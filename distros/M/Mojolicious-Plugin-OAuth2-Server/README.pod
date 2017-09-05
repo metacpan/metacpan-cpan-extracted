@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.38
+0.39
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -578,9 +578,17 @@ sub _verify_credentials {
 L<Net::OAuth2::AuthorizationServer> - The dist that handles the bulk of the
 functionality used by this plugin
 
-=head1 AUTHOR
+=head1 AUTHOR & CONTRIBUTORS
 
 Lee Johnson - C<leejo@cpan.org>
+
+With contributions from:
+
+Nick Logan C<nlogan@gmail.com>
+
+Pierre VIGIER C<pierre.vigier@gmail.com>
+
+Renee C<reb@perl-services.de>
 
 =head1 LICENSE
 

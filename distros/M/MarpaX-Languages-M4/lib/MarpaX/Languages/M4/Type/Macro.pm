@@ -6,7 +6,7 @@ use Moops;
 
 library MarpaX::Languages::M4::Type::Macro declares M4Macro {
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -27,7 +27,7 @@ MarpaX::Languages::M4::Type::Macro - M4 Macro type
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

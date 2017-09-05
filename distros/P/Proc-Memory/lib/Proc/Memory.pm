@@ -3,7 +3,7 @@ use warnings;
 package Proc::Memory;
 
 # ABSTRACT: Peek/Poke other processes' address spaces
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Carp;
 use Sentinel;
@@ -34,13 +34,22 @@ Proc::Memory - Peek/Poke into processes' address spaces
 
 =head1 DESCRIPTION
 
-PEEK/POKE are a BASIC programming language extension for reading/writing memory at a specified address. This module brings similiar capability to Perl.
+PEEK/POKE are a BASIC programming language extension for reading and writing memory at a specified address across process boundaries. This module brings similiar capability to Perl.
 
 Eventually, Memory searching capability will also be added.
 
 =head1 IMPLEMENTATION
 
-The module is a Perlish wrapper for L<Alien::libvas> and doesn't expose any extra functionality. L<libvas|http://github.com/a3f/libvas> currently supports Win32, macOS and Linux.
+The module is a Perlish wrapper for L<Alien::libvas> and doesn't expose any extra functionality. L<libvas|http://github.com/a3f/libvas> claims support for following backends:
+
+    • win32      - Windows API's {Read,Write}ProcessMemory
+    • mach       - Mach Virtual Memory API (vm_copy) - macOS and GNU Hurd
+    • process_vm - process_vm_{readv, writev} on Linux 3.2+
+    • procfs     - /proc/$pid/mem on Linux and some BSDs, /proc/$pid/as on SunOS
+    • ptrace     - ptrace(2), available on many Unices
+    • memcpy     - Trivial implementation that doesn't supports foreign address spaces
+
+Bug reports and contributions are welcome. :-)
 
 =head1 METHODS AND ARGUMENTS
 
@@ -56,7 +65,7 @@ sub new {
 	my $class = shift;
     my @opts = @_;
     unshift @opts, 'pid' if @_ % 2 == 1;
-    
+
     my $self = {
         @opts
     };
@@ -146,7 +155,7 @@ Writes C<buf> to C<addr>
 
 =cut
 
-#ssize_t xs_vas_write(void* vas, unsigned long dst, SV *sv) {
+#int xs_vas_write(void* vas, unsigned long dst, SV *sv) {
 sub write {
     my $self = shift;
     my $addr = shift;
@@ -169,6 +178,13 @@ To be implemented
 To be implemented when libvas provides it
 
 =cut
+
+
+
+sub DESTROY {
+    my $self = shift;
+    xs_vas_close($self->{vas});
+}
 
 Inline->init();
 1;
@@ -223,11 +239,16 @@ SV *xs_vas_read(void* vas, unsigned long src, size_t size) {
         return sv;
 }
 
-ssize_t xs_vas_write(void* vas, unsigned long dst, SV *sv, size_t size) {
-    ssize_t nbytes;
+int xs_vas_write(void* vas, unsigned long dst, SV *sv, size_t size) {
+    int nbytes;
 
     nbytes = vas_write(vas, dst, SvPV_nolen(sv), size);
     return nbytes;
 }
+
+void xs_vas_close(void* vas) {
+    vas_close(vas);
+}
+
 
 

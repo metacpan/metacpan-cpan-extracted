@@ -1,4 +1,3 @@
-@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
 @prefix dc:    <http://purl.org/dc/terms/> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
@@ -7,19 +6,19 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-<file:///home/kjetil/dev/Test-RDF/meta/project.ttl>
+<file:///mnt/robin/kjetil/dev/Test-RDF/meta/project.ttl>
 	dc:creator           <http://www.kjetil.kjernsmo.net/foaf#me>;
 	dc:subject           <http://purl.org/NET/cpan-uri/dist/Test-RDF/project>;
 	dc:title             "DOAP for Test-RDF"@en.
 
 <http://purl.org/NET/cpan-uri/dist/Test-RDF/project>
 	a                    doap:Project;
-	cpan-uri:x_IRC       <irc://irc.perl.org/#perlrdf>;
 	doap-deps:runtime-requirement [ doap-deps:on "Scalar::Util 1.24"^^doap-deps:CpanId ], [ doap-deps:on "Test::More"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::Builder::Module"^^doap-deps:CpanId;
-	], [ doap-deps:on "RDF::Trine 0.134"^^doap-deps:CpanId ];
+	], [ doap-deps:on "RDF::Trine 0.134"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::Tester"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/kjetilk/Test-RDF/issues>;
 	doap:created         "2010-09-03"^^xsd:date;
@@ -28,13 +27,14 @@
 	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
 	doap:name            "Test-RDF";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_03>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_10>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_22>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_24>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_26>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-16>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-18>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-19>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_0>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_1>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_14>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_03>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_10>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_22>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_24>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_26>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-16>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-18>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-19>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-20>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-22>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_0>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_1>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_11>, <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_14>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/Test-RDF/>;
 		prov:has_provenance <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FTest-RDF%2F&serialization=PROV-O#>;
 	];
 	doap:shortdesc       "Test RDF data for validity and equality."@en;
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>;
 	owl:sameAs           <http://packages.qa.debian.org/libtest-rdf-perl#upstream>.
 
 <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_0_03>
@@ -238,6 +238,22 @@
 	doap:revision        "1.20"^^xsd:string;
 	owl:sameAs           <http://packages.qa.debian.org/libtest-rdf-perl#upstreamsrc_1.20>.
 
+<http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1-22>
+	a                    doap:Version;
+	rdfs:label           "Add has_type function."@en;
+	dc:issued            "2017-08-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add has_type function."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor cosmetic changes."@en;
+		];
+	];
+	doap:revision        "1.22"^^xsd:string;
+	owl:sameAs           <http://packages.qa.debian.org/libtest-rdf-perl#upstreamsrc_1.22>.
+
 <http://purl.org/NET/cpan-uri/dist/Test-RDF/v_1_0>
 	a                    doap:Version;
 	rdfs:label           "Stable release."@en;
@@ -303,4 +319,7 @@
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FTest-RDF%2F&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel.
 

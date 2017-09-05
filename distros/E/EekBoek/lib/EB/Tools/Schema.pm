@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sun Aug 14 18:10:49 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Sep  6 14:38:33 2012
-# Update Count    : 934
+# Last Modified On: Tue Feb 18 13:45:04 2014
+# Update Count    : 952
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -124,6 +124,7 @@ sub init_kmap {
     $km{tg_nul}		 = __xt("scm:tg:nul");
     $km{tg_geen}	 = __xt("scm:tg:geen");
     $km{tg_privé}	 = __xt("scm:tg:privé");
+    $km{tg_prive}	 = __xt("scm:tg:prive");
     $km{tg_anders}	 = __xt("scm:tg:anders");
 
     # Koppelingen.
@@ -304,7 +305,7 @@ sub scan_btw {
 	    warn("!"._T("Gelieve BTW tariefgroep \"Geen\" te vervangen door \"Nul\"")."\n")
 	      if lc($1) eq $km{tg_geen};
 	}
-	elsif ( $extra =~ m/^$km{tariefgroep}=(prive|$km{tg_privé})$/i ) {
+	elsif ( $extra =~ m/^$km{tariefgroep}=(prive|$km{tg_privé}|$km{tg_prive})$/i ) {
 	    $groep = BTWTARIEF_PRIV;
 	}
 	elsif ( $extra =~ m/^$km{tariefgroep}=$km{tg_anders}$/i ) {
@@ -424,7 +425,7 @@ sub scan_balres {
 		    # elsif ( defined $btwmap{$_} ) {
 		    # 	$btw_type = $btwmap{$_};
 		    # }
-		    elsif ( /^($km{tg_hoog}|$km{tg_laag}|$km{tg_nul}|prive|$km{tg_privé}|$km{tg_anders})$/ ) {
+		    elsif ( /^($km{tg_hoog}|$km{tg_laag}|$km{tg_nul}|prive|$km{tg_privé}|$km{tg_prive}|$km{tg_anders})$/ ) {
 			$btw_type = substr(_xtr("scm:tg:$1"), 0, 1);
 		    }
 		    elsif ( /^\d+$/ ) {
@@ -565,6 +566,11 @@ sub load_schema1 {
 
     }
 
+    if ( @btw && !defined $btwmap{n} ) {
+	$btw[0] = [ 0,  undef, _T("BTW 0%"), BTWTARIEF_NUL, 0, 1 ];
+	$btwmap{n} = 0;
+    }
+
 }
 
 sub load_schema2 {
@@ -651,7 +657,17 @@ sub load_schema2 {
     foreach ( @dbk ) {
 	next unless defined($_); # sparse
 	my ($id, $desc, $type, $dc, $rek) = @$_;
-	next if defined($rek);
+
+	if ( defined($rek) ) {
+	    # Controleer of de tegenrekening isgedefinieerd.
+	    next if defined $acc{$rek};
+	    error(__x("Tegenrekening {acct} van dagboek {id} is niet gedefinieerd",
+		      acct => $rek,
+		      id => $id)."\n");
+	    $fail++;
+	    next;
+	}
+
 	if ( $type == DBKTYPE_INKOOP ) {
 	    $need_crd++;
 	    $_->[4] = $std{"crd"};

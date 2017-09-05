@@ -10,7 +10,7 @@ use Catmandu;
 use Catmandu::Util qw(data_at is_instance);
 use Datahub::Factory;
 use namespace::clean;
-use Datahub::Factory::PipelineConfig;
+use Datahub::Factory::Pipeline;
 use Datahub::Factory::Fixer::Condition;
 
 with 'Datahub::Factory::Flash';
@@ -56,19 +56,23 @@ sub execute {
     #    nice errors.
     $self->info("Loading pipeline configuration...");
     my ($pipeline, $options);
-    $pipeline = Datahub::Factory->pipeline($opt);
-    $options = $pipeline->opt;
+    $pipeline = Datahub::Factory->pipeline($opt->{pipeline});
+    $options = $pipeline->parse();
 
     # Load modules
     $self->info("Initializing importer/exporter...");
     my ($import_module, $fix_module, $export_module);
-    $import_module = Datahub::Factory->importer($options->{importer})->new($options->{oimport});
-    $export_module = Datahub::Factory->exporter($options->{exporter})->new($options->{oexport});
+    $import_module = Datahub::Factory
+        ->importer($options->{importer}->{name})
+        ->new($options->{importer}->{options});
+    $export_module = Datahub::Factory
+        ->exporter($options->{exporter}->{name})
+        ->new($options->{exporter}->{options});
 
     # Load conditions & fixers
     $self->info("Initializing fixers...");
-    my $condition = Datahub::Factory::Fixer::Condition->new('options' => $options);
-    $condition->fixers;
+    my $condition = Datahub::Factory::Fixer::Condition->new('fixer' => $options->{fixer});
+    my $fixers = $condition->get_fixers();
 
     my $counter = 0;
 
@@ -88,7 +92,7 @@ sub execute {
             $item_id = data_at($options->{'id_path'}, $item);
             $item_id //= 'Undefined ID';
 
-            $fix_module = $condition->fix_module($item);
+            $fix_module = $condition->fix_module($fixers, $item);
             $fix_module->fixer->fix($item);
             $export_module->add($item);
 
@@ -105,6 +109,12 @@ sub execute {
                 $self->error($msg);
                 $logger->error($msg);
                 return 1;
+            }
+            elsif (is_instance $_, 'Datahub::Factory::InvalidPipeline') {
+                # Throw a fatal error if the pipeline configuration was invalid
+                $self->error($msg);
+                $logger->fatal($error);
+                exit 1;
             }
             elsif (is_instance $_, 'Datahub::Factory::ModuleNotFound') {
                 # Throw a fatal error if we couldn't load a fix module
@@ -195,6 +205,7 @@ Supported I<Exporter> plugins:
 
     [Importer]
     plugin = OAI
+    id_path = 'lidoRecID.0._'
 
     [plugin_importer_OAI]
     endpoint = https://oai.my.museum/oai
@@ -204,12 +215,11 @@ Supported I<Exporter> plugins:
 
     [plugin_fixer_Fix]
     file_name = '/home/datahub/my.fix'
-    id_path = 'lidoRecID.0._'
 
     [Exporter]
-    plugin = LIDO
+    plugin = YAML
 
-    [plugin_exporter_LIDO]
+    [plugin_exporter_YAML]
 
 All plugins have their own configuration options in sections called
 C<[plugin_type_name]> where C<type> can be I<importer>, I<exporter>
@@ -223,16 +233,20 @@ If a plugin requires no options, you still need to create the (empty)
 configuration section (e.g. C<[plugin_exporter_LIDO]> in the above
 example).
 
+=head4 Importer plugin
+
+The C<id_path> option contains the path (in Fix syntax) of the identifier of
+each record in your data after the fix has been applied, but before it is
+submitted to the I<Exporter>. It is used for reporting and logging.
+
 =head4 Fixer plugin
 
     [plugin_fixer_Fix]
     condition = record.institution_name
-    fixers = MSK, GRO
-    id_path = record.id
+    fixers = FOO, BAR
 
     [plugin_fixer_Fix]
     file_name = /home/datahub/my.fix
-    id_path = record.id
 
 The C<[plugin_fixer_Fix]> can directly load a fix file (via the option
 C<file_name>) or can be configured to conditionally load a different
@@ -241,24 +255,19 @@ when two institutions with different data models use the same API
 endpoint). This is done by setting the C<condition> and C<fixers>
 options.
 
-The C<id_path> option contains the path (in Fix syntax) of the identifier of
-each record in your data after the fix has been applied, but before it is
-submitted to the I<Exporter>. It is used for reporting and logging.
-
 =head4 Conditional fixers
 
     [plugin_fixer_Fix]
     condition = record.institution_name
-    fixers = MSK, GRO
-    id_path = 'lidoRecID.0._'
+    fixers = FOO, BAR
 
-    [plugin_fixer_GRO]
-    condition = 'Groeningemuseum'
-    file_name = '/home/datahub/gro.fix'
+    [plugin_fixer_FOO]
+    condition = 'Museum of Foo'
+    file_name = '/home/datahub/foo.fix'
 
-    [plugin_fixer_MSK]
-    condition = 'Museum voor Schone Kunsten Gent'
-    file_name = '/home/datahub/msk.fix'
+    [plugin_fixer_BAR]
+    condition = 'Museum of Bar'
+    file_name = '/home/datahub/bar.fix'
 
 If you want to separate the data stream into multiple (smaller) streams with
 a different fix file for each stream, you can do this by setting the appropriate
@@ -290,6 +299,7 @@ block.
 
   [Importer]
   plugin = Adlib
+  id_path = 'record.id'
 
   [Fixer]
   plugin = Fix
@@ -303,7 +313,6 @@ block.
 
   [plugin_fixer_Fix]
   file_name = '/tmp/msk.fix'
-  id_path = 'record.id'
 
   [plugin_exporter_Datahub]
   datahub_url = https://my.thedatahub.io
@@ -316,7 +325,6 @@ block.
 =head1 AUTHORS
 
 Pieter De Praetere <pieter@packed.be>
-
 Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
 
 =head1 COPYRIGHT

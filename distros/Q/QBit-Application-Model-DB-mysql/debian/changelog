@@ -1,3 +1,9 @@
+libqbit-application-model-db-mysql-perl (0.013) raring; urgency=low
+
+  * added order for add[_multi]
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Sep 2017 21:32:04 +0300
+
 libqbit-application-model-db-mysql-perl (0.012) raring; urgency=low
 
   * deleted get_dbh. Use set_dbh and dbh

@@ -5,7 +5,7 @@ BEGIN {
     use_ok 'Game::Tibia::Packet::Charlist';
 }
 
-my $instance = Game::Tibia::Packet::Charlist->new();
+my $instance = Game::Tibia::Packet::Charlist->new(version => 860);
 
 done_testing;
 

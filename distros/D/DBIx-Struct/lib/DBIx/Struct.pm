@@ -190,7 +190,7 @@ use Data::Dumper;
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.24';
+our $VERSION = '0.28';
 
 our @EXPORT = qw{
 	one_row
@@ -250,7 +250,7 @@ INS
 INS
 	},
 	_last_id_undef => sub {
-		my ($table, $insert_exp, $pk_row_data) = @_;
+		my ($table, $pk_row_data) = @_;
 		my $ret;
 		$ret = <<INS;
 						\$_->do(\$insert, undef, \@bind)
@@ -261,12 +261,12 @@ INS
 INS
 		if ($pk_row_data) {
 			$ret .= <<INS;
-						$pk_row_data = $_->last_insert_id(undef, undef, undef, undef);
+						$pk_row_data = \$_->last_insert_id(undef, undef, undef, undef);
 INS
 		}
 	},
 	_last_id_empty => sub {
-		my ($table, $insert_exp, $pk_row_data) = @_;
+		my ($table, $pk_row_data) = @_;
 		my $ret;
 		$ret = <<INS;
 						\$_->do(\$insert, undef, \@bind)
@@ -277,7 +277,7 @@ INS
 INS
 		if ($pk_row_data) {
 			$ret .= <<INS;
-						$pk_row_data = $_->last_insert_id("", "", "", "");
+						$pk_row_data = \$_->last_insert_id("", "", "", "");
 INS
 		}
 	}
@@ -1177,6 +1177,7 @@ sub setup_row {
 					if ($chr->{TYPE_NAME} =~ /^json/) {
 						$json_fields{$chr->{COLUMN_NAME}} = undef;
 					}
+					$chr->{COLUMN_DEF} ||= $chr->{mysql_is_auto_increment};
 					if ($chr->{NULLABLE} == 0 && !defined($chr->{COLUMN_DEF})) {
 						push @required, $chr->{COLUMN_NAME};
 					}
@@ -1205,26 +1206,45 @@ sub setup_row {
 				}
 				my $sth = $_->foreign_key_info(undef, undef, undef, undef, undef, $table);
 				if ($sth) {
-					@fkeys = grep {$_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/} @{$sth->fetchall_arrayref({})};
+					@fkeys = grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
+						map {
+						$_->{FK_COLUMN_NAME} = $_->{FKCOLUMN_NAME}
+							if $_->{FKCOLUMN_NAME};
+						$_->{FK_TABLE_NAME} = $_->{FKTABLE_NAME} if $_->{FKTABLE_NAME};
+						$_
+						} @{$sth->fetchall_arrayref({})};
 				}
 				$sth = $_->foreign_key_info(undef, undef, $table, undef, undef, undef);
 				if ($sth) {
-					@refkeys = grep {$_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/} @{$sth->fetchall_arrayref({})};
+					@refkeys = grep {($_->{PKTABLE_NAME} || $_->{UK_TABLE_NAME}) && $_->{FK_COLUMN_NAME} !~ /[^a-z_0-9]/}
+						map {
+						$_->{FK_COLUMN_NAME} = $_->{FKCOLUMN_NAME}
+							if $_->{FKCOLUMN_NAME};
+						$_->{FK_TABLE_NAME} = $_->{FKTABLE_NAME} if $_->{FKTABLE_NAME};
+						$_
+						} @{$sth->fetchall_arrayref({})};
 				}
 			}
 		);
 	} else {
 
 		# means this is a query
-		%fields = %{$table->{NAME_hash}};
+		my %tnh = %{$table->{NAME_hash}};
+		for my $k (keys %tnh) {
+			my $fk = $k;
+			$fk =~ s/[^\w ].*$//;
+			$fields{$fk} = $tnh{$k};
+		}
 		$connector->run(
 			sub {
 				for (my $cn = 0; $cn < @{$table->{NAME}}; ++$cn) {
-					my $ti = $_->type_info($table->{TYPE}->[$cn]);
-					$field_types{$table->{NAME}->[$cn]} = _field_type_from_name($ti->{TYPE_NAME});
-					push @timestamp_fields, $table->{NAME}->[$cn]
+					my $ti    = $_->type_info($table->{TYPE}->[$cn]);
+					my $field = $table->{NAME}->[$cn];
+					$field =~ s/[^\w ].*$//;
+					$field_types{$field} = _field_type_from_name($ti->{TYPE_NAME});
+					push @timestamp_fields, $field
 						if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^time/;
-					$json_fields{$table->{NAME}->[$cn]} = undef
+					$json_fields{$field} = undef
 						if $ti->{TYPE_NAME} && $ti->{TYPE_NAME} =~ /^json/;
 				}
 			}
@@ -1715,7 +1735,7 @@ sub _parse_groupby {
 	my $sql_grp;
 	if (defined $groupby) {
 		$sql_grp = "GROUP BY ";
-		my @groupby = map {/^\d+$/ ? $_ : "$_"} (ref($groupby) ? @$groupby : ($groupby));
+		my @groupby = map {/^\d+$/ ? $_ : /^[a-z][\w ]*$/i ? "\"$_\"" : "$_"} (ref($groupby) ? @$groupby : ($groupby));
 		$sql_grp .= join(", ", @groupby);
 	}
 	$sql_grp;

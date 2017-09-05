@@ -46,6 +46,6 @@
          "url" : "https://github.com/benkasminbullock/C-Tokenize"
       }
    },
-   "version" : "0.15",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

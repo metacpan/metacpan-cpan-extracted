@@ -19,11 +19,11 @@
 #include "my_dmalloc.h"
 
 
-FILE *open_file (char *basename, char *dirname, char *filename)
+FILE *open_file (char *basename, char *dirname, char *filename, int len)
 {
    FILE * file;
 
-   sprintf (filename, "%s/%s", dirname, basename);
+   snprintf (filename, len-1, "%s/%s", dirname, basename);
    file = fopen (filename, "r");
    if (file == NULL)
    {

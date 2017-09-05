@@ -9,7 +9,7 @@ DBD::XMLSimple - Access XML data via the DBI interface
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -17,13 +17,18 @@ Version 0.05
 
 Reads XML and makes it available via DBI.
 
+Sadly DBD::AnyData doesn't work with the latest DBI and DBD::AnyData2 isn't
+out yet, so I am writing this pending the publication of DBD::AnyData2
+
+DBD-XMLSimple doesn't yet expect to support complex XML data, so that's why
+it's not called DBD-XML.
+
     use FindBin qw($Bin);
     use DBI;
 
     my $dbh = DBI->connect('dbi:XMLSimple(RaiseError => 1):');
 
-    # To be replaced with xmls_import once the driver has been registered
-    $dbh->func('person', 'XML', "$Bin/../data/person.xml", 'x_import');
+    $dbh->func('person', 'XML', "$Bin/../data/person.xml", 'xmlsimple_import');
 
     my $sth = $dbh->prepare("SELECT * FROM person");
 
@@ -40,6 +45,23 @@ Input data will be something like this:
 	    <email>nobody@example.com</email>
 	</row>
     </table>
+
+If a leaf appears twice it will be concatenated
+
+    <?xml version="1.0" encoding="US-ASCII"?>
+    <table>
+	<row id="1">
+	    <name>Nigel Horne</name>
+	    <email>njh@bandsman.co.uk</email>
+	    <email>nhorne@pause.org</email>
+	</row>
+    </table>
+
+    $sth = $dbh->prepare("Select email FROM person");
+    $sth->execute();
+    $sth->dump_results();
+
+    Gives the output "njh@bandsman.co.uk,nhorne@pause.org"
 =cut
 
 =head1 SUBROUTINES/METHODS
@@ -54,8 +76,9 @@ use base qw(DBI::DBD::SqlEngine);
 
 use vars qw($VERSION $drh $methods_already_installed);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $drh = undef;
+our $methods_already_installed = 0;
 
 sub driver
 {
@@ -67,15 +90,15 @@ sub driver
 	# $drh = DBI::_new_drh($class, {
 	# $drh = DBI::_new_drh("$class::dr", {
 	$drh = $class->SUPER::driver({
-		'Name' => 'XML',
+		'Name' => 'XMLSimple',
 		'Version' => $VERSION,
 		'Attribution' => 'DBD::XMLSimple by Nigel Horne',
 	});
 
 	if($drh) {
 		unless($methods_already_installed++) {
-			DBI->setup_driver(__PACKAGE__);
-			DBD::XMLSimple::db->install_method('x_import');
+			# DBI->setup_driver(__PACKAGE__);
+			DBD::XMLSimple::db->install_method('xmlsimple_import');
 		}
 	}
 
@@ -108,13 +131,13 @@ use vars qw($imp_data_size);
 $DBD::XMLSimple::db::imp_data_size = 0;
 @DBD::XMLSimple::db::ISA = qw(DBI::DBD::SqlEngine::db);
 
-sub x_import
+sub xmlsimple_import
 {
-	my($dbh, $table_name, $format, $file_name, $flags) = @_;
+	my($dbh, $table_name, $format, $filename, $flags) = @_;
 
 	die if($format ne 'XML');
 
-	$dbh->{filename} = $file_name;
+	$dbh->{filename} = $filename;
 }
 
 package DBD::XMLSimple::st;
@@ -159,7 +182,8 @@ sub open_table($$$$$)
 		my $index = 0;
 		foreach my $leaf($record->children) {
 			my $key = $leaf->name();
-			$row{$key} = $leaf->field();
+			$row{$key} .= ',' if($row{$key});
+			$row{$key} .= $leaf->field();
 			if(!exists($col_nums{$key})) {
 				$col_nums{$key} = $index++;
 				push @col_names, $key;
@@ -207,18 +231,15 @@ sub fetch_row($$)
 {
 	my($self, $data) = @_;
 
-	if($self->{cursor} >= $data->{rows}) {
+	if($self->{'cursor'} >= $data->{'rows'}) {
 		return;
 	}
-	$self->{cursor}++;
+	$self->{'cursor'}++;
 
-	my @fields;
-	foreach my $col(@{$self->{'col_names'}}) {
-		push @fields, $self->{'data'}->{$self->{'cursor'}}->{$col};
-	}
-	$self->{row} = \@fields;
+	my @fields = map { $self->{'data'}->{$self->{'cursor'}}->{$_ } } @{$self->{'col_names'}};
+	$self->{'row'} = \@fields;
 
-	return $self->{row};
+	return $self->{'row'};
 }
 
 sub seek($$$$)
@@ -268,8 +289,6 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-Change x_import to xmls_import once it's been registered
-
 =head1 SEE ALSO
 
 L<DBD::AnyData>, which was also used as a template for this module.
@@ -304,7 +323,7 @@ L<http://search.cpan.org/dist/DBD-XMLSimple/>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2016 Nigel Horne.
+Copyright 2016-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
 

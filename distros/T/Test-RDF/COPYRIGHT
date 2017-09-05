@@ -6,9 +6,9 @@ Source: https://metacpan.org/module/Test::RDF
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2014 Kjetil Kjernsmo.
+ t/has_uri.t
+Copyright: Copyright 2017 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/are_subgraphs.t
@@ -19,7 +19,6 @@ Copyright: Copyright 2011 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/00-load.t
- t/has_uri.t
  t/hasnt_literal.t
  t/is_valid_rdf.t
 Copyright: Copyright 2013 Kjetil Kjernsmo.
@@ -31,6 +30,11 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
 Files: t/pattern_fail.t
  t/pattern_ok.t
 Copyright: Copyright 2012 Kjetil Kjernsmo.
@@ -39,27 +43,26 @@ License: GPL-1.0+ or Artistic-1.0
 Files: README
  lib/Test/RDF.pm
 Copyright: Copyright 2010 ABC Startsiden AS.
- Copyright 2010, 2011, 2012, 2013, 2014 Kjetil Kjernsmo.
+ Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kjetil Kjernsmo.
 License: GPL-1.0
 
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
+Files: dist.ini
+Copyright: Copyright 2014 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2017 by the copyright holder(s).
  
  This is free software, licensed under:
  

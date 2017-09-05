@@ -1,6 +1,10 @@
 Changelog for MarpaX-Languages-M4
 
-0.019 2017-08-01T18:09:47
+0.020 2017-09-03T09:47:55
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use MooX::Options 4.103 (short option fix)
+
+0.019 2017-08-01T18:09:47Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Implicit dependency from MooX::Options and its autosplit facility -
    closes #1

@@ -9,7 +9,8 @@ Makefile.PL
 README
 author.yml
 corpus/DZT/lib/DZT.pm
-cpanfile
+corpus/DZT2/inc/mymm.pl
+corpus/DZT2/lib/DZT.pm
 dist.ini
 lib/Dist/Zilla/MintingProfile/Author/Plicease.pm
 lib/Dist/Zilla/Plugin/Author/Plicease.pm
@@ -32,7 +33,8 @@ share/profiles/default/skel/t/00_diag.t
 share/profiles/default/skel/t/00_xdiag.t
 t/00_diag.t
 t/01_use.t
-t/dist_zilla_plugin_author_plicease.t
+t/dist_zilla_plugin_author_plicease_makemaker.t
+t/dist_zilla_plugin_author_plicease_thanks.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

@@ -18,6 +18,8 @@ sub template {
     <section id='footer'>
       <hr/>
       <p id='copy'>copyright </p>
+      <view-author author='John' />
+      <view-author author='Dan' />
     </section>
   ];
 }

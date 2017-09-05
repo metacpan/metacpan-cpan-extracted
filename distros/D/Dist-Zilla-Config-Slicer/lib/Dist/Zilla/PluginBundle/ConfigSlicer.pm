@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::ConfigSlicer;
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Load another bundle and override its plugin configurations
-$Dist::Zilla::PluginBundle::ConfigSlicer::VERSION = '0.201';
+$Dist::Zilla::PluginBundle::ConfigSlicer::VERSION = '0.202';
 use Moose;
 
 extends 'Dist::Zilla::PluginBundle::Filter';
@@ -38,7 +38,10 @@ Dist::Zilla::PluginBundle::ConfigSlicer - Load another bundle and override its p
 
 =head1 VERSION
 
-version 0.201
+version 0.202
+
+=for test_synopsis 1;
+__END__
 
 =head1 SYNOPSIS
 
@@ -63,9 +66,6 @@ This way you can override the plugin configuration
 for any bundle that doesn't consume
 L<Dist::Zilla::Role::PluginBundle::Config::Slicer|Dist::Zilla::Role::PluginBundle::Config::Slicer>
 as if it did!
-
-=for test_synopsis 1;
-__END__
 
 =head1 SEE ALSO
 

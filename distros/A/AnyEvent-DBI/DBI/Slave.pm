@@ -24,7 +24,7 @@ use Convert::Scalar ();
 use CBOR::XS ();
 use AnyEvent ();
 
-our $VERSION = '3.0';
+our $VERSION = '3.02';
 
 # this is the forked server code, could/should be bundled as it's own file
 

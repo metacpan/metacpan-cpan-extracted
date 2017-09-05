@@ -353,7 +353,8 @@ sub run {
 
 	# Make sure we're not in a pending transaction.
 	if ( $::dbh->in_transaction ) {
-	    warn("?INTERNAL ERROR: Command failed but did not rollback.\n");
+	    warn("?INTERNAL ERROR: Command failed but did not rollback.\n")
+	      unless $cfg->val( qw(internal transdbg), 0 );;
 	    $::dbh->rollback;
 	}
 

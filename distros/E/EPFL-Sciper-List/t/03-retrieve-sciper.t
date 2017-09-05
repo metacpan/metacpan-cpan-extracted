@@ -45,8 +45,8 @@ $module->mock(
 
 my $output = toJson(@personsList);
 my $content < io 't/resources/output.json';
-is_valid_json($output, 'is valid json');
-is_json($output, $content, 'same json');
+is_valid_json( $output, 'is valid json' );
+is_json( $output, $content, 'same json' );
 
 $output = toTsv(@personsList);
 $content < io 't/resources/output.tsv';

@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use Data::Dumper;
 if (!eval "use threads; use threads::shared; 1") {
-    ok("SKIP: no threads");
+    diag "SKIP: no threads";
+    ok("$0: SKIP - no threads");
     done_testing;
     exit;
 }
@@ -43,9 +44,14 @@ eval { $d{bar} = Patro::CODE::Shareable->new($sub2) };
 ok($d{bar} && !$@, "ok to add shareable CODE to shared hash")
     or diag $@;
 
-# does this code fail on perl 5.14?
-ok($d{bar} && eval { $d{bar}->(17) } == 36,
-   "ok to execute sub in shared hash") or diag $@;
+# this code is not reliable on all versions of perl
+if ($] < 5.017000) {
+    ok($d{bar} && eval { $d{bar}->_invoke->(17) } == 36,
+       "ok to execute sub in shared hash") or diag $@;
+} else {
+    ok($d{bar} && eval { $d{bar}->(17) } == 36,
+       "ok to execute sub in shared hash") or diag $@;
+}
 
 my $dispatch = {
     foo => sub { $_[0]->{def}++; return 42 },
@@ -65,15 +71,19 @@ use Data::Dumper;
 ok($shpatch->{abc} == 19 && $shpatch->{def} == 35,
    'initial shared dispatch table values ok') or diag Dumper($shpatch);
 
-my $thr1 = threads->create( sub { $shpatch->{foo}->($shpatch) } );
-my $thr2 = threads->create( sub { $shpatch->{baz}->($shpatch,-5) } );
+my $thr1 = threads->create( sub { eval { 
+    $] >= 5.017000 ? $shpatch->{foo}->($shpatch)
+	           : $shpatch->{foo}->_invoke->($shpatch)} } );
+my $thr2 = threads->create( sub { 
+    eval {
+	$] >= 5.017000 ? $shpatch->{baz}->($shpatch,-5)
+	               : $shpatch->{baz}->_invoke->($shpatch,-5) 
+    } } );
 my $j1 = $thr1->join;
 my $j2 = $thr2->join;
 ok($j1 == 42, 'thread 1 completed');
 ok($j2 == 14, 'thread 2 completed');
 ok($shpatch->{def} == 36, 'shared hash updated by shared code');
 ok($shpatch->{abc} == 14, 'shared hash updated by shared code');
-
-
 
 done_testing();

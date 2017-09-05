@@ -12,7 +12,7 @@ use Carp;
 
 with 'CatalystX::ASP::Compiler', 'CatalystX::ASP::Parser';
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 =head1 NAME
 
@@ -367,7 +367,7 @@ sub BUILD {
     # Go through each IncludeDir and check paths
     my @includes_dir;
     for ( @{ $self->IncludesDir } ) {
-        if ( !$_->exists && $_->is_relative ) {
+        if ( $_->is_relative ) {
             push @includes_dir, path( $c->config->{home}, $_ );
         }
         else {

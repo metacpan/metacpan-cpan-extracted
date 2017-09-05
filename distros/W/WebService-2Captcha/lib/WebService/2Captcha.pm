@@ -2,7 +2,7 @@ package WebService::2Captcha;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp 'croak';
 use LWP::UserAgent;
@@ -63,7 +63,7 @@ sub upload {
         method => 'base64',
         body => encode_base64($file_or_content),
         %params
-    );
+    ) or return;
     if ($res !~ /OK/) {
         $errstr = $res;
         return;
@@ -75,7 +75,7 @@ sub upload {
 sub get {
     my ($self, $id) = @_;
 
-    my $res = $self->request(action => 'get', id => $id);
+    my $res = $self->request(action => 'get', id => $id) or return;
     if ($res !~ /OK/) {
         $errstr = $res;
         return;
@@ -87,7 +87,7 @@ sub get {
 sub get_multi {
     my ($self, @ids) = @_;
 
-    my $res = $self->request(action => 'get', ids => join(',', @ids));
+    my $res = $self->request(action => 'get', ids => join(',', @ids)) or return;
     return wantarray ? split(/\|/, $res) : $res;
 }
 
@@ -123,7 +123,7 @@ sub userrecaptcha {
         method => 'userrecaptcha',
         googlekey => $googlekey,
         pageurl => $pageurl,
-    );
+    ) or return;
     if ($res !~ /OK/) {
         $errstr = $res;
         return;

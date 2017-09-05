@@ -1,6 +1,37 @@
+NAME
+    Perl::Examples::Accessors - A collection of example classes using
+    various accessor generators
+
+VERSION
+    This document describes version 0.130 of Perl::Examples::Accessors (from
+    Perl distribution Perl-Examples-Accessors), released on 2017-09-01.
+
 DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-Examples-Accessors>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-Examples-Accessors>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Examples-Accesso
+    rs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Perl::Examples
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

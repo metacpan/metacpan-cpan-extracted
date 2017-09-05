@@ -224,7 +224,8 @@ Please refer to the L<Date::Manip::Obj> documentation for these methods.
    @periods = $tz->all_periods($zone,$year);
 
 This returns the description of all time zone periods that occur (in
-full or in part) during the given year.
+full or in part) during the given year.  The year is measured in universal
+(GMT) time.
 
 =item B<convert>
 

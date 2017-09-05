@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 use parent 'Module::Build';
 
@@ -1507,6 +1507,8 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt> and the L<Alien::Ba
 =item Kang-min Liu (劉康民, gugod)
 
 =item Nicholas Shipp (nshp)
+
+=item Petr Pisar (ppisar)
 
 =back
 

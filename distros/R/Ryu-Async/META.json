@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,11 @@
          "requires" : {
             "Future" : "0.34",
             "IO::Async" : "0.71",
-            "Ryu" : "0.020",
+            "Log::Any" : "1.000",
+            "Ryu" : "0.024",
+            "Syntax::Keyword::Try" : "0",
+            "URI::tcp" : "0",
+            "URI::udp" : "0",
             "curry" : "1.000",
             "namespace::clean" : "0",
             "parent" : "0"
@@ -68,7 +72,19 @@
    "provides" : {
       "Ryu::Async" : {
          "file" : "lib/Ryu/Async.pm",
-         "version" : "0.006"
+         "version" : "0.007"
+      },
+      "Ryu::Async::Client" : {
+         "file" : "lib/Ryu/Async/Client.pm",
+         "version" : "0.007"
+      },
+      "Ryu::Async::Packet" : {
+         "file" : "lib/Ryu/Async/Packet.pm",
+         "version" : "0.007"
+      },
+      "Ryu::Async::Server" : {
+         "file" : "lib/Ryu/Async/Server.pm",
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -82,7 +98,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu-Async"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

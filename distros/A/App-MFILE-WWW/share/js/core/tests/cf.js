@@ -1,22 +1,22 @@
-// ************************************************************************* 
-// Copyright (c) 2014, SUSE LLC
-// 
+// *************************************************************************
+// Copyright (c) 2014-2017, SUSE LLC
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,44 +40,45 @@ define ([
     cf
 ) {
 
+    var prefix = 'core: ';
+
     return function () {
         var priv = cf('currentUserPriv');
-        test('cf sees parameters sent from Perl side', function () {
-            strictEqual(typeof cf('appName'), 'string', "appName");
-            strictEqual(typeof cf('appVersion'), 'string', "appVersion");
-            strictEqual(typeof cf('currentUser'), 'object', "currentUser");
+        test(prefix + 'cf sees parameters sent from Perl side', function (assert) {
+            assert.strictEqual(typeof cf('appName'), 'string', "appName");
+            assert.strictEqual(typeof cf('appVersion'), 'string', "appVersion");
+            assert.strictEqual(typeof cf('currentUser'), 'object', "currentUser");
 
             // currentUser can either be null or a user/employee object
             if (cf('currentUser') === null) {
-                strictEqual(cf('currentUser'), null, "currentUser is null");
+                assert.strictEqual(cf('currentUser'), null, "currentUser is null");
+                assert.strictEqual(cf('currentUserPriv'), null, "currentUserPriv is null when currentUser is null");
             } else {
-                ok(cf('currentUser').hasOwnProperty('nick'), "currentUser has nick property");
-                ok(cf('currentUser').hasOwnProperty('passhash'), "currentUser has passhash property");
-                ok(cf('currentUser').hasOwnProperty('salt'), "currentUser has salt property");
-                equal(cf('currentUser').hasOwnProperty('priv'), false, "currentUser does NOT have priv property");
+                assert.ok(cf('currentUser').hasOwnProperty('nick'), "currentUser has nick property");
+                assert.strictEqual(cf('currentUser').hasOwnProperty('priv'), false, "currentUser does NOT have priv property");
+                assert.strictEqual(typeof priv, 'string', "currentUserPriv");
+                assert.ok( 
+                    (priv === 'passerby') ||
+                    (priv === 'inactive') ||
+                    (priv === 'active') ||
+                    (priv === 'admin')
+                    , "currentUserPriv value is valid (" + priv + ")");
             }
 
-            strictEqual(typeof priv, 'string', "currentUserPriv");
-
-            // currentUserPriv must be a valid privlevel
-            ok( 
-                (priv === 'passerby') ||
-                (priv === 'inactive') ||
-                (priv === 'active') ||
-                (priv === 'admin')
-                , "currentUserPriv value is valid (" + priv + ")");
-
-            strictEqual(typeof cf('loginDialogChallengeText'), 'string', "loginDialogChallengeText (1)");
-            ok(cf('loginDialogChallengeText').length > 0, "loginDialogChallengeText (2)");
-            strictEqual(typeof cf('loginDialogMaxLengthUsername'), 'number', "loginDialogMaxLengthUsername");
-            strictEqual(typeof cf('loginDialogMaxLengthPassword'), 'number', "loginDialogMaxLengthPassword");
-            strictEqual(typeof cf('dummyParam'), 'object', "dummyParam is an object");
-            strictEqual(cf('nonExistentdummyParam'), undefined, "nonExistentDummyParam is undefined");
+            assert.strictEqual(typeof cf('loginDialogChallengeText'), 'string', "loginDialogChallengeText (1)");
+            assert.ok(cf('loginDialogChallengeText').length > 0, "loginDialogChallengeText (2)");
+            assert.strictEqual(typeof cf('loginDialogMaxLengthUsername'), 'number', "loginDialogMaxLengthUsername");
+            assert.strictEqual(typeof cf('loginDialogMaxLengthPassword'), 'number', "loginDialogMaxLengthPassword");
+            assert.strictEqual(typeof cf('dummyParam'), 'object', "dummyParam is an object");
+            assert.strictEqual(cf('nonExistentdummyParam'), undefined, "nonExistentDummyParam is undefined");
         });
-        test('cf parameter values can be overridden', function () {
+        test(prefix + 'cf parameter values can be overridden', function (assert) {
             // override dummyParam
             cf('dummyParam', { test: 'test' });
-            deepEqual(cf('dummyParam'), { test: 'test' }, 'dummyParam value override');
+            assert.deepEqual(cf('dummyParam'), { test: 'test' }, 'dummyParam value override');
+        });
+        test(prefix + 'cf testing is set to true', function (assert) {
+            assert.strictEqual(cf('testing'), true, 'cf testing is set to true');
         });
     };
 

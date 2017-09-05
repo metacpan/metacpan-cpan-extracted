@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,7 @@ requires:
   Date::Calc: '5'
   Email::Valid: '0'
   File::MMagic: '1.17'
+  File::Spec: '0'
   Image::Size: '0'
   MIME::Types: '1.005'
   Regexp::Common: '0.03'
@@ -31,5 +32,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/dnmfarrell/Data-FormValidator
-version: 4.86
+version: 4.88
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Date::Gregorian::Simple" : {
          "file" : "lib/Date/Gregorian/Simple.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/manwar/Date-Gregorian-Simple"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

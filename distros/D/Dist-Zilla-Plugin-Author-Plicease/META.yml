@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease.git
-version: '2.22'
+version: '2.23'
 x_serialization_backend: 'YAML::Tiny version 1.70'

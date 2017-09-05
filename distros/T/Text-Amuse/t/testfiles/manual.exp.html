@@ -166,8 +166,9 @@ rule of paragraphs separated by blank lines still apply, though.
 </p>
 
 <p>
-Also, <code>&lt;tags&gt;</code> which start and stop blocks, <strong>must be placed on a line by
-themselves</strong>.
+Also, <code>&lt;tags&gt;</code> which start and stop blocks, <strong>must be placed on a line
+by themselves and don&#x27;t mix with environments marked by leading
+spaces, notably lists and tables.</strong>
 </p>
 <h4 id="toc5">Literal paragraphs</h4>
 
@@ -183,12 +184,12 @@ Example:
 </p>
 
 <pre class="example">
- &lt;example&gt;
- The =&lt;example&gt;= tag is used for examples, where
- whitespace should be preserved, the text rendered in
- monospace, and any characters special to the output
- style escaped.
- &lt;/example&gt;
+&lt;example&gt;
+The =&lt;example&gt;= tag is used for examples, where
+whitespace should be preserved, the text rendered in
+monospace, and any characters special to the output
+style escaped.
+&lt;/example&gt;
 </pre>
 
 <p>
@@ -203,6 +204,16 @@ will get overflowing lines. To avoid this, a safe value
 for a line length could be 60 characters. Use longer
 lines at your perils.
 </p>
+
+<p>
+An alternate syntax for the <code>&lt;example&gt;</code> tag is <code>{{{</code> <code>}}}</code>:
+</p>
+
+<pre class="example">
+{{{
+This is verbatim as well
+}}}
+</pre>
 <h4 id="toc6">Line breaks</h4>
 
 
@@ -320,26 +331,25 @@ section of an article. For example the “Literal paragraph” above.
 </p>
 
 <p>
-The forth level goes down further.
+The fourth level goes down further.
 </p>
-<h5 id="toc9">Forth level, a “subsection”</h5>
+<h5 id="toc9">Fourth level, a “subsection”</h5>
 
 
 <p>
-The fifth level is very, very low. It’s handy to create description
-lists, too. It’s not dumped on the Table of Contents.
+The fifth level is very, very low and does not create a Table of Contents entry.
 </p>
-<h6>item 1</h6>
+<h6>Fifth level 1</h6>
 
 
 <p>
-A description
+Some text.
 </p>
-<h6>item 2</h6>
+<h6>Fifth level 2</h6>
 
 
 <p>
-Another description
+Some other text.
 </p>
 <h5 id="toc10">The example of levels</h5>
 
@@ -499,9 +509,47 @@ original, original contribution, etc.). The preferred format is
 </p>
 
 </li>
+<li>
+<p>
+<code>#hyphenation</code>
+</p>
+
+<p>
+See above.
+</p>
+
+</li>
 
 </ul>
-<h3 id="toc12">Bold, italicized and emphatized text</h3>
+<h4 id="toc12">Correcting the hyphenation in the PDF output</h4>
+
+
+<p>
+Sometimes you may notice some words with incorrect hyphenation in your
+document. You can fix this adding the breakpoint in the
+<code>#hyphenation</code> directive.
+</p>
+
+<p>
+E.g.
+</p>
+
+<pre class="example">
+#title Test
+#lang it
+#hyphenation al-be-rel-lo que-sto
+
+Questo alberello...
+</pre>
+
+<p>
+You can as many words with breakpoints as you wish, separated by
+spaces, but you can’t insert numbers or special characters (accents
+and diacritics are fine, though). You specify a breakpoint with the
+hyphen character “-”. Using a word without any hyphen will prevent the
+hyphenation for that word.
+</p>
+<h3 id="toc13">Bold, italicized and monospace text</h3>
 
 
 <p>
@@ -519,7 +567,7 @@ The following example will produce:
 <em>emphasis</em>
 <strong>strong emphasis</strong>
 <strong><em>very strong emphasis</em></strong>
-<code>verbatim and monospace</code>
+<code>code and monospace</code>
 </p>
 
 </blockquote>
@@ -528,7 +576,7 @@ The following example will produce:
      *emphasis*
      **strong emphasis**
      ***very strong emphasis***
-     =verbatim and monospace=
+     =code and monospace=
 </pre>
 
 <p>
@@ -537,7 +585,7 @@ multiple lines, but not multiple paragraphs.
 </p>
 
 <p>
-You can also use the <code>&lt;code&gt;</code> tag to indicate verbatim and monospace
+You can also use the <code>&lt;code&gt;</code> tag to indicate code and monospace
 text. This is handy for regions that have an “=” in them.
 </p>
 
@@ -554,7 +602,7 @@ The above example rewritten with tags:
      &lt;em&gt;emphasis&lt;/em&gt;
      &lt;strong&gt;strong emphasis&lt;/strong&gt;
      &lt;strong&gt;&lt;em&gt;very strong emphasis&lt;/em&gt;&lt;/strong&gt;
-     &lt;code&gt;verbatim and monospace&lt;/code&gt;
+     &lt;code&gt;code and monospace&lt;/code&gt;
 </pre>
 
 <p>
@@ -567,7 +615,7 @@ And produces the same thing.
 <em>emphasis</em>
 <strong>strong emphasis</strong>
 <strong><em>very strong emphasis</em></strong>
-<code>verbatim and monospace</code>
+<code>code and monospace</code>
 </p>
 
 </blockquote>
@@ -598,7 +646,21 @@ This is the <sup>superscript</sup> and this is a
 <sub>subscript</sub>, and this is <del>something deleted and
 overstriked</del>
 </p>
-<h4 id="toc13">Making notes to be shown at the end</h4>
+
+<p>
+If you nest the same tag (e.g. <code>&lt;em&gt;this &lt;em&gt;and
+this&lt;/em&gt;&lt;/em&gt;</code>, you are going to get weird results
+(and doesn&#x27;t make any sense), so don&#x27;t do it. <code>=</code> and
+<code>*</code> when surronding words have the same meaning of the
+respective tags:
+</p>
+
+<pre class="example">
+*this* is the same as &lt;em&gt;this&lt;/em&gt;
+
+=this= is the same as &lt;code&gt;this&lt;/code&gt;
+</pre>
+<h4 id="toc14">Making notes to be shown at the end</h4>
 
 
 <p>
@@ -648,7 +710,7 @@ Here the text continues.
 <p>
 You can break the footnotes lines (even if it’s not reccomended), but keep the indentation consistent, as shown above
 </p>
-<h4 id="toc14">Indicating poetic stanzas</h4>
+<h4 id="toc15">Indicating poetic stanzas</h4>
 
 
 <p>
@@ -720,13 +782,18 @@ A line of Emacs verse;<br />
 In terms of terse verse,<br />
 &nbsp;&nbsp;you could do worse.
 </div>
-<h3 id="toc15">Lists</h3>
+<h3 id="toc16">Lists</h3>
 
 
 <p>
 Lists are given using special characters at the beginning of a line.
 Whitespace must occur before bullets or numbered items, to distinguish
 from the possibility of those characters occurring in a real sentence.
+</p>
+
+<p>
+Description lists are marked by some initial whitespace, the term, a
+double colon surrounded by whitespace, and the description body.
 </p>
 
 <pre class="example">
@@ -763,6 +830,12 @@ A list with lower letters
  a. first
  b. second
  c. third
+
+A description list
+
+ First term :: definition and description
+ Second term :: definition and description
+
 </pre>
 
 <p>
@@ -914,12 +987,118 @@ third
 </ol>
 
 <p>
-While the original Emacs Muse had the description lists, this
-implementation has not. You should use the fifth level of headings for
-those. The outcome is mostly the same (yes, you can’t nest them in
-lists, but crazy nesting is beyond the scope of this markup).
+A description list
 </p>
-<h4 id="toc16">Nested lists</h4>
+
+<dl>
+<dt>First term</dt>
+<dd>
+<p>
+definition and description
+</p>
+</dd>
+<dt>Second term</dt>
+<dd>
+<p>
+definition and description
+</p>
+</dd>
+
+</dl>
+<h4 id="toc17">Breaking lists</h4>
+
+
+<p>
+If for some reason you want to break the list without starting a
+regular paragraph, you can do so by inserting a
+&lt;br&gt; tag (which adds some white space between
+them) or a comment (invisible). E.g.
+</p>
+
+<pre class="example">
+List:
+
+   a. bullet item one
+   a. bullet item two, and will break
+
+; a comment
+
+   a. bullet item one
+   a. bullet item two, and break
+
+&lt;br&gt;
+
+   a. bullet item one
+   a. bullet item two, and end
+</pre>
+
+<p>
+Resulting in:
+</p>
+
+<p>
+List:
+</p>
+
+<ol style="list-style-type:lower-alpha">
+<li>
+<p>
+bullet item one
+</p>
+
+</li>
+<li>
+<p>
+bullet item two, and will break
+</p>
+
+</li>
+
+</ol>
+
+<!-- start comment -->
+<div class="comment"><span class="commentmarker">{{COMMENT:</span> 
+; a comment
+<span class="commentmarker">END_COMMENT}}:</span>
+</div>
+<!-- stop comment -->
+
+<ol style="list-style-type:lower-alpha">
+<li>
+<p>
+bullet item one
+</p>
+
+</li>
+<li>
+<p>
+bullet item two, and break
+</p>
+
+</li>
+
+</ol>
+
+<p>
+<br />
+</p>
+
+<ol style="list-style-type:lower-alpha">
+<li>
+<p>
+bullet item one
+</p>
+
+</li>
+<li>
+<p>
+bullet item two, and end
+</p>
+
+</li>
+
+</ol>
+<h4 id="toc18">Nested lists</h4>
 
 
 <p>
@@ -943,6 +1122,8 @@ Normal text.
    a. Level 2, enum item “a”
    b. Level 2, enum item “b”
       I. Level 3, enum item “I”
+         One term :: description
+         Another term :: description
  - Back to the bullets
 </pre>
 
@@ -1040,6 +1221,22 @@ Level 2, enum item “b”
 Level 3, enum item “I”
 </p>
 
+<dl>
+<dt>One term</dt>
+<dd>
+<p>
+description
+</p>
+</dd>
+<dt>Another term</dt>
+<dd>
+<p>
+description
+</p>
+</dd>
+
+</dl>
+
 </li>
 
 </ol>
@@ -1057,7 +1254,7 @@ Back to the bullets
 </li>
 
 </ul>
-<h4 id="toc17">Breaking list items</h4>
+<h4 id="toc19">Breaking list items</h4>
 
 
 <p>
@@ -1140,87 +1337,7 @@ third
 </li>
 
 </ol>
-
-<p>
-If you need to switch type while the list is running, put a <code>br</code> tag
-between them, or some invisible material like a non-breaking space.
-</p>
-
-<pre class="example">
-This won’t get you what you expect:
-
- 1. first
- a. first item
-
-So you’ll have to do:
-
- 1. first
-
-&lt;br&gt;
-
- a. first item
-</pre>
-
-<p>
-Which yields:
-</p>
-
-<hr />
-
-<p>
-This won’t get you what you expect:
-</p>
-
-<ol>
-<li>
-<p>
-first
-</p>
-
-</li>
-
-</ol>
-
-<ol style="list-style-type:lower-alpha">
-<li>
-<p>
-first item
-</p>
-
-</li>
-
-</ol>
-
-<p>
-So you’ll have to do:
-</p>
-
-<ol>
-<li>
-<p>
-first
-</p>
-
-</li>
-
-</ol>
-
-<p>
-<br />
-</p>
-
-<ol style="list-style-type:lower-alpha">
-<li>
-<p>
-first item
-</p>
-
-</li>
-
-</ol>
-
-<hr />
-<h4 id="toc18">Complete example</h4>
+<h4 id="toc20">Complete example</h4>
 
 
 <pre class="example">
@@ -1300,6 +1417,15 @@ Normal text.
 
             Here I have the same amount of indentation,
             and it continues the item above.
+
+                 And inside this item :: a description
+
+                                         Which continues here.
+
+                 Another term :: a description
+
+                                 Which continues here.
+
 
  - Back to the bullets
 
@@ -1476,6 +1602,30 @@ Here I have the same amount of indentation, and it continues the
 item above.
 </p>
 
+<dl>
+<dt>And inside this item</dt>
+<dd>
+<p>
+a description
+</p>
+
+<p>
+Which continues here.
+</p>
+</dd>
+<dt>Another term</dt>
+<dd>
+<p>
+a description
+</p>
+
+<p>
+Which continues here.
+</p>
+</dd>
+
+</dl>
+
 </li>
 
 </ol>
@@ -1498,11 +1648,18 @@ item above.
 </li>
 
 </ul>
-<h3 id="toc19">Generation of data tables</h3>
+<h3 id="toc21">Generation of data tables</h3>
 
 
 <p>
-Only very simple tables are supported.  The syntax is as follows (just keep the indentation consistent and separate each cell by one or more textbars).
+Only very simple tables are supported. The syntax is as follows (just
+keep the indentation consistent and separate each cell by one or more
+textbars).
+</p>
+
+<p>
+Indentation (one or more leading spaces) is required to trigger the
+table rendering.
 </p>
 
 <pre class="example">
@@ -1559,12 +1716,10 @@ Only very simple tables are supported.  The syntax is as follows (just keep the 
 The ordering of the footer, header and table body blocks is irrelevant
 for the output (HTML requires you put first the header, then the
 footer, then the body). Ordering of the single rows is of course
-preserved. From this we come to the conclusion that you can’t normally
-typeset the pipe symbol without triggering a list. In <code>&lt;example&gt;</code> you
-can type it freely. Inside the cells you can do pretty much what you
-want (beside headers and lists): mark them up freely.
+preserved. Inside the cells you can do pretty much what you want
+(beside headers and lists): mark them up freely.
 </p>
-<h4 id="toc20">Floating tables</h4>
+<h4 id="toc22">Floating tables</h4>
 
 
 <p>
@@ -1591,7 +1746,7 @@ caption, so you can refer to them in the text.
 </li>
 
 </ul>
-<h3 id="toc21">Hyperlinks with or without description (and images)</h3>
+<h3 id="toc23">Hyperlinks with or without description (and images)</h3>
 
 
 <p>
@@ -1610,20 +1765,24 @@ So, the home of this project is
 which can be found at
 [[http://amusewiki.org]] Bare links will not
 get the hyperlinking. So http://thisisspam.org won’t
-get the hyperlinking. &lt;/example&gt;
+get the hyperlinking.
+</pre>
 
+<p>
 So, the home of this project is
-[[http://amusewiki.org][AMuseWiki]],
-which can be found at [[http://amusewiki.org]]
+<a class="text-amuse-link" href="http://amusewiki.org">AMuseWiki</a>,
+which can be found at <a class="text-amuse-link" href="http://amusewiki.org">http://amusewiki.org</a>
 Bare links will not get the hyperlinking.
 So http://thisisspam.org won’t get the hyperlinking.
+</p>
+<h4 id="toc24">Images</h4>
 
-*** Images
 
-
+<p>
 Images are special case of this kind of linking.
+</p>
 
-&lt;example&gt;
+<pre class="example">
 [[m-l-manual-logo.png]]
 </pre>
 
@@ -1655,7 +1814,7 @@ Now, let’s add a caption.
 Remote urls are not permitted. Also, the path checking is rather
 strict, so please use just alphanumeric filenames for your images.
 </p>
-<h4 id="toc22">Floating images and adjusting width</h4>
+<h4 id="toc25">Floating images and adjusting width</h4>
 
 
 <p>
@@ -1713,7 +1872,7 @@ The Following will be marked as a fullpage.
 Floating without a width doesn’t make sense, as in the PDF will be no
 room for wrapping text around it.
 </p>
-<h5 id="toc23">Examples</h5>
+<h5 id="toc26">Examples</h5>
 
 
 <p>
@@ -1823,9 +1982,7 @@ Van spent all his free time in research work for me.
 <div class="caption">full page</div>
 </div>
 
-<h3 id="toc24">Inserting a horizontal line or anchor</h3>
-
-<h4 id="toc25">Horizontal Rules</h4>
+<h3 id="toc27">Inserting a horizontal line</h3>
 
 
 <p>
@@ -1847,7 +2004,88 @@ Results:
 </p>
 
 <hr />
-<h3 id="toc26">Lines to omit from published output</h3>
+<h3 id="toc28">Named anchors</h3>
+
+
+<p>
+If you start a line with &quot;#anchor&quot; – where &quot;anchor&quot; can be any (ascii)
+word that starts with a letter and contains only ascii letters and
+digits – it defines an anchor at that point into the document. This
+point can be referenced using &quot;#anchor&quot; as the target in a Muse link.
+Please note that the anchor must be on a line by itself.
+</p>
+
+<p>
+You can&#x27;t have an anchor at the very beginning of the text, because it&#x27;s
+merged into the header, so, if you really have to, put a <code>br</code> tag before
+it.
+</p>
+
+<p>
+The support for this feature was introduced in Text::Amuse version
+0.70 and improved in 0.82
+</p>
+
+<pre class="example">
+#title My text
+
+#badanchor
+This is not an anchor, it&#x27;s part of the header with a dummy name.
+
+&lt;br&gt;
+
+#begin
+This will work.
+
+*** Section
+
+#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+#nextsection
+
+And here we can link to [[#anchor][our anchor]] and to the
+[[#begin][begin]] and to [[#nextsection][this section]].
+
+</pre>
+
+<p>
+Please note that the name in the HTML output is not kept verbatim.
+Instead a <code>text-amuse-label</code> prefix is added (if you need to link it
+externally).
+</p>
+
+<p>
+Also note that the link is lost when producing imposed PDFs (and
+implicitely lost when printing any PDF), so it&#x27;s recommended to keep
+this in mind when writing the document, as the text of the link should
+work even if the link is not present.
+</p>
+
+<p>
+Bad example:
+</p>
+
+<pre class="example">
+See [[#anchor][here]]
+</pre>
+
+<p>
+The poor soul printing it and reading it on paper will see just &quot;See
+here&quot;. Here where?
+</p>
+
+<p>
+Good example:
+</p>
+
+<pre class="example">
+See [[#anchor][the previous chapter]] for more informations.
+</pre>
+<h3 id="toc29">Lines to omit from published output</h3>
 
 
 <pre class="example">
@@ -1890,7 +2128,7 @@ This won’t be published, but in the HTML is there, only hidden
 <span class="commentmarker">END_COMMENT}}:</span>
 </div>
 <!-- stop comment -->
-<h3 id="toc27">Plays and bibliographies</h3>
+<h3 id="toc30">Plays and bibliographies</h3>
 
 
 <p>
@@ -1933,10 +2171,10 @@ very, long description
 </div>
 
 <p>
-The list is wrapped in a <code>&lt;div&gt;</code> with class set to biblio, while the TeX
-source get wrapped in <code>\startawikibiblio</code> and <code>\stopawikibiblio</code>. You are
-free to change class and definition. A reversed indentation is
-suggested.
+The list is wrapped in a <code>&lt;div&gt;</code> with class set to biblio, while the
+TeX source get wrapped in the <code>amusebiblio</code> environment. You are free
+to change class and environment definition if you need to. A reversed
+indentation is suggested.
 </p>
 
 <p>
@@ -1988,7 +2226,29 @@ Oh heauie burthen!
 </p>
 
 </div>
-<h2 id="toc28">GNU Free Documentation License</h2>
+<h3 id="toc31">Preventing the markup to be interpreted</h3>
+
+
+<p>
+Sometimes you want to write something like [1]
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. *this*.
+</p>
+
+<p>
+You can do so wrapping the words with the &lt;verbatim&gt; tag.
+</p>
+
+<p>
+Example:
+</p>
+
+<pre class="example">
+Sometimes you want to write something like &lt;verbatim&gt;[1]&lt;/verbatim&gt;
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. &lt;verbatim&gt;*this*&lt;/verbatim&gt;.
+</pre>
+<h2 id="toc32">GNU Free Documentation License</h2>
 
 
 <div class="center">
@@ -2010,7 +2270,7 @@ of this license document, but changing it is not allowed.
 </p>
 
 </blockquote>
-<h3 id="toc29">0. PREAMBLE</h3>
+<h3 id="toc33">0. PREAMBLE</h3>
 
 
 <p>
@@ -2039,7 +2299,7 @@ it can be used for any textual work, regardless of subject matter or
 whether it is published as a printed book.  We recommend this License
 principally for works whose purpose is instruction or reference.
 </p>
-<h3 id="toc30">1. APPLICABILITY AND DEFINITIONS</h3>
+<h3 id="toc34">1. APPLICABILITY AND DEFINITIONS</h3>
 
 
 <p>
@@ -2150,7 +2410,7 @@ License, but only as regards disclaiming warranties: any other
 implication that these Warranty Disclaimers may have is void and has
 no effect on the meaning of this License.
 </p>
-<h3 id="toc31">2. VERBATIM COPYING</h3>
+<h3 id="toc35">2. VERBATIM COPYING</h3>
 
 
 <p>
@@ -2169,7 +2429,7 @@ number of copies you must also follow the conditions in section 3.
 You may also lend copies, under the same conditions stated above, and
 you may publicly display copies.
 </p>
-<h3 id="toc32">3. COPYING IN QUANTITY</h3>
+<h3 id="toc36">3. COPYING IN QUANTITY</h3>
 
 
 <p>
@@ -2215,7 +2475,7 @@ Document well before redistributing any large number of copies, to
 give them a chance to provide you with an updated version of the
 Document.
 </p>
-<h3 id="toc33">4. MODIFICATIONS</h3>
+<h3 id="toc37">4. MODIFICATIONS</h3>
 
 
 <p>
@@ -2387,7 +2647,7 @@ The author(s) and publisher(s) of the Document do not by this License
 give permission to use their names for publicity for or to assert or
 imply endorsement of any Modified Version.
 </p>
-<h3 id="toc34">5. COMBINING DOCUMENTS</h3>
+<h3 id="toc38">5. COMBINING DOCUMENTS</h3>
 
 
 <p>
@@ -2417,7 +2677,7 @@ in the various original documents, forming one section Entitled
 and any sections Entitled “Dedications”.  You must delete all sections
 Entitled “Endorsements”.
 </p>
-<h3 id="toc35">6. COLLECTIONS OF DOCUMENTS</h3>
+<h3 id="toc39">6. COLLECTIONS OF DOCUMENTS</h3>
 
 
 <p>
@@ -2436,7 +2696,7 @@ copy of this License into the extracted document, and follow this
 License in all other respects regarding verbatim copying of that
 document.
 </p>
-<h3 id="toc36">7. AGGREGATION WITH INDEPENDENT WORKS</h3>
+<h3 id="toc40">7. AGGREGATION WITH INDEPENDENT WORKS</h3>
 
 
 <p>
@@ -2459,7 +2719,7 @@ electronic equivalent of covers if the Document is in electronic form.
 Otherwise they must appear on printed covers that bracket the whole
 aggregate.
 </p>
-<h3 id="toc37">8. TRANSLATION</h3>
+<h3 id="toc41">8. TRANSLATION</h3>
 
 
 <p>
@@ -2483,7 +2743,7 @@ If a section in the Document is Entitled “Acknowledgements”,
 its Title (section 1) will typically require changing the actual
 title.
 </p>
-<h3 id="toc38">9. TERMINATION</h3>
+<h3 id="toc42">9. TERMINATION</h3>
 
 
 <p>
@@ -2518,7 +2778,7 @@ this License.  If your rights have been terminated and not permanently
 reinstated, receipt of a copy of some or all of the same material does
 not give you any rights to use it.
 </p>
-<h3 id="toc39">10. FUTURE REVISIONS OF THIS LICENSE</h3>
+<h3 id="toc43">10. FUTURE REVISIONS OF THIS LICENSE</h3>
 
 
 <p>
@@ -2543,7 +2803,7 @@ License can be used, that proxy’s public statement of acceptance of a
 version permanently authorizes you to choose that version for the
 Document.
 </p>
-<h3 id="toc40">11. RELICENSING</h3>
+<h3 id="toc44">11. RELICENSING</h3>
 
 
 <p>
@@ -2581,7 +2841,7 @@ The operator of an MMC Site may republish an MMC contained in the site
 under CC-BY-SA on the same site at any time before August 1, 2009,
 provided the MMC is eligible for relicensing.
 </p>
-<h3 id="toc41">ADDENDUM: How to use this License for your documents</h3>
+<h3 id="toc45">ADDENDUM: How to use this License for your documents</h3>
 
 
 <p>

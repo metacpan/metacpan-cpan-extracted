@@ -3,14 +3,13 @@ abstract: 'Dist::Zilla plugin bundle used by Plicease'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.28'
   Test::More: '0.94'
   Test::Script: '1.10'
   perl: '5.014'
 configure_requires:
-  Module::Build: '0.28'
-  perl: '5.008001'
-dynamic_config: '1'
+  ExtUtils::MakeMaker: '6.64'
+  perl: '5.014'
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -23,7 +22,7 @@ requires:
   Dist::Zilla: '6.00'
   Dist::Zilla::App::Command::aliendeps: '0.01'
   Dist::Zilla::Plugin::Alien: '0.023'
-  Dist::Zilla::Plugin::Author::Plicease: '2.22'
+  Dist::Zilla::Plugin::Author::Plicease: '2.23'
   Dist::Zilla::Plugin::AutoMetaResources: '1.20'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0.150250'
   Dist::Zilla::Plugin::InsertExample: '0.04'
@@ -51,5 +50,5 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.22'
+version: '2.23'
 x_serialization_backend: 'YAML::Tiny version 1.70'

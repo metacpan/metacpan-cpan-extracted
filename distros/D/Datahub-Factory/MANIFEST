@@ -43,7 +43,7 @@ lib/Datahub/Factory/Importer/OAI.pm
 lib/Datahub/Factory/Importer/TMS.pm
 lib/Datahub/Factory/Importer/TMS/Index.pm
 lib/Datahub/Factory/Logger.pm
-lib/Datahub/Factory/PipelineConfig.pm
+lib/Datahub/Factory/Pipeline.pm
 lib/Datahub/Factory/Sane.pm
 lib/Datahub/Factory/Util.pm
 script/dhconveyor

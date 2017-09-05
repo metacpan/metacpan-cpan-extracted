@@ -1,5 +1,8 @@
 Revision history for Crypt::Hill
 
+0.08  Tue Sep 05 12:00:00 2017
+      - Updated copyright year information.
+
 0.07  Fri Sep 02 10:30:00 2016
       - Updated copyright year information.
       - Tidied up unit test script t/00-load.t.

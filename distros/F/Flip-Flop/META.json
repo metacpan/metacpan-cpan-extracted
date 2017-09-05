@@ -1,5 +1,5 @@
 {
-   "abstract" : "Flop a switch in your script to zero after a clean run with the switch set to one",
+   "abstract" : "Flop a switch in your script to zero after a run with the switch set to one.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -23,15 +23,14 @@
          "requires" : {
             "Carp" : "0",
             "Data::Table::Text" : "20170820",
-            "Test::More" : "0",
-            "perl" : "v5.16.0"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Flip::Flop" : {
          "file" : "lib/Flip/Flop.pm",
-         "version" : "20170823"
+         "version" : "20170828"
       }
    },
    "release_status" : "stable",
@@ -40,5 +39,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170823"
+   "version" : "20170828"
 }

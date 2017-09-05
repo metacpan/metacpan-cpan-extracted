@@ -3,7 +3,7 @@ package DBIx::dbMan::Interface;
 use strict;
 use DBIx::dbMan::History;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 1;
 
@@ -151,10 +151,18 @@ sub loop {
 	my %action = ();
 
 	do {
-		%action = $obj->get_action();
-		do {
-			%action = $obj->{-core}->handle_action(%action);
-		} until ($action{processed});
+        eval {
+            %action = $obj->get_action();
+            do {
+                %action = $obj->{-core}->handle_action(%action);
+            } until ($action{processed});
+        };
+        if ( $@ =~ /^Catched signal INT/ ) {
+            print "Interrupted by user.\n";
+        }
+        elsif ( $@ ) {
+            die $@;
+        }
 	} until ($action{action} eq 'QUIT');
 }
 

@@ -666,11 +666,11 @@ Enable/disable debug mode:
 
 * `--format` 
 
-Sets reports format. Available formats are: `concise|default`. Default value is `default`.
+Sets reports format. Available formats are: `concise|production|default`. Default value is `default`.
 
-In concise format strun shrinks output to only STDOUT/STDERR comes from scenarios.
+In concise format strun shrinks output to only STDOUT/STDERR comes from scenarios. It's useful when you want to parse stories output by external commands.
 
-It's useful when you want to parse stories output by external commands.
+Production format omits debug information.
 
 * `--purge-cache`
 
@@ -901,6 +901,8 @@ converted. If you need single dashes, prepend parameters in configuration file w
 * `SPARROW_NO_COLOR` - disable color output, see `--nocolor` option of story runner.
 
 * `OUTTHENTIC_CWD` - sets working directory for strun, see `--cwd` parameter of story runner
+
+* `OUTTHENTIC_FORMAT` - overrides default value for `--format` parameter of story runner.
 
 Cache directory resolution:
     

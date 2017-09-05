@@ -50,9 +50,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         
       // Core type or array
       if (
-        SPVM_TYPE_is_array(compiler, type) || strcmp(base_name, "void") || strcmp(base_name, "byte")
-        || strcmp(base_name, "short") || strcmp(base_name, "int") || strcmp(base_name, "long")
-        || strcmp(base_name, "float") || strcmp(base_name, "double") || strcmp(base_name, "string")
+        SPVM_TYPE_is_array(compiler, type) || strcmp(base_name, "void") == 0 || strcmp(base_name, "byte") == 0
+        || strcmp(base_name, "short") == 0 || strcmp(base_name, "int") == 0 || strcmp(base_name, "long") == 0
+        || strcmp(base_name, "float") == 0 || strcmp(base_name, "double") == 0 || strcmp(base_name, "string") == 0
       )
       {
         // Nothing
@@ -61,6 +61,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         // Package
         SPVM_HASH* op_package_symtable = compiler->op_package_symtable;
         SPVM_OP* op_found_package = SPVM_HASH_search(op_package_symtable, base_name, strlen(base_name));
+        
         if (op_found_package) {
           // Nothing
         }
@@ -87,6 +88,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         new_type->op_package = SPVM_HASH_search(compiler->op_package_symtable, type->name, strlen(type->name));
         
         op_type->uv.type = new_type;
+
       }
     }
   }
@@ -112,36 +114,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       
       SPVM_DYNAMIC_ARRAY* op_fields_object = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
       SPVM_DYNAMIC_ARRAY* op_fields_numeric = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-      
-      /*
-      // Separate reference type and value type
-      _Bool field_type_error = 0;
-      int32_t field_pos;
-      {
-        for (field_pos = 0; field_pos < op_fields->length; field_pos++) {
-          SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, field_pos);
-          SPVM_FIELD_INFO* field = op_field->uv.field;
-          SPVM_TYPE* field_type = field->op_type->uv.type;
-          
-          // Check field type
-          if (SPVM_TYPE_is_array(compiler, field_type)) {
-            if (!SPVM_TYPE_is_array_numeric(compiler, field_type)) {
-              SPVM_yyerror_format(compiler, "Type of field \"%s::%s\" must not be object array at %s line %d\n", package->op_name->uv.name, field->op_name->uv.name, op_field->file, op_field->line);
-              compiler->fatal_error = 1;
-              return;
-            }
-          }
-          else if (field_type->code == SPVM_TYPE_C_CODE_STRING) {
-            // Nothing
-          }
-          else if (!SPVM_TYPE_is_numeric(compiler, field_type)) {
-              SPVM_yyerror_format(compiler, "Type of field \"%s::%s\" must not be numeric at %s line %d\n", package->op_name->uv.name, field->op_name->uv.name, op_field->file, op_field->line);
-              compiler->fatal_error = 1;
-              return;
-          }
-        }
-      }
-      */
       
       // Separate reference type and value type
       {
@@ -208,6 +180,28 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_subs, sub_pos);
       SPVM_SUB* sub = op_sub->uv.sub;
       SPVM_OP* op_package = sub->op_package;
+      SPVM_PACKAGE* package = op_package->uv.package;
+      
+      // Destructor must receive own package object
+      if (sub->is_destructor) {
+        // DESTROY argument must be 0
+        _Bool error = 0;
+        if (sub->op_args->length != 1) {
+          error = 1;
+        }
+        else {
+          SPVM_OP* op_arg = SPVM_DYNAMIC_ARRAY_fetch(sub->op_args, 0);
+          SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, op_arg);
+          
+          if (arg_type->code != package->op_type->uv.type->code) {
+            error = 1;
+          }
+        }
+        
+        if (error) {
+          SPVM_yyerror_format(compiler, "DESTROY argument type must be %s\n", package->op_name->uv.name, op_sub->file, op_sub->line);
+        }
+      }
       
       // Only process normal subroutine
       if (!sub->is_native) {
@@ -1394,7 +1388,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       }
                     }
                     if (is_invalid) {
-                      SPVM_yyerror_format(compiler, "Argument %d type is invalid. sub \"%s\" at %s line %d\n", (int) call_sub_args_count, sub_abs_name, op_cur->file, op_cur->line);
+                      SPVM_yyerror_format(compiler, "Type of %d argument must be %s(%s()) at %s line %d\n", (int)call_sub_args_count, sub_arg_type->name, sub_abs_name, op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }

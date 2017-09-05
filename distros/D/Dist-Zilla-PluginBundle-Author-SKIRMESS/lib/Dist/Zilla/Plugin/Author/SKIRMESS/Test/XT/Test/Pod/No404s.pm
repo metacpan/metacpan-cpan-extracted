@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 use Moose;
 
@@ -24,6 +24,11 @@ sub test_body {
     my ($self) = @_;
 
     return <<'TEST_BODY';
+if ( exists $ENV{AUTOMATED_TESTING} ) {
+    print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
+    exit 0;
+}
+
 use Test::Pod::No404s;
 
 all_pod_files_ok();

@@ -35,6 +35,9 @@ is($x, undef, 'proxy undefined method call no good val returned');
 ok($@ =~ /goodbye/ && $@ =~ /ScalarThing/,
    'proxy undefined method call raised error');
 
+ok($proxy->can('hello'), '$proxy->can ok on valid method name');
+ok(!$proxy->can('later'), '$proxy->can ok on invalid method name');
+
 done_testing;
 
 

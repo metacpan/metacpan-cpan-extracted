@@ -809,7 +809,7 @@ int m;
 #endif
 {
    if(zzmdep == ZZMAXSTK - 1) {
-     sprintf(zzmbuf, "Mode stack overflow ");
+     snprintf(zzmbuf, 69, "Mode stack overflow "); // slower but easier to track pointer overflows
      zzerr(zzmbuf);
    } else {
      zzmstk[zzmdep++] = zzauto;
@@ -824,8 +824,8 @@ zzmpop( void )
 zzmpop( )
 #endif
 {
-   if(zzmdep == 0)
-   {  sprintf(zzmbuf, "Mode stack underflow ");
+   if(zzmdep == 0) {
+      snprintf(zzmbuf, 69, "Mode stack underflow ");
       zzerr(zzmbuf);
    }
    else

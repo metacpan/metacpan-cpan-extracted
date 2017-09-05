@@ -44,7 +44,7 @@ WriteMakefile(
     'NAME'              => 'Mail::GPG',
     'VERSION_FROM'      => 'lib/Mail/GPG.pm',
     'PREREQ_PM'         => {
-        'Event'             => 0,
+        'AnyEvent'          => 0,
         'List::MoreUtils'   => 0,
         'MIME::Entity'      => 5.419,
         'MIME::Parser'      => 5.419,

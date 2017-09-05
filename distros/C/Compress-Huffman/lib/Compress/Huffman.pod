@@ -1,4 +1,5 @@
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -14,14 +15,14 @@ Compress::Huffman - Huffman encode a symbol table
     use Compress::Huffman;
     my $cf = Compress::Huffman->new ();
     my %symbols = (
-    a => 0.5,
-    b => 0.25,
-    c => 0.125,
-    d => 0.125,
+        a => 0.5,
+        b => 0.25,
+        c => 0.125,
+        d => 0.125,
     );
     $cf->symbols (\%symbols);
     my $table = $cf->table ();
-    for my $k (keys %symbols) {
+    for my $k (sort keys %symbols) {
         print "$k: <$table->{$k}> ";
     }
     print "\n";
@@ -32,7 +33,7 @@ Compress::Huffman - Huffman encode a symbol table
     $cf->symbols (\%symbols, size => 3, notprob => 1);
     
     my $table3 = $cf->table ();
-    for my $k (keys %symbols) {
+    for my $k (sort keys %symbols) {
         print "$k: <$table3->{$k}> ";
     }
     print "\n";
@@ -40,14 +41,17 @@ Compress::Huffman - Huffman encode a symbol table
 
 produces output
 
-    b: <11> c: <101> a: <0> d: <100> 
-    b: <1> c: <02> a: <2> d: <01> 
+    a: <1> b: <01> c: <000> d: <001> 
+    a: <2> b: <1> c: <02> d: <01> 
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.07/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.05 of Compress::Huffman corresponding to git
-commit a923820b287c44d900d2831266f925506d2fa5e8 released on Wed Sep 21 20:46:29 2016 +0900.
+This documents version 0.07 of Compress-Huffman corresponding to
+L<git commit 70439e9c1749bc36e8a0a404cf7cf7e418ff16d0|https://github.com/benkasminbullock/compress-huffman/commit/70439e9c1749bc36e8a0a404cf7cf7e418ff16d0> released on Fri Sep 1 14:55:57 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -341,8 +345,11 @@ The module is slow for large symbol tables. For example a hash with
 100,000 entries might take several minutes to finish building the
 table.
 
-Huffman encoding itself does not achieve any compression with, for
-example, two symbols A and B with probabilities 0.001 and 0.999.
+Huffman encoding itself does not achieve any compression when there
+are, for example, two symbols A and B with probabilities 0.001 and
+0.999, since every symbol takes at least one bit of information to
+encode. Arithmetic encoding and asymmetric numeral systems are two
+forms of encoding designed to overcome this issue.
 
 =head1 DEPENDENCIES
 
@@ -361,10 +368,16 @@ L<POSIX/ceil> to calculate the size of tables needed in encoding.
 
 Perl extension that implements the Huffman algorithm
 
-Unfortunately this is 14 years old and L<seems to
+Unfortunately this is 15 years old and L<seems to
 fail all its
 tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
+
+=item L<Compress::Huffman::Binary>
+
+This module is by the same author as Compress::Huffman. It is intended
+to compute the binary case of Huffman encoding. It's written in C and
+should be faster than this module, but as of version 0.07, it is not complete.
 
 =back
 
@@ -400,18 +413,10 @@ I<Elements of Information Theory> by Thomas Cover and Joy Thomas,
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2015-2016
+2015-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -8,7 +8,7 @@ use XML::Twig;
 
 use Device::PaloAlto::Firewall;
 
-plan tests => 21;
+plan tests => 11;
 
 ### Testing interfaces_up() ###
 
@@ -28,33 +28,17 @@ ok( $test->interfaces_up(interfaces => ['ethernet1/1', 'ethernet1/2']), 'Multipl
 ok( !$test->interfaces_up(interfaces => ['ethernet1/3']), 'Interface down' );
 ok( !$test->interfaces_up(interfaces => ['ethernet1/1', 'ethernet1/3']), 'One interface up, one interface down' );
 
-ok( $test->interfaces_up(interfaces => ['ethernet1/(1|2)']), 'Regex interface up' );
-ok( !$test->interfaces_up(interfaces => ['ethernet1/(1|3)']), 'Regex One interface up, one interface down' );
-
-ok( !$test->interfaces_up(interfaces => ['ethernet1/.']), 'All ethernet interfaces' );
-
-warning_is { $test->interfaces_up(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no configured interfaces. Test may still succeed", "interfaces_up() - no match warns";
 warning_is { $test->interfaces_up(interfaces => [ ]) } "Warning: no interfaces specified - test returns true", "interfaces_up() with an empty ARRAYREF warns";
+
 { 
 	# Supress the warning output
     no warnings 'redefine';
     local *Device::PaloAlto::Firewall::Test::carp = sub { };
-	ok( $test->interfaces_up(interfaces => ['ethrnet1/2']), 'No matching misspelled interface' );
     ok( $test->interfaces_up(interfaces => [ ]), 'No interfaces specified' );
 }
 
 
 ### Testing interfaces_duplex() ###
-
-warning_is { $test->interfaces_duplex(interfaces => ['ethrnet1/2']) } "Warning: 'ethrnet1/2' matched no configured interfaces. Test may still succeed", "interfaces_duplex() - no match warns";
-
-warning_is { $test->interfaces_duplex(interfaces => ['ethernet1/1']) } "Warning: detected 'auto' duplex, probable VM? Test may still succeed", "Probable VM Warning";
-{ 
-	# Supress the warning output
-    no warnings 'redefine';
-    local *Device::PaloAlto::Firewall::Test::carp = sub { };
-	ok( $test->interfaces_duplex(interfaces => ['ethrnet1/1']), 'VM detection still succeeds' );
-}
 
 $fw->meta->remove_method('_send_request');
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( static_phy_response() )->simplify( forcearray => ['entry'] )->{result} } );
@@ -62,8 +46,6 @@ $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse
 ok( $test->interfaces_duplex(interfaces => ['ethernet1/11']), 'Interface in full duplex mode' );
 ok( !$test->interfaces_duplex(interfaces => ['ethernet1/12']), 'Interface in half duplex mode' );
 ok( !$test->interfaces_duplex(interfaces => ['ethernet1/11', 'ethernet1/12']), 'One interface in half duplex mode, one in full duplex mode' );
-ok( !$test->interfaces_duplex(interfaces => ['ethernet1/(1|2)']), 'One interface in half duplex mode, one in full duplex mode, regex' );
-ok( !$test->interfaces_duplex(interfaces => ['.*']), 'Wildcard regex.' );
 
 
 sub static_vm_response {

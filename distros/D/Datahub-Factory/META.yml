@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Datahub-Factory/issues
   homepage: https://github.com/thedatahub/Datahub-Factory
   repository: https://github.com/thedatahub/Datahub-Factory.git
-version: '1.5'
+version: 1.6.1
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

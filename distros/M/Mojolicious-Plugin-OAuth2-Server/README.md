@@ -3,12 +3,15 @@
 Mojolicious::Plugin::OAuth2::Server - Easier implementation of an OAuth2
 Authorization Server / Resource Server with Mojolicious
 
-[![Build Status](https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server.svg)](https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server)
-[![Coverage Status](https://coveralls.io/repos/github/Humanstate/mojolicious-plugin-oauth2-server/badge.svg?branch=master)](https://coveralls.io/github/Humanstate/mojolicious-plugin-oauth2-server?branch=master)
+<div>
+
+    <a href='https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server?branch=master'><img src='https://travis-ci.org/Humanstate/mojolicious-plugin-oauth2-server.svg?branch=master' alt='Build Status' /></a>
+    <a href='https://coveralls.io/r/Humanstate/mojolicious-plugin-oauth2-server?branch=master'><img src='https://coveralls.io/repos/Humanstate/mojolicious-plugin-oauth2-server/badge.png?branch=master' alt='Coverage Status' /></a>
+</div>
 
 # VERSION
 
-0.38
+0.39
 
 # SYNOPSIS
 
@@ -119,9 +122,17 @@ module (`verify_token_and_scope` method) to validate the access/refresh token.
 [Net::OAuth2::AuthorizationServer](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer) - The dist that handles the bulk of the
 functionality used by this plugin
 
-# AUTHOR
+# AUTHOR & CONTRIBUTORS
 
 Lee Johnson - `leejo@cpan.org`
+
+With contributions from:
+
+Nick Logan `nlogan@gmail.com`
+
+Pierre VIGIER `pierre.vigier@gmail.com`
+
+Renee `reb@perl-services.de`
 
 # LICENSE
 

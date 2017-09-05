@@ -24,6 +24,8 @@ src/panda/date/DateInt.h
 src/panda/date/DateRel.cc
 src/panda/date/DateRel.h
 src/panda/date/inc.h
+src/panda/date/iso.cc
+src/panda/date/iso8601.cc
 src/panda/date/parse.cc
 src/panda/date/parse.h
 sv2class.h
@@ -44,6 +46,8 @@ t/40-operations.t
 t/41-storable.t
 t/42-json.t
 t/43-panda-lib-clone.t
+t/44-unparsable_junk.t
+t/45-ISO-8601.t
 t/99-leaks.t
 t/lib/PDTest.pm
 typemap

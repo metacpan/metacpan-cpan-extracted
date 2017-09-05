@@ -1,5 +1,5 @@
 #!perl -T
-use 5.14;
+use v5.14;
 use strict;
 use warnings;
 use Test::More;
@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'API::Drip' ) || print "Bail out!\n";
+    use_ok( 'API::Drip::Request' ) || print "Bail out!\n";
 }
 
-diag( "Testing API::Drip $API::Drip::VERSION, Perl $], $^X" );
+diag( "Testing API::Drip::Request $API::Drip::Request::VERSION, Perl $], $^X" );

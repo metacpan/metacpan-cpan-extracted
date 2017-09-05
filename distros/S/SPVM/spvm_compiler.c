@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "spvm_compiler.h"
 #include "spvm_type.h"
@@ -108,6 +109,33 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
     }
   }
   
+  // Build use package path id symtable
+  {
+    int32_t package_name_index;
+    for (package_name_index = 0; package_name_index < compiler->use_package_names->length; package_name_index++) {
+      const char* package_name = SPVM_DYNAMIC_ARRAY_fetch(compiler->use_package_names, package_name_index);
+      const char* package_path = SPVM_HASH_search(compiler->use_package_path_symtable, package_name, strlen(package_name));
+      
+      int32_t package_path_id = (int32_t)(intptr_t)SPVM_HASH_search(compiler->string_symtable, package_path, strlen(package_path));
+      assert(package_path_id > 0);
+      
+      SPVM_HASH_insert(runtime->use_package_path_id_symtable, package_name, strlen(package_name), (void*)(intptr_t)package_path_id);
+    }
+  }
+
+  // Build inline files
+  {
+    int32_t inline_file_index;
+    for (inline_file_index = 0; inline_file_index < compiler->inline_files->length; inline_file_index++) {
+      const char* inline_file = SPVM_DYNAMIC_ARRAY_fetch(compiler->inline_files, inline_file_index);
+      
+      int32_t inline_file_id = (int32_t)(intptr_t)SPVM_HASH_search(compiler->string_symtable, inline_file, strlen(inline_file));
+      assert(inline_file_id > 0);
+      
+      SPVM_DYNAMIC_ARRAY_push(runtime->inline_file_ids, (void*)(intptr_t)inline_file_id);
+    }
+  }
+  
   SPVM_DYNAMIC_ARRAY* op_packages = compiler->op_packages;
   
   runtime->packages_length = op_packages->length;
@@ -149,6 +177,13 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->type_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->op_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+  compiler->string_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
+  
+  compiler->inline_files = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+  
+  compiler->use_package_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+
+  compiler->use_package_path_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   
   compiler->native_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
 

@@ -19,7 +19,7 @@ sub ua {
     eval { require LWP::UserAgent; };
     $self->abort( 'LWP::UserAgent isn\'t installed', $@ ) if ($@);
 
-# TODO : - LWP options to use a proxy for example
+    # TODO : - LWP options to use a proxy for example
     $_ua = LWP::UserAgent->new(
         $self->{lwpSslOpts} && %{ $self->{lwpSslOpts} }
         ? ( ssl_opts => $self->{lwpSslOpts} )

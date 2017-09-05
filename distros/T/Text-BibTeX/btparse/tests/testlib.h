@@ -39,7 +39,7 @@ if (! (cond))                                                   \
 }
 
 
-FILE *open_file (char *basename, char *dirname, char *filename);
+FILE *open_file (char *basename, char *dirname, char *filename, int len);
 void set_all_stringopts (btshort options);
 
 

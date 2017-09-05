@@ -26,7 +26,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.59';
+$VERSION='6.60';
 END { undef $VERSION; }
 
 ########################################################################
@@ -1932,12 +1932,63 @@ sub _nth_interval {
 sub _locate_n {
    my($self,$op) = @_;
 
-   return $$self{'data'}{$op}  if (defined $$self{'data'}{$op}  ||
-                                   $$self{'data'}{'noint'} == 2);
+   return $$self{'data'}{$op}  if (defined $$self{'data'}{$op});
 
    my $start = $$self{'data'}{'start'};
    my $end   = $$self{'data'}{'end'};
    my $unmod = $$self{'data'}{'unmod_range'};
+
+   if ($$self{'data'}{'noint'} == 2) {
+      # If there is no interval, then we have calculated all the dates
+      # possible.  Work with them only.
+
+      my($i,$first,$last);
+
+      # Find the first date in the interval
+
+      $i = 0;
+      while (1) {
+         last  if (! exists $$self{'data'}{'dates'}{$i});
+         my $date = $$self{'data'}{'dates'}{$i};
+         if ($date->cmp($start) == -1) {
+            # date < start   : move to the next one
+            $i++;
+            next;
+         } elsif ($date->cmp($end) == 1) {
+            # date > end     : we're done
+            last;
+         } else {
+            # start <= date <= end    : this is the first one
+            $first = $i;
+            last;
+         }
+      }
+
+      # If we found one, find the last one
+
+      if (defined($first)) {
+         $i       = $first;
+         $last    = $i;
+         while (1) {
+            last  if (! exists $$self{'data'}{'dates'}{$i});
+            my $date = $$self{'data'}{'dates'}{$i};
+            if ($date->cmp($end) == 1) {
+               # date > end    : we're done
+               last;
+            } else {
+               # date <= end   : this might be the last one
+               $last = $i;
+               $i++;
+               next;
+            }
+         }
+      }
+
+      $$self{'data'}{'first'} = $first;
+      $$self{'data'}{'last'}  = $last;
+      return $$self{'data'}{$op}
+   }
+
 
    # Given interval date Idate(n) produces event dates: Date(f)..Date(l)
    #

@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Fri Jan 20 17:57:13 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Mar 18 20:31:19 2011
-# Update Count    : 251
+# Last Modified On: Thu Aug 31 10:01:04 2017
+# Update Count    : 263
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -85,13 +85,6 @@ sub init_config {
 	    }
 	}
     }
-
-    $ENV{EB_LANG} = $cfg->val('locale','lang',
-                              $ENV{EB_LANG}||$ENV{LANG}||
-                              ($^O =~ /^(ms)?win/i ? "nl_NL.utf8" : "nl_NL"));
-
-    $cfg->_plug(qw(locale       lang         EB_LANG));
-    $ENV{LANG} = $cfg->val(qw(locale lang));
 
     $cfg->_plug(qw(database     name         EB_DB_NAME));
 

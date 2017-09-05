@@ -1,18 +1,14 @@
 package Dist::Zilla::PluginBundle::Author::WATERKIP;
 use Moose;
-our $VERSION = '1.0';
 
 # ABSTRACT: An plugin bundle for all distributions by WATERKIP
 # KEYWORDS: author bundle distribution tool
 
-use Moose::Util::TypeConstraints qw(enum);
+use Moose::Util::TypeConstraints qw(enum subtype where);
 use List::Util qw(uniq any first);
 use namespace::autoclean;
 
-# Have multi value args
-sub mvp_multivalue_args {
-    return qw(copy_file_from_release);
-}
+our $VERSION = '1.4';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -40,6 +36,7 @@ has license => (
     default => sub { $_[0]->payload->{license} // 'LICENSE' },
 );
 
+
 has copy_file_from_release => (
     isa => 'ArrayRef[Str]',
     init_arg => undef,
@@ -49,11 +46,19 @@ has copy_file_from_release => (
     handles => { copy_files_from_release => 'elements' },
 );
 
+has debug => (
+    is => 'ro', isa => 'Bool',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { $ENV{DZIL_AUTHOR_DEBUG} // $_[0]->payload->{debug} // 0 },
+);
+
 around copy_files_from_release => sub {
     my $orig = shift; my $self = shift;
     sort(uniq(
             $self->$orig(@_),
-            qw(LICENCE LICENSE CONTRIBUTING Changes CHANGES ppport.h INSTALL Makefile.PL cpanfile README README.md)
+            qw(LICENCE LICENSE CONTRIBUTING ppport.h INSTALL
+            Makefile.PL cpanfile README Build.PL)
     ));
 };
 
@@ -68,23 +73,18 @@ has authority => (
 );
 
 has fake_release => (
-    is       => 'ro',
-    isa      => 'Bool',
+    is => 'ro', isa => 'Bool',
     init_arg => undef,
-    lazy     => 1,
-    default  => sub {
-            $ENV{FAKE_RELEASE}
-            || $_[0]->payload->{fake_release} // 0;
-    },
+    lazy => 1,
+    default => sub { $ENV{FAKE_RELEASE} // $_[0]->payload->{fake_release} // 0 },
 );
 
-has test_release => (
+has changes_version_columns => (
     is       => 'ro',
-    isa      => 'Bool',
+    isa      => subtype('Int', where { $_ > 0 && $_ < 20 }),
     init_arg => undef,
     lazy     => 1,
-    # Currently all our releases are test releases
-    default => sub { $_[0]->payload->{test_release} // 1 },
+    default => sub { $_[0]->payload->{changes_version_columns} // 10 },
 );
 
 my @network_plugins = qw(
@@ -105,11 +105,24 @@ sub _warn_me {
     warn(sprintf("[\@Author::WATERKIP]  %s\n", $msg));
 }
 
+sub commit_files_after_release {
+    grep { -e } sort(uniq('README.md', 'README.pod', 'Changes', shift->copy_files_from_release));
+}
+
 my %removed;
 
 sub configure {
     my $self = shift;
 
+
+    if ($self->debug) {
+        use Data::Dumper;
+        _warn_me(
+            Dumper {
+                payload => $self->payload,
+            }
+        );
+    }
 
     if (!-d '.git' and -f 'META.json' and !exists $removed{'Git::GatherDir'}) {
         _warn_me(
@@ -123,42 +136,39 @@ sub configure {
         [
             'Git::GatherDir' => {
                 do {
-                    my @filenames = $self->copy_files_from_release;
+                    my @filenames
+                        = grep { -e } $self->copy_files_from_release;
                     @filenames ? (exclude_filename => \@filenames) : ();
                 },
             },
         ],
 
-        qw(MetaYAML MetaJSON Readme ManifestSkip Manifest),
-
-        $self->test_release ? () :
-        [
-            'Git::Check' => {
-                allow_dirty     => [$self->copy_files_from_release],
-            }
-        ],
-
+        qw(PruneCruft ManifestSkip MetaYAML MetaJSON),
 
         [ 'License' => { filename => $self->license } ],
 
-        ['PruneCruft'],
-        ['ExtraTests'],
-        ['ExecDir'],
-        ['ShareDir'],
-        ['MakeMaker'],
-        ['ChangelogFromGit'],
-        #['TestRelease'],
+        qw(Readme ExtraTests ExecDir ShareDir MakeMaker Manifest
+           TestRelease PodWeaver),
+
+        [ 'AutoPrereqs' => { skip => [qw(^perl$ ^namespace::autoclean$)]}],
+        [ 'Prereqs::AuthorDeps' => { ':version' => '0.006' } ],
+        [ 'MinimumPerl'         => { ':version' => '1.006', configure_finder => ':NoFiles' } ],
         ['CPANFile'],
+        ['Repository'],
+        ['ConfirmRelease'],
+
+#        [ 'PrereqsClean'],
 
         $self->fake_release ? do { _warn_me('FAKE_RELEASE set - not uploading to CPAN'); 'FakeRelease' }
            : 'UploadToCPAN',
 
+        # Perhaps do copy files from build first?
+        # [ 'CopyFilesFromBuild' => { filename => [ $self->copy_files_from_release ] } ],
         [ 'CopyFilesFromRelease' => { filename => [ $self->copy_files_from_release ] } ],
+        # Don't generate a change log from git just yet, figure out
+        # first what our workflow will be
+        #['ChangelogFromGit' => { include_message => '^release' } ],
 
-        [ 'PodWeaver'],
-        [ 'AutoPrereqs'],
-        [ 'Prereqs::AuthorDeps' => { ':version' => '0.006' } ],
-        [ 'MinimumPerl'         => { ':version' => '1.006', configure_finder => ':NoFiles' } ],
 
     );
 
@@ -178,6 +188,27 @@ sub configure {
         push @plugins, 'BlockRelease';
     }
 
+    # plugins to do with calculating, munging, incrementing versions
+    $self->add_bundle('@Git::VersionManager' => {
+        'RewriteVersion::Transitional.global' => 1,
+        'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
+        'RewriteVersion::Transitional.version_regexp' => '^v([\d._]+)(-TRIAL)?$',
+
+        # for first Git::Commit
+        commit_files_after_release => [ $self->commit_files_after_release ],
+        # because of [Git::Check], only files copied from the release would be added -- there is nothing else
+        # hanging around in the current directory
+        'release snapshot.add_files_in' => ['.'],
+        'release snapshot.commit_msg' => '%N-%v%t%n%n%c',
+
+        'Git::Tag.tag_message' => 'v%v%t',
+
+        'BumpVersionAfterRelease::Transitional.global' => 1,
+
+        'NextRelease.:version' => '5.033',
+        'NextRelease.time_zone' => 'UTC',
+        'NextRelease.format' => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
+    });
     $self->add_plugins(@plugins);
 
 }
@@ -196,11 +227,31 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 1.0
+version 1.4
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    [@Author::WATERKIP]
+
+=head1 METHODS
+
+=head2 configure
+
+Configure the author plugin
+
+=head2 commit_files_after_release
+
+Commit files after a release
+
+=head1 SEE ALSO
+
+I took inspiration from L<Dist::Zilla::PluginBundle::Author::ETHER>
 
 =head1 AUTHOR
 
-Wesley Schwengle <wesley@schwengle.net>
+Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

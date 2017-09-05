@@ -29,10 +29,10 @@
 #include "spvm_compiler_allocator.h"
 #include "spvm_limit.h"
 #include "spvm_extention.h"
-#include "spvm_extention_bind.h"
 #include "spvm_use.h"
 #include "spvm_constant_pool.h"
 #include "spvm_constant_pool_type.h"
+#include "spvm_constant_pool_package.h"
 
 
 
@@ -186,6 +186,7 @@ SPVM_OP* SPVM_OP_new_op_use_from_package_name(SPVM_COMPILER* compiler, const cha
   SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_USE, file, line);
   SPVM_USE* use = SPVM_USE_new(compiler);
   use->package_name = package_name;
+  use->package_name_with_template_args = package_name;
   op_use->uv.use = use;
   SPVM_OP_insert_child(compiler, op_use, op_use->last, op_name_package);
   
@@ -295,19 +296,6 @@ SPVM_OP* SPVM_OP_get_op_block_from_op_sub(SPVM_COMPILER* compiler, SPVM_OP* op_s
 }
 
 SPVM_OP* SPVM_OP_build_eval(SPVM_COMPILER* compiler, SPVM_OP* op_eval, SPVM_OP* op_eval_block) {
-  
-  // Set exception to undef at first of eval block
-  SPVM_OP* op_exception_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_EXCEPTION_VAR, op_eval_block->file, op_eval_block->line);
-  SPVM_OP* op_undef = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_UNDEF, op_eval_block->file, op_eval_block->line);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_eval_block->file, op_eval_block->line);
-  SPVM_OP_insert_child(compiler, op_assign, op_assign->last, op_exception_var);
-  SPVM_OP_insert_child(compiler, op_assign, op_assign->last, op_undef);
-  
-  op_assign->first->lvalue = 1;
-  op_assign->last->rvalue = 1;
-  
-  SPVM_OP* op_list_statement = op_eval_block->first;
-  SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_assign);
   
   SPVM_OP_insert_child(compiler, op_eval, op_eval->last, op_eval_block);
   
@@ -875,6 +863,23 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
       }
     }
   }
+
+  // Set destcutor sub id to package
+  {
+    int32_t package_index;
+    for (package_index = 0; package_index < op_packages->length; package_index++) {
+      SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(op_packages, package_index);
+      SPVM_PACKAGE* package = op_package->uv.package;
+      
+      int32_t package_id = package->id;
+      
+      SPVM_CONSTANT_POOL_PACKAGE* constant_pool_package = (SPVM_CONSTANT_POOL_PACKAGE*)&compiler->constant_pool->values[package_id];
+      
+      if (package->op_sub_destructor) {
+        constant_pool_package->destructor_sub_id = package->op_sub_destructor->uv.sub->id;
+      }
+    }
+  }
 }
 
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages) {
@@ -1035,6 +1040,10 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           
           sub->op_package = op_package;
           
+          if (sub->is_destructor) {
+            package->op_sub_destructor = op_sub;
+          }
+          
           assert(op_sub->file);
           
           sub->file_name = op_sub->file;
@@ -1064,6 +1073,7 @@ SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op
   
   SPVM_USE* use = SPVM_USE_new(compiler);
   op_use->uv.use = use;
+  use->package_name_with_template_args = package_name_with_template_args;
   
   SPVM_DYNAMIC_ARRAY* part_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   
@@ -1162,7 +1172,7 @@ SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP
   return op_field;
 }
 
-SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_name_sub, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_type, SPVM_OP* op_block) {
+SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_name_sub, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_return_type, SPVM_OP* op_block) {
   
   if (op_name_sub->code == SPVM_OP_C_CODE_NEW) {
     op_name_sub->code = SPVM_OP_C_CODE_NAME;
@@ -1180,7 +1190,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_name_sub);
   SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_args);
   SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_descriptors);
-  SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_type);
+  SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_return_type);
   if (op_block) {
     op_block->flag = SPVM_OP_C_FLAG_BLOCK_SUB;
     SPVM_OP_insert_child(compiler, op_sub, op_sub->last, op_block);
@@ -1223,7 +1233,15 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   }
 
   // return type
-  sub->op_return_type = op_type;
+  sub->op_return_type = op_return_type;
+  
+  if (strcmp(sub->op_name->uv.name, "DESTROY") == 0) {
+    sub->is_destructor = 1;
+    // DESTROY return type must be void
+    if (sub->op_return_type->uv.type->code != SPVM_TYPE_C_CODE_VOID) {
+      SPVM_yyerror_format(compiler, "DESTROY return type must be void\n", op_block->file, op_block->line);
+    }
+  }
   
   // Add my declaration to first of block
   if (op_block) {

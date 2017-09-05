@@ -183,3 +183,12 @@ Revision history for Dios
         * Fixed non-persistence of values in typed attributes
           (thanks, Felix!)
 
+
+
+0.002011  Sat Sep  2 09:40:40 2017
+
+        * Silenced the warning when a variable declared in a submethod
+          shadows the name of an attribute variable
+
+        * Fixed initialization of objects with BUILD methods
+          (thanks, Felix!)

@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Apr 13 17:25:07 2008
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun  7 13:59:14 2012
-# Update Count    : 241
+# Last Modified On: Fri Dec 11 21:51:17 2015
+# Update Count    : 244
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -286,8 +286,6 @@ sub transactions {
 		    $self->xml_elt_close("transaction");
 		    redo FETCH;
 		}
-		# Combine deb/crd amounts.
-		$jnl_amount -= $jnl_damount if $jnl_damount;
 
 		$self->xml_elt_open("line");
 		  $self->xml_elt("recordID", $jnl_seq);

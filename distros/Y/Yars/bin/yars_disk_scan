@@ -19,7 +19,7 @@ yars_disk_scan - scan a disk for corruption and report corrupt files to stdout
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 

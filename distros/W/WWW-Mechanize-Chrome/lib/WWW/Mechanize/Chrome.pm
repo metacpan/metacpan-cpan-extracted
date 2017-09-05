@@ -16,7 +16,7 @@ use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
 use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 =head1 NAME
 
@@ -259,6 +259,16 @@ sub _build_log( $self ) {
     Log::Log4perl->get_logger(__PACKAGE__);
 }
 
+# The generation of node ids
+sub _generation( $self, $val=undef ) {
+    @_ == 2 and $self->{_generation} = $_[1];
+    $self->{_generation}
+};
+
+sub new_generation( $self ) {
+    $self->_generation( ($self->_generation() ||0) +1 );
+}
+
 sub log( $self, $level, $message, @args ) {
     my $logger = $self->{log};
     if( !@args ) {
@@ -314,35 +324,41 @@ sub new($class, %options) {
     $options{ extra_headers } ||= {};
 
     # Connect to it
-    eval {
-        $options{ driver } ||= Chrome::DevToolsProtocol->new(
-            'port' => $options{ port },
-            host => $host,
-            auto_close => 0,
-            error_handler => sub {
-                #warn ref$_[0];
-                #warn "<<@CARP_NOT>>";
-                #warn ((caller($_))[0,1,2])
-                #    for 1..4;
-                local @CARP_NOT = (@CARP_NOT, ref $_[0],'Try::Tiny');
-                # Reraise the error
-                croak $_[1]
-            },
-            transport => $options{ transport },
-            log => $options{ log },
-        );
-        # Synchronously connect here, just for easy API compatibility
-        $self->driver->connect(
-            new_tab => !$options{ reuse },
-            tab     => $options{ tab },
-        )->get;
-    };
-
+    $options{ driver } ||= Chrome::DevToolsProtocol->new(
+        'port' => $options{ port },
+        host => $host,
+        auto_close => 0,
+        error_handler => sub {
+            #warn ref$_[0];
+            #warn "<<@CARP_NOT>>";
+            #warn ((caller($_))[0,1,2])
+            #    for 1..4;
+            local @CARP_NOT = (@CARP_NOT, ref $_[0],'Try::Tiny');
+            # Reraise the error
+            croak $_[1]
+        },
+        transport => $options{ transport },
+        log => $options{ log },
+    );
+    # Synchronously connect here, just for easy API compatibility
+    
+    my $err;
+    $self->driver->connect(
+        new_tab => !$options{ reuse },
+        tab     => $options{ tab },
+    )->catch( sub($_err) {
+        $err = $_err;
+        Future->done( $err );
+    })->get;
+        
     # if Chrome started, but so slow or unresponsive that we cannot connect
     # to it, kill it manually to avoid waiting for it indefinitely
-    if ( $@ ) {
-        kill 9, delete $self->{ pid } if $self->{ kill_pid };
-        die $@;
+    if ( $err ) {
+        if( $self->{ kill_pid } and my $pid = delete $self->{ pid }) {
+            local $SIG{CHLD} = 'IGNORE';
+            kill 'SIGKILL' => $pid;
+        };
+        die $err;
     }
 
     my $s = $self;
@@ -354,6 +370,9 @@ sub new($class, %options) {
         $self->add_listener( 'Runtime.consoleAPICalled', $collect_JS_problems );
     $self->{exceptionThrownListener} =
         $self->add_listener( 'Runtime.exceptionThrown', $collect_JS_problems );
+    $self->{nodeGenerationChange} =
+        $self->add_listener( 'DOM.attributeModified', sub { $s->new_generation() } );
+    $self->new_generation;
 
     Future->wait_all(
         $self->driver->send_message('Page.enable'),    # capture DOMLoaded
@@ -372,7 +391,11 @@ sub new($class, %options) {
 
   my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
       my( $info ) = @_;
-      warn "Loaded URL $info->{response}->{url}: $info->{response}->{status}";
+      warn "Loaded URL "
+           . $info->{params}->{response}->{url}
+           . ": "
+           . $info->{params}->{response}->{status};
+      warn "Resource timing: " . Dumper $info->{params}->{response}->{timing};
   });
 
 Returns a listener object. If that object is discarded, the listener callback
@@ -384,7 +407,8 @@ Calling this method in void context croaks.
 
 sub add_listener( $self, $event, $callback ) {
     if( ! defined wantarray ) {
-        croak "->add_listener called in void context";
+        croak "->add_listener called in void context."
+            . "Please store the result somewhere";
     };
     return $self->driver->add_listener( $event, $callback )
 }
@@ -675,6 +699,7 @@ sub DESTROY {
     delete $_[0]->{ driver };
 
     if( $pid ) {
+        local $SIG{CHLD} = 'IGNORE';
         kill 'SIGKILL' => $pid;
     };
     %{ $_[0] }= (); # clean out all other held references
@@ -718,7 +743,7 @@ JS
 
 Retrieves the URL C<URL>.
 
-It returns a <HTTP::Response> object for interface compatibility
+It returns a L<HTTP::Response> object for interface compatibility
 with L<WWW::Mechanize>.
 
 Note that Chrome does not support download of files.
@@ -815,6 +840,9 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
 
     # Kick off the navigation ourselves
     my $nav = $get_navigation_future->()->get;
+    # We have a race condition to find out whether Chrome navigates or not
+    # so we wait a bit to see if it will navigate in response to our click
+    $self->sleep(0.1); # X XX baad fix
 
     my @events;
     if( $navigated or $options{ navigates }) {
@@ -822,11 +850,12 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
         # Handle all the events, by turning them into a ->response again
         my $res = $self->httpMessageFromEvents( $self->frameId, \@events );
         $self->update_response( $res );
-        undef $scheduled;
     } else {
         $self->log('trace', "No navigation occurred, not collecting events");
-        undef $scheduled;
+        $does_navigation->cancel;
     };
+    $scheduled->cancel;
+    undef $scheduled;
 
     # Store our frame id so we know what events to listen for in the future!
     $self->{frameId} ||= $nav->{frameId};
@@ -925,12 +954,12 @@ sub getResponseBody( $self, $requestId ) {
 }
 
 sub httpResponseFromChromeResponse( $self, $res ) {
-    $self->log('debug', sprintf "Status %d",$res->{params}->{response}->{status});
     my $response = HTTP::Response->new(
         $res->{params}->{response}->{status} || 200, # is 0 for files?!
         $res->{params}->{response}->{statusText},
         HTTP::Headers->new( %{ $res->{params}->{response}->{headers} }),
     );
+    $self->log('debug',sprintf "Status %0d - %s",$response->code, $response->status_line);
 
     # Also fetch the response body and include it in the response
     # as we can't do that lazily...
@@ -2054,7 +2083,6 @@ sub _performSearch( $self, %args ) {
             my $setChildNodes = $self->add_listener('DOM.setChildNodes', sub( $ev ) {
                 push @childNodes, @{ $ev->{params}->{nodes} };
             });
-            my $childNodes = $self->driver->one_shot('DOM.setChildNodes');
             $self->driver->send_message( 'DOM.getSearchResults',
                 searchId => $results->{searchId},
                 fromIndex => 0,
@@ -2097,7 +2125,6 @@ sub _performSearch( $self, %args ) {
                     # Upgrade the attributes to a hash, ruining their order:
                     my $n = $nodes{ $_ };
                     $self->_fetchNode( 0+$_, $n );
-                    #WWW::Mechanize::Chrome::Node->new( $n )
                 } @foundNodes;
 
                 Future->wait_all( @nodes );
@@ -2105,12 +2132,14 @@ sub _performSearch( $self, %args ) {
         } else {
             return Future->done()
         };
-    })
+    });
 }
 
 # If we have the attributes, don't fetch them separately
 sub _fetchNode( $self, $nodeId, $attributes = undef ) {
     $self->log('trace', sprintf "Resolving nodeId %s", $nodeId );
+    my $s = $self;
+    weaken $s;
     my $body = $self->driver->send_message( 'DOM.resolveNode', nodeId => 0+$nodeId );
     if( $attributes ) {
         $attributes = Future->done( $attributes )
@@ -2132,6 +2161,8 @@ sub _fetchNode( $self, $nodeId, $attributes = undef ) {
             },
             nodeName => $nodeName,
             driver => $self->driver,
+            mech => $s,
+            _generation => $self->_generation,
         };
         Future->done( WWW::Mechanize::Chrome::Node->new( $node ));
     });
@@ -2204,7 +2235,6 @@ sub xpath( $self, $query, %options) {
                     $self->_performSearch( query => $_, backendNodeId => $id )
                 } @$query
             )->get;
-
             @found = map { my @r = $_->get; @r ? map { $_->get } @r : () } @found;
             push @res, @found;
         };
@@ -2340,10 +2370,8 @@ sub click {
     };
 
     # Get the node as an object so we can find its position and send the clicks:
-    #warn Dumper $buttons[0];
     $self->log('trace', sprintf "Resolving nodeId %d to object for clicking", $buttons[0]->nodeId );
     my $id = $buttons[0]->objectId;
-    #$buttons[0]->{objectId} = $id;
     #warn Dumper $self->driver->send_message('Runtime.getProperties', objectId => $id)->get;
     #warn Dumper $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function() { this.focus(); }', arguments => [])->get;
 
@@ -3217,6 +3245,10 @@ JS
 Returns the current page rendered as PDF or PNG
 as a bytestring.
 
+Note that the PDF format will only be successful with headless Chrome. At least
+on Windows, when launching Chrome with a UI, printing to PDF will
+be unavailable.
+
 This method is specific to WWW::Mechanize::Chrome.
 
 =cut
@@ -3247,11 +3279,10 @@ sub render_content( $self, %options ) {
 
     my $pdf_data = $mech->content_as_pdf();
 
-    $mech->content_as_pdf(
-        filename => '/path/to/my.pdf',
-    );
-
 Returns the current page rendered in PDF format as a bytestring.
+
+Note that this method will only be successful with headless Chrome. At least on
+Windows, when launching Chrome with a UI, printing to PDF will be unavailable.
 
 This method is specific to WWW::Mechanize::Chrome.
 
@@ -3407,8 +3438,10 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
+use Scalar::Util 'weaken';
+
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 has 'attributes' => (
     is => 'lazy',
@@ -3420,10 +3453,6 @@ has 'nodeName' => (
 );
 
 has 'localName' => (
-    is => 'ro',
-);
-
-has 'nodeId' => (
     is => 'ro',
 );
 
@@ -3443,9 +3472,47 @@ has 'driver' => (
     is => 'ro',
 );
 
+# The generation from when our ->nodeId was valid
+has '_generation' => (
+    is => 'rw',
+);
+
+has 'mech' => (
+    is => 'ro',
+    weak_ref => 1,
+);
+
+sub _fetchNodeId($self) {
+    $self->driver->send_message('DOM.requestNode', objectId => $self->objectId)->then(sub($d) {
+        Future->done( $d->{nodeId} );
+    });
+}
+
+sub _nodeId($self) {
+    my $nid = $self->{nodeId};
+    my $generation = $self->mech->_generation;
+    if( !$nid or ( $self->_generation and $self->_generation != $generation )) {
+        # Re-resolve, and hopefully we still have our objectId
+        $nid = $self->_fetchNodeId();
+        $self->_generation( $generation);
+    } else {
+        $nid = Future->done( $nid );
+    }
+    $nid;
+}
+
+sub nodeId($self) {
+    $self->_nodeId()->get;
+}
+
 sub get_attribute( $self, $attribute ) {
+    my $nid = $self->_nodeId();
+    my $s = $self;
+    weaken $s;
     if( $attribute eq 'innerText' ) {
-        my $html = $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$self->nodeId )->get->{outerHTML};
+        my $html = $nid->then(sub( $nodeId ) {
+            $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
+        })->get()->{outerHTML};
 
         # Strip first and last tag in a not so elegant way
         $html =~ s!\A<[^>]+>!!;
@@ -3453,7 +3520,9 @@ sub get_attribute( $self, $attribute ) {
         return $html
 
     } elsif( $attribute eq 'innerHTML' ) {
-        my $html = $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$self->nodeId )->get->{outerHTML};
+        my $html = $nid->then(sub( $nodeId ) {
+            $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
+        })->get()->{outerHTML};
 
         # Strip first and last tag in a not so elegant way
         $html =~ s!\A<[^>]+>!!;
@@ -3575,17 +3644,41 @@ information to the console. Check that Chrome starts:
 
 C<< chrome >>
 
+=head1 RUNNING THE TEST SUITE
+
+The normal test invocation is 'make test'.
+
+If your executable has a different name than C<chrome-browser> or
+C<chrome.exe> or is not in your path, then set the environment variable
+C<CHROME_BIN> to the absolute path.
+
+If you have Chrome already running, it must have been started with the
+C<<--remote-debugging-port=9222>> option to enable the developer console. You
+may want to set up a dedicated and version pinned version of Chrome for your
+automation.
+
+The test suite is apt to disturb your display when a locally running
+chrome browser gets animated. On unixish systems you can avoid this
+kind of disturbance by (1) not running any chrome binary and (2) start
+a separate display with Xvfb and (3) set the DISPLAY variable
+accordingly. E.g.:
+
+  Xvfb :121 &
+  DISPLAY=:121 CHROME_BIN=/usr/bin/google-chrome-stable make test
+
 =head1 SEE ALSO
 
 =over 4
 
 =item *
 
-L<https://developer.chrome.com/devtools/docs/debugging-clients> - the Chrome DevTools homepage
+L<https://developer.chrome.com/devtools/docs/debugging-clients> - the Chrome
+DevTools homepage
 
 =item *
 
-L<https://github.com/GoogleChrome/lighthouse> - Google Lighthouse, the main client
+L<https://github.com/GoogleChrome/lighthouse> - Google Lighthouse, the main
+client of the Chrome API
 
 =item *
 
@@ -3594,10 +3687,12 @@ L<WWW::Mechanize> - the module whose API grandfathered this module
 =item *
 
 L<WWW::Mechanize::Firefox> - a similar module with a visible application
+automating Firefox
 
 =item *
 
 L<WWW::Mechanize::PhantomJS> - a similar module without a visible application
+automating PhantomJS
 
 =back
 
@@ -3608,19 +3703,23 @@ L<https://github.com/Corion/www-mechanize-chrome>.
 
 =head1 SUPPORT
 
-The public support forum of this module is
-L<https://perlmonks.org/>.
+The public support forum of this module is L<https://perlmonks.org/>.
 
 =head1 TALKS
 
 I've given a German talk at GPW 2017, see L<http://act.yapc.eu/gpw2017/talk/7027>
 and L<https://corion.net/talks> for the slides.
 
+At The Perl Conference 2017 in Amsterdam, I also presented a talk, see
+L<http://act.perlconference.org/tpc-2017-amsterdam/talk/7022>.
+The slides for the English presentation at TPCiA 2017 are at
+L<https://corion.net/talks/WWW-Mechanize-Chrome/www-mechanize-chrome.en.html>.
+
 =head1 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
-or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org>.
+or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
 
 =head1 AUTHOR
 

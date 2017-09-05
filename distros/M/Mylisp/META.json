@@ -1,0 +1,66 @@
+{
+   "abstract" : "My lovely Lisp",
+   "author" : [
+      "Micheal.Song <perlvim@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mylisp",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "List::MoreUtils" : "0",
+            "Scalar::Util" : "0",
+            "Spp" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "Mylisp" : {
+         "file" : "lib/Mylisp.pm",
+         "version" : "1.05"
+      },
+      "Mylisp::Ast" : {
+         "file" : "lib/Mylisp/Ast.pm"
+      },
+      "Mylisp::Builtin" : {
+         "file" : "lib/Mylisp/Builtin.pm"
+      },
+      "Mylisp::Grammar" : {
+         "file" : "lib/Mylisp/Grammar.pm"
+      },
+      "Mylisp::IsAtom" : {
+         "file" : "lib/Mylisp/IsAtom.pm"
+      },
+      "Mylisp::OptAst" : {
+         "file" : "lib/Mylisp/OptAst.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

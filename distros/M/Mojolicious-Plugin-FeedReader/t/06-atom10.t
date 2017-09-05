@@ -3,7 +3,6 @@ use Mojo::Base -strict;
 
 use Test::Mojo;
 use Mojo::URL;
-use Mojo::Util qw(slurp);
 
 use Mojolicious::Lite;
 plugin 'FeedReader';

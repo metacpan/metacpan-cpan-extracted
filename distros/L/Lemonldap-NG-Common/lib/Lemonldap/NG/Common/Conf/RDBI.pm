@@ -5,7 +5,7 @@ use utf8;
 use Lemonldap::NG::Common::Conf::Serializer;
 use Lemonldap::NG::Common::Conf::_DBI;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.11';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::_DBI);
 
 sub store {
@@ -23,7 +23,6 @@ sub store {
         $req = $self->_dbh->prepare(
 "UPDATE $self->{dbiTable} SET field=?, value=? WHERE cfgNum=? AND field=?"
         );
-
     }
     else {
         $req = $self->_dbh->prepare(
@@ -40,7 +39,9 @@ sub store {
             @execValues = ( $k, $v, $cfgNum, $k );
         }
         else { @execValues = ( $cfgNum, $k, $v ); }
-        unless ( $req->execute(@execValues) ) {
+        my $execute;
+        eval { $execute = $req->execute(@execValues); };
+        unless ($execute) {
             $self->logError;
             $self->_dbh->do("ROLLBACK");
             return UNKNOWN_ERROR;

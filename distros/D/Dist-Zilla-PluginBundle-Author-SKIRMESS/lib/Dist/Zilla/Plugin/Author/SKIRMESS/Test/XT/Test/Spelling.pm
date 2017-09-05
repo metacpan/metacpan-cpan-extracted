@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 use Moose;
 
@@ -39,7 +39,7 @@ use Pod::Wordlist;
 
 add_stopwords(<DATA>);
 
-all_pod_files_spelling_ok(qw( bin lib ));
+all_pod_files_spelling_ok( grep { -d } qw( bin lib t xt ) );
 __DATA__
 TEST_BODY
 

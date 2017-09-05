@@ -1,5 +1,11 @@
 Revision history for perl module Sys::Virt
 
+3.7.0 2017-09-04
+
+ - Add VIR_FROM_RESCTRL constant
+ - Add migrate_get_max_downtime
+ - Add managed_save_define_xml and managed_save_get_xml_description
+
 3.5.0 2017-07-06
 
  - Add VIR_DOMAIN_BLOCK_COPY_TRANSIENT_JOB constant

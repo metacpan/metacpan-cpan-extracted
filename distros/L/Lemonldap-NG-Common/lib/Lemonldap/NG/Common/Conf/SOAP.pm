@@ -3,8 +3,9 @@ package Lemonldap::NG::Common::Conf::SOAP;
 use strict;
 use utf8;
 use SOAP::Lite;
+use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.11';
 
 #parameter proxy Url of SOAP service
 #parameter proxyOptions SOAP::Lite parameters
@@ -86,7 +87,16 @@ sub store {
 
 sub load {
     my $self = shift;
-    return $self->_soapCall( 'getConfig', @_ );
+    my $conf = $self->_soapCall( 'getConfig', @_ );
+
+    # Force empty hash that are not converted by SOAP
+    foreach ( keys %{ $conf || {} } ) {
+        if ( $_ =~ /$hashParameters/ ) {
+            $conf->{$_} ||= {};
+        }
+    }
+
+    return $conf;
 }
 
 1;

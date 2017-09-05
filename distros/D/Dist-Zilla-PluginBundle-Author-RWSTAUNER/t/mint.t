@@ -6,21 +6,20 @@ use lib 't/lib';
 use Path::Tiny;
 use Test::DZil;
 use Git::Wrapper;
-use File::Temp qw( tempfile );
 
 use Test::File::ShareDir -share => {
   -module => { 'Dist::Zilla::MintingProfile::Author::RWSTAUNER' => 'share/profiles' },
 };
 
-(my $tmpfile, $ENV{GIT_CONFIG}) = tempfile( 'git-config.XXXXXX', TMPDIR => 1, UNLINK => 1, );
-print $tmpfile <<'CONFIG';
+my $home = Path::Tiny->tempdir;
+$home->child('.gitconfig')->openw->print(<<'CONFIG');
 [user]
   name  = Reinhold Messner
   email = magic.mess@example.com
 [github]
   user  = narcolepsy
 CONFIG
-close $tmpfile;
+$ENV{HOME} = $home->absolute;
 
 {
   my $user = 'rwstauner';

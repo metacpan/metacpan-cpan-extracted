@@ -960,3 +960,11 @@ Revision history for App::MFILE::WWW
 - stack: implement grep function
 - stack,start: cleanup
 
+0.158 2017-08-29 15:12 CEST
+- doc: fix POD syntax in WWW.pm
+- Fixed up the existing unit tests
+- js: make JS entry point more of a wrapper
+- tests: js: add a test that starts the application
+- tests: js: add #mainarea introspection to dmenu test
+- tests: js: migrate QUnit from 1.15.0 to 2.4.0
+

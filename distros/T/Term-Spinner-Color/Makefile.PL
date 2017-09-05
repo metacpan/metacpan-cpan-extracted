@@ -19,15 +19,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "bsd",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Term::Spinner::Color",
-  "PREREQ_PM" => {
-    "Term::ANSIColor" => 0
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +35,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Term::ANSIColor" => 0,
   "Test::More" => 0
 );
 

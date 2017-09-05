@@ -1,24 +1,47 @@
-abstract: Failover and Load Balancing of DBI Handles
-author: 'Dan Wright <dwright@cpan.org>'
+---
+abstract: 'Failover and Load Balancing of DBI Handles'
+author:
+  - 'Dan Wright <Dan@DWright.Org>'
 build_requires:
-  DBD::SQLite: 1.09
-  Pod::Simple: 0
-  Test::Exception: 0.21
-  Test::More: 0
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
-distribution_type: module
-generated_by: Module::Install version 0.63
+  DBD::SQLite: '1.09'
+  Pod::Simple: '0'
+  Test::Exception: '0.21'
+  Test::More: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
 name: DBD-Multi
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  DBD::Multi:
+    file: lib/DBD/Multi.pm
+    version: '1.01'
+  DBD::Multi::Handler:
+    file: lib/DBD/Multi.pm
+    version: '1.01'
+  DBD::Multi::db:
+    file: lib/DBD/Multi.pm
+    version: '1.01'
+  DBD::Multi::dr:
+    file: lib/DBD/Multi.pm
+    version: '1.01'
+  DBD::Multi::st:
+    file: lib/DBD/Multi.pm
+    version: '1.01'
 requires:
-  Class::Accessor::Fast: 0.19
-  DBI: 0
-  List::Util: 1.18
-  Sys::SigAction: 0.1
-  perl: 5.8.0
-version: 0.14
+  Class::Accessor::Fast: '0.19'
+  DBI: '0'
+  List::Util: '1.18'
+  Sys::SigAction: '0.10'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/dwright/DBD-Multi/issues
+  repository: https://github.com/dwright/DBD-Multi.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

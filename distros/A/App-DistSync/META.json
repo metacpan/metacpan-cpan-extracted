@@ -4,7 +4,7 @@
       "Serz Minus (Lepenkov Sergey) http://www.serzik.com <minus@mail333.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "open_source"
    ],
@@ -42,7 +42,7 @@
             "LWP" : "6.08",
             "URI" : "1.64",
             "YAML::Tiny" : "1",
-            "perl" : "5.008001"
+            "perl" : "5.012001"
          }
       }
    },
@@ -56,5 +56,5 @@
          "url" : "https://svn.code.sf.net/p/app-distsync/code/trunk"
       }
    },
-   "version" : "1.04"
+   "version" : "1.05"
 }

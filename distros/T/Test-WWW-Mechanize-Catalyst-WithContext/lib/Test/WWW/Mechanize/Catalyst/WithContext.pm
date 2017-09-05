@@ -7,7 +7,7 @@ use Carp 'croak';
 require Catalyst::Test;
 extends 'Test::WWW::Mechanize::Catalyst';
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 $VERSION = eval $VERSION;
 
 # this stores the ctx_request function as a code reference
@@ -41,7 +41,7 @@ sub get_context {
 
     croak 'url is required' unless $url;
 
-    my $request = HTTP::Request->new( GET => URI->new_abs( $url, $self->base ) );
+    my $request = HTTP::Request->new( GET => URI->new_abs( $url, $self->base || 'http://localhost' ) );
     $self->cookie_jar->add_cookie_header($request);
 
     my ( $res, $c ) = $self->_get_context->($request);
@@ -69,7 +69,7 @@ Test::WWW::Mechanize::Catalyst::WithContext - T::W::M::C can now give you $c
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

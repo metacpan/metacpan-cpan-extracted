@@ -59,10 +59,10 @@ sub proxyQuery {
     my $res = $r->result();
 
     # If authentication failed, display error
-    if ( $res->{error} ) {
+    if ( $res->{errorCode} ) {
         $self->_sub( 'userError',
             "Authentication failed for $self->{user} "
-              . $soap->error( $res->{error} )->result() );
+              . $soap->error( $res->{errorCode} )->result() );
         return PE_BADCREDENTIALS;
     }
     $self->{_remoteId} = $res->{cookies}->{ $self->{remoteCookieName} }

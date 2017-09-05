@@ -4,7 +4,7 @@
       "Kjetil Kjernsmo <kjetilk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -35,7 +35,8 @@
             "RDF::Trine" : "0.134",
             "Scalar::Util" : "1.24",
             "Test::Builder::Module" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -47,7 +48,7 @@
    "provides" : {
       "Test::RDF" : {
          "file" : "lib/Test/RDF.pm",
-         "version" : "1.20"
+         "version" : "1.22"
       }
    },
    "release_status" : "stable",
@@ -66,8 +67,10 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Test-RDF/project"
    },
-   "version" : "1.20",
+   "version" : "1.22",
    "x_contributors" : [
       "Toby Inkster"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "x_static_install" : 1
 }

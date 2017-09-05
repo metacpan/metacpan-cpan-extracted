@@ -24,6 +24,7 @@
 
 package Data::FormValidator;
 use Exporter 'import';
+use File::Spec qw();
 use 5.008;
 
 use Data::FormValidator::Results;
@@ -31,7 +32,7 @@ use Data::FormValidator::Results;
 use Data::FormValidator::Filters ':filters';
 use Data::FormValidator::Constraints qw(:validators :matchers);
 
-our $VERSION = 4.86;
+our $VERSION = 4.88;
 
 our %EXPORT_TAGS = (
     filters => [qw/
@@ -123,7 +124,7 @@ simple format.
 Data::FormValidator lets you define profiles which declare the
 required and optional fields and any constraints they might have.
 
-The results are provided as an object which makes it easy to handle
+The results are provided as an object, which makes it easy to handle
 missing and invalid results, return error messages about which constraints
 failed, or process the resulting valid data.
 
@@ -147,7 +148,7 @@ sub new {
         $profiles = $profiles_or_file;
     }
     else {
-        $file = $profiles_or_file;
+        $file = File::Spec->rel2abs( $profiles_or_file );
     }
 
 
@@ -166,8 +167,8 @@ sub new {
 
 C<check> is the recommended method to use to validate forms. It returns its results as a
 L<Data::FormValidator::Results|Data::FormValidator::Results> object.  A
-deprecated method C<validate> is also available, returning its results as an
-array described below.
+deprecated method C<validate> described below is also available, returning its results as an
+array.
 
  use Data::FormValidator;
  my $results = Data::FormValidator->check(\%input_hash, \%dfv_profile);
@@ -1255,7 +1256,7 @@ For more details see L<VALIDATING INPUT BASED ON MULTIPLE FIELDS>.
 
 =head2 constraint_regexp_map (profile key)
 
-This is a supported by deprecated profile key. Using
+This is a supported but deprecated profile key. Using
 C<constraint_methods_regexp_map> is recommended instead.
 
  constraint_regexp_map => {
@@ -1325,7 +1326,7 @@ Debian GNU/Linux includes a port named B<libdata-formvalidator-perl>
 
 =head1 CREDITS
 
-Some of those input validation functions have been taken from MiniVend
+Some of these input validation functions have been taken from MiniVend
 by Michael J. Heins.
 
 The credit card checksum validation was taken from contribution by Bruce
@@ -1334,25 +1335,13 @@ Albrecht to the MiniVend program.
 =head1 BUGS
 
 Bug reports and patches are welcome. Reports which include a failing Test::More
-style test are helpful will receive priority.
+style test are helpful and will receive priority.
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-FormValidator>
 
 =head1 CONTRIBUTING
 
-This project is managed using the darcs source control system (
-http://www.darcs.net/ ). You can browse, pull and fork the repo here:
-
-http://hub.darcs.net/markstos/Data--FormValidator
-
-B<Support Mailing List>
-
-If you have any questions, comments, or feature suggestions, post them to the
-support mailing list!  To join the mailing list, visit
-
-L<http://lists.sourceforge.net/lists/listinfo/cascade-dataform>
-
-Messages about DFV sent directly to the maintainer may be redirected here.
+This project is maintained on L<Github|https://github.com/dnmfarrell/Data-FormValidator>.
 
 =head1 AUTHOR
 

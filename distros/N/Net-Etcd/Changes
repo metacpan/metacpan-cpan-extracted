@@ -1,5 +1,9 @@
 Revision history for Net::Etcd
 
+0.014
+[ BUG FIX ]
+* Resolved bug which prevented range delete transaction from completing. Closed via GH #25 Thanks Ananth Kavuri! 
+
 0.013
 [ ENHANCEMENTS ]
 * Add Net::Etcd::Auth::RolePermission class allowing roles to be defined by key/range.

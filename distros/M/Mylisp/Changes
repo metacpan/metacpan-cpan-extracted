@@ -1,0 +1,29 @@
+Revision history for Spp
+
+1.00    2017-8-31
+        init project.
+
+1.01    2017-9-4
+        mylisp grammar parse to Ast and save to Module, then could load rapid.
+        Slist :[] used for str list for match import and export.
+        add update() to modify grammar.
+
+1.02    2017-9-4
+        add ToMylisp.pm to Parse code to Mylisp itself.
+
+1.03    2017-9-4
+        add remove_ast_pos() as repl output interface.
+        Module export mylisp_to_ast()
+
+1.04    2017-9-4
+        1. mylisp.pl add no argument help.
+        2. tidy all source code.
+
+1.05    2017-9-4
+        sym 'else' and 'in' would not make special transfer,
+        only judge is_else in if expr. 'in' would check it
+        in lint-ast().
+        load-module() could load from package name return text
+        reject export keyword, function use def is exported.
+        add def keyword
+        

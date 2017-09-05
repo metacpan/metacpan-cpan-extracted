@@ -1,3 +1,6 @@
+use FindBin;
+use lib $FindBin::Bin;
+
 use inc::Module::Install;
 name 'Number-ZipCode-JP';
 all_from 'lib/Number/ZipCode/JP.pm';

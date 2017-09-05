@@ -1,5 +1,10 @@
 Revision history for Perl extension Locale::TextDomain::OO.
 
+1.030  Tue Aug 29 23:32:58 2017
+- extended/fixed Pod
+- moved begin/end domain/capacity switching into one common role
+- added domain/capacity switching for BabelFish
+
 1.029  Wed Jul 19 14:23:59 2017
 - removed unneeded dependencies
   https://rt.cpan.org/Ticket/Display.html?id=122540

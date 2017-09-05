@@ -1,4 +1,4 @@
-use Test::Tester tests => 118;
+use Test::Tester tests => 125;
 
 use Test::RDF;
 
@@ -81,6 +81,17 @@ check_test(
 	   {
 	    ok => 0,
 	    name => 'Has not correct object URI',
+	    diag => 'No matching URIs found in model'
+	   }
+);
+
+check_test(
+	   sub {
+	     has_type('http://example.com/Bar', $model, 'Has not correct type URI');
+	   },
+	   {
+	    ok => 0,
+	    name => 'Has not correct type URI',
 	    diag => 'No matching URIs found in model'
 	   }
 );

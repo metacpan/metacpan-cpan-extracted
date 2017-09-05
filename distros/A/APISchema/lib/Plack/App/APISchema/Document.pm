@@ -27,9 +27,9 @@ sub call {
             )
     );
 
-    my $renderer = Text::MicroTemplate::DataSection->new;
+    my $renderer = Text::MicroTemplate::DataSection->new(package => ref $self);
     my $title = $self->schema->title || '';
-    my $html = render_mt('template.mt', $title, $body);
+    my $html = $renderer->render_mt('template.mt', $title, $body);
 
     return [200, ['Content-Type' => 'text/html; charset=utf-8'], [encode_utf8 $html]];
 }

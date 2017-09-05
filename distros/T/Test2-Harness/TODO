@@ -1,0 +1,18 @@
+
+TAP mode support
+    --tap <done>
+    --no-stream <done>
+    HARNESS-NO-STREAM <still TODO>
+    HARNESS-USE-TAP <still TODO>
+
+'run' yath command to run an arbitrary command inside a runner
+
+'server' command that starts a runner, and listens for requests (plack based API server)
+
+'queue' command that adds tasks to a 'server'.
+
+Remove job dirs as soon as possible outside of keep mode.
+
+Watch for changes...
+
+color/no-color CLI options

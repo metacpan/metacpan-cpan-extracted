@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,19 +27,32 @@ name: Ryu-Async
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.006'
+    version: '0.007'
+  Ryu::Async::Client:
+    file: lib/Ryu/Async/Client.pm
+    version: '0.007'
+  Ryu::Async::Packet:
+    file: lib/Ryu/Async/Packet.pm
+    version: '0.007'
+  Ryu::Async::Server:
+    file: lib/Ryu/Async/Server.pm
+    version: '0.007'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
 requires:
   Future: '0.34'
   IO::Async: '0.71'
-  Ryu: '0.020'
+  Log::Any: '1.000'
+  Ryu: '0.024'
+  Syntax::Keyword::Try: '0'
+  URI::tcp: '0'
+  URI::udp: '0'
   curry: '1.000'
   namespace::clean: '0'
   parent: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   repository: git://github.com/team-at-cpan/Ryu-Async.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'YAML::Tiny version 1.70'

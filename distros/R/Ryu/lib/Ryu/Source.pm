@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 =head1 NAME
 
@@ -1581,7 +1581,7 @@ sub emit {
 
 =cut
 
-sub each {
+sub each : method {
     my ($self, $code, %args) = @_;
     push @{$self->{on_item}}, $code;
     $self;

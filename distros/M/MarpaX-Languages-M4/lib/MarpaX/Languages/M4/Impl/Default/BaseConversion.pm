@@ -9,7 +9,7 @@ class MarpaX::Languages::M4::Impl::Default::BaseConversion {
     use Bit::Vector;
     use Carp qw/croak/;
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -174,7 +174,7 @@ MarpaX::Languages::M4::Impl::Default::BaseConversion - Base conversion util clas
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

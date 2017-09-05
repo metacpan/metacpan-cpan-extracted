@@ -40,11 +40,7 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Term::ANSIScreen" : "0"
-         },
          "requires" : {
-            "Term::ANSIColor" : "0",
             "perl" : "5.010"
          }
       },
@@ -62,7 +58,7 @@
    "provides" : {
       "Term::Spinner::Color" : {
          "file" : "lib/Term/Spinner/Color.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -77,7 +73,7 @@
          "web" : "https://github.com/SwellJoe/perl-Term-Spinner-Color"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -295,17 +291,6 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.009"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "runtime",
-                  "type" : "recommends"
-               }
-            },
-            "name" : "Recommends",
             "version" : "6.009"
          },
          {

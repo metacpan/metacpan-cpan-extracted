@@ -11,7 +11,7 @@ use Pod::Usage qw( pod2usage );
 
 # PODNAME: aeftpd
 # ABSTRACT: FTP Server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 my $port;
@@ -202,7 +202,7 @@ aeftpd - FTP Server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 

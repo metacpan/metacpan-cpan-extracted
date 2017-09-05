@@ -1,5 +1,23 @@
 Revision history for Perl extension ObjectDB
 
+3.21 2017-09-03T22:03:18Z
+
+    - explicitly set mysql settings for travis ci
+    - do not use empty heredocs terminators
+    - proverc
+    - with and columns
+    - get rid of Test::Spec
+    - perltidy
+    - get rid of Hash::Merge
+    - remove unused exported function
+    - benchmarks
+    - make bench docs lines shorter
+    - improving docs
+    - move stmt class to its own package, use counters instead of shifting
+    - resurrect iterators
+    - find_by_compose for building custom queries
+    - rows_as_hashes option for returning raw hashes instead of objects
+
 3.20 2017-05-15T09:27:48Z
 
     [FIXES]

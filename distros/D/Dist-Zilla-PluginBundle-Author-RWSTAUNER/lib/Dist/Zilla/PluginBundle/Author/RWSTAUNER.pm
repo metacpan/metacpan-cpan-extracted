@@ -11,10 +11,10 @@ use strict;
 use warnings;
 
 package Dist::Zilla::PluginBundle::Author::RWSTAUNER;
-# git description: v4.213-1-ge2e9747
+# git description: v6.001-1-gc3c24a5
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
-$Dist::Zilla::PluginBundle::Author::RWSTAUNER::VERSION = '6.001';
+$Dist::Zilla::PluginBundle::Author::RWSTAUNER::VERSION = '6.002';
 # ABSTRACT: RWSTAUNER's Dist::Zilla config
 
 use Moose;
@@ -552,7 +552,7 @@ Dist::Zilla::PluginBundle::Author::RWSTAUNER - RWSTAUNER's Dist::Zilla config
 
 =head1 VERSION
 
-version 6.001
+version 6.002
 
 =head1 SYNOPSIS
 

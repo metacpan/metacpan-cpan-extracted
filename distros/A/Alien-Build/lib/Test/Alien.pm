@@ -19,7 +19,7 @@ use Alien::Build::Util qw( _dump );
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 our @aliens;
@@ -644,7 +644,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

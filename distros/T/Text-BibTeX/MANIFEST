@@ -29,6 +29,7 @@ lib/Text/BibTeX/Bib.pm
 lib/Text/BibTeX/BibFormat.pm
 lib/Text/BibTeX/BibSort.pm
 
+t/00_system_info.t
 t/common.pl
 t/bib.t
 t/macro.t

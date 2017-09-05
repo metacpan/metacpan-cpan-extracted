@@ -11,6 +11,7 @@ examples/AllFramesDemo.pm
 examples/Examples.pm
 examples/test-spinner.sh
 lib/Term/Spinner/Color.pm
+perl-Term-Spinner-Color.spec
 t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

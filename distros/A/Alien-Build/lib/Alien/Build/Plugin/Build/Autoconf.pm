@@ -7,7 +7,7 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 has with_pic       => 1;
@@ -134,7 +134,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

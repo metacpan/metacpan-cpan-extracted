@@ -23,7 +23,7 @@ use vars qw'$VERSION';
 use Carp;
 use Text::BibTeX qw(:metatypes :nodetypes);
 
-$VERSION = 0.82;
+$VERSION = 0.85;
 
 =head1 NAME
 
@@ -534,7 +534,7 @@ L<Text::BibTeX::Value>.
 
 =item value ()
 
-Retuns the single string associated with C<@comment> and C<@preamble>
+Returns the single string associated with C<@comment> and C<@preamble>
 entries.  For instance, the entry
 
    @preamble{" This is   a preamble" # 

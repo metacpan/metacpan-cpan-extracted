@@ -72,6 +72,10 @@ as raw bytes.
 
 Use L<Ryu::Source/by_line> and L<Ryu::Source/decode> to split into lines and/or decode from UTF-8.
 
+=head2 stdout
+
+Returns a new L<Ryu::Sink> that wraps STDOUT.
+
 =head2 timer
 
 Provides a L<Ryu::Source> which emits an empty string at selected intervals.
@@ -95,6 +99,19 @@ Example:
 =head2 source
 
 Returns a new L<Ryu::Source> instance.
+
+=head2 udp_client
+
+Creates a new UDP client.
+
+This will return a L<Ryu::Async::Connection> instance, which provides
+a sink for outgoing packets, and a source for incoming responses.
+
+=head2 udp_server
+
+=head2 sink
+
+Returns a new L<Ryu::Sink>.
 
 =head1 SEE ALSO
 

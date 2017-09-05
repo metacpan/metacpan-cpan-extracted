@@ -1,4 +1,4 @@
-# this test was generated with Dist::Zilla::Plugin::Test::Kwalitee 2.11
+# this test was generated with Dist::Zilla::Plugin::Test::Kwalitee 2.12
 use strict;
 use warnings;
 use Test::More 0.88;

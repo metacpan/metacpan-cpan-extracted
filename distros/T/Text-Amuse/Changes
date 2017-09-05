@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.90 2017-08-30
+
+ - Support footnotes spanning more paragraphs (GH#19)
+ - Support ordered lists respecting the index provided (GH#13)
+
 0.82 2017-04-03
 
  - Support named anchors in sections and verses (and relaxed the

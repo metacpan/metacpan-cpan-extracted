@@ -3,18 +3,25 @@ package Ceph::Rados;
 use 5.014002;
 use strict;
 use warnings;
-use Carp;
 
+use AutoLoader;
+use Carp;
 use Ceph::Rados::IO;
 
-our @ISA = qw();
+our $VERSION = '0.09';
 
-our $VERSION = '0.08';
+# Do we have C symbols in a Ceph::Rados::Constants::C::Symbols module?
+my $_symbols_present;
+# Check for (and note) the existence of the C constants module.
+BEGIN {
+    eval "require Ceph::Rados::Constants::C::Symbols";
+    $_symbols_present = 1 unless $@;
+    eval "require Ceph::Rados::Constants::C::ForwardDecls";
+}
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.
-
     my $constname;
     our $AUTOLOAD;
     ($constname = $AUTOLOAD) =~ s/.*:://;
@@ -30,6 +37,14 @@ sub AUTOLOAD {
 
 require XSLoader;
 XSLoader::load('Ceph::Rados', $VERSION);
+
+# Bring in the whole lot of C constants that are available. Your mileage
+# of course, may vary, e.g. alternatively do this via @EXPORT_OK.
+our @EXPORT = (
+    # any other symbols you are exporting, plus:
+    $_symbols_present ? @Ceph::Rados::Constants::C::Symbols::ALL
+        : (),
+);
 
 # Preloaded methods go here.
 

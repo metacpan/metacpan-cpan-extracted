@@ -1,4 +1,12 @@
 Revision history for Perl module JSON::WithComments
 
+0.003 - 2017-09-01
+  - Small doc fix for GitHub issue #1
+  - More tests added, to test escaping of comments within strings
+  - Documentation updated to cover escaping JS comments in depth
+  - Handling of Perl comments changed over to the being done via the
+    "relaxed" method, as the "#" cannot be legally escaped in JSON
+0.002 - 2017-08-28
+  - Fixed issue arising from use of JSON::XS backend
 0.001 - 2017-08-27
   - Initial release

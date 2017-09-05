@@ -79,6 +79,7 @@ lib/Mojo/Webqq/Model/Remote/_shutup_group_member.pm
 lib/Mojo/Webqq/Model/Remote/get_qq_from_id.pm
 lib/Mojo/Webqq/Model/Remote/get_single_long_nick.pm
 lib/Mojo/Webqq/Plugin.pm
+lib/Mojo/Webqq/Plugin/FFM.pm
 lib/Mojo/Webqq/Plugin/FmPush.pm
 lib/Mojo/Webqq/Plugin/FuckAndroid.pm
 lib/Mojo/Webqq/Plugin/FuckDaShen.pm

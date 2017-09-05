@@ -1,0 +1,18 @@
+Build.PL
+Changes
+bin/mylisp
+lib/Mylisp.pm
+lib/Mylisp/Ast.pm
+lib/Mylisp/Builtin.pm
+lib/Mylisp/Grammar.pm
+lib/Mylisp/IsAtom.pm
+lib/Mylisp/OptAst.pm
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

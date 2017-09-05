@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.24'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -335,7 +335,8 @@ sub get_job_status {
 
 	Mojo::IOLoop->singleton->reactor->one_tick while !$done;
 
-	return $job_id, $outargs;
+	$outargs = encode_json($outargs) if $self->{json};
+	return $job_id2, $outargs;
 }
 
 sub ping {

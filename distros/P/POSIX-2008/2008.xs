@@ -1,39 +1,86 @@
-#undef _GNU_SOURCE
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
-#define _ATFILE_SOURCE 1
-#define _POSIX_C_SOURCE 200809L
-#define _XOPEN_SOURCE 700
-#define _FILE_OFFSET_BITS 64
-
-#include <complex.h>
-#include <dirent.h>
-#include <dlfcn.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <fenv.h>
-#include <fnmatch.h>
-#include <libgen.h>
-#include <limits.h>
-#include <math.h>
-#include <nl_types.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
-#include <utmpx.h>
+#endif
 
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_newCONSTSUB
+#ifdef PERL_IMPLICIT_SYS
+#undef open
+#endif
+
+#define NEED_sv_2pv_flags
 #include "ppport.h"
+
+#include "const-c.inc"
+
+#include <complex.h>
+#include <ctype.h>
+#ifdef I_DIRENT
+#include <dirent.h>
+#endif
+#ifdef I_DLFCN
+#include <dlfcn.h>
+#endif
+#include <errno.h>
+#ifdef I_FLOAT
+#include <float.h>
+#endif
+#ifdef I_FCNTL
+#include <fcntl.h>
+#endif
+#include <fenv.h>
+#include <fnmatch.h>
+#ifdef I_INTTYPES
+#include <inttypes.h>
+#endif
+#include <libgen.h>
+#ifdef I_LIMITS
+#include <limits.h>
+#endif
+#ifdef I_MATH
+#include <math.h>
+#endif
+#ifndef __CYGWIN__
+#include <nl_types.h>
+#endif
+#include <signal.h>
+#ifdef I_STDLIB
+#include <stdlib.h>
+#endif
+#ifdef I_STRING
+#include <string.h>
+#endif
+#include <strings.h>
+#ifdef I_SUNMATH
+#include <sunmath.h>
+#endif
+#ifdef I_SYS_PARAM
+#include <sys/param.h>
+#endif
+#ifdef I_SYS_RESOURCE
+#include <sys/resource.h>
+#endif
+#ifdef I_SYS_STAT
+#include <sys/stat.h>
+#endif
+#ifdef I_SYS_TYPES
+#include <sys/types.h>
+#endif
+#include <sys/uio.h>
+#ifdef I_TIME
+#include <time.h>
+#endif
+#ifdef I_UNISTD
+#include <unistd.h>
+#endif
+#include <utmpx.h>
+
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX 255
+#endif
 
 typedef int SysRet;   /* returns 0 as "0 but true" */
 typedef int SysRet0;  /* returns 0 as 0 */
@@ -83,11 +130,9 @@ _readlink50c(char *path, int *dirfd) {
   ssize_t linklen;
   char *buf;
 
-  dTHX;
-
   errno = 0;
 
-  Newx(buf, bufsize, char);
+  Newxc(buf, bufsize, char, char);
   if (!buf)
     return NULL;
 
@@ -98,7 +143,7 @@ _readlink50c(char *path, int *dirfd) {
       linklen = readlink(path, buf, bufsize);
 
     if (linklen >= 0) {
-      if (linklen < bufsize || linklen == SSIZE_MAX) {
+      if ((size_t)linklen < bufsize || linklen == SSIZE_MAX) {
         buf[linklen] = '\0';
         return buf;
       }
@@ -117,6 +162,49 @@ _readlink50c(char *path, int *dirfd) {
   }
 }
 
+static int
+_writev50c(pTHX_ int fd, AV *ioAV, off_t *offset) {
+  struct iovec *iov;
+  struct iovec iov_elt;
+  int ioAVcnt, iovcnt, i, rv;
+  SV **av_elt;
+
+  ioAVcnt = av_len(ioAV) + 1;
+  if (ioAVcnt <= 0)
+    return 0;
+
+  Newxc(iov, ioAVcnt, struct iovec, struct iovec);
+  if (!iov)
+    return -1;
+
+  iovcnt = 0;
+
+  for (i = 0; i < ioAVcnt; i++) {
+    av_elt = av_fetch(ioAV, i, 0);
+    if (av_elt && SvOK(*av_elt)) {
+      iov_elt.iov_base = (void*)SvPV(*av_elt, iov_elt.iov_len);
+      if (iov_elt.iov_len)
+        iov[iovcnt++] = iov_elt;
+    }
+  }
+
+  if (iovcnt == 0)
+    rv = 0;
+  else if (offset == NULL) 
+    rv = writev(fd, iov, iovcnt);
+  else {
+#ifdef __CYGWIN__
+    /* no pwritev() on cygwin */
+    rv = -1;
+#else
+    rv = pwritev(fd, iov, iovcnt, *offset);
+#endif
+  }
+
+  Safefree(iov);
+  return rv;
+}
+
 static const char*
 flags2raw(int flags) {
   int accmode = flags & O_ACCMODE;
@@ -132,36 +220,34 @@ flags2raw(int flags) {
     return "";
 }
 
-static int
-psx_looks_like_number(SV *sv) {
-  dTHX;
-
 #if PERL_BCDVERSION >= 0x5008005
-    return looks_like_number(sv);
+static int
+psx_looks_like_number(pTHX_ SV *sv) {
+  return looks_like_number(sv);
+}
 #else
+static int
+psx_looks_like_number(pTHX_ SV *sv) {
   if (SvPOK(sv) || SvPOKp(sv))
     return looks_like_number(sv);
   else
-    return (SvFLAGS(fh) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK));
-#endif
+    return (SvFLAGS(sv) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK));
 }
+#endif
 
 static int
-psx_fileno(SV *sv) {
+psx_fileno(pTHX_ SV *sv) {
   IO *io;
   int fn = -1;
 
-  dTHX;
-
   if (SvOK(sv)) {
-    if (psx_looks_like_number(sv))
+    if (psx_looks_like_number(aTHX_ sv))
       fn = SvIV(sv);
-    else {
-      io = sv_2io(sv);
-      if (IoDIRP(io))  /* from opendir() */
-        fn = my_dirfd(IoDIRP(io));
-      else if (IoIFP(io))  /* from open() or sysopen() */
+    else if ((io = sv_2io(sv))) {
+      if (IoIFP(io))  /* from open() or sysopen() */
         fn = PerlIO_fileno(IoIFP(io));
+      else if (IoDIRP(io))  /* from opendir() */
+        fn = my_dirfd(IoDIRP(io));
     }
   }
 
@@ -173,6 +259,10 @@ psx_fileno(SV *sv) {
 
 MODULE = POSIX::2008    PACKAGE = POSIX::2008
 
+PROTOTYPES: ENABLE
+
+INCLUDE: const-xs.inc
+  
 long
 a64l(char* s);
 
@@ -185,7 +275,7 @@ abort();
 unsigned
 alarm(unsigned seconds);
 
-double
+NV
 atof(char *str);
 
 int
@@ -200,6 +290,7 @@ atoll(char *str);
 char*
 basename(char *path);
 
+# ifndef __CYGWIN__
 int
 catclose(nl_catd catd);
 
@@ -209,6 +300,36 @@ catgets(nl_catd catd, int set_id, int msg_id, char *dflt);
 nl_catd
 catopen(char *name, int oflag);
 
+# else
+void
+catclose(...);
+    PPCODE:
+        croak("catclose() not available");
+
+void
+catgets(...);
+    PPCODE:
+        croak("catgets() not available");
+
+void
+catopen(...);
+    PPCODE:
+        croak("catopen() not available");
+
+# endif
+
+clock_t
+clock();
+
+# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 1000000) || \
+     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+     
+void
+clock_getcpuclockid(...);
+    PPCODE:
+        croak("clock_getcpuclockid() not available");
+
+# else
 clockid_t
 clock_getcpuclockid(pid_t pid = PerlProc_getpid());
     INIT:
@@ -220,6 +341,9 @@ clock_getcpuclockid(pid_t pid = PerlProc_getpid());
     OUTPUT:
         RETVAL
 
+# endif
+
+# ifdef CLOCK_REALTIME
 void
 clock_getres(clockid_t clock_id = CLOCK_REALTIME);
     ALIAS:
@@ -238,6 +362,14 @@ clock_getres(clockid_t clock_id = CLOCK_REALTIME);
             mPUSHi(res.tv_nsec);
         }
 
+# else
+void
+clock_getres(...);
+    PPCODE:
+        croak("clock_getres() not available");
+
+# endif
+
 #define RETURN_NANOSLEEP_REMAIN(ret) {                      \
     if (ret == 0 || errno == EINTR) {                       \
         if (GIMME_V != G_ARRAY)                             \
@@ -252,7 +384,9 @@ clock_getres(clockid_t clock_id = CLOCK_REALTIME);
         XSRETURN_UNDEF;                                     \
 }
 
-# if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000
+# if (defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000) || \
+     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || \
+      defined(__OpenBSD__)
 void
 clock_nanosleep(...);
     PPCODE:
@@ -270,6 +404,7 @@ clock_nanosleep(clockid_t clock_id, int flags, time_t sec, long nsec);
 
 # endif
 
+# ifdef HAS_NANOSLEEP
 void
 nanosleep(time_t sec, long nsec);
     INIT:
@@ -280,6 +415,14 @@ nanosleep(time_t sec, long nsec);
         errno = 0;
         ret = nanosleep(&request, &remain);
         RETURN_NANOSLEEP_REMAIN(ret)
+
+# else
+void
+nanosleep(...);
+    PPCODE:
+        croak("nanosleep() not available");
+        
+#endif
 
 int
 clock_settime(clockid_t clock_id, time_t sec, long nsec);
@@ -299,7 +442,7 @@ confstr(int name);
     CODE:
         len = confstr(name, NULL, 0);
         if (len) {
-            Newx(buf, len, char);
+            Newxc(buf, len, char, char);
             if (buf != NULL)
                 confstr(name, buf, len);
         }
@@ -346,7 +489,7 @@ fnmatch(char *pattern, char *string, int flags);
 int
 killpg(pid_t pgrp, int sig);
 
-# ifdef __FreeBSD__
+# if defined(__FreeBSD__) || defined(__CYGWIN__)
 void
 getdate(...);
     PPCODE:
@@ -378,6 +521,8 @@ getdate(char *string);
 
 int
 getdate_err();
+    PREINIT:
+        extern int getdate_err;
     CODE:
         RETVAL = getdate_err;
     OUTPUT:
@@ -425,9 +570,6 @@ strptime(char *s, char *format, SV *sec = &PL_sv_undef, SV *min = &PL_sv_undef, 
 long
 gethostid();
 
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX 255
-#endif
 char *
 gethostname();
     INIT:
@@ -537,7 +679,7 @@ getutxline(char *ut_line);
 void
 setutxent();
 
-double
+NV
 drand48();
 
 void
@@ -571,6 +713,14 @@ lrand48();
 
 long
 mrand48();
+
+int
+nice(int incr);
+    CODE:
+        errno = 0;
+        RETVAL = nice(incr);
+    OUTPUT:
+        RETVAL
 
 void
 seed48(unsigned short seed1, unsigned short seed2, unsigned short seed3);
@@ -636,7 +786,7 @@ int
 sigrelse(int sig);
 
 
-# I/O-related functions
+## I/O-related functions
 ########################
 
 SysRet
@@ -649,7 +799,27 @@ SysRet
 chown(char *path, uid_t owner, gid_t group);
 
 SysRet
+lchown(char *path, uid_t owner, gid_t group);
+
+# ifdef HAS_ACCESS
+SysRet
+access(char *path, int mode);
+
+SysRet
 faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
+
+# else
+void
+access(...);
+  PPCODE:
+    croak("access() not available");
+
+void
+faccessat(...);
+  PPCODE:
+    croak("faccessat() not available");
+
+# endif
 
 SysRet
 fchdir(psx_fd_t dirfd);
@@ -666,7 +836,7 @@ fchown(psx_fd_t fd, uid_t owner, gid_t group);
 SysRet
 fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
 
-# if defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000
+# if !defined(HAS_FSYNC) || (defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000)
 void
 fdatasync(...);
     PPCODE:
@@ -678,30 +848,57 @@ fdatasync(psx_fd_t fd);
 
 #endif
 
+#ifndef __NetBSD__
 #define RETURN_STAT_BUF(buf) { \
-    EXTEND(SP, 16);                                     \
-    mPUSHu( buf.st_dev );           \
-    mPUSHu( buf.st_ino );           \
-    mPUSHu( buf.st_mode );          \
-    mPUSHu( buf.st_nlink );         \
-    mPUSHu( buf.st_uid );           \
-    mPUSHu( buf.st_gid );           \
-    mPUSHu( buf.st_rdev );          \
-    if (sizeof(IV) < 8)                                 \
-        mPUSHn( buf.st_size );      \
-    else                                                \
-        mPUSHi( buf.st_size );      \
-    mPUSHi( buf.st_atim.tv_sec );   \
-    mPUSHi( buf.st_mtim.tv_sec );   \
-    mPUSHi( buf.st_ctim.tv_sec );   \
+    EXTEND(SP, 16);                \
+    mPUSHu( buf.st_dev );          \
+    mPUSHu( buf.st_ino );          \
+    mPUSHu( buf.st_mode );         \
+    mPUSHu( buf.st_nlink );        \
+    mPUSHu( buf.st_uid );          \
+    mPUSHu( buf.st_gid );          \
+    mPUSHu( buf.st_rdev );         \
+    if (sizeof(IV) < 8)            \
+        mPUSHn( buf.st_size );     \
+    else                           \
+        mPUSHi( buf.st_size );     \
+    mPUSHi( buf.st_atim.tv_sec );  \
+    mPUSHi( buf.st_mtim.tv_sec );  \
+    mPUSHi( buf.st_ctim.tv_sec );  \
     /* actually these come before the times but we follow core stat */ \
-    mPUSHi( buf.st_blksize );       \
-    mPUSHi( buf.st_blocks );        \
+    mPUSHi( buf.st_blksize );      \
+    mPUSHi( buf.st_blocks );       \
     /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
-    mPUSHi( buf.st_atim.tv_nsec );  \
-    mPUSHi( buf.st_mtim.tv_nsec );  \
-    mPUSHi( buf.st_ctim.tv_nsec );  \
+    mPUSHi( buf.st_atim.tv_nsec ); \
+    mPUSHi( buf.st_mtim.tv_nsec ); \
+    mPUSHi( buf.st_ctim.tv_nsec ); \
 }
+#else
+#define RETURN_STAT_BUF(buf) { \
+    EXTEND(SP, 16);                \
+    mPUSHu( buf.st_dev );          \
+    mPUSHu( buf.st_ino );          \
+    mPUSHu( buf.st_mode );         \
+    mPUSHu( buf.st_nlink );        \
+    mPUSHu( buf.st_uid );          \
+    mPUSHu( buf.st_gid );          \
+    mPUSHu( buf.st_rdev );         \
+    if (sizeof(IV) < 8)            \
+        mPUSHn( buf.st_size );     \
+    else                           \
+        mPUSHi( buf.st_size );     \
+    mPUSHi( buf.st_atime );  \
+    mPUSHi( buf.st_mtime );  \
+    mPUSHi( buf.st_ctime );  \
+    /* actually these come before the times but we follow core stat */ \
+    mPUSHi( buf.st_blksize );      \
+    mPUSHi( buf.st_blocks );       \
+    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
+    mPUSHi( buf.st_atimensec ); \
+    mPUSHi( buf.st_mtimensec ); \
+    mPUSHi( buf.st_ctimensec ); \
+}
+#endif
 
 void
 fstatat(psx_fd_t dirfd, char *path, int flags = 0);
@@ -716,18 +913,37 @@ lstat(char *path);
     ALIAS:
         stat = 1
     INIT:
-        int ret;
+        int ret = 0;
         struct stat buf;
     PPCODE:
-        ret = ix == 0 ? lstat(path, &buf) : stat(path, &buf);
+        if (ix == 0)
+#ifdef HAS_LSTAT
+            ret = lstat(path, &buf);
+#else
+            croak("lstat() not available");
+#endif
+        else
+            ret = stat(path, &buf);
         if (ret == 0)
             RETURN_STAT_BUF(buf);
 
+# ifdef HAS_FSYNC
 SysRet
 fsync(psx_fd_t fd);
 
+# else
+void
+fsync(...);
+    PPCODE:
+        croak("fsync() not available");
+
+# endif
+
 SysRet
 ftruncate(psx_fd_t fd, off_t length);
+
+int
+isatty(psx_fd_t fd);
 
 SysRet
 link(char *path1, char *path2);
@@ -840,8 +1056,8 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
     if (!SvOK(dirfdsv))
       XSRETURN_UNDEF;
 
-    got_fd = psx_looks_like_number(dirfdsv);
-    dir_fd = psx_fileno(dirfdsv);
+    got_fd = psx_looks_like_number(aTHX_ dirfdsv);
+    dir_fd = psx_fileno(aTHX_ dirfdsv);
     if (dir_fd < 0)
       XSRETURN_UNDEF;
 
@@ -862,17 +1078,19 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
        * file handle.
        */
       gv = newGVgen(PACKNAME);
+      io = GvIOn(gv);
       if (S_ISDIR(st.st_mode)) {
         if ((dir = fdopendir(path_fd))) {
-          io = GvIOn(gv);
           IoDIRP(io) = dir;
           return_handle = 1;
         }
       }
       else if ((file = fdopen(path_fd, flags2raw(oflag)))) {
         fp = PerlIO_importFILE(file, 0);
-        if (fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp))
+        if (fp) { /* && do_open(gv, "+<&", 3, FALSE, 0, 0, fp)) */
+          IoIFP(io) = fp;
           return_handle = 1;
+        }
       }
     }
 
@@ -915,29 +1133,53 @@ read(psx_fd_t fd, SV *buf, size_t count);
 SysRet0
 write(psx_fd_t fd, SV *buf, SV *count = &PL_sv_undef);
     INIT:
-        char *cbuf;
+        const char *cbuf;
         STRLEN buf_cur, nbytes;
     CODE:
     {
       if (!SvPOK(buf))
         RETVAL = 0;
       else {
-        cbuf = SvPV(buf, buf_cur);
-        if (!cbuf || !buf_cur)
+        cbuf = SvPV_const(buf, buf_cur);
+        if (!buf_cur)
           RETVAL = 0;
         else {
           if (count == &PL_sv_undef)
             nbytes = buf_cur;
-          else
+          else {
             nbytes = SvUV(count);
-          if (nbytes > buf_cur)
-            nbytes = buf_cur;
-          RETVAL = write(fd, cbuf, nbytes);
+            if (nbytes > buf_cur)
+              nbytes = buf_cur;
+          }
+          RETVAL = nbytes ? write(fd, cbuf, nbytes) : 0;
         }
       }
     }
     OUTPUT:
         RETVAL
+
+SysRet0
+writev(psx_fd_t fd, AV *ioAV);
+  CODE:
+    RETVAL = _writev50c(aTHX_ fd, ioAV, NULL);
+  OUTPUT:
+    RETVAL
+
+# ifdef __CYGWIN__
+void
+pwritev(...);
+  PPCODE:
+    croak("pwritev() not available");
+
+# else
+SysRet0
+pwritev(psx_fd_t fd, AV *ioAV, off_t offset);
+  CODE:
+    RETVAL = _writev50c(aTHX_ fd, ioAV, &offset);
+  OUTPUT:
+    RETVAL
+
+# endif
 
 SysRet0
 pread(psx_fd_t fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset = 0);
@@ -993,10 +1235,10 @@ SysRet0
 pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, off_t buf_offset = 0);
   INIT:
     STRLEN buf_cur, nbytes, max_nbytes;
-    char *cbuf;
+    const char *cbuf;
   CODE:
   {
-    cbuf = SvPV(buf, buf_cur);
+    cbuf = SvPV_const(buf, buf_cur);
     if (!cbuf || !buf_cur)
       RETVAL = 0;
     else {
@@ -1011,10 +1253,11 @@ pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, of
       max_nbytes = buf_cur - buf_offset;
       if (sv_nbytes == &PL_sv_undef)
         nbytes = max_nbytes;
-      else
+      else {
         nbytes = SvUV(sv_nbytes);
-      if (nbytes > max_nbytes)
-        nbytes = max_nbytes;
+        if (nbytes > max_nbytes)
+          nbytes = max_nbytes;
+      }
       if (nbytes)
         RETVAL = pwrite(fd, cbuf + buf_offset, nbytes, file_offset);
       else
@@ -1027,6 +1270,7 @@ pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, of
 char *
 ptsname(int fd);
 
+# ifdef HAS_READLINK
 char *
 readlink(char *path);
     CODE:
@@ -1046,6 +1290,19 @@ readlinkat(psx_fd_t dirfd, char *path);
     CLEANUP:
         if (RETVAL != NULL)
             Safefree(RETVAL);
+
+# else
+void
+readlink(...);
+  PPCODE:
+    croak("readlink() not available");
+
+void
+readlinkat(...);
+  PPCODE:
+    croak("readlinkat() not available");
+
+# endif
 
 #
 # POSIX::remove() fails to remove a symlink to a directory
@@ -1114,46 +1371,46 @@ utimensat(...);
 
 # endif
 
-# Integer and real number arithmetic
+## Integer and real number arithmetic
 #####################################
 
 int
 abs(int i);
 
-double
+NV
 acos(double x);
 
-double
+NV
 acosh(double x);
 
-double
+NV
 asin(double x);
 
-double
+NV
 asinh(double x);
 
-double
+NV
 atan(double x);
 
-double
+NV
 atan2(double y, double x);
 
-double
+NV
 atanh(double x);
 
-double
+NV
 cbrt(double x);
 
-double
+NV
 ceil(double x);
 
-double
+NV
 copysign(double x, double y);
 
-double
+NV
 cos(double x);
 
-double
+NV
 cosh(double x);
 
 void
@@ -1176,40 +1433,50 @@ ldiv(long numer, long denom);
         mPUSHi(result.quot);
         mPUSHi(result.rem);
 
-double
+NV
 erf(double x);
 
-double
+NV
 erfc(double x);
 
-double
+NV
 exp2(double x);
 
-double
+NV
 expm1(double x);
 
-double
+NV
 fdim(double x, double y);
 
-double
+NV
 floor(double x);
 
-double
+# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 504000) || \
+     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+void
+fma(...);
+    PPCODE:
+        croak("fma() not available");
+
+# else
+NV
 fma(double x, double y, double z);
 
-double
+# endif
+
+NV
 fmax(double x, double y);
 
-double
+NV
 fmin(double x, double y);
 
-double
+NV
 fmod(double x, double y);
 
 int
 fpclassify(double x);
 
-double
+NV
 hypot(double x, double y);
 
 int
@@ -1227,135 +1494,253 @@ isnan(double x);
 int
 isnormal(double x);
 
-double
+NV
 j0(double x);
 
-double
+NV
 j1(double x);
 
-double
+NV
 jn(int n, double x);
 
-double
+NV
 ldexp(double x, int exp);
 
-double
+NV
 lgamma(double x);
 
-double
+NV
+log(double x);
+
+NV
+log10(double x);
+
+NV
 log1p(double x);
 
-double
+NV
 log2(double x);
 
-double
+NV
 logb(double x);
 
-double
+long
+lround(double x);
+
+# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 503001) || \
+     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+void
+nearbyint(...);
+    PPCODE:
+        croak("nearbyint() not available");
+
+# else
+NV
 nearbyint(double x);
 
-double
+# endif
+
+NV
 nextafter(double x, double y);
 
-double
+NV
 remainder(double x, double y);
 
-double
+NV
 round(double x);
 
-double
+NV
 scalbn(double x, int n);
 
 int
 signbit(double x);
 
-double
+NV
 sinh(double x);
 
-double
+NV
 tan(double x);
 
-double
+NV
 tanh(double x);
 
-double
+NV
 tgamma(double x);
 
-double
+NV
 trunc(double x);
 
-double
+NV
 y0(double x);
 
-double
+NV
 y1(double x);
 
-double
+NV
 yn(int n, double x);
 
 
-# Complex arithmetic functions
+## Complex arithmetic functions
 ###############################
 
-double
+# ifdef _Complex_I
+NV
 cabs(double re, double im);
-    ALIAS:
-        carg = 1
-        cimag = 2
-        creal = 3
     INIT:
-#ifdef _Complex_I
         double complex z = re + im * _Complex_I;
-#else
-        ;
-#endif
     CODE:
-#ifdef _Complex_I
-        switch(ix) {
-        case 0:
-            RETVAL = cabs(z);
-            break;
-        case 1:
-            RETVAL = carg(z);
-            break;
-        case 2:
-            RETVAL = cimag(z);
-            break;
-        default:
-            RETVAL = creal(z);
-        }
-#else
-        PERL_UNUSED_VAR(re);
-        PERL_UNUSED_VAR(im);
-        PERL_UNUSED_VAR(ix);
-        PERL_UNUSED_VAR(RETVAL);
-        croak("Complex functions not available.");
-#endif
+        RETVAL = cabs(z);
+    OUTPUT:
+        RETVAL
+
+# else
+void
+cabs(...);
+    PPCODE:
+        croak("cabs() not available");
+
+# endif
+
+# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 800000)
+void
+carg(...);
+    PPCODE:
+        croak("carg() not available");
+
+void
+cproj(...);
+    PPCODE:
+        croak("cproj() not available");
+
+void
+csqrt(...);
+    PPCODE:
+        croak("csqrt() not available");
+
+# else
+NV
+carg(double re, double im);
+    INIT:
+        double complex z = re + im * _Complex_I;
+    CODE:
+        RETVAL = carg(z);
     OUTPUT:
         RETVAL
 
 void
-cpow(double re_x, double im_x, double re_y, double im_y);
+cproj(double re, double im);
+    ALIAS:
+        sqrt = 1
     INIT:
-#ifdef _Complex_I
-        double complex x = re_x + im_x * _Complex_I;
-        double complex y = re_y + im_y * _Complex_I;
-        double complex result = cpow(x, y);
-#else
-        ;
-#endif
+        double complex z = re + im * _Complex_I;
+        double complex result;
     PPCODE:
-#ifdef _Complex_I
+        if (ix == 0)
+            result = cproj(z);
+        else
+            result = csqrt(z);
         EXTEND(SP, 2);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
-#else
-        PERL_UNUSED_VAR(re_x);
-        PERL_UNUSED_VAR(im_x);
-        PERL_UNUSED_VAR(re_y);
-        PERL_UNUSED_VAR(im_y);
-        croak("Complex functions not available.");
-#endif
+
+# endif
+
+# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 503001)
+void
+cimag(...);
+    PPCODE:
+        croak("cimag() not available");
+
+void
+conj(...);
+    PPCODE:
+        croak("conj() not available");
+
+void
+creal(...);
+    PPCODE:
+        croak("creal() not available");
+
+# else
+NV
+cimag(double re, double im);
+    ALIAS:
+        conj = 1
+        creal = 2
+    INIT:
+        double complex z = re + im * _Complex_I;
+    CODE:
+        switch(ix) {
+        case 0:
+            RETVAL = cimag(z);
+            break;
+        case 1:
+            RETVAL = conj(z);
+            break;
+        default:
+            RETVAL = creal(z);
+            break;
+        }
+    OUTPUT:
+        RETVAL
+
+# endif
+
+# if defined(_Complex_I) && !defined(__FreeBSD__)
+void
+cpow(double re_x, double im_x, double re_y, double im_y);
+    INIT:
+        double complex x = re_x + im_x * _Complex_I;
+        double complex y = re_y + im_y * _Complex_I;
+        double complex result = cpow(x, y);
+    PPCODE:
+        EXTEND(SP, 2);
+        mPUSHn(creal(result));
+        mPUSHn(cimag(result));
+
+void
+clog(double re, double im);
+    INIT:
+        double complex z = re + im * _Complex_I;
+        double complex result = clog(z);
+    PPCODE:
+        EXTEND(SP, 2);
+        mPUSHn(creal(result));
+        mPUSHn(cimag(result));
+
+# else
+void
+cpow(...);
+    PPCODE:
+        /* https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=221341 */
+        croak("cpow() not available");
+
+void
+clog(...);
+    PPCODE:
+        /* https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=221341 */
+        croak("clog() not available");
+
+# endif
+
+# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 900000)
+void
+cexp(...);
+    PPCODE:
+        croak("cexp() not available");
+
+# else
+void
+cexp(double re, double im);
+    INIT:
+        double complex z = re + im * _Complex_I;
+        double complex result = cexp(z);
+    PPCODE:
+        EXTEND(SP, 2);
+        mPUSHn(creal(result));
+        mPUSHn(cimag(result));
+
+# endif
 
 void
 cacos(double re, double im);
@@ -1367,28 +1752,23 @@ cacos(double re, double im);
         catanh = 5
         ccos = 6
         ccosh = 7
-        cexp = 8
-        clog = 9
-        conj = 10
-        cproj = 11
-        csin = 12
-        csinh = 13
-        csqrt = 14
-        ctan = 15
-        ctanh = 16
+        csin = 8
+        csinh = 9
+        ctan = 10
+        ctanh = 11
     INIT:
-#ifdef _Complex_I
+#if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
+        ;
+#else
         double complex z = re + im * _Complex_I;
         double complex result;
-#else
-        ;
 #endif
     PPCODE:
-#ifndef _Complex_I
+#if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
         PERL_UNUSED_VAR(re);
         PERL_UNUSED_VAR(im);
         PERL_UNUSED_VAR(ix);
-        croak("Complex functions not available.");
+        croak("Complex trigonometric functions not available");
 #else
         switch(ix) {
         case 0:
@@ -1416,27 +1796,12 @@ cacos(double re, double im);
             result = ccosh(z);
             break;
         case 8:
-            result = cexp(z);
-            break;
-        case 9:
-            result = clog(z);
-            break;
-        case 10:
-            result = conj(z);
-            break;
-        case 11:
-            result = cproj(z);
-            break;
-        case 12:
             result = csin(z);
             break;
-        case 13:
+        case 9:
             result = csinh(z);
             break;
-        case 14:
-            result = csqrt(z);
-            break;
-        case 15:
+        case 10:
             result = ctan(z);
             break;
         default:
@@ -1450,7 +1815,6 @@ cacos(double re, double im);
 
 BOOT:
 {
-    HV *stash;
     CV *cv;
     char *file = __FILE__;
 
@@ -1461,6 +1825,9 @@ BOOT:
 #undef isalpha
     cv = newXS("POSIX::2008::isalpha", is_common, file);
     XSANY.any_dptr = (any_dptr_t) &isalpha;
+#undef isblank
+    cv = newXS("POSIX::2008::isblank", is_common, file);
+    XSANY.any_dptr = (any_dptr_t) &isblank;
 #undef iscntrl
     cv = newXS("POSIX::2008::iscntrl", is_common, file);
     XSANY.any_dptr = (any_dptr_t) &iscntrl;
@@ -1488,120 +1855,6 @@ BOOT:
 #undef isxdigit
     cv = newXS("POSIX::2008::isxdigit", is_common, file);
     XSANY.any_dptr = (any_dptr_t) &isxdigit;
-
-    stash = gv_stashpv(PACKNAME, TRUE);
-    newCONSTSUB(stash, "_CS_PATH",            newSViv(_CS_PATH));
-#ifdef _CS_GNU_LIBC_VERSION
-    newCONSTSUB(stash, "_CS_GNU_LIBC_VERSION",newSViv(_CS_GNU_LIBC_VERSION));
-#endif
-#ifdef _CS_GNU_LIBPTHREAD_VERSION
-    newCONSTSUB(stash, "_CS_GNU_LIBPTHREAD_VERSION",
-                newSViv(_CS_GNU_LIBPTHREAD_VERSION));
-#endif
-#ifdef AT_EACCESS
-    newCONSTSUB(stash, "AT_EACCESS",          newSViv(AT_EACCESS));
-#endif
-#ifdef AT_EMPTY_PATH
-    newCONSTSUB(stash, "AT_EMPTY_PATH",       newSViv(AT_EMPTY_PATH));
-#endif
-#ifdef AT_FDCWD
-    newCONSTSUB(stash, "AT_FDCWD",            newSViv(AT_FDCWD));
-#endif
-#ifdef AT_NO_AUTOMOUNT
-    newCONSTSUB(stash, "AT_NO_AUTOMOUNT",     newSViv(AT_NO_AUTOMOUNT));
-#endif
-#ifdef AT_REMOVEDIR
-    newCONSTSUB(stash, "AT_REMOVEDIR",        newSViv(AT_REMOVEDIR));
-#endif
-#ifdef AT_SYMLINK_FOLLOW
-    newCONSTSUB(stash, "AT_SYMLINK_FOLLOW",   newSViv(AT_SYMLINK_FOLLOW));
-#endif
-#ifdef AT_SYMLINK_NOFOLLOW
-    newCONSTSUB(stash, "AT_SYMLINK_NOFOLLOW", newSViv(AT_SYMLINK_NOFOLLOW));
-#endif
-#ifdef CLOCK_REALTIME
-    newCONSTSUB(stash, "CLOCK_REALTIME",      newSViv(CLOCK_REALTIME));
-#endif
-#ifdef CLOCK_MONOTONIC
-    newCONSTSUB(stash, "CLOCK_MONOTONIC",     newSViv(CLOCK_MONOTONIC));
-#endif
-#ifdef CLOCK_MONOTONIC_RAW
-    newCONSTSUB(stash, "CLOCK_MONOTONIC_RAW", newSViv(CLOCK_MONOTONIC_RAW));
-#endif
-#ifdef CLOCK_PROCESS_CPUTIME_ID
-    newCONSTSUB(stash, "CLOCK_PROCESS_CPUTIME_ID",
-                newSViv(CLOCK_PROCESS_CPUTIME_ID));
-#endif
-#ifdef CLOCK_THREAD_CPUTIME_ID
-    newCONSTSUB(stash, "CLOCK_THREAD_CPUTIME_ID",
-                newSViv(CLOCK_THREAD_CPUTIME_ID));
-#endif
-    newCONSTSUB(stash, "FNM_NOMATCH",         newSViv(FNM_NOMATCH));
-    newCONSTSUB(stash, "FNM_PATHNAME",        newSViv(FNM_PATHNAME));
-    newCONSTSUB(stash, "FNM_PERIOD",          newSViv(FNM_PERIOD));
-    newCONSTSUB(stash, "FNM_NOESCAPE",        newSViv(FNM_NOESCAPE));
-#ifdef FNM_FILE_NAME
-    newCONSTSUB(stash, "FNM_FILE_NAME",       newSViv(FNM_FILE_NAME));
-#endif
-#ifdef FNM_LEADING_DIR
-    newCONSTSUB(stash, "FNM_LEADING_DIR",     newSViv(FNM_LEADING_DIR));
-#endif
-#ifdef FNM_CASEFOLD
-    newCONSTSUB(stash, "FNM_CASEFOLD",        newSViv(FNM_CASEFOLD));
-#endif
-    newCONSTSUB(stash, "FP_NAN",              newSViv(FP_NAN));
-    newCONSTSUB(stash, "FP_INFINITE",         newSViv(FP_INFINITE));
-    newCONSTSUB(stash, "FP_ZERO",             newSViv(FP_ZERO));
-    newCONSTSUB(stash, "FP_SUBNORMAL",        newSViv(FP_SUBNORMAL));
-    newCONSTSUB(stash, "FP_NORMAL",           newSViv(FP_NORMAL));
-#ifdef O_CLOEXEC
-    newCONSTSUB(stash, "O_CLOEXEC",           newSViv(O_CLOEXEC));
-#endif
-#ifdef O_DIRECTORY
-    newCONSTSUB(stash, "O_DIRECTORY",         newSViv(O_DIRECTORY));
-#endif
-#ifdef O_EXEC
-    newCONSTSUB(stash, "O_EXEC",              newSViv(O_EXEC));
-#endif
-#ifdef O_NOFOLLOW
-    newCONSTSUB(stash, "O_NOFOLLOW",          newSViv(O_NOFOLLOW));
-#endif
-#ifdef O_RSYNC
-    newCONSTSUB(stash, "O_RSYNC",             newSViv(O_RSYNC));
-#endif
-    newCONSTSUB(stash, "O_SYNC",              newSViv(O_SYNC));
-#ifdef O_SEARCH
-    newCONSTSUB(stash, "O_SEARCH",            newSViv(O_SEARCH));
-#endif
-#ifdef O_TMPFILE
-    /* not POSIX but useful */
-    newCONSTSUB(stash, "O_TMPFILE",           newSViv(O_TMPFILE));
-#endif
-#ifdef O_TTY_INIT
-    newCONSTSUB(stash, "O_TTY_INIT",          newSViv(O_TTY_INIT));
-#endif
-    newCONSTSUB(stash, "TIMER_ABSTIME",       newSViv(TIMER_ABSTIME));
-#ifdef UTIME_NOW
-    newCONSTSUB(stash, "UTIME_NOW",           newSViv(UTIME_NOW));
-    newCONSTSUB(stash, "UTIME_OMIT",          newSViv(UTIME_OMIT));
-#endif
-#ifdef RUN_LVL
-    newCONSTSUB(stash, "RUN_LVL",             newSViv(RUN_LVL));
-#endif
-    newCONSTSUB(stash, "BOOT_TIME",           newSViv(BOOT_TIME));
-    newCONSTSUB(stash, "NEW_TIME",            newSViv(NEW_TIME));
-    newCONSTSUB(stash, "OLD_TIME",            newSViv(OLD_TIME));
-    newCONSTSUB(stash, "DEAD_PROCESS",        newSViv(DEAD_PROCESS));
-    newCONSTSUB(stash, "INIT_PROCESS",        newSViv(INIT_PROCESS));
-    newCONSTSUB(stash, "LOGIN_PROCESS",       newSViv(LOGIN_PROCESS));
-    newCONSTSUB(stash, "USER_PROCESS",        newSViv(USER_PROCESS));
-    newCONSTSUB(stash, "RTLD_GLOBAL",         newSViv(RTLD_GLOBAL));
-    newCONSTSUB(stash, "RTLD_LOCAL",          newSViv(RTLD_LOCAL));
-    newCONSTSUB(stash, "RTLD_LAZY",           newSViv(RTLD_LAZY));
-    newCONSTSUB(stash, "RTLD_NOW",            newSViv(RTLD_NOW));
-    newCONSTSUB(stash, "ITIMER_PROF",         newSViv(ITIMER_PROF));
-    newCONSTSUB(stash, "ITIMER_REAL",         newSViv(ITIMER_REAL));
-    newCONSTSUB(stash, "ITIMER_VIRTUAL",      newSViv(ITIMER_VIRTUAL));
 }
 
 # vim: set ts=4 sw=4 sts=4 expandtab:

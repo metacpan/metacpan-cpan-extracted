@@ -1,0 +1,65 @@
+{
+   "abstract" : "Experimental Enhancements to core Data::Dumper",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Data-Dumper-Extensions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.89"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Data::Dumper::Extensions" : {
+         "file" : "lib/Acme/Data/Dumper/Extensions.pm",
+         "version" : "0.001000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/Acme-Data-Dumper-Extensions/issues"
+      },
+      "homepage" : "https://github.com/kentnl/Acme-Data-Dumper-Extensions",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kentnl/Acme-Data-Dumper-Extensions",
+         "web" : "https://github.com/kentnl/Acme-Data-Dumper-Extensions"
+      }
+   },
+   "version" : "0.001000",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

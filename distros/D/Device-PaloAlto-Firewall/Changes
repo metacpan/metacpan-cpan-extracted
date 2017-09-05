@@ -1,12 +1,23 @@
 Revision history for Device-PaloAlto
 
-0.01        02-05-2017
+0.081     2017-09-05 15:44:34+10:00 Australia/Melbourne
 
-0.02        09-08-2017
+0.08      2017-09-05 14:38:44+10:00 Australia/Melbourne
 
-0.03        10-08-2017
+0.071     2017-08-29 21:36:09+10:00 Australia/Melbourne
+
+0.07      2017-08-29 16:21:19+10:00 Australia/Melbourne
+            * Device::PaloAlto::Firewall
+                * Added ike_peers(), ipsec_peers(), vpn_tunnels()
+            * Device::PaloAlto::Firewall::Test
+                * Added version(), vpn_tunnels_up()
 
 0.06      2017-08-24 11:22:25+10:00 Australia/Melbourne
 
 0.05      2017-08-11 15:38:31+10:00 Australia/Melbourne
 
+0.03        10-08-2017
+
+0.02        09-08-2017
+
+0.01        02-05-2017

@@ -1,0 +1,6 @@
+Revision history for Perl extension Lab::VXI11::Sunrpc.
+
+0.01  Wed Aug 30 19:07:13 2017
+	- original version; created by h2xs 1.23 with options
+		-n Lab::VXI11::Sunrpc ./vxi11.h
+

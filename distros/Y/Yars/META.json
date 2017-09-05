@@ -14,14 +14,9 @@
    },
    "name" : "Yars",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "6.64",
             "perl" : "5.010001"
          }
       },
@@ -85,13 +80,13 @@
          "web" : "https://github.com/clustericious/Yars"
       }
    },
-   "version" : "1.30",
+   "version" : "1.31",
    "x_contributors" : [
       "Marty Brandon",
       "Graham Ollis <plicease@cpan.org>",
       "Brian Duggan",
       "Curt Tilmes"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -14,11 +14,11 @@ EPFL::Sciper::List - Retrieve a list of all public active sciper from EPFL.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JSON-WithComments",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "JSON::WithComments",
   "PREREQ_PM" => {
     "JSON" => "2.94"
@@ -23,7 +24,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

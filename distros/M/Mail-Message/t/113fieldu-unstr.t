@@ -5,11 +5,12 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Mail::Message::Test;
 use Mail::Message::Field::Unstructured;
 
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 my $mmff = 'Mail::Message::Field::Full';
 my $mmfu = 'Mail::Message::Field::Unstructured';
@@ -80,3 +81,24 @@ cmp_ok(@dl, '==', 1,                    "Folded body of d");
 is($dl[0], " =?iso-8859-1?q?a=E4b?=\n", "Folded d line 0");
 
 is($d->decodedBody, "a\x{E4}b");
+
+#
+# Test folding of very long lines with unicode and fieldname
+# added 3.002
+
+my $e = $mmfu->new(Subject => 'Ẇåƫ įś Ûņįĉóɖé ¿ Ŵąť ïŝ Ḝṋɕòḑǐꞑĝ, Ẇåƫ įś Ûņįĉóɖé ¿ Ŵąť ïŝ Ḝṋɕòḑǐꞑĝ Ẇåƫ įś Ûņįĉóɖé ¿ Ŵąť ïŝ Ḝṋɕòḑǐꞑĝ, Ẇåƫ įś Ûņįĉóɖé ¿ Ŵąť ïŝ Ḝṋɕòḑǐꞑĝ', charset => 'utf-8');
+ok defined $e, 'folding';
+is $e->string, <<_E_ENCODED;
+Subject: =?utf-8?q?=E1=BA=86=C3=A5=C6=AB_=C4=AF=C5=9B_=C3=9B=C5=86=C4=AF?=
+ =?utf-8?q?=C4=89=C3=B3=C9=96=C3=A9_=C2=BF_=C5=B4=C4=85=C5=A5_=C3=AF=C5=9D?=
+ =?utf-8?q?_=E1=B8=9C=E1=B9=8B=C9=95=C3=B2=E1=B8=91=C7=90=EA=9E=91=C4=9D,_?=
+ =?utf-8?q?=E1=BA=86=C3=A5=C6=AB_=C4=AF=C5=9B_=C3=9B=C5=86=C4=AF=C4=89?=
+ =?utf-8?q?=C3=B3=C9=96=C3=A9_=C2=BF_=C5=B4=C4=85=C5=A5_=C3=AF=C5=9D_?=
+ =?utf-8?q?=E1=B8=9C=E1=B9=8B=C9=95=C3=B2=E1=B8=91=C7=90=EA=9E=91=C4=9D_?=
+ =?utf-8?q?=E1=BA=86=C3=A5=C6=AB_=C4=AF=C5=9B_=C3=9B=C5=86=C4=AF=C4=89?=
+ =?utf-8?q?=C3=B3=C9=96=C3=A9_=C2=BF_=C5=B4=C4=85=C5=A5_=C3=AF=C5=9D_?=
+ =?utf-8?q?=E1=B8=9C=E1=B9=8B=C9=95=C3=B2=E1=B8=91=C7=90=EA=9E=91=C4=9D,_?=
+ =?utf-8?q?=E1=BA=86=C3=A5=C6=AB_=C4=AF=C5=9B_=C3=9B=C5=86=C4=AF=C4=89?=
+ =?utf-8?q?=C3=B3=C9=96=C3=A9_=C2=BF_=C5=B4=C4=85=C5=A5_=C3=AF=C5=9D_?=
+ =?utf-8?q?=E1=B8=9C=E1=B9=8B=C9=95=C3=B2=E1=B8=91=C7=90=EA=9E=91=C4=9D?=
+_E_ENCODED

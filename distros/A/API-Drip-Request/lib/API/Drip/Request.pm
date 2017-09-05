@@ -31,11 +31,11 @@ API::Drip::Request - Perl interface to api.getdrip.com
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -253,12 +253,7 @@ Dan Wright, C<< <Dan at DWright.Org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-api-drip at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=API-Drip>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report bugs as an issue via GitHub L<https://github.com/dwright/API-Drip/issues>.
 
 =head1 SUPPORT
 
@@ -271,7 +266,10 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * Github repository (please report bugs here)
+L<https://github.com/dwright/API-Drip>
+
+=item * RT: CPAN's request tracker (not recommended)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=API-Drip>
 

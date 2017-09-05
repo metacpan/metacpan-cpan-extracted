@@ -30,7 +30,7 @@ use base qw(JSON);
 
 use Carp ();
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 # These regular expressions are adapted from Regexp::Common::comment.
 
@@ -48,6 +48,10 @@ my %PATTERNS  = (
 # specified a style. It can be changed in import() with -default_comment_style.
 # This is also the style that will be used by decode_json.
 my $default_comment_style = 'javascript';
+
+# This table is used in lieu of per-object hashkeys, as the object is not a
+# hashref when the JSON::XS backend is in use.
+my %comment_style;
 
 sub import {
     my ($class, @imports) = @_;
@@ -72,14 +76,24 @@ sub import {
     return $class->SUPER::import(@imports);
 }
 
+sub new {
+    my $class = shift;
+
+    return $class->SUPER::new->comment_style($default_comment_style);
+}
+
 sub comment_style {
     my ($self, $value) = @_;
 
     if (defined $value) {
-        if (! $PATTERNS{$value}) {
+        if ($value eq 'perl') {
+            $self->relaxed(1);
+        } elsif ($PATTERNS{$value}) {
+            $self->relaxed(0);
+        } else {
             Carp::croak "Unknown comment_style ($value)";
         }
-        $self->{comment_style} = $value;
+        $comment_style{"$self"} = $value;
     }
 
     return $self;
@@ -88,20 +102,32 @@ sub comment_style {
 sub get_comment_style {
     my $self = shift;
 
-    return $self->{comment_style} || $default_comment_style;
+    return $comment_style{"$self"};
 }
 
 sub decode {
     my ($self, $text) = @_;
 
-    my $comment_re = $PATTERNS{$self->get_comment_style};
-    # The JSON module reports errors using the character-offset within the
-    # string as a whole. So rather than deleting comments, replace them with a
-    # string of spaces of the same length. This should mean that any reported
-    # character offsets in the JSON data will still be correct.
-    $text =~ s/$comment_re/q{ } x length($1)/ge;
+    # Perl-style comments are handled by having set the "relaxed" property on
+    # the object. We only use the regexp approach for the other style(s).
+    if ((my $style = $self->get_comment_style) ne 'perl') {
+        my $comment_re = $PATTERNS{$style};
+        # The JSON module reports errors using the character-offset within the
+        # string as a whole. So rather than deleting comments, replace them
+        # with a string of spaces of the same length. This should mean that any
+        # reported character offsets in the JSON data will still be correct.
+        $text =~ s/$comment_re/q{ } x length($1)/ge;
+    }
 
     return $self->SUPER::decode($text);
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    delete $comment_style{"$self"};
+
+    return;
 }
 
 1;
@@ -114,7 +140,7 @@ JSON::WithComments - Parse JSON content with embedded comments
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -133,7 +159,7 @@ version 0.001
     JSON
     
     my $json = JSON::WithComments->new;
-    my $hashref = $json->decode($json);
+    my $hashref = $json->decode($content);
 
 =head1 DESCRIPTION
 
@@ -180,9 +206,10 @@ C<#> character, and does not have a block-style comment.
 
 =back
 
-Comment delimiters may be prefixed with a backslash character (C<\>) to prevent
-their removal. This may be needed if the delimiter character(s) appear in a
-string, for example.
+JavaScript comment delimiters may be prefixed with a backslash character (C<\>)
+to prevent their removal. This may be needed if the delimiter character(s)
+appear in a string, for example. Perl comments do not need this when appearing
+in a string.
 
 =head1 IMPORT OPTIONS
 
@@ -206,6 +233,12 @@ This class provides the following methods:
 
 =over 4
 
+=item B<new>
+
+This method is the class constructor. It simply allocates an object of the
+class, then calls B<comment_style> with the default style to set that property
+on the object. It returns the new object reference.
+
 =item B<comment_style>
 
 This method takes a single value and sets it to be the new comment style for
@@ -215,18 +248,42 @@ return value is the object reference itself.
 
 =item B<get_comment_style>
 
-Returns the current comment style, or the default comment style if the calling
-object does not have its own style set.
+Returns the object's comment style.
 
 =item B<decode>
 
-This method takes one argument, the JSON text to parse. The text is first
-scrubbed of comments, then passed to the superclass B<decode> method.
+This method takes one argument, the JSON text to parse. For comment styles
+other than C<perl>, the text is scrubbed of the comments. Then the superclass
+B<decode> method is called on the text.
 
 =back
 
 At present, this module does not facilitate the import of the non-method
 functions that B<JSON> provides.
+
+=head1 COMMENTS WITHIN STRINGS
+
+If a comment appears within a string, it should not be removed. If the comment
+style for the object is C<perl>, it will not be removed and it will not affect
+the parsing of the JSON.
+
+However, if the comment style is C<javascript> then the leading C</> character
+of the comment needs to be escaped using the backslash (C<\>) character. This
+conforms to the JSON specification for escaping characters, and will result in
+just the C</> character appearing in the string post-parsing.
+
+For example, given the following JSON text:
+
+    {
+       "key1" : "\// scalar value",
+       "key2" : "\/* start",
+       "key3" : "end */"
+    }
+
+Upon parsing, the resulting hash reference will have the string
+C<// scalar value> in slot C<key1>, and C</* start> in slot C<key2>. Slot
+C<key3> will have C<end */> because there is nothing in it that needed to be
+escaped.
 
 =head1 DIAGNOSTICS
 
@@ -247,6 +304,15 @@ Comments are not an official feature of JSON, so by using comments with JSON
 data you are limiting the range of tools that you can use with that data. If
 in the future a new JSON standard is published that supports comments, this
 module will have to be updated (or deprecated) accordingly.
+
+Perl comments are handled by setting the B<relaxed> property on the object.
+This allows the comments, but also allows another extension to the JSON syntax.
+This means that when using C<perl> comments, your parsing is more lax than when
+using C<javascript> comments. See the entry for B<relaxed> in the B<JSON>
+module's manual page.
+
+Using the B<property> method from the B<JSON> class will not include the
+C<comment_style> property.
 
 =head1 BUGS
 

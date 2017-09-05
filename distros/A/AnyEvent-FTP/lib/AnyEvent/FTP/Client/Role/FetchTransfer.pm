@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Fetch transfer interface for AnyEvent::FTP objects
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 sub xfer
 {
@@ -92,7 +92,7 @@ AnyEvent::FTP::Client::Role::FetchTransfer - Fetch transfer interface for AnyEve
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 

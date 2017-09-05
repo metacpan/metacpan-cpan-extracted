@@ -7,7 +7,7 @@ use strict;
 
 package Mail::Message::Field::URIs;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 use base 'Mail::Message::Field::Structured';
 
@@ -57,10 +57,9 @@ sub addURI(@)
 {   my $self  = shift;
     my $uri   = ref $_[0] ? shift : URI->new(@_);
     push @{$self->{MMFU_uris}}, $uri->canonical if defined $uri;
+    delete $self->{MMFF_body};
     $uri;
 }
-
-#------------------------------------------
 
 
 sub URIs() { @{shift->{MMFU_uris}} }

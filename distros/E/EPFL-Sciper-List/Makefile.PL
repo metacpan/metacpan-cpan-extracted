@@ -2,23 +2,24 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'EPFL::Sciper::List',
-  'PREREQ_PM' => {
-                   'LWP::UserAgent' => '6.26',
-                   'IO::All' => '0.87',
-                   'JSON' => '2.94',
-                   'Test::More' => 0,
-                   'Test::MockModule' => '0.12',
-                   'File::Copy::Recursive' => '0.38',
-                   'LWP::Protocol::https' => '6.07',
-                   'Test::JSON' => '0.11',
-                   'Readonly' => '2.05'
-                 },
+  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/EPFL/Sciper/List.pm',
   'EXE_FILES' => [
                    'bin/epfl-sciper-list.pl'
                  ],
+  'PREREQ_PM' => {
+                   'JSON' => '2.94',
+                   'File::Find::Rule' => '0.34',
+                   'Readonly' => '2.05',
+                   'Test::JSON' => '0.11',
+                   'Test::More' => 0,
+                   'IO::All' => '0.87',
+                   'Test::MockModule' => '0.12',
+                   'LWP::UserAgent' => '6.26',
+                   'LWP::Protocol::https' => '6.07',
+                   'File::Copy::Recursive' => '0.38'
+                 },
   'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/EPFL/Sciper/List.pm',
-  'PL_FILES' => {}
+  'NAME' => 'EPFL::Sciper::List'
 )
 ;

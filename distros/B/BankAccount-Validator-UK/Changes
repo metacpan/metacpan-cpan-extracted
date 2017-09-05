@@ -1,5 +1,8 @@
 Revision history for BankAccount::Validator::UK
 
+0.32  2017-09-03T12:00:00:+01:00
+      - Updated copyright year information.
+
 0.31  2017-07-27T10:30:00:+01:00
       - Added new sort codes 230088 and 040004. (v4.40)
 

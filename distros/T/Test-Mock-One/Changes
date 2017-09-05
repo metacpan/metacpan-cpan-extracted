@@ -1,0 +1,26 @@
+Revision history for Test::Mock::One
+
+0.005     2017-09-04 19:40:37Z
+
+    * Allow copy of X-Mock attributes
+    * Update documenation
+
+0.004     2017-09-03 11:57:07Z
+
+    * Set dependency of List::Util to 1.33 (Thank you CPAN testers :))
+    * Add kwalitee tests before releasing the module
+    * Add Changes file tests
+
+0.003     2017-09-03 10:47:18Z
+
+    * Remove pod error
+
+0.002     2017-09-03 01:00:41Z
+
+    * Fix "Kwalitee Issues" for use strict and use warnings
+    * Fix documentation
+
+0.001     2017-09-02 18:42:21Z
+
+    * First release to CPAN
+

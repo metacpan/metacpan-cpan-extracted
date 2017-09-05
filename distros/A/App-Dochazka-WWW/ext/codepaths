@@ -1,0 +1,70 @@
+dmenu.mainMenu (sets flag)
+  dmenu.mainEmpl (sets flag)
+    daction.myProfileAction -> empLib.myProfileAction
+      dform.empProfile { "xtarget": "mainEmpl" }
+        dform.empProfileEdit
+          daction.empProfileEditSave
+            unwindToFlag()
+        daction.ldapSync -> empLib.ldapSync
+          unwindToFlag()
+    dform.ldapLookup
+      daction.ldapLookupSubmit -> empLib.ldapLookupSubmit
+        dform.ldapDisplayEmployee
+          daction.ldapSync -> empLib.ldapSync
+    dform.searchEmployee
+      daction.actionEmplSearch -> empLib.actionEmplSearch
+        dbrowser.simpleEmployeeBrowser
+          daction.ldapSync -> empLib.ldapSync
+          dform.empProfileEdit
+            daction.empProfileEditSave
+              unwindToFlag()
+          daction.masqEmployee -> empLib.masqEmployee
+            unwindToFlag()
+  dmenu.mainPriv (sets flag)
+    daction.actionPrivHistory -> privLib.actionPrivHistory (pushable)
+      dtable.privHistoryDtable
+        daction.actionPrivHistoryEdit -> privLib.actionPrivHistoryEdit
+          drowselect.privHistoryDrowselect
+            daction.privHistoryAddRecordAction -> privLib.privHistoryAddRecordAction
+              dform.privHistoryAddRecord
+                daction.privHistorySaveAction -> privLib.privHistorySaveAction
+                  unwindToTarget("actionPrivHistory")
+            daction.privHistoryDeleteAction -> privLib.privHistoryDeleteAction
+              unwindToTarget("actionPrivHistory")
+  dmenu.mainSched (sets flag)
+    daction.actionSchedHistory -> schedHistLib.actionSchedHistory
+      dtable.schedHistoryDtable
+        daction.actionSchedHistoryEdit -> schedHistLib.actionSchedHistoryEdit
+          drowselect.schedHistoryDrowselect
+            daction.schedHistoryAddRecordAction -> schedHistLib.schedHistoryAddRecordAction
+              dform.schedHistoryAddRecord
+                daction.schedHistorySaveAction -> schedHistLib.schedHistorySaveAction
+                  unwindToTarget("actionSchedHistory")
+            daction.schedHistoryDeleteAction -> schedHistLib.schedHistoryDeleteAction
+              unwindToTarget("actionSchedHistory")
+    dform.schedLookup
+      daction.actionSchedLookup -> schedLib.actionSchedLookup
+        dform.schedDisplay
+          dform.schedEdit
+            daction.schedEditSave -> schedLib.schedActionSave
+              unwindToTarget("actionSchedLookup")
+          dform.schedDelete
+            dform.schedReallyDelete
+              daction.schedReallyDelete -> schedLib.schedReallyDelete
+                unwindToFlag()
+    daction.browseAllSchedules -> schedLib.browseAllSchedules
+      dbrowser.simpleScheduleBrowser
+        dform.schedEditFromBrowser
+          daction.schedEditSave -> schedLib.schedEditSave
+            unwindToTarget("simpleScheduleBrowser")
+        dform.schedDeleteFromBrowser
+          dform.schedReallyDelete
+            daction.schedReallyDelete -> schedLib.schedReallyDelete
+              unwindToFlag() [i.e., back to last dmenu]
+    dmenu.schedNew
+      dform.schedNewBoilerplate
+        daction.createSchedule -> schedLib.createSchedule
+          stack.unwindToTarget('mainSched')
+      dform.schedNewCustom
+        daction.createSchedule -> schedLib.createSchedule
+          stack.unwindToTarget('mainSched')

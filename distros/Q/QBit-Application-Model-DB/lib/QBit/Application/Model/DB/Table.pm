@@ -10,7 +10,7 @@ Base class for DB tables.
 =cut
 
 package QBit::Application::Model::DB::Table;
-$QBit::Application::Model::DB::Table::VERSION = '0.018';
+$QBit::Application::Model::DB::Table::VERSION = '0.019';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -118,7 +118,7 @@ sub init {
 
     $self->SUPER::init();
 
-    throw gettext('Required opt \"fields\" ')
+    throw gettext('Required option "fields"')
       unless $self->{'fields'};
 
     foreach my $field (@{$self->{'fields'}}) {    # Если нет типа, ищем тип в foreign_keys

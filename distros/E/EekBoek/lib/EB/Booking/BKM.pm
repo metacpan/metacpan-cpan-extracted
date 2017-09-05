@@ -10,8 +10,8 @@ package EB::Booking::BKM;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 14:50:41 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 27 13:24:53 2012
-# Update Count    : 547
+# Last Modified On: Wed Oct  7 17:11:39 2015
+# Update Count    : 555
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -42,6 +42,7 @@ sub perform {
     my $beginsaldo = $opts->{beginsaldo};
     my $does_btw = $dbh->does_btw;
     my $verbose = $opts->{verbose};
+    my $bsk_att = $opts->{bijlage};
 
     if ( defined($totaal) ) {
 	my $t = amount($totaal);
@@ -62,6 +63,10 @@ sub perform {
 	return "?".__x("Ongeldig beginsaldo: {saldo}", saldo => $beginsaldo)
 	  unless defined $t;
 	$beginsaldo = $t;
+    }
+
+    if ( defined $bsk_att ) {
+	return unless $self->check_attachment($bsk_att);
     }
 
     my $bky = $self->{bky} ||= $opts->{boekjaar} || $dbh->adm("bky");
@@ -93,6 +98,14 @@ sub perform {
     my $nr = 1;
     my $bsk_id;
     my $gacct = $dbh->lookup($dagboek, qw(Dagboeken dbk_id dbk_acc_id));
+    # Be slightly paranoid...
+    if ( defined($gacct) && $gacct != $dbh->lookup( $gacct, qw(Accounts acc_id acc_id) ) ) {
+	croak("INTERNAL ERROR: ".
+	      __x("Grootboekrekening {acct} voor dagboek {dbk} is niet gedefinieerd",
+		  acct => $gacct,
+		  dbk => $dbh->lookup( $dagboek, qw( Dagboeken dbk_id dbk_desc ) ) ) );
+    }
+
     my $btw_adapt = $cfg->val(qw(strategy btw_adapt), 0);
 
     if ( $gacct ) {
@@ -647,6 +660,8 @@ sub perform {
 	$dbh->rollback;
 	return undef;
     }
+
+    $self->add_attachment( $bsk_att, $bsk_id ) if $bsk_att;
     $dbh->commit;
 
     # TODO -- need this to get a current booking.

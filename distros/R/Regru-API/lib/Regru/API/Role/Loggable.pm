@@ -9,7 +9,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Carp;
 
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 our $AUTHORITY = 'cpan:IMAGO'; # AUTHORITY
 
 sub debug_warn {
@@ -40,7 +40,7 @@ Regru::API::Role::Loggable - something that produces a debug messages
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ L<Regru::API::Role::Client>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/regru/regru-api-perl/issues
+L<https://github.com/regru/regru-api-perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

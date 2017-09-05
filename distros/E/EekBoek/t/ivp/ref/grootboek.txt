@@ -1,6 +1,6 @@
                                              Grootboek
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                      EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                      EekBoek, 2013-12-31
 
  GrBk  Grootboek/Boekstuk              Datum           Debet     Credit  BoekstukNr      Relatie
 ---------------------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ EekBoek Demo Administratie                                                      
 
  1101  Afschrijving inv. & inr.
         Beginsaldo                                      0,00    1304,81
-         Afschrijving                  2007-12-31       0,00     411,26  Memoriaal:1
+         Afschrijving                  2013-12-31       0,00     411,26  Memoriaal:1
         Totaal mutaties                                          411,26
  1101  Totaal Afschrijving inv. &                               1716,07
        inr.
@@ -24,45 +24,45 @@ EekBoek Demo Administratie                                                      
 
  1111  Afschrijving computers
         Beginsaldo                                      0,00   12106,78
-         Afschrijving                  2007-12-31       0,00     396,82  Memoriaal:2
+         Afschrijving                  2013-12-31       0,00     396,82  Memoriaal:2
         Totaal mutaties                                          396,82
  1111  Totaal Afschrijving computers                           12503,60
 
  2200  Debiteuren
         Beginsaldo                                      0,00       0,00
-         Perl Cursus                   2007-02-18    3570,00       0,00  Verkoop:1
-         Perl Cursus                   2007-03-18    3570,00       0,00  Verkoop:2
-         *Perl Cursus                  2007-03-18       0,00    3570,00  Postbank:3      ACME
-         *Perl Cursus                  2007-04-12       0,00    3570,00  Postbank:4      ACME
-         Perl Cursus                   2007-04-18     600,00       0,00  Verkoop:3
-         Perl Cursus                   2007-05-12       0,00       5,00  Verkoop:4
-         Ondersteuning                 2007-05-14     714,00       0,00  Verkoop:5
-         *Perl Cursus                  2007-05-31       0,00     600,00  Postbank:5      ACME
-         *Ondersteuning                2007-06-08       0,00     714,00  Postbank:6      ACME
-         *Perl Cursus                  2007-06-12       5,00       0,00  Postbank:6      ACME
-         Ondersteuning                 2007-07-16     714,00       0,00  Verkoop:6
-         *Ondersteuning                2007-08-10       0,00     714,00  Postbank:8      ACME
-         Pocket Reference              2007-08-19    1000,00       0,00  Verkoop:7
-         *Pocket Reference             2007-08-19       0,00    1000,00  Postbank:8      ORA
+         Perl Cursus                   2013-02-18    3570,00       0,00  Verkoop:1
+         Perl Cursus                   2013-03-18    3570,00       0,00  Verkoop:2
+         *Perl Cursus                  2013-03-18       0,00    3570,00  Postbank:3      ACME
+         *Perl Cursus                  2013-04-12       0,00    3570,00  Postbank:4      ACME
+         Perl Cursus                   2013-04-18     600,00       0,00  Verkoop:3
+         Perl Cursus                   2013-05-12       0,00       5,00  Verkoop:4
+         Ondersteuning                 2013-05-14     714,00       0,00  Verkoop:5
+         *Perl Cursus                  2013-05-31       0,00     600,00  Postbank:5      ACME
+         *Ondersteuning                2013-06-08       0,00     714,00  Postbank:6      ACME
+         *Perl Cursus                  2013-06-12       5,00       0,00  Postbank:6      ACME
+         Ondersteuning                 2013-07-16     714,00       0,00  Verkoop:6
+         *Ondersteuning                2013-08-10       0,00     714,00  Postbank:8      ACME
+         Pocket Reference              2013-08-19    1000,00       0,00  Verkoop:7
+         *Pocket Reference             2013-08-19       0,00    1000,00  Postbank:8      ORA
         Totaal mutaties                                 0,00
  2200  Totaal Debiteuren                                0,00
 
  2320  Postbank
         Beginsaldo                                   1131,92       0,00
-         Afschrift 1                   2007-01-31       0,00     130,15  Postbank:1
-         Afschrift 2                   2007-02-28       0,00      25,50  Postbank:2
-         Afschrift 3                   2007-03-31    3442,98       0,00  Postbank:3
-         Afschrift 4                   2007-04-30    3544,50       0,00  Postbank:4
-         Afschrift 5                   2007-05-31     472,28       0,00  Postbank:5
-         Afschrift 6                   2007-06-30     683,50       0,00  Postbank:6
-         Afschrift 7                   2007-07-31       0,00     130,16  Postbank:7
-         Afschrift 8                   2007-08-31    1688,50       0,00  Postbank:8
-         Afschrift 9                   2007-09-30       0,00     134,22  Postbank:9
-         Afschrift 10                  2007-10-31       0,00      25,50  Postbank:10
-         Afschrift 11                  2007-11-30       0,00     135,17  Postbank:11
-         Afschrift 12                  2007-12-07       0,00      25,50  Postbank:12
-         Eerste deel ADSL              2007-12-09       0,00      10,00  Postbank:13
-         Tweede deel ADSL              2007-12-10       0,00      12,80  Postbank:14
+         Afschrift 1                   2013-01-31       0,00     130,15  Postbank:1
+         Afschrift 2                   2013-02-28       0,00      25,50  Postbank:2
+         Afschrift 3                   2013-03-31    3442,98       0,00  Postbank:3
+         Afschrift 4                   2013-04-30    3544,50       0,00  Postbank:4
+         Afschrift 5                   2013-05-31     472,28       0,00  Postbank:5
+         Afschrift 6                   2013-06-30     683,50       0,00  Postbank:6
+         Afschrift 7                   2013-07-31       0,00     130,16  Postbank:7
+         Afschrift 8                   2013-08-31    1688,50       0,00  Postbank:8
+         Afschrift 9                   2013-09-30       0,00     134,22  Postbank:9
+         Afschrift 10                  2013-10-31       0,00      25,50  Postbank:10
+         Afschrift 11                  2013-11-30       0,00     135,17  Postbank:11
+         Afschrift 12                  2013-12-07       0,00      25,50  Postbank:12
+         Eerste deel ADSL              2013-12-09       0,00      10,00  Postbank:13
+         Tweede deel ADSL              2013-12-10       0,00      12,80  Postbank:14
         Totaal mutaties                              9202,76
  2320  Totaal Postbank                              10334,68
 
@@ -74,166 +74,166 @@ EekBoek Demo Administratie                                                      
 
  4100  Crediteuren
         Beginsaldo                                      0,00       0,00
-         Internet                      2007-01-05       0,00      22,80  Inkoop:1
-         ADSL + Telefoon               2007-01-15       0,00     104,65  Inkoop:2
-         *Internet                     2007-01-19      22,80       0,00  Postbank:1      XS4ALL
-         *ADSL + Telefoon              2007-01-31     104,65       0,00  Postbank:1      KPN
-         Internet                      2007-02-09       0,00      22,80  Inkoop:3
-         *Internet                     2007-02-23      22,80       0,00  Postbank:2      XS4ALL
-         Internet                      2007-03-08       0,00      22,80  Inkoop:4
-         Telefoonkosten                2007-03-18       0,00     101,52  Inkoop:5
-         *Internet                     2007-03-31      22,80       0,00  Postbank:3      XS4ALL
-         *Telefoonkosten               2007-03-31     101,52       0,00  Postbank:3      KPN
-         Internet                      2007-04-05       0,00      22,80  Inkoop:6
-         *Internet                     2007-04-06      22,80       0,00  Postbank:4      XS4ALL
-         Internet                      2007-05-10       0,00      22,80  Inkoop:7
-         Telefoonkosten                2007-05-20       0,00     102,22  Inkoop:8
-         *Internet                     2007-05-31      22,80       0,00  Postbank:5      XS4ALL
-         *Telefoonkosten               2007-05-31     102,22       0,00  Postbank:5      KPN
-         Internet                      2007-06-07       0,00      22,80  Inkoop:9
-         *Internet                     2007-06-21      22,80       0,00  Postbank:6      XS4ALL
-         Internet                      2007-07-05       0,00      22,80  Inkoop:10
-         Telefoonkosten                2007-07-15       0,00     104,66  Inkoop:11
-         *Internet                     2007-07-30      22,80       0,00  Postbank:7      XS4ALL
-         *Telefoonkosten               2007-07-31     104,66       0,00  Postbank:7      KPN
-         Internet                      2007-08-09       0,00      22,80  Inkoop:12
-         *Internet                     2007-08-10      22,80       0,00  Postbank:8      XS4ALL
-         Internet                      2007-09-06       0,00      22,80  Inkoop:13
-         Telefoonkosten                2007-09-16       0,00     108,72  Inkoop:14
-         *Internet                     2007-09-30      22,80       0,00  Postbank:9      XS4ALL
-         *Telefoonkosten               2007-09-30     108,72       0,00  Postbank:9      KPN
-         Internet                      2007-10-11       0,00      22,80  Inkoop:15
-         *Internet                     2007-10-13      22,80       0,00  Postbank:10     XS4ALL
-         Internet                      2007-11-07       0,00      22,80  Inkoop:16
-         Telefoonkosten                2007-11-17       0,00     109,67  Inkoop:17
-         *Internet                     2007-11-30      22,80       0,00  Postbank:11     XS4ALL
-         *Telefoonkosten               2007-11-30     109,67       0,00  Postbank:11     KPN
-         Internet                      2007-12-06       0,00      22,80  Inkoop:18
-         Internet                      2007-12-07       0,00      22,80  Inkoop:20
-         *Internet                     2007-12-07      22,80       0,00  Postbank:12     XS4ALL
-         *Internet                     2007-12-09      10,00       0,00  Postbank:13     XS4ALL
-         *Internet                     2007-12-10      12,80       0,00  Postbank:14     XS4ALL
+         Internet                      2013-01-05       0,00      22,80  Inkoop:1
+         ADSL + Telefoon               2013-01-15       0,00     104,65  Inkoop:2
+         *Internet                     2013-01-19      22,80       0,00  Postbank:1      XS4ALL
+         *ADSL + Telefoon              2013-01-31     104,65       0,00  Postbank:1      KPN
+         Internet                      2013-02-09       0,00      22,80  Inkoop:3
+         *Internet                     2013-02-23      22,80       0,00  Postbank:2      XS4ALL
+         Internet                      2013-03-08       0,00      22,80  Inkoop:4
+         Telefoonkosten                2013-03-18       0,00     101,52  Inkoop:5
+         *Internet                     2013-03-31      22,80       0,00  Postbank:3      XS4ALL
+         *Telefoonkosten               2013-03-31     101,52       0,00  Postbank:3      KPN
+         Internet                      2013-04-05       0,00      22,80  Inkoop:6
+         *Internet                     2013-04-06      22,80       0,00  Postbank:4      XS4ALL
+         Internet                      2013-05-10       0,00      22,80  Inkoop:7
+         Telefoonkosten                2013-05-20       0,00     102,22  Inkoop:8
+         *Internet                     2013-05-31      22,80       0,00  Postbank:5      XS4ALL
+         *Telefoonkosten               2013-05-31     102,22       0,00  Postbank:5      KPN
+         Internet                      2013-06-07       0,00      22,80  Inkoop:9
+         *Internet                     2013-06-21      22,80       0,00  Postbank:6      XS4ALL
+         Internet                      2013-07-05       0,00      22,80  Inkoop:10
+         Telefoonkosten                2013-07-15       0,00     104,66  Inkoop:11
+         *Internet                     2013-07-30      22,80       0,00  Postbank:7      XS4ALL
+         *Telefoonkosten               2013-07-31     104,66       0,00  Postbank:7      KPN
+         Internet                      2013-08-09       0,00      22,80  Inkoop:12
+         *Internet                     2013-08-10      22,80       0,00  Postbank:8      XS4ALL
+         Internet                      2013-09-06       0,00      22,80  Inkoop:13
+         Telefoonkosten                2013-09-16       0,00     108,72  Inkoop:14
+         *Internet                     2013-09-30      22,80       0,00  Postbank:9      XS4ALL
+         *Telefoonkosten               2013-09-30     108,72       0,00  Postbank:9      KPN
+         Internet                      2013-10-11       0,00      22,80  Inkoop:15
+         *Internet                     2013-10-13      22,80       0,00  Postbank:10     XS4ALL
+         Internet                      2013-11-07       0,00      22,80  Inkoop:16
+         Telefoonkosten                2013-11-17       0,00     109,67  Inkoop:17
+         *Internet                     2013-11-30      22,80       0,00  Postbank:11     XS4ALL
+         *Telefoonkosten               2013-11-30     109,67       0,00  Postbank:11     KPN
+         Internet                      2013-12-06       0,00      22,80  Inkoop:18
+         Internet                      2013-12-07       0,00      22,80  Inkoop:20
+         *Internet                     2013-12-07      22,80       0,00  Postbank:12     XS4ALL
+         *Internet                     2013-12-09      10,00       0,00  Postbank:13     XS4ALL
+         *Internet                     2013-12-10      12,80       0,00  Postbank:14     XS4ALL
         Totaal mutaties                                 0,00
  4100  Totaal Crediteuren                               0,00
 
  4200  BTW Verkoop Hoog
         Beginsaldo                                      0,00       0,00
-         BTW Perl Cursus 1e bet.       2007-02-18       0,00     570,00  Verkoop:1
-         BTW Perl Cursus 2e bet.       2007-03-18       0,00     570,00  Verkoop:2
-         BTW Perl Cursus rest          2007-04-18       0,00      95,80  Verkoop:3
-         BTW Perl Cursus rest          2007-05-12       0,80       0,00  Verkoop:4
-         BTW Consultancy               2007-05-14       0,00     114,00  Verkoop:5
-         BTW Consultancy               2007-07-16       0,00     114,00  Verkoop:6
-        Totaal mutaties                                         1463,00
- 4200  Totaal BTW Verkoop Hoog                                  1463,00
+         BTW Perl Cursus 1e bet.       2013-02-18       0,00     619,59  Verkoop:1
+         BTW Perl Cursus 2e bet.       2013-03-18       0,00     619,59  Verkoop:2
+         BTW Perl Cursus rest          2013-04-18       0,00     104,13  Verkoop:3
+         BTW Perl Cursus rest          2013-05-12       0,87       0,00  Verkoop:4
+         BTW Consultancy               2013-05-14       0,00     123,92  Verkoop:5
+         BTW Consultancy               2013-07-16       0,00     123,92  Verkoop:6
+        Totaal mutaties                                         1590,28
+ 4200  Totaal BTW Verkoop Hoog                                  1590,28
 
  4220  BTW Inkoop Hoog
         Beginsaldo                                      0,00       0,00
-         BTW ADSL                      2007-01-05       3,64       0,00  Inkoop:1
-         BTW ADSL                      2007-01-15       3,86       0,00  Inkoop:2
-         BTW Telefoonkosten            2007-01-15      12,84       0,00  Inkoop:2
-         BTW ADSL                      2007-02-09       3,64       0,00  Inkoop:3
-         BTW ADSL                      2007-03-08       3,64       0,00  Inkoop:4
-         BTW ADSL + Telefoon           2007-03-18      16,21       0,00  Inkoop:5
-         BTW ADSL                      2007-04-05       3,64       0,00  Inkoop:6
-         BTW ADSL                      2007-05-10       3,64       0,00  Inkoop:7
-         BTW ADSL + Telefoon           2007-05-20      16,32       0,00  Inkoop:8
-         BTW ADSL                      2007-06-07       3,64       0,00  Inkoop:9
-         BTW ADSL                      2007-07-05       3,64       0,00  Inkoop:10
-         BTW ADSL + Telefoon           2007-07-15      16,71       0,00  Inkoop:11
-         BTW ADSL                      2007-08-09       3,64       0,00  Inkoop:12
-         BTW ADSL                      2007-09-06       3,64       0,00  Inkoop:13
-         BTW ADSL + Telefoon           2007-09-16      17,36       0,00  Inkoop:14
-         BTW ADSL                      2007-10-11       3,64       0,00  Inkoop:15
-         BTW ADSL                      2007-11-07       3,64       0,00  Inkoop:16
-         BTW ADSL + Telefoon           2007-11-17      17,51       0,00  Inkoop:17
-         BTW ÁDSL                      2007-12-06       3,64       0,00  Inkoop:18
-         BTW ADSL                      2007-12-07       3,64       0,00  Inkoop:20
-        Totaal mutaties                               148,13
- 4220  Totaal BTW Inkoop Hoog                         148,13
+         BTW ADSL                      2013-01-05       3,96       0,00  Inkoop:1
+         BTW ADSL                      2013-01-15       4,20       0,00  Inkoop:2
+         BTW Telefoonkosten            2013-01-15      13,96       0,00  Inkoop:2
+         BTW ADSL                      2013-02-09       3,96       0,00  Inkoop:3
+         BTW ADSL                      2013-03-08       3,96       0,00  Inkoop:4
+         BTW ADSL + Telefoon           2013-03-18      17,62       0,00  Inkoop:5
+         BTW ADSL                      2013-04-05       3,96       0,00  Inkoop:6
+         BTW ADSL                      2013-05-10       3,96       0,00  Inkoop:7
+         BTW ADSL + Telefoon           2013-05-20      17,74       0,00  Inkoop:8
+         BTW ADSL                      2013-06-07       3,96       0,00  Inkoop:9
+         BTW ADSL                      2013-07-05       3,96       0,00  Inkoop:10
+         BTW ADSL + Telefoon           2013-07-15      18,16       0,00  Inkoop:11
+         BTW ADSL                      2013-08-09       3,96       0,00  Inkoop:12
+         BTW ADSL                      2013-09-06       3,96       0,00  Inkoop:13
+         BTW ADSL + Telefoon           2013-09-16      18,87       0,00  Inkoop:14
+         BTW ADSL                      2013-10-11       3,96       0,00  Inkoop:15
+         BTW ADSL                      2013-11-07       3,96       0,00  Inkoop:16
+         BTW ADSL + Telefoon           2013-11-17      19,03       0,00  Inkoop:17
+         BTW ÁDSL                      2013-12-06       3,96       0,00  Inkoop:18
+         BTW ADSL                      2013-12-07       3,96       0,00  Inkoop:20
+        Totaal mutaties                               161,06
+ 4220  Totaal BTW Inkoop Hoog                         161,06
 
  6800  Afschr. kosten inv. & inr.
         Beginsaldo                                      0,00       0,00
-         Afschrijving                  2007-12-31     411,26       0,00  Memoriaal:1
+         Afschrijving                  2013-12-31     411,26       0,00  Memoriaal:1
         Totaal mutaties                               411,26
  6800  Totaal Afschr. kosten inv. &                   411,26
        inr.
 
  6810  Afschr. kosten computers
         Beginsaldo                                      0,00       0,00
-         Afschrijving                  2007-12-31     396,82       0,00  Memoriaal:2
+         Afschrijving                  2013-12-31     396,82       0,00  Memoriaal:2
         Totaal mutaties                               396,82
  6810  Totaal Afschr. kosten                          396,82
        computers
 
  6900  Telefoon- en faxkosten
         Beginsaldo                                      0,00       0,00
-         Telefoonkosten                2007-01-15      67,61       0,00  Inkoop:2
-         ADSL + Telefoon               2007-03-18      85,31       0,00  Inkoop:5
-         ADSL + Telefoon               2007-05-20      85,90       0,00  Inkoop:8
-         ADSL + Telefoon               2007-07-15      87,95       0,00  Inkoop:11
-         ADSL + Telefoon               2007-09-16      91,36       0,00  Inkoop:14
-         ADSL + Telefoon               2007-11-17      92,16       0,00  Inkoop:17
-        Totaal mutaties                               510,29
- 6900  Totaal Telefoon- en faxkosten                  510,29
+         Telefoonkosten                2013-01-15      66,49       0,00  Inkoop:2
+         ADSL + Telefoon               2013-03-18      83,90       0,00  Inkoop:5
+         ADSL + Telefoon               2013-05-20      84,48       0,00  Inkoop:8
+         ADSL + Telefoon               2013-07-15      86,50       0,00  Inkoop:11
+         ADSL + Telefoon               2013-09-16      89,85       0,00  Inkoop:14
+         ADSL + Telefoon               2013-11-17      90,64       0,00  Inkoop:17
+        Totaal mutaties                               501,86
+ 6900  Totaal Telefoon- en faxkosten                  501,86
 
  6905  Internetkosten
         Beginsaldo                                      0,00       0,00
-         ADSL                          2007-01-05      19,16       0,00  Inkoop:1
-         ADSL                          2007-01-15      20,34       0,00  Inkoop:2
-         ADSL                          2007-02-09      19,16       0,00  Inkoop:3
-         ADSL                          2007-03-08      19,16       0,00  Inkoop:4
-         ADSL                          2007-04-05      19,16       0,00  Inkoop:6
-         ADSL                          2007-05-10      19,16       0,00  Inkoop:7
-         ADSL                          2007-06-07      19,16       0,00  Inkoop:9
-         ADSL                          2007-07-05      19,16       0,00  Inkoop:10
-         ADSL                          2007-08-09      19,16       0,00  Inkoop:12
-         ADSL                          2007-09-06      19,16       0,00  Inkoop:13
-         ADSL                          2007-10-11      19,16       0,00  Inkoop:15
-         ADSL                          2007-11-07      19,16       0,00  Inkoop:16
-         ÁDSL                          2007-12-06      19,16       0,00  Inkoop:18
-         ADSL                          2007-12-07      19,16       0,00  Inkoop:20
-        Totaal mutaties                               269,42
- 6905  Totaal Internetkosten                          269,42
+         ADSL                          2013-01-05      18,84       0,00  Inkoop:1
+         ADSL                          2013-01-15      20,00       0,00  Inkoop:2
+         ADSL                          2013-02-09      18,84       0,00  Inkoop:3
+         ADSL                          2013-03-08      18,84       0,00  Inkoop:4
+         ADSL                          2013-04-05      18,84       0,00  Inkoop:6
+         ADSL                          2013-05-10      18,84       0,00  Inkoop:7
+         ADSL                          2013-06-07      18,84       0,00  Inkoop:9
+         ADSL                          2013-07-05      18,84       0,00  Inkoop:10
+         ADSL                          2013-08-09      18,84       0,00  Inkoop:12
+         ADSL                          2013-09-06      18,84       0,00  Inkoop:13
+         ADSL                          2013-10-11      18,84       0,00  Inkoop:15
+         ADSL                          2013-11-07      18,84       0,00  Inkoop:16
+         ÁDSL                          2013-12-06      18,84       0,00  Inkoop:18
+         ADSL                          2013-12-07      18,84       0,00  Inkoop:20
+        Totaal mutaties                               264,92
+ 6905  Totaal Internetkosten                          264,92
 
  6980  Bankkosten
         Beginsaldo                                      0,00       0,00
-         Girotel                       2007-01-06       2,70       0,00  Postbank:1
-         Girotel                       2007-02-10       2,70       0,00  Postbank:2
-         Girotel                       2007-03-09       2,70       0,00  Postbank:3
-         Girotel                       2007-04-06       2,70       0,00  Postbank:4
-         Girotel                       2007-05-11       2,70       0,00  Postbank:5
-         Girotel                       2007-06-08       2,70       0,00  Postbank:6
-         Girotel                       2007-07-06       2,70       0,00  Postbank:7
-         Girotel                       2007-08-10       2,70       0,00  Postbank:8
-         Girotel                       2007-09-17       2,70       0,00  Postbank:9
-         Girotel                       2007-10-12       2,70       0,00  Postbank:10
-         Girotel                       2007-11-08       2,70       0,00  Postbank:11
-         Girotel                       2007-12-06       2,70       0,00  Postbank:12
+         Girotel                       2013-01-06       2,70       0,00  Postbank:1
+         Girotel                       2013-02-10       2,70       0,00  Postbank:2
+         Girotel                       2013-03-09       2,70       0,00  Postbank:3
+         Girotel                       2013-04-06       2,70       0,00  Postbank:4
+         Girotel                       2013-05-11       2,70       0,00  Postbank:5
+         Girotel                       2013-06-08       2,70       0,00  Postbank:6
+         Girotel                       2013-07-06       2,70       0,00  Postbank:7
+         Girotel                       2013-08-10       2,70       0,00  Postbank:8
+         Girotel                       2013-09-17       2,70       0,00  Postbank:9
+         Girotel                       2013-10-12       2,70       0,00  Postbank:10
+         Girotel                       2013-11-08       2,70       0,00  Postbank:11
+         Girotel                       2013-12-06       2,70       0,00  Postbank:12
         Totaal mutaties                                32,40
  6980  Totaal Bankkosten                               32,40
 
  8100  Omzet advisering
         Beginsaldo                                      0,00       0,00
-         Consultancy                   2007-05-14       0,00     600,00  Verkoop:5
-         Consultancy                   2007-07-16       0,00     600,00  Verkoop:6
-        Totaal mutaties                                         1200,00
- 8100  Totaal Omzet advisering                                  1200,00
+         Consultancy                   2013-05-14       0,00     590,08  Verkoop:5
+         Consultancy                   2013-07-16       0,00     590,08  Verkoop:6
+        Totaal mutaties                                         1180,16
+ 8100  Totaal Omzet advisering                                  1180,16
 
  8300  Omzet editing
         Beginsaldo                                      0,00       0,00
-         Produktie boek                2007-08-19       0,00    1000,00  Verkoop:7
+         Produktie boek                2013-08-19       0,00    1000,00  Verkoop:7
         Totaal mutaties                                         1000,00
  8300  Totaal Omzet editing                                     1000,00
 
  8400  Omzet cursussen
         Beginsaldo                                      0,00       0,00
-         Perl Cursus 1e bet.           2007-02-18       0,00    3000,00  Verkoop:1
-         Perl Cursus 2e bet.           2007-03-18       0,00    3000,00  Verkoop:2
-         Perl Cursus rest              2007-04-18       0,00     504,20  Verkoop:3
-         Perl Cursus rest              2007-05-12       4,20       0,00  Verkoop:4
-        Totaal mutaties                                         6500,00
- 8400  Totaal Omzet cursussen                                   6500,00
+         Perl Cursus 1e bet.           2013-02-18       0,00    2950,41  Verkoop:1
+         Perl Cursus 2e bet.           2013-03-18       0,00    2950,41  Verkoop:2
+         Perl Cursus rest              2013-04-18       0,00     495,87  Verkoop:3
+         Perl Cursus rest              2013-05-12       4,13       0,00  Verkoop:4
+        Totaal mutaties                                         6392,56
+ 8400  Totaal Omzet cursussen                                   6392,56
 
        Totaal mutaties                              10971,08   10971,08
 ---------------------------------------------------------------------------------------------------

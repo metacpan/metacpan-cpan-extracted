@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Type role for FTP server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 has type => (
@@ -54,7 +54,7 @@ AnyEvent::FTP::Server::Role::Type - Type role for FTP server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,11 @@ This role provides an interface for the FTP C<TYPE> command.
 
 =head1 ATTRIBUTES
 
-=head2 $context-E<gt>type
+=head2 type
+
+ my $type = $context->type;
+ $context->type('A');
+ $context->type('I');
 
 The current transfer type 'A' for ASCII and I for binary.
 

@@ -1,0 +1,100 @@
+==================================================
+Changes from 2016-08-30 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.1.3 at 2017-08-30 22:24:13 +0000
+-------------------------------------------
+
+  Change: a880a6d28901b59cc991dcef139e775603e70832
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 18:23:21 +0000
+
+    Moved version info into modules. 
+
+  Change: 7677835b42515e61fe24fb2badd225277f12f96e
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 18:21:02 +0000
+
+    Resolved name conflict with another CPAN module
+
+    dist.ini improvements. 
+
+------------------------------------------
+version 0.1.2 at 2017-08-30 22:02:37 +0000
+------------------------------------------
+
+  Change: cc92f17c7bc5932be734a04626a7ce559b18f3fd
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 11:05:49 +0000
+
+    Documentation fixes. 
+
+  Change: 31c62ebdf110088e107bcf60316b9dac6a1a467d
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 10:30:26 +0000
+
+    Version bump to 0.1.1 
+
+--------------------------------------------
+version 0.1.900 at 2017-08-29 23:51:31 +0000
+--------------------------------------------
+
+  Change: e7984463142b512a729ac2f1bf0139c76f10f03f
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 19:51:31 +0000
+
+    Made all classes immutable. 
+
+------------------------------------------
+version 0.1.1 at 2017-08-29 14:30:26 +0000
+------------------------------------------
+
+  Change: 31c62ebdf110088e107bcf60316b9dac6a1a467d
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 10:30:26 +0000
+
+    Version bump to 0.1.1 
+
+  Change: a367230494554ece5cdbd740dfc3acf27d890f42
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 10:20:54 +0000
+
+    Documentation fixes 
+
+  Change: 5515594ca90ebdf0d0099b476c9791a7ee17ffeb
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 09:39:46 +0000
+
+    Accidentally added release subdir is now removed. 
+
+  Change: 19297c58120b1cd7e330d2c3de5f3c9dc93ca447
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-28 22:22:10 +0000
+
+    Added documentation.
+
+    - Error reporting has been tuned a little. - Added PRIVATE
+    ATTRIBUTES/METHODS sections. - Preparing for CPAN release. 
+
+  Change: b8fff2ecd427018a986cc77b310b51fa9220ddd7
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-28 19:49:26 +0000
+
+    First working code. 
+
+  Change: 2d79af0a37412122186239cf23080473675575b7
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-24 18:38:32 +0000
+
+    Initial commit 
+
+  Change: 49e3b4a7275a9c165e95ba3195d77f3d0ee0e359
+  Author: Vadim Belman <vrurg@users.noreply.github.com>
+  Date : 2017-08-24 18:31:57 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -1,9 +1,18 @@
 Revision history for Mojo-Ecrawler
 
+0.04    2017-09-05/16
+
+* bug fixes
+
+0.03    2016-12-20/10
+
+* add indicate parameter for getdiv function 
+* add practice example for http://zhaopin.baidu.com
+
 0.02    2016-12-16/11
    
-* fix docs 
-* fix module rely on        
+* fixx docs 
+* fix moduleerely on        
 
 0.01    2016-12-15/19
 

@@ -5,15 +5,14 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Data::Hexdumper: '0'
-  Module::Build: '0.28'
   Monkey::Patch: '0'
   Test::Clustericious::Cluster: '0.28'
   Test::More: '0.94'
   perl: '5.010001'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '6.64'
   perl: '5.010001'
-dynamic_config: '1'
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -39,7 +38,7 @@ resources:
   bugtracker: https://github.com/clustericious/Yars/issues
   homepage: https://metacpan.org/pod/Yars
   repository: git://github.com/clustericious/Yars.git
-version: '1.30'
+version: '1.31'
 x_contributors:
   - 'Marty Brandon'
   - 'Graham Ollis <plicease@cpan.org>'

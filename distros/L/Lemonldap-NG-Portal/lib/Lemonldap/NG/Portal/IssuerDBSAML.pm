@@ -354,11 +354,16 @@ sub issuerForUnAuthUser {
                 return $self->sendSLOErrorResponse( $logout, $method );
             }
 
-            # Decrypt session index
-            my $local_session_id = $self->{cipher}->decrypt($session_index);
+            # Get session index
+            my $sessionIndexSession = $self->getSamlSession($session_index);
+            return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
+
+            my $local_session_id = $sessionIndexSession->data->{_saml_id};
+
+            $sessionIndexSession->remove;
 
             $self->lmLog(
-"Get session id $local_session_id (decrypted from $session_index)",
+"Get session id $local_session_id (from session index $session_index)",
                 'debug'
             );
 
@@ -1742,13 +1747,19 @@ sub issuerForAuthUser {
             my @authn_statements = $response_assertions[0]->AuthnStatement();
 
             # Set sessionIndex
-            # sessionIndex is the encrypted session_id
-            my $sessionIndex = $self->{cipher}->encrypt($session_id);
+            my $sessionIndexSession = $self->getSamlSession();
+            return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
+
+            $sessionIndexSession->update(
+                { '_utime' => time, '_saml_id' => $session_id } );
+            my $sessionIndex = $sessionIndexSession->id;
+
             $authn_statements[0]->SessionIndex($sessionIndex);
 
             $self->lmLog(
-                "Set sessionIndex $sessionIndex (encrypted from $session_id)",
-                'debug' );
+"Set sessionIndex $sessionIndex (linked to session $session_id)",
+                'debug'
+            );
 
             # Set SessionNotOnOrAfter
             my $sessionNotOnOrAfterTimeout =
@@ -2121,11 +2132,16 @@ sub issuerForAuthUser {
             my $provider_nb =
               $self->sendLogoutRequestToProviders( $logout, $relayID );
 
-            # Decrypt session index
-            my $local_session_id = $self->{cipher}->decrypt($session_index);
+            # Get session index
+            my $sessionIndexSession = $self->getSamlSession($session_index);
+            return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
+
+            my $local_session_id = $sessionIndexSession->data->{_saml_id};
+
+            $sessionIndexSession->remove;
 
             $self->lmLog(
-"Get session id $local_session_id (decrypted from $session_index)",
+"Get session id $local_session_id (from session index $session_index)",
                 'debug'
             );
 

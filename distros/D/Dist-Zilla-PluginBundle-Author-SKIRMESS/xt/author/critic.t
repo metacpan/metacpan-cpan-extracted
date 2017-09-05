@@ -5,19 +5,13 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic 0.004
+# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic 0.007
 
 use File::Spec;
 
-my $rcfile;
-
-BEGIN {
-    $rcfile = File::Spec->catfile(qw(xt author perlcriticrc));
-}
-
 use Perl::Critic::Utils qw(all_perl_files);
 use Test::More;
-use Test::Perl::Critic ( -profile => $rcfile );
+use Test::Perl::Critic;
 
 my @dirs = qw(bin lib t xt);
 

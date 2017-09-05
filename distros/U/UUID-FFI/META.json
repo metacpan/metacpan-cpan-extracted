@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,16 +14,28 @@
    },
    "name" : "UUID-FFI",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "FFI::CheckLib" : "0.05",
-            "Module::Build" : "0.28",
             "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -35,7 +47,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "perl" : "5.006"
          }
       }
@@ -45,13 +57,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/UUID-FFI/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/UUID-FFI",
+      "homepage" : "https://metacpan.org/pod/UUID::FFI",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/UUID-FFI.git",
          "web" : "https://github.com/plicease/UUID-FFI"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0238"
 }
 

@@ -3,7 +3,7 @@ package Locale::TextDomain::OO; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 
 use Locale::TextDomain::OO::Translator;
 
@@ -36,19 +36,41 @@ __END__
 
 Locale::TextDomain::OO - Perl OO Interface to Uniforum Message Translation
 
-$Id: OO.pm 657 2017-06-05 20:03:05Z steffenw $
+$Id: OO.pm 681 2017-07-19 12:48:28Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO.pm $
 
 =head1 VERSION
 
-1.029
+1.030
 
 Starting with version 1.000 the interface has changed.
 
 =head1 DESCRIPTION
 
 This module provides a high-level interface to Perl message translation.
+
+It is based on Singleton objects for translator and lexicon.
+So it is easy to attach that without any Web or Cmd plugins.
+There is no conflict between singleton and more than 1 project at the same time.
+The lexicon has a project key to split.
+
+You are able to use the translator singleton earlier then language initialization
+but do not call the translation methods before.
+Create the lexicon singleton during compilation time.
+
+Maketext is implemented here for moving existing projects to Gettext.
+
+BabelFish is implemented for multi-plural in one phrase.
+But use BabelFish in that case only.
+BabelFish is much harder to translate (similar to maketext)
+by translation office or automatic translation.
+
+For combinded plurals watch the Gettext multiplural example.
+In that case you have to write that awful long formulas but it is possibel.
+
+Never use keys instead of English language in code.
+You can't read, execute (with placeholders) or test your code without translation.
 
 =head2 Why a new module?
 
@@ -64,7 +86,7 @@ like L<Locale::Maketext|Locale::Maketext>.
 You decide what you need.
 
 There are some plugins, so it is possible
-to use different the Maketext and/or Gettext styles.
+to use different the Gettext, BabelFish and/or Maketext styles.
 
 Locale::TextDomain::OO has a flexible object oriented interface
 based on L<Moo|Moo>.
@@ -72,7 +94,7 @@ based on L<Moo|Moo>.
 Creating the Lexicon and translating are two split things.
 So it is possible to create the lexicon during the compilation phase.
 The connection between both is the singleton mechanism
-of the lexicon module using  and L<MooX::Singleton|MooX::Singleton>.
+of the lexicon module using L<MooX::Singleton|MooX::Singleton>.
 
 =head2 Plugin for the web framework?
 
@@ -96,7 +118,7 @@ We also added our project specific methods there.
 
 Write you own role. There is no need for a plugin for any framework.
 
-=head2 Who to set the languages?
+=head2 Who is sets the languages?
 
 Not this module.
 
@@ -153,7 +175,7 @@ Pick up the common file en.mo and the special en-gb.mo as en-gb.
 
 =head2 Do not follow the dead end of Locale::Maketext!
 
-But is is allowed to use that writing for backward compatiblity.
+But it is allowed to use that writing for backward compatiblity.
 
 What is the problem of Maketext?
 
@@ -263,20 +285,19 @@ Run the examples of this distribution (folder example).
          |                   exists in your project)       |
          |                               |                 |
          v                               v                 v
- .---------------------------------------------------------------------.
- | Locale::TextDomain::OO                                              |
- | with plugin LanguageOfLanguages                                     |
- | with plugins Locale::TextDomain::OO::Plugin::Expand::...            |
- |---------------------------------------------------------------------|
- | Gettext                          |\       /| Maketext               |
- | Gettext::DomainAndCategory       | |     | |                        |
- | (experimental)                   | |     | | Maketext::Loc          |
- | Gettext::Loc (Hint: select this) | > and < | (Hint: select this)    |
- | Gettext::Loc::DomainAndCategory  | |     | |                        |
- | (experimental)                   | |     | | Maketext::Localise     |
- | Gettext::Named (experimental)    | |     | | Maketext::Localize     |
- | BabelFish::Loc (experimental)    |/       \|                        |
- `---------------------------------------------------------------------'
+ .----------------------------------------------------------------------.
+ | Locale::TextDomain::OO                                               |
+ | with plugin LanguageOfLanguages                                      |
+ | with plugins Locale::TextDomain::OO::Plugin::Expand::...             |
+ |----------------------------------------------------------------------|
+ | Gettext                           |\       /| Maketext               |
+ | Gettext::DomainAndCategory        | |     | |                        |
+ | Gettext::Loc (Hint: select this)  | |     | | Maketext::Loc          |
+ | Gettext::Loc::DomainAndCategory   | > and < | (Hint: select this)    |
+ | Gettext::Named (experimental)     | |     | |                        |
+ | BabelFish::Loc                    | |     | | Maketext::Localise     |
+ | BabelFish::Loc::DomainAndCategory |/       \| Maketext::Localize     |
+ `----------------------------------------------------------------------'
                             ^
                             |
  .--------------------------'-----------------.
@@ -344,12 +365,12 @@ Run the examples of this distribution (folder example).
  | Example:                                                                         |
  | javascript/Example.html                                                          |
  `----------------------------------------------------------------------------------'
-         ^                     ^                  ^
-         |                     |                  |
- JavaScript calls      JavaScript calls   JavaScript calls
- Gettext methods       Gettext and        Maketext methods
- (Hint: select this)   Maketext methods   (not implemented)
-                       (not implemented)
+         ^                     ^                            ^
+         |                     |                            |
+ JavaScript calls      JavaScript calls             JavaScript calls
+ Gettext methods       Gettext and                  Maketext methods
+ (Hint: select this)   Maketext methods             (Maketext not implemented)
+                       (Maketext not implemented)
 
 =head1 SYNOPSIS
 

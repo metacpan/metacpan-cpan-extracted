@@ -1,5 +1,8 @@
 Revision history for Net-PMP-Profile
 
+0.102   28 Aug 2017
+ - use DateTime->stringify (public method) instead of _stringify (deprecated private)
+
 0.101   05 May 2015
  - add itags attribute to base Profile
  - fix DateTime stringification in to_doc()

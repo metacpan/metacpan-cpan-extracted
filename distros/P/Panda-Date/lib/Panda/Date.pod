@@ -231,12 +231,72 @@ If some args are missing, will use defaults [2000,1,1,0,0,0]
 
 If some args are missing, will use defaults defined in previous section.
 
-=item "YYYY-MM-DD HH:MM:SS" or "YYYY/MM/DD HH:MM:SS"
+=item ISO 8601 and some additional formats
 
-A standard ISO(-like) date format. Additional ".fraction" part is ignored.
-Any number of trailing parameters can be missing. So the actual format is "YYYY-[MM[-DD[ HH[:MM[:SS[.MS]]]]]]"
-Minimal string is "YYYY-". Fractional part of seconds will be ignored.
-If some args are missing, will use defaults defined in previous section.
+=over
+
+=item YYYY-
+
+=item YYYY/
+
+=item YYYY-MM
+
+=item YYYY/MM
+
+=item YYYY-MM-DD
+
+=item YYYY/MM/DD
+
+=item YYYYMMDD
+
+=item YYYY-MM-DD hh
+
+=item YYYY/MM/DD hh
+
+=item YYYY-MM-DD hh:mm
+
+=item YYYY/MM/DD hh:mm
+
+=item YYYY-MM-DD hh:mm:ss
+
+=item YYYY/MM/DD hh:mm:ss
+
+=item YYYY-MM-DD hh:mm:ss.sss
+
+=item YYYY/MM/DD hh:mm:ss.sss
+
+With microseconds. They are ignored.
+
+=item YYYYMMDDThhmmss
+
+=item YYYY-MM-DDThh:mm:ss
+
+=item YYYYMMDDThhmmss±hh
+
+With timezone offset designator (hours only).
+20170102T153159+03
+
+=item YYYY-MM-DDThh:mm:ss±hh
+
+2017-01-02T15:31:59+03
+
+=item YYYYMMDDThhmmss±hhmm
+
+With timezone offset designator (hours and minutes).
+20170102T153159+0300
+
+=item YYYY-MM-DDThh:mm:ss±hh:mm
+
+2017-01-02T15:31:59+03:00
+
+=item YYYY-MM-DDThh:mm:ss[.sss]
+
+With microseconds. They are ignored.
+
+=back
+
+If timezone offset designator is present, the date is created in unnamed timezone with constant offset from GMT (no transition rules). If you pass your
+own timezone (second parameter to constructor or set()) in this case, it will be ignored (your parameter).
 
 =item Another date object
 
@@ -247,7 +307,7 @@ Otherwise constructed date is converted to timezone $timezone preserving YMDhms 
 
 =back
 
-If there is any error while creating an object, properties error() and errstr() will be set.
+If there is any error while creating an object, properties error() and errstr() will be set and the date is set to epoch=0.
 The object itself will return false in boolean context, empty string in string context and so on.
 
 =head1 FUNCTIONS

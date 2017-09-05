@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.007';
+our $VERSION = '2.011';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -15,18 +15,43 @@ with qw(
     Locale::TextDomain::OO::Extract::Role::File
 );
 
-my $text_rule = qr{ \s* ( [^<]+ ) }xms;
+has filter => (
+    is      => 'rw',
+    isa     => ArrayRef[Str],
+    lazy    => 1,
+    default => sub {[ 'all' ]},
+);
+
+sub _filtered_start_rule {
+    my $self = shift;
+
+    my %filter_of = map { $_ => 1 } @{ $self->filter };
+    my $list_if = sub {
+        my ( $key, @list ) = @_;
+        my $condition
+            = $filter_of{all} && ! $filter_of{"!$key"}
+            || $filter_of{$key};
+        return $condition ? @list : ();
+    };
+    my $with_bracket = join "\n| ", (
+        $list_if->('Gettext',      qr{ ["] [^"]*? \b __   \b [^"]*? ["] }xms,
+                                   qr{ ['] [^']*? \b __   \b [^']*? ['] }xms),
+        $list_if->('Gettext::Loc', qr{ ["] [^"]*? \b loc_ \b [^"]*? ["] }xms,
+                                   qr{ ['] [^']*? \b loc_ \b [^']*? ['] }xms),
+        $list_if->('Maketext',     qr{ ["] [^"]*? \b loc  \b [^"]*? ["] }xms,
+                                   qr{ ['] [^']*? \b loc  \b [^']*? ['] }xms),
+    );
+    $with_bracket ||= '(?!)';
+
+    return qr{
+        [<] [^>]*?
+        \b class \s* [=] \s*
+        (?: $with_bracket )
+    }xms;
+}
 
 ## no critic (ComplexRegexes)
-my $start_rule = qr{
-    [<] [^>]*?
-    \b class \s* [=] \s*
-    (?:
-        ["] [^"]*? \b (?: loc_ | __ | loc ) \b [^"]*? ["]
-        |
-        ['] [^']*? \b (?: loc_ | __ | loc ) \b [^']*? [']
-    )
-}xms;
+my $text_rule = qr{ \s* ( [^<]+ ) }xms;
 
 my $rules = [
     # <input class="... loc_|__|loc ..." ... placeholder="text to extract" ... />
@@ -295,7 +320,7 @@ sub stack_item_mapping {
 sub extract {
     my $self = shift;
 
-    $self->start_rule($start_rule);
+    $self->start_rule( $self->_filtered_start_rule );
     $self->rules($rules);
     $self->preprocess;
     $self->SUPER::extract;
@@ -316,13 +341,13 @@ __END__
 Locale::TextDomain::OO::Extract::HTML
 - Extracts internationalization data from HTML
 
-$Id: HTML.pm 683 2017-08-22 18:41:42Z steffenw $
+$Id: HTML.pm 693 2017-09-02 09:20:30Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/HTML.pm $
 
 =head1 VERSION
 
-2.007
+2.011
 
 =head1 DESCRIPTION
 
@@ -352,13 +377,23 @@ Whitespace is allowed everywhere.
     use Locale::TextDomain::OO::Extract::HTML;
     use Path::Tiny qw(path);
 
-    my $extractor = Locale::TextDomain::OO::Extract::HTML->new;
+    my $extractor = Locale::TextDomain::OO::Extract::HTML->new(
+        # optional filter parameter, the default is ['all'],
+        # the following means:
+        # extract for all plugins but not for Plugin
+        # Locale::TextDomain::OO::Plugin::Maketext
+        filter => [ qw(
+            all
+            !Maketext
+        ) ],
+    );
     for ( @files ) {
         $extractor->clear;
         $extractor->filename($_);            # dir/filename for reference
         $extractor->content_ref( \( path($_)->slurp_utf8 ) );
-        $exttactor->category('LC_Messages'); # set defaults or q{} is used
-        $extractor->domain('default');       # set defaults or q{} is used
+        $extractor->project('my project');   # set or default undef is used
+        $extractor->category('LC_MESSAGES'); # set or default q{} is used
+        $extractor->domain('my domain');     # set or default q{} is used
         $extractor->extract;
     }
     ... = $extractor->lexicon_ref;
@@ -371,6 +406,15 @@ All parameters are optional.
 See Locale::TextDomain::OO::Extract to replace the defaults.
 
     my $extractor = Locale::TextDomain::OO::Extract::HTML->new;
+
+=head2 method filter
+
+Ignore some of 'all' or define what to scan.
+See SYNOPSIS and DESCRIPTION for how and what.
+
+    my $array_ref = $extractor->filter;
+
+    $extractor->filter(['all']); # the default
 
 =head2 method preprocess (called by method extract)
 

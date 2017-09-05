@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::Author::RWSTAUNER::Minter;
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: RWSTAUNER's Dist::Zilla config for minting
-$Dist::Zilla::PluginBundle::Author::RWSTAUNER::Minter::VERSION = '6.001';
+$Dist::Zilla::PluginBundle::Author::RWSTAUNER::Minter::VERSION = '6.002';
 use Moose;
 use MooseX::AttributeShortcuts;
 use Git::Wrapper;
@@ -135,7 +135,7 @@ Dist::Zilla::PluginBundle::Author::RWSTAUNER::Minter - RWSTAUNER's Dist::Zilla c
 
 =head1 VERSION
 
-version 6.001
+version 6.002
 
 =head1 SYNOPSIS
 
@@ -167,10 +167,11 @@ This bundle is roughly equivalent to the following (generated) F<profile.ini>:
   [Run::AfterMint]
   run = %x -e "mkdir(shift(@ARGV))" %d%pt
 
-  [GenerateFile / Generate-LICENSE]
-  content     = This is free software; you can redistribute it and/or modify it under
-  content     = the same terms as the Perl 5 programming language system itself.
-  filename    = LICENSE
+  [GenerateFile / Generate-Changes]
+  content     = Revision history for {{$dist->name}}
+  content     = {{ '{{$NEXT}}' }}
+  content     =   - Initial release
+  filename    = Changes
   is_template = 1
 
   [GenerateFile / Generate-README.mkdn]
@@ -212,11 +213,10 @@ This bundle is roughly equivalent to the following (generated) F<profile.ini>:
   filename    = dist.ini
   is_template = 1
 
-  [GenerateFile / Generate-Changes]
-  content     = Revision history for {{$dist->name}}
-  content     = {{ '{{$NEXT}}' }}
-  content     =   - Initial release
-  filename    = Changes
+  [GenerateFile / Generate-LICENSE]
+  content     = This is free software; you can redistribute it and/or modify it under
+  content     = the same terms as the Perl 5 programming language system itself.
+  filename    = LICENSE
   is_template = 1
 
   [GenerateFile / Generate-.mailmap]

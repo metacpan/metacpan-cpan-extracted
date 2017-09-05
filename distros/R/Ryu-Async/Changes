@@ -1,6 +1,12 @@
 Revision history for Ryu-Async
 
-0.005     2017-06-17 01:43:13+08:00 Asia/Kuala_Lumpur
+0.006     2017-09-01 21:03:27+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    * Basic timeout support
+    * UDP client/server helpers
+
+0.006     2017-06-17 01:43:13+08:00 Asia/Kuala_Lumpur
     No new features.
 
     Bugs fixed:

@@ -72,7 +72,7 @@ Catalyst::Model::LDAP::Entry - Convenience methods for Net::LDAP::Entry
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

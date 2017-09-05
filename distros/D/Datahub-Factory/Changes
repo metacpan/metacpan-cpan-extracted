@@ -1,5 +1,18 @@
 Revision history for Datahub-Factory
 
+1.6.1  2017-09-04 09:11:34 CEST
+
+    - Fixed: faulty references to deprecated Datahub::Factory::PipelineConfig.
+
+1.6  2017-08-29 17:00:28 CEST
+
+    - Changed: condition property renamed to explicit condition_path.
+    - Changed: id_path configuration now done in importer instead of fixer.
+    - Changed: All validation of the pipeline consolidated in Pipeline module.
+    - Changed: refactored the Condition module.
+    - Changed: refactored the Pipeline module.
+    - Changed: removed deprecated legacy CLI options from the Pipeline
+
 1.5  2017-08-27 14:38:46 CEST
 
     - Updated: Catmandu dependency from 1.0304 to 1.0602.

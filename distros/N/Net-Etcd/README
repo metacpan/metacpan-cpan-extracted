@@ -23,6 +23,9 @@ SYNOPSIS
         # return array { key => value } pairs from range request.
         my @users = $range->all
 
+        # delete single key
+        $etcd->deleterange({ key => 'test0' });
+
         # watch key range, streaming.
         $watch = $etcd->watch( { key => 'foo', range_end => 'fop'}, sub {
             my ($result) =  @_;
@@ -39,7 +42,10 @@ SYNOPSIS
         $etcd->user( { name => 'samba', password => 'foo' } )->add;
 
         # add new user role
-            $role = $etcd->role( { name => 'myrole' } )->add;
+        $role = $etcd->role( { name => 'myrole' } )->add;
+
+        # grant read permission for the foo key to myrole
+        $etcd->role_perm( { name => 'myrole', key => 'foo', permType => 'READWRITE' } )->grant;
 
         # grant role
         $etcd->user_role( { user => 'samba', role => 'myrole' } )->grant;
@@ -86,6 +92,12 @@ PUBLIC METHODS
 
         $etcd->role({ role => 'foo' });
 
+  role_perm
+    See Net::Etcd::Auth::RolePermission
+
+    Grants or revoke permission of a specified key or range to a specified
+    role.
+
   user_role
     See Net::Etcd::User::Role
 
@@ -95,8 +107,8 @@ PUBLIC METHODS
     See Net::Etcd::Auth
 
         $etcd->auth({ name => 'samba', password => 'foo' })->authenticate;
-            $etcd->auth()->enable;
-            $etcd->auth()->disable
+        $etcd->auth()->enable;
+        $etcd->auth()->disable
 
   lease
     See Net::Etcd::Lease
@@ -118,6 +130,11 @@ PUBLIC METHODS
 
         $etcd->put({ key =>'foo1', value => 'bar' });
 
+  deleterange
+    See Net::Etcd::KV::DeleteRange
+
+        $etcd->deleterange({ key=>'test0' });
+
   range
     See Net::Etcd::KV::Range
 
@@ -132,7 +149,7 @@ PUBLIC METHODS
     See Net::Etcd::KV::Op
 
         $etcd->op({ request_put => $put });
-            $etcd->op({ request_delete_range => $range });
+        $etcd->op({ request_delete_range => $range });
 
   compare
     See Net::Etcd::KV::Compare
@@ -144,7 +161,10 @@ PUBLIC METHODS
     Initialize configuration checks to see it etcd is installed locally.
 
 AUTHOR
-    Sam Batschelet, <sbatschelet at mac.com>
+    Sam Batschelet (hexfusion)
+
+CONTRIBUTORS
+    Ananth Kavuri
 
 ACKNOWLEDGEMENTS
     The etcd <https://github.com/coreos/etcd> developers and community.
@@ -154,6 +174,8 @@ CAVEATS
     and can change at anytime please see api_reference_v3
     <https://github.com/coreos/etcd/blob/master/Documentation/dev-guide/api_
     reference_v3.md> for latest details.
+
+    Authentication provided by this module will only work with etcd v3.3.0+
 
 LICENSE AND COPYRIGHT
     Copyright 2017 Sam Batschelet (hexfusion).

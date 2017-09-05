@@ -8,7 +8,7 @@ use base qw( Exporter );
 BEGIN {
 
 # ABSTRACT: Make readlink work with shortcuts
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
   if($^O =~ /^(cygwin|MSWin32)$/)
   {
@@ -56,7 +56,7 @@ Win32::Shortcut::Readlink - Make readlink work with shortcuts
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -115,8 +115,6 @@ when using this module.
 =item L<Win32::Hardlink>
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

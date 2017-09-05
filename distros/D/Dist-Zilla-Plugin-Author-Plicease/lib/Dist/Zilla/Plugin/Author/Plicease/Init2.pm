@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.22 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.23 {
   
   use 5.014;
   use Moose;
@@ -255,6 +255,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.22 {
       name    => '.travis.yml',
       content => join("\n", q{language: perl},
                             q{sudo: false},
+                            q{dist: trusty},
                             q{},
                             q{install:},
                             q{  - perlbrew list},
@@ -548,7 +549,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.22
+version 2.23
 
 =head1 DESCRIPTION
 

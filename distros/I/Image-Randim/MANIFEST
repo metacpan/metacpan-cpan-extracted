@@ -1,0 +1,17 @@
+Changes
+cpanfile
+Image-Randim-0.01.tar
+lib/Image/Randim.pm
+lib/Image/Randim/Image.pm
+lib/Image/Randim/Source.pm
+lib/Image/Randim/Source/Desktoppr.pm
+lib/Image/Randim/Source/Role.pm
+lib/Image/Randim/Source/Unsplash.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+script/randim
+t/001-initial.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

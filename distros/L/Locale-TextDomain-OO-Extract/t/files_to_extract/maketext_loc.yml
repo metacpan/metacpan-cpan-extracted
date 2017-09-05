@@ -1,0 +1,23 @@
+---
+indicator: login
+elements:
+  - type: Block
+    attributes:
+      class: line
+    elements:
+      - type: Text
+        name: username
+        label_loc: Username
+        filters:
+          - TrimEdges
+      - type: Password
+        name: password
+        label_loc: Password
+        attributes:
+          - style: "width: 150px;"
+        filters:
+          - TrimEdges
+      - type: Submit
+        label_loc: ' '
+        name: login
+        value_loc: login

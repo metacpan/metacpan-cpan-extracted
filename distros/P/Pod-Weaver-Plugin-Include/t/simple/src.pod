@@ -1,0 +1,41 @@
+
+=tmpl opts
+
+=item B<option1>
+
+option1 description.
+
+=item B<option2>
+
+option2 description.
+
+=tmpl info
+
+Some more info
+
+=tmpl test
+
+This is a test paragraph
+from src.pod
+
+=include nested@level3.pod
+
+=tmpl
+
+=cut
+
+=tmpl cont
+
+bla-bla-bla
+
+=tmpl forNonPod
+
+This
+
+will
+
+end
+
+with =cut
+
+=cut

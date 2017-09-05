@@ -10,8 +10,8 @@ package EB::Report::Balres;
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jun  9 22:19:50 2010
-# Update Count    : 423
+# Last Modified On: Fri Feb  7 21:42:15 2014
+# Update Count    : 424
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -181,6 +181,7 @@ sub perform {
 		      unless $detail < 2 || $did_vd++;
 		    my ($acc_id, $acc_desc, $acc_balance, $acc_ibalance,
 			$acc_debcrd, $acc_dcfixed) = @$rr;
+		    $acc_balance -= $acc_ibalance unless $opts->{balans};
 		    $acc_balance = -$acc_balance if $acc_dcfixed && !$acc_debcrd;
 		    if ( $acc_dcfixed ? $acc_debcrd : ($acc_balance >= 0) ) {
 			$dsstot += $acc_balance;

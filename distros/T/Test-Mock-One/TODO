@@ -1,0 +1,4 @@
+TODO:
+
+    * Try understand how the comparision overloading works so we can run
+      cmp_deeply() on two objects or how is() works for testing.

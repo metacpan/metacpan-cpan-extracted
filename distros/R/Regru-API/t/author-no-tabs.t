@@ -1,15 +1,15 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.09
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
 
 use Test::More 0.88;
 use Test::NoTabs;
@@ -17,6 +17,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Regru/API.pm',
     'lib/Regru/API/Bill.pm',
+    'lib/Regru/API/DNSSEC.pm',
     'lib/Regru/API/Domain.pm',
     'lib/Regru/API/Folder.pm',
     'lib/Regru/API/Hosting.pm',
@@ -46,17 +47,18 @@ my @files = (
     't/18-namespace_as_param.t',
     't/19-namespace_hosting.t',
     't/20-namespace_shop.t',
+    't/21-namespace_dnssec.t',
     't/30-response.t',
     't/author-eol.t',
     't/author-no-tabs.t',
+    't/author-pod-coverage.t',
+    't/author-pod-syntax.t',
+    't/author-test-version.t',
     't/lib/Connection.pm',
     't/lib/FakeResponse.pm',
     't/lib/NamespaceClient.pm',
     't/release-distmeta.t',
-    't/release-kwalitee.t',
-    't/release-pod-coverage.t',
-    't/release-pod-syntax.t',
-    't/release-test-version.t'
+    't/release-kwalitee.t'
 );
 
 notabs_ok($_) foreach @files;

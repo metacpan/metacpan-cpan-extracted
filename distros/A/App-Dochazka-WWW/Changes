@@ -270,3 +270,14 @@ Revision history for App-Dochazka-WWW
 - Implement "schedule edit and delete from browser" feature
 - Move "{priv,schedule} history EDIT" to miniMenu
 
+0.148 2017-08-29 15:16 CEST
+- schedhistory: make dtable columns visible to inactive+
+- Employee Profile: rename priv/status entries
+- Employee Profile: show current schedule
+- Implement "target stack" feature/redesign
+- js: emp-lib: migrate ldapSync from Employee Profile
+- js: emp-lib: migrate empProfileEditSave to target stack
+- tests: js: first dochazka-www unit test
+- tests: js: migrate unit test to QUnit 2.4.0
+- build/ops: require App::MFILE::WWW 0.158
+

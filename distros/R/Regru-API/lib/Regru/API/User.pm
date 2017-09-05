@@ -7,7 +7,7 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 our $AUTHORITY = 'cpan:IMAGO'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
@@ -41,7 +41,7 @@ Regru::API::User - REG.API v2 user account management
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 DESCRIPTION
 
@@ -142,7 +142,7 @@ L<REG.API Common error codes|https://www.reg.com/support/help/api2#common_errors
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/regru/regru-api-perl/issues
+L<https://github.com/regru/regru-api-perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

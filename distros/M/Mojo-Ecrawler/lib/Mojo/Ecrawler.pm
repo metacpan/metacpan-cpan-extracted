@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(geturlcontent getdiv);
+our @EXPORT = qw(geturlcontent getdiv gettext);
 
 =encoding utf8
 
@@ -18,12 +18,11 @@ Mojo::Ecrawler - A Eeay crawler for html page!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
-
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -58,54 +57,78 @@ Get content of  filter using Mojo:DOM
 
 =cut
 
-my $DEBUG=0;
+my $DEBUG = 0;
+my $host;
 sub geturlcontent {
-my $feed = shift;
-my $ua   = Mojo::UserAgent->new;
-$ua->transactor->name( 'Mozilla/5.0 (Macintosh; '
-      . 'Intel Mac OS X 10_8_5) AppleWebKit/537.36 '
-      . '(KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36' );
-my $recontent;
-my $result=($ua->get($feed));
-return  $result->res->dom;
+    my $feed = shift;
+    $host= $1 if $feed=~/(http:\/\/[^\/]*)\//;
+    my $ua   = Mojo::UserAgent->new;
+    $ua->transactor->name( 'Mozilla/5.0 (Macintosh; '
+          . 'Intel Mac OS X 10_8_5) AppleWebKit/537.36 '
+          . '(KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36' );
+    my $recontent;
+    my $result = ( $ua->get($feed) );
+    return $result->res->dom;
 }
 
 sub getdiv {
 
-my ($dom,$re1,$re2)=@_;
-my $recontent;
-my @div = $dom->find($re1)->each;
-   $recontent.=getndiv($_,$re2) for(@div);
-print "DEBUG:getndiv()\::OUT:\n",$recontent if $DEBUG;;
-return  $recontent;
+    my ( $dom, $re1, $re2, $ind ) = @_;
+    my $recontent;
+    my @div = $dom->find($re1)->each;
+    for (@div){
+
+    $recontent .= getndiv( $_, $re2, $ind ) if getndiv( $_, $re2, $ind );
+
+    }
+    print "DEBUG:getndiv()\::OUT:\n", $recontent if $DEBUG;
+    return $recontent;
 }
 
 sub getndiv {
 
-#my $DEBUG=1;
-my ($st,$re)=@_;
-my $ndom=gmyc($st);
-my @ndiv = $ndom->find($re)->each;
-my $nrecontent;
-   for(@ndiv){
-   $nrecontent.=$_->content;
-   $nrecontent.="  ".$_->attr->{href};
-   $nrecontent.="\n";
+    #my $DEBUG=1;
+    my ( $st, $re, $ind ) = @_;
+    my $ndom = gmyc($st);
+    my @ndiv = $ndom->find($re)->each;
+    my $nrecontent;
+    for (@ndiv) {
+        $nrecontent .= $_->content;
+        my $surl=$_->attr->{href} if $ind;
+       #    $surl =  $host.$surl  unless $surl=~/https?:/;
+        $nrecontent .= $surl if $surl;
+        $nrecontent .= "\n";
+    }
+    print "DEBUG:getndiv()\::OUT:\n", $nrecontent if $DEBUG;
+    return $nrecontent;
+
 }
-print "DEBUG:getndiv()\::OUT:\n",$nrecontent if $DEBUG;
-return $nrecontent;
+
+sub oplink {
+...
+
+
+}
+sub gettext {
+
+    my ( $st, $re ) = @_;
+    my $ndom       = gmyc($st);
+    my $nrecontent = $ndom->all_text;
+   
+    $nrecontent .= "\n";
+    print "DEBUG:getndiv()\::OUT:\n", $nrecontent if $DEBUG;
+   
+    return $nrecontent;
 
 }
 
 sub gmyc {
 
-  my ($c,$s)=@_;
-  my $dom =$s ? Mojo::DOM->new($c)->at($s): Mojo::DOM->new($c);
-#  say Dump($dom);
-  return $dom;
+    my ( $c, $s ) = @_;
+    my $dom = $s ? Mojo::DOM->new($c)->at($s) : Mojo::DOM->new($c);
+    return $dom;
 
 }
-
 
 =head1 AUTHOR
 
@@ -162,4 +185,4 @@ This program is released under the following license: Perl
 
 =cut
 
-1; # End of Mojo::Ecrawler
+1;    # End of Mojo::Ecrawler

@@ -552,7 +552,7 @@ int main (void)
 
    for (i = 0; i < NUM_TESTS; i++)
    {
-      infile = open_file (tests[i].filename, DATA_DIR, filename);
+     infile = open_file (tests[i].filename, DATA_DIR, filename, 255);
 
       /* Override string-processing options for all entry metatypes */
       set_all_stringopts (tests[i].options);
@@ -569,7 +569,7 @@ int main (void)
       if (!ok) num_failures++;
    } /* for i */
 
-   infile = open_file ("simple.bib", DATA_DIR, filename);
+   infile = open_file ("simple.bib", DATA_DIR, filename, 255);
    if (! test_multiple (infile, filename, BTO_MINIMAL, options, 4, tests+4))
       num_failures++;
    rewind (infile);

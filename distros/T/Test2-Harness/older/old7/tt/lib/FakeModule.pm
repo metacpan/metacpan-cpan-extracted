@@ -1,0 +1,3 @@
+package FakeModule;
+
+1;

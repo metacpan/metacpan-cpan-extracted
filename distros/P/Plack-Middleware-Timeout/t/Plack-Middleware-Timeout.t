@@ -5,6 +5,7 @@ use Plack::Middleware::Timeout;
 use Test::More tests => 9;
 use Plack::Test;
 use HTTP::Request::Common;
+use HTTP::Status qw(HTTP_GATEWAY_TIMEOUT);
 
 my $app = sub { sleep 2; return [ 200, [], ["Hello"] ] };
 my $timeout_app = sub { sleep 5; return [ 200, [], "Hello" ] };
@@ -40,7 +41,7 @@ my $timeout_app = sub { sleep 5; return [ 200, [], "Hello" ] };
     test_psgi $timeout_app, sub {
         my $cb  = shift;
         my $res = $cb->( GET "/" );
-        is $res->code, 408, "response code ok";
+        is $res->code, HTTP_GATEWAY_TIMEOUT, "response code ok";
         is $res->content, "the request timed out", 'response body looks ok';
     };
 
@@ -58,7 +59,7 @@ my $timeout_app = sub { sleep 5; return [ 200, [], "Hello" ] };
     test_psgi $timeout_app, sub {
         my $cb  = shift;
         my $res = $cb->( GET "/" );
-        is $res->code, 408, "response code ok";
+        is $res->code, HTTP_GATEWAY_TIMEOUT, "response code ok";
         like $warning_caught, qr/due to timeout \(\d+s\)/,
           'warning caught matches the default warning';
     };

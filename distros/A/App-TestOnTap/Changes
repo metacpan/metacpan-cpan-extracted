@@ -1,5 +1,15 @@
 Revision history for App-TestOnTap
 
+0.036	2017-09-02
+
+	Don't trap preprocessing STDERR
+
+0.035	2017-08-08
+
+	New capability: 'preprocess' for env/argv
+	Minor bug fixes
+	Upgrade to latest Grep::Query
+
 0.034	2017-05-22
 
 	Drop the actual creation of a binary by directly using 'pp'

@@ -68,6 +68,10 @@ lib/Mail/Message/Field/Addresses.pm
 lib/Mail/Message/Field/Addresses.pod
 lib/Mail/Message/Field/Attribute.pm
 lib/Mail/Message/Field/Attribute.pod
+lib/Mail/Message/Field/AuthResults.pm
+lib/Mail/Message/Field/AuthResults.pod
+lib/Mail/Message/Field/DKIM.pm
+lib/Mail/Message/Field/DKIM.pod
 lib/Mail/Message/Field/Date.pm
 lib/Mail/Message/Field/Date.pod
 lib/Mail/Message/Field/Fast.pm
@@ -134,6 +138,8 @@ t/115fieldu-parse.t
 t/116fieldu-userid.t
 t/117fieldu-addr.t
 t/118fieldu-uri.t
+t/119fieldu-auth.t
+t/120fieldu-dkim.t
 t/200head-create.t
 t/201head-partial.t
 t/202head-resentgroup.t

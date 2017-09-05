@@ -11,7 +11,7 @@ set of modules
 
 =head1 VERSION
 
-0.22
+0.24
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ use Carp qw/ confess /;
 use Business::GoCardless::Client;
 use Business::GoCardless::Webhook;
 
-$Business::GoCardless::VERSION = '0.22';
+$Business::GoCardless::VERSION = '0.24';
 
 has api_version => (
     is       => 'ro',
@@ -221,6 +221,10 @@ L<Business::GoCardless::Pro>
 =head1 AUTHOR
 
 Lee Johnson - C<leejo@cpan.org>
+
+=head1 CONTRIBUTORS
+
+grifferz - C<andy-github.com@strugglers.net>
 
 =head1 LICENSE
 

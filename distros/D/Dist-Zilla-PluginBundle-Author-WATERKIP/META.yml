@@ -1,27 +1,30 @@
 ---
 abstract: 'An plugin bundle for all distributions by WATERKIP'
 author:
-  - 'Wesley Schwengle <wesley@schwengle.net>'
+  - 'Wesley Schwengle <waterkip@cpan.org>'
 build_requires:
+  Test::More: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-WATERKIP
 requires:
+  Data::Dumper: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0.103'
   List::Util: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
-  namespace::autoclean: '0'
   perl: '5.010'
-version: '1.0'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+resources:
+  repository: git://gitlab.com/waterkip/Dist-Zilla-PluginBundle-Author-WATERKIP
+version: '1.4'
+x_serialization_backend: 'YAML::Tiny version 1.70'

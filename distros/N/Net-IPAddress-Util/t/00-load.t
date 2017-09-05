@@ -3,6 +3,9 @@
 use Test::More tests => 4;
 
 BEGIN {
+  if ($] ge '5.026') {
+    use lib '.';
+  }
   use_ok('Net::IPAddress::Util');
   use_ok('Net::IPAddress::Util::Range');
   use_ok('Net::IPAddress::Util::Collection');

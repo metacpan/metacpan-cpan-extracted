@@ -2,6 +2,10 @@ Revision history for Perl extension Unix::Processors
 
 The contributors that suggested a given feature are shown in [].
 
+* Unix::Processors 2.046 2017-09-04
+
+****	Fix FreeBSD support, rt122943.  [Slaven Rezic]
+
 * Unix::Processors 2.045 2017-04-26
 
 ****	Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]

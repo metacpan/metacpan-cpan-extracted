@@ -8,6 +8,7 @@ use Shell::Guess;
 use Shell::Config::Generate qw( cmd_escape_path powershell_escape_path );
 use Test2::API qw( context );
 use Env qw( @PATH );
+use TestPath;
 use base qw( Exporter );
 
 our @EXPORT = qw( find_shell tempdir get_env bad_fish );

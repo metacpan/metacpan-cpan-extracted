@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Map::Tube.
 
+0.32  Mon Aug 28 12:00:00 2017
+      - Upgraded to use Map::Tube v3.34.
+
 0.31  Tue Jul 25 11:50:00 2017
       - Handle failed route correctly.
       - Stopped noise from not_ok_map.t script.

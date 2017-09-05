@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: UNIX implementations for AnyEvent::FTP
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub BUILDARGS
@@ -84,7 +84,7 @@ AnyEvent::FTP::Server::OS::UNIX - UNIX implementations for AnyEvent::FTP
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -128,11 +128,15 @@ List of groups (as GIDs) that the user also belongs to.
 
 =head1 METHODS
 
-=head2 $unix-E<gt>jail
+=head2 jail
+
+ $unix->jail;
 
 C<chroot> to the users' home directory.  Requires root and the chroot function.
 
-=head2 $unix-E<gt>drop_privileges
+=head2 drop_privileges
+
+ $unix->drop_privileges;
 
 Drop super user privileges
 

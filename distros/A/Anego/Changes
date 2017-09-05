@@ -1,0 +1,20 @@
+Revision history for Perl extension Anego
+
+0.02 2017-08-28T13:18:45Z
+
+    - add test
+    - update document
+
+0.01_03 2017-08-19T05:41:24Z
+
+    - fix some bugs
+    - new feature: "help" command
+
+0.01_02 2016-11-04T03:56:54Z
+
+    - new feature: "diff" command
+
+0.01_01 2016-07-19T12:28:04Z
+
+    - original version
+

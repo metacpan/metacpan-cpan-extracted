@@ -4,7 +4,7 @@
 
 # Methoden 57 und 95 werden zeitabhängig getestet (ab 9.9.2013 gibt es einen anderen Rückgabewert)
 
-use Test::More tests => 8137;
+use Test::More tests => 8143;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -6566,6 +6566,9 @@ __DATA__
 1 c2b 5779371458
 1 c2b 8463927775
 1 c2b 8282995573
+1 c2c 0076543216
+1 c2c 3456789012
+1 c2c 9024675138
 1 c3a 0126362672
 1 c3a 0170888838
 1 c3a 0696256643
@@ -7895,6 +7898,9 @@ __DATA__
 0 C21 9024675131
 0 C22 0328705282
 0 C22 9024675131
+0 C23 0328705282
+0 C23 7352569145
+0 C23 9024675131
 0 c31 122448
 0 c31 123451
 0 c31 17002

@@ -4,13 +4,13 @@ package Catalyst::Model::LDAP::Search;
 use strict;
 use warnings;
 use base qw/Net::LDAP::Search/;
+use Module::Runtime qw/ require_module /;
 
 
 sub init {
     my ( $self, $class ) = @_;
 
-    eval { require $class };
-    die $@ if $@;
+    require_module($class);
 
     foreach my $entry ( @{ $self->{entries} } ) {
         bless $entry, $class;
@@ -33,7 +33,7 @@ Catalyst::Model::LDAP::Search - Convenience methods for Net::LDAP::Search
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

@@ -38,7 +38,7 @@ for my $file ( map { path($_) } @files ) {
     ->Useqq(1)
     ->Dump;
 
-# $Id: 12_extract_tt.pl 683 2017-08-22 18:41:42Z steffenw $
+# $Id: 12_extract_tt.pl 691 2017-08-31 16:46:05Z steffenw $
 
 __END__
 
@@ -52,6 +52,44 @@ $lexicon_ref = {
         plural => "n != 1"
       }
     },
+    "#{name} is programming #{language}." => {
+      automatic => "name => 'Steffen', language => 'Perl',",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:22" => undef
+      }
+    },
+    "#{num :num} ((date|dates))" => {
+      automatic => "num => 2,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:39" => undef
+      }
+    },
+    "#{num} ((date|dates)):num" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:35" => undef
+      }
+    },
+    "#{num} date\4appointment" => {
+      automatic => "num => 1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:47" => undef
+      }
+    },
+    "((Singular|Plural))" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:27" => undef,
+        "files_to_extract/babelfish_loc.tt:31" => undef
+      }
+    },
+    "((date|dates))\4appointment" => {
+      automatic => "1,",
+      reference => {
+        "files_to_extract/babelfish_loc.tt:52" => undef,
+        "files_to_extract/babelfish_loc.tt:57" => undef
+      }
+    },
     "Singular\0Plural" => {
       automatic => 1,
       reference => {
@@ -63,6 +101,7 @@ $lexicon_ref = {
     },
     "Text \x{c4}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:9" => undef,
         "files_to_extract/gettext.tt:9" => undef,
         "files_to_extract/gettext_loc.tt:9" => undef,
         "files_to_extract/maketext_l.tt:9" => undef
@@ -70,6 +109,7 @@ $lexicon_ref = {
     },
     "Text \x{d6}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:13" => undef,
         "files_to_extract/gettext.tt:13" => undef,
         "files_to_extract/gettext_loc.tt:13" => undef,
         "files_to_extract/maketext_l.tt:13" => undef
@@ -77,6 +117,7 @@ $lexicon_ref = {
     },
     "Text \x{dc}" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:16" => undef,
         "files_to_extract/gettext.tt:16" => undef,
         "files_to_extract/gettext_loc.tt:16" => undef,
         "files_to_extract/maketext_l.tt:16" => undef
@@ -84,13 +125,9 @@ $lexicon_ref = {
     },
     "This is a text." => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:21" => undef,
         "files_to_extract/gettext.tt:21" => undef,
         "files_to_extract/gettext_loc.tt:21" => undef
-      }
-    },
-    date => {
-      reference => {
-        "files_to_extract/gettext_loc.tt:84" => undef
       }
     },
     "date\0dates\4appointment" => {
@@ -104,9 +141,9 @@ $lexicon_ref = {
     },
     "date\4appointment" => {
       reference => {
+        "files_to_extract/babelfish_loc.tt:43" => undef,
         "files_to_extract/gettext.tt:49" => undef,
-        "files_to_extract/gettext_loc.tt:49" => undef,
-        "files_to_extract/gettext_loc.tt:87" => undef
+        "files_to_extract/gettext_loc.tt:49" => undef
       }
     },
     "{name} is programming {language}." => {

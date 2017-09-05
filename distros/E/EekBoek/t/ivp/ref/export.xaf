@@ -8,13 +8,13 @@
     <companyAddress>Here</companyAddress>
     <companyCity>There</companyCity>
     <companyPostalCode>1234AA</companyPostalCode>
-    <fiscalYear>2007</fiscalYear>
-    <startDate>2007-01-01</startDate>
-    <endDate>2007-12-31</endDate>
+    <fiscalYear>2013</fiscalYear>
+    <startDate>2013-01-01</startDate>
+    <endDate>2013-12-31</endDate>
     <currencyCode>EUR</currencyCode>
-    <dateCreated>2007-12-31</dateCreated>
+    <dateCreated>2013-12-31</dateCreated>
     <productID>EekBoek</productID>
-    <productVersion>2.02.05</productVersion>
+    <productVersion>2.030.1</productVersion>
   </header>
   <generalLedger>
     <taxonomy>geen</taxonomy>
@@ -540,14 +540,14 @@
       <transaction>
         <transactionID>1</transactionID>
         <period>01</period>
-        <transactionDate>2007-01-05</transactionDate>
+        <transactionDate>2013-01-05</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>1</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -555,7 +555,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>1</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -569,14 +569,14 @@
       <transaction>
         <transactionID>2</transactionID>
         <period>01</period>
-        <transactionDate>2007-01-15</transactionDate>
+        <transactionDate>2013-01-15</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>KPN</custSupID>
           <documentID>2</documentID>
           <description>ADSL</description>
-          <debitAmount>20.34</debitAmount>
+          <debitAmount>20.00</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -584,7 +584,7 @@
           <custSupID>KPN</custSupID>
           <documentID>2</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.86</debitAmount>
+          <debitAmount>4.20</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -592,7 +592,7 @@
           <custSupID>KPN</custSupID>
           <documentID>2</documentID>
           <description>Telefoonkosten</description>
-          <debitAmount>67.61</debitAmount>
+          <debitAmount>66.49</debitAmount>
         </line>
         <line>
           <recordID>4</recordID>
@@ -600,7 +600,7 @@
           <custSupID>KPN</custSupID>
           <documentID>2</documentID>
           <description>BTW Telefoonkosten</description>
-          <debitAmount>12.84</debitAmount>
+          <debitAmount>13.96</debitAmount>
         </line>
         <line>
           <recordID>5</recordID>
@@ -614,14 +614,14 @@
       <transaction>
         <transactionID>3</transactionID>
         <period>02</period>
-        <transactionDate>2007-02-09</transactionDate>
+        <transactionDate>2013-02-09</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>3</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -629,7 +629,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>3</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -643,14 +643,14 @@
       <transaction>
         <transactionID>4</transactionID>
         <period>03</period>
-        <transactionDate>2007-03-08</transactionDate>
+        <transactionDate>2013-03-08</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>4</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -658,7 +658,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>4</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -672,14 +672,14 @@
       <transaction>
         <transactionID>5</transactionID>
         <period>03</period>
-        <transactionDate>2007-03-18</transactionDate>
+        <transactionDate>2013-03-18</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6900</accountID>
           <custSupID>KPN</custSupID>
           <documentID>5</documentID>
           <description>ADSL + Telefoon</description>
-          <debitAmount>85.31</debitAmount>
+          <debitAmount>83.90</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -687,7 +687,7 @@
           <custSupID>KPN</custSupID>
           <documentID>5</documentID>
           <description>BTW ADSL + Telefoon</description>
-          <debitAmount>16.21</debitAmount>
+          <debitAmount>17.62</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -701,14 +701,14 @@
       <transaction>
         <transactionID>6</transactionID>
         <period>04</period>
-        <transactionDate>2007-04-05</transactionDate>
+        <transactionDate>2013-04-05</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>6</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -716,7 +716,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>6</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -730,14 +730,14 @@
       <transaction>
         <transactionID>7</transactionID>
         <period>05</period>
-        <transactionDate>2007-05-10</transactionDate>
+        <transactionDate>2013-05-10</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>7</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -745,7 +745,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>7</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -759,14 +759,14 @@
       <transaction>
         <transactionID>8</transactionID>
         <period>05</period>
-        <transactionDate>2007-05-20</transactionDate>
+        <transactionDate>2013-05-20</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6900</accountID>
           <custSupID>KPN</custSupID>
           <documentID>8</documentID>
           <description>ADSL + Telefoon</description>
-          <debitAmount>85.90</debitAmount>
+          <debitAmount>84.48</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -774,7 +774,7 @@
           <custSupID>KPN</custSupID>
           <documentID>8</documentID>
           <description>BTW ADSL + Telefoon</description>
-          <debitAmount>16.32</debitAmount>
+          <debitAmount>17.74</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -788,14 +788,14 @@
       <transaction>
         <transactionID>9</transactionID>
         <period>06</period>
-        <transactionDate>2007-06-07</transactionDate>
+        <transactionDate>2013-06-07</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>9</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -803,7 +803,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>9</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -817,14 +817,14 @@
       <transaction>
         <transactionID>10</transactionID>
         <period>07</period>
-        <transactionDate>2007-07-05</transactionDate>
+        <transactionDate>2013-07-05</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>10</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -832,7 +832,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>10</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -846,14 +846,14 @@
       <transaction>
         <transactionID>11</transactionID>
         <period>07</period>
-        <transactionDate>2007-07-15</transactionDate>
+        <transactionDate>2013-07-15</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6900</accountID>
           <custSupID>KPN</custSupID>
           <documentID>11</documentID>
           <description>ADSL + Telefoon</description>
-          <debitAmount>87.95</debitAmount>
+          <debitAmount>86.50</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -861,7 +861,7 @@
           <custSupID>KPN</custSupID>
           <documentID>11</documentID>
           <description>BTW ADSL + Telefoon</description>
-          <debitAmount>16.71</debitAmount>
+          <debitAmount>18.16</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -875,14 +875,14 @@
       <transaction>
         <transactionID>12</transactionID>
         <period>08</period>
-        <transactionDate>2007-08-09</transactionDate>
+        <transactionDate>2013-08-09</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>12</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -890,7 +890,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>12</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -904,14 +904,14 @@
       <transaction>
         <transactionID>13</transactionID>
         <period>09</period>
-        <transactionDate>2007-09-06</transactionDate>
+        <transactionDate>2013-09-06</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>13</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -919,7 +919,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>13</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -933,14 +933,14 @@
       <transaction>
         <transactionID>14</transactionID>
         <period>09</period>
-        <transactionDate>2007-09-16</transactionDate>
+        <transactionDate>2013-09-16</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6900</accountID>
           <custSupID>KPN</custSupID>
           <documentID>14</documentID>
           <description>ADSL + Telefoon</description>
-          <debitAmount>91.36</debitAmount>
+          <debitAmount>89.85</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -948,7 +948,7 @@
           <custSupID>KPN</custSupID>
           <documentID>14</documentID>
           <description>BTW ADSL + Telefoon</description>
-          <debitAmount>17.36</debitAmount>
+          <debitAmount>18.87</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -962,14 +962,14 @@
       <transaction>
         <transactionID>15</transactionID>
         <period>10</period>
-        <transactionDate>2007-10-11</transactionDate>
+        <transactionDate>2013-10-11</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>15</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -977,7 +977,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>15</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -991,14 +991,14 @@
       <transaction>
         <transactionID>16</transactionID>
         <period>11</period>
-        <transactionDate>2007-11-07</transactionDate>
+        <transactionDate>2013-11-07</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>16</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1006,7 +1006,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>16</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1020,14 +1020,14 @@
       <transaction>
         <transactionID>17</transactionID>
         <period>11</period>
-        <transactionDate>2007-11-17</transactionDate>
+        <transactionDate>2013-11-17</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6900</accountID>
           <custSupID>KPN</custSupID>
           <documentID>17</documentID>
           <description>ADSL + Telefoon</description>
-          <debitAmount>92.16</debitAmount>
+          <debitAmount>90.64</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1035,7 +1035,7 @@
           <custSupID>KPN</custSupID>
           <documentID>17</documentID>
           <description>BTW ADSL + Telefoon</description>
-          <debitAmount>17.51</debitAmount>
+          <debitAmount>19.03</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1049,14 +1049,14 @@
       <transaction>
         <transactionID>18</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-06</transactionDate>
+        <transactionDate>2013-12-06</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>18</documentID>
           <description>ÁDSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1064,7 +1064,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>18</documentID>
           <description>BTW ÁDSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1078,14 +1078,14 @@
       <transaction>
         <transactionID>20</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-07</transactionDate>
+        <transactionDate>2013-12-07</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6905</accountID>
           <custSupID>XS4ALL</custSupID>
           <documentID>20</documentID>
           <description>ADSL</description>
-          <debitAmount>19.16</debitAmount>
+          <debitAmount>18.84</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1093,7 +1093,7 @@
           <custSupID>XS4ALL</custSupID>
           <documentID>20</documentID>
           <description>BTW ADSL</description>
-          <debitAmount>3.64</debitAmount>
+          <debitAmount>3.96</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1117,7 +1117,7 @@
       <transaction>
         <transactionID>0</transactionID>
         <period>0</period>
-        <transactionDate>2007-01-01</transactionDate>
+        <transactionDate>2013-01-01</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>1100</accountID>
@@ -1164,7 +1164,7 @@
       <transaction>
         <transactionID>1</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-31</transactionDate>
+        <transactionDate>2013-12-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6800</accountID>
@@ -1185,7 +1185,7 @@
       <transaction>
         <transactionID>2</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-31</transactionDate>
+        <transactionDate>2013-12-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6810</accountID>
@@ -1211,7 +1211,7 @@
       <transaction>
         <transactionID>1</transactionID>
         <period>01</period>
-        <transactionDate>2007-01-31</transactionDate>
+        <transactionDate>2013-01-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1248,7 +1248,7 @@
       <transaction>
         <transactionID>2</transactionID>
         <period>02</period>
-        <transactionDate>2007-02-28</transactionDate>
+        <transactionDate>2013-02-28</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1277,7 +1277,7 @@
       <transaction>
         <transactionID>3</transactionID>
         <period>03</period>
-        <transactionDate>2007-03-31</transactionDate>
+        <transactionDate>2013-03-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1322,7 +1322,7 @@
       <transaction>
         <transactionID>4</transactionID>
         <period>04</period>
-        <transactionDate>2007-04-30</transactionDate>
+        <transactionDate>2013-04-30</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1359,7 +1359,7 @@
       <transaction>
         <transactionID>5</transactionID>
         <period>05</period>
-        <transactionDate>2007-05-31</transactionDate>
+        <transactionDate>2013-05-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1404,7 +1404,7 @@
       <transaction>
         <transactionID>6</transactionID>
         <period>06</period>
-        <transactionDate>2007-06-30</transactionDate>
+        <transactionDate>2013-06-30</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1449,7 +1449,7 @@
       <transaction>
         <transactionID>7</transactionID>
         <period>07</period>
-        <transactionDate>2007-07-31</transactionDate>
+        <transactionDate>2013-07-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1486,7 +1486,7 @@
       <transaction>
         <transactionID>8</transactionID>
         <period>08</period>
-        <transactionDate>2007-08-31</transactionDate>
+        <transactionDate>2013-08-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1531,7 +1531,7 @@
       <transaction>
         <transactionID>9</transactionID>
         <period>09</period>
-        <transactionDate>2007-09-30</transactionDate>
+        <transactionDate>2013-09-30</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1568,7 +1568,7 @@
       <transaction>
         <transactionID>10</transactionID>
         <period>10</period>
-        <transactionDate>2007-10-31</transactionDate>
+        <transactionDate>2013-10-31</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1597,7 +1597,7 @@
       <transaction>
         <transactionID>11</transactionID>
         <period>11</period>
-        <transactionDate>2007-11-30</transactionDate>
+        <transactionDate>2013-11-30</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1634,7 +1634,7 @@
       <transaction>
         <transactionID>12</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-07</transactionDate>
+        <transactionDate>2013-12-07</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>6980</accountID>
@@ -1663,7 +1663,7 @@
       <transaction>
         <transactionID>13</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-09</transactionDate>
+        <transactionDate>2013-12-09</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>4100</accountID>
@@ -1684,7 +1684,7 @@
       <transaction>
         <transactionID>14</transactionID>
         <period>12</period>
-        <transactionDate>2007-12-10</transactionDate>
+        <transactionDate>2013-12-10</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>4100</accountID>
@@ -1715,14 +1715,14 @@
       <transaction>
         <transactionID>1</transactionID>
         <period>02</period>
-        <transactionDate>2007-02-18</transactionDate>
+        <transactionDate>2013-02-18</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8400</accountID>
           <custSupID>ACME</custSupID>
           <documentID>1</documentID>
           <description>Perl Cursus 1e bet.</description>
-          <creditAmount>3000.00</creditAmount>
+          <creditAmount>2950.41</creditAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1730,7 +1730,7 @@
           <custSupID>ACME</custSupID>
           <documentID>1</documentID>
           <description>BTW Perl Cursus 1e bet.</description>
-          <creditAmount>570.00</creditAmount>
+          <creditAmount>619.59</creditAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1744,14 +1744,14 @@
       <transaction>
         <transactionID>2</transactionID>
         <period>03</period>
-        <transactionDate>2007-03-18</transactionDate>
+        <transactionDate>2013-03-18</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8400</accountID>
           <custSupID>ACME</custSupID>
           <documentID>2</documentID>
           <description>Perl Cursus 2e bet.</description>
-          <creditAmount>3000.00</creditAmount>
+          <creditAmount>2950.41</creditAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1759,7 +1759,7 @@
           <custSupID>ACME</custSupID>
           <documentID>2</documentID>
           <description>BTW Perl Cursus 2e bet.</description>
-          <creditAmount>570.00</creditAmount>
+          <creditAmount>619.59</creditAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1773,14 +1773,14 @@
       <transaction>
         <transactionID>3</transactionID>
         <period>04</period>
-        <transactionDate>2007-04-18</transactionDate>
+        <transactionDate>2013-04-18</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8400</accountID>
           <custSupID>ACME</custSupID>
           <documentID>3</documentID>
           <description>Perl Cursus rest</description>
-          <creditAmount>504.20</creditAmount>
+          <creditAmount>495.87</creditAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1788,7 +1788,7 @@
           <custSupID>ACME</custSupID>
           <documentID>3</documentID>
           <description>BTW Perl Cursus rest</description>
-          <creditAmount>95.80</creditAmount>
+          <creditAmount>104.13</creditAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1802,14 +1802,14 @@
       <transaction>
         <transactionID>4</transactionID>
         <period>05</period>
-        <transactionDate>2007-05-12</transactionDate>
+        <transactionDate>2013-05-12</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8400</accountID>
           <custSupID>ACME</custSupID>
           <documentID>4</documentID>
           <description>Perl Cursus rest</description>
-          <debitAmount>4.20</debitAmount>
+          <debitAmount>4.13</debitAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1817,7 +1817,7 @@
           <custSupID>ACME</custSupID>
           <documentID>4</documentID>
           <description>BTW Perl Cursus rest</description>
-          <debitAmount>0.80</debitAmount>
+          <debitAmount>0.87</debitAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1831,14 +1831,14 @@
       <transaction>
         <transactionID>5</transactionID>
         <period>05</period>
-        <transactionDate>2007-05-14</transactionDate>
+        <transactionDate>2013-05-14</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8100</accountID>
           <custSupID>ACME</custSupID>
           <documentID>5</documentID>
           <description>Consultancy</description>
-          <creditAmount>600.00</creditAmount>
+          <creditAmount>590.08</creditAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1846,7 +1846,7 @@
           <custSupID>ACME</custSupID>
           <documentID>5</documentID>
           <description>BTW Consultancy</description>
-          <creditAmount>114.00</creditAmount>
+          <creditAmount>123.92</creditAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1860,14 +1860,14 @@
       <transaction>
         <transactionID>6</transactionID>
         <period>07</period>
-        <transactionDate>2007-07-16</transactionDate>
+        <transactionDate>2013-07-16</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8100</accountID>
           <custSupID>ACME</custSupID>
           <documentID>6</documentID>
           <description>Consultancy</description>
-          <creditAmount>600.00</creditAmount>
+          <creditAmount>590.08</creditAmount>
         </line>
         <line>
           <recordID>2</recordID>
@@ -1875,7 +1875,7 @@
           <custSupID>ACME</custSupID>
           <documentID>6</documentID>
           <description>BTW Consultancy</description>
-          <creditAmount>114.00</creditAmount>
+          <creditAmount>123.92</creditAmount>
         </line>
         <line>
           <recordID>3</recordID>
@@ -1889,7 +1889,7 @@
       <transaction>
         <transactionID>7</transactionID>
         <period>08</period>
-        <transactionDate>2007-08-19</transactionDate>
+        <transactionDate>2013-08-19</transactionDate>
         <line>
           <recordID>1</recordID>
           <accountID>8300</accountID>

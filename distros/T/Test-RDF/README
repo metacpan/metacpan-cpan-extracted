@@ -2,7 +2,7 @@ NAME
     Test::RDF - Test RDF data for content, validity and equality, etc.
 
 VERSION
-    Version 1.20
+    Version 1.22
 
 SYNOPSIS
      use Test::RDF;
@@ -16,6 +16,7 @@ SYNOPSIS
      has_subject($uri_string, $model, 'Subject URI is found');
      has_predicate($uri_string, $model, 'Predicate URI is found');
      has_object_uri($uri_string, $model, 'Object URI is found');
+     has_type($uri_string, $model, 'Class URI is found');
      has_literal($string, $language, $datatype, $model, 'Literal is found');
      hasnt_literal($string, $language, $datatype, $model, 'Literal is not found');
      pattern_target($model);
@@ -53,6 +54,10 @@ EXPORT
   has_object_uri
     Check if the string URI passed as first argument is a object in any of the
     statements given in the model given as second argument.
+
+  has_type
+    Check if the string URI passed as first argument is an RDF class instance
+    in any of the statements given in the model given as second argument.
 
   has_literal
     Check if the string passed as first argument, with corresponding optional
@@ -170,8 +175,8 @@ ACKNOWLEDGEMENTS
     Toby Inkster has submitted the pattern_* functions.
 
 LICENSE AND COPYRIGHT
-    Copyright 2010 ABC Startsiden AS. Copyright 2010, 2011, 2012, 2013, 2014
-    Kjetil Kjernsmo.
+    Copyright 2010 ABC Startsiden AS. Copyright 2010, 2011, 2012, 2013, 2014,
+    2015, 2017 Kjetil Kjernsmo.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published by

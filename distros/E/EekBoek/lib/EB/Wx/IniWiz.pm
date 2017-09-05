@@ -27,7 +27,6 @@ use base qw(Wx::Frame);
 use EB;
 use File::Spec;
 use File::Basename;
-use File::Glob ( $] >= 5.016 ? ":bsd_glob" : ":glob" );
 
 my @db_drivers;
 my @adm_dirs;
@@ -703,9 +702,6 @@ sub OnWizardFinished {
 # wxGlade: EB::Wx::IniWiz::OnWizardFinished <event_handler>
     my %opts;
 
-    $opts{lang} = $ENV{EB_LANG} || $ENV{LANG};
-    $opts{lang} =~ s/\..*//;	# strip .utf8
-
     $opts{adm_naam} = $self->{t_adm_name}->GetValue;
     $opts{adm_code} = $self->{t_adm_code}->GetValue;
     $opts{adm_begindatum} = $self->{sp_adm_begin}->GetValue;
@@ -876,9 +872,9 @@ sub OnOk {
 sub find_db_drivers {
     my %drivers;
 
-    if ( $Cava::Packager::PACKAGED ) {
+    if ( $App::Packager::PACKAGED ) {
 	# Trust packager.
-	unless ( $Cava::Packager::PACKAGED ) {
+	unless ( $App::Packager::PACKAGED ) {
 	    # Ignored, but force packaging.
 	    require EB::DB::Postgres;
 	    require EB::DB::Sqlite;

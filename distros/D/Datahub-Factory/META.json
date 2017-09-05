@@ -85,12 +85,12 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6.1",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Yogendra Sharma <eh.yogendra@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

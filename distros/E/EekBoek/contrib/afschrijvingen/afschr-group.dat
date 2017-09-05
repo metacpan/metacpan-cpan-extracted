@@ -1,0 +1,8 @@
+1100 6100 = Computers
+1200 6200 = Auto's
+
+# Aanschaf      Bedrag  Restw  #jr      Bal   Res   Omschrijving
+2006-07-01       2500.00    0   5       1100  6100  Computer A
+2007-07-01       1000.00    0   5       1100  6100  Computer B
+2007-01-01      28500.00 3500   5       1200  6200  Auto A
+2007-07-01       5000.00    0   4       1200  6200  Auto B

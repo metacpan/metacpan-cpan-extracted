@@ -1,12 +1,13 @@
 package Email::MIME::Kit::Assembler::Markdown;
 # ABSTRACT: build multipart/alternative messages from Markdown alone
-$Email::MIME::Kit::Assembler::Markdown::VERSION = '0.100005';
+$Email::MIME::Kit::Assembler::Markdown::VERSION = '0.100006';
 use Moose;
 with 'Email::MIME::Kit::Role::Assembler';
 
 use Email::MIME 1.900;
 use Moose::Util::TypeConstraints qw(maybe_type role_type);
 use Text::Markdown;
+use HTML::Entities ();
 
 #pod =for Pod::Coverage assemble BUILD
 #pod
@@ -62,6 +63,10 @@ use Text::Markdown;
 #pod wrapped content (Markdown-produced HTML or text) is available in a template
 #pod parameter called C<wrapped_content>, and should be included that way.
 #pod
+#pod If given (and true), the C<encode_entities> option will cause HTML in the
+#pod source text to be entity encoded in the HTML part (and passed through
+#pod unmodified in the plain text part)
+#pod
 #pod =cut
 
 has manifest => (
@@ -92,6 +97,11 @@ has render_wrapper => (
   # XXX Removed because JSON booly objects (and YAML?) aren't consistently
   # compatible with Moose's Bool type. -- rjbs, 2016-08-03
   # isa     => 'Bool',
+  default => 0,
+);
+
+has encode_entities => (
+  is      => 'ro',
   default => 0,
 );
 
@@ -167,6 +177,10 @@ sub assemble {
   }
 
   my $plaintext = $markdown;
+
+  if ($self->encode_entities) {
+    $markdown = HTML::Entities::encode_entities($markdown);
+  }
 
   if ($self->munge_signature) {
     my ($body, $sig) = split /^-- $/m, $markdown, 2;
@@ -254,7 +268,7 @@ Email::MIME::Kit::Assembler::Markdown - build multipart/alternative messages fro
 
 =head1 VERSION
 
-version 0.100005
+version 0.100006
 
 =head1 SYNOPSIS
 
@@ -308,6 +322,10 @@ is a template. In this case, the C<marker> comment is ignored. Instead, the
 wrapped content (Markdown-produced HTML or text) is available in a template
 parameter called C<wrapped_content>, and should be included that way.
 
+If given (and true), the C<encode_entities> option will cause HTML in the
+source text to be entity encoded in the HTML part (and passed through
+unmodified in the plain text part)
+
 =for Pod::Coverage assemble BUILD
 
 =head1 AUTHOR
@@ -316,7 +334,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Chris Nehren Robert Norris
+=for stopwords Chris Nehren Michael McClimon Robert Norris
 
 =over 4
 
@@ -326,13 +344,17 @@ Chris Nehren <cnehren@gmail.com>
 
 =item *
 
+Michael McClimon <michael@mcclimon.org>
+
+=item *
+
 Robert Norris <rob@eatenbyagrue.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

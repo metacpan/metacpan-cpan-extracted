@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Temp qw/tempdir/;
+use File::Spec;
+use Test2::Harness;
+use List::Util qw/first/;
+
+my $workroot = -w '/dev/shm' ? '/dev/shm' : File::Spec->tmpdir();
+
+my $workdir = tempdir("TEST2-HARNESS-$$-XXXXXXX", CLEANUP => 0, DIR => $workroot);
+
+my $harness = Test2::Harness->new(
+    workdir => $workdir,
+#    rootdir => '/home/exodist/projects/Test2/Test2',
+
+    jobs    => 1,
+    lib     => 1,
+    blib    => 1,
+    merge   => 0,
+    verbose => 1,
+
+    libs => [
+        '/home/exodist/projects/Test2/Test2/lib',
+        '/home/exodist/projects/Test2/Test2-Harness/lib'
+    ],
+
+    unsafe_inc    => 1,
+
+    output_muxing => 1,
+    output_events => 1,
+
+    preload => [
+#        'Test2::API',
+        'Scalar::Util',
+        'Carp',
+        'Exporter',
+    ],
+
+#    search => ['t'],
+    search => ['output_test.t'],
+
+    #worker
+    #aggregator
+    #parser
+    #renderer
+);
+
+my ($run_id, $run_dir) = $harness->make_run;
+
+my $worker = $harness->worker->new(
+    harness => $harness,
+    run_id  => $run_id,
+    run_dir => $run_dir,
+);
+
+$worker->spawn;
+
+use Test2::Formatter::Test2;
+my $formatter = Test2::Formatter::Test2->new;
+my $counter = 1;
+
+while ($worker->active) {
+    my @events = $worker->poll;
+    $formatter->write($_, $counter++) for @events;
+}
+
+my $exit = grep { $_ && $_->failures } @{$worker->jobs};
+exit $exit;

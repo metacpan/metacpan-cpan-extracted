@@ -4,7 +4,7 @@
       "Dotan Dimet <dotan@corky.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "HTTP::Date" : "6.02",
-            "Mojolicious" : "6.0",
+            "Mojolicious" : "7.15",
             "Time::Zone" : "2.2",
             "perl" : "5.010001"
          }
@@ -52,6 +52,6 @@
          "url" : "http://github.com/dotandimet/Mojolicious-Plugin-FeedReader"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

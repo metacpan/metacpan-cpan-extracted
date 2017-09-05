@@ -7,7 +7,7 @@ plan skip_all => 'set TEST_AUTHOR, LDAP_BINDDN, and LDAP_PASSWORD to enable this
     unless $ENV{TEST_AUTHOR} and $ENV{LDAP_BINDDN} and $ENV{LDAP_PASSWORD};
 plan tests    => 7;
 
-my $UID = 'dwc';
+my $UID = 'ghenry';
 
 my $ldap = Catalyst::Model::LDAP::Connection->new(
     host => 'ldap.ufl.edu',

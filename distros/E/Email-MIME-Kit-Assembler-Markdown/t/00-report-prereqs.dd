@@ -17,6 +17,7 @@ do { my $x = {
                                       'Email::MIME' => '1.900',
                                       'Email::MIME::Kit' => '3.000001',
                                       'Email::MIME::Kit::Role::Assembler' => '0',
+                                      'HTML::Entities' => '0',
                                       'Moose' => '0',
                                       'Moose::Util::TypeConstraints' => '0',
                                       'Text::Markdown' => '0'

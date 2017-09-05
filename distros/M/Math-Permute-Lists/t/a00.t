@@ -2,7 +2,6 @@ use Test::More qw(no_plan);
 use strict;
 
 use Math::Permute::Lists;
-use Data::Dump qw(dump);
 
 my $a = '';
 
@@ -18,4 +17,3 @@ ok $a eq <<END
 4 3 1 2
 4 3 2 1
 END
-

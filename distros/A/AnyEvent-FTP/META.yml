@@ -3,10 +3,12 @@ abstract: 'Simple asynchronous FTP client and server'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.3601'
+  EV: '0'
+  Test2::V0: '0.000060'
   perl: '5.010001'
 configure_requires:
-  Module::Build: '0.3601'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
   perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
@@ -29,13 +31,14 @@ requires:
   Moo: '2.0'
   Path::Class: '0.26'
   PerlIO::eol: '0'
+  Test2::API: '1.302015'
   URI: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/plicease/AnyEvent-FTP/issues
   homepage: https://metacpan.org/pod/AnyEvent::FTP
   repository: git://github.com/plicease/AnyEvent-FTP.git
-version: '0.14'
+version: '0.16'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ryo Okamoto'

@@ -1,7 +1,7 @@
 package Perl::Examples::Accessors::Moose;
 
-our $DATE = '2016-11-26'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2017-09-01'; # DATE
+our $VERSION = '0.130'; # VERSION
 
 use Moose;
 
@@ -23,7 +23,7 @@ Perl::Examples::Accessors::Moose
 
 =head1 VERSION
 
-This document describes version 0.12 of Perl::Examples::Accessors::Moose (from Perl distribution Perl-Examples-Accessors), released on 2016-11-26.
+This document describes version 0.130 of Perl::Examples::Accessors::Moose (from Perl distribution Perl-Examples-Accessors), released on 2017-09-01.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

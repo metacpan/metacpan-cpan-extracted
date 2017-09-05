@@ -1,5 +1,5 @@
 // *************************************************************************
-// Copyright (c) 2014-2016, SUSE LLC
+// Copyright (c) 2014-2017, SUSE LLC
 //
 // All rights reserved.
 //
@@ -40,6 +40,7 @@ define ([
     'lib',
     'current-user',
     'target',
+    'stack',
     'start'
 ], function (
     $,
@@ -47,12 +48,14 @@ define ([
     lib,
     currentUser,
     target,
+    stack,
     start
 ) {
 
     var genSchedHistoryAction = function (tgt) {
             return function () {
-                var rest = {
+                var nick = currentUser('obj').nick,
+                    rest = {
                         "method": 'GET',
                         "path": 'schedule/history/nick/' + currentUser('obj').nick
                     },
@@ -63,6 +66,7 @@ define ([
                             var history = st.payload.history.map(
                                 function (row) {
                                     return {
+                                        "nick": nick,
                                         "shid": row.shid,
                                         "sid": row.sid,
                                         "effective": lib.readableDate(row.effective),
@@ -70,8 +74,16 @@ define ([
                                     };
                                 }
                             );
-                            lib.holdObject(history);
-                            target.pull(tgt).start();
+                            if (tgt === 'schedHistoryDtable') {
+                                stack.push(tgt, history, {
+                                    "xtarget": "mainSched"
+                                });
+                            } else if (tgt === 'schedHistoryDrowselect') {
+                                stack.push(tgt, {
+                                    'pos': 0,
+                                    'set': history
+                                });
+                            }
                         }
                     },
                     fc = function (st) {
@@ -80,8 +92,16 @@ define ([
                         if (st.payload.code === "404") {
                             // The employee has no history records. This is not
                             // really an error condition.
-                            lib.holdObject([]);
-                            target.pull(tgt).start();
+                            if (tgt === 'schedHistoryDtable') {
+                                stack.push(tgt, [], {
+                                    "xtarget": "mainSched"
+                                });
+                            } else if (tgt === 'schedHistoryDrowselect') {
+                                stack.push(tgt, {
+                                    'pos': 0,
+                                    'set': []
+                                });
+                            }
                         }
                     };
                 ajax(rest, sc, fc);
@@ -109,7 +129,7 @@ define ([
                 sc = function (st) {
                     if (st.code === 'DOCHAZKA_CUD_OK') {
                         console.log("Payload is", st.payload);
-                        target.pull("actionSchedHistoryEdit").start();
+                        stack.unwindToTarget("actionSchedHistory");
                     }
                 },
                 fc = function (st) {
@@ -135,7 +155,7 @@ define ([
                 sc = function (st) {
                     if (st.code === 'DOCHAZKA_CUD_OK') {
                         console.log("Payload is", st.payload);
-                        target.pull("actionSchedHistoryEdit").start();
+                        stack.unwindToTarget("actionSchedHistory");
                     }
                 },
                 fc = function (st) {
@@ -154,8 +174,13 @@ define ([
             rest.path += shid;
             ajax(rest, sc, fc);
             // start.drowselectListen();
+        },
+        "schedHistoryAddRecordAction": function (obj) {
+            console.log("Entering schedHistoryAddRecordAction with obj", obj);
+            stack.push('schedHistoryAddRecord', {
+                'nick': obj.nick
+            });
         }
     };
-
 });
 

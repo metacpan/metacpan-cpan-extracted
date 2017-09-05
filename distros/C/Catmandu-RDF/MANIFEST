@@ -10,6 +10,7 @@ cpanfile
 dist.ini
 lib/Catmandu/Exporter/RDF.pm
 lib/Catmandu/Fix/aref_query.pm
+lib/Catmandu/Fix/rdf_ldf_statements.pm
 lib/Catmandu/Importer/RDF.pm
 lib/Catmandu/RDF.pm
 t/aref_query.t
@@ -21,6 +22,7 @@ t/exporter.t
 t/importer.t
 t/issue-3.t
 t/query.sparql
+t/rdf_ldf_statements.t
 t/release-pod-syntax.t
 t/sparql.t
 t/url.t

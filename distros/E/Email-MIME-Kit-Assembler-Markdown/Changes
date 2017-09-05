@@ -1,5 +1,9 @@
 Revision history for Email-MIME-Kit-Assembler-Markdown
 
+0.100006  2017-08-29 15:59:19-04:00 America/New_York
+        - added encode_entities to HTML entity encode variables in the HTML
+          part (thanks, Michael McClimon!)
+
 0.100005  2016-08-03 09:47:33-04:00 America/New_York
         - Bool options now accept any value, meaning that JSON booleans work
           even from weirdo versions that don't work with Bool

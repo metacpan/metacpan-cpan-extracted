@@ -1,0 +1,126 @@
+#title Random enumerations
+
+  2. First
+  
+  3. Second
+  
+      7. Third
+  
+      8. Abc
+  
+          i. Roman
+          ii. Roman
+
+
+  c. First
+  
+          i. Alpha
+          l. Alpha
+          m. Alpha
+
+  d. Second
+  
+      f. Third
+  
+      g. Abc
+
+          i. Alpha
+          l. Alpha
+
+And what is this?
+
+
+  x. Roman.
+
+  xi. Roman.
+
+
+And this?
+
+  c. Alpha
+
+  d. Alpha.
+
+
+And this???
+
+  x. Alpha
+
+  y. Alpha
+
+  z. Alpha
+
+
+And this?
+
+  i. Alpha
+
+  l. Alpha
+
+*** Reset
+
+  C. test
+
+Hello there
+
+                         a. pinco
+
+                         Signed.<br>
+                         A. Pallino
+
+*** Reset
+
+  Signed.
+
+  A. Prova
+
+           A. Prova      
+   
+              viii. Prova
+
+                    A. Pallinox
+
+        A. Prova
+
+           A. Last Prova
+
+
+*** Regular
+
+ 1. one
+ 2. two
+ 3. three
+ 1. four
+ 1. five
+ 1. six
+
+    - bullet
+
+ 1. seven
+ 1. eight
+
+    a. alpha a
+    a. alpha b
+    c. alpha c
+    d. alpha d
+
+       A. Alpha A
+       A. Alpha A
+
+          i. roman
+          i. roman
+
+       A. Alpha C
+
+          I. Roman
+          II. Roman
+          IV. Roman IV
+
+       Description :: List
+       Description :: List
+
+    e. alpha e
+    g. alpha g
+    h. alpha h
+
+ 1. nine.

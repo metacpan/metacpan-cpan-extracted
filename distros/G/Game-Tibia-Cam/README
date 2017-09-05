@@ -1,0 +1,98 @@
+NAME
+
+    Game::Tibia::Cam - Read/Convert TibiCam .rec files to pcaps
+
+SYNOPSIS
+
+        # cam2pcap script
+        use Game::Tibia::Cam;
+        local $/;
+        print Game::Tibia::Cam->new(rec => <>)->pcap;
+
+DESCRIPTION
+
+    With programs like TibiCam, Tibia game sessions can be saved to a
+    custom format and replayed with a modified game client.
+
+    This plugin allows conversion between some of these formats and the
+    more main-stream pcap format.
+
+METHODS AND ARGUMENTS
+
+    new(rec => $recording, [is_str => undef])
+
+      Here, the [] indicate an optional parameter.
+
+      Constructs a new Game::Tibia::Cam instance. $recording is either a
+      binary string resulting from reading a recording in the *.rec format
+      or the filename of such a recording.
+
+      When $is_str is undef, the type of $recording's contents is inferred
+      from the first bytes.
+
+      Function croaks if opening file fails.
+
+    ptotal()
+
+      Returns the total number of packets in the recording. This is O(1).
+
+    version()
+
+      Returns the recording's protocol version. If the version can't be
+      precisely determined, return value should be interpreted as ($min,
+      $max) instead. Otherwise, ($ver, $ver).
+
+    pfirst()
+
+      Returns the first packet in a capture
+
+    pnum()
+
+      Returns the number of the packet that has just been read by pnext
+
+    pnext()
+
+      Returns the next packet in a capture
+
+    duration()
+
+      Returns the duration of the clip. This requires traversing all
+      unparsed packets, so calling it after pnext returns undef is
+      preferable.
+
+    pcap([ file => undef, synthesize_login => 1])
+
+      Either creates a new pcap file or append the data to a file handle if
+      specified. In both cases, it returns a file handle for possible
+      further appending. If file is undef, which it is by default, a string
+      with the contents is returned instead.
+
+      Unless, synthesize_login => 0, a Tibia game server login packet is
+      prepended to the pcap. This allows the pcap to be directly read into
+      wireshark and dissected with the Tibia dissector, because otherwise
+      Wireshark wouldn't know for sure what version and possibly XTEA key,
+      the capture has.
+
+      If RSA encryption is required, the OTServ RSA key is used.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Game-Tibia-Cam
+
+SEE ALSO
+
+    Game::Tibia::Packet
+
+    Tibia Wireshark Plugin <https://github.com/a3f/Tibia-Wireshark-Plugin>.
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

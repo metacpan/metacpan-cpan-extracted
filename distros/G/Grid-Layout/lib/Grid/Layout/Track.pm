@@ -12,7 +12,7 @@ use utf8;
 
 use Carp;
  #_}
-our $VERSION = 0.01;
+our $VERSION = $Grid::Layout::VERSION;
 #_{ Synopsis
 
 =head1 SYNOPSIS
@@ -166,15 +166,47 @@ sub area { #_{
 #_{ POD
 =head2 area
 
+    my $track_v      = $gl->add_vertical_track(…);
+
+    my $track_h_from = $gl->add_horizontal_track(…);
+    my $track_h_to   = $gl->add_horizontal_track(…);
+
+    my $line_h_from = $gl->add_line(…);
+    my $line_h_to   = $gl->add_line(…);
+
+
+    my $area_1 = $track_v->area($track_h_from, $track_h_to);
+    my $area_2 = $track_v->area($line_h_from , $line_h_to );
+
+Defines an L<< area|Grid::Layout::Area >> lying on C<< $track_v >> between C<< $track_h_from >> and C<< $track_h_to >>.
+
+An area that is bound by four tracks can be created with L<< Grid::Layout/area >>.
+
 =cut
 #_}
 
-  my $self       = shift;
-  my $track_from = shift;
-  my $track_to   = shift;
+  my $self = shift;
+  my $from = shift;
+  my $to   = shift;
 
-  croak '$track_from must be a Grid::Layout::Track' unless $track_from->isa('Grid::Layout::Track');
-  croak '$track_to   must be a Grid::Layout::Track' unless $track_to  ->isa('Grid::Layout::Track');
+  croak '$from must be a Grid::Layout::Track/Line' unless $from->isa('Grid::Layout::Track') or $from->isa('Grid::Layout::Line');
+  croak '$to   must be a Grid::Layout::Track/Line' unless $to  ->isa('Grid::Layout::Track') or $to  ->isa('Grid::Layout::Line');
+
+  my $track_from;
+  my $track_to;
+
+  if ($from->isa('Grid::Layout::Track')) {
+    $track_from = $from;
+  }
+  else {
+    $track_from = $from->_next_track;
+  }
+  if ($to->isa('Grid::Layout::Track')) {
+    $track_to = $to;
+  }
+  else {
+    $track_to = $to->_previous_track;
+  }
 
   croak '$track_from must be other direction' unless $track_from->{V_or_H} eq Grid::Layout::VH_opposite($self->{V_or_H});
   croak '$track_from must be other direction' unless $track_to  ->{V_or_H} eq Grid::Layout::VH_opposite($self->{V_or_H});
@@ -192,10 +224,12 @@ sub area { #_{
 #_{ POD: Copyright
 
 =head1 Copyright
+
 Copyright © 2017 René Nyffenegger, Switzerland. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at: L<http://www.perlfoundation.org/artistic_license_2_0>
+
 =cut
 
 #_}

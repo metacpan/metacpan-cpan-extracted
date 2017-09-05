@@ -1,0 +1,6 @@
+~$
+^.git
+^TODO
+^.travis.yml
+^.build
+^USB-TMC

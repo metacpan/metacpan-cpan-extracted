@@ -1,16 +1,17 @@
 {
    "abstract" : "Make handling JSON easier in Web::Request",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@cpan.org>",
+      "Klaus Ita <koki@itascraft.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Web-Request-Role-JSON",
    "prereqs" : {
@@ -28,7 +29,7 @@
          "requires" : {
             "Encode" : "0",
             "JSON::MaybeXS" : "0",
-            "Moose::Role" : "0",
+            "MooseX::Role::Parameterized" : "0",
             "perl" : "5.010"
          }
       },
@@ -36,6 +37,7 @@
          "requires" : {
             "HTTP::Request" : "0",
             "HTTP::Request::Common" : "0",
+            "Moose" : "0",
             "Plack::Builder" : "0",
             "Plack::Test" : "0",
             "Test::More" : "0",
@@ -54,6 +56,7 @@
          "web" : "https://github.com/domm/Web-Request-Role-JSON"
       }
    },
-   "version" : "1.004"
+   "version" : "1.005",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

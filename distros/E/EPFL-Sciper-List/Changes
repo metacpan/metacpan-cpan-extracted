@@ -1,4 +1,7 @@
 Revision history for EPFL-Sciper-List
 
+0.02    2017-09-01
+        Fix missing dependency File::Find::Rule
+
 0.01    2017-08-25
         First version, released on an unsuspecting world.

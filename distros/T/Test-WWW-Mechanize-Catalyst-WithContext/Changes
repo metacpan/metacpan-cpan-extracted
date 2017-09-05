@@ -1,5 +1,9 @@
 Revision history for Perl extension Test-WWW-Mechanize-Catalyst-WithContext
 
+0.02 2017-08-28T13:30:14Z
+
+    - fix bug where using get_context would throw an error about a missing base for the URI if no other request had been made on this $mech
+
 0.01 2017-02-04T14:24:04Z
 
     - first release

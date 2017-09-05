@@ -1,6 +1,6 @@
                             Openingsbalans
-Datum: 2007-01-01
-EekBoek Demo Administratie                         EekBoek, 2007-12-31
+Datum: 2013-01-01
+EekBoek Demo Administratie                         EekBoek, 2013-12-31
 
 RekNr   Grootboekrekening                             Debet     Credit
 ----------------------------------------------------------------------

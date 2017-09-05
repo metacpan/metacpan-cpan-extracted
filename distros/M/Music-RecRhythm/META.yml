@@ -28,7 +28,7 @@ requires:
   Scalar::Util: '0'
   namespace::clean: '0'
   strict: '0'
-version: '0.04'
+version: '0.05'
 x_homepageresources:
   repository:
     type: git

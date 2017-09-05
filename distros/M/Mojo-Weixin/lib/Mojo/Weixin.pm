@@ -1,5 +1,5 @@
 package Mojo::Weixin;
-our $VERSION = '1.3.5';
+our $VERSION = '1.3.7';
 use Mojo::Weixin::Base 'Mojo::EventEmitter';
 use Mojo::IOLoop;
 use Mojo::Weixin::Log;
@@ -38,12 +38,13 @@ has ioloop              => sub {Mojo::IOLoop->singleton};
 has keep_cookie         => 1;
 has fix_media_loop      => 1;
 has synccheck_interval  => 1;
-has synccheck_delay     => 10;
+has synccheck_delay     => 1;
 has _synccheck_interval => sub{ $_[0]->synccheck_interval};
 has sync_interval       => 0;
 has emoji_to_text       => 1;
 has stop_with_mobile    => 0;
 has http_max_message_size  => undef; #16777216;
+has controller_pid      => sub{$ENV{MOJO_WEIXIN_CONTROLLER_PID}};
 
 has user    => sub {+{}};
 has friend  => sub {[]};
@@ -222,11 +223,15 @@ sub new {
         $self->error(Carp::longmess($err));
     });
     $self->check_pid();
+    $self->check_controller(1);
     $self->load_cookie();
     $self->save_state();
     $SIG{CHLD} = 'IGNORE';
     $SIG{INT}  = $SIG{TERM} = $SIG{HUP} = sub{
-        return if $^O ne 'MSWin32' and $_[0] eq 'INT' and !-t;
+        if($^O ne 'MSWin32' and $_[0] eq 'INT' and !-t){
+            $self->warn("后台程序捕获到信号[$_[0]]，已将其忽略，程序继续运行");
+            return;
+        }
         $self->info("捕获到停止信号[$_[0]]，准备停止...");
         $self->stop();
     };
@@ -258,6 +263,11 @@ sub new {
             $msg->reply(" ") if $self->fix_media_loop == 2;
         });
     }
+    $self->on(update_friend=>sub{
+        my $self = shift;
+        my $filehelper = Mojo::Weixin::Friend->new(name=>"文件传输助手",id=>"filehelper");
+        $self->add_friend($filehelper) if not $self->search_friend(id=>"filehelper");
+    });
     $Mojo::Weixin::Message::SEND_INTERVAL = $self->send_interval;
     $Mojo::Weixin::_CLIENT = $self;
     $self;

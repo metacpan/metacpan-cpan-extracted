@@ -49,6 +49,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-webdriver/overview"
       }
    },
-   "version" : "v0.9.6",
+   "version" : "v0.9.7",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

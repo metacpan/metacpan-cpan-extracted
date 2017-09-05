@@ -2,7 +2,7 @@ package Net::PMP::Profile::TypeConstraints;
 use Moose;
 use Moose::Util::TypeConstraints;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 # The Net::PMP::Type::* prefix is used for all our type constraints
 # to avoid stepping on anyone's toes

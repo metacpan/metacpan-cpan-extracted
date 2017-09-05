@@ -6,5 +6,6 @@
 ^(Build|Makefile)$
 \bpm_to_blib$
 ^MYMETA\.
+^cover_db/
 
 

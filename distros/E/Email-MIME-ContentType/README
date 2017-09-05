@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Email-MIME-ContentType,
-version 1.021:
+version 1.022:
 
-  Parse a MIME Content-Type Header
+  Parse a MIME Content-Type or Content-Disposition Header
 
 This software is copyright (c) 2004 by Simon Cozens.
 

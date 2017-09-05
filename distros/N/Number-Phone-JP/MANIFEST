@@ -16,6 +16,7 @@ lib/Number/Phone/JP/Table/Fmc.pm
 lib/Number/Phone/JP/Table/Freedial.pm
 lib/Number/Phone/JP/Table/Home.pm
 lib/Number/Phone/JP/Table/Ipphone.pm
+lib/Number/Phone/JP/Table/M2m.pm
 lib/Number/Phone/JP/Table/Mobile.pm
 lib/Number/Phone/JP/Table/Pager.pm
 lib/Number/Phone/JP/Table/Phs.pm
@@ -39,6 +40,7 @@ t/is_mobile.t
 t/is_pager.t
 t/is_specialrate.t
 t/is_tollfree.t
+t/m2m.t
 t/mobile.t
 t/number-phone.t
 t/pager.t
@@ -47,6 +49,7 @@ t/pod.t
 t/q2.t
 t/united.t
 t/upt.t
+t/use-pager-and-m2m.t
 t/use-twice.t
 xt/perlcritic.t
 xt/perlcriticrc

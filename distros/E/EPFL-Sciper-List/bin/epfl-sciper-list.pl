@@ -18,15 +18,15 @@ Get a list of all public active sciper from EPFL
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 USAGE
 
-  ./epfl-sciper-list.pl --help
+  epfl-sciper-list.pl --help
 
-  ./epfl-sciper-list.pl --output=json > sciper.json
+  epfl-sciper-list.pl --output=json > sciper.json
 
-  ./epfl-sciper-list.pl --output=tsv > sciper.tsv
+  epfl-sciper-list.pl --output=tsv > sciper.tsv
 
 =head1 OPTIONS
 
@@ -40,7 +40,7 @@ Output format in TSV or Json.
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my ( $help, $output );
 

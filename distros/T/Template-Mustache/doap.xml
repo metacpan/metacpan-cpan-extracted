@@ -58,6 +58,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Pieter van de Bruggen</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pvande@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>ReadmeCritic</foaf:name>
       <foaf:mbox rdf:resource="mailto:frankensteinbot@gmail.com" />
     </foaf:Person>
@@ -129,6 +135,18 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.1_0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-06-30</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.3</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-08-30</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

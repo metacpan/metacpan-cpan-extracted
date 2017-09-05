@@ -18,7 +18,6 @@ use EB;
 use EB::Tools::MiniAdm;
 use File::Basename;
 use Encode;
-use File::Glob ( $] >= 5.016 ? ":bsd_glob" : ":glob" );
 
 my @adm_dirs;
 my @adm_names;
@@ -96,9 +95,9 @@ sub run {
 sub find_db_drivers {
     my %drivers;
 
-    if ( $Cava::Packager::PACKAGED ) {
+    if ( $App::Packager::PACKAGED ) {
 	# Trust packager.
-	unless ( $Cava::Packager::PACKAGED ) {
+	unless ( $App::Packager::PACKAGED ) {
 	    # Ignored, but force packaging.
 	    require EB::DB::Postgres;
 	    require EB::DB::Sqlite;
@@ -471,9 +470,6 @@ EOD
     return -1 unless $answers->{dbcreate};
 
     my %opts;
-
-    $opts{lang} = $ENV{EB_LANG} || $ENV{LANG};
-    $opts{lang} =~ s/\..*//;	# strip .utf8
 
     $opts{adm_naam} = $answers->{admname};
     $opts{adm_code} = $answers->{admcode};

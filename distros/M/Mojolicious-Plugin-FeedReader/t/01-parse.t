@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 use Mojo::URL;
-use Mojo::Util qw(slurp);
+use Mojo::File;
 use HTTP::Date qw(time2isoz);
 
 use FindBin;
@@ -14,7 +14,7 @@ my $sample_dir = File::Spec->catdir($FindBin::Bin, 'samples');
 push @{app->static->paths}, $sample_dir;
 my $t = Test::Mojo->new(app);
 
-get '/plasm' => sub { shift->render(data => slurp(File::Spec->catfile($sample_dir, 'plasmastrum.xml')), format => 'htm'); };
+get '/plasm' => sub { shift->render(data => Mojo::File->new(File::Spec->catfile($sample_dir, 'plasmastrum.xml'))->slurp, format => 'htm'); };
 
 # test the parse_feed helper.
 
@@ -56,7 +56,7 @@ isa_ok($feed, 'HASH');
 is($feed->{title}, 'First Weblog', 'string ref from body');
 
 # parse a string
-my $str = slurp $file;
+my $str = Mojo::File->new($file)->slurp;
 $feed = $t->app->parse_feed(\$str);
 isa_ok($feed, 'HASH');
 is($feed->{title}, 'First Weblog');

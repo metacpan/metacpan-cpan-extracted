@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +24,5 @@ requires:
   Test::Pod::Coverage: '0'
   Time::HiRes: '0'
   XML::XPath: '0'
-version: v3.5.0
+version: v3.7.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

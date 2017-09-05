@@ -1,5 +1,4 @@
 Changes
-ignore.txt
 lib/Grid/Layout.pm
 lib/Grid/Layout/Area.pm
 lib/Grid/Layout/Cell.pm
@@ -9,10 +8,20 @@ lib/Grid/Layout/Render.pm
 lib/Grid/Layout/Track.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
 README
-README.md
 t/01-load.t
 t/02-create-grid.t
 t/02-grid-expected.html
+t/02-grid-gotten.html
+t/03-add-line.t
+t/03-grid-expected.html
+t/03-grid-gotten.html
+t/04-area-on-track.t
+t/04-grid-expected.html
+t/04-grid-gotten.html
+t/05-next-previous-line.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

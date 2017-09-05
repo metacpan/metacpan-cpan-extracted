@@ -1,61 +1,61 @@
-use Test::Spec;
-use Test::Fatal;
-
+use strict;
+use warnings;
 use lib 't/lib';
 
+use Test::More;
+use Test::Fatal;
 use TestDBH;
 use TestEnv;
+
 use ObjectDB::Table;
 use Person;
 
-describe 'table find by sql' => sub {
+subtest 'finds by sql' => sub {
+    _setup();
 
-    before each => sub {
-        TestEnv->prepare_table('person');
-    };
+    Person->new(name => $_)->create for (qw/foo bar/);
 
-    it 'finds by sql' => sub {
-        Person->new(name => $_)->create for (qw/foo bar/);
+    my @persons = Person->table->find_by_sql('SELECT * FROM person WHERE name = ?', ['foo']);
 
-        my @persons =
-          Person->table->find_by_sql('SELECT * FROM person WHERE name = ?',
-            ['foo']);
+    is(@persons, 1);
 
-        is(@persons, 1);
-
-        is($persons[0]->get_column('name'), 'foo');
-    };
-
-    it 'finds by sql with smart bind' => sub {
-        Person->new(name => $_)->create for (qw/foo bar/);
-
-        my @persons =
-          Person->table->find_by_sql('SELECT * FROM person WHERE name = :name',
-            {name => 'bar'});
-
-        is(@persons, 1);
-
-        is($persons[0]->get_column('name'), 'bar');
-    };
-
-    it 'finds by sql with iterator' => sub {
-        Person->new(name => 'vti')->create;
-        Person->new(name => 'foo')->create;
-
-        my @persons;
-        Person->table->find_by_sql(
-            'SELECT * FROM person WHERE name = ?',
-            ['vti'],
-            each => sub {
-                my ($person) = @_;
-
-                push @persons, $person;
-            }
-        );
-
-        is($persons[0]->get_column('name'), 'vti');
-    };
-
+    is($persons[0]->get_column('name'), 'foo');
 };
 
-runtests unless caller;
+subtest 'finds by sql with smart bind' => sub {
+    _setup();
+
+    Person->new(name => $_)->create for (qw/foo bar/);
+
+    my @persons = Person->table->find_by_sql('SELECT * FROM person WHERE name = :name', { name => 'bar' });
+
+    is(@persons, 1);
+
+    is($persons[0]->get_column('name'), 'bar');
+};
+
+subtest 'finds by sql with iterator' => sub {
+    _setup();
+
+    Person->new(name => 'vti')->create;
+    Person->new(name => 'foo')->create;
+
+    my @persons;
+    Person->table->find_by_sql(
+        'SELECT * FROM person WHERE name = ?',
+        ['vti'],
+        each => sub {
+            my ($person) = @_;
+
+            push @persons, $person;
+        }
+    );
+
+    is($persons[0]->get_column('name'), 'vti');
+};
+
+done_testing;
+
+sub _setup {
+    TestEnv->prepare_table('person');
+}

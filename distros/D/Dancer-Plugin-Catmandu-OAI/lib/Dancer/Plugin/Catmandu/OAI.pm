@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0501';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
@@ -48,16 +48,6 @@ my $VERBS = {
         required => [],
     },
 };
-
-sub render {
-    my ($tmpl, $data) = @_;
-    content_type 'xml';
-    my $out = "";
-    my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
-    $exporter->add($data);
-    $exporter->commit;
-    $out;
-}
 
 sub oai_provider {
     my ($path, %opts) = @_;
@@ -322,8 +312,20 @@ TT
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
+    my $template_options = $setting->{template_options} || {};
+
+    my $render = sub {
+        my ($tmpl, $data) = @_;
+        content_type 'xml';
+        my $out = "";
+        my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
+        $exporter->add($data);
+        $exporter->commit;
+        $out;
+    };
+
     any ['get', 'post'] => $path => sub {
-        my $uri_base = $setting->{uri_base} // request->uri_base;
+        my $uri_base = $setting->{uri_base} // request->uri_for(request->path_info);
         my $response_date = DateTime->now->iso8601.'Z';
         my $params = request->is_get ? params('query') : params('body');
         my $errors = [];
@@ -363,7 +365,7 @@ TT
         }
 
         if (@$errors) {
-            return render(\$template_error, $vars);
+            return $render->(\$template_error, $vars);
         }
 
         $vars->{params} = $params;
@@ -406,7 +408,7 @@ TT
         }
 
         if (@$errors) {
-            return render(\$template_error, $vars);
+            return $render->(\$template_error, $vars);
         }
 
 
@@ -432,6 +434,7 @@ TT
                 $vars->{setSpec} = $sub_set_specs_for->($rec);
                 my $metadata = "";
                 my $exporter = Catmandu::Exporter::Template->new(
+                    %$template_options,
                     template => $format->{template},
                     file => \$metadata,
                 );
@@ -442,11 +445,11 @@ TT
                 $exporter->commit;
                 $vars->{metadata} = $metadata;
                 unless ($vars->{deleted} and $setting->{deletedRecord} eq 'no') {
-                    return render(\$template_get_record, $vars);
+                    return $render->(\$template_get_record, $vars);
                 }
             }
             push @$errors, [idDoesNotExist => "identifier $params->{identifier} is unknown or illegal"];
-            return render(\$template_error, $vars);
+            return $render->(\$template_error, $vars);
 
         } elsif ($verb eq 'Identify') {
             $vars->{earliest_datestamp} = $setting->{earliestDatestamp} || do {
@@ -462,7 +465,7 @@ TT
                     '1970-01-01T00:00:01Z';
                 }
             };
-            return render(\$template_identify, $vars);
+            return $render->(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
             my $limit = $setting->{limit} // $DEFAULT_LIMIT;
@@ -474,18 +477,18 @@ TT
                 $datestamp || next;
                 if ($datestamp !~ /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?$/) {
                     push @$errors, [badArgument => "datestamps must have the format YYYY-MM-DD or YYYY-MM-DDThh:mm:ssZ"];
-                    return render(\$template_error, $vars);
+                    return $render->(\$template_error, $vars);
                 };
             }
 
             if ($from && $until && length($from) != length($until)) {
                 push @$errors, [badArgument => "datestamps must have the same granularity"];
-                return render(\$template_error, $vars);
+                return $render->(\$template_error, $vars);
             }
 
             if ($from && $until && $from gt $until) {
                 push @$errors, [badArgument => "from is more recent than until"];
-                return render(\$template_error, $vars);
+                return $render->(\$template_error, $vars);
             }
 
             if ($from && length($from) == 10) {
@@ -521,7 +524,7 @@ TT
 
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
-                return render(\$template_error, $vars);
+                return $render->(\$template_error, $vars);
             }
 
             if ($start + $limit < $search->total) {
@@ -551,7 +554,7 @@ TT
                         setSpec   => $sub_set_specs_for->($rec),
                     };
                 } @{$search->hits}];
-                return render(\$template_list_identifiers, $vars);
+                return $render->(\$template_list_identifiers, $vars);
             } else {
                 $vars->{records} = [map {
                     my $rec = $_;
@@ -572,6 +575,7 @@ TT
                     unless ($deleted) {
                         my $metadata = "";
                         my $exporter = Catmandu::Exporter::Template->new(
+                            %$template_options,
                             template => $format->{template},
                             file     => \$metadata,
                         );
@@ -584,7 +588,7 @@ TT
                     }
                     $rec_vars;
                 } @{$search->hits}];
-                return render(\$template_list_records, $vars);
+                return $render->(\$template_list_records, $vars);
             }
 
         } elsif ($verb eq 'ListMetadataFormats') {
@@ -592,13 +596,13 @@ TT
                 $id =~ s/^$ns//;
                 unless ($bag->get($id)) {
                     push @$errors, [idDoesNotExist => "identifier $params->{identifier} is unknown or illegal"];
-                    return render(\$template_error, $vars);
+                    return $render->(\$template_error, $vars);
                 }
             }
-            return render(\$template_list_metadata_formats, $vars);
+            return $render->(\$template_list_metadata_formats, $vars);
 
         } elsif ($verb eq 'ListSets') {
-            return render(\$template_list_sets, $vars);
+            return $render->(\$template_list_sets, $vars);
         }
     }
 };
@@ -721,7 +725,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
     * repositoryName - The name of the repository
-    * uri_base - The base URL of the repository
+    * uri_base - The full base url of the OAI controller. To be used when behind a proxy server. When not set, this module relies on the Dancer request to provide its full url. Use middleware like 'ReverseProxy' or 'Dancer::Middleware::Rebase' in that case.
     * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
     * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
     * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
@@ -744,6 +748,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
         * setDescription - an optional and repeatable container that may hold community-specific XML-encoded data about the set. Should be string or array of strings.
         * cql - The CQL command to find records in this set in the L<Catmandu::Store>
     * xsl_stylesheet - Optional path to an xsl stylesheet
+    * template_options - An optional hash of configuration options that will be passed to L<Catmandu::Exporter::Template> or L<Template>.
 
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 

@@ -5,8 +5,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Thu Jul  7 15:53:48 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Aug 11 21:13:47 2012
-# Update Count    : 1009
+# Last Modified On: Tue Aug 29 11:16:43 2017
+# Update Count    : 1019
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -83,6 +83,10 @@ sub run {
 	 !$opts->{config}
 	 && ( ( -e $cfg->std_config || -e $cfg->std_config_alt ) ? $cfg->val( qw(general wizard), 0 ) : 1 )
        ) {
+	if ( $opts->{inexport} ) {
+	    die("?"._T("Opties --init, --command en --import zijn niet toegestaan bij gebruik van de wizard.")."\n")
+	      if $opts->{inexport} || $opts->{command};
+	}
 	require EB::IniWiz;
 	EB::IniWiz->run($opts); # sets $opts->{runeb}
 	die("?"._T("Geen administratie geselecteerd")."\n") unless $opts->{runeb};
@@ -195,12 +199,13 @@ sub app_options {
 		      'ident',
 		      'journaal',
 		      'boekjaar=s',
-		      'verbose',
+		      'verbose|v',
 		      'dir=s',
 		      'file=s',
 		      'interactive!',
 		      'wizard!',
 		      'errexit!',
+		      'version',
 		      'trace',
 		      'help|?',
 		      'debug',
@@ -209,7 +214,7 @@ sub app_options {
 	app_usage(2);
     }
     app_usage(2) if @ARGV && !($opts->{command} || $opts->{printconfig});
-    app_ident() if $opts->{ident};
+    app_ident() if $opts->{ident} || $opts->{version};
 }
 
 sub app_ident {

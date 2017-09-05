@@ -1,3 +1,25 @@
  0.01  2017-08-08
 
-Start on initial version
+       Start on initial version
+
+ 0.02  2017-08-08 - 2017-09-02
+
+       Improve POD
+         - Typos
+         - Add head1 for Source Code
+
+
+       A grid minimally consists of one vertical and one
+       horizontal line
+
+       Adding tracks returns also the newly created line.
+
+       $track->area($line_from, $line_to);
+
+       Makefile.PL
+        - She bang
+        - chmod 755
+
+       t/01-load.t: isa_ok();
+
+       Use MANIFEST.SKIP rather than ignore.txt

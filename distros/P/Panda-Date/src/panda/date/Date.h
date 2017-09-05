@@ -88,12 +88,23 @@ public:
         epoch(val);
     }
 
-    err_t set (const char* str, size_t len = 0, const Timezone* zone = NULL) {
+    err_t set (string_view str, const Timezone* zone = NULL) {
+        const Timezone* parsed_zone = NULL;
+        _error = parse(str, &_date, &parsed_zone); // parse() can parse and create zone
+
+        if (parsed_zone) {
+            if (zone) { zone->retain(); zone->release(); } // ugly shit, should be replaced with intrusive pointers
+            zone = parsed_zone;
+        }
         _zone_set(zone);
-        _error    = parse_iso(str, len, &_date);
-        _has_date = true;
-        dchg_auto();
-        if (_range_check && _error == E_OK) validate_range();
+
+         if (_error == E_OK) {
+            _has_date = true;
+            dchg_auto();
+            if (_range_check) validate_range();
+        }
+        else epoch(0);
+
         return (err_t) _error;
     }
 
@@ -144,8 +155,8 @@ public:
         set(epoch, zone);
     }
 
-    Date (const char* str, size_t len = 0, const Timezone* zone = NULL) : _zone(NULL) {
-        set(str, len, zone);
+    Date (string_view str, const Timezone* zone = NULL) : _zone(NULL) {
+        set(str, zone);
     }
 
     Date (int32_t year, ptime_t mon, ptime_t day, ptime_t hour, ptime_t min, ptime_t sec, int isdst = -1, const Timezone* zone = NULL) : _zone(NULL) {

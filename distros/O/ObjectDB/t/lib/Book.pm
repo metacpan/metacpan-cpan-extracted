@@ -15,12 +15,12 @@ __PACKAGE__->meta(
         parent_author => {
             type  => 'many to one',
             class => 'Author',
-            map   => {author_id => 'id'}
+            map   => { author_id => 'id' }
         },
         book_tag_map => {
             type  => 'one to many',
             class => 'BookTagMap',
-            map   => {id => 'book_id'}
+            map   => { id => 'book_id' }
         },
         tags => {
             type      => 'many to many',
@@ -31,7 +31,7 @@ __PACKAGE__->meta(
         description => {
             type  => 'one to one',
             class => 'BookDescription',
-            map   => {id => 'book_id'}
+            map   => { id => 'book_id' }
         }
     }
 );

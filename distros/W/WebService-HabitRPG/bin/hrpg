@@ -23,7 +23,7 @@ eval {
 
 # ABSTRACT: hrpg - Command line interface to HabitRPG
 
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.30'; # VERSION
 
 
 if (not @ARGV or $ARGV[0] eq 'help') {
@@ -283,31 +283,11 @@ elsif ($cmd =~ /^(?<dir>[+-])(?<qty>\d*)$/) {
         my $result;
 
         foreach (1..$qty) {
+            $result = $hrpg->updown($task->id, $direction);
 
-            # Kludge to catch upstream errors from dropping items.
-            # pjf/WebService-HabitRPG#32 lefire/habitrpg#815
-
-            # TODO: Remove once lefnire/habitrpg#815 is resolved.
-
-            try {
-                $result = $hrpg->updown($task->id, $direction);
+            if(my $drop = $result->{_tmp}{drop}) {
+                say $drop->{dialog};
             }
-            catch {
-                # TODO: Figure out if we actually got a dropped item,
-                # or if upstream is just dead or broken.
-
-                say "Looks like an item dropped! "
-                    ."Check http://habitrpg.com/ to see what it is.";
-                $result = undef;
-            };
-        }
-
-        # If our last call resulted in a drop-error, then we have
-        # to go get our user data to see what actually happened.
-
-        if (not defined $result) {
-            # Grab our current user stats.
-            $result = $hrpg->user->{stats};
         }
 
         # Display stats delta.
@@ -447,7 +427,7 @@ hrpg - hrpg - Command line interface to HabitRPG
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 

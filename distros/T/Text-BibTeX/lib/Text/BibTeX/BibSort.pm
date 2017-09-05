@@ -23,7 +23,7 @@ use vars qw(@ISA $VERSION);
 use Text::BibTeX::Structure;
 
 @ISA = qw(Text::BibTeX::StructuredEntry);
-$VERSION = 0.82;
+$VERSION = 0.85;
 
 use Text::BibTeX qw(purify_string change_case);
 
@@ -70,7 +70,7 @@ to produce the sort key: non-English letters are mercilessly anglicized,
 non-alphabetic characters are stripped, and everything is forced to
 lowercase.  (The first two steps are done by the C<purify_string> routine;
 see L<Text::BibTeX/"Generic string-processing functions"> for a brief
-description, and the descripton of the C function C<bt_purify_string()> in
+description, and the description of the C function C<bt_purify_string()> in
 L<bt_misc> for all the gory details.)
 
 =cut

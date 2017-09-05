@@ -6,7 +6,7 @@ use strict;
 
 package Mail::Message::Test;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 use base 'Exporter';
 

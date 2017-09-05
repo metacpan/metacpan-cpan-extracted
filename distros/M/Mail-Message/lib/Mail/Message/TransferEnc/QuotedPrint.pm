@@ -8,7 +8,7 @@ use warnings;
 
 package Mail::Message::TransferEnc::QuotedPrint;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 use base 'Mail::Message::TransferEnc';
 

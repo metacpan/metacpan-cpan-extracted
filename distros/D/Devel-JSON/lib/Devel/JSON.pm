@@ -3,7 +3,7 @@ use warnings;
 
 package Devel::JSON;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 # Just to allow to be loaded with -d:JSON
 sub DB::DB {}
@@ -75,6 +75,11 @@ Force ASCII output:
     $ perl -d:JSON=ascii -e "qq<\N{SNOWMAN}>"
     "\u2603"
 
+Booleans:
+
+    $ perl -d:JSON -MJSON::PP -e 'JSON::PP::true'
+    true
+
 =head1 DESCRIPTION
 
 If you use this module from the command-line, the last value of your one-liner
@@ -122,7 +127,7 @@ Olivier Mengué, L<mailto:dolmen@cpan.org>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright E<copy> 2015 Olivier Mengué.
+Copyright E<copy> 2017 Olivier Mengué.
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as the Perl 5 programming language system itself.

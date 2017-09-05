@@ -13,8 +13,10 @@ t/mgpg-test-key.pub.asc
 Makefile.PL
 MANIFEST
 README
-META.yml
+MYMETA.yml
+MYMETA.json
 genreadme
 patches/GnuPG-Interface-0.33.tru-record-type.txt
 Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

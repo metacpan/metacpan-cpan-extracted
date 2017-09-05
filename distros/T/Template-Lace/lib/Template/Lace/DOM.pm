@@ -232,64 +232,87 @@ sub append_js_src_uniquely {
   return $self;
 }
 
-sub append_css_href_uniquely {
-  my ($self, $href, $attrs) = @_;
-  unless($self->at("link[href='$href']")) {
-    my $extra_attrs = join ' ', map { "$_='$attrs->{$_}'"  } keys %{$attrs||+{}};
-    $self->at('head')
-     ->append_content("<link rel='stylesheet' href='$href' $extra_attrs />");
+sub append_link_uniquely {
+  my $self = shift;
+  my $tag = 'link';
+  my $dom = ref($_[0]) ? shift : ref($self)->new(shift);
+  $dom = (($dom->tag||'') eq $tag) ?
+    $dom : $dom->at($tag);
+  if(my $id = $dom->attr('href')) {
+    if(my $head = $self->at("head")) {
+      if($self->at($tag."[href='$id']")) {
+        return $self;
+      } else {
+        $head->append_content($dom);
+        return $self;
+      }
+    } else {
+      $self->append_content($dom);
+    }
+  } else {
+    return $self;
   }
   return $self;
 }
 
 sub append_style_uniquely {
   my $self = shift;
-  my $style_dom = ref($_[0]) ? shift : ref($self)->new(shift);
-  $style_dom = (($style_dom->tag||'') eq 'style') ?
-    $style_dom : $style_dom->at('style');
-
-  if(my $id = $style_dom->attr('id')) {
-    my $head = $self->at("head") || return $self;
-    unless($head->at("style[id='$id']")) {
-      $head->append_content($style_dom);
+  my $tag = 'style';
+  my $dom = ref($_[0]) ? shift : ref($self)->new(shift);
+  $dom = (($dom->tag||'') eq $tag) ?
+    $dom : $dom->at($tag);
+  if(my $id = $dom->attr('id')) {
+    if(my $head = $self->at("head")) {
+      if($self->at($tag."[id='$id']")) {
+        return $self;
+      } else {
+        $head->append_content($dom);
+        return $self;
+      }
+    } else {
+      $self->append_content($dom);
     }
+  } else {
+    return $self;
   }
   return $self;
 }
 
 sub append_script_uniquely {
   my $self = shift;
-  my $script_dom = ref($_[0]) ? shift : ref($self)->new(shift);
-  $script_dom = (($script_dom->tag||'') eq 'script') ?
-    $script_dom : $script_dom->at('script');
-
-  if(my $id = $script_dom->attr('id')) {
-    my $head = $self->at("head") || return $self;
-    unless($head->at("script[id='$id']")) {
-      $head->append_content($script_dom);
+  my $tag = 'script';
+  my $dom = ref($_[0]) ? shift : ref($self)->new(shift);
+  $dom = (($dom->tag||'') eq $tag) ?
+    $dom : $dom->at($tag);
+  if(my $id = $dom->attr('id')) {
+    if(my $head = $self->at("head")) {
+      if($self->at($tag."[id='$id']")) {
+        return $self;
+      } else {
+        $head->append_content($dom);
+        return $self;
+      }
+    } else {
+      $self->append_content($dom);
     }
-  } elsif(my $src = $script_dom->attr('src')) {
-    my $head = $self->at("head") || return $self;
-    unless($head->at("script[src='$src']")) {
-      $head->append_content($script_dom);
+  } elsif(my $src = $dom->attr('src')) {
+    if(my $head = $self->at("head")) {
+      if($self->at($tag."[src='$src']")) {
+        return $self;
+      } else {
+        $head->append_content($dom);
+        return $self;
+      }
+    } else {
+      $self->append_content($dom);
     }
+  } else {
+    return $self;
   }
   return $self;
 }
 
-sub append_link_uniquely {
-  my $self = shift;
-  my $link_dom = ref($_[0]) ? shift : ref($self)->new(shift);
-  $link_dom = (($link_dom->tag||'') eq 'link') ?
-    $link_dom : $link_dom->at('link');
-  if(my $href = $link_dom->attr('href')) {
-    my $head = $self->at("head") || return $self;
-    unless($head->at("link[href='$href']")) {
-      $head->append_content($link_dom);
-    }
-  }
-  return $self;
-}
+
 
 my %_escape_table = (
   '&' => '&amp;', 

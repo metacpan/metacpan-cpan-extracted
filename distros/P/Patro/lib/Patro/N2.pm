@@ -3,15 +3,24 @@ use strict;
 use warnings;
 
 # we must keep this namespace very clean
-
 use Carp ();
-use Socket ();
-use Data::Dumper ();
 
 use overload
     '${}' => sub { $_[0]->{scalar} },
     'nomethod' => \&Patro::LeumJelly::overload_handler,
     ;
+
+# override UNIVERSAL methods
+foreach my $umethod (keys %UNIVERSAL::) {
+    no strict 'refs';
+    *{$umethod} = sub {
+	my ($proxy,@args) = @_;
+	my $context = defined(wantarray) ? 1 + wantarray : 0;
+	return Patro::LeumJelly::proxy_request( $proxy,
+	    { id => $proxy->{id}, topic => 'METHOD', command => $umethod,
+	      has_args => @args > 0, args => [ @args ], context => $context } );
+    };
+}
 
 sub AUTOLOAD {
     my $method = $Patro::N2::AUTOLOAD;

@@ -1,3 +1,13 @@
+2017-08-29  Péter Szabó   <pts@fazekas.hu>
+
+	* version 0.14 released
+	* merged MIME/AltWords0.pm to MIME/AltWords.pm, to avoid confusion
+
+2017-08-29  Péter Szabó   <pts@fazekas.hu>
+
+	* version 0.13 released
+	* added accepting both lowercase and uppercase encoding
+
 2006-06-11  Péter Szabó   <pts@fazekas.hu>
 
 	* version 0.12 released

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Provides nucleobase alphabet capabilities for Perl code.",
+   "author" : [
+      "James Johnson <meme-suite@uw.edu>",
+      "Timothy L. Bailey <meme-suite@uw.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "restricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MEME-Alphabet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Array::Compare" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "feature" : "0",
+            "perl" : "5.0120",
+            "strict" : "0",
+            "utf8" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MEME::Alphabet" : {
+         "file" : "lib/MEME/Alphabet.pm",
+         "version" : "v4.12.0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/cviner2/meme-alphabet/issues"
+      },
+      "homepage" : "http://meme-suite.org",
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://cviner2@bitbucket.org/cviner2/meme-alphabet",
+         "web" : "https://bitbucket.org/cviner2/meme-alphabet"
+      }
+   },
+   "version" : "v4.12.0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

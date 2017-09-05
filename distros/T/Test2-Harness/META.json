@@ -1,10 +1,10 @@
 {
-   "abstract" : "Test2 based test harness.",
+   "abstract" : "Test2 Harness designed for the Test2 event system",
    "author" : [
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,32 +21,45 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
             "File::Find" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "2.36",
+            "IO::Compress::Bzip2" : "0",
+            "IO::Compress::Gzip" : "0",
             "IO::Handle" : "1.27",
+            "IO::Uncompress::Bunzip2" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "IPC::Cmd" : "0",
             "IPC::Open3" : "0",
+            "Importer" : "0.024",
             "JSON::PP" : "0",
             "List::Util" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Symbol" : "0",
-            "Term::ANSIColor" : "0",
-            "Test2" : "1.302071",
-            "Test2::AsyncSubtest" : "0.000013",
-            "Test2::Bundle::Extended" : "0.000063",
+            "Test2" : "1.302095",
+            "Test2::V0" : "0.000074",
             "Time::HiRes" : "0",
+            "base" : "0",
+            "parent" : "0",
             "perl" : "5.008001"
          },
          "suggests" : {
             "Cpanel::JSON::XS" : "0",
-            "JSON::MaybeXS" : "0"
+            "JSON::MaybeXS" : "0",
+            "Term::ANSIColor" : "0"
          }
       }
    },
@@ -60,7 +73,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.000013",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.001004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

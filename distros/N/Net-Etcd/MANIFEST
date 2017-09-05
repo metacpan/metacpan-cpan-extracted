@@ -14,6 +14,7 @@ lib/Net/Etcd/Maintenance.pm
 lib/Net/Etcd/Role/Actions.pm
 lib/Net/Etcd/KV.pm
 lib/Net/Etcd/KV/Compare.pm
+lib/Net/Etcd/KV/DeleteRange.pm
 lib/Net/Etcd/KV/Op.pm
 lib/Net/Etcd/KV/Put.pm
 lib/Net/Etcd/KV/Range.pm

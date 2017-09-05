@@ -1,5 +1,13 @@
 Revision history for Perl module Compress::Huffman
 
+0.07 2017-09-01
+
+- Remove "inf" (infinity) for the benefit of Windows Perls
+
+0.06 2017-08-31
+
+- Order the encodings consistently each time
+
 0.05 2016-09-21
 
 - xl works correctly for non-probability distributions

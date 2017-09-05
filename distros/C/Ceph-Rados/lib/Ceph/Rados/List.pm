@@ -29,7 +29,7 @@ __END__
 
 =head1 NAME
 
-Ceph::Rados::IO - Perl wrapper to librados IO context.
+Ceph::Rados::List - Perl wrapper to librados IO context.
 
 =head1 METHODS
 

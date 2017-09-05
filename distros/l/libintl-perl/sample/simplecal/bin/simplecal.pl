@@ -20,7 +20,7 @@ use vars qw ($VERSION);
 $VERSION = '1.0';
 
 # Set the locale according to the environment.
-setlocale (LC_MESSAGES, "");
+setlocale LC_MESSAGES, "";
 
 # Print a greeting message.  We want to be flexible with the package
 # name, and so we will make this a placeholder.

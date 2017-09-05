@@ -3,13 +3,17 @@ abstract: 'Interact with the Palo Alto firewall API'
 author:
   - 'Greg Foletta <greg@foletta.org>'
 build_requires:
+  HTTP::Response: '0'
+  Pod::Coverage::TrustPod: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +22,10 @@ name: Device-PaloAlto-Firewall
 provides:
   Device::PaloAlto::Firewall:
     file: lib/Device/PaloAlto/Firewall.pm
-    version: '0.06'
+    version: '0.081'
   Device::PaloAlto::Firewall::Test:
     file: lib/Device/PaloAlto/Firewall/Test.pm
-    version: '0.06'
+    version: '0.081'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -36,9 +40,10 @@ requires:
   XML::Twig: '0'
   perl: '5.006'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gregfoletta/Device-PaloAlto/issues
   repository: git://github.com/gregfoletta/Device-PaloAlto.git
-version: '0.06'
+version: '0.081'
 x_serialization_backend: 'YAML::Tiny version 1.70'

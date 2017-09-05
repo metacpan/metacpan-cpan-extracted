@@ -11,7 +11,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Port::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.430';
+$VERSION = '3.440';
 
 structs('_new_base',
 	'Verilog::Netlist::Port::Struct'
@@ -67,12 +67,19 @@ sub _link {
     if (!$self->net) {
 	my $net = $self->module->find_net ($self->name);
 	if (!$net) {
+	    my $msb;
+	    my $lsb;
+	    if (defined $self->data_type) {
+		$self->data_type =~ /\[([^:]+)(:(.*))?\]$/;
+		$msb = $1;
+		$lsb = defined($3) ? $3 : $1;
+	    }
 	    $net = $self->module->new_net
 		(name=>$self->name,
 		 filename=>$self->filename, lineno=>$self->lineno,
 		 decl_type=>"port", net_type=>"wire",
 		 data_type=>$self->data_type, array=>$self->array,
-		 comment=>undef,
+		 comment=>undef, msb=>$msb, lsb=>$lsb,
 		 );
 	    $net->attributes($self->attributes);  # Copy attributes across
 	}

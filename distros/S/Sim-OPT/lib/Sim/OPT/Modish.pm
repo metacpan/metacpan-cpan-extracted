@@ -7,8 +7,8 @@ use List::Util qw[ min max reduce shuffle];
 use List::MoreUtils qw(uniq);
 use List::AllUtils qw(sum);
 use Statistics::Basic qw(:all);
-use Data::Dump qw(dump);
-use Data::Dumper;
+use Data::Dump qw(dump)
+;use Data::Dumper;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Purity  = 1;
 use Vector::Object3D::Polygon;
@@ -23,7 +23,7 @@ our @EXPORT = qw( modish );
 
 BEGIN { $Devel::DumpTrace::TRACE = 0 }
 
-$VERSION = '0.79';
+$VERSION = '0.79.105';
 $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (shading and insolation) files of the ESP-r building performance simulation suite in order to make it take into account the reflections from obstructions.';
 
 # Modish is a program for altering the shading values calculated by the ESP-r simulation platform to take into account the reflections from obstructions.
@@ -95,6 +95,7 @@ $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (s
 # All rights reserved, 2015-17.
 # This is free software.  You can redistribute it and/or modify it under the terms of the
 # GNU General Public License, version 3, as published by the Free Software Foundation.
+
 
 my $max_processes = $main::max_processes;
 if ( not ( defined( $max_processes ) ) ) { $max_processes = 1; }
@@ -1139,9 +1140,11 @@ sub adjustlaunch
 sub setrad
 {
   # THIS CREATES THE RADIANCE SCENES.
-  my ( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, $skycondition_ref ) = @_;
+  my ( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, $skycondition_ref, $countrad, $specularratios_ref, $calcprocedures_ref ) = @_;
   my %skycondition = %$skycondition_ref; print REPORT "\%skycondition: " . dump ( %skycondition );
- 
+  my %specularratios = %$specularratios_ref;
+  my @calcprocedures = @$calcprocedures_ref;
+
   my $skycond = $skycondition{$monthnum}; print REPORT "\$skycond: " . dump ( $skycond );
 
   my $radoctroot = $radoctfile;
@@ -1222,6 +1225,7 @@ $shortriffile
 -
 -
 YYY
+.Done this.
 ";
 
 `cd $path/rad/
@@ -1256,6 +1260,15 @@ $shortriffile
 YYY
 `;
 
+  if ( ( $countrad == 0 ) and ( "complete" ~~ @calcprocedures ) and ( "besides" ~~ @calcprocedures ) and ( "diluted" ~~ @calcprocedures ) and ( "extra" ~~ @calcprocedures ) )
+  {
+    adjust_radmatfile1( $conffile, $path, \%specularratios, \@calcprocedures );
+  }
+
+  #if ( ( $countrad == 0 ) and ( "complete" ~~ @calcprocedures ) and ( "besides" ~~ @calcprocedures ) and ( "diluted" ~~ @calcprocedures ) and ( "extra" ~~ @calcprocedures ) )
+  #{
+  #  adjust_radmatfile1( $conffile, $path, \%specularratios, \@calcprocedures );
+  #}
 }
 
 
@@ -1502,14 +1515,33 @@ sub pursue
               #createrad( $conffile, $radoctfile, $rcffile, $path );
 
               setroot( $conffile, $path);
-              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
+              
+              #unless ( $countrad == 1 )
+              #{
+              #  say REPORT "14_q \$conffile: $conffile";
+              #  my $radmatfile__ = $radmatfile;
+              #  $radmatfile__ =~ s/_f2_/_f1_/; print " \$radmatfile__ : $radmatfile__"; print " \$radmatfile__ : $radmatfile__"; print " \$radmatfile__ : $radmatfile__";
+              #  my $radmatcopy__ = $radmatcopy;
+              #  $radmatcopy__ =~ s/_f2_/_f1_/; print " \$radmatcopy__ : $radmatcopy__"; print " \$radmatcopy__ : $radmatcopy__";print " \$radmatcopy__ : $radmatcopy__";
+              #  say REPORT "14_q \$radmatfile__: $radmatfile__";
+              #  say REPORT "14_q \$radmatcopy__: $radmatcopy__";
+              #  adjust_radmatfile1( $conffile, $path, \%specularratios, \@calcprocedures );
+              #  `cp -f $radpath/$radmatfile__ $radpath/$radmatcopy__`;
+              #  say REPORT "cp -f $radpath/$radmatfile__ $radpath/$radmatcopy__";
+              #
+              #  open ( FIXLIST, ">$path/rad/fixl.pl" ) or die( $! );
+              #  print FIXLIST "$radmatfile__\n";          
+              #  print FIXLIST "$radmatcopy__\n";
+              #  close FIXLIST;
+              #}
 
-              if ( $countrad == 1)
+              if ( $countrad == 1 )
               {
-                say REPORT "15q \$conffile: $conffile";
-                say REPORT "15q \$radmatfile: $radmatfile";
-                say REPORT "15q \$radmatcopy: $radmatcopy";
-                adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%$specularratios, "", \@calcprocedures );
+                say REPORT "15_q \$conffile: $conffile";
+                say REPORT "15_q \$radmatfile: $radmatfile"; print " \$radmatfile : $radmatfile"; print " \$radmatfile : $radmatfile"; print " \$radmatfile : $radmatfile";
+                say REPORT "15_q \$radmatcopy: $radmatcopy"; print " \$radmatcopy : $radmatcopy"; print " \$radmatcopy : $radmatcopy"; print " \$radmatcopy : $radmatcopy"; 
+                adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%specularratios, "", \@calcprocedures );
                 `cp -f $radpath/$radmatfile $radpath/$radmatcopy`;
                   say REPORT "cp -f $radpath/$radmatfile $radpath/$radmatcopy";
 
@@ -1519,8 +1551,7 @@ sub pursue
                 close FIXLIST;
               }
 
-
-              $setoldfiles = "off";
+                            $setoldfiles = "off";
             }
 
             #my $d = File::Modified->new(files=>[$radmatfile] );  #STARTDAEMON
@@ -1557,7 +1588,7 @@ sub pursue
 
             #}
 
-            setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+            setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
 
             #if ( $countrad == 1)
             #{
@@ -1782,19 +1813,19 @@ sub pursue__
             if ( ( $countmonth == 0 ) and ( $countsurf == 0 ) and ( $countlithour == 1 ) ) ### and ( $countpoint == 0 ) and ( $setoldfiles = "on" )
             {
               setroot( $conffile, $path);
-              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
 
               if ( ( "main" ~~ @calcprocedures ) or ( "alternative" ~~ @calcprocedures ) ) # "alternative" OPTION: OBSOLETE 
               {
                 setroot( $conffile_a, $path);
-                setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+                setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
               }
 
               if ( $countrad == 0 )
               { 
                 if ( "alternative" ~~ @calcprocedures ) # OBSOLETE
                 {        
-                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%$specularratios, "diffuse", \@calcprocedures );
+                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%specularratios, "diffuse", \@calcprocedures );
                   `cp -f $radmatfile $radmatcopy`;
                   say REPORT "cp -f $radmatfile $radmatcopy";
 
@@ -1803,7 +1834,7 @@ sub pursue__
                   print FIXLIST "$radmatcopy\n";
                   close FIXLIST;
                   
-                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile_a, $path, \%$specularratios, "direct", \@calcprocedures );
+                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile_a, $path, \%specularratios, "direct", \@calcprocedures );
                   `cp -f $radmatfile_a $radmatcopy_a`;
                   say REPORT "cp -f $radmatfile_a $radmatcopy_a";
 
@@ -1812,13 +1843,31 @@ sub pursue__
                   print FIXLIST "$radmatcopy_a\n";
                   close FIXLIST;
                 }
+                #elsif( "extra" ~~ @calcprocedures )
+                #{
+                #  say REPORT "14_q \$conffile: $conffile";
+                #  my $radmatfile__ = $radmatfile;
+                #  $radmatfile__ =~ s/_f2_/_f1_/; print " \$radmatfile__ : $radmatfile__"; print " \$radmatfile__ : $radmatfile__"; print " \$radmatfile__ : $radmatfile__";
+                #  my $radmatcopy__ = $radmatcopy;
+                #  $radmatcopy__ =~ s/_f2_/_f1_/; print " \$radmatcopy__ : $radmatcopy__"; print " \$radmatcopy__ : $radmatcopy__";print " \$radmatcopy__ : $radmatcopy__";
+                #  say REPORT "14_q \$radmatfile__: $radmatfile__";
+                #  say REPORT "14_q \$radmatcopy__: $radmatcopy__";
+                #  adjust_radmatfile1( $conffile, $path, \%specularratios, \@calcprocedures );
+                #  `cp -f $radpath/$radmatfile__ $radpath/$radmatcopy__`;
+                #  say REPORT "cp -f $radpath/$radmatfile__ $radpath/$radmatcopy__";
+                #
+                #  open ( FIXLIST, ">$path/rad/fixl.pl" ) or die( $! );
+                #  print FIXLIST "$radmatfile__\n";          
+                #  print FIXLIST "$radmatcopy__\n";
+                #  close FIXLIST;
+                #}
               }
 
               if ( $countrad == 1)
               {
                	if ( not ( "alternative" ~~ @calcprocedures ) )
                 {
-                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%$specularratios, "", \@calcprocedures );
+                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%specularratios, "", \@calcprocedures );
                   `cp -f $radmatfile $radmatcopy`;
                    say REPORT "cp -f $radmatfile $radmatcopy";
 
@@ -1829,7 +1878,7 @@ sub pursue__
                 }
                 else # OBSOLETE
                 {        
-                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%$specularratios, "diffuse", \@calcprocedures );
+                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile, $path, \%specularratios, "diffuse", \@calcprocedures );
                   `cp -f $radmatfile $radmatcopy`;
                   say REPORT "cp -f $radmatfile $radmatcopy";
 
@@ -1838,7 +1887,7 @@ sub pursue__
                   print FIXLIST "$radmatcopy\n";
                   close FIXLIST;
                   
-                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile_a, $path, \%$specularratios, "direct", \@calcprocedures );
+                  adjust_radmatfile( $exportconstrref, $exportreflref, $conffile_a, $path, \%specularratios, "direct", \@calcprocedures );
                   `cp -f $radmatfile_a $radmatcopy_a`;
                   say REPORT "cp -f $radmatfile_a $radmatcopy_a";
 
@@ -1854,18 +1903,18 @@ sub pursue__
 
             if ( ( "main" ~~ @calcprocedures ) or ( "maincomplete" ~~ @calcprocedures ) )
             {
-              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
-              setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
+              setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
               adjustlaunch( $skyfile_a, $diffskyfile_a, $path, $radpath );
             }
             elsif ( "alternative" ~~ @calcprocedures ) # OBSOLETE
             {
-              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
-              setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
+              setrad( $conffile_a, $radoctfile_a, $rcffile_a, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
             }
             else
             {
-              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition );
+              setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad, \%specularratios, \@calcprocedures );
             }
 
             my $countpoint = 0;
@@ -2331,14 +2380,14 @@ sub compareirrs
           {
             if ( $surfirr == 0 ) { $surfirr = 0.0001 }
             if ( $whitesurfirr == 0 ) { $whitesurfirr = 0.0001 }
-          	$irrratio = sqrt( ( $whitesurfirr ** 2 ) / ( $surfirr ** 2) );
+          	$irrratio = ( ( $whitesurfirr / $surfirr ) ** 2 ) ;
           }
 
-          if ( $computype eq "root" ) # OBSOLETE
+          if ( $computype eq "root" ) 
           {
             if ( $surfirr == 0 ) { $surfirr = 0.0001 }
             if ( $whitesurfirr == 0 ) { $whitesurfirr = 0.0001 }
-          	$irrratio = ( ( sqrt( $whitesurfirr ) / sqrt( $surfirr ) ) ** 2 );
+          	$irrratio = sqrt( $whitesurfirr / $surfirr );
           }
 
           $irrvars{ $zonenum }{ $monthnum }{ $surfnum }{ $hour }{ irrvar } = $irrratio;
@@ -2389,14 +2438,14 @@ sub compareirrs__
             {
               if ( $surfirr == 0 ) { $surfirr = 0.0001 }
               if ( $whitesurfirr == 0 ) { $whitesurfirr = 0.0001 }
-              $irrratio = sqrt( ( $whitesurfirr ** 2 ) / ( $surfirr ** 2) );
+              $irrratio = ( ( $whitesurfirr / $surfirr ) ** 2 );
             }
 
-            if ( $computype eq "root" ) # OBSOLETE
+            if ( $computype eq "root" )
             {
               if ( $surfirr == 0 ) { $surfirr = 0.0001 }
               if ( $whitesurfirr == 0 ) { $whitesurfirr = 0.0001 }
-              $irrratio = ( ( sqrt( $whitesurfirr ) / sqrt( $surfirr ) ) ** 2 );
+              $irrratio = sqrt( $whitesurfirr / $surfirr );
             }
 
             $irrvars{ $zonenum }{ $monthnum }{ $surfnum }{ $hour }{ irrvar } = $irrratio;
@@ -2418,14 +2467,14 @@ sub compareirrs__
             {
               if ( $dirsurfirr == 0 ) { $dirsurfirr = 0.0001 }
               if ( $dirwhitesurfirr == 0 ) { $dirwhitesurfirr = 0.0001 }
-              $dirirrratio = sqrt( ( $dirwhitesurfirr ** 2 ) / ( $dirsurfirr ** 2) );
+              $dirirrratio = ( ( $dirwhitesurfirr / $dirsurfirr ) ** 2 );
             }
 
-            if ( $computype eq "root" ) # OBSOLETE
+            if ( $computype eq "root" )
             {
               if ( $dirsurfirr == 0 ) { $dirsurfirr = 0.0001 }
               if ( $dirwhitesurfirr == 0 ) { $dirwhitesurfirr = 0.0001 }
-              $dirirrratio = ( ( sqrt( $dirwhitesurfirr ) / sqrt( $dirsurfirr ) ) ** 2 );
+              $dirirrratio = sqrt( $dirwhitesurfirr / $dirsurfirr ) ;
             }
 
             $irrvars{ $zonenum }{ $monthnum }{ $surfnum }{ $hour }{ dirirrvar } = $dirirrratio;
@@ -2593,36 +2642,36 @@ sub modifyshda
                       my ( $calcamount, $improvedguess, $newshadingvalue);
                       if ( $irrvariation > 1 )
                       {
-                        my $provisional;
-
-                        if ( "quadratic__" ~~ @calcprocedures )
-                        {
-                          $provisional = ( ( 1 - $irrvariation ) ** 2 );
-                          $irrvariation = ( 1 + $provisional );
-                        }
-
-                         if ( "logarithmic__" ~~ @calcprocedures )
-                        {
-                          $provisional = ( sqrt( 1 - $irrvariation ) );
-                          $irrvariation = ( 1 + $provisional );
-                        }
-
-                         if ( "halved__" ~~ @calcprocedures )
-                        {
-                          $provisional = ( ( 1 - $irrvariation ) / 2 );
-                          $irrvariation = ( 1 + $provisional );
-                        }
-
-
                         $calcamount = ( 1 - $el ); # THIS IS THE RATIO OF NON-SHADED IRRADIATION AS CALCULATED BY THE ESP-r's ISH MODULE
                         $improvedguess = ( $calcamount * $irrvariation ); # THIS IS THE RATIO ABOVE CORRECTED BY MULTIPLYING IT BY THE IRRADIANCE RATIO TO TAKE REFLECTIONS INTO ACCOUNT.
-                        unless ( "halved" ~~ @calcprocedures )
+
+                        unless ( ( "halved" ~~ @calcprocedures ) or ( "halved250" ~~ @calcprocedures ) or ( "halved125" ~~ @calcprocedures ) or ( "halved375" ~~ @calcprocedures ) )
                         {
                           $newshadingvalue = ( 1 - $improvedguess ); # AS THE NAME SAYS, THIS IS THE NEW SHADING VALUE.
                         }
-                        else
+                        elsif ( "halved" ~~ @calcprocedures )
                         {
                           my $halfdiff = ( ( $el - ( 1 - $improvedguess ) ) / 2 );
+                          $newshadingvalue = ( $el - $halfdiff );
+                        }
+                        elsif ( "halved250" ~~ @calcprocedures )
+                        {
+                          my $halfdiff = ( ( $el - ( 1 - $improvedguess ) ) / 4 );
+                          $newshadingvalue = ( $el - $halfdiff );
+                        }
+                        elsif ( "halved125" ~~ @calcprocedures )
+                        {
+                          my $halfdiff = ( ( $el - ( 1 - $improvedguess ) ) / 8 );
+                          $newshadingvalue = ( $el - $halfdiff );
+                        }
+                        elsif ( "halved375" ~~ @calcprocedures )
+                        {
+                          my $halfdiff = ( ( $el - ( 1 - $improvedguess ) )  / ( 3 / 8 ) );
+                          $newshadingvalue = ( $el - $halfdiff );
+                        }
+                        elsif ( "halved0675" ~~ @calcprocedures )
+                        {
+                          my $halfdiff = ( ( $el - ( 1 - $improvedguess ) )  / 16 );
                           $newshadingvalue = ( $el - $halfdiff );
                         }
                       }
@@ -2892,41 +2941,27 @@ sub creatematdbfiles
 
   my @blackcopy;
   my @tempcopy = @newcopy;
-  my $flagthis = 0;
   foreach my $line ( @tempcopy )
   {
-  	if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
-  	{ $flagthis == 1; }
-  	
-	if ( $line =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
-	{
-	  if ( $flagthis = 1 )
-      {
-	    my $absout = "0.990";
-	    my $absin = "0.990";
-	    $line = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
-	  }
-	}
+    if ( $line =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+    {
+      my $absout = "0.990";
+      my $absin = "0.990";
+      $line = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+    }
     push ( @blackcopy, $line );
   }
 
   my @blackloop;
   my @secondtemploop = @firstloop;
-  my $flagthat = 0;
   foreach ( @secondtemploop )
   {
-  	if ( ( $line =~ /class,/ ) and ( $line =~ /,Fictitious/ ) )
-  	{ $flagthat = 1; }
-
-	if ( $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
-	{
-      if ( $flagthat == 1 )
-      {
-	    my $absout = "0.990";
-	    my $absin = "0.990";
-	    $_ = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
-	  }
-	}
+    if ( $_ =~ /(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),-/ )
+    {
+      my $absout = "0.990";
+      my $absin = "0.990";
+      $_ = "$1,$2,$3,$4,$5,$absout,$absin,$8,$9,-\n";
+    }
     push ( @blackloop, $_ );
   }
 
@@ -2949,7 +2984,6 @@ sub creatematdbfiles
   close MATDBFILE_F2;
   return ( \%exportrefl );
 }
-
 
 sub creatematdbfiles__
 {  # THIS MANAGES THE CREATION OF THE TWO FICTITIOUS MATERIALS DATABASES.
@@ -3109,8 +3143,65 @@ sub creatematdbfiles__
   return ( \%exportrefl );
 }
 
+sub adjust_radmatfile1
+{ # THIS MODIFIES THE RADIANCE MATERIAL FOR ADDING A SPECULAR FRACTION AND ROUGHNESS
+  my ( $conffile, $path, $specularratios_ref, $calcprocedures_ref ) = @_;
+    say REPORT "IN ADJUST_RADMATFILE1: \$exportconstrref\: " . dump($exportconstrref);   say REPORT "\$exportreflref\: " . dump($exportreflref);
+    say REPORT "\$conffile\: " . dump($conffile);   say REPORT "\$path\: " . dump($path);
+  my %exportconstr = %$exportconstrref;
+  my %exportrefl = %$exportreflref;
+  my $radmat_f1 = $conffile;
+  my %specularratios = %$specularratios_ref;
+  my @calcprocedures = @$calcprocedures_ref;
 
 
+  my ( $roughnval, $roughnroughval, $specval, $specroughval );
+  if ( "besides" ~~ @calcprocedures )
+  { 
+    $roughnval = $specularratios{roughnval}; ######################################## FINISH THIS
+    $roughnroughval = $specularratios{roughnroughval}; ######################################## FINISH THIS 
+    $specval = $specularratios{specval}; ######################################## FINISH THIS
+    $specroughval = $specularratios{specroughval}; ######################################## FINISH THIS
+  }
+
+  $radmat_f1 =~ s/$path\/cfg\///;
+  $radmat_f1 =~ s/.cfg//;
+  $radmat_f1 = $radmat_f1 . "_Extern.mat";
+  $radmat_f1 = "$path/rad/$radmat_f1";
+  my $radmattemp = $radmat_f1 . ".temp";
+  `mv -f $radmat_f1 $radmattemp`;
+  open( RADMATTEMP, "$radmattemp" ) or die;
+  my @lines = <RADMATTEMP>;
+  close RADMATTEMP;
+  open( RADMAT_F1, ">$radmat_f1" ) or die;
+  my $count = 0;
+  my @constrs = keys %exportconstr;    say REPORT "\@constrs\: " . dump(@constrs);
+  foreach ( @lines )
+  {
+    if ( $_ =~ /# External MLC Colours.../ )
+    {
+      if ( "extra" ~~ @calcprocedures )
+      {
+        my $lin = $lines[ $count + 4 ];
+        my @arr = split( /\s+/, $lin );
+        $lines[ $count + 4 ] = "5  $arr[1] $arr[2] $arr[3] $specroughval $roughnroughval \n";
+      }
+    }
+
+    if ( $_ =~ /# Internal MLC Colours.../ )
+    {
+      if ( "extra" ~~ @calcprocedures )
+      {
+        my $lin = $lines[ $count + 4 ];
+        my @arr = split(/\s+/, $lin );
+        $lines[ $count + 4 ] = "5  $arr[1] $arr[2] $arr[3] $specroughval $roughnroughval \n";
+      }
+    }
+    print RADMAT_F1 $lines[ $count ];
+    $count++;
+  }
+  close RADMAT_F1;
+}
 
 sub adjust_radmatfile
 { # THIS CHECKS IF THE RADIANCE MATERIAL FILE HAS BEEN PROPERLY MODIFIED. IF NOT, IT DOES THE MODIFICATION BY ITSELF.
@@ -3122,6 +3213,18 @@ sub adjust_radmatfile
   my $radmat_f2 = $conffile;
   my %specularratios = %$specularratios_ref;
   my @calcprocedures = @$calcprocedures_ref;
+
+
+  my ( $roughnval, $roughnroughval, $specval, $specroughval );
+  
+  if ( "besides" ~~ @calcprocedures )
+  { 
+    $roughnval = $specularratios{roughnval}; ######################################## FINISH THIS
+    $roughnroughval = $specularratios{roughnroughval}; ######################################## FINISH THIS 
+    $specval = $specularratios{specval}; ######################################## FINISH THIS
+    $specroughval = $specularratios{specroughval}; ######################################## FINISH THIS
+  }
+
   $radmat_f2 =~ s/$path\/cfg\///;
   $radmat_f2 =~ s/.cfg//;
   $radmat_f2 = $radmat_f2 . "_Extern.mat";
@@ -3138,6 +3241,13 @@ sub adjust_radmatfile
   {
     if ( $_ =~ /# External MLC Colours.../ )
     {
+      if ( "extra" ~~ @calcprocedures )
+      {
+        my $lin = $lines[ $count + 4 ];
+        my @arr = split(/\s+/, $lin );
+        $lines[ $count + 4 ] = "5  $arr[1] $arr[2] $arr[3] $specroughval $roughnroughval \n";
+      }
+
       foreach ( @constrs )
       {
         my $constrout = "rc_ex_" . $_;
@@ -3148,18 +3258,8 @@ sub adjust_radmatfile
           my $refl = ( 1 - $absextext );   say REPORT "\$refl EXT\ " . dump( $refl );
           $refl = sprintf( "%.2f", $refl );   say REPORT "\$refl\ " . dump( $refl ); # %refl is the diffuse reflectivity
 
-          my $specrefl;
-          if ( not ( $specularratios{undefined__} eq "undefined__" ) )
-          {
-            $specrefl = $refl * $specularratios{$constrout}; # $specrefl is the specular reflectivity
-            $specrefl = sprintf( "%.2f", $specrefl );   say REPORT "\$specrefl\ " . dump( $specrefl );
-          }
-          else
-          {
-            $specrefl = $refl;
-          }
 
-          $lines[ $count + 4 ] =~ /5  (\d+) (\d+) (\d+) (\d+) (\d+)/ ;
+          #$lines[ $count + 4 ] =~ /5  (\d+) (\d+) (\d+) (\d+) (\d+)/ ;
           
 
           if ( ( $stickto eq "diffuse" ) or ( "spreaddiff" ~~ @calcprocedures ) )
@@ -3168,17 +3268,31 @@ sub adjust_radmatfile
           }
           elsif ( $stickto eq "direct" )
           {
-             $lines[ $count + 4 ] = "5  0 0 0 $specrefl 0\n";
+             $lines[ $count + 4 ] = "5  0 0 0 $specval 0\n";
           }
           else
           {
-          	$lines[ $count + 4 ] = "5  $refl $refl $refl $specrefl 0\n";
+            unless ( "besides" ~~ @calcprocedures )
+            {
+              $lines[ $count + 4 ] = "5  $refl $refl $refl 0 0 \n";
+            }
+            else
+            {
+              $lines[ $count + 4 ] = "5  $refl $refl $refl $specval $roughnval \n";
+            }
           }
         }
       }
     }
     if ( $_ =~ /# Internal MLC Colours.../ )
     {
+      if ( "extra" ~~ @calcprocedures )
+      {
+        my $lin = $lines[ $count + 4 ];
+        my @arr = split(/\s+/, $lin );
+        $lines[ $count + 4 ] = "5  $arr[1] $arr[2] $arr[3] $specroughval $roughnroughval \n";
+      }
+
       foreach ( @constrs )
       {
         my $constrin = "rc_in_" . $_;
@@ -3189,18 +3303,7 @@ sub adjust_radmatfile
           my $refl = 1 - $absintint;   say REPORT "\$refl INT\ " . dump( $refl );
           $refl = sprintf( "%.2f", $refl );    say REPORT "\$refl INT\ " . dump( $refl );
 
-          my $specrefl;
-          if ( not ( $specularratios{undefined__} eq "undefined__" ) )
-          {
-            $specrefl = $refl * $specularratios{$constrin}; # $specrefl is the specular reflectivity
-            $specrefl = sprintf( "%.2f", $specrefl );   say REPORT "\$specrefl\ " . dump( $specrefl );
-          }
-          else
-          {
-            $specrefl = $refl;
-          }
-
-          $lines[ $count + 4 ] =~ /5  (\d+) (\d+) (\d+) (\d+) (\d+)/ ;
+          #$lines[ $count + 4 ] =~ /5  (\d+) (\d+) (\d+) (\d+) (\d+)/ ;
 
           if ( $stickto eq "diffuse" )
           {
@@ -3208,11 +3311,18 @@ sub adjust_radmatfile
           }
           elsif ( $stickto eq "direct" )
           {
-             $lines[ $count + 4 ] = "5  0 0 0 $specrefl 0\n";
+             $lines[ $count + 4 ] = "5  0 0 0 $specval 0\n";
           }
           else
           {
-          	$lines[ $count + 4 ] = "5  $refl $refl $refl $specrefl 0\n";
+            unless ( "besides" ~~ @calcprocedures )
+            {
+              $lines[ $count + 4 ] = "5  $refl $refl $refl 0 0 \n";
+            }
+            else
+            {
+              $lines[ $count + 4 ] = "5  $refl $refl $refl $specval $roughnval \n";
+            }
           }
         }
       }

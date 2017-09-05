@@ -25,7 +25,7 @@ my $exefiles = [qw(
 
 WriteMakefile(
     'NAME'              => 'App::DistSync',
-    'MIN_PERL_VERSION'  => 5.008001,
+    'MIN_PERL_VERSION'  => 5.012001,
     'VERSION_FROM'      => 'lib/App/DistSync.pm',
     'ABSTRACT_FROM'     => 'lib/App/DistSync.pm',
     'BUILD_REQUIRES'    => $build_requires,

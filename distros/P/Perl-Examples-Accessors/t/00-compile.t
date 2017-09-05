@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perl/Examples/Accessors.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'Perl/Examples/Accessors/ClassAccessor.pm',
     'Perl/Examples/Accessors/ClassAccessorArray.pm',
     'Perl/Examples/Accessors/ClassAccessorArrayGlob.pm',
+    'Perl/Examples/Accessors/ClassAccessorPackedString.pm',
     'Perl/Examples/Accessors/ClassInsideOut.pm',
     'Perl/Examples/Accessors/ClassStruct.pm',
     'Perl/Examples/Accessors/ClassTiny.pm',

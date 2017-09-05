@@ -1,4 +1,10 @@
 Revision history for Perl extension Libssh.
 
+0.3 2017-08-31
+  - add sftp function: unlink, open/write/close file, list_dir
+  - add ssh function: ssh_userauth_gssapi
+  - add the capability to send input in a ssh channel
+  - Fix issue when we close a channel
+
 0.1 2015-01-02
   - initial version

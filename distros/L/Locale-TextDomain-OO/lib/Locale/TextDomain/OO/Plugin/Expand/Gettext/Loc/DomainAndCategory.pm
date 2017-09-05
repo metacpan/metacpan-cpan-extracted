@@ -2,220 +2,168 @@ package Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc::DomainAndCategory;
 
 use strict;
 use warnings;
-use Carp qw(confess cluck);
 use Locale::Utils::PlaceholderNamed;
 use Moo::Role;
 
-our $VERSION = '1.027';
+our $VERSION = '1.030';
 
 with qw(
     Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc
+    Locale::TextDomain::OO::Role::DomainAndCategory
 );
 
 requires qw(
-    category
-    domain
+    loc_x
+    loc_nx
+    loc_px
+    loc_npx
+
+    begin_c
+    begin_d
+    begin_dc
+    callback_scope
+    end_c
+    end_d
+    end_dc
 );
-
-has _shadow_domains => (
-    is      => 'rw',
-    default => sub { [] },
-);
-
-has _shadow_categories => (
-    is      => 'rw',
-    default => sub { [] },
-);
-
-sub loc_begin_d {
-    my ($self, $domain) = @_;
-
-    defined $domain
-        or confess 'Domain is not defined';
-    push
-        @{ $self->_shadow_domains },
-        $self->domain;
-    $self->domain($domain);
-
-    return $self;
-}
-
-sub loc_begin_c {
-    my ($self, $category) = @_;
-
-    defined $category
-        or confess 'Category is not defined';
-    push
-        @{ $self->_shadow_categories },
-        $self->category;
-    $self->category($category);
-
-    return $self;
-}
-
-sub loc_begin_dc {
-    my ($self, $domain, $category) = @_;
-
-    $self->loc_begin_d($domain);
-    $self->loc_begin_c($category);
-
-    return $self;
-}
-
-sub loc_end_d {
-    my $self = shift;
-
-    if ( ! @{ $self->_shadow_domains } ) {
-        cluck 'Tried to get the domain from stack but no domain is not stored';
-        return $self;
-    }
-    $self->domain( pop @{ $self->_shadow_domains } );
-
-    return $self;
-}
-
-sub loc_end_c {
-    my $self = shift;
-
-    if ( ! @{ $self->_shadow_categories } ) {
-        cluck 'Tried to get the category from stack but no category is stored',
-        return $self;
-    }
-    $self->category( pop @{ $self->_shadow_categories } );
-
-    return $self;
-}
-
-sub loc_end_dc {
-    my $self = shift;
-
-    $self->loc_end_d;
-    $self->loc_end_c;
-
-    return $self;
-}
 
 sub loc_dx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_x(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            return $self->loc_x(@more);
+        },
+    );
 }
 
 sub loc_cx {
     my ($self, @more) = @_;
 
-    $self->loc_begin_c( splice @more, 1, 1 );
-    my $translation = $self->loc_x(@more);
-    $self->loc_end_c;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_c( splice @more, 1, 1 );
+            return $self->loc_x(@more);
+        },
+    );
 }
 
 sub loc_dcx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_cx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            $self->begin_c( splice @more, 1, 1 );
+            return $self->loc_x(@more);
+        },
+    );
 }
 
 sub loc_dnx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_nx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            return $self->loc_nx(@more);
+        },
+    );
 }
 
 sub loc_cnx {
     my ( $self, @more ) = @_;
 
-    $self->loc_begin_c( splice @more, 3, 1 ); ## no critic (MagicNumbers)
-    my $translation = $self->loc_nx(@more);
-    $self->loc_end_c;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_c( splice @more, 3, 1 ); ## no critic (MagicNumbers)
+            return $self->loc_nx(@more);
+        },
+    );
 }
 
 sub loc_dcnx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_cnx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            $self->begin_c( splice @more, 3, 1 ); ## no critic (MagicNumbers)
+            return $self->loc_nx(@more);
+        },
+    );
 }
 
 sub loc_dpx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_px(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            return $self->loc_px(@more);
+        },
+    );
 }
 
 sub loc_cpx {
     my ( $self, @more ) = @_;
 
-    $self->loc_begin_c( splice @more, 2, 1 );
-    my $translation = $self->loc_px(@more);
-    $self->loc_end_c;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_c( splice @more, 2, 1 );
+            return $self->loc_px(@more);
+        },
+    );
 }
 
 sub loc_dcpx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_cpx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            $self->begin_c( splice @more, 2, 1 );
+            return $self->loc_px(@more);
+        },
+    );
 }
 
 sub loc_dnpx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_npx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            return $self->loc_npx(@more);
+        },
+    );
 }
 
 sub loc_cnpx {
     my ($self, @more) = @_;
 
-    $self->loc_begin_c( splice @more, 4, 1 ); ## no critic (MagicNumbers)
-    my $translation = $self->loc_npx(@more);
-    $self->loc_end_c;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_c( splice @more, 4, 1 ); ## no critic (MagicNumbers)
+            return $self->loc_npx(@more);
+        },
+    );
 }
 
 sub loc_dcnpx {
     my ( $self, $domain, @more ) = @_;
 
-    $self->loc_begin_d($domain);
-    my $translation = $self->loc_cnpx(@more);
-    $self->loc_end_d;
-
-    return $translation;
+    return $self->callback_scope(
+        sub {
+            $self->begin_d($domain);
+            $self->begin_c( splice @more, 4, 1 ); ## no critic (MagicNumbers)
+            return $self->loc_npx(@more);
+        },
+    );
 }
 
-BEGIN {
+{
     no warnings qw(redefine); ## no critic (NoWarnings)
 
     # Dummy methods for string marking.
@@ -223,6 +171,14 @@ BEGIN {
         my (undef, @more) = @_;
         return wantarray ? @more : $more[0];
     };
+
+    *loc_begin_c  = \&begin_c;
+    *loc_begin_d  = \&begin_d;
+    *loc_begin_dc = \&begin_dc;
+
+    *loc_end_c  = \&end_c;
+    *loc_end_d  = \&end_d;
+    *loc_end_dc = \&end_dc;
 
     *loc_d   = \&loc_dx;
     *loc_dn  = \&loc_dnx;
@@ -284,7 +240,7 @@ $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk
 
 =head1 VERSION
 
-1.027
+1.030
 
 =head1 DESCRIPTION
 
@@ -394,9 +350,7 @@ Run this *.pl files.
 
 =head1 DIAGNOSTICS
 
-confess
-
-cluck
+nothing
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -404,13 +358,13 @@ none
 
 =head1 DEPENDENCIES
 
-L<Carp|Carp>
-
 L<Locale::Utils::PlaceholderNamed|Locale::Utils::PlaceholderNamed>
 
 L<Moo::Role|Moo::Role>
 
 L<Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc|Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc>
+
+L<Locale::TextDomain::OO::Role::DomainAndCategory|Locale::TextDomain::OO::Role::DomainAndCategory>
 
 =head1 INCOMPATIBILITIES
 

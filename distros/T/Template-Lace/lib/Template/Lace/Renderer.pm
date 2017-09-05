@@ -61,30 +61,29 @@ sub process_components {
     next unless $constructed_components{$id};
     my $processed_component = $constructed_components{$id}->get_processed_dom;
 
-=head1 comment
+#=head1 comment
 
     # Move all the scripts, styles and links to the head area
     # TODO this probably doesn't work if the stuff is in a component
     # inside a component.
     $processed_component->find('link:not(head link)')->each(sub {
+        return unless $_->attr('id') || $_->attr('href');
         $dom->append_link_uniquely($_);
         $_->remove;
-    });
+    }); # href
     $processed_component->find('style:not(head style)')->each(sub {
-        my $content = $_->content || '';
+        return unless $_->attr('id');
         $dom->append_style_uniquely($_);
         $_->remove;
-    });
+    }); #id
     $processed_component->find('script:not(head script)')->each(sub {
         my ($e, $num) = @_;
-        my $content = $dom->content || '';
-                warn "moving $e to $dom";
-
+        return unless $e->attr('id') || $e->attr('src');
         $dom->append_script_uniquely($e);
         $_->remove;
-    });
+    }); #id or src
 
-=cut
+#=cut
 
     $dom->at("[uuid='$id']")->replace($processed_component);
   }

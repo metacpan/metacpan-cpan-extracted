@@ -1,4 +1,4 @@
-package App::DistSync; # $Id: DistSync.pm 23 2017-05-08 13:44:30Z abalama $
+package App::DistSync; # $Id: DistSync.pm 25 2017-08-29 09:21:01Z abalama $
 use strict;
 
 =head1 NAME
@@ -7,7 +7,7 @@ App::DistSync - Utility synchronization of the mirror distribution-sites
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ See C<LICENSE> file
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 use Carp;
 use File::Basename;

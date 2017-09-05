@@ -1,3 +1,11 @@
+1.01    2017-08-31
+
+  - Huzzah!  DBD::Multi has been an official DBD library recognized by DBI since December 2014.
+  - Added public support for multi_do_all()
+  - Replaced Module::Install with Module::Build.
+  - Update meta information to point to github.
+  - Update documentation.
+
 0.18    2013-04-09
 
   - Added get_info() patch from Jon Isbell (RT #84240)

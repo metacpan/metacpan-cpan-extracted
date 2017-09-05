@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.106';
+$Config::Model::BackendMgr::VERSION = '2.108';
 use Mouse;
 use strict;
 use warnings;
@@ -139,7 +139,7 @@ sub get_cfg_file_path {
         return ( $dir_ok, $res );
     }
 
-    if ( not defined $args{suffix} ) {
+    if ( not defined $args{suffix} or not $args{suffix} ) {
         $logger->trace("get_cfg_file_path: returns undef (no suffix, no file argument)");
         return (0);
     }
@@ -384,7 +384,7 @@ sub try_read_backend {
     my ( $res, $file_path, $error );
 
     if ( $backend eq 'custom' ) {
-        #$logger->warn("custom read/write backend is deprecated. Please replace with a backend inheriting Config::Model::Backend::Any");
+        warn("custom read/write backend is deprecated. Please replace with a backend inheriting Config::Model::Backend::Any\n");
         my $c = my $file = delete $read->{class};
         $file =~ s!::!/!g;
         my $f = delete $read->{function} || 'read';
@@ -818,7 +818,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.106
+version 2.108
 
 =head1 SYNOPSIS
 
@@ -923,9 +923,10 @@ for details on the data structure.
 
 =item * 
 
-C<custom>: specifies a dedicated class and function to read and load the
-configuration tree. This is provided for backward compatibility and
-should not be used for new projects.
+C<custom>: specifies a dedicated class and function to read and load
+the configuration tree. This backend is now deprecated. See
+L<Config::Model::Backend::Any/Replacing a custom backend>
+for instructions to migrate to a class based on C<Config::Model::Backend::Any>
 
 =back
 

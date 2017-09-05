@@ -12,7 +12,7 @@ use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
 use JSON::Create '0.22', 'create_json';
 use JSON::Parse '0.42', 'parse_json';
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
@@ -49,8 +49,6 @@ sub symbols
 {
     # Object and the table of symbols.
     my ($o, $s, %options) = @_;
-    # Debugging output switch.
-    my $verbose;
     if ($options{verbose}) {
 	$o->{verbose} = 1;
     }
@@ -165,9 +163,14 @@ sub symbols
 	# picking them out.
 
 	for my $i (0..$size - 1) {
-	    my $min = 'inf';
+	    # This method is from
+	    # https://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl/1185828#1185828
+
+	    # inf doesn't work on some versions of Perl, see
+	    # http://www.cpantesters.org/cpan/report/314e30b0-6bfb-1014-8e6c-c1e3e4f7669d
+	    my $min = 9**9**9;
 	    my $minkey;
-	    for my $k (keys %c) {
+	    for my $k (sort keys %c) {
 		if ($c{$k} < $min) {
 		    $min = $c{$k};
 		    $minkey = $k;
@@ -181,7 +184,6 @@ sub symbols
 	    push @keys, $minkey;
 	    $h{$minkey} = $i;
 	}
-#	my @keys = sort {$c{$a} <=> $c{$b}} keys %c;
 	# The total weight of this table.
 	# The next table
 	my @huff;

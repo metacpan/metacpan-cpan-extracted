@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Fri Sep 16 18:38:45 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jan 31 12:03:31 2017
-# Update Count    : 322
+# Last Modified On: Thu Aug 31 09:57:36 2017
+# Update Count    : 331
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -31,9 +31,9 @@ sub libfile {
     my ($f) = @_;
 
     unless ( $lib ) {
-	# Cava.
-	if ( $Cava::Packager::PACKAGED ) {
-	    return Cava::Packager::GetResourcePath()."/$f";
+	# Packaged.
+	if ( $App::Packager::PACKAGED ) {
+	    return App::Packager::GetResourcePath()."/$f";
 	}
 	else {
 	    $lib = $INC{"EB.pm"};
@@ -44,7 +44,7 @@ sub libfile {
 }
 
 sub findlib {
-    my ($file, $section) = @_;
+    my ( $file, $section ) = @_;
 
     # The two-argument form supports locale-dependent paths, but
     # we hard-wire this to 'nl'.
@@ -57,18 +57,18 @@ sub findlib {
 	return undef;
     }
 
-    # Cava.
-    if ( $Cava::Packager::PACKAGED ) {
-	my $found = Cava::Packager::GetUserFile($file);
+    # Packaged.
+    if ( $App::Packager::PACKAGED ) {
+	my $found = App::Packager::GetUserFile($file);
 	return $found if -e $found;
-	$found = Cava::Packager::GetResource($file);
+	$found = App::Packager::GetResource($file);
 	return $found if -e $found;
     }
 
     foreach ( @INC ) {
 	return "$_/EB/user/$file" if -e "$_/EB/user/$file";
-	return "$_/EB/res/$file" if -e "$_/EB/res/$file";
-	return "$_/EB/$file" if -e "$_/EB/$file";
+	return "$_/EB/res/$file"  if -e "$_/EB/res/$file";
+	return "$_/EB/$file"      if -e "$_/EB/$file";
     }
     undef;
 }
@@ -79,8 +79,10 @@ use lib ( grep { defined } findlib("CPAN") );
 use EB::Globals;
 use Carp;
 use Data::Dumper;
-use Carp::Assert;
 use EB::Utils;
+
+# We need a glob() that deals with spaces.
+use File::Glob ( $] >= 5.016 ? ":bsd_glob" : ":glob" );
 
 # Even though we do not use translations, most of the code is in place.
 sub _T { $_[0] }
@@ -88,11 +90,11 @@ sub _T { $_[0] }
 # Export our and the imported globals.
 @EXPORT = ( @EB::Globals::EXPORT,
 	    @EB::Utils::EXPORT,
-	    "_T",			# @EB::Locale::EXPORT,
-	    qw(carp croak),		# Carp
+	    "_T",
+	    qw(carp croak confess),	# Carp
+	    qw(glob),			# File::Glob
 	    qw(Dumper),			# Data::Dumper
 	    qw(findlib libfile),	# <self>
-	    qw(assert affirm),		# Carp::Assert
 	  );
 
 our $ident;
@@ -168,10 +170,6 @@ EekBoek is a bookkeeping package for small and medium-size businesses.
 Unlike other accounting software, EekBoek has both a command-line
 interface (CLI) and a graphical user-interface (GUI). Furthermore, it
 has a complete Perl API to create your own custom applications.
-
-EekBoek is designed for the Dutch/European market and currently
-available in Dutch only. An English translation is in the works (help
-appreciated).
 
 =head1 DESCRIPTION
 

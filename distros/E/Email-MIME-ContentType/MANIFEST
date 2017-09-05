@@ -11,5 +11,6 @@ lib/Email/MIME/ContentType.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/1.t
+t/parse_content_disposition.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

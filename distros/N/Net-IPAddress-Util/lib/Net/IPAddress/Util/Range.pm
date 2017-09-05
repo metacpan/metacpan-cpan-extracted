@@ -178,7 +178,7 @@ Net::IPAddress::Util::Range - Representation of a range of IP addresses
 
 =head1 VERSION
 
-Version 3.031
+Version 3.033
 
 =head1 SYNOPSIS
 

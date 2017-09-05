@@ -1,5 +1,8 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.2.2 2017-09-04T06:24:54Z
+    - Die when git workspace is dirty
+
 v0.2.1 2017-06-12T09:51:59Z
     - diff with origin/master instead of master
 

@@ -8,7 +8,7 @@ use base qw( Exporter );
 BEGIN {
 
 # ABSTRACT: Implementation of getppid() for windows
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
   if($^O =~ /^(cygwin|MSWin32|msys)$/)
   {
@@ -33,7 +33,7 @@ elsif($^O =~ /^(cygwin|msys)$/)
 else
 {
   @EXPORT_OK = qw( getppid );
-  if(eval q{ require 5.016 })
+  if($] >= 5.016)
   {
     *getppid = \&CORE::getppid;
   }
@@ -62,7 +62,7 @@ Win32::Getppid - Implementation of getppid() for windows
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

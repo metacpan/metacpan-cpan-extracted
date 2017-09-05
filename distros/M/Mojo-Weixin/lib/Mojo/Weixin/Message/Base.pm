@@ -47,6 +47,7 @@ sub to_json_hash{
             $json->{sender_uid} = $self->sender->uid;
             $json->{sender_name} = $self->sender->name;
             $json->{sender_markname} = $self->sender->markname;
+            $json->{sender_category} = $self->sender->category if $self->sender->type eq 'friend';
         }
         elsif($key eq "receiver"){
             next if $self->type eq 'group_message' and $self->class eq 'send';
@@ -75,6 +76,7 @@ sub to_json_hash{
 
 sub is_at{
     my $self = shift;
+    return if not $self->content;
     my $object;
     my $displayname;
     if($self->class eq "recv"){
@@ -91,6 +93,7 @@ sub is_at{
             $displayname = $object->displayname;
         }
     }
+    return if not $displayname;
     return $self->content =~/\@\Q$displayname\E( |"\xe2\x80\x85"|)/;
 }
 

@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Carp;
+use Storable;
+use MIME::Base64 ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub isProxyRef {
     my ($pkg) = @_;
@@ -21,18 +23,20 @@ sub handle {
 }
 
 sub serialize {
-    local $Data::Dumper::Useqq = 1;
-    local $Data::Dumper::Indent = 0;
-    local $Data::Dumper::Purity = 1;
-    my $dump = Data::Dumper::Dumper( $_[0] );
-    chomp($dump);
-    return $dump;
+    return MIME::Base64::encode_base64( 
+	Storable::freeze( $_[0] ), "");
 }
 
 sub deserialize {
-    my $VAR1;
-    eval $_[0];
-    $VAR1;
+    if ($Patro::SERVER_VERSION && $Patro::SERVER_VERSION <= 0.10) {
+	# Data::Dumper was used before v0.11
+	my $VAR1;
+	eval $_[0];
+	$VAR1;
+    } else {
+	return Storable::thaw(
+	    MIME::Base64::decode_base64($_[0]));
+    }
 }
 
 # return a Patro::N1 or Patro::N2 object appropriate for the
@@ -68,7 +72,8 @@ sub getproxy {
 	return bless \$proxy, 'Patro::N1';
     }
 
-    if ($proxy->{reftype} eq 'CODE') {
+    if ($proxy->{reftype} eq 'CODE' ||
+	$proxy->{reftype} eq 'CODE*') {
 	require Patro::N3;
 	$proxy->{sub} = sub {
 	    return proxy_request( $proxy,
@@ -104,7 +109,6 @@ sub proxy_request {
 	foreach my $arg (@{$request->{args}}) {
 	    if (isProxyRef(ref($arg))) {
 		my $id = handle($arg)->{id};
-#		::xdiag("client: arg $id as .Patroon");
 		$arg = bless \$id, '.Patroon';
 	    }
 	}

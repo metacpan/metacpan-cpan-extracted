@@ -2,7 +2,7 @@ package Catmandu::Fix::Condition::exists;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0602';
+our $VERSION = '1.0603';
 
 use Moo;
 use namespace::clean;
@@ -27,7 +27,7 @@ sub emit {
             if ($key eq '$first' || $key eq '$last') {
                 $perl .= "is_array_ref(${var}) && \@{${var}}";
             }
-            elsif ($key =~ /^\d+$/) {
+            elsif ($key =~ /^[0-9]+$/) {
                 $perl
                     .= "is_hash_ref(${var}) && exists(${var}->{${str_key}}) || is_array_ref(${var}) && \@{${var}} > ${key}";
             }

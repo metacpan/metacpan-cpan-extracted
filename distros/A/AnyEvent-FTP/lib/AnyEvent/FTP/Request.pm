@@ -6,7 +6,7 @@ use 5.010;
 use overload '""' => sub { shift->as_string };
 
 # ABSTRACT: Request class for asynchronous ftp server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub new
@@ -45,7 +45,7 @@ AnyEvent::FTP::Request - Request class for asynchronous ftp server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 DESCRIPTION
 
@@ -53,21 +53,30 @@ Instances of this class represent client requests.
 
 =head1 ATTRIBUTES
 
-=head2 $req-E<gt>command
+=head2 command
+
+ my $command = $req->command;
 
 The command, usually something like C<USER>, C<PASS>, C<HELP>, etc.
 
-=head2 $res-E<gt>args
+=head2 args
+
+ my $args = $res->args;
 
 The arguments passed in with the command
 
-=head2 $res-E<gt>raw
+=head2 raw
+
+ my $raw = $res->raw;
 
 The raw, unparsed request.
 
 =head1 METHODS
 
-=head2 $res-E<gt>as_string
+=head2 as_string
+
+ my $str = $res->as_string
+ my $str = "$res";
 
 Returns a string representation of the request.  This may not be exactly the same as
 what was actually sent to the server (see C<raw> attribute for that).  You can also

@@ -13,7 +13,7 @@ SKIP: {
 		plan skip_all => "No gpg found in PATH";
 	}
 
-	plan tests => 5;
+	plan tests => 10;
 
 	use_ok ("Mail::GPG::Test");
 
@@ -31,5 +31,10 @@ SKIP: {
 
 	ok ($key_id eq $test->get_key_id, "Key ID retrieved");
 
-	$test->big_test ( mg => $mg );
+    $test->big_test ( mg => $mg, chunks =>  10_000 );
+    $test->big_test ( mg => $mg, chunks =>  50_000 );
+    $test->big_test ( mg => $mg, chunks => 150_000 );
+    $test->big_test ( mg => $mg, chunks => 200_000 );
+    $test->big_test ( mg => $mg, chunks => 400_000 );
+    $test->big_test ( mg => $mg, chunks => 900_000 );
 }

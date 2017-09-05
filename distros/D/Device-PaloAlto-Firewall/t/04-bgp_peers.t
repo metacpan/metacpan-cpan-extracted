@@ -11,7 +11,7 @@ use Data::Dumper;
 
 use Device::PaloAlto::Firewall;
 
-plan tests => 11;
+plan tests => 12;
 
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test', debug => 1);
 my $test = $fw->tester();
@@ -25,7 +25,9 @@ dies_ok { $fw->bgp_peers(rtr => 'default') } 'Incorrect parameter dies';
 dies_ok { $test->bgp_peers_up() } 'Not specifying \'peer_ips =>\' dies';
 
 ### Tests when the firewall is not configured with BGP ###
-ok( !$fw->bgp_peers(), "bgp_peers() with no configured BGP" );
+isa_ok( $fw->bgp_peers(), 'ARRAY', "No BGP peers configured returns ARRAYREF" );
+is_deeply( $fw->bgp_peers(), [] , "No BGP peers configured returns an empty ARRAYREF" );
+
 ok( !$test->bgp_peers_up(peer_ips => ['192.168.122.30']), 'No configured BGP');
 
 

@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla" => 0,
     "Dist::Zilla::Plugin::Authority" => "1.009",
     "Dist::Zilla::Plugin::AutoPrereqs" => 0,
+    "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic" => 0,
     "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
     "Dist::Zilla::Plugin::CPANFile" => 0,
     "Dist::Zilla::Plugin::CheckChangesHasContent" => 0,
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,6 +95,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla" => 0,
   "Dist::Zilla::Plugin::Authority" => "1.009",
   "Dist::Zilla::Plugin::AutoPrereqs" => 0,
+  "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic" => 0,
   "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
   "Dist::Zilla::Plugin::CPANFile" => 0,
   "Dist::Zilla::Plugin::CheckChangesHasContent" => 0,

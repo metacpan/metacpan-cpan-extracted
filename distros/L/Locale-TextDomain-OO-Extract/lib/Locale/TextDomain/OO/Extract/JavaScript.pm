@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.007';
+our $VERSION = '2.011';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -14,6 +14,42 @@ extends qw(
 with qw(
     Locale::TextDomain::OO::Extract::Role::File
 );
+
+has filter => (
+    is      => 'rw',
+    isa     => ArrayRef[Str],
+    lazy    => 1,
+    default => sub {[ 'all' ]},
+);
+
+sub _filtered_start_rule {
+    my $self = shift;
+
+    my %filter_of = map { $_ => 1 } @{ $self->filter };
+    my $list_if = sub {
+        my ( $key, @list ) = @_;
+        my $condition
+            = $filter_of{all} && ! $filter_of{"!$key"}
+            || ! $filter_of{'!all'} && $filter_of{$key};
+        return $condition ? @list : ();
+    };
+    my $with_bracket = join "\n| ", (
+        $list_if->('Gettext',                           '__? n? p? x?',
+                                                        'n? p? gettext'),
+        $list_if->('Gettext::DomainAndCategory',        '__? d? c? n? p? x?',
+                                                        'd? c? n? p? gettext'),
+        $list_if->('Gettext::Loc',                      'loc_ n? p? x?'),
+        $list_if->('Gettext::Loc::DomainAndCategory',   'loc_ d? c? n? p? x?'),
+        $list_if->('BabelFish::Loc',                    'loc_b p?'),
+        $list_if->('BabelFish::Loc::DomainAndCategory', 'loc_b d? c? p?'),
+    );
+    $with_bracket ||= '(?!)';
+
+    return qr{
+        \b N?
+        (?: $with_bracket ) \s* [(]
+    }xms;
+}
 
 my $category_rule
     = my $context_rule
@@ -49,17 +85,6 @@ my $category_rule
 my $comma_rule = qr{ \s* [,] }xms;
 my $count_rule = qr{ \s* ( [^,)]+ ) }xms;
 my $close_rule = qr{ \s* [,]? \s* ( [^)]* ) [)] }xms;
-
-my $start_rule = qr{
-    \b N?
-    (?:
-        # Gettext::Loc, Gettext
-        (?: loc_ | __? ) d? c? n? p? x?
-        # Gettext
-        | d? c? n? p? gettext
-    )
-    \s* [(]
-}xms;
 
 my $rules = [
     # loc_, _, __
@@ -389,7 +414,7 @@ my $rules = [
         'end',
     ],
 
-    # babelfish loc_b
+    # loc_b... (BabelFish)
     'or',
     [
         'begin',
@@ -855,7 +880,7 @@ sub stack_item_mapping {
 sub extract {
     my $self = shift;
 
-    $self->start_rule($start_rule);
+    $self->start_rule( $self->_filtered_start_rule );
     $self->rules($rules);
     $self->preprocess;
     $self->SUPER::extract;
@@ -876,20 +901,21 @@ __END__
 Locale::TextDomain::OO::Extract::JavaScript
 - Extracts internationalization data from JavaScript code
 
-$Id: JavaScript.pm 683 2017-08-22 18:41:42Z steffenw $
+$Id: JavaScript.pm 693 2017-09-02 09:20:30Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/JavaScript.pm $
 
 =head1 VERSION
 
-2.007
+2.011
 
 =head1 DESCRIPTION
 
 This module extracts internationalization data from JavaScript code.
 
-Implemented Rules:
+Implemented rules:
 
+ # Gettext::Loc
  loc_('...
  loc_x('...
  loc_n('...
@@ -899,6 +925,7 @@ Implemented Rules:
  loc_np('...
  loc_npx('...
 
+ # Gettext::Loc::DomainAndCategory
  loc_d('...
  loc_dx('...
  loc_dn('...
@@ -926,6 +953,21 @@ Implemented Rules:
  loc_dcnp('...
  loc_dcnpx('...
 
+ # BabelFish::Loc
+ loc_b('...
+ loc_bp('...
+
+ # BabelFish::Loc::DomainAndCategory
+ loc_bd('...
+ loc_bdp('...
+
+ loc_bc('...
+ loc_bcp('...
+
+ loc_bdc('...
+ loc_bdcp('...
+
+ # Gettext
  _('...
  _x('...
  _n('...
@@ -935,6 +977,21 @@ Implemented Rules:
  _np('...
  _npx('...
 
+ __('...
+ __x('...
+ __n('...
+ __nx('...
+ __p('...
+ __px('...
+ __np('...
+ __npx('...
+
+ gettext('...
+ ngettext('...
+ pgettext('...
+ npgettext('...
+
+ # Gettext::DomainAndCategory
  _d('...
  _dx('...
  _dn('...
@@ -961,15 +1018,6 @@ Implemented Rules:
  _dcpx('...
  _dcnp('...
  _dcnpx('...
-
- __('...
- __x('...
- __n('...
- __nx('...
- __p('...
- __px('...
- __np('...
- __npx('...
 
  __d('...
  __dx('...
@@ -998,14 +1046,6 @@ Implemented Rules:
  __dcnp('...
  __dcnpx('...
 
- loc_b('...
- loc_bp('...
-
- gettext('...
- ngettext('...
- pgettext('...
- npgettext('...
-
  dgettext('...
  dngettext('...
  dpgettext('...
@@ -1030,13 +1070,20 @@ Also possible all functions with N in front like Nloc_, N__, Ngettext, ... to pr
     use Locale::TextDomain::OO::Extract::JavaScript;
     use Path::Tiny qw(path);
 
-    my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new;
+    my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new(
+        # optional filter parameter, the default is ['all'],
+        # the following means:
+        # extract for all plugins but not for Plugin
+        # Locale::TextDomain::OO::Plugin::BabelFish::Loc
+        filter => [ qw( all !BabelFish::Loc ) ],
+    );
     for ( @files ) {
         $extractor->clear;
         $extractor->filename($_);            # dir/filename for reference
         $extractor->content_ref( \( path($_)->slurp_utf8 ) );
-        $exttactor->category('LC_Messages'); # set defaults or q{} is used
-        $extractor->domain('default');       # set defaults or q{} is used
+        $extractor->project('my project');   # set or default undef is used
+        $extractor->category('LC_MESSAGES'); # set or default q{} is used
+        $extractor->domain('my domain');     # set or default q{} is used
         $extractor->extract;
     }
     ... = $extractor->lexicon_ref;
@@ -1049,6 +1096,15 @@ All parameters are optional.
 See Locale::TextDomain::OO::Extract to replace the defaults.
 
     my $extractor = Locale::TextDomain::OO::Extract::JavaScript->new;
+
+=head2 method filter
+
+Ignore some of 'all' or define what to scan.
+See SYNOPSIS and DESCRIPTION for how and what.
+
+    my $array_ref = $extractor->filter;
+
+    $extractor->filter(['all']); # the default
 
 =head2 method preprocess (called by method extract)
 

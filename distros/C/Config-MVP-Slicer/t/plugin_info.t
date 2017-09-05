@@ -28,7 +28,7 @@ is_deeply
 
 like
   exception { $slicer->plugin_info($slicer) },
-  qr/Don't know how to handle/, 
+  qr/Don't know how to handle/,
   'instance without plugin_name';
 
 done_testing;

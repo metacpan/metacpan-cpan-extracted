@@ -75,10 +75,10 @@
          "web" : "https://github.com/kentfredric/HTML-Tree"
       }
    },
-   "version" : "5.06",
+   "version" : "5.07",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.025012"
+         "version" : "5.026000"
       },
       "plugins" : [
          {
@@ -344,7 +344,7 @@
                   "version_regexp" : "(?^u:^(\\d+\\.[\\d_]+)(?:-TRIAL)?$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                }
             },
@@ -365,7 +365,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                }
             },
@@ -387,7 +387,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -404,12 +404,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "5.06",
+                  "tag" : "5.07",
                   "tag_format" : "%v%t",
                   "tag_message" : "Tagged %N %v%{ (trial release)}t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -429,7 +429,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                }
             },
@@ -440,7 +440,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.1",
                   "repo_root" : "."
                }
             },

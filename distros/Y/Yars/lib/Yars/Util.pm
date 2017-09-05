@@ -6,7 +6,7 @@ use 5.010;
 use base qw( Exporter );
 
 # ABSTRACT: Yars internally used functions.
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 our @EXPORT_OK = qw( format_tx_error );
 
@@ -39,7 +39,7 @@ Yars::Util - Yars internally used functions.
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 FUNCTIONS
 

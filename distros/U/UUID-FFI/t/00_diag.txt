@@ -1,4 +1,0 @@
-FFI::CheckLib
-FFI::Platypus
-Module::Build
-Test::More

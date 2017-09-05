@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 use Moose;
 
@@ -26,13 +26,12 @@ use namespace::autoclean;
 after 'before_build' => sub {
     my ($self) = @_;
 
-    my $perlcriticrc = 'xt/author/perlcriticrc';
+    my $perlcriticrc = path('.perlcriticrc');
     return if -e $perlcriticrc;
-
-    $perlcriticrc->parent()->mkpath();
 
     my $perlcriticrc_content = <<'RC';
 severity = 1
+theme    = core
 
 [-Documentation::RequirePodSections]
 
@@ -59,15 +58,9 @@ sub test_body {
     return <<'TEST_BODY';
 use File::Spec;
 
-my $rcfile;
-
-BEGIN {
-    $rcfile = File::Spec->catfile(qw(xt author perlcriticrc));
-}
-
 use Perl::Critic::Utils qw(all_perl_files);
 use Test::More;
-use Test::Perl::Critic ( -profile => $rcfile );
+use Test::Perl::Critic;
 
 my @dirs = qw(bin lib t xt);
 

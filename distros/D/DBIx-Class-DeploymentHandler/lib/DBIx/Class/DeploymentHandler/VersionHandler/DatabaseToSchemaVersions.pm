@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionHandler::DatabaseToSchemaVersions;
-$DBIx::Class::DeploymentHandler::VersionHandler::DatabaseToSchemaVersions::VERSION = '0.002219';
+$DBIx::Class::DeploymentHandler::VersionHandler::DatabaseToSchemaVersions::VERSION = '0.002220';
 use Moose;
 
 # ABSTRACT: Go straight from Database to Schema version
@@ -7,7 +7,6 @@ use Moose;
 with 'DBIx::Class::DeploymentHandler::HandlesVersioning';
 
 has schema_version => (
-  isa      => 'Str',
   is       => 'ro',
   required => 1,
 );

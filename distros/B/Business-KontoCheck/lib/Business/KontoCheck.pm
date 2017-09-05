@@ -45,7 +45,7 @@ our @EXPORT_OK = qw(kto_check kto_check_str kto_check_blz
 
 our @EXPORT = qw( lut_init kto_check kto_check_blz kto_check_at %kto_retval );
 
-our $VERSION = '6.00';
+our $VERSION = '6.01';
 
 require XSLoader;
 XSLoader::load('Business::KontoCheck', $VERSION);

@@ -2,7 +2,7 @@ use 5.008;
 use strict;
 use warnings;
 
-use lib '.';
+BEGIN { unshift @INC, '.' }
 use inc::My_Build;
 
 my $builder = inc::My_Build->new(

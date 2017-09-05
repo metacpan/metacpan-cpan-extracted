@@ -187,8 +187,8 @@ int _proc_nthreaders_calc (void)
 #endif
 
 #if defined(__FreeBSD__) || defined(HW_NCPU)
-    int len = sizeof(num_cpus);
-    sysctlbyname("hw.ncpu", &num_cpus, (void*)(&len), NULL, 0);
+    size_t len = sizeof(num_cpus);
+    sysctlbyname("hw.ncpu", &num_cpus, &len, NULL, 0);
 #endif
 
     if (num_cpus < 1)
@@ -257,7 +257,7 @@ int logical_per_physical_cpu() {
 #endif
 #ifdef __FreeBSD__
     int hlt_htt_cpu = 0;
-    int len = sizeof(hlt_htt_cpu);
+    size_t len = sizeof(hlt_htt_cpu);
     if (sysctlbyname("machdep.hlt_logical_cpus",
 		     &hlt_htt_cpu, &len, NULL, 0) == 0) {
 	if (hlt_htt_cpu == 0) {
@@ -444,7 +444,7 @@ CODE:
 #endif
 #if (defined(__FreeBSD__) && (__FreeBSD_version >= 503105))
     int value = 0;
-    int len = sizeof(value);
+    size_t len = sizeof(value);
     /*
      * Even if the frequency is modified using cpu_freq(3), all cpus
      * have the same value why we can request CPU 0 for max_clock.
@@ -454,8 +454,8 @@ CODE:
     }
 #elif defined(HW_CPU_FREQ)
     long long value = 0;
-    int len = sizeof(value);
-    if (sysctlbyname("hw.cpufrequency", &value, (void*)(&len), NULL, 0) == 0) {
+    size_t len = sizeof(value);
+    if (sysctlbyname("hw.cpufrequency", &value, &len, NULL, 0) == 0) {
 	clock = value;
     }
 #endif
@@ -554,7 +554,7 @@ CODE:
 #endif
 #if (defined(__FreeBSD__) && (__FreeBSD_version >= 503105))
     int cpu_freq = 0;
-    int len =  sizeof(cpu_freq);
+    size_t len =  sizeof(cpu_freq);
     char cpu_freq_req[16];
     snprintf(cpu_freq_req, 16, "dev.cpu.%d.freq", cpu);
     if (sysctlbyname(cpu_freq_req, &cpu_freq, &len, NULL, 0) == 0) {
@@ -778,7 +778,7 @@ CODE:
 #ifdef __FreeBSD__
     if (cpu < proc_nthreaders()) {
 	if ((value = (char *)malloc(64)) != NULL) {
-	    int len = 64;
+	    size_t len = 64;
 	    sysctlbyname("hw.machine_arch", value, &len, NULL, 0);
 	}
     }

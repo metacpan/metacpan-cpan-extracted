@@ -1,6 +1,7 @@
 package t::Plack::App::APISchema::Document;
 use t::test;
 use t::test::fixtures;
+use t::test::InheritedDocument;
 use Plack::Test;
 use HTTP::Request::Common;
 
@@ -48,4 +49,20 @@ sub mojibake : Tests {
              done_testing;
          }
      };
+}
+
+sub inheritable : Tests {
+    my $schema = t::test::fixtures::prepare_bmi;
+    my $app = t::test::InheritedDocument->new(schema => $schema)->to_app;
+
+    subtest 'Document is inheritable' => sub {
+        test_psgi $app => sub {
+            my $server = shift;
+            my $res = $server->(GET '/');
+            is $res->code, 200;
+            is $res->header('content-type'), 'text/html; charset=utf-8';
+            like $res->content, qr{pink};
+            done_testing;
+        };
+    };
 }

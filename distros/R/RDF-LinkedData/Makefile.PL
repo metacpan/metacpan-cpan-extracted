@@ -67,8 +67,8 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "Plack::App::RDF::LinkedData" => { file => "lib/Plack/App/RDF/LinkedData.pm", version => "1.00" },
-                            "RDF::LinkedData" => { file => "lib/RDF/LinkedData.pm", version => "1.00" },
+                            "Plack::App::RDF::LinkedData" => { file => "lib/Plack/App/RDF/LinkedData.pm", version => 1.02 },
+                            "RDF::LinkedData" => { file => "lib/RDF/LinkedData.pm", version => 1.02 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -81,7 +81,7 @@ my $meta = {
                             x_mailinglist => "http://lists.perlrdf.org/listinfo/dev",
                             x_wiki        => "http://wiki.perlrdf.org/",
                           },
-  "version"            => "1.00",
+  "version"            => 1.02,
   "x_contributors"     => [
                             "Gregory Todd Williams <gwilliams\@cpan.org>",
                             "Richard Lewis",

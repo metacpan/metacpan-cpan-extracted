@@ -6,20 +6,20 @@ use strict;
 
 require Encode if $] >= 5.008;
 
-sub get_mail_gpg		{ shift->{mail_gpg}			}
+sub get_mail_gpg                { shift->{mail_gpg}                     }
 
-sub get_is_encrypted		{ shift->{is_encrypted}			}
-sub get_enc_ok			{ shift->{enc_ok}			}
-sub get_enc_key_id		{ shift->{enc_key_id}			}
-sub get_enc_mail		{ shift->{enc_mail}			}
+sub get_is_encrypted            { shift->{is_encrypted}                 }
+sub get_enc_ok                  { shift->{enc_ok}                       }
+sub get_enc_key_id              { shift->{enc_key_id}                   }
+sub get_enc_mail                { shift->{enc_mail}                     }
 sub get_enc_key_ids             { shift->{enc_key_ids}                  }
 sub get_enc_mails               { shift->{enc_mails}                    }
-sub get_is_signed		{ shift->{is_signed}			}
-sub get_sign_ok			{ shift->{sign_ok}			}
+sub get_is_signed               { shift->{is_signed}                    }
+sub get_sign_ok                 { shift->{sign_ok}                      }
 sub get_sign_state              { shift->{sign_state}                   }
-sub get_sign_key_id		{ shift->{sign_key_id}			}
-sub get_sign_mail		{ shift->{sign_mail}			}
-sub get_sign_mail_aliases	{ shift->{sign_mail_aliases}		}
+sub get_sign_key_id             { shift->{sign_key_id}                  }
+sub get_sign_mail               { shift->{sign_mail}                    }
+sub get_sign_mail_aliases       { shift->{sign_mail_aliases}            }
 sub get_sign_fingerprint        { shift->{sign_fingerprint}             }
 
 sub set_is_encrypted            { shift->{is_encrypted}         = $_[1] }
@@ -36,10 +36,10 @@ sub set_sign_mail               { shift->{sign_mail}            = $_[1] }
 sub set_sign_mail_aliases       { shift->{sign_mail_aliases}    = $_[1] }
 sub set_sign_fingerprint        { shift->{sign_fingerprint}     = $_[1] }
 
-sub get_gpg_stdout		{ shift->{gpg_stdout}			}
-sub get_gpg_stderr		{ shift->{gpg_stderr}			}
+sub get_gpg_stdout              { shift->{gpg_stdout}                   }
+sub get_gpg_stderr              { shift->{gpg_stderr}                   }
 sub get_gpg_status              { shift->{gpg_status}                   }
-sub get_gpg_rc			{ shift->{gpg_rc}			}
+sub get_gpg_rc                  { shift->{gpg_rc}                       }
 
 sub new {
     my $class = shift;

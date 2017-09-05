@@ -1,5 +1,5 @@
 {
-   "abstract" : "Parse a MIME Content-Type Header",
+   "abstract" : "Parse a MIME Content-Type or Content-Disposition Header",
    "author" : [
       "Simon Cozens <simon@cpan.org>",
       "Casey West <casey@geeknest.com>",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/rjbs/Email-MIME-ContentType"
       }
    },
-   "version" : "1.021",
+   "version" : "1.022",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -109,7 +109,7 @@
                }
             },
             "name" : "@RJBS/RJBS-Outdated",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -124,7 +124,7 @@
                }
             },
             "name" : "@RJBS/CPAN-Outdated",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
@@ -431,7 +431,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.021",
+                  "tag" : "1.022",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

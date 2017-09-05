@@ -1,5 +1,5 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.018';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.019';
 use base qw(Exception::DB);
 
 =head1 Name
@@ -13,7 +13,7 @@ Base class for DB queries.
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.018';
+$QBit::Application::Model::DB::Query::VERSION = '0.019';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -865,7 +865,7 @@ sub _field_to_sql {
     $opts{'offset'} ||= 0;
 
     if (ref($expr) eq 'SCALAR') {
-        # {name => \'string or number'}
+        # {name => \'string or number or undef'}
         return ($self->quote($$expr) . (defined($alias) ? ' AS ' . $self->quote_identifier($alias) : ''));
 
     } elsif (!ref($expr) && $expr eq '') {
@@ -876,7 +876,7 @@ sub _field_to_sql {
 
         return (
             map {
-                    $self->quote_identifier($self->_table_alias($cur_query_table)) . '.'
+                    $self->_get_table_alias($cur_query_table)
                   . $self->quote_identifier($alias . $_) . ' AS '
                   . $self->quote_identifier($alias . ($field->{'i18n'} && $self->{'__ALL_LANGS__'} ? $_ : ''))
               } $field->{'i18n'} ? $self->_get_locale_suffixes() : ('')
@@ -890,7 +890,7 @@ sub _field_to_sql {
 
         return (
             map {
-                    $self->quote_identifier($self->_table_alias($cur_query_table)) . '.'
+                  $self->_get_table_alias($cur_query_table)
                   . $self->quote_identifier($expr . $_)
                   . (
                     defined($alias)
@@ -915,7 +915,7 @@ sub _field_to_sql {
 
         return (
             map {
-                    $self->quote_identifier($self->_table_alias($query_table)) . '.'
+                    $self->_get_table_alias($query_table)
                   . $self->quote_identifier([%$expr]->[0] . $_)
                   . (
                     defined($alias)
@@ -927,7 +927,7 @@ sub _field_to_sql {
         );
 
     } elsif (ref($expr) eq 'HASH' && ref([%$expr]->[1]) eq 'ARRAY') {
-        # Function: {field => [SUM => ['f1', \5, ['-' => ['f2', 'f3']]]]}
+        # Function: {field => [SUM => {'f1', \5, ['-' => ['f2', 'f3']]}]}
         my @res       = ();
         my $func_name = [%$expr]->[0];
         $func_name =~ s/^\s+|\s+$//g;
@@ -1045,6 +1045,12 @@ sub _field_to_sql {
     } else {
         throw Exception::BadArguments gettext('Bad field expression:\n%s', Dumper($expr));
     }
+}
+
+sub _get_table_alias {
+    my ($self, $table) = @_;
+
+    return $self->quote_identifier($self->_table_alias($table)) . '.';
 }
 
 TRUE;

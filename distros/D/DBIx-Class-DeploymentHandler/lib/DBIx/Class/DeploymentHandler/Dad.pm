@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::Dad;
-$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002219';
+$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002220';
 # ABSTRACT: Parent class for DeploymentHandlers
 
 use Moose;
@@ -29,7 +29,6 @@ sub _build_to_version { $_[0]->schema_version }
 
 has schema_version => (
   is         => 'ro',
-  isa        => 'StrSchemaVersion',
   lazy_build => 1,
 );
 

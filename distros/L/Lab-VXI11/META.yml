@@ -1,0 +1,27 @@
+---
+abstract: 'Perl interface to VXI-11 Test&Measurement backend'
+author:
+  - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lab-VXI11
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  IRC: irc://chat.freenode.net/#labmeasurement
+  MailingList: https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
+  homepage: http://www.labmeasurement.de
+  repository: git://github.com/lab-measurement/Lab-VXI11.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

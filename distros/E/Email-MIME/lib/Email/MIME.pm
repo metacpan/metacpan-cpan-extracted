@@ -3,20 +3,22 @@ use strict;
 use warnings;
 package Email::MIME;
 # ABSTRACT: easy MIME message handling
-$Email::MIME::VERSION = '1.945';
+$Email::MIME::VERSION = '1.946';
 use Email::Simple 2.212; # nth header value
 use parent qw(Email::Simple);
 
 use Carp ();
 use Email::MessageID;
 use Email::MIME::Creator;
-use Email::MIME::ContentType 1.016; # type/subtype, not discrete/composite
+use Email::MIME::ContentType 1.022; # parse_content_disposition
 use Email::MIME::Encode;
 use Email::MIME::Encodings 1.314;
 use Email::MIME::Header;
 use Email::MIME::Modifier;
 use Encode 1.9801 ();
 use Scalar::Util qw(reftype weaken);
+
+our @CARP_NOT = qw(Email::MIME::ContentType);
 
 #pod =head1 SYNOPSIS
 #pod
@@ -171,7 +173,11 @@ sub new {
 #pod C<header_str>.  Its values will be used verbatim.
 #pod
 #pod C<attributes> is a hash of MIME attributes to assign to the part, and may
-#pod override portions of the header set in the C<header> parameter.
+#pod override portions of the header set in the C<header> parameter. The hash keys
+#pod correspond directly to methods or modifying a message from
+#pod C<Email::MIME::Modifier>. The allowed keys are: content_type, charset, name,
+#pod format, boundary, encoding, disposition, and filename. They will be mapped to
+#pod C<"$attr\_set"> for message modification.
 #pod
 #pod The C<parts> parameter is a list reference containing C<Email::MIME>
 #pod objects. Elements of the C<parts> list can also be a non-reference
@@ -185,12 +191,6 @@ sub new {
 #pod If C<body_str> is given instead of C<body> or C<parts>, it is assumed to be a
 #pod character string to be used as the body.  If you provide a C<body_str>
 #pod parameter, you B<must> provide C<charset> and C<encoding> attributes.
-#pod
-#pod Back to C<attributes>. The hash keys correspond directly to methods or
-#pod modifying a message from C<Email::MIME::Modifier>. The allowed keys are:
-#pod content_type, charset, name, format, boundary, encoding, disposition,
-#pod and filename. They will be mapped to C<"$attr\_set"> for message
-#pod modification.
 #pod
 #pod =cut
 
@@ -410,7 +410,7 @@ sub parts_multipart {
   for my $bit (@bits) {
     $bit =~ s/\A[\n\r]+//smg;
     $bit =~ s/(?<!\x0d)$self->{mycrlf}\Z//sm;
-    my $email = (ref $self)->new($bit);
+    my $email = (ref $self)->new($bit, { encode_check => $self->encode_check });
     push @parts, $email;
   }
 
@@ -440,10 +440,7 @@ sub filename {
   return $gcache{$self} if exists $gcache{$self};
 
   my $dis = $self->header("Content-Disposition") || '';
-  my $attrs
-    = $dis =~ s/^.*?;//
-    ? Email::MIME::ContentType::_parse_attributes($dis)
-    : {};
+  my $attrs = parse_content_disposition($dis)->{attributes};
   my $name = $attrs->{filename}
     || $self->{ct}{attributes}{name};
   return $name if $name or !$force;
@@ -580,7 +577,7 @@ sub content_type_attribute_set {
 
 #pod =method encode_check
 #pod
-#pod =method encode_check-set
+#pod =method encode_check_set
 #pod
 #pod   $email->encode_check;
 #pod   $email->encode_check_set(0);
@@ -732,9 +729,9 @@ sub filename_set {
   my $dis_header = $self->header('Content-Disposition');
   my ($disposition, $attrs);
   if ($dis_header) {
-    ($disposition) = ($dis_header =~ /^([^;]+)/);
-    $dis_header =~ s/^$disposition(?:;\s*)?//;
-    $attrs = Email::MIME::ContentType::_parse_attributes($dis_header) || {};
+    my $struct = parse_content_disposition($dis_header);
+    $disposition = $struct->{type};
+    $attrs = $struct->{attributes};
   }
   $filename ? $attrs->{filename} = $filename : delete $attrs->{filename};
   $disposition ||= 'inline';
@@ -938,7 +935,7 @@ Email::MIME - easy MIME message handling
 
 =head1 VERSION
 
-version 1.945
+version 1.946
 
 =head1 SYNOPSIS
 
@@ -1069,7 +1066,11 @@ A similar C<header> parameter can be provided in addition to or instead of
 C<header_str>.  Its values will be used verbatim.
 
 C<attributes> is a hash of MIME attributes to assign to the part, and may
-override portions of the header set in the C<header> parameter.
+override portions of the header set in the C<header> parameter. The hash keys
+correspond directly to methods or modifying a message from
+C<Email::MIME::Modifier>. The allowed keys are: content_type, charset, name,
+format, boundary, encoding, disposition, and filename. They will be mapped to
+C<"$attr\_set"> for message modification.
 
 The C<parts> parameter is a list reference containing C<Email::MIME>
 objects. Elements of the C<parts> list can also be a non-reference
@@ -1083,12 +1084,6 @@ flat (subpart-less) MIME message.  It is assumed to be a sequence of octets.
 If C<body_str> is given instead of C<body> or C<parts>, it is assumed to be a
 character string to be used as the body.  If you provide a C<body_str>
 parameter, you B<must> provide C<charset> and C<encoding> attributes.
-
-Back to C<attributes>. The hash keys correspond directly to methods or
-modifying a message from C<Email::MIME::Modifier>. The allowed keys are:
-content_type, charset, name, format, boundary, encoding, disposition,
-and filename. They will be mapped to C<"$attr\_set"> for message
-modification.
 
 =head2 content_type_set
 
@@ -1116,7 +1111,7 @@ information is preserved when modifying an attribute.
 
 =head2 encode_check
 
-=head2 encode_check-set
+=head2 encode_check_set
 
   $email->encode_check;
   $email->encode_check_set(0);
@@ -1373,7 +1368,7 @@ Simon Cozens <simon@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Vandiver Arthur Axel 'fREW' Schmidt Brian Cassidy David Steinbrunner Dotan Dimet Geraint Edwards Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall (alh) memememomo Pali Shawn Sorichetti Tomohiro Hosaka
+=for stopwords Alex Vandiver Arthur Axel 'fREW' Schmidt Brian Cassidy Dan Book David Steinbrunner Dotan Dimet Geraint Edwards Jesse Luehrs Kurt Anderson Lance A. Brown Matthew Horsfall (alh) memememomo Michael McClimon Pali Shawn Sorichetti Tomohiro Hosaka
 
 =over 4
 
@@ -1388,6 +1383,10 @@ Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
 =item *
 
 Brian Cassidy <bricas@cpan.org>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
 
 =item *
 
@@ -1420,6 +1419,10 @@ Matthew Horsfall (alh) <wolfsage@gmail.com>
 =item *
 
 memememomo <memememomo@gmail.com>
+
+=item *
+
+Michael McClimon <michael@mcclimon.org>
 
 =item *
 

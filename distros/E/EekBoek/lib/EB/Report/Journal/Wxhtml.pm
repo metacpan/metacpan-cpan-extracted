@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Feb  7 14:21:31 2008
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jun 19 00:37:27 2010
-# Update Count    : 9
+# Last Modified On: Fri Oct  9 20:13:02 2015
+# Update Count    : 11
 # Status          : Unknown, Use with caution!
 
 package EB::Report::Journal::Wxhtml;
@@ -25,8 +25,18 @@ sub style {
 	    _style => { colour => 'red'  },
 	    rel    => { link => "crd://" },
 	},
+	cheada   => {
+	    _style => { colour => 'red'  },
+	    desc   => { att => "att://" },
+	    rel    => { link => "crd://" },
+	},
 	dhead    => {
 	    _style => { colour => 'red'  },
+	    rel    => { link => "deb://" },
+	},
+	dheada   => {
+	    _style => { colour => 'red'  },
+	    desc   => { att => "att://" },
 	    rel    => { link => "deb://" },
 	},
 	total    => {

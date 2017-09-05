@@ -3,35 +3,35 @@ require 5.009005;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'EXE_FILES' => [],
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Locale::TextDomain::OO::Extract',
   'PREREQ_PM' => {
-                   'Locale::TextDomain::OO::Util::JoinSplitLexiconKeys' => 0,
-                   'Clone' => 0,
-                   'Locale::MO::File' => '0.05',
-                   'Carp' => 0,
-                   'Encode' => 0,
-                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
-                   'Test::Differences' => '0.60',
-                   'Locale::PO' => '0.25',
-                   'Path::Tiny' => 0,
-                   'Locale::Utils::PlaceholderMaketext' => 0,
-                   'MooX::Types::MooseLike::Base' => 0,
-                   'Cwd' => 0,
-                   'Test::Exception' => 0,
-                   'namespace::autoclean' => 0,
-                   'Class::Load' => 0,
-                   'Moo::Role' => 0,
                    'Locale::TextDomain::OO::Util' => '3.001',
                    'Moo' => '1.003001',
+                   'Moo::Role' => 0,
+                   'Locale::PO' => '0.25',
+                   'Locale::Utils::PlaceholderMaketext' => 0,
                    'Test::More' => 0,
+                   'Locale::TextDomain::OO::Util::JoinSplitLexiconKeys' => 0,
+                   'Locale::MO::File' => '0.05',
+                   'Cwd' => 0,
+                   'Encode' => 0,
+                   'MooX::Types::MooseLike::Base' => 0,
+                   'Class::Load' => 0,
                    'MooX::StrictConstructor' => 0,
                    'Data::Dumper' => 0,
+                   'Path::Tiny' => 0,
+                   'Carp' => 0,
+                   'Test::NoWarnings' => 0,
+                   'Clone' => 0,
+                   'namespace::autoclean' => 0,
+                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
+                   'Test::Exception' => 0,
                    'Set::Scalar' => 0,
-                   'Test::NoWarnings' => 0
+                   'Test::Differences' => '0.60'
                  },
-  'VERSION_FROM' => 'lib/Locale/TextDomain/OO/Extract.pm',
-  'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
-  'NAME' => 'Locale::TextDomain::OO::Extract'
+  'VERSION_FROM' => 'lib/Locale/TextDomain/OO/Extract.pm'
 )
 ;

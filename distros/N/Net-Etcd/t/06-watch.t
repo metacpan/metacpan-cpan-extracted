@@ -60,7 +60,7 @@ cmp_ok( scalar @events, '==', 2, "number of async events stored. (create_watch, 
 # delete range
 lives_ok(
     sub {
-        $key = $etcd->range( { key => 'foo' } )->delete
+        $key = $etcd->deleterange( { key => 'foo' } )
     },
     "kv range_delete"
 );

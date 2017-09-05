@@ -1,5 +1,7 @@
 package APISchema::Generator::Markdown::ResourceResolver;
 use 5.014;
+use strict;
+use warnings;
 
 # cpan
 use JSON::Pointer;

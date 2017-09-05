@@ -41,6 +41,10 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: lib/RDF/LinkedData.pm
 Copyright: Copyright 2010 Gregory Todd Williams.
  Copyright 2010 ABC Startsiden AS.
@@ -53,10 +57,6 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
 Copyright: Copyright 2016 Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

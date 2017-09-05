@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002010';
+our $VERSION = '0.002011';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -1152,7 +1152,7 @@ sub import {
             my @param_names = $parameter_list =~ m{ : [\$\@%]?+ (\w++) }gxms;
 
             # Tell OIO about this constructor args...
-            $init_args = qq{ BEGIN{ my %$sub_name :InitArgs = map { \$_ => '' } qw{@param_names}; } };
+            $init_args = qq{ BEGIN{ my %$sub_name :InitArgs = map { \$_ => {} } qw{@param_names}; } };
 
             # Mark the sub as an initializer
             $attrs .= ' :Private :Init';
@@ -1180,7 +1180,7 @@ sub import {
 
         # Assemble and return the method definition...
         ($sub_name ? "sub $sub_name;" : q{} )
-        . qq{$init_args sub $sub_name $attrs { $attr_binding $parameter_list->{code}; do $block } };
+        . qq{$init_args sub $sub_name $attrs { $attr_binding { $parameter_list->{code}; do $block } } };
     }
 
     # Components of variable declaration...
@@ -1260,7 +1260,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002010
+This document describes Dios version 0.002011
 
 
 =head1 SYNOPSIS

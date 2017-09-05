@@ -252,12 +252,12 @@ int m;
 {
 	/* points to base of dfa table */
 	if (m<MAX_MODE){
-		zzauto = m;
-		/* have to redo class since using different compression */
-		zzclass = ZZSHIFT(zzchar);
+	  zzauto = m;
+	  /* have to redo class since using different compression */
+	  zzclass = ZZSHIFT(zzchar);
 	}else{
-		sprintf(zzebuf,"Invalid automaton mode = %d ",m);
-		zzerr(zzebuf);
+   	  snprintf(zzebuf, 69, "Invalid automaton mode = %d ",m); // easier to track bugs
+	  zzerr(zzebuf);
 	}
 }
 

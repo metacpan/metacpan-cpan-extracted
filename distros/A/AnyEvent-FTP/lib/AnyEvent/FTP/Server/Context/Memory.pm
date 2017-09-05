@@ -10,7 +10,7 @@ use Path::Class::Dir;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -462,7 +462,7 @@ AnyEvent::FTP::Server::Context::Memory - FTP Server client context class with fu
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -520,7 +520,9 @@ will be an L<Path::Class::Dir>.
 Returns the hash (for directory) or scalar (for file) of
 a file in the filesystem.
 
-=head2 $context-E<gt>rename_from
+=head2 rename_from
+
+ my $filename = $context->rename_from;
 
 The filename specified by the last FTP C<RNFR> command.
 

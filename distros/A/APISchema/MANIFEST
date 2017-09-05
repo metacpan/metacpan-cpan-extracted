@@ -44,6 +44,7 @@ t/fixtures/status.def
 t/fixtures/syntax-error.def
 t/fixtures/user.def
 t/test.pm
+t/test/InheritedDocument.pm
 t/test/fixtures.pm
 META.yml
 MANIFEST

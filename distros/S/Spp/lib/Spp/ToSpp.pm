@@ -1,24 +1,27 @@
-# Copyright 2016 The Michael Song. All rights rberved.
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
 package Spp::ToSpp;
 
 use Exporter;
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(to_spp);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(ast_to_spp to_spp);
 
 use 5.012;
 no warnings "experimental";
-use Spp::Tools;
-use Spp::IsAtom;
+use Spp::Builtin;
+
+sub ast_to_spp {
+   my $ast  = shift;
+   my @strs = ();
+   for my $spec (@{$ast}) {
+      my ($name, $rule) = @{$spec};
+      my $rule_str = to_spp($rule);
+      push @strs, "$name = $rule_str";
+   }
+   return join(";", @strs);
+}
 
 # to str use for trace rule or repl of spp
 sub to_spp {
    my $rule = shift;
-   return 'false' if is_false($rule);
-   return 'true'  if is_true($rule);
-   return $rule   if is_chars($rule);
    my ($name, $value) = @{$rule};
    given ($name) {
       when ('Rules')    { return rules_to_spp($value) }
@@ -29,7 +32,7 @@ sub to_spp {
       when ('Look')     { return look_to_spp($value) }
       when ("Chclass")  { return chclass_to_spp($value) }
       when ("Nchclass") { return nchclass_to_spp($value) }
-      when ('Str')      { return "'" . $value . "'" }
+      when ('Str')      { return str_to_spp($value) }
       when ('Char')     { return char_to_spp($value) }
       when ("Cclass")   { return cclass_to_spp($value) }
       when ('Till')     { return till_to_spp($value) }
@@ -38,8 +41,13 @@ sub to_spp {
       when ("Cchar")    { return char_to_spp($value) }
       when ("Expr")     { return expr_to_spp($value) }
       when ("Array")    { return array_to_spp($value) }
-      # ['Assert','Ntoken','Ctoken','Schar','Schar','Sym','Int']
-      default { return $value }
+      when ('Assert')   { return $value }
+      when ('Ntoken')   { return $value }
+      when ('Ctoken')   { return $value }
+      when ('Rtoken')   { return $value }
+      when ('Sym')      { return $value }
+      when ('Int')      { return $value }
+      default           { die "unknown atom to Spp: |$name|" }
    }
 }
 
@@ -50,61 +58,60 @@ sub rules_to_spp {
 
 sub group_to_spp {
    my $rule = shift;
-   return "{" . rules_to_spp($rule) . "}";
+   return str("{", rules_to_spp($rule), "}");
 }
 
 sub branch_to_spp {
-   my $x_branch = shift;
-   return "|" . rules_to_spp($x_branch) . "|";
+   my $branch = shift;
+   return "|" . rules_to_spp($branch) . "|";
 }
 
 sub lbranch_to_spp {
-   my $x_branch = shift;
-   return "||" . rules_to_spp($x_branch) . "||";
+   my $branch = shift;
+   return str("||", rules_to_spp($branch), "||");
 }
 
 sub rept_to_spp {
    my $rule = shift;
    my ($rept, $atom) = @{$rule};
-   return to_spp($atom) . $rept;
+   return str(to_spp($atom), $rept);
 }
 
 sub look_to_spp {
    my $rule = shift;
    my ($rept, $atom, $look) = @{$rule};
-   return to_spp($atom) . $rept . to_spp($look);
+   return str(to_spp($atom), $rept, to_spp($look));
 }
 
 sub chclass_to_spp {
-   my $x_atoms = shift;
-   return "[" . atoms_to_spp($x_atoms) . "]";
+   my $atoms = shift;
+   return str("[", atoms_to_spp($atoms), "]");
 }
 
 sub nchclass_to_spp {
-   my $x_atoms = shift;
-   return "[^" . atoms_to_spp($x_atoms) . "]";
+   my $atoms = shift;
+   return str("[^", atoms_to_spp($atoms), "]");
 }
 
 sub str_to_spp {
-   my $x_str = shift;
-   return "'" . $x_str . "'";
+   my $str = shift;
+   return str("'", $str, "'");
 }
 
 sub cclass_to_spp {
    my $cclass = shift;
-   return "\\" . $cclass;
+   return str("\\", $cclass);
 }
 
 sub char_to_spp {
    my $char = shift;
    given ($char) {
-     when ('"')  { return '\\"' }
-     when ("\n") { return '\n'  }
-     when ("\r") { return '\r'  }
-     when ("\t") { return '\t'  }
-     when ("\f") { return '\f'  }
-     when ("'")  { return "\\'" }
-     default { return "'$char'" }
+      when ('"')  { return '\\"' }
+      when ("\n") { return '\n' }
+      when ("\r") { return '\r' }
+      when ("\t") { return '\t' }
+      when ("'")  { return "\\'" }
+      default     { return "'$char'" }
    }
 }
 
@@ -119,28 +126,28 @@ sub not_to_spp {
 }
 
 sub range_to_spp {
-   my $x_range = shift;
-   return join('-', @{$x_range});
+   my $range = shift;
+   return join('-', @{$range});
 }
 
 sub expr_to_spp {
-   my $x_expr = shift;
-   return "(" . rules_to_spp($x_expr) . ")";
+   my $expr = shift;
+   return "(" . rules_to_spp($expr) . ")";
 }
 
 sub array_to_spp {
-   my $x_expr = shift;
-   return "[" . rules_to_spp($x_expr) . "]";
+   my $expr = shift;
+   return "[" . rules_to_spp($expr) . "]";
 }
 
 sub map_atoms {
-   my $x_atoms = shift;
-   return map { to_spp($_) } @{$x_atoms};
+   my $atoms = shift;
+   return map { to_spp($_) } @{$atoms};
 }
 
 sub atoms_to_spp {
-   my $x_atoms = shift;
-   return join('', map_atoms($x_atoms));
+   my $atoms = shift;
+   return join('', map_atoms($atoms));
 }
 
 1;

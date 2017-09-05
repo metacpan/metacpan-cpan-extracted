@@ -20,8 +20,8 @@ TEXTDOMAIN = com.cantanea.simplecal
 
 # Initial copyright holder added to pot and po files.
 #COPYRIGHT_HOLDER = Guido Flohr
-COPYRIGHT_HOLDER = Edit the file PACKAGE to change this.
+COPYRIGHT_HOLDER = Edit the file PACKAGE to change this
 
 # Where to send msgid bugs?  
 #MSGID_BUGS_ADDRESS = Guido Flohr <guido.flohr@cantanea.com>
-MSGID_BUGS_ADDRESS = Edit the file PACAKGE to change this.
+MSGID_BUGS_ADDRESS = Edit the file PACKAGE to change this

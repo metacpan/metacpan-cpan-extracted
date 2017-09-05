@@ -1,6 +1,6 @@
                                 Balans
-Periode: t/m 2007-12-31
-EekBoek Demo Administratie                         EekBoek, 2007-12-31
+Periode: t/m 2013-12-31
+EekBoek Demo Administratie                         EekBoek, 2013-12-31
 
 RekNr   Grootboekrekening                             Debet     Credit
 ----------------------------------------------------------------------
@@ -10,8 +10,8 @@ RekNr   Grootboekrekening                             Debet     Credit
 1111    Afschrijving computers                                12503,60
 2320    Postbank                                   10334,68
 3100    Kapitaal de heer/mevrouw                               2443,18
-4200    BTW Verkoop Hoog                                       1463,00
-4220    BTW Inkoop Hoog                              148,13
-        << Winst >>                                            7079,81
+4200    BTW Verkoop Hoog                                       1590,28
+4220    BTW Inkoop Hoog                              161,06
+        << Winst >>                                            6965,46
 ----------------------------------------------------------------------
-        TOTAAL Balans                              25205,66   25205,66
+        TOTAAL Balans                              25218,59   25218,59

@@ -1,5 +1,9 @@
 Revision history for perl module Mojolicious::Plugin::FeedReader
 
+0.09 2017-08-28
+
+   - Replace use of removed Mojo::Util function slurp() with Mojo::File
+
 0.08 2016-05-29
 
    - Fix missing use statement in 2 tests. Thanks CPAN testers!

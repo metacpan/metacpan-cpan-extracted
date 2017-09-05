@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.09  Fri 25 Aug 17:26:05 BST 2017
+    - auto-generate constants using C::Scan::Constants, as they vary with librados version
+
 0.08  Thu 22 Jun 12:35:15 BST 2017
     - warning suppression for 'tell() on unopened filehandle'
     - fixes inconsistent references to write_io() and write_handle()

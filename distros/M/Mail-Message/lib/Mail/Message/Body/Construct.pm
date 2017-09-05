@@ -9,7 +9,7 @@ use warnings;
 
 package Mail::Message::Body;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 
 use Carp;

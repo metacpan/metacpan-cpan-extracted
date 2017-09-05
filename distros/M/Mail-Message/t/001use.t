@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 51;
+use Test::More tests => 52;
 
 # The versions of the following packages are reported to help understanding
 # the environment in which the tests are run.  This is certainly not a
@@ -50,6 +50,7 @@ require_ok('Mail::Message::Field::Addresses');
 require_ok('Mail::Message::Field::Address');
 require_ok('Mail::Message::Field::AddrGroup');
 require_ok('Mail::Message::Field::Attribute');
+require_ok('Mail::Message::Field::AuthResults');
 require_ok('Mail::Message::Field::Date');
 require_ok('Mail::Message::Field::Fast');
 require_ok('Mail::Message::Field::Flex');

@@ -1,0 +1,73 @@
+﻿<form name="f1" method="post">
+    <input type="hidden" name="i1" value="[% var.v1 %]" />
+    <table>
+        <colgroup>
+            <col width="70%" />
+            <col width="30%" />
+        </colgroup>
+        <tr>
+            <td colspan="2"><b>[% loc_b('Text Ä') %]</b></td>
+        </tr>
+        <tr>
+            <td>
+                <input type="checkbox" name="c1" [% IF var.v2 %] checked="checked" [% END %] />[% loc_b('Text Ö') %]
+            </td>
+            <td>
+                <input type="submit" class="button" value="[% loc_b('Text Ü') %]" name="s1" />
+            </td>
+        </tr>
+    </table>
+    <pre>
+        [% loc_b('This is a text.') %]
+        [% loc_b(
+            '#{name} is programming #{language}.',
+            name     => 'Steffen',
+            language => 'Perl',
+        ) %]
+        [% loc_b(
+            '((Singular|Plural))',
+            1,
+        ) %]
+        [% loc_b(
+            '((Singular|Plural))',
+            2,
+        ) %]
+        [% loc_b(
+            '#{num} ((date|dates)):num',
+            num => 1,
+        ) %]
+        [% loc_b(
+            '#{num :num} ((date|dates))',
+            num => 2,
+        ) %]
+        [% loc_bp(
+            'appointment',
+            'date',
+        ) %]
+        [% loc_bp(
+            'appointment',
+            '#{num} date',
+            num => 1,
+        ) %]
+        [% loc_bp(
+            'appointment',
+            '((date|dates))',
+            1,
+        ) %]
+        [% loc_bp(
+            'appointment',
+            '((date|dates))',
+            2,
+        ) %]
+        [% loc_npx(
+            'appointment',
+            '#{num} ((date|dates)):num',
+            num => 1,
+        ) %]
+        [% loc_bpx(
+            'appointment',
+            '#{num :num} ((date|dates)):num',
+            num => 2,
+        ) %]
+    </pre>
+</form>

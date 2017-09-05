@@ -14,7 +14,7 @@ __PACKAGE__->meta(
         reply => {
             type  => 'many to one',
             class => 'Reply',
-            map   => {reply_id => 'id'}
+            map   => { reply_id => 'id' }
         },
     },
 );

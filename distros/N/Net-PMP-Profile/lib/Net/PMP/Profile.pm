@@ -6,7 +6,7 @@ use Net::PMP::Profile::TypeConstraints;
 use Net::PMP::CollectionDoc;
 use Net::PMP::CollectionDoc::Link;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 # attributes
 has 'title' => ( is => 'rw', isa => 'Str', required => 1, );
@@ -53,7 +53,7 @@ sub get_profile_title { ref(shift) }
 
 # singleton for class
 my $cleaner = Data::Clean::JSON->new(
-    DateTime                              => [ call_method => '_stringify' ],
+    DateTime                              => [ call_method => 'stringify' ],
     'Net::PMP::CollectionDoc::Link'       => [ call_method => 'as_hash' ],
     'Net::PMP::CollectionDoc::Permission' => [ call_method => 'as_hash' ],
     SCALAR                                => ['deref_scalar'],

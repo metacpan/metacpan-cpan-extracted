@@ -7,7 +7,7 @@ use Exporter qw(import);
 use XSLoader;
 use Time::HiRes;
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 XSLoader::load('Libssh::Session', $VERSION);
 
@@ -90,6 +90,8 @@ sub new {
         return undef;
     }
     
+    $self->{commands} = [];
+    $self->{authenticated} = 0;
     $self->{channels} = {};
     return $self;
 }
@@ -98,6 +100,12 @@ sub get_session {
     my ($self, %options) = @_;
      
     return $self->{ssh_session};
+}
+
+sub get_error {
+    my ($self, %options) = @_;
+    
+    return ssh_get_error_from_session($self->{ssh_session});
 }
 
 sub check_uint {
@@ -198,16 +206,16 @@ sub options {
             $ret = $func->($self, value => $options{$key});
         } else {
             $self->set_err(msg => sprintf("option '%s' is not supported", $key));
-            return 0;
+            return SSH_ERROR;
         }
-        if ($ret != 0) {
+        if ($ret != SSH_OK) {
             # error from libssh (< 0)
             $self->set_err(msg => sprintf("option '%s' failed: %s", $key, ssh_get_error_from_session($self->{ssh_session}))) if ($ret < 0);
-            return 0;
+            return $ret;
         }
     }
     
-    return 1;
+    return SSH_OK;
 }
 
 sub get_server_publickey {
@@ -313,6 +321,25 @@ sub disconnect {
     if (ssh_is_connected($self->{ssh_session}) == 1) {
         ssh_disconnect($self->{ssh_session});
     }
+    $self->{authenticated} = 0;
+}
+
+sub is_authenticated {
+    my ($self, %options) = @_;
+    
+    return $self->{authenticated};
+}
+
+sub auth_gssapi {
+    my ($self, %options) = @_;
+
+    my $ret = ssh_userauth_gssapi($self->{ssh_session});
+    if ($ret == SSH_AUTH_ERROR) {
+        $self->set_err(msg => sprintf("authentification failed: %s", ssh_get_error_from_session($self->{ssh_session})));
+    }
+    $self->{authenticated} = 1 if ($ret == SSH_OK);
+
+    return $ret;
 }
 
 sub auth_password {
@@ -322,6 +349,7 @@ sub auth_password {
     if ($ret == SSH_AUTH_ERROR) {
         $self->set_err(msg => sprintf("authentification failed: %s", ssh_get_error_from_session($self->{ssh_session})));
     }
+    $self->{authenticated} = 1 if ($ret == SSH_OK);
 
     return $ret;
 }
@@ -338,6 +366,7 @@ sub auth_publickey_auto {
     if ($ret == SSH_AUTH_ERROR) {
         $self->set_err(msg => sprintf("authentification failed: %s", ssh_get_error_from_session($self->{ssh_session})));
     }
+    $self->{authenticated} = 1 if ($ret == SSH_OK);
 
     return $ret;
 }
@@ -349,6 +378,7 @@ sub auth_none {
     if ($ret == SSH_AUTH_ERROR) {
         $self->set_err(msg => sprintf("authentification failed: %s", ssh_get_error_from_session($self->{ssh_session})));
     }
+    $self->{authenticated} = 1 if ($ret == SSH_OK);
 
     return $ret;
 }
@@ -370,6 +400,12 @@ sub get_issue_banner {
 #
 
 sub add_command {
+    my ($self, %options) = @_;
+
+    push @{$self->{commands}}, $options{command};
+}
+
+sub add_command_internal {
     my ($self, %options) = @_;
     my $timeout = (defined($options{timeout}) && int($options{timeout}) > 0) ? 
         $options{timeout} : 300;
@@ -395,6 +431,20 @@ sub add_command {
     
     $self->channel_request_exec(channel => ${$self->{channels}->{$channel_id}},
                                 cmd => $options{command}->{cmd});
+    if (defined($options{command}->{input_data})) {
+        if ($self->channel_write(channel => ${$self->{channels}->{$channel_id}}, data => $options{command}->{input_data}) == SSH_ERROR) {
+            $self->close_channel(channel_id => $channel_id);
+            if (defined($options{command}->{callback})) {
+                $options{command}->{callback}->(exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self);
+            } else {
+                push @{$self->{store_no_callback}}, { exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self };
+            }
+            return undef;
+        }
+        
+        # Force to finish it
+        $self->channel_send_eof(channel => ${$self->{channels}->{$channel_id}});
+    }
 }
 
 sub execute_read_channel {
@@ -454,8 +504,8 @@ sub execute_internal {
     $self->{slots} = {};
     $self->{channels_array} = [];
     while (1) {
-        while (scalar(keys %{$self->{slots}}) < $parallel && scalar(@{$options{commands}}) > 0) {
-            $self->add_command(command => shift(@{$options{commands}}), %options);
+        while (scalar(keys %{$self->{slots}}) < $parallel && scalar(@{$self->{commands}}) > 0) {
+            $self->add_command_internal(command => shift(@{$self->{commands}}), %options);
         }
         
         last if (scalar(keys %{$self->{slots}}) == 0);
@@ -511,8 +561,10 @@ sub execute_internal {
 sub execute {
     my ($self, %options) = @_;
 
+    push @{$self->{commands}}, @{$options{commands}} if (defined($options{commands}));
     $self->{store_no_callback} = [];
     $self->execute_internal(%options);
+    $self->{commands} = [];
 
     return $self->{store_no_callback};
 }
@@ -520,9 +572,10 @@ sub execute {
 sub execute_simple {
     my ($self, %options) = @_;
 
-    my $commands = [ { cmd => $options{cmd} } ];
+    $self->{commands} = [ { cmd => $options{cmd}, input_data => $options{input_data} } ];
     $self->{store_no_callback} = [];
-    $self->execute_internal(%options, commands => $commands);
+    $self->execute_internal(%options);
+    $self->{commands} = [];
 
     return pop(@{$self->{store_no_callback}});
 }
@@ -562,7 +615,6 @@ sub close_channel {
         return undef;
     }
     $self->channel_close(channel => ${$self->{channels}->{$options{channel_id}}});
-    $self->channel_send_eof(channel => ${$self->{channels}->{$options{channel_id}}});
     $self->channel_free(channel => ${$self->{channels}->{$options{channel_id}}});
     
     delete $self->{channels}->{$options{channel_id}};
@@ -588,6 +640,12 @@ sub channel_open_session {
     my ($self, %options) = @_;
     
     return ssh_channel_open_session($options{channel});
+}
+
+sub channel_write {
+    my ($self, %options) = @_;
+    
+    return ssh_channel_write($options{channel}, $options{data});
 }
 
 sub channel_request_exec {
@@ -821,7 +879,7 @@ B<Warning>: should be used if you know what are you doing!
 
 =item options ([ OPTIONS ])
 
-Set options for the ssh session. If an error occured, 0 is returned.
+Set options for the ssh session. If an error occured, != SSH_OK is returned.
 
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs. Possible options are:
 

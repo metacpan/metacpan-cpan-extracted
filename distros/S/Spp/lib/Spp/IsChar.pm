@@ -1,7 +1,3 @@
-# Copyright 2016 The Michael Song. All rights reserved.
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
 package Spp::IsChar;
 
 use Exporter;
@@ -11,12 +7,12 @@ our @EXPORT = qw(
   is_alpha is_words is_hspace is_vspace
 );
 
-use 5.012; # no 5.012 no smart-match
+use 5.012;    # no 5.012 no smart-match
 no warnings "experimental";
 
 sub is_space {
    my $r = shift;
-   return $r ~~ ["\f", "\n", "\t", "\r", ' '];
+   return $r ~~ ["\n", "\t", "\r", ' '];
 }
 
 sub is_upper {
@@ -35,8 +31,11 @@ sub is_digit {
 }
 
 sub is_xdigit {
-   my $r = shift;
-   return $r ~~ ['0' .. '9', 'a' .. 'f', 'A' .. 'F'];
+   my $char = shift;
+   return 1 if is_digit($char);
+   return 1 if $char ~~ ['a' .. 'f'];
+   return 1 if $char ~~ ['A' .. 'F'];
+   return 0;
 }
 
 sub is_alpha {

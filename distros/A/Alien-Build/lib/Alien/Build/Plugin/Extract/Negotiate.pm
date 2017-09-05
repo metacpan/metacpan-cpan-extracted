@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 has '+format' => 'tar';
@@ -112,7 +112,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

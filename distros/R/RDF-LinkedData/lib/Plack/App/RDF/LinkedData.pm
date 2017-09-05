@@ -12,11 +12,11 @@ Plack::App::RDF::LinkedData - A Plack application for running RDF::LinkedData
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =cut
 
- our $VERSION = '1.00';
+ our $VERSION = '1.02';
 
 
 =head1 SYNOPSIS
@@ -130,8 +130,8 @@ work-in-progress, It is a more lightweight but less powerful way to
 query RDF data than SPARQL. If you have this, it is recommended to
 have CORS enabled and required to have at least a minimal VoID setup.
 
-Note that in some environments, for example if the Plack server that
-is dynamically configured, and/or behind a proxy server, the server
+Note that in some environments, for example if the Plack server
+is dynamically configured and/or behind a proxy server, the server
 may fail to bind to the address you give it as hostname. In this case,
 it is wise to allow the server to bind to any public IP address,
 i.e. set the host name to 0.0.0.0.

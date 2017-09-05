@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Jun 11 13:44:43 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jun  8 22:38:39 2012
-# Update Count    : 340
+# Last Modified On: Thu Oct  8 22:21:28 2015
+# Update Count    : 344
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -59,9 +59,17 @@ sub journal {
 
     # Sort order (boekstukken).
     my $so = join(", ",
+		  $opts->{bkstsort}
+		  ? (
+		  "jnl_dbk_id",					# dagboek
+		  "bsk_nr",					# boekstuk
+		  "jnl_date",					# date
+		  )
+		  : (
 		  "jnl_date",					# date
 		  "jnl_dbk_id",					# dagboek
 		  "bsk_nr",					# boekstuk
+		  ),
 		  "CASE WHEN jnl_seq = 0 THEN 0 ELSE 1 END",# bsr 0 eerst
 		  "sign(jnl_amount) DESC",			# debet eerst
 		  "jnl_acc_id",					# rekeningnummer
@@ -156,7 +164,11 @@ sub journal {
 	    if ( $iv && $cfg->val(qw(internal noxrel), 0) ) {
 		undef $t;
 	    }
-	    $rep->add({ _style => $iv.'head',
+	    my $st = $iv.'head';
+	    if ( EB::Booking->find_attachment($jnl_bsk_id) ) {
+		$st .= 'a';
+	    }
+	    $rep->add({ _style => $st,
 			date => datefmt($jnl_bsr_date),
 			desc => join(":", _dbk_desc($jnl_dbk_id), $bsk_nr),
 			bsk  => $jnl_desc,

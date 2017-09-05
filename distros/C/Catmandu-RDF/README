@@ -5,10 +5,15 @@ NAME
 SYNOPSIS
     Command line client "catmandu":
 
-      catmandu convert RDF --url http://dx.doi.org/10.2474/trol.7.147 
+      catmandu convert RDF --url http://dx.doi.org/10.2474/trol.7.147
                            --fix 'aref_query(dct_title,title)' to YAML
 
-      catmandu convert RDF --file rdfdump.nt to RDF --type turtle
+      catmandu convert RDF --file rdfdump.ttl to RDF --type turtle
+
+      # For big file the only efficient option to convert RDF is by
+      # transforming the input stream into triples and writing to NTriples
+      # in the output
+      catmandu convert convert RDF --triples 1 --type ttl to RDF --type NTriples < rdfdump.ttl
 
     See documentation of modules for more examples.
 

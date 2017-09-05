@@ -1,6 +1,6 @@
                                    Proef- en Saldibalans
-Periode: t/m 2007-12-31
-EekBoek Demo Administratie                                               EekBoek, 2007-12-31
+Periode: t/m 2013-12-31
+EekBoek Demo Administratie                                               EekBoek, 2013-12-31
 
 RekNr   Grootboekrekening                             Debet     Credit   Saldo Db   Saldo Cr
 --------------------------------------------------------------------------------------------
@@ -12,15 +12,15 @@ RekNr   Grootboekrekening                             Debet     Credit   Saldo D
 2320    Postbank                                   10963,68     629,00   10334,68
 3100    Kapitaal de heer/mevrouw                       0,00    2443,18               2443,18
 4100    Crediteuren                                  927,84     927,84
-4200    BTW Verkoop Hoog                               0,80    1463,80               1463,00
-4220    BTW Inkoop Hoog                              148,13       0,00     148,13
+4200    BTW Verkoop Hoog                               0,87    1591,15               1590,28
+4220    BTW Inkoop Hoog                              161,06       0,00     161,06
 6800    Afschr. kosten inv. & inr.                   411,26       0,00     411,26
 6810    Afschr. kosten computers                     396,82       0,00     396,82
-6900    Telefoon- en faxkosten                       510,29       0,00     510,29
-6905    Internetkosten                               269,42       0,00     269,42
+6900    Telefoon- en faxkosten                       501,86       0,00     501,86
+6905    Internetkosten                               264,92       0,00     264,92
 6980    Bankkosten                                    32,40       0,00      32,40
-8100    Omzet advisering                               0,00    1200,00               1200,00
+8100    Omzet advisering                               0,00    1180,16               1180,16
 8300    Omzet editing                                  0,00    1000,00               1000,00
-8400    Omzet cursussen                                4,20    6504,20               6500,00
+8400    Omzet cursussen                                4,13    6396,69               6392,56
 --------------------------------------------------------------------------------------------
         TOTAAL                                     38560,69   38560,69   26825,85   26825,85

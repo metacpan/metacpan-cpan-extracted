@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # High-level interface to Perl i18n.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,7 @@ use Cwd qw (abs_path);
 
 use vars qw ($VERSION);
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 require Exporter;
 
@@ -98,6 +98,68 @@ BEGIN {
             last;
         }
     }
+}
+
+# Class methods.
+sub keywords {
+    join ' ', (
+        '--keyword=__',
+        '--keyword=%__',
+        '--keyword=$__',
+        '--keyword=__x',
+        '--keyword=__n:1,2',
+        '--keyword=__nx:1,2',
+        '--keyword=__xn:1,2',
+        '--keyword=__p:1c,2',
+        '--keyword=__px:1c,2',
+        '--keyword=__np:1c,2,3',
+        '--keyword=__npx:1c,2,3',
+        '--keyword=N__',
+        '--keyword=N__n:1,2',
+        '--keyword=N__p:1c,2',
+        '--keyword=N__np:1c,2,3',
+    );
+}
+
+sub flags {
+    join ' ', (
+        '--flag=__:1:pass-perl-format',
+        '--flag=%__:1:pass-perl-format',
+        '--flag=$__:1:pass-perl-format',
+        '--flag=__x:1:perl-brace-format',
+        '--flag=__x:1:pass-perl-format',
+        '--flag=__n:1:pass-perl-format',
+        '--flag=__n:2:pass-perl-format',
+        '--flag=__nx:1:perl-brace-format',
+        '--flag=__nx:1:pass-perl-format',
+        '--flag=__nx:2:perl-brace-format',
+        '--flag=__nx:2:pass-perl-format',
+        '--flag=__xn:1:perl-brace-format',
+        '--flag=__xn:1:pass-perl-format',
+        '--flag=__xn:2:perl-brace-format',
+        '--flag=__xn:2:pass-perl-format',
+        '--flag=__p:2:pass-perl-format',
+        '--flag=__px:2:perl-brace-format',
+        '--flag=__px:2:pass-perl-format',
+        '--flag=__np:2:pass-perl-format',
+        '--flag=__np:3:pass-perl-format',
+        '--flag=__npx:2:perl-brace-format',
+        '--flag=__npx:2:pass-perl-format',
+        '--flag=__npx:3:perl-brace-format',
+        '--flag=__npx:3:pass-perl-format',
+        '--flag=N__:1:pass-perl-format',
+        '--flag=N__n:1:pass-perl-format',
+        '--flag=N__n:2:pass-perl-format',
+        '--flag=N__p:2:pass-perl-format',
+        '--flag=N__np:2:pass-perl-format',
+        '--flag=N__np:3:pass-perl-format',
+    );
+}
+
+sub options {
+    my ($class) = @_;
+
+    join ' ', $class->keywords, $class->flags;
 }
 
 # Normal gettext.
@@ -962,6 +1024,55 @@ A reference to C<%__>, in case you prefer:
 
 =back
 
+=head1 CLASS METHODS
+
+The following class methods are defined:
+
+=over 4
+
+=item B<options>
+
+Returns a space-separated list of all '--keyword' and all '--flag' options
+for B<xgettext(1)>, when extracing strings from Perl source files localized
+with B<Locale::TextDomain>.
+
+The option should rather be called B<xgettextDefaultOptions>.  With regard
+to the typical use-case, a shorter name has been picked:
+
+    xgettext `perl -MLocale::TextDomain -e 'print Locale::TextDomain->options'`
+
+See L<https://www.gnu.org/software/gettext/manual/html_node/xgettext-Invocation.html>
+for more information about the xgettext options '--keyword' and '--flag'.
+
+If you want to disable the use of the xgettext default keywords, you
+should pass an option '--keyword=""' to xgettext before the options returned
+by this method.
+
+If you doubt the usefulness of this method, check the output on the
+command-line:
+
+    perl -MLocale::TextDomain -e 'print Locale::TextDomain->options'
+
+Nothing that you want to type yourself.
+
+This method was added in libintl-perl 1.28.
+
+=item B<keywords>
+
+Returns a space-separated list of all '--keyword' options for B<xgettext(1)> 
+so that all translatable strings are properly extracted.
+
+This method was added in libintl-perl 1.28.
+
+=item B<flags>
+
+Returns a space-separated list of all '--flag' options for B<xgettext(1)> 
+so that extracted strings are properly flagged.
+
+This method was added in libintl-perl 1.28.
+
+=back
+
 =head1 PERFORMANCE
 
 Message translation can be a time-consuming task.  Take this little
@@ -1040,7 +1151,7 @@ overhead for the function calls.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 

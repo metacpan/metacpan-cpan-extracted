@@ -203,8 +203,8 @@ unknown.  The decoded data is returned.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.001,
-built on July 26, 2017.
+This module is part of Mail-Message distribution version 3.002,
+built on September 04, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

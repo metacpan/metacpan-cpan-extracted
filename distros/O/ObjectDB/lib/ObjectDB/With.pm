@@ -3,7 +3,7 @@ package ObjectDB::With;
 use strict;
 use warnings;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 sub new {
     my $class = shift;
@@ -14,17 +14,24 @@ sub new {
 
     $self->{meta} = $params{meta};
     $self->{with} = $params{with};
-    $self->{with} = [$self->{with}]
+    $self->{with} = [ $self->{with} ]
       if $self->{with} && ref $self->{with} ne 'ARRAY';
 
-    my $joins = {join => []};
+    my $joins = { join => [] };
 
     my %seen;
-    if (my @with = sort grep { defined } @{$self->{with} || []}) {
+    if (my @with = sort grep { defined } @{ $self->{with} || [] }) {
         foreach my $with (@with) {
             my $meta = $self->{meta};
 
-            my @parts = split /[.]/xms, $with;
+            my $name = $with;
+            my $columns;
+            if (ref $name eq 'HASH') {
+                $name    = $with->{name};
+                $columns = $with->{columns};
+            }
+
+            my @parts = split /[.]/xms, $name;
 
             my $seen        = q{};
             my $parent_join = $joins;
@@ -48,14 +55,14 @@ sub new {
                 );
 
                 foreach my $join (@joins) {
-                    push @{$parent_join->{join}},
+                    push @{ $parent_join->{join} },
                       {
                         source   => $join->{table},
                         rel_name => $join->{as},
                         as       => $name_prefix . $join->{as},
                         on       => $join->{constraint},
                         op       => $join->{join},
-                        columns  => $join->{columns},
+                        columns  => $columns || $join->{columns},
                         join     => []
                       };
                 }

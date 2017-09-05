@@ -1,0 +1,41 @@
+#title Multiline footnotes
+
+This is a paragraph [1] with a [2] footnote [11] Footnote [3]
+and another [4]
+
+[1] Footnote.
+
+    Here the footnote continues, because of the same indentation.
+
+
+[11] Footnote.
+
+     Here it continues as well.
+
+    Continuing.
+
+
+[2] Footnote, single.
+
+  This is just a quotation because indentation doesn't match.
+
+[3] Multiple footnotes lines.
+
+   With a space less.
+
+    With the same space.
+
+     With more space.
+
+      And this is a centering because there is too much indentation.
+
+[4] Multiple footnotes lines.
+
+     With a space less.
+
+   With the less space.
+
+     With more space.
+
+    With the same space.
+

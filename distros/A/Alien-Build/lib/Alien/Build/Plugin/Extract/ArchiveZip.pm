@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 has '+format' => 'zip';
@@ -50,7 +50,7 @@ Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

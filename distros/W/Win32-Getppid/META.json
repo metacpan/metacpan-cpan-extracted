@@ -3,8 +3,8 @@
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,21 +14,13 @@
    },
    "name" : "Win32-Getppid",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "6.64",
             "perl" : "5.008001"
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "Devel::PPPort" : "3.23",
             "File::Spec" : "0",
@@ -53,7 +45,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
             "perl" : "5.008001"
          }
       }
@@ -63,13 +55,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Win32-Getppid/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Win32-Getppid",
+      "homepage" : "https://metacpan.org/pod/Win32::Getppid",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Win32-Getppid.git",
          "web" : "https://github.com/plicease/Win32-Getppid"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

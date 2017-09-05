@@ -4,9 +4,9 @@
       "Paul Bennett <paul.w.bennett@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Statistics::Descriptive" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,11 +35,26 @@
             "Exporter" : "0",
             "List::AllUtils" : "0",
             "overload" : "0",
-            "perl" : "5.018000",
-            "utf8" : "0"
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Statistics::Descriptive" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.013"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PWBENNETT/Statistics-Distribution-Generator.git",
+         "web" : "https://github.com/PWBENNETT/Statistics-Distribution-Generator"
+      }
+   },
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -8,7 +8,7 @@ use MarpaX::Languages::M4::Impl::Default;
 class MarpaX::Languages::M4 {
     extends 'MarpaX::Languages::M4::Impl::Default';
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -54,7 +54,7 @@ MarpaX::Languages::M4 - M4 pre-processor
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

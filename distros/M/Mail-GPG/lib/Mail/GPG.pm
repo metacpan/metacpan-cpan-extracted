@@ -1,6 +1,6 @@
 package Mail::GPG;
 
-$VERSION = "1.0.10";
+$VERSION = "1.0.11";
 
 use strict;
 use Carp;
@@ -12,33 +12,31 @@ use Mail::GPG::Result;
 use Mail::Address;
 use File::Temp;
 use List::MoreUtils ();
+use AnyEvent;
 
-$Mail::GPG::SKIP_EVENT = $ENV{MAIL_GPG_SKIP_EVENT}
-    unless defined $Mail::GPG::SKIP_EVENT;
+#-- control debug output on i/o multiplexing
+use constant IODEBUG => 0;
 
-my $HAS_EVENT = 0;
-$Mail::GPG::SKIP_EVENT || eval { use Event; $HAS_EVENT = 1 };
-
-sub get_default_key_id		{ shift->{default_key_id}		}
-sub get_default_passphrase	{ shift->{default_passphrase}		}
-sub get_debug			{ shift->{debug}			}
-sub get_debug_dir		{ shift->{debug_dir}			}
-sub get_gnupg_hash_init		{ shift->{gnupg_hash_init}		}
-sub get_digest			{ shift->{digest}			}
-sub get_default_key_encrypt	{ shift->{default_key_encrypt}		}
-sub get_gpg_call		{ shift->{gpg_call}			}
-sub get_no_strict_7bit_encoding	{ shift->{no_strict_7bit_encoding}	}
+sub get_default_key_id          { shift->{default_key_id}               }
+sub get_default_passphrase      { shift->{default_passphrase}           }
+sub get_debug                   { shift->{debug}                        }
+sub get_debug_dir               { shift->{debug_dir}                    }
+sub get_gnupg_hash_init         { shift->{gnupg_hash_init}              }
+sub get_digest                  { shift->{digest}                       }
+sub get_default_key_encrypt     { shift->{default_key_encrypt}          }
+sub get_gpg_call                { shift->{gpg_call}                     }
+sub get_no_strict_7bit_encoding { shift->{no_strict_7bit_encoding}      }
 sub get_use_long_key_ids        { shift->{use_long_key_ids}             }
 
-sub set_default_key_id		{ shift->{default_key_id}	= $_[1]	}
-sub set_default_passphrase	{ shift->{default_passphrase}	= $_[1]	}
-sub set_debug			{ shift->{debug}		= $_[1]	}
-sub set_debug_dir		{ shift->{debug_dir}		= $_[1]	}
-sub set_gnupg_hash_init		{ shift->{gnupg_hash_init}	= $_[1]	}
-sub set_digest			{ shift->{digest}		= $_[1]	}
-sub set_default_key_encrypt	{ shift->{default_key_encrypt}	= $_[1]	}
-sub set_gpg_call		{ shift->{gpg_call}		= $_[1]	}
-sub set_no_strict_7bit_encoding	{ shift->{no_strict_7bit_encoding}=$_[1]}
+sub set_default_key_id          { shift->{default_key_id}       = $_[1] }
+sub set_default_passphrase      { shift->{default_passphrase}   = $_[1] }
+sub set_debug                   { shift->{debug}                = $_[1] }
+sub set_debug_dir               { shift->{debug_dir}            = $_[1] }
+sub set_gnupg_hash_init         { shift->{gnupg_hash_init}      = $_[1] }
+sub set_digest                  { shift->{digest}               = $_[1] }
+sub set_default_key_encrypt     { shift->{default_key_encrypt}  = $_[1] }
+sub set_gpg_call                { shift->{gpg_call}             = $_[1] }
+sub set_no_strict_7bit_encoding { shift->{no_strict_7bit_encoding}=$_[1]}
 sub set_use_long_key_ids        { shift->{use_long_key_ids}     = $_[1] }
 
 sub new {
@@ -185,11 +183,6 @@ sub check_encryption {
 }
 
 sub perform_multiplexed_gpg_io {
-    $HAS_EVENT ? perform_multiplexed_gpg_io_event(@_) :
-                 perform_multiplexed_gpg_io_select(@_);
-}
-
-sub perform_multiplexed_gpg_io_select {
     my $self = shift;
     my %par  = @_;
     my  ($data_fh, $data_canonify, $stdin_fh, $stderr_fh) =
@@ -199,7 +192,14 @@ sub perform_multiplexed_gpg_io_select {
     my  ($status_sref) =
     $par{'status_sref'};
 
-    require IO::Select;
+    #-- Debug stuff
+    IODEBUG && print "anyevent\n";
+    my $nl = "\n";
+    my $r = 0;
+    my $w = 0;
+
+    #-- I/O buffer size
+    my $bsize = 8192;
 
     #-- perl < 5.6 compatibility: seek() and read() work
     #-- on native GLOB filehandle only, so dertmine type
@@ -214,211 +214,167 @@ sub perform_multiplexed_gpg_io_select {
         $data_fh->seek( 0, 0 );
     }
 
-    #-- create IO::Select objects for all
-    #-- filehandles in question
-    my $stdin  = IO::Select->new($stdin_fh);
-    my $stderr = IO::Select->new($stderr_fh);
-    my $stdout = IO::Select->new($stdout_fh);
-    my $status = $status_fh ? IO::Select->new($status_fh) : undef;
-
-    my $buffer;
-    while (1) {
-
-        #-- as long we has data try to write
-        #-- it into gpg
-        while ( $data_fh && $stdin->can_write(0.1) ) {
-            if ( $data_fh_glob
-                ? read $data_fh,
-                $buffer, 1024
-                : $data_fh->read( $buffer, 1024 ) ) {
-
-                #-- ok, got a block of data
-                if ($data_canonify) {
-
-                    #-- canonify it if requested
-                    $buffer =~ s/\x0A/\x0D\x0A/g;
-                    $buffer =~ s/\x0D\x0D\x0A/\x0D\x0A/g;
-                }
-
-                #-- feed it into gpg
-                print $stdin_fh $buffer;
-            }
-            else {
-
-                #-- no data read, close gpg's stdin
-                #-- and set the data filehandle to false
-                close $stdin_fh;
-                $data_fh = 0;
-            }
-        }
-
-        #-- probably we can read from gpg's stdout
-        while ( $stdout->can_read(0.1) ) {
-            last if eof($stdout_fh);
-            $$stdout_sref .= <$stdout_fh>;
-        }
-
-        #-- probably we can read from gpg's stderr
-        while ( $stderr->can_read(0.1) ) {
-            last if eof($stderr_fh);
-            $$stderr_sref .= <$stderr_fh>;
-        }
-
-        #-- probably we can read from gpg's status
-        if ($status) {
-            while ( $status->can_read(0.1) ) {
-                last if eof($status_fh);
-                $$status_sref .= <$status_fh>;
-            }
-        }
-
-        #-- we're finished if no more data left
-        #-- and both gpg's stdout and stderr
-        #-- are at eof.
-        return
-            if !$data_fh
-            && eof($stderr_fh)
-            && eof($stdout_fh)
-            && ( !$status_fh || eof($status_fh) );
-    }
-
-    1;
-}
-
-sub perform_multiplexed_gpg_io_event {
-    my $self = shift;
-    my %par  = @_;
-    my  ($data_fh, $data_canonify, $stdin_fh, $stderr_fh) =
-    @par{'data_fh','data_canonify','stdin_fh','stderr_fh'};
-    my  ($stdout_fh, $status_fh, $stderr_sref, $stdout_sref) =
-    @par{'stdout_fh','status_fh','stderr_sref','stdout_sref'};
-    my  ($status_sref) =
-    $par{'status_sref'};
-
-    #-- perl < 5.6 compatibility: seek() and read() work
-    #-- on native GLOB filehandle only, so dertmine type
-    #-- of filehandle here
-    my $data_fh_glob = ref $data_fh eq 'GLOB';
-
-    #-- rewind the data filehandle
-    if ($data_fh_glob) {
-        seek $data_fh, 0, 0;
-    }
-    else {
-        $data_fh->seek( 0, 0 );
-    }
-
-    my $data_buffer = "";
-
+    #-- Watchers for various handles
     my ($data_watcher, $stdin_watcher, $stderr_watcher,
         $stdout_watcher, $status_watcher);
 
-    $data_watcher = Event->io (
-        fd   => $data_fh,
-        poll => 're',
-        desc => "data ($data_fh)",
-        cb   => sub {
-            my $buffer;
-            my $rc = sysread($data_fh, $buffer, 4096);
+    #-- Buffer for data reading and stdin writing
+    my $data_buffer = "";
+
+    #-- Mainloop condvar
+    my $done = AnyEvent->condvar;
+
+    IODEBUG && print "dw $nl";
+
+    #-- watch for incoming data
+    $data_watcher = AnyEvent->io (
+        fh => $data_fh,
+        poll => "r",
+        cb => sub {
+            IODEBUG && print "d";
+
+            my $rc = sysread($data_fh, my $buffer, $bsize);
+
+            IODEBUG && ( $r += $rc );
+            IODEBUG && print "($rc->$r) $nl";
+
+            #-- on eof stop watcher and close filehandle
+            if ( !$rc ) {
+                IODEBUG && print "de $nl";
+                $data_watcher = undef;
+                close $data_fh;
+                return;
+            }
 
             if ( $data_canonify ) {
                 #-- canonify it if requested
                 $buffer =~ s/\x0A/\x0D\x0A/g;
                 $buffer =~ s/\x0D\x0D\x0A/\x0D\x0A/g;
             }
-            
+
             $data_buffer .= $buffer;
-            
-            $stdin_watcher->start
-                if $data_buffer ne '' and !$stdin_watcher->is_active;
 
-            if ( !$rc ) {
-                $data_watcher->cancel;
-                $data_watcher = undef;
-                $stdin_watcher->cancel if $data_buffer eq '';
-                close $stdin_fh if $data_buffer eq '';
-                return;
+            #-- start stdin watcher if there is no watcher yet
+            if ( not $stdin_watcher ) {
+                IODEBUG && print "iw $nl";
+
+                $stdin_watcher = AnyEvent->io (
+                    fh   => $stdin_fh,
+                    poll => 'w',
+                    cb   => sub {
+                        IODEBUG && print "i";
+
+                        my $written = syswrite($stdin_fh, $data_buffer, $bsize);
+
+                        $w += $written;
+                        IODEBUG && print "($written->$w) $nl";
+
+                        #-- if we couldn't write anything, stop watcher
+                        if ( not defined $written ) {
+                            $stdin_watcher = undef;
+                            IODEBUG && print "ie $nl";
+                            return;
+                        }
+
+                        #-- cut off i/o buffer
+                        $data_buffer = substr($data_buffer, $written) if $written;
+
+                        #-- on empty buffer there is no need to watch
+                        #-- for writing into the stdin handle
+                        $stdin_watcher = undef if $data_buffer eq "";
+
+                        IODEBUG && print "is $nl" unless $stdin_watcher;
+
+                        #-- if read and write watchers are off, we
+                        #-- are done with feeding and close stdin
+                        #-- filehandle to signal that to gpg
+                        if ( not $stdin_watcher and not $data_watcher ) {
+                            IODEBUG && print "ic $nl";
+                            close $stdin_fh;
+                        }
+                    },
+                );
             }
-        },
+        }
     );
 
-    $stdin_watcher = Event->io (
-        fd   => $stdin_fh,
-        poll => 'we',
-        cb   => sub {
-            my $written = syswrite($stdin_fh, $data_buffer, length($data_buffer));
-            if ( not defined $written ) {
-                $stdin_watcher->cancel;
-                close $stdin_fh;
-                $data_watcher->cancel;
-                $stderr_watcher->cancel;
-                $stdout_watcher->cancel;
-                $status_watcher->cancel;
-                Event::unloop();
-                return;
-            }
-            $data_buffer = substr($data_buffer, $written) if $written;
-            if ( $data_buffer eq '' && !$data_watcher ) {
-                $stdin_watcher->cancel;
-                close $stdin_fh;
-            }
-            elsif ( $data_buffer eq '' ) {
-                $stdin_watcher->stop;
-            }
-        },
-    );
-    $stdin_watcher->stop;
+    IODEBUG && print "ew $nl";
 
-    $stderr_watcher = Event->io (
-        fd   => $stderr_fh,
-        poll => 're',
+    #-- grab stderr
+    $stderr_watcher = AnyEvent->io (
+        fh   => $stderr_fh,
+        poll => 'r',
         cb   => sub {
+            IODEBUG && print "e";
+
             my $rc = sysread(
                 $stderr_fh,
                 ${$stderr_sref},
-                4096,
+                $bsize,
                 length(${$stderr_sref})
             );
-            $stderr_watcher->cancel unless $rc;
+
+            IODEBUG && print "($rc) $nl";
+
+            $stderr_watcher = undef unless $rc;
         },
     );
 
-    $stdout_watcher = Event->io (
-        fd   => $stdout_fh,
-        poll => 're',
+    #-- grab stdout and stop loop on eof
+    $stdout_watcher = AnyEvent->io (
+        fh   => $stdout_fh,
+        poll => 'r',
         cb   => sub {
+            IODEBUG && print "o";
+
             my $rc = sysread(
                 $stdout_fh,
                 ${$stdout_sref},
-                4096,
+                $bsize,
                 length(${$stdout_sref})
             );
-            $stdout_watcher->cancel unless $rc;
+
+            IODEBUG && print "($rc) $nl";
+
+            #-- if gpg stdout is eof we're done
+            if ( not $rc ) {
+                $stdout_watcher = undef;
+                $done->send;
+            }
         },
     );
 
+    #-- grab status if requested
     if ( $status_fh ) {
-        $status_watcher = Event->io (
-            fd   => $status_fh,
-            poll => 're',
+        IODEBUG && print "sw $nl";
+
+        $status_watcher = AnyEvent->io (
+            fh   => $status_fh,
+            poll => 'r',
             cb   => sub {
+                IODEBUG && print "s";
+
                 my $rc = sysread(
                     $status_fh,
                     ${$status_sref},
-                    4096,
+                    $bsize,
                     length(${$status_sref})
                 );
-                $status_watcher->cancel unless $rc;
+
+                IODEBUG && print "($rc) $nl";
+
+                $status_watcher = undef unless $rc;
             },
         );
     }
 
-    Event::loop();
+    IODEBUG && print "loop $nl";
+
+    #-- enter mainloop until eof of gpg stdout
+    $done->recv;
 
     1;
 }
-
-
 
 #-- Addresses bug:     https://rt.cpan.org/Public/Bug/Display.html?id=103828  (here)
 #-- Possibly also:     https://rt.cpan.org/Public/Bug/Display.html?id=81082   (here)
@@ -1804,17 +1760,8 @@ that is OpenPGP MIME and traditional armor signed/encrypted mails.
   MIME-tools        >= 5.419
   MIME::QuotedPrint >= 2.20  (part of MIME-Base64 distribution)
   GnuPG::Interface  >= 0.52
-  Event             >= 1.24
   List::MoreUtils   >= 0.410
-
-Since version 1.0.7 the Event module is loaded when present. This
-gives a small performance boost when handling big entities. If you
-like to fallback to the old IO::Select based behaviour set either
-
-  $Mail::GPG::SKIP_EVENT    = 1
-  $ENV{MAIL_GPG_SKIP_EVENT} = 1
-  
-before loading Mail::GPG.
+  AnyEvent
 
 =head1 INSTALLATION
 

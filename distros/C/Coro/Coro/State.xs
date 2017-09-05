@@ -2374,7 +2374,7 @@ safe_cancel (pTHX_ struct coro *coro, SV **arg, int items)
   if (coro->cctx)
     croak ("coro inside C callback, unable to cancel at this time, caught");
 
-  if (coro->flags & CF_NEW)
+  if (coro->flags & (CF_NEW | CF_ZOMBIE))
     {
       coro_set_status (aTHX_ coro, arg, items);
       coro_state_destroy (aTHX_ coro);

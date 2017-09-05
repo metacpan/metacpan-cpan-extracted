@@ -5,13 +5,13 @@ use Carp;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/
-		       $fargs_re
 		       $char_const_re
 		       $comment_re
 		       $cpp_re
 		       $cvar_re
 		       $cxx_comment_re
 		       $decimal_re
+		       $fargs_re
 		       $grammar_re
 		       $hex_re
 		       $include
@@ -26,17 +26,17 @@ our @EXPORT_OK = qw/
 		       $word_re
 		       @fields
 		       decomment
-		       remove_quotes
-		       tokenize
 		       function_arg
+		       remove_quotes
 		       strip_comments
+		       tokenize
 		   /;
 
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 # http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf
 # 6.4.1
@@ -453,8 +453,11 @@ sub strip_comments
     my ($xs) = @_;
     # Remove trad comments but keep the line numbering. Trad comments
     # are deleted before C++ comments, see below for explanation.
-    while ($xs =~ /($trad_comment_re)/) {
+    while ($xs =~ /($single_string_re|$trad_comment_re|$cxx_comment_re)/g) {
         my $comment = $1;
+	if ($comment =~ /^".*"$/) {
+	    next;
+	}
 	# If the C comment consists of int/* comment */x;, it compiles
 	# OK, but if /* comment */ is completely removed then intx;
 	# doesn't compile, so at minimum substitute one space
@@ -465,10 +468,6 @@ sub strip_comments
         }
         $xs =~ s/\Q$comment\E/$subs/;
     }
-    # Remove "//" comments. Must do this only after removing trad
-    # comments, otherwise "/* http://bad */" has its final "*/"
-    # wrongly removed.
-    $xs =~ s/$cxx_comment_re/\n/g;
     return $xs;
 }
 

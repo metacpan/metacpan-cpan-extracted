@@ -36,10 +36,10 @@ public:
 
     void set (const datetime*, const datetime*);
 
-    err_t set (const char* str, size_t len = 0) {
+    err_t set (string_view str) {
         _ensure_mutable();
         datetime date;
-        err_t error = parse_relative(str, len, &date);
+        err_t error = parse_relative(str, &date);
         if (error != E_OK) return error;
         _year  = date.year;
         _month = date.mon;
@@ -67,7 +67,7 @@ public:
     DateRel (const DateRel* source)                       : _is_const(false) { set(source); }
     DateRel (const DateRel& source)                       : _is_const(false) { set(&source); }
     DateRel (const datetime* from, const datetime* till)  : _is_const(false) { set(from, till); }
-    DateRel (const char* str, size_t len = 0)             : _is_const(false) { set(str, len); }
+    DateRel (string_view str)                             : _is_const(false) { set(str); }
     
     DateRel& operator= (const DateRel& source) {
         if (this != &source) set(&source);

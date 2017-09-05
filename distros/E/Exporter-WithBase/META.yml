@@ -28,4 +28,4 @@ requires:
 resources:
   homepage: https://github.com/dolmen-perl5/Exporter-WithBase
   repository: https://github.com/dolmen-perl5/Exporter-WithBase.git
-version: '1.00'
+version: '1.01'

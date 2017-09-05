@@ -70,7 +70,7 @@ use AnyEvent::Util ();
 
 use Errno ();
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 =head2 METHODS
 

@@ -1,0 +1,41 @@
+---
+abstract: 'A prove plugin to get/set random seed of shuffled test.'
+author:
+  - 'Masahiro Iuchi <masahiro.iuchi@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Prove-Plugin-RandomSeed
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::RandomSeed:
+    file: lib/App/Prove/Plugin/RandomSeed.pm
+    version: '0.01'
+requires:
+  App::Prove: '0'
+  Class::Method::Modifiers: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/masiuchi/p5-app-prove-plugin-random-seed/issues
+  homepage: https://github.com/masiuchi/p5-app-prove-plugin-random-seed
+  repository: git://github.com/masiuchi/p5-app-prove-plugin-random-seed.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

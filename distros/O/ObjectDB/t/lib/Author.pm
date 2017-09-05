@@ -15,7 +15,7 @@ __PACKAGE__->meta(
         books => {
             type  => 'one to many',
             class => 'Book',
-            map   => {id => 'author_id'}
+            map   => { id => 'author_id' }
         }
     },
 );

@@ -30,10 +30,12 @@ share/js/core/main.js
 share/js/core/prototypes.js
 share/js/core/qunit.js
 share/js/core/require.js
+share/js/core/root.js
 share/js/core/stack.js
 share/js/core/start.js
 share/js/core/target.js
 share/js/core/test.js
+share/js/core/test-go.js
 share/js/core/tests/cf.js
 share/js/core/tests/current-user.js
 share/js/core/tests/dummy.js
@@ -49,6 +51,9 @@ share/js/mfile-www/drowselect-init.js
 share/js/mfile-www/dtable-init.js
 share/js/mfile-www/lib.js
 share/js/mfile-www/target-init.js
+share/js/mfile-www/test.js
+share/js/mfile-www/tests/dmenu.js
+share/js/mfile-www/tests/dummy.js
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

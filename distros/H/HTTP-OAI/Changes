@@ -1,9 +1,12 @@
 Revision history for HTTP-OAI
 
+4.06  2017-09-01 07:55:01 CEST
+  - Fixed metadataPrefix unreserved characters bugs [sdt]
+
 4.05  2017-07-15 10:19:45 CEST
   - Fixing 5.26 installs
   - Fixing installation of command line tools
-  
+
 4.04  2017-01-19 10:06:11 CET
   - Moving to Dist::Milla [phochste]
   - Fixed Test t/getrecord.t fails [phochste]

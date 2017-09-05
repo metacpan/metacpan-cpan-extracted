@@ -14,7 +14,7 @@ use constant SKIP      => 2;
 #inherits Apache::Session
 #link Lemonldap::NG::Common::Apache::Session::SOAP protected globalStorage
 
-our $VERSION = '1.9.7';
+our $VERSION = '1.9.11';
 our ( %EXPORT_TAGS, @EXPORT_OK, @EXPORT );
 
 our $tsv = {};    # Hash ref containing thread-shared values, filled
@@ -209,6 +209,26 @@ sub retrieveSession {
         Lemonldap::NG::Handler::Main::Logger->lmLog( "Get session $id",
             'debug' );
 
+        # Update the session to notify activity, if necessary
+        if ( $tsv->{timeoutActivity}
+            and
+            ( $now - $datas->{_lastSeen} > $tsv->{timeoutActivityInterval} ) )
+        {
+            $session->update( { '_lastSeen' => $now } );
+            $datas = $session->data;
+
+            if ( $session->error ) {
+                Lemonldap::NG::Handler::Main::Logger->lmLog(
+                    "Cannot update session $id", 'error' );
+                Lemonldap::NG::Handler::Main::Logger->lmLog( $session->error,
+                    'error' );
+            }
+            else {
+                Lemonldap::NG::Handler::Main::Logger->lmLog(
+                    "Update _lastSeen with $now", 'debug' );
+            }
+        }
+
         # Verify that session is valid
         if (
             $now - $datas->{_utime} > $tsv->{timeout}
@@ -223,25 +243,6 @@ sub retrieveSession {
             # Clean cached data
             $datas = {};
             return 0;
-        }
-
-        # Update the session to notify activity, if necessary
-        if ( $tsv->{timeoutActivity}
-            and
-            ( $now - $datas->{_lastSeen} > $tsv->{timeoutActivityInterval} ) )
-        {
-            $session->update( { '_lastSeen' => $now } );
-
-            if ( $session->error ) {
-                Lemonldap::NG::Handler::Main::Logger->lmLog(
-                    "Cannot update session $id", 'error' );
-                Lemonldap::NG::Handler::Main::Logger->lmLog( $session->error,
-                    'error' );
-            }
-            else {
-                Lemonldap::NG::Handler::Main::Logger->lmLog(
-                    "Update _lastSeen with $now", 'debug' );
-            }
         }
 
         $datasUpdate = $now;

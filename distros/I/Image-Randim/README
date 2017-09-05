@@ -1,0 +1,20 @@
+Image::Randim::Source provides a quick way to pull information about
+random image from an online image provider, such as Desktoppr or
+Unsplash.
+
+It was created to make it easy to look at many different random images
+for desktop wallpaper switching.
+
+The library provides a means to pull just the necessary information to
+get the image URLs, but does not provide the download capability.
+
+The included script "randim" does provide that ability, though, along
+with ways to store images you like locally and change the desktop
+background.
+
+The module can easily be expanded to support additional online sources
+by creating a module that implements Image::Randim::Source::Role and
+I'd love to add some more.
+
+POD documentation is included with each module and the script.
+

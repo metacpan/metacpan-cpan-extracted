@@ -1,0 +1,7 @@
+
+=pod
+
+=include український@src.pod
+
+=cut
+

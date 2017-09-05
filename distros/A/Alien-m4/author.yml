@@ -5,6 +5,11 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - exe
+    - Autoconf
+    - Build.PL
+    - Unixen
+    - gm4
+    - gnum4
 
 pod_coverage:
   skip: 0
@@ -13,11 +18,3 @@ pod_coverage:
   private:
     - #alien_helper
 
-unused_vars:
-  skip: 0
-  global:
-    ignore_vars: []
-  module: {}
-
-version:
-  dir: lib

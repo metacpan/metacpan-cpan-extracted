@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK;
 
-$BankAccount::Validator::UK::VERSION   = '0.31';
+$BankAccount::Validator::UK::VERSION   = '0.32';
 $BankAccount::Validator::UK::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK - Interface to validate UK bank account.
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
@@ -644,7 +644,7 @@ L<http://search.cpan.org/dist/BankAccount-Validator-UK/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 - 2016 Mohammad S Anwar.
+Copyright (C) 2012 - 2017 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License  (2.0). You may obtain a copy of the full

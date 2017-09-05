@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 # ------------------------
 # This package defines how our web server handles the request-response 
@@ -154,9 +154,13 @@ sub _render_response_html {
     my $ce = $session->{'currentUser'};
     my $cepriv = $session->{'currentUserPriv'};
     my $entity;
-    $entity = ( $r->path_info =~ m/test/i )
-        ? $self->test_html( $ce, $cepriv )
-        : $self->main_html( $ce, $cepriv );
+    if ( $r->path_info =~ m/test/i ) {
+        $log->debug( "Running unit tests" );
+        $entity = $self->test_html( $ce, $cepriv );
+    } else {
+        $log->debug( "Running the app" );
+        $entity = $self->main_html( $ce, $cepriv );
+    }
     return $entity;
 }
 
@@ -298,6 +302,7 @@ FIXME: might be worth spinning this off into a separate module.
 
 sub main_html {
     my ( $self, $ce, $cepriv ) = @_;
+    $log->debug( "Entering " . __PACKAGE__ . "::main_html" );
 
     $cepriv = '' unless defined( $cepriv );
     $log->debug( "Entering " . __PACKAGE__ . "::main_html() with \$ce " .
@@ -309,8 +314,8 @@ sub main_html {
     $r .= "<title>App::MFILE::WWW " . $meta->META_MFILE_APPVERSION . "</title>";
     $r .= '<link rel="stylesheet" type="text/css" href="/css/start.css" />';
 
-    # Bring in RequireJS
-    $r .= $self->_require_js($ce, $cepriv);
+    # Bring in RequireJS with test == 0 (false)
+    $r .= $self->_require_js($ce, $cepriv, 0);
 
     $r .= '</head>';
     $r .= '<body>';
@@ -326,12 +331,24 @@ sub main_html {
 
 =head3 test_html
 
-Generate html for running unit tests
+Generate html for running (core and app) unit tests. The following JS files are
+run (in this order):
+
+=over
+
+=item test.js (in mfile-www core)
+
+=item test.js (in app, e.g. dochazka-www)
+
+=item test-go.js (in mfile-www core)
+
+=back
 
 =cut
 
 sub test_html {
     my ( $self, $ce, $cepriv ) = @_;
+    $log->debug( "Entering " . __PACKAGE__ . "::test_html" );
 
     my $r = '';
     
@@ -340,15 +357,18 @@ sub test_html {
     $r .= "<title>App::MFILE::WWW " . $meta->META_MFILE_APPVERSION . " (Unit testing)</title>";
     $r .= '<link rel="stylesheet" type="text/css" href="/css/qunit.css" />';
 
-    # Bring in RequireJS
-    $r .= $self->_require_js($ce, $cepriv);
+    # Bring in RequireJS with test == 1 (true)
+    $r .= $self->_require_js($ce, $cepriv, 1);
 
     $r .= '</head><body>';
     $r .= '<div id="qunit"></div>';
     $r .= '<div id="qunit-fixture"></div>';
 
-    # Start unit tests
-    $r .= '<script>require([\'test\']);</script>';
+    # Run unit tests; see:
+    # - test.js (in mfile-www core)
+    # - app/test.js (in app; e.g. dochazka-www
+    # - test-go.js (in mfile-www core)
+    $r .= '<script>require([\'test\', \'app/test\', \'test-go\']);</script>';
 
     $r .= '</body></html>';
     return $r;
@@ -357,7 +377,7 @@ sub test_html {
 
 # HTML necessary for RequireJS
 sub _require_js {
-    my ( $self, $ce, $cepriv ) = @_;
+    my ( $self, $ce, $cepriv, $test ) = @_;
 
     my $r = '';
 
@@ -431,7 +451,10 @@ sub _require_js {
     }
 
     # dummyParam in last position so we don't have to worry about comma/no comma
-    $r .= 'dummyParam: null';
+    $r .= 'dummyParam: null,';
+
+    # unit tests running?
+    $r .= "testing: " . ( $test ? 'true' : 'false' );
 
     $r .= '} } });';
     $r .= '</script>';

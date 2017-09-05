@@ -1,3 +1,4 @@
+.travis.yml
 Build.PL
 lib/Alien/libvas.pm
 MANIFEST			This list of files

@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Mon Jan 16 20:47:38 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  8 08:22:15 2016
-# Update Count    : 244
+# Last Modified On: Mon Mar  7 08:38:34 2016
+# Update Count    : 263
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -23,6 +23,8 @@ use warnings;
 use EB;
 use EB::Format;
 use Encode;
+use Fcntl qw( O_WRONLY O_CREAT );
+use EB::Tools::Attachments;
 
 my $ident;
 
@@ -41,6 +43,13 @@ sub export {
 	$self->_write("$dir/relaties.eb", sub { print { shift } $self->_relaties });
 	$self->_write("$dir/opening.eb",  sub { print { shift } $self->_opening  });
 	$self->_write("$dir/mutaties.eb", sub { print { shift } $self->_mutaties($opts) });
+
+	my $att = EB::Tools::Attachments->new;
+	foreach my $rr ( @{ $att->attachments } ) {
+	    next if $rr->{encoding} == ATTENCODING_URI;
+	    my $file = sprintf( "$dir/%08d_%s", $rr->{id}, $rr->{name} );
+	    $att->save_to_file( $file, $rr->{id} );
+	}
 	return;
 
     }
@@ -76,6 +85,15 @@ sub export {
 	$m->desiredCompressionMethod(8);
 	$m = $zip->addString(_enc($self->_mutaties($opts)), "mutaties.eb");
 	$m->desiredCompressionMethod(8);
+
+	# Attachments.
+	my $att = EB::Tools::Attachments->new;
+	foreach my $rr ( @{ $att->attachments } ) {
+	    next if $rr->{encoding} == ATTENCODING_URI;
+	    my $file = sprintf( "%08d_%s", $rr->{id}, $rr->{name} );
+	    $att->save_to_zip( $zip, $file, $rr->{id} );
+	}
+
 	my $status = $zip->writeToFileNamed($out);
 	unlink($tmpname);
 	die("?", __x("Fout {status} tijdens het aanmaken van exportbestand {name}",

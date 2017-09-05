@@ -15,7 +15,7 @@ my $build = Module::Build->new(
   requires => { 
     'perl' => 5.012,
     'JSON::XS' => 0,
-    'List::Util' => 0,
+    'List::MoreUtils' => 0,
   },
   add_to_cleanup  => [ 'Spp-*' ],
   script_files    => ['bin/spp'],

@@ -8,6 +8,11 @@ Wiki:         <http://wiki.perlrdf.org/>
 Mailing list: <http://lists.perlrdf.org/listinfo/dev>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+1.02	2017-08-28	Skip some tests if no RDFa parser is present.
+
+ [ Bug Fixes ]
+ - Skip some tests if no RDFa parser is present.
+
 1.00	2017-08-25	Clean up for Milestone 1.0.
 
  [ Bug Fixes ]

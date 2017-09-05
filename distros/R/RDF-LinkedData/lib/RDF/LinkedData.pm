@@ -32,11 +32,11 @@ RDF::LinkedData - A Linked Data server implementation
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =cut
 
- our $VERSION = '1.00';
+ our $VERSION = '1.02';
 
 
 =head1 SYNOPSIS
@@ -854,9 +854,9 @@ L<http://lists.perlrdf.org/listinfo/dev>
 
 =head1 TODO
 
-This module does what it is supposed to do rather well, and has thus
+This module does what it is supposed to do rather well and has thus
 reached the 1.0 milestone. To support a wider variety of use cases,
-the current module isn't flexible enough, so future version will need
+the current module isn't flexible enough, so future versions will need
 substantial changes, but the version number is intended to reflect
 that.
 

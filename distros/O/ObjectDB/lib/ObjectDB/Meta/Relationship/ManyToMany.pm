@@ -5,7 +5,7 @@ use warnings;
 
 use base 'ObjectDB::Meta::Relationship';
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 use ObjectDB::Util qw(load_class);
 
@@ -52,9 +52,9 @@ sub to_source {
     my (%options) = @_;
 
     my ($map_from, $map_to) =
-      %{$self->map_class->meta->get_relationship($self->{map_from})->map};
+      %{ $self->map_class->meta->get_relationship($self->{map_from})->map };
     my ($rel_from, $rel_to) =
-      %{$self->map_class->meta->get_relationship($self->{map_to})->map};
+      %{ $self->map_class->meta->get_relationship($self->{map_to})->map };
 
     my $orig_table = $self->orig_class->meta->table;
     my $map_table  = $self->map_class->meta->table;
@@ -62,9 +62,9 @@ sub to_source {
 
     my @columns;
     if ($options{columns}) {
-        $options{columns} = [$options{columns}]
+        $options{columns} = [ $options{columns} ]
           unless ref $options{columns} eq 'ARRAY';
-        @columns = @{$options{columns}};
+        @columns = @{ $options{columns} };
         unshift @columns, $self->class->meta->get_primary_key;
     }
     else {
@@ -74,17 +74,16 @@ sub to_source {
     my $name = $self->name;
 
     return {
-        table => $map_table,
-        as    => $map_table,
-        join  => 'left',
-        constraint =>
-          ["$orig_table.$map_to" => {-col => "$map_table.$map_from"}]
+        table      => $map_table,
+        as         => $map_table,
+        join       => 'left',
+        constraint => [ "$orig_table.$map_to" => { -col => "$map_table.$map_from" } ]
       },
       {
         table      => $rel_table,
         as         => $name,
         join       => 'left',
-        constraint => ["$map_table.$rel_from" => {-col => "$name.$rel_to"}],
+        constraint => [ "$map_table.$rel_from" => { -col => "$name.$rel_to" } ],
         columns    => [@columns]
       };
 }

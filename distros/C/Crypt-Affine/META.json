@@ -43,11 +43,11 @@
    "provides" : {
       "Crypt::Affine" : {
          "file" : "lib/Crypt/Affine.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Crypt::Affine::Params" : {
          "file" : "lib/Crypt/Affine/Params.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/manwar/Crypt-Affine"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

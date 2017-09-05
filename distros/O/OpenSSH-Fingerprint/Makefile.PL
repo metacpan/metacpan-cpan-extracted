@@ -28,7 +28,7 @@ WriteMakefile(
            resources   => {
             repository => {
                 type => 'git',
-                url  => 'https://git.oschina.net/ijz/OpenSSH-Fingerprint',
+                url  => 'https://github.com/bollwarm/OpenSSH-Fingerprint',
                 web  => 'http://ijz.me',
                  },
             },

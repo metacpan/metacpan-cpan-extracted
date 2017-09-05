@@ -1,13 +1,21 @@
 package DBD::Multi;
-# $Id: Multi.pm,v 1.26 2013/04/09 21:57:19 wright Exp $
+our $VERSION   = '1.01';
+package DBD::Multi::dr;
+our $VERSION   = '1.01';
+package DBD::Multi::db;
+our $VERSION   = '1.01';
+package DBD::Multi::st;
+our $VERSION   = '1.01';
+package DBD::Multi::Handler;
+our $VERSION   = '1.01';
+
+package DBD::Multi;
 use strict;
 
 use DBI;
 DBI->setup_driver('DBD::Multi');
 
-use vars qw[$VERSION $err $errstr $sqlstate $drh];
-
-$VERSION   = '0.18';
+use vars qw[$err $errstr $sqlstate $drh];
 
 $err       = 0;        # DBI::err
 $errstr    = "";       # DBI::errstr
@@ -27,8 +35,7 @@ sub driver {
         State       => \$DBD::Multi::sqlstate,
         Attribution => 'DBD::Multi, pair Networks Inc.',
     });
-    # This doesn't work without formal registration with DBI
-    #DBD::Multi::db->install_method('multi_do_all');
+    DBD::Multi::db->install_method('multi_do_all');
     return $drh;
 }
 
@@ -105,6 +112,12 @@ sub prepare {
     $sth->STORE(_sth => $_sth);
 
     return $outer;
+}
+
+sub multi_do_all {
+    my $dbh = shift;
+    my $handler = $dbh->FETCH('_handler');
+    return $handler->multi_do_all( @_ );
 }
 
 sub disconnect {
@@ -367,11 +380,16 @@ sub _pick_dsource {
     die("All data sources failed!");
 }
 
+### _pick_pri_dsource
+#  Given a list of data sources, all of the same priority, choose one to use.
+#  Passed in a structure like this:
+#  _pick_pri_dsource( $self, { 3 => 1, 4 => 1, 5 => 1 } )
+#  Where the keys 3,4,5 are dsource id's, and the values are always true.
 sub _pick_pri_dsource {
     my ($self, $dsources) = @_;
-    my @dsources = sort { $a <=> $b } keys %{$dsources};
-    my @used     = grep { exists $self->used->{$_} } @dsources;
-    my @failed   = grep { exists($self->failed->{$_}) && $self->failed->{$_} >= $self->failed_max } @dsources;
+    my @dsources = sort { $a <=> $b } keys %{$dsources};  # Indexes of data sources to try.
+    my @used     = grep { exists $self->used->{$_} } @dsources; # List of data sources already used. 
+    my @failed   = grep { exists($self->failed->{$_}) && $self->failed->{$_} >= $self->failed_max } @dsources;  # List of data sources that won't be tried.
 
     # We've used them all and they all failed. Escallate.
     return if @used == @dsources && @failed == @dsources;
@@ -474,6 +492,15 @@ DBD::Multi - Manage Multiple Data Sources with Failover and Load Balancing
       timeout       => 10,    # time out connection attempts after 10 seconds.
   });
 
+  $dbh->prepare(...);  # Works like any other DBI handle.
+
+
+  $dbh->multi_do_all(  # Loops through every single DB handle.
+    sub {
+        my $dbh = shift;
+        ...
+    } );
+
 =head1 DESCRIPTION
 
 This software manages multiple database connections for failovers and also
@@ -487,8 +514,10 @@ is being used to handle replication).
 This software does not prevent write operations from being executed.  This is
 left up to the user. See L<SUGGESTED USES> below for ideas.
 
-The interface is nearly the same as other DBI drivers with one notable
-exception.
+The interface is nearly the same as other DBI drivers except that it allows you
+to specify multiple connections for a single handle.
+
+=head1 CONFIGURING CONNECTIONS
 
 =head2 Configuring DSNs
 
@@ -536,6 +565,29 @@ DBD::Multi will give up on connection attempts after 5 seconds and then try
 another connection.   You may set the C<timeout> parameter to change the
 timeout time, or set it to 0 to disable the timeout feature completely.
 
+=head1 EXTRA METHODS
+
+=head2 multi_do_all
+
+Loops through every database handle, executing an arbitrary coderef passing the
+current database handle as the first parameter and the original connection
+parameters as the second parameter.
+
+If a database is unreachable, multi_do_all will skip over it.
+
+
+    use Data::Dumper;
+    my $expected_value = ...;
+    $dbh->multi_do_all(
+        sub {
+            my $dbh = shift;
+            my $source = shift;
+            my($value) = $dbh->selectrow_array("SELECT ...");
+            unless ( $value eq $expected_value ) {
+                die "Unexpected value, $value found. (Expected $expected_value).  Data Source:\n", Dumper( $source );
+            }
+        } );
+
 =head1 SUGGESTED USES
 
 Here are some ideas on how to use this module effectively and safely. 
@@ -558,7 +610,8 @@ read/write handle as well.
 =head1 TODO
 
 There really isn't much of a TODO list for this module at this time.  Feel free
-to submit a bug report to rt.cpan.org if you think there is a feature missing.
+to submit a bug report to L<github|https://github.com/dwright/DBD-Multi/issues>
+if you think there is a feature missing.
 
 Although there is some code intended for read/write operations, this should be
 considered not supported and not actively developed at this time.  The actual
@@ -584,11 +637,33 @@ fix it).
 
 =head1 SEE ALSO
 
-L<CGI::Application::Plugin::DBH> - A plugin for the L<CGI::Application> framework
-which makes it easy to support two database handles, and also supports lazy-loading.
+There are other modules that have similar, but different objectives.  Depending
+on your specific needs these may be more or less suitable for your task:
 
-L<DBD::Multiplex>, L<DBIx::HA> - Two modules similar to DBD::Multi, but with
-slightly different objectives.
+=over
+
+=item L<CGI::Application::Plugin::DBH> 
+
+A plugin for the L<CGI::Application> framework which makes it easy to support
+two database handles, and also supports lazy-loading.
+
+=item L<DBD::Multiplex>
+
+The original inspiration for this module.  It doesn't support as many
+connection configurations options at this module.   It does try to support
+write options in a single master, mutliple slave configuration.   It does this
+by parsing your SQL and trying to decide if you were doing a read or write
+operation.
+
+=item L<DBIx::HA>
+
+Written after this module.  Built for high availability rather than load
+balancing.   It purposely ignores some DBI features in favor of producing the
+fastest results for the most common operations.  It doesn't utilize the
+standard DBI->connect() API, which means it will not work as a drop-in auto
+proxy.
+
+=back
 
 L<DBI>, L<perl> - You should probably already know about these before using
 this module.

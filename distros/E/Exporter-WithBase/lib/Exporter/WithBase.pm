@@ -3,7 +3,7 @@ use warnings;
 
 package Exporter::WithBase;
 # ABSTRACT: Like Exporter, but add a '-base' flag to declare a class as a child
-$Exporter::WithBase::VERSION = '1.00';
+$Exporter::WithBase::VERSION = '1.01';
 use Exporter 5.57 ();
 
 sub import
@@ -57,6 +57,11 @@ Exporter::WithBase - Like Exporter, but add '-base' to declare a child class
 Does the same things as L<Exporter>, but also supports a C<-base> flag. That
 flag can be used in the C<use> statement of a class to push the class into
 C<@ISA>.
+
+The C<-base> flag must be the first argument in the import list:
+
+    use Mother qw( ONE -base ); # doesn't work
+    use Mother qw( -base ONE ); # works
 
 =head1 SEE ALSO
 

@@ -1,3 +1,14 @@
+0.3.8 2017-09-04
+
+Production format: shows scripts stdout/stderr in case of errors.
+
+0.3.7 2017-09-01
+
+- support for production format
+- sets format by using OUTTHENTIC_FORMAT variable
+- merged PR from @lancew - https://github.com/melezhik/outthentic/pull/6 
+  Misc small commits - Mainly Kritika.io violations #6 
+
 0.3.6 2017-07-28
 
 - Minor fixes of strun reports.

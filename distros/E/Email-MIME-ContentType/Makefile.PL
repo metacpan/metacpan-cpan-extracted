@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Parse a MIME Content-Type Header",
+  "ABSTRACT" => "Parse a MIME Content-Type or Content-Disposition Header",
   "AUTHOR" => "Simon Cozens <simon\@cpan.org>, Casey West <casey\@geeknest.com>, Ricardo SIGNES <rjbs\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "1.021",
+  "VERSION" => "1.022",
   "test" => {
     "TESTS" => "t/*.t"
   }

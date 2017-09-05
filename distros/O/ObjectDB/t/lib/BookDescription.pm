@@ -14,7 +14,7 @@ __PACKAGE__->meta(
         parent_book => {
             type  => 'one to one',
             class => 'Book',
-            map   => {book_id => 'id'}
+            map   => { book_id => 'id' }
         }
     }
 );

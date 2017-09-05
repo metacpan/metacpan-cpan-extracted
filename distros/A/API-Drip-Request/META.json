@@ -4,7 +4,7 @@
       "Dan Wright <Dan@DWright.Org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -44,9 +44,20 @@
    "provides" : {
       "API::Drip::Request" : {
          "file" : "lib/API/Drip/Request.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dwright/API-Drip/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwright/API-Drip.git",
+         "web" : "https://github.com/dwright/API-Drip"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

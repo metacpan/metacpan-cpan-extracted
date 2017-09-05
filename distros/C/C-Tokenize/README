@@ -6,7 +6,7 @@
                                                     
 
 
-This is the README for C::Tokenize version 0.15.
+This is the README for C::Tokenize version 0.17.
 
 C::Tokenize is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -27,16 +27,15 @@ four sections:
 C::Tokenize - reduce a C file to a series of tokens
 
 This module provides a tokenizer, "tokenize", which breaks C source
-code into its smallest meaningful components, and the regular
-expressions which match each of these components. For example, the
-module supplies a regular expression "$comment_re" which matches a C
-comment line.
+code into its smallest meaningful components, and the regexs which
+match each of these components. For example, the module supplies a
+regex "$comment_re" which matches a C comment.
 
-It also supplies some extra regular expressions for, for example,
-local include statements, "$include_local", or C variables,
-"$cvar_re", as well as extra functions, like "decomment" for
-removing traditional C comments, and "strip_comments" for removing
-all comments from a C program.
+As well as the basic components of C, it also supplies regexes for,
+for example, local include statements, "$include_local", or C
+variables, "$cvar_re", as well as extra functions, like
+"decomment" to remove the comment syntax of traditional C comments,
+and "strip_comments" which removes all comments from a C program.
 
 -----------------------------------------------------------------------------
 
@@ -69,11 +68,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm C::Tokenize
 
-To install the module from the source file, C-Tokenize-0.15.tar.gz, follow
+To install the module from the source file, C-Tokenize-0.17.tar.gz, follow
 this sequence of commands:
 
-    tar xfz C-Tokenize-0.15.tar.gz
-    cd C-Tokenize-0.15
+    tar xfz C-Tokenize-0.17.tar.gz
+    cd C-Tokenize-0.17
     perl Makefile.PL
     make
     make install
@@ -98,6 +97,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Aug 28 13:22:15 2017.
+This README was written on Thu Aug 31 09:22:54 2017.
 
 -----------------------------------------------------------------------------

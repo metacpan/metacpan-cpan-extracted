@@ -26,14 +26,15 @@ no_index:
 provides:
   JSON::WithComments:
     file: lib/JSON/WithComments.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   JSON: '2.94'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/rjray/json-withcomments/issues
   homepage: https://github.com/rjray/json-withcomments
   repository: https://github.com/rjray/json-withcomments.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.018002'

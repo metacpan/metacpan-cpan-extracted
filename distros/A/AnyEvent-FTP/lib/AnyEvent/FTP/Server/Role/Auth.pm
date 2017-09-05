@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Authentication role for FTP server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 has user => (is => 'rw');
@@ -137,7 +137,7 @@ AnyEvent::FTP::Server::Role::Auth - Authentication role for FTP server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -224,7 +224,9 @@ has authenticated.  The default is USER, PASS, HELP and QUIT
 
 =head1 METHODS
 
-=head2 $context-E<gt>auth_command_check_hook
+=head2 auth_command_check_hook
+
+ $context->auth_command_check_hook($connection, $command);
 
 This hook checks that any commands executed by the client before
 authentication are in the C<authenticated_safe_commands> list.

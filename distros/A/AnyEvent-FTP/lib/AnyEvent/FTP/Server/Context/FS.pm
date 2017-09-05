@@ -10,7 +10,7 @@ use File::Spec;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP server context that uses real file system (no transfers)
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -307,7 +307,7 @@ AnyEvent::FTP::Server::Context::FS - FTP server context that uses real file syst
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -348,11 +348,15 @@ L<AnyEvent::FTP::Server::Role::Type>
 
 =head1 ATTRIBUTES
 
-=head2 $context-E<gt>cwd
+=head2 cwd
+
+ my $dir = $context->cwd;
 
 The current working directory as a string.
 
-=head2 $context-E<gt>rename_from
+=head2 rename_from
+
+ my $filename = $context-E<gt>rename_from;
 
 The filename specified by the last FTP C<RNFR> command.
 

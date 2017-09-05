@@ -1,9 +1,6 @@
-lib/Math/Disarrange/List.pm
-CHANGES
 Build.PL
-MANIFEST
-META.yml
-README
+lib/Math/Disarrange/List.pm
+MANIFEST			This list of files
 t/d03.t
 t/die.t
 t/t00.t
@@ -14,4 +11,5 @@ t/t03a.t
 t/t04.t
 t/t05.t
 t/t10.t
+META.yml
 META.json

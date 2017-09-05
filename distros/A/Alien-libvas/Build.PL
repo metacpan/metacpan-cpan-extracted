@@ -1,6 +1,9 @@
 use Alien::Base::ModuleBuild;
 use Config;
 use Alien::CMake;
+use File::Which;
+$ENV{CC} //= $Config{cc} if $^O eq 'MSWin32' && !which('cl');
+my $cmake = Alien::CMake->config('prefix') . '/bin/cmake';
 my $build = Alien::Base::ModuleBuild->new(
     module_name => 'Alien::libvas',
     alien_name => 'libvas',
@@ -19,6 +22,7 @@ my $build = Alien::Base::ModuleBuild->new(
     configure_requires => {
         'Alien::Base::ModuleBuild' => 0,
         'Module::Build' => 0,
+        'File::Which' => 0,
         'Alien::CMake' => '0.07',
     },
     build_requires => {
@@ -37,22 +41,27 @@ my $build = Alien::Base::ModuleBuild->new(
         'Test2::Bundle::More' => 0,
     },
     requires => {
-        'perl' => '5.008001',
+        'perl' => '5.010',
         'Alien::Base' => '0.030',
     },
     alien_inline_auto_include => [ 'vas.h' ],
     alien_stage_install => 1,
-
     alien_build_commands => [
-            Alien::CMake->config('prefix')
+                Alien::CMake->config('prefix')
               . "/bin/cmake -DCMAKE_C_COMPILER_INIT=$Config{cc}"
               . ' -DCMAKE_INSTALL_PREFIX:PATH=%s CMakeLists.txt',
-            $Config{make},
+            "$cmake --build ."
+     ],
+    alien_install_commands => ["cmake --build . --target install"],
+
+    alien_test_commands => [
+            Alien::CMake->config('prefix') . "/bin/ctest --output-on-failure" .
+            ($^O eq 'darwin' ? " -E child" : '') # child tests on macOS require superuser privileges
     ],
-    alien_install_commands => ["$Config{make} install"],
 
     extra_compiler_flags => Alien::CMake->config('cflags'),
     extra_linker_flags   => Alien::CMake->config('libs'),
+#    alien_isolate_dynamic => 1,
 );
 
 $build->create_build_script;

@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Edit the file PACKAGE to change this.
+# Copyright (C) YEAR Edit the file PACKAGE to change this
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: Edit the file PACAKGE to change this.\n"
-"POT-Creation-Date: 2013-01-14 18:14+0200\n"
+"Report-Msgid-Bugs-To: Edit the file PACKAGE to change this\n"
+"POT-Creation-Date: 2017-08-30 22:51+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

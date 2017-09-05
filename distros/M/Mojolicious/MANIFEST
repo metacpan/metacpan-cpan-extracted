@@ -210,6 +210,7 @@ t/mojo/path.t
 t/mojo/prefork.t
 t/mojo/proxy.t
 t/mojo/psgi.t
+t/mojo/reactor_detect.t
 t/mojo/reactor_ev.t
 t/mojo/reactor_poll.t
 t/mojo/request.t
@@ -277,6 +278,7 @@ t/mojolicious/lib/MojoliciousTest/Foo/Bar.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/Test/SomePlugin2.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/UPPERCASETestPlugin.pm
 t/mojolicious/lib/MojoliciousTest/PODTest.pm
+t/mojolicious/lib/MojoliciousTest/SideEffects/Test.pm
 t/mojolicious/lib/MojoliciousTest/SyntaxError.pm
 t/mojolicious/lib/MojoliciousTest2/Foo.pm
 t/mojolicious/lib/MojoliciousTest3/Bar.pm

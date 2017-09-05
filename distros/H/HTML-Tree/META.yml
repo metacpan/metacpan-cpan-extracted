@@ -36,10 +36,10 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/kentfredric/HTML-Tree.git
-version: '5.06'
+version: '5.07'
 x_Dist_Zilla:
   perl:
-    version: '5.025012'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -249,7 +249,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^(\d+\.[\d_]+)(?:-TRIAL)?$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
       name: Git::NextVersion
       version: '2.041'
@@ -264,7 +264,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
       name: '@Git/Check'
       version: '2.041'
@@ -280,7 +280,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -293,11 +293,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.06'
+          tag: '5.07'
           tag_format: '%v%t'
           tag_message: 'Tagged %N %v%{ (trial release)}t'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -311,7 +311,7 @@ x_Dist_Zilla:
             - 'github master'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
       name: '@Git/Push'
       version: '2.041'
@@ -319,7 +319,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.12.2
+          'git --version': 2.13.1
           repo_root: .
       name: GitBranch
       version: '0.014'

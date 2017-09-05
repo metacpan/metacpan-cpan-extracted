@@ -1,5 +1,19 @@
 Revision history for POSIX::2008.
 
+0.12  2017-09-03
+  - Fixed missing semicolon in #if branch of nearbyint().
+  - Added some CLOCK_ constants.
+  - Added const-c.inc, const-xs.c.
+0.11  2017-09-02
+  - Don't call clog() if you mean cexp() ...
+0.10  2017-09-02
+  - Added more detailed checks for availability of complex functions.
+  - NetBSD seems a bit special about struct stat.
+0.09  2017-09-01
+  - Added some cheats to make some red lights turn to green on cpantesters.
+  - Fixed a POD typo.
+0.08  2017-08-31
+  - Added writev(), pwritev(), lchown(), lround(), clock(), access().
 0.07  2017-08-27
   - Call croak_xs_usage() only if available.
   - Really let all I/O functions accept file handles.

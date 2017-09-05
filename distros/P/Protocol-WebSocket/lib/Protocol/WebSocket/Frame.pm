@@ -10,6 +10,8 @@ use Scalar::Util 'readonly';
 use constant MAX_RAND_INT       => 2**32;
 use constant MATH_RANDOM_SECURE => eval "require Math::Random::Secure;";
 
+our $MAX_PAYLOAD_SIZE = 65536;
+
 our %TYPES = (
     continuation => 0x00,
     text         => 0x01,
@@ -53,7 +55,7 @@ sub new {
     $self->{fragments} = [];
 
     $self->{max_fragments_amount} ||= 128;
-    $self->{max_payload_size}     ||= 65536 unless exists $self->{max_payload_size};
+    $self->{max_payload_size}     ||= $MAX_PAYLOAD_SIZE unless exists $self->{max_payload_size};
 
     return $self;
 }
@@ -253,12 +255,12 @@ sub to_bytes {
 
 
     my $rsv_set = 0;
-    if($self->{rsv} && ref($self->{rsv}) eq 'ARRAY') {
-    	for my $i (0..@{$self->{rsv}}-1) { 
-    		$rsv_set += $self->{rsv}->[$i] * (1 << (6 - $i));
-    	}
+    if ( $self->{rsv} && ref( $self->{rsv} ) eq 'ARRAY' ) {
+        for my $i ( 0 .. @{ $self->{rsv} } - 1 ) {
+            $rsv_set += $self->{rsv}->[$i] * ( 1 << ( 6 - $i ) );
+        }
     }
-    
+
     my $string = '';
     my $opcode = $self->opcode;
     $string .= pack 'C', ($opcode | $rsv_set | ($self->fin ? 128 : 0));

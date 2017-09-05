@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Role::PluginBundle::Config::Slicer;
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Pass Portions of Bundle Config to Plugins
-$Dist::Zilla::Role::PluginBundle::Config::Slicer::VERSION = '0.201';
+$Dist::Zilla::Role::PluginBundle::Config::Slicer::VERSION = '0.202';
 use Dist::Zilla::Config::Slicer ();
 use Moose::Role;
 
@@ -51,7 +51,7 @@ Dist::Zilla::Role::PluginBundle::Config::Slicer - Pass Portions of Bundle Config
 
 =head1 VERSION
 
-version 0.201
+version 0.202
 
 =head1 SYNOPSIS
 

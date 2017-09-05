@@ -1,8 +1,9 @@
 package Mojolicious::Plugin::FeedReader;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.08';
-use Mojo::Util qw(decode slurp trim);
+our $VERSION = '0.09';
+use Mojo::Util qw(decode trim);
+use Mojo::File;
 use Mojo::DOM;
 use Mojo::IOLoop;
 use HTTP::Date;
@@ -35,7 +36,7 @@ sub make_dom {
   my ($xml) = @_;
   my $rss;
   if (!ref $xml) {    # assume file
-    $rss = slurp $xml;
+    $rss = Mojo::File->new($xml)->slurp;
     die "Unable to read file $xml: $!" unless ($rss);
   }
   elsif (ref $xml eq 'SCALAR') {    # assume string
@@ -44,7 +45,7 @@ sub make_dom {
   elsif (blessed $xml && $xml->isa('Mojo::DOM')) { # Mojo::DOM (old style)
     return $xml;
   }
-  elsif (blessed $xml && $xml->can('slurp')) { # Mojo::Asset or similar
+  elsif (blessed $xml && $xml->can('slurp')) { # Mojo::Asset/File or similar
     $rss = $xml->slurp;
   }
   else {
@@ -330,7 +331,7 @@ sub _find_feed_links {
 sub parse_opml {
   my ($self, $opml_file) = @_;
   my $opml_str = decode 'UTF-8',
-    (ref $opml_file) ? $opml_file->slurp : slurp $opml_file;
+    (ref $opml_file) ? $opml_file->slurp : Mojo::File->new($opml_file)->slurp;
   my $d = Mojo::DOM->new->parse($opml_str);
   my (%subscriptions, %categories);
   for my $item ($d->find(q{outline})->each) {

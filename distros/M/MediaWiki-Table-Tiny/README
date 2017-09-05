@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    MediaWiki::Table::Tiny - Generate MediaWiki table from table data
 
+VERSION
+    This document describes version 0.020 of MediaWiki::Table::Tiny (from
+    Perl distribution MediaWiki-Table-Tiny), released on 2017-09-03.
+
+SYNOPSIS
      use MediaWiki::Table::Tiny;
-    
+
      my $rows = [
          # header row
          ['Name', 'Rank', 'Serial'],
@@ -10,7 +16,13 @@ SYNOPSIS
          ['bob',   'cpl', '98765321'],
          ['carol', 'brig gen', '8745'],
      ];
-     print MediaWiki::Table::Tiny::table(rows => $rows);
+     print MediaWiki::Table::Tiny::table(
+         rows     => $rows,
+         #caption => "foo", # optional, default is none. if set will add "|+foo" row
+         #class   => "wikitable", # optional
+         #style   => "text-align:center", # optional
+         #border  => 1, # optional
+     );
 
     Result:
 
@@ -27,18 +39,45 @@ SYNOPSIS
      |}
 
 DESCRIPTION
-
-    This module can be used to generate MediaWiki table from table data.
-    The interface is inspired from Text::Table::Tiny.
+    This module can be used to generate MediaWiki table from table data. The
+    interface is inspired from Text::Table::Tiny.
 
 FUNCTIONS
-
- table(%args) => str
-
-    Generate table in MediaWiki format. Arguments (* marks required
+  table(%args) => str
+    Generate table in MediaWiki format. Arguments ("*" marks required
     argument):
 
-      * rows* => aoa
+    *   rows* => aoa
 
-      * caption => str
+    *   caption => str
+
+    *   style => str
+
+    *   class => str
+
+    *   border => bool
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/MediaWiki-Table-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-MediaWiki-Table-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=MediaWiki-Table-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

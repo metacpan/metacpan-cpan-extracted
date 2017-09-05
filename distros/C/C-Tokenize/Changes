@@ -1,5 +1,14 @@
 Revision history for perl module C::Tokenize
 
+0.17 2017-08-31
+
+* Correction of documentation of "strip_comments".
+* Change methodology of "strip_comments".
+
+0.16 2017-08-29
+
+* In "strip_comments", don't alter string contents
+
 0.15 2017-08-28
 
 * In "strip_comments", preserve at least one space when removing

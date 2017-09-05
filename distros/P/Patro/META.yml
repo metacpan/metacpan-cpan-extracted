@@ -17,9 +17,13 @@ no_index:
   directory:
     - t
     - inc
+  package:
+    - threads::shared
 recommends:
   Sys::HostAddr: '0'
 requires:
   Devel::GlobalDestruction: '0'
-version: '0.10'
+  MIME::Base64: '0'
+  Storable: '0'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

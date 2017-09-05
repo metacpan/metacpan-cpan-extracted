@@ -1,75 +1,81 @@
-use Test::Spec;
-use Test::Fatal;
-
+use strict;
+use warnings;
 use lib 't/lib';
 
+use Test::More;
+use Test::Fatal;
 use TestEnv;
+
 use Book;
 
-describe 'transaction' => sub {
+subtest 'should rollback on exception' => sub {
+    _setup();
 
-    before each => sub {
-        TestEnv->prepare_table('book');
-    };
-
-    it 'should rollback on exception' => sub {
-        my $e = exception {
-            Book->txn(
-                sub {
-                    my $self = shift;
-
-                    Book->new(title => 'foo')->create;
-                    die 'here';
-                }
-            );
-        };
-
-        like $e, qr/here/;
-        is(Book->table->count, 0);
-    };
-
-    it 'should not rollback if commited' => sub {
-        my $e = exception {
-            Book->txn(
-                sub {
-                    my $self = shift;
-
-                    Book->new(title => 'foo')->create;
-                    $self->commit;
-                    die 'here';
-                }
-            );
-        };
-
-        like $e, qr/here/;
-        is(Book->table->count, 1);
-    };
-
-    it 'should rollback manually' => sub {
+    my $e = exception {
         Book->txn(
             sub {
                 my $self = shift;
 
                 Book->new(title => 'foo')->create;
-                $self->rollback;
+                die 'here';
             }
         );
-
-        is(Book->table->count, 0);
     };
 
-    it 'should return block value' => sub {
-        my $result = Book->txn(
+    like $e, qr/here/;
+    is(Book->table->count, 0);
+};
+
+subtest 'should not rollback if commited' => sub {
+    _setup();
+
+    my $e = exception {
+        Book->txn(
             sub {
                 my $self = shift;
 
-                'hi there';
+                Book->new(title => 'foo')->create;
+                $self->commit;
+                die 'here';
             }
         );
-
-        is($result, 'hi there');
     };
 
+    like $e, qr/here/;
+    is(Book->table->count, 1);
 };
 
-runtests unless caller;
+subtest 'should rollback manually' => sub {
+    _setup();
+
+    Book->txn(
+        sub {
+            my $self = shift;
+
+            Book->new(title => 'foo')->create;
+            $self->rollback;
+        }
+    );
+
+    is(Book->table->count, 0);
+};
+
+subtest 'should return block value' => sub {
+    _setup();
+
+    my $result = Book->txn(
+        sub {
+            my $self = shift;
+
+            'hi there';
+        }
+    );
+
+    is($result, 'hi there');
+};
+
+done_testing;
+
+sub _setup {
+    TestEnv->prepare_table('book');
+}

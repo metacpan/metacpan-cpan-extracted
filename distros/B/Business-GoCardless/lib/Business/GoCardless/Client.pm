@@ -348,9 +348,11 @@ sub _api_request {
 
     my $req = HTTP::Request->new(
         # passing through the absolute URL means we don't build it
-        $method => $path =~ /^http/
+        $method => my $uri = $path =~ /^http/
             ? $path : join( '/',$self->base_url . $self->api_path . $path ),
     );
+
+    say STDERR "GOCARDLESS -> $uri" if $ENV{GOCARDLESS_DEBUG};
 
     $req->header( 'Authorization' => "Bearer " . $self->token );
     $req->header( 'Accept' => 'application/json' );

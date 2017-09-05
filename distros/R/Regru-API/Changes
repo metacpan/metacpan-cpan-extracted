@@ -1,5 +1,14 @@
 Revision history for Perl distribution Regru-API.
 
+0.047   Tue Aug 29 19:10:28 2017 +0000
+
+0.047   Fri Jul 14 05:26:30  2017 +0000
+    [ FEATURES ]
+    - added new REG.API namespace "dnssec" with DNSSEC related methods
+    
+    [ FIXES ]
+    - fixed test failures (gh #6)
+
 0.046   Mon Nov 9 07:23:20 2015 +0000
 
     [ FIXES ]

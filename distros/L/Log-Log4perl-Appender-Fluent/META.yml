@@ -1,5 +1,5 @@
 name:                Log-Log4perl-Appender-Fluent
-version:             0.04
+version:             0.05
 abstract:            Log::Log4perl appender writing to Fluentd
 license:             perl
 distribution_type:   module

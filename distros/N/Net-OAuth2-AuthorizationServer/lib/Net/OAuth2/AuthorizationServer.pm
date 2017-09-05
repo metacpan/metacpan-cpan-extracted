@@ -11,7 +11,7 @@ Authorization Server
 
 =head1 VERSION
 
-0.15
+0.16
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ use Net::OAuth2::AuthorizationServer::ImplicitGrant;
 use Net::OAuth2::AuthorizationServer::PasswordGrant;
 use Net::OAuth2::AuthorizationServer::ClientCredentialsGrant;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 GRANT TYPES
 
@@ -114,6 +114,8 @@ Lee Johnson - C<leejo@cpan.org>
 With contributions from:
 
 Martin Renvoize - C<martin.renvoize@ptfs-europe.com>
+
+Pierre VIGIER C<pierre.vigier@gmail.com>
 
 =head1 LICENSE
 

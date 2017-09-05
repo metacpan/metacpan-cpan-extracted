@@ -11,7 +11,7 @@ use warnings;
 use version;
 use Carp;
 use English qw/ -no_match_vars /;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/uniq/;
 use Getopt::Alt::Option qw/build_option/;
 use Getopt::Alt::Exception;
 use Try::Tiny;
@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.4.5');
+our $VERSION = version->new('0.4.6');
 our $EXIT    = 1;
 
 has options => (
@@ -297,7 +297,8 @@ sub process {
                 # last means we have found a sub command we should see if it is an alias
                 if ($self->aliases->{$arg}) {
                     $self->files->[-1] = shift @{ $self->aliases->{$arg} };
-                    unshift @args, @{ $self->aliases->{$arg} };
+                    my @new_args = @{ $self->aliases->{$arg} };
+                    unshift @args, @new_args;
                 }
 
                 $action = 'last';
@@ -524,7 +525,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.4.5.
+This documentation refers to Getopt::Alt version 0.4.6.
 
 =head1 SYNOPSIS
 
@@ -817,7 +818,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.4.5 and earlier
+B<Note>: This is different from version 0.4.6 and earlier
 
 =head1 DIAGNOSTICS
 

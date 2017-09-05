@@ -12,7 +12,7 @@ use Lingua::Awkwords::Parser;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has pattern => (
     is      => 'rw',

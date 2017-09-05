@@ -3,7 +3,7 @@ package Number::Phone::JP::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.20170801';
+our $VERSION = '0.20170901';
 
 require Number::Phone::JP::Table::Class1;
 require Number::Phone::JP::Table::Class2;
@@ -16,6 +16,7 @@ require Number::Phone::JP::Table::Phs;
 require Number::Phone::JP::Table::Q2;
 require Number::Phone::JP::Table::United;
 require Number::Phone::JP::Table::Fmc;
+require Number::Phone::JP::Table::M2m;
 
 no warnings 'once';
 
@@ -32,6 +33,13 @@ our %TEL_TABLE = (
     %Number::Phone::JP::Table::United::TEL_TABLE,
     %Number::Phone::JP::Table::Fmc::TEL_TABLE,
 );
+
+# prefixes of both pager and m2m are duplicated with each other
+$TEL_TABLE{'20'} = '(?:' .
+    $TEL_TABLE{'20'} .
+        '|' .
+    $Number::Phone::JP::Table::M2m::TEL_TABLE{'20'} .
+')';
 
 sub import {
     my $class = shift;

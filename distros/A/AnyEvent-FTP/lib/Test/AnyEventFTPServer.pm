@@ -6,13 +6,13 @@ use 5.010;
 use Moo;
 use URI;
 use AnyEvent;
-use Test::Builder::Module;
+use Test2::API qw( context );
 use Path::Class qw( tempdir );
 
 extends 'AnyEvent::FTP::Server';
 
 # ABSTRACT: Test (non-blocking) ftp clients against a real FTP server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 has test_uri => (
@@ -69,6 +69,8 @@ sub create_ftpserver_ok (;$$)
 {
   my($context, $message) = @_;
   
+  my $ctx = context();
+
   my $uri = URI->new("ftp://127.0.0.1");
   
   $context //= 'Memory';
@@ -91,23 +93,22 @@ sub create_ftpserver_ok (;$$)
     
     if($ENV{AEF_DEBUG})
     {
-      my $tb = Test::Builder::Module->builder;
       $server->on_connect(sub {
         my $con = shift;
-        $tb->note("CONNECT");
+        $ctx->note("CONNECT");
         
         $con->on_request(sub {
           my $raw = shift;
-          $tb->note("CLIENT: $raw");
+          $ctx->note("CLIENT: $raw");
         });
         
         $con->on_response(sub {
           my $raw = shift;
-          $tb->note("SERVER: $raw");
+          $ctx->note("SERVER: $raw");
         });
         
         $con->on_close(sub {
-          $tb->note("DISCONNECT");
+          $ctx->note("DISCONNECT");
         });
       });
     }
@@ -134,9 +135,9 @@ sub create_ftpserver_ok (;$$)
   
   $message //= "created FTP ($name) server at $uri";
 
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;
+  $ctx->ok($error eq '', $message);
+  $ctx->diag($error) if $error;
+  $ctx->release;
   
   $server;
 }
@@ -170,9 +171,10 @@ sub connect_ftpclient_ok
   
   $message //= "connected to FTP server at " . $self->test_uri;
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;  
+  my $ctx = context();
+  $ctx->ok($error eq '', $message);
+  $ctx->diag($error) if $error;  
+  $ctx->release;
   
   $client;
 }
@@ -202,12 +204,13 @@ sub help_coverage_ok
 
   $message //= "help coverage for $class";
 
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '' && @missing == 0, $message);
-  $tb->diag($error) if $error;
-  $tb->diag("commands missing help: @missing") if @missing; 
-  $tb->diag("didn't find ANY commands for class: $class")
+  my $ctx = context();
+  $ctx->ok($error eq '' && @missing == 0, $message);
+  $ctx->diag($error) if $error;
+  $ctx->diag("commands missing help: @missing") if @missing; 
+  $ctx->diag("didn't find ANY commands for class: $class")
     if $count == 0;
+  $ctx->release;
 
   $self;
 }
@@ -231,9 +234,10 @@ sub command_ok
   
   $message //= "command: $command";
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;
+  my $ctx = context();
+  $ctx->ok($error eq '', $message);
+  $ctx->diag($error) if $error;
+  $ctx->release;
   
   $self;
 }
@@ -245,11 +249,12 @@ sub code_is
   
   $message //= "response code is $code";
   
-  my $tb = Test::Builder::Module->builder;
+  my $ctx = context();
   my $actual = eval { $self->res->code } // 'undefined';
-  $tb->ok($actual == $code, $message);
-  $tb->diag("actual code returned is $actual")
+  $ctx->ok($actual == $code, $message);
+  $ctx->diag("actual code returned is $actual")
     unless $actual == $code;
+  $ctx->release;
   
   $self;  
 }
@@ -261,11 +266,12 @@ sub code_like
   
   $message //= "response code matches";
   
-  my $tb = Test::Builder::Module->builder;
+  my $ctx = context();
   my $actual = eval { $self->res->code } // 'undefined';
-  $tb->ok($actual =~ $regex, $message);
-  $tb->diag("code $actual does not match $regex")
+  $ctx->ok($actual =~ $regex, $message);
+  $ctx->diag("code $actual does not match $regex")
     unless $actual =~ $regex;
+  $ctx->release;
   
   $self;  
 }
@@ -285,14 +291,15 @@ sub message_like
     $ok = 1 if $line =~ $regex;
   }
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($ok, $message);
+  my $ctx = context();
+  $ctx->ok($ok, $message);
   unless($ok)
   {
-    $tb->diag("message: ");
-    $tb->diag("  $_") for @message;
-    $tb->diag("does not match $regex");
+    $ctx->diag("message: ");
+    $ctx->diag("  $_") for @message;
+    $ctx->diag("does not match $regex");
   }
+  $ctx->release;
   
   $self;
 }
@@ -313,14 +320,15 @@ sub message_is
     $ok = 1 if $line eq $string;
   }
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($ok, $message);
+  my $ctx = context();
+  $ctx->ok($ok, $message);
   unless($ok)
   {
-    $tb->diag("message: ");
-    $tb->diag("  $_") for @message;
-    $tb->diag("does not match $string");
+    $ctx->diag("message: ");
+    $ctx->diag("  $_") for @message;
+    $ctx->diag("does not match $string");
   }
+  $ctx->release;
   
   $self;
 }
@@ -344,9 +352,10 @@ sub list_ok
     $self->content(join "\n", @$list, '') unless $error;
   }
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;
+  my $ctx = context();
+  $ctx->ok($error eq '', $message);
+  $ctx->diag($error) if $error;
+  $ctx->release;
   
   $self;
 }
@@ -370,9 +379,10 @@ sub nlst_ok
     $self->content(join "\n", @$list, '') unless $error;
   }
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;
+  my $ctx = context();
+  $ctx->ok($error eq '', $message);
+  $ctx->diag($error) if $error;
+  $ctx->release;
   
   $self;
 }
@@ -380,11 +390,10 @@ sub nlst_ok
 
 sub _display_content
 {
-  my $tb = shift;
   state $temp;
   state $counter = 0;
   my $method = 'diag';
-  $method = 'note' if $tb->todo;
+  #$method = 'note' if $tb->todo;
   
   unless(defined $temp)
   {
@@ -394,21 +403,25 @@ sub _display_content
   my $file = $temp->file(sprintf("data.%d", $counter++));
   $file->spew($_[0]);
   
+  my $ctx = context();
+  
   if(-T $file)
   {
-    $tb->$method("  $_") for split /\n/, $_[0];
+    $ctx->$method("  $_") for split /\n/, $_[0];
   }
   else
   {
     if(eval { require Data::HexDump })
     {
-      $tb->$method("  $_") for grep !/^$/, split /\n/, Data::HexDump::HexDump($_[0]);
+      $ctx->$method("  $_") for grep !/^$/, split /\n/, Data::HexDump::HexDump($_[0]);
     }
     else
     {
-      $tb->$method("  binary content");
+      $ctx->$method("  binary content");
     }
   }
+  
+  $ctx->release;
   
   $file->remove;
 }
@@ -417,17 +430,21 @@ sub content_is
 {
   my($self, $string, $message) = @_;
   
+  $message ||= 'content matches';
+  
   my $ok = $self->content eq $string;
   
-  my $tb = Test::Builder::Module->builder;
-  $tb->ok($ok);
+  my $ctx = context();
+  $ctx->ok($ok, $message);
   unless($ok)
   {
-    $tb->diag("content:");
-    _display_content($tb, $self->content);
-    $tb->diag("expected:");
-    _display_content($tb, $string);
+    $ctx->diag("content:");
+    _display_content($self->content);
+    $ctx->diag("expected:");
+    _display_content($string);
   }
+  
+  $ctx->release;
   
   $self;
 }
@@ -440,20 +457,26 @@ sub global_timeout_ok (;$$)
   $timeout //= 120;
   $message //= "global timeout of $timeout seconds";
   
-  my $tb = Test::Builder::Module->builder;
+  my $ctx = context();
 
   state $timers = [];
 
   eval {
     push @$timers, AnyEvent->timer(
       after => $timeout,
-      cb    => sub { $tb->diag("GLOBAL TIMEOUT"); exit },
+      cb    => sub { $ctx->diag("GLOBAL TIMEOUT"); exit },
     );
   };
   my $error = $@;
   
-  $tb->ok($error eq '', $message);
-  $tb->diag($error) if $error;
+  my $ok = $error eq '';
+  
+  $ctx->ok($ok, $message);
+  $ctx->diag($error) if $error;
+  
+  $ctx->release;
+  
+  $ok;
 }
 
 sub import
@@ -480,33 +503,35 @@ Test::AnyEventFTPServer - Test (non-blocking) ftp clients against a real FTP ser
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
- use Test::More test => 3;
+ use Test2:V0;
  use Test::AnyEventFTPServer;
  
  # exit this script after 30s to avoid hung test
  global_timeout_ok;
  
- # $server isa AnyEvent::FTP::Server
- # and     isa Test::AnyEventFTPServer
- my $server = create_ftpserver_ok;
+ # $test_server isa AnyEvent::FTP::Server
+ # and          isa Test::AnyEventFTPServer
+ my $test_server = create_ftpserver_ok;
  
- $server->command_ok('HELP')
-        ->code_is(214)
-        ->message_like(qr{the following commands are recognize});
+ $test_server->command_ok('HELP')
+             ->code_is(214)
+             ->message_like(qr{the following commands are recognize});
  
  # $res isa AnyEvent::FTP::Client::Response
  # from that last HELP command
- my $res = $server->res;
+ my $res = $test_server->res;
  
  # $client isa AnyEvent::FTP::Client
- my $client = $server->connect_ftpclient_ok;
+ my $client = $test_server->connect_ftpclient_ok;
  
  # check to make sure that all FTP commands have help
- $server->help_coverage_ok;
+ $test_server->help_coverage_ok;
+ 
+ done_testing;
 
 =head1 DESCRIPTION
 
@@ -519,22 +544,30 @@ is safe to use in testing against the server.
 
 =head1 ATTRIBUTES
 
-=head2 $test_server-E<gt>test_uri
+=head2 test_uri
+
+ my $uri = $test_server->test_uri
 
 The full URL (including host, port, username and password) of the
 test ftp server.  This is returned as L<URI>.
 
-=head2 $test_server-E<gt>res
+=head2 res
+
+ my $res = $test_server->res
 
 The last L<AnyEvent::FTP::Client::Response> object returned from the
 server after calling the C<command_ok> method.
 
-=head2 $test_server-E<gt>content
+=head2 content
+
+ my $content = $test_server->content
 
 The last content retrieved from a C<list_ok>, C<nlst_ok> or C<transfer_ok>
 test.
 
-=head2 $test_server-E<gt>auto_login
+=head2 auto_login
+
+ my $bool = $test_server->auto_login
 
 If true (the default) automatically login using the correct credentials.
 Normally if you are testing file transfers you want to keep this to the
@@ -543,7 +576,11 @@ then you want to set this to false.
 
 =head1 METHODS
 
-=head2 create_ftpserver_ok ( [ $default_context, [ $message ] ] )
+=head2 create_ftpserver_ok
+
+ my $test_server = create_ftpserver_ok;
+ my $test_server = create_ftpserver_ok($default_context);
+ my $test_server = create_ftpserver_ok($default_context, $test_name);
 
 Create the FTP server with a random username and password
 for logging in.  You can get the username/password from the
@@ -551,19 +588,29 @@ C<test_uri> attribute, or connect to the server using
 L<AnyEvent::FTP::Client> automatically with the C<connect_ftpclient_ok>
 method below.
 
-=head2 $test_server-E<gt>connect_ftpclient_ok( [ $message ] )
+=head2 connect_ftpclient_ok
+
+ my $client = $test_server->connect_ftpclient_ok;
+ my $client = $test_server->connect_ftpclient_ok($test_name);
 
 Connect to the FTP server, return the L<AnyEvent::FTP::Client>
 object which can be used for testing.
 
-=head2 $test_server-E<gt>help_coverage_ok( [ $context_class, [ $message ] )
+=head2 help_coverage_ok
+
+ $test_server->help_coverage_ok;
+ $test_server->help_coverage_ok($context_class);
+ $test_server->help_coverage_ok($context_class, $test_name);
 
 Test that there is a C<help_*> method for each C<cmd_*> method in the
 given context class (the server's default context class is used if
 it isn't provided).  This can also be used to test help coverage of
 context roles.
 
-=head2 $test_command->command_ok( $command, $arguments, [ $message ] )
+=head2 command_ok
+
+ $test_command->command_ok( $command, $arguments );
+ $test_command->command_ok( $command, $arguments, $test_name );
 
 Execute the given command with the given arguments on the 
 remote server.  Fails only if a valid FTP response is not
@@ -578,22 +625,34 @@ chain this command:
         ->code_is(214)               # returns status code 214
         ->message_like(qr{HELP});    # the help command mentions the help command
 
-=head2 $test_server->code_is($code, [ $message ])
+=head2 code_is
+
+ $test_server->code_is($code);
+ $test_server->code_is($code, $test_name);
 
 Verifies that the status code of the last command executed matches
 the given code exactly.
 
-=head2 $test_server->code_like($regex, [ $message ])
+=head2 code_like
+
+ $test_server->code_like($regex);
+ $test_server->code_like($regex, $test_name);
 
 Verifies that the status code of the last command executed matches
 the given regular expression..
 
-=head2 $test_server->message_like($regex, [ $message ])
+=head2 message_like
+
+ $test_server->message_like($regex);
+ $test_server->message_like($regex, $test_name);
 
 Verifies that the message portion of the response of the last command executed matches
 the given regular expression.
 
-=head2 $test_server->message_is($string, [ $message ])
+=head2 message_is
+
+ $test_server->message_is($string);
+ $test_server->message_is($string, $test_name);
 
 Verifies that the message portion of the response of the last command executed matches
 the given string.
@@ -601,26 +660,41 @@ the given string.
 If the response message has multiple lines, then only one of the lines needs to match
 the given string.
 
-=head2 $test_server->list_ok( [ $location, [ $message ] ] )
+=head2 list_ok
+
+ $test_server->list_ok;
+ $test_server->list_ok($location);
+ $test_server->list_ok($location, $test_name)
 
 Execute a the C<LIST> command on the given C<$location>
 and wait for the results.  You can see the result using
 the C<content> attribute or test it with the C<content_is> 
 method.
 
-=head2 $test_server->nlst_ok( $location, $message )
+=head2 nlst_ok
+
+ $test_server->nlst_ok;
+ $test_server->nlst_ok( $location );
+ $test_server->nlst_ok( $location, $test_name );
 
 Execute a the C<NLST> command on the given C<$location>
 and wait for the results.  You can see the result using
 the C<content> attribute or test it with the C<content_is> 
 method.
 
-=head2 $test_server->content_is( $string, [ $message ] )
+=head2 content_is
+
+ $test_server->content_is($string);
+ $test_server->content_is($string, $test_name);
 
 Test that the given C<$string> matches the content
 returned by the last C<list_ok> or C<nlst_ok> method.
 
-=head2 global_timeout_ok( [ $timeout, [ $message ] ] )
+=head2 global_timeout_ok
+
+ global_timeout_ok;
+ global_timeout_ok($timeout);
+ global_timeout_ok($timeout, $test_name)
 
 Set a global timeout on the entire test script.  If the timeout
 is exceeded the test will exit.  Handy if you have test automation

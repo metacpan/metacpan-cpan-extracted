@@ -1,5 +1,5 @@
 // ************************************************************************* 
-// Copyright (c) 2014-2016, SUSE LLC
+// Copyright (c) 2014-2017, SUSE LLC
 // 
 // All rights reserved.
 // 
@@ -30,7 +30,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 // ************************************************************************* 
 //
-// app/daction.js
+// app/daction-init.js
 //
 // Round one of daction initialization - called from app/target-init.js
 //
@@ -46,80 +46,80 @@ define ([
 
     return function () {
 
-        // demo action
-        target.push('demoAction', {
-            'name': 'demoAction',
-            'type': 'daction',
-            'menuText': 'Do something',
-            'aclProfile': 'passerby',
-            'start': dactionStart('demoAction')
-        });
-
-        // general actions
+        // generalized actions
         target.push('drowselectListen', {
             'name': 'drowselectListen',
             'type': 'daction',
             'menuText': 'drowselectListen',
             'aclProfile': 'passerby',
-            'start': dactionStart('drowselectListen')
+            'start': dactionStart('drowselectListen'),
+            'pushable': false
         });
         target.push('returnToBrowser', {
             'name': 'returnToBrowser',
             'type': 'daction',
             'menuText': 'returnToBrowser',
             'aclProfile': 'passerby',
-            'start': dactionStart('returnToBrowser')
+            'start': dactionStart('returnToBrowser'),
+            'pushable': false
         });
 
         // Employee actions
-        target.push('myProfile', {
-            'name': 'myProfile',
+        target.push('myProfileAction', {
+            'name': 'myProfileAction',
             'type': 'daction',
             'menuText': 'My profile',
             'aclProfile': 'passerby',
-            'start': dactionStart('myProfile')
+            'start': dactionStart('myProfileAction'),
+            'pushable': true
         });
         target.push('empProfileEditSave', {
             'name': 'empProfileEditSave',
             'type': 'daction',
             'menuText': 'Save changes',
             'aclProfile': 'active',
-            'start': dactionStart('empProfileEditSave')
+            'start': dactionStart('empProfileEditSave'),
+            'pushable': false
         });
         target.push('ldapLookupSubmit', {
             'name': 'ldapLookupSubmit',
             'type': 'daction',
             'menuText': 'Lookup',
             'aclProfile': 'passerby',
-            'start': dactionStart('ldapLookupSubmit')
+            'start': dactionStart('ldapLookupSubmit'),
+            'pushable': false
         });
         target.push('ldapSync', {
             'name': 'ldapSync',
             'type': 'daction',
             'menuText': 'LDAP sync',
             'aclProfile': 'admin',
-            'start': dactionStart('ldapSync')
+            'start': dactionStart('ldapSync'),
+            'pushable': false
         });
-        target.push('ldapSyncSelf', {
-            'name': 'ldapSync',
+        target.push('ldapSyncFromBrowser', {
+            'name': 'ldapSyncFromBrowser',
             'type': 'daction',
             'menuText': 'LDAP sync',
-            'aclProfile': 'active',
-            'start': dactionStart('ldapSyncSelf')
+            'aclProfile': 'admin',
+            'start': dactionStart('ldapSyncFromBrowser'),
+            'pushable': false
         });
         target.push('actionEmplSearch', {
             'name': 'actionEmplSearch',
             'type': 'daction',
             'menuText': 'Search',
             'aclProfile': 'admin',
-            'start': dactionStart('actionEmplSearch')
+            'start': dactionStart('actionEmplSearch'),
+            'pushable': false
         });
         target.push('masqEmployee', {
             'name': 'masqEmployee',
             'type': 'daction',
             'menuText': 'Masquerade (begin/end)',
             'aclProfile': 'admin',
-            'start': dactionStart('masqEmployee')
+            'start': dactionStart('masqEmployee'),
+            'pushable': false
         });
 
         // Privhistory actions
@@ -128,28 +128,40 @@ define ([
             'type': 'daction',
             'menuText': 'Privilege (status) history',
             'aclProfile': 'passerby',
-            'start': dactionStart('actionPrivHistory')
+            'start': dactionStart('actionPrivHistory'),
+            'pushable': true
         });
         target.push('actionPrivHistoryEdit', { // read-write
             'name': 'actionPrivHistoryEdit',
             'type': 'daction',
             'menuText': 'Edit',
             'aclProfile': 'admin',
-            'start': dactionStart('actionPrivHistoryEdit')
+            'start': dactionStart('actionPrivHistoryEdit'),
+            'pushable': false
         });
         target.push('privHistorySaveAction', {
             'name': 'privHistorySaveAction',
             'type': 'daction',
             'menuText': 'Commit to database',
             'aclProfile': 'admin',
-            'start': dactionStart('privHistorySaveAction')
+            'start': dactionStart('privHistorySaveAction'),
+            'pushable': false
         });
         target.push('privHistoryDeleteAction', {
             'name': 'privHistoryDeleteAction',
             'type': 'daction',
             'menuText': 'Delete record',
             'aclProfile': 'admin',
-            'start': dactionStart('privHistoryDeleteAction')
+            'start': dactionStart('privHistoryDeleteAction'),
+            'pushable': false
+        });
+        target.push('privHistoryAddRecordAction', {
+            'name': 'privHistoryAddRecordAction',
+            'type': 'daction',
+            'menuText': 'Add record',
+            'aclProfile': 'admin',
+            'start': dactionStart('privHistoryAddRecordAction'),
+            'pushable': false
         });
 
         // Schedhistory actions
@@ -158,28 +170,40 @@ define ([
             'type': 'daction',
             'menuText': 'Schedule history',
             'aclProfile': 'passerby',
-            'start': dactionStart('actionSchedHistory')
+            'start': dactionStart('actionSchedHistory'),
+            'pushable': true
         });
         target.push('actionSchedHistoryEdit', { // read-write
             'name': 'actionSchedHistoryEdit',
             'type': 'daction',
             'menuText': 'Edit',
             'aclProfile': 'admin',
-            'start': dactionStart('actionSchedHistoryEdit')
+            'start': dactionStart('actionSchedHistoryEdit'),
+            'pushable': false
         });
         target.push('schedHistorySaveAction', {
             'name': 'schedHistorySaveAction',
             'type': 'daction',
             'menuText': 'Commit to database',
             'aclProfile': 'admin',
-            'start': dactionStart('schedHistorySaveAction')
+            'start': dactionStart('schedHistorySaveAction'),
+            'pushable': false
         });
         target.push('schedHistoryDeleteAction', {
             'name': 'schedHistoryDeleteAction',
             'type': 'daction',
             'menuText': 'Delete record',
             'aclProfile': 'admin',
-            'start': dactionStart('schedHistoryDeleteAction')
+            'start': dactionStart('schedHistoryDeleteAction'),
+            'pushable': false
+        });
+        target.push('schedHistoryAddRecordAction', {
+            'name': 'schedHistoryAddRecordAction',
+            'type': 'daction',
+            'menuText': 'Add record',
+            'aclProfile': 'admin',
+            'start': dactionStart('schedHistoryAddRecordAction'),
+            'pushable': false
         });
 
         // Schedule actions
@@ -188,49 +212,50 @@ define ([
             'type': 'daction',
             'menuText': 'Browse schedules',
             'aclProfile': 'admin',
-            'start': dactionStart('browseAllSchedules')
+            'start': dactionStart('browseAllSchedules'),
+            'pushable': false
         });
         target.push('actionSchedLookup', {
             'name': 'actionSchedLookup',
             'type': 'daction',
-            'menuText': 'Lookup a schedule by name or ID',
+            'menuText': 'Lookup',
             'aclProfile': 'admin',
-            'start': dactionStart('actionSchedLookup')
+            'start': dactionStart('actionSchedLookup'),
+            'pushable': true
         });
         target.push('createSchedule', {
             'name': 'createSchedule',
             'type': 'daction',
             'menuText': 'Create',
             'aclProfile': 'admin',
-            'start': dactionStart('createSchedule')
-        });
-        target.push('schedEditFromBrowser', {
-            'name': 'schedEditFromBrowser',
-            'type': 'daction',
-            'menuText': 'Edit',
-            'aclProfile': 'admin',
-            'start': dactionStart('schedEditFromBrowser')
-        });
-        target.push('schedDeleteFromBrowser', {
-            'name': 'schedDeleteFromBrowser',
-            'type': 'daction',
-            'menuText': 'Delete',
-            'aclProfile': 'admin',
-            'start': dactionStart('schedDeleteFromBrowser')
+            'start': dactionStart('createSchedule'),
+            'pushable': false
         });
         target.push('schedEditSave', {
             'name': 'schedEditSave',
             'type': 'daction',
             'menuText': 'Save changes',
             'aclProfile': 'active',
-            'start': dactionStart('schedEditSave')
+            'start': dactionStart('schedEditSave'),
+            'pushable': false
         });
         target.push('schedReallyDelete', {
             'name': 'schedReallyDelete',
             'type': 'daction',
             'menuText': 'Yes, I really mean it',
             'aclProfile': 'admin',
-            'start': dactionStart('schedReallyDelete')
+            'start': dactionStart('schedReallyDelete'),
+            'pushable': false
+        });
+
+        // Adminitrivia actions
+        target.push('restServerDetailsAction', {
+            'name': 'restServerDetailsAction',
+            'type': 'daction',
+            'menuText': 'REST server details',
+            'aclProfile': 'passerby',
+            'start': dactionStart('restServerDetailsAction'),
+            'pushable': false
         });
 
         // Run unit tests

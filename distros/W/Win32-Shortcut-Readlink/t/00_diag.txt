@@ -1,2 +1,0 @@
-Module::Build
-Test::More

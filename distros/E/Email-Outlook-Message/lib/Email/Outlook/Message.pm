@@ -59,7 +59,7 @@ use strict;
 use warnings;
 use 5.006;
 use vars qw($VERSION);
-$VERSION = "0.918";
+$VERSION = "0.919";
 
 use Email::Simple;
 use Email::MIME::Creator;
@@ -372,7 +372,7 @@ sub _create_mime_plain_body {
   return Email::MIME->create(
     attributes => {
       content_type => "text/plain",
-      charset => "UTF8",
+      charset => "UTF-8",
       disposition => "inline",
       encoding => "8bit",
     },
@@ -441,7 +441,7 @@ sub _create_mime_rtf_body {
     }
     $buffer = substr $buffer, length $BASE_BUFFER;
   } elsif ($magic == $MAGIC_UNCOMPRESSED_RTF) {
-    $buffer = substr $data, length $BASE_BUFFER;
+    $buffer = substr $data, 16;
   } else {
     carp "Incorrect magic number in RTF body.\n";
   }

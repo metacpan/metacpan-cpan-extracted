@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.3.6';
+our $VERSION = '0.3.8';
 
 1;
 
@@ -57,11 +57,17 @@ sub execute_cmd2 {
     my $cmd = shift;
     my $out;
 
+    my $format = get_prop('format');
+
     note("execute scenario: $cmd") if debug_mod2();
 
     my $stdout; my $stderr; my $exit;
 
-    ( $stdout, $stderr, $exit) =  Capture::Tiny::tee { system( $cmd ) };
+    if ($format eq 'production'){
+      ( $stdout, $stderr, $exit) =  Capture::Tiny::capture { system( $cmd ) };
+    } else{
+      ( $stdout, $stderr, $exit) =  Capture::Tiny::tee { system( $cmd ) };
+    }
 
     return ($exit >> 8,$stdout.$stderr);
 }
@@ -249,7 +255,11 @@ sub print_story_header {
 
     my $format = get_prop('format');
 
-    unless ($format eq 'concise'){
+    if ($format eq 'production') {
+      note(
+        timestamp().' : '.( $task_name || '').' '.(short_story_name($task_name))
+      );
+    } elsif ($format ne 'concise') {
       note(
         'run'.($task_name ? ' '.$task_name.' at ' : ' story at ').timestamp()."\n".( nocolor() ? short_story_name($task_name) : colored(['yellow'],short_story_name($task_name)) )
       );
@@ -261,6 +271,10 @@ sub run_story_file {
 
     return get_prop('stdout') if defined get_prop('stdout');
 
+    set_prop('has_scenario',1);
+
+    my $format = get_prop('format');
+
     my $story_dir = get_prop('story_dir');
 
     if ( get_stdout() ){
@@ -269,9 +283,13 @@ sub run_story_file {
         print_story_header();
 
         note("stdout is already set") if debug_mod12;
-        for my $l (split /\n/, get_stdout()){
-          note($l);
-        };
+
+        unless ($format eq 'production') {
+          for my $l (split /\n/, get_stdout()){
+            note($l);
+          }
+        }
+
         set_prop( stdout => get_stdout() );
         set_prop( scenario_status => 1 );
 
@@ -335,7 +353,7 @@ sub run_story_file {
         my ($ex_code, $out) = execute_cmd2($story_command);
 
         if ($ex_code == 0) {
-            outh_ok(1, "scenario succeeded" );
+            outh_ok(1, "scenario succeeded" ) unless $format eq 'production';
             set_prop( scenario_status => 1 );
             Outthentic::Story::Stat->set_scenario_status(1);
             Outthentic::Story::Stat->set_stdout($out);
@@ -346,7 +364,12 @@ sub run_story_file {
             Outthentic::Story::Stat->set_scenario_status(2);
             Outthentic::Story::Stat->set_stdout($out);
         }else{
-            outh_ok(0, "scenario succeeded", $ex_code);
+            if ( $format eq 'production'){
+              print "$out";
+              outh_ok(0, "scenario succeeded", $ex_code);
+            } else {
+              outh_ok(0, "scenario succeeded", $ex_code);
+            }
             set_prop( scenario_status => 0 );
             Outthentic::Story::Stat->set_scenario_status(0);
             Outthentic::Story::Stat->set_stdout($out);
@@ -382,6 +405,8 @@ sub run_and_check {
 
     my $story_check_file = shift;
 
+    my $format = get_prop('format');
+
     header() if debug_mod2();
 
     dsl()->{debug_mod} = get_prop('debug');
@@ -408,11 +433,17 @@ sub run_and_check {
     };
 
     my $err = $@;
+    my $check_fail=0;
     for my $r ( @{dsl()->results}){
         note($r->{message}) if $r->{type} eq 'debug';
         if ($r->{type} eq 'check_expression' ){
           Outthentic::Story::Stat->add_check_stat($r);
-          outh_ok($r->{status}, $r->{message}); 
+          $check_fail=1 unless $r->{status};
+          if ($format eq 'production'){
+            outh_ok($r->{status}, $r->{message}) unless $r->{status}; 
+          } else {
+            outh_ok($r->{status}, $r->{message}); 
+          }
           Outthentic::Story::Stat->set_status(0) unless $r->{status};
         };
 
@@ -424,6 +455,9 @@ sub run_and_check {
       die "validator error: $err";
     }
 
+    if ($format eq 'production' and $check_fail) {
+      print get_prop("stdout");
+    }
 }
 
       
@@ -502,7 +536,7 @@ sub short_story_name {
     push @ret, "[path] $short_story_dir" if $short_story_dir;
     push @ret, "[params] $story_vars" if $story_vars;
 
-    join "\n", @ret;
+    join " ", @ret;
 
 }
 
@@ -516,6 +550,7 @@ sub timestamp {
 END {
 
   #print "STATUS: $STATUS\n";
+
   if ($STATUS == 1){
     exit(0);
   } elsif($STATUS == -1){
@@ -1406,11 +1441,11 @@ C<--format>
 
 =back
 
-Sets reports format. Available formats are: C<concise|default>. Default value is C<default>.
+Sets reports format. Available formats are: C<concise|production|default>. Default value is C<default>.
 
-In concise format strun shrinks output to only STDOUT/STDERR comes from scenarios.
+In concise format strun shrinks output to only STDOUT/STDERR comes from scenarios. It's useful when you want to parse stories output by external commands.
 
-It's useful when you want to parse stories output by external commands.
+Production format omits debug information.
 
 =over
 
@@ -1746,6 +1781,12 @@ C<SPARROW_NO_COLOR> - disable color output, see C<--nocolor> option of story run
 =item *
 
 C<OUTTHENTIC_CWD> - sets working directory for strun, see C<--cwd> parameter of story runner
+
+
+
+=item *
+
+C<OUTTHENTIC_FORMAT> - overrides default value for C<--format> parameter of story runner.
 
 
 

@@ -1,0 +1,21 @@
+libqbit-application-model-db-clickhouse-perl (0.001) raring; urgency=low
+
+  * fix .gitignore
+
+  * added dist.ini
+
+  * added folder debian and documentation
+
+  * added calc_rows
+
+  * fix
+
+  * DB::clickhouse
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Sep 2017 22:06:08 +0300
+
+libqbit-application-model-db-clickhouse-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 3 Aug 2017 12:22:00 +0400

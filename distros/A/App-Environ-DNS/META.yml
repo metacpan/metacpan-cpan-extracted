@@ -1,0 +1,29 @@
+---
+abstract: 'AnyEvent::DNS fork safety for App::Environ environment'
+author:
+  - 'Andrey Kuzmin <kak-tus@mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Environ-DNS
+no_index:
+  directory:
+    - t
+    - inc
+    - example
+    - t
+requires:
+  AnyEvent::DNS: '0'
+  App::Environ: '0.18'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/kak-tus/App-Environ-DNS.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

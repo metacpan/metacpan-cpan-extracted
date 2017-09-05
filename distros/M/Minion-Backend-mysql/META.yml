@@ -2,20 +2,48 @@
 abstract: 'MySQL backend'
 author:
   - 'Brian Medley <bpmedley@cpan.org>'
-build_requires: {}
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::mysqld: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Minion-Backend-mysql
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Minion::Backend::mysql:
+    file: lib/Minion/Backend/mysql.pm
+    version: '0.08'
 requires:
-  Minion: '0'
-  Mojo::mysql: '0'
+  Minion: '7'
+  Mojo::mysql: '1.04'
   Mojolicious: '0'
 resources:
-  repository: https://github.com/brianmed/Minion-Backend-mysql
-version: '0.05'
+  IRC: irc://irc.perl.org/#mojo
+  bugtracker: https://github.com/preaction/Minion-Backend-mysql/issues
+  homepage: https://github.com/preaction/Minion-Backend-mysql
+  repository: https://github.com/preaction/Minion-Backend-mysql.git
+version: '0.08'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Alexander Nalobin <nalobin@reg.ru>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Zoffix Znet <cpan@zoffix.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

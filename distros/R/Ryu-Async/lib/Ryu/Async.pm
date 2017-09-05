@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 NAME
 
@@ -42,12 +42,32 @@ This is an L<IO::Async::Notifier> subclass for interacting with L<Ryu>.
 
 use parent qw(IO::Async::Notifier);
 
-use IO::Async::Timer::Periodic;
+use IO::Async::Handle;
+use IO::Async::Listener;
+use IO::Async::Process;
+use IO::Async::Resolver;
+use IO::Async::Signal;
+use IO::Async::Socket;
 use IO::Async::Stream;
+use IO::Async::Timer::Absolute;
+use IO::Async::Timer::Countdown;
+use IO::Async::Timer::Periodic;
+
+use Ryu::Async::Client;
+use Ryu::Async::Packet;
+use Ryu::Async::Server;
+
+use Ryu::Sink;
 use Ryu::Source;
+
+use URI::udp;
+use URI::tcp;
+
 use curry::weak;
+use Variable::Disposition qw(retain_future);
 
 use Log::Any qw($log);
+use Syntax::Keyword::Try;
 
 =head1 METHODS
 
@@ -173,6 +193,16 @@ sub stdin {
     )
 }
 
+=head2 stdout
+
+Returns a new L<Ryu::Sink> that wraps STDOUT.
+
+=cut
+
+sub stdout {
+    my ($self) = @_;
+}
+
 =head2 timer
 
 Provides a L<Ryu::Source> which emits an empty string at selected intervals.
@@ -206,7 +236,7 @@ sub timer {
         )
     );
     Scalar::Util::weaken($timer);
-    $src->on_ready($self->_capture_weakself(sub {
+    $src->on_ready($self->$curry::weak(sub {
         my ($self) = @_;
         return unless $timer;
         $timer->stop if $timer->is_running;
@@ -224,13 +254,163 @@ Returns a new L<Ryu::Source> instance.
 
 sub source {
     my ($self, %args) = @_;
-    my $label = delete($args{label}) // (caller 1)[3];
-    $label =~ s/^Net::Async::/Na/g;
-    $label =~ s/^IO::Async::/Ia/g;
-    $label =~ s/^Web::Async::/Wa/g;
-    $label =~ s/^Tickit::Async::/Ta/g;
-    $label =~ s/::([^:]*)$/->$1/;
+    my $label = delete($args{label}) // do {
+        my $label = (caller 1)[3];
+        for($label) {
+            s/^Net::Async::/Na/g;
+            s/^IO::Async::/Ia/g;
+            s/^Web::Async::/Wa/g;
+            s/^Tickit::Async::/Ta/g;
+            s/^Tickit::Widget::/TW/g;
+            s/::([^:]*)$/->$1/;
+        }
+        $label
+    };
     Ryu::Source->new(
+        new_future    => $self->loop->curry::weak::new_future,
+        apply_timeout => $self->curry::timeout,
+        label         => $label,
+        %args,
+    )
+}
+
+=head2 udp_client
+
+Creates a new UDP client.
+
+This will return a L<Ryu::Async::Connection> instance, which provides
+a sink for outgoing packets, and a source for incoming responses.
+
+=cut
+
+sub udp_client {
+    my ($self, %args) = @_;
+
+    my $uri = delete $args{uri};
+    $uri //= 'udp://' . join ':', $args{host} // '*', $args{port} // ();
+    $uri = URI->new($uri) unless ref $uri;
+    $log->debugf("UDP client for %s", $uri->as_string);
+
+    my $sink = $self->sink(
+        label => $args{label} // $uri->as_string,
+    );
+    $self->add_child(
+        my $client = IO::Async::Socket->new(
+            on_recv => sub {
+                my ($sock, $msg, $addr) = @_;
+                warn "Client received $msg from $addr";
+            },
+        )
+    );
+    my $f = $client->connect(
+        host     => $uri->host || '0.0.0.0',
+        service  => $uri->port // 0,
+        socktype => 'dgram',
+    );
+    $f->on_done(sub {
+        $log->debugf("UDP client connected");
+    })->on_fail(sub {
+        $log->errorf("UDP client failed to connect - %s", join ',', @_);
+    });
+    $sink->source->each(sub {
+        my $payload = $_;
+        retain_future(
+            $f->on_done(sub {
+                try {
+                    $log->tracef("Sending [%s] to %s", $payload, $uri);
+                    $client->send($payload);
+                } catch {
+                    $log->errorf("Exception when sending: %s", $@);
+                }
+            })
+        );
+    });
+    Ryu::Async::Client->new(
+        outgoing => $sink,
+        incoming => undef
+    );
+}
+
+=head2 udp_server
+
+=cut
+
+sub udp_server {
+    my ($self, %args) = @_;
+
+    my $uri = delete $args{uri};
+    $uri //= do {
+        $args{host} //= '0.0.0.0';
+        'udp://' . join ':', $args{host}, $args{port} // ();
+    };
+    $uri = URI->new($uri) unless ref $uri;
+    $log->debugf("UDP server %s", $uri->as_string);
+
+    my $src = $self->source;
+    my $sink = $self->sink;
+
+    $self->add_child(
+        my $server = IO::Async::Socket->new(
+            on_recv => sub {
+                my ($sock, $msg, $addr) = @_;
+                $log->debugf("UDP server [%s] had %s from %s", $uri->as_string, $msg, $addr);
+                $src->emit(
+                    Ryu::Async::Packet->new(
+                        payload => $msg, 
+                        from => $addr
+                    )
+                )
+            },
+            on_recv_error => sub {
+                my ($sock, $err) = @_;
+                $src->fail($err);
+            }
+        )
+    );
+    $sink->source->each(sub { $server->send($_->payload, 0, $_->addr) });
+    my $port_f = $server->bind(
+            service  => $uri->port // 0,
+            socktype => 'dgram'
+    )->then(sub {
+        Future->done($server->write_handle->sockport)
+    });
+    Ryu::Async::Server->new(
+        port     => $port_f,
+        incoming => $src,
+        outgoing => undef,
+    );
+}
+
+sub timeout {
+    my ($self, $input, $output, $delay) = @_;
+    $self->add_child(
+        my $timer = IO::Async::Timer::Countdown->new(
+            interval => $delay,
+            on_expire => sub { $output->fail('timeout') },
+        )
+    );
+    $input->each_while_source(sub { $timer->reset }, $output);
+    return $self;
+}
+
+=head2 sink
+
+Returns a new L<Ryu::Sink>.
+
+=cut
+
+sub sink {
+    my ($self, %args) = @_;
+    my $label = delete($args{label}) // do {
+        my $label = (caller 1)[3];
+        $label =~ s/^Net::Async::/Na/g;
+        $label =~ s/^IO::Async::/Ia/g;
+        $label =~ s/^Web::Async::/Wa/g;
+        $label =~ s/^Tickit::Async::/Ta/g;
+        $label =~ s/::([^:]*)$/->$1/;
+        $label
+    };
+    Ryu::Sink->new(
         new_future => $self->loop->curry::weak::new_future,
         label      => $label,
         %args,

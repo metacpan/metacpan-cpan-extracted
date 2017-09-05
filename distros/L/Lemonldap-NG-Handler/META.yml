@@ -34,8 +34,8 @@ requires:
   Apache::Session::Generate::MD5: '0'
   CGI: '3.08'
   LWP: '0'
-  Lemonldap::NG::Common: v1.9.10
+  Lemonldap::NG::Common: v1.9.11
   Mouse: '0'
   URI: '0'
-version: v1.9.10
+version: v1.9.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

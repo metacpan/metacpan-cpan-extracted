@@ -164,8 +164,9 @@ lines (using the rule 1 line, 1 paragraph) are perfectly fine. The
 rule of paragraphs separated by blank lines still apply, though.
 
 
-Also, \texttt{<tags>} which start and stop blocks, \textbf{must be placed on a line by
-themselves}.
+Also, \texttt{<tags>} which start and stop blocks, \textbf{must be placed on a line
+by themselves and don't mix with environments marked by leading
+spaces, notably lists and tables.}
 
 \section{Literal paragraphs}
 
@@ -179,12 +180,12 @@ Example:
 
 
 \begin{alltt}
- <example>
- The =<example>= tag is used for examples, where
- whitespace should be preserved, the text rendered in
- monospace, and any characters special to the output
- style escaped.
- </example>
+<example>
+The =<example>= tag is used for examples, where
+whitespace should be preserved, the text rendered in
+monospace, and any characters special to the output
+style escaped.
+</example>
 \end{alltt}
 
 
@@ -197,6 +198,16 @@ untouched. This means that it's very likely that you
 will get overflowing lines. To avoid this, a safe value
 for a line length could be 60 characters. Use longer
 lines at your perils.
+
+
+An alternate syntax for the \texttt{<example>} tag is \texttt{\{\{\{} \texttt{\}\}\}}:
+
+
+\begin{alltt}
+\{\{\{
+This is verbatim as well
+\}\}\}
+\end{alltt}
 
 \section{Line breaks}
 
@@ -298,23 +309,22 @@ The third level is undoubtely the most used. It usually separate a
 section of an article. For example the “Literal paragraph” above.
 
 
-The forth level goes down further.
+The fourth level goes down further.
 
-\subsection{Forth level, a “subsection”}
-
-
-The fifth level is very, very low. It’s handy to create description
-lists, too. It’s not dumped on the Table of Contents.
-
-\subsubsection{item 1}
+\subsection{Fourth level, a “subsection”}
 
 
-A description
+The fifth level is very, very low and does not create a Table of Contents entry.
 
-\subsubsection{item 2}
+\subsubsection{Fifth level 1}
 
 
-Another description
+Some text.
+
+\subsubsection{Fifth level 2}
+
+
+Some other text.
 
 \subsection{The example of levels}
 
@@ -454,9 +464,43 @@ original, original contribution, etc.). The preferred format is
 
 
 
+\item\relax 
+\texttt{\#hyphenation}
+
+
+See above.
+
+
+
 
 \end{itemize}
-\chapter{Bold, italicized and emphatized text}
+\section{Correcting the hyphenation in the PDF output}
+
+
+Sometimes you may notice some words with incorrect hyphenation in your
+document. You can fix this adding the breakpoint in the
+\texttt{\#hyphenation} directive.
+
+
+E.g.
+
+
+\begin{alltt}
+\#title Test
+\#lang it
+\#hyphenation al-be-rel-lo que-sto
+
+Questo alberello...
+\end{alltt}
+
+
+You can as many words with breakpoints as you wish, separated by
+spaces, but you can’t insert numbers or special characters (accents
+and diacritics are fine, though). You specify a breakpoint with the
+hyphen character “-”. Using a word without any hyphen will prevent the
+hyphenation for that word.
+
+\chapter{Bold, italicized and monospace text}
 
 
 To emphasize text, surround it with certain specially recognized
@@ -473,7 +517,7 @@ The following example will produce:
 \emph{emphasis}
 \textbf{strong emphasis}
 \textbf{\emph{very strong emphasis}}
-\texttt{verbatim and monospace}
+\texttt{code and monospace}
 
 
 
@@ -484,7 +528,7 @@ The following example will produce:
      *emphasis*
      **strong emphasis**
      ***very strong emphasis***
-     =verbatim and monospace=
+     =code and monospace=
 \end{alltt}
 
 
@@ -492,7 +536,7 @@ Each of these forms may span
 multiple lines, but not multiple paragraphs.
 
 
-You can also use the \texttt{<code>} tag to indicate verbatim and monospace
+You can also use the \texttt{<code>} tag to indicate code and monospace
 text. This is handy for regions that have an “=” in them.
 
 
@@ -507,7 +551,7 @@ The above example rewritten with tags:
      <em>emphasis</em>
      <strong>strong emphasis</strong>
      <strong><em>very strong emphasis</em></strong>
-     <code>verbatim and monospace</code>
+     <code>code and monospace</code>
 \end{alltt}
 
 
@@ -521,7 +565,7 @@ And produces the same thing.
 \emph{emphasis}
 \textbf{strong emphasis}
 \textbf{\emph{very strong emphasis}}
-\texttt{verbatim and monospace}
+\texttt{code and monospace}
 
 
 
@@ -550,6 +594,20 @@ deleted and overstriked</del>
 This is the \textsuperscript{superscript} and this is a
 \textsubscript{subscript}, and this is \sout{something deleted and
 overstriked}
+
+
+If you nest the same tag (e.g. \texttt{<em>this <em>and
+this</em></em>}, you are going to get weird results
+(and doesn't make any sense), so don't do it. \texttt{=} and
+\texttt{*} when surronding words have the same meaning of the
+respective tags:
+
+
+\begin{alltt}
+*this* is the same as <em>this</em>
+
+=this= is the same as <code>this</code>
+\end{alltt}
 
 \section{Making notes to be shown at the end}
 
@@ -688,6 +746,10 @@ Whitespace must occur before bullets or numbered items, to distinguish
 from the possibility of those characters occurring in a real sentence.
 
 
+Description lists are marked by some initial whitespace, the term, a
+double colon surrounded by whitespace, and the description body.
+
+
 \begin{alltt}
 Normal text.
 
@@ -722,6 +784,12 @@ A list with lower letters
  a. first
  b. second
  c. third
+
+A description list
+
+ First term :: definition and description
+ Second term :: definition and description
+
 \end{alltt}
 
 
@@ -850,11 +918,104 @@ third
 
 \end{enumerate}
 
-While the original Emacs Muse had the description lists, this
-implementation has not. You should use the fifth level of headings for
-those. The outcome is mostly the same (yes, you can’t nest them in
-lists, but crazy nesting is beyond the scope of this markup).
+A description list
 
+
+\begin{description}
+
+\item[{First term}] 
+definition and description
+
+
+\item[{Second term}] 
+definition and description
+
+
+\end{description}
+\section{Breaking lists}
+
+
+If for some reason you want to break the list without starting a
+regular paragraph, you can do so by inserting a
+<br> tag (which adds some white space between
+them) or a comment (invisible). E.g.
+
+
+\begin{alltt}
+List:
+
+   a. bullet item one
+   a. bullet item two, and will break
+
+; a comment
+
+   a. bullet item one
+   a. bullet item two, and break
+
+<br>
+
+   a. bullet item one
+   a. bullet item two, and end
+\end{alltt}
+
+
+Resulting in:
+
+
+List:
+
+
+\begin{enumerate}[a.]
+\item\relax 
+bullet item one
+
+
+
+\item\relax 
+bullet item two, and will break
+
+
+
+
+\end{enumerate}
+
+
+\begin{comment}
+; a comment
+\end{comment}
+
+
+\begin{enumerate}[a.]
+\item\relax 
+bullet item one
+
+
+
+\item\relax 
+bullet item two, and break
+
+
+
+
+\end{enumerate}
+
+
+\bigskip
+
+
+\begin{enumerate}[a.]
+\item\relax 
+bullet item one
+
+
+
+\item\relax 
+bullet item two, and end
+
+
+
+
+\end{enumerate}
 \section{Nested lists}
 
 
@@ -878,6 +1039,8 @@ Normal text.
    a. Level 2, enum item “a”
    b. Level 2, enum item “b”
       I. Level 3, enum item “I”
+         One term :: description
+         Another term :: description
  - Back to the bullets
 \end{alltt}
 
@@ -961,6 +1124,18 @@ Level 2, enum item “b”
 \item\relax 
 Level 3, enum item “I”
 
+
+\begin{description}
+
+\item[{One term}] 
+description
+
+
+\item[{Another term}] 
+description
+
+
+\end{description}
 
 
 
@@ -1051,81 +1226,6 @@ third
 
 
 \end{enumerate}
-
-If you need to switch type while the list is running, put a \texttt{br} tag
-between them, or some invisible material like a non-breaking space.
-
-
-\begin{alltt}
-This won’t get you what you expect:
-
- 1. first
- a. first item
-
-So you’ll have to do:
-
- 1. first
-
-<br>
-
- a. first item
-\end{alltt}
-
-
-Which yields:
-
-
-\hairline
-
-
-This won’t get you what you expect:
-
-
-\begin{enumerate}[1.]
-\item\relax 
-first
-
-
-
-
-\end{enumerate}
-
-\begin{enumerate}[a.]
-\item\relax 
-first item
-
-
-
-
-\end{enumerate}
-
-So you’ll have to do:
-
-
-\begin{enumerate}[1.]
-\item\relax 
-first
-
-
-
-
-\end{enumerate}
-
-
-\bigskip
-
-
-\begin{enumerate}[a.]
-\item\relax 
-first item
-
-
-
-
-\end{enumerate}
-
-\hairline
-
 \section{Complete example}
 
 
@@ -1206,6 +1306,15 @@ Normal text.
 
             Here I have the same amount of indentation,
             and it continues the item above.
+
+                 And inside this item :: a description
+
+                                         Which continues here.
+
+                 Another term :: a description
+
+                                 Which continues here.
+
 
  - Back to the bullets
 
@@ -1356,6 +1465,24 @@ Here I have the same amount of indentation, and it continues the
 item above.
 
 
+\begin{description}
+
+\item[{And inside this item}] 
+a description
+
+
+Which continues here.
+
+
+\item[{Another term}] 
+a description
+
+
+Which continues here.
+
+
+\end{description}
+
 
 
 \end{enumerate}
@@ -1379,7 +1506,13 @@ item above.
 \chapter{Generation of data tables}
 
 
-Only very simple tables are supported.  The syntax is as follows (just keep the indentation consistent and separate each cell by one or more textbars).
+Only very simple tables are supported. The syntax is as follows (just
+keep the indentation consistent and separate each cell by one or more
+textbars).
+
+
+Indentation (one or more leading spaces) is required to trigger the
+table rendering.
 
 
 \begin{alltt}
@@ -1411,10 +1544,8 @@ Only very simple tables are supported.  The syntax is as follows (just keep the 
 The ordering of the footer, header and table body blocks is irrelevant
 for the output (HTML requires you put first the header, then the
 footer, then the body). Ordering of the single rows is of course
-preserved. From this we come to the conclusion that you can’t normally
-typeset the pipe symbol without triggering a list. In \texttt{<example>} you
-can type it freely. Inside the cells you can do pretty much what you
-want (beside headers and lists): mark them up freely.
+preserved. Inside the cells you can do pretty much what you want
+(beside headers and lists): mark them up freely.
 
 \section{Floating tables}
 
@@ -1458,20 +1589,23 @@ So, the home of this project is
 which can be found at
 [[http://amusewiki.org]] Bare links will not
 get the hyperlinking. So http://thisisspam.org won’t
-get the hyperlinking. </example>
+get the hyperlinking.
+\end{alltt}
+
 
 So, the home of this project is
-[[http://amusewiki.org][AMuseWiki]],
-which can be found at [[http://amusewiki.org]]
+\href{http://amusewiki.org}{AMuseWiki},
+which can be found at \url{http://amusewiki.org}
 Bare links will not get the hyperlinking.
-So http://thisisspam.org won’t get the hyperlinking.
+So http:\Slash{}\Slash{}thisisspam.org won’t get the hyperlinking.
 
-*** Images
+\section{Images}
 
 
 Images are special case of this kind of linking.
 
-<example>
+
+\begin{alltt}
 [[m-l-manual-logo.png]]
 \end{alltt}
 
@@ -1661,9 +1795,7 @@ Van spent all his free time in research work for me.
 \end{figure}
 \clearpage
 
-\chapter{Inserting a horizontal line or anchor}
-
-\section{Horizontal Rules}
+\chapter{Inserting a horizontal line}
 
 
 Four or more dashes indicate a horizontal rule.  Be sure to put blank
@@ -1683,6 +1815,82 @@ Results:
 
 
 \hairline
+
+\chapter{Named anchors}
+
+
+If you start a line with "\#anchor" – where "anchor" can be any (ascii)
+word that starts with a letter and contains only ascii letters and
+digits – it defines an anchor at that point into the document. This
+point can be referenced using "\#anchor" as the target in a Muse link.
+Please note that the anchor must be on a line by itself.
+
+
+You can't have an anchor at the very beginning of the text, because it's
+merged into the header, so, if you really have to, put a \texttt{br} tag before
+it.
+
+
+The support for this feature was introduced in Text::Amuse version
+0.70 and improved in 0.82
+
+
+\begin{alltt}
+\#title My text
+
+\#badanchor
+This is not an anchor, it's part of the header with a dummy name.
+
+<br>
+
+\#begin
+This will work.
+
+*** Section
+
+\#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+\#nextsection
+
+And here we can link to [[\#anchor][our anchor]] and to the
+[[\#begin][begin]] and to [[\#nextsection][this section]].
+
+\end{alltt}
+
+
+Please note that the name in the HTML output is not kept verbatim.
+Instead a \texttt{text-amuse-label} prefix is added (if you need to link it
+externally).
+
+
+Also note that the link is lost when producing imposed PDFs (and
+implicitely lost when printing any PDF), so it's recommended to keep
+this in mind when writing the document, as the text of the link should
+work even if the link is not present.
+
+
+Bad example:
+
+
+\begin{alltt}
+See [[\#anchor][here]]
+\end{alltt}
+
+
+The poor soul printing it and reading it on paper will see just "See
+here". Here where?
+
+
+Good example:
+
+
+\begin{alltt}
+See [[\#anchor][the previous chapter]] for more informations.
+\end{alltt}
 
 \chapter{Lines to omit from published output}
 
@@ -1768,10 +1976,10 @@ very, long description
 \end{amusebiblio}
 
 
-The list is wrapped in a \texttt{<div>} with class set to biblio, while the TeX
-source get wrapped in \texttt{\textbackslash{}startawikibiblio} and \texttt{\textbackslash{}stopawikibiblio}. You are
-free to change class and definition. A reversed indentation is
-suggested.
+The list is wrapped in a \texttt{<div>} with class set to biblio, while the
+TeX source get wrapped in the \texttt{amusebiblio} environment. You are free
+to change class and environment definition if you need to. A reversed
+indentation is suggested.
 
 
 The same goes with the \texttt{<play>} environment, which is supposed to wrap
@@ -1824,6 +2032,26 @@ Oh heauie burthen!
 
 
 \end{amuseplay}
+
+\chapter{Preventing the markup to be interpreted}
+
+
+Sometimes you want to write something like [1]
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. *this*.
+
+
+You can do so wrapping the words with the <verbatim> tag.
+
+
+Example:
+
+
+\begin{alltt}
+Sometimes you want to write something like <verbatim>[1]</verbatim>
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. <verbatim>*this*</verbatim>.
+\end{alltt}
 
 \part{GNU Free Documentation License}
 

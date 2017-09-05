@@ -1,6 +1,7 @@
 use Test::More;
 use Patro ':test';
 use Scalar::Util 'reftype';
+use 5.010;
 
 my $main_pid = $$;
 $SIG{ALRM} = sub { warn "SIGALRM! \@ ",scalar localtime; };

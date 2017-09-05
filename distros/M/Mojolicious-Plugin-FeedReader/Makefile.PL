@@ -8,7 +8,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Mojolicious/Plugin/FeedReader.pm',
     AUTHOR       => 'Dotan Dimet <dotan@corky.net>',
     PREREQ_PM    => {
-        'Mojolicious' => '6.0',
+        'Mojolicious' => '7.15',
         'HTTP::Date'  => '6.02',
         'Time::Zone'  => '2.2'
     },

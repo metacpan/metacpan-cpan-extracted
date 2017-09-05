@@ -30,10 +30,9 @@ Math::Permute::Lists - Generate all the permutations of zero or more nested list
 
 =cut
 
-use strict;
-
 package Math::Permute::Lists;
-
+our $VERSION = '20170828';
+use v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
 
@@ -111,14 +110,12 @@ sub Permute                                                                     
 
 # Export details
 
-require 5;
 require Exporter;
 
 use vars qw(@ISA @EXPORT $VERSION);
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(permute);
-$VERSION = '20170808';
 
 =head1 Description
 

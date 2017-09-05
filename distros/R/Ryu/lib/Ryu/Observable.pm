@@ -3,7 +3,7 @@ package Ryu::Observable;
 use strict;
 use warnings;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 =encoding utf8
 

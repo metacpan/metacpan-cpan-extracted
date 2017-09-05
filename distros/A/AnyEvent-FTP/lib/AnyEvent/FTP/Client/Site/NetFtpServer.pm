@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Net::FTPServer
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 # TODO add a test for this
@@ -29,7 +29,7 @@ AnyEvent::FTP::Client::Site::NetFtpServer - Site specific commands for Net::FTPS
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,9 @@ This class provides the C<SITE> specific commands for L<Net::FTPServer>.
 
 =head1 METHODS
 
-=head2 $client-E<gt>site-E<gt>net_ftp_server-E<gt>version
+=head2 version
+
+ $client->site->net_ftp_server->version
 
 Get the L<Net::FTPServer> version.
 

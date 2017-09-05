@@ -28,13 +28,14 @@ you passed it one.
 
 =head1 SYSTEM CALL RETURN VALUES
 
-For system calls that return -1 on failure and 0 on success the return value
-is mapped to undef on failure and "0 but true" on success. This is the
-majority of system calls.
+A system call return value of -1 meaning "error" is mapped to undef.
 
-For system calls where 0 is a valid return value it is left unchanged. These
-are C<read()>, C<write()>, C<pread()>, C<pwrite()>. C<openat()> gets a special
-treatment in this module, see its description below.
+A system call return value of 0 meaning "success" is mapped to "0 but true".
+
+For system calls where 0 does not just mean "success", 0 is returned
+unchanged. These are C<read()>, C<write()>, C<writev()>, C<pread()>,
+C<pwrite()>, C<pwritev()>. C<openat()> gets a special treatment in this
+module, see below.
 
 =head1 FUNCTIONS
 
@@ -42,7 +43,7 @@ treatment in this module, see its description below.
 
 =item a64l
 
-n = a64l(s);
+l = a64l(s);
 
 =item abort
 
@@ -51,6 +52,10 @@ abort();
 =item abs
 
 ui = abs(i);
+
+=item access
+
+ret = access(path, mode);
 
 =item acos
 
@@ -175,6 +180,10 @@ ret = chown(path, uid, gid);
 =item cimag
 
 im = cimag(re, im);
+
+=item clock
+
+t = clock()
 
 =item clock_getcpuclockid
 
@@ -548,6 +557,17 @@ y = ilogb(x);
 
 Like POSIX::isalpha() but returns 0 for the empty string.
 
+=item isatty
+
+ret = isatty(fd)
+
+=item isblank
+
+ret = isblank(charstring)
+
+Returns 1 if I<charstring> consists only of blank characters (i.e. spaces
+and/or tabs). Returns 0 otherwise (also for the empty string).
+
 =item iscntrl
 
 Like POSIX::iscntrl() but returns 0 for the empty string.
@@ -630,6 +650,10 @@ ret = killpg(pgrp, sig);
 
 s = l64a(n);
 
+=item lchown
+
+ret = lchown(path, uid, gid)
+
 =item ldexp
 
 y = ldexp(x, exp);
@@ -667,6 +691,10 @@ y = logb(x);
 =item lrand48
 
 r = lrand48();
+
+=item lround
+
+l = lround(x)
 
 =item lstat
 
@@ -747,11 +775,11 @@ Returns undef on failure.
 
 =item pread
 
-bytes_read = pread(fd, buf, file_offset, nbytes[, buf_offset]);
+bytes_read = pread(fd, buf, offset, count[, buf_offset]);
 
-C<pread()> reads I<nbytes> bytes of data from the file descriptor I<fd> at
-file offset I<offset> into the scalar I<buf> without changing the file
-offset. I<buf> will be enlarged automatically if necessary.
+C<pread()> reads I<count> bytes (not characters) of data from the file
+descriptor I<fd> at file offset I<offset> into the scalar I<buf> without
+changing the file offset. I<buf> will be enlarged automatically if necessary.
 
 C<pread()> treats I<buf> just like C<sysread()> does: I<buf_offset> may be
 specified to place the read data at that position in I<buf>. Defaults to 0. If
@@ -763,7 +791,8 @@ latter detail is missing from the sysread() documentation.
 
 Returns the number of bytes read, 0 at EOF, undef on error.
 
-Note that pread() deals with I<bytes> not characters.
+Note that the order of I<offset> and I<count> is inverted compared to
+pread(2). This is to be consistent with pwrite() (see below).
 
 =item ptsname
 
@@ -771,14 +800,15 @@ name = ptsname(fd);
 
 =item pwrite
 
-bytes_written = pwrite(fd, buf, offset[, nbytes, buf_offset]);
+bytes_written = pwrite(fd, buf, offset[, count, buf_offset]);
 
 pwrite() writes data from the scalar I<buf> to the file descriptor I<fd> at
 file offset I<offset> without changing the file offset. The file referenced by
 I<fd> must be capable of seeking.
 
-I<nbytes> may be specified to write only that much bytes. If not specified or
-undef, everything from I<buf_offset> up to the end of I<buf> is written.
+I<count> may be specified to write only that much bytes (not characters). If
+not specified or undef, everything from I<buf_offset> up to the end of I<buf>
+is written.
 
 I<buf_offset> may be specified to write data from that position in
 I<buf>. Defaults to 0. If I<buf_offset> is negative it is counted from the end
@@ -786,10 +816,19 @@ of the string.
 
 Returns the number of bytes written, undef on error.
 
-Note that pwrite() deals with I<bytes> not characters.
+Note that the order of I<offset> and I<count> is inverted compared to
+pwrite(2). This is to allow omitting I<count> and I<buf_offset> if you just
+want to write the whole buffer.
 
 On Linux, if a file is opened with O_APPEND, pwrite() appends data to the end
 of the file, regardless of the value of offset (in violation of POSIX).
+
+=item pwritev
+
+bytes_written = pwritev(fd, arrayref, offset)
+
+C<pwritev()> behaves like C<writev()> but adds an I<offset> argument, which
+specifies the file position at which the data is to be written.
 
 =item random
 
@@ -797,7 +836,7 @@ r = random();
 
 =item read
 
-ret = read(fd, buf, nbytes);
+ret = read(fd, buf, count);
 
 Like POSIX::read() but returns 0 at EOF instead of "0 but true".
 
@@ -999,12 +1038,22 @@ default to UTIME_NOW.
 
 =item write
 
-ret = write(fd, buf[, nbytes]);
+bytes_written = write(fd, buf[, count]);
 
 Like POSIX::write() but returns 0 instead of "0 but true" if 0 bytes were
 written, and it does not write more bytes than I<buf> contains.
 
-If I<nbytes> is omitted, it defaults to the length of I<buf>
+If I<count> is omitted, it defaults to the length of I<buf>
+
+=item writev
+
+bytes_written = writev(fd, arrayref);
+
+writev() writes multiple buffers from I<arrayref> to the file associated with
+the file descriptor I<fd>. The buffers are processed in array order. Undefined
+or empty buffers are skipped.
+
+Returns the number of bytes written or undef on error.
 
 =item y0
 
@@ -1034,21 +1083,25 @@ available:
  :at     All *at() functions like openat() etc. plus all AT_ constants
  :id     All get/set*id() functions like getuid() etc.
  :is     All is* functions like isdigit() etc.
- :prw    pread() and pwrite()
- :clock  All clock_* functions like clock_gettime() etc. plus all CLOCK_ constants
+ :rw     read(), write(), writev()
+ :prw    pread(), pwrite(), pwritev()
+ :clock  All clock* functions and all CLOCK* constants
 
 =head1 CONSTANTS
 
 AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
-AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW BOOT_TIME CLOCK_MONOTONIC
-CLOCK_MONOTONIC_RAW CLOCK_PROCESS_CPUTIME_ID CLOCK_REALTIME
-CLOCK_THREAD_CPUTIME_ID _CS_GNU_LIBC_VERSION _CS_GNU_LIBPTHREAD_VERSION
-_CS_PATH DEAD_PROCESS FNM_CASEFOLD FNM_FILE_NAME FNM_LEADING_DIR FNM_NOESCAPE
-FNM_NOMATCH FNM_PATHNAME FNM_PERIOD FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL
-FP_ZERO INIT_PROCESS ITIMER_PROF ITIMER_REAL ITIMER_VIRTUAL LOGIN_PROCESS
-NEW_TIME O_CLOEXEC O_DIRECTORY O_EXEC OLD_TIME O_NOFOLLOW O_RSYNC O_SEARCH
-O_SYNC O_TMPFILE O_TTY_INIT RTLD_GLOBAL RTLD_LAZY RTLD_LOCAL RTLD_NOW RUN_LVL
-TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
+AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW BOOT_TIME CLOCK_BOOTTIME CLOCK_HIGHRES
+CLOCK_MONOTONIC CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC_FAST
+CLOCK_MONOTONIC_PRECISE CLOCK_MONOTONIC_RAW CLOCK_PROCESS_CPUTIME_ID
+CLOCK_REALTIME CLOCK_REALTIME_COARSE CLOCK_REALTIME_FAST
+CLOCK_REALTIME_PRECISE CLOCK_SOFTTIME CLOCK_THREAD_CPUTIME_ID CLOCK_UPTIME
+CLOCK_UPTIME_FAST CLOCK_UPTIME_PRECISE _CS_GNU_LIBC_VERSION
+_CS_GNU_LIBPTHREAD_VERSION _CS_PATH DEAD_PROCESS FNM_CASEFOLD FNM_FILE_NAME
+FNM_LEADING_DIR FNM_NOESCAPE FNM_NOMATCH FNM_PATHNAME FNM_PERIOD FP_INFINITE
+FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO INIT_PROCESS ITIMER_PROF ITIMER_REAL
+ITIMER_VIRTUAL LOGIN_PROCESS NEW_TIME O_CLOEXEC O_DIRECTORY O_EXEC OLD_TIME
+O_NOFOLLOW O_RSYNC O_SEARCH O_SYNC O_TMPFILE O_TTY_INIT RTLD_GLOBAL RTLD_LAZY
+RTLD_LOCAL RTLD_NOW RUN_LVL TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use base 'Exporter';
 our @EXPORT = qw(share shared_clone);
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use overload
     fallback => 1,
@@ -75,7 +75,7 @@ $make_shared_with_code = sub {
 	$cloned->{$addr} = $copy;
 	push @$copy, map { $make_shared_with_code->($_,$cloned) } @$item;
     } elsif ($ref_type eq 'HASH') {
-	my $ccc = {}; $DB::single=1;
+	my $ccc = {};
 	$copy = &threads::shared::share( $ccc );
 	$cloned->{$addr} = $copy;
 	while (my ($k,$v) = each %$item) {
@@ -200,6 +200,14 @@ of the input data structure and make any references within the
 data structure shared across threads. Unlike L<threads::shared::shared_clone>,
 this function supports the sharing of C<CODE> references within
 the data structure.
+
+=head1 LIMITATIONS
+
+Using this module requires features of Perl that only work properly
+on Perl v5.17.0 or better. If the code C<$shared_coderef->(@args)>
+gives you a C<Not a CODE reference ...> error, a workaround is to
+call C<$shared_coderef->_invoke->(@args)>. This is how the L<Patro>
+distribution works around this problem for older versions of perl.
 
 =head1 LICENSE AND COPYRIGHT
 

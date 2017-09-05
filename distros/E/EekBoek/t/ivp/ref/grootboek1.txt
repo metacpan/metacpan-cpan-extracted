@@ -1,6 +1,6 @@
                                              Grootboek
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                      EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                      EekBoek, 2013-12-31
 
  GrBk  Grootboek/Boekstuk              Datum           Debet     Credit  BoekstukNr      Relatie
 ---------------------------------------------------------------------------------------------------
@@ -49,13 +49,13 @@ EekBoek Demo Administratie                                                      
 
  4200  BTW Verkoop Hoog
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                                         1463,00
- 4200  Totaal BTW Verkoop Hoog                                  1463,00
+        Totaal mutaties                                         1590,28
+ 4200  Totaal BTW Verkoop Hoog                                  1590,28
 
  4220  BTW Inkoop Hoog
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                               148,13
- 4220  Totaal BTW Inkoop Hoog                         148,13
+        Totaal mutaties                               161,06
+ 4220  Totaal BTW Inkoop Hoog                         161,06
 
  6800  Afschr. kosten inv. & inr.
         Beginsaldo                                      0,00       0,00
@@ -71,13 +71,13 @@ EekBoek Demo Administratie                                                      
 
  6900  Telefoon- en faxkosten
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                               510,29
- 6900  Totaal Telefoon- en faxkosten                  510,29
+        Totaal mutaties                               501,86
+ 6900  Totaal Telefoon- en faxkosten                  501,86
 
  6905  Internetkosten
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                               269,42
- 6905  Totaal Internetkosten                          269,42
+        Totaal mutaties                               264,92
+ 6905  Totaal Internetkosten                          264,92
 
  6980  Bankkosten
         Beginsaldo                                      0,00       0,00
@@ -86,8 +86,8 @@ EekBoek Demo Administratie                                                      
 
  8100  Omzet advisering
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                                         1200,00
- 8100  Totaal Omzet advisering                                  1200,00
+        Totaal mutaties                                         1180,16
+ 8100  Totaal Omzet advisering                                  1180,16
 
  8300  Omzet editing
         Beginsaldo                                      0,00       0,00
@@ -96,8 +96,8 @@ EekBoek Demo Administratie                                                      
 
  8400  Omzet cursussen
         Beginsaldo                                      0,00       0,00
-        Totaal mutaties                                         6500,00
- 8400  Totaal Omzet cursussen                                   6500,00
+        Totaal mutaties                                         6392,56
+ 8400  Totaal Omzet cursussen                                   6392,56
 
        Totaal mutaties                              10971,08   10971,08
 ---------------------------------------------------------------------------------------------------

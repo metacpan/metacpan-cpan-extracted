@@ -1,0 +1,30 @@
+---
+abstract: 'storing profiling information on template use.'
+author:
+  - 'Matthew Somerville <matthew@mysociety.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Debug-Template
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Method::Modifiers: '0'
+  Plack::Middleware::Debug: '0'
+  Text::MicroTemplate: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mysociety/Plack-Middleware-Debug-Template/issues
+  repository: https://github.com/mysociety/Plack-Middleware-Debug-Template
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

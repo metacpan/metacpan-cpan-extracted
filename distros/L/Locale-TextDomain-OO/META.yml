@@ -18,7 +18,7 @@ name: Locale-TextDomain-OO
 provides:
   Locale::TextDomain::OO:
     file: lib/Locale/TextDomain/OO.pm
-    version: '1.029'
+    version: '1.030'
   Locale::TextDomain::OO::FunctionalInterface:
     file: lib/Locale/TextDomain/OO/FunctionalInterface.pm
     version: '1.000'
@@ -52,18 +52,21 @@ provides:
   Locale::TextDomain::OO::Plugin::Expand::BabelFish::Loc:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc.pm
     version: '1.027'
+  Locale::TextDomain::OO::Plugin::Expand::BabelFish::Loc::DomainAndCategory:
+    file: lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc/DomainAndCategory.pm
+    version: '1.030'
   Locale::TextDomain::OO::Plugin::Expand::Gettext:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext.pm
     version: '1.027'
   Locale::TextDomain::OO::Plugin::Expand::Gettext::DomainAndCategory:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/DomainAndCategory.pm
-    version: '1.027'
+    version: '1.030'
   Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc.pm
     version: '1.027'
   Locale::TextDomain::OO::Plugin::Expand::Gettext::Loc::DomainAndCategory:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc/DomainAndCategory.pm
-    version: '1.027'
+    version: '1.030'
   Locale::TextDomain::OO::Plugin::Expand::Gettext::Named:
     file: lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Named.pm
     version: '1.027'
@@ -82,6 +85,9 @@ provides:
   Locale::TextDomain::OO::Plugin::Language::LanguageOfLanguages:
     file: lib/Locale/TextDomain/OO/Plugin/Language/LanguageOfLanguages.pm
     version: '1.014'
+  Locale::TextDomain::OO::Role::DomainAndCategory:
+    file: lib/Locale/TextDomain/OO/Role/DomainAndCategory.pm
+    version: '1.030'
   Locale::TextDomain::OO::Role::Logger:
     file: lib/Locale/TextDomain/OO/Role/Logger.pm
     version: '1.027'
@@ -129,5 +135,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.029'
+version: '1.030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

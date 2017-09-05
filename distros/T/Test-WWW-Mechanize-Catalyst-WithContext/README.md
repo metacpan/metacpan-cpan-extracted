@@ -11,7 +11,7 @@ Test::WWW::Mechanize::Catalyst::WithContext - T::W::M::C can now give you $c
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 

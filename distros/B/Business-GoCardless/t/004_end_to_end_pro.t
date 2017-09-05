@@ -76,7 +76,7 @@ my $NewBill = $GoCardless->bill( $Bill->id );
 is( $NewBill->id,$Bill->id,'getting bill with same id gives same bill' );
 
 my $Paginator = $GoCardless->bills(
-	# TOOD: args here
+	limit => 500,
 );
 
 note explain $Paginator->info if $DEBUG;

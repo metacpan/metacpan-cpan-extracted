@@ -1,5 +1,9 @@
 Revision history for Exporter-WithBase.
 
+1.01      2017-09-03 06:29:48+02:00 Europe/Paris
+	Document that the '-base' flag is only recognized in first position.
+	(fixes RT#121628, thanks to Toby Inkster)
+
 1.00      2017-05-11 22:49:59+02:00 Europe/Paris
 	Fix testsuite for dot-less-@INC.
 

@@ -1,5 +1,13 @@
 Revision history for DBIx-Class-DeploymentHandler
 
+0.002220  2017-08-29 16:59:10-07:00 America/Los_Angeles
+ - generate short package names for scripts (Fixes GH#55)
+   (Thanks Andrew Gregory!)
+ - Fix args to internal method (Fixes GH#53)
+   (Thanks Alastair McGowan-Douglas!)
+ - Allow schema versions to be version objects (Fixes GH#51)
+   (Good find Jonathan Scott Duff!)
+
 0.002219  2017-03-19 21:15:19-07:00 America/Los_Angeles
  - Fix typo in docs (Thanks Aaron Crane) (Fixes GH#49)
  - Fix spelling mistake in POD (Thanks Stefan Hornburg!)

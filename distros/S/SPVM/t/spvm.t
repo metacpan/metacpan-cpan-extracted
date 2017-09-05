@@ -15,6 +15,8 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
 use SPVM 'std'; my $use_std_line = __LINE__;
 
+use SPVM 'TestCase::Inline';
+
 use POSIX ();
 
 use SPVM::Object;
@@ -44,6 +46,15 @@ my $start_objects_count = SPVM::get_objects_count();
   my $nums = SPVM::new_int_array([1, 2, 3]);
   my $total = SPVM::std::sum_int($nums);
   is($total, 6);
+}
+
+# Call subroutine
+{
+  ok(SPVM::TestCase::call_sub_last_camma());
+}
+# Destructor
+{
+  ok(SPVM::TestCase::destructor());
 }
 
 # Weaken
@@ -122,6 +133,60 @@ my $start_objects_count = SPVM::get_objects_count();
   }
 }
 
+# Exception
+{
+  {
+    ok(SPVM::TestCase::exception_eval_call_sub());
+  }
+  
+  {
+    eval { SPVM::TestCase::exception_call_stack() };
+    like($@, qr/Error/);
+    like($@, qr/exception_die_return_int/);
+    like($@, qr/exception_call_stack/);
+  }
+
+  {
+    eval { SPVM::TestCase::exception_die_return_byte() };
+    like($@, qr/Error/);
+    like($@, qr/exception_die_return_byte/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_short() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_int() };
+    like($@, qr/Error/);
+    like($@, qr/exception_die_return_int/);
+    like($@, qr/TestCase\.spvm/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_long() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_float() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_double() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_object() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_die_return_void() };
+    like($@, qr/Error/);
+  }
+  
+  {
+    ok(SPVM::TestCase::exception_die_return_int_eval_catch());
+  }
+}
+
 # Call void subroutine
 {
   ok(SPVM::TestCase::call_void());
@@ -192,6 +257,7 @@ my $start_objects_count = SPVM::get_objects_count();
   ok(SPVM::TestCase::get_object_from_freelist());
 }
 
+=pod
 is_deeply(
   \@SPVM::PACKAGE_INFOS,
   [
@@ -199,6 +265,12 @@ is_deeply(
     {name => 'std', file => $file, line => $use_std_line}
   ]
 );
+=cut
+
+# Inline
+{
+  ok(SPVM::TestCase::spvm_inline());
+}
 
 # Get object from freelist
 {

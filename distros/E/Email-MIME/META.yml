@@ -22,7 +22,7 @@ name: Email-MIME
 requires:
   Carp: '0'
   Email::Address::XS: '0'
-  Email::MIME::ContentType: '1.016'
+  Email::MIME::ContentType: '1.022'
   Email::MIME::Encodings: '1.314'
   Email::MessageID: '0'
   Email::Simple: '2.212'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/rjbs/Email-MIME/issues
   homepage: https://github.com/rjbs/Email-MIME
   repository: https://github.com/rjbs/Email-MIME.git
-version: '1.945'
+version: '1.946'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -81,7 +81,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@RJBS/RJBS-Outdated'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -93,7 +93,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@RJBS/CPAN-Outdated'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RJBS/@Filter/PruneCruft'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.945'
+          tag: '1.946'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -426,6 +426,7 @@ x_contributors:
   - 'Alex Vandiver <alexmv@mit.edu>'
   - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
   - 'Brian Cassidy <bricas@cpan.org>'
+  - 'Dan Book <grinnz@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Dotan Dimet <dotan@corky.net>'
   - 'Geraint Edwards <gedge-oss@yadn.org>'
@@ -434,6 +435,7 @@ x_contributors:
   - 'Lance A. Brown <lance@bearcircle.net>'
   - 'Matthew Horsfall (alh) <wolfsage@gmail.com>'
   - 'memememomo <memememomo@gmail.com>'
+  - 'Michael McClimon <michael@mcclimon.org>'
   - 'Pali <pali@cpan.org>'
   - 'Shawn Sorichetti <ssoriche@coloredblocks.com>'
   - 'Tomohiro Hosaka <bokutin@bokut.in>'

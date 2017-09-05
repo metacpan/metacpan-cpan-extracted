@@ -12,7 +12,7 @@ use Dist::Zilla::Tester;
 
 use Dist::Zilla::Plugin::Repository;    # make sure it's already loaded
 use File::Temp qw/tempdir/;
-local $ENV{HOME} = tempdir( CLEANUP => 1 );
+local $ENV{HOME} = tempdir(CLEANUP => 1);
 
 my %result;
 
@@ -82,6 +82,32 @@ $result{'hg paths'} = <<'END HG';
 default = https://foobar.googlecode.com/hg/
 END HG
 
+$result{'git remote show -n gitlab'} = <<'END GITLAB';
+* remote origin
+  Fetch URL: git@gitlab.com:foo/bar
+  Push  URL: git@gitlab.com:foo/bar
+  HEAD branch: (not queried)
+  Remote branch: (status not queried)
+    master
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push' (status not queried):
+    (matching) pushes to (matching)
+END GITLAB
+
+$result{'git remote show -n bitbucket'} = <<'END BITBUCKET';
+* remote origin
+  Fetch URL: git@bitbucket.org:foo/bar
+  Push  URL: git@bitbucket.org:foo/bar
+  HEAD branch: (not queried)
+  Remote branch: (status not queried)
+    master
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push' (status not queried):
+    (matching) pushes to (matching)
+END BITBUCKET
+
 #---------------------------------------------------------------------
 sub make_ini {
     my $ini = <<'END START';
@@ -95,7 +121,7 @@ version  = 0.01
 [Repository]
 END START
 
-    $ini . join( '', map { "$_\n" } @_ );
+    $ini . join('', map { "$_\n" } @_);
 }    # end make_ini
 
 #---------------------------------------------------------------------
@@ -109,7 +135,7 @@ sub build_tzil {
     }
 
     my $tzil = Builder->from_config(
-        { dist_root => 't/corpus/DZT' },
+        {dist_root => 't/corpus/DZT'},
         {
             add_files => {
                 'source/dist.ini' => make_ini(@$repo),
@@ -125,48 +151,46 @@ sub build_tzil {
 
 #---------------------------------------------------------------------
 sub github_deprecated {
-    scalar grep { /github_http is deprecated/ } @{ shift->log_messages };
+    scalar grep { /github_http is deprecated/ } @{shift->log_messages};
 }    # end github_deprecated
-
 #---------------------------------------------------------------------
 sub remote_not_found {
-    scalar grep { /Skipping invalid git remote/ } @{ shift->log_messages };
+    scalar grep { /Skipping invalid git remote/ } @{shift->log_messages};
 }    # end remote_not_found
 
 #=====================================================================
 {
     my $tzil = build_tzil();
 
-    is( $tzil->distmeta->{resources}{repository}, undef, "No repository" );
-    ok( !github_deprecated($tzil), "No repository log message" );
+    is($tzil->distmeta->{resources}{repository}, undef, "No repository");
+    ok(!github_deprecated($tzil), "No repository log message");
 }
 
 #---------------------------------------------------------------------
 {
     my $url = 'http://example.com';
 
-    my $tzil = build_tzil( ["repository = $url"] );
+    my $tzil = build_tzil(["repository = $url"]);
 
-    is_deeply(
-        $tzil->distmeta->{resources}{repository},
-        { url => $url },
-        "Just a URL"
-    );
-    ok( !github_deprecated($tzil), "Just a URL log message" );
+    is_deeply($tzil->distmeta->{resources}{repository}, {url => $url}, "Just a URL");
+    ok(!github_deprecated($tzil), "Just a URL log message");
 }
 
 #---------------------------------------------------------------------
 {
     my $url = 'http://example.com/svn/repo';
 
-    my $tzil = build_tzil( [ "repository = $url", 'type = svn' ] );
+    my $tzil = build_tzil(["repository = $url", 'type = svn']);
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        { url => $url, type => 'svn' },
+        {
+            url  => $url,
+            type => 'svn'
+        },
         "SVN with type"
     );
-    ok( !github_deprecated($tzil), "SVN with type log message" );
+    ok(!github_deprecated($tzil), "SVN with type log message");
 }
 
 #---------------------------------------------------------------------
@@ -174,20 +198,23 @@ sub remote_not_found {
     my $url = 'http://example.com/svn/repo';
     my $web = 'http://example.com';
 
-    my $tzil =
-      build_tzil( [ "repository = $url", "web = $web", 'type = svn' ] );
+    my $tzil = build_tzil(["repository = $url", "web = $web", 'type = svn']);
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        { web => $web, url => $url, type => 'svn' },
+        {
+            web  => $web,
+            url  => $url,
+            type => 'svn'
+        },
         "SVN with type and web"
     );
-    ok( !github_deprecated($tzil), "SVN with type and web log message" );
+    ok(!github_deprecated($tzil), "SVN with type and web log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( [], '.git' );
+    my $tzil = build_tzil([], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -198,12 +225,12 @@ sub remote_not_found {
         },
         "Auto github"
     );
-    ok( !github_deprecated($tzil), "Auto github log message" );
+    ok(!github_deprecated($tzil), "Auto github log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( ['github_http = 1'], '.git' );
+    my $tzil = build_tzil(['github_http = 1'], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -213,12 +240,12 @@ sub remote_not_found {
         },
         "Auto github with http"
     );
-    ok( github_deprecated($tzil), "Auto github with http log message" );
+    ok(github_deprecated($tzil), "Auto github with http log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( ['github_http = 0'], '.git' );
+    my $tzil = build_tzil(['github_http = 0'], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -229,12 +256,12 @@ sub remote_not_found {
         },
         "Auto github no http"
     );
-    ok( !github_deprecated($tzil), "Auto github no http log message" );
+    ok(!github_deprecated($tzil), "Auto github no http log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( [ 'git_remote = dzil', 'github_http = 1' ], '.git' );
+    my $tzil = build_tzil(['git_remote = dzil', 'github_http = 1'], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -244,13 +271,12 @@ sub remote_not_found {
         },
         "Auto github remote dzil with github_http"
     );
-    ok( github_deprecated($tzil),
-        "Auto github remote dzil with github_http log message" );
+    ok(github_deprecated($tzil), "Auto github remote dzil with github_http log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( ['git_remote = dzil'], '.git' );
+    my $tzil = build_tzil(['git_remote = dzil'], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -261,13 +287,44 @@ sub remote_not_found {
         },
         "Auto github remote dzil no http"
     );
-    ok( !github_deprecated($tzil),
-        "Auto github remote dzil no http log message" );
+    ok(!github_deprecated($tzil), "Auto github remote dzil no http log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( [], '.svn' );
+    my $tzil = build_tzil(['git_remote = gitlab'], '.git');
+
+    is_deeply(
+        $tzil->distmeta->{resources}{repository},
+        {
+            type => 'git',
+            url  => 'git://gitlab.com/foo/bar',
+            web  => 'https://gitlab.com/foo/bar'
+        },
+        "Auto gitlab"
+    );
+    ok(!github_deprecated($tzil), "Auto gitlab log message");
+}
+
+#---------------------------------------------------------------------
+{
+    my $tzil = build_tzil(['git_remote = bitbucket'], '.git');
+
+    is_deeply(
+        $tzil->distmeta->{resources}{repository},
+        {
+            type => 'git',
+            url  => 'git://bitbucket.org/foo/bar',
+            web  => 'https://bitbucket.org/foo/bar'
+        },
+        "Auto bitbucket"
+    );
+    ok(!github_deprecated($tzil), "Auto bitbucket log message");
+}
+
+#---------------------------------------------------------------------
+{
+    my $tzil = build_tzil([], '.svn');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -277,14 +334,14 @@ sub remote_not_found {
         },
         "Auto svn"
     );
-    ok( !github_deprecated($tzil), "Auto svn log message" );
+    ok(!github_deprecated($tzil), "Auto svn log message");
 }
 
 #---------------------------------------------------------------------
 {
     my $web = 'http://example.com';
 
-    my $tzil = build_tzil( ["web = $web"], '.svn' );
+    my $tzil = build_tzil(["web = $web"], '.svn');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -295,12 +352,12 @@ sub remote_not_found {
         },
         "Auto svn with web"
     );
-    ok( !github_deprecated($tzil), "Auto svn with web log message" );
+    ok(!github_deprecated($tzil), "Auto svn with web log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( [], '_darcs' );
+    my $tzil = build_tzil([], '_darcs');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -310,8 +367,7 @@ sub remote_not_found {
         },
         "Auto darcs from default remote"
     );
-    ok( !github_deprecated($tzil),
-        "Auto darcs from default remote log message" );
+    ok(!github_deprecated($tzil), "Auto darcs from default remote log message");
 }
 
 #---------------------------------------------------------------------
@@ -322,32 +378,38 @@ sub remote_not_found {
     local $result{'darcs query repo'} = $result{'darcs query repo'};
     $result{'darcs query repo'} =~ s!Remote: http!Remote: ssh!;
 
-    my $tzil = build_tzil( [], '_darcs/prefs/repos' => "ssh:foo\n$url\n" );
+    my $tzil = build_tzil([], '_darcs/prefs/repos' => "ssh:foo\n$url\n");
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        { type => 'darcs', url => $url },
+        {
+            type => 'darcs',
+            url  => $url
+        },
         "Auto darcs from prefs/repos"
     );
-    ok( !github_deprecated($tzil), "Auto darcs from prefs/repos log message" );
+    ok(!github_deprecated($tzil), "Auto darcs from prefs/repos log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $tzil = build_tzil( [], '.hg' );
+    my $tzil = build_tzil([], '.hg');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        { type => 'hg', url => 'https://foobar.googlecode.com/hg/' },
+        {
+            type => 'hg',
+            url  => 'https://foobar.googlecode.com/hg/'
+        },
         "Auto hg"
     );
-    ok( !github_deprecated($tzil), "Auto hg log message" );
+    ok(!github_deprecated($tzil), "Auto hg log message");
 }
 
 #---------------------------------------------------------------------
 {
     my $web = 'http://code.google.com/p/foobar/';
-    my $tzil = build_tzil( ["web = $web"], '.hg' );
+    my $tzil = build_tzil(["web = $web"], '.hg');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
@@ -358,7 +420,7 @@ sub remote_not_found {
         },
         "Auto hg with web"
     );
-    ok( !github_deprecated($tzil), "Auto hg with web log message" );
+    ok(!github_deprecated($tzil), "Auto hg with web log message");
 }
 
 #---------------------------------------------------------------------
@@ -371,25 +433,25 @@ $result{'git remote show -n nourl'} = <<'END GIT NOURL';
 END GIT NOURL
 
 {
-    my $tzil = build_tzil( ['git_remote = nourl'], '.git' );
+    my $tzil = build_tzil(['git_remote = nourl'], '.git');
 
-    is( $tzil->distmeta->{resources}{repository},
-        undef, "Auto git remote nourl" );
-    ok( !github_deprecated($tzil), "Auto git remote nourl log message" );
+    is($tzil->distmeta->{resources}{repository}, undef, "Auto git remote nourl");
+    ok(!github_deprecated($tzil), "Auto git remote nourl log message");
 }
 
 {
     my $url = 'git://example.com/example.git';
-    my $tzil =
-      build_tzil( [ 'git_remote = nourl', "repository = $url" ], '.git' );
+    my $tzil = build_tzil(['git_remote = nourl', "repository = $url"], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        { type => 'git', url => $url },
+        {
+            type => 'git',
+            url  => $url
+        },
         "Auto git remote nourl with repository"
     );
-    ok( !github_deprecated($tzil),
-        "Auto git remote nourl with repository log message" );
+    ok(!github_deprecated($tzil), "Auto git remote nourl with repository log message");
 }
 
 #---------------------------------------------------------------------
@@ -402,11 +464,10 @@ $result{'git remote show -n github'} = <<'END GITHUB REMOTE NOT FOUND';
 END GITHUB REMOTE NOT FOUND
 
 {
-    my $tzil = build_tzil( ['git_remote = github'], '.git' );
+    my $tzil = build_tzil(['git_remote = github'], '.git');
 
-    is( $tzil->distmeta->{resources}{repository},
-        undef, "Auto git remote github not found" );
-    ok( remote_not_found($tzil), "Auto git remote github not found" );
+    is($tzil->distmeta->{resources}{repository}, undef, "Auto git remote github not found");
+    ok(remote_not_found($tzil), "Auto git remote github not found");
 }
 
 #---------------------------------------------------------------------

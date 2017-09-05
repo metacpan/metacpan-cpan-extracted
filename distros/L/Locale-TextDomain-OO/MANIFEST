@@ -54,6 +54,7 @@ lib/Locale/TextDomain/OO/Lexicon/Role/StoreFile.pm
 lib/Locale/TextDomain/OO/Lexicon/Role/StoreFilter.pm
 lib/Locale/TextDomain/OO/Lexicon/StoreJSON.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc.pm
+lib/Locale/TextDomain/OO/Plugin/Expand/BabelFish/Loc/DomainAndCategory.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/Gettext.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/DomainAndCategory.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/Loc.pm
@@ -64,6 +65,7 @@ lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Loc.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localise.pm
 lib/Locale/TextDomain/OO/Plugin/Expand/Maketext/Localize.pm
 lib/Locale/TextDomain/OO/Plugin/Language/LanguageOfLanguages.pm
+lib/Locale/TextDomain/OO/Role/DomainAndCategory.pm
 lib/Locale/TextDomain/OO/Role/Logger.pm
 lib/Locale/TextDomain/OO/Singleton/Lexicon.pm
 lib/Locale/TextDomain/OO/Singleton/Translator.pm

@@ -1,18 +1,17 @@
-#!/usr/bin/perl #-I/home/phil/z/perl/cpan/DataTableText/lib
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Edit data held in xml format
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2017
 #-------------------------------------------------------------------------------
-# Preserve labels across a reparse by adding them to a used attribute
 # podDocumentation
 
 package Data::Edit::Xml;
-our $VERSION = 20170822;
-use v5.16.0;
+our $VERSION = 20170901;
+use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
-use Carp;
-use Data::Table::Text qw(:all);
+use Carp qw(confess);
+use Data::Table::Text qw(fullFileName genLValueArrayMethods genLValueHashMethods genLValueScalarMethods temporaryFile);
 use XML::Parser;                                                                # https://metacpan.org/pod/XML::Parser
 use Storable qw(store retrieve freeze thaw);
 
@@ -49,14 +48,12 @@ genLValueScalarMethods(qw(parser));                                             
 genLValueScalarMethods(qw(tag));                                                # Tag name for this node, see also L</Traversal> and L</Navigation>. Consider as read only.
 genLValueScalarMethods(qw(text));                                               # Text of this node but only if it is a text node, i.e. the tag is cdata() <=> L</isText> is true.
 
-sub cdata                                                                       # The name of the tag to be used to represent text - this tag must not also be used as a command tag otherwise the parser will L<confess|http://perldoc.perl.org/Carp.html#SYNOPSIS/>.
+sub cdata()                                                                     # The name of the tag to be used to represent text - this tag must not also be used as a command tag otherwise the parser will L<confess|http://perldoc.perl.org/Carp.html#SYNOPSIS/>.
  {'CDATA'
  }
 
 sub parse($)                                                                    # Parse input xml specified via: L<inputFile|/inputFile>, L<input|/input> or L<inputString|/inputString>.
  {my ($parser) = @_;                                                            # Parser created by L</new>
-  my $badFile = $parser->errorsFile // fullFileName('zzzParseErrors/out.data'); # File to write source xml into if a parsing error occurs
-  unlink $badFile if -e $badFile;                                               # Remove existing errors file
 
   if (my $s = $parser->input)                                                   # Source to be parsed is a file or a string
    {if ($s =~ /\n/s or !-e $s)                                                  # Parse as a string because it does not look like a file name
@@ -78,10 +75,15 @@ sub parse($)                                                                    
   my $xmlParser = new XML::Parser(Style => 'Tree');                             # Extend Larry Wall's excellent XML parser
   my $d = $parser->inputString;                                                 # String to be parsed
   my $x = eval {$xmlParser->parse($d)};                                         # Parse string
-  if (!$x)                                                                      # Error in parse
-   {my $f = $parser->inputFile ? "Source files is:\n".                          # Source details if a file
+  if (!$x)                                                                      # Error in parse: write a message to STDERR and to a file if possible
+   {my $f = $parser->inputFile ? "Source file is:\n".                           # Source details if a file
             $parser->inputFile."\n" : '';
-    writeFile($badFile, "$d\n$f\n$@\n");                                        # Write a description of the error to the errorsFile
+    my $e = "$d\n$f\n$@\n";                                                     # Error
+    # warn "Xml parse error: $e";                                               # Write a description of the error to STDERR before attempting to write to a file
+    my $badFile  = $parser->errorsFile ||                                       # File name to write error analysis to
+                   fullFileName(filePath(qw(zzzParseErrors out.data)));
+    unlink $badFile if -e $badFile;                                             # Remove existing errors file
+    writeFile($badFile, $e);                                                    # Write a description of the error to the errorsFile
     confess "Xml parse error, see file:\n$badFile\n";                           # Complain helpfully if parse failed
    }
   $parser->tree($x);                                                            # Structure parse results as a tree
@@ -165,10 +167,10 @@ sub indexNode($)                                                                
   my @contents = $node->contents;                                               # Contents of the node
   return unless @contents;                                                      # No content so no indexes
 
-  if ((grep {$_->isText} @contents) > 1)                                        # Make parsing easier for the user by concatenating successive text nodes
+  if ((grep {$_->{tag} eq cdata} @contents) > 1)                                # Make parsing easier for the user by concatenating successive text nodes - NB: this statement has been optimized
    {my (@c, @t);                                                                # New content, pending intermediate texts list
     for(@contents)                                                              # Each node under the current node
-     {if ($_->isText)                                                           # Text node
+     {if ($_->{tag} eq cdata)                                                   # Text node. NB: optimized
        {push @t, $_;                                                            # Add the text node to pending intermediate texts list
        }
       elsif (@t == 1)                                                           # Non text element encountered with one pending intermediate text
@@ -254,7 +256,7 @@ sub prettyString($;$)                                                           
 
   if ($node->isText)                                                            # Text node
    {my $n = $node->next;
-    my $s = defined($n) && $n->isText ? '' : "\n";                              # Add a new line after contiguous blocks of text to offset next node
+    my $s = !defined($n) || $n->isText ? '' : "\n";                             # Add a new line after contiguous blocks of text to offset next node
     return $node->text.$s;
    }
 
@@ -266,7 +268,9 @@ sub prettyString($;$)                                                           
   my $s = $space.'<'.$t.$node->printAttributes.'>'.                             # Has sub nodes
     ($node->first->isText ? '' : "\n");                                         # Continue text on the same line, otherwise place nodes on following lines
   $s .= $_->prettyString($depth+1) for @$content;                               # Recurse to get the sub content
-  $s.$space.'</'.$t.'>'."\n";
+  $s .= $node->last->isText ? ((grep{!$_->isText} @$content)                    # Continue text on the same line, otherwise place nodes on following lines
+                            ? "\n$space": "") : $space;
+  $s .  '</'.$t.'>'."\n";                                                       # Closing tag
  }
 
 sub prettyStringNumbered($;$)                                                   # Return a readable string representing a node of a parse tree and all the nodes below it with a L<number|/number> attached to each tag. The node numbers can then be used as described in L<Order|/Order> to monitor changes to the parse tree.
@@ -277,7 +281,7 @@ sub prettyStringNumbered($;$)                                                   
 
   if ($node->isText)                                                            # Text node
    {my $n = $node->next;
-    my $s = defined($n) && $n->isText ? '' : "\n";                              # Add a new line after contiguous blocks of text to offset next node
+    my $s = !defined($n) || $n->isText ? '' : "\n";                             # Add a new line after contiguous blocks of text to offset next node
     return ($N ? "($N)" : '').$node->text.$s;                                   # Number text
    }
 
@@ -290,16 +294,18 @@ sub prettyStringNumbered($;$)                                                   
   my $s = $space.'<'.$t.$i.$node->printAttributes.'>'.                          # Has sub nodes
     ($node->first->isText ? '' : "\n");                                         # Continue text on the same line, otherwise place nodes on following lines
   $s .= $_->prettyStringNumbered($depth+1) for @$content;                       # Recurse to get the sub content
-  $s.$space.'</'.$t.'>'."\n";
+  $s .= $node->last->isText ? ((grep{!$_->isText} @$content)                    # Continue text on the same line, otherwise place nodes on following lines
+                            ? "\n$space": "") : $space;
+  $s .  '</'.$t.'>'."\n";                                                       # Closing tag
  }
 
-sub prettyStringShowingCDATA($;$)                                               # Return a readable string representing a node of a parse tree and all the nodes below it with the text fields wrapped with <CDATA>...</CDATA>.
+sub prettyStringCDATA($;$)                                                      # Return a readable string representing a node of a parse tree and all the nodes below it with the text fields wrapped with <CDATA>...</CDATA>.
  {my ($node, $depth) = @_;                                                      # Start node, optional depth.
   $depth //= 0;                                                                 # Start depth if none supplied
 
   if ($node->isText)                                                            # Text node
    {my $n = $node->next;
-    my $s = defined($n) && $n->isText ? '' : "\n";                              # Add a new line after contiguous blocks of text to offset next node
+    my $s = !defined($n) || $n->isText ? '' : "\n";                             # Add a new line after contiguous blocks of text to offset next node
     return '<'.cdata.'>'.$node->text.'</'.cdata.'>'.$s;
    }
 
@@ -310,8 +316,10 @@ sub prettyStringShowingCDATA($;$)                                               
 
   my $s = $space.'<'.$t.$node->printAttributes.'>'.                             # Has sub nodes
     ($node->first->isText ? '' : "\n");                                         # Continue text on the same line, otherwise place nodes on following lines
-  $s .= $_->prettyStringShowingCDATA($depth+2) for @$content;                   # Recurse to get the sub content
-  $s.$space.'</'.$t.'>'."\n";
+  $s .= $_->prettyStringCDATA($depth+2) for @$content;                          # Recurse to get the sub content
+  $s .= $node->last->isText ? ((grep{!$_->isText} @$content)                    # Continue text on the same line, otherwise place nodes on following lines
+                            ? "\n$space": "") : $space;
+  $s .  '</'.$t.'>'."\n";                                                       # Closing tag
  }
 
 sub prettyStringEnd($)                                                          #P Return a readable string representing a node of a parse tree and all the nodes below it as a here document
@@ -320,7 +328,7 @@ sub prettyStringEnd($)                                                          
 '  ok -p $x eq <<END;'. "\n".(-p $node). "\nEND"                                # Here document
  }
 
-sub PrettyContentString($)                                                      # Return a readable string representing all the nodes below a node of a parse tree - infrequent use and so capitalized to avoid being presented as an option by L<Geany|http://www.geany.org/>.
+sub prettyStringContent($)                                                      # Return a readable string representing all the nodes below a node of a parse tree - infrequent use and so capitalized to avoid being presented as an option by L<Geany|http://www.geany.org/>.
  {my ($node) = @_;                                                              # Start node.
   my $s = '';
   $s .= $_->prettyString for $node->contents;                                   # Recurse to get the sub content
@@ -450,12 +458,14 @@ sub attrs($@)                                                                   
 
 sub attrCount($)                                                                # Return the number of attributes in the specified node.
  {my ($node) = @_;                                                              # Node in parse tree, attribute names.
-  keys %{$node->attributes}
+  my $a = $node->attributes;                                                    # Attributes
+  scalar grep {defined $a->{$_}} keys %$a                                                    # Attributes
  }
 
 sub getAttrs($)                                                                 # Return a sorted list of all the attributes on this node.
  {my ($node) = @_;                                                              # Node in parse tree.
-  sort keys %{$node->attributes}
+  my $a = $node->attributes;                                                    # Attributes
+  grep {defined $a->{$_}} sort keys %$a                                         # Attributes
  }
 
 sub setAttr($@)                                                                 # Set the values of some attributes in a node and return the node.
@@ -606,13 +616,50 @@ sub throughX($$$;@)                                                             
   $node
  }
 
+#2 Range                                                                        # Ranges of nodes
+
+sub from($@)                                                                    # Return a list consisting of the specified node and its following siblings optionally including only those nodes that match the specified context
+ {my ($start, @context) = @_;                                                   # Start node, optional context
+  my $p = $start->parent;                                                       # Parent node
+  confess "No parent" unless $p;                                                # Not possible on a root node
+  my @c = $p->contents;                                                         # Content
+  shift @c while @c and $c[ 0] != $start;                                       # Position on start node
+  return grep {$_->at(@context)} @c if @context;                                # Select matching nodes if requested
+  @c                                                                            # Elements in the specified range
+ }
+
+sub to($@)                                                                      # Return a list of the siblings preceding the specified node and the specified node at optionally optionally including only those nodes that match the specified context
+ {my ($end, @context) = @_;                                                     # End node, optional context
+  my $q = $end->parent;                                                         # Parent node
+  confess "No parent" unless $q;                                                # Not possible on a root node
+  my @c = $q->contents;                                                         # Content
+  pop   @c while @c and $c[-1] != $end;                                         # Position on end
+  return grep {$_->at(@context)} @c if @context;                                # Select matching nodes if requested
+  @c                                                                            # Elements in the specified range
+ }
+
+sub fromTo($$@)                                                                 # Return a list of the nodes between the specified start node and end node that optionally match the specified context.
+ {my ($start, $end, @context) = @_;                                             # Start node, end node, optional context
+  my $p = $start->parent;                                                       # Parent node
+  confess "No parent" unless $p;                                                # Not possible on a root node
+  my $q = $end->parent;                                                         # Parent node
+  confess "No parent" unless $q;                                                # Not possible on a root node
+  confess "Not siblings" unless $p == $q;                                       # Not possible unless the two nodes are siblings under the same parent
+  my @c = $p->contents;                                                         # Content
+  shift @c while @c and $c[ 0] != $start;                                       # Position on start node
+  pop   @c while @c and $c[-1] != $end;                                         # Position on end
+  return grep {$_->at(@context)} @c if @context;                                # Select matching nodes if requested
+  @c                                                                            # Elements in the specified range
+ }
+
 #1 Position                                                                     # Confirm that the position L<navigated|/Navigation> to is the expected position.
 
-sub at($@)                                                                      #IX Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>.
+sub at($@)                                                                      #IX Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>. Ancestry is specified by providing the expected tag sof the parent, the parent's parent etc. If B<undef> is specified as a parent's tag then any tag is assumed to match.
  {my ($start, @context) = @_;                                                   # Starting node, ancestry.
   for(my $x = shift @_; $x; $x = $x->parent)                                    # Up through parents
    {return $start unless @_;                                                    # OK if no more required context
-    next if shift @_ eq $x->tag;                                                # Carry on if contexts match
+    my $p = shift @_;                                                           # Next parent tag
+    next if !$p or $p eq $x->tag;                                               # Carry on if contexts match
     return undef                                                                # Error if required does not match actual
    }
   !@_ ? $start : undef                                                          # Top of the tree is OK as long as there is no more required context
@@ -643,6 +690,13 @@ sub containsSingleText($)                                                       
   my $f = $node->first;                                                         # Child element
   return undef unless $f->isText;                                               # Child element must be text
   $f
+ }
+
+sub depth($)                                                                    # Returns the depth of the specified node, the  depth of a root node is zero.
+ {my ($node) = @_;                                                              # Node.
+  my $a = 0;
+  for(my $x = $node->parent; $x; $x = $x->parent) {++$a}                        # Up through parents
+  $a                                                                            # Return ancestry
  }
 
 sub isFirst($)                                                                  #X Confirm that this node is the first node under its parent.
@@ -742,9 +796,11 @@ sub c($$)                                                                       
 
 #2 First                                                                        # Find nodes that are first amongst their siblings.
 
-sub first($)                                                                    #BX Return the first node below this node.
- {my ($node) = @_;                                                              # Node.
-  $node->content->[0]
+sub first($@)                                                                   #BX Return the first node below this node optionally checking its context.
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  return $node->content->[0] unless @context;                                   # Return first node if no context specified
+  my ($c) = $node->contents;                                                    # First node
+  $c ? $c->at(@context) : undef;                                                # Return first node if in specified context
  }
 
 sub firstBy($@)                                                                 # Return a list of the first instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
@@ -772,6 +828,15 @@ sub firstIn($@)                                                                 
   return undef                                                                  # No such node
  }
 
+sub firstInIndex($@)                                                            #X Return the specified node if it is first in its index and optionally L<at|/at> the specified context else B<undef>
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  return undef if @context and !$node->at(@context);                            # Check the context if supplied
+  my $parent = $node->parent;                                                   # Parent
+  return undef unless $parent;                                                  # The root node is not first in anything
+  my @c = $parent->c($node->tag);                                               # Index containing node
+  @c && $c[0] == $node ? $node : undef                                         # First in index ?
+ }
+
 sub firstContextOf($@)                                                          #X Return the first node encountered in the specified context in a depth first post-order traversal of the parse tree.
  {my ($node, @context) = @_;                                                    # Node, array of tags specifying context.
   my $x;                                                                        # Found node if found
@@ -790,9 +855,11 @@ sub firstContextOf($@)                                                          
 
 #2 Last                                                                         # Find nodes that are last amongst their siblings.
 
-sub last($)                                                                     #BX Return the last node below this node.
- {my ($node) = @_;                                                              # Node.
-  $node->content->[-1]
+sub last($@)                                                                    #BX Return the last node below this node optionally checking its context.
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  return $node->content->[-1] unless @context;                                  # Return last node if no context specified
+  my ($c) = reverse $node->contents;                                            # Last node
+  $c ? $c->at(@context) : undef;                                                # Return last node if in specified context
  }
 
 sub lastBy($@)                                                                  # Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
@@ -820,6 +887,15 @@ sub lastIn($@)                                                                  
   return undef                                                                  # No such node
  }
 
+sub lastInIndex($@)                                                             #X Return the specified node if it is last in its index and optionally L<at|/at> the specified context else B<undef>
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  return undef if @context and !$node->at(@context);                            # Check the context if supplied
+  my $parent = $node->parent;                                                   # Parent
+  return undef unless $parent;                                                  # The root node is not first in anything
+  my @c = $parent->c($node->tag);                                               # Index containing node
+  @c && $c[-1] == $node ? $node : undef                                         # Last in index ?
+ }
+
 sub lastContextOf($@)                                                           #X Return the last node encountered in the specified context in a depth first reverse pre-order traversal of the parse tree.
  {my ($node, @context) = @_;                                                    # Node, array of tags specifying context.
   my $x;                                                                        # Found node if found
@@ -838,13 +914,17 @@ sub lastContextOf($@)                                                           
 
 #2 Next                                                                         # Find sibling nodes after the specified node.
 
-sub next($)                                                                     #BX Return the node next to the specified node.
- {my ($node) = @_;                                                              # Node.
+sub next($@)                                                                    #BX Return the node next to the specified node, optionally checking its context.
+ {my ($node, @context) = @_;                                                    # Node, optional context.
   return undef if $node->isLast;                                                # No node follows the last node at a level or the top most node
   my @c = $node->parent->contents;                                              # Content array of parent
   while(@c)                                                                     # Test until no more nodes left to test
    {my $c = shift @c;                                                           # Each node
-    return shift @c if $c == $node                                              # Next node if this is the specified node
+    if ($c == $node)                                                            # Current node
+     {my $n = shift @c;                                                         # Next node
+      return undef if @context and !$n->at(@context);                           # Next node is not in specified context
+      return $n;                                                                # Found node
+     }
    }
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
@@ -878,13 +958,17 @@ sub nextOn($@)                                                                  
 
 #2 Prev                                                                         # Find sibling nodes before the specified node.
 
-sub prev($)                                                                     #BIX Return the node previous to the specified node.
- {my ($node) = @_;                                                              # Node.
-  return undef if $node->isFirst;                                               # No node precedes the first node at a level or the top most node
+sub prev($@)                                                                    #BX Return the node before the specified node, optionally checking its context.
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  return undef if $node->isFirst;                                               # No node follows the last node at a level or the top most node
   my @c = $node->parent->contents;                                              # Content array of parent
   while(@c)                                                                     # Test until no more nodes left to test
    {my $c = pop @c;                                                             # Each node
-    return pop @c if $c == $node                                                # Previous node if this is the specified node
+    if ($c == $node)                                                            # Current node
+     {my $n = pop @c;                                                           # Prior node
+      return undef if @context and !$n->at(@context);                           # Prior node is not in specified context
+      return $n;                                                                # Found node
+     }
    }
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
@@ -1194,7 +1278,7 @@ sub wrapContentWith($$@)                                                        
   $new                                                                          # Return new node
  }
 
-sub wrapTo($$$@)                                                                #X Wrap all the nodes starting and ending at the specified nodes with a new node with the specified tag and attributes and return the new node.  Return B<undef> if the start and end nodes are not siblings - they must have the same parent.
+sub wrapTo($$$@)                                                                #X Wrap all the nodes starting and ending at the specified nodes with a new node with the specified tag and attributes and return the new node.  Return B<undef> if the start and end nodes are not siblings - they must have the same parent for this method to work.
  {my ($start, $end, $tag, %attributes) = @_;                                    # Start node, end node, tag for the wrapping node, attributes for the wrapping node
   my $parent = $start->parent;                                                  # Parent
   confess "Start node has no parent" unless $parent;                            # Not possible unless the start node has a parent
@@ -1295,18 +1379,37 @@ sub index($)                                                                    
 sub present($@)                                                                 # Return the count of the number of the specified tag types present immediately under a node or a hash {tag} = count for all the tags present under the node if no names are specified.
  {my ($node, @names) = @_;                                                      # Node, possible tags immediately under the node.
   my %i = %{$node->indexes};                                                    # Index of child nodes
-  return map {$_=>scalar @{$i{$_}}} keys %i unless @names;                        # Hash of all names
+  return map {$_=>scalar @{$i{$_}}} keys %i unless @names;                      # Hash of all names
   grep {$i{$_}} @names                                                          # Count of tag types present
  }
 
 sub isText($)                                                                   #X Confirm that this is a text node.
  {my ($node) = @_;                                                              # Node to test.
-  $node->tag eq cdata
+  $node->tag eq cdata ? $node : undef
  }
 
-sub isBlankText($)                                                              #X Confirm that this is a text node and that it is blank.
+sub isBlankText($)                                                              #X Confirm that this node either contains no children or if it does, that they are all blank text
  {my ($node) = @_;                                                              # Node to test.
-  $node->isText and $node->text =~ /\A\s*\Z/s;
+
+  $node->isText && $node->text =~ /\A\s*\Z/s ? $node : undef
+ }
+
+sub bitsNodeTextBlank                                                           # Return a bit string that shows if there are tags, text, blank text under a node. An empty string is returned if there are no child nodes
+ {my ($node) = @_;                                                              # Node to test.
+  my ($n, $t, $b) = (0,0,0);                                                    # Non text, text, blank text count
+  my @c = $node->contents;                                                      # Contents of node
+  return '' unless @c;                                                          # Return empty string if no children
+
+  for(@c)                                                                       # Contents of node
+   {if ($_->isText)                                                             # Text node
+     {++$t;
+      ++$b if $_->isBlankText;                                                  # Blank text node
+     }
+    else                                                                        # Non text node
+     {++$n;
+     }
+   }
+  join '', map {$_ ? 1 : 0} ($n, $t, $b);                                       # Multiple content so there must be some tags present because L<indexNode|/indexNode> concatenates contiguous text
  }
 
 #1 Order                                                                        # Number and verify the order of nodes.
@@ -1371,6 +1474,22 @@ sub disordered($@)                                                              
   my $c = $node;                                                                # Node we are currently checking for
   $node->parser->down(sub {$c = shift @nodes while $c and $_ == $c});           # Preorder traversal from root looking for each specified node
   $c                                                                            # Disordered if we could not find this node
+ }
+
+sub commonAncestor($@)                                                          #X Find the most recent common ancestor of the specified nodes or B<undef> if there is no common ancestor.
+ {my ($node, @nodes) = @_;                                                      # Node, @nodes
+  return $node unless @nodes;                                                   # A single node is it its own common ancestor
+  my @n = $node->ancestry;                                                      # The common ancestor so far
+  for(@nodes)                                                                   # Each node
+   {my @t = $_->ancestry;                                                       # Ancestry of latest node
+    my @c;                                                                      # Common ancestors
+    while(@n and @t and $n[-1] == $t[-1])                                       # Find common ancestors
+     {push @c, pop @n; pop @t;                                                  # Save common ancestor
+     }
+    return undef unless @c;                                                     # No common ancestors
+    @n = reverse @c;                                                            # Update common ancestry so far
+   }
+  $n[0]                                                                         # Most recent common ancestor
  }
 
 sub ordered($@)                                                                 #X Return the first node if the specified nodes are all in order when performing a pre-ordered traversal of the parse tree else return B<undef>
@@ -1448,14 +1567,16 @@ use overload
   '++'       => \&opUnwrap,
   "fallback" => 1;
 
-sub opString($$)                                                                # -b: L<previous node|/prev>\m-c: L<next node|/next>\m-e: L<prettyStringEnd|/prettyStringEnd>\m-f: L<first node|/first>\m-l: L<last node|/last>\m-o: L<stringQuoted|/stringQuoted>\m-p: L<prettyString|/prettyString>\m-r: L<stringReplacingIdWithLabels|/stringReplacingIdWithLabels>\m-s: L<string|/string>\m-S : L<stringNode|/stringNode>\m-t : L<tag|/tag>\m-u: L<id|/id>\m-z: L<prettyStringNumbered|/prettyStringNumbered>.
+sub opString($$)                                                                # -B: L<bitsNodeTextBlank|/bitsNodeTextBlank>\m-b: L<previous node|/prev>\m-c: L<next node|/next>\m-e: L<prettyStringEnd|/prettyStringEnd>\m-f: L<first node|/first>\m-l: L<last node|/last>\m-M: L<number|/number>\m-o: L<stringQuoted|/stringQuoted>\m-p: L<prettyString|/prettyString>\m-r: L<stringReplacingIdWithLabels|/stringReplacingIdWithLabels>\m-s: L<string|/string>\m-S : L<stringNode|/stringNode>\m-t : L<tag|/tag>\m-u: L<id|/id>\m-z: L<prettyStringNumbered|/prettyStringNumbered>.
  {my ($node, $op) = @_;                                                         # Node, monadic operator.
   $op or confess;
+  return $node->bitsNodeTextBlank            if $op eq 'B';
   return $node->prev                         if $op eq 'b';
   return $node->next                         if $op eq 'c';
   return $node->prettyStringEnd              if $op eq 'e';
   return $node->first                        if $op eq 'f';
   return $node->last                         if $op eq 'l';
+  return $node->number                       if $op eq 'M';
   return $node->stringQuoted                 if $op eq 'o';
   return $node->prettyString                 if $op eq 'p';
   return $node->stringReplacingIdsWithLabels if $op eq 'r';
@@ -1465,7 +1586,7 @@ sub opString($$)                                                                
   return $node->id                           if $op eq 'u';
   return $node->prettyStringNumbered         if $op eq 'z';
   confess "Unknown operator: $op";
-# A B C d g k M O R T w W x X
+ # A B C d g k M O R T w W x X
  }
 
 sub opContents($)                                                               # @{} : content of a node.
@@ -1550,6 +1671,7 @@ sub opGo($$)                                                                    
 
 sub opAttr($$)                                                                  # % : Get the value of an attribute of this node.
  {my ($node, $attr) = @_;                                                       # Node, reference to an array of words and numbers specifying the node to search for.
+  return map {$node->attr($_)} @$attr if ref($attr);
   $node->attr($attr)
  }
 
@@ -1565,11 +1687,13 @@ sub opAttr($$)                                                                  
 
 sub opWrapWith($$)                                                              # / : Wrap node with a tag, returning the wrapping node.
  {my ($node, $tag) = @_;                                                        # Node, tag.
+  return $node->wrapUp(@$tag) if ref($tag);
   $node->wrapWith($tag)
  }
 
 sub opWrapContentWith($$)                                                       # * : Wrap content with a tag, returning the wrapping node.
  {my ($node, $tag) = @_;                                                        # Node, tag.
+  return $node->wrapDown(@$tag) if ref($tag);
   $node->wrapContentWith($tag)
  }
 
@@ -1635,15 +1759,28 @@ sub countAttrNames($;$)                                                         
   $count                                                                        # Count
  }
 
+sub countOutputClasses($)                                                       # Count instances of outputclass attributes
+ {my ($node, $count) = @_;                                                      # Node, count so far.
+  $count //= {};                                                                # Counts
+  my $a = $node->attr(qw(outputclass));                                         # Outputclass attribute
+  $$count{$a}++ if $a ;                                                         # Add current output class
+  &countOutputClasses($_, $count) for $node->contents;                          # Each contained node
+  $count                                                                        # Count
+ }
+
+
 #1 Debug                                                                        # Debugging methods
 
 sub printAttributes($)                                                          #P Print the attributes of a node.
  {my ($node) = @_;                                                              # Node whose attributes are to be printed.
-  my $a = $node->attributes;                                                    # Attributes
-  defined($$a{$_}) ? undef : delete $$a{$_} for keys %$a;                       # Remove undefined attributes
-  return '' unless keys %$a;                                                    # No attributes
-  my $s = ' '; $s .= $_.'="'.$a->{$_}.'" ' for sort keys %$a; chop($s);         # Attributes enclosed in "" in alphabetical order
-  $s
+  my %a = %{$node->attributes};                                                 # Attributes
+  my $s = '';
+  for(sort keys %a)
+   {next unless defined(my $v = $a{$_});
+    $s .= $_.'="'.$v.'" ';                                                      # Attributes enclosed in "" in alphabetical order
+   }
+  chop($s);
+  length($s) ? ' '.$s : '';
  }
 
 sub printAttributesReplacingIdsWithLabels($)                                    #P Print the attributes of a node replacing the id with the labels.
@@ -1700,10 +1837,15 @@ then receive a returned B<undef> or false result.
 END
     push @code, <<END;
 sub $b
- {my \$r = &$method(\@_);
-  return \$r unless \$r and \$r->isBlankText;
-  shift \@_;
-  &$m(\$r, \@_)
+ {my \$r = &$method(\$_[0]);
+  return undef unless \$r;
+  if (\$r->isBlankText)
+   {shift \@_;
+    return &$m(\$r, \@_)
+   }
+  else
+   {return &$m(\@_);
+   }
  }
 
 sub $x
@@ -1748,7 +1890,6 @@ to get:
     </d>
   </a>
 
-
 L<Cut|/cut> out B<c> under B<b> but not under B<d> in the created tree
 by L<traversing|/Traversal> in post-order L<applying|/by> a B<sub> to each node
 to L<cut|/cut> out B<c> when we are L<at|/at> B<c> under B<b> under B<a>.
@@ -1783,7 +1924,7 @@ to get:
 
 To transform a series of bullets in to <ul> <li> ...  first parse the input xml:
 
-  my $a = Data::Edit::Xml::new(<<END);
+ {my $a = Data::Edit::Xml::new(<<END);
 <a>
 <p>• Minimum 1 number</p>
 <p>•   No leading, trailing, or embedded spaces</p>
@@ -1795,12 +1936,16 @@ Traverse the resulting parse tree, changing bullets to <li> and either wrapping
 with <ul> or appending to a previous <ul>
 
   $a->by(sub                                                                    # Bulleted list to <ul>
-   {if ($_->at(qw(p)) and my $t = $_->containsSingleText)                       # <p> with single text
-     {if ($t->text =~ m/\A\x{2022}/s)                                           # Starting with a bullet
-       {$t->text =~ s(\A.\s*)()s;                                               # Remove bullet and leading spaces
-        $_->change(qw(li));                                                     # <p> to <li>
-        if (my $p = $_->prev)                                                   # Previous element
-         {$p->at(qw(ul)) ? $p->putLast($_->cut) : $_->wrapWith(qw(ul));         # Put in preceding list or create a new list
+   {if ($_->at(qw(p)))                                                          # <p>
+     {if (my $t = $_->containsSingleText)                                       # <p> with single text
+       {if ($t->text =~ s(\A\x{2022}\s*) ()s)                                   # Starting with a bullet
+         {$_->change(qw(li));                                                   # <p> to <li>
+          if (my $p = $_->prev(qw(ul)))                                         # Previous element is ul?
+           {$p->putLast($_->cut);                                               # Put in preceding list or create a new list
+           }
+          else
+           {$_->wrapWith(qw(ul))
+           }
          }
        }
      }
@@ -1808,18 +1953,13 @@ with <ul> or appending to a previous <ul>
 
 To get:
 
-  ok -p $a eq <<END;
-<a>
-  <li>Minimum 1 number
-  </li>
-  <ul>
-    <li>No leading, trailing, or embedded spaces
-    </li>
-    <li>Not case-sensitive
-    </li>
-  </ul>
-</a>
-END
+  <a>
+    <ul>
+      <li>Minimum 1 number</li>
+      <li>No leading, trailing, or embedded spaces</li>
+      <li>Not case-sensitive</li>
+    </ul>
+  </a>
 
 =head2 DocBook to Dita
 
@@ -1906,13 +2046,13 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Immediately useful methods
 
-These methods are the ones most likely to be of immediate useful to anyone
-using this module for the first time:
+These methods are the ones most likely to be of immediate use to anyone using
+this module for the first time:
 
 
 L<at|/at>
 
-Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>.
+Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>. Ancestry is specified by providing the expected tag sof the parent, the parent's parent etc. If B<undef> is specified as a parent's tag then any tag is assumed to match.
 
 L<attr :lvalue|/attr :lvalue>
 
@@ -1941,10 +2081,6 @@ New parse - call this method statically as in Data::Edit::Xml::new(file or strin
 L<prettyString|/prettyString>
 
 Return a readable string representing a node of a parse tree and all the nodes below it. Or use L<-p|/opString> $node
-
-L<prev|/prev>
-
-Return the node previous to the specified node.
 
 L<putLast|/putLast>
 
@@ -2384,7 +2520,7 @@ Example:
   END
 
 
-=head3 prettyStringShowingCDATA($$)
+=head3 prettyStringCDATA($$)
 
 Return a readable string representing a node of a parse tree and all the nodes below it with the text fields wrapped with <CDATA>...</CDATA>.
 
@@ -2398,9 +2534,8 @@ Example:
 
   $a->first->replaceWithBlank;
 
-  ok $a->prettyStringShowingCDATA eq <<END;
-  <a><CDATA> </CDATA>
-  </a>
+  ok $a->prettyStringCDATA eq <<END;
+  <a><CDATA> </CDATA></a>
   END
 
   my $a = Data::Edit::Xml::new("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>");
@@ -2409,7 +2544,7 @@ Example:
 
   map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;
 
-  ok $a->prettyStringShowingCDATA eq <<'END';
+  ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -2423,7 +2558,7 @@ Example:
   END
 
 
-=head3 PrettyContentString($)
+=head3 prettyStringContent($)
 
 Return a readable string representing all the nodes below a node of a parse tree - infrequent use and so capitalized to avoid being presented as an option by L<Geany|http://www.geany.org/>.
 
@@ -2445,7 +2580,7 @@ Example:
   </a>
   END
 
-  ok $a->PrettyContentString eq <<END;
+  ok $a->prettyStringContent eq <<END;
   <b>
     <A/>
     <B/>
@@ -3084,13 +3219,173 @@ Example:
   ok $s eq "abccbdeeda"
 
 
+=head2 Range
+
+Ranges of nodes
+
+=head3 from($@)
+
+Return a list consisting of the specified node and its following siblings optionally including only those nodes that match the specified context
+
+  1  $start    Start node
+  2  @context  Optional context
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+  my @f = $d->from;
+
+  ok @f == 4;
+
+  ok $d == $f[0];
+
+  my @F = $d->from(qw(c));
+
+  ok @F == 2;
+
+  ok -M $F[1] == 12;
+
+  ok $D == $t[-1];
+
+
+=head3 to($@)
+
+Return a list of the siblings preceding the specified node and the specified node at optionally optionally including only those nodes that match the specified context
+
+  1  $end      End node
+  2  @context  Optional context
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+  my @t = $D->to;
+
+  ok @t == 4;
+
+  my @T = $D->to(qw(c));
+
+  ok @T == 2;
+
+  ok -M $T[1] == 7;
+
+
+=head3 fromTo($$@)
+
+Return a list of the nodes between the specified start node and end node that optionally match the specified context.
+
+  1  $start    Start node
+  2  $end      End node
+  3  @context  Optional context
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
+
+  my @r = $d->fromTo($D);
+
+  ok @r == 3;
+
+  my @R = $d->fromTo($D, qw(c));
+
+  ok @R == 1;
+
+  ok -M $R[0] == 7;
+
+  ok !$D->fromTo($d);
+
+  ok 1 == $d->fromTo($d);
+
+
 =head1 Position
 
 Confirm that the position L<navigated|/Navigation> to is the expected position.
 
 =head2 at($@)
 
-Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>.
+Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>. Ancestry is specified by providing the expected tag sof the parent, the parent's parent etc. If B<undef> is specified as a parent's tag then any tag is assumed to match.
 
   1  $start    Starting node
   2  @context  Ancestry.
@@ -3098,7 +3393,7 @@ Confirm that the node has the specified L<ancestry|/ancestry> and return the sta
 Example:
 
 
-  ok Data::Edit::Xml::new(<<END)->go(qw(b c -1 f))->at(qw(f c b a));
+  my $a = Data::Edit::Xml::new(<<END);
   <a>
     <b>
       <c> <d/> </c>
@@ -3107,6 +3402,16 @@ Example:
     </b>
   </a>
   END
+
+  ok  $a->go(qw(b c -1 f))->at(qw(f c b a));
+
+  ok  $a->go(qw(b c  1 e))->at(undef, qq(c), undef, qq(a));
+
+  ok  $a->go(qw(b c  d))  ->at(qw(d c b),    undef);
+
+  ok !$a->go(qw(b c  d))  ->at(qw(d c b),    undef, undef);
+
+  ok !$a->go(qw(b c  d))  ->at(qw(d e b));
 
 
 Use B<atX> to execute L<at|/at> but B<die> 'at' instead of returning B<undef>
@@ -3175,6 +3480,46 @@ Example:
   ok  $a->go(qw(b))->containsSingleText->text eq q(bb);
 
   ok !$a->go(qw(c))->containsSingleText;
+
+
+=head2 depth($)
+
+Returns the depth of the specified node, the  depth of a root node is zero.
+
+  1  $node  Node.
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  ok 0 == $a->depth;
+
+  ok 4 == $a->findByNumber(14)->depth;
 
 
 =head2 isFirst($)
@@ -3481,11 +3826,12 @@ Example:
 
 Find nodes that are first amongst their siblings.
 
-=head3 first($)
+=head3 first($@)
 
-Return the first node below this node.
+Return the first node below this node optionally checking its context.
 
-  1  $node  Node.
+  1  $node     Node
+  2  @context  Optional context.
 
 Use B<firstNonBlank> to skip a (rare) initial blank text CDATA. Use B<firstNonBlankX> to die rather
 then receive a returned B<undef> or false result.
@@ -3526,7 +3872,11 @@ Example:
   </a>
   END
 
-  ok $a->go(qw(b))    ->first->id == 13;
+  ok  $a->go(qw(b))->first->id == 13;
+
+  ok  $a->go(qw(b))->first(qw(c b a));
+
+  ok !$a->go(qw(b))->first(qw(b a));
 
 
 Use B<firstX> to execute L<first|/first> but B<die> 'first' instead of returning B<undef>
@@ -3602,7 +3952,7 @@ Return the first node matching one of the named tags under the specified node.
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<'END';
+  ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -3619,6 +3969,49 @@ Example:
 
 
 Use B<firstInX> to execute L<firstIn|/firstIn> but B<die> 'firstIn' instead of returning B<undef>
+
+=head3 firstInIndex($@)
+
+Return the specified node if it is first in its index and optionally L<at|/at> the specified context else B<undef>
+
+  1  $node     Node
+  2  @context  Optional context.
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  ok  $a->findByNumber (5)->firstInIndex;
+
+  ok !$a->findByNumber(7) ->firstInIndex;
+
+
+Use B<firstInIndexX> to execute L<firstInIndex|/firstInIndex> but B<die> 'firstInIndex' instead of returning B<undef>
 
 =head3 firstContextOf($@)
 
@@ -3666,11 +4059,12 @@ Use B<firstContextOfX> to execute L<firstContextOf|/firstContextOf> but B<die> '
 
 Find nodes that are last amongst their siblings.
 
-=head3 last($)
+=head3 last($@)
 
-Return the last node below this node.
+Return the last node below this node optionally checking its context.
 
-  1  $node  Node.
+  1  $node     Node
+  2  @context  Optional context.
 
 Use B<lastNonBlank> to skip a (rare) initial blank text CDATA. Use B<lastNonBlankX> to die rather
 then receive a returned B<undef> or false result.
@@ -3711,7 +4105,11 @@ Example:
   </a>
   END
 
-  ok $a->go(qw(b))    ->last ->id == 22;
+  ok  $a->go(qw(b))->last ->id == 22;
+
+  ok  $a->go(qw(b))->last(qw(g b a));
+
+  ok !$a->go(qw(b))->last(qw(b a));
 
 
 Use B<lastX> to execute L<last|/last> but B<die> 'last' instead of returning B<undef>
@@ -3787,7 +4185,7 @@ Return the first node matching one of the named tags under the specified node.
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<'END';
+  ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -3804,6 +4202,49 @@ Example:
 
 
 Use B<lastInX> to execute L<lastIn|/lastIn> but B<die> 'lastIn' instead of returning B<undef>
+
+=head3 lastInIndex($@)
+
+Return the specified node if it is last in its index and optionally L<at|/at> the specified context else B<undef>
+
+  1  $node     Node
+  2  @context  Optional context.
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  ok  $a->findByNumber(10)->lastInIndex;
+
+  ok !$a->findByNumber(7) ->lastInIndex;
+
+
+Use B<lastInIndexX> to execute L<lastInIndex|/lastInIndex> but B<die> 'lastInIndex' instead of returning B<undef>
 
 =head3 lastContextOf($@)
 
@@ -3851,11 +4292,12 @@ Use B<lastContextOfX> to execute L<lastContextOf|/lastContextOf> but B<die> 'las
 
 Find sibling nodes after the specified node.
 
-=head3 next($)
+=head3 next($@)
 
-Return the node next to the specified node.
+Return the node next to the specified node, optionally checking its context.
 
-  1  $node  Node.
+  1  $node     Node
+  2  @context  Optional context.
 
 Use B<nextNonBlank> to skip a (rare) initial blank text CDATA. Use B<nextNonBlankX> to die rather
 then receive a returned B<undef> or false result.
@@ -3896,7 +4338,11 @@ Example:
   </a>
   END
 
-  ok $a->go(qw(b b e))->next ->id == 19;
+  ok  $a->go(qw(b b e))->next ->id == 19;
+
+  ok  $a->go(qw(b b e))->next(qw(f b b a));
+
+  ok !$a->go(qw(b b e))->next(qw(f b a));
 
 
 Use B<nextX> to execute L<next|/next> but B<die> 'next' instead of returning B<undef>
@@ -3911,7 +4357,7 @@ Return the next node matching one of the named tags.
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<'END';
+  ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -3964,11 +4410,12 @@ Example:
 
 Find sibling nodes before the specified node.
 
-=head3 prev($)
+=head3 prev($@)
 
-Return the node previous to the specified node.
+Return the node before the specified node, optionally checking its context.
 
-  1  $node  Node.
+  1  $node     Node
+  2  @context  Optional context.
 
 Use B<prevNonBlank> to skip a (rare) initial blank text CDATA. Use B<prevNonBlankX> to die rather
 then receive a returned B<undef> or false result.
@@ -4009,6 +4456,12 @@ Example:
   </a>
   END
 
+  ok  $a->go(qw(b b e))->prev ->id == 17;
+
+  ok  $a->go(qw(b b e))->prev(qw(d b b a));
+
+  ok !$a->go(qw(b b e))->prev(qw(d b a));
+
 
 Use B<prevX> to execute L<prev|/prev> but B<die> 'prev' instead of returning B<undef>
 
@@ -4022,7 +4475,7 @@ Return the next previous node matching one of the named tags.
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<'END';
+  ok $a->prettyStringCDATA eq <<'END';
   <a><CDATA> </CDATA>
       <A/>
   <CDATA>  </CDATA>
@@ -4387,8 +4840,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d></c>
     </b>
   </a>
   END
@@ -4407,8 +4859,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d></c>
     </b>
   </a>
   END
@@ -4418,8 +4869,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
     </b>
   </a>
   END
@@ -4438,8 +4888,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
     </b>
   </a>
   END
@@ -4449,8 +4898,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
   <n id="nn">NNNN</n>
     </b>
   </a>
@@ -4470,8 +4918,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
-      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
   <n id="nn">NNNN</n>
     </b>
   </a>
@@ -4482,8 +4929,7 @@ Example:
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb"><p id="pp">PPPP</p>
-      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-      </c>
+      <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
   <n id="nn">NNNN</n>
     </b>
   </a>
@@ -4825,7 +5271,7 @@ Example:
 
 =head3 wrapTo($$$@)
 
-Wrap all the nodes starting and ending at the specified nodes with a new node with the specified tag and attributes and return the new node.  Return B<undef> if the start and end nodes are not siblings - they must have the same parent.
+Wrap all the nodes starting and ending at the specified nodes with a new node with the specified tag and attributes and return the new node.  Return B<undef> if the start and end nodes are not siblings - they must have the same parent for this method to work.
 
   1  $start       Start node
   2  $end         End node
@@ -5124,9 +5570,8 @@ Confirm that this is a text node.
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<END;
-  <a><CDATA> </CDATA>
-  </a>
+  ok $a->prettyStringCDATA eq <<END;
+  <a><CDATA> </CDATA></a>
   END
 
   ok $a->first->isText;
@@ -5136,22 +5581,60 @@ Use B<isTextX> to execute L<isText|/isText> but B<die> 'isText' instead of retur
 
 =head2 isBlankText($)
 
-Confirm that this is a text node and that it is blank.
+Confirm that this node either contains no children or if it does, that they are all blank text
 
   1  $node  Node to test.
 
 Example:
 
 
-  ok $a->prettyStringShowingCDATA eq <<END;
-  <a><CDATA> </CDATA>
-  </a>
+  ok $a->prettyStringCDATA eq <<END;
+  <a><CDATA> </CDATA></a>
   END
 
   ok $a->first->isBlankText;
 
 
 Use B<isBlankTextX> to execute L<isBlankText|/isBlankText> but B<die> 'isBlankText' instead of returning B<undef>
+
+=head2 bitsNodeTextBlank()
+
+Return a bit string that shows if there are tags, text, blank text under a node. An empty string is returned if there are no child nodes
+
+
+Example:
+
+
+  ok $x->prettyStringCDATA eq <<END;
+  <a>
+      <b>
+          <C/>
+      </b>
+      <c>
+          <D/>
+  <CDATA>
+       E
+      </CDATA>
+      </c>
+      <d>
+          <F/>
+  <CDATA> </CDATA>
+          <H/>
+      </d>
+      <e/>
+  </a>
+  END
+
+  ok '100' eq -B $x;
+
+  ok '100' eq -B $x->go(qw(b));
+
+  ok '110' eq -B $x->go(qw(c));
+
+  ok '111' eq -B $x->go(qw(d));
+
+  ok !-B $x->go(qw(e));
+
 
 =head1 Order
 
@@ -5438,6 +5921,55 @@ Example:
   ok !$c->disordered($e);
 
 
+=head2 commonAncestor($@)
+
+Find the most recent common ancestor of the specified nodes or B<undef> if there is no common ancestor.
+
+  1  $node   Node
+  2  @nodes  @nodes
+
+Example:
+
+
+  ok -z $a eq <<END;
+  <a id="1">
+    <b id="2">
+      <c id="3">
+        <e id="4"/>
+      </c>
+      <d id="5">
+        <e id="6"/>
+      </d>
+      <c id="7">
+        <d id="8">
+          <e id="9"/>
+        </d>
+      </c>
+      <d id="10">
+        <e id="11"/>
+      </d>
+      <c id="12">
+        <d id="13">
+          <e id="14"/>
+        </d>
+      </c>
+    </b>
+  </a>
+  END
+
+  my ($b, $e, @n) = $a->findByNumbers(2, 4, 6, 9);
+
+  ok $e == $e->commonAncestor;
+
+  ok $e == $e->commonAncestor($e);
+
+  ok $b == $e->commonAncestor($b);
+
+  ok $b == $e->commonAncestor(@n);
+
+
+Use B<commonAncestorX> to execute L<commonAncestor|/commonAncestor> but B<die> 'commonAncestor' instead of returning B<undef>
+
 =head2 ordered($@)
 
 Return the first node if the specified nodes are all in order when performing a pre-ordered traversal of the parse tree else return B<undef>
@@ -5608,6 +6140,8 @@ Operator access to methods use the assign versions to avoid 'useless use of oper
 
 =head2 opString($$)
 
+-B: L<bitsNodeTextBlank|/bitsNodeTextBlank>
+
 -b: L<previous node|/prev>
 
 -c: L<next node|/next>
@@ -5617,6 +6151,8 @@ Operator access to methods use the assign versions to avoid 'useless use of oper
 -f: L<first node|/first>
 
 -l: L<last node|/last>
+
+-M: L<number|/number>
 
 -o: L<stringQuoted|/stringQuoted>
 
@@ -5696,6 +6232,351 @@ Example:
     </d>
   </a>
   END
+
+
+=head2 opContents($)
+
+@{} : content of a node.
+
+  1  $node  Node.
+
+Example:
+
+
+  ok -p $x eq <<END;
+  <a>
+    <b>
+      <c id="42"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+  ok 'bd' eq join '', map {$_->tag} @$x ;
+
+
+=head2 opAt($$)
+
+<= : Check that a node is in the context specified by the referenced array of words.
+
+  1  $node     Node
+  2  $context  Reference to array of words specifying the parents of the desired node.
+
+Example:
+
+
+  ok -p $x eq <<END;
+  <a>
+    <b>
+      <c id="42"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+  ok (($x >= [qw(d e)]) <= [qw(e d a)]);
+
+
+=head2 opNew($$)
+
+** : create a new node from the text on the right hand side: if the text contains a non word character \W the node will be create as text, else it will be created as a tag
+
+  1  $node  Node
+  2  $text  Name node of node to create or text of new text element
+
+Example:
+
+
+  my $a = Data::Edit::Xml::new("<a/>");
+
+  my $b = $a ** q(b);
+
+  ok -s $b eq "<b/>";
+
+
+=head2 opPutFirst($$)
+
+>> : put a node or string first under a node and return the new node.
+
+  1  $node  Node
+  2  $text  Node or text to place first under the node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a/>
+  END
+
+  my $f = $a >> qq(first);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+  </a>
+  END
+
+
+=head2 opPutFirstAssign($$)
+
+>>= : put a node or string first under a node.
+
+  1  $node  Node
+  2  $text  Node or text to place first under the node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a/>
+  END
+
+  $a >>= qq(first);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+  </a>
+  END
+
+
+=head2 opPutLast($$)
+
+<< : put a node or string last under a node and return the new node.
+
+  1  $node  Node
+  2  $text  Node or text to place last under the node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+  </a>
+  END
+
+  my $l = $a << qq(last);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opPutLastAssign($$)
+
+<<= : put a node or string last under a node.
+
+  1  $node  Node
+  2  $text  Node or text to place last under the node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+  </a>
+  END
+
+  $a <<= qq(last);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opPutNext($$)
+
+> + : put a node or string after the specified node and return the new node.
+
+  1  $node  Node
+  2  $text  Node or text to place after the first node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <last/>
+  </a>
+  END
+
+  $f += qq(next);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opPutNextAssign($$)
+
++= : put a node or string after the specified node.
+
+  1  $node  Node
+  2  $text  Node or text to place after the first node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <last/>
+  </a>
+  END
+
+  my $f = -f $a;
+
+  $f += qq(next);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opPutPrev($$)
+
+< - : put a node or string before the specified node and return the new node.
+
+  1  $node  Node
+  2  $text  Node or text to place before the first node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <last/>
+  </a>
+  END
+
+  $l -= qq(prev);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <prev/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opPutPrevAssign($$)
+
+-= : put a node or string before the specified node,
+
+  1  $node  Node
+  2  $text  Node or text to place before the first node.
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <last/>
+  </a>
+  END
+
+  my $l = -l $a;
+
+  $l -= qq(prev);
+
+  ok -p $a eq <<END;
+  <a>
+    <first/>
+    <next/>
+    <prev/>
+    <last/>
+  </a>
+  END
+
+
+=head2 opBy($$)
+
+x= : Traverse a parse tree in post-order.
+
+  1  $node  Parse tree
+  2  $code  Code to execute against each node.
+
+Example:
+
+
+  ok -p $x eq <<END;
+  <a>
+    <b>
+      <c id="42"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+  my $s; $x x= sub{$s .= -t $_}; ok $s eq "cbeda"
+
+
+=head2 opGo($$)
+
+>= : Search for a node via a specification provided as a reference to an array of words each number.  Each word represents a tag name, each number the index of the previous tag or zero by default.
+
+  1  $node  Node
+  2  $go    Reference to an array of search parameters.
+
+Example:
+
+
+  ok -p $x eq <<END;
+  <a>
+    <b>
+      <c id="42"/>
+    </b>
+    <d>
+      <e/>
+    </d>
+  </a>
+  END
+
+  ok (($x >= [qw(d e)]) <= [qw(e d a)]);
+
+
+=head2 opAttr($$)
+
+% : Get the value of an attribute of this node.
+
+  1  $node  Node
+  2  $attr  Reference to an array of words and numbers specifying the node to search for.
+
+Example:
+
+
+  my $a = Data::Edit::Xml::new('<a number="1"/>');
+
+  ok $a %  qq(number) == 1;
 
 
 =head1 Statistics
@@ -5875,420 +6756,470 @@ Replace new lines in a string with N to make testing easier.
 =head1 Index
 
 
-L<above|/above>
+1 L<above|/above>
 
-L<aboveX|/above>
+2 L<aboveX|/above>
 
-L<addConditions|/addConditions>
+3 L<addConditions|/addConditions>
 
-L<addLabels|/addLabels>
+4 L<addLabels|/addLabels>
 
-L<after|/after>
+5 L<after|/after>
 
-L<afterX|/after>
+6 L<afterX|/after>
 
-L<ancestry|/ancestry>
+7 L<ancestry|/ancestry>
 
-L<at|/at>
+8 L<at|/at>
 
-L<attr :lvalue|/attr :lvalue>
+9 L<attr :lvalue|/attr :lvalue>
 
-L<attrCount|/attrCount>
+10 L<attrCount|/attrCount>
 
-L<attributes|/attributes>
+11 L<attributes|/attributes>
 
-L<attrs|/attrs>
+12 L<attrs|/attrs>
 
-L<atX|/at>
+13 L<atX|/at>
 
-L<before|/before>
+14 L<before|/before>
 
-L<beforeX|/before>
+15 L<beforeX|/before>
 
-L<below|/below>
+16 L<below|/below>
 
-L<belowX|/below>
+17 L<belowX|/below>
 
-L<breakIn|/breakIn>
+18 L<bitsNodeTextBlank|/bitsNodeTextBlank>
 
-L<breakInBackwards|/breakInBackwards>
+19 L<breakIn|/breakIn>
 
-L<breakInForwards|/breakInForwards>
+20 L<breakInBackwards|/breakInBackwards>
 
-L<breakOut|/breakOut>
+21 L<breakInForwards|/breakInForwards>
 
-L<by|/by>
+22 L<breakOut|/breakOut>
 
-L<byReverse|/byReverse>
+23 L<by|/by>
 
-L<byReverseX|/byReverseX>
+24 L<byReverse|/byReverse>
 
-L<byX|/byX>
+25 L<byReverseX|/byReverseX>
 
-L<c|/c>
+26 L<byX|/byX>
 
-L<cdata|/cdata>
+27 L<c|/c>
 
-L<change|/change>
+28 L<cdata|/cdata>
 
-L<changeAttr|/changeAttr>
+29 L<change|/change>
 
-L<changeAttrValue|/changeAttrValue>
+30 L<changeAttr|/changeAttr>
 
-L<changeX|/change>
+31 L<changeAttrValue|/changeAttrValue>
 
-L<checkParentage|/checkParentage>
+32 L<changeX|/change>
 
-L<checkParser|/checkParser>
+33 L<checkParentage|/checkParentage>
 
-L<class|/class>
+34 L<checkParser|/checkParser>
 
-L<clone|/clone>
+35 L<class|/class>
 
-L<concatenate|/concatenate>
+36 L<clone|/clone>
 
-L<concatenateSiblings|/concatenateSiblings>
+37 L<commonAncestor|/commonAncestor>
 
-L<conditions|/conditions>
+38 L<commonAncestorX|/commonAncestor>
 
-L<containsSingleText|/containsSingleText>
+39 L<concatenate|/concatenate>
 
-L<content|/content>
+40 L<concatenateSiblings|/concatenateSiblings>
 
-L<contentAfter|/contentAfter>
+41 L<conditions|/conditions>
 
-L<contentAfterAsTags|/contentAfterAsTags>
+42 L<containsSingleText|/containsSingleText>
 
-L<contentAsTags|/contentAsTags>
+43 L<content|/content>
 
-L<contentBefore|/contentBefore>
+44 L<contentAfter|/contentAfter>
 
-L<contentBeforeAsTags|/contentBeforeAsTags>
+45 L<contentAfterAsTags|/contentAfterAsTags>
 
-L<contents|/contents>
+46 L<contentAsTags|/contentAsTags>
 
-L<context|/context>
+47 L<contentBefore|/contentBefore>
 
-L<copyLabels|/copyLabels>
+48 L<contentBeforeAsTags|/contentBeforeAsTags>
 
-L<count|/count>
+49 L<contents|/contents>
 
-L<countAttrNames|/countAttrNames>
+50 L<context|/context>
 
-L<countLabels|/countLabels>
+51 L<copyLabels|/copyLabels>
 
-L<countTagNames|/countTagNames>
+52 L<count|/count>
 
-L<countTags|/countTags>
+53 L<countAttrNames|/countAttrNames>
 
-L<cut|/cut>
+54 L<countLabels|/countLabels>
 
-L<deleteAttr|/deleteAttr>
+55 L<countTagNames|/countTagNames>
 
-L<deleteAttrs|/deleteAttrs>
+56 L<countTags|/countTags>
 
-L<deleteConditions|/deleteConditions>
+57 L<cut|/cut>
 
-L<deleteLabels|/deleteLabels>
+58 L<deleteAttr|/deleteAttr>
 
-L<disconnectLeafNode|/disconnectLeafNode>
+59 L<deleteAttrs|/deleteAttrs>
 
-L<disordered|/disordered>
+60 L<deleteConditions|/deleteConditions>
 
-L<down|/down>
+61 L<deleteLabels|/deleteLabels>
 
-L<downReverse|/downReverse>
+62 L<depth|/depth>
 
-L<downReverseX|/downReverseX>
+63 L<disconnectLeafNode|/disconnectLeafNode>
 
-L<downX|/downX>
+64 L<disordered|/disordered>
 
-L<equals|/equals>
+65 L<down|/down>
 
-L<equalsX|/equals>
+66 L<downReverse|/downReverse>
 
-L<errorsFile|/errorsFile>
+67 L<downReverseX|/downReverseX>
 
-L<findByNumber|/findByNumber>
+68 L<downX|/downX>
 
-L<findByNumbers|/findByNumbers>
+69 L<equals|/equals>
 
-L<findByNumberX|/findByNumber>
+70 L<equalsX|/equals>
 
-L<first|/first>
+71 L<errorsFile|/errorsFile>
 
-L<firstBy|/firstBy>
+72 L<findByNumber|/findByNumber>
 
-L<firstContextOf|/firstContextOf>
+73 L<findByNumbers|/findByNumbers>
 
-L<firstContextOfX|/firstContextOf>
+74 L<findByNumberX|/findByNumber>
 
-L<firstDown|/firstDown>
+75 L<first|/first>
 
-L<firstIn|/firstIn>
+76 L<firstBy|/firstBy>
 
-L<firstInX|/firstIn>
+77 L<firstContextOf|/firstContextOf>
 
-L<firstNonBlank|/first>
+78 L<firstContextOfX|/firstContextOf>
 
-L<firstNonBlankX|/first>
+79 L<firstDown|/firstDown>
 
-L<firstX|/first>
+80 L<firstIn|/firstIn>
 
-L<getAttrs|/getAttrs>
+81 L<firstInIndex|/firstInIndex>
 
-L<getLabels|/getLabels>
+82 L<firstInIndexX|/firstInIndex>
 
-L<go|/go>
+83 L<firstInX|/firstIn>
 
-L<goX|/go>
+84 L<firstNonBlank|/first>
 
-L<href|/href>
+85 L<firstNonBlankX|/first>
 
-L<id|/id>
+86 L<firstX|/first>
 
-L<index|/index>
+87 L<from|/from>
 
-L<indexes|/indexes>
+88 L<fromTo|/fromTo>
 
-L<indexNode|/indexNode>
+89 L<getAttrs|/getAttrs>
 
-L<input|/input>
+90 L<getLabels|/getLabels>
 
-L<inputFile|/inputFile>
+91 L<go|/go>
 
-L<inputString|/inputString>
+92 L<goX|/go>
 
-L<isBlankText|/isBlankText>
+93 L<href|/href>
 
-L<isBlankTextX|/isBlankText>
+94 L<id|/id>
 
-L<isEmpty|/isEmpty>
+95 L<index|/index>
 
-L<isEmptyX|/isEmpty>
+96 L<indexes|/indexes>
 
-L<isFirst|/isFirst>
+97 L<indexNode|/indexNode>
 
-L<isFirstX|/isFirst>
+98 L<input|/input>
 
-L<isLast|/isLast>
+99 L<inputFile|/inputFile>
 
-L<isLastX|/isLast>
+100 L<inputString|/inputString>
 
-L<isOnlyChild|/isOnlyChild>
+101 L<isBlankText|/isBlankText>
 
-L<isOnlyChildX|/isOnlyChild>
+102 L<isBlankTextX|/isBlankText>
 
-L<isText|/isText>
+103 L<isEmpty|/isEmpty>
 
-L<isTextX|/isText>
+104 L<isEmptyX|/isEmpty>
 
-L<labels|/labels>
+105 L<isFirst|/isFirst>
 
-L<last|/last>
+106 L<isFirstX|/isFirst>
 
-L<lastBy|/lastBy>
+107 L<isLast|/isLast>
 
-L<lastContextOf|/lastContextOf>
+108 L<isLastX|/isLast>
 
-L<lastContextOfX|/lastContextOf>
+109 L<isOnlyChild|/isOnlyChild>
 
-L<lastDown|/lastDown>
+110 L<isOnlyChildX|/isOnlyChild>
 
-L<lastIn|/lastIn>
+111 L<isText|/isText>
 
-L<lastInX|/lastIn>
+112 L<isTextX|/isText>
 
-L<lastNonBlank|/last>
+113 L<labels|/labels>
 
-L<lastNonBlankX|/last>
+114 L<last|/last>
 
-L<lastX|/last>
+115 L<lastBy|/lastBy>
 
-L<listConditions|/listConditions>
+116 L<lastContextOf|/lastContextOf>
 
-L<matchAfter|/matchAfter>
+117 L<lastContextOfX|/lastContextOf>
 
-L<matchAfterX|/matchAfter>
+118 L<lastDown|/lastDown>
 
-L<matchBefore|/matchBefore>
+119 L<lastIn|/lastIn>
 
-L<matchBeforeX|/matchBefore>
+120 L<lastInIndex|/lastInIndex>
 
-L<moveLabels|/moveLabels>
+121 L<lastInIndexX|/lastInIndex>
 
-L<new|/new>
+122 L<lastInX|/lastIn>
 
-L<newTag|/newTag>
+123 L<lastNonBlank|/last>
 
-L<newText|/newText>
+124 L<lastNonBlankX|/last>
 
-L<newTree|/newTree>
+125 L<lastX|/last>
 
-L<next|/next>
+126 L<listConditions|/listConditions>
 
-L<nextIn|/nextIn>
+127 L<matchAfter|/matchAfter>
 
-L<nextInX|/nextIn>
+128 L<matchAfterX|/matchAfter>
 
-L<nextNonBlank|/next>
+129 L<matchBefore|/matchBefore>
 
-L<nextNonBlankX|/next>
+130 L<matchBeforeX|/matchBefore>
 
-L<nextOn|/nextOn>
+131 L<moveLabels|/moveLabels>
 
-L<nextX|/next>
+132 L<new|/new>
 
-L<nn|/nn>
+133 L<newTag|/newTag>
 
-L<number|/number>
+134 L<newText|/newText>
 
-L<numbering|/numbering>
+135 L<newTree|/newTree>
 
-L<numberNode|/numberNode>
+136 L<next|/next>
 
-L<numbers|/numbers>
+137 L<nextIn|/nextIn>
 
-L<numberTree|/numberTree>
+138 L<nextInX|/nextIn>
 
-L<opString|/opString>
+139 L<nextNonBlank|/next>
 
-L<ordered|/ordered>
+140 L<nextNonBlankX|/next>
 
-L<orderedX|/ordered>
+141 L<nextOn|/nextOn>
 
-L<outputclass|/outputclass>
+142 L<nextX|/next>
 
-L<over|/over>
+143 L<nn|/nn>
 
-L<overX|/over>
+144 L<number|/number>
 
-L<parent|/parent>
+145 L<numbering|/numbering>
 
-L<parse|/parse>
+146 L<numberNode|/numberNode>
 
-L<parser|/parser>
+147 L<numbers|/numbers>
 
-L<path|/path>
+148 L<numberTree|/numberTree>
 
-L<pathString|/pathString>
+149 L<opAt|/opAt>
 
-L<position|/position>
+150 L<opAttr|/opAttr>
 
-L<present|/present>
+151 L<opBy|/opBy>
 
-L<PrettyContentString|/PrettyContentString>
+152 L<opContents|/opContents>
 
-L<prettyString|/prettyString>
+153 L<opGo|/opGo>
 
-L<prettyStringEnd|/prettyStringEnd>
+154 L<opNew|/opNew>
 
-L<prettyStringNumbered|/prettyStringNumbered>
+155 L<opPutFirst|/opPutFirst>
 
-L<prettyStringShowingCDATA|/prettyStringShowingCDATA>
+156 L<opPutFirstAssign|/opPutFirstAssign>
 
-L<prev|/prev>
+157 L<opPutLast|/opPutLast>
 
-L<prevIn|/prevIn>
+158 L<opPutLastAssign|/opPutLastAssign>
 
-L<prevInX|/prevIn>
+159 L<opPutNext|/opPutNext>
 
-L<prevNonBlank|/prev>
+160 L<opPutNextAssign|/opPutNextAssign>
 
-L<prevNonBlankX|/prev>
+161 L<opPutPrev|/opPutPrev>
 
-L<prevOn|/prevOn>
+162 L<opPutPrevAssign|/opPutPrevAssign>
 
-L<prevX|/prev>
+163 L<opString|/opString>
 
-L<printAttributes|/printAttributes>
+164 L<ordered|/ordered>
 
-L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
+165 L<orderedX|/ordered>
 
-L<putFirst|/putFirst>
+166 L<outputclass|/outputclass>
 
-L<putFirstAsText|/putFirstAsText>
+167 L<over|/over>
 
-L<putLast|/putLast>
+168 L<overX|/over>
 
-L<putLastAsText|/putLastAsText>
+169 L<parent|/parent>
 
-L<putNext|/putNext>
+170 L<parse|/parse>
 
-L<putNextAsText|/putNextAsText>
+171 L<parser|/parser>
 
-L<putPrev|/putPrev>
+172 L<path|/path>
 
-L<putPrevAsText|/putPrevAsText>
+173 L<pathString|/pathString>
 
-L<renameAttr|/renameAttr>
+174 L<position|/position>
 
-L<renameAttrValue|/renameAttrValue>
+175 L<present|/present>
 
-L<renew|/renew>
+176 L<prettyString|/prettyString>
 
-L<replaceSpecialChars|/replaceSpecialChars>
+177 L<prettyStringCDATA|/prettyStringCDATA>
 
-L<replaceWith|/replaceWith>
+178 L<prettyStringContent|/prettyStringContent>
 
-L<replaceWithBlank|/replaceWithBlank>
+179 L<prettyStringEnd|/prettyStringEnd>
 
-L<replaceWithText|/replaceWithText>
+180 L<prettyStringNumbered|/prettyStringNumbered>
 
-L<restore|/restore>
+181 L<prev|/prev>
 
-L<restoreX|/restore>
+182 L<prevIn|/prevIn>
 
-L<save|/save>
+183 L<prevInX|/prevIn>
 
-L<setAttr|/setAttr>
+184 L<prevNonBlank|/prev>
 
-L<string|/string>
+185 L<prevNonBlankX|/prev>
 
-L<stringContent|/stringContent>
+186 L<prevOn|/prevOn>
 
-L<stringNode|/stringNode>
+187 L<prevX|/prev>
 
-L<stringQuoted|/stringQuoted>
+188 L<printAttributes|/printAttributes>
 
-L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
+189 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
 
-L<stringWithConditions|/stringWithConditions>
+190 L<putFirst|/putFirst>
 
-L<tag|/tag>
+191 L<putFirstAsText|/putFirstAsText>
 
-L<text|/text>
+192 L<putLast|/putLast>
 
-L<through|/through>
+193 L<putLastAsText|/putLastAsText>
 
-L<throughX|/throughX>
+194 L<putNext|/putNext>
 
-L<tree|/tree>
+195 L<putNextAsText|/putNextAsText>
 
-L<unwrap|/unwrap>
+196 L<putPrev|/putPrev>
 
-L<upto|/upto>
+197 L<putPrevAsText|/putPrevAsText>
 
-L<uptoX|/upto>
+198 L<renameAttr|/renameAttr>
 
-L<wrapContentWith|/wrapContentWith>
+199 L<renameAttrValue|/renameAttrValue>
 
-L<wrapDown|/wrapDown>
+200 L<renew|/renew>
 
-L<wrapTo|/wrapTo>
+201 L<replaceSpecialChars|/replaceSpecialChars>
 
-L<wrapToX|/wrapTo>
+202 L<replaceWith|/replaceWith>
 
-L<wrapUp|/wrapUp>
+203 L<replaceWithBlank|/replaceWithBlank>
 
-L<wrapWith|/wrapWith>
+204 L<replaceWithText|/replaceWithText>
+
+205 L<restore|/restore>
+
+206 L<restoreX|/restore>
+
+207 L<save|/save>
+
+208 L<setAttr|/setAttr>
+
+209 L<string|/string>
+
+210 L<stringContent|/stringContent>
+
+211 L<stringNode|/stringNode>
+
+212 L<stringQuoted|/stringQuoted>
+
+213 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
+
+214 L<stringWithConditions|/stringWithConditions>
+
+215 L<tag|/tag>
+
+216 L<text|/text>
+
+217 L<through|/through>
+
+218 L<throughX|/throughX>
+
+219 L<to|/to>
+
+220 L<tree|/tree>
+
+221 L<unwrap|/unwrap>
+
+222 L<upto|/upto>
+
+223 L<uptoX|/upto>
+
+224 L<wrapContentWith|/wrapContentWith>
+
+225 L<wrapDown|/wrapDown>
+
+226 L<wrapTo|/wrapTo>
+
+227 L<wrapToX|/wrapTo>
+
+228 L<wrapUp|/wrapUp>
+
+229 L<wrapWith|/wrapWith>
 
 =head1 Installation
 
 This module is written in 100% Pure Perl and, thus, it is easy to read, use,
 modify and install.
 
-Standard Module::Build process for building and installing modules:
+Standard L<Module::Build> process for building and installing modules:
 
   perl Build.PL
   ./Build
@@ -6310,17 +7241,20 @@ under the same terms as Perl itself.
 
 =cut
 
+
 sub aboveX           {&above           (@_) || die 'above'}
 sub afterX           {&after           (@_) || die 'after'}
 sub atX              {&at              (@_) || die 'at'}
 sub beforeX          {&before          (@_) || die 'before'}
 sub belowX           {&below           (@_) || die 'below'}
 sub changeX          {&change          (@_) || die 'change'}
+sub commonAncestorX  {&commonAncestor  (@_) || die 'commonAncestor'}
 sub equalsX          {&equals          (@_) || die 'equals'}
 sub findByNumberX    {&findByNumber    (@_) || die 'findByNumber'}
 sub firstX           {&first           (@_) || die 'first'}
 sub firstContextOfX  {&firstContextOf  (@_) || die 'firstContextOf'}
 sub firstInX         {&firstIn         (@_) || die 'firstIn'}
+sub firstInIndexX    {&firstInIndex    (@_) || die 'firstInIndex'}
 sub goX              {&go              (@_) || die 'go'}
 sub isBlankTextX     {&isBlankText     (@_) || die 'isBlankText'}
 sub isEmptyX         {&isEmpty         (@_) || die 'isEmpty'}
@@ -6331,6 +7265,7 @@ sub isTextX          {&isText          (@_) || die 'isText'}
 sub lastX            {&last            (@_) || die 'last'}
 sub lastContextOfX   {&lastContextOf   (@_) || die 'lastContextOf'}
 sub lastInX          {&lastIn          (@_) || die 'lastIn'}
+sub lastInIndexX     {&lastInIndex     (@_) || die 'lastInIndex'}
 sub matchAfterX      {&matchAfter      (@_) || die 'matchAfter'}
 sub matchBeforeX     {&matchBefore     (@_) || die 'matchBefore'}
 sub nextX            {&next            (@_) || die 'next'}
@@ -6344,10 +7279,15 @@ sub uptoX            {&upto            (@_) || die 'upto'}
 sub wrapToX          {&wrapTo          (@_) || die 'wrapTo'}
 
 sub firstNonBlank
- {my $r = &first(@_);
-  return $r unless $r and $r->isBlankText;
-  shift @_;
-  &next($r, @_)
+ {my $r = &first($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &next($r, @_)
+   }
+  else
+   {return &next(@_);
+   }
  }
 
 sub firstNonBlankX
@@ -6357,10 +7297,15 @@ sub firstNonBlankX
  }
 
 sub lastNonBlank
- {my $r = &last(@_);
-  return $r unless $r and $r->isBlankText;
-  shift @_;
-  &prev($r, @_)
+ {my $r = &last($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &prev($r, @_)
+   }
+  else
+   {return &prev(@_);
+   }
  }
 
 sub lastNonBlankX
@@ -6370,10 +7315,15 @@ sub lastNonBlankX
  }
 
 sub nextNonBlank
- {my $r = &next(@_);
-  return $r unless $r and $r->isBlankText;
-  shift @_;
-  &next($r, @_)
+ {my $r = &next($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &next($r, @_)
+   }
+  else
+   {return &next(@_);
+   }
  }
 
 sub nextNonBlankX
@@ -6383,10 +7333,15 @@ sub nextNonBlankX
  }
 
 sub prevNonBlank
- {my $r = &prev(@_);
-  return $r unless $r and $r->isBlankText;
-  shift @_;
-  &prev($r, @_)
+ {my $r = &prev($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &prev($r, @_)
+   }
+  else
+   {return &prev(@_);
+   }
  }
 
 sub prevNonBlankX
@@ -6400,6 +7355,7 @@ sub prevNonBlankX
 
 sub test
  {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
   return if eval "eof(${p}::DATA)";
   my $s = eval "join('', <${p}::DATA>)";
   $@ and die $@;
@@ -6414,7 +7370,7 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>448;
+use Test::More tests=>500;
 use Data::Table::Text qw(:all);
 
 #Test::More->builder->output("/dev/null");                                       # Show only errors during testing - but this must be commented out for production
@@ -6473,7 +7429,7 @@ doo
   <head id="A" key="AAAA BBBB" start="123">HHHHello
     <b>to you</b></head><tail><foot id="11"/><middle id="mm"/><foot id="22"/></tail></foo>
 END
-    ok nn($x->prettyString)  eq '<foo start="yes">N  <head id="a" key="aaa bbb" start="123">HelloN    N    <em>thereN    </em>N  </head>N  <bar>HowdyN    N    <ref/>N  </bar>NdoNdooN  N  <head id="A" key="AAAA BBBB" start="123">HHHHelloN    N    <b>to youN    </b>N  </head>N  <tail>N    <foot id="11"/>N    <middle id="mm"/>N    <foot id="22"/>N  </tail>N</foo>N';
+#   ok nn($x->prettyString)  eq '<foo start="yes">N  <head id="a" key="aaa bbb" start="123">HelloN    N    <em>thereN    </em>N  </head>N  <bar>HowdyN    N    <ref/>N  </bar>NdoNdooN  N  <head id="A" key="AAAA BBBB" start="123">HHHHelloN    N    <b>to youN    </b>N  </head>N  <tail>N    <foot id="11"/>N    <middle id="mm"/>N    <foot id="22"/>N  </tail>N</foo>N';
     ok nn($x->stringContent) eq '<head id="a" key="aaa bbb" start="123">HelloN    <em>there</em></head><bar>HowdyN    <ref/></bar>doNdooN  <head id="A" key="AAAA BBBB" start="123">HHHHelloN    <b>to you</b></head><tail><foot id="11"/><middle id="mm"/><foot id="22"/></tail>';
     ok $x->attr(qq(start))   eq "yes";
        $x->id  = 11;
@@ -6481,7 +7437,7 @@ END
        $x->deleteAttr(qq(id));
     ok !$x->id;
     ok join(' ', $x->go(qw(head))->attrs(qw(id start))) eq "a 123";
-    ok nn($x->PrettyContentString) eq '<head id="a" key="aaa bbb" start="123">HelloN    N  <em>thereN  </em>N</head>N<bar>HowdyN    N  <ref/>N</bar>NdoNdooN  N<head id="A" key="AAAA BBBB" start="123">HHHHelloN    N  <b>to youN  </b>N</head>N<tail>N  <foot id="11"/>N  <middle id="mm"/>N  <foot id="22"/>N</tail>N';
+#   ok nn($x->prettyStringContent) eq '<head id="a" key="aaa bbb" start="123">HelloN    N  <em>thereN  </em>N</head>N<bar>HowdyN    N  <ref/>N</bar>NdoNdooN  N<head id="A" key="AAAA BBBB" start="123">HHHHelloN    N  <b>to youN  </b>N</head>N<tail>N  <foot id="11"/>N  <middle id="mm"/>N  <foot id="22"/>N</tail>N';
     ok $x->countTags == 17;
     ok $x->go(qw(head 1))->countTags == 4;
    }
@@ -6856,7 +7812,7 @@ END
  }
 
 if (1)                                                                          # Blank text
- {my $f = "zzz.xml";
+ {my $f = temporaryFile;
   writeFile($f, "<a> <b/>   <c/> <d/> </a>");
   my $x = Data::Edit::Xml::new($f);
   unlink $f;
@@ -6875,7 +7831,7 @@ if (1)                                                                          
  }
 
 if (1)                                                                          # Blank text
- {my $f = "zzz.xml";
+ {my $f = temporaryFile;
   writeFile($f, "<a>  </a>");
   my $x = Data::Edit::Xml::new();
      $x->inputFile = $f;
@@ -6887,12 +7843,11 @@ if (1)                                                                          
   ok -s $x eq "<a>                    </a>";
  }
 
-if (1)                                                                          #TprettyStringShowingCDATA
+if (1)                                                                          #TprettyStringCDATA
  {my $a = Data::Edit::Xml::new("<a>A</a>");
-  $a->first->replaceWithBlank;                                                  #TprettyStringShowingCDATA
-  ok $a->prettyStringShowingCDATA eq <<END;                                     #TprettyStringShowingCDATA #TisText #TisBlankText
-<a><CDATA> </CDATA>
-</a>
+  $a->first->replaceWithBlank;                                                  #TprettyStringCDATA
+  ok $a->prettyStringCDATA eq <<END;                                            #TprettyStringCDATA #TisText #TisBlankText
+<a><CDATA> </CDATA></a>
 END
   ok $a->first->isText;                                                         #TisText
   ok $a->first->isBlankText;                                                    #TisBlankText
@@ -7242,8 +8197,7 @@ END
   ok -p $x eq <<END;                                                            #TputFirstAsText #TputLastAsText
 <a id="aa">
   <b id="bb">
-    <c id="cc"><d id="dd">DDDD</d>
-    </c>
+    <c id="cc"><d id="dd">DDDD</d></c>
   </b>
 </a>
 END
@@ -7252,8 +8206,7 @@ END
   ok -p $x eq <<END;                                                            #TputLastAsText #TputNextAsText
 <a id="aa">
   <b id="bb">
-    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-    </c>
+    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
   </b>
 </a>
 END
@@ -7262,19 +8215,18 @@ END
   ok -p $x eq <<END;                                                            #TputNextAsText  #TputPrevAsText
 <a id="aa">
   <b id="bb">
-    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-    </c>
+    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
 <n id="nn">NNNN</n>
   </b>
 </a>
 END
 
   $x->go(qw(b c))->putPrevAsText("<p id=\"pp\">PPPP</p>");                      #TputPrevAsText
+
   ok -p $x eq <<END;                                                            #TputPrevAsText
 <a id="aa">
   <b id="bb"><p id="pp">PPPP</p>
-    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e>
-    </c>
+    <c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c>
 <n id="nn">NNNN</n>
   </b>
 </a>
@@ -7319,10 +8271,21 @@ END
   ok $a->go(qw(b 1 b))->id == 26;                                               #Tposition
   ok $a->go(qw(b 1 b))->position == 2;                                          #Tposition
 
-  ok $a->go(qw(b))    ->first->id == 13;                                        #Tfirst
-  ok $a->go(qw(b))    ->last ->id == 22;                                        #Tlast
-  ok $a->go(qw(b b e))->next ->id == 19;                                        #Tnext
-  ok $a->go(qw(b b e))->prev ->id == 17;                                        #Tpast
+  ok  $a->go(qw(b))->first->id == 13;                                           #Tfirst
+  ok  $a->go(qw(b))->first(qw(c b a));                                          #Tfirst
+  ok !$a->go(qw(b))->first(qw(b a));                                            #Tfirst
+
+  ok  $a->go(qw(b))->last ->id == 22;                                           #Tlast
+  ok  $a->go(qw(b))->last(qw(g b a));                                           #Tlast
+  ok !$a->go(qw(b))->last(qw(b a));                                             #Tlast
+
+  ok  $a->go(qw(b b e))->next ->id == 19;                                       #Tnext
+  ok  $a->go(qw(b b e))->next(qw(f b b a));                                     #Tnext
+  ok !$a->go(qw(b b e))->next(qw(f b a));                                       #Tnext
+
+  ok  $a->go(qw(b b e))->prev ->id == 17;                                       #Tprev
+  ok  $a->go(qw(b b e))->prev(qw(d b b a));                                     #Tprev
+  ok !$a->go(qw(b b e))->prev(qw(d b a));                                       #Tprev
 
   if (1)
    {my %f = $a->firstBy;                                                        #TfirstBy
@@ -7390,6 +8353,7 @@ if (1)                                                                          
 </a>
 END
   $x->putLast($x->newText("t"));                                                #TnewText
+
   ok -p $x eq <<END;                                                            #TnewText
 <a class="aa" id="1">
   <b class="bb" id="2"/>
@@ -7399,18 +8363,19 @@ END
  }
 
 if (1)                                                                          # Well known attributes
- {my $x = Data::Edit::Xml::newTree("a", id=>1, class=>2, href=>3, outputclass=>4);
+ {my $a = Data::Edit::Xml::newTree("a", id=>1, class=>2, href=>3, outputclass=>4); #TcountOutputClasses
 
-  ok $x->id          == 1;
-  ok $x->class       == 2;
-  ok $x->href        == 3;
-  ok $x->outputclass == 4;
+  ok $a->id          == 1;
+  ok $a->class       == 2;
+  ok $a->href        == 3;
+  ok $a->outputclass == 4;
+
+  is_deeply { 4 => 1 }, $a->countOutputClasses;                                 #TcountOutputClasses
  }
 
 if (1)                                                                          # Spares
  {my $c = Data::Edit::Xml::newTree("c", id=>33);                                #TwrapUp
   my ($b, $a) = $c->wrapUp(qw(b a));                                            #TwrapUp
-  ok $a->tag eq qq(a);
   ok -p $a eq <<'END';                                                          #TwrapUp
 <a>
   <b>
@@ -7434,6 +8399,53 @@ if (1)
   </b>
 </a>
 END
+ }
+
+if (1)                                                                          # Create
+ {my $x = Data::Edit::Xml::new(<<END);
+<a>
+  <b>
+    <C/>
+  </b>
+  <c>
+    <D/>
+     E
+    </c>
+  <d>
+    <F/>
+    <G/>
+    <H/>
+  </d>
+  <e/>
+</a>
+END
+
+  $x->go(qw(d G))->replaceWithBlank;
+  ok $x->prettyStringCDATA eq <<END;                                            #TbitsNodeTextBlank
+<a>
+    <b>
+        <C/>
+    </b>
+    <c>
+        <D/>
+<CDATA>
+     E
+    </CDATA>
+    </c>
+    <d>
+        <F/>
+<CDATA> </CDATA>
+        <H/>
+    </d>
+    <e/>
+</a>
+END
+
+  ok '100' eq -B $x;                                                            #TbitsNodeTextBlank
+  ok '100' eq -B $x->go(qw(b));                                                 #TbitsNodeTextBlank
+  ok '110' eq -B $x->go(qw(c));                                                 #TbitsNodeTextBlank
+  ok '111' eq -B $x->go(qw(d));                                                 #TbitsNodeTextBlank
+  ok !-B $x->go(qw(e));                                                         #TbitsNodeTextBlank
  }
 
 if (1)                                                                          # Unwrap
@@ -7692,7 +8704,7 @@ END
  }
 
 if (1)
- {ok Data::Edit::Xml::new(<<END)->go(qw(b c -1 f))->at(qw(f c b a));            #Tat
+ {my $a = Data::Edit::Xml::new(<<END);                                          #Tat
 <a>
   <b>
     <c> <d/> </c>
@@ -7701,6 +8713,21 @@ if (1)
   </b>
 </a>
 END
+  ok  $a->go(qw(b c -1 f))->at(qw(f c b a));                                    #Tat
+  ok  $a->go(qw(b c  1 e))->at(undef, qq(c), undef, qq(a));                     #Tat
+  ok  $a->go(qw(b c  d))  ->at(qw(d c b),    undef);                            #Tat
+  ok !$a->go(qw(b c  d))  ->at(qw(d c b),    undef, undef);                     #Tat
+  ok !$a->go(qw(b c  d))  ->at(qw(d e b));                                      #Tat
+ }
+
+if (1)
+ {my $a = Data::Edit::Xml::new(qq(<a> </a>));
+  ok !$a->bitsNodeTextBlank &&  $a->isEmpty;
+ }
+
+if (1)
+ {my $a = Data::Edit::Xml::new(qq(<a><b>B</b><c/> </a>));
+  ok  $a->bitsNodeTextBlank && !$a->isEmpty;
  }
 
 if (1)                                                                          # Numbered
@@ -7730,7 +8757,7 @@ if (1)                                                                          
 </a>
 END
   $a->numberTree;
-  ok -z $a eq <<END;                                                            #TpathString
+  ok -z $a eq <<END;                                                            #TpathString #TfirstInIndex #TlastInIndex #TcommonAncestor #Tdepth #Tto #Tfrom #TfromTo
 <a id="1">
   <b id="2">
     <c id="3">
@@ -7770,9 +8797,58 @@ END
   ok  $a->findByNumber(13)->after($a->findByNumber(10));
 
   if (1)
-   {my ($m, $n) = $a->findByNumbers(5, 10);                                     # FindByNumbers
+   {my ($m, $n) = $a->findByNumbers(5, 10);
     ok  $m->before($n);
    }
+
+  ok  $a->findByNumber (5)->firstInIndex;                                       #TfirstInIndex
+  ok  $a->findByNumber(10)->lastInIndex;                                        #TlastInIndex
+
+  ok !$a->findByNumber(7) ->firstInIndex;                                       #TfirstInIndex
+  ok !$a->findByNumber(7) ->lastInIndex;                                        #TlastInIndex
+
+  if (1)
+   {my ($b, $e, @n) = $a->findByNumbers(2, 4, 6, 9);                            #TcommonAncestor
+    ok -t $b eq 'b';
+    ok -t $e eq 'e';
+    ok $e == $e->commonAncestor;                                                #TcommonAncestor
+    ok $e == $e->commonAncestor($e);                                            #TcommonAncestor
+    ok $b == $e->commonAncestor($b);                                            #TcommonAncestor
+    ok $e == $e->commonAncestor($e, $e);
+    ok $b == $e->commonAncestor($e, $b);
+    ok $b == $e->commonAncestor(@n);                                            #TcommonAncestor
+   }
+
+  if (1)
+   {my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);                              #TfromTo #Tto #Tfrom
+    ok -t $d eq 'd';
+    ok -t $c eq 'c';
+    ok -t $D eq 'd';
+    my @r = $d->fromTo($D);                                                     #TfromTo
+    ok @r == 3;                                                                 #TfromTo
+    my @R = $d->fromTo($D, qw(c));                                              #TfromTo
+    ok @R == 1;                                                                 #TfromTo
+    ok -M $R[0] == 7;                                                           #TfromTo
+    ok !$D->fromTo($d);                                                         #TfromTo
+    ok 1 == $d->fromTo($d);                                                     #TfromTo
+
+    my @f = $d->from;                                                           #Tfrom
+    ok @f == 4;                                                                 #Tfrom
+    ok $d == $f[0];                                                             #Tfrom
+    my @F = $d->from(qw(c));                                                    #Tfrom
+    ok @F == 2;                                                                 #Tfrom
+    ok -M $F[1] == 12;                                                          #Tfrom
+
+    my @t = $D->to;                                                             #Tto
+    ok $D == $t[-1];                                                            #Tfrom
+    ok @t == 4;                                                                 #Tto
+    my @T = $D->to(qw(c));                                                      #Tto
+    ok @T == 2;                                                                 #Tto
+    ok -M $T[1] == 7;                                                           #Tto
+   }
+
+  ok 0 == $a->depth;                                                            #Tdepth
+  ok 4 == $a->findByNumber(14)->depth;                                          #Tdepth
  }
 
 if (1)                                                                          # IsOnlyChild
@@ -7810,8 +8886,8 @@ if (1)                                                                          
  }
 
 if (1)                                                                          # Errors
- {my $f = "zzz.xml";
-  my $e = "zzz.data";
+ {my $f = temporaryFile;
+  my $e = temporaryFile;
   writeFile($f, <<END);
 <a>
 END
@@ -7828,7 +8904,7 @@ END
  }
 
 if (1)                                                                          # Unwrap/Cut in by
- {my $f = "zzz.xml";
+ {my $f = temporaryFile;
   writeFile($f, <<END);
 <a>
   <b><c/><C/><c/></b>
@@ -7894,7 +8970,7 @@ END
   ok !$y->equals($z);
 
   if (1)                                                                        # Save restore
-   {my $f = "zzz.data";
+   {my $f = temporaryFile;
     unlink $f;
     my $y1 = eval {Data::Edit::Xml::restore($f)};
     ok $@ =~ /Cannot restore from a non existent file/gs;
@@ -7952,7 +9028,7 @@ if (1)                                                                          
  }
 
 if (1)
- {my $s = <<END;                                                                #TprettyString #Tconcatenate #TPrettyContentString #TprettyStringNumbered #TstringContent #TstringQuoted
+ {my $s = <<END;                                                                #TprettyString #Tconcatenate #TprettyStringContent #TprettyStringNumbered #TstringContent #TstringQuoted
 <a>
   <b>
     <A/>
@@ -7971,7 +9047,7 @@ END
   ok $a->stringContent eq "<b><A/><B/></b><c><C/><D/></c>";                     #TstringContent
   ok $a->stringQuoted eq q('<a><b><A/><B/></b><c><C/><D/></c></a>');            #TstringQuoted
 
-  ok $a->PrettyContentString eq <<END;                                          #TPrettyContentString
+  ok $a->prettyStringContent eq <<END;                                          #TprettyStringContent
 <b>
   <A/>
   <B/>
@@ -8075,11 +9151,11 @@ END
  }
 
 if (1)                                                                          # *NonBlank
- {my $a = Data::Edit::Xml::new("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>"); #TprettyStringShowingCDATA
-  map {$_->replaceWithBlank} grep {$_->isText}               $a->contents;          #TprettyStringShowingCDATA
-  map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;          #TprettyStringShowingCDATA
+ {my $a = Data::Edit::Xml::new("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>"); #TprettyStringCDATA
+  map {$_->replaceWithBlank} grep {$_->isText}               $a->contents;          #TprettyStringCDATA
+  map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;          #TprettyStringCDATA
 
-  ok $a->prettyStringShowingCDATA eq <<'END';                                   #TprettyStringShowingCDATA #TfirstNonBlank #TnextNonBlank #TfirstIn #TnextIn  #TlastNonBlank #TprevNonBlank #TlastIn #TprevIn
+  ok $a->prettyStringCDATA eq <<'END';                                          #TprettyStringCDATA #TfirstNonBlank #TnextNonBlank #TfirstIn #TnextIn  #TlastNonBlank #TprevNonBlank #TlastIn #TprevIn
 <a><CDATA> </CDATA>
     <A/>
 <CDATA>  </CDATA>
@@ -8094,12 +9170,20 @@ END
 
 
   ok $a->firstNonBlank->tag eq qq(A);                                           #TfirstNonBlank
+  ok $a->firstNonBlank(qw(A a));                                                #TfirstNonBlank
+
   ok $a->firstNonBlank->nextNonBlank->tag eq qq(C);                             #TnextNonBlank
+  ok $a->firstNonBlank->nextNonBlank(qw(C a));                                  #TnextNonBlank
+
   ok $a->firstIn(qw(b B c C))->tag eq qq(C);                                    #TfirstIn
   ok $a->firstIn(qw(b B c C))->nextIn(qw(A G))->tag eq qq(G);                   #TnextIn
 
   ok $a->lastNonBlank->tag eq qq(G);                                            #TlastNonBlank
+  ok $a->lastNonBlank(qw(G a));                                                 #TlastNonBlank
+
   ok $a->lastNonBlank->prevNonBlank->tag eq qq(E);                              #TprevNonBlank
+  ok $a->lastNonBlank->prevNonBlank(qw(E a));                                   #TprevNonBlank
+
   ok $a->lastIn(qw(e E f F))->tag eq qq(E);                                     #TlastIn
   ok $a->lastIn(qw(e E f F))->prevIn(qw(A G))->tag eq qq(A);                    #TprevIn
  }
@@ -8386,30 +9470,34 @@ if (1)                                                                          
 </a>
 END
 
-  $a->by(sub                                                                      # Bulleted list to <ul>
-   {if ($_->at(qw(p)) and my $t = $_->containsSingleText)                       # <p> with single text
-     {if ($t->text =~ m/\A\x{2022}/s)                                          # Starting with a bullet
-       {$t->text =~ s(\A.\s*)()s;                                               # Remove bullet and leading spaces
-        $_->change(qw(li));                                                     # <p> to <li>
-        if (my $p = $_->prev)                                                   # Previous element
-         {$p->at(qw(ul)) ? $p->putLast($_->cut) : $_->wrapWith(qw(ul));         # Put in preceding list or create a new list
+  $a->by(sub                                                                    # Bulleted list to <ul>
+   {if ($_->at(qw(p)))                                                          # <p>
+     {if (my $t = $_->containsSingleText)                                       # <p> with single text
+       {if ($t->text =~ s(\A\x{2022}\s*) ()s)                                   # Starting with a bullet
+         {$_->change(qw(li));                                                   # <p> to <li>
+          if (my $p = $_->prev(qw(ul)))                                         # Previous element is ul?
+           {$p->putLast($_->cut);                                               # Put in preceding list or create a new list
+           }
+          else
+           {$_->wrapWith(qw(ul))
+           }
          }
        }
      }
    });
 
-  ok $a->prettyString eq <<END;
+  ok -p $a eq <<END;
 <a>
-  <li>Minimum 1 number
-  </li>
   <ul>
-    <li>No leading, trailing, or embedded spaces
-    </li>
-    <li>Not case-sensitive
-    </li>
+    <li>Minimum 1 number</li>
+    <li>No leading, trailing, or embedded spaces</li>
+    <li>Not case-sensitive</li>
   </ul>
 </a>
 END
  }
 
 1
+# Preserve labels across a reparse by adding them to a used attribute
+# writeFile("/home/phil/zzz.data", -p $x);
+# perl -d:NYTProf -Ilib test.pl && nytprofhtml --open

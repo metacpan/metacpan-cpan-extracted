@@ -21,6 +21,7 @@
 #include "spvm_descriptor.h"
 #include "spvm_type.h"
 #include "spvm_use.h"
+#include "spvm_constant_pool.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -34,6 +35,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
   // Save buf pointer
   compiler->befbufptr = compiler->bufptr;
+  _Bool before_is_comma = compiler->before_is_comma;
+  compiler->before_is_comma = 0;
   
   // Constant minus sign
   int32_t minus = 0;
@@ -119,7 +122,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               if (!fh) {
                 if (op_use) {
-                  fprintf(stderr, "Can't locate SPVM/%s.spvm @INC (@INC contains:", package_name);
+                  fprintf(stderr, "Can't locate %s in @INC (@INC contains:", module_path_base);
                   {
                     int32_t i;
                     for (i = 0; i < include_pathes_length; i++) {
@@ -158,6 +161,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               fclose(fh);
               cur_src[file_size] = '\0';
+              
+              // Add package loading information
+              SPVM_CONSTANT_POOL_push_string(compiler, compiler->constant_pool, package_name);
+              const char* package_path = cur_file;
+              SPVM_CONSTANT_POOL_push_string(compiler, compiler->constant_pool, package_path);
+              SPVM_DYNAMIC_ARRAY_push(compiler->use_package_names, (void*)package_name);
+              SPVM_HASH_insert(compiler->use_package_path_symtable, package_name, strlen(package_name), (void*)package_path);
               
               compiler->cur_src = cur_src;
               compiler->bufptr = cur_src;
@@ -1160,6 +1170,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               break;
             case '_':
               if (strcmp(keyword, "__END__") == 0) {
+                if (strstr(compiler->bufptr, "__NATIVE__")) {
+                  SPVM_DYNAMIC_ARRAY_push(compiler->inline_files, (void*)compiler->cur_file);
+                }
+                
+                *compiler->bufptr = '\0';
+                continue;
+              }
+              else if (strcmp(keyword, "__NATIVE__") == 0) {
+                SPVM_DYNAMIC_ARRAY_push(compiler->inline_files, (void*)compiler->cur_file);
                 *compiler->bufptr = '\0';
                 continue;
               }
@@ -1176,6 +1195,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           yylvalp->opval = op;
           
           return NAME;
+        }
+        
+        if (*compiler->bufptr == ',') {
+          if (before_is_comma && *compiler->bufptr == ',') {
+            fprintf(stderr, "Double camma is forbidden at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
+            exit(EXIT_FAILURE);
+          }
+          compiler->before_is_comma = 1;
         }
         
         /* Return character */

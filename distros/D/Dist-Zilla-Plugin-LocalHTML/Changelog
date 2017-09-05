@@ -1,0 +1,67 @@
+==================================================
+Changes from 2016-09-02 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.1.1 at 2017-09-02 01:05:31 +0000
+-------------------------------------------
+
+  Change: a118aa96f4565dbbd0ef16410107ddc5368dcc62
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 21:04:27 +0000
+
+    Determine link type by checking if it maps into project files.
+
+    Override default search.cpan.org with metacpan.org 
+
+  Change: a9ea6b608d394a4e63cd8748cc8a6504fa291210
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-09-01 13:28:05 +0000
+
+    Fixed L<name/section> links. 
+
+  Change: e05d2b2be89620eeb50155fc84e6ad9de95c0cf8
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 22:05:22 +0000
+
+    Support for section links. 
+
+------------------------------------------
+version 0.1.0 at 2017-08-30 21:03:46 +0000
+------------------------------------------
+
+  Change: df28af0ec0c38b18d387459f9dc6f029749d5eb4
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 17:03:46 +0000
+
+    vv0.1.0 
+
+--------------------------------------------
+version 0.0.001 at 2017-08-30 20:48:30 +0000
+--------------------------------------------
+
+  Change: db341cd9f18f9fbbaf509424f2b853f4f9d2be05
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-30 16:48:30 +0000
+
+    First working version. 
+
+  Change: 0f85523bec2d17cc35b5dc167229a46a1f0a87be
+  Author: Vadim Belman <vrurg@lflat.org>
+  Date : 2017-08-29 16:56:28 +0000
+
+    Initial commit 
+
+----------------------------------------
+version 0.0 at 2017-08-29 20:51:54 +0000
+----------------------------------------
+
+  Change: 417bdfc71fdfc9f2b1dbae8ced8fc55ab24329db
+  Author: Vadim Belman <vrurg@users.noreply.github.com>
+  Date : 2017-08-29 16:51:54 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

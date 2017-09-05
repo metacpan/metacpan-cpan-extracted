@@ -5,7 +5,7 @@ use Test::More;
 use Data::Dump qw( dump );
 
 eval "use Text::Aspell";
-plan skip_all => "Text::Aspell unavailable" if $@; 
+plan skip_all => "Text::Aspell unavailable" if $@;
 
 use_ok('Text::IQ::EN');
 
@@ -25,8 +25,8 @@ is( sprintf( "%0.1f", $iq->avg_word_length ), "4.3", "avg_word_length" );
 is( $iq->num_sentences, 1886, "num_sentences" );
 is( sprintf( "%0.1f", $iq->avg_sentence_length ),
     "15.2", "avg_sentence_length" );
-is( $iq->num_misspellings,      461, "num_misspellings" );
-is( $iq->num_uniq_misspellings, 294, "num_uniq_misspellings" );
+cmp_ok( $iq->num_misspellings,      '>', 400, "num_misspellings" );
+cmp_ok( $iq->num_uniq_misspellings, '>', 280, "num_uniq_misspellings" );
 is( sprintf( "%0.1f", $iq->flesch ),  "79.9", "flesch" );
 is( sprintf( "%0.1f", $iq->fog ),     "8.3",  "fog" );
 is( sprintf( "%0.1f", $iq->kincaid ), "5.9",  "kincaid" );

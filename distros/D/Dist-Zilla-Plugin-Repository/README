@@ -1,76 +1,56 @@
-NAME
-    Dist::Zilla::Plugin::Repository - Automatically sets repository URL from
-    svn/svk/Git checkout for Dist::Zilla
-
-VERSION
-    version 0.20
-
 SYNOPSIS
+
         # dist.ini
         [Repository]
 
 DESCRIPTION
+
     The code is mostly a copy-paste of Module::Install::Repository
 
-  ATTRIBUTES
-    *   git_remote
+ ATTRIBUTES
 
-        This is the name of the remote to use for the public repository (if
-        you use Git). By default, unsurprisingly, to origin.
+      * git_remote
 
-    *   github_http
+      This is the name of the remote to use for the public repository (if
+      you use Git). By default, unsurprisingly, to origin.
 
-        This attribute is deprecated. If the remote is a GitHub repository,
-        list only the https url
-        (https://github.com/fayland/dist-zilla-plugin-repository) and not
-        the actual clonable url
-        (git://github.com/fayland/dist-zilla-plugin-repository.git). This
-        used to default to true, but as of 0.16 it defaults to false.
+      * github_http
 
-        The CPAN Meta 2 spec defines separate keys for the clonable "url"
-        and web front-end "web". The Meta 1 specs allowed only 1 URL. If you
-        set "github_http" to true, the "url" key will be removed from the v2
-        metadata, and the v1 metadata will then use the "web" key.
+      This attribute is deprecated. If the remote is a GitHub repository,
+      list only the https url
+      (https://github.com/fayland/dist-zilla-plugin-repository) and not the
+      actual clonable url
+      (git://github.com/fayland/dist-zilla-plugin-repository.git). This
+      used to default to true, but as of 0.16 it defaults to false.
 
-        Instead of setting "github_http", you should use the MetaJSON plugin
-        to include a v2 META.json file with both URLs.
+      The CPAN Meta 2 spec defines separate keys for the clonable url and
+      web front-end web. The Meta 1 specs allowed only 1 URL. If you set
+      github_http to true, the url key will be removed from the v2
+      metadata, and the v1 metadata will then use the web key.
 
-    *   repository
+      Instead of setting github_http, you should use the MetaJSON plugin to
+      include a v2 META.json file with both URLs.
 
-        You can set this attribute if you want a specific repository instead
-        of the plugin to auto-identify your repository.
+      * repository
 
-        An example would be if you're releasing a module from your fork, and
-        you don't want it to identify your fork, so you can specify the
-        repository explicitly.
+      You can set this attribute if you want a specific repository instead
+      of the plugin to auto-identify your repository.
 
-        In the Meta 2 spec, this is the "url" key.
+      An example would be if you're releasing a module from your fork, and
+      you don't want it to identify your fork, so you can specify the
+      repository explicitly.
 
-    *   type
+      In the Meta 2 spec, this is the url key.
 
-        This should be the (lower-case) name of the most common program used
-        to work with the repository, e.g. git, svn, cvs, darcs, bzr or hg.
-        It's normally determined automatically, but you can override it.
+      * type
 
-    *   web
+      This should be the (lower-case) name of the most common program used
+      to work with the repository, e.g. git, svn, cvs, darcs, bzr or hg.
+      It's normally determined automatically, but you can override it.
 
-        This is a URL pointing to a human-usable web front-end for the
-        repository. Currently, only Github repositories get this set
-        automatically.
+      * web
 
-AUTHORS
-    *   Fayland Lam <fayland@gmail.com>
-
-    *   Ricardo SIGNES <rjbs@cpan.org>
-
-    *   Moritz Onken <onken@netcubed.de>
-
-    *   Christopher J. Madsen <perl@cjmweb.net>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Fayland Lam, Ricardo SIGNES,
-    Moritz Onken, Christopher J. Madsen.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+      This is a URL pointing to a human-usable web front-end for the
+      repository. Currently, only Github repositories get this set
+      automatically.
 

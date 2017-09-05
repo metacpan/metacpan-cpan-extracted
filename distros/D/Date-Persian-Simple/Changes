@@ -1,5 +1,9 @@
 Revision history for Date::Persian::Simple
 
+0.18  Thu Aug 31 12:00:00 2017
+      - Updated copyright year information.
+      - Updated SEE ALSO section in the pod.
+
 0.17  Tue Jan 17 13:00:00 2017
       - Moved version up as last release wasn't indexed for some reason.
 

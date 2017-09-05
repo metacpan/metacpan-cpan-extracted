@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +27,11 @@ meta-spec:
 name: Regru-API
 no_index:
   directory:
-    - t
-    - xt
+    - corpus
     - eg
     - examples
-    - corpus
+    - t
+    - xt
   namespace:
     - t::lib
   package:
@@ -39,49 +39,52 @@ no_index:
 provides:
   Regru::API:
     file: lib/Regru/API.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Bill:
     file: lib/Regru/API/Bill.pm
-    version: '0.046'
+    version: '0.047'
+  Regru::API::DNSSEC:
+    file: lib/Regru/API/DNSSEC.pm
+    version: '0.047'
   Regru::API::Domain:
     file: lib/Regru/API/Domain.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Folder:
     file: lib/Regru/API/Folder.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Hosting:
     file: lib/Regru/API/Hosting.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Response:
     file: lib/Regru/API/Response.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Role::Client:
     file: lib/Regru/API/Role/Client.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Role::Loggable:
     file: lib/Regru/API/Role/Loggable.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Role::Namespace:
     file: lib/Regru/API/Role/Namespace.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Role::Serializer:
     file: lib/Regru/API/Role/Serializer.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Role::UserAgent:
     file: lib/Regru/API/Role/UserAgent.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Service:
     file: lib/Regru/API/Service.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Shop:
     file: lib/Regru/API/Shop.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::User:
     file: lib/Regru/API/User.pm
-    version: '0.046'
+    version: '0.047'
   Regru::API::Zone:
     file: lib/Regru/API/Zone.pm
-    version: '0.046'
+    version: '0.047'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -100,5 +103,6 @@ resources:
   bugtracker: https://github.com/regru/regru-api-perl/issues
   homepage: https://metacpan.org/release/Regru-API
   repository: git://github.com/regru/regru-api-perl.git
-version: '0.046'
+version: '0.047'
 x_authority: cpan:IMAGO
+x_serialization_backend: 'YAML::Tiny version 1.69'

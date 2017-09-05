@@ -6,7 +6,7 @@ use Moops;
 
 class MarpaX::Languages::M4::Impl::Input {
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -157,7 +157,7 @@ MarpaX::Languages::M4::Impl::Input - M4 Input generic implementation
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

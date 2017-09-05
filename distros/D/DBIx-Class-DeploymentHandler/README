@@ -1,76 +1,76 @@
-SYNOPSIS
+NAME
+    DBIx::Class::DeploymentHandler - Extensible DBIx::Class deployment
 
+SYNOPSIS
      use aliased 'DBIx::Class::DeploymentHandler' => 'DH';
      my $s = My::Schema->connect(...);
-    
+
      my $dh = DH->new({
        schema              => $s,
        databases           => 'SQLite',
        sql_translator_args => { add_drop_table => 0 },
      });
-    
+
      $dh->prepare_install;
-    
+
      $dh->install;
 
     or for upgrades:
 
      use aliased 'DBIx::Class::DeploymentHandler' => 'DH';
      my $s = My::Schema->connect(...);
-    
+
      my $dh = DH->new({
        schema              => $s,
        databases           => 'SQLite',
        sql_translator_args => { add_drop_table => 0 },
      });
-    
+
      $dh->prepare_deploy;
      $dh->prepare_upgrade({
        from_version => 1,
        to_version   => 2,
      });
-    
+
      $dh->upgrade;
 
 DESCRIPTION
+    "DBIx::Class::DeploymentHandler" is, as its name suggests, a tool for
+    deploying and upgrading databases with DBIx::Class. It is designed to be
+    much more flexible than DBIx::Class::Schema::Versioned, hence the use of
+    Moose and lots of roles.
 
-    DBIx::Class::DeploymentHandler is, as its name suggests, a tool for
-    deploying and upgrading databases with DBIx::Class. It is designed to
-    be much more flexible than DBIx::Class::Schema::Versioned, hence the
-    use of Moose and lots of roles.
-
-    DBIx::Class::DeploymentHandler itself is just a recommended set of
+    "DBIx::Class::DeploymentHandler" itself is just a recommended set of
     roles that we think will not only work well for everyone, but will also
     yield the best overall mileage. Each role it uses has its own nuances
     and documentation, so I won't describe all of them here, but here are a
-    few of the major benefits over how DBIx::Class::Schema::Versioned
-    worked (and DBIx::Class::DeploymentHandler::Deprecated tries to
-    maintain compatibility with):
+    few of the major benefits over how DBIx::Class::Schema::Versioned worked
+    (and DBIx::Class::DeploymentHandler::Deprecated tries to maintain
+    compatibility with):
 
-      * Downgrades in addition to upgrades.
+    *   Downgrades in addition to upgrades.
 
-      * Multiple sql files files per upgrade/downgrade/install.
+    *   Multiple sql files files per upgrade/downgrade/install.
 
-      * Perl scripts allowed for upgrade/downgrade/install.
+    *   Perl scripts allowed for upgrade/downgrade/install.
 
-      * Just one set of files needed for upgrade, unlike before where one
-      might need to generate factorial(scalar @versions), which is just
-      silly.
+    *   Just one set of files needed for upgrade, unlike before where one
+        might need to generate "factorial(scalar @versions)", which is just
+        silly.
 
-      * And much, much more!
+    *   And much, much more!
 
     That's really just a taste of some of the differences. Check out each
     role for all the details.
 
 WHERE IS ALL THE DOC?!
-
     To get up and running fast, your best place to start is
     DBIx::Class::DeploymentHandler::Manual::Intro and then
     DBIx::Class::DeploymentHandler::Manual::CatalystIntro if your intending
     on using this with Catalyst.
 
     For the full story you should realise that
-    DBIx::Class::DeploymentHandler extends
+    "DBIx::Class::DeploymentHandler" extends
     DBIx::Class::DeploymentHandler::Dad, so that's probably the first place
     to look when you are trying to figure out how everything works.
 
@@ -81,38 +81,50 @@ WHERE IS ALL THE DOC?!
     DBIx::Class::DeploymentHandler::VersionStorage::Standard, and
     DBIx::Class::DeploymentHandler::WithReasonableDefaults.
 
-     $dh->prepare_version_storage_install
-
-    Creates the needed .sql file to install the version storage and not the
-    rest of the tables
-
-     $dh->prepare_install
-
-    First prepare all the tables to be installed and the prepare just the
-    version storage
-
-     $dh->install_version_storage
-
-    Install the version storage and not the rest of the tables
-
 WHY IS THIS SO WEIRD
-
-    DBIx::Class::DeploymentHandler has a strange structure. The gist is
+    "DBIx::Class::DeploymentHandler" has a strange structure. The gist is
     that it delegates to three small objects that are proxied to via
     interface roles that then create the illusion of one large, monolithic
     object. Here is a diagram that might help:
 
+Figure 1
+                    +------------+
+                    |            |
+       +------------+ Deployment +-----------+
+       |            |  Handler   |           |
+       |            |            |           |
+       |            +-----+------+           |
+       |                  |                  |
+       |                  |                  |
+       :                  :                  :
+       v                  v                  v
+  /-=-------\        /-=-------\       /-=----------\
+  |         |        |         |       |            |  (interface roles)
+  | Handles |        | Handles |       |  Handles   |
+  | Version |        | Deploy  |       | Versioning |
+  | Storage |        |         |       |            |
+  |         |        \-+--+--+-/       \-+---+---+--/
+  \-+--+--+-/          |  |  |           |   |   |
+    |  |  |            |  |  |           |   |   |
+    |  |  |            |  |  |           |   |   |
+    v  v  v            v  v  v           v   v   v
+ +----------+        +--------+        +-----------+
+ |          |        |        |        |           |  (implementations)
+ | Version  |        | Deploy |        |  Version  |
+ | Storage  |        | Method |        |  Handler  |
+ | Standard |        | SQLT   |        | Monotonic |
+ |          |        |        |        |           |
+ +----------+        +--------+        +-----------+
     The nice thing about this is that we have well defined interfaces for
-    the objects that comprise the DeploymentHandler, the smaller objects
+    the objects that comprise the "DeploymentHandler", the smaller objects
     can be tested in isolation, and the smaller objects can even be swapped
     in easily. But the real win is that you can subclass the
-    DeploymentHandler without knowing about the underlying delegation; you
+    "DeploymentHandler" without knowing about the underlying delegation; you
     just treat it like normal Perl and write methods that do what you want.
 
 THIS SUCKS
-
     You started your project and weren't using
-    DBIx::Class::DeploymentHandler? Lucky for you I had you in mind when I
+    "DBIx::Class::DeploymentHandler"? Lucky for you I had you in mind when I
     wrote this doc.
 
     First, define the version in your main schema file (maybe using
@@ -122,7 +134,7 @@ THIS SUCKS
 
      my $s = My::Schema->connect(...);
      my $dh = DBIx::Class::DeploymentHandler->new({ schema => $s });
-    
+
      $dh->prepare_version_storage_install;
      $dh->install_version_storage;
 
@@ -130,28 +142,26 @@ THIS SUCKS
 
      $dh->add_database_version({ version => $s->schema_version });
 
-    Now you should be able to use DBIx::Class::DeploymentHandler like
+    Now you should be able to use "DBIx::Class::DeploymentHandler" like
     normal!
 
 LOGGING
-
-    This is a complex tool, and because of that sometimes you'll want to
-    see what exactly is happening. The best way to do that is to use the
-    built in logging functionality. It the standard six log levels; fatal,
-    error, warn, info, debug, and trace. Most of those are pretty self
-    explanatory. Generally a safe level to see what all is going on is
+    This is a complex tool, and because of that sometimes you'll want to see
+    what exactly is happening. The best way to do that is to use the built
+    in logging functionality. It the standard six log levels; "fatal",
+    "error", "warn", "info", "debug", and "trace". Most of those are pretty
+    self explanatory. Generally a safe level to see what all is going on is
     debug, which will give you everything except for the exact SQL being
     run.
 
     To enable the various logging levels all you need to do is set an
-    environment variables: DBICDH_FATAL, DBICDH_ERROR, DBICDH_WARN,
-    DBICDH_INFO, DBICDH_DEBUG, and DBICDH_TRACE. Each level can be set on
-    its own, but the default is the first three on and the last three off,
-    and the levels cascade, so if you turn on trace the rest will turn on
-    automatically.
+    environment variables: "DBICDH_FATAL", "DBICDH_ERROR", "DBICDH_WARN",
+    "DBICDH_INFO", "DBICDH_DEBUG", and "DBICDH_TRACE". Each level can be set
+    on its own, but the default is the first three on and the last three
+    off, and the levels cascade, so if you turn on trace the rest will turn
+    on automatically.
 
 DONATIONS
-
     If you'd like to thank me for the work I've done on this module, don't
     give me a donation. I spend a lot of free time creating free software,
     but I do it because I love it.
@@ -159,25 +169,36 @@ DONATIONS
     Instead, consider donating to someone who might actually need it.
     Obviously you should do research when donating to a charity, so don't
     just take my word on this. I like Matthew 25: Ministries:
-    http://www.m25m.org/, but there are a host of other charities that can
-    do much more good than I will with your money. (Third party charity
-    info here:
-    http://www.charitynavigator.org/index.cfm?bay=search.summary&orgid=6901
+    <http://www.m25m.org/>, but there are a host of other charities that can
+    do much more good than I will with your money. (Third party charity info
+    here:
+    <http://www.charitynavigator.org/index.cfm?bay=search.summary&orgid=6901
+    >
 
-POD ERRORS
+METHODS
+  prepare_version_storage_install
+     $dh->prepare_version_storage_install
 
-    Hey! The above document had some coding errors, which are explained
-    below:
+    Creates the needed ".sql" file to install the version storage and not
+    the rest of the tables
 
-    Around line 96:
+  prepare_install
+     $dh->prepare_install
 
-      Unknown directive: =method
+    First prepare all the tables to be installed and the prepare just the
+    version storage
 
-    Around line 103:
+  install_version_storage
+     $dh->install_version_storage
 
-      Unknown directive: =method
+    Install the version storage and not the rest of the tables
 
-    Around line 110:
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
-      Unknown directive: =method
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

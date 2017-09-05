@@ -10,7 +10,7 @@ use AnyEvent::FTP::Server::Connection;
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp server
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 $AnyEvent::FTP::Server::VERSION //= 'dev';
@@ -204,7 +204,7 @@ AnyEvent::FTP::Server - Simple asynchronous ftp server
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -236,31 +236,44 @@ connected client.
 
 =head1 ATTRIBUTES
 
-=head2 $server-E<gt>hostname
+=head2 hostname
+
+ my $hostname = $server->hostname;
 
 Readonly, and should be assigned at the constructor. The hostname to listen
 on.
 
-=head2 $server-E<gt>port
+=head2 port
+
+ my $port = $server->port;
 
 The port to listen to. Default is 21 - a different port can be assigned
 at the constructor.
 
-=head2 $server-E<gt>default_context
+=head2 default_context
+
+ my $context = $server->default_context;
 
 Readonly: the default context class (can be set as a parameter in the
 constructor).
 
-=head2 $server-E<gt>welcome
+=head2 welcome
+
+ my($code, $message) = @{ $server->welcome };
 
 The welcome messages as key value pairs. Read only and can be overridden by
 the constructor.
 
-=head2 $server-E<gt>bindport([$port])
+=head2 bindport
+
+ my $port = $server->bindport;
+ $server->bindport($port);
 
 Retrieves or sets the TCP port to bind to.
 
-=head2 my $bool = $server-E<gt>inet
+=head2 inet
+
+ my $bool = $server->inet;
 
 Readonly (assignable via the constructor). If true, then assume a TCP
 connection has been established by inet. The default (false) is to start
@@ -268,7 +281,9 @@ a standalone server.
 
 =head1 METHODS
 
-=head2 $server-E<gt>start()
+=head2 start
+
+ $server->start;
 
 Call this method to start the service.
 

@@ -1,0 +1,307 @@
+#!/usr/bin/perl -w
+
+our $VERSION = '0.01';
+use v5.20;
+use strict;
+use Getopt::Long;
+use LWP::UserAgent ();
+use File::Path qw(make_path remove_tree);
+use File::Temp ();
+use File::Copy;
+use IO::Prompter;
+
+use Image::Randim::Source;
+
+my $req_timeout   = 20;
+my $output_dir    = $ENV{'HOME'}.'/Pictures/Desktop-Randim/';
+my $no_delete     = 0;
+my $save_to_dir   = $ENV{'HOME'}.'/Pictures/Desktop-Saved/';
+my $show_url      = 0;
+my $help          = 0;
+my $list_sources  = 0;
+my $no_prompt     = 0;
+my $gnome3        = 0;
+my $unsplash_key;
+my $providers;
+my $viewer;
+my $version;
+my $viewer_default = 'eog';
+
+GetOptions('show-url'       => \$show_url,
+	   'list-sources'   => \$list_sources,
+	   'source=s@'      => \$providers,
+	   'output-dir=s'   => \$output_dir,
+	   'save-to-dir=s'  => \$save_to_dir,
+	   'no-delete'      => \$no_delete,
+	   'timeout:i'      => \$req_timeout,
+	   'no-prompt'      => \$no_prompt,
+	   'gnome3'         => \$gnome3,
+	   'unsplash-key=s' => \$unsplash_key,
+	   'viewer:s'       => \$viewer,
+	   'version'        => \$version,
+	   'help'           => \$help,
+    ) or die 'Bad options';
+
+$output_dir  =~ s!/*$!/!;
+$save_to_dir =~ s!/*$!/!;
+
+if ($help)         { &help; exit }
+if ($version)      { say $VERSION; exit }
+if ($list_sources) { &list_sources; exit }
+
+if (!$output_dir || $output_dir eq '/' || $output_dir eq $ENV{'HOME'}) {
+    die "Unlikely output dir $output_dir";
+}
+unless (-d $output_dir)  { make_path($output_dir, {verbose => 1}) };
+unless (-d $save_to_dir) { make_path($save_to_dir, {verbose => 1}) };
+
+my $quit = 0;
+while (!$quit) {
+    my $source = Image::Randim::Source->new(timeout => $req_timeout);
+    $source->set_random_provider($providers);
+    if ($unsplash_key && $source->name eq 'Unsplash') {
+	$source->src_obj->api_key($unsplash_key);
+    }
+    my $image = $source->get_image;
+
+    my $img_url = $image->url;
+    say   '=' x 40;
+    say   "Size:    ".$image->width.'x'.$image->height;
+    say   "URL:     ".$image->link;
+    print "Owner:   ".($image->owner || 'UNDEFINED');
+    print ' ('.$image->owner_name.')' if $image->owner_name;
+    say   ' @ '.$source->name;
+    say   "Img URL: ".$img_url if $show_url;
+    say   '=' x 40;
+    print "Getting image...";
+
+    my $temp = File::Temp->new;
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout($req_timeout);
+    my $response = $ua->get($img_url, ':content_file' => $temp->filename);
+    unless ($response->is_success) {
+	warn "Error retrieving image at $img_url: ".$response->status_line." - skipping\n\n";
+	next;
+    }
+    print "\n";
+    
+    my $filename = $response->filename;
+    unless ($filename =~ /\.[a-zA-Z]{3,4}$/) {
+	warn "Bad or no filename extension provided for $filename - adding .jpg\n";
+	$filename .= '.jpg';
+    }
+    if (!$filename || $filename =~ /^[\.\/]/) {
+	die "Bad or no filename $filename\n";
+    }
+    $image->filename($filename);
+
+    remove_tree($output_dir, {keep_root => 1}) unless $no_delete;
+    copy($temp->filename, $output_dir.$filename);
+    if ($gnome3) {
+	`gsettings set org.gnome.desktop.background picture-uri "file:///$output_dir$filename"`;
+    }
+    if (defined $viewer) {
+	$viewer = $viewer ? $viewer : $viewer_default;
+	system("$viewer $output_dir$filename &");
+    }
+
+    unless ($no_prompt) {
+	my $saveit = prompt("Do you want to save this image locally?", -yesno, -single);
+	if ($saveit) {
+	    say "saving $filename to $save_to_dir";
+	    copy($output_dir.$filename, $save_to_dir);
+	    if ($gnome3) {
+		`gsettings set org.gnome.desktop.background picture-uri "file:///$save_to_dir$filename"`;
+	    }
+	}
+    }
+
+    if ($no_prompt) {
+	$quit = 1;
+    } else {
+	$quit = prompt("Quit?", -yesno, -single);
+    }
+    print "\n";
+}
+
+sub list_sources {
+    my $source = Image::Randim::Source->new;
+    map say, @{$source->list};
+}
+
+sub help {
+    print <<"EOB"
+
+Download a random image from a random Internet source.
+
+--list-sources
+    List supported sources by installed plugins.
+--show-url
+    Show the image URL in the info display.
+--source <name>
+    By default all sources are used. Specify --source multiple times
+    with a source name to limit images to just those sources.
+
+--output-dir <dir> (default: $output_dir)
+    Directory where image will be downloaded. BY DEFAULT THIS MUST BE
+    EMPTY AND ALL FILES/DIRECTORIES THERE WILL BE DELETED.
+
+--no-delete
+    Do not delete everything from the --output-dir before downloading.
+
+--save-to-dir <dir> (default: $save_to_dir)
+    Directory where images can be "permanently saved".
+
+--timeout <seconds> (default: $req_timeout)
+    How many whole seconds to wait for each Internet request to
+    respond.
+
+--no-prompt
+    Just grab a random image and exit.
+--gnome3
+    Set the desktop background to the image in Gnome3
+
+--viewer [<program>] (default: $viewer_default)
+    Display image in default viewer or the one specified.
+
+--unsplash-key <key>
+    Unsplash requires a so-called developer key. The default one is
+    the author's, but they can become rate-limited. If you find that's
+    the case for your use, you can register for your own developer
+    client key and enter it here.
+
+--version
+    Print the version.
+
+EOB
+
+}
+
+=pod
+
+=head1 NAME
+
+randim - Download a random image from online sources
+
+=head1 SYNOPSIS
+
+  # Default, radim deletes all files in $HOME/Pictures/Desktop-Randim
+  # and downloads a random image to that directory. Good for desktop
+  # environments that can watch a directory for changes.
+  $ randim
+
+  # You can have it set the desktop wallpaper in gnome shell
+  $ randim --gnome3
+
+  # Maybe you want to view it in a viewer? Specify the executable with
+  # this, or leave it blank for eog
+  $ randim --viewer
+  $ randim --viewer gwenview
+
+  # Only want to pull from Desktoppr?
+  $ randim --source Desktoppr
+
+  # How about Desktoppr and Unsplash both?
+  $ randim --source Desktoppr --source Unsplash
+
+  # What plugins are available to pull from (sites)
+  $ randim --list-sources
+
+  # I dont't want to look at this man page
+  $ randim --help
+
+  # Don't keep me waiting for a response for more than 10 seconds
+  $ randim --timeout 10
+
+  # Just grab a random image and exit
+  $ randim --no-prompt
+
+  # Unsplash is rate limiting - I'll enter my own API key
+  $ randim --unsplash-key 00023fd8ae25887....
+
+=head1 DESCRIPTION
+
+Script using the Perl Image::Randim::Source library to pull random
+images down that people have given out to the world on various
+websites. This was written for getting new desktop images, and it's
+always wonderful seeing what other people are creating and sharing for
+us. :)
+
+Without any options, the program loops continuously after each
+downloaded image, asking if you want to keep it. So you can just let
+chance let you stumble on something you like.
+
+It downloads to your home directory by default, into your Pictures
+folder, into a subdirectory there called Desktop-Randim. This
+directory gets cleaned out on every single loop so never put anything
+important there. Of course you can change this behavior.
+
+This is done, for example, because some desktop environments you can
+set wallpaper changing to watch a directory for files. Just have it
+watch this directory, and when you download a new image, it will show
+up as your background, and keep on looping through until you find one
+you want to keep.
+
+Gnome3 in its forever downward spiral into assuming the dumbest users
+possible, doesn't let you do something like this, but you can specify
+--gnome3 and it will set your background for you on each loop
+iteration.
+
+For me, I just needed something that didn't rely on any one particular
+desktop environment's plugins to do, since I change environments
+frequently.
+
+=head1 ARGUMENTS
+
+  --list-sources
+      List supported sources by installed plugins.
+  --show-url
+      Show the image URL in the info display.
+  --source <name>
+      By default all sources are used. Specify --source multiple times
+      with a source name to limit images to just those sources.
+
+  --output-dir <dir> (default: $HOME/Pictures/Desktop-Randim/)
+      Directory where image will be downloaded. BY DEFAULT THIS MUST BE
+      EMPTY AND ALL FILES/DIRECTORIES THERE WILL BE DELETED.
+
+  --no-delete
+      Do not delete everything from the --output-dir before downloading.
+
+  --save-to-dir <dir> (default: $HOME/Pictures/Desktop-Saved/)
+      Directory where images can be "permanently saved".
+
+  --timeout <seconds> (default: 20)
+      How many whole seconds to wait for each Internet request to
+      respond.
+
+  --no-prompt
+      Just grab a random image and exit.
+  --gnome3
+      Set the desktop background to the image in Gnome3
+
+  --viewer [<program>] (default: eog)
+      Display image in default viewer or the one specified.
+
+  --unsplash-key <key>
+      Unsplash requires a so-called developer key. The default one is
+      the author's, but they can become rate-limited. If you find that's
+      the case for your use, you can register for your own developer
+      client key and enter it here.
+
+  --version
+      Print the version.
+
+=head1 AUTHOR
+
+Mark Rushing <mark@orbislumen.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Home Grown Systems, SPC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

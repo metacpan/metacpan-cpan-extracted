@@ -194,8 +194,8 @@ sub sendHtml {
         # TODO: replace app
         # TODO: warn if STATICPREFIX does not end with '/'
         $htpl->param(
-            STATIC_PREFIX       => $sp,
-            SCRIPTNAME         => $sc,
+            STATIC_PREFIX => $sp,
+            SCRIPTNAME    => $sc,
             ( $self->can('tplParams') ? ( $self->tplParams ) : () ),
         );
     };

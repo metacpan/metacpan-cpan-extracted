@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-IQ
   homepage: https://github.com/karpet/text-iq-perl
   license: http://dev.perl.org/licenses/
-version: '0.005'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

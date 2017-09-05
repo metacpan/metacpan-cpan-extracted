@@ -27,6 +27,9 @@ Net::Etcd - etcd v3 REST API.
     # return array { key => value } pairs from range request.
     my @users = $range->all
 
+    # delete single key
+    $etcd->deleterange({ key => 'test0' });
+
     # watch key range, streaming.
     $watch = $etcd->watch( { key => 'foo', range_end => 'fop'}, sub {
         my ($result) =  @_;
@@ -43,7 +46,10 @@ Net::Etcd - etcd v3 REST API.
     $etcd->user( { name => 'samba', password => 'foo' } )->add;
 
     # add new user role
-        $role = $etcd->role( { name => 'myrole' } )->add;
+    $role = $etcd->role( { name => 'myrole' } )->add;
+
+    # grant read permission for the foo key to myrole
+    $etcd->role_perm( { name => 'myrole', key => 'foo', permType => 'READWRITE' } )->grant;
 
     # grant role
     $etcd->user_role( { user => 'samba', role => 'myrole' } )->grant;
@@ -101,6 +107,12 @@ See [Net::Etcd::Auth::Role](https://metacpan.org/pod/Net::Etcd::Auth::Role)
 
     $etcd->role({ role => 'foo' });
 
+## role\_perm
+
+See [Net::Etcd::Auth::RolePermission](https://metacpan.org/pod/Net::Etcd::Auth::RolePermission)
+
+Grants or revoke permission of a specified key or range to a specified role.
+
 ## user\_role
 
 See [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role)
@@ -112,8 +124,8 @@ See [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role)
 See [Net::Etcd::Auth](https://metacpan.org/pod/Net::Etcd::Auth)
 
     $etcd->auth({ name => 'samba', password => 'foo' })->authenticate;
-        $etcd->auth()->enable;
-        $etcd->auth()->disable
+    $etcd->auth()->enable;
+    $etcd->auth()->disable
 
 ## lease
 
@@ -139,6 +151,12 @@ See [Net::Etcd::KV::Put](https://metacpan.org/pod/Net::Etcd::KV::Put)
 
     $etcd->put({ key =>'foo1', value => 'bar' });
 
+## deleterange
+
+See [Net::Etcd::KV::DeleteRange](https://metacpan.org/pod/Net::Etcd::KV::DeleteRange)
+
+    $etcd->deleterange({ key=>'test0' });
+
 ## range
 
 See [Net::Etcd::KV::Range](https://metacpan.org/pod/Net::Etcd::KV::Range)
@@ -156,7 +174,7 @@ See [Net::Etcd::KV::Txn](https://metacpan.org/pod/Net::Etcd::KV::Txn)
 See [Net::Etcd::KV::Op](https://metacpan.org/pod/Net::Etcd::KV::Op)
 
     $etcd->op({ request_put => $put });
-        $etcd->op({ request_delete_range => $range });
+    $etcd->op({ request_delete_range => $range });
 
 ## compare
 
@@ -171,7 +189,11 @@ Initialize configuration checks to see it etcd is installed locally.
 
 # AUTHOR
 
-Sam Batschelet, &lt;sbatschelet at mac.com>
+Sam Batschelet (hexfusion)
+
+# CONTRIBUTORS
+
+Ananth Kavuri
 
 # ACKNOWLEDGEMENTS
 
@@ -179,13 +201,11 @@ The [etcd](https://github.com/coreos/etcd) developers and community.
 
 # CAVEATS
 
-Authentication will not be available until etcd release 3.2.1.  For testing puposes you can use my pre-release.
-
-[v3.2.0_plus_git](https://github.com/hexfusion/etcd/releases/tag/v3.2.0_plus_git)
-
 The [etcd](https://github.com/coreos/etcd) v3 API is in heavy development and can change at anytime please see
  [api\_reference\_v3](https://github.com/coreos/etcd/blob/master/Documentation/dev-guide/api_reference_v3.md)
 for latest details.
+
+Authentication provided by this module will only work with etcd v3.3.0+
 
 # LICENSE AND COPYRIGHT
 

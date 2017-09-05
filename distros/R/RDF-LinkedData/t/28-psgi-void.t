@@ -32,13 +32,12 @@ use Log::Any::Adapter;
 
 Log::Any::Adapter->set($ENV{LOG_ADAPTER} || 'Stderr') if $ENV{TEST_VERBOSE};
 
-{
-    note "Get /foo, no redirects";
+subtest "Get /foo, no redirects" => sub {
     my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester, requests_redirectable => []);
     my $res = $mech->get("/foo");
     is($mech->status, 303, "Returns 303");
     like($res->header('Location'), qr|/foo/data$|, "Location is OK");
-}
+};
 
 
 my $rxparser = RDF::Trine::Parser->new( 'rdfxml' );
@@ -48,17 +47,15 @@ my $ns = URI::NamespaceMap->new(['rdf', 'rdfs', 'foaf', 'void', 'xsd']);
 $ns->add_mapping('hydra' => 'http://www.w3.org/ns/hydra/core#');
 
 
-{
-    note "Get /.well-known/void, no redirects";
+subtest "Get /.well-known/void, no redirects" => sub {
     my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester, requests_redirectable => []);
     my $res = $mech->get("/.well-known/void");
     is($mech->status, 302, "Returns 302");
     like($res->header('Location'), qr|$base_uri|, "Location is OK");
-}
+};
 
 
-{
-    note "Get /bar/baz/bing, ask for RDF/XML";
+subtest "Get /bar/baz/bing, ask for RDF/XML" => sub {
     my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester);
     $mech->default_header('Accept' => 'application/rdf+xml');
     $mech->get_ok("/bar/baz/bing");
@@ -73,10 +70,9 @@ $ns->add_mapping('hydra' => 'http://www.w3.org/ns/hydra/core#');
 	 hasnt_uri($base_uri . 'sparql', $model, 'SPARQL endpoint in data');
 	 hasnt_uri('http://purl.org/dc/terms/modified', $model, 'None of the added description in data');
 	 has_object_uri($base_uri . '#dataset-0', $model, "Void oject URI in content");
-}
+};
 
-{
-	note "Get the base_uri with the VoID";
+subtest "Get the base_uri with the VoID" => sub {
 	my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester);
 	$mech->default_header('Accept' => 'application/rdf+xml');
 	$mech->get_ok($base_uri);
@@ -110,10 +106,10 @@ $ns->add_mapping('hydra' => 'http://www.w3.org/ns/hydra/core#');
 								iri($ns->void->Dataset)
 							  ),
 				  'Common statements are there');
-}
+};
 
-{
-	note "Get the base_uri with the VoID";
+subtest "Get the base_uri with the VoID and RDFa" => sub {
+	plan skip_all => 'RDFa parser not present' unless $RDF::Trine::Parser::RDFa::HAVE_RDFA_PARSER;
 	my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester);
 	$mech->default_header('Accept' => 'application/xhtml+xml;q=1.0,text/html;q=0.94,application/xml;q=0.9,*/*;q=0.8');
 	$mech->get_ok($base_uri);
@@ -124,10 +120,9 @@ $ns->add_mapping('hydra' => 'http://www.w3.org/ns/hydra/core#');
 		is($mech->ct,  'application/xhtml+xml', "Correct content-type");
 		$mech->title_is('VoID Description for my dataset', 'Correct title in RDFa');
 	}
-}
+};
 
-{
-	note 'Testing Triple Pattern Fragments';
+subtest 'Testing Triple Pattern Fragments' => sub {
 	my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester);
 	$mech->default_header('Accept' => 'text/turtle');
 	$mech->get_ok( '/fragments?subject=' . uri_escape_utf8('http://localhost/foo'));
@@ -171,6 +166,6 @@ $ns->add_mapping('hydra' => 'http://www.w3.org/ns/hydra/core#');
 								iri($ns->hydra->template),
 								literal($base_uri . 'fragments{?subject,predicate,object}')),
 				  'Important control information present');
-}
+};
 
 done_testing();

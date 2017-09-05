@@ -39,5 +39,5 @@ resources:
   bugtracker: https://github.com/frioux/DBIx-Class-DeploymentHandler/issues
   homepage: https://github.com/frioux/DBIx-Class-DeploymentHandler
   repository: https://github.com/frioux/DBIx-Class-DeploymentHandler.git
-version: '0.002219'
+version: '0.002220'
 x_serialization_backend: 'YAML::Tiny version 1.70'

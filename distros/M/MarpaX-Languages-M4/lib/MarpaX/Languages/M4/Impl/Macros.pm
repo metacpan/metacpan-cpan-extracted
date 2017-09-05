@@ -9,7 +9,7 @@ class MarpaX::Languages::M4::Impl::Macros {
     use MarpaX::Languages::M4::Type::Macro -all;
     use MooX::HandlesVia;
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -45,7 +45,7 @@ MarpaX::Languages::M4::Impl::Macros - M4 Macro list generic implementation
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

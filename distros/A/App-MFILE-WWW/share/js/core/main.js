@@ -32,48 +32,20 @@
 //
 // main.js - JavaScript side entry point
 //
-// displays the application frame in the browser window, determines user and
-// privlevel, initializes targets, and loads the main menu
-//
 "use strict";
 
 define ([
-    'jquery',
-    'cf',
-    'current-user',
-    'html', 
-    'login-dialog',
-    'app/target-init',
-    'target'
+    'root'
 ], function (
-    $,
-    cf,
-    currentUser,
-    html, 
-    loginDialog,
-    targetInit,
-    target
+    root
 ) {
 
-    var dummy = Object.create(null),
-        userObject,
-        userPriv,
-        main; // as soon as we are authenticated, we start this target
+    var dummy = Object.create(null);
 
     console.log("mfile-www booting");
 
-    //
-    // throw up HTML body
-    //
-    $(document.body).html(html.body());
+    root();
 
-    userObject = currentUser('obj');
-    userPriv = currentUser('priv');
-    if ( userObject && userPriv ) {
-        targetInit();
-    } else {
-        loginDialog();
-    }
     return dummy;
 
 });

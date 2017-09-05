@@ -1,6 +1,6 @@
                           BTW Aangifte
-Periode: 2007
-EekBoek Demo Administratie                    EekBoek, 2007-12-31
+Periode: 2013
+EekBoek Demo Administratie                    EekBoek, 2013-12-31
 
 -----------------------------------------------------------------
 
@@ -8,7 +8,7 @@ Binnenland
 
 1. Door mij verrichte leveringen/diensten
 
-1a   Belast met hoog tarief                        7700      1463
+1a   Belast met hoog tarief                        7572      1590
 1b   Belast met laag tarief                           0         0
 1e   Belast met 0% / verlegd                          0
 
@@ -28,10 +28,10 @@ Berekening
 
 5. Berekening totaal
 
-5a   Subtotaal                                               1463
-5b   Voorbelasting                                            149
-5c   Subtotaal                                               1314
-5d   Vermindering kleineondernemersregeling                  1314
-5g   Totaal te betalen                                          0
-     Totaal te betalen (onafgerond)             1314,87
-     Afrondingsverschil                            0,87
+5a   Subtotaal                                               1590
+5b   Voorbelasting                                            162
+5c   Subtotaal                                               1428
+5d   Vermindering kleineondernemersregeling                  1138
+5g   Totaal te betalen                                        290
+     Totaal te betalen (onafgerond)             1429,22
+     Afrondingsverschil                            1,22

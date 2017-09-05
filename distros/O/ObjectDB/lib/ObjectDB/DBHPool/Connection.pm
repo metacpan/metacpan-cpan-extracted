@@ -3,7 +3,7 @@ package ObjectDB::DBHPool::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 require Carp;
 use DBI;
@@ -23,7 +23,7 @@ sub new {
     $self->{do}            = $params{do};
 
     $self->{check_timeout} = 5 unless defined $self->{check_timeout};
-    $self->{attrs} ||= {RaiseError => 1};
+    $self->{attrs} ||= { RaiseError => 1 };
 
     return $self;
 }
@@ -97,14 +97,12 @@ sub _is_check_timeout_elapsed {
 sub _get_dbh {
     my $self = shift;
 
-    my $dbh =
-      DBI->connect($self->{dsn}, $self->{username}, $self->{password},
-        $self->{attrs});
+    my $dbh = DBI->connect($self->{dsn}, $self->{username}, $self->{password}, $self->{attrs});
 
     Carp::croak("Can't connect $DBI::errstr") unless $dbh;
 
     if ($self->{do}) {
-        foreach my $do (ref $self->{do} eq 'ARRAY' ? @{$self->{do}} : ($self->{do})) {
+        foreach my $do (ref $self->{do} eq 'ARRAY' ? @{ $self->{do} } : ($self->{do})) {
             $dbh->do($do);
         }
     }

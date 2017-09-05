@@ -23,5 +23,5 @@ requires:
   MIME::Base64: '0'
   perl: '5.006'
 resources:
-  repository: https://git.oschina.net/ijz/OpenSSH-Fingerprint
-version: '0.01'
+  repository: https://github.com/bollwarm/OpenSSH-Fingerprint
+version: '0.02'

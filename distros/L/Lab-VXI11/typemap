@@ -1,0 +1,9 @@
+u_long                           T_UV
+u_int                            T_UV
+u_short                          T_UV
+Device_AddrFamily                T_IV
+Device_Link                      T_IV
+Device_Flags                     T_IV
+Device_ErrorCode                 T_IV
+
+Lab::VXI11                       T_PTROBJ

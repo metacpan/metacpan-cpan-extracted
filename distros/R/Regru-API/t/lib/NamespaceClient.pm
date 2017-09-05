@@ -18,6 +18,7 @@ sub root {
 sub user    { $_[0]->root->user; }
 sub domain  { $_[0]->root->domain; }
 sub zone    { $_[0]->root->zone; }
+sub dnssec  { $_[0]->root->dnssec; }
 sub service { $_[0]->root->service; }
 sub folder  { $_[0]->root->folder; }
 sub bill    { $_[0]->root->bill; }

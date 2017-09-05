@@ -1,5 +1,8 @@
 Revision history for Shell-Config-Generate
 
+0.29      2017-09-01 09:38:58 -0400
+  - Filter PATH on Windows Subsystem for Linux
+
 0.28      2017-08-22 20:26:12 -0400
   - Production release identical to 0.27_02
 

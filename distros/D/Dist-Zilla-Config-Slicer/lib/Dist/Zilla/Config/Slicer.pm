@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Config::Slicer;
-# git description: v0.200-6-g8420185
+# git description: v0.201-0-g2f5999f
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Config::MVP::Slicer customized for Dist::Zilla
-$Dist::Zilla::Config::Slicer::VERSION = '0.201';
+$Dist::Zilla::Config::Slicer::VERSION = '0.202';
 use Config::MVP::Slicer ();
 use Dist::Zilla::Util 4 ();
 use Moose;
@@ -46,7 +46,9 @@ Dist::Zilla::Config::Slicer - Config::MVP::Slicer customized for Dist::Zilla
 
 =head1 VERSION
 
-version 0.201
+version 0.202
+
+=for test_synopsis my ($section, $plugin);
 
 =head1 SYNOPSIS
 
@@ -62,8 +64,6 @@ This is a subclass of L<Config::MVP::Slicer>
 that overrides the default
 L<match_package|Config::MVP::Slicer/match_package>
 to expand packages according to L<Dist::Zilla>'s rules.
-
-=for test_synopsis my ($section, $plugin);
 
 =head1 SEE ALSO
 

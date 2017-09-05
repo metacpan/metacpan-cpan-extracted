@@ -1,6 +1,6 @@
 package Math::Vector::Real;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use strict;
 use warnings;
@@ -412,6 +412,42 @@ sub dist2_to_box {
     $d2;
 }
 
+sub chebyshev_dist_to_box {
+    @_ > 1 or croak 'Usage $v->chebyshev_dist_to_box($w0, ...)';
+    my $p = shift;
+    my $d = 0;
+    my ($min, $max) = Math::Vector::Real->box(@_);
+    for (0..$#$p) {
+        if ($p->[$_] < $min->[$_]) {
+            my $delta = CORE::abs($p->[$_] - $min->[$_]);
+            $d = $delta if $delta > $d;
+        }
+        elsif ($p->[$_] > $max->[$_]) {
+            my $delta = CORE::abs($p->[$_] - $min->[$_]);
+            $d = $delta if $delta > $d;
+        }
+    }
+    $d;
+}
+
+sub chebyshev_cut_box {
+    @_ > 2 or croak 'Usage $v->chebyshev_cut_box($cd, $w0, ...)';
+    my $p = shift;
+    my $cd = shift;
+    my ($min, $max) = Math::Vector::Real->box(@_);
+    for (0..$#$p) {
+        my $a = $p->[$_];
+        my $a_min = $a - $cd;
+        my $a_max = $a + $cd;
+        my $b_min = $min->[$_];
+        my $b_max = $max->[$_];
+        return if $b_min > $a_max or $b_max < $a_min;
+        $min->[$_] = $a_min if $b_min < $a_min;
+        $max->[$_] = $a_max if $b_min > $a_max;
+    }
+    ($min, $max);
+}
+
 sub nearest_in_box_border {
     # TODO: this method can be optimized
     my $p = shift->clone;
@@ -631,6 +667,68 @@ sub select_in_ball_ref2bitmap {
     return $bm;
 }
 
+sub dist2_to_segment {
+    my ($p, $a, $b) = @_;
+    my $ab = $a - $b;
+    my $ap = $a - $p;
+    my $ap_ab = $ap * $ab;
+    return norm2($ap) if $ap_ab <= 0;
+    my $x = $ap * $ab / ($ab * $ab);
+    return dist2($ap, $ab) if $x >= 1;
+    return dist2($ap, $x * $ab);
+}
+
+sub dist_to_segment { sqrt(&dist_to_segment) }
+
+sub dist2_between_segments {
+    my ($class, $a, $b, $c, $d) = @_;
+
+    my $ab = $a - $b;
+    my $cd = $c - $d;
+    my $bd = $b - $d;
+
+    if (@$a > 2) {
+        my $ab_ab = $ab * $ab;
+        my $ab_cd = $ab * $cd;
+        my $cd_cd = $cd * $cd;
+
+        if (CORE::abs(1.0 - ($ab_cd * $ab_cd) / ($ab_ab * $cd_cd)) > 1e-10) {
+            # This method works for non-parallel segments
+            my $ab_bd = $ab * $bd;
+            my $bd_cd = $bd * $cd;
+
+            my $D01 = $ab_cd * $ab_cd - $ab_ab * $cd_cd;
+            my $D21 = $cd_cd * $ab_bd - $bd_cd * $ab_cd;
+            my $x = $D21 / $D01;
+            return dist2_to_segment($b, $c, $d) if $x < 0;
+            return dist2_to_segment($a, $c, $d) if $x > 1;
+
+            my $D02 = $ab_cd * $ab_bd - $bd_cd * $ab_ab;
+            my $y = $D02 / $D01;
+            return dist2_to_segment($d, $a, $b) if $y < 0;
+            return dist2_to_segment($c, $a, $b) if $y > 1;
+
+            my $p = $b + $ab * $x;
+            my $q = $d + $cd * $y;
+
+            return $p->dist2($q);
+        }
+    }
+
+    # We are in 2D or lines are parallel, we consider the distance
+    # between one segment to the vertices of the other one and
+    # viceverse and return the minimum.
+    my $min_d2 = dist2_to_segment($a, $c, $d);
+    my $d2 = dist2_to_segment($b, $c, $d);
+    $d2 = dist2_to_segment($c, $a, $b);
+    $min_d2 = $d2 if $d2 < $min_d2;
+    $d2 = dist2_to_segment($d, $a, $b);
+    $min_d2 = $d2 if $d2 < $min_d2;
+    return $min_d2;
+}
+
+sub dist_between_segments { sqrt(&dist2_between_segments) }
+
 # This is run *after* Math::Vector::Real::XS is loaded!
 *norm = \&abs;
 *norm2 = \&abs2;
@@ -815,7 +913,7 @@ Returns the distance between the two vectors using the Manhattan metric.
 Returns the norm of the vector calculated using the Chebyshev metric
 (note that this method is an alias for C<max_component>.
 
-=item $d = $v->chebyshev_dist
+=item $d = $v->chebyshev_dist($u)
 
 Returns the distance between the two vectors using the Chebyshev metric.
 
@@ -855,6 +953,12 @@ Calculates the square of the maximum distance between the vector C<$v>
 and the minimal axis-aligned box containing all the vectors C<($w0,
 $w1, ...)>.
 
+=item $d = $v->chebyshev_dist_to_box($w0, $w1, ...)
+
+Calculates the minimal distance between the vector C<$v> and the
+minimal axis-aligned box containing all the vectors C<($w0, $w1, ...)>
+using the Chebyshev metric.
+
 =item $d2 = Math::Vector::Real->dist2_between_boxes($a0, $a1, $b0, $b1)
 
 Returns the square of the minimum distance between any two points
@@ -866,6 +970,20 @@ C<($b0, $b1)> respectively.
 Returns the square of the maximum distance between any two points
 belonging respectively to the boxes defined by C<($a0, $a1)> and
 C<($b0, $b1)>.
+
+=item $d2 = $v->dist2_to_segment($a0, $a1)
+
+Returns the square of the minimum distance between the given point
+C<$v> and the line segment defined by the vertices C<$a0> and C<$a1>.
+
+=item $d2 = Math::Vector::Real->dist2_between_segments($a0, $a1, $b0, $b1)
+
+Returns the square of the distance between the line segment defined by
+the vertices C<$a0> and C<$a1> and the one defined by the vertices
+C<$b0> and C<$b1>.
+
+Degenerated cases where the length of any segment is (too close to) 0
+are not supported.
 
 =item $v->set($u)
 
@@ -967,8 +1085,8 @@ instabilities if the algorithm allows it.
 =head2 Math::Vector::Real::XS
 
 The module L<Math::Vector::Real::XS> reimplements most of the methods
-available from this module in XS. When it is installed,
-C<Math::Vector::Real> when automatically load and use it.
+available from this module in XS. C<Math::Vector::Real> automatically
+loads and uses it when it is available.
 
 =head1 SEE ALSO
 
@@ -997,7 +1115,7 @@ wishlist: L<http://amzn.com/w/1WU1P6IR5QZ42>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2012, 2014, 2015 by Salvador FandiE<ntilde>o
+Copyright (C) 2009-2012, 2014-2017 by Salvador FandiE<ntilde>o
 (sfandino@yahoo.com)
 
 This library is free software; you can redistribute it and/or modify

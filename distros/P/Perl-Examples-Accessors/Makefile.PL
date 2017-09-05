@@ -18,8 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Perl::Examples::Accessors",
   "PREREQ_PM" => {
     "Class::Accessor" => 0,
-    "Class::Accessor::Array" => 0,
+    "Class::Accessor::Array" => "0.031",
     "Class::Accessor::Array::Glob" => 0,
+    "Class::Accessor::PackedString" => 0,
     "Class::InsideOut" => 0,
     "Class::Struct" => 0,
     "Class::Tiny" => 0,
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.130",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,8 +56,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Accessor" => 0,
-  "Class::Accessor::Array" => 0,
+  "Class::Accessor::Array" => "0.031",
   "Class::Accessor::Array::Glob" => 0,
+  "Class::Accessor::PackedString" => 0,
   "Class::InsideOut" => 0,
   "Class::Struct" => 0,
   "Class::Tiny" => 0,

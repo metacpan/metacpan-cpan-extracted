@@ -94,7 +94,7 @@ regular expressions on the right:
    JUNK                  ~[\@\n\ \r\t]+
 
 (Note that this is PCCTS regular expression syntax, which should be
-fairly familar to users of other regex engines.  One oddity is that a
+fairly familiar to users of other regex engines.  One oddity is that a
 character class is negated as C<~[...]> rather than C<[^...]>.)
 
 On seeing C<at> at top-level, we enter in-entry mode.  Whitespace, junk,

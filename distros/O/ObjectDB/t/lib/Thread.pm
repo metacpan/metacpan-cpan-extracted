@@ -14,7 +14,7 @@ __PACKAGE__->meta(
         author => {
             type  => 'many to one',
             class => 'Author',
-            map   => {author_id => 'id'}
+            map   => { author_id => 'id' }
         }
     }
 );

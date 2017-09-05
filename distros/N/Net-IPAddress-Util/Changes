@@ -1,5 +1,11 @@
 Revision history for Net-IPAddress-Util
 
+3.033   2017-08-31
+        Starting to prepare for Perl 5.026
+
+3.032   2017-08-31
+        A couple of ultra-paranoid numification tweaks
+
 3.031   2017-08-18
         Fixup whitespace and make the tests smarter
 

@@ -13,7 +13,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '1.9.10';
+our $VERSION = '1.9.11';
 
 # TODO: Missing:
 #  * activeTimer
@@ -191,8 +191,20 @@ sub tree {
                                 {
                                     title => 'dbiPassword',
                                     help  => 'authdbi.html#password',
-                                    form  => 'simpleInputContainer',
-                                    nodes => ['dbiAuthPasswordHash']
+                                    nodes => [
+                                        'dbiAuthPasswordHash',
+                                        {
+                                            title => 'dbiDynamicHash',
+                                            help  => 'authdbi.html#password',
+                                            form  => 'simpleInputContainer',
+                                            nodes => [
+                                                'dbiDynamicHashEnabled',
+                                                'dbiDynamicHashValidSchemes',
+'dbiDynamicHashValidSaltedSchemes',
+'dbiDynamicHashNewPasswordScheme'
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -270,6 +282,15 @@ sub tree {
                                         'ldapAllowResetExpiredPassword'
                                     ]
                                 },
+                            ]
+                        },
+                        {
+                            title => 'linkedinParams',
+                            help  => 'authlinkedin.html',
+                            nodes => [
+                                'linkedInAuthnLevel',   'linkedInClientID',
+                                'linkedInClientSecret', 'linkedInFields',
+                                'linkedInUserField',    'linkedInScope'
                             ]
                         },
                         {

@@ -1,4 +1,12 @@
 Revision history for Patro
+--------------------------
+
+0.11	2017-08-27
+	- Use Storable + MIME::Base64 for serialization instead of Data::Dumper
+	- Include fixes and workarounds for thread-shared code references
+	  with perls older than v5.17
+	- Improved methods of making server config available to clients
 
 0.10	2017-08-23
 	Initial release.
+

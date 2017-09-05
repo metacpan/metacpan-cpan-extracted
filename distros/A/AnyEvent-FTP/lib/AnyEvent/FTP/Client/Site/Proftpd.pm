@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Proftpd
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 sub utime   { shift->client->push_command([SITE => "UTIME $_[0] $_[1]"]   ) }
@@ -37,7 +37,7 @@ AnyEvent::FTP::Client::Site::Proftpd - Site specific commands for Proftpd
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -55,35 +55,51 @@ Patches are welcome to fix this.
 
 =head1 METHODS
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>utime( $arg1, $arg2 )
+=head2 utime
+
+ $client->site->proftpd->utime( $arg1, $arg2 );
 
 Execute C<SITE UTIME> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>mkdir( $arg1 )
+=head2 mkdir
+
+ $client->site->proftpd->mkdir( $arg1 );
 
 Execute C<SITE MKDIR> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>rmdir( $arg1 )
+=head2 rmdir
+
+ $client->site->proftpd->rmdir( $arg1 );
 
 Execute C<SITE RMDIR> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>symlink( $arg1, $arg2 )
+=head2 symlink
+
+ $client->site->proftpd->symlink( $arg1, $arg2 );
 
 Execute C<SITE SYMLINK> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>ratio
+=head2 ratio
+
+ $client->site->proftpd->ratio;
 
 Execute C<SITE RATIO> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>help( $arg1 )
+=head2 help
+
+ $client->site->proftpd->help( $arg1 );
 
 Execute C<SITE HELP> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>chgrp( $arg1, $arg2 )
+=head2 chgrp
+
+ $client->site->proftpd->chgrp( $arg1, $arg2 );
 
 Execute C<SITE CHGRP> command.
 
-=head2 $client-E<gt>site-E<gt>proftpd-E<gt>chmodk( $arg1, $arg2 )
+=head2 chmodk
+
+ $client->site->proftpd->chmodk( $arg1, $arg2 );
 
 Execute C<SITE CHMOD> command.
 

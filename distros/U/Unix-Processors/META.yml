@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:         Unix-Processors
-version:      2.045
+version:      2.046
 version_from: Processors.pm
 abstract:     Interface to processor (CPU) information
 license:      perl

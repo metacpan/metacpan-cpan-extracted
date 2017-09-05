@@ -1,0 +1,23 @@
+Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
+
+1.4       2017-09-03 11:40:28Z
+
+1.3       2017-08-30 20:56:23Z
+
+    * Make Moose a dependency if found (RT#122918)
+    * Add Git::VersionManager
+    * Add ConfirmRelease
+
+1.2       2017-08-28
+
+    * Distribute the Changes file to CPAN
+    * Fix fake_release bug from always be faking it
+
+1.1       2017-08-27
+
+    * Create a Changes file
+
+1.0       2017-08-27
+
+    * First release to CPAN.
+

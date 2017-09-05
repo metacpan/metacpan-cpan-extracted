@@ -6,7 +6,7 @@ use Moops;
 
 role MarpaX::Languages::M4::Role::Regexp {
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -35,7 +35,7 @@ MarpaX::Languages::M4::Role::Regexp - M4 Regexp role
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

@@ -10,6 +10,7 @@ use Flip::Flop;
 use Test::More tests=>1;
 
 Flip::Flop::uploadToCloud(0);
+Flip::Flop::uploadToCloud();
 
 ok 1;
 

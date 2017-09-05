@@ -1,5 +1,11 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0501  2017-08-31 15:16:24 CEST
+  - fix template_options setting
+
+0.05  2017-08-18 11:11:03 CEST
+  - new template_options setting
+
 0.0403  2017-05-29 15:58:21 CEST
   - determine earliestDatestamp dynamically
 

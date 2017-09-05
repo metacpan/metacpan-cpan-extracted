@@ -6,7 +6,7 @@ use Moops;
 
 library MarpaX::Languages::M4::Type::Logger declares M4Logger {
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -27,7 +27,7 @@ MarpaX::Languages::M4::Type::Logger - M4 Logger Type
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

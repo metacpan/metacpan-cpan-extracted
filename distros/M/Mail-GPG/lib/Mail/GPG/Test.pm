@@ -17,7 +17,7 @@ my $TIMEIT = 0;
 our $DUMPDIR;
 
 BEGIN {
-  $DUMPDIR  = $ENV{DUMPDIR} || File::Spec->tmpdir . '/mail-gpg-test';
+  $DUMPDIR  = $ENV{DUMPDIR} || './mail-gpg-test';
 
   if (not -d $DUMPDIR ) {
     File::Path::make_path($DUMPDIR) or die "Cannot create '$DUMPDIR' - $!";
@@ -28,21 +28,21 @@ BEGIN {
 
 my $has_encode = eval { require Encode; 1 };
 
-sub get_gpg_home_dir		{ shift->{gpg_home_dir}			}
+sub get_gpg_home_dir            { shift->{gpg_home_dir}                 }
 sub get_use_long_key_ids        { shift->{use_long_key_ids}             }
 
-sub set_gpg_home_dir		{ shift->{gpg_home_dir}		= $_[1]	}
+sub set_gpg_home_dir            { shift->{gpg_home_dir}         = $_[1] }
 sub set_use_long_key_ids        { shift->{use_long_key_ids}     = $_[1] }
 
 #-- These methods return information about the shipped test key.
 #-- The email adress has a German umlaut and colons
 #-- to test the proper decoding of gpg --list-keys output.
-sub get_key_id			{ $_[0]->get_use_long_key_ids ?
+sub get_key_id                  { $_[0]->get_use_long_key_ids ?
                                   '062F00DAE20F5035' : 'E20F5035' }
-sub get_key_sub_id		{ $_[0]->get_use_long_key_ids ?
+sub get_key_sub_id              { $_[0]->get_use_long_key_ids ?
                                   '6C187D0F196ED9E3' : '196ED9E3' }
-sub get_key_mail		{ 'Jörn Reder Mail::GPG Test Key <mailgpg@localdomain>' }
-sub get_passphrase		{ 'test' }
+sub get_key_mail                { 'Jörn Reder Mail::GPG Test Key <mailgpg@localdomain>' }
+sub get_passphrase              { 'test' }
 
 sub new {
     my $class = shift;
@@ -433,9 +433,15 @@ sub enc_test {
 sub big_test {
     my $self = shift;
     my %par  = @_;
-    my ($mg) = $par{'mg'};
+    my ($mg, $chunks) = @par{'mg','chunks'};
 
-    my @big_data = ( "This is a fat data body\n" x 200000 );
+    $chunks ||= 200000;
+
+    srand($chunks);
+
+    my $line = (join "", map { chr(32+rand(80)) } (1..40))."\n";
+
+    my @big_data = ( $line x $chunks );
 
     my $entity = MIME::Entity->build(
         From     => $self->get_key_mail,

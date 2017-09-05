@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-CheckChangeLog
 
+0.05    2017-08-29
+        - fix warnings and code for new Dist-Zilla
+
 0.04    2017-07-05
         - hidden from PAUSE
 

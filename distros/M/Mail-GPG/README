@@ -59,17 +59,8 @@ PREREQUISITES
       MIME-tools        >= 5.419
       MIME::QuotedPrint >= 2.20  (part of MIME-Base64 distribution)
       GnuPG::Interface  >= 0.52
-      Event             >= 1.24
       List::MoreUtils   >= 0.410
-
-    Since version 1.0.7 the Event module is loaded when present. This gives
-    a small performance boost when handling big entities. If you like to
-    fallback to the old IO::Select based behaviour set either
-
-      $Mail::GPG::SKIP_EVENT    = 1
-      $ENV{MAIL_GPG_SKIP_EVENT} = 1
-
-    before loading Mail::GPG.
+      AnyEvent
 
 INSTALLATION
     Then install Mail::GPG

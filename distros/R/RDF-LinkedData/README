@@ -156,8 +156,8 @@ To set this up under Apache, put this in the host configuration:
     SetHandler default-handler
   </Location>
 
-Note that in some environments, for example if the Plack server that
-is dynamically configured, and/or behind a proxy server, the server
+Note that in some environments, for example if the Plack server
+is dynamically configured and/or behind a proxy server, the server
 may fail to bind to the address you give it as hostname. In this case,
 it is wise to allow the server to bind to any public IP address,
 i.e. set the host name to 0.0.0.0.

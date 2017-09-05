@@ -1,5 +1,20 @@
 Revision history and release notes for Mail::GPG.
 
+1.0.11 Sat Aug 26, 2017, joern
+    Bugfix:
+    - Fixed I/O issue on (specific) bigger message bodies.
+      Thanks for report and test material to Markus Wernig
+      and Frank Fichtner.
+
+      Mail::GPG now depends on AnyEvent for I/O with GnuPG.
+      The alternative IO::Select based implementation (in
+      case no Event is installed) was dropped.
+
+    - Tests now use "./mail-gpg-test" temp dir instead
+      of /tmp/mail-gpg-test, which could cause issues
+      when tests are executed with different users on
+      the same machine.
+
 1.0.10 Sat Sep 19, 2015, joern
     Bugfix:
     - Fixed incorrect and potentially insecure UTF8 handling.

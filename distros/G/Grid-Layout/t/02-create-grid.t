@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 275;
+use Test::Simple tests => 297;
 use Test::More;
 use Test::Exception;
 use Test::Files;
@@ -14,8 +14,28 @@ is(Grid::Layout::VH_opposite('H'), 'V', 'Opposite of H is V');
 
 my $gl = Grid::Layout->new();                    isa_ok($gl        , 'Grid::Layout', '$gl is a Grid::Layout');
 
-is_deeply($gl->{V}{tracks}, [], '$gl->{V}{tracks} is an array reference');
-is_deeply($gl->{H}{tracks}, [], '$gl->{H}{tracks} is an array reference');
+is(ref($gl->{V}{tracks}), 'ARRAY', '$gl->{V}{tracks} is an array reference');
+is(ref($gl->{H}{tracks}), 'ARRAY', '$gl->{V}{tracks} is an array reference');
+is(ref($gl->{V}{lines }), 'ARRAY', '$gl->{V}{tracks} is an array reference');
+is(ref($gl->{H}{lines }), 'ARRAY', '$gl->{V}{tracks} is an array reference');
+
+my $v_line_0 = $gl->get_vertical_line  (0);
+my $h_line_0 = $gl->get_horizontal_line(0);
+
+isa_ok($v_line_0, 'Grid::Layout::Line');
+isa_ok($h_line_0, 'Grid::Layout::Line');
+is($v_line_0->{position}, 0);
+is($h_line_0->{position}, 0);
+isnt($v_line_0, $h_line_0);
+
+throws_ok { $v_line_0->_previous_track } qr{Cannot return previous track. I am line zero};
+throws_ok { $h_line_0->_previous_track } qr{Cannot return previous track. I am line zero};
+
+throws_ok { $v_line_0->_next_track     } qr{Cannot return next track. I am last line};
+throws_ok { $h_line_0->_next_track     } qr{Cannot return next track. I am last line};
+
+is($v_line_0, $gl->line_x(0));
+is($h_line_0, $gl->line_y(0));
 
 my @size = $gl->size();
 
@@ -26,37 +46,54 @@ my $cell;
 $cell = $gl->cell(0, 0);
 is($cell, undef, 'cell 0.0 is undefined');
 
-is(scalar @{$gl->{V}->{lines}}, 0, '0 vertical lines');
-is(scalar @{$gl->{H}->{lines}}, 0, '0 horizontal lines');
+is(scalar @{$gl->{V}->{lines }}, 1, '1 vertical   tracks after creation');
+is(scalar @{$gl->{H}->{lines }}, 1, '1 horizontal tracks after creation');
+
+is(scalar @{$gl->{V}->{tracks}}, 0, '0 vertical   tracks after creation');
+is(scalar @{$gl->{H}->{tracks}}, 0, '0 horizontal tracks after creation');
 
 # Add 4 horizontal and 3 vertical tracks:
-my $track_h_A    = $gl->add_horizontal_track();
+my ($track_h_A,
+    $line_h_A)   = $gl->add_horizontal_track();
+
                  isa_ok($track_h_A   , 'Grid::Layout::Track', '$track_h_A is a Grid::Layout::Track');
+                 isa_ok($line_h_A    , 'Grid::Layout::Line');
                  is($gl->size_x, 0, 'gl size_x is 1');
                  is($gl->size_y, 1, 'gl size_y is 0');
                  @size=$gl->size(); is_deeply(\@size, [0, 1], 'Size is 0x1');
                  $cell = $gl->cell(0, 0); is($cell, undef, 'cell 0.0 is undefined');
-                 is(scalar @{$gl->{V}->{lines}}, 0, '0 vertical lines');
+                 is(scalar @{$gl->{V}->{lines}}, 1, '1 vertical lines');
                  is(scalar @{$gl->{H}->{lines}}, 2, '2 horizontal lines');
                  is($track_h_A->{position}, 0, '$track_h_A->{position} == 0');
+                 is($line_h_A, $gl->line_y(1));
 my $track_h_B    = $gl->add_horizontal_track();
                  isa_ok($track_h_B, 'Grid::Layout::Track', '$track_h_B is a Grid::Layout::Track');
                  is($gl->size_x, 0, 'gl size_x is 2');
                  is($gl->size_y, 2, 'gl size_y is 0');
                  @size=$gl->size(); is_deeply(\@size, [0, 2], 'Size is 0x2');
                  $cell = $gl->cell(0, 0); is($cell, undef, 'cell 0.0 is undefined');
-                 is(scalar @{$gl->{V}->{lines}}, 0, '0 vertical lines');
+                 is(scalar @{$gl->{V}->{lines}}, 1, '1 vertical lines');
                  is(scalar @{$gl->{H}->{lines}}, 3, '3 horizontal lines');
                  is($track_h_B->{position}, 1, '$track_h_B->{position} == 1');
-my $track_h_C  = $gl->add_horizontal_track();
+my ($track_h_C,
+    $line_h_C)   = $gl->add_horizontal_track();
                  isa_ok($track_h_C, 'Grid::Layout::Track', '$track_h_C is a Grid::Layout::Track');
+                 isa_ok($line_h_C , 'Grid::Layout::Line' , '$line_h_C  is a Grid::Layout::Line' );
                  is($gl->size_x, 0, 'gl size_x is 3');
                  is($gl->size_y, 3, 'gl size_y is 0');
                  $cell = $gl->cell(0, 0); is($cell, undef, 'cell 0.0 is undefined');
-                 is(scalar @{$gl->{V}->{lines}}, 0, '0 vertical lines');
+                 is(scalar @{$gl->{V}->{lines}}, 1, '1 vertical lines');
                  is(scalar @{$gl->{H}->{lines}}, 4, '4 horizontal lines');
-my $track_v_abc = $gl->add_vertical_track();
-                 isa_ok($track_v_abc, 'Grid::Layout::Track', '$track_h_A is a Grid::Layout::Track');
+                 is($line_h_C, $gl->line_y(3));
+                 throws_ok { $line_h_C->_next_track} qr{Cannot return next track. I am last line};
+
+                 my $line_h_C_prev_track = $line_h_C->_previous_track;
+                 isa_ok($line_h_C_prev_track, 'Grid::Layout::Track');
+
+my ($track_v_abc,
+    $line_v_abc) = $gl->add_vertical_track();
+                 isa_ok($track_v_abc, 'Grid::Layout::Track', '$track_v_abc is a Grid::Layout::Track');
+                 isa_ok($line_v_abc , 'Grid::Layout::Line' , '$line_v_abc is a Grid::Layout::Line');
                  @size=$gl->size(); is_deeply(\@size, [1, 3], 'Size is 1x3');
                  $cell = $gl->cell(0, 0); isa_ok($cell, 'Grid::Layout::Cell', 'cell 0.0 is Cell');
                  $cell = $gl->cell(0, 1); isa_ok($cell, 'Grid::Layout::Cell', 'cell 0.1 is Cell');

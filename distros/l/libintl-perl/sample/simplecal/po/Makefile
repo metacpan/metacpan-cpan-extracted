@@ -3,15 +3,15 @@
 srcdir = .
 libdir = ../lib
 
-CATALOGS  = $(LINGUAS)
-MO_FILES = $(addsuffix .gmo, $(LINGUAS))
-
-MSGMERGE = msgmerge
-MSGFMT   = msgfmt
-XGETTEXT = xgettext
+MSGMERGE  = msgmerge
+MSGFMT    = msgfmt
+XGETTEXT  = xgettext
 CATOBJEXT = .po
+PERL      = perl
 
 include PACKAGE
+
+MO_FILES = $(addsuffix .gmo, $(LINGUAS))
 
 TD = $(strip $(TEXTDOMAIN))
 
@@ -40,11 +40,8 @@ $(TD).pot: $(POTFILES)
 		--add-comments=TRANSLATORS: --files-from=$(srcdir)/POTFILES \
 		--copyright-holder="$(COPYRIGHT_HOLDER)" \
 		--msgid-bugs-address="$(MSGID_BUGS_ADDRESS)" \
-		--keyword --keyword='$$__' --keyword=__ --keyword=__x \
-		--keyword=__n:1,2 --keyword=__nx:1,2 --keyword=__xn:1,2 \
-		--keyword=__p:1c,2 --keyword=__np:1c,2,3 \
-		--keyword=__npx:1c,2,3 --keyword=N__ --keyword=N__n:1,2 \
-		--keyword=N__p:1c,2 --keyword=N__np:1c,2,3 --keyword=%__ && \
+                `$(PERL) -MLocale::TextDomain \
+                -e "print Locale::TextDomain->options"` && \
 	rm -f $@ && mv $(TD).pox $@
 
 install: $(MO_FILES)
@@ -64,7 +61,7 @@ update-mo: $(MO_FILES)
 update-po:
 	$(MAKE) $(TD).pot
 	cd $(srcdir); \
-        catalogs='$(CATALOGS)'; \
+        catalogs='$(LINGUAS)'; \
         for cat in $$catalogs; do \
           cat=`basename $$cat`; \
           lang=`echo $$cat | sed 's/\$(CATOBJEXT)$$//'`; \

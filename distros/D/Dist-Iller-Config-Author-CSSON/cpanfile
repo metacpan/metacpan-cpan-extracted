@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2017-07-31 13:36:36 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2017-08-31 21:00:45 UTC.
 
 on runtime => sub {
     requires 'Dist::Iller' => '0.1401';
@@ -64,13 +64,13 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::PodSyntaxTests' => '0';
     requires 'Dist::Zilla::Plugin::PodWeaver' => '4.006';
     requires 'Dist::Zilla::Plugin::Prereqs' => '0';
-    requires 'Dist::Zilla::Plugin::PromptIfStale' => '0.053';
+    requires 'Dist::Zilla::Plugin::PromptIfStale' => '0.054';
     requires 'Dist::Zilla::Plugin::Readme' => '0';
     requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.163250';
     requires 'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.007';
     requires 'Dist::Zilla::Plugin::RunExtraTests' => '0.028';
     requires 'Dist::Zilla::Plugin::ShareDir' => '0';
-    requires 'Dist::Zilla::Plugin::Test::Compile' => '2.056';
+    requires 'Dist::Zilla::Plugin::Test::Compile' => '2.057';
     requires 'Dist::Zilla::Plugin::Test::EOF' => '0.0501';
     requires 'Dist::Zilla::Plugin::Test::EOL' => '0.18';
     requires 'Dist::Zilla::Plugin::Test::NoTabs' => '0.15';
@@ -104,5 +104,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1408';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0318';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0319';
 };

@@ -1,0 +1,66 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libfontforge';
+
+requires 'Alien::Build::Plugin::Gather::Dino';
+requires 'Path::Tiny' => 0;
+use Env qw(@ACLOCAL_PATH);
+if ( exists $ENV{MSYSTEM} ) {
+	requires 'Archive::Zip'; # for Extract::ArchiveZip
+}
+
+# https://fontforge.github.io/
+share {
+	# Use .zip on Windows' MSYS2 because of extraction issues with bsdtar under MSYS2
+	my $ext = exists $ENV{MSYSTEM} ? 'zip' : 'tar.gz';
+	plugin Download => (
+		url => 'https://github.com/fontforge/fontforge/releases',
+		version => qr/(\d{4}\d{2}\d{2})\.\Q$ext\E/,
+	);
+
+	if ( exists $ENV{MSYSTEM} ) {
+		plugin 'Extract::ArchiveZip' => $ext;
+	} else {
+		plugin 'Extract::CommandLine' => $ext;
+	}
+
+	patch sub {
+		my($splinefont_h) = Path::Tiny->new('fontforge/splinefont.h');
+
+		if( $^O eq 'darwin' ) {
+			$splinefont_h->edit_lines(sub {
+				s{\Q#include "locale.h"\E}{#include <locale.h>\n#include <xlocale.h>\n}g;
+			});
+		}
+	};
+
+	plugin 'Build::Autoconf' => ();
+
+
+	if( exists $ENV{MSYSTEM} ) {
+		# Need for call to `autoreconf` in `./bootstrap`.
+		# Taken from <https://github.com/jtanx/fontforgebuilds/blob/master/ffbuild.sh>.
+		push @ACLOCAL_PATH,
+			(
+				'm4',
+				"/@{[ lc $ENV{MSYSTEM} ]}/share/aclocal"
+			);
+	}
+
+	build [
+		[ 'sh ./bootstrap' ],
+		[ '%{configure}'
+			. ' ' . join(' ',
+				qw(--disable-programs
+				--disable-python-scripting
+				--disable-python-extension
+				--without-x
+				)
+			)
+		],
+		[ '%{make}' ],
+		[ '%{make}', 'install' ],
+	];
+
+	plugin 'Gather::Dino';
+};

@@ -14,17 +14,17 @@ __PACKAGE__->meta(
         thread => {
             type  => 'many to one',
             class => 'Thread',
-            map   => {thread_id => 'id'}
+            map   => { thread_id => 'id' }
         },
         author => {
             type  => 'many to one',
             class => 'Author',
-            map   => {author_id => 'id'}
+            map   => { author_id => 'id' }
         },
         parent => {
             type  => 'many to one',
             class => 'Reply',
-            map   => {parent_id => 'id'}
+            map   => { parent_id => 'id' }
         },
     },
 );

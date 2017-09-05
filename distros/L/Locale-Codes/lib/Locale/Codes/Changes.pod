@@ -24,7 +24,9 @@ codes, I will add them to the module and release a new version.
 
 =head1 VERSION 3.55  (planned 2017-12-01; sbeck)
 
-=head1 VERSION 3.54  (planned 2017-09-01; sbeck)
+=head1 VERSION 3.54  (2017-09-01; sbeck)
+
+NEW CODE(s)
 
 =head1 VERSION 3.53  (2017-07-25; sbeck)
 

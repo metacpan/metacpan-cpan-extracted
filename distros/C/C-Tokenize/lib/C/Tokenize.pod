@@ -30,7 +30,7 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/synopsis-cpp.pl> in the distribution.)  
+(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/synopsis-cpp.pl> in the distribution.)  
 
     
     # Print all the comments in a C program:
@@ -60,26 +60,25 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/synopsis-comment.pl> in the distribution.)  
+(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/synopsis-comment.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents version 0.15 of C::Tokenize corresponding
-to git commit L<adccd168d3c753454f353dfb06e4773b94e29c5f|https://github.com/benkasminbullock/C-Tokenize/commit/adccd168d3c753454f353dfb06e4773b94e29c5f> released on Mon Aug 28 13:21:31 2017 +0900.
+This documents version 0.17 of C::Tokenize corresponding
+to git commit L<e7734a52fb15da79a33967349ffcfbec72127ef8|https://github.com/benkasminbullock/C-Tokenize/commit/e7734a52fb15da79a33967349ffcfbec72127ef8> released on Thu Aug 31 09:22:10 2017 +0900.
 
 =head1 DESCRIPTION
 
 This module provides a tokenizer, L</tokenize>, which breaks C source
-code into its smallest meaningful components, and the regular
-expressions which match each of these components. For example, the
-module supplies a regular expression L</$comment_re> which matches a C
-comment line.
+code into its smallest meaningful components, and the regexs which
+match each of these components. For example, the module supplies a
+regex L</$comment_re> which matches a C comment.
 
-It also supplies some extra regular expressions for, for example,
-local include statements, L</$include_local>, or C variables,
-L</$cvar_re>, as well as extra functions, like L</decomment> for
-removing traditional C comments, and L</strip_comments> for removing
-all comments from a C program.
+As well as the basic components of C, it also supplies regexes for,
+for example, local include statements, L</$include_local>, or C
+variables, L</$cvar_re>, as well as extra functions, like
+L</decomment> to remove the comment syntax of traditional C comments,
+and L</strip_comments> which removes all comments from a C program.
 
 =head1 REGULAR EXPRESSIONS
 
@@ -155,7 +154,7 @@ produces output
     Include statement #include "that.h" includes file that.h.
 
 
-(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/includes.pl> in the distribution.)  
+(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/includes.pl> in the distribution.)  
 
 This was added in version 0.12 of C::Tokenize.
 
@@ -243,7 +242,7 @@ produces output
     & q is a C variable.
 
 
-(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/cvar.pl> in the distribution.)  
+(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/cvar.pl> in the distribution.)  
 
 Because in theory this can contain very complex things, this regex is
 somewhat heuristic and there are edge cases where it is known to
@@ -370,8 +369,8 @@ This removes all comments from its input while preserving line breaks.
     
     use C::Tokenize 'strip_comments';
     my $c = <<EOF;
-    /* The X coordinate. */
-    int x;
+    char * not_comment = "/* This is not a comment */";
+    int/* The X coordinate. */x;
     /* The Y coordinate.
        See https://en.wikipedia.org/wiki/Cartesian_coordinates. */
     int y;
@@ -383,19 +382,45 @@ This removes all comments from its input while preserving line breaks.
 
 produces output
 
-    
+    char * not_comment = "/* This is not a comment */";
     int x;
-    
+     
     
     int y;
     
     int z;
 
 
-(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.15/examples/strip-comments.pl> in the distribution.)  
+(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/strip-comments.pl> in the distribution.)  
 
 This function was moved to this module from L<XS::Check> in version
 0.14.
+
+This function can also be used to strip C-style comments from JSON
+without removing string contents:
+
+    
+    use C::Tokenize 'strip_comments';
+    my $json =<<EOF;
+    {
+    /* Comment comment comment */
+    "/* not comment */":"/* not comment */",
+    "value":["//not comment"] // Comment
+    }
+    EOF
+    print strip_comments ($json);
+
+
+produces output
+
+    {
+     
+    "/* not comment */":"/* not comment */",
+    "value":["//not comment"]  
+    }
+
+
+(This example is included as L<F<strip-json.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/strip-json.pl> in the distribution.)  
 
 =head1 EXPORTS
 

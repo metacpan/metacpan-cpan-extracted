@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sat Oct 15 23:36:51 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Aug 31 19:07:41 2012
-# Update Count    : 208
+# Last Modified On: Thu Jan 26 16:39:38 2017
+# Update Count    : 226
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -22,6 +22,7 @@ use warnings;
 
 use EB;
 use EB::Format;
+use EB::Tools::Attachments;
 
 sub new {
     my ($class) = @_;
@@ -59,7 +60,8 @@ sub bsk_nr {
     my ($self, $opts) = @_;
     my $bsk_nr;
     my $prev = defined($opts->{boekjaar}) && $opts->{boekjaar} ne $dbh->adm("bky");
-    if ( $bsk_nr = $opts->{boekstuk} ) {
+    $bsk_nr = $opts->{boekstuk};
+    if ( defined $bsk_nr ) {
 	unless ( $bsk_nr =~ /^[0-9]+$/ ) {
 	    warn("?"._T("Het boekstuknummer moet een geheel getal (volgnummer) zijn")."\n");
 	    return;
@@ -254,7 +256,7 @@ sub norm_btw {
 	my $rr = $dbh->do("SELECT btw_perc, btw_incl, btw_tariefgroep".
 			  " FROM BTWTabel".
 			  " WHERE btw_id = ?", $bsr_btw_id);
-	assert($rr, "Unk BTW: $bsr_btw_id");
+	confess( "Unknown BTW: $bsr_btw_id" ) unless $rr;
 	($btw_perc, $btw_incl) = @$rr;
     }
 
@@ -322,9 +324,10 @@ sub journalise {
 	my $bsr_bsk_id = $bsk_id;
 	my $btw = 0;
 	my $amt = $bsr_amount;
+	my $btw_intra = ($bsr_btw_class & BTWKLASSE_TYPE_BITS) == BTWTYPE_INTRA;
 	$g_bsr_rel_code = $bsr_rel_code if defined $iv && $bsr_rel_code;
 
-	if ( ($bsr_btw_class & BTWKLASSE_BTW_BIT) && $bsr_btw_id && $bsr_btw_acc ) {
+	if ( ($bsr_btw_class & BTWKLASSE_BTW_BIT) && $bsr_btw_id && $bsr_btw_acc && !$btw_intra ) {
 	    ( $bsr_amount, $btw, my $perc ) =
 	      @{$self->norm_btw($bsr_amount, $bsr_btw_id)};
 	    $amt = $bsr_amount - $btw;
@@ -387,6 +390,48 @@ sub journalise {
 		    undef, undef, $bsk_desc, $g_bsr_rel_code, undef, $bsk_ref]);
 
     $ret;
+}
+
+sub check_attachment {
+    my ( $self, $att ) = @_;
+    return 1 unless defined $att;
+
+    return 1 if $att =~ m;^(\w+)://(.+);; # URI
+
+    if ( ! ( -f $att && -r _ ) ) {
+	warn("?".__x("Boekingsbijlage kan niet worden gevonden: {att}",
+		     att => $att)."\n");
+	return;
+    }
+
+    return 1;
+}
+
+sub add_attachment {
+    my ( $self, $att, $bsk_id ) = @_;
+    return unless defined $att;
+    my $att_id;
+
+    if ( $att =~ m;^(\w+)://(.+); ) { # URI
+	if ( $1 eq "int" && $2 =~ m;^(\d+)/.+; ) {
+	    $att_id = $1;
+	}
+	else {
+	    $att_id = EB::Tools::Attachments->new->store_from_uri($att);
+	}
+    }
+    else {
+	# We may at some point in time decide to turn $file into
+	# file://$url and treat as such.
+	$att_id = EB::Tools::Attachments->new->store_from_file($att);
+    }
+    $dbh->sql_exec("UPDATE Boekstukken SET bsk_att = ? WHERE bsk_id = ?",
+		   $att_id, $bsk_id);
+}
+
+sub find_attachment {
+    my ( $self, $bsk_id ) = @_;
+    $dbh->lookup( $bsk_id, qw(Boekstukken bsk_id bsk_att =) );
 }
 
 1;

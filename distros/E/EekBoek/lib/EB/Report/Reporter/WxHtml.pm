@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Mar  2 21:01:17 2007
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat Jun 19 00:39:59 2010
-# Update Count    : 70
+# Last Modified On: Fri Oct  9 20:38:04 2015
+# Update Count    : 77
 # Status          : Unknown, Use with caution!
 
 # WxHtmlWindow supports HTML, but to a limited extent. In particular,
@@ -131,6 +131,16 @@ sub add {
 		    }
 		    chop($v);
 		    $val = $v."\">$val</a>";
+		}
+		if ( $t->{att} && $value ne "" ) {
+		    my $v = $val . "&nbsp;&nbsp;<a href=\"".$t->{att}.$value."?";
+		    if ( $self->{periodex} ) {
+			$v .= "periode=" .
+			  $self->{per_begin} . "-" .
+			  $self->{per_end} . "&";
+		    }
+		    chop($v);
+		    $val = $v."\">\x{1f4c4}</a>";
 		}
 	    }
 	}

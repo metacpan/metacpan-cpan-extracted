@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-# ABSTRACT: Find or build m4
-our $VERSION = '0.16'; # VERSION
+# ABSTRACT: Find or build GNU m4
+our $VERSION = '0.17'; # VERSION
 
 
 sub alien_helper
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-Alien::m4 - Find or build m4
+Alien::m4 - Find or build GNU m4
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ From Alien::Base Build.PL
 
 =head1 DESCRIPTION
 
-This package can be used by other CPAN modules that require m4.
+This package can be used by other CPAN modules that require GNU m4.
 
 =head1 METHODS
 
@@ -68,8 +68,8 @@ This package can be used by other CPAN modules that require m4.
 
  my $m4 = Alien::m4->exe;
 
-Returns the "name" of m4.  Normally this is C<m4>, but in some cases, it
-may be the full path to m4.
+Returns the "name" of m4.  Normally this is C<m4>, but on some platforms
+it may be gm4 or gnum4, or whatever is specified by C<$ENV{M4}>.
 
 =head1 HELPERS
 
@@ -78,6 +78,17 @@ may be the full path to m4.
  %{m4}
 
 Returns the name of the m4 command.  Usually just C<m4>.
+
+=head1 CAVEATS
+
+Why GNU m4?  Many Unixen come with BSD or other variants of m4 which are
+perfectly good.  Unfortunately, the main use case for this module is
+L<Alien::Autotools> and friends.  Autoconf requires the GNU m4, probably
+for political reasons, possibly for technical reasons.  If you are using
+one of these Unixen, don't dispair, you can usually install the GNU
+version of m4 either by building from source or by installing a binary
+package, with either the name C<gm4> or C<gnum4>, and this module will
+find it, and L<Alien::Autotools> will be able to use it.
 
 =head1 AUTHOR
 

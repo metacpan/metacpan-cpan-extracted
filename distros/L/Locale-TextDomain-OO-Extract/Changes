@@ -1,5 +1,12 @@
 Revision history for Perl extension Locale::TextDomain:OO::Extract.
 
+2.011  Sat Sep  2 11:18:09 2017
+- added YAML extractor
+
+2.010  Thu Aug 31 18:42:24 2017
+- more BabelFish
+- added filter to tell the extractor what to scan/ignore
+
 2.009  Fri Aug 25 07:11:21 2017
 - fixed 21_process_utf-8.t
   wrong plan

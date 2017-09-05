@@ -19,7 +19,7 @@ use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
 use constant DEBUG => $ENV{JSON_VALIDATOR_DEBUG} || 0;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -347,6 +347,12 @@ sub _validate {
     my $method = sprintf '_validate_type_%s', $type;
     @errors = $self->$method($data, $path, $schema);
     warn "[JSON::Validator] type @{[$path||'/']} $method [@errors]\n" if DEBUG > 1;
+    return @errors if @errors;
+  }
+
+  if ($schema->{enum}) {
+    @errors = $self->_validate_type_enum($data, $path, $schema);
+    warn "[JSON::Validator] type @{[$path||'/']} _validate_type_enum [@errors]\n" if DEBUG > 1;
     return @errors if @errors;
   }
 
@@ -746,7 +752,6 @@ sub _guess_schema_type {
     or defined $_[0]->{minLength};
   return _guessed_right($_[1], 'number') if $_[0]->{multipleOf};
   return _guessed_right($_[1], 'number') if defined $_[0]->{maximum} or defined $_[0]->{minimum};
-  return 'enum'  if $_[0]->{enum};
   return 'const' if $_[0]->{const};
   return undef;
 }
@@ -845,7 +850,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-1.01
+1.02
 
 =head1 SYNOPSIS
 

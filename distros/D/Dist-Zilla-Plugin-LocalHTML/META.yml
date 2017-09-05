@@ -1,0 +1,38 @@
+---
+abstract: 'Generate HTML documentation suitable for local browsing'
+author:
+  - 'Vadim Belman <vrurg@cpan.org>'
+build_requires:
+  Dist::Zilla::App: '0'
+  Test::More: '0'
+  local::lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-LocalHTML
+requires:
+  Cwd: '0'
+  Data::Dumper: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::InstallTool: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Moose: '0'
+  Moose::Autobox: '0'
+  MooseX::NonMoose: '0'
+  PPI: '0'
+  Pod::Find: '0'
+  Pod::Simple::HTML: '0'
+  namespace::autoclean: '0'
+  perl: v5.24.0
+version: v0.1.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

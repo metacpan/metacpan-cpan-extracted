@@ -7,7 +7,7 @@ use warnings;
 
 package Mail::Message::Field::Structured;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 use base 'Mail::Message::Field::Full';
 
@@ -58,7 +58,7 @@ sub attributes() { values %{shift->{MMFS_attrs}} }
 sub beautify() { delete shift->{MMFF_body} }
 
 
-sub attrPairs() { map { $_->name, $_->value } shift->attributes }
+sub attrPairs() { map +($_->name, $_->value), shift->attributes }
 
 #-------------------------
 

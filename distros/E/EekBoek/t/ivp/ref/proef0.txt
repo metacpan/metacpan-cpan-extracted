@@ -1,14 +1,14 @@
                                    Proef- en Saldibalans
-Periode: t/m 2007-12-31
-EekBoek Demo Administratie                                               EekBoek, 2007-12-31
+Periode: t/m 2013-12-31
+EekBoek Demo Administratie                                               EekBoek, 2013-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit   Saldo Db   Saldo Cr
 --------------------------------------------------------------------------------------------
 1       Totaal Vaste Activa                        14722,85   14219,67     503,18
 2       Totaal Vlottende activa                    21136,68   10802,00   10334,68
 3       Totaal Eigen vermogen                                  2443,18               2443,18
-4       Totaal Vreemd vermogen                      1076,77    2391,64               1314,87
-6       Totaal Kosten                               1620,19               1620,19
-8       Totaal Bedrijfsopbrengsten                     4,20    8704,20               8700,00
+4       Totaal Vreemd vermogen                      1089,77    2518,99               1429,22
+6       Totaal Kosten                               1607,26               1607,26
+8       Totaal Bedrijfsopbrengsten                     4,13    8576,85               8572,72
 --------------------------------------------------------------------------------------------
-        TOTAAL                                     38560,69   38560,69   12458,05   12458,05
+        TOTAAL                                     38560,69   38560,69   12445,12   12445,12

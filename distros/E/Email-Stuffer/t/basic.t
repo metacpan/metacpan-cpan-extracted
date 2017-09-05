@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use File::Spec::Functions ':ALL';
 
-use Test::More tests => 62;
+use Test::More;
+
 use Test::Fatal;
 use Email::Stuffer;
 
@@ -11,16 +12,16 @@ my $TEST_GIF = catfile( 't', 'data', 'paypal.gif' );
 ok( -f $TEST_GIF, "Found test image: $TEST_GIF" );
 
 sub string_ok {
-	my $string = shift;
-	$string = !! (defined $string and ! ref $string and $string ne '');
-	ok( $string, $_[0] || 'Got a normal string' );
+  my $string = shift;
+  $string = !! (defined $string and ! ref $string and $string ne '');
+  ok( $string, $_[0] || 'Got a normal string' );
 }
 
 sub stuff_ok {
-	my $stuff = shift;
-	isa_ok( $stuff,        'Email::Stuffer' );
-	isa_ok( $stuff->email, 'Email::MIME' );
-	string_ok( $stuff->as_string, 'Got a non-null string for Email::Stuffer->as_string' );
+  my $stuff = shift;
+  isa_ok( $stuff,        'Email::Stuffer' );
+  isa_ok( $stuff->email, 'Email::MIME' );
+  string_ok( $stuff->as_string, 'Got a non-null string for Email::Stuffer->as_string' );
 }
 
 #####################################################################
@@ -53,6 +54,15 @@ stuff_ok( $rv    );
 is( $Stuffer->as_string, $rv->as_string, '->To (multiple) returns the same object' );
 is( $Stuffer->email->header('To'), 'adam@ali.as, another@ali.as, bob@ali.as', '->To (multiple) sets To header' );
 
+my $error = exception {
+  $Stuffer->to([ 'bob@ali.as', 'another@ali.as','adam@ali.as' ])
+};
+like(
+  $error,
+  qr/list of to headers contains unblessed ref/,
+  'to croaks when passed a reference',
+);
+
 # Cc allows multiple recipients
 $rv = $Stuffer->cc('adam@ali.as', 'another@ali.as', 'bob@ali.as');
 stuff_ok( $Stuffer );
@@ -60,12 +70,38 @@ stuff_ok( $rv    );
 is( $Stuffer->as_string, $rv->as_string, '->Cc (multiple) returns the same object' );
 is( $Stuffer->email->header('Cc'), 'adam@ali.as, another@ali.as, bob@ali.as', '->Cc (multiple) sets To header' );
 
+$error = exception {
+  $Stuffer->cc([ 'bob@ali.as', 'another@ali.as','adam@ali.as' ])
+};
+like(
+  $error,
+  qr/list of cc headers contains unblessed ref/,
+  'cc croaks when passed a reference',
+);
+
 # Bcc allows multiple recipients
 $rv = $Stuffer->bcc('adam@ali.as', 'another@ali.as', 'bob@ali.as');
 stuff_ok( $Stuffer );
 stuff_ok( $rv    );
 is( $Stuffer->as_string, $rv->as_string, '->Bcc (multiple) returns the same object' );
 is( $Stuffer->email->header('Bcc'), 'adam@ali.as, another@ali.as, bob@ali.as', '->Bcc (multiple) sets To header' );
+
+
+$error = exception {
+  $Stuffer->bcc([ 'bob@ali.as', 'another@ali.as','adam@ali.as' ])
+};
+like(
+  $error,
+  qr/list of bcc headers contains unblessed ref/,
+  'bcc croaks when passed a reference',
+);
+
+# Set a Reply-To address
+$rv = $Stuffer->reply_to('sue@ali.as');
+stuff_ok( $Stuffer );
+stuff_ok( $rv    );
+is( $Stuffer->as_string, $rv->as_string, '->reply_to returns the same object' );
+is( $Stuffer->email->header('Reply-To'), 'sue@ali.as', '->reply_to sets Reply-To header' );
 
 # More complex one
 use Email::Sender::Transport::Test 0.120000 (); # ->delivery_count, etc.
@@ -104,7 +140,7 @@ like( $email, qr/I am an email/, 'Email contains text_body' );
 like( $email, qr{Content-Type: text/plain; name="dist\.ini"}, 'Email contains attachment content-Type' );
 
 # attach_file with no such file
-my $error = exception { Email::Stuffer->attach_file( 'no such file' ) };
+$error = exception { Email::Stuffer->attach_file( 'no such file' ) };
 like $error,
     qr/No such file 'no such file'/,
     'attach_file croaks when passed a bad file name';
@@ -126,5 +162,7 @@ $error = exception { Email::Stuffer::_slurp( 'no such file' ) };
 like $error,
     qr/\Aerror opening no such file: \Q$enoent/,
     '_slurp croaks when passed a bad filename';
+
+done_testing;
 
 1;

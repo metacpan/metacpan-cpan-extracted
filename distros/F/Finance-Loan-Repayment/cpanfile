@@ -1,0 +1,34 @@
+requires "Config::Any" => "0";
+requires "File::Spec::Functions" => "0";
+requires "Getopt::Long" => "0";
+requires "Moose" => "0";
+requires "Pod::Usage" => "0";
+requires "perl" => "5.010";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+  requires "perl" => "5.010";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.010";
+};
+
+on 'develop' => sub {
+  requires "Dist::Zilla" => "5";
+  requires "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004";
+  requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
+  requires "Dist::Zilla::Plugin::Git::Commit" => "2.020";
+  requires "Dist::Zilla::Plugin::Git::Tag" => "0";
+  requires "Dist::Zilla::Plugin::NextRelease" => "5.033";
+  requires "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004";
+  requires "Dist::Zilla::PluginBundle::Author::WATERKIP" => "0";
+  requires "Software::License::MIT" => "0";
+  requires "Test::Compile" => "0";
+  requires "Test::More" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+};

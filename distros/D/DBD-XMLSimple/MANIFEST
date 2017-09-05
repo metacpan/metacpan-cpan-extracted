@@ -1,13 +1,14 @@
+bin/xml
 Changes
-MANIFEST
-Makefile.PL
+data/person.xml
+ignore.txt
+lib/DBD/XMLSimple.pm
 LICENCE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
 README
 README.md
-ignore.txt
-bin/xml
-data/person.xml
-lib/DBD/XMLSimple.pm
 t/00-load.t
 t/10-filedata.t
 t/20-stringdata.t
@@ -34,5 +35,4 @@ t/strict.t
 t/unused.t
 t/used.t
 t/vars.t
-META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

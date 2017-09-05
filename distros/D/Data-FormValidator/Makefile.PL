@@ -19,6 +19,7 @@ WriteMakefile(
     'Regexp::Common'  => 0.03, # when ::whitespace was added
     'Scalar::Util'    => 0,
     'Email::Valid'    => 0,
+    'File::Spec'      => 0,
   },
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
       'meta-spec' => { version => 2 },

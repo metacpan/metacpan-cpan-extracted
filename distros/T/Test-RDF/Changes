@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/module/Test::RDF>
 Bug tracker:  <https://github.com/kjetilk/Test-RDF/issues>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+1.22	2017-08-31	Add has_type function.
+
+ - Added: Add has_type function.
+ - Minor cosmetic changes.
+
 1.20	2014-10-16	Fix packaging.
 
  - Added: Skip README.pod for CPAN.

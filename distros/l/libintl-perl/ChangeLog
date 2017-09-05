@@ -1,3 +1,66 @@
+commit 2e9b2284883b84eab39cc45eb864d6688ba2f930
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Thu Aug 31 21:56:12 2017 +0300
+
+    bumped version number to 1.28
+
+commit c9cd1546061ed7b2973ea81fd2427b610c87d134
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Thu Aug 31 21:48:36 2017 +0300
+
+    git ignore in sample
+
+commit f25061d0fbd8a287cdaa69e1b92737cc1d4e3b90
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:52:14 2017 +0300
+
+    editorial changes
+
+commit 53aab676068c1da95498c91b316d7125f8427e79
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:50:07 2017 +0300
+
+    use new class methods for xgettext options
+
+commit a6e4ee63d6a33ff9b49a061d239d76a69618bf45
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:30:44 2017 +0300
+
+    quote import tags in docs
+
+commit 63e7345ee6a78b172770a6910052b18bfe7e0c55
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:23:58 2017 +0300
+
+    updated copyright date
+
+commit 2ac9ce9e79f51697c44e5910e2620fcd77c858b4
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:21:54 2017 +0300
+
+    git ignore
+
+commit 9a5dc45010d68cc0b8decc728b413770f27aed6b
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:15:39 2017 +0300
+
+    updated FAQ
+
+commit 6753d9718d605ef11627bc79082e3e8dbe23958a
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 22:03:54 2017 +0300
+
+    new class methods options, flags, and keywords
+    
+    This will produce the default keyword and flag definitions for xgettext
+    for Locale::TextDomain.
+
+commit f2b9d789f3ec7176ef79c17d71d29f9b191f5909
+Author: Guido Flohr <guido.flohr@cantanea.com>
+Date:   Wed Aug 30 21:57:05 2017 +0300
+
+    updated ChangeLog
+
 commit 2dfd72f7a28ec60ba19cc3e4054f4585763ce015
 Author: Guido Flohr <guido.flohr@cantanea.com>
 Date:   Tue Aug 8 11:05:57 2017 +0300

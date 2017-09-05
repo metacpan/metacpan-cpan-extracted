@@ -25,9 +25,9 @@ $modules{$_} = $_ for qw(
   Dist::Zilla::Plugin::ReadmeAnyFromPod
   Dist::Zilla::Plugin::Run::BeforeBuild
   Dist::Zilla::Util::CurrentCmd
+  ExtUtils::MakeMaker
   File::Glob
   IPC::System::Simple
-  Module::Build
   Moose
   Path::Tiny
   PerlX::Maybe

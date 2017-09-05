@@ -1,5 +1,7 @@
 package APISchema::Generator::Markdown::Formatter;
 use 5.014;
+use strict;
+use warnings;
 
 # core
 use Exporter qw(import);

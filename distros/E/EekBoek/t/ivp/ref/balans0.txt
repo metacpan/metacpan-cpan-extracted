@@ -1,13 +1,13 @@
                                 Balans
-Periode: t/m 2007-12-31
-EekBoek Demo Administratie                         EekBoek, 2007-12-31
+Periode: t/m 2013-12-31
+EekBoek Demo Administratie                         EekBoek, 2013-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 ----------------------------------------------------------------------
 1       Vaste Activa                                 503,18
 2       Vlottende activa                           10334,68
 3       Eigen vermogen                                         2443,18
-4       Vreemd vermogen                                        1314,87
-        << Winst >>                                            7079,81
+4       Vreemd vermogen                                        1429,22
+        << Winst >>                                            6965,46
 ----------------------------------------------------------------------
         TOTAAL Balans                              10837,86   10837,86

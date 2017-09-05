@@ -1,5 +1,8 @@
 Revision history for Perl extension Email::MIME::ContentType
 
+1.022     2017-08-31 09:16:58-04:00 America/New_York
+        - add parse_content_disposition (thanks, Pali Rohár)
+
 1.021     2017-08-02 19:35:56-04:00 America/New_York
         - reject non-ASCII and control characters in strict mode (thanks, Pali
           Rohár)

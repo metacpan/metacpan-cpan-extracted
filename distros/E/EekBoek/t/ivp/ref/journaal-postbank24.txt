@@ -1,6 +1,6 @@
                                                                  Journaal
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                                                             EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                                                             EekBoek, 2013-12-31
 
 Datum       Boekstuk/Grootboek                Rek      Debet     Credit      BTW %  Tarief      Boekstuk/regel                  Relatie
 ------------------------------------------------------------------------------------------------------------------------------------------

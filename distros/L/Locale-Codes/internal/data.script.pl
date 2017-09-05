@@ -11,21 +11,23 @@ $Data{'script'}{'link'} =
 
 $Data{'script'}{'iso'}{'orig'}{'name'} =
   {
-   "Ethiopic (Geʻez)"                 => "Ethiopic (Geez)",
+   "Ethiopic (Geʻez)"                => "Ethiopic (Geez)",
    "Hangul (Hangŭl, Hangeul)"        => "Hangul (Hangul, Hangeul)",
    "Hanunoo (Hanunóo)"               => "Hanunoo (Hanunoo)",
    "Lepcha (Róng)"                   => "Lepcha (Rong)",
-   "Modi, Moḍī"                       => "Modi, Modi",
-   "Nakhi Geba ('Na-'Khi ²Ggŏ-¹baw, Naxi Geba)" =>
-   "Nakhi Geba ('Na-'Khi Ggo-baw, Naxi Geba)",
+   "Modi, Moḍī"                      => "Modi, Modi",
+   "Naxi Dongba (na²¹ɕi³³ to³³ba²¹, Nakhi Tomba)" =>
+                                        "Naxi Dongba (Nakhi Tomba)",
+   "Naxi Geba (na²¹ɕi³³ gʌ²¹ba²¹, 'Na-'Khi ²Ggŏ-¹baw, Nakhi Geba)" =>
+                                        "Naxi Geba (Nakhi Geba, 'Na-'Khi Ggo-baw)",
    "N’Ko"                            => "N'Ko",
    "Nüshu"                           => "Nushu",
    "Ol Chiki (Ol Cemet’, Ol, Santali)" =>
-   "Ol Chiki (Ol Cemet, Ol, Santali)",
-   "Sharada, Śāradā"                  => "Sharada, Sarada",
-   "Takri, Ṭākrī, Ṭāṅkrī"              => "Takri, Takri, Tankri",
-   "Siddham, Siddhaṃ, Siddhamātṛkā"   => "Siddham, Siddham, Siddhamatrka",
-   "Newa, Newar, Newari, Nepāla lipi" => "Newa, Newar, Newari, Nepala lipi",
+                                        "Ol Chiki (Ol Cemet, Ol, Santali)",
+   "Sharada, Śāradā"                 => "Sharada, Sarada",
+   "Takri, Ṭākrī, Ṭāṅkrī"            => "Takri, Takri, Tankri",
+   "Siddham, Siddhaṃ, Siddhamātṛkā"  => "Siddham, Siddham, Siddhamatrka",
+   "Newa, Newar, Newari, Nepāla lipi"=> "Newa, Newar, Newari, Nepala lipi",
    "Medefaidrin (Oberi Okaime, Oberi Ɔkaimɛ)" =>
    "Medefaidrin (Oberi Okaime, Oberi Okaime)",
    "Zanabazar Square (Zanabazarin Dörböljin Useg, Xewtee Dörböljin Bicig, Horizontal Square Script)" =>
@@ -52,6 +54,8 @@ $Data{'script'}{'iana'}{'orig'}{'name'} =
    "Moḍī"                 => "Modi",
    "Nüshu"               => "Nushu",
    "N’Ko"                => "N'Ko",
+   "na²¹ɕi³³ to³³ba²¹"   => "Nakhi Tomba",
+   "na²¹ɕi³³ gʌ²¹ba²¹"   => "Nakhi Geba",
    "'Na-'Khi ²Ggŏ-¹baw"  => "'Na-'Khi Ggo-baw",
    "Śāradā"              => "Sarada",
    "Ṭākrī"               => "Takri",

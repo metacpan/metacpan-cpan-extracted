@@ -1,4 +1,4 @@
-package Pcore::Ext v0.12.2;
+package Pcore::Ext v0.13.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;
@@ -194,33 +194,41 @@ sub SCAN ( $self, $app, $ext, $framework ) {
         my $added_methods;
 
         # build app content
-        my ( %processed_class, @app_js );
+        my %processed_class;
 
         # topologically sort deps tree
         my $add_deps = sub ($class_name) {
             if ( !exists $processed_class{$class_name} ) {
-                $processed_class{$class_name} = 1;    # mark node as "gray"
+
+                # mark node as "gray"
+                $processed_class{$class_name} = 1;
             }
             elsif ( $processed_class{$class_name} == 1 ) {
-                die q[Cyclic dependency found];       # entered to the "gray" node, this is cyclic deps
+
+                # entered to the "gray" node, this is cyclic deps
+                die q[Cyclic dependency found];
             }
             else {
-                return;                               # entered to the "black" node
+
+                # entered to the "black" node
+                return;
             }
 
             my $class_cfg = $CFG->{class}->{$class_name};
 
             for my $require ( keys $class_cfg->{requires}->%* ) {
-                next if !exists $CFG->{class}->{$require};    # skip external deps
+
+                # skip external deps
+                next if !exists $CFG->{class}->{$require};
 
                 __SUB__->($require);
             }
 
-            # all deps processed
-            $processed_class{$class_name} = 2;                # mark node as "black"
+            # all deps processed, mark node as "black"
+            $processed_class{$class_name} = 2;
 
             # add content
-            push @app_js, $class_cfg->{js}->$* if !$app->{devel};
+            push $ext_app->{classes}->@*, $class_name;
 
             # add api map
             for my $method_id ( keys $class_cfg->{api}->%* ) {
@@ -238,13 +246,11 @@ sub SCAN ( $self, $app, $ext, $framework ) {
         };
 
         # sort deps
-        for my $class ( values $CFG->{class}->%* ) {
-            next if $class->{app_namespace} // $class->{namespace} ne $ext_app->{namespace};
+        for my $class ( sort { $b->{class} cmp $a->{class} } values $CFG->{class}->%* ) {
+            next if ( $class->{app_namespace} // $class->{namespace} ) ne $ext_app->{namespace};
 
             $add_deps->( $class->{class} );
         }
-
-        $ext_app->{js} = \join ';', @app_js if !$app->{devel};
     }
 
     return;
@@ -265,7 +271,9 @@ sub _get_ctx ( $self, $class, $app, $framework ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (37)                      |
+## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (35)                      |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 249                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

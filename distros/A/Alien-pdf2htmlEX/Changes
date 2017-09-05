@@ -1,0 +1,6 @@
+0.001 2017-08-29 00:29:08-0400
+
+  Features
+
+   - First release.
+   - Installs pdf2htmlEX if binary is not found on the system.

@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Exporter-WithBase,
-version 1.00:
+version 1.01:
 
   Like Exporter, but add a '-base' flag to declare a class as a child
 
-This software is copyright (c) 2014 by Olivier Mengué.
+This software is copyright (c) 2017 by Olivier Mengué.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use Carp ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -42,6 +42,7 @@ sub init
       my($build) = @_;
       $build->runtime_prop->{legacy}->{name} ||= $pkg_name;
 
+      require PkgConfig;
       my $pkg = PkgConfig->find($pkg_name);
       die "package @{[ $pkg_name ]} not found" if $pkg->errmsg;
       if(defined $self->minimum_version)
@@ -70,6 +71,7 @@ sub init
 
     foreach my $name ($pkg_name, @alt_names)
     {
+      require PkgConfig;
       my $pkg = PkgConfig->find($name, search_path => [@PKG_CONFIG_PATH]);
       if($pkg->errmsg)
       {
@@ -125,7 +127,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

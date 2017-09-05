@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use constant {
 	CMD_OK       => 2,
@@ -146,7 +146,8 @@ sub send {
 	$delay->on(finish => sub {
 		if ($cb) {
 			my $r = $_[1];
-			if ($r->isa('Mojo::SMTP::Client::Exception')) {
+			unless ($r->isa('Mojo::SMTP::Client::Response')) {
+				# some error occured, which throwed an exception
 				$r = Mojo::SMTP::Client::Response->new('', error => $r);
 			}
 			
@@ -238,7 +239,7 @@ sub _make_cmd_steps {
 			sub {
 				eval { $self->{resp_checker}->(@_); $_[1]->{checked} = 1 };
 				if (my $e = $@) {
-					die $e unless $e->error->isa('Mojo::SMTP::Client::Exception::Response');
+					die $e unless $e->isa('Mojo::SMTP::Client::Response');
 					my $delay = shift;
 					
 					$self->{stream}->start if !$prepend && $mi == $#cmd; # XXX: _read_response may stop stream
@@ -325,17 +326,53 @@ sub _make_cmd_steps {
 			}
 		}
 		elsif ($cmd[$i] eq 'auth') { # AUTH
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('AUTH PLAIN '.b64_encode(join("\0", '', $cmd[$mi]->{login}, $cmd[$mi]->{password}), ''), CMD_AUTH);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}),
-			$self->{resp_checker},
-			sub {
+			my $type = lc($cmd[$mi]->{type} // 'plain');
+			my $set_auth_ok = sub {
 				my $delay = shift;
 				$self->{authorized} = 1;
 				$delay->pass;
+			};
+			
+			if ($type eq 'plain') {
+				push @steps, $self->_new_cmd(sub {
+					my $delay = shift;
+					$self->_write_cmd('AUTH PLAIN '.b64_encode(join("\0", '', $cmd[$mi]->{login}, $cmd[$mi]->{password}), ''), CMD_AUTH);
+					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
+					$self->{expected_code} = CMD_OK;
+				}),
+				$self->{resp_checker},
+				$set_auth_ok;
+			}
+			elsif ($type eq 'login') {
+				push @steps,
+				# start auth
+				$self->_new_cmd(sub {
+					my $delay = shift;
+					$self->_write_cmd('AUTH LOGIN', CMD_AUTH);
+					$self->_read_response($delay->begin, 0);
+					$self->{expected_code} = CMD_MORE;
+				}),
+				$self->{resp_checker},
+				# send username
+				$self->_new_cmd(sub {
+					my $delay = shift;
+					$self->_write_cmd(b64_encode($cmd[$mi]->{login}, ''), CMD_AUTH);
+					$self->_read_response($delay->begin, 0);
+					$self->{expected_code} = CMD_MORE;
+				}),
+				$self->{resp_checker},
+				# send password
+				$self->_new_cmd(sub {
+					my $delay = shift;
+					$self->_write_cmd(b64_encode($cmd[$mi]->{password}, ''), CMD_AUTH);
+					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
+					$self->{expected_code} = CMD_OK;
+				}),
+				$self->{resp_checker},
+				$set_auth_ok;
+			}
+			else {
+			    croak 'unrecognized auth method: ', $type;
 			}
 		}
 		elsif ($cmd[$i] eq 'from') { # FROM
@@ -588,7 +625,8 @@ C<Mojo::SMTP::Client> inherits all events from L<Mojo::EventEmitter> and can emi
 		$smtp->inactivity_timeout(5*60);
 	});
 
-Emitted whenever a new connection is about to start.
+Emitted whenever a new connection is about to start. You can interrupt sending by dying or throwing an exception
+from this callback, C<error> attribute of the response will contain corresponding error.
 
 =head2 response
 
@@ -601,7 +639,8 @@ Emitted whenever a new connection is about to start.
 	});
 
 Emitted for each SMTP response from the server. C<$cmd> is a command L<constant|/CONSTANTS> for which this
-response was sent. C<$resp> is L<Mojo::SMTP::Client::Response> object.
+response was sent. C<$resp> is L<Mojo::SMTP::Client::Response> object. You can interrupt sending by dying or
+throwing an exception from this callback, C<error> attribute of the response will contain corresponding error.
 
 =head1 ATTRIBUTES
 
@@ -700,10 +739,12 @@ attributes
 
 =item auth
 
-Authorize on SMTP server. Argument to this command should be reference to a hash with C<login> and C<password>
-keys. Only PLAIN authorization supported for now. You should authorize only once per session
+Authorize on SMTP server. Argument to this command should be a reference to a hash with C<type>,
+C<login> and C<password> keys. Only PLAIN and LOGIN authorization are supported as C<type> for now.
+You should authorize only once per session.
 
-	$smtp->send(auth => {login => 'oleg', password => 'qwerty'});
+    $smtp->send(auth => {login => 'oleg', password => 'qwerty'});      # defaults to AUTH PLAIN
+    $smtp->send(auth => {login => 'oleg', password => 'qwerty', type => 'login'}); # AUTH LOGIN
 
 =item from
 
@@ -751,7 +792,7 @@ C<$resp-E<gt>message> (string).
 
 For blocking usage C<$resp> will be returned as result of C<$smtp-E<gt>send> call. C<$resp> is the same as for
 non-blocking result. If L</autodie> attribute has true value C<send> will throw an exception on any error.
-Which will be one of C<Mojo::SMTP::Client::Exception::*>.
+Which will be one of C<Mojo::SMTP::Client::Exception::*> or an error throwed by the user inside L<start> or L<connect> callback.
 
 B<Note>. For SMTP protocol it is important to send commands in certain order. Also C<send> will send all commands in order you are
 specified. So, it is important to pass arguments to C<send> in right order. For basic usage this will always be:

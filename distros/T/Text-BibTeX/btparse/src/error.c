@@ -175,7 +175,7 @@ report_error (bt_errclass class,
 #if HAVE_VSNPRINTF
    vsnprintf (error_buf, MAX_ERROR, fmt, arglist);
 #else
-   msg_len = vsprintf (error_buf, fmt, arglist);
+   msg_len = vsprintf (error_buf, fmt, arglist);   // protected by cpp
    if (msg_len > MAX_ERROR)
       internal_error ("static error message buffer overflowed");
 #endif

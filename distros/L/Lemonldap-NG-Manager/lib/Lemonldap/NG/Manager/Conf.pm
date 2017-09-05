@@ -683,7 +683,7 @@ sub metadatas {
         my @a  = $self->confAcc->available;
         my $id = -1;
         my ($ind) = map { $id++; $_ == $res->{cfgNum} ? ($id) : () } @a;
-        if ($ind)         { $res->{prev} = $a[ $ind - 1 ]; }
+        if ($ind) { $res->{prev} = $a[ $ind - 1 ]; }
         if ( $ind and $ind < $#a ) { $res->{next} = $a[ $ind + 1 ]; }
         $self->userNotice( 'User '
               . $self->userId($req)
@@ -1008,17 +1008,18 @@ sub applyConf {
 
     # Parse apply values
     while ( my ( $host, $request ) = each %reloadUrls ) {
-        my $r = HTTP::Request->new( 'GET', "http://$host$request");
-        if ($request =~ /^https?:\/\/[^\/]+.*$/) {
-            my $url = URI::URL->new($request);
-            my $targetUrl = $url->scheme."://".$host;
-            $targetUrl .= ":".$url->port if defined ($url->port);
+        my $r = HTTP::Request->new( 'GET', "http://$host$request" );
+        if ( $request =~ /^https?:\/\/[^\/]+.*$/ ) {
+            my $url       = URI::URL->new($request);
+            my $targetUrl = $url->scheme . "://" . $host;
+            $targetUrl .= ":" . $url->port if defined( $url->port );
             $targetUrl .= $url->full_path;
             $r =
               HTTP::Request->new( 'GET', $targetUrl,
                 HTTP::Headers->new( Host => $url->host ) );
-            if (defined $url->userinfo && $url->userinfo =~/^([^:]+):(.*)$/) {
-                $r->authorization_basic($1,$2);
+            if ( defined $url->userinfo && $url->userinfo =~ /^([^:]+):(.*)$/ )
+            {
+                $r->authorization_basic( $1, $2 );
             }
         }
 

@@ -13,6 +13,7 @@ build_requires:
 configure_requires:
   Alien::Base::ModuleBuild: '0'
   Alien::CMake: '0.07'
+  File::Which: '0'
   Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
@@ -24,14 +25,14 @@ name: Alien-libvas
 provides:
   Alien::libvas:
     file: lib/Alien/libvas.pm
-    version: '0.15'
+    version: '0.204'
 recommends:
   IO::Socket::SSL: '0'
 requires:
   Alien::Base: '0.030'
   File::ShareDir: '1.00'
-  perl: '5.008001'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.15'
+version: '0.204'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

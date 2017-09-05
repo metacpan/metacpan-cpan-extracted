@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 8d419ad3679645e230f0559186d56e2a2f8aa7a2 Changes
+SHA1 a498d4efa7fca9c3ffa4e177fa1d447af1745e8e MANIFEST
+SHA1 f41f3a6b7b2cfe8b7ba9df28b607ec471e10d0e3 META.json
+SHA1 cff25888a696c6f2f6e8e3c95c11dd36345de427 META.yml
+SHA1 48958b8943569b0d8591b563633088b554db5f57 Makefile.PL
+SHA1 2beb348042e6635e637abab58085ec8bba1e5d69 README
+SHA1 f1e3dc70f47b60bbd0d4da815a60442fce6b76da lib/Android/ADB.pm
+SHA1 aa8feb736515d74ff67ce5a398f54c2ca029b40b lib/Android/ADB/Device.pm
+SHA1 e1fe79de63c283079fb1a481ef5a316da8b7aa34 t/Android-ADB.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlmollIQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYhAmD/0cFPYloQA4RfObrplowuH8eeU8Lo3ltMmI
+cCcZwASI03dsd6vwEYQz7c6KSr0f1gvQlBcqfnkYyj9WIjv72Dt44CZD94lf0ZOS
+KSIf+kwyKAc6zIqDrkjXLMjpmeBmYJxIqmTt1L6ftNKCcW4s/EINnwhtSEf2Sh1b
+jVYLdAXapjpD/brsM86Y2MUP+49ql94E23sprA7I1YDjTD+WI8/vOabVHCSAvQma
+g5l5/IHrmKy+frMx/LVMLiFSV2Y6QBarlvBa72stTresKw3/GQGJsoTb5UfvU4O0
+sI1GLDqkav3/usrOQlXwJH4+LAZjgVKqtTq6QGpZdBKvKH2l3stkq9ppwNtpznXw
+61z8uPjOtvCkRdtssdcU0ltadYFpoXco+iPwQGt7t/N3ML1g4SjvpALKqA9M5Zxa
+0JrSTfCksUmOY4BHMBGhDShyuHodvvBpd/nkwejpcoKkMo+pIqXUl5tPl0DSU9mU
+DiD8Mgv9VavqxxPsMeCcgFgdesZFVmElAhlgVSWWL+LPgEYbBEu7Df8pda+F2hve
+SbkjQU8PwshMQP62slyHlPGbGwhmv5CzpqmXZMHIxnLR7L+DoDg6ClyxXkQ5A9tu
+tCk2FkPPA0oJx/G8wT/5pxuFQM0HaxBkUaV9i+YGCvj2y8BkzTdIlWEyCs+bCFSE
+Tzs+NmhRIw==
+=oLbb
+-----END PGP SIGNATURE-----

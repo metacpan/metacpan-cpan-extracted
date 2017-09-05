@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sat Oct  7 10:10:36 2006
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar  7 23:09:44 2011
-# Update Count    : 163
+# Last Modified On: Tue Oct 13 16:32:32 2015
+# Update Count    : 186
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -247,6 +247,103 @@ sub set_sequence {
     return;
 }
 
+################ Attachments ################
+
+# SQLite stores the data into files, next to the database.
+
+use Fcntl;
+
+#### TODO: (re)factor the slurp/blurp code.
+
+sub get_attachment {
+    my ( $self, $id ) = @_;
+
+    my $rr = $dbh->selectrow_arrayref("SELECT att_name,att_encoding".
+				      " FROM Attachments".
+				      " WHERE att_id = ?", {}, $id );
+    my ( $name, $enc, $data ) = @{ $rr };
+
+    if ( $enc == ATTENCODING_URI ) {
+	return { name => $name, encoding => $enc, content => \$name };
+    }
+
+    my $path = $cfg->val(qw(database path), ".");
+    my $file = File::Spec->catfile( $path, sprintf("%08d_%s", $id, $name) );
+    my $fail;
+    sysopen( my $fd, $file, O_RDONLY ) or $fail = $!;
+    my $cnt = 1;
+    my $offset = 0;
+    $data = "";
+    while ( !$fail && $cnt > 0 ) {
+	$cnt = sysread( $fd, $data, 20480, $offset );
+	$fail = $! if $cnt < 0;
+	$offset += $cnt;
+    }
+    close($fd);
+
+    if ( $fail ) {
+	die(__x("Intern probleem met bijlage {id} ({name}): {err}",
+		id => $id, name => $name, err => $fail)."\n");
+    }
+    return { name => $name, encoding => $enc, content => \$data };
+}
+
+sub store_attachment {
+    my ( $self, $atts ) = @_;
+
+    my @fields = qw( id name size encoding );
+
+    $dbh->do("INSERT INTO Attachments" .
+	     " (" . join(",", map { +"att_$_" } @fields ) . ") ".
+	     " VALUES (" . join(",", ("?") x @fields) . ")", {},
+	     $atts->{id}, $atts->{name}, $atts->{size},
+	     $atts->{encoding} );
+
+    return if $atts->{encoding} == ATTENCODING_URI;
+
+    my $path = $cfg->val(qw(database path), ".");
+    my $file = File::Spec->catfile( $path,
+				    sprintf("%08d_%s",
+					    $atts->{id}, $atts->{name}) );
+    my $fail;
+    sysopen( my $fd, $file, O_WRONLY|O_CREAT, 0600 ) or $fail = $!;
+    my $data = $atts->{content};
+    my $cnt = length($$data);
+    my $offset = 0;
+    while ( !$fail && $cnt > 0 ) {
+	my $w = syswrite( $fd, $$data, 20480, $offset );
+	$fail = $! if $cnt < 0;
+	$offset += $w;
+	$cnt -= $w;
+    }
+    unless ( $fail ) {
+	close($fd) or $fail = $!;
+    }
+
+    if ( $fail ) {
+	die(__x("Intern probleem met bijlage {id} ({name}): {err}",
+		id => $atts->{id}, name => $atts->{name}, err => $fail)."\n");
+    }
+}
+
+sub drop_attachment {
+    my ( $self, $id ) = @_;
+    my $rr = $dbh->selectrow_arrayref("SELECT att_name,att_encoding".
+				      " FROM Attachments".
+				      " WHERE att_id = ?", {}, $id );
+    my ( $name, $enc ) = @{ $rr };
+
+    $dbh->do("DELETE FROM Attachments WHERE att_id = ?", {}, $id );
+    return if $enc == ATTENCODING_URI;
+
+    my $path = $cfg->val(qw(database path), ".");
+    my $file = File::Spec->catfile( $path, sprintf("%08d_%s", $id, $name) );
+    unless ( unlink($file) ) {
+	die(__x("Intern probleem met bijlage {id} ({name}): {err}",
+		id => $id, name => $name, err => $!)."\n");
+    }
+}
+
 ################ Interactive SQL ################
 
 # API: Interactive SQL.
@@ -298,7 +395,7 @@ sub sqlfilter {
     my (@args) = @_;
 
     # No sequences.
-    return if /^(?:create|drop)\s+sequence\b/i;
+    return if /^(?:create|drop|alter)\s+sequence\b/i;
 
     # Constraints are ignored in table defs, but an
     # explicit alter needs to be skipped.

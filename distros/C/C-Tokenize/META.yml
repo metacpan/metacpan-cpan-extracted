@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/C-Tokenize/issues
   repository: https://github.com/benkasminbullock/C-Tokenize
-version: '0.15'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

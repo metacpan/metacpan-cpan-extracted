@@ -5,7 +5,7 @@
 # Handler module
 package Lemonldap::NG::Handler;
 
-our $VERSION = '1.9.10';
+our $VERSION = '1.9.11';
 
 use Lemonldap::NG::Handler::SharedConf;
 @ISA = qw(Lemonldap::NG::Handler::SharedConf);

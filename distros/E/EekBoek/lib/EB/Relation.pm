@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Jul 14 12:54:08 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jan 26 11:04:05 2012
-# Update Count    : 118
+# Last Modified On: Sat Mar  1 22:19:37 2014
+# Update Count    : 122
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -50,9 +50,6 @@ sub add {
 	    warn("?"._T("Relaties met verlegde BTW worden nog niet ondersteund")."\n");
 	    return;
 	}
-	if ( $bstate == BTWTYPE_INTRA ) { #### TODO
-	    warn("!"._T("Relaties met intra-communautaire BTW worden nog niet volledig ondersteund")."\n");
-	}
     }
     my $debiteur;
     my $ddesc;
@@ -78,6 +75,16 @@ sub add {
 	}
 	$dbk = $id;
 	$ddesc = $desc;
+    }
+
+    # There are virtually no restrictions on what can go in a relation
+    # code. Relation codes that start with digits and a dash may lead
+    # to parse errors.
+    # Except for the schema SQL this is the only place where the length
+    # constraint is explicit.
+    if ( $code =~ /^\d+-/ || length($code) > 10 ) {
+	warn("?".__x("Ongeldige relatiecode: {rel}", rel => $code)."\n");
+	return;
     }
 
     # Invoeren nieuwe relatie.

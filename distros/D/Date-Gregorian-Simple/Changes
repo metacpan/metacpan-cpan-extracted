@@ -1,5 +1,9 @@
 Revision history for Date::Gregorian::Simple
 
+0.11  Sat Sep 02 12:00:00 2017
+      - Updated copyright year information.
+      - Updated SEE ALSO section in the pod.
+
 0.10  Sun Jan 15 11:30:00 2017
       - Updated the dependency on Date::Utils v0.22.
 

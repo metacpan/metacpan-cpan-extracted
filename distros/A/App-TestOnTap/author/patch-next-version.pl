@@ -72,18 +72,6 @@ foreach my $fn (keys(%files))
 	writeAll($fn, @contents);
 }
 
-my @mk = qx(perl Makefile.PL 2>&1);
-die("Failed creating makefile:\n@mk") if $?;
-
-my $mkcfg = qx(perl -V:make 2>&1);
-die("Failed finding make config:\n$mkcfg") if $?;
-die("Unexpected mkcfg: '$mkcfg'\n") unless $mkcfg =~ /^make='([^']+)'/; #'
-my $mkcmd = $1;
-
-my $expectedDist = "App-TestOnTap-$nextVersion.tar.gz";
-system("$mkcmd dist 2>&1");
-die("Failed making dist '$expectedDist'\n") if ($? || !-f $expectedDist);
-
 my @msg = readAll($msgfile);
 my $subj = "Release $nextVersion";
 writeAll($msgfile2, $subj, "", @msg);
@@ -98,6 +86,18 @@ foreach (@msg)
 }
 splice(@changes, 2, 0, "$nextVersion\t$today", @msg, "");
 writeAll('Changes', @changes);
+
+my @mk = qx(perl Makefile.PL 2>&1);
+die("Failed creating makefile:\n@mk") if $?;
+
+my $mkcfg = qx(perl -V:make 2>&1);
+die("Failed finding make config:\n$mkcfg") if $?;
+die("Unexpected mkcfg: '$mkcfg'\n") unless $mkcfg =~ /^make='([^']+)'/; #'
+my $mkcmd = $1;
+
+my $expectedDist = "App-TestOnTap-$nextVersion.tar.gz";
+system("$mkcmd dist 2>&1");
+die("Failed making dist '$expectedDist'\n") if ($? || !-f $expectedDist);
 
 print "The current branch is '$br[0]' with next version = '$nextVersion'\n";
 print "Ready to commit => tag => push => upload? ";

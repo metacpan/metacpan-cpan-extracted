@@ -18,19 +18,19 @@ name: Locale-TextDomain-OO-Extract
 provides:
   Locale::TextDomain::OO::Extract:
     file: lib/Locale/TextDomain/OO/Extract.pm
-    version: '2.009'
+    version: '2.011'
   Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor:
     file: lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm
     version: '2.007'
   Locale::TextDomain::OO::Extract::HTML:
     file: lib/Locale/TextDomain/OO/Extract/HTML.pm
-    version: '2.007'
+    version: '2.011'
   Locale::TextDomain::OO::Extract::JavaScript:
     file: lib/Locale/TextDomain/OO/Extract/JavaScript.pm
-    version: '2.007'
+    version: '2.011'
   Locale::TextDomain::OO::Extract::Perl:
     file: lib/Locale/TextDomain/OO/Extract/Perl.pm
-    version: '2.007'
+    version: '2.011'
   Locale::TextDomain::OO::Extract::Process:
     file: lib/Locale/TextDomain/OO/Extract/Process.pm
     version: '2.004'
@@ -45,7 +45,10 @@ provides:
     version: '2.007'
   Locale::TextDomain::OO::Extract::TT:
     file: lib/Locale/TextDomain/OO/Extract/TT.pm
-    version: '2.007'
+    version: '2.011'
+  Locale::TextDomain::OO::Extract::YAML:
+    file: lib/Locale/TextDomain/OO/Extract/YAML.pm
+    version: '2.011'
 recommends:
   Path::Iterator::Rule: '0'
   Test::Pod: '1.14'
@@ -72,5 +75,5 @@ requires:
   perl: '5.009005'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.009'
+version: '2.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

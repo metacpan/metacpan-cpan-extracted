@@ -41,19 +41,14 @@ is $child_two->data_sources, 4, 'four data sources';
 is $c->data_sources, 4, 'four data sources';
 
 sub do_on_all {
+    my $dbh = shift;
     my @args = @_;
     my $i = 1;
-    $c->{handler}->multi_do_all(sub {ok shift->do(@args), "$i: @args"; $i++});
-#    # should be in nine, one, five, ten
-#    ok $c->do(@args), "@args" for 1..4;
-#    # should be in two, three, four
-#    ok $child_one->do(@args), "@args" for 1..3;
-#    # should be in six, seven, eight 
-#    ok $child_two->do(@args), "@args" for 1..3;
+    $c->multi_do_all(sub {ok shift->do(@args), "$i: @args"; $i++});
 }
 
-do_on_all("CREATE TABLE multi(id int)");
-do_on_all("INSERT INTO multi VALUES(?)", {}, $_) for 1..5;
+do_on_all($c, "CREATE TABLE multi(id int)");
+do_on_all($c, "INSERT INTO multi VALUES(?)", {}, $_) for 1..5;
 
 for my $val ( 1 .. 5 ) {
     my $sth = $c->prepare("SELECT * FROM multi where id = ?");

@@ -1,7 +1,4 @@
-#!perl -T
-
-use Test::More tests => 1;
-# required by appenders to work correctly
+use Test::More;
 use Log::Log4perl;
 
 BEGIN {
@@ -11,4 +8,4 @@ BEGIN {
 
 diag("Testing Log::Log4perl::Appender::Fluent $Log::Log4perl::Appender::Fluent::VERSION, Perl $], $^X");
 
-# vim:ft=perl
+done_testing();

@@ -1,5 +1,9 @@
 Revision history for Devel::JSON
 
+1.001     2017-09-03 06:53:22+02:00 Europe/Paris
+	Document how to output a boolean value (use JSON::PP::{true,false}).
+	Repository moved to https://github.com/dolmen-perl5/Devel-JSON
+
 1.000     2016-02-17 23:17:30+01:00 Europe/Paris
 	Dependencies: require Encode 2.73 on MSWin32 and netbsd.
 	Spéciale dédicace à Andéol !

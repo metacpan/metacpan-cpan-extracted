@@ -53,7 +53,9 @@ ok(fchmodat($dot, $tmpname, 0755), 'fchmodat');
 @stat = fstatat($dot, $tmpname);
 ok(@stat && S_ISDIR($stat[2]) && ($stat[2] & 07777) == 0755, 'fstatat after fchmodat');
 
-$rv = openat($dot, $tmpname, O_RDONLY|O_DIRECTORY);
+# Don't use O_DIRECTORY here because it's not always available. We don't need
+# it anyway because we know we've just created a directory.
+$rv = openat($dot, $tmpname, O_RDONLY);
 ok(blessed($rv) =~ /^POSIX::2008/, 'openat returns handle (2)');
 
 openat($rv, $tmpname, O_RDWR|O_CREAT|O_TRUNC);

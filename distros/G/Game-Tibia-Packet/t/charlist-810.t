@@ -1,7 +1,6 @@
 use Test::More;
 use Test::HexString;
-use Data::Dumper;
-use Data::HexDump;
+#use Data::HexDump;
 
 BEGIN {
     use_ok 'Game::Tibia::Packet::Charlist';

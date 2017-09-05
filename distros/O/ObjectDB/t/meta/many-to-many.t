@@ -1,48 +1,44 @@
-use Test::Spec;
-use Test::Fatal;
-
+use strict;
+use warnings;
 use lib 't/lib';
 
-use ObjectDB::Meta::Relationship::ManyToMany;
+use Test::More;
+use Test::Fatal;
 
-describe 'many to many' => sub {
+use_ok 'ObjectDB::Meta::Relationship::ManyToMany';
 
-    it 'build_to_source' => sub {
-        my $rel = _build_relationship(
-            name       => 'tags',
-            orig_class => 'Book',
-            type       => 'many to many',
-            map_class  => 'BookTagMap',
-            map_from   => 'book',
-            map_to     => 'tag'
-        );
+subtest 'to_source: builds correct mapping' => sub {
+    my $rel = _build_relationship(
+        name       => 'tags',
+        orig_class => 'Book',
+        type       => 'many to many',
+        map_class  => 'BookTagMap',
+        map_from   => 'book',
+        map_to     => 'tag'
+    );
 
-        is_deeply(
-            [$rel->to_source],
-            [
-                {
-                    table => 'book_tag_map',
-                    as    => 'book_tag_map',
-                    join  => 'left',
-                    constraint =>
-                      ['book.id' => {-col => 'book_tag_map.book_id'}]
-                },
-                {
-                    table => 'tag',
-                    as    => 'tags',
-                    join  => 'left',
-                    constraint =>
-                      ['book_tag_map.tag_id' => {-col => 'tags.id'}],
-                    columns => ['id', 'name']
-                }
-            ]
-        );
-    };
-
+    is_deeply(
+        [ $rel->to_source ],
+        [
+            {
+                table      => 'book_tag_map',
+                as         => 'book_tag_map',
+                join       => 'left',
+                constraint => [ 'book.id' => { -col => 'book_tag_map.book_id' } ]
+            },
+            {
+                table      => 'tag',
+                as         => 'tags',
+                join       => 'left',
+                constraint => [ 'book_tag_map.tag_id' => { -col => 'tags.id' } ],
+                columns => [ 'id', 'name' ]
+            }
+        ]
+    );
 };
+
+done_testing;
 
 sub _build_relationship {
     ObjectDB::Meta::Relationship::ManyToMany->new(@_);
 }
-
-runtests unless caller;

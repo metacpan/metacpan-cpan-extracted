@@ -11,14 +11,11 @@ use strict;
 use warnings;
 
 package Config::MVP::Slicer;
-{
-  $Config::MVP::Slicer::VERSION = '0.302';
-}
-BEGIN {
-  $Config::MVP::Slicer::AUTHORITY = 'cpan:RWSTAUNER';
-}
-# ABSTRACT: Extract embedded plugin config from parent config
+# git description: v0.302-4-g57e9836
 
+our $AUTHORITY = 'cpan:RWSTAUNER';
+# ABSTRACT: Extract embedded plugin config from parent config
+$Config::MVP::Slicer::VERSION = '0.303';
 use Carp (); # core
 use Moose;
 
@@ -202,11 +199,11 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 1;
 
-
 __END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =for :stopwords Randy Stauner ACKNOWLEDGEMENTS cpan testmatrix url annocpan anno bugtracker
 rt cpants kwalitee diff irc mailto metadata placeholders metacpan
@@ -217,7 +214,9 @@ Config::MVP::Slicer - Extract embedded plugin config from parent config
 
 =head1 VERSION
 
-version 0.302
+version 0.303
+
+=for test_synopsis my ($parent, $plugin);
 
 =head1 SYNOPSIS
 
@@ -435,8 +434,6 @@ If C<$plugin> is an instance of a plugin that has a C<plugin_name>
 method it will construct the list from that method, C<ref>,
 and the instance itself.
 
-=for test_synopsis my ($parent, $plugin);
-
 =head1 CONFIGURATION SYNTAX
 
 Often configurations come from an C<ini> file and look like this:
@@ -514,58 +511,18 @@ in addition to those websites please use your favorite search engine to discover
 
 =item *
 
-Search CPAN
+MetaCPAN
 
-The default CPAN search engine, useful to view POD in HTML format.
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://search.cpan.org/dist/Config-MVP-Slicer>
-
-=item *
-
-RT: CPAN's Bug Tracker
-
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-MVP-Slicer>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Config-MVP-Slicer>
-
-=item *
-
-CPAN Testers
-
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
-
-L<http://www.cpantesters.org/distro/C/Config-MVP-Slicer>
-
-=item *
-
-CPAN Testers Matrix
-
-The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
-
-L<http://matrix.cpantesters.org/?dist=Config-MVP-Slicer>
-
-=item *
-
-CPAN Testers Dependencies
-
-The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
-
-L<http://deps.cpantesters.org/?module=Config::MVP::Slicer>
+L<http://metacpan.org/release/Config-MVP-Slicer>
 
 =back
 
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-config-mvp-slicer at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-MVP-Slicer>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Config-MVP-Slicer>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -587,4 +544,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

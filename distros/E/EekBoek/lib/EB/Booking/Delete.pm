@@ -11,8 +11,8 @@ package EB::Booking::Delete;
 # Author          : Johan Vromans
 # Created On      : Mon Sep 19 22:19:05 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Jun  7 13:58:47 2012
-# Update Count    : 88
+# Last Modified On: Thu Sep 24 22:01:25 2015
+# Update Count    : 90
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -59,12 +59,13 @@ sub perform {
 	}
     }
 
+    my ($amt, $open, $dbk, $att) = @{$dbh->do("SELECT bsk_amount,bsk_open,bsk_dbk_id,bsk_att".
+					      " FROM Boekstukken".
+					      " WHERE bsk_id = ?", $bsk)};
+
     # Check if this boekstuk is used by others. This can only be the
     # case if has been paid.
 
-    my ($amt, $open, $dbk) = @{$dbh->do("SELECT bsk_amount,bsk_open,bsk_dbk_id".
-				  " FROM Boekstukken".
-				  " WHERE bsk_id = ?", $bsk)};
     if ( defined($open) && $amt != $open ) {
 	# It has been paid. Show the user the list of bookstukken.
 	$sth = $dbh->sql_exec("SELECT dbk_desc, bsk_nr".
@@ -127,6 +128,9 @@ sub perform {
 	# Delete boekstuk.
 	$dbh->sql_exec("DELETE FROM Boekstukken".
 		       " WHERE bsk_id = ?", $bsk)->finish;
+
+	# Delete attachments.
+	$dbh->drop_attachment($att) if defined $att;
 
 #	# Adjust saldi van boekingen na deze.
 #	$dbh->sql_exec("UPDATE Boekstukken".

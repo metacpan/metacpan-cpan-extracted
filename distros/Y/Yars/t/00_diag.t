@@ -19,6 +19,7 @@ $modules{$_} = $_ for qw(
   Digest::MD5
   Digest::file
   EV
+  ExtUtils::MakeMaker
   File::Find::Rule
   Hash::MoreUtils
   IO::Socket::INET
@@ -29,7 +30,6 @@ $modules{$_} = $_ for qw(
   JSON::XS
   List::Util
   Log::Log4perl
-  Module::Build
   Monkey::Patch
   Number::Bytes::Human
   Path::Class

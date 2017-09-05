@@ -1,0 +1,8 @@
+/*
+ * Block comment
+ */
+{
+   "key1" : "\// scalar value",
+   "key2" : "\/* start",
+   "key3" : "end */"
+}

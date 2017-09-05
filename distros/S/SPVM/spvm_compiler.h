@@ -10,6 +10,9 @@ struct SPVM_compiler {
   // Constant pool
   SPVM_CONSTANT_POOL* constant_pool;
   
+  // String symbol table
+  SPVM_HASH* string_symtable;
+  
   // Bytecodes
   SPVM_BYTECODE_ARRAY* bytecode_array;
 
@@ -79,6 +82,9 @@ struct SPVM_compiler {
   // Resolved type symbol table
   SPVM_HASH* type_symtable;
   
+  // Inline files
+  SPVM_DYNAMIC_ARRAY* inline_files;
+  
   // Current case statements in switch statement
   SPVM_DYNAMIC_ARRAY* cur_op_cases;
   
@@ -86,6 +92,12 @@ struct SPVM_compiler {
   const char* start_sub_name;
   
   SPVM_DYNAMIC_ARRAY* cur_template_args;
+  
+  // Use module pathes
+  SPVM_DYNAMIC_ARRAY* use_package_names;
+  
+  // Use module pathes
+  SPVM_HASH* use_package_path_symtable;
   
   // Current line number
   int32_t cur_line;
@@ -113,6 +125,9 @@ struct SPVM_compiler {
   
   // Error is fatal
   _Bool fatal_error;
+  
+  // Before is camma
+  _Bool before_is_comma;
   
   _Bool debug;
 };

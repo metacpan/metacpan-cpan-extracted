@@ -24,7 +24,7 @@ use base 'Exporter';
 use strict;
 our $AUTOLOAD;
 
-our $VERSION = 4.86;
+our $VERSION = 4.88;
 
 BEGIN {
     use Carp;
@@ -655,7 +655,8 @@ sub match_cc_number {
     return undef unless $card_type =~ /^[admv]/i;
 
     return undef if ($card_type =~ /^v/i && substr($the_card, 0, 1) ne "4") ||
-      ($card_type =~ /^m/i && substr($the_card, 0, 1) ne "5") ||
+      ($card_type =~ /^m/i && substr($the_card, 0, 1) ne "5" &&
+       substr($the_card, 0, 1) ne "2") ||
       ($card_type =~ /^d/i && substr($the_card, 0, 4) ne "6011") ||
       ($card_type =~ /^a/i && substr($the_card, 0, 2) ne "34" &&
        substr($the_card, 0, 2) ne "37");

@@ -1,3 +1,28 @@
+0.001004  2017-08-31 21:02:34-07:00 America/Los_Angeles
+
+    - Make test.pl ok with preload
+    - Fix Formatter::Test2 for non-tty output
+    - Add -T for timing data per-test
+    - Better signal handling
+    - More HARNESS- header options:
+      - HARNESS-NO-TIMEOUT
+    - Delete job dirs when they are done unless -k is used
+
+0.001003  2017-08-30 23:18:54-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Set env vars in the run-runner for preload
+    - Improve preload support
+    - Fix formatter selection in Open3 runner
+    - Update deps
+
+0.001002  2017-08-29 21:10:17-07:00 America/Los_Angeles
+
+    - Allow preload of Test::Builder
+
+0.001001  2017-08-28 22:40:20-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Complete rewrite
+
 0.000013  2017-01-03 21:18:19-08:00 America/Los_Angeles
 
     - Add event timeout option
@@ -17,7 +42,7 @@
       argument, rather than just the job id.
     - Fixed the TAP parser to handle comments with leading
       whitespace. Previously it would strip all the leading whitespace out,
-      causing both "# foo" and "# foo" to be output the same way.
+      causing both "# foo" and "#     foo" to be output the same way.
     - Add example for using the harness as a preload test file
     - Document using Test2::Harness as a preload test runner
     - Rewrote all of the internals so that the harness now handles Test2

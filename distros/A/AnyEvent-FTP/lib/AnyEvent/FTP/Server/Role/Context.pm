@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Server connection context role
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 requires 'push_request';
 
@@ -24,7 +24,7 @@ AnyEvent::FTP::Server::Role::Context - Server connection context role
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 

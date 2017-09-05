@@ -1,7 +1,16 @@
+Version 1.28 - 31 Aug 2017 
+
+* New class methods options(), keywords(), and flags() for
+  Locale::TextDomain
+
 Version 1.27 - 7 Aug 2017
 
 * Bugs fixed:
 
+  https://rt.cpan.org/Public/Bug/Display.html?id=114731
+  https://rt.cpan.org/Public/Bug/Display.html?id=116772
+  https://rt.cpan.org/Public/Bug/Display.html?id=119014
+  https://rt.cpan.org/Public/Bug/Display.html?id=120165
   https://rt.cpan.org/Public/Bug/Display.html?id=120446
 
 Version 1.26 - 13 May 2016

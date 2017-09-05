@@ -32,8 +32,7 @@
 //
 // test.js
 //
-// Unit testing script - runs routines in tests/ directory to set up 
-// unit tests and then called QUnit to load and start them, respectively
+// runs routines in tests/ directory to declare unit tests
 //
 "use strict";
 
@@ -57,6 +56,4 @@ require ([
     currentUserTests();
     libTests();
     prototypeTests();
-    qunit.load();
-    qunit.start();
 });

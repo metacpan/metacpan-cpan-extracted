@@ -8,11 +8,12 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
+  blib: '1.01'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,6 +31,6 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/dolmen/p5-Devel-JSON
-  repository: https://github.com/dolmen/p5-Devel-JSON.git
-version: '1.000'
+  homepage: https://github.com/dolmen-perl5/Devel-JSON
+  repository: https://github.com/dolmen-perl5/Devel-JSON.git
+version: '1.001'

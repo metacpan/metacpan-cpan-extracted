@@ -1,5 +1,8 @@
 Revision history for Perl module Alien::Base.
 
+0.045 2017-08-29 04:51:05 -0400
+  - Fix broken skip in t/alien_base_modulebuild_pkgconfig.t
+
 0.044 2017-08-23 13:20:29 -0400
   - Remove unnecessary prereqs on newer versions of Alien::Base
 

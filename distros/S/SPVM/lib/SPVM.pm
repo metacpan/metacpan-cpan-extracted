@@ -17,16 +17,47 @@ use SPVM::Array::Float;
 use SPVM::Array::Double;
 use SPVM::String;
 use SPVM::Array::Object;
+use File::Temp 'tempdir';
+use ExtUtils::CBuilder;
+
 
 use Encode 'encode';
 
-use Carp 'croak';
+use Carp 'confess';
 
-our $VERSION = '0.0249';
+our $VERSION = '0.0257';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
+our %PACKAGE_INFO_SYMTABLE;
 our $API;
+our @INLINE_DLL_FILES;
+
+our @PACKAGE_INFOS_INLINE;
+
+sub import {
+  my ($class, $package_name) = @_;
+  
+  # Add package infomations
+  if (defined $package_name) {
+    unless ($SPVM::PACKAGE_INFO_SYMTABLE{$package_name}) {
+      my ($file, $line) = (caller)[1, 2];
+
+      my $package_info = {
+        name => $package_name,
+        file => $file,
+        line => $line
+      };
+      push @SPVM::PACKAGE_INFOS, $package_info;
+      
+      $SPVM::PACKAGE_INFO_SYMTABLE{$package_name} = 1;
+      
+      return $package_info;
+    }
+  }
+  
+  return undef;
+}
 
 sub _get_dll_file {
   my $package_name = shift;
@@ -53,6 +84,29 @@ sub _get_dll_file {
   return $dll_file;
 }
 
+sub search_native_address {
+  my ($dll_file, $sub_abs_name) = @_;
+  
+  my $native_address;
+  
+  if ($dll_file) {
+    my $dll_libref = DynaLoader::dl_load_file($dll_file);
+    if ($dll_libref) {
+      my $sub_abs_name_c = $sub_abs_name;
+      $sub_abs_name_c =~ s/:/_/g;
+      $native_address = DynaLoader::dl_find_symbol($dll_libref, $sub_abs_name_c);
+    }
+    else {
+      return;
+    }
+  }
+  else {
+    return;
+  }
+  
+  return $native_address;
+}
+
 sub get_sub_native_address {
   my $sub_abs_name = shift;
   
@@ -68,35 +122,32 @@ sub get_sub_native_address {
   my $dll_file;
   my $dll_package_name = $package_name;
   while (1) {
-    my $not_found;
     $dll_file = _get_dll_file($dll_package_name);
-    if ($dll_file) {
-      my $dll_libref = DynaLoader::dl_load_file($dll_file);
-      if ($dll_libref) {
-        my $sub_abs_name_c = $sub_abs_name;
-        $sub_abs_name_c =~ s/:/_/g;
-        $native_address = DynaLoader::dl_find_symbol($dll_libref, $sub_abs_name_c);
-        if ($native_address) {
-          last;
-        }
-        else {
-          $not_found = 1;
-        }
-      }
-      else {
-        $not_found = 1;
-      }
+    $native_address = search_native_address($dll_file, $sub_abs_name);
+    
+    if ($native_address) {
+      last;
     }
     else {
-      $not_found = 1;
-    }
-    
-    if ($not_found) {
       if ($dll_package_name =~ /::/) {
         $dll_package_name =~ s/::[^:]+$//;
       }
       else {
         last;
+      }
+    }
+  }
+  
+  # Search inline dlls
+  my $package_name_tmp = $package_name;
+  $package_name_tmp =~ s/:/_/g;
+  unless ($native_address) {
+    for my $dll_file (@INLINE_DLL_FILES) {
+      if ($dll_file =~ /\Q$package_name_tmp/) {
+        $native_address = search_native_address($dll_file, $sub_abs_name);
+        if ($native_address) {
+          last;
+        }
       }
     }
   }
@@ -110,9 +161,64 @@ sub bind_native_subs {
     my $native_sub_name_spvm = "SPVM::$native_sub_name";
     my $native_address = get_sub_native_address($native_sub_name_spvm);
     unless ($native_address) {
-      croak "Can't find native address($native_sub_name())";
+      confess "Can't find native address($native_sub_name())";
     }
     bind_native_sub($native_sub_name, $native_address);
+  }
+}
+
+sub compile_inline_native_subs {
+  
+  my $spvm_files = get_inline_files();
+  
+  for my $spvm_file (@$spvm_files) {
+    my $temp_dir = tempdir;
+    
+    open my $spvm_fh, '<', $spvm_file
+      or confess "Can't open $spvm_file: $!";
+    
+    my $native_src;
+    my $start;
+    my $first_line = 1;
+    while (my $line = <$spvm_fh>) {
+      if ($start) {
+        if ($first_line) {
+          $native_src .= "#line " . ($. + 1) . "\"$spvm_file\"";
+          $first_line = 0;
+        }
+        $native_src .= $line;
+      }
+      else {
+        if ($line =~ /__NATIVE__/) {
+          $start = 1;
+        }
+      }
+    }
+    
+    my $spvm_tmp_file = $spvm_file;
+    $spvm_tmp_file =~ s/\//__/g;
+    $spvm_tmp_file =~ s/\.spvm$//;
+    $spvm_tmp_file .= '.c';
+    
+    my $native_src_file = "$temp_dir/$spvm_tmp_file";
+    open my $native_src_fh, '>', $native_src_file
+      or die "Can't open $native_src_file:$!";
+    
+    print $native_src_fh "$native_src\n";
+    
+    close $native_src_fh;
+    
+    my $api_header_include_dir = $INC{"SPVM.pm"};
+    $api_header_include_dir =~ s/\.pm$//;
+    
+    my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+    my $obj_file = $cbuilder->compile(
+      source => $native_src_file,
+      include_dirs => [$api_header_include_dir]
+    );
+    my $lib_file = $cbuilder->link(objects => $obj_file);
+    
+    push @INLINE_DLL_FILES, $lib_file;
   }
 }
 
@@ -129,6 +235,9 @@ CHECK {
   
   # Free compiler
   free_compiler();
+  
+  # Compile inline native subroutine
+  compile_inline_native_subs();
   
   # Bind native subroutines
   bind_native_subs();
@@ -159,7 +268,7 @@ sub new_byte_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -183,7 +292,7 @@ sub new_short_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -207,7 +316,7 @@ sub new_int_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -231,7 +340,7 @@ sub new_long_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -255,7 +364,7 @@ sub new_float_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -279,7 +388,7 @@ sub new_double_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
-    croak "Argument must be array reference";
+    confess "Argument must be array reference";
   }
   
   my $length = @$elements;
@@ -315,28 +424,6 @@ sub new_object {
   return $object;
 }
 
-my $package_names_h = {};
-
-sub import {
-  my ($class, $package_name) = @_;
-  
-  # Add package infomations
-  if (defined $package_name) {
-    unless ($package_names_h->{$package_name}) {
-      my ($file, $line) = (caller)[1, 2];
-
-      my $package_info = {
-        name => $package_name,
-        file => $file,
-        line => $line
-      };
-      push @PACKAGE_INFOS, $package_info;
-      
-      $package_names_h->{$package_name} = 1;
-    }
-  }
-}
-
 sub build_spvm_subs {
   my $sub_names = get_sub_names();
   
@@ -346,16 +433,18 @@ sub build_spvm_subs {
     *{"SPVM::$abs_name"} = sub {
       my $return_value;
       eval { $return_value = SPVM::call_sub("$abs_name", @_) };
-      croak $@ if $@;
+      my $error = $@;
+      if ($error) {
+        $error = Encode::decode('UTF-8', $error);
+        confess $error;
+      }
       $return_value;
     };
   }
 }
 
-# Preloaded methods go here.
-
 1;
-__END__
+
 =encoding UTF-8
 
 =head1 NAME
@@ -381,9 +470,9 @@ Module file
     has x : int;
     has y : int;
 
-    sub sum ($a : int, $b : int) : int {
+    sub sum ($x : int, $y : int) : int {
 
-      my $total = $a + $b;
+      my $total = $x + $y;
 
       return $total;
     }
@@ -393,9 +482,9 @@ Module file
   use MyModule1;
   package MyModule2 {
 
-    sub foo ($a : int, $b : int) : int {
+    sub foo ($x : int, $y : int) : int {
 
-      my $total = ($a * $b) + MyModule1::sum(2, 4);
+      my $total = ($x * $y) + MyModule1::sum(2, 4);
 
       return $total;
     }
@@ -437,7 +526,81 @@ B<Perl module> - SPVM function can be called from Perl itself.
 
 =back
 
-SPVM only work on the Perl which support 64 bit integer.
+=head1 TUTORIAL
+
+L<SPVM> is a language which is similar with Perl. SPVM is very similar to Perl, and you can write same syntax of Perl in most part.
+
+L<SPVM> communicate with Perl. You can call SPVM function directory from Perl.
+
+L<SPVM> is very fast and provide array data structure. Now SPVM array operation is about 6x faster.
+
+=head2 SPVM module
+
+At first, you can write SPVM module. 
+
+  # lib/SPVM/MyModule1.spvm
+  package MyModule1 {
+    has x : int;
+    has y : int;
+
+    sub sum ($x : int, $y : int) : int {
+
+      my $total = $x + $y;
+
+      return $total;
+    }
+  }
+
+This is same as Perl except SPVM have static type and C<has> keyword.
+
+You can define field by C<has> keyword, and specify static type by C<: type>.
+
+  has x : int;
+
+You can specify argument types and return type to subroutine by C<: type>.
+
+  sub sum ($x : int, $y : int) : int {
+
+    my $total = $x + $y;
+
+    return $total;
+  }
+
+Let's save this file by the following name
+
+  lib/SPVM/MyModule1.spvm
+
+If package name is C<MyModule1>, file name must be C<SPVM/MyModule1.spvm>.
+
+Extension is C<spvm>. And you create C<SPVM> directory.
+
+C<lib> is normal directory.
+
+=head2 Call SPVM subroutine
+
+Next you can use SPVM subroutine from Perl.
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+
+  use SPVM 'MyModule1';
+
+  my $total = SPVM::MyModule1::sum(3, 5);
+  print $total . "\n";
+
+At first, you add library path by L<FindBin> and L<lib> module.
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+
+Next, use SPVM module. C<MyModule1> is loaded.
+
+  use SPVM 'MyModule1';
+
+And call SPVM subroutine. If SPVM subroutine absolute name is C<MyModule1::sum>, you can call this subroutine by C<SPVM::MyModule1::sum>.
+
+  my $total = SPVM::MyModule1::sum(3, 5);
+  print $total . "\n";
 
 =head1 DOCUMENT
 
@@ -445,21 +608,114 @@ SPVM only work on the Perl which support 64 bit integer.
 
 =item 1
 
-L<SPVM::Document::Tutorial> - SPVM Tutorial
-
-=item 2
-
-L<SPVM::Document::PerlAPI> - API to exchange Perl value to SPVM value.
+L<SPVM::Document::Cookbook> - SPVM Cookbook, advanced technique and many examples.
 
 =item 3
 
-L<SPVM::Document::Spec> - SPVM Specification
+L<SPVM::Document::Spec> - SPVM Language Specification
 
 =item 4
 
-L<SPVM::Document::FAQ> - SPVM Specification
+L<SPVM::Document::FAQ> - Oftten asked question.
 
 =back
+
+=head1 FUNCTIONS
+
+=head2 new_byte_array
+
+Create new_byte array
+
+  my $array = SPVM::new_byte_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_short_array
+
+Create short array
+
+  my $array = SPVM::new_short_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_int_array
+
+Create int array
+
+  my $array = SPVM::new_int_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_long_array
+
+Create long array
+
+  my $array = SPVM::new_long_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_float_array
+
+Create float array
+
+  my $array = SPVM::new_float_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_double_array
+
+Create double array
+
+  my $array = SPVM::new_double_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+  
+=head2 new_object_array_len
+
+Create object array with type name and length.
+
+  my $array = SPVM::new_object_array_len("int[]", 3);
+
+You can set and get elements by C<set> and C<get> method.
+
+  $array->set(1, SPVM::new_int_array([1, 2, 3]));
+  my $element = $array->get(1);
+
+=head2 new_string_raw
+
+Create byte array from B<not decoded> Perl string.
+This function is faster than C<SPVM::string> because copy is not executed.
+
+  my $array = SPVM::new_string_raw("AGTCAGTC");
+
+=head2 new_string
+
+Create byte array from B<decoded> Perl string.
+
+  my $array = SPVM::new_string("Å†Ç¢Å§Ç¶Å®");
+
+=head2 new_object
+
+Create object.
+
+  my $object = SPVM::new_object("Point");
+
+You can set and get value by C<set> and C<get> method.
+
+  $object->set(x => 1);
+  my $x = $object->get('x');
 
 =head1 DON'T PANIC!
 

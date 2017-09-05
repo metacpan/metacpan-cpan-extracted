@@ -101,7 +101,7 @@ Date* SV2C_DATE_FUNC (pTHX_ SV* arg, const Timezone* zone, Date* operand) {
         else {
             STRLEN len;
             const char* str = SvPV(arg, len);
-            SV2C_DATE_ACTION(str, len, zone);
+            SV2C_DATE_ACTION(string_view(str, len), zone);
             return operand;
         }
 #endif
@@ -171,7 +171,7 @@ DateRel* SV2C_DATEREL_FUNC (pTHX_ SV* arg, DateRel* operand) {
     else {
         STRLEN len;
         const char* str = SvPV(arg, len);
-        SV2C_DATEREL_ACTION(str, len);
+        SV2C_DATEREL_ACTION(string_view(str, len));
         return operand;
     }
 }
@@ -202,7 +202,7 @@ DateInt* SV2C_DATEINT_FUNC (pTHX_ SV* arg, DateInt* operand) {
     else if (SvPOK(arg)) {
         STRLEN len;
         const char* str = SvPV(arg, len);
-        SV2C_DATEINT_ACTION(str, len);
+        SV2C_DATEINT_ACTION(string_view(str, len));
         return operand;
     }
     

@@ -1,6 +1,6 @@
 package Date::Gregorian::Simple;
 
-$Date::Gregorian::Simple::VERSION   = '0.10';
+$Date::Gregorian::Simple::VERSION   = '0.11';
 $Date::Gregorian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Gregorian::Simple - Represents Gregorian date.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -214,6 +214,10 @@ L<https://github.com/manwar/Date-Gregorian-Simple>
 
 =item L<Date::Hijri::Simple>
 
+=item L<Date::Hebrew::Simple>
+
+=item L<Date::Julian::Simple>
+
 =item L<Date::Persian::Simple>
 
 =item L<Date::Saka::Simple>
@@ -257,7 +261,7 @@ L<http://search.cpan.org/dist/Date-Gregorian-Simple/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Mohammad S Anwar.
+Copyright (C) 2016 - 2017 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

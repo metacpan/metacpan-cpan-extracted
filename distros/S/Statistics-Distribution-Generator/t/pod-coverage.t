@@ -4,7 +4,7 @@ use Test::More;
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
-plan skip_all => "Author tests only" unless $ENV{ I_AM_PWBENNETT };
+plan skip_all => "Author tests only" unless -d '.git';
 
 eval "use Test::Pod::Coverage $min_tpc";
 plan skip_all => "Test::Pod::Coverage $min_tpc required for testing POD coverage"

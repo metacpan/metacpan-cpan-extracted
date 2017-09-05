@@ -6,8 +6,8 @@ use utf8;
 # Author          : Johan Vromans
 # Created On      : Sun Oct  4 15:11:05 2009
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri May  6 13:44:19 2011
-# Update Count    : 111
+# Last Modified On: Wed Feb 19 14:50:46 2014
+# Update Count    : 113
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -460,13 +460,12 @@ EOD
 # betreffende boeking plaatsvindt.
 # Binnen elke tariefgroep zijn meerdere tarieven mogelijk, hoewel dit
 # in de praktijk niet snel zal voorkomen.
-# In de eerste kolom wordt de (numerieke) code voor dit tarief
-# opgegeven. Deze kan o.m. worden gebruikt om expliciet een BTW tarief
-# op te geven bij het boeken. Voor elk gebruikt tarief (behalve die
-# van groep "nul") moet het percentage worden opgegeven. Met de
-# aanduiding :exclusief kan worden opgegeven dat boekingen op
-# rekeningen met deze tariefgroep standaard het bedrag exclusief BTW
-# aangeven.
+# In de eerste kolom wordt de code voor dit tarief opgegeven. Deze kan
+# o.m. worden gebruikt om expliciet een BTW tarief op te geven bij het
+# boeken. Voor elk gebruikt tarief (behalve die van groep "nul") moet
+# het percentage worden opgegeven. Met de aanduiding :exclusief kan
+# worden opgegeven dat boekingen op rekeningen met deze tariefgroep
+# standaard het bedrag exclusief BTW aangeven.
 #
 # BELANGRIJK: Mutaties die middels de command line shell of de API
 # worden uitgevoerd maken gebruik van het geassocieerde BTW tarief van
@@ -475,13 +474,9 @@ EOD
 
 BTW Tarieven
 
-   0  BTW 0%                 :tariefgroep=nul
-   1  BTW 19% incl.          :tariefgroep=hoog :perc=19,00
-   2  BTW 19% excl.          :tariefgroep=hoog :perc=19,00 :exclusief
-   3  BTW 6,0% incl.         :tariefgroep=laag :perc=6,00
-   4  BTW 6,0% excl.         :tariefgroep=laag :perc=6,00 :exclusief
-   5  BTW Privé 12% incl.    :tariefgroep=privé :perc=12,00
-   6  BTW Privé 12% ex.	     :tariefgroep=privé :perc=12,00 :exclusief
+   H21  BTW 21%          :tariefgroep=hoog  :perc=21,00
+   L06  BTW 6,0%         :tariefgroep=laag  :perc=06,00
+   P12  BTW Privé 12%    :tariefgroep=privé :perc=12,00
 EOD
 	    }
 	    print { $fd } ( <<"EOD" );

@@ -2,7 +2,7 @@
 
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ use File::Spec;
 
 use vars qw ($package @EXPORT_OK %EXPORT_TAGS @ISA $VERSION);
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 # Try to load the C version first.
 $package = 'gettext_xs';
@@ -432,7 +432,7 @@ Locale::Messages - Gettext Like Message Retrieval
 
 =head1 SYNOPSIS
 
- use Locale::Messages (:locale_h :libintl_h);
+ use Locale::Messages qw(:locale_h :libintl_h);
 
  gettext $msgid;
  dgettext $textdomain, $msgid;
@@ -1007,7 +1007,7 @@ Imports the locale category constants:
 
 A complete example:
 
-    1: use Locale::Messages qw (:locale_h :libintl_h);
+    1: use Locale::Messages qw(:locale_h :libintl_h);
     2: use POSIX qw (setlocale);
     3: setlocale (LC_MESSAGES, '');
     4: textdomain ('my-package');
@@ -1041,7 +1041,7 @@ should be able to find various files with the name F<libc.mo>, the
 message catalog for the library itself.  If you have found these
 files under F</usr/share/locale>, then you can try the following:
 
-    use Locale::Messages qw (:locale_h :libintl_h);
+    use Locale::Messages qw(:locale_h :libintl_h);
     use POSIX qw (setlocale);
 
     setlocale LC_MESSAGES, "";
@@ -1058,7 +1058,7 @@ See Locale::TextDomain(3) for much simpler ways.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 

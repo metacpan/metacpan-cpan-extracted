@@ -1,0 +1,34 @@
+Revision history for Perl extension Minion::Backend::mysql.
+
+0.08      2017-09-01 20:21:11-05:00 America/Chicago
+
+  - Fixed contributors showing multiple times in the documentation
+
+0.07      2017-09-01 20:02:45-05:00 America/Chicago
+
+    - Increased size of args/result fields to support jobs with more
+      information.
+
+0.06  2017-09-01
+
+    - Partial support for Minion 7.0
+        - Automatic job retry
+        - Worker commands
+        - Missing features: job parents, locking, job notes
+      This is enough to boot Minion and run basic jobs. Any jobs that
+      depend on unimplemented features may not work correctly, and may
+      cause errors.
+
+0.04  After 0.03
+	- Support Minion 2.0
+
+0.03  After 0.02
+	- Inital Pub/Sub work
+
+0.02  After 0.01
+	- Add in complete Mojolicious::Lite example
+
+0.01  Tue Sep 15 19:24:46 2015
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Minion::Backend::mysql
+

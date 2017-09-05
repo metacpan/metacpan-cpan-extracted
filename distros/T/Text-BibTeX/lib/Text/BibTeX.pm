@@ -25,7 +25,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-our $VERSION='0.82';
+our $VERSION='0.85';
 
 @ISA = qw(Exporter DynaLoader);
 %EXPORT_TAGS = (nodetypes => [qw(BTAST_STRING BTAST_MACRO BTAST_NUMBER)],
@@ -667,7 +667,7 @@ the input string is returned.
 
 OPTIONS is currently unused.
 
-=item change_case (TRANFORM, STRING [, OPTIONS])
+=item change_case (TRANSFORM, STRING [, OPTIONS])
 
 Transforms the case of STRING according to TRANSFORM (a single
 character, one of C<'u'>, C<'l'>, or C<'t'>).  See L<bt_misc> for

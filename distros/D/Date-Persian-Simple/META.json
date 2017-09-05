@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "Date::Persian::Simple" : {
          "file" : "lib/Date/Persian/Simple.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Persian-Simple"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

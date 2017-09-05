@@ -6,7 +6,7 @@ build_requires:
   Catalyst: '5.90080'
   Moo: '2.003000'
   Patterns::UndefObject: '0'
-  Template::Lace: '0.013'
+  Template::Lace: '0.015'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -23,10 +23,10 @@ requires:
   Module::Runtime: '0'
   Moo: '2.003000'
   Scalar::Util: '0'
-  Template::Lace: '0.013'
+  Template::Lace: '0.015'
 resources:
   bugtracker: https://github.com/jjn1056/Catalyst-View-Template-Lace/issues
   homepage: https://github.com/jjn1056/Catalyst-View-Template-Lace
   repository: https://github.com/jjn1056/Catalyst-View-Template-Lace.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'YAML::Tiny version 1.70'

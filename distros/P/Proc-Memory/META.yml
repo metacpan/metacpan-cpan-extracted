@@ -3,12 +3,12 @@ abstract: "Peek/Poke other processes' address spaces"
 author:
   - 'Ahmad Fatoum <athreef@cpan.org>'
 build_requires:
-  Alien::libvas: '0.15'
+  Alien::libvas: '0.202'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0'
 configure_requires:
-  Alien::libvas: '0.15'
+  Alien::libvas: '0.202'
   ExtUtils::MakeMaker: '0'
   Inline::C: '0'
 dynamic_config: 0
@@ -29,9 +29,9 @@ no_index:
 provides:
   Proc::Memory:
     file: lib/Proc/Memory.pm
-    version: '0.007'
+    version: '0.009'
 requires:
-  Alien::libvas: '0.15'
+  Alien::libvas: '0.202'
   Carp: '0'
   Inline: '0.56'
   Scalar::Util: '0'
@@ -39,10 +39,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/athreef/Memory-Process/issues
-  homepage: https://github.com/athreef/Memory-Process
-  repository: https://github.com/athreef/Memory-Process.git
-version: '0.007'
+  bugtracker: https://github.com/athreef/Proc-Memory/issues
+  homepage: https://github.com/athreef/Proc-Memory
+  repository: https://github.com/athreef/Proc-Memory.git
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -245,7 +245,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.009
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

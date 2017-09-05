@@ -1,13 +1,14 @@
+requires "Data::Dumper" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Config::Slicer" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Easy" => "0";
 requires "Dist::Zilla::Role::PluginBundle::PluginRemover" => "0.103";
 requires "List::Util" => "0";
 requires "Moose" => "0";
 requires "Moose::Util::TypeConstraints" => "0";
-requires "namespace::autoclean" => "0";
 requires "perl" => "5.010";
 
 on 'test' => sub {
+  requires "Test::More" => "0";
   requires "perl" => "5.010";
 };
 
@@ -18,6 +19,19 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Dist::Zilla" => "5";
+  requires "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004";
+  requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
+  requires "Dist::Zilla::Plugin::Git::Commit" => "2.020";
+  requires "Dist::Zilla::Plugin::Git::Tag" => "0";
+  requires "Dist::Zilla::Plugin::NextRelease" => "5.033";
+  requires "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004";
   requires "Dist::Zilla::PluginBundle::Author::WATERKIP" => "0";
   requires "Software::License::Perl_5" => "0";
+  requires "Test::Compile" => "0";
+  requires "Test::Kwalitee" => "0";
+  requires "Test::More" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "strict" => "0";
+  requires "warnings" => "0";
 };

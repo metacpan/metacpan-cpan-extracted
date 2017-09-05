@@ -1,7 +1,7 @@
 use Test::More;
 use Carp 'verbose';
 use Patro ':test';
-use 5.012;
+use 5.010;
 use Scalar::Util 'reftype';
 
 my $r0 = [ 1, 2, 3, 4 ];
@@ -10,10 +10,11 @@ ok($r0 && ref($r0) eq 'ARRAY', 'created remote var');
 
 my $cfg = patronize($r0);
 ok($cfg, 'got config for patronize array ref');
+my $cfgstr = $cfg->to_string;
+ok($cfgstr, 'got string representation of Patro config');
 
-my ($r1) = Patro->new($cfg)->getProxies;
-
-ok($r1, 'client as boolean');
+my ($r1) = Patro->new($cfgstr)->getProxies;
+ok($r1, 'client as boolean, loaded from config string');
 is(CORE::ref($r1), 'Patro::N1', 'client ref');
 is(Patro::ref($r1), 'ARRAY', 'remote ref');
 is(Patro::reftype($r1), 'ARRAY', 'remote reftype');

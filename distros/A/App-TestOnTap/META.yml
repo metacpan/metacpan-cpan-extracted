@@ -53,5 +53,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-TestOnTap.git
-version: '0.035'
+version: '0.036'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

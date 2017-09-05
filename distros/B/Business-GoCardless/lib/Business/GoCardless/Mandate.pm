@@ -18,12 +18,28 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
+    created_at
     id
-
+    links
+    metadata
+    next_possible_charge_date
+    payments_require_approval
+    reference
+    scheme
+    status
+    
 =cut
 
 has [ qw/
+    created_at
     id
+    links
+    metadata
+    next_possible_charge_date
+    payments_require_approval
+    reference
+    scheme
+    status
 / ] => (
     is => 'rw',
 );

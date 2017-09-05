@@ -2,7 +2,7 @@ package Net::PMP::Profile::Image;
 use Moose;
 extends 'Net::PMP::Profile::Media';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 sub get_profile_url {'https://api.pmp.io/profiles/image'}
 

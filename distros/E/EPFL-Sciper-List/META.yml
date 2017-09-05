@@ -4,6 +4,7 @@ author:
   - 'William Belle <william.belle@gmail.com>'
 build_requires:
   File::Copy::Recursive: '0.38'
+  File::Find::Rule: '0.34'
   IO::All: '0.87'
   Test::JSON: '0.11'
   Test::MockModule: '0.12'
@@ -20,11 +21,13 @@ name: EPFL-Sciper-List
 provides:
   EPFL::Sciper::List:
     file: lib/EPFL/Sciper/List.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   JSON: '2.94'
   LWP::Protocol::https: '6.07'
   LWP::UserAgent: '6.26'
   Readonly: '2.05'
-version: '0.01'
+resources:
+  repository: https://github.com/epfl-devrun/epfl-sciper-list
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

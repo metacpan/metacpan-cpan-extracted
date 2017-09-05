@@ -65,8 +65,8 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.72.73';
-$ABSTRACT = 'Sim::OPT is a program for optimization and parametric exploration oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
+$VERSION = '0.72.105';
+$ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
 # Sim::OPT 
@@ -1293,7 +1293,7 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-Sim::OPT is a program for optimization and parametric exploration oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module seeks for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphingchange module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position. The Sim::OPT::Parcoord3d module converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings. The Sim::OPT::Modish module alters the shading values calculated with the ESP-r simulation platform in order to take into account the solar reflections from obstructions.
+Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module seeks for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphingchange module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position. The Sim::OPT::Parcoord3d module converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings. The Sim::OPT::Modish module alters the shading values calculated with the ESP-r simulation platform in order to take into account the solar reflections from obstructions.
 
 The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform. A working knowledge of ESP-r (http://www.esru.strath.ac.uk/Programs/ESP-r.htm) is necessary to use those functionalities.
 

@@ -5,6 +5,14 @@ Limitations to be fixed:
  - when lines are over 997 chars, then the transfer-encoding should
    automatically change from 'none' into 'quoted-printable' or 'base64'
 
+version 3.002: Mon  4 Sep 21:30:43 CEST 2017
+
+	Improvements:
+	- support structured Authentication-Results header.
+	- decompose structured DKIM-Signature header
+	- folding of encoded unstructured fields do now take length of header into
+	  account.
+
 version 3.001: Wed 26 Jul 14:22:22 CEST 2017
 
 	Fixes:

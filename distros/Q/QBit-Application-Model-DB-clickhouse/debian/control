@@ -1,0 +1,12 @@
+Source: libqbit-application-model-db-clickhouse-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-model-db-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-db-clickhouse-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-model-db-perl
+Description: Class for working with ClickHouse DB.
+ Class for working with ClickHouse DB. It's not ORM.

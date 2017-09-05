@@ -1,5 +1,8 @@
 Revision history for Win32-Shortcut-Readlink
 
+0.03      2017-08-31 14:08:11 -0400
+  - Migrate to EUMM
+
 0.02      2014-05-10 17:24:06 -0400
   - include partial support for Perl 5.8
 

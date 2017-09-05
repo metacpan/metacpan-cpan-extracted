@@ -1,8 +1,10 @@
+use lib 't/lib';
 use strict;
 use warnings;
 use 5.008001;
 use File::Spec;
 use Test::More tests => 1;
+use TestPath;
 
 diag '';
 diag '';
@@ -49,5 +51,13 @@ unless($found_test)
 diag '';
 diag '';
 diag '';
+
+if($TestPath::WSL)
+{
+  diag "Looks like you are running on Windows Subsystem for Linux.  Filtering PATH.";
+  diag '';
+  diag '';
+  diag '';
+}
 
 pass 'okay';

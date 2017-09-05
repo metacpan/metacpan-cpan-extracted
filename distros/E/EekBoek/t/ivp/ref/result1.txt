@@ -1,20 +1,20 @@
                             Verlies/Winst
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                         EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                         EekBoek, 2013-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 ----------------------------------------------------------------------
 6       Kosten
 68       Afschrijvingen                              808,08
-69       Algemene kosten                             812,11
-6       Totaal Kosten                               1620,19
+69       Algemene kosten                             799,18
+6       Totaal Kosten                               1607,26
 
 8       Bedrijfsopbrengsten
-81       Omzet Consultancy                                     1200,00
+81       Omzet Consultancy                                     1180,16
 83       Omzet Editing                                         1000,00
-84       Omzet Cursussen                                       6500,00
-8       Totaal Bedrijfsopbrengsten                             8700,00
+84       Omzet Cursussen                                       6392,56
+8       Totaal Bedrijfsopbrengsten                             8572,72
 
-        << Winst >>                                 7079,81
+        << Winst >>                                 6965,46
 ----------------------------------------------------------------------
-        TOTAAL Resultaten                           8700,00    8700,00
+        TOTAAL Resultaten                           8572,72    8572,72

@@ -4,7 +4,7 @@ use v5.16.0;
 package Game::Tibia::Packet;
 
 # ABSTRACT: Minimal session layer support for the MMORPG Tibia
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Digest::Adler32 qw(adler32);
 use Crypt::XTEA 0.0108;
@@ -12,7 +12,6 @@ use Crypt::ECB 2.0.0;
 use Carp;
 
 sub version;
-my $default = Game::Tibia::Packet::version(860);
 
 =pod
 
@@ -50,29 +49,31 @@ Game::Tibia::Packet - Session layer support for the MMORPG Tibia
 
 Methods for constructing Tibia Gameserver (XTEA) packets. Handles checksum calculation and symmetric encryption depending on the requested Tibia version.
 
-Tested working with Tibia 8.1, but will probably work with other protocol versions too.
+Should work with all Tibia versions less than 9.80.
 
 =head1 METHODS AND ARGUMENTS
 
 =over 4
 
-=item new([packet => $payload, xtea => $xtea, version => 860])
+=item new(version => $version, [packet => $payload, xtea => $xtea])
 
-Constructs a new Game::Tibia::Packet instance. If payload and XTEA are given, the payload will be decrypted and trimmed to correct size. version argument defaults to 860.
+Constructs a new Game::Tibia::Packet instance of version C<$version>. If payload and XTEA are given, the payload will be decrypted and trimmed to correct size.
 
 =cut
 
 sub new {
-	my $type = shift;
-	my $self = {
+    my $type = shift;
+    my $self = {
         payload => '',
         packet => '',
         xtea => undef,
-        version => $default,
         padding => '',
         @_
     };
-    $self->{version} = version $self->{version} unless ref $self->{version};
+
+    croak 'A protocol version < 9.80 must be supplied' if !defined $self->{version} || $self->{version} >= 980;
+    $self->{versions}{client} = version $self->{version} unless ref $self->{version};
+
     if ($self->{packet} ne '')
     {
         #return undef unless isValid($self->{packet});
@@ -80,35 +81,35 @@ sub new {
             -cipher => Crypt::XTEA->new($self->{xtea}, 32, little_endian => 1)
         );
         $ecb->padding('null');
- 
-        my $digest_size = $self->{version}{ADLER32};
+
+        my $digest_size = defined $self->{versions}{client}{adler32} ? 4 : 0;
         $self->{payload} = $ecb->decrypt(substr($self->{packet}, 2 + $digest_size));
         $self->{payload} .= "\0" x ((8 - length($self->{payload})% 8)%8);
         $self->{padding} = substr $self->{payload}, 2 + unpack('v', $self->{payload});
         $self->{payload} = substr $self->{payload}, 2,  unpack('v', $self->{payload});
     }
 
-	bless $self, $type;
-	return $self;
+    bless $self, $type;
+    return $self;
 }
 
 =item isValid($packet)
 
-Checks if packet's adler32 digest matches (A totally unnecessary thing on Cipsoft's part, as we already have TCP checksum. Why hash again?) 
+Checks if packet's adler32 digest matches (A totally unnecessary thing on Cipsoft's part, as we already have TCP checksum. Why hash again?)
 
 =cut
 
 sub isValid {
-	my $packet = shift;
+    my $packet = shift;
 
-	my ($len, $adler) = unpack('(S a4)<', $packet);
-	return 0 if $len + 2 != length $packet;
+    my ($len, $adler) = unpack('(S a4)<', $packet);
+    return 0 if $len + 2 != length $packet;
 
-	my $a32 = Digest::Adler32->new;
-	$a32->add(substr($packet, 6));
-	return 0 if $a32->digest ne reverse $adler;
-	1;
-	#TODO: set errno to checksum failed or length doesnt match
+    my $a32 = Digest::Adler32->new;
+    $a32->add(substr($packet, 6));
+    return 0 if $a32->digest ne reverse $adler;
+    1;
+    #TODO: set errno to checksum failed or length doesnt match
 }
 
 =item payload() : lvalue
@@ -118,7 +119,7 @@ returns the payload as lvalue (so you can concat on it)
 =cut
 
 sub payload : lvalue {
-	my $self = shift;
+    my $self = shift;
     return $self->{payload};
 }
 
@@ -130,18 +131,18 @@ Finalizes the packet. XTEA encrypts, prepends checksum and length.
 
 
 sub finalize {
-	my $self = shift;
+    my $self = shift;
     my $XTEA = $self->{xtea} // shift;
 
-	my $packet = $self->{payload};
-	if ($self->{version}{XTEA} and defined $XTEA) {
-		$packet = pack('v', length $packet) . $packet;
-        
+    my $packet = $self->{payload};
+    if ($self->{versions}{client}{xtea} and defined $XTEA) {
+        $packet = pack('v', length $packet) . $packet;
+
         my $ecb = Crypt::ECB->new(
             -cipher => Crypt::XTEA->new($XTEA, 32, little_endian => 1)
         );
         $ecb->padding('null');
- 
+
         # $packet .= "\0" x ((8 - length($packet)% 8)%8);
         my $padding_len = (8 - length($packet)% 8)%8;
         $packet .= pack("a$padding_len", unpack('a*', $self->{padding}));
@@ -150,46 +151,66 @@ sub finalize {
         substr($packet, $orig_len) = '';
     }
 
-	my $digest = '';
-	if ($self->{version}{ADLER32}) {
-		my $a32 = Digest::Adler32->new;
-		$a32->add($packet);
+    my $digest = '';
+    if ($self->{versions}{client}{adler32}) {
+        my $a32 = Digest::Adler32->new;
+        $a32->add($packet);
         $digest = unpack 'H*', pack 'N', unpack 'L', $a32->digest;
-	}
+    }
 
-	$packet = CORE::pack("S/a", $digest.$packet);
+    $packet = CORE::pack("S/a", $digest.$packet);
 
-	$packet;
+    $packet;
 }
 
 
 =item version($version)
 
-Returns a hash reference with size information about a protocol version.
-For example, for 860 it returns:
+Returns a hash reference with protocol traits. For example for 840, it returns:
 
-    {XTEA => 16, RSA => 128, ADLER32 => 4, ACCNUM => 0, GET_CHARLIST => 147, LOGIN_CHAR => 135}
+    { gmbyte => 1, outfit_addons => 1, adler32 => 1, acc_name => 1,
+      stamina => 1, xtea => 1, VERSION => 840, rsa => 1, lvl_on_msg => 1 };
 
-Sizes are in bytes.
+=cut
 
-=cut 
+use constant TRUE => 1;
 
 sub version {
-    my $ver = shift;
-    $ver = $ver->{VERSION} if ref $ver;
-    $ver =~ s/^v|[ .]//g;
-    $ver =~ /^\d+/ or croak 'Version format invalid';
+    my $version = shift;
+    $version = $version->{VERSION} if ref $version;
+    $version =~ s/^v|[ .]//g;
+    $version =~ /^\d+/ or croak 'Version format invalid';
 
-    my $sizes = $ver >= 830 ? {XTEA => 16, RSA => 128, ADLER32 => 4, ACCNUM => 0,
-                               GET_CHARLIST => 147, LOGIN_CHAR => 135}
+    my %has;
 
-              : $ver >= 761 ? {XTEA => 16, RSA => 128, ADLER32 => 0, ACCNUM => 4,
-                               GET_CHARLIST => 143, LOGIN_CHAR => 131}
+    $has{gmbyte} = 1; # Not sure when the GM byte first appeared
 
-                             : {XTEA => 0, RSA => 0, ADLER32 => 0, ACCNUM => 4,
-                               GET_CHARLIST => undef, LOGIN_CHAR => undef};
-    $sizes->{VERSION} = $ver;
-    return $sizes;
+    ($version >= 761) # 761 was a test client. 770 was the first release
+        and $has{xtea} = $has{rsa} = TRUE;
+    ($version >= 780)
+        and $has{outfit_addons} = $has{stamina} = $has{lvl_on_msg} = TRUE;
+    ($version >= 830)
+        and $has{adler32} = $has{acc_name} = TRUE;
+    ($version >= 841)
+        and $has{hwinfo} = $has{nonce} = TRUE;
+    ($version >= 953)
+        and $has{ping} = TRUE;
+    ($version >= 980)
+        and $has{client_version} = $has{game_preview} = TRUE;
+    ($version >= 1010)
+        and $has{worldlist_in_charlist} = TRUE;
+    ($version >= 1061)
+        and $has{extra_gpu_info} = TRUE;
+    ($version >= 1071)
+        and $has{game_content_revision} = TRUE;
+    ($version >= 1072)
+        and $has{auth_token} = TRUE;
+    ($version >= 1074)
+        and $has{session_key} = TRUE;
+
+    $has{VERSION} = $version;
+
+    return \%has;
 }
 
 1;
@@ -205,9 +226,12 @@ L<http://github.com/athreef/Game-Tibia-Packet>
 
 The protocol was reverse engineered as part of writing my L<Tibia Wireshark Plugin|https://github.com/a3f/Tibia-Wireshark-Plugin>.
 
+L<Game::Tibia::Cam>
+
 L<Game::Tibia::Packet::Login>
 
 L<Game::Tibia::Packet::Charlist>
+
 
 L<http://tpforums.org/forum/forum.php>
 L<http://tibia.com>

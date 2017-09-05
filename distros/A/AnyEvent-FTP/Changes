@@ -1,5 +1,12 @@
 Revision history for AnyEvent-FTP
 
+0.16      2017-08-30 09:08:58 -0400
+  - Fix to timeout in now longer running client test
+  - Fix to test that was not optionally using EV
+
+0.15      2017-08-29 18:39:58 -0400
+  - Migrate to EUMM
+
 0.14      2017-07-26 07:42:52 -0400
   - Remove dependency on List::MoreUtils
   - Migrate from File::ShareDir to File::ShareDir::Dist

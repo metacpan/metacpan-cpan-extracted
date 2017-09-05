@@ -4,42 +4,44 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "Test RDF data for validity and equality.",
-  "author"         => ["Kjetil Kjernsmo <kjetilk\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142060",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Test-RDF",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => {
-                            "RDF::Trine"            => 0.134,
-                            "Scalar::Util"          => 1.24,
-                            "Test::Builder::Module" => 0,
-                            "Test::More"            => 0,
-                          },
+  "abstract"         => "Test RDF data for validity and equality.",
+  "author"           => ["Kjetil Kjernsmo <kjetilk\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => { requires => { "Test::Tester" => 0 } },
-                      },
-  "provides"       => { "Test::RDF" => { file => "lib/Test/RDF.pm", version => "1.20" } },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "https://github.com/kjetilk/Test-RDF/issues" },
-                        homepage     => "https://metacpan.org/module/Test::RDF",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => { type => "git", web => "https://github.com/kjetilk/Test-RDF/" },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-RDF/project",
-                        x_IRC        => "irc://irc.perl.org/#perlrdf",
-                      },
-  "version"        => "1.20",
-  "x_contributors" => ["Toby Inkster"],
+  "name"             => "Test-RDF",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "perl" => 5.006,
+                              "RDF::Trine" => 0.134,
+                              "Scalar::Util" => 1.24,
+                              "Test::Builder::Module" => 0,
+                              "Test::More" => 0,
+                            },
+                          },
+                          test => { requires => { "Test::Tester" => 0 } },
+                        },
+  "provides"         => { "Test::RDF" => { file => "lib/Test/RDF.pm", version => 1.22 } },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "https://github.com/kjetilk/Test-RDF/issues" },
+                          homepage     => "https://metacpan.org/module/Test::RDF",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => { type => "git", web => "https://github.com/kjetilk/Test-RDF/" },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-RDF/project",
+                          x_IRC        => "irc://irc.perl.org/#perlrdf",
+                        },
+  "version"          => 1.22,
+  "x_contributors"   => ["Toby Inkster"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

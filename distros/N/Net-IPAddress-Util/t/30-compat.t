@@ -5,6 +5,9 @@ BEGIN {
     use strict;
     use warnings;
   }
+  if ($] ge '5.026') {
+    use lib '.';
+  }
 }
 
 use Test::More tests => 5;

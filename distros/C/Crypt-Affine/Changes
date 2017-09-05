@@ -1,5 +1,8 @@
 Revision history for Crypt::Affine
 
+0.13  2017-09-04T12:00:00+01:00
+      - Updated copyright year information.
+
 0.12  2017-04-14T23:10:00+01:00
       - Improved type handling.
 

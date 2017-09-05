@@ -1,5 +1,9 @@
 Revision history for DBD-XMLSimple
 
+0.06	Sun Sep  3 03:28:35 EDT 2017
+	Concatenate leafs of the same entry
+	DBI now supports this module
+
 0.05	Sun Sep  4 15:04:42 EDT 2016
 	Support more free form input data
 

@@ -3,14 +3,16 @@ abstract: 'Access XML data via the DBI interface'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
+  Test::DatabaseRow: '0'
   Test::Most: '0'
   Test::Script: '1.12'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +24,12 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  DBI: '1.637'
   DBI::DBD::SqlEngine: '0.06'
   SQL::Statement: '1.41'
   XML::Twig: '0'
   perl: '5.006002'
 resources:
   repository: git://github.com/nigelhorne/DBD-XMLSimple.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

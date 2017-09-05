@@ -1,3 +1,10 @@
+v0.13.0 2017-08-28T21:09:48Z
+ - combine all app classes
+ - devel source map
+ - pack locale to app
+ - load overrides separately
+ - use latest amcharts version
+
 v0.12.2 2017-08-11T01:30:01Z
  - amcharts v3.21.4
 

@@ -27,6 +27,11 @@ SYNOPSIS
         $ perl -d:JSON=ascii -e "qq<\N{SNOWMAN}>"
         "\u2603"
 
+    Booleans:
+
+        $ perl -d:JSON -MJSON::PP -e 'JSON::PP::true'
+        true
+
 DESCRIPTION
 
     If you use this module from the command-line, the last value of your
@@ -71,7 +76,7 @@ AUTHOR
 
 COPYRIGHT & LICENSE
 
-    Copyright © 2015 Olivier Mengué.
+    Copyright © 2017 Olivier Mengué.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

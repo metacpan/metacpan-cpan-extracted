@@ -11,6 +11,7 @@ use Test::EnumD;
 use Test::Simple;
 use Test::Minimal;
 use Test::Template_int_long;
+use Test::Destructor;
 
 =head1 NAME
 
@@ -38,10 +39,29 @@ package Test {
     LONG_MAX = 9223372036854775807L,
     LONG_MIN = -9223372036854775808L,
     FLOAT_PRECICE = 32767f,
-    DOUBLE_PRECICE = 2147483647.0
+    DOUBLE_PRECICE = 2147483647.0,
   }
   
   sub main($mvar : int) : int {
+    
+    {
+      error_eval_call();
+    }
+    
+    {
+      # error_call_stack();
+    }
+    
+    {
+      my $ret = error_eval();
+      
+      std::println_int($ret);
+    }
+    
+    error_eval();
+    
+    my $dest = new Test::Destructor;
+    
     # enum
     {
       BYTE_MAX();
@@ -92,7 +112,7 @@ package Test {
 
     # Use template package
     {
-      my $num = Test::Template_int_long::get(100, 200, 300L);
+      my $num = Test::Template_int_long::get(100, 200, 300L,);
       std::println_int($num);
     }
 
@@ -1026,6 +1046,39 @@ package Test {
     return 0;
   }
   
+  sub error() : int {
+    die "ERROR";
+  }
+  
+  sub error_call_stack() : int {
+    error();
+  }
+
+  sub error_eval() : int {
+    eval {
+      die "ERROR";
+    };
+    
+    if ($@) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub error_eval_call() : int {
+    eval {
+      error();
+    };
+    
+    if ($@) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
 
 }
 

@@ -27,11 +27,25 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-=head1 VERSION 6.61  (planned 2017-12-01)
+=head1 VERSION 6.61 (planned 2017-12-01)
 
-=head1 VERSION 6.60  (planned 2017-09-01)
+=head1 VERSION 6.60 (planned 2017-09-01)
 
-=head1 VERSION 6.59  2017-06-01
+=over 4
+
+=item Bug fixes
+
+Fixed a bug where if a recurrence had no interval, start and end dates passed
+in to the dates method would not work.  PJ-DSI-DevOps (GitHub #12).
+
+=item Documentation fixes
+
+Clarified Date::Manip::TZ::all_periods.  Based on discussion with
+Peter Pfannenschmid.
+
+=back
+
+=head1 VERSION 6.59 (2017-06-01)
 
 =over 4
 
@@ -45,7 +59,7 @@ Improved some of the documentation.
 
 =back
 
-=head1 VERSION 6.58  2017-03-01
+=head1 VERSION 6.58 (2017-03-01)
 
 =over 4
 
@@ -59,7 +73,7 @@ Parsing a date like 01/02/2016 and calling printf with %e gave '02' instead
 of ' 2'.  RT 119787.
 
 Fixed a problem where the tzdata method of determining the timezone was
-producing an error which wasn't correct.  Reported on GitHub by John.
+producing an error which wasn't correct.  John (GitHub #8)
 
 =item Time zone fixes
 
@@ -67,7 +81,7 @@ Newest zoneinfo data (tzdata 2017a)
 
 =back
 
-=head1 VERSION 6.57  2016-12-01
+=head1 VERSION 6.57 (2016-12-01)
 
 =over 4
 
@@ -84,7 +98,7 @@ the test to bypass the bug.  RT 118862
 
 =back
 
-=head1 VERSION 6.56  2016-09-09
+=head1 VERSION 6.56 (2016-09-09)
 
 =over 4
 
@@ -95,7 +109,7 @@ RT 117404
 
 =back
 
-=head1 VERSION 6.55  2016-09-01
+=head1 VERSION 6.55 (2016-09-01)
 
 =over 4
 
@@ -108,7 +122,7 @@ for a timezone.  RT 114949.
 
 Passing in incorrect values for a field was not trapped in all cases
 and it led to problems.  All values passed in to a recurrence are now
-correctly checked.  Albert Hilazo
+correctly checked.  Albert Hilazo (GitHub #7).
 
 =item Fixed a bug in some methods of creating new objects
 
@@ -126,7 +140,7 @@ Added a number of new tests based on Devel::Cover.
 
 =back
 
-=head1 VERSION 6.54  2016-05-31
+=head1 VERSION 6.54 (2016-05-31)
 
 =over 4
 
@@ -166,7 +180,7 @@ Clarified the Config document.  Based on a report in perlmonks.org.
 
 =back
 
-=head1 VERSION 6.53  2016-03-02
+=head1 VERSION 6.53 (2016-03-02)
 
 =over 4
 
@@ -189,7 +203,7 @@ Switched to pod2text which does a better job.  RT 110025
 
 =back
 
-=head1 VERSION 6.52  2015-12-01
+=head1 VERSION 6.52 (2015-12-01)
 
 =over 4
 
@@ -231,7 +245,7 @@ Added a number of new tests based on Devel::Cover.
 
 =back
 
-=head1 VERSION 6.51  2015-09-01
+=head1 VERSION 6.51 (2015-09-01)
 
 =over 4
 
@@ -282,7 +296,7 @@ Fixed a typo.  RT 105546
 
 =back
 
-=head1 VERSION 6.50  2015-06-01
+=head1 VERSION 6.50 (2015-06-01)
 
 =over 4
 
@@ -310,7 +324,7 @@ Added aliases for older HP-UX time zones.  RT 104141
 
 =item Documentation fixes
 
-Fixed URL for tzdata.  Mohammad S Anwar
+Fixed URL for tzdata.  Mohammad S Anwar (GitHub #3).
 
 Better POD formats.
 
@@ -318,7 +332,7 @@ Fixed a documentation error.  RT 103966
 
 =back
 
-=head1 VERSION 6.49  2015-03-01
+=head1 VERSION 6.49 (2015-03-01)
 
 =over 4
 
@@ -345,7 +359,7 @@ A number of corrections by Nicholas Riley
 
 =back
 
-=head1 VERSION 6.48  2014-12-01
+=head1 VERSION 6.48 (2014-12-01)
 
 =over 4
 
@@ -389,7 +403,7 @@ Newest zoneinfo data (tzdata 2014j)
 
 =back
 
-=head1 VERSION 6.47  2014-09-01
+=head1 VERSION 6.47 (2014-09-01)
 
 =over 4
 
@@ -403,7 +417,7 @@ Fixed some encoding errors in the language pod documentation.
 
 =back
 
-=head1 VERSION 6.46  2014-07-08
+=head1 VERSION 6.46 (2014-07-08)
 
 =over 4
 
@@ -422,7 +436,7 @@ Added some plural abbreviations that were missing.  RT 96944
 
 =back
 
-=head1 VERSION 6.45  2014-06-05
+=head1 VERSION 6.45 (2014-06-05)
 
 =over 4
 
@@ -433,7 +447,7 @@ reports).
 
 =back
 
-=head1 VERSION 6.44  2014-06-01
+=head1 VERSION 6.44 (2014-06-01)
 
 =over 4
 
@@ -472,7 +486,7 @@ Fixed a typo.  RT 95619
 
 =back
 
-=head1 VERSION 6.43  (2014-03-03)
+=head1 VERSION 6.43 (2014-03-03)
 
 =over 4
 
@@ -492,7 +506,7 @@ Cleaned up some of the Recur documentation.  Suggested by RT 92794
 
 =back
 
-=head1 VERSION 6.42  (2013-12-02)
+=head1 VERSION 6.42 (2013-12-02)
 
 =over 4
 
@@ -520,7 +534,7 @@ that applied.  RT 90344
 
 =back
 
-=head1 VERSION 6.41  (2013-09-05)
+=head1 VERSION 6.41 (2013-09-05)
 
 =over 4
 
@@ -546,7 +560,7 @@ Newest zoneinfo data (tzdata 2013d)
 
 =back
 
-=head1 VERSION 6.40  (2013-06-01)
+=head1 VERSION 6.40 (2013-06-01)
 
 =over 4
 
@@ -561,7 +575,7 @@ Newest zoneinfo data (tzdata 2013c)
 
 =back
 
-=head1 VERSION 6.39  (2013-03-01)
+=head1 VERSION 6.39 (2013-03-01)
 
 =over 4
 
@@ -588,7 +602,7 @@ Clarified the Examples page.  Winston Heng
 
 =back
 
-=head1 VERSION 6.38  (2013-01-08)
+=head1 VERSION 6.38 (2013-01-08)
 
 =over 4
 
@@ -620,7 +634,7 @@ The following config variables have been removed.
 
 =back
 
-=head1 VERSION 6.37  (2012-12-01)
+=head1 VERSION 6.37 (2012-12-01)
 
 =over 4
 
@@ -639,12 +653,12 @@ Spelling error fixed.  RT 80621
 
 =back
 
-=head1 VERSION 6.36  (2012-10-31)
+=head1 VERSION 6.36 (2012-10-31)
 
 This was an interim release to fix the version numbers (6.35 was
 released with all of the version numbers 6.34).
 
-=head1 VERSION 6.35  (2012-10-31)
+=head1 VERSION 6.35 (2012-10-31)
 
 This was an interim release to fix the problem with the PATH being
 replaced.
@@ -664,7 +678,7 @@ appropriate.  This is fixed.  Report and patch supplied by RT 80435.
 
 =back
 
-=head1 VERSION 6.34  (2012-09-04)
+=head1 VERSION 6.34 (2012-09-04)
 
 This is a bug fix so that the PATH won't break non-unix installs.
 
@@ -677,7 +691,7 @@ environments.  Geoff Rowell
 
 =back
 
-=head1 VERSION 6.33  (2012-09-01)
+=head1 VERSION 6.33 (2012-09-01)
 
 =over 5
 
@@ -713,7 +727,7 @@ Minor fix.  Henrique Martins
 
 =back
 
-=head1 VERSION 6.32  (2012-06-01)
+=head1 VERSION 6.32 (2012-06-01)
 
 =over 4
 
@@ -741,7 +755,7 @@ Better support for UTF-8 in autogenerated language module pod files.
 
 =back
 
-=head1 VERSION 6.31  (2012-03-01)
+=head1 VERSION 6.31 (2012-03-01)
 
 =over 4
 
@@ -819,7 +833,7 @@ Fixed a typo.  Nicholas Bamber
 
 =back
 
-=head1 VERSION 6.30  (2012-01-11)
+=head1 VERSION 6.30 (2012-01-11)
 
 =over 4
 

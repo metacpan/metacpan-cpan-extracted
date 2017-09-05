@@ -1,4 +1,24 @@
-Revision history for Data-Dumper-Tabluate
+Revision history for Statistics-Distribution-Generator
+
+1.003   2017-09-01
+        More tweaks to Makefile.PL for Kwalitee
+
+1.002   2017-09-01
+        A note regarding spurious test failures being inevitable. Some tweaks
+        to Makefile.PL and the way some Author Tests are done.
+
+1.001   2017-08-31
+        Give NWETTERS proper props. Refactor some stuff. Fix whitespace.
+        Fix ancient bug where using more than one "x" or "|" in a row might
+        silently fail.
+
+1.000   2017-08-30
+        From here on out, API changes will be backwards-compatible to the 
+        maximum extent allowable, though this does not guarantee the interals
+        will stay as they are.
+
+0.014   2017-08-30
+        Add the dice() distribution
 
 0.013   2015-01-12
         Kwalitee bump

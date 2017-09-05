@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "IPC::System::Simple" : "0",
-            "Test::Most" : "0",
-            "Test::Script" : "1.12",
-            "autodie" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -36,10 +33,20 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "DBI" : "1.637",
             "DBI::DBD::SqlEngine" : "0.06",
             "SQL::Statement" : "1.41",
             "XML::Twig" : "0",
             "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::System::Simple" : "0",
+            "Test::DatabaseRow" : "0",
+            "Test::Most" : "0",
+            "Test::Script" : "1.12",
+            "autodie" : "0"
          }
       }
    },
@@ -51,6 +58,6 @@
          "web" : "https://github.com/nigelhorne/DBD-XMLSimple"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

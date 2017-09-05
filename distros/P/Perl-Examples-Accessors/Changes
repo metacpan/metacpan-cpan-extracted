@@ -1,4 +1,7 @@
-Revision history for Perl-Examples-Accessors
+0.130   2017-09-01 (PERLANCAR)
+
+	- Add Perl::Examples::Accessors::ClassAccessorPackedString.
+
 
 0.12    2016-11-26 (PERLANCAR)
 

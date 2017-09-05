@@ -47,7 +47,7 @@ cmp_ok( $key->{response}{success}, '==', 1, "kv range success" );
 # delete range
 lives_ok(
     sub {
-        $key = $etcd->range( { key => 'foo1' } )->delete
+        $key = $etcd->deleterange( { key => 'foo1' } )
     },
     "kv range_delete"
 );

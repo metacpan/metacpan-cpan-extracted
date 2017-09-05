@@ -15,6 +15,12 @@
    */
 #[% ALLOCA_H %]
 
+#undef HAVE_STRLCAT
+/* Have strlcat? */
+#[% STRLCAT %]
+
+
+
 /* Define to 1 if the system has the type `boolean'. */
 #undef HAVE_BOOLEAN
 

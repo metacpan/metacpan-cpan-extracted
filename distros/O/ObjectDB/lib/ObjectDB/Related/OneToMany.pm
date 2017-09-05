@@ -5,17 +5,18 @@ use warnings;
 
 use base 'ObjectDB::Related';
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 use Scalar::Util ();
-use ObjectDB::Util qw(merge);
+use Storable qw(dclone);
+use ObjectDB::Util qw(to_array);
 
 sub create_related {
     my $self = shift;
     my ($row, $related) = @_;
 
     my $meta = $self->meta;
-    my ($from, $to) = %{$meta->map};
+    my ($from, $to) = %{ $meta->map };
 
     my @params = ($to => $row->column($from));
 
@@ -37,7 +38,7 @@ sub find_related {
     my ($row) = shift;
 
     my $meta = $self->meta;
-    my ($from, $to) = %{$meta->map};
+    my ($from, $to) = %{ $meta->map };
 
     return unless defined $row->column($from) && length $row->column($from);
 
@@ -68,14 +69,17 @@ sub delete_related {
 sub _related_table { shift->meta->class->table }
 
 sub _build_params {
-    my $self = shift;
-    my ($row) = shift;
+    my $self     = shift;
+    my ($row)    = shift;
+    my (%params) = @_;
 
     my $meta = $self->meta;
-    my ($from, $to) = %{$meta->map};
+    my ($from, $to) = %{ $meta->map };
 
-    my $params = merge { @_ }, {where => [$to => $row->column($from)]};
-    return %$params;
+    my $merged = dclone(\%params);
+    $merged->{where} = [ $to => $row->column($from), to_array $merged->{where} ];
+
+    return %$merged;
 }
 
 1;

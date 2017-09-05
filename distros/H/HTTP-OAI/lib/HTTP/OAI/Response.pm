@@ -6,7 +6,7 @@ require POSIX;
 
 use strict;
 
-our $VERSION = '4.05';
+our $VERSION = '4.06';
 
 # Backwards compatibility, pass any unknown methods to content
 our $AUTOLOAD;

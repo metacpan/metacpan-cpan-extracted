@@ -2,10 +2,12 @@
 abstract: 'Make handling JSON easier in Web::Request'
 author:
   - 'Thomas Klausner <domm@cpan.org>'
+  - 'Klaus Ita <koki@itascraft.com>'
 build_requires:
   HTTP::Request: '0'
   HTTP::Request::Common: '0'
   Module::Build: '0.28'
+  Moose: '0'
   Plack::Builder: '0'
   Plack::Test: '0'
   Test::More: '0'
@@ -16,7 +18,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,8 +27,9 @@ name: Web-Request-Role-JSON
 requires:
   Encode: '0'
   JSON::MaybeXS: '0'
-  Moose::Role: '0'
+  MooseX::Role::Parameterized: '0'
   perl: '5.010'
 resources:
   repository: git://github.com/domm/Web-Request-Role-JSON.git
-version: '1.004'
+version: '1.005'
+x_serialization_backend: 'YAML::Tiny version 1.69'

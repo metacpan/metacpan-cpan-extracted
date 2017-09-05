@@ -66,7 +66,7 @@
 	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
 	doap:name            "RDF-LinkedData";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/RDF-LinkedData/>;
@@ -627,6 +627,12 @@
 	dc:issued            "2012-04-04"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Use Module::Install::RDF to manage the metadata."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Restructure the documentation."@en;
+		], [
 			a doap-changeset:Change;
 			rdfs:label "Many minor test and code fixes."@en;
 		], [
@@ -656,12 +662,6 @@
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "More tests on HTML/RDFa content."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use Module::Install::RDF to manage the metadata."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Restructure the documentation."@en;
 		];
 	];
 	doap:revision        "0.40"^^xsd:string.
@@ -817,6 +817,12 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Change;
+			rdfs:label "Remove the final eval, use Try::Tiny."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use can_load to check for optionals in tests."@en;
+		], [
+			a doap-changeset:Change;
 			rdfs:label "A few smaller changes."@en;
 		], [
 			a doap-changeset:Change;
@@ -837,16 +843,23 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Remove the Error module, use Carp::croak."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Remove the final eval, use Try::Tiny."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use can_load to check for optionals in tests."@en;
 		];
 	];
 	doap:revision        "1.00"^^xsd:string;
 	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.00>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02>
+	a                    doap:Version;
+	rdfs:label           "Skip some tests if no RDFa parser is present."@en;
+	dc:issued            "2017-08-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Skip some tests if no RDFa parser is present."@en;
+		];
+	];
+	doap:revision        "1.02"^^xsd:string;
+	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.02>.
 
 <http://purl.org/NET/cpan-uri/person/hochsten>
 	a                    foaf:Person;

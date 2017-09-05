@@ -1,0 +1,38 @@
+---
+abstract: 'Be able to select archivable formats'
+author:
+  - 'Wesley Schwengle <wesley@mintlab.nl>'
+build_requires:
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  MIME::Types: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-ArchivableFormats
+requires:
+  Archive::Zip: '0'
+  File::Basename: '0'
+  File::LibMagic: '0'
+  Image::ExifTool: '0'
+  List::Util: '0'
+  Module::Pluggable::Object: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  perl: '5.006'
+resources:
+  repository: git://gitlab.com/waterkip/File-ArchivableFormats.git
+version: '1.3'
+x_serialization_backend: 'YAML::Tiny version 1.70'

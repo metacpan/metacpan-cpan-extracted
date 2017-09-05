@@ -16,7 +16,7 @@ package WWW::Mechanize::Chrome::Examples;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 1;
 
@@ -79,7 +79,7 @@ The following is a list of the 4 example programs that are included in the WWW::
     show_screen;
 
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.06/examples/url-to-image.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.07/examples/url-to-image.pl>
 
 =head2 Example: html-to-pdf.pl
 
@@ -88,6 +88,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chr
     use WWW::Mechanize::Chrome;
     
     my $mech = WWW::Mechanize::Chrome->new(
+        headless => 1, # otherwise, PDF printing will not work
     );
     
     for my $url (@ARGV) {
@@ -101,7 +102,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chr
         print "\nSaved $url as $fn\n";
     };
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.06/examples/html-to-pdf.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.07/examples/html-to-pdf.pl>
 
 =head2 Example: dump-links.pl
 
@@ -127,12 +128,12 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chr
     
     =head1 DESCRIPTION
     
-    This program demonstrates how to read elements out of the PhantomJS
+    This program demonstrates how to read elements out of the Chrome
     DOM and how to get at text within nodes.
     
     =cut
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.06/examples/dump-links.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.07/examples/dump-links.pl>
 
 =head2 Example: javascript.pl
 
@@ -164,7 +165,7 @@ Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chr
     
     =cut
 
-Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.06/examples/javascript.pl>
+Download this example: L<http://cpansearch.perl.org/src/CORION/WWW-Mechanize-Chrome-0.07/examples/javascript.pl>
 
 =head1 AUTHOR
 

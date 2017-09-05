@@ -3,12 +3,17 @@ Changes
 LICENSE
 META.json
 README.md
+bench/insert.pl
+bench/select-first.pl
+bench/select-iterator.pl
+bench/select.pl
 cpanfile
 lib/ObjectDB.pm
 lib/ObjectDB/DBHPool.pm
 lib/ObjectDB/DBHPool/Connection.pm
 lib/ObjectDB/Exception.pm
 lib/ObjectDB/Factory.pm
+lib/ObjectDB/Iterator.pm
 lib/ObjectDB/Meta.pm
 lib/ObjectDB/Meta/Relationship.pm
 lib/ObjectDB/Meta/Relationship/ManyToMany.pm
@@ -23,6 +28,7 @@ lib/ObjectDB/Related/ManyToOne.pm
 lib/ObjectDB/Related/OneToMany.pm
 lib/ObjectDB/Related/OneToOne.pm
 lib/ObjectDB/RelatedFactory.pm
+lib/ObjectDB/Stmt.pm
 lib/ObjectDB/Table.pm
 lib/ObjectDB/Util.pm
 lib/ObjectDB/With.pm
@@ -69,7 +75,9 @@ t/row/txn.t
 t/row/update.t
 t/table/count.t
 t/table/delete.t
+t/table/find-by-compose.t
 t/table/find-by-sql.t
+t/table/find-rows-as-hashes.t
 t/table/find-with-paging.t
 t/table/find.t
 t/table/update.t

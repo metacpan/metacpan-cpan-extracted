@@ -4,7 +4,7 @@
 #authors Marco Pessotto, Michael Olson, John Wiegley
 #subtitle The writer’s guide
 #date 2012
-
+#teaser Everything you have to know about the Text::Amuse markup
 
 Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 Foundation, Inc.
@@ -121,8 +121,9 @@ to keep the lines short** and break them inserting a new line. Long
 lines (using the rule 1 line, 1 paragraph) are perfectly fine. The
 rule of paragraphs separated by blank lines still apply, though.
 
-Also, =<tags>= which start and stop blocks, **must be placed on a line by
-themselves**.
+Also, =<tags>= which start and stop blocks, **must be placed on a line
+by themselves and don't mix with environments marked by leading
+spaces, notably lists and tables.**
 
 *** Literal paragraphs
 
@@ -133,14 +134,14 @@ to the output style escaped.
 
 Example:
 
+{{{
 <example>
- <example>
- The =<example>= tag is used for examples, where
- whitespace should be preserved, the text rendered in
- monospace, and any characters special to the output
- style escaped.
- </example>
+The =<example>= tag is used for examples, where
+whitespace should be preserved, the text rendered in
+monospace, and any characters special to the output
+style escaped.
 </example>
+}}}
 
 There is no =<literal>= tag as in the original Muse markup, because it’s
 not a private tool and will be exposed to the internet.
@@ -150,6 +151,15 @@ untouched. This means that it's very likely that you
 will get overflowing lines. To avoid this, a safe value
 for a line length could be 60 characters. Use longer
 lines at your perils.
+
+An alternate syntax for the =<example>= tag is ={{{= =}}}=:
+
+<example>
+{{{
+This is verbatim as well
+}}}
+</example>
+
 
 *** Line breaks
 
@@ -223,20 +233,19 @@ The second level is a “chapter”. It starts a new page on the PDF output.
 The third level is undoubtely the most used. It usually separate a
 section of an article. For example the “Literal paragraph” above.
 
-The forth level goes down further.
+The fourth level goes down further.
 
-**** Forth level, a “subsection”
+**** Fourth level, a “subsection”
 
-The fifth level is very, very low. It’s handy to create description
-lists, too. It’s not dumped on the Table of Contents.
+The fifth level is very, very low and does not create a Table of Contents entry.
 
-***** item 1
+***** Fifth level 1
 
-A description
+Some text.
 
-***** item 2
+***** Fifth level 2
 
-Another description
+Some other text.
 
 **** The example of levels
 
@@ -322,9 +331,33 @@ with this bunlde there is support for the following directives:
    original, original contribution, etc.). The preferred format is 
    “Retrieved on March 8, 2012 from [[http://url.org][the url]]”
 
+ - =#hyphenation=
 
+   See above.
 
-** Bold, italicized and emphatized text
+*** Correcting the hyphenation in the PDF output
+
+Sometimes you may notice some words with incorrect hyphenation in your
+document. You can fix this adding the breakpoint in the
+<code>#hyphenation</code> directive.
+
+E.g.
+
+<example>
+#title Test
+#lang it
+#hyphenation al-be-rel-lo que-sto
+
+Questo alberello...
+</example>
+
+You can as many words with breakpoints as you wish, separated by
+spaces, but you can’t insert numbers or special characters (accents
+and diacritics are fine, though). You specify a breakpoint with the
+hyphen character “-”. Using a word without any hyphen will prevent the
+hyphenation for that word.
+
+** Bold, italicized and monospace text
 
   
 To emphasize text, surround it with certain specially recognized
@@ -335,19 +368,19 @@ The following example will produce:
      *emphasis*
      **strong emphasis**
      ***very strong emphasis***
-     =verbatim and monospace=
+     =code and monospace=
 
 <example>
      *emphasis*
      **strong emphasis**
      ***very strong emphasis***
-     =verbatim and monospace=
+     =code and monospace=
 </example>
 
 Each of these forms may span
 multiple lines, but not multiple paragraphs.
 
-You can also use the =<code>= tag to indicate verbatim and monospace
+You can also use the =<code>= tag to indicate code and monospace
 text. This is handy for regions that have an “=” in them.
 
 If the “*” confuse you or the preview is screwed up, you can use
@@ -359,7 +392,7 @@ The above example rewritten with tags:
      <em>emphasis</em>
      <strong>strong emphasis</strong>
      <strong><em>very strong emphasis</em></strong>
-     <code>verbatim and monospace</code>
+     <code>code and monospace</code>
 </example>
 
 And produces the same thing.
@@ -367,7 +400,7 @@ And produces the same thing.
      <em>emphasis</em>
      <strong>strong emphasis</strong>
      <strong><em>very strong emphasis</em></strong>
-     <code>verbatim and monospace</code>
+     <code>code and monospace</code>
 
 Please note that there is no support for the underline. Underlining is
 an handwritten substitute for the italics. You simply don’t need it.
@@ -375,7 +408,6 @@ an handwritten substitute for the italics. You simply don’t need it.
 Also, small caps are missing, mainly because on the HTML they look
 awful and a very few fonts have decent small caps.
 
-  
 Other tags are =<sub>= and =<sup>= for subscript and superscript. And
 there is also a =<del>= tag for overstriking.
 
@@ -388,6 +420,18 @@ deleted and overstriked</del>
 This is the <sup>superscript</sup> and this is a
 <sub>subscript</sub>, and this is <del>something deleted and
 overstriked</del>
+
+If you nest the same tag (e.g. <code><verbatim><em>this <em>and
+this</em></em></verbatim></code>, you are going to get weird results
+(and doesn't make any sense), so don't do it. <code>=</code> and
+<code>*</code> when surronding words have the same meaning of the
+respective tags:
+
+{{{
+*this* is the same as <em>this</em>
+
+=this= is the same as <code>this</code>
+}}}
 
 *** Making notes to be shown at the end
 
@@ -506,6 +550,9 @@ Lists are given using special characters at the beginning of a line.
 Whitespace must occur before bullets or numbered items, to distinguish
 from the possibility of those characters occurring in a real sentence.
 
+Description lists are marked by some initial whitespace, the term, a
+double colon surrounded by whitespace, and the description body.
+
 <example>
 Normal text.
 
@@ -540,6 +587,12 @@ A list with lower letters
  a. first
  b. second
  c. third
+
+A description list
+
+ First term :: definition and description
+ Second term :: definition and description
+
 </example>
 
 Please note the consistent indentation, **expecially** for roman numbering.
@@ -578,10 +631,52 @@ A list with lower letters
  b. second
  c. third
 
-While the original Emacs Muse had the description lists, this
-implementation has not. You should use the fifth level of headings for
-those. The outcome is mostly the same (yes, you can’t nest them in
-lists, but crazy nesting is beyond the scope of this markup).
+A description list
+
+ First term :: definition and description
+ Second term :: definition and description
+
+*** Breaking lists
+
+If for some reason you want to break the list without starting a
+regular paragraph, you can do so by inserting a
+<verbatim><br></verbatim> tag (which adds some white space between
+them) or a comment (invisible). E.g.
+
+{{{
+List:
+
+   a. bullet item one
+   a. bullet item two, and will break
+
+; a comment
+
+   a. bullet item one
+   a. bullet item two, and break
+
+<br>
+
+   a. bullet item one
+   a. bullet item two, and end
+}}}
+
+Resulting in:
+
+List:
+
+   a. bullet item one
+   a. bullet item two, and will break
+
+; a comment
+
+   a. bullet item one
+   a. bullet item two, and break
+
+<br>
+
+   a. bullet item one
+   a. bullet item two, and end
+
 
 *** Nested lists
 
@@ -604,6 +699,8 @@ Normal text.
    a. Level 2, enum item “a”
    b. Level 2, enum item “b”
       I. Level 3, enum item “I”
+         One term :: description
+         Another term :: description
  - Back to the bullets
 </example>
 
@@ -622,6 +719,8 @@ Normal text.
    a. Level 2, enum item “a”
    b. Level 2, enum item “b”
       I. Level 3, enum item “I”
+         One term :: description
+         Another term :: description
  - Back to the bullets
 
 *** Breaking list items
@@ -660,43 +759,6 @@ or
  a. first
  a. second
  a. third
-
-If you need to switch type while the list is running, put a =br= tag
-between them, or some invisible material like a non-breaking space.
-
-<example>
-This won’t get you what you expect:
-
- 1. first
- a. first item
-
-So you’ll have to do:
-
- 1. first
-
-<br>
-
- a. first item
-</example>
-
-Which yields:
-
-----
-
-This won’t get you what you expect:
-
- 1. first
- a. first item
-
-So you’ll have to do:
-
- 1. first
-
-<br>
-
- a. first item
-
-----
 
 *** Complete example
 
@@ -777,6 +839,15 @@ Normal text.
 
             Here I have the same amount of indentation,
             and it continues the item above.
+
+                 And inside this item :: a description
+
+                                         Which continues here.
+
+                 Another term :: a description
+
+                                 Which continues here.
+
 
  - Back to the bullets
 
@@ -861,6 +932,15 @@ Normal text.
             Here I have the same amount of indentation, and it continues the
             item above.
 
+
+                 And inside this item :: a description
+
+                                         Which continues here.
+
+                 Another term :: a description
+
+                                 Which continues here.
+
  - Back to the bullets
 
    Here I have the same amount of indentation, and it continues the
@@ -869,7 +949,12 @@ Normal text.
 ** Generation of data tables
 
 
-Only very simple tables are supported.  The syntax is as follows (just keep the indentation consistent and separate each cell by one or more textbars).
+Only very simple tables are supported. The syntax is as follows (just
+keep the indentation consistent and separate each cell by one or more
+textbars).
+
+Indentation (one or more leading spaces) is required to trigger the
+table rendering.
 
 <example>
      Triple bars ||| Separate footer fields
@@ -888,10 +973,8 @@ Only very simple tables are supported.  The syntax is as follows (just keep the 
 The ordering of the footer, header and table body blocks is irrelevant
 for the output (HTML requires you put first the header, then the
 footer, then the body). Ordering of the single rows is of course
-preserved. From this we come to the conclusion that you can’t normally
-typeset the pipe symbol without triggering a list. In =<example>= you
-can type it freely. Inside the cells you can do pretty much what you
-want (beside headers and lists): mark them up freely.
+preserved. Inside the cells you can do pretty much what you want
+(beside headers and lists): mark them up freely.
 
 *** Floating tables
 
@@ -923,7 +1006,8 @@ So, the home of this project is
 which can be found at
 [[http://amusewiki.org]] Bare links will not
 get the hyperlinking. So http://thisisspam.org won’t
-get the hyperlinking. </example>
+get the hyperlinking.
+</example>
 
 So, the home of this project is
 [[http://amusewiki.org][AMuseWiki]],
@@ -1075,10 +1159,7 @@ Van spent all his free time in research work for me.
 
 
 
-** Inserting a horizontal line or anchor
-
-*** Horizontal Rules
-
+** Inserting a horizontal line
 
 Four or more dashes indicate a horizontal rule.  Be sure to put blank
 lines around it, or it will be considered part of the proceeding or
@@ -1093,6 +1174,71 @@ Example
 Results:
 
 ----
+
+** Named anchors
+
+If you start a line with "#anchor" – where "anchor" can be any (ascii)
+word that starts with a letter and contains only ascii letters and
+digits – it defines an anchor at that point into the document. This
+point can be referenced using "#anchor" as the target in a Muse link.
+Please note that the anchor must be on a line by itself.
+
+You can't have an anchor at the very beginning of the text, because it's
+merged into the header, so, if you really have to, put a =br= tag before
+it.
+
+The support for this feature was introduced in Text::Amuse version
+0.70 and improved in 0.82
+
+{{{
+#title My text
+
+#badanchor
+This is not an anchor, it's part of the header with a dummy name.
+
+<br>
+
+#begin
+This will work.
+
+*** Section
+
+#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+#nextsection
+
+And here we can link to [[#anchor][our anchor]] and to the
+[[#begin][begin]] and to [[#nextsection][this section]].
+
+}}}
+
+Please note that the name in the HTML output is not kept verbatim.
+Instead a =text-amuse-label= prefix is added (if you need to link it
+externally).
+
+Also note that the link is lost when producing imposed PDFs (and
+implicitely lost when printing any PDF), so it's recommended to keep
+this in mind when writing the document, as the text of the link should
+work even if the link is not present.
+
+Bad example:
+
+{{{
+See [[#anchor][here]]
+}}}
+
+The poor soul printing it and reading it on paper will see just "See
+here". Here where?
+
+Good example:
+
+{{{
+See [[#anchor][the previous chapter]] for more informations.
+}}}
 
 ** Lines to omit from published output
 
@@ -1155,10 +1301,10 @@ very, very, very, very, very, very, very, very, very, very, very,
 very, long description
 </biblio>
 
-The list is wrapped in a =<div>= with class set to biblio, while the TeX
-source get wrapped in =\startawikibiblio= and =\stopawikibiblio=. You are
-free to change class and definition. A reversed indentation is
-suggested.
+The list is wrapped in a =<div>= with class set to biblio, while the
+TeX source get wrapped in the =amusebiblio= environment. You are free
+to change class and environment definition if you need to. A reversed
+indentation is suggested.
 
 
 The same goes with the =<play>= environment, which is supposed to wrap
@@ -1203,6 +1349,22 @@ Then is my deede, to my most painted word. <br>
 Oh heauie burthen!
 
 </play>
+
+** Preventing the markup to be interpreted
+
+Sometimes you want to write something like <verbatim>[1]</verbatim>
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. <verbatim>*this*</verbatim>.
+
+You can do so wrapping the words with the <verbatim><verbatim></verbatim> tag.
+
+Example:
+
+{{{
+Sometimes you want to write something like <verbatim>[1]</verbatim>
+without meaning a footnote reference, or asterisks without meaning an
+emphasis, e.g. <verbatim>*this*</verbatim>.
+}}}
 
 * GNU Free Documentation License
 

@@ -295,7 +295,7 @@ sub _verify_access_token_jwt {
             }
         }
 
-        return ( $access_token_payload, undef );
+        return ( $access_token_payload->{client}, undef, $access_token_payload->{scopes} );
     }
 
     return ( 0, 'invalid_grant' );

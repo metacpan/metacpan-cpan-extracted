@@ -1,3 +1,6 @@
+3.1.0    01.09.2017
+           - set date to epoch=0 if error occures while creating object (parsing error, etc)
+           - add support for ISO 8601 formats
 3.0.7    19.05.2017
            - remove Panda::Lib usage, make it optional in tests
 3.0.6    11.05.2017

@@ -13,7 +13,7 @@ use overload '<=>' => sub { $_[0]->compare($_[1]) },
 # TODO: as_bin or similar
 
 # ABSTRACT: Universally Unique Identifiers FFI style
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 *_malloc = \&FFI::Platypus::Memory::malloc;
@@ -148,7 +148,7 @@ UUID::FFI - Universally Unique Identifiers FFI style
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

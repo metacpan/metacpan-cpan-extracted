@@ -1,5 +1,6 @@
 See also the git repository.
 
+ * 0.04 - srand learnings related to tests.
  * 0.03 - fixed various bugs in Subpattern ->walk. Subpatterns now close
    over what they point to at time of object creation instead of at walk
    or ->render time.

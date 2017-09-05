@@ -1,3 +1,13 @@
+4.88 August 28th, 2017
+
+    [MAINTENANCE]
+    - Address "." being removed from @INC by using absolute filepaths - thanks Kent Fredric!
+
+4.87 May 14th, 2017
+
+    [MAINTENANCE]
+    - Update cc routine to recognize new 2 series Mastercards
+
 4.86 March 26th, 2017
     [NEW FEATURES]
     - Add three new profile methods: depedencies_regexp, dependent_optional, dependent_require_some

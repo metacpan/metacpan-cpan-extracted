@@ -1,12 +1,11 @@
-README
 Changes
-MANIFEST
+lib/Log/Log4perl/Appender/Fluent.pm
+Makefile.PL
+MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
-Makefile.PL
-lib/Log/Log4perl/Appender/Fluent.pm
+README
 t/00-load.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-t/release.t
+xt/manifest.t
+xt/pod.t
+xt/release.t

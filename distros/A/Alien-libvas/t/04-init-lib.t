@@ -8,6 +8,7 @@ my $xs = do { local $/; <DATA> };
 xs_ok {xs => $xs, verbose => 1}, with_subtest {
     my($module) = @_;
     my $handle = $module->xs_vas_open($$); # Opening own VAS always succeeds
+    diag("Opening $$ => $handle");
     ok $handle;
     $module->xs_vas_close($handle);
 };

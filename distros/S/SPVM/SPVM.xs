@@ -40,6 +40,7 @@
 static SPVM_API_VALUE call_sub_args[255];
 
 SPVM_API* SPVM_XS_UTIL_get_api() {
+  
   SV* sv_api = get_sv("SPVM::API", 0);
   
   SPVM_API* api = (SPVM_API*)SvIV(SvRV(sv_api));
@@ -77,11 +78,11 @@ SV*
 DESTROY(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_object = ST(0);
   
   assert(SvOK(sv_object));
-  
-  // warn("DESTROY");
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
@@ -103,13 +104,15 @@ SV*
 new_object(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_package_name = ST(1);
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
   
   if (!SvOK(sv_package_name)) {
     croak("Type must be specified(SPVM::Object::new_object)");
@@ -118,10 +121,6 @@ new_object(...)
   const char* package_name = SvPV_nolen(sv_package_name);
   
   int32_t type_id = api->get_type_id(api, package_name);
-  
-  SPVM_CONSTANT_POOL_TYPE* constant_pool_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[type_id];
-  
-  int32_t type_code = constant_pool_type->code;
   
   if (type_id <= 0) {
     croak("Unkown package \"%s\"(SPVM::Object::new_object", package_name);
@@ -144,6 +143,8 @@ SV*
 set(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_object = ST(0);
   SV* sv_field_name = ST(1);
   SV* sv_value = ST(2);
@@ -160,9 +161,6 @@ set(...)
   int32_t package_type_id = object->type_id;
   
   SPVM_CONSTANT_POOL_TYPE* constant_pool_package_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[package_type_id];
-  
-  // Package type id
-  int32_t package_type_code = constant_pool_package_type->code;
   
   // Package name
   const char* package_name = (char*)&runtime->constant_pool[constant_pool_package_type->name_id + 1];
@@ -223,12 +221,7 @@ set(...)
       SPVM_OBJECT* value = SPVM_XS_UTIL_get_object(sv_value);
       int32_t value_type_id = value->type_id;
       
-      // warn("AAAAAAAAAAA %d", value_type_id);
-      
       SPVM_CONSTANT_POOL_TYPE* constant_pool_value_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[value_type_id];
-      
-      int32_t value_type_code = constant_pool_value_type->code;
-      // warn("BBBBBB %d %d %d", value_type_id, value_type_code, constant_pool_value_type->code);
       
       if (value_type_id != field_type_id
       ) {
@@ -250,6 +243,8 @@ SV*
 get(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_object = ST(0);
   SV* sv_field_name = ST(1);
   
@@ -267,9 +262,6 @@ get(...)
   
   // Package type
   SPVM_CONSTANT_POOL_TYPE* constant_pool_package_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[package_type_id];
-  
-  // Package type code
-  int32_t package_type_code = constant_pool_package_type->code;
   
   // Package name
   const char* package_name = (char*)&runtime->constant_pool[constant_pool_package_type->name_id + 1];
@@ -400,7 +392,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -425,6 +421,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -455,6 +453,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -487,7 +487,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -512,6 +516,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -542,6 +548,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -574,7 +582,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -599,6 +611,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -629,6 +643,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -661,7 +677,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -686,6 +706,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -716,6 +738,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -748,7 +772,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -773,6 +801,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -803,6 +833,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -835,7 +867,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_length = ST(1);
   
   int32_t length = (int32_t)SvIV(sv_length);
@@ -860,6 +896,8 @@ SV*
 set_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_nums = ST(1);
   AV* av_nums = (AV*)SvRV(sv_nums);
@@ -890,6 +928,8 @@ SV*
 get_elements(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
 
   // Set API
@@ -922,7 +962,11 @@ SV*
 new_raw(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_string = ST(1);
   
   int32_t length = (int32_t)sv_len(sv_string);
@@ -954,7 +998,11 @@ SV*
 new(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_class = ST(0);
+  (void)sv_class;
+  
   SV* sv_element_type_name = ST(1);
   SV* sv_length = ST(2);
   
@@ -1005,6 +1053,8 @@ SV*
 set(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_index = ST(1);
   SV* sv_object = ST(2);
@@ -1024,9 +1074,6 @@ set(...)
   // Array type
   SPVM_CONSTANT_POOL_TYPE* constant_pool_array_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[array_type_id];
   
-  // Array type code
-  int32_t array_type_code = constant_pool_array_type->code;
-  
   // Array type name
   const char* array_type_name = (char*)&runtime->constant_pool[constant_pool_array_type->name_id + 1];
 
@@ -1039,9 +1086,6 @@ set(...)
   // Object type
   SPVM_CONSTANT_POOL_TYPE* constant_pool_objet_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[object_type_id];
 
-  // Object type code
-  int32_t object_type_code = constant_pool_objet_type->code;
-  
   // Object type name
   const char* object_type_name = (char*)&runtime->constant_pool[constant_pool_objet_type->name_id + 1];
   
@@ -1061,6 +1105,8 @@ SV*
 get(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_array = ST(0);
   SV* sv_index = ST(1);
   
@@ -1078,9 +1124,6 @@ get(...)
   
   // Array type
   SPVM_CONSTANT_POOL_TYPE* constant_pool_array_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[array_type_id];
-  
-  // Array type code
-  int32_t array_type_code = constant_pool_array_type->code;
   
   // Array type name
   const char* array_type_name = (char*)&runtime->constant_pool[constant_pool_array_type->name_id + 1];
@@ -1148,6 +1191,8 @@ SV*
 get_objects_count(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   int32_t objects_count = api->get_objects_count(api);
   SV* sv_objects_count = sv_2mortal(newSViv(objects_count));
@@ -1160,6 +1205,8 @@ SV*
 compile(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // Create compiler
   SPVM_COMPILER* compiler = SPVM_COMPILER_new();
   
@@ -1235,6 +1282,8 @@ SV*
 get_sub_names(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   
@@ -1269,6 +1318,8 @@ SV*
 get_native_sub_names(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   
@@ -1302,9 +1353,70 @@ get_native_sub_names(...)
 }
 
 SV*
+get_use_package_path(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+
+  SV* sv_package_name = ST(0);
+  const char* package_name = SvPV_nolen(sv_package_name);
+  
+  SPVM_RUNTIME* runtime = api->get_runtime(api);
+  
+  int32_t* constant_pool = runtime->constant_pool;
+  
+  int32_t package_name_id = (int32_t)(intptr_t)SPVM_HASH_search(runtime->use_package_path_id_symtable, package_name, strlen(package_name));
+  
+  const char* use_package_path = (char*)&constant_pool[package_name_id + 1];
+  
+  SV* sv_use_package_path = sv_2mortal(newSVpv(use_package_path, 0));
+  
+  XPUSHs(sv_use_package_path);
+  
+  XSRETURN(1);
+}
+
+SV*
+get_inline_files(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  SPVM_RUNTIME* runtime = api->get_runtime(api);
+  
+  int32_t* constant_pool = runtime->constant_pool;
+  
+  AV* av_inline_files = (AV*)sv_2mortal((SV*)newAV());
+  
+  {
+    int32_t inline_file_index;
+    for (inline_file_index = 0; inline_file_index < runtime->inline_file_ids->length; inline_file_index++) {
+      int32_t inline_file_id = (int32_t)(intptr_t)SPVM_DYNAMIC_ARRAY_fetch(runtime->inline_file_ids, inline_file_index);
+      const char* inline_file = (char*)&constant_pool[inline_file_id + 1];
+      SV* sv_inline_file = sv_2mortal(newSVpv(inline_file, 0));
+      av_push(av_inline_files, SvREFCNT_inc(sv_inline_file));
+    }
+  }
+  
+  SV* sv_inline_files = sv_2mortal(newRV_inc((SV*)av_inline_files));
+  
+  XPUSHs(sv_inline_files);
+  
+  XSRETURN(1);
+}
+
+SV*
 bind_native_sub(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_native_sub_name = ST(0);
   SV* sv_native_address = ST(1);
   
@@ -1334,6 +1446,8 @@ SV*
 build_field_symtable(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // Get compiler
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
   
@@ -1358,10 +1472,6 @@ build_field_symtable(...)
           SPVM_FIELD_INFO* field = op_field->uv.field;
           const char* field_name = field->op_name->uv.name;
           
-          // Field type
-          const char* field_type = field->op_type->uv.type->name;
-          SV* sv_field_type = sv_2mortal(newSVpv(field_type, 0));
-          
           // Field type id
           int32_t field_type_id = field->op_type->uv.type->id;
           SV* sv_field_type_id = sv_2mortal(newSViv(field_type_id));
@@ -1371,16 +1481,17 @@ build_field_symtable(...)
           SV* sv_field_id = sv_2mortal(newSViv(field_id));
           
           HV* hv_field_info = (HV*)sv_2mortal((SV*)newHV());
-          hv_store(hv_field_info, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
-          hv_store(hv_field_info, "type_id", strlen("type_id"), SvREFCNT_inc(sv_field_type_id), 0);
+          (void)hv_store(hv_field_info, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
+          (void)hv_store(hv_field_info, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
+          (void)hv_store(hv_field_info, "type_id", strlen("type_id"), SvREFCNT_inc(sv_field_type_id), 0);
           SV* sv_field_info = sv_2mortal(newRV_inc((SV*)hv_field_info));
           
-          hv_store(hv_package_info, field_name, strlen(field_name), SvREFCNT_inc(sv_field_info), 0);
+          (void)hv_store(hv_package_info, field_name, strlen(field_name), SvREFCNT_inc(sv_field_info), 0);
         }
       }
       
       SV* sv_package_info = sv_2mortal(newRV_inc((SV*)hv_package_info));
-      hv_store(hv_field_symtable, package_name, strlen(package_name), SvREFCNT_inc(sv_package_info), 0);
+      (void)hv_store(hv_field_symtable, package_name, strlen(package_name), SvREFCNT_inc(sv_package_info), 0);
     }
   }
   
@@ -1391,6 +1502,8 @@ SV*
 build_runtime(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // Get compiler
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
   
@@ -1411,6 +1524,8 @@ SV*
 free_compiler(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   // Get compiler
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
   
@@ -1427,6 +1542,8 @@ SV*
 call_sub(...)
   PPCODE:
 {
+  (void)RETVAL;
+  
   SV* sv_sub_abs_name = ST(0);
   
   // Get API
@@ -1527,120 +1644,63 @@ call_sub(...)
     }
   }
   
-  api->set_exception(api, NULL);
-  
   // Return type id
   int32_t return_type_id = constant_pool_sub->return_type_id;
   SPVM_CONSTANT_POOL_TYPE* return_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[return_type_id];
   int32_t return_type_code = return_type->code;
   
+  // Return count
+  int32_t return_count;
   switch (return_type_code) {
     case SPVM_TYPE_C_CODE_VOID:  {
       api->call_void_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
-      XSRETURN(0);
+      return_count = 0;
       break;
     }
     case SPVM_TYPE_C_CODE_BYTE: {
       int8_t return_value = api->call_byte_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSViv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     case SPVM_TYPE_C_CODE_SHORT: {
       int16_t return_value = api->call_short_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSViv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     case SPVM_TYPE_C_CODE_INT: {
       int32_t return_value = api->call_int_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSViv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     case SPVM_TYPE_C_CODE_LONG: {
       int64_t return_value = api->call_long_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSViv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     case SPVM_TYPE_C_CODE_FLOAT: {
       float return_value = api->call_float_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSVnv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     case SPVM_TYPE_C_CODE_DOUBLE: {
       double return_value = api->call_double_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
       SV* sv_return_value = sv_2mortal(newSVnv(return_value));
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
       break;
     }
     default: {
       SPVM_API_OBJECT* return_value = api->call_object_sub(api, sub_id, call_sub_args);
-      SPVM_API_OBJECT* exception = api->get_exception(api);
-      if (exception) {
-        int32_t length = api->get_array_length(api, exception);
-        int8_t* exception_bytes = api->get_byte_array_elements(api, exception);
-        SV* sv_exception = newSVpv(exception_bytes, length);
-        croak("%s", SvPV_nolen(sv_exception));
-      }
-      
       SV* sv_return_value = NULL;
       if (return_value != NULL) {
         api->inc_ref_count(api, return_value);
@@ -1681,7 +1741,16 @@ call_sub(...)
         sv_return_value = &PL_sv_undef;
       }
       XPUSHs(sv_return_value);
-      XSRETURN(1);
+      return_count = 1;
     }
   }
+  SPVM_API_OBJECT* exception = api->get_exception(api);
+  if (exception) {
+    int32_t length = api->get_array_length(api, exception);
+    char* exception_bytes = (char*)api->get_byte_array_elements(api, exception);
+    SV* sv_exception = sv_2mortal(newSVpv(exception_bytes, length));
+    croak("%s", SvPV_nolen(sv_exception));
+  }
+  
+  XSRETURN(return_count);
 }

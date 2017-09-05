@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # Pure Perl implementation of Uniforum message translation.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -845,7 +845,7 @@ Locale::gettext_pp - Pure Perl Implementation of Uniforum Message Translation
 
 =head1 SYNOPSIS
 
- use Locale::gettext_pp (:locale_h :libintl_h);
+ use Locale::gettext_pp qw(:locale_h :libintl_h);
 
  gettext $msgid;
  dgettext $domainname, $msgid;
@@ -990,7 +990,7 @@ You can import groups of functions via two tags:
 
 =over 4
 
-=item B<use Locale::gettext_pp (':locale_h')>
+=item B<use Locale::gettext_pp qw(':locale_h')>
 
 Imports the functions that are normally defined in the C include
 file F<locale.h>:
@@ -1067,7 +1067,7 @@ Imports the locale category constants:
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 

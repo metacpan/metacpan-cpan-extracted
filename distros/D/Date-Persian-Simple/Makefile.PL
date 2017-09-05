@@ -30,7 +30,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Persian::Simple' => { file => 'lib/Date/Persian/Simple.pm', version => '0.17' },
+            'Date::Persian::Simple' => { file => 'lib/Date/Persian/Simple.pm', version => '0.18' },
         },
         resources => {
             repository => {

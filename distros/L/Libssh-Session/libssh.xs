@@ -6,23 +6,44 @@
 
 #include <errno.h>
 #include <libssh/libssh.h>
+#include <libssh/sftp.h>
 #include <libssh/callbacks.h>
 #include "channel.h"
 
-void my_channel_close_function(ssh_session session, ssh_channel channel, void *userdata) {
-    printf("in callback close===\n");
-}
-
-void my_channel_exit_status_function(ssh_session session, ssh_channel channel, int exit_status, void *userdata) {
-    printf("in callback exit===\n");
-}
-
-int my_channel_data_function(ssh_session session, ssh_channel channel, void *data, uint32_t len, int is_stderr, void *userdata) {
-    printf("in callback data = %s ==\n", (char *)data);
-    return 0;
-}
-
 /* C functions */
+
+void store_attributes_inHV(sftp_attributes attributes, HV *hv) {
+    dTHX;
+
+    (void)hv_store(hv, "size", 4, newSViv(attributes->size), 0);
+    (void)hv_store(hv, "type", 4, newSViv(attributes->type), 0);
+    (void)hv_store(hv, "flags", 5, newSViv(attributes->flags), 0);
+    (void)hv_store(hv, "uid", 3, newSViv(attributes->uid), 0);
+    (void)hv_store(hv, "gid", 3, newSViv(attributes->gid), 0);
+    (void)hv_store(hv, "mtime", 5, newSViv(attributes->mtime), 0);
+    (void)hv_store(hv, "permissions", 11, newSViv(attributes->permissions), 0);
+        
+    if (attributes->owner != NULL) {
+        (void)hv_store(hv, "owner", 5, newSVpv(attributes->owner, strlen(attributes->owner)), 0);
+    } else {
+        (void)hv_store(hv, "owner", 5, newSV(0), 0);
+    }
+    
+    if (attributes->group != NULL) {
+        (void)hv_store(hv, "group", 5, newSVpv(attributes->group, strlen(attributes->group)), 0);
+    } else {
+        (void)hv_store(hv, "group", 5, newSV(0), 0);
+    }
+    
+    // it's null when we use sftp_lstat
+    if (attributes->name != NULL) {
+        (void)hv_store(hv, "name", 4, newSVpv(attributes->name, strlen(attributes->name)), 0);
+    } else {
+        (void)hv_store(hv, "name", 4, newSV(0), 0);
+    }
+    
+    sftp_attributes_free(attributes);
+}
 
 MODULE = Libssh::Session		PACKAGE = Libssh::Session
 
@@ -130,6 +151,12 @@ int
 ssh_userauth_none(ssh_session session)
     CODE:
         RETVAL = ssh_userauth_none(session, NULL);
+    OUTPUT: RETVAL
+
+int
+ssh_userauth_gssapi(ssh_session session)
+    CODE:
+        RETVAL = ssh_userauth_gssapi(session);
     OUTPUT: RETVAL
 
 char *
@@ -283,6 +310,12 @@ ssh_channel_request_exec(ssh_channel channel, char *cmd)
         RETVAL = ssh_channel_request_exec(channel, cmd);
     OUTPUT: RETVAL
 
+int
+ssh_channel_write(ssh_channel channel, char *data)
+    CODE:
+        RETVAL = ssh_channel_write(channel, data, strlen(data));
+    OUTPUT: RETVAL
+
 HV *
 ssh_channel_select_read(AV *list, int timeout)
     CODE:
@@ -364,50 +397,115 @@ get_strerror()
         RETVAL = strerror(errno);
     OUTPUT: RETVAL
 
- 
-MODULE = Libssh::Session		PACKAGE = Libssh::Event
+
+MODULE = Libssh::Session		PACKAGE = Libssh::Sftp
 
 # XS code
 
 PROTOTYPES: ENABLED
-    
-ssh_event
-ssh_event_new()
+
+sftp_session
+sftp_new(ssh_session session)
     CODE:
-        RETVAL = ssh_event_new();
+        RETVAL = sftp_new(session);
+    OUTPUT: RETVAL
+
+int
+sftp_init(sftp_session sftp)
+    CODE:
+        RETVAL = sftp_init(sftp);
+    OUTPUT: RETVAL
+    
+int
+sftp_get_error(sftp_session sftp)
+    CODE:
+        RETVAL = sftp_get_error(sftp);
     OUTPUT: RETVAL
 
 NO_OUTPUT void
-ssh_event_free(ssh_event event)
+sftp_free(sftp_session sftp)
     CODE:
-        ssh_event_free(event);
+        sftp_free(sftp);
 
-int 
-ssh_event_add_session(ssh_event event, ssh_session session)
+HV *
+sftp_lstat(sftp_session sftp, char *file)
     CODE:
-        RETVAL = ssh_event_add_session(event, session);
+        HV *hv_ret = NULL;
+        sftp_attributes attributes;
+        
+        attributes = sftp_lstat(sftp, file);
+        if (attributes != NULL) {
+            hv_ret = newHV();
+            store_attributes_inHV(attributes, hv_ret);
+        } else {
+            XSRETURN_UNDEF;
+        }
+        RETVAL = hv_ret;
+    OUTPUT: RETVAL
+
+sftp_dir
+sftp_opendir(sftp_session sftp, char *dir)
+    CODE:
+        sftp_dir handle_dir = sftp_opendir(sftp, dir);
+        if (handle_dir == NULL) {
+            XSRETURN_UNDEF;
+        }
+        RETVAL = handle_dir;
+    OUTPUT: RETVAL
+
+HV *
+sftp_readdir(sftp_session sftp, sftp_dir dir)
+    CODE:
+        HV *hv_ret = NULL;
+        sftp_attributes attributes;
+        
+        attributes = sftp_readdir(sftp, dir);
+        if (attributes != NULL) {
+            hv_ret = newHV();
+            store_attributes_inHV(attributes, hv_ret);
+        } else {
+            XSRETURN_UNDEF;
+        }
+        RETVAL = hv_ret;
     OUTPUT: RETVAL
 
 int
-ssh_event_remove_session(ssh_event event, ssh_session session)
+sftp_dir_eof(sftp_dir dir)
     CODE:
-        RETVAL = ssh_event_remove_session(event, session);
+        RETVAL = sftp_dir_eof(dir);
     OUTPUT: RETVAL
 
 int
-ssh_event_dopoll(ssh_event event, int timeout)
+sftp_closedir(sftp_dir dir)
     CODE:
-        RETVAL = ssh_event_dopoll(event, timeout);
+        RETVAL = sftp_closedir(dir);
+    OUTPUT: RETVAL
+
+sftp_file
+sftp_open(sftp_session sftp, char *file, int accesstype, mode_t mode)
+    CODE:
+        sftp_file fileret = sftp_open(sftp, file, accesstype, mode);
+        
+        if (fileret == NULL) {
+            XSRETURN_UNDEF;
+        }
+        RETVAL = fileret;
+    OUTPUT: RETVAL
+
+size_t
+sftp_write(sftp_file file, char *buf)
+    CODE:
+        RETVAL = sftp_write(file, (void *)buf, strlen(buf));
     OUTPUT: RETVAL
 
 int
-ssh_channel_exit_status_callback(ssh_channel channel, char *userdata)
+sftp_close(sftp_file file)
     CODE:
-        struct ssh_channel_callbacks_struct cb = {
-            .userdata = NULL,
-            .channel_data_function = my_channel_data_function,
-            .channel_exit_status_function = my_channel_exit_status_function
-        };
-        ssh_callbacks_init(&cb);
-        RETVAL = ssh_set_channel_callbacks(channel, &cb);
+        RETVAL = sftp_close(file);
+    OUTPUT: RETVAL
+
+int
+sftp_unlink(sftp_session sftp, char *file)
+    CODE:
+        RETVAL = sftp_unlink(sftp, file);
     OUTPUT: RETVAL

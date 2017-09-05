@@ -1,13 +1,14 @@
 package Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Drawing Mustaches on Perl for fun and profit
-$Template::Mustache::VERSION = '1.0.2';
+$Template::Mustache::VERSION = '1.0.4';
 use 5.12.0;
 
 use Moo;
 use MooseX::MungeHas { has_rw => [ 'is_rw' ], has_ro => [ 'is_ro' ] };
 
 use Text::Balanced qw/ extract_tagged gen_extract_tagged extract_multiple /;
+use Scalar::Util qw/ looks_like_number /;
 
 use Template::Mustache::Token::Template;
 use Template::Mustache::Token::Variable;
@@ -148,11 +149,16 @@ sub resolve_context {
     for my $c ( @$context ) {
         if ( blessed $c ) {
             next CONTEXT unless $c->can($first);
-            return $c->$first;
+            return resolve_context($key,[$c->$first]);
         }
         if ( ref $c eq 'HASH' ) {
             next CONTEXT unless exists $c->{$first};
             return resolve_context($key,[$c->{$first}]);
+        }
+
+        if ( ref $c eq 'ARRAY' ) {
+            next CONTEXT unless looks_like_number($first);
+            return resolve_context( $key, [ $c->[$first] ] );
         }
     }
 
@@ -357,7 +363,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.4
 
 =head1 SYNOPSIS
 
@@ -497,6 +503,11 @@ definitions, but also for C<{{#section}}>s.
         }
     );  # => 'I am (Sam)'
 
+=head4 as an arrayref
+
+    Template::Mustache->render( 'Hello {{ 1 }}', [ 'Earth', 'World!' ] );
+    # => 'Hello World!
+
 =head4 as an object
 
     my $object = Something->new( ... );  
@@ -506,6 +517,8 @@ definitions, but also for C<{{#section}}>s.
 =head4 as a scalar
 
     Template::Mustache->render( 'Hello {{ . }}', 'World!' );
+
+=head4 no context
 
 If no context is provided, it will default to the mustache object itself.
 Which allows for definining templates as subclasses of I<Template::Mustache>.
@@ -521,6 +534,15 @@ Which allows for definining templates as subclasses of I<Template::Mustache>.
 
     # later on
     My::Template->new->render; # => Hello World!
+
+=head4 multi-level variable
+
+If the variable to be rendered is multi-level (e.g., C<foo.bar>), it is
+resolved recursively on the context.
+
+    # $foo->bar returns `{ baz => [ 'quux' ] }`
+
+    Template::Mustache->render( '{{ bar.baz.0 }}', $foo );  # => 'quux'
 
 =head2 render( $template, $context, $partials )
 
@@ -648,7 +670,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

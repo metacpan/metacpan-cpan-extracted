@@ -512,7 +512,7 @@ sub confirm_resource {
 
         # don't know what to do, complain
         Business::GoCardless::Exception->throw({
-            message => "Unkown type ($type) in ->confirm_resource",
+            message => "Unknown type ($type) in ->confirm_resource",
         });
     }
 

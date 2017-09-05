@@ -17,3 +17,51 @@ Revision history for Spp
 
 1.02    2017-8-21
         fix bug could not install. readme add some content.
+
+1.03    2017-8-29
+        fix some bug, add string and str to Str
+
+1.04    2017-8-29
+        rewrite repl and Spp.pm
+
+1.05    2017-8-29
+        delete two no use function, is_str_atom() rename is_str()
+
+1.06    2017-8-31
+        name match atom add pos info [line,from,len]
+
+1.07    2017-8-31
+        add mode to control debug and get pos
+        mode = 0 (default) not debug and pos
+        mode = 1 debug matching
+        mode = 2 get pos information of Token
+
+1.08    2017-9-1
+        match if return false, then set max match report str return.
+        ['false', max_report]
+
+1.09    2017-9-2
+        to_end() set to Spp::Tools, could share with Mylisp.pm
+        add spp_to_spp to test Spp could transfer itself to itself.
+        add three test case.
+
+1.10    2017-9-3
+        Spp::Tools rename => Spp::Builtin
+        would define function register Stable could have type sign
+        Do not need re-write with Mylisp. Must implement by other
+        language.
+
+1.11    2017-9-4
+        add get_matcher() match_matcher()
+        could use 'Int Int+' match 'Int Int'
+        type validation use type signature to check argument type gather.
+        'Str Any' could match 'Str Str'
+
+1.12    2017-9-4
+        Spp.pm export grammar_to_ast() ast_to_parser() then other language
+        Could backup ast to Json, then load it when use. also could load
+        from grammar_text. but more quickly.
+
+1.13    2017-9-4
+        write_file would send a message to output when write ok!
+        perl-tidy all source code.

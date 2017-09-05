@@ -1,8 +1,5 @@
 package Dist::Zilla::Plugin::Repository;
-{
-    $Dist::Zilla::Plugin::Repository::VERSION = '0.20';
-}
-
+$Dist::Zilla::Plugin::Repository::VERSION = '0.21';
 # ABSTRACT: Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla
 
 use Moose;
@@ -28,7 +25,7 @@ has _found_repo => (
 
 sub _build__found_repo {
     my $self = shift;
-    my @info = $self->_find_repo( \&_execute );
+    my @info = $self->_find_repo(\&_execute);
 
     unshift @info, 'url' if @info == 1;
 
@@ -64,7 +61,7 @@ has web => (
 );
 
 sub metadata {
-    my ( $self, $arg ) = @_;
+    my ($self, $arg) = @_;
 
     my %repo;
     $repo{url}  = $self->repository if $self->repository;
@@ -73,7 +70,7 @@ sub metadata {
 
     return unless $repo{url} or $repo{web};
 
-    return { resources => { repository => \%repo } };
+    return {resources => {repository => \%repo}};
 }
 
 sub _execute {
@@ -84,63 +81,56 @@ sub _execute {
 
 # Copy-Paste of Module-Install-Repository, thank MIYAGAWA
 sub _find_repo {
-    my ( $self, $execute ) = @_;
+    my ($self, $execute) = @_;
 
     my %repo;
 
-    if ( -e ".git" ) {
+    if (-e ".git") {
         $repo{type} = 'git';
-        if ( $execute->( 'git remote show -n ' . $self->git_remote ) =~
-            /URL: (.*)$/m )
-        {
+        if ($execute->('git remote show -n ' . $self->git_remote) =~ /URL: (.*)$/m) {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
+
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
 
             $repo{url} = $git_url unless $git_url eq 'origin';    # RT 55136
 
-            if ( $git_url =~ /^(?:git|https?):\/\/(github\.com.*?)\.git$/ ) {
+            if ($git_url =~ /^(?:git|https?):\/\/((?:git(?:lab|hub)\.com|bitbucket.org).*?)(?:\.git)?$/) {
                 $repo{web} = "https://$1";
 
-                if ( $self->github_http ) {
-
+                if ($self->github_http) {
                     # I prefer https://github.com/user/repository
                     # to git://github.com/user/repository.git
                     delete $repo{url};
-                    $self->log( "github_http is deprecated.  "
-                          . "Consider using META.json instead,\n"
-                          . "which can store URLs for both git clone "
-                          . "and the web front-end." );
+                    $self->log("github_http is deprecated.  "
+                            . "Consider using META.json instead,\n"
+                            . "which can store URLs for both git clone "
+                            . "and the web front-end.");
                 }    # end if github_http
             }    # end if Github repository
 
+        } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
+            %repo = (qw(type svn  url), $1);
         }
-        elsif ( $execute->('git svn info') =~ /URL: (.*)$/m ) {
-            %repo = ( qw(type svn  url), $1 );
-        }
-
         # invalid github remote might come back with just the remote name
-        if ( $repo{url} && $repo{url} =~ /\A\w+\z/ ) {
+        if ($repo{url} && $repo{url} =~ /\A\w+\z/) {
             delete $repo{$_} for qw/url type web/;
-            $self->log( "Skipping invalid git remote " . $self->git_remote );
+            $self->log("Skipping invalid git remote " . $self->git_remote);
         }
-    }
-    elsif ( -e ".svn" ) {
+    } elsif (-e ".svn") {
         $repo{type} = 'svn';
-        if ( $execute->('svn info') =~ /URL: (.*)$/m ) {
+        if ($execute->('svn info') =~ /URL: (.*)$/m) {
             my $svn_url = $1;
-            if ( $svn_url =~ /^https(\:\/\/.*?\.googlecode\.com\/svn\/.*)$/ ) {
+            if ($svn_url =~ /^https(\:\/\/.*?\.googlecode\.com\/svn\/.*)$/) {
                 $svn_url = 'http' . $1;
             }
             $repo{url} = $svn_url;
         }
-    }
-    elsif ( -e "_darcs" ) {
-
+    } elsif (-e "_darcs") {
         # defaultrepo is better, but that is more likely to be ssh, not http
         $repo{type} = 'darcs';
-        if ( my $query_repo = $execute->('darcs query repo') ) {
-            if ( $query_repo =~ m!Default Remote: (http://.+)! ) {
+        if (my $query_repo = $execute->('darcs query repo')) {
+            if ($query_repo =~ m!Default Remote: (http://.+)!) {
                 return %repo, url => $1;
             }
         }
@@ -150,25 +140,22 @@ sub _find_repo {
             chomp;
             return %repo, url => $_ if m!^http://!;
         }
-    }
-    elsif ( -e ".hg" ) {
+    } elsif (-e ".hg") {
         $repo{type} = 'hg';
-        if ( $execute->('hg paths') =~ /default = (.*)$/m ) {
+        if ($execute->('hg paths') =~ /default = (.*)$/m) {
             my $mercurial_url = $1;
             $mercurial_url =~ s!^ssh://hg\@(bitbucket\.org/)!https://$1!;
             $repo{url} = $mercurial_url;
         }
-    }
-    elsif ( -e "$ENV{HOME}/.svk" ) {
-
+    } elsif (-e "$ENV{HOME}/.svk") {
         # Is there an explicit way to check if it's an svk checkout?
         my $svk_info = $execute->('svk info') or return;
-      SVK_INFO: {
-            if ( $svk_info =~ /Mirrored From: (.*), Rev\./ ) {
+        SVK_INFO: {
+            if ($svk_info =~ /Mirrored From: (.*), Rev\./) {
                 return qw(type svn  url) => $1;
             }
 
-            if ( $svk_info =~ m!Merged From: (/mirror/.*), Rev\.! ) {
+            if ($svk_info =~ m!Merged From: (/mirror/.*), Rev\.!) {
                 $svk_info = $execute->("svk info /$1") or return;
                 redo SVK_INFO;
             }
@@ -195,7 +182,7 @@ Dist::Zilla::Plugin::Repository - Automatically sets repository URL from svn/svk
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -280,7 +267,7 @@ Christopher J. Madsen <perl@cjmweb.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
+This software is copyright (c) 2017 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

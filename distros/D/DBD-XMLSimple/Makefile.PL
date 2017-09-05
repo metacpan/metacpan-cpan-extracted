@@ -1,7 +1,9 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 use File::Spec;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
 WriteMakefile(
     NAME		=> 'DBD::XMLSimple',
@@ -13,9 +15,10 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
 	'Test::Most' => 0,
 	'Test::Script' => 1.12,
+	'Test::DatabaseRow' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
     },
@@ -23,6 +26,7 @@ WriteMakefile(
 	'XML::Twig' => 0,
 	'SQL::Statement' => 1.410,
 	'DBI::DBD::SqlEngine' => 0.06,
+	'DBI' => 1.637,	# Version that understands XMLSimple impoer
 	'Carp' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-RWSTAUNER
 
+6.002     2017-09-04T19:30:42Z
+
+  - Fix tests on alpine.
+
 6.001     2016-06-17T04:00:37Z
 
   - Require dzil v6 so that tests work with Path::Tiny.

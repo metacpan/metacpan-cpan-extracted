@@ -1,0 +1,19 @@
+Changes
+lib/Lab/VXI11.pm
+main
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+scripts/agilent-test.pl
+t/Lab-VXI11.t
+t/pod.t
+typemap
+vxi11.h
+vxi11.x
+VXI11.xs
+vxi11_clnt.c
+vxi11_xdr.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

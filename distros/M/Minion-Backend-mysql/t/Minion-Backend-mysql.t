@@ -4,21 +4,25 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 
-plan skip_all => 'set TEST_ONLINE_MYSQL to enable this test' unless $ENV{TEST_ONLINE_MYSQL};
-
+use Test::mysqld;
 use Minion;
 use Mojo::IOLoop;
 use Sys::Hostname 'hostname';
 use Time::HiRes qw(time usleep);
 
+my $mysqld = Test::mysqld->new(
+  my_cnf => {
+    'skip-networking' => '', # no TCP socket
+  }
+) or plan skip_all => $Test::mysqld::errstr;
+
 # Clean up before start
 require Mojo::mysql;
-
-my $mysql = Mojo::mysql->new($ENV{TEST_ONLINE_MYSQL});
+my $mysql = Mojo::mysql->new( dsn => $mysqld->dsn( dbname => 'test' ));
 $mysql->db->query('drop table if exists mojo_migrations');
 $mysql->db->query('drop table if exists minion_jobs');
 $mysql->db->query('drop table if exists minion_workers');
-my $minion = Minion->new(mysql => $ENV{TEST_ONLINE_MYSQL});
+my $minion = Minion->new(mysql => dsn => $mysqld->dsn( dbname => 'test' ));
 $minion->reset;
 
 # Nothing to repair
@@ -33,7 +37,7 @@ like $notified, qr/^[\d.]+$/, 'has timestamp';
 my $id = $worker->id;
 is $worker->register->id, $id, 'same id';
 usleep 50000;
-ok $worker->register->info->{notified} > $notified, 'new timestamp';
+cmp_ok $worker->register->info->{notified}, '>=', $notified, 'new timestamp';
 is $worker->unregister->info, undef, 'no information';
 my $host = hostname;
 is $worker->register->info->{host}, $host, 'right host';
@@ -265,8 +269,7 @@ is $job->task, 'add', 'right task';
 # Retry and remove
 $id = $minion->enqueue(add => [5, 6]);
 $job = $worker->register->dequeue(0);
-is $job->info->{attempts}, 1, 'job will be attempted once';
-is $job->info->{retries},  0, 'job has not been retried';
+is $job->info->{retries}, 0, 'job has not been retried';
 is $job->id, $id, 'right id';
 ok $job->finish, 'job finished';
 ok !$worker->dequeue(0), 'no more jobs';
@@ -284,18 +287,16 @@ ok !$job->remove, 'job has not been removed';
 ok $job->fail,  'job failed';
 ok $job->retry, 'job retried';
 is $job->info->{retries}, 2, 'job has been retried twice';
+ok !$job->info->{finished}, 'no finished timestamp';
+ok !$job->info->{result},   'no result';
+ok !$job->info->{started},  'no started timestamp';
+ok !$job->info->{worker},   'no worker';
 $job = $worker->dequeue(0);
 is $job->info->{state}, 'active', 'right state';
 ok $job->finish, 'job finished';
 ok $job->remove, 'job has been removed';
 is $job->info,   undef, 'no information';
 $id = $minion->enqueue(add => [6, 5]);
-$job = $minion->job($id);
-is $job->info->{state},   'inactive', 'right state';
-is $job->info->{retries}, 0,          'job has not been retried';
-ok $job->retry, 'job retried';
-is $job->info->{state},   'inactive', 'right state';
-is $job->info->{retries}, 1,          'job has been retried once';
 $job = $worker->dequeue(0);
 is $job->id, $id, 'right id';
 ok $job->fail,   'job failed';
@@ -356,47 +357,6 @@ ok $job->retry({delay => 100}), 'job retried with delay';
 is $job->info->{retries}, 1, 'job has been retried once';
 ok $job->info->{delayed} > time, 'delayed timestamp';
 ok $minion->job($id)->remove, 'job has been removed';
-$worker->unregister;
-
-# Events
-my $pid;
-my $failed = 0;
-$finished = 0;
-$minion->once(
-  worker => sub {
-    my ($minion, $worker) = @_;
-    $worker->on(
-      dequeue => sub {
-        my ($worker, $job) = @_;
-        $job->on(failed   => sub { $failed++ });
-        $job->on(finished => sub { $finished++ });
-        $job->on(spawn    => sub { $pid = pop });
-      }
-    );
-  }
-);
-$worker = $minion->worker->register;
-$minion->enqueue(add => [3, 3]);
-$minion->enqueue(add => [4, 3]);
-$job = $worker->dequeue(0);
-is $failed,   0, 'failed event has not been emitted';
-is $finished, 0, 'finished event has not been emitted';
-my $result;
-$job->on(finished => sub { $result = pop });
-$job->finish('Everything is fine!');
-$job->perform;
-is $result,   'Everything is fine!', 'right result';
-is $failed,   0,                     'failed event has not been emitted';
-is $finished, 1,                     'finished event has been emitted once';
-isnt $pid, $$, 'new process id';
-$job = $worker->dequeue(0);
-my $err;
-$job->on(failed => sub { $err = pop });
-$job->fail("test\n");
-$job->fail;
-is $err,      "test\n", 'right error';
-is $failed,   1,        'failed event has been emitted once';
-is $finished, 1,        'finished event has been emitted once';
 $worker->unregister;
 
 # Queues
@@ -463,7 +423,7 @@ is $minion->job($id)->info->{state}, 'finished', 'right state';
 is_deeply $minion->job($id)->info->{result}, {added => 17}, 'right result';
 
 # Non-zero exit status
-$minion->add_task(exit => sub { exit 1 });
+$minion->add_task(exit => sub { POSIX::_exit( 1 ) });
 $id  = $minion->enqueue('exit');
 $job = $worker->register->dequeue(0);
 is $job->id, $id, 'right id';
@@ -471,56 +431,6 @@ $job->perform;
 is $job->info->{state}, 'failed', 'right state';
 is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
 $worker->unregister;
-
-# Multiple attempts while processing
-is $minion->backoff->(0),  15,     'right result';
-is $minion->backoff->(1),  16,     'right result';
-is $minion->backoff->(2),  31,     'right result';
-is $minion->backoff->(3),  96,     'right result';
-is $minion->backoff->(4),  271,    'right result';
-is $minion->backoff->(5),  640,    'right result';
-is $minion->backoff->(25), 390640, 'right result';
-$id = $minion->enqueue(exit => [] => {attempts => 2});
-$job = $worker->register->dequeue(0);
-is $job->id, $id, 'right id';
-is $job->retries, 0, 'job has not been retried';
-$job->perform;
-is $job->info->{attempts}, 2,          'job will be attempted twice';
-is $job->info->{state},    'inactive', 'right state';
-is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
-ok $job->info->{retried} < $job->info->{delayed}, 'delayed timestamp';
-$minion->backend->mysql->db->query(
-  'update minion_jobs set `delayed` = now() where id = ?', $id);
-$job = $worker->register->dequeue(0);
-is $job->id, $id, 'right id';
-is $job->retries, 1, 'job has been retried once';
-$job->perform;
-is $job->info->{attempts}, 2,        'job will be attempted twice';
-is $job->info->{state},    'failed', 'right state';
-is $job->info->{result}, 'Non-zero exit status (1)', 'right result';
-$worker->unregister;
-
-# Multiple attempts during maintenance
-$id = $minion->enqueue(exit => [] => {attempts => 2});
-$job = $worker->register->dequeue(0);
-is $job->id, $id, 'right id';
-is $job->retries, 0, 'job has not been retried';
-is $job->info->{attempts}, 2,        'job will be attempted twice';
-is $job->info->{state},    'active', 'right state';
-$worker->unregister;
-$minion->repair;
-is $job->info->{state},  'inactive',         'right state';
-is $job->info->{result}, 'Worker went away', 'right result';
-ok $job->info->{retried} < $job->info->{delayed}, 'delayed timestamp';
-$minion->backend->mysql->db->query(
-  'update minion_jobs set `delayed` = now() where id = ?', $id);
-$job = $worker->register->dequeue(0);
-is $job->id, $id, 'right id';
-is $job->retries, 1, 'job has been retried once';
-$worker->unregister;
-$minion->repair;
-is $job->info->{state},  'failed',           'right state';
-is $job->info->{result}, 'Worker went away', 'right result';
 
 # A job needs to be dequeued again after a retry
 $minion->add_task(restart => sub { });
@@ -551,7 +461,7 @@ $job    = $worker->dequeue(0);
 $job2   = $worker->dequeue(0);
 my $job3 = $worker->dequeue(0);
 my $job4 = $worker->dequeue(0);
-$pid = $job->start;
+my $pid  = $job->start;
 my $pid2 = $job2->start;
 my $pid3 = $job3->start;
 my $pid4 = $job4->start;
@@ -572,5 +482,34 @@ is $minion->job($id4)->info->{result}, 'Non-zero exit status (1)',
   'right result';
 $worker->unregister;
 $minion->reset;
+
+# worker commands
+$worker  = $minion->worker->register->process_commands;
+$worker2 = $minion->worker->register;
+my @commands;
+$_->add_command(test_id => sub { push @commands, shift->id })
+  for $worker, $worker2;
+$worker->add_command(test_args => sub { shift and push @commands, [@_] })
+  ->register;
+ok $minion->backend->broadcast('test_id', [], [$worker->id]), 'sent command';
+ok $minion->backend->broadcast('test_id', [], [$worker->id, $worker2->id]),
+  'sent command';
+$worker->process_commands->register;
+$worker2->process_commands;
+is_deeply \@commands, [$worker->id, $worker->id, $worker2->id],
+  'right structure';
+@commands = ();
+ok $minion->backend->broadcast('test_id'),       'sent command';
+ok $minion->backend->broadcast('test_whatever'), 'sent command';
+ok $minion->backend->broadcast('test_args', [23], []), 'sent command';
+ok $minion->backend->broadcast('test_args', [1, [2], {3 => 'three'}],
+  [$worker->id]),
+  'sent command';
+$_->process_commands for $worker, $worker2;
+is_deeply \@commands,
+  [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id],
+  'right structure';
+$_->unregister for $worker, $worker2;
+ok !$minion->backend->broadcast('test_id', []), 'command not sent';
 
 done_testing();

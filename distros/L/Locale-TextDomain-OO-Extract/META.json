@@ -55,7 +55,7 @@
    "provides" : {
       "Locale::TextDomain::OO::Extract" : {
          "file" : "lib/Locale/TextDomain/OO/Extract.pm",
-         "version" : "2.009"
+         "version" : "2.011"
       },
       "Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm",
@@ -63,15 +63,15 @@
       },
       "Locale::TextDomain::OO::Extract::HTML" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/HTML.pm",
-         "version" : "2.007"
+         "version" : "2.011"
       },
       "Locale::TextDomain::OO::Extract::JavaScript" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/JavaScript.pm",
-         "version" : "2.007"
+         "version" : "2.011"
       },
       "Locale::TextDomain::OO::Extract::Perl" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/Perl.pm",
-         "version" : "2.007"
+         "version" : "2.011"
       },
       "Locale::TextDomain::OO::Extract::Process" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/Process.pm",
@@ -91,7 +91,11 @@
       },
       "Locale::TextDomain::OO::Extract::TT" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/TT.pm",
-         "version" : "2.007"
+         "version" : "2.011"
+      },
+      "Locale::TextDomain::OO::Extract::YAML" : {
+         "file" : "lib/Locale/TextDomain/OO/Extract/YAML.pm",
+         "version" : "2.011"
       }
    },
    "release_status" : "stable",
@@ -100,6 +104,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.009",
+   "version" : "2.011",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

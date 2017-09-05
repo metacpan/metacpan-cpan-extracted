@@ -1,0 +1,601 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Field::DKIM - message header field for dkim signatures
+
+=head1 INHERITANCE
+
+ Mail::Message::Field::DKIM
+   is a Mail::Message::Field::Structured
+   is a Mail::Message::Field::Full
+   is a Mail::Message::Field
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ my $f = Mail::Message::Field->new('DKIM-Signature' => '...');
+
+ my $g = Mail::Message::Field->new('DKIM-Signature');
+ $g->add...
+
+=head1 DESCRIPTION
+
+Decode the information contained in a DKIM header.  You can also
+construct DKIM-Signature headers this way.  However, verification
+and signing is not yet implemented.
+
+This implementation is based on RFC6376.
+
+Extends L<"DESCRIPTION" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<"">
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<0+>
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<<=>>
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<bool>
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<cmp>
+
+Inherited, see L<Mail::Message::Field/"OVERLOADED">
+
+=item overload: B<stringification>
+
+Inherited, see L<Mail::Message::Field::Full/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clone>()
+
+Inherited, see L<Mail::Message::Field/"Constructors">
+
+=item Mail::Message::Field::DKIM-E<gt>B<from>($field, %options)
+
+Inherited, see L<Mail::Message::Field::Full/"Constructors">
+
+=item Mail::Message::Field::DKIM-E<gt>B<new>($data)
+
+ -Option    --Defined in                      --Default
+  attributes  Mail::Message::Field::Structured  <ignored>
+  charset     Mail::Message::Field::Full        undef
+  datum       Mail::Message::Field::Structured  undef
+  encoding    Mail::Message::Field::Full        'q'
+  force       Mail::Message::Field::Full        false
+  language    Mail::Message::Field::Full        undef
+  log         Mail::Reporter                    'WARNINGS'
+  trace       Mail::Reporter                    'WARNINGS'
+
+=over 2
+
+=item attributes => ATTRS
+
+=item charset => STRING
+
+=item datum => STRING
+
+=item encoding => 'q'|'Q'|'b'|'B'
+
+=item force => BOOLEAN
+
+=item language => STRING
+
+=item log => LEVEL
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 The field
+
+Extends L<"The field" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"The field">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isStructured>()
+
+=item Mail::Message::Field::DKIM-E<gt>B<isStructured>()
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<length>()
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<nrLines>()
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<string>( [$wrap] )
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=item $obj-E<gt>B<toDisclose>()
+
+Inherited, see L<Mail::Message::Field/"The field">
+
+=back
+
+=head2 Access to the name
+
+Extends L<"Access to the name" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the name">.
+ 
+=over 4
+
+=item $obj-E<gt>B<Name>()
+
+Inherited, see L<Mail::Message::Field/"Access to the name">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Message::Field/"Access to the name">
+
+=item $obj-E<gt>B<wellformedName>( [STRING] )
+
+Inherited, see L<Mail::Message::Field/"Access to the name">
+
+=back
+
+=head2 Access to the body
+
+Extends L<"Access to the body" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<body>()
+
+Inherited, see L<Mail::Message::Field/"Access to the body">
+
+=item $obj-E<gt>B<decodedBody>(%options)
+
+Inherited, see L<Mail::Message::Field::Full/"Access to the body">
+
+=item $obj-E<gt>B<folded>()
+
+Inherited, see L<Mail::Message::Field/"Access to the body">
+
+=item $obj-E<gt>B<foldedBody>( [$body] )
+
+Inherited, see L<Mail::Message::Field/"Access to the body">
+
+=item $obj-E<gt>B<stripCFWS>( [STRING] )
+
+=item Mail::Message::Field::DKIM-E<gt>B<stripCFWS>( [STRING] )
+
+Inherited, see L<Mail::Message::Field/"Access to the body">
+
+=item $obj-E<gt>B<unfoldedBody>( [$body, [$wrap]] )
+
+Inherited, see L<Mail::Message::Field/"Access to the body">
+
+=back
+
+=head2 Access to the content
+
+Extends L<"Access to the content" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Access to the content">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addAttribute>(...)
+
+Attributes are not supported here.
+
+=item $obj-E<gt>B<addTag>($name, $value|@values)
+
+Add a tag to the set.  When the tag already exists, it is replaced.
+Names are (coverted to) lower-case.  When multiple values are given,
+they will be concatenated with a blank (and may get folded there later)
+
+=item $obj-E<gt>B<addresses>()
+
+Inherited, see L<Mail::Message::Field/"Access to the content">
+
+=item $obj-E<gt>B<attrPairs>()
+
+Inherited, see L<Mail::Message::Field::Structured/"Access to the content">
+
+=item $obj-E<gt>B<attribute>( $object|<STRING, %options>|<$name,$value,%options> )
+
+Inherited, see L<Mail::Message::Field::Structured/"Access to the content">
+
+=item $obj-E<gt>B<attributes>()
+
+Inherited, see L<Mail::Message::Field::Structured/"Access to the content">
+
+=item $obj-E<gt>B<beautify>()
+
+Inherited, see L<Mail::Message::Field::Full/"Access to the content">
+
+=item $obj-E<gt>B<comment>( [STRING] )
+
+Inherited, see L<Mail::Message::Field/"Access to the content">
+
+=item $obj-E<gt>B<createComment>(STRING, %options)
+
+=item Mail::Message::Field::DKIM-E<gt>B<createComment>(STRING, %options)
+
+Inherited, see L<Mail::Message::Field::Full/"Access to the content">
+
+=item $obj-E<gt>B<createPhrase>(STRING, %options)
+
+=item Mail::Message::Field::DKIM-E<gt>B<createPhrase>(STRING, %options)
+
+Inherited, see L<Mail::Message::Field::Full/"Access to the content">
+
+=item $obj-E<gt>B<study>()
+
+Inherited, see L<Mail::Message::Field/"Access to the content">
+
+=item $obj-E<gt>B<tag>($name)
+
+Returns the value for the named tag.
+
+=item $obj-E<gt>B<toDate>( [$time] )
+
+=item Mail::Message::Field::DKIM-E<gt>B<toDate>( [$time] )
+
+Inherited, see L<Mail::Message::Field/"Access to the content">
+
+=item $obj-E<gt>B<toInt>()
+
+Inherited, see L<Mail::Message::Field/"Access to the content">
+
+=back
+
+=head3 DKIM-Signature tags
+
+The tag methods return the tag-value content without any validation
+or modification.  For many situations, the actual content does not
+need (expensive) validation and interpretation.
+
+=over 4
+
+=item $obj-E<gt>B<tagAgentID>()
+
+The Agent or User Identifier (AUID).  Defaults to C<@$domain>
+
+=item $obj-E<gt>B<tagAlgorithm>()
+
+Signature algorithm.  Should be rsa-sha(1|256): check before use. Required.
+
+=item $obj-E<gt>B<tagBodyLength>()
+
+The number of octets which where used to calculate the hash.  By default,
+the whole body was used.
+
+=item $obj-E<gt>B<tagC14N>()
+
+The canonicalization method used.  Defaults to 'simple/simple'.
+
+=item $obj-E<gt>B<tagDomain>()
+
+The sub-domain (SDID) which claims responsibility for this signature. Required.
+
+=item $obj-E<gt>B<tagExpires>()
+
+The timestamp when the signature will expire.  Recommended.
+
+=item $obj-E<gt>B<tagExtract>()
+
+Some headers from the original message packed together.
+
+=item $obj-E<gt>B<tagQueryMethods>()
+
+A colon-separated list of method which can be used to retrieve the
+public key.  The default is "dns/txt" (currently the only valid option)
+
+=item $obj-E<gt>B<tagSelector>()
+
+The selector subdividing the $domain tag.  Required.
+
+=item $obj-E<gt>B<tagSignData>()
+
+=item $obj-E<gt>B<tagSignature>()
+
+Message signature in base64, with whitespaces removed. Required.
+
+=item $obj-E<gt>B<tagSignedHeaders>()
+
+The colon separated list of headers which need to be included in the
+signature.  Required.
+
+=item $obj-E<gt>B<tagTimestamp>()
+
+When the signature was created in UNIX-like seconds (since 1970).  Recommended.
+
+=item $obj-E<gt>B<tagVersion>()
+
+Signature header synax version (usually 1)
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Other methods">.
+ 
+=over 4
+
+=item $obj-E<gt>B<dateToTimestamp>(STRING)
+
+=item Mail::Message::Field::DKIM-E<gt>B<dateToTimestamp>(STRING)
+
+Inherited, see L<Mail::Message::Field/"Other methods">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<consume>( $line | <$name,<$body|$objects>> )
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=item $obj-E<gt>B<decode>(STRING, %options)
+
+=item Mail::Message::Field::DKIM-E<gt>B<decode>(STRING, %options)
+
+Inherited, see L<Mail::Message::Field::Full/"Internals">
+
+=item $obj-E<gt>B<defaultWrapLength>( [$length] )
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=item $obj-E<gt>B<encode>(STRING, %options)
+
+Inherited, see L<Mail::Message::Field::Full/"Internals">
+
+=item $obj-E<gt>B<fold>( $name, $body, [$maxchars] )
+
+=item Mail::Message::Field::DKIM-E<gt>B<fold>( $name, $body, [$maxchars] )
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=item $obj-E<gt>B<setWrapLength>( [$length] )
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=item $obj-E<gt>B<stringifyData>(STRING|ARRAY|$objects)
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=item $obj-E<gt>B<unfold>(STRING)
+
+Inherited, see L<Mail::Message::Field/"Internals">
+
+=back
+
+=head2 Parsing
+
+Extends L<"Parsing" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Parsing">.
+ 
+=over 4
+
+=item $obj-E<gt>B<consumeComment>(STRING)
+
+=item Mail::Message::Field::DKIM-E<gt>B<consumeComment>(STRING)
+
+Inherited, see L<Mail::Message::Field::Full/"Parsing">
+
+=item $obj-E<gt>B<consumeDotAtom>(STRING)
+
+Inherited, see L<Mail::Message::Field::Full/"Parsing">
+
+=item $obj-E<gt>B<consumePhrase>(STRING)
+
+=item Mail::Message::Field::DKIM-E<gt>B<consumePhrase>(STRING)
+
+Inherited, see L<Mail::Message::Field::Full/"Parsing">
+
+=item $obj-E<gt>B<datum>( [$value] )
+
+Inherited, see L<Mail::Message::Field::Structured/"Parsing">
+
+=item $obj-E<gt>B<parse>(STRING)
+
+Inherited, see L<Mail::Message::Field::Full/"Parsing">
+
+=item $obj-E<gt>B<produceBody>()
+
+Inherited, see L<Mail::Message::Field::Full/"Parsing">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Field::DKIM-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Field::DKIM-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Field::DKIM-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Message::Field::Structured|Mail::Message::Field::Structured/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Field content is not numerical: $content
+
+The numeric value of a field is requested (for instance the C<Lines> or
+C<Content-Length> fields should be numerical), however the data contains
+weird characters.
+
+=item Warning: Illegal character in charset '$charset'
+
+The field is created with an utf8 string which only contains data from the
+specified character set.  However, that character set can never be a valid
+name because it contains characters which are not permitted.
+
+=item Warning: Illegal character in field name $name
+
+A new field is being created which does contain characters not permitted
+by the RFCs.  Using this field in messages may break other e-mail clients
+or transfer agents, and therefore mutulate or extinguish your message.
+
+=item Warning: Illegal character in language '$lang'
+
+The field is created with data which is specified to be in a certain language,
+however, the name of the language cannot be valid: it contains characters
+which are not permitted by the RFCs.
+
+=item Warning: Illegal encoding '$encoding', used 'q'
+
+The RFCs only permit base64 (C<b > or C<B >) or quoted-printable
+(C<q> or C<Q>) encoding.  Other than these four options are illegal.
+
+=item Error: No attributes for DKIM headers
+
+Is is not possible to add attributes to this field.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.002,
+built on September 04, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

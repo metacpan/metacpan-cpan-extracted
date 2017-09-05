@@ -14,6 +14,7 @@ t/030_expiry_config.t
 t/035_login_confirm_error.t
 t/040_full_fat_app.t
 t/050_jwt.t
+t/051_jwt_refresh.t
 t/060_jwt_with_revoke.t
 t/070_overrides_hash_args.t
 t/080_password_grant_basic.t

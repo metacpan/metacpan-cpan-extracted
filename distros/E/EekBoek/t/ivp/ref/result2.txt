@@ -1,6 +1,6 @@
                             Verlies/Winst
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                         EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                         EekBoek, 2013-12-31
 
 RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 ----------------------------------------------------------------------
@@ -11,28 +11,28 @@ RekNr   Verdichting/Grootboekrekening                 Debet     Credit
 68       Totaal Afschrijvingen                       808,08
 
 69       Algemene kosten
-6900      Telefoon- en faxkosten                     510,29
-6905      Internetkosten                             269,42
+6900      Telefoon- en faxkosten                     501,86
+6905      Internetkosten                             264,92
 6980      Bankkosten                                  32,40
-69       Totaal Algemene kosten                      812,11
+69       Totaal Algemene kosten                      799,18
 
-6       Totaal Kosten                               1620,19
+6       Totaal Kosten                               1607,26
 
 8       Bedrijfsopbrengsten
 81       Omzet Consultancy
-8100      Omzet advisering                                     1200,00
-81       Totaal Omzet Consultancy                              1200,00
+8100      Omzet advisering                                     1180,16
+81       Totaal Omzet Consultancy                              1180,16
 
 83       Omzet Editing
 8300      Omzet editing                                        1000,00
 83       Totaal Omzet Editing                                  1000,00
 
 84       Omzet Cursussen
-8400      Omzet cursussen                                      6500,00
-84       Totaal Omzet Cursussen                                6500,00
+8400      Omzet cursussen                                      6392,56
+84       Totaal Omzet Cursussen                                6392,56
 
-8       Totaal Bedrijfsopbrengsten                             8700,00
+8       Totaal Bedrijfsopbrengsten                             8572,72
 
-        << Winst >>                                 7079,81
+        << Winst >>                                 6965,46
 ----------------------------------------------------------------------
-        TOTAAL Resultaten                           8700,00    8700,00
+        TOTAAL Resultaten                           8572,72    8572,72

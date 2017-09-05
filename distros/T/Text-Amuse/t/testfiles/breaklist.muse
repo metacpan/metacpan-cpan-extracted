@@ -10,3 +10,38 @@ An enumerated list follows.
       1. Enum item one
       2. Enum item two
 
+
+Now breaking:
+
+   - bullet item one
+   - bullet item two, and will break
+
+;  comment
+
+   - bullet item one
+   - bullet item two, and break
+
+<comment>
+Break the list
+</comment>
+
+   - bullet item one
+   - bullet item two, and EOF
+
+Now breaking:
+
+   a. bullet item one
+   a. bullet item two, and will break
+
+;  comment
+
+   a. bullet item one
+   a. bullet item two, and break
+
+<comment>
+Break the list
+</comment>
+
+   a. bullet item one
+   a. bullet item two, and EOF
+

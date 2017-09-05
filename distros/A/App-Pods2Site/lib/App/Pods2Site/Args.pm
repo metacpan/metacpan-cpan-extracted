@@ -10,6 +10,7 @@ use warnings;
 use App::Pods2Site::Util qw(slashify trim readData writeData expandAts $IS_PACKED $IS_WINDOWS $SHELL_ARG_DELIM);
 use App::Pods2Site::SiteBuilderFactory;
 
+use Config;
 use FindBin qw($RealBin $Script);
 use Getopt::Long qw(GetOptionsFromArray :config require_order no_ignore_case bundling);
 use File::Spec;
@@ -209,7 +210,7 @@ sub __parseArgv
 	pod2usage(-input => $manualPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{manual};
 	pod2usage(-input => $argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{help};
 	pod2usage(-input => $argsPodInput, -exitval => 0, -verbose => 0) if $rawOpts{usage};
-	pod2usage(-message => "$0 version $App::Pods2Site::VERSION", -exitval => 0, -verbose => 99, -sections => '_') if $rawOpts{version};
+	pod2usage(-message => slashify($0) . " version $App::Pods2Site::VERSION", -exitval => 0, -verbose => 99, -sections => '_') if $rawOpts{version};
 
 	# if -quiet has been given, it trumps any verbosity
 	#	
@@ -308,7 +309,7 @@ sub __parseArgv
 		$self->{css} = $css;
 	}
 
-	$rawOpts{title} = 'Pods2Site' unless $rawOpts{title};
+	$rawOpts{title} = $rawOpts{title} || ($Config{myuname} ? "Pods2Site : $Config{myuname}" : 'Pods2Site');
 	$self->{title} = $rawOpts{title};
 	
 	$self->{style} = $rawOpts{style};

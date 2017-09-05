@@ -13,6 +13,8 @@ Mail::Message::Field::Structured - one line of a structured message header
 
  Mail::Message::Field::Structured is extended by
    Mail::Message::Field::Addresses
+   Mail::Message::Field::AuthResults
+   Mail::Message::Field::DKIM
    Mail::Message::Field::Date
    Mail::Message::Field::URIs
 
@@ -551,8 +553,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.001,
-built on July 26, 2017.
+This module is part of Mail-Message distribution version 3.002,
+built on September 04, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

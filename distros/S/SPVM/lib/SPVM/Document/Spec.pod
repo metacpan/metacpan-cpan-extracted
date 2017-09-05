@@ -1,6 +1,163 @@
 =head1 NAME
 
-SPVM::Document::Spec - SPVM language specification(BETA)
+SPVM::Document::Spec - SPVM Language Specification(BETA before 1.0)
+
+=head1 SPVM Language Specification
+
+=head2 Package Declaration
+
+Package declaration is the following.
+
+  package PackageName {
+    
+  }
+
+C<PackageName> is package name.
+
+Package name is consist of Upper Case and Lower Case and Number and C<::>.
+Package name must start with Upper Case. Package name which start with Lower Case is forbidden.
+Package name which start with Lower Case is resolved for core.
+
+Note that package name can't contain Under Score C<_>.
+Under Score is used for C<Package Template>.
+
+  # Legal
+  Foo
+  Foo2
+  Foo::Bar
+  Foo::Bar::Baz
+  Foo::bar
+  
+  # Illegal
+  foo
+  foo::Bar
+  2Foo
+  Foo_Bar
+
+Package Declaration must be just under file itself.
+
+  # Legal
+  package PackageName {
+    
+  }
+  
+  # Illegal
+  sub foo() : int {
+    package PackageName {
+      
+    }
+  }
+
+=head2 Field Declaration
+
+Field declaration is the following.
+
+  has field_name : type_name;
+
+C<filed_name> is field name. 
+Field name is consist of Upper Case and Lower Case and Number and Under Score C<_>.
+Field name must not start with Number. Under score must not continue more than one.
+
+  # Legal
+  foo
+  foo_bar
+  foo2
+  foo_bar2
+  FOO
+  
+  # Illegal
+  2foo
+  foo__bar
+
+C<type_name> is a type. Type is explained in L</"Type"> section.
+
+Field Declaration must be just under Package Declaration.
+
+  # Legal
+  package PackageName {
+    has field_name : type_name;
+  }
+
+  # Illeagal
+  has field_name : type_name;
+  sub foo() : int {
+    has field_name : type_name
+  }
+
+=head2 Subroutine Decralation
+
+Subroutine declaration is the following.
+
+  sub sub_name(arg_name : type_name, ...) : descripter_name return_type_name {
+    
+  }
+
+C<sub_name> is subroutine name. 
+Subroutine name is consist of Upper Case and Lower Case and Number and Under Score C<_>.
+Subroutine name must not start with Number. Under score must not continue more than one.
+
+  # Legal
+  foo
+  foo_bar
+  foo2
+  foo_bar2
+  FOO
+  
+  # Illegal
+  2foo
+  foo__bar
+
+C<arg_name> is Argument Name. This is Variable name. Variable name is explained in L</"Variable Declaration"> section,
+
+C<type_name> is a Type. Type is explained L</"Type"> section.
+
+C<arg_name : type_name> can be repeated with C<,>. If argument is none, that is ok. Max arguments count is C<255>.
+
+C<descripter_name> is a Descripter. If descripter is none, that is ok. Available descripters are following.
+Currently only one descripter is available.
+  
+  [Name]     [Description]
+  native     the subroutine is native
+
+Native subroutine is explained in L</"Native Subroutine">.
+
+C<return_type_name> is a Type or C<void>. C<void> mean the subroutine don't have return value.
+Type is explained L</"Type"> section.
+
+Subroutine Declaration must be just under Package Declaration.
+
+  # Legal
+  package PackageName {
+    sub foo($nums : int[]) : int {
+    
+    }
+  }
+  
+  # Illeagal
+  sub foo() : double {
+    sub var() : void {
+      
+    }
+  }
+
+=head2 Variable Declaration
+
+Variable Declaration is the following.
+
+  my var_name : type_name;
+
+C<var_name> is Variable Name. Variable Name first character is C<$>.
+Rest characters is consist of Upper case, Lower case, Number and Under score C<_>.
+
+  # Legal
+  $foo
+  $FOO
+  $foo2
+  $foo_bar
+
+If Variable Declaration is done, you can use variable after the declaration.
+
+C<type_name> is a <Type>. Type is explained L</"Type"> section.
 
 =head2 Number literal
 
@@ -328,3 +485,48 @@ Using weak reference, recursive reference is resolved.
   
   # Weak reference
   weaken $foo->{bar};
+
+=head2 Destructor
+
+Destructor.
+  
+  package Foo {
+  
+    sub DESTROY($self : Foo) : void {
+      
+    }
+  }
+
+=head2 enumeration
+
+Enumeration.
+
+  package Foo {
+    enum {
+      ONE,
+      TWO,
+      THREE
+    }
+    
+    enum {
+      FORE = 4,
+      FIVE,
+    }
+  }
+
+=head2 Inline native function
+
+  package TestCase::Inline {
+    sub sum($num1 : int, $num2 : int) : native int;
+  }
+
+  __NATIVE__
+
+  #include <spvm_api.h>
+
+  int32_t SPVM__TestCase__Inline__sum(SPVM_API* api, SPVM_API_VALUE* args) {
+
+    int32_t total = args[0].int_value + args[1].int_value;
+    
+    return total;
+  }

@@ -299,10 +299,12 @@ Returns the C<< $position >>th line in vertical or horizontal direction.
 #_{ POD: Copyright
 
 =head1 Copyright
+
 Copyright © 2017 René Nyffenegger, Switzerland. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at: L<http://www.perlfoundation.org/artistic_license_2_0>
+
 =cut
 
 #_}

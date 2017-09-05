@@ -1,3 +1,9 @@
+libqbit-application-model-db-perl (0.019) raring; urgency=low
+
+  * added sub _get_table_alias
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Sep 2017 21:10:15 +0300
+
 libqbit-application-model-db-perl (0.018) raring; urgency=low
 
   * perltidy and use new methods in test

@@ -12,7 +12,7 @@ use Cwd;
 my $project_root_dir  = $ENV{'OUTTHENTIC_ROOT'} || getcwd();
 my $cwd = $ENV{'OUTTHENTIC_CWD'} || getcwd();
 my $purge_cache   = 0;
-my $format        = 'default';
+my $format        = $ENV{'OUTTHENTIC_FORMAT'} || 'default';
 my $debug_mod     = 0;
 my $dump_config   = 0;
 my $nocolor       = 0;
@@ -162,7 +162,7 @@ sub wanted {
         }
 
         if (-e "$File::Find::dir/meta.txt"){
-          print F "print_meta();\n\n" unless $format eq 'concise';
+          print F "print_meta();\n\n" unless $format eq 'concise' or $format eq 'production';
         }
 
         if ( -e "$File::Find::dir/story.pm" ){
@@ -216,7 +216,7 @@ unless ( $dump_config ) { # do not check story status in case we only dump confi
   #warn "exit code: $exit_code";
   if ($st) {
     print $nocolor ? "STATUS\tSUCCEED\n" : colored(["green"],"STATUS\tSUCCEED\n")
-      unless $format eq 'concise';
+      unless $format eq 'concise' or $format eq 'production';
   }else{
     print $nocolor ? "STATUS\tFAILED ($exit_code)\n" :  colored(["red"],"STATUS\tFAILED ($exit_code)\n")
       unless $format eq 'concise';

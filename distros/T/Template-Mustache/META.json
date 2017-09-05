@@ -6,13 +6,13 @@
       "Ricardo Signes <rjbs@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Template-Mustache",
    "prereqs" : {
@@ -60,51 +60,50 @@
             "Test::More" : "0.88",
             "Test::Most" : "0",
             "Test::Requires" : "0",
-            "base" : "0",
-            "blib" : "1.01"
+            "base" : "0"
          }
       }
    },
    "provides" : {
       "Moose::Meta::Attribute::Custom::Trait::Mustache" : {
          "file" : "lib/Template/Mustache/Trait.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Parse::RecDescent::Template::Mustache::Parser" : {
          "file" : "lib/Template/Mustache/Parser.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache" : {
          "file" : "lib/Template/Mustache.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Parser" : {
          "file" : "lib/Template/Mustache/Parser.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Token::Partial" : {
          "file" : "lib/Template/Mustache/Token/Partial.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Token::Section" : {
          "file" : "lib/Template/Mustache/Token/Section.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Token::Template" : {
          "file" : "lib/Template/Mustache/Token/Template.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Token::Variable" : {
          "file" : "lib/Template/Mustache/Token/Variable.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Token::Verbatim" : {
          "file" : "lib/Template/Mustache/Token/Verbatim.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       },
       "Template::Mustache::Trait" : {
          "file" : "lib/Template/Mustache/Trait.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -119,7 +118,7 @@
          "web" : "https://github.com/yanick/Template-Mustache"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.0.4",
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
       "Chris Christensen <christianchristensen@gmail.com>",
@@ -127,9 +126,10 @@
       "Josh Lavin <jlavin@endpoint.com>",
       "Paul Cochrane <paul@liekut.de>",
       "Pieter Vande Bruggen <pvande@gmail.com>",
+      "Pieter van de Bruggen <pvande@gmail.com>",
       "ReadmeCritic <frankensteinbot@gmail.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

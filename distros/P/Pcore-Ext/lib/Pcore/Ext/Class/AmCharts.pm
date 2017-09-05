@@ -1,6 +1,7 @@
 package Pcore::Ext::Class::AmCharts;
 
 use Pcore -class;
+use Pcore::Share::WWW;
 
 our $EXT_MAP = {    #
     panel => 'Ext.panel.Panel',
@@ -63,11 +64,11 @@ JS
         ),
 
         _loadCharts => $ext->js_func(
-            <<'JS'
+            <<"JS"
                 var urls = [];
 
-                var chartsBaseUrl = '/static/amcharts/v3.21.4/';
-                var mapBaseUrl = '/static/ammap/v3.21.4/';
+                var chartsBaseUrl = '/static/amcharts/$Pcore::Share::WWW::VER->{amcharts}/';
+                var mapBaseUrl = '/static/ammap/$Pcore::Share::WWW::VER->{ammap}/';
 
                 if (typeof AmCharts == 'undefined') {
                     urls.push( chartsBaseUrl + 'amcharts.js');

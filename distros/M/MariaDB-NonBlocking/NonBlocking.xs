@@ -272,7 +272,11 @@ THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row, bool want_has
                     MUTABLE_HV(row_results),
                     fields[i].name,
                     fields[i].name_length,
-                    &PL_sv_undef,
+                    /* CANNOT use &PL_sv_no here!
+                     * it leads to errors like:
+                     * Modification of non-creatable hash value attempted
+                     */
+                    newSVsv(&PL_sv_undef),
                     0
                 );
                 continue;

@@ -1,5 +1,8 @@
 Revision history for AnyEvent::DBI
 
+3.02 Mon Sep  4 13:45:56 CEST 2017
+	- fixed module version mismatch (reported by Martin Barth).
+
 3.01 Sun Aug 27 11:53:26 CEST 2017
 	- add missing dependency to AnyEvent::Fork.
 

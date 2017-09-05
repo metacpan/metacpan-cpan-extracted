@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.015   August 28, 2017
+        - Restored feature where components normalized scripts and styles
+
 0.014   August 24, 2017
         - Another tweak to the tt helper.
 

@@ -220,6 +220,16 @@ Remove the current managed save image, causing the guest to perform
 a full boot next time it is started. The C<$flags> parameter is
 unused and defaults to zero.
 
+=item $dom->managed_save_define_xml($xml, $flags=0)
+
+Update the XML of the managed save image to C<$xml>. The C<$flags>
+parameter is unused and defaults to zero.
+
+=item $xml = $dom->managed_save_get_xml_description($flags=0)
+
+Get the XML in the managed save image. The C<$flags>
+parameter is unused and defaults to zero.
+
 =item $dom->core_dump($filename[, $flags])
 
 Trigger a core dump of the guest virtual machine, saving its memory
@@ -1253,6 +1263,12 @@ longer downtime makes it more likely that migration will complete,
 at the cost of longer time blackout for the guest OS at the switch
 over point. The C<downtime> parameter is measured in milliseconds.
 The C<$flags> parameter is currently unused and defaults to zero.
+
+=item $downtime = $dom->migrate_get_max_downtime($flags=0)
+Get the current value of the maximum downtime allowed during a
+migration of a guest. The returned <downtime> value is measured
+in milliseconds. The C<$flags> parameter is currently unused and
+defaults to zero.
 
 =item $dom->migrate_set_max_speed($bandwidth, $flags=0)
 

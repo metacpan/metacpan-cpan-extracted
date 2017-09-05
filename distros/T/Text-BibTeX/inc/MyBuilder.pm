@@ -84,13 +84,17 @@ sub ACTION_code {
     my $vsnprintf = 'undef HAVE_VSNPRINTF';
     $vsnprintf = 'define HAVE_VSNPRINTF 1' if Config::AutoConf->check_func('vsnprintf');
 
+    my $strlcat = 'undef HAVE_STRLCAT';
+    $strlcat = 'define HAVE_STRLCAT 1' if Config::AutoConf->check_func('strlcat');
+
     _interpolate("btparse/src/bt_config.h.in",
                  "btparse/src/bt_config.h",
                  PACKAGE  => "\"libbtparse\"",
                  FPACKAGE => "\"libbtparse $version\"",
                  VERSION  => "\"$version\"",
                  ALLOCA_H => $alloca_h,
-		 VSNPRINTF => $vsnprintf
+		 VSNPRINTF => $vsnprintf,
+		 STRLCAT => $strlcat
                 );
 
 
@@ -383,7 +387,7 @@ sub ACTION_test {
 
 sub _interpolate {
     my ($from, $to, %config) = @_;
-	
+
     print "Creating new '$to' from '$from'.\n";
     open FROM, $from or die "Cannot open file '$from' for reading.\n";
     open TO, ">", $to or die "Cannot open file '$to' for writing.\n";

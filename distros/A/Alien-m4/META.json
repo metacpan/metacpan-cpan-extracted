@@ -1,10 +1,10 @@
 {
-   "abstract" : "Find or build m4",
+   "abstract" : "Find or build GNU m4",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,7 +76,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

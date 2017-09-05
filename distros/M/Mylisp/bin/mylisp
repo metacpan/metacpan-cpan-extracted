@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use 5.012;
+no warnings "experimental";
+use Mylisp;
+
+my $action = $ARGV[0];
+my $file   = $ARGV[1];
+given ($action) {
+   when ('--repl')   { Mylisp::repl() }
+   when ('--update') { Mylisp::update() }
+   when ('--ast')    { Mylisp::to_ast($file) }
+   default           { 
+      say <<'EOF';
+    mylisp --repl
+    mylisp --update
+    mylisp --ast file.spp
+EOF
+   }
+}

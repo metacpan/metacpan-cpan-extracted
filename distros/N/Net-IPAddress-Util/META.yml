@@ -1,7 +1,7 @@
 ---
 abstract: 'Version-agnostic representation of an IP address'
 author:
-  - PWBENNETT
+  - 'Paul Bennett <paul.w.bennett@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -26,5 +26,5 @@ requires:
   Math::BigInt: '0'
   overload: '0'
   perl: '5.010000'
-version: '3.031'
+version: '3.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -49,7 +49,7 @@ do { my $x = {
                                       'Log::Any::Adapter::Callback' => '0',
                                       'Marpa::R2' => '0',
                                       'MooX::HandlesVia' => '0',
-                                      'MooX::Options' => '0',
+                                      'MooX::Options' => '4.103',
                                       'MooX::Role::Logger' => '0',
                                       'Moops' => '0',
                                       'POSIX' => '0',
@@ -82,7 +82,6 @@ do { my $x = {
                                    'Log::Any::Adapter::Handler' => '0',
                                    'Log::Handler' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010'
                                  }
                  }

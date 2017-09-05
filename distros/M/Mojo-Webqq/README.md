@@ -1,4 +1,4 @@
-Mojo-Webqq v2.1.2 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Webqq.svg?branch=master)](https://travis-ci.org/sjdy521/Mojo-Webqq) [![Join the chat at https://gitter.im/sjdy521/Mojo-Webqq](https://badges.gitter.im/sjdy521/Mojo-Webqq.svg)](https://gitter.im/sjdy521/Mojo-Webqq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![API列表](https://img.shields.io/badge/doc-API%E5%88%97%E8%A1%A8-brightgreen.svg)](API.md) [![QQ群-498880156](https://img.shields.io/badge/QQ%E7%BE%A4-498880156-blue.svg)](http://jq.qq.com/?_wv=1027&k=kjVJzo) [![IRC](https://img.shields.io/badge/IRC-%E5%AE%98%E6%96%B9%E9%A2%91%E9%81%93-yellow.svg)](http://irc.perfi.wang/?channel=#Mojo-Webqq)
+Mojo-Webqq v2.1.4 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Webqq.svg?branch=master)](https://travis-ci.org/sjdy521/Mojo-Webqq) [![Join the chat at https://gitter.im/sjdy521/Mojo-Webqq](https://badges.gitter.im/sjdy521/Mojo-Webqq.svg)](https://gitter.im/sjdy521/Mojo-Webqq?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![API列表](https://img.shields.io/badge/doc-API%E5%88%97%E8%A1%A8-brightgreen.svg)](API.md) [![QQ群-498880156](https://img.shields.io/badge/QQ%E7%BE%A4-498880156-blue.svg)](http://jq.qq.com/?_wv=1027&k=kjVJzo) [![IRC](https://img.shields.io/badge/IRC-%E5%AE%98%E6%96%B9%E9%A2%91%E9%81%93-yellow.svg)](http://irc.perfi.wang/?channel=#Mojo-Webqq)
 ========================
 
 使用Perl语言编写的Smartqq客户端框架，基于Mojolicious，要求Perl版本5.10+，可通过插件提供基于HTTP协议的api接口供其他语言或系统调用
@@ -265,13 +265,13 @@ Mojo-Webqq v2.1.2 [![Build Status](https://travis-ci.org/sjdy521/Mojo-Webqq.svg?
 *Java*
 * [smartqq](https://github.com/ScienJus/smartqq) SmartQQ（WebQQ）的Api ，你可以用它实现自己的QQ 机器人
 
-### 捐赠奖励
+### 赞助奖励
 
-可以通过扫描支付宝付款二维码进行捐赠，感谢您的支持和鼓励
+可以通过扫描支付宝付款二维码进行赞助，感谢您的支持和鼓励
 
 ![donate](screenshot/donate.jpg)
 
-特别致谢 [那些曾经捐赠的小伙伴们](https://github.com/sjdy521/Mojo-Thanks)
+特别致谢 [那些曾经赞助的小伙伴们](https://github.com/sjdy521/Mojo-Thanks)
 
 ### COPYRIGHT 和 LICENCE
 

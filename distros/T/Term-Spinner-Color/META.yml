@@ -26,17 +26,14 @@ no_index:
 provides:
   Term::Spinner::Color:
     file: lib/Term/Spinner/Color.pm
-    version: '0.03'
-recommends:
-  Term::ANSIScreen: '0'
+    version: '0.06'
 requires:
-  Term::ANSIColor: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/SwellJoe/perl-Term-Spinner-Color/issues
   homepage: https://github.com/SwellJoe/perl-Term-Spinner-Color
   repository: https://github.com/SwellJoe/perl-Term-Spinner-Color.git
-version: '0.03'
+version: '0.06'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -204,14 +201,6 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.009'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: recommends
-      name: Recommends
       version: '6.009'
     -
       class: Dist::Zilla::Plugin::OSPrereqs

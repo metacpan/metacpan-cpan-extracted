@@ -26,13 +26,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::libvas" : "0.15",
+            "Alien::libvas" : "0.202",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::libvas" : "0.15",
+            "Alien::libvas" : "0.202",
             "ExtUtils::MakeMaker" : "0",
             "Inline::C" : "0"
          }
@@ -50,7 +50,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::libvas" : "0.15",
+            "Alien::libvas" : "0.202",
             "Carp" : "0",
             "Inline" : "0.56",
             "Scalar::Util" : "0",
@@ -73,22 +73,22 @@
    "provides" : {
       "Proc::Memory" : {
          "file" : "lib/Proc/Memory.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/athreef/Memory-Process/issues"
+         "web" : "https://github.com/athreef/Proc-Memory/issues"
       },
-      "homepage" : "https://github.com/athreef/Memory-Process",
+      "homepage" : "https://github.com/athreef/Proc-Memory",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/athreef/Memory-Process.git",
-         "web" : "https://github.com/athreef/Memory-Process"
+         "url" : "https://github.com/athreef/Proc-Memory.git",
+         "web" : "https://github.com/athreef/Proc-Memory"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -352,7 +352,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.007",
+                  "tag" : "v0.009",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

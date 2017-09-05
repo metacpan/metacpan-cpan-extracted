@@ -9,7 +9,7 @@ use constant {
     IMINOR => -1,
 };
 
-# use Data::Dumper;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -30,7 +30,14 @@ accessible via the L<Text::Amuse> class.
 sub new {
     my $class = shift;
     my %args;
-    my $self = {};
+    my $self = {
+                _raw_footnotes => {},
+                _current_footnote_indent => 0,
+                _current_footnote_number => undef,
+                _current_footnote_stack  => [],
+                _list_element_pile => [],
+                _list_parsing_output => [],
+               };
     if (@_ % 2 == 0) {
         %args = @_;
     }
@@ -47,6 +54,40 @@ sub new {
     }
     $self->{debug} = 1 if $args{debug};
     bless $self, $class;
+}
+
+sub _list_index_map {
+    # numerals
+    my $self = shift;
+    unless ($self->{_list_index_map}) {
+        my %map = map { $_ => $_ } (1..200); # never seen lists so long
+        # this is a bit naif but will do. Generated with Roman module. We
+        # support them to 89, otherwise you have to use i. i. i.
+
+        my @romans = (qw/i ii iii iv v vi vii viii ix x xi xii xiii
+                         xiv xv xvi xvii xviii xix xx xxi xxii xxiii
+                         xxiv xxv xxvi xxvii xxviii xxix xxx xxxi
+                         xxxii xxxiii xxxiv xxxv xxxvi xxxvii xxxviii
+                         xxxix xl xli xlii xliii xliv xlv xlvi xlvii
+                         xlviii xlix l li lii liii liv lv lvi lvii
+                         lviii lix lx lxi lxii lxiii lxiv lxv lxvi
+                         lxvii lxviii lxix lxx lxxi lxxii lxxiii lxxiv
+                         lxxv lxxvi lxxvii lxxviii lxxix lxxx lxxxi
+                         lxxxii lxxxiii lxxxiv lxxxv lxxxvi lxxxvii
+                         lxxxviii lxxxix/);
+        my @alpha = ('a'..'z');
+        # we will need to take care of 'i', 'x', 'v', 'l', which can be both alpha or roman
+        foreach my $list (\@alpha, \@romans) {
+            my $lcount = 0;
+            foreach my $letter (@$list) {
+                $lcount++;
+                $map{$letter} = $lcount;
+                $map{uc($letter)} = $lcount;
+            }
+        }
+        $self->{_list_index_map} = \%map;
+    }
+    return $self->{_list_index_map};
 }
 
 
@@ -214,96 +255,93 @@ sub _parse_body {
             $el->type('verse');
         }
     }
-    my @out;
-    my @listpile;
+    $self->_reset_list_parsing_output;
   LISTP:
     while (@parsed) {
         my $el = shift @parsed;
         if ($el->type eq 'li' or $el->type eq 'dd') {
-            if (@listpile) {
+            if ($self->_list_pile_count) {
                 # indentation is major, open a new level
-                if (_indentation_kinda_major($el, $listpile[-1])) {
-                    push @out, $self->_opening_blocks_new_level($el);
-                    push @listpile, $self->_closing_blocks_new_level($el);
+                if (_indentation_kinda_major($el, $self->_list_pile_last_element)) {
+                    $self->_list_open_new_list_level($el);
                 }
                 else {
                     # close the lists until we get the the right level
-                    while(@listpile and _indentation_kinda_minor($el, $listpile[-1])) {
-                        push @out, pop @listpile;
-                    }
-                    if (@listpile) { # continue if open
-                        if (_element_is_same_kind_as_in_list($el, \@listpile)) {
-                            push @out, pop @listpile, $self->_opening_blocks($el);
-                            push @listpile, $self->_closing_blocks($el);
+                    $self->_list_close_until_indentation($el);
+                    if ($self->_list_pile_count) { # continue if open
+                        if ($self->_list_element_is_same_kind_as_in_list($el) and
+                            $self->_list_element_is_a_progression($el)) {
+                            $self->_list_continuation($el);
                         }
                         else {
-                            my $top = $listpile[-1];
-                            while (@listpile and _indentation_kinda_equal($top, $listpile[-1])) {
+                            my $top = $self->_list_pile_last_element;
+                            while ($self->_list_pile_count and
+                                   _indentation_kinda_equal($top, $self->_list_pile_last_element)) {
                                 # empty the pile until the indentation drops.
-                                push @out, pop @listpile;
+                                $self->_close_list_level;
                             }
                             # and open a new level
-                            push @out, $self->_opening_blocks_new_level($el);
-                            push @listpile, $self->_closing_blocks_new_level($el);
+                            $self->_list_open_new_list_level($el);
                         }
                     }
                     else { # if by chance, we emptied all, start anew.
-                        push @out, $self->_opening_blocks_new_level($el);
-                        push @listpile, $self->_closing_blocks_new_level($el);
+                        $self->_list_open_new_list_level($el);
                     }
                 }
             }
             # no list pile, this is the first element
             elsif ($self->_list_element_can_be_first($el)) {
-                push @out, $self->_opening_blocks_new_level($el);
-                push @listpile, $self->_closing_blocks_new_level($el);
+                $self->_list_open_new_list_level($el);
             }
             else {
                 # reparse and should become quote/center/right
-                push @out, $self->_reparse_nolist($el);
-                # call next to avoid being mangled.
-                next LISTP;
+                $self->_append_element_to_list_parsing_output($self->_reparse_nolist($el));
+                next LISTP; # call next to avoid being mangled.
             }
             $el->become_regular;
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
-            while (@listpile and _indentation_kinda_minor($el, $listpile[-1])) {
-                push @out, pop @listpile;
-            }
-            if (@listpile) {
+            $self->_list_close_until_indentation($el);
+            if ($self->_list_pile_count) {
                 $el->become_regular;
             }
         }
         elsif ($el->type ne 'null') { # something else: close the pile
-            while (@listpile) {
-                push @out, pop @listpile;
-            }
+            $self->_list_flush;
         }
-        push @out, $el;
+        $self->_append_element_to_list_parsing_output($el);
     }
-    # end of input?
-    while (@listpile) {
-        push @out, pop @listpile;
-    }
+    # end of input, flush what we have.
+    $self->_list_flush;
 
     # now we use parsed as output
-    my %footnotes;
-    while (@out) {
-        my $el = shift @out;
+    $self->_flush_current_footnote;
+    my @out;
+    while (@{$self->_list_parsing_output}) {
+        my $el = shift @{$self->_list_parsing_output};
         if ($el->type eq 'footnote') {
-            if ($el->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
-                warn "Overwriting footnote number $1" if exists $footnotes{$1};
-                $footnotes{$1} = $el;
+            $self->_register_footnote($el);
+        }
+        elsif (my $fn_indent = $self->_current_footnote_indent) {
+            if ($el->type eq 'null') {
+                push @parsed, $el;
             }
-            else { die "Something is wrong here! <" . $el->removed . ">"
-                     . $el->string . "!" }
+            elsif ($el->can_be_regular and
+                   $el->indentation and
+                   _kinda_equal($el->indentation, $fn_indent)) {
+                push @{$self->_current_footnote_stack}, Text::Amuse::Element->new($self->_parse_string("<br>\n")), $el;
+            }
+            else {
+                $self->_flush_current_footnote;
+                push @parsed, $el;
+            }
         }
         else {
             push @parsed, $el;
         }
     }
-    $self->_raw_footnotes(\%footnotes);
+    $self->_flush_current_footnote;
 
     # unroll the quote/center/right blocks
     while (@parsed) {
@@ -395,11 +433,30 @@ sub get_footnote {
 
 sub _raw_footnotes {
     my $self = shift;
-    if (@_) {
-        $self->{_raw_footnotes} = shift;
-    }
     return $self->{_raw_footnotes};
 }
+
+sub _current_footnote_stack {
+    return shift->{_current_footnote_stack};
+}
+
+sub _current_footnote_number {
+    my $self = shift;
+    if (@_) {
+        $self->{_current_footnote_number} = shift;
+    }
+    return $self->{_current_footnote_number};
+}
+
+sub _current_footnote_indent {
+    my $self = shift;
+    if (@_) {
+        $self->{_current_footnote_indent} = shift;
+    }
+    return $self->{_current_footnote_indent};
+}
+
+
 
 sub _parse_string {
     my ($self, $l, %opts) = @_;
@@ -506,6 +563,7 @@ sub _parse_string {
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
         $element{indentation} = length($1);
+        $element{start_list_index} = 1;
         return %element;
     }
     if (!$opts{nolist}) {
@@ -515,6 +573,7 @@ sub _parse_string {
             $element{string} = $3;
             $element{block} = "ul";
             $element{indentation} = length($2);
+            $element{start_list_index} = 1;
             return %element;
         }
         if ($l =~ m/^((\x{20}+)  # leading space and type $1
@@ -529,13 +588,18 @@ sub _parse_string {
                     (.*) # the string itself $4
                    /sx) {
             my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-            $element{type} = "li";
-            $element{removed} = $remove;
-            $element{string} = $text;
-            my $list_type = $self->_identify_list_type($prefix);
-            $element{indentation} = length($whitespace);
-            $element{block} = $list_type;
-            return %element;
+
+            # validate roman numbers, so we don't end up with random strings
+            if (my $list_index = $self->_get_start_list_index($prefix)) {
+                $element{type} = "li";
+                $element{removed} = $remove;
+                $element{string} = $text;
+                my $list_type = $self->_identify_list_type($prefix);
+                $element{indentation} = length($whitespace);
+                $element{block} = $list_type;
+                $element{start_list_index} = $list_index;
+                return %element;
+            }
         }
     }
     if ($l =~ m/^(\x{20}{20,})([^ ].+)$/s) {
@@ -585,28 +649,30 @@ sub _identify_list_type {
     return $type;
 }
 
+sub _get_start_list_index {
+    my ($self, $prefix) = @_;
+    my $map = $self->_list_index_map;
+    if (exists $map->{$prefix}) {
+        return $map->{$prefix};
+    }
+    else {
+        warn "$prefix doesn't map exactly to a list index!\n";
+        return 0;
+    }
+}
+
 sub _list_element_can_be_first {
     my ($self, $el) = @_;
     # every dd can be the first
     return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
-    my $type = $el->block;
-    my $prefix = $el->removed;
-    if ($prefix =~ m/^\s{1,6}  # leading space
-                     (  # the type               $1
-                         - | ((1|a|A|i|I)\.)
-                     )
-                     \s+  # space
-                     $/sx) {
-        my $id = $1;
-        if    ($type eq 'ul'  and $id eq '-' ) { return 1; }
-        elsif ($type eq 'oln' and $id eq '1.') { return 1; }
-        elsif ($type eq 'ola' and $id eq 'a.') { return 1; }
-        elsif ($type eq 'olA' and $id eq 'A.') { return 1; }
-        elsif ($type eq 'oli' and $id eq 'i.') { return 1; }
-        elsif ($type eq 'olI' and $id eq 'I.') { return 1; }
+    # first element, can't be too indented
+    if ($el->indentation > 6) {
+        return 0;
     }
-    return;
+    else {
+        return $el->start_list_index;
+    }
 }
 
 sub _current_el {
@@ -719,6 +785,10 @@ sub _opening_blocks_new_level {
     my ($self, $el) = @_;
     my @out = ($self->_create_block(open => $el->block, $el->indentation),
                $self->_opening_blocks($el));
+    if (my $list_index = $el->start_list_index) {
+        $out[0]->start_list_index($list_index);
+        $out[1]->start_list_index($list_index);
+    }
     return @out;
 }
 sub _closing_blocks_new_level {
@@ -752,6 +822,14 @@ sub _indentation_kinda_equal {
     return 0;
 }
 
+sub _kinda_equal {
+    my $result = _compare_tolerant(@_);
+    if ($result == IEQUAL) {
+        return 1;
+    }
+    return 0;
+}
+
 sub _indentation_compare {
     my ($first, $second) = @_;
     my $one_indent = $first->indentation;
@@ -778,8 +856,10 @@ sub _compare_tolerant {
     }
 }
 
-sub _element_is_same_kind_as_in_list {
-    my ($el, $list) = @_;
+
+sub _list_element_is_same_kind_as_in_list {
+    my ($self, $el) = @_;
+    my $list = $self->_list_element_pile;
     my $find = $el->block;
     my $found = 0;
     for (my $i = $#$list; $i >= 0; $i--) {
@@ -791,6 +871,131 @@ sub _element_is_same_kind_as_in_list {
         last;
     }
     return $found;
+}
+
+sub _register_footnote {
+    my ($self, $el) = @_;
+    my $fn_num = $el->footnote_index;
+    if (defined $fn_num) {
+        if ($self->_raw_footnotes->{$fn_num}) {
+            warn "Overwriting footnote number $fn_num!\n";
+        }
+        $self->_flush_current_footnote;
+        $self->_current_footnote_indent($el->indentation);
+        $self->_current_footnote_number($fn_num);
+        $self->_raw_footnotes->{$fn_num} = $el;
+    }
+    else {
+        die "Something is wrong here! <" . $el->removed . ">"
+          . $el->string . "!";
+    }
+}
+
+sub _flush_current_footnote {
+    my $self = shift;
+    if (@{$self->_current_footnote_stack}) {
+        my $footnote = $self->get_footnote($self->_current_footnote_number);
+        die "Missing current footnote to append " . Dumper($self->_current_footnote_stack) unless $footnote;
+        while (@{$self->_current_footnote_stack}) {
+            my $append = shift @{$self->_current_footnote_stack};
+            $footnote->append($append);
+        }
+    }
+    $self->_current_footnote_indent(0);
+    $self->_current_footnote_number(undef)
+}
+
+# list parsing
+
+sub _list_element_pile {
+    return shift->{_list_element_pile};
+}
+
+sub _list_parsing_output {
+    return shift->{_list_parsing_output};
+}
+
+sub _list_pile_count {
+    my $self = shift;
+    return scalar(@{$self->_list_element_pile});
+}
+
+sub _list_pile_last_element {
+    my $self = shift;
+    return $self->_list_element_pile->[-1];
+}
+
+sub _reset_list_parsing_output {
+    my $self = shift;
+    $self->{_list_parsing_output} = [];
+}
+
+sub _list_open_new_list_level {
+    my ($self, $el) = @_;
+    push @{$self->_list_parsing_output}, $self->_opening_blocks_new_level($el);
+    my @pile = $self->_closing_blocks_new_level($el);
+    if (my $list_index = $el->start_list_index) {
+        $_->start_list_index($list_index) for @pile;
+    }
+    push @{$self->_list_element_pile}, @pile;
+}
+
+sub _list_continuation {
+    my ($self, $el) = @_;
+    my $current = $self->_list_pile_last_element->start_list_index + 1;
+    push @{$self->_list_parsing_output}, pop @{$self->_list_element_pile}, $self->_opening_blocks($el);
+    my @pile = $self->_closing_blocks($el);
+    if (my $list_index = $el->start_list_index) {
+        $_->start_list_index($current) for @pile;
+    }
+    push @{$self->_list_element_pile}, @pile;
+}
+
+sub _close_list_level {
+    my $self = shift;
+    push @{$self->_list_parsing_output}, pop @{$self->_list_element_pile};
+}
+
+sub _append_element_to_list_parsing_output {
+    my ($self, $el) = @_;
+    push @{$self->_list_parsing_output}, $el;
+}
+
+sub _list_close_until_indentation {
+    my ($self, $el) = @_;
+    while ($self->_list_pile_count and
+           _indentation_kinda_minor($el, $self->_list_pile_last_element)) {
+        $self->_close_list_level;
+    }
+}
+
+sub _list_flush {
+    my $self = shift;
+    while ($self->_list_pile_count) {
+        $self->_close_list_level;
+    }
+}
+
+sub _list_element_is_a_progression {
+    my ($self, $el) = @_;
+    # not defined, not needed.
+    my $last = $self->_list_pile_last_element->start_list_index;
+    my $current = $el->start_list_index;
+    # no index from one or another, we cant compare
+    if (!$last or !$current) {
+        return 1;
+    }
+    elsif ($last > 0 and $current > 1) {
+        if (($current - $last) == 1) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    else {
+        return 1;
+    }
 }
 
 

@@ -10,7 +10,7 @@ class MarpaX::Languages::M4::Impl::Parser::Actions {
     use MarpaX::Languages::M4::Type::Macro -all;
     use Types::Common::Numeric -all;
 
-    our $VERSION = '0.019'; # VERSION
+    our $VERSION = '0.020'; # VERSION
 
     our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -98,7 +98,7 @@ MarpaX::Languages::M4::Impl::Parser::Actions - M4 Marpa parser actions
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

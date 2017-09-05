@@ -11,7 +11,7 @@ use constant {
 };
 
 # ABSTRACT: Set and retrieves the error mode for the current process.
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 our @EXPORT_OK = qw(
@@ -84,7 +84,7 @@ Win32::ErrorMode - Set and retrieves the error mode for the current process.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

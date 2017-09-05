@@ -7,7 +7,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.007';
+our $VERSION = '2.011';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -15,6 +15,55 @@ extends qw(
 with qw(
     Locale::TextDomain::OO::Extract::Role::File
 );
+
+has filter => (
+    is      => 'rw',
+    isa     => ArrayRef[Str],
+    lazy    => 1,
+    default => sub {[ 'all' ]},
+);
+
+sub _filtered_start_rule {
+    my $self = shift;
+
+    my %filter_of = map { $_ => 1 } @{ $self->filter };
+    my $list_if = sub {
+        my ( $key, @list ) = @_;
+        my $condition
+            = $filter_of{all} && ! $filter_of{"!$key"}
+            || $filter_of{$key};
+        return $condition ? @list : ();
+    };
+    my $with_bracket = join "\n| ", (
+        $list_if->('Gettext',                           'N? __ n? p? x?'),
+        $list_if->('Gettext::DomainAndCategory',        'N? __ d? c? n? p? x?'),
+        $list_if->('Gettext::Loc',                      'N? loc_ n? p? x?'),
+        $list_if->('Gettext::Loc::DomainAndCategory',   'N? loc_ d? c? n? p? x?'),
+        $list_if->('BabelFish::Loc',                    'N? loc_b p?'),
+        $list_if->('BabelFish::Loc::DomainAndCategory', 'N? loc_b d? c? p?'),
+        $list_if->('Maketext::Loc',                     'N? loc (?: _mp? )?'),
+        $list_if->('Maketext::Localise',                'N? localise (?: _mp? )?'),
+        $list_if->('Maketext::Localize',                'N? localize (?: _mp? )?'),
+        $list_if->('Maketext',                          'N? maketext (?: _p )?'),
+        $list_if->('Gettext::DomainAndCategory',        '__begin_ d? c?'),
+        $list_if->('Gettext::Loc::DomainAndCategory',   'loc_begin_ d? c?'),
+        $list_if->('BabelFish::Loc::DomainAndCategory', 'loc_begin_b d? c?'),
+    );
+    $with_bracket ||= '(?!)';
+    my $without = join q{}, map { "\n| $_" } (
+        $list_if->('Gettext::DomainAndCategory',        '__end_ d? c?'),
+        $list_if->('Gettext::Loc::DomainAndCategory',   'loc_end_ d? c?'),
+        $list_if->('BabelFish::Loc::DomainAndCategory', 'loc_end_b d? c?'),
+    );
+
+    return qr{
+        \b
+        (?:
+            (?: $with_bracket ) \s* [(]
+            $without
+        )
+    }xms;
+}
 
 my $category_rule
     = my $context_rule
@@ -68,30 +117,6 @@ my $category_rule
 my $comma_rule = qr{ \s* [,] }xms;
 my $count_rule = qr{ \s* ( [^,)]+ ) }xms;
 my $close_rule = qr{ \s* [,]? \s* ( [^)]* ) [)] }xms;
-
-## no critic (Complex Regexes)
-my $start_rule = qr{
-    \b
-    (?:
-        (?:
-            # Gettext::Loc, Gettext
-            N? (?: loc_ | __ ) d? c? n? p? x?
-            # BabelFish::Loc
-            | N? loc_b p?
-            # Maketext::Loc, Maketext::Localise, Maketext::Localize
-            | N? loc (?: ali[sz]e )? (?: _mp? )?
-            # Maketext
-            | N? maketext (?: _p )?
-            # Getext::DomainAndCategory, Getext::Loc::DomainAndCategory
-            | (?: loc_ | __ ) begin_ d? c?
-        )
-        \s*
-        [(]
-    )
-    # Getext::DomainAndCategory, Getext::Loc::DomainAndCategory
-    | (?: loc_ | __ ) end_ d? c?
-}xms;
-## use critic (Complex Regexes)
 
 my $rules = [
     # loc_, __
@@ -421,7 +446,7 @@ my $rules = [
         'end',
     ],
 
-    # babelfish loc_b
+    # loc_b... (BabelFish)
     'or',
     [
         'begin',
@@ -433,7 +458,6 @@ my $rules = [
         'end',
     ],
     'or',
-    # babelfish loc_bp
     [
         'begin',
         qr{ \b N? loc_b ( p ) \s* [(] }xms,
@@ -443,6 +467,109 @@ my $rules = [
         $comma_rule,
         'and',
         $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( d ) \s* [(] }xms,
+        'and',
+        $domain_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( dp ) \s* [(] }xms,
+        'and',
+        $domain_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $context_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( c ) \s* [(] }xms,
+        'and',
+        $text_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $category_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( cp ) \s* [(] }xms,
+        'and',
+        $context_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $category_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( dc ) \s* [(] }xms,
+        'and',
+        $domain_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $category_rule,
+        'and',
+        $close_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b N? loc_b ( dcp ) \s* [(] }xms,
+        $domain_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $context_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $text_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $category_rule,
         'and',
         $close_rule,
         'end',
@@ -521,6 +648,26 @@ my $rules = [
         $category_rule,
         'end',
     ],
+    'or',
+    [
+        'begin',
+        qr{ \b loc_begin_b ( [dc] ) \s* [(] }xms,
+        'and',
+        $domain_or_category_rule,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b loc_begin_b ( dc ) \s* [(] }xms,
+        'and',
+        $domain_rule,
+        'and',
+        $comma_rule,
+        'and',
+        $category_rule,
+        'end',
+    ],
 
     # end
     'or',
@@ -533,6 +680,18 @@ my $rules = [
     [
         'begin',
         qr{ \b (?: loc_ | __ ) ( end ) [_] ( dc ) \b }xms,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b loc_end_b ( [dc] ) \b }xms,
+        'end',
+    ],
+    'or',
+    [
+        'begin',
+        qr{ \b loc_end_b ( dc ) \b }xms,
         'end',
     ],
 ];
@@ -699,19 +858,19 @@ sub stack_item_mapping {
         {
             d => sub {
                 @{ $self->domain_stack }
-                    or confess 'Domain stack is empty because __end_d is called without __begin_d or __begin_dc before';
+                    or confess 'Domain stack is empty because end_d is called without begin_d or begin_dc before';
                 $self->domain( pop @{ $self->domain_stack } );
             },
             c => sub {
                 @{ $self->category_stack }
-                    or confess 'Category stack is empty because __end_c is called without __begin_c or __begin_dc before';
+                    or confess 'Category stack is empty because end_c is called without begin_c or begin_dc before';
                 $self->category( pop @{ $self->category_stack } );
             },
             dc => sub {
                 @{ $self->domain_stack }
-                    or confess 'Domain stack is empty because __end_dc is called without __begin_d or __begin_dc before';
+                    or confess 'Domain stack is empty because end_dc is called without begin_d or begin_dc before';
                 @{ $self->category_stack }
-                    or confess 'Category stack is empty because __end_dc is called without __begin_c or __begin_dc before';
+                    or confess 'Category stack is empty because end_dc is called without begin_c or begin_dc before';
                 $self->domain( pop @{ $self->domain_stack } );
                 $self->category( pop @{ $self->category_stack } );
             },
@@ -771,7 +930,7 @@ sub stack_item_mapping {
 sub extract {
     my $self = shift;
 
-    $self->start_rule($start_rule);
+    $self->start_rule( $self->_filtered_start_rule );
     $self->rules($rules);
     $self->preprocess;
     $self->SUPER::extract;
@@ -792,13 +951,13 @@ __END__
 Locale::TextDomain::OO::Extract::Perl
 - Extracts internationalization data from Perl source code
 
-$Id: Perl.pm 683 2017-08-22 18:41:42Z steffenw $
+$Id: Perl.pm 693 2017-09-02 09:20:30Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/Perl.pm $
 
 =head1 VERSION
 
-2.007
+2.011
 
 =head1 DESCRIPTION
 
@@ -806,6 +965,7 @@ This module extracts internationalization data from Perl source code.
 
 Implemented rules:
 
+ # Gettext::Loc
  loc_('...
  loc_x('...
  loc_n('...
@@ -815,6 +975,7 @@ Implemented rules:
  loc_np('...
  loc_npx('...
 
+ # Gettext::Loc::DomainAndCategory
  loc_d('...
  loc_dx('...
  loc_dn('...
@@ -842,6 +1003,15 @@ Implemented rules:
  loc_dcnp('...
  loc_dcnpx('...
 
+ loc_begin_d('
+ loc_begin_c('
+ loc_begin_dc('
+
+ loc_end_d
+ loc_end_c
+ loc_end_dc
+
+ # Gettext
  __('...
  __x('...
  __n('...
@@ -851,6 +1021,7 @@ Implemented rules:
  __np('...
  __npx('...
 
+ # Gettext::DomainAndCategory
  __d('...
  __dx('...
  __dn('...
@@ -878,29 +1049,6 @@ Implemented rules:
  __dcnp('...
  __dcnpx('...
 
- loc_b('...
- loc_bp('...
-
- loc('...
- loc_mp('...
-
- localize('...
- localize_mp('...
-
- localise('...
- localise_mp('...
-
- maketext('...
- maketext_p('...
-
- loc_begin_d('
- loc_begin_c('
- loc_begin_dc('
-
- loc_end_d
- loc_end_c
- loc_end_dc
-
  __begin_d('
  __begin_c('
  __begin_dc('
@@ -908,6 +1056,41 @@ Implemented rules:
  __end_d
  __end_c
  __end_dc
+
+ # BabelFish::Loc
+ loc_b('...
+ loc_bp('...
+
+ # BabelFish::Loc::DomainAndCategory
+ loc_bc('...
+ loc_bcp('...
+
+ loc_bdc('...
+ loc_bdcp('...
+
+ loc_begin_bd('
+ loc_begin_bc('
+ loc_begin_bdc('
+
+ loc_end_bd
+ loc_end_bc
+ loc_end_bdc
+
+ # Maketext::Loc
+ loc('...
+ loc_mp('...
+
+ # Maketext::Localize
+ localize('...
+ localize_mp('...
+
+ # Maketext::Localise
+ localise('...
+ localise_mp('...
+
+ # Maketext
+ maketext('...
+ maketext_p('...
 
 N before loc..., __... and maketext... is allowed. E.g. Nloc_ and so on.
 Whitespace is allowed everywhere.
@@ -918,13 +1101,26 @@ Quote and escape any text like: ' text {placeholder} \\ \' ' or q{ text {placeho
     use Locale::TextDomain::OO::Extract::Perl;
     use Path::Tiny qw(path);
 
-    my $extractor = Locale::TextDomain::OO::Extract::Perl->new;
+    my $extractor = Locale::TextDomain::OO::Extract::Perl->new(
+        # optional filter parameter, the default is ['all'],
+        # the following means:
+        # extract for all plugins but not for Plugins
+        # Locale::TextDomain::OO::Plugin::Maketext ...
+        filter => [ qw(
+            all
+            !Maketext::Loc
+            !Maketext::Localise
+            !Maketext::Localize
+            !Maketext
+        ) ],
+    );
     for ( @files ) {
         $extractor->clear;
         $extractor->filename($_);            # dir/filename for reference
         $extractor->content_ref( \( path($_)->slurp_utf8 ) );
-        $exttactor->category('LC_Messages'); # set defaults or q{} is used
-        $extractor->domain('default');       # set defaults or q{} is used
+        $extractor->project('my project');   # set or default undef is used
+        $extractor->category('LC_MESSAGES'); # set or default q{} is used
+        $extractor->domain('my domain');     # set or default q{} is used
         $extractor->extract;
     }
     ... = $extractor->lexicon_ref;
@@ -937,6 +1133,15 @@ All parameters are optional.
 See Locale::TextDomain::OO::Extract to replace the defaults.
 
     my $extractor = Locale::TextDomain::OO::Extract::Perl->new;
+
+=head2 method filter
+
+Ignore some of 'all' or define what to scan.
+See SYNOPSIS and DESCRIPTION for how and what.
+
+    my $array_ref = $extractor->filter;
+
+    $extractor->filter(['all']); # the default
 
 =head2 method preprocess (called by method extract)
 

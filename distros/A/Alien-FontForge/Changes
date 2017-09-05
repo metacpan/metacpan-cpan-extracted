@@ -1,0 +1,6 @@
+0.001 2017-08-28 23:52:45-0400
+
+  Features
+
+   - First release.
+   - Installs fontforge if package is not found on the system.

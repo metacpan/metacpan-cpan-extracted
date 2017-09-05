@@ -15,11 +15,10 @@ build_requires:
   Test::Most: '0'
   Test::Requires: '0'
   base: '0'
-  blib: '1.01'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,34 +27,34 @@ name: Template-Mustache
 provides:
   Moose::Meta::Attribute::Custom::Trait::Mustache:
     file: lib/Template/Mustache/Trait.pm
-    version: v1.0.2
+    version: v1.0.4
   Parse::RecDescent::Template::Mustache::Parser:
     file: lib/Template/Mustache/Parser.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache:
     file: lib/Template/Mustache.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Parser:
     file: lib/Template/Mustache/Parser.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Token::Partial:
     file: lib/Template/Mustache/Token/Partial.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Token::Section:
     file: lib/Template/Mustache/Token/Section.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Token::Template:
     file: lib/Template/Mustache/Token/Template.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Token::Variable:
     file: lib/Template/Mustache/Token/Variable.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Token::Verbatim:
     file: lib/Template/Mustache/Token/Verbatim.pm
-    version: v1.0.2
+    version: v1.0.4
   Template::Mustache::Trait:
     file: lib/Template/Mustache/Trait.pm
-    version: v1.0.2
+    version: v1.0.4
 requires:
   Carp: '0'
   Escape::Houdini: '0'
@@ -76,7 +75,7 @@ resources:
   bugtracker: https://github.com/yanick/Template-Mustache/issues
   homepage: https://github.com/yanick/Template-Mustache
   repository: https://github.com/yanick/Template-Mustache.git
-version: 1.0.2
+version: 1.0.4
 x_authority: cpan:YANICK
 x_contributors:
   - 'Chris Christensen <christianchristensen@gmail.com>'
@@ -84,6 +83,7 @@ x_contributors:
   - 'Josh Lavin <jlavin@endpoint.com>'
   - 'Paul Cochrane <paul@liekut.de>'
   - 'Pieter Vande Bruggen <pvande@gmail.com>'
+  - 'Pieter van de Bruggen <pvande@gmail.com>'
   - 'ReadmeCritic <frankensteinbot@gmail.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.67'

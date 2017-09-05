@@ -13,7 +13,7 @@ package Lemonldap::NG::Manager;
 use 5.10.0;
 use utf8;
 use Mouse;
-our $VERSION = '1.9.10';
+our $VERSION = '1.9.11';
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
@@ -121,10 +121,13 @@ sub javascript {
     my ($self) = @_;
     return
       'var formPrefix=staticPrefix+"forms/";var confPrefix=scriptname+"confs/";'
-      . ( $self->links ? 'var links=' . JSON::to_json( $self->links ) . ';' : '' )
-      . ( $self->menuLinks
+      . (
+        $self->links ? 'var links=' . JSON::to_json( $self->links ) . ';' : '' )
+      . (
+        $self->menuLinks
         ? 'var menulinks=' . JSON::to_json( $self->menuLinks ) . ';'
-        : '' );
+        : ''
+      );
 }
 
 sub sendHtml {

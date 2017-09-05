@@ -39,7 +39,7 @@ use Sys::Hostname;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 #-----------------------------------------------------------------------------
 
@@ -91,6 +91,12 @@ I<tag> has the precedence from these two if both set.
 
 =back
 
+=head1 METHODS
+
+=head2 new
+
+Constructor method
+
 =cut
 
 sub new {
@@ -123,6 +129,12 @@ sub new {
 
   return $self;
 }
+
+=head2 log
+
+Log method
+
+=cut
 
 sub log {
   my ($self, %params) = @_;

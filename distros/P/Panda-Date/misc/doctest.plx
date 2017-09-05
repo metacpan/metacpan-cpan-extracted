@@ -17,7 +17,7 @@ say "START";
     
     timethese(-1, {
         cdate_new_str   => sub { new Class::Date("2013-01-25 21:26:43"); },
-        panda_new_str   => sub { new Panda::Date("2013-01-25 21:26:43"); },
+        panda_new_str   => sub { state $date = new Panda::Date(0); $date->set("2013-01-25 21:26:43"); },
         cdate_new_epoch => sub { new Class::Date(1000000000); },
         panda_new_epoch => sub { new Panda::Date(1000000000); },
         panda_new_reuse => sub { state $date = new Panda::Date(0); $date->set(1000000000); },

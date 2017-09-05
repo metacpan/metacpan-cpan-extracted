@@ -9,8 +9,8 @@ __PACKAGE__->meta(
     table   => 'table',
     columns => [
         qw/foo bar baz/,
-        'nullable'   => {is_null => 1},
-        with_default => {default => '123'}
+        'nullable'   => { is_null => 1 },
+        with_default => { default => '123' }
     ],
 );
 

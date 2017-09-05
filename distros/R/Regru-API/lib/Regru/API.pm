@@ -9,7 +9,7 @@ use Carp ();
 use Class::Load qw(try_load_class);
 use namespace::autoclean;
 
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 our $AUTHORITY = 'cpan:IMAGO'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
@@ -25,6 +25,7 @@ sub available_namespaces {[qw(
     user
     domain
     zone
+    dnssec
     bill
     folder
     service
@@ -37,7 +38,7 @@ sub _get_namespace_handler {
     my $namespace = shift;
 
     unless ( $self->{_handlers}->{$namespace} ) {
-        my $ns = 'Regru::API::' . ucfirst($namespace);
+        my $ns = 'Regru::API::' . ( $namespace eq 'dnssec' ? uc($namespace) : ucfirst($namespace) );
 
         try_load_class $ns or Carp::croak 'Unable to load namespace: ' . $ns;
 
@@ -93,7 +94,7 @@ Regru::API - Perl bindings for Reg.ru API v2
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 
@@ -207,6 +208,18 @@ DNS resource records management methods.
 
 See L<Regru::API::Zone> for details and
 L<REG.API DNS management functions|https://www.reg.com/support/help/api2#zone_functions>.
+
+=item B<dnssec>
+
+DNSSEC management methods.
+
+    # suppose we already have a client
+    $client->dnssec->enable(
+        domain_name => 'tvilgo.com',
+    );
+
+See L<Regru::API::DNSSEC> for details and
+L<REG.API DNSSEC management functions|https://www.reg.com/support/help/api2#dnssec_functions>.
 
 =item B<service>
 
@@ -473,6 +486,10 @@ Returns a handler to access to REG.API domain name management methods. See L<Reg
 
 Returns a handler to access to REG.API DNS resource records management methods. See L<Regru::API::Zone>.
 
+=head2 dnssec
+
+Returns a handler to access to REG.API DNSSEC management methods. See L<Regru::API::DNSSEC>.
+
 =head2 service
 
 Returns a handler to access to REG.API service management methods. See L<Regru::API::Service>.
@@ -568,7 +585,7 @@ L<REG.API Common error codes|https://www.reg.com/support/help/api2#common_errors
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/regru/regru-api-perl/issues
+L<https://github.com/regru/regru-api-perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

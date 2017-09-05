@@ -16,23 +16,33 @@ OpenSSH::Fingerprint - The great new OpenSSH::Fingerprint!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
 
-Perhaps a little code snippet.
+     use OpenSSH::Fingerprint;
+     use use MIME::Base64;
 
-    use OpenSSH::Fingerprint;
+     my $file=shift;
+     my $resutlt= unbase64($file);
 
-    my $foo = OpenSSH::Fingerprint->new();
-    ...
+     print "md5 fingerpint: ",md5_sum($_ ),"\n" for(@{$resutlt}); 
+     print "sha265 fingleprint: ",encode_base64(sha256($_ )) for(@{$resutlt});
+
+
+The result
+
+   perl sshfingerprint.pl aaa.pub
+
+   md5 fingerpint: 4b:12:23:8a:95:rt:ec:da:43:fc:aa:0b:1a:e6:6a:2f
+   sha265 fingleprint: sfeQQGLlTi5j69KMzEkLmK9f78/CGtVk2a8N8pDfV88=...
 
 =head1 EXPORT
 

@@ -143,7 +143,7 @@ test_psgi(
         subtest 'json_response plain' => sub {
             my $res = $cb->( GET "http://localhost/get/plain" );
             is( $res->code, 200, 'status' );
-            is( $res->content_type, 'application/json', 'content-type' );
+            is( $res->header('content-type'), 'application/json; charset=utf-8', 'content-type' );
             is( decode_utf8( $res->content ), '{"value":"plain"}',
                 'content' );
         };

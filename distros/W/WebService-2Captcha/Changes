@@ -1,5 +1,8 @@
 Revision history for WebService-2Captcha
 
+0.05  2017-08-29 09:42:55 CST
+        - add 'return' if request failed.
+
 0.04  2017-03-28 16:27:13 CST
         - new userrecaptcha for recaptcha
 

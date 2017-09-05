@@ -3,7 +3,7 @@ package ObjectDB::Table;
 use strict;
 use warnings;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 use constant DEFAULT_PAGE_SIZE => 10;
 
@@ -11,11 +11,13 @@ require Carp;
 use SQL::Composer;
 use SQL::Composer::Expression;
 use ObjectDB;
+use ObjectDB::Stmt;
+use ObjectDB::Iterator;
 use ObjectDB::Quoter;
 use ObjectDB::With;
 use ObjectDB::Meta;
 use ObjectDB::Exception;
-use ObjectDB::Util qw(execute merge merge_rows filter_columns);
+use ObjectDB::Util qw(execute to_array filter_columns);
 
 sub new {
     my $class = shift;
@@ -45,21 +47,27 @@ sub dbh {
 
 sub find {
     my $self = shift;
+    my (%params) = @_;
 
-    my $params = merge { @_ }, {where => [], with => []};
+    my $single = $params{single} || $params{first};
 
-    my $single = $params->{single} || $params->{first};
+    my $offset = $params{offset};
+    my $limit  = $params{limit};
 
-    unless ($single) {
-        my $page = delete $params->{page};
-        my $page_size = delete $params->{page_size} || DEFAULT_PAGE_SIZE;
-
-        if (defined $page) {
-            $page = 1 unless $page && $page =~ m/^\d+$/smx;
-            $params->{offset} = ($page - 1) * $page_size;
-            $params->{limit}  = $page_size;
-        }
+    if ($single) {
+        $limit = 1;
     }
+    elsif (my $page = $params{page}) {
+        my $page_size = $params{page_size};
+
+        $page = 1 unless $page && $page =~ m/^[0-9]$/;
+        $page_size = DEFAULT_PAGE_SIZE unless $page_size && $page_size =~ m/^[0-9]$/;
+
+        $offset = ($page - 1) * $page_size;
+        $limit  = $page_size;
+    }
+
+    my $table = $self->meta->table;
 
     my $quoter = ObjectDB::Quoter->new(
         meta   => $self->meta,
@@ -67,80 +75,99 @@ sub find {
     );
     my $where = SQL::Composer::Expression->new(
         quoter         => $quoter,
-        expr           => $params->{where},
-        default_prefix => $self->meta->table
+        expr           => $params{where},
+        default_prefix => $table
     );
     my $having = SQL::Composer::Expression->new(
         quoter         => $quoter,
-        expr           => $params->{having},
-        default_prefix => $self->meta->table
+        expr           => $params{having},
+        default_prefix => $table
     );
     my $with = ObjectDB::With->new(
         meta => $self->meta,
-        with => [@{$params->{with}}, $quoter->with]
+        with => [ to_array($params{with}), $quoter->with ]
     );
 
-    my $columns = filter_columns([$self->meta->columns], $params);
+    my $columns = filter_columns([ $self->meta->columns ], {%params});
 
     my $join = $with->to_joins;
-    push @$join, @{$params->{join}} if $params->{join};
+    push @$join, to_array($params{join}) if $params{join};
 
     my $select = SQL::Composer->build(
         'select',
         driver     => $self->dbh->{Driver}->{Name},
-        from       => $self->meta->table,
+        from       => $table,
         columns    => $columns,
         join       => $join,
         where      => $where,
-        limit      => $params->{limit},
-        offset     => $params->{offset},
-        order_by   => $params->{order_by},
-        group_by   => $params->{group_by},
+        limit      => $limit,
+        offset     => $offset,
+        order_by   => $params{order_by},
+        group_by   => $params{group_by},
         having     => $having,
-        for_update => $params->{for_update},
+        for_update => $params{for_update},
     );
 
     my ($rv, $sth) = execute($self->dbh, $select, context => $self);
 
-    if (my $cb = $params->{each}) {
-        while (my $row = $sth->fetchrow_arrayref) {
-            my $rows = [[@$row]];
-            $rows = $select->from_rows($rows);
+    return $self->_finalize_results($select, $sth, %params, meta => $self->meta, wantarray => wantarray);
+}
 
-            my $object =
-              $self->meta->class->new(%{$rows->[0]});
-            $object->is_in_db(1);
+sub find_by_compose {
+    my $self = shift;
+    my (%params) = @_;
 
-            $cb->($object);
-        }
+    my $single = $params{single} || $params{first};
 
-        return $self;
+    my $offset = $params{offset};
+    my $limit  = $params{limit};
+
+    if ($single) {
+        $limit = 1;
     }
-    else {
-        my $rows = $sth->fetchall_arrayref;
-        return unless $rows && @$rows;
+    elsif (my $page = $params{page}) {
+        my $page_size = $params{page_size};
 
-        $rows = $select->from_rows($rows);
+        $page = 1 unless $page && $page =~ m/^[0-9]$/;
+        $page_size = DEFAULT_PAGE_SIZE unless $page_size && $page_size =~ m/^[0-9]$/;
 
-        my @objects =
-          map { $_->is_in_db(1) }
-          map { $self->meta->class->new->set_columns(%{$_}) } @$rows;
-
-        return $single ? $objects[0] : @objects;
+        $offset = ($page - 1) * $page_size;
+        $limit  = $page_size;
     }
+
+    my $table = $params{table};
+
+    my $select = SQL::Composer->build(
+        'select',
+        driver     => $self->dbh->{Driver}->{Name},
+        from       => $table,
+        columns    => $params{columns},
+        join       => $params{join},
+        where      => $params{where},
+        limit      => $params{limit},
+        offset     => $params{offset},
+        order_by   => $params{order_by},
+        group_by   => $params{group_by},
+        having     => $params{heaving},
+        for_update => $params{for_update},
+    );
+
+    my ($rv, $sth) = execute($self->dbh, $select, context => $self);
+
+    my $meta;
+    if (!$params{rows_as_hashes}) {
+        $meta = ObjectDB::Meta->find_by_table($table);
+        die qq{Can't find meta for table '$table'} unless $meta;
+    }
+
+    return $self->_finalize_results($select, $sth, %params, meta => $meta, wantarray => wantarray);
 }
 
 sub find_by_sql {
     my $self = shift;
     my ($sql, $bind, %params) = @_;
 
-    {
-
-        package ObjectDB::Stmt;
-        sub new { bless {@_[1 .. $#_]}, $_[0] }
-        sub to_sql  { shift->{sql} }
-        sub to_bind { @{shift->{bind}} }
-    }
+    my $single = $params{single} || $params{first};
 
     my @bind;
     if (ref $bind eq 'HASH') {
@@ -149,14 +176,14 @@ sub find_by_sql {
         }
     }
     else {
-        @bind = @$bind;
+        @bind = @$bind if $bind && ref $bind eq 'ARRAY';
     }
 
     my $stmt = ObjectDB::Stmt->new(sql => $sql, bind => \@bind);
 
     my ($rv, $sth) = execute($self->dbh, $stmt, context => $self);
 
-    my @column_names = @{$sth->{NAME_lc}};
+    my @column_names = @{ $sth->{NAME_lc} };
 
     if (my $cb = $params{each}) {
         while (my $row = $sth->fetchrow_arrayref) {
@@ -174,20 +201,121 @@ sub find_by_sql {
 
         return $self;
     }
-    else {
+    elsif ($single || wantarray) {
         my $rows = $sth->fetchall_arrayref;
         return () unless $rows && @$rows;
 
-        my @objects;
+        my $i = 0;
+        my @results;
         foreach my $row (@$rows) {
             my %values;
             foreach my $column (@column_names) {
-                $values{$column} = shift @$row;
+                $values{$column} = $row->[ $i++ ];
             }
-            push @objects, $self->meta->class->new(%values)->is_in_db(1);
+
+            if ($params{rows_as_hashes}) {
+                push @results, \%values;
+            }
+            else {
+                push @results, $self->meta->class->new(%values)->is_in_db(1);
+            }
         }
 
-        return @objects;
+        return @results;
+    }
+    else {
+        my $i      = 0;
+        my $walker = sub {
+            my $row = $sth->fetchrow_arrayref;
+            return unless defined $row;
+
+            my %values;
+            foreach my $column (@column_names) {
+                $values{$column} = $row->[ $i++ ];
+            }
+
+            my $result;
+            if ($params{rows_as_hashes}) {
+                $result = \%values;
+            }
+            else {
+                $result = $self->meta->class->new(%values);
+                $result->is_in_db(1);
+            }
+
+            return $result;
+        };
+
+        return ObjectDB::Iterator->new(walker => $walker);
+    }
+}
+
+sub _finalize_results {
+    my $self = shift;
+    my ($select, $sth, %params) = @_;
+
+    my $meta = $params{meta};
+    my $single = $params{single} || $params{first};
+
+    if (my $cb = $params{each}) {
+        while (my $row = $sth->fetchrow_arrayref) {
+            my $rows = [ [@$row] ];
+            $rows = $select->from_rows($rows);
+
+            my $result;
+            if ($params{rows_as_hashes}) {
+                $result = $rows->[0];
+            }
+            else {
+                $result = $meta->class->new(%{ $rows->[0] });
+                $result = $result->is_in_db(1);
+            }
+
+            $cb->($result);
+        }
+
+        return $self;
+    }
+    elsif ($single || $params{wantarray}) {
+        my $rows = $sth->fetchall_arrayref;
+        return unless $rows && @$rows;
+
+        $rows = $select->from_rows($rows);
+
+        my @results;
+
+        if ($params{rows_as_hashes}) {
+            @results = @$rows;
+        }
+        else {
+            @results =
+              map { $_->is_in_db(1) }
+              map { $meta->class->new->set_columns(%{$_}) } @$rows;
+        }
+
+        return $single ? $results[0] : @results;
+    }
+    else {
+        my $walker = sub {
+            my $row = $sth->fetchrow_arrayref;
+            return unless defined $row;
+
+            my $rows = [ [@$row] ];
+            $rows = $select->from_rows($rows);
+
+            my $result;
+            if ($params{rows_as_hashes}) {
+                $result = $rows->[0];
+            }
+            else {
+                $result = $meta->class->new(%{ $rows->[0] });
+                $result->is_in_db(1);
+            }
+
+            return $result;
+        };
+
+        return ObjectDB::Iterator->new(walker => $walker);
     }
 }
 
@@ -235,11 +363,10 @@ sub count {
         expr           => $params{where},
         default_prefix => $self->meta->table
     );
-    my $with =
-      ObjectDB::With->new(meta => $self->meta, with => [$quoter->with]);
+    my $with = ObjectDB::With->new(meta => $self->meta, with => [ $quoter->with ]);
 
     my $joins = $with->to_joins;
-    push @$joins, @{$params{join}} if $params{join};
+    push @$joins, @{ $params{join} } if $params{join};
 
     # We have to remove columns, because:
     # 1) we don't need them
@@ -250,7 +377,7 @@ sub count {
         'select',
         driver   => $self->dbh->{Driver}->{Name},
         from     => $self->meta->table,
-        columns  => [{-col => \'COUNT(*)', -as => 'count'}],
+        columns  => [ { -col => \'COUNT(*)', -as => 'count' } ],
         where    => $where,
         join     => $joins,
         group_by => $params{group_by},
@@ -335,13 +462,32 @@ rows at a time.
 
 =item C<find>
 
-Finds specific rows.
+Finds specific rows. Query builder is L<SQL::Composer>.
 
     my @books = MyBook->table->find;
     my @books = MyBook->table->find(where => [...]);
     my @books = MyBook->table->find(where => [...], order_by => [...]);
     my @books =
       MyBook->table->find(where => [...], order_by => [...], group_by => [...]);
+
+When using C<rows_as_hashes> returns array of hashes instead of objects.
+
+=item C<find_by_compose>
+
+Finds by using raw query.
+
+    my @books = MyBook->find_by_compose(table => 'book', columns => ['id', 'title']);
+
+When using C<rows_as_hashes> returns array of hashes instead of objects.
+
+=item C<find_by_sql>
+
+Finds by using raw SQL.
+
+    my @books = MyBook->find_by_sql('SELECT * FROM books WHERE title = ?', ['About Everything']);
+    my @books = MyBook->find_by_sql('SELECT * FROM books WHERE title = :title', { title => 'About Everything' });
+
+When using C<rows_as_hashes> returns array of hashes instead of objects.
 
 =item C<count>
 

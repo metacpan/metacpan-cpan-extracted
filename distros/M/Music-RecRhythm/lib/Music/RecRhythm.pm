@@ -16,13 +16,20 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 with 'MooX::Rebuild';    # for ->rebuild a.k.a. clone
 
 has extra => ( is => 'rw' );
-has _next => ( is => 'rw' );
-has prev  => ( is => 'rw', weak_ref => 1 );
+
+has next => (
+    is      => 'rw',
+    trigger => sub {
+        my ( $self, $next ) = @_;
+        $next->prev($self);
+    },
+);
+has prev => ( is => 'rw', weak_ref => 1 );
 
 has set => (
     is     => 'rw',
@@ -92,18 +99,6 @@ sub levels {
         $self = $self->next;
     }
     return $count;
-}
-
-# TODO could this instead be simplified with a trigger to set prev?
-sub next {
-    my ( $self, $next ) = @_;
-    if ( defined $next ) {
-        $self->_next($next);
-        $next->prev($self);
-        return $self;
-    } else {
-        return $self->_next;
-    }
 }
 
 sub recurse {

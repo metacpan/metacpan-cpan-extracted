@@ -2,7 +2,7 @@ use Test::More;
 use Patro ':test', ':code';
 use Scalar::Util 'reftype', 'refaddr';
 use Carp 'verbose';
-use 5.012;
+use 5.010;
 
 my $dispatch = {
     abc => 12,
@@ -19,7 +19,9 @@ ok(!$null, 'extra client as boolean');
 is(CORE::ref($r1), 'Patro::N1', 'client ref');
 is(Patro::ref($r1), 'HASH', 'remote ref');
 is(Patro::reftype($r1),'HASH', 'remote reftype');
-ok(tied(%$r1), 'proxy var is tied when deref as hash');
+if ($] >= 5.017000) {
+    ok(tied(%$r1), 'proxy var is tied when deref as hash');
+}
 
 my $c = Patro::client($r1);
 ok($c, 'retrieved client object');
@@ -28,6 +30,8 @@ my $THREADED = $c->{config}{style} eq 'threaded';
 
 is(CORE::ref($r1->{foo}), 'Patro::N3', 'remote dispatch entry');
 is(Patro::ref($r1->{foo}), 'CODE', 'remote dispatch entry');
+
+is($r1->{foo}->(), 42, 'execute remote dispatch');
 
 done_testing;
 

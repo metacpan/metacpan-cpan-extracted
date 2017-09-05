@@ -31,7 +31,7 @@ sub fixer {
     if (!defined($name) || (ref $name eq 'ARRAY' && scalar @{$name} == 0)) {
         die 'Undefined value for plugin at [Fixer]';
     }
-    
+
     return require_package($name, $ns);
 }
 
@@ -43,13 +43,13 @@ sub exporter {
     if (!defined($name) || (ref $name eq 'ARRAY' && scalar @{$name} == 0)) {
         die 'Undefined value for plugin at [Exporter]';
     }
-    
+
     return require_package($name, $ns);
 }
 
 sub pipeline {
     my $self = shift;
-    require_package('PipelineConfig', 'Datahub::Factory')->new({'conf_object' => @_});
+    require_package('Pipeline', 'Datahub::Factory')->new({'file_name' => @_});
 }
 
 sub module {

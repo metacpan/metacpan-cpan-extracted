@@ -20,9 +20,8 @@ sub doit
 	print "Test 1 - import from file\n";
 	my $dbh = DBI->connect('dbi:XMLSimple(RaiseError => 1):');
 
-	# To be replaced with xmls_import once the driver has been registered
-	# print "x_import file\n";
-	$dbh->func('person', 'XML', "$Bin/../data/person.xml", 'x_import');
+	# print "xmlsimple_import file\n";
+	$dbh->func('person', 'XML', "$Bin/../data/person.xml", 'xmlsimple_import');
 
 	# print "prepare\n";
 	# my $sth = $dbh->prepare( "SELECT * FROM person WHERE name = 'Nigel Horne'");
@@ -35,12 +34,16 @@ sub doit
 
 	print "Test 2 - import from string\n";
 	$dbh = DBI->connect('dbi:XMLSimple(RaiseError => 1):');
-	# print "x_import string\n";
-	$dbh->func('person2', 'XML', [<DATA>], 'x_import');
+	# print "xmlsimple_import string\n";
+	$dbh->func('person2', 'XML', [<DATA>], 'xmlsimple_import');
 
 	# $sth = $dbh->prepare("SELECT * FROM person2");
 	$sth = $dbh->prepare("Select email FROM person2 WHERE name = 'Nigel Horne'");
 	# print "execute\n";
+	$sth->execute();
+	$sth->dump_results();
+
+	$sth = $dbh->prepare("Select name FROM person2");
 	$sth->execute();
 	$sth->dump_results();
 }
@@ -55,5 +58,6 @@ __DATA__
 	<row id="2">
 		<email>somebody@example.com</email>
 		<name>A N Other</name>
+		<name>Fred Flintsone</name>
 	</row>
 </table>

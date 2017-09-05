@@ -9,7 +9,7 @@ use AnyEvent::Socket qw( tcp_server tcp_connect );
 use AnyEvent::Handle;
 
 # ABSTRACT: Interface for PASV, PORT and REST commands
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 has data => (
@@ -161,7 +161,7 @@ AnyEvent::FTP::Server::Role::TransferPrep - Interface for PASV, PORT and REST co
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -180,19 +180,25 @@ L<AnyEvent::FTP::Server::Role::TransferPut>.
 
 =head1 ATTRIBUTES
 
-=head2 $context-E<gt>data
+=head2 data
+
+ my $connection = $context->data
 
 The data connection prepared from the FTP C<PASV> or C<PORT> command.
 This is an L<AnyEvent::Handle>.
 
-=head2 $context-E<gt>restart_offset
+=head2 restart_offset
+
+ my $offset = $context->restart_offset;
 
 The offset specified in the last FTP C<REST> command.
 This should be a positive integer.
 
 =head1 METHODS
 
-=head2 $context-E<gt>clear_data
+=head2 clear_data
+
+ $context->clear_data;
 
 Clears the C<data> and C<restart_offset> attributes.
 

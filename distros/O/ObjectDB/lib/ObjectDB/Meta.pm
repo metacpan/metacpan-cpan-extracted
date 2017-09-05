@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use mro;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 require Storable;
 require Carp;
@@ -18,8 +18,22 @@ sub find_or_register_meta {
     my $class = shift;
     my ($meta_class, @args) = @_;
 
-    return $OBJECTS{$meta_class} ||=
-      ObjectDB::Meta->new(class => $meta_class, @args);
+    return $OBJECTS{$meta_class} ||= ObjectDB::Meta->new(class => $meta_class, @args);
+}
+
+sub find_by_table {
+    my $class = shift;
+    my ($table) = @_;
+
+    foreach my $meta_class (keys %OBJECTS) {
+        my $meta = $OBJECTS{$meta_class};
+
+        if ($meta->table eq $table) {
+            return $meta;
+        }
+    }
+
+    return;
 }
 
 sub new {
@@ -44,7 +58,7 @@ sub new {
         $self->discover_schema;
     }
 
-    $self->set_columns($params{columns}) if $params{columns};
+    $self->set_columns($params{columns})         if $params{columns};
     $self->set_primary_key($params{primary_key}) if $params{primary_key};
     $self->set_unique_keys($params{unique_keys}) if $params{unique_keys};
     $self->set_auto_increment($params{auto_increment})
@@ -82,7 +96,7 @@ sub is_unique_key {
     my $self = shift;
     my ($name) = @_;
 
-    foreach my $key (@{$self->{unique_keys}}) {
+    foreach my $key (@{ $self->{unique_keys} }) {
         return 1 if first { $name eq $_ } @$key;
     }
 
@@ -116,7 +130,7 @@ sub is_column {
 
     Carp::croak('Name is required') unless $name;
 
-    return !!first { $name eq $_->{name} } @{$self->{columns}};
+    return !!first { $name eq $_->{name} } @{ $self->{columns} };
 }
 
 sub get_column {
@@ -125,13 +139,13 @@ sub get_column {
 
     Carp::croak("Unknown column '$name'") unless $self->is_column($name);
 
-    return first { $_->{name} eq $name } @{$self->{columns}};
+    return first { $_->{name} eq $name } @{ $self->{columns} };
 }
 
 sub get_columns {
     my $self = shift;
 
-    return map { $_->{name} } @{$self->{columns}};
+    return map { $_->{name} } @{ $self->{columns} };
 }
 
 sub get_regular_columns {
@@ -160,10 +174,10 @@ sub set_columns {
 
 sub add_columns {
     my $self = shift;
-    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
     my $count = 0;
-    while (my ($name, $options) = @columns[$count, $count + 1]) {
+    while (my ($name, $options) = @columns[ $count, $count + 1 ]) {
         last unless $name;
 
         if (ref $options eq 'HASH') {
@@ -191,7 +205,7 @@ sub add_column {
 
     $attributes ||= {};
 
-    push @{$self->{columns}}, {name => $name, %$attributes};
+    push @{ $self->{columns} }, { name => $name, %$attributes };
 
     return $self;
 }
@@ -202,7 +216,7 @@ sub remove_column {
 
     return unless $name && $self->is_column($name);
 
-    $self->{columns} = [grep { $_->{name} ne $name } @{$self->{columns}}];
+    $self->{columns} = [ grep { $_->{name} ne $name } @{ $self->{columns} } ];
 
     return $self;
 }
@@ -210,12 +224,12 @@ sub remove_column {
 sub get_primary_key {
     my $self = shift;
 
-    return @{$self->{primary_key} || []};
+    return @{ $self->{primary_key} || [] };
 }
 
 sub set_primary_key {
     my $self = shift;
-    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
     foreach my $column (@columns) {
         Carp::croak("Unknown column '$column' set as primary key")
@@ -230,12 +244,12 @@ sub set_primary_key {
 sub get_unique_keys {
     my $self = shift;
 
-    return @{$self->{unique_keys}};
+    return @{ $self->{unique_keys} };
 }
 
 sub set_unique_keys {
     my $self = shift;
-    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
     $self->{unique_keys} = [];
 
@@ -246,7 +260,7 @@ sub set_unique_keys {
 
 sub add_unique_keys {
     my $self = shift;
-    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
     foreach my $column (@columns) {
         $self->add_unique_key($column);
@@ -257,14 +271,14 @@ sub add_unique_keys {
 
 sub add_unique_key {
     my $self = shift;
-    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my (@columns) = @_ == 1 && ref $_[0] eq 'ARRAY' ? @{ $_[0] } : @_;
 
     foreach my $column (@columns) {
         Carp::croak("Unknown column '$column' set as unique key")
           unless $self->is_column($column);
     }
 
-    push @{$self->{unique_keys}}, [@columns];
+    push @{ $self->{unique_keys} }, [@columns];
 
     return $self;
 }
@@ -310,19 +324,18 @@ sub add_relationship {
 
     Carp::croak('Name and options are required') unless $name && $options;
 
-    $self->{relationships}->{$name} =
-      ObjectDB::Meta::RelationshipFactory->new->build(
+    $self->{relationships}->{$name} = ObjectDB::Meta::RelationshipFactory->new->build(
         $options->{type}, %{$options},
         orig_class => $self->get_class,
         name       => $name
-      );
+    );
 }
 
 sub add_relationships {
     my $self = shift;
 
     my $count = 0;
-    while (my ($name, $options) = @_[$count, $count + 1]) {
+    while (my ($name, $options) = @_[ $count, $count + 1 ]) {
         last unless $name && $options;
 
         $self->add_relationship($name, $options);
@@ -348,9 +361,8 @@ sub discover_schema {
     foreach my $column ($table->columns) {
         my $default_value = undef;
 
-        if ( defined $column->column_def ) {
-            $default_value =
-              $column->column_def =~ /^'(.*?)'/ ? $1 : $column->column_def;
+        if (defined $column->column_def) {
+            $default_value = $column->column_def =~ /^'(.*?)'/ ? $1 : $column->column_def;
 
             if ($column->type_name =~ m/^bool/i) {
                 if ($column->column_def =~ m/^\d/) {
@@ -376,7 +388,7 @@ sub generate_columns_methods {
     no strict 'refs';
     no warnings 'redefine';
     foreach my $column ($self->get_columns) {
-        *{$self->class . '::' . $column} =
+        *{ $self->class . '::' . $column } =
           sub { shift->column($column, @_) };
     }
 
@@ -388,8 +400,8 @@ sub generate_related_methods {
 
     no strict 'refs';
     no warnings 'redefine';
-    foreach my $rel_name (keys %{$self->relationships}) {
-        *{$self->class . '::' . $rel_name} =
+    foreach my $rel_name (keys %{ $self->relationships }) {
+        *{ $self->class . '::' . $rel_name } =
           sub { shift->related($rel_name, @_) };
     }
 
@@ -403,12 +415,11 @@ sub _build_relationships {
     $self->{relationships} ||= {};
 
     foreach my $rel (keys %{$relationships}) {
-        $self->{relationships}->{$rel} =
-          ObjectDB::Meta::RelationshipFactory->new->build(
-            $relationships->{$rel}->{type}, %{$relationships->{$rel}},
+        $self->{relationships}->{$rel} = ObjectDB::Meta::RelationshipFactory->new->build(
+            $relationships->{$rel}->{type}, %{ $relationships->{$rel} },
             orig_class => $self->{class},
             name       => $rel
-          );
+        );
     }
 }
 

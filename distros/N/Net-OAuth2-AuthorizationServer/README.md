@@ -11,7 +11,7 @@ Authorization Server
 
 # VERSION
 
-0.14
+0.16
 
 # SYNOPSIS
 
@@ -71,6 +71,8 @@ Lee Johnson - `leejo@cpan.org`
 With contributions from:
 
 Martin Renvoize - `martin.renvoize@ptfs-europe.com`
+
+Pierre VIGIER `pierre.vigier@gmail.com`
 
 # LICENSE
 

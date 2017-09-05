@@ -30,7 +30,7 @@ my $build = Module::Build->new(
         'perl'               => 5.012,
         'App::CELL'          => 0.196,
         'App::MFILE'         => 0.181,
-        'App::MFILE::WWW'    => 0.156,
+        'App::MFILE::WWW'    => 0.158,
         # not really required, but designed to work with
         #'App::Dochazka::REST' => 0.549,
         'File::Temp'         => 0,

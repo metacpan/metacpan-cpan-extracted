@@ -23,7 +23,7 @@ use IO::File;
 use Text::BibTeX::Entry;
 
 use vars qw'$VERSION';
-$VERSION = 0.82;
+$VERSION = 0.85;
 
 =head1 NAME
 

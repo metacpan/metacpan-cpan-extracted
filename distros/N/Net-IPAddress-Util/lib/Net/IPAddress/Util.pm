@@ -43,7 +43,7 @@ $EXPORT_TAGS{ all } = [@EXPORT_OK];
 our $DIE_ON_ERROR = 0;
 our $PROMOTE_N32 = 1;
 
-our $VERSION = '3.031';
+our $VERSION = '3.033';
 
 sub IP {
   return Net::IPAddress::Util->new($_[0]);
@@ -315,7 +315,7 @@ sub _shift_right {
       $rv[$octet + 1] += $lsb if $octet < 15;
     }
   }
-  @rv = $self->_mask_out($pow, $mask, unpack('U16', pack('N4', @rv)));
+  @rv = $self->_mask_out($pow, $mask, unpack('C16', pack('N4', @rv)));
   return Net::IPAddress::Util->new(\@rv);
 }
 
@@ -433,11 +433,11 @@ sub ip_pad_prefix (\@) {
 
 sub explode_ip {
   my $ip = shift;
-  return split //, unpack 'B128', $ip->{ address };
+  return map { ~~$_ } split //, unpack 'B128', $ip->{ address };
 }
 
 sub implode_ip {
-  return Net::IPAddress::Util->new([ unpack 'C16', pack 'B128', join '', map { split // } @_ ]);
+  return Net::IPAddress::Util->new([ unpack 'C16', pack 'B128', join '', map { ~~$_ } map { split // } @_ ]);
 }
 
 sub n32_to_ipv4 { local $PROMOTE_N32 = 1; return IP(@_) }
@@ -521,7 +521,7 @@ Net::IPAddress::Util - Version-agnostic representation of an IP address
 
 =head1 VERSION
 
-Version 3.031
+Version 3.033
 
 =head1 SYNOPSIS
 

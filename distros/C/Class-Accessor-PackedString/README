@@ -1,0 +1,88 @@
+NAME
+    Class::Accessor::PackedString - Generate accessors/constructor for
+    object that use pack()-ed string as storage backend
+
+VERSION
+    This document describes version 0.001 of Class::Accessor::PackedString
+    (from Perl distribution Class-Accessor-PackedString), released on
+    2017-09-01.
+
+SYNOPSIS
+    In lib/Your/Class.pm:
+
+     package Your::Class;
+     use Class::Accessor::PackedString {
+         # constructor => 'new',
+         accessors => {
+             foo => "f",
+             bar => "c",
+         },
+     };
+
+    In code that uses your class:
+
+     use Your::Class;
+
+     my $obj = Your::Class->new;
+     $obj->foo(1.2);
+     $obj->bar(34);
+
+    or:
+
+     my $obj = Your::Class->new(foo => 1.2, bar => 34);
+
+    $obj is now:
+
+     bless(do{\(my $o = pack("fc", 1.2, 34))}, "Your::Class")
+
+    To subclass, in lib/Your/Subclass.pm:
+
+     package Your::Subclass;
+     use parent 'Your::Class';
+     use Class::Accessor::PackedString {
+         accessors => {
+             %Your::Class::HAS_PACKED,
+             baz => "a8",
+             qux => "a8",
+         },
+     };
+
+DESCRIPTION
+    This module is a builder for classes that use pack()-ed string as memory
+    storage backend. This is useful in situations where you need to create
+    many (e.g. thousands+) objects in memory and want to reduce memory
+    usage, because string-based objects are more space-efficient than the
+    commonly used hash-based objects. The downsides are: 1) you have to
+    predeclare all the attributes of your class along with their types
+    (pack() templates); 2) you can only store data which can be pack()-ed;
+    3) slower speed, because unpack()-ing and re-pack()-ing are done
+    everytime an attribute is accessed or set.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Class-Accessor-PackedString>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Class-Accessor-PackedString>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Packed
+    String>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Class::Accessor::PackedString::Set
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

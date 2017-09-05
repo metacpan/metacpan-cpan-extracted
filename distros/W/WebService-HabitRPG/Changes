@@ -1,5 +1,7 @@
 Revision history for WebService::HabitRPG
 
+0.30      2017-09-02 10:50:39-05:00 America/Chicago
+
 0.29      2017-05-26 22:24:33-05:00 America/Chicago
     * Abandon JSON::Any in favor of JSON::MaybeXS.
 

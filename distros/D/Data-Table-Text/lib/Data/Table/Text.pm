@@ -6,8 +6,8 @@
 # podDocumentation
 
 package Data::Table::Text;
-use v5.16.0;
-our $VERSION = '20170824';
+use v5.8.0;
+our $VERSION = '20170901';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -193,7 +193,7 @@ sub fullFileName                                                                
   filePath(currentDirectory, $file)                                             # Full file name
  }
 
-sub printFullFileName                                                           # Print a file name on a separate line with escaping so it can be use easily from the command line
+sub printFullFileName                                                           # Print a file name on a separate line with escaping so it can be used easily from the command line
  {my ($file) = @_;                                                              # File name
   "\n\'".dump(fullFileName($file))."\'\n'"
  }
@@ -201,7 +201,8 @@ sub printFullFileName                                                           
 #2 Temporary                                                                    # Temporary files and folders
 
 sub temporaryFile                                                               # Create a temporary file that will automatically be L<unlinked|/unlink> during END
- {tempfile()
+ {my ($fh, $filename) = tempfile;
+  $filename
  }
 
 sub temporaryFolder                                                             # Create a temporary folder that will automatically be L<rmdired|/rmdir> during END
@@ -254,7 +255,7 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   sort @f
  } # searchDirectoryTreesForMatchingFiles
 
-sub matchPath($)                                                                # Given an absolute path find out how much of the path exists
+sub matchPath($)                                                                # Given an absolute path find out how much of the path actually exists
  {my ($file) = @_;                                                              # File name
   return $file if -e $file;                                                     # File exists so nothing more to match
   my @p = split /[\/\\]/, $file;                                                # Split path into components
@@ -291,11 +292,11 @@ sub readBinaryFile($)                                                           
   <$F>;
  }
 
-sub makePath($)                                                                 # Make a path for a file name or a folder
- {my ($path) = @_;                                                              # Path
-  my @p = split /[\\\/]+/, $path;
+sub makePath($)                                                                 # Make the path for the specified file name or folder
+ {my ($file) = @_;                                                              # File
+  my @p = split /[\\\/]+/, $file;
   return 1 unless @p > 1;
-  pop @p unless $path =~ /[\\\/]\Z/;
+  pop @p unless $file =~ /[\\\/]\Z/;
   my $p = join '/', @p;
   return 2 if -d $p;
   eval {make_path($p)};
@@ -391,7 +392,7 @@ END
 
 #1 Powers                                                                       # Integer powers of two
 
-sub powerOfTwo($)                                                               #X Test whether a number is a power of two, return the power if it is else undef
+sub powerOfTwo($)                                                               #X Test whether a number is a power of two, return the power if it is else B<undef>
  {my ($n) = @_;                                                                 # Number to check
   for(0..128)
    {return $_  if 1<<$_ == $n;
@@ -649,7 +650,7 @@ sub genLValueHashMethods(@)                                                     
 
 #1 Strings                                                                      # Actions on strings
 
-sub indentString($$)                                                            # Indent lines contained in a string or formatted table by the specified amount
+sub indentString($$)                                                            # Indent lines contained in a string or formatted table by the specified string
  {my ($string, $indent) = @_;                                                   # The string of lines to indent, the indenting string
   join "\n", map {$indent.$_} split "\n", (ref($string) ? $$string  : $string)
  }
@@ -703,7 +704,7 @@ sub extractTest($)                                                              
   $string
  }
 
-sub extractDocumentation(;$)                                                    # Extract documentation from a perl script between the lines marked with:\m  #n title # description\mand:\m  #...\mwhere n is either 1 or 2 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be any combination of:\m=over\m=item P\mprivate method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. \mThe character sequence \\xn in the comment will be expanded to one new line and \\xm to two new lines.\mSearch for '#1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20170728/lib/Data/Table/Text.pm>  to see examples.\mParameters:\n
+sub extractDocumentation(;$)                                                    # Extract documentation from a perl script between the lines marked with:\m  #n title # description\mand:\m  #...\mwhere n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.\mMethods are formatted as:\m  sub name(signature)      #FLAGS comment describing method\n   {my ($parameters) = @_; # comments for each parameter separated by commas.\mFLAGS can be any combination of:\m=over\m=item I\mmethod of interest to new users\m=item P\mprivate method\m=item S\mstatic method\m=item X\mdie rather than received a returned B<undef> result\m=back\mOther flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].\mText following 'E\xxample:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#T'.methodName will also be aggregated as an example. \mLines formatted as:\m  #C emailAddress text\mwill be aggregated in the acknowledgments section at the end of the documentation.\mThe character sequence \\xn in the comment will be expanded to one new line and \\xm to two new lines.\mSearch for '#1': in L<https://metacpan.org/source/PRBRENAN/Data-Table-Text-20170728/lib/Data/Table/Text.pm>  to see examples.\mParameters:\n
  {my ($perlModule) = @_;                                                        # Optional file name with caller's file being the default
   $perlModule //= $0;                                                           # Extract documentation from the caller if no perl module is supplied
   my $package = perlPackage($perlModule);                                       # Package name
@@ -737,7 +738,7 @@ END
        {warn "Duplicate example name $_ on line $l";
        }
 
-       my @testLines = (extractTest($line));
+      my @testLines = (extractTest($line));
 
       if ($line =~ m/<<(END|'END'|"END")/)                                      # Process here documents
        {for(my $L = $l + 1; $L < @l; ++$L)
@@ -780,7 +781,7 @@ END
     elsif ($line =~ /\A#/)                                                      # Switch documentation off
      {$level = 0;
      }
-    elsif ($level and $line =~ /\A\s*sub\s*(.*?)\s*#(\w*)\s+(.+?)\s*\Z/)        # Documentation for a method
+    elsif ($level and $line =~ /\A\s*sub\s*(.*?)?\s*#(\w*)\s+(.+?)\s*\Z/)       # Documentation for a method
      {my ($sub, $flags, $comment, $example, $produces) =                        # Name from sub, flags, description
          ($1, $2, $3);
 
@@ -795,7 +796,7 @@ END
                               s/\A\(//gsr     =~
                               s/\)\s*(:lvalue\s*)?\Z//gsr =~
                               s/;//gsr;                                         # Remove optional parameters marker from signature
-      my $name      = $sub =~ s/\(.+?\)//r;                                     # Method name after removing parameters
+      my $name      = $sub =~ s/\(.*?\)//r;                                     # Method name after removing parameters
 
       my $methodX   = $flags =~ m/X/;                                           # Die rather than return undef
       my $private   = $flags =~ m/P/;                                           # Private
@@ -900,8 +901,8 @@ END
 
 `head1 Immediately useful methods
 
-These methods are the ones most likely to be of immediate useful to anyone
-using this module for the first time:
+These methods are the ones most likely to be of immediate use to anyone using
+this module for the first time:
 
 END
     for my $m(sort {lc($a) cmp lc($b)} keys %iUseful)
@@ -917,9 +918,12 @@ END
   push @doc, qq(\n\n=head1 Private Methods), @private if @private;              # Private methods in a separate section if there are any
 
   push @doc, "\n\n=head1 Index\n\n";
-  for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                         # Alphabetic listing of methods
-   {my $t = $methodParms{$s};
-    push @doc, "L<$s|/$t>\n"
+  if (1)
+   {my $n = 0;
+    for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                       # Alphabetic listing of methods
+     {my $t = $methodParms{$s};
+      push @doc, ++$n." L<$s|/$t>\n"
+     }
    }
 
   push @doc, <<END;                                                             # Standard stuff
@@ -928,7 +932,7 @@ END
 This module is written in 100% Pure Perl and, thus, it is easy to read, use,
 modify and install.
 
-Standard Module::Build process for building and installing modules:
+Standard L<Module::Build> process for building and installing modules:
 
   perl Build.PL
   ./Build
@@ -1020,10 +1024,10 @@ sub updatePerlModuleDocumentation($)                                            
  {my ($perlModule) = @_;                                                        # File containing the code of the perl module
   -e $perlModule or confess "No such file: $perlModule";
   my $t = extractDocumentation($perlModule);                                    # Get documentation
-  my $s = readFile($perlModule);                                                # Read module source
+  my $S = my $s = readFile($perlModule);                                        # Read module source
   writeFile(filePathExt($perlModule, qq(backup)), $s);                          # Backup module source
   $s =~ s/\n+=head1 Description.+?\n+1;\n+/\n\n$t\n1;\n/gs;                     # Edit module source from =head1 description to final 1;
-  writeFile($perlModule, $s);                                                   # Write updated module source
+  writeFile($perlModule, $s) unless $s eq $S;                                   # Write updated module source
 
   xxx("pod2html --infile=$perlModule --outfile=zzz.html && ".                   # View documentation
       " google-chrome zzz.html pods2 && ".
@@ -1933,7 +1937,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 87;
+use Test::More tests => 84;
 
 #Test::More->builder->output("/dev/null");
 
@@ -1943,24 +1947,21 @@ if (1)                                                                          
   my $t = temporaryFolder;
   my $f = filePathExt($t, $z, qq(data));
   unlink $f if -e $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   writeFile($f, $z);
-  ok  -e $f;
+  ok  -e $f, $f;
   my $s = readFile($f);
   ok $s eq $z;
   ok length($s) == 3;
   unlink $f;
-  ok !-e $f,    'unlink1';
+  ok !-e $f,    "unlink $f";
   rmdir $t;
-  ok !-d $t,    'rmDir1';
-  rmdir 'tmp';
-  ok !-d 'tmp', 'rmDir2';
+  ok !-d $t,    "rmDir $t";
  }
 
 if (1)                                                                          # Key counts
  {my $a = [[1..3],       {map{$_=>1} 1..3}];
   my $h = {a=>[1..3], b=>{map{$_=>1} 1..3}};
-  use Data::Dump qw(dump);
   ok keyCount(2, $a) == 6;
   ok keyCount(2, $h) == 6;
  }
@@ -1989,20 +1990,18 @@ if (1)                                                                          
   my $t = filePath($T, $z);
   my $f = filePathExt($t, $z, qq(data));
   unlink $f if -e $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   writeFile($f, $z);
-  ok  -e $f;
+  ok  -e $f, $f;
   my $s = readFile($f);
   ok $s eq $z;
   ok length($s) == 3;
   unlink $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   rmdir $t;
-  ok !-d $t;
+  ok !-d $t, $t;
   rmdir $T;
-  ok !-d $T;
-  rmdir 'tmp';
-  ok !-d 'tmp';
+  ok !-d $T, $T;
  }
 
 if (1)                                                                          # Binary
@@ -2012,20 +2011,18 @@ if (1)                                                                          
   my $t = filePath($T, $z);
   my $f = filePathExt($t, $z, qq(data));
   unlink $f if -e $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   writeBinaryFile($f, $Z);
-  ok  -e $f;
+  ok  -e $f, $f;
   my $s = readBinaryFile($f);
   ok $s eq $Z;
   ok length($s) == 12;
   unlink $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   rmdir $t;
-  ok !-d $t;
+  ok !-d $t, $t;
   rmdir $T;
-  ok !-d $T;
-  rmdir 'tmp';
-  ok !-d 'tmp';
+  ok !-d $T, $T;
  }
 
 if (1)                                                                          # Check files
@@ -2034,17 +2031,17 @@ if (1)                                                                          
   my $f = filePathExt(qw(a b c d e x));
   my $F = filePathExt(qw(a b c e d));
   writeFile($f, '1');
-  ok checkFile($d);
-  ok checkFile($f);
+  ok checkFile($d), $d;
+  ok checkFile($f), $f;
   eval {checkFile($F)};
   my @m = split m/\n/, $@;
   ok $m[1] eq  "a/b/c";
   unlink $f;
-  ok !-e $f;
+  ok !-e $f, $f;
   while(@d)                                                                     # Remove path
    {my $d = filePathDir(@d);
     rmdir $d;
-    ok !-e $d;
+    ok !-e $d, $d;
     pop @d;
    }
  }
@@ -2169,7 +2166,7 @@ if (1)                                                                          
  }
 
 ok trim(" a b ") eq join ' ', qw(a b);                                          # Trim
-ok isBlank("");                                                                  # isBlank
+ok isBlank("");                                                                 # isBlank
 ok isBlank(" \n ");
 
 ok  powerOfTwo(1) == 0;                                                         # Power of two
@@ -2195,24 +2192,24 @@ ok containingFolder("phil/test.data")       eq "phil/";
 ok containingFolder("test.data")            eq "./";
 
 if (1)
- {my $f = "test.java";
-  writeFile("test.java", <<END);
+ {my $f = temporaryFile;
+  writeFile($f, <<END);
 // Test
 package com.xyz;
 END
-  ok javaPackage($f) eq "com.xyz";
+  ok javaPackage($f) eq "com.xyz", $f;
   unlink $f;
  }
 
 if ($^O !~ m/\AMSWin32\Z/)                                                      # Ignore windows for this test
  {ok xxx("echo aaa")       =~ /aaa/;
-  ok xxx("a=aaa;echo \$a") =~ /aaa/;
+  ok xxx("a=bbb;echo \$a") =~ /bbb/;
 
-  eval {xxx "echo aaa", qr(aaa)};
-  ok !$@, 'aaa';
+  eval {xxx "echo ccc", qr(ccc)};
+  ok !$@, "ccc $@";
 
-  eval {xxx "echo aaa", qr(bbb)};
-  ok $@ =~ /aaa/, 'bbb';
+  eval {xxx "echo ddd", qr(eee)};
+  ok $@ =~ /ddd/, "ddd";
  }
 else
  {ok 1 for 1..4;

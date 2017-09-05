@@ -24,7 +24,7 @@ sub generate : Tests {
         my $markdown = $generator->format_schema($schema);
 
         like $markdown, qr{# BMI API};
-        like $markdown, qr{^\Q    - [BMI API](#route-BMI%20API) - POST /bmi\E$}m;
+        like $markdown, qr{^\Q    - [BMI API](#route-BMI%20API) - `POST` /bmi\E$}m;
         like $markdown, qr!{"height":1.6,"weight":50}!;
         like $markdown, qr!|`.` |`object` | | |`required["value"]` |Body mass index |!;
         like $markdown, qr!|`.height` |`number` | |`1.6` | |Height(m) |!;
@@ -75,6 +75,20 @@ EOS
         my $markdown = $generator->format_schema($schema);
 
         like $markdown, qr/^"other"$/m;
+    };
+
+    subtest 'FETCH endpoint' => sub {
+        my $schema = APISchema::DSL::process {
+            FETCH '/' => {
+                title => 'Fetch',
+                destination => {},
+            };
+        };
+
+        my $generator = APISchema::Generator::Markdown->new;
+        my $markdown = $generator->format_schema($schema);
+
+        like $markdown, qr{\Q- [Fetch](#route-Fetch) - `GET`, `HEAD` /\E}, 'FETCH expanded to GET and HEAD';
     };
 }
 

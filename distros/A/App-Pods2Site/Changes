@@ -1,5 +1,17 @@
 Revision history for App-Pods2Site
 
+0.014	2017-09-02
+
+	Minor beautification
+	
+	* Minor wording
+	* Ensures version output is slashified properly
+	* Defaults the title to include the Config 'myuname' value (if any).
+
+0.013	2017-08-08
+
+	Upgrade to latest Grep::Query
+
 0.012	2017-08-07
 
 	Adjust handling of core pods

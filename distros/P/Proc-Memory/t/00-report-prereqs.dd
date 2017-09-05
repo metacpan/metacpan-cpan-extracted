@@ -1,13 +1,13 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::libvas' => '0.15',
+                                    'Alien::libvas' => '0.202',
                                     'ExtUtils::MakeMaker' => '0'
                                   }
                   },
        'configure' => {
                         'requires' => {
-                                        'Alien::libvas' => '0.15',
+                                        'Alien::libvas' => '0.202',
                                         'ExtUtils::MakeMaker' => '0',
                                         'Inline::C' => '0'
                                       }
@@ -25,7 +25,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::libvas' => '0.15',
+                                      'Alien::libvas' => '0.202',
                                       'Carp' => '0',
                                       'Inline' => '0.56',
                                       'Scalar::Util' => '0',

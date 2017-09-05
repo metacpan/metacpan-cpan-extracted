@@ -1,13 +1,22 @@
-use Test::Spec;
+use strict;
+use warnings;
 
-use ObjectDB::Util qw/merge/;
+use Test::More;
 
-describe 'merge' => sub {
+use ObjectDB::Util qw/to_array filter_columns/;
 
-    it 'merges hashes' => sub {
-        is_deeply({with => ['table']}, merge {with => 'table'}, {with => []});
-    };
-
+subtest 'to_array: converts data to array' => sub {
+    is_deeply [to_array],        [];
+    is_deeply [ to_array(1) ],   [1];
+    is_deeply [ to_array([1]) ], [1];
+    is_deeply [ to_array([ 1, 2 ]) ], [ 1, 2 ];
 };
 
-runtests unless caller;
+subtest 'filter_columns: filters columns' => sub {
+    is_deeply filter_columns([qw/title/]), [qw/title/];
+    is_deeply filter_columns([qw/title/],      { columns    => [qw/custom/] }), [qw/custom/];
+    is_deeply filter_columns([qw/title/],      { '+columns' => [qw/custom/] }), [qw/title custom/];
+    is_deeply filter_columns([qw/title long/], { '-columns' => [qw/long/] }),   [qw/title/];
+};
+
+done_testing;

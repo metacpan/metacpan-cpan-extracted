@@ -1,5 +1,12 @@
 Revision history for Business-GoCardless
 
+0.24     2017-09-05
+        - Support the payout resource in an event (GH #10, thanks to grifferz)
+
+0.23     2017-08-31
+        - Add missing attributes to Mandate clasee (GH #8, thanks to grifferz)
+        - Fix some typos (GH #9, thanks to grifferz)
+
 0.22     2017-08-14
         - Don't send empty params to GoCardless for user information
           to prevent incorrect assumptions about the user on the GoCardless

@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: Server response encoder that encodes responses so they cannot be confused
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::ResponseEncoder';
@@ -50,7 +50,7 @@ AnyEvent::FTP::Server::UnambiguousResponseEncoder - Server response encoder that
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,10 @@ the client from the server.
 
 =head1 METHODS
 
-=head2 $encoder-E<gt>encode( [ $res | $code, $message ] )
+=head2 encode
+
+ my $str = $encoder->encode( $res );
+ my $str = $encoder->encode( $code, $message );
 
 Returns the encoded message.  You can pass in either a
 L<AnyEvent::FTP::Response> object, or a code message pair.

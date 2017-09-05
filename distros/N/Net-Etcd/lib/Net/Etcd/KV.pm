@@ -11,6 +11,7 @@ use Moo::Role;
 use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Net::Etcd::KV::Put;
 use Net::Etcd::KV::Range;
+use Net::Etcd::KV::DeleteRange;
 use Net::Etcd::KV::Txn;
 use Net::Etcd::KV::Op;
 use Net::Etcd::KV::Compare;
@@ -24,7 +25,7 @@ Net::Etcd::KV
 
 =cut
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 =head1 DESCRIPTION
 
@@ -41,9 +42,6 @@ Range gets the keys in the range from the key-value store.
     # get range
     $etcd->range({key =>'test0', range_end => 'test100'})
 
-    # delete range
-    $etcd->range({key =>'test0', range_end => 'test100'})->delete
-
 =cut
 
 sub range {
@@ -57,6 +55,29 @@ sub range {
     );
     $range->request unless $range->hold;
     return $range
+}
+
+=head2 deleterange
+
+DeleteRange deletes the given range from the key-value store. A delete
+request increments the revision of the key-value store and generates a
+delete event in the event history for every deleted key.
+
+    $etcd->deleterange({key => 'test0'})
+
+=cut
+
+sub deleterange {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    my $delete_range = Net::Etcd::KV::DeleteRange->new(
+        endpoint => '/kv/deleterange',
+        etcd     => $self,
+        cb       => $cb,
+        ( $options ? %$options : () ),
+    );
+    $delete_range->request unless $delete_range->hold;
+    return $delete_range;
 }
 
 =head2 put

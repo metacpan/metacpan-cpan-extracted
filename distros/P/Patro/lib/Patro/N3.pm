@@ -3,7 +3,6 @@ use Devel::GlobalDestruction;
 use strict;
 use warnings;
 
-# we must keep this namespace very clean
 use Carp ();
 use Socket ();
 use Data::Dumper ();

@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # High-level interface to Perl i18n.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software; you can redistribute it and/or modify it
@@ -255,3 +255,49 @@ Or use double-quotes:
     print __"Hello";
 
 Thanks to Slavi Agafonkin for pointing me to the solution of this mystery.
+
+=head2 What options should be used with xgettext?
+
+More precise, the question should be which '--keyword' and '--flag' 
+options for xgettext should be used.  All other options are completely
+dependent on your use-case.
+
+If you are using L<Locale::Messages> or L<Locale::Gettext> for localizing
+Perl code, the default keywords and default flags built into xgettext
+are correct.
+
+If you are using L<Locale::TextDomain> you have to use a long plethora
+of command-line options for xgettext.  Beginning with libintl-perl 1.28
+you can use the library itself to produce these options:
+
+    perl -MLocale::TextDomain -e 'print Locale::TextDomain->options'
+
+If you want to disable the use of the built-in default keywords, precede
+the output of the above command with '--keyword=""'.  That will reset
+the keywords for xgettext.
+
+=head2 Why Isn't There A Function N__x(), N__nx(), or N__px()?
+
+The sole purpose of these functions would be to set proper flags in the
+output of B<xgettext(1)>.  You probably thought of something like this:
+
+    xgettext --keyword=N__x --flag=N__x:1:perl-brace-format filename.pl
+
+First of all, xgettext(1) will I<always> set the flag correctly if the
+argument to N__() I<looks> like a brace format string.
+
+Second, you can set any flag you want on the PO entry with a source code
+comment:
+
+   # xgettext: no-perl-brace-format
+   my $msg = N__("Placeholders are enclosed in {curly} braces.");
+
+When B<xgettext(1)> extracts the string, it will appear like this in the
+F<.pot> file:
+
+    #: filename.pl:2304
+    #, no-perl-brace-format
+    msgid "Placeholders are enclosed in {curly} braces."
+    msgstr ""
+
+No reason to pollute the namespace with N__x functions.

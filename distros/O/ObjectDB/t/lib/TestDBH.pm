@@ -14,17 +14,19 @@ sub import {
 
     my $skip_reason;
     if ($has_sqlite) {
-    } elsif ($has_mysql || $has_pg) {
+    }
+    elsif ($has_mysql || $has_pg) {
         if (!$ENV{TEST_OBJECTDB_DBH}) {
             $skip_reason = 'Setup TEST_OBJECT_DBH to point to test database';
         }
-    } else {
+    }
+    else {
         $skip_reason = 'One of DBD::SQLite, DBD::mysql, DBD::Pg is required';
     }
 
     if ($skip_reason) {
         require Test::More;
-        Test::More->import( skip_all => $skip_reason);
+        Test::More->import(skip_all => $skip_reason);
     }
 }
 
@@ -42,7 +44,7 @@ sub dbh {
         push @dsn, 'dbi:SQLite::memory:', '', '';
     }
 
-    my $dbh = DBI->connect(@dsn, {RaiseError => 1});
+    my $dbh = DBI->connect(@dsn, { RaiseError => 1 });
     die $DBI::errstr unless $dbh;
 
     if (!$ENV{TEST_OBJECTDB_DBH}) {

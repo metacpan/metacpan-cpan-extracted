@@ -3,6 +3,11 @@ Revision history for Perl extension Business::KontoCheck.
 
 The complete history can be found in 0_history.txt (in german).
 
+6.01:
+   - new submethod C2c implemented
+   - IBAN rule 45 removed
+   - change in IBAN rule 56
+
 6.00:
    - The version number was bumped to 6.00 for the perl indexer...
    - new check method B1c

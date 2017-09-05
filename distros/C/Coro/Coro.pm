@@ -368,7 +368,7 @@ our $idle;    # idle handler
 our $main;    # main coro
 our $current; # current coro
 
-our $VERSION = 6.513;
+our $VERSION = 6.514;
 
 our @EXPORT = qw(async async_pool cede schedule terminate current unblock_sub rouse_cb rouse_wait);
 our %EXPORT_TAGS = (
@@ -784,9 +784,9 @@ multiple running Coro::States).
 Returns true iff this Coro object has been suspended. Suspended Coros will
 not ever be scheduled.
 
-=item $coro->cancel (arg...)
+=item $coro->cancel ($arg...)
 
-Terminates the given Coro thread and makes it return the given arguments as
+Terminate the given Coro thread and make it return the given arguments as
 status (default: an empty list). Never returns if the Coro is the
 current Coro.
 
@@ -832,10 +832,14 @@ guarantee that the thread can be cancelled when you call this method, and
 therefore, it might fail. It is also considerably slower than C<cancel> or
 C<terminate>.
 
-A thread is in a safe-cancellable state if it either hasn't been run yet,
-or it has no C context attached and is inside an SLF function.
+A thread is in a safe-cancellable state if it either has never been run
+yet, has already been canceled/terminated or otherwise destroyed, or has
+no C context attached and is inside an SLF function.
 
-The latter two basically mean that the thread isn't currently inside a
+The first two states are trivial - a thread that hasnot started or has
+already finished is safe to cancel.
+
+The last state basically means that the thread isn't currently inside a
 perl callback called from some C function (usually via some XS modules)
 and isn't currently executing inside some C function itself (via Coro's XS
 API).

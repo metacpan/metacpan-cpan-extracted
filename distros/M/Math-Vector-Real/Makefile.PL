@@ -1,3 +1,4 @@
+use 5.010;
 
 use ExtUtils::MakeMaker;
 

@@ -27,25 +27,25 @@ no_index:
 provides:
   App::EvalServerAdvanced:
     file: lib/App/EvalServerAdvanced.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::Config:
     file: lib/App/EvalServerAdvanced/Config.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::JobManager:
     file: lib/App/EvalServerAdvanced/JobManager.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::Log:
     file: lib/App/EvalServerAdvanced/Log.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::Sandbox:
     file: lib/App/EvalServerAdvanced/Sandbox.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::Sandbox::Internal:
     file: lib/App/EvalServerAdvanced/Sandbox/Internal.pm
-    version: '0.018'
+    version: '0.020'
   App::EvalServerAdvanced::Seccomp:
     file: lib/App/EvalServerAdvanced/Seccomp.pm
-    version: '0.018'
+    version: '0.020'
 requires:
   App::EvalServerAdvanced::Protocol: '0'
   B::Deparse: '0'
@@ -84,7 +84,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlbot/evalserver-async/issues
   repository: git://github.com/perlbot/evalserver-async.git
-version: '0.018'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -223,11 +223,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.018
+          tag: v0.020
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.2
+          git_version: 2.13.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -245,7 +245,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.2
+          git_version: 2.13.3
           repo_root: .
       name: Git::Push
       version: '2.042'

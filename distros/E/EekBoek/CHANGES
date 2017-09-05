@@ -1,22 +1,62 @@
-2.02.05.5
+2.030.1	Aug 31, 2017
 
-	* Verwijder internationalisatie.
+	* File::Glob fix for Perls older than 5.16. Not really an emergency.
 
-	* Emergency fix voor CPAN issues 112777 and 120013.
-	  (Failures met de ontwikkelversie van Perl 5.24.)
+2.03	Aug 29, 2017
 
-2.02.04	2013-07-05 08:45
+	* Boekingen kunnen een bijlage krijgen, b.v. een PDF van de
+          faktuur.
 
-	* Fix issue #38, crash bij rapport 'save' knop.
+	* Fix IVP tests to use bsd_glob instead of glob.
+	  This is necessary for Perl 5.26 and above.
 
-2.02.02	2013-05-15 21:45
+	* Fix Build.PL for no_index.
 
-	* Emergency bugfix release.
+	* Actualiseren URLs in documentatie etc..
+
+	* Check relatiecodes voor geldigheid: max. 10 tekens, niet
+          beginnend met NN- ivm parseproblemen.
+
+	* Build procedure verloopt weer via ExtUtils::MakeMaker
+          (Makefile.PL) aangezien Module::Build (Build.PL) obsoleet is.
+
+	* Fix problemen met het verwijderen van '.' in @INC (perl 5.26).
 
 	* Fix probleem dat maart 2013 loopt van 2013-03-01 t/m 2013-03-30.
-          Oorzaak is de zomertijd die op 30 maart 2013 inging.
+  	  Oorzaak is de zomertijd die op 30 maart 2013 inging.
 
-2.02.00	2012-09-18 14:37
+	* Rond bedragen niet af in de melding "Er is een verschil...".
+
+	* Taalinstellingen zijn niet langer mogelijk. Deze
+          veroorzaakten teveel problemen en misverstanden.
+
+	* (contrib/API/example1.pl) Waarschuwing inzake SQL op de database.
+
+	* (example schemas) Aanpassen beschrijving van het :dc attribuut.
+
+	* Onderdruk de INTERNAL ERROR op open transacties tenzij
+          gevraagd via de config settings.
+
+	* Sta :btw=prive toe in het schema.
+
+	* Automatisch toevoegen van BTW 0 als deze in het schema
+          ontbreekt.
+
+	* Aanpassen examples aan moderne BTW codes.
+
+	* Op sommige systemen crashte de GUI shell wanneer bij het
+	  bekijken van een rapport window op de [Opslaan] button wordt
+	  gedrukt.
+
+	* Op Windows systemen werkten de pijltjestoetsen niet in
+          command line mode.
+
+	* Aangezien de volledige documentatie beschikbaar is in de
+          EekBoek hulp browser wordt deze niet meer apart meegeleverd.
+
+	* Diverse kleine bugfixes en optimalisaties.
+
+2.02.00 2012-09-18 14:37
 
 	* Update documentation, site, help documents.
 

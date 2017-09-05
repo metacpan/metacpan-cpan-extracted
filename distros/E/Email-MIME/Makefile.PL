@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Email::Address::XS" => 0,
-    "Email::MIME::ContentType" => "1.016",
+    "Email::MIME::ContentType" => "1.022",
     "Email::MIME::Encodings" => "1.314",
     "Email::MessageID" => 0,
     "Email::Simple" => "2.212",
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "utf8" => 0
   },
-  "VERSION" => "1.945",
+  "VERSION" => "1.946",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Email::Address::XS" => 0,
-  "Email::MIME::ContentType" => "1.016",
+  "Email::MIME::ContentType" => "1.022",
   "Email::MIME::Encodings" => "1.314",
   "Email::MessageID" => 0,
   "Email::Simple" => "2.212",

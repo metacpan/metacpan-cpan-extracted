@@ -1,0 +1,9 @@
+\.git
+\.swp$
+MANIFEST\.bak$
+Grid-Layout-.*\.tar\.gz
+blib
+README.md
+TODO
+Makefile$
+Makefile.old

@@ -1,5 +1,10 @@
 Revision history for OpenSSH-Fingerprint
 
-0.01    Date/time
+0.02    2017-09-04/14
+
+        add example and git url fixes.
+
+0.01    2017-07-19/20
+
         First version, released on an unsuspecting world.
 

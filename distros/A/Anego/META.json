@@ -1,0 +1,130 @@
+{
+   "abstract" : "The database migration utility as our elder sister.",
+   "author" : [
+      "papix <mail@papix.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Anego",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "DBIx::Schema::DSL" : "0",
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Git::Repository" : "0",
+            "SQL::Translator" : "0",
+            "Term::ANSIColor" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::Git" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires::Git" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Anego" : {
+         "file" : "lib/Anego.pm",
+         "version" : "0.02"
+      },
+      "Anego::CLI" : {
+         "file" : "lib/Anego/CLI.pm"
+      },
+      "Anego::CLI::Diff" : {
+         "file" : "lib/Anego/CLI/Diff.pm"
+      },
+      "Anego::CLI::Help" : {
+         "file" : "lib/Anego/CLI/Help.pm"
+      },
+      "Anego::CLI::Migrate" : {
+         "file" : "lib/Anego/CLI/Migrate.pm"
+      },
+      "Anego::CLI::Status" : {
+         "file" : "lib/Anego/CLI/Status.pm"
+      },
+      "Anego::CLI::Version" : {
+         "file" : "lib/Anego/CLI/Version.pm"
+      },
+      "Anego::Config" : {
+         "file" : "lib/Anego/Config.pm"
+      },
+      "Anego::Git" : {
+         "file" : "lib/Anego/Git.pm"
+      },
+      "Anego::Logger" : {
+         "file" : "lib/Anego/Logger.pm"
+      },
+      "Anego::Task::Diff" : {
+         "file" : "lib/Anego/Task/Diff.pm"
+      },
+      "Anego::Task::GitLog" : {
+         "file" : "lib/Anego/Task/GitLog.pm"
+      },
+      "Anego::Task::SchemaLoader" : {
+         "file" : "lib/Anego/Task/SchemaLoader.pm"
+      },
+      "Anego::Util" : {
+         "file" : "lib/Anego/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/papix/Anego/issues"
+      },
+      "homepage" : "https://github.com/papix/Anego",
+      "repository" : {
+         "url" : "git://github.com/papix/Anego.git",
+         "web" : "https://github.com/papix/Anego"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:PAPIX",
+   "x_contributors" : [
+      "dokechin <ttatsumi@ra2.so-net.ne.jp>",
+      "dokechin <user@user-PC.(none)>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

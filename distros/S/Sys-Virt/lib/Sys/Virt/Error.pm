@@ -402,6 +402,10 @@ The performance events subsystem
 
 The libSSH socket client
 
+=item Sys::Virt::Error::FROM_RESCTRL
+
+The resource control subsystem
+
 =back
 
 =head2 ERROR CODE CONSTANTS

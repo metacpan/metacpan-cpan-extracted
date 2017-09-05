@@ -1,12 +1,12 @@
 #!/usr/bin/perl -I/home/phil/z/perl/cpan/DataTableText/lib
 #-------------------------------------------------------------------------------
-# Flop a switch in your script to zero after a clean run with the switch set to one
+# Flop a switch in your script to zero after a run with the switch set to one.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2017
 #-------------------------------------------------------------------------------
 
 package Flip::Flop;
-our $VERSION = 20170823;
-use v5.16.0;
+our $VERSION = 20170828;
+use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -16,8 +16,8 @@ my @flipflops;                                                                  
 my $startProcess = $$;                                                          # Starting process
 
 sub AUTOLOAD                                                                    # Any method will do
- {my $program = push @flipflops, $Flip::Flop::AUTOLOAD;                         # Save switch
-  return $_[0];
+ {push @flipflops, $Flip::Flop::AUTOLOAD unless @_;                             # No parameters: flop switch, with parameters: flip switch to $[0]
+  $_[0]
  }
 
 END
@@ -44,7 +44,7 @@ END
 
 =head1 Name
 
-Flip::Flop - Flop a switch in your script to zero after a clean run with the
+Flip::Flop - Flop a switch in your script to zero after a run with the
 switch set to one.
 
 =head1 Synopsis
@@ -58,7 +58,7 @@ the actions the code is to perform on the next run from your IDE:
 
  if ($doUpload)
   {....
-   exit(1) unless ... upload succeeded.
+   Flip::Flop::uploadToCloud;
   }
 
 If the upload succeeds, your program source code will be modified to read:

@@ -1,5 +1,9 @@
 Revision history for Catmandu
 
+1.0603  2017-09-04 10:16:55 CEST
+  - bags can have default plugins applied
+  - add hard dependency on List::MoreUtils::XS
+
 1.0602  2017-06-23 10:16:48 CEST
   - fix filestore permission bug on Windows
 

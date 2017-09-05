@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo::SMTP::Client
 
+0.13  Fri Sep  1 11:14:01 DST 2017
+    - Properly process exceptions throwed by user from an event handler (#gh5)
+	- New authorization method support: AUTH LOGIN (#gh6)
+
 0.12  Sat Feb  4 00:32:46 KRAT 2017
     - Fix tests, so they works with newer Mojolicious (#rt119946)
 

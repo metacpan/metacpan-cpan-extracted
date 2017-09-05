@@ -1,5 +1,39 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.008  2017-08-30 21:24:52 UTC
+
+  - Removed an occurrence of 'Use of uninitialized value'
+
+0.007  2017-08-30 21:09:56 UTC
+
+  - Added Plugin::AutoPrereqs::Perl::Critic plugin
+
+0.006  2017-08-29 22:18:19 UTC
+
+  - Add .perltidyrc to the distribution
+  - Added 'theme = core' to .perlcriticrc
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Changes
+  - Added
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::EOL
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::TravisCI
+  - Added Test::CPAN::Changes release test
+  - Added Test::CleanNamespaces author test
+  - Added Test::EOL release test
+  - Allow travis_ci_ignore_perl configuration option for dist.ini
+  - Also scan files under t and xt with Test::Spelling
+  - Automatically create the .perltidyrc file
+  - Automatically create the .travis.yml file
+  - Moved xt/author/perlcriticrc to .perlcriticrc
+  - No longer define a -profile for Test::Perl::Critic as the .perlcriticrc
+    is now in the cwd
+  - No longer set AUTHOR_TESTING env variable on TravisCI because we don't
+    check for that anymore
+  - Run 'make manifest' on TravisCI before running release tests
+  - Run xt/release tests on TravisCI
+  - Skip pod-no404s.t author tests during AUTOMATED_TESTING
+
 0.005  2017-08-26 18:55:22 UTC
 
   - A default Perl::Critic config file xt/author/perlcriticrc is created if

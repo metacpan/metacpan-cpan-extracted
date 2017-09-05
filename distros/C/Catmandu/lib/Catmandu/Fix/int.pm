@@ -2,7 +2,7 @@ package Catmandu::Fix::int;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0602';
+our $VERSION = '1.0603';
 
 use Moo;
 use namespace::clean;
@@ -16,7 +16,7 @@ sub emit_value {
     my ($self, $var, $fixer) = @_;
     my $match_var = $fixer->generate_var;
     <<EOF;
-if (is_string(${var}) and my (${match_var}) = ${var} =~ /([+-]?\\d+)/) {
+if (is_string(${var}) and my (${match_var}) = ${var} =~ /([+-]?[0-9]+)/) {
     ${var} = ${match_var} + 0;
 } elsif (is_array_ref(${var})) {
     ${var} = scalar(\@{${var}});

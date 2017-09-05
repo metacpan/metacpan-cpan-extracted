@@ -7,6 +7,8 @@ $^W = 1;
 use_ok 'DBD::Multi';
 can_ok 'DBD::Multi::db', 'prepare';
 
+cleanup();
+
 my $c = DBI->connect('DBI:Multi:', undef, undef, {
     dsns => [
         1 => ['dbi:SQLite:one.db', '',''],
@@ -32,4 +34,8 @@ eval {
 };
 ok $@, "$@";
 
-unlink "$_.db" for qw[one two three four five six seven eight nine ten];
+cleanup();
+
+sub cleanup {
+    -e "$_.db" and unlink "$_.db" for qw[one two three four five six seven eight nine ten];
+}

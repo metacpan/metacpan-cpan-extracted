@@ -25,7 +25,7 @@ use Plack::Util::Accessor qw(
     encoder
 );
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 sub new {
     my ($class, %args) = @_;
@@ -330,6 +330,9 @@ Raisin - A REST API microframework for Perl.
         },
     );
 
+    plugin 'Logger', fallback => 1;
+    app->log( debug = > 'Starting Raisin...' );
+
     middleware 'CrossOrigin',
         origins => '*',
         methods => [qw/DELETE GET HEAD OPTIONS PATCH POST PUT/],
@@ -616,7 +619,7 @@ See also L<Raisin::Encoder>.
 
 Returns the C<PSGI> application.
 
-=head2 INSIDE ROUTE
+=head2 CONTROLLER
 
 =head3 req
 
@@ -713,7 +716,7 @@ the supported methods.
     >
     * HTTP 1.0, assume close after body
     < HTTP/1.1 204 No Content
-    < Allow: GET, OPTOINS, PUT
+    < Allow: GET, OPTIONS, PUT
 
 If a request for a resource is made with an unsupported HTTP method, an HTTP 405
 (Method Not Allowed) response will be returned.
@@ -905,10 +908,10 @@ See L<Type::Tiny::Manual> and L<Moose::Manual::Types>.
 
 =head1 HOOKS
 
-This blocks can be executed before or/and after every API call, using
+Those blocks can be executed before or/and after every API call, using
 C<before>, C<after>, C<before_validation> and C<after_validation>.
 
-Before and after callbacks execute in the following order:
+Callbacks execute in the following order:
 
 =over
 
@@ -934,7 +937,10 @@ The block applies to every API call
         say $self->res->body;
     };
 
-Steps 3 and 4 only happen if validation succeeds.
+Steps C<after_validation> and C<after> are executed only if validation succeeds.
+
+Every callback has only one argument as an input parameter which is L<Raisin>
+object. For more information of available methods see L<Raisin/CONTROLLER>.
 
 =head1 API FORMATS
 
@@ -990,11 +996,15 @@ Or use L<Raisin::Logger> with a C<fallback> option:
 
     plugin 'Logger', fallback => 1;
 
-Exports C<log> subroutine.
+The plugin registers a C<log> subroutine to L<Raisin>. Below are examples of
+how to use it.
 
-    log(debug => 'Debug!');
-    log(warn => 'Warn!');
-    log(error => 'Error!');
+    app->log(debug => 'Debug!');
+    app->log(warn => 'Warn!');
+    app->log(error => 'Error!');
+
+C<app> is a L<Raisin> instance, so you can use C<$self> instead of C<app> where
+it is possible.
 
 See L<Raisin::Plugin::Logger>.
 

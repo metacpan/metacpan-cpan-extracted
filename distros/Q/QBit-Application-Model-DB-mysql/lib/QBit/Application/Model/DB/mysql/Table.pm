@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Table;
-$QBit::Application::Model::DB::mysql::Table::VERSION = '0.012';
+$QBit::Application::Model::DB::mysql::Table::VERSION = '0.013';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Table);
@@ -43,23 +43,34 @@ sub add_multi {
 
     my $fields = $self->_fields_hs();
 
-    my $data_fields;
-    if ($opts{'identical_rows'}) {
-        $data_fields = [keys(%{$data->[0] // {}})];
-    } else {
-        $data_fields = array_uniq(map {keys(%$_)} @$data);
-    }
-
     my $field_names;
-    if ($opts{'ignore_extra_fields'}) {
-        $field_names = arrays_intersection([map {$fields->{$_}->name} keys %$fields], $data_fields);
-    } else {
-        my @unknown_fields = grep {!exists($fields->{$_})} @$data_fields;
+    if ($opts{'fields'}) {
+        my @unknown_fields = grep {!exists($fields->{$_})} @{$opts{'fields'}};
 
         throw gettext('In table %s not found follows fields: %s', $self->name(), join(', ', @unknown_fields))
           if @unknown_fields;
 
-        $field_names = $data_fields;
+        $field_names = $opts{'fields'};
+    } else {
+        my $data_fields;
+        if ($opts{'identical_rows'}) {
+            $data_fields = [keys(%{$data->[0] // {}})];
+        } else {
+            $data_fields = array_uniq(map {keys(%$_)} @$data);
+        }
+
+        if ($opts{'ignore_extra_fields'}) {
+            $field_names = arrays_intersection([map {$fields->{$_}->name} keys %$fields], $data_fields);
+        } else {
+            my @unknown_fields = grep {!exists($fields->{$_})} @$data_fields;
+
+            throw gettext('In table %s not found follows fields: %s', $self->name(), join(', ', @unknown_fields))
+              if @unknown_fields;
+
+            $field_names = $data_fields;
+        }
+
+        $field_names = [sort @$field_names];
     }
 
     throw Exception::BadArguments gettext('Expected fields') unless $field_names;
@@ -314,6 +325,10 @@ B<%opts> - additional options
 
 B<replace> - boolean (uses 'REPLACE' instead 'INSERT')
 
+=item *
+
+B<fields> - reference to array (order for fields)
+
 =back
 
 =back
@@ -331,6 +346,15 @@ B<$id> - ID new record (returns array if primary key has more than one columns)
 B<Example:>
 
   my $id = $app->db->users->add({login => 'Login'});
+
+  $id = $app->db->users->add({
+      login => 'Login',
+      name => 'Name',
+      phone => '3-56-54'
+    },
+    fields => [qw(login name)]
+  );
+  # insert only login and name in this order
 
 =head2 add_multi
 
@@ -355,6 +379,10 @@ B<%opts> - additional options
 =item *
 
 B<replace> - boolean
+
+=item *
+
+B<fields> - reference to array (order for fields)
 
 =item *
 
@@ -385,6 +413,22 @@ B<$count> - records number
 B<Example:>
 
   my $count = $app->db->users->add_multi([{login => 'Login 1'}, {login => 'Login 2'}]); # $count = 2
+
+  $count = $app->db->users->add_multi([
+        {
+          login => 'Login 1',
+          name => 'Name 1',
+          phone => '3-56-54'
+        },
+        {
+          login => 'Login 2',
+          name => 'Name 2',
+          phone => '2-54-56'
+        }
+    ],
+    fields => [qw(login name)]
+  );
+  # $count = 2, insert only date and hits in this order
 
 =head2 create_sql
 

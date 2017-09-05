@@ -5,7 +5,7 @@ use warnings;
 
 use base 'ObjectDB::Meta::Relationship';
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 require Carp;
 
@@ -20,16 +20,16 @@ sub to_source {
     my $table     = $self->orig_class->meta->table;
     my $rel_table = $self->class->meta->table;
 
-    my ($from, $to) = %{$self->{map}};
+    my ($from, $to) = %{ $self->{map} };
 
     my $constraint =
-      ["$table.$from" => {-col => "$name.$to"}, @{$self->{constraint} || []}];
+      [ "$table.$from" => { -col => "$name.$to" }, @{ $self->{constraint} || [] } ];
 
     my @columns;
     if ($options{columns}) {
-        $options{columns} = [$options{columns}]
+        $options{columns} = [ $options{columns} ]
           unless ref $options{columns} eq 'ARRAY';
-        @columns = @{$options{columns}};
+        @columns = @{ $options{columns} };
         unshift @columns, $self->class->meta->get_primary_key;
     }
     else {

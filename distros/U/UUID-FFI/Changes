@@ -1,5 +1,8 @@
 Revision history for UUID-FFI
 
+0.06      2017-08-28 15:58:41 -0400
+  - Migrate to EUMM
+
 0.05      2015-01-22 06:42:44 -0500
   - First CPAN release
   - Very minor documentation tweak

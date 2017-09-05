@@ -34,13 +34,13 @@ $oneof->add_choice( $strings[1], 3 );
 
 # thanks to the filters and weight, this should produce only 'h' or 'i'
 # at 1:3 odds, roughly
+diag( "srand seed " . srand );
 my %results;
 for ( 1 .. 300 ) {
     $results{ $oneof->render }++;
 }
 $deeply->( [ sort keys %results ], [qw/h i/] );
 
-diag( "srand seed " . srand );
-ok( $results{i} > 200 && $results{i} < 250, '3:1 odds within tolerance' );
+ok( $results{i} > 195 && $results{i} < 255, '3:1 odds within tolerance' );
 
 plan tests => 7;

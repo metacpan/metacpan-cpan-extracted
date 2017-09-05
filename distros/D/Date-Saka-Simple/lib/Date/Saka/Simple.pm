@@ -1,6 +1,6 @@
 package Date::Saka::Simple;
 
-$Date::Saka::Simple::VERSION   = '0.18';
+$Date::Saka::Simple::VERSION   = '0.19';
 $Date::Saka::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Saka::Simple - Represents Saka date.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
@@ -465,7 +465,11 @@ L<https://github.com/manwar/Date-Saka-Simple>
 
 =item L<Date::Gregorian::Simple>
 
+=item L<Date::Hebrew::Simple>
+
 =item L<Date::Hijri::Simple>
+
+=item L<Date::Julian::Simple>
 
 =item L<Date::Persian::Simple>
 

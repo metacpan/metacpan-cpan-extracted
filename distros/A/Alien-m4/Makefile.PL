@@ -14,7 +14,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Find or build m4",
+  "ABSTRACT" => "Find or build GNU m4",
   "AUTHOR" => "Graham Ollis <plicease\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,0 +1,155 @@
+NAME
+    Dist::Zilla::Plugin::LocalHTML - create CSS-rich HTML pages from the
+    POD-aware files for local browsing
+
+VERSION
+    version v0.1.1
+
+SYNOPSIS
+        # dist.ini
+        [LocalHTML]
+        local_prefix = Dist::Zilla::
+        local_preifx = MyProject\b
+        dir = html_local   ; where to create HTML files
+        ignore = bin/myscript1   ; what input file to ignore
+        ignore = bin/myscript2   ; another input to ignore
+
+DESCRIPTION
+    *This plugin is based upon Dist::Zilla::Plugin::Pod2Html. Check for more
+    info below.*
+
+    This plugin generates HTML pages from the POD files and puts them into
+    the distribution in a separate directory (not as a tree of files but
+    flatten). The created HTML pages have the same (or, at least, similar)
+    style as the modules' documentation shown at CPAN. They're also suitable
+    for local browsing meaning linking between pages is local to the file
+    system meaning that pages are browsable without any webserver or posting
+    a module to CPAN. This could be especially handy for developers using
+    unicode in their docs as sometimes it is not displayed correctly with
+    perldoc – like on macOS systems.
+
+    It creates HTML pages from all files in the "lib" and "bin" directory
+    that contain a POD section and that have ".pm" or ".pl" extension or
+    that have the word "perl" in their first line. The plugin is run after
+    other plugins that may munge files and create the POD sections (such as
+    *PodWeaver*).
+
+    The plugin overrides Pod::Simple::HTML link generation. By
+    distinguishing local and remote links it generates either a simple
+    reference to local filesystem, or a reference to metacpan.org. Link is
+    conisdered local if there is a corresponding file for the original
+    "<L<>"> Pod tag. For example, of the following to links:
+
+        L<Local::Project::Module>
+        L<Local::Project::NoModule>
+
+    the first one is considered local if there is file
+    lib/Local/Project/Module.pm; the second one would get linked to
+    metacpan.org if there is no file lib/Local/Project/NoModule.pm.
+
+    Link type could additionally be determined by "local_prefix"
+    configuration variable.
+
+ATTRIBUTES
+  "dir"
+    This attribute changes the destination of the generated HTML files. It
+    is a directory (or even a path) relative to the distribution root
+    directory. Default value is "docs". For example:
+
+        [LocalHTML]
+        dir = docs/html
+
+  "local_prefix"
+    What modules to consider as local - i.e. part of the current project.
+    Few prefixes could be defined. Each one could be a regexp expression. A
+    module is considered local if it matches against one of the local
+    prefixes. Note that match is done agains the beginning of module name.
+
+        [LocalHTML]
+        local_prefix=My::Project::
+        local_prefix=My\d::Project\b
+
+    The above expressions will match against:
+
+    My::Project::Module
+    My2::Project-A
+
+    NOTE There is no way yet to define local status for files other that
+    modules. Solution is planned for future.
+
+  "pod2html_class"
+    Class to be used for HTML generation. Must be a descendant of
+    Pod::Simple::HTML. Dist::Zilla::Plugin::LocalHTML::Pod2HTML is used by
+    default.
+
+  "ignore"
+    This attribute allows to ignore some input files that would be otherwise
+    converted to HTML. Its value is a file name that should be ignored
+    (relative to the distribution root directory). By default no
+    (appropriate) files are ignored. The attribute can be repeated if you
+    wish to ignore more files. For example:
+
+        [LocalHTML]
+        ignore = lib/My/Sample.pm
+        ignore = bin/obscure-script
+
+METHODS
+  "is_interesting_file"
+    The method decides (by returning something or undef) whether the given
+    file should be a candidate for the conversion to the HTML. The parameter
+    is a blessed object with the "Dist::Zilla::Role::File" role.
+
+  "setup_installer"
+    The main job
+
+  "base_filename( $file )"
+    Returns base name of HTML file formed of source file path. Rules are:
+
+    1. Suffix is stripped off
+    2. Leading lib, bin, or script subdir is removed.
+    3. Remaining elements are joined with a dash symbol.
+
+    The result gets appenede with .html
+
+  "output_filename( $file )"
+    Create and return a suitable name for the output file for the given
+    input $file.
+
+  "pod2html( $file )"
+    This method does the conversion to the HTML (using module defined by
+    "pod2html_class"). It gets an input file (a blessed object with the
+    "Dist::Zilla::Role::File" role) and it should return a converted
+    content. By overwriting this method a new plugin can make any
+    conversion, to anything.
+
+  "get_css_style()"
+    It returns a string containing CSS-style definitions. The string will be
+    used in the "head" section of the created HTML file. See its default
+    value in the *__DATA__* section of this module.
+
+ACKNOWLEDGEMENT
+    This plugin is a rewrite of Dist::Zilla::Plugin::Pod2Html. I would like
+    to express my deepest gratitude to Martin Senger
+    <martin.senger@gmail.com> for his great work! The original copyright for
+    Dist::Zilla::Plugin::Pod2Html follows.
+
+    * This software is copyright (c) 2013 by Martin Senger, CBRC - KAUST
+    (Computational Biology Research Center - King Abdullah University of
+    Science and Technology) All Rights Reserved.. *
+
+AUTHOR
+    Vadim Belman <vrurg@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Vadim Belman.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 198:
+        An empty L<>
+

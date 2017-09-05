@@ -28,17 +28,13 @@ interface in ontwikkeling die op dezelfde database werkt, Een
 export-faciliteit kan van alles wat met de GUI is uitgevoerd weer
 tekstbestandjes maken. Op deze wijze blijft het geheel overzichtelijk.
 
-Na een uitgebreide test-periode is EekBoek nu voldoende capabel om aan
-het brede publiek te worden gepresenteerd.
+Voor meer informatie: https://www.eekboek.nl/ .
 
-Voor meer informatie: http://www.eekboek.nl .
+* Documentatie: https://www.eekboek.nl/docs/ 
 
-Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo:
-gebruik de mailing list http://lists.sourceforge.net/lists/listinfo/eekboek-users.
+* Wiki: https://wiki.eekboek.nl
 
-----------------------------------------------------------------------------
-Johan Vromans                                           jvromans@squirrel.nl
-Squirrel Consultancy                                  Exloo, the Netherlands
-http://www.squirrel.nl                              http://johan.vromans.org
-PGP Key 2048/4783B14D                   http://johan.vromans.org/pgpkey.html
------------------------ "Arms are made for hugging" ------------------------
+Voor het uitwisselen van ervaringen, vragen om ondersteuning en zo is
+er een mailing list:
+
+* https://lists.sourceforge.net/lists/listinfo/eekboek-users .

@@ -9,7 +9,7 @@ package Lemonldap::NG::Portal::_Choice;
 use Lemonldap::NG::Portal::Simple;
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.9.3';
+our $VERSION = '1.9.11';
 
 ## @cmethod Lemonldap::NG::Portal::_Choice new(Lemonldap::NG::Portal::Simple portal)
 # Constructor
@@ -59,13 +59,22 @@ sub new {
             $portal->lmLog( "SAML choice force not tested: $@", 'debug' );
         }
 
-        # Force SAML choice if needed
+        # Select SAML choice if needed
         if ($samlForce) {
-            $portal->lmLog( "SAML is a forced choice", 'debug' );
-            $portal->{_authChoice} = 'forcedSAML';
-            $portal->{authChoiceModules}->{'forcedSAML'} = 'SAML;SAML;Null';
+            $portal->lmLog( "Find SAML choice", 'debug' );
+            foreach ( keys %{ $portal->{authChoiceModules} } ) {
+                $portal->{_authChoice} = $_
+                  if ( $portal->{authChoiceModules}->{$_} =~ /^SAML/ );
+            }
+            if ( $portal->{_authChoice} ) {
+                $portal->lmLog(
+                    "SAML Choice " . $portal->{_authChoice} . " found",
+                    'debug' );
+            }
+            else {
+                $portal->lmLog( "No SAML Choice found", 'error' );
+            }
         }
-
     }
 
     return $self unless $portal->{_authChoice};
@@ -178,9 +187,6 @@ sub _buildAuthLoop {
     foreach ( sort keys %{ $self->{authChoiceModules} } ) {
 
         my $name = $_;
-
-        # Ignore 'forcedSAML'
-        next if $name eq 'forcedSAML';
 
         # Name can have a digit as first character
         # for sorting purpose

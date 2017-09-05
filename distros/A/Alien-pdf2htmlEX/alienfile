@@ -1,0 +1,58 @@
+use alienfile;
+
+configure {
+	requires 'Alien::Build' => 0.77;
+};
+
+use Env qw(@PKG_CONFIG_PATH);
+requires 'Alien::Poppler';
+requires 'Alien::FontForge';
+requires 'Path::Tiny' => 0;
+requires 'Alien::gmake';
+
+# Probe::CommandLine: `pdf2htmlEX` output is only on STDERR
+plugin 'Probe::CommandLine' => (
+	command        => 'pdf2htmlEX',
+	args           => [ '--version' ],
+	match_stderr   => qr/pdf2htmlEX/,
+	version_stderr => qr/pdf2htmlEX version ([0-9\.]+)/,
+);
+
+# http://coolwanglu.github.io/pdf2htmlEX/
+share {
+	plugin Download => (
+		url => 'https://github.com/coolwanglu/pdf2htmlEX/releases',
+		version => qr/v([\w\.]+)\.tar\.gz/,
+	);
+
+	plugin Extract => 'tar.gz';
+
+	patch sub {
+		my @files = map { Path::Tiny->new($_) }
+			qw(src/pdf2htmlEX-config.h.in pdf2htmlEX.1.in);
+
+		for my $file (@files) {
+			# Patch to allow the data directory to point to the final
+			# location of the share dir.
+			$file->edit_lines(sub {
+				s/\@CMAKE_INSTALL_PREFIX\@/\@CMAKE_RUNTIME_PREFIX\@/g;
+			});
+		}
+	};
+
+	# warn is fine here because this is part of configure-time
+	eval {
+		require Alien::FontForge;
+		require Alien::Poppler;
+		push @PKG_CONFIG_PATH, Alien::FontForge->pkg_config_path;
+		push @PKG_CONFIG_PATH, Alien::Poppler->pkg_config_path;
+	} or warn "Unable to add to \$PKG_CONFIG_PATH (@PKG_CONFIG_PATH): $@";
+	build [
+		[ 'cmake', qw(-G), 'Unix Makefiles',
+			exists $ENV{MSYSTEM} ? ('-DPDF2HTMLEX_LIBS=-lintl') : (),
+			'-DCMAKE_RUNTIME_PREFIX:PATH=%{.runtime.prefix}',
+			'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
+		[ '%{gmake}' ],
+		[ '%{gmake}', 'install' ],
+	]
+};

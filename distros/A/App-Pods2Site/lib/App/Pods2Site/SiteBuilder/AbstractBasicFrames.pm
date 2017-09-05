@@ -66,7 +66,7 @@ sub __updateMain
 	$style .= "&emsp;" . encode_entities($self->getStyleName()) . "<br/>";
 	$style .= "</p>\n";
 	
-	my $actualCSS = encode_entities($args->getCSS() || '(no custom css)');
+	my $actualCSS = encode_entities($args->getCSS() || '(default css)');
 	$actualCSS = "<p><strong>CSS:</strong><br/>&emsp;$actualCSS<br/></p>";
 	
 	my $groupDefs = '';

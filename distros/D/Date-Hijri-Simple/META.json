@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "Date::Hijri::Simple" : {
          "file" : "lib/Date/Hijri/Simple.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Date-Hijri-Simple"
       }
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

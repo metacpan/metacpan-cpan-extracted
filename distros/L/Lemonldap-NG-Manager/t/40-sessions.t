@@ -29,7 +29,14 @@ sub newSession {
     );
     count(1);
     $tmp->update(
-        { ipAddr => $ip, _whatToTrace => $uid, uid => $uid, _utime => time, _session_kind => 'SSO' } );
+        {
+            ipAddr        => $ip,
+            _whatToTrace  => $uid,
+            uid           => $uid,
+            _utime        => time,
+            _session_kind => 'SSO'
+        }
+    );
     return $tmp->{id};
 }
 

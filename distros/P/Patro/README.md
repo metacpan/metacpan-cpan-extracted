@@ -9,14 +9,13 @@ Patro - proxy access to remote objects
 use Patro;
 my $obj = ...
 $config = patronize($obj);
-open my $fh, '>config_file'; print $fh $config; close $fh;
+$config->to_file( 'config_file' );
 ```
 
 ```perl
 # on machines 2 through n (clients)
 use Patro;
-open my $fh, '<config_file'; my $config=<$fh>; close $fh;
-my ($proxy) = getProxies($config);
+my ($proxy) = getProxies('config_file');
 ...
 $proxy->{key} = $val;         # updates $obj->{key} for obj on server
 $val = $proxy->method(@args); # calls $obj->method for obj on server
@@ -104,8 +103,10 @@ print $proxy->prod;      # 6 * 9 => 54
 ## `patronize(@REFS)`
 
 Creates a server on the local machine that provides proxy access to
-the given list of references. It returns a string (some `Data::Dumper`
-output) with information about how to connect to the server. The output
+the given list of references. It returns an object with information
+about how to connect to the server. The object has `to_string` and
+`to_file` methods to make the connection information available to
+other hosts. The output of this method, or its string or file output,
 can be used as input to the `getProxies()` function to retrieve
 proxies to the shared references.
 
@@ -113,4 +114,3 @@ proxies to the shared references.
 
 Connects to a server on another machine, specified in the `CONFIG`
 string, and returns proxies to the list of references that are served.
-

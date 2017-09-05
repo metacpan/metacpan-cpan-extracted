@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 1;
+use Test::More tests => 1;
 
 use Grid::Layout;
 
+my $layout = Grid::Layout->new();
 
-ok(1, 'Module could be loaded');
+isa_ok($layout, 'Grid::Layout');

@@ -20,22 +20,12 @@ package MIME::AltWords;
 use v5.8; # Dat: Unicode string support etc.
 use integer;
 use strict;
-use MIME::AltWords0; #use MIME::Words;
 use MIME::Base64;
+use MIME::QuotedPrint;
 use Encode;
 use warnings;
 use Exporter;
 no warnings qw(prototype redefine);
-
-# vvv Dat: exports symbols from MIME::AltWords0 by default, works only
-#     without these
-#use vars qw(@EXPORT_OK %EXPORT_TAGS);
-#BEGIN {
-#  @EXPORT_OK=@MIME::AltWords0::EXPORT_OK;
-#  %EXPORT_TAGS=%MIME::AltWords0::EXPORT_TAGS;
-##  die "@EXPORT_OK";
-#}
-#Exporter::export_ok_tags('all');
 
 =pod
 
@@ -119,7 +109,7 @@ use vars qw($NONPRINT $VERSION);
 
 ### The package version, both in 1.23 style *and* usable by MakeMaker:
 BEGIN { # vvv Dat: MakeMaker needs $VERSION in a separate line
-$VERSION = "0.12"
+$VERSION = "0.14"
 }
 
 # Dat: MIME::Words has [\x00-\x1F\x7F-\xFF]. We prepare for Unicode.
@@ -329,8 +319,8 @@ sub encode_mimewords_low {
     #die if !defined $S;
     $S=Encode::decode($opts{Charset}, $S);
     # ^^^ Dat: better do a Unicode regexp match
-  }  
-  $opts{Encoding}="Q" if !defined $opts{Encoding};
+  }
+  $opts{Encoding}=defined($opts{Encoding}) ? uc($opts{Encoding}) : "Q";
   $opts{Encoding}="Q" if $opts{Encoding} ne "B"; # Dat: improvement
   $opts{Encoding}="B" if $opts{Encoding} eq "Q" and $opts{Charset} eq "UTF-8";
   # ^^^ Dat: UTF-8 encoded MimeWords must be in base64 -- quoted-printable is
@@ -419,8 +409,107 @@ sub encode_mimeword {
   encode_mimewords($_[0],Encoding=>$_[1],Charset=>$_[2],Shorts=>0);
 }
 
-use vars qw($old_decode_mimewords);
-BEGIN { $old_decode_mimewords=\&MIME::AltWords::decode_mimewords_wantarray } #### pts #### AltWords.pm adds `_wantarray'
+# ---
+
+# $MIME_WORDS VERSION = "5.420";
+
+# _decode_Q STRING
+#     Private: used by _decode_header() to decode "Q" encoding, which is
+#     almost, but not exactly, quoted-printable.  :-P
+sub _decode_Q {
+    my $str = shift;
+    $str =~ s/_/\x20/g;                                # RFC-1522, Q rule 2
+    $str =~ s/=([\da-fA-F]{2})/pack("C", hex($1))/ge;  # RFC-1522, Q rule 1
+    $str;
+}
+
+# _encode_Q STRING
+#     Private: used by _encode_header() to decode "Q" encoding, which is
+#     almost, but not exactly, quoted-printable.  :-P
+sub _encode_Q {
+    my $str = shift;
+    $str =~ s{([_\?\=\x00-\x1F\x7F-\xFF])}{sprintf("=%02X", ord($1))}eg;
+    $str;
+}
+
+# _decode_B STRING
+#     Private: used by _decode_header() to decode "B" encoding.
+sub _decode_B {
+    my $str = shift;
+    decode_base64($str);
+}
+
+# _encode_B STRING
+#     Private: used by _decode_header() to decode "B" encoding.
+sub _encode_B {
+    my $str = shift;
+    encode_base64($str, '');
+}
+
+# Copied from MIME::Words.
+sub decode_mimewords_wantarray_low {
+    my $encstr = shift;
+    my %params = @_;
+    my @tokens;
+    $@ = '';           ### error-return
+
+    ### Collapse boundaries between adjacent encoded words:
+    $encstr =~ s{(\?\=)\s*(\=\?)}{$1$2}gs;
+    pos($encstr) = 0;
+    ### print STDOUT "ENC = [", $encstr, "]\n";
+
+    ### Decode:
+    my ($charset, $encoding, $enc, $dec);
+    while (1) {
+	last if (pos($encstr) >= length($encstr));
+	my $pos = pos($encstr);               ### save it
+
+	### Case 1: are we looking at "=?..?..?="?
+	if ($encstr =~    m{\G             # from where we left off..
+			    =\?([^?]*)     # "=?" + charset +
+			     \?([bq])      #  "?" + encoding +
+			     \?([^?]+)     #  "?" + data maybe with spcs +
+			     \?=           #  "?="
+			    }xgi) {
+	    ($charset, $encoding, $enc) = ($1, lc($2), $3);
+	    $dec = (($encoding eq 'q') ? _decode_Q($enc) : _decode_B($enc));
+	    push @tokens, [$dec, $charset];
+	    next;
+	}
+
+	### Case 2: are we looking at a bad "=?..." prefix? 
+	### We need this to detect problems for case 3, which stops at "=?":
+	pos($encstr) = $pos;               # reset the pointer.
+	if ($encstr =~ m{\G=\?}xg) {
+	    $@ .= qq|unterminated "=?..?..?=" in "$encstr" (pos $pos)\n|;
+	    push @tokens, ['=?'];
+	    next;
+	}
+
+	### Case 3: are we looking at ordinary text?
+	pos($encstr) = $pos;               # reset the pointer.
+	if ($encstr =~ m{\G                # from where we left off...
+			 ([\x00-\xFF]*?    #   shortest possible string,
+			  \n*)             #   followed by 0 or more NLs,
+		         (?=(\Z|=\?))      # terminated by "=?" or EOS
+			}xg) {
+	    length($1) or die "MIME::AltWords: internal logic err: empty token\n";
+	    push @tokens, [$1];
+	    next;
+	}
+	
+	if ($encstr=~m{\G([\x00-\xFF]*)[^\x00-\xFF]+}g) { #### pts ####
+	    $@.=qq|wide character in encoded string\n|;
+	    push @tokens, [$1] if 0!=length($1);
+	    next;
+	}
+
+	### Case 4: bug!
+	die "MIME::AltWords: unexpected case:\n($encstr) pos $pos\n\t".
+	    "Please alert developer.\n";
+    }
+    return (wantarray ? @tokens : join('',map {$_->[0]} @tokens));
+}
 
 #** Dat: function added by #### pts ####
 #** @param $_[0] a mimewords-encoded string
@@ -497,7 +586,7 @@ Name of the mail field this string came from.  I<Currently ignored.>
 #**        with Encode::encode(Charset)
 #**   New key: Charset: specific charset name for Raw=1 (ignored for Raw=0)
 sub decode_mimewords_low {
-  return $old_decode_mimewords->(@_) if wantarray;
+  return decode_mimewords_wantarray_low(@_) if wantarray;
   my($encodedstr,%opts)=@_;
   $opts{Raw}=1 if !defined $opts{Raw}; # Dat: default
   my $ret='';
@@ -507,7 +596,7 @@ sub decode_mimewords_low {
   $opts{Charset}=get_best_decode_charset($encodedstr) if
     $opts{Raw} and !defined $opts{Charset};
   my $S;
-  for my $token ($old_decode_mimewords->($encodedstr,%opts)) { # Dat: $charset in $token->[1]
+  for my $token (decode_mimewords_wantarray_low($encodedstr,%opts)) { # Dat: $charset in $token->[1]
     $S=$token->[1] ? Encode::decode($token->[1], $token->[0]) : $token->[0];
     $S=Encode::encode($opts{Charset}, $S) if $opts{Raw};
     $ret.=$S
@@ -676,8 +765,7 @@ no warnings qw(prototype redefine);
 Exports its principle functions by default, in keeping with 
 L<MIME::Base64> and L<MIME::QuotedPrint>.
 
-Doesn't depend on L<MIME::Words> or L<MIME::Tools>. All the shared code is
-copied to L<MIME::AltWords0>, which is bundled.
+Doesn't depend on L<MIME::Words> or L<MIME::Tools>.
 
 See also L<http://www.szszi.hu/wiki/Sympa4Patches> for the previous version
 of L<MIME::AltWords> integrated into the Sympa 4 mailing list software.
@@ -688,9 +776,9 @@ L<MIME::AltWords> was written by
 P√©ter Szab√≥ (F<pts@fazekas.hu>) in 2006, and it has been uploaded to CPAN on
 2006-09-27.
 
-L<MIME::AltWords> uses code from L<MIME::Words> (in the file
-C<lib/MIME/AltWords0.pm>) and it uses documentation from L<MIME::Words>
-(in the files C<lib/MIME/AltWords0.pm> and C<lib/MIME/AltWords.pm>).
+L<MIME::AltWords> uses code from L<MIME::Words> (in the function
+C<decode_mimewords_wantarray>) and it uses documentation from L<MIME::Words>
+(in the file C<lib/MIME/AltWords.pm>).
 
 Here is the original author and copyright information for L<MIME::Words>.
 
@@ -717,8 +805,8 @@ See $VERSION in C<lib/MIME/AltWords.pm> .
 
 =begin testing
 
-is(MIME::AltWords::encode_mimewords("foo  bar"), "foo  bar");
 is(MIME::AltWords::encode_mimewords("foo-b\x{E9}r"), "=?ISO-8859-1?Q?foo-b=E9r?=");
+is(MIME::AltWords::encode_mimewords("foo  bar"), "foo  bar");
 is(MIME::AltWords::encode_mimeword("foo  bar"), "=?ISO-8859-1?Q?foo__bar?="); # Dat: improvement over MIME::AltWords
 is(MIME::AltWords::encode_mimeword("foo__bar "), "=?ISO-8859-1?Q?foo=5F=5Fbar_?="); # Dat: improvement over MIME::AltWords
 is(MIME::AltWords::encode_mimewords("az ˚rkikˆtı fˆldi adatai",Whole=>0), "az =?ISO-8859-1?Q?=FBrkik=F6t=F5_f=F6ldi?= adatai");
@@ -897,6 +985,18 @@ is(MIME::AltWords::encode_mimewords("Me and \xABFran\xE7ois\xBB at the beach"), 
 # vvv !! is this correct (space after \n)?
 is(MIME::AltWords::encode_mimewords("Me and \xABFran\xE7ois\xBB, down at the beach\nwith Dave <dave\@ether.net>"), "=?ISO-8859-1?Q?Me_and_=ABFran=E7ois=BB,_down_at_the_beach=0Awith?=\n =?ISO-8859-1?Q?_Dave_<dave\@ether.net>?=", "MIME::Words test case 7");
 is(MIME::AltWords::decode_mimewords(MIME::AltWords::encode_mimewords("Me and \xABFran\xE7ois\xBB, down at the beach\nwith Dave <dave\@ether.net>")), "Me and \xABFran\xE7ois\xBB, down at the beach\nwith Dave <dave\@ether.net>", "MIME::Words test case 8");
+
+my $in0 = Encode::encode("windows-1251", "\x{422}\x{435}\x{441}\x{442}\x{438}\x{440}\x{43e}\x{432}\x{430}\x{43d}\x{438}\x{435}");
+my $out0b = "=?WINDOWS-1251?B?0uXx8ujw7uLg7ejl?=";
+my $out0q = "=?WINDOWS-1251?Q?=D2=E5=F1=F2=E8=F0=EE=E2=E0=ED=E8=E5?=";
+is(MIME::AltWords::encode_mimewords($in0, Charset=>"windows-1251", Encoding=>"B"), $out0b);
+is(MIME::AltWords::encode_mimewords($in0, Charset=>"windows-1251", Encoding=>"Q"), $out0q);
+is(MIME::AltWords::encode_mimewords($in0, Charset=>"windows-1251", Encoding=>"q"), $out0q);
+is(MIME::AltWords::encode_mimeword($in0, "B", "windows-1251"), $out0b);
+is(MIME::AltWords::encode_mimeword($in0, "Q", "windows-1251"), $out0q);
+is(MIME::AltWords::encode_mimeword($in0, "q", "windows-1251"), $out0q);
+is(MIME::AltWords::encode_mimewords($in0, Charset=>"windows-1251", Encoding=>"b"), $out0b);
+is(MIME::AltWords::encode_mimeword($in0, "b", "windows-1251"), $out0b);
 
 =cut
 

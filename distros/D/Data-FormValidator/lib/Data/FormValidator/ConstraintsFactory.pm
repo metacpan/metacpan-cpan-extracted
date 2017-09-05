@@ -45,7 +45,7 @@ instead. It's a modern alternative to what's here, offering improved names and s
 =cut
 
 BEGIN {
-    our $VERSION = 4.86;
+    our $VERSION = 4.88;
     our @EXPORT = ();
     our @EXPORT_OK = (qw/make_length_constraint/);
 

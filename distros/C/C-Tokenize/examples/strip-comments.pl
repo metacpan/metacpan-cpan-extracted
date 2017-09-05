@@ -3,8 +3,8 @@ use warnings;
 use strict;
 use C::Tokenize 'strip_comments';
 my $c = <<EOF;
-/* The X coordinate. */
-int x;
+char * not_comment = "/* This is not a comment */";
+int/* The X coordinate. */x;
 /* The Y coordinate.
    See https://en.wikipedia.org/wiki/Cartesian_coordinates. */
 int y;

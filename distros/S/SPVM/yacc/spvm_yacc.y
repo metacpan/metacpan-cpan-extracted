@@ -197,6 +197,10 @@ enumeration_values
       
       $$ = op_list;
     }
+  | enumeration_values ','
+    {
+      $$ = $1;
+    }
   | enumeration_value
   
 enumeration_value
@@ -440,6 +444,10 @@ terms
       SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
       
       $$ = op_list;
+    }
+  | terms ','
+    {
+      $$ = $1
     }
   | term
 
@@ -685,6 +693,10 @@ args
       
       $$ = op_list;
     }
+  | args ','
+    {
+      $$ = $1;
+    }
   | arg
 
 arg
@@ -724,6 +736,10 @@ descriptors
       SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
       
       $$ = op_list;
+    }
+  | descriptors ','
+    {
+      $$ = $1;
     }
   | DESCRIPTOR
 

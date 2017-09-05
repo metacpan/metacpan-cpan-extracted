@@ -1,0 +1,101 @@
+commit ac7e964f287e03f138cdc2630e9c2ac134948a01
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Sep 3 04:45:47 2017 -0700
+
+    CPAN testing revealing failure to use JSON - needs to be put into cpanfile as dependency
+
+commit 3e878dd075c3956a64446c5cfc17e08e4c2dea1d
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 16:59:31 2017 -0700
+
+    Final admin file changes
+
+commit b81c71ef7f2c7ecd26b6a999b715389b819e7fbb
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 16:16:42 2017 -0700
+
+    Added LICENSE and README
+
+commit d51701dbd1b58245749c3550b48c7ee550bc3f35
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 15:58:43 2017 -0700
+
+    Added placeholder module in namespace root
+
+commit dc6d8ba424fcd523cbd226df783c8282ad0111d9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 12:58:20 2017 -0700
+
+    Added version display option
+
+commit 3531fa3e79bc20489af1be9eba9dd258a0f5b703
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 12:53:54 2017 -0700
+
+    Add file versions, copy instead of move temp, docs for main script
+
+commit 3b246f8ace567e115c63e25ea093cdad2ac107f9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Sep 2 11:54:22 2017 -0700
+
+    lots of documentation added, script to support custom Unsplash client key as well as the plugin
+
+commit 2cb32be52783a176333c059e7552c2b3c3fe30f8
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Sep 1 19:34:26 2017 -0700
+
+    Added some documentation
+
+commit 1efd8c404bf2a466787b78067a073a233b82833c
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Sep 1 16:33:13 2017 -0700
+
+    Added viewer and auto setting for gnome3
+
+commit 03a8483e7d13c6ad7bb600fc442cc4f7fdae0c88
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Sep 1 13:14:37 2017 -0700
+
+    some cleaning up, added some help
+
+commit 7b9d2c4bcab3b275fd58adc7f9265cf01f7086c9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Sep 1 01:44:45 2017 -0700
+
+    Added Module::Find to test
+
+commit 88004ad0049e774c059955aea0684a246df7d1ee
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 23:22:03 2017 -0700
+
+    Split out usplash API key so that it can be changed by others more easily
+
+commit 80a2522c0699b73ee53234f4da1806ff61cad34f
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 22:16:37 2017 -0700
+
+    took out a couple unneeded uses
+
+commit aa25dd874df914a1b606faabed64ca19fe367a15
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 20:58:07 2017 -0700
+
+    plugins given REST retrieval, implementation of get_image, tests for actual retrieval
+
+commit e77448980e065a1f98739e5c6db26186a80fc3d3
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 08:34:17 2017 -0700
+
+    timeout attribute added to source
+
+commit a6827a52ae4e8c994d075119d74254fe49d4d454
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 08:20:40 2017 -0700
+
+    Splitting functions out into classes, creating some tests, plugin role for image sources created
+
+commit 94d66b99f9995167819a8c5346c2d78069c039a2
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Aug 31 00:23:07 2017 -0700
+
+    Initial comit

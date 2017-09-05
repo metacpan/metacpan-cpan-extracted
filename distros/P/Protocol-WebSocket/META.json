@@ -4,7 +4,7 @@
       "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "Protocol::WebSocket" : {
          "file" : "lib/Protocol/WebSocket.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Protocol::WebSocket::Client" : {
          "file" : "lib/Protocol/WebSocket/Client.pm"
@@ -105,21 +105,21 @@
          "web" : "https://github.com/vti/protocol-websocket"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
-      "Jon Gentle <atrodo@atrodo.org>",
-      "Lee Aylward <lee@laylward.com>",
-      "Chia-liang Kao <clkao@clkao.org>",
+      "Anton Petrusevich <anton.petrusevich@lycos.com>",
       "BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>",
+      "Chia-liang Kao <clkao@clkao.org>",
+      "Graham Ollis <plicease@cpan.org>",
       "Joao Orui <joao@joao.jp>",
+      "Jon Gentle <atrodo@atrodo.org>",
       "Jonathan Barber <jonathan.barber@gmail.com>",
+      "Lee Aylward <lee@laylward.com>",
+      "Michal Špaček <tupinek@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
       "Toshio Ito <debug.ito@gmail.com>",
-      "Michal Špaček <tupinek@gmail.com>",
-      "vti <vti@clarive.com>",
-      "Anton Petrusevich <anton.petrusevich@lycos.com>",
-      "Graham Ollis <plicease@cpan.org>",
-      "vti <viacheslav.t@gmail.com>"
+      "vti <viacheslav.t@gmail.com>",
+      "vti <vti@clarive.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

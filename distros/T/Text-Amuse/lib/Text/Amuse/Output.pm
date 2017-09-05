@@ -153,7 +153,7 @@ sub process {
         }
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
-            push @pieces, $self->blkstring(start => $el->block);
+            push @pieces, $self->blkstring(start => $el->block, start_list_index => $el->start_list_index);
         }
         elsif ($el->type eq 'stopblock') {
             die "stopblock with string passed!:" . $el->string if $el->string;
@@ -306,7 +306,7 @@ sub manage_html_footnote {
 =cut
 
 sub blkstring  {
-    my ($self, $start_stop, $block) = @_;
+    my ($self, $start_stop, $block, %attributes) = @_;
     die "Wrong usage! Missing params $start_stop, $block"
       unless ($start_stop && $block);
     die "Wrong usage!\n" unless ($start_stop eq 'stop' or
@@ -314,7 +314,13 @@ sub blkstring  {
     my $table = $self->blk_table;
     die "Table is missing an element $start_stop  $block "
       unless exists $table->{$block}->{$start_stop}->{$self->fmt};
-    return $table->{$block}->{$start_stop}->{$self->fmt};
+    my $string = $table->{$block}->{$start_stop}->{$self->fmt};
+    if (ref($string)) {
+        return $string->(%attributes);
+    }
+    else {
+        return $string;
+    }
 }
 
 =head3 manage_regular($element_or_string, %options)
@@ -1290,6 +1296,14 @@ Methods providing some fixed values
 =cut
 
 sub blk_table {
+    my $self = shift;
+    unless ($self->{_block_table_map}) {
+        $self->{_block_table_map} = $self->_build_blk_table;
+    }
+    return $self->{_block_table_map};
+}
+
+sub _build_blk_table {
     my $table = {
                                   p =>  { start => {
                                                     ltx => "\n",
@@ -1352,12 +1366,10 @@ sub blk_table {
                                         },
                                   example => { 
                                               start => { 
-                                                        tex => "{\n\\startlines[space=on,style=\\tt]\n",
                                                         html => "\n<pre class=\"example\">\n",
                                                         ltx => "\n\\begin{alltt}\n",
                                                        },
                                               stop => {
-                                                       tex => "\n\\stoplines\n",
                                                        html => "</pre>\n",
                                                        ltx => "\\end{alltt}\n\n",
                                                       },
@@ -1366,36 +1378,30 @@ sub blk_table {
                                   comment => {
                                               start => { # we could also use a more
                                                         # stable startstop hiding
-                                                        tex => "\n\\startcomment[][]\n",
                                                         html => "\n<!-- start comment -->\n<div class=\"comment\"><span class=\"commentmarker\">{{COMMENT:</span> \n",
                                                         ltx => "\n\n\\begin{comment}\n",
                                                        },
                                               stop => {
-                                                       tex => "\n\\stopcomment\n",
                                                        html => "\n<span class=\"commentmarker\">END_COMMENT}}:</span>\n</div>\n<!-- stop comment -->\n",  
                                                        ltx => "\n\\end{comment}\n\n",
                                                       },
                                              },
                                   verse => {
                                             start => {
-                                                      tex => "\n\n\\startawikiverse\n",
                                                       html => "<div class=\"verse\">\n",
                                                       ltx => "\n\n\\begin{verse}\n",
                                                      },
                                             stop => {
-                                                     tex => "\\stopawikiverse\n\n",
                                                      html => "\n</div>\n",
                                                      ltx => "\n\\end{verse}\n\n",
                                                     },
                                            },
                                quote => {
                                          start => {
-                                                   tex => "\n\\startblockquote\n",
                                                    html => "\n<blockquote>\n",
                                                    ltx => "\n\n\\begin{quote}\n\n",
                                                   },
                                          stop => {
-                                                  tex => "\n\\stopblockquote\n",
                                                   html => "\n</blockquote>\n",
                                                   ltx => "\n\n\\end{quote}\n\n",
                                                  },
@@ -1403,24 +1409,20 @@ sub blk_table {
 	      
                                biblio => {
                                           start => {
-                                                    tex => "\\startawikibiblio\n",
                                                     html => "\n<div class=\"biblio\">\n",
                                                     ltx => "\n\n\\begin{amusebiblio}\n\n",
                                                    },
                                           stop => {
-                                                   tex => "\\stopawikibiblio\n",
                                                    html => "\n</div>\n",
                                                    ltx => "\n\n\\end{amusebiblio}\n\n",
                                                   },
                                          },
                                play => {
                                         start => {
-                                                  tex => "\\startawikiplay\n",
                                                   html => "\n<div class=\"play\">\n",
                                                   ltx => "\n\n\\begin{amuseplay}\n\n",
                                                  },
                                         stop => {
-                                                 tex => "\\stopawikiplay\n",
                                                  html => "\n</div>\n",
                                                  ltx => "\n\n\\end{amuseplay}\n\n",
                                                 },
@@ -1428,24 +1430,20 @@ sub blk_table {
 
                                center => {
                                           start => {
-                                                    tex => "\\startawikicenter\n",
                                                     html => "\n<div class=\"center\">\n",
                                                     ltx => "\n\n\\begin{center}\n",
                                                    },
                                           stop => {
-                                                   tex => "\\stopawikicenter\n",
                                                    html => "\n</div>\n",
                                                    ltx => "\n\\end{center}\n\n",
                                                   },
                                          },
                                right => {
                                          start => {
-                                                   tex => "\\startawikiright\n",
                                                    html => "\n<div class=\"right\">\n",
                                                    ltx => "\n\n\\begin{flushright}\n",
                                                   },
                                          stop => {
-                                                  tex => "\\stopawikiright\n",
                                                   html => "\n</div>\n",
                                                   ltx => "\n\\end{flushright}\n\n",
                                                  },
@@ -1453,12 +1451,10 @@ sub blk_table {
 
                                ul => {
                                       start => {
-                                                tex => "\n\\startitemize[1]\\relax\n",
                                                 html => "\n<ul>\n",
                                                 ltx => "\n\\begin{itemize}\n",
                                                },
                                       stop => {
-                                               tex => "\n\\stopitemize\n",
                                                html => "\n</ul>\n",
                                                ltx => "\n\\end{itemize}\n",
                                               },
@@ -1466,12 +1462,14 @@ sub blk_table {
 
                                ol => {
                                       start => {
-                                                tex => "\n\\startitemize[N]\\relax\n",
-                                                html => "\n<ol>\n",
-                                                ltx => "\n\\begin{enumerate}[1.]\n",
+                                                html => sub {
+                                                    _html_ol_element(n => @_);
+                                                },
+                                                ltx => sub {
+                                                    _ltx_enum_element(1 => @_);
+                                                },
                                                },
                                       stop => {
-                                               tex => "\n\\stopitemize\n",
                                                html => "\n</ol>\n",
                                                ltx => "\n\\end{enumerate}\n",
                                               },
@@ -1479,12 +1477,14 @@ sub blk_table {
 
                                oln => {
                                        start => {
-                                                 tex => "\n\\startitemize[N]\\relax\n",
-                                                 html => "\n<ol>\n",
-                                                 ltx => "\n\\begin{enumerate}[1.]\n",
+                                                 html => sub {
+                                                     _html_ol_element(n => @_);
+                                                 },
+                                                 ltx => sub {
+                                                     _ltx_enum_element(1 => @_);
+                                                 },
                                                 },
                                        stop => {
-                                                tex => "\n\\stopitemize\n",
                                                 html => "\n</ol>\n",
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
@@ -1492,12 +1492,14 @@ sub blk_table {
 
                                oli => {
                                        start => {
-                                                 tex => "\n\\startitemize[r]\\relax\n",
-                                                 html => "\n<ol style=\"list-style-type:lower-roman\">\n",
-                                                 ltx => "\n\\begin{enumerate}[i.]\n",
+                                                 html => sub {
+                                                     _html_ol_element(i => @_);
+                                                 },
+                                                 ltx => sub {
+                                                     _ltx_enum_element(i => @_);
+                                                 },
                                                 },
                                        stop => {
-                                                tex => "\n\\stopitemize\n",
                                                 html => "\n</ol>\n",
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
@@ -1505,12 +1507,14 @@ sub blk_table {
 
                                olI => {
                                        start => {
-                                                 tex => "\n\\startitemize[R]\\relax\n",
-                                                 html => "\n<ol style=\"list-style-type:upper-roman\">\n",
-                                                 ltx => "\n\\begin{enumerate}[I.]\n",
+                                                 html => sub {
+                                                     _html_ol_element(I => @_);
+                                                 },
+                                                 ltx => sub {
+                                                     _ltx_enum_element(I => @_);
+                                                 },
                                                 },
                                        stop => {
-                                                tex => "\n\\stopitemize\n",
                                                 html => "\n</ol>\n",
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
@@ -1518,12 +1522,14 @@ sub blk_table {
 
                                olA => {
                                        start => {
-                                                 tex => "\n\\startitemize[A]\\relax\n",
-                                                 html => "\n<ol style=\"list-style-type:upper-alpha\">\n",
-                                                 ltx => "\n\\begin{enumerate}[A.]\n",
+                                                 html => sub {
+                                                     _html_ol_element(A => @_);
+                                                 },
+                                                 ltx => sub {
+                                                     _ltx_enum_element(A => @_);
+                                                 },
                                                 },
                                        stop => {
-                                                tex => "\n\\stopitemize\n",
                                                 html => "\n</ol>\n",
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
@@ -1531,12 +1537,14 @@ sub blk_table {
 
                                ola => {
                                        start => {
-                                                 tex => "\n\\startitemize[a]\\relax\n",
-                                                 html => "\n<ol style=\"list-style-type:lower-alpha\">\n",
-                                                 ltx => "\n\\begin{enumerate}[a.]\n",
+                                                 html => sub {
+                                                     _html_ol_element(a => @_);
+                                                 },
+                                                 ltx => sub {
+                                                     _ltx_enum_element(a => @_);
+                                                 },
                                                 },
                                        stop => {
-                                                tex => "\n\\stopitemize\n",
                                                 html => "\n</ol>\n",
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
@@ -1544,12 +1552,10 @@ sub blk_table {
 
                                li => {
                                       start => {
-                                                tex => "\\item[] ",
                                                 html => "<li>",
                                                 ltx => "\\item\\relax ",
                                                },
                                       stop => {
-                                               tex => "\n\n ",
                                                html => "\n</li>\n",
                                                ltx => "\n\n",
                                               },
@@ -1748,5 +1754,48 @@ sub html_table_mapping {
             etr => "  </tr>",
            };
 }
+
+sub _html_ol_element {
+    my ($type, %attributes) = @_;
+    my %map = (
+               ol => '',
+               n => '',
+               i => 'lower-roman',
+               I => 'upper-roman',
+               A => 'upper-alpha',
+               a => 'lower-alpha',
+              );
+    my $ol_type = '';
+    if ($map{$type}) {
+        $ol_type = qq{ style="list-style-type:$map{$type}"};
+    }
+    my $start = $attributes{start_list_index};
+    my $start_string = '';
+    if ($start and $start =~ m/\A[0-9]+\z/ and $start > 1) {
+        $start_string = qq{ start="$start"};
+    }
+    return "\n<ol" . $ol_type . $start_string . ">\n";
+}
+
+sub _ltx_enum_element {
+    my ($type, %attributes) = @_;
+    my %map = (
+               1 => '1',
+               i => 'i',
+               I => 'I',
+               A => 'A',
+               a => 'a',
+              );
+    my $string = "\n\\begin{enumerate}[";
+    my $type_string = $map{$type} || '1';
+
+    my $start = $attributes{start_list_index};
+    my $start_string = '';
+    if ($start and $start =~ m/\A[0-9]+\z/ and $start > 1) {
+        $start_string = qq{, start=$start};
+    }
+    return $string . $type_string . '.' . $start_string . "]\n";
+}
+
 
 1;

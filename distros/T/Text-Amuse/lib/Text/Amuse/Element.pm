@@ -30,6 +30,7 @@ sub new {
                 indentation => 0,
                 attribute_type => '',
                 style => 'X',
+                start_list_index => 0,
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -176,6 +177,24 @@ Accessor to attribute_type
 
 sub attribute_type {
     return shift->{attribute_type};
+}
+
+
+=head2 start_list_index
+
+Accessor rw to start_list_index (defaults to 0)
+
+=cut
+
+sub start_list_index {
+    my $self = shift;
+    if (@_) {
+        my $arg = shift;
+        if (defined $arg) {
+            $self->{start_list_index} = $arg;
+        }
+    }
+    return $self->{start_list_index};
 }
 
 =head2 HELPERS
@@ -340,7 +359,7 @@ sub add_to_string {
 
 =head3 append($element)
 
-Append the element passed as argument to this one, setting th raw_line
+Append the element passed as argument to this one, setting the raw_line
 
 =cut
 
@@ -393,5 +412,22 @@ sub become_regular {
     $self->type('regular');
     $self->block('');
 }
+
+=head3 footnote_index
+
+Return the number of the footnote if the element is a footnote, undef othewise
+
+=cut
+
+sub footnote_index {
+    my $self = shift;
+    if ($self->type eq 'footnote') {
+        if ($self->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
+            return $1;
+        }
+    }
+    return undef;
+}
+
 
 1;

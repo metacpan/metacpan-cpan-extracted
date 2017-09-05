@@ -13,11 +13,11 @@ use ObjectDB::Quoter;
 use ObjectDB::RelatedFactory;
 use ObjectDB::Table;
 use ObjectDB::With;
-use ObjectDB::Util qw(execute merge_rows filter_columns);
+use ObjectDB::Util qw(execute filter_columns);
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
-$Carp::Internal{(__PACKAGE__)}++;
+$Carp::Internal{ (__PACKAGE__) }++;
 $Carp::Internal{"ObjectDB::$_"}++ for qw/
   With
   Related
@@ -229,8 +229,7 @@ sub get_column {
         return $self->{columns}->{$name};
     }
     elsif ($self->meta->is_relationship($name)) {
-        return
-          exists $self->{relationships}->{$name}
+        return exists $self->{relationships}->{$name}
           ? $self->{relationships}->{$name}
           : undef;
     }
@@ -241,7 +240,7 @@ sub get_column {
 
 sub set_columns {
     my $self = shift;
-    my %values = ref $_[0] ? %{$_[0]} : @_;
+    my %values = ref $_[0] ? %{ $_[0] } : @_;
 
     while (my ($key, $value) = each %values) {
         $self->set_column($key => $value);
@@ -261,13 +260,8 @@ sub set_column {
             $value = q{};
         }
 
-        if (
-            !exists $self->{columns}->{$name}
-            || !(
-                   (defined $self->{columns}->{$name} && defined $value)
-                && ($self->{columns}->{$name} eq $value)
-            )
-          )
+        if (   !exists $self->{columns}->{$name}
+            || !((defined $self->{columns}->{$name} && defined $value) && ($self->{columns}->{$name} eq $value)))
         {
             $self->{columns}->{$name} = $value;
             $self->{is_modified} = 1;
@@ -283,31 +277,25 @@ sub set_column {
             foreach my $sub_value (@$value) {
                 next unless defined $sub_value && ref $sub_value;
 
-                Carp::croak(
-                    qq{Value of related object(s) '$name' has to be a reference}
-                ) unless ref $sub_value;
+                Carp::croak(qq{Value of related object(s) '$name' has to be a reference}) unless ref $sub_value;
 
                 if (Scalar::Util::blessed($sub_value)) {
                     push @$related_value, $sub_value;
                 }
                 elsif (ref($sub_value) eq 'HASH') {
                     if (!$self->_is_empty_hash_ref($sub_value)) {
-                        push @$related_value,
-                          $self->meta->get_relationship($name)
-                          ->class->new(%$sub_value);
+                        push @$related_value, $self->meta->get_relationship($name)->class->new(%$sub_value);
                     }
                 }
                 else {
-                    Carp::croak(qq{Unexpected reference found }
-                          . qq{when setting '$name' related object});
+                    Carp::croak(qq{Unexpected reference found } . qq{when setting '$name' related object});
                 }
             }
 
             undef $related_value unless @$related_value;
         }
         elsif (!$self->_is_empty_hash_ref($value)) {
-            $related_value =
-              $self->meta->get_relationship($name)->class->new(%$value);
+            $related_value = $self->meta->get_relationship($name)->class->new(%$value);
         }
 
         if ($related_value) {
@@ -351,23 +339,20 @@ sub create {
         'insert',
         driver => $self->init_db->{Driver}->{Name},
         into   => $self->meta->table,
-        values => [map { $_ => $self->{columns}->{$_} } $self->columns]
+        values => [ map { $_ => $self->{columns}->{$_} } $self->columns ]
     );
 
     my $rv = execute($self->init_db, $sql, context => $self);
 
     if (my $auto_increment = $self->meta->auto_increment) {
         $self->set_column(
-            $auto_increment => $self->init_db->last_insert_id(
-                undef, undef, $self->meta->table, $auto_increment
-            )
-        );
+            $auto_increment => $self->init_db->last_insert_id(undef, undef, $self->meta->table, $auto_increment));
     }
 
     $self->{is_in_db}    = 1;
     $self->{is_modified} = 0;
 
-    foreach my $rel_name (keys %{$self->meta->relationships}) {
+    foreach my $rel_name (keys %{ $self->meta->relationships }) {
         if (my $rel_values = $self->{relationships}->{$rel_name}) {
             if (ref $rel_values eq 'ARRAY') {
                 @$rel_values = grep { !$_->is_in_db } @$rel_values;
@@ -420,11 +405,11 @@ sub load {
     Carp::croak(ref($self) . ': no primary or unique keys specified')
       unless @columns;
 
-    my $where = [map { $_ => $self->{columns}->{$_} } @columns];
+    my $where = [ map { $_ => $self->{columns}->{$_} } @columns ];
 
     my $with = ObjectDB::With->new(meta => $self->meta, with => $params{with});
 
-    my $columns = filter_columns([$self->meta->get_columns], \%params);
+    my $columns = filter_columns([ $self->meta->get_columns ], \%params);
 
     my $select = SQL::Composer->build(
         'select',
@@ -443,7 +428,7 @@ sub load {
 
     my $row_object = $select->from_rows($rows)->[0];
 
-    $self->{columns} = {};
+    $self->{columns}       = {};
     $self->{relationships} = {};
 
     $self->set_columns(%$row_object);
@@ -454,8 +439,7 @@ sub load {
     return $self;
 }
 
-sub load_or_create
-{
+sub load_or_create {
     my $self = shift;
 
     my @columns;
@@ -569,18 +553,18 @@ sub to_hash {
         }
     }
 
-    foreach my $key (keys %{$self->{virtual_columns}}) {
+    foreach my $key (keys %{ $self->{virtual_columns} }) {
         $hash->{$key} = $self->get_column($key);
     }
 
-    foreach my $name (keys %{$self->{relationships}}) {
+    foreach my $name (keys %{ $self->{relationships} }) {
         my $rel = $self->{relationships}->{$name};
         next unless defined $rel;
 
         Carp::croak("unknown '$name' relationship") unless $rel;
 
         if (ref $rel eq 'ARRAY') {
-            $hash->{$name} = [map { $_->to_hash } @$rel];
+            $hash->{$name} = [ map { $_->to_hash } @$rel ];
         }
         else {
             $hash->{$name} = $rel->to_hash;
@@ -606,7 +590,7 @@ sub related {
     if (!$self->{relationships}->{$name}) {
         $self->{relationships}->{$name} =
           $rel->is_multi
-          ? [$self->find_related($name, @_)]
+          ? [ $self->find_related($name, @_) ]
           : $self->find_related($name, @_);
     }
 
@@ -629,7 +613,7 @@ sub create_related {
     my $self = shift;
     my $name = shift;
 
-    my @related = @_ == 1 ? ref $_[0] eq 'ARRAY' ? @{$_[0]} : ($_[0]) : ({@_});
+    my @related = @_ == 1 ? ref $_[0] eq 'ARRAY' ? @{ $_[0] } : ($_[0]) : ({@_});
 
     my @rv = $self->_do_related('create', $name, \@related);
     return @rv == 1 ? $rv[0] : @rv;
@@ -701,15 +685,16 @@ ObjectDB - usable ORM
     use base 'MyDB';
 
     __PACKAGE__->meta(
-        table          => 'author',
-        columns        => [qw/id name/],
-        primary_key    => 'id',
-        auto_increment => 'id',
-        relationships  => {
+        table                    => 'author',
+        auto_increment           => 'id',
+        discover_schema          => 1,
+        generate_columns_methods => 1,
+        generate_related_methods => 1,
+        relationships            => {
             books => {
-                type = 'one to many',
+                type  => 'one to many',
                 class => 'MyBook',
-                map   => {id => 'author_id'}
+                map   => { id => 'author_id' }
             }
         }
     );
@@ -718,23 +703,23 @@ ObjectDB - usable ORM
     use base 'MyDB';
 
     __PACKAGE__->meta(
-        table          => 'book',
-        columns        => [qw/id author_id title/],
-        primary_key    => 'id',
-        auto_increment => 'id',
-        relationships  => {
+        table                    => 'book',
+        auto_increment           => 'id',
+        discover_schema          => 1,
+        generate_columns_methods => 1,
+        generate_related_methods => 1,
+        relationships            => {
             author => {
-                type = 'many to one',
+                type  => 'many to one',
                 class => 'MyAuthor',
-                map   => {author_id => 'id'}
+                map   => { author_id => 'id' }
             }
         }
     );
 
     my $book_by_id = MyBook->new(id => 1)->load(with => 'author');
 
-    my @books_authored_by_Pushkin =
-      MyBook->table->find(where => ['author.name' => 'Pushkin']);
+    my @books_authored_by_Pushkin = MyBook->table->find(where => [ 'author.name' => 'Pushkin' ]);
 
     $author->create_related('books', title => 'New Book');
 
@@ -745,7 +730,65 @@ light it stays usable. ObjectDB borrows many things from L<Rose::DB::Object>,
 but unlike in the last one columns are not objects, everything is pretty much
 straightforward and flat.
 
-Supported servers: SQLite, MySQL, PostgreSQL
+Supported servers: SQLite, MySQL, PostgreSQL.
+
+=head1 STABILITY
+
+This module is used in several productions, under heavy load and big volumes.
+
+=head1 PERFORMANCE
+
+When performance is a must but you don't want to switch back to L<DBI> take a look at C<find_by_compose>, C<find_by_sql>
+methods and at C<rows_as_hashes> option in L<ObjectDB::Table>.
+
+Latest benchmarks
+
+    # Create
+
+              Rate create    DBI
+    create 10204/s     --   -73%
+    DBI    37975/s   272%     --
+
+    # Select 1
+
+                       Rate          find find_by_compose  find_by_sql           DBI
+    find             4478/s            --            -36%         -80%          -91%
+    find_by_compose  7042/s           57%              --         -69%          -86%
+    find_by_sql     22556/s          404%            220%           --          -56%
+    DBI             51724/s         1055%            634%         129%            --
+
+    # Select many
+
+                       Rate          find find_by_compose  find_by_sql           DBI
+    find             5618/s            --            -21%         -76%          -89%
+    find_by_compose  7109/s           27%              --         -69%          -86%
+    find_by_sql     23077/s          311%            225%           --          -53%
+    DBI             49180/s          775%            592%         113%            --
+
+    # Select many with iterator
+
+                             Rate find_by_sql find_by_compose  find
+    find_by_sql            25.8/s          --            -18%  -19%
+    find_by_compose        31.5/s         22%              --   -2%
+    find                   32.1/s         24%              2%    --
+    find_by_compose (hash)  201/s        677%            537%  526%
+    find (hash)             202/s        680%            539%  528%
+    find_by_sql (hash)      415/s       1505%           1215% 1193%
+    DBI                    1351/s       5128%           4184% 4109%
+
+                             find_by_compose (hash) find (hash) find_by_sql (hash)  DBI
+    find_by_sql                                -87%        -87%               -94% -98%
+    find_by_compose                            -84%        -84%               -92% -98%
+    find                                       -84%        -84%               -92% -98%
+    find_by_compose (hash)                       --         -0%               -52% -85%
+    find (hash)                                  0%          --               -51% -85%
+    find_by_sql (hash)                         107%        106%                 -- -69%
+    DBI                                        573%        570%               226%   --
+
+=head2 Meta auto discovery and method generation
+
+When you have L<DBIx::Inspector> installed meta can be automatically discovered without the need to specify columns. And
+special methods for columns and relationships are automatically generated.
 
 =head2 Actions on columns
 
@@ -833,7 +876,7 @@ Deletes an object. Related objects are NOT deleted.
 
 In order to perform an action on table a L<ObjectDB::Table> object must be
 obtained via C<table> method (see L<ObjectDB::Table> for all available actions).
-The only exception is C<find>, it is available in a row object for convenience.
+The only exception is C<find>, it is available on a row object for convenience.
 
     MyBook->table->delete; # deletes ALL records from MyBook
 
@@ -966,7 +1009,7 @@ Viacheslav Tykhanovskyi
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013, Viacheslav Tykhanovskyi.
+Copyright 2013-2017, Viacheslav Tykhanovskyi.
 
 This module is free software, you may distribute it under the same terms as Perl.
 

@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator;
-$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002219';
+$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002220';
 use Moose;
 
 # ABSTRACT: Manage your SQL and Perl migrations in nicely laid out directories
@@ -8,6 +8,7 @@ use autodie;
 use Carp qw( carp croak );
 use DBIx::Class::DeploymentHandler::LogImporter qw(:log :dlog);
 use Context::Preserve;
+use Digest::MD5;
 
 use Try::Tiny;
 
@@ -78,7 +79,6 @@ has txn_wrap => (
 
 has schema_version => (
   is => 'ro',
-  isa => 'Str',
   lazy_build => 1,
 );
 
@@ -282,15 +282,35 @@ sub _run_sql {
   };
 }
 
+my ( %f2p, %p2f );
+sub _generate_script_package_name {
+    my $file = shift;
+
+    my $pkgbase = 'DBICDH::Sandbox::';
+    my $maxlen = 200;    # actual limit is "about 250" according to perldiag
+
+    return $pkgbase . $f2p{"$file"} if $f2p{"$file"};
+
+    my $package = Digest::MD5::md5_hex("$file");
+    $package++ while exists $p2f{$package};    # increment until unique
+
+    die "unable to generate a unique short name for '$file'"
+      if length($pkgbase) + length($package) > $maxlen;
+
+    $f2p{"$file"} = $package;
+    $p2f{$package} = "$file";
+
+    return $pkgbase . $package;
+}
+
 sub _load_sandbox {
   my $_file = shift;
   $_file = "$_file";
 
-  my $_package = $_file;
-  $_package =~ s/([^A-Za-z0-9_])/sprintf("_%2x", ord($1))/eg;
+  my $_package = _generate_script_package_name($_file);
 
   my $fn = eval sprintf <<'END_EVAL', $_package;
-package DBICDH::Sandbox::%s;
+package %s;
 {
   our $app;
   $app ||= require $_file;
@@ -571,7 +591,7 @@ sub install_resultsource {
       $version,
     )
   ];
-  $self->_run_sql_and_perl($files, '', [$version]);
+  $self->_run_sql_and_perl($files, [], [$version]);
 }
 
 sub prepare_resultsource_install {

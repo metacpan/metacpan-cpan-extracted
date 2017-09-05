@@ -1,0 +1,4 @@
+name = "App-Prove-Plugin-RandomSeed"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

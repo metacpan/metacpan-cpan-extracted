@@ -8,4 +8,5 @@ Makefile$
 Makefile.old$
 ^Catalyst-Model-SMS-
 ^.gitignore
-
+local
+cpanfile.snapshot

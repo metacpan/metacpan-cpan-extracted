@@ -1,5 +1,10 @@
 Revision histories for Perl extension Number::Phone::JP
 
+0.20170901 Mon Sep  4 2017
+     - Added a new table class Number::Phone::JP::Table::M2m
+     - Modified to support to import duplicated prefixes.
+     - Update some table classes.
+
 0.20170801 Wed Aug  2 2017
      - Update some table classes.
 

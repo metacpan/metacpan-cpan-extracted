@@ -29,7 +29,7 @@ Perl Setup
 ----------
 
 The I18N library libintl-perl will run with a wide range of Perl versions (at
-least from Perl version 5.005_03 to Perl 5.8.0) but you will experience slight
+least from Perl version 5.005_03) but you will experience slight
 difference in features and performance depending on the version of Perl you
 use.
 
@@ -111,7 +111,7 @@ variable "OUTPUT_CHARSET" to the appropriate value, for example:
      OUTPUT_CHARSET=iso-8859-1
      export OUTPUT_CHARSET
 
-Charset names are case-insensitive, i. e. "LATIN-1" is the equivalent to
+Charset names are case-insensitive, i. e. "LATIN-1" is equivalent to
 "Latin-1" or even "lAtIn-1".
 
 Note: The output charset "utf8" is NOT recognized.  Please use the correct

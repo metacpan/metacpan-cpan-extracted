@@ -1,0 +1,41 @@
+---
+abstract: 'Provides nucleobase alphabet capabilities for Perl code.'
+author:
+  - 'James Johnson <meme-suite@uw.edu>'
+  - 'Timothy L. Bailey <meme-suite@uw.edu>'
+build_requires:
+  Array::Compare: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MEME-Alphabet
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  MEME::Alphabet:
+    file: lib/MEME/Alphabet.pm
+    version: v4.12.0.1.1
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  feature: '0'
+  perl: '5.0120'
+  strict: '0'
+  utf8: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://bitbucket.org/cviner2/meme-alphabet/issues
+  homepage: http://meme-suite.org
+  repository: https://cviner2@bitbucket.org/cviner2/meme-alphabet
+version: v4.12.0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ use parent qw(Number::Phone);
 use Carp;
 use UNIVERSAL::require;
 
-our $VERSION = '0.20170801';
+our $VERSION = '0.20170901';
 our %TEL_TABLE = ();
 
 sub import {
@@ -20,7 +20,13 @@ sub import {
             {
                 no strict 'refs';
                 while (my($k, $v) = each %{"$package\::TEL_TABLE"}) {
-                    $TEL_TABLE{$k} = $v;
+                    if ($TEL_TABLE{$k}) {
+                        $TEL_TABLE{$k} =
+                            '(?:' . $TEL_TABLE{$k} . '|' . $v . ')';
+                    }
+                    else {
+                        $TEL_TABLE{$k} = $v;
+                    }
                 }
             }
         }

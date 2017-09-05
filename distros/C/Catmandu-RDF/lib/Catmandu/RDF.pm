@@ -6,7 +6,7 @@ use Catmandu::Util qw(is_instance);
 use Moo::Role;
 use RDF::NS;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 our %TYPE_ALIAS = (
     Ttl  => 'Turtle',
@@ -17,12 +17,12 @@ our %TYPE_ALIAS = (
 );
 
 has type => (
-    is => 'ro', 
+    is => 'ro',
     coerce => sub { my $t = ucfirst($_[0]); $TYPE_ALIAS{$t} // $t },
 );
 
 has ns => (
-    is => 'ro', 
+    is => 'ro',
     default => sub { RDF::NS->new },
     coerce => sub {
         return $_[0] if is_instance($_[0],'RDF::NS');
@@ -55,10 +55,15 @@ Catmandu::RDF - Modules for handling RDF data within the Catmandu framework
 
 Command line client C<catmandu>:
 
-  catmandu convert RDF --url http://dx.doi.org/10.2474/trol.7.147 
+  catmandu convert RDF --url http://dx.doi.org/10.2474/trol.7.147
                        --fix 'aref_query(dct_title,title)' to YAML
 
-  catmandu convert RDF --file rdfdump.nt to RDF --type turtle
+  catmandu convert RDF --file rdfdump.ttl to RDF --type turtle
+
+  # For big file the only efficient option to convert RDF is by
+  # transforming the input stream into triples and writing to NTriples
+  # in the output
+  catmandu convert convert RDF --triples 1 --type ttl to RDF --type NTriples < rdfdump.ttl
 
 See documentation of modules for more examples.
 

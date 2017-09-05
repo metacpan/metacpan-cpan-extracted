@@ -1,10 +1,10 @@
 {
    "abstract" : "Generate all the disarrangements of a list.",
    "author" : [
-      "PhilipRBrenan@appaapps.com"
+      "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,14 +16,21 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Math::Disarrange::List" : {
          "file" : "lib/Math/Disarrange/List.pm",
-         "version" : "1.005"
+         "version" : "20170828"
       }
    },
    "release_status" : "stable",
@@ -32,5 +39,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.005"
+   "version" : "20170828"
 }

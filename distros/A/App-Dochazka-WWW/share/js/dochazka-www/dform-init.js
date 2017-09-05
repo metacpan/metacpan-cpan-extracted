@@ -69,12 +69,11 @@ define ([
             'aclProfile': 'passerby',
             'entriesRead': [entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail, entries.ePremark,
-                entries.ePpriv, entries.ePeffective],
+                entries.ePpriv, entries.ePprivEffective,
+                entries.ePsched, entries.ePschedEffective],
             'entriesWrite': [],
-            'hook': empLib.getEmployeeProfile,
             'miniMenu': {
-                entries: ['empProfileEdit', 'ldapSyncSelf'],
-                back: ['Back', 'mainEmpl']
+                entries: ['empProfileEdit', 'ldapSync']
             }
         }); // target.push('empProfile'
 
@@ -89,10 +88,8 @@ define ([
             'entriesRead': [entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail],
             'entriesWrite': [entries.ePremark],
-            'hook': empLib.getEmployeeProfile,
             'miniMenu': {
-                entries: ['empProfileEditSave'],
-                back: ['Back', 'empProfile']
+                entries: ['empProfileEditSave']
             }
         }); // target.push('empProfileEdit'
 
@@ -101,14 +98,12 @@ define ([
             'type': 'dform',
             'menuText': 'Look up an LDAP employee',
             'title': 'Look up an LDAP employee',
-            'preamble': 'Enter employee nick for exact (case insensitive) match.',
+            'preamble': 'Enter employee nick for exact (case insensitive) match',
             'aclProfile': 'active',
             'entriesRead': null,
             'entriesWrite': [entries.ePnick],
-            'hook': function () { return Object.create(prototypes.empProfile); },
             'miniMenu': {
-                entries: ['ldapLookupSubmit'],
-                back: ['Back', 'mainEmpl']
+                entries: ['ldapLookupSubmit']
             }
         }); // target.push('ldapLookup'
 
@@ -121,10 +116,8 @@ define ([
             'entriesRead': [entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail, entries.LDAPdochazka],
             'entriesWrite': [],
-            'hook': empLib.getLdapEmployeeObject,
             'miniMenu': {
-                entries: ['ldapSync'],
-                back: ['Back', 'mainEmpl']
+                entries: ['ldapSync']
             }
         }); // target.push('ldapDisplayEmployee'
 
@@ -137,10 +130,8 @@ define ([
             'aclProfile': 'admin',
             'entriesRead': null,
             'entriesWrite': [entries.sEnick],
-            'hook': function () { return { searchKeyNick: null }; },
             'miniMenu': {
-                entries: ['actionEmplSearch'],
-                back: ['Back', 'mainEmpl']
+                entries: ['actionEmplSearch']
             }
         }); // target.push('searchEmployee'
 
@@ -154,10 +145,8 @@ define ([
                         'on REST server',
             'aclProfile': 'admin',
             'entriesRead': [entries.rSDurl, entries.rSDversion],
-            'hook': restLib.restServerDetails,
             'miniMenu': {
-                entries: [],
-                back: ['To leave this page, press ENTER or click the Submit button', 'mainAdmin']
+                entries: []
             }
         }); // target.push('restServerDetails'
 
@@ -171,16 +160,8 @@ define ([
             'aclProfile': 'admin',
             'entriesRead': [entries.ePnick], 
             'entriesWrite': [entries.pHeffective, entries.pHpriv],
-            'hook': function () {
-                    return {
-                        'nick': currentUser('obj').nick,
-                        'effective': null,
-                        'priv': null
-                    };
-                },
             'miniMenu': {
-                entries: ['privHistorySaveAction'],
-                back: ['Back', 'drowselectListen']
+                entries: ['privHistorySaveAction']
             }
         }); // target.push('privHistoryAddRecord'
 
@@ -203,10 +184,9 @@ define ([
                     };
                 },
             'miniMenu': {
-                entries: ['schedHistorySaveAction'],
-                back: ['Back', 'drowselectListen']
+                entries: ['schedHistorySaveAction']
             }
-        }); // target.push('privHistoryAddRecord'
+        }); // target.push('schedHistoryAddRecord'
 
         target.push('schedLookup', {
             'name': 'schedLookup',
@@ -217,6 +197,7 @@ define ([
             'aclProfile': 'passerby',
             'entriesRead': null,
             'entriesWrite': [entries.sScode, entries.sSid],
+            'rememberState': false,
             'hook': function () {
                 return {
                     searchKeySchedCode: null,
@@ -224,8 +205,7 @@ define ([
                 };
             },
             'miniMenu': {
-                entries: ['actionSchedLookup'],
-                back: ['Back', 'mainSched']
+                entries: ['actionSchedLookup']
             }
         }); // target.push('schedLookup'
 
@@ -241,10 +221,8 @@ define ([
                             entries.sDfri, entries.sDsat, entries.sDsun,
                             coreLib.emptyLineEntry, entries.ePremark],
             'entriesWrite': null,
-            'hook': schedLib.getScheduleForDisplay,
             'miniMenu': {
-                entries: ['schedEdit', 'schedDelete'],
-                back: ['Back', 'mainSched']
+                entries: ['schedEdit', 'schedDelete']
             }
         }); // target.push('schedDisplay'
 
@@ -261,15 +239,13 @@ define ([
                                 entries.sDtue, entries.sDwed, entries.sDthu,
                                 entries.sDfri, entries.sDsat, entries.sDsun],
                 'entriesWrite': [entries.sDcode, entries.ePremark],
-                'hook': schedLib.getScheduleForDisplay,
                 'miniMenu': {
-                    entries: ['schedEditSave'],
-                    back: ['Back', 'schedDisplay']
+                    entries: ['schedEditSave']
                 }
             },
             schedEditFromBrowserObj = coreLib.shallowCopy(schedEditObj);
         schedEditFromBrowserObj.name = 'schedEditFromBrowser';
-        schedEditFromBrowserObj.miniMenu.back = ['Back', 'returnToBrowser'];
+        // schedEditFromBrowserObj.miniMenu.back = ['Back', 'returnToBrowser'];
         schedEditFromBrowserObj.hook = function () {
             return coreLib.dbrowserState.set[coreLib.dbrowserState.pos];
         };
@@ -290,10 +266,8 @@ define ([
                                 entries.sDfri, entries.sDsat, entries.sDsun,
                                 coreLib.emptyLineEntry, entries.ePremark],
                 'entriesWrite': null,
-                'hook': schedLib.getScheduleForDisplay,
                 'miniMenu': {
-                    entries: ['schedReallyDelete'],
-                    back: ['Back', 'schedDisplay']
+                    entries: ['schedReallyDelete']
                 }
             },
             schedDeleteFromBrowserObj = coreLib.shallowCopy(schedDeleteObj);
@@ -324,8 +298,7 @@ define ([
                  };
             },
             'miniMenu': {
-                entries: ['createSchedule'],
-                back: ['Back', 'schedNew']
+                entries: ['createSchedule']
             }
         }); // target.push('schedDisplay'
 
@@ -355,8 +328,7 @@ define ([
                  };
             },
             'miniMenu': {
-                entries: ['createSchedule'],
-                back: ['Back', 'schedNew']
+                entries: ['createSchedule']
             }
         }); // target.push('schedDisplay'
 

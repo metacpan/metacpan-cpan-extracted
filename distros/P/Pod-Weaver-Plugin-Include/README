@@ -1,0 +1,233 @@
+NAME
+    Pod::Weaver::Plugin::Include - Support for including sections of Pod
+    from other files
+
+VERSION
+    version v0.1.3
+
+SYNOPSIS
+        # weaver.ini
+        [-Include]
+        pod_path = lib:bin:docs/pod
+        insert_errors = 0
+
+DESCRIPTION
+    This is a Pod::Weaver plugin for making it possible to include segments
+    of Pod documentation being included from one file into another. This is
+    useful when one has a piece of documentation which is nice to have
+    included into a couple of documentations. So, instead of telling a user
+    to 'go see this info in *that* file' one could simply have this info
+    included from *that* file into *this* file.
+
+    For example, let's say we have a script "useful_tool" which is handling
+    its command line processing to a module "Core". In turn, the module
+    gathers information about standard command line options from modules
+    "Core::Mod1", "Core::Mod2", etc. So far, so good until one writes
+    another script "noless_useful", which is based upon the module "Core"
+    too. Yet, even worse – it adds its own command lines the list gathered
+    by "Core"! With standard Pod documentation for the common set of options
+    would have to be copy-pasted into each script documentation. For the
+    latter one it's own options must be included. And then if any
+    documentation would be changed in the original modules we would have not
+    forget update both scripts' docs too!
+
+    Phew...
+
+    "Pod::Weaver::Plugin::Include" solves the issue by defining a concept of
+    template (borrowed from archaic Pod::Template) and allowing a template
+    to be included by a third-party pod:
+
+        # File lib/Core/Mod1.pm
+        package Core::Mod1;
+     
+        ...
+    
+        # Template options won't be included into resulting Pod.
+        =pod
+    
+        Here we define command line options for later use by calling module.
+     
+        =tmpl -options
+    
+        =item B<--option1>
+    
+        document it
+    
+        =item B<--option2>
+    
+        repeat
+    
+        =cut
+    
+        1;
+        __END__
+    
+    
+    
+        # File lib/Core/Mod2.pm
+        package Core::Mod2
+    
+        =head1 Options
+    
+        Here is the options we declare in this module:
+    
+        =over 4
+    
+        =tmpl options
+    
+        =item B<--file=>I<source_file>
+    
+        Whatever it means.
+    
+        =item B<--ignore-something>
+    
+        ... we'll document it. Some day...
+    
+        =tmpl
+    
+        =back
+    
+        You will find these in your script documentation too.
+    
+        =cut
+    
+        1;
+        __END__
+    
+    
+    
+        # File lib/Core.pm
+        package Core;
+    
+        =pod
+    
+        =srcAlias mod2opts Core/Mod2.pm
+    
+        =tmpl coreOpts
+    
+        =over 4
+    
+        =item B<--help>
+    
+        Display this help
+    
+        =include options@Core::Mod1
+    
+        =include options@mod2opts
+    
+        =cut
+    
+        1;
+        __END__
+
+    Now, after processing this code by "Include" plugin, resulting
+    lib/Core.pm documentation will contain options from both "Core::Mod1"
+    and "Core::Mod2". Yet, the "noless_useful" script would has the
+    following section in its documentation:
+
+        # File: noless_useful
+    
+        =head1 OPTIONS
+    
+        =over 4
+    
+        include coreOpts@Core
+    
+        =item B<--script-opt>
+    
+        This is added by the script code
+    
+        =back
+    
+        =cut
+
+    and this section will have all the options defined by the modules plus
+    what is been added by the script itself.
+
+  Syntax
+    Three Pod commands are added by this plugin:
+
+        =tmpl [[-]tmplName]
+        =srcAlias alias source
+        =include tmplName@source
+
+    =tmpl
+        Declares a template if *tmplName* is defined. Prefixing the name
+        with a dash tells the plugin that template body is 'hidden' and must
+        not be included into enclosing documentation and will only be
+        visible as a result of "=include" command.
+
+        Template's name must start with either a alpha char or underscore
+        ("_") and continued with alpha-numeric or underscore.
+
+        A template body is terminated either by another "=tmpl" command or
+        by "=cut". If "=tmpl" doesn't have a name defined then it acts as a
+        terminating command only. For example:
+
+            =head1 SECTION
+    
+            Section docs...
+    
+            =tmpl tmpl1
+    
+            Template 1
+    
+            =tmpl -tmpl2
+    
+            Template 2
+    
+            =tmpl
+    
+            Some more docs
+    
+            =tmpl -tmpl3
+    
+            Template 3
+    
+            =cut
+
+        The above code declares three templates of which *tmpl2* and *tmpl3*
+        are hidden and *tmpl1* is included into the resulting Pod. The
+        *"Some more docs"* paragraph is not a part of any template.
+
+    =srcAlias
+        Defines an alias for a source. The source could be either a file
+        name or a module name.
+
+            =srcAlias mod1 Some::Very::Long::Module::Name1
+            =srcAlias aPodFile pod/templates/some.pod
+
+    =include
+        This command tries to locate a template defined by name *tmplName*
+        in a source defined by either a file name, a module name, or by an
+        alias and include it into the output.
+
+        Missing template is an "Error Case" (see below).
+
+  Error Cases
+    Plugin does its best as to not abort the building process. Errors are
+    ignored and only error messages are logged. But some error reports could
+    be included into generated pod if "insert_errors" option is set to
+    *true* in weaver.ini. In this case the error message is also inserted
+    into the resulting Pod with *Pod INCLUDE ERROR:* prefix.
+
+  Configuration variables
+    pod_path
+        Semicolon-separated list of directories to search for template
+        sources.
+
+        Default: *lib*
+
+    insert_errors
+        Insert some error message into the resulting Pod.
+
+AUTHOR
+    Vadim Belman <vrurg@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by Vadim Belman.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

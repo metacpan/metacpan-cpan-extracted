@@ -1,0 +1,77 @@
+{
+   "abstract" : "Failover and Load Balancing of DBI Handles",
+   "author" : [
+      "Dan Wright <Dan@DWright.Org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBD-Multi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.09",
+            "Pod::Simple" : "0",
+            "Test::Exception" : "0.21",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.19",
+            "DBI" : "0",
+            "List::Util" : "1.18",
+            "Sys::SigAction" : "0.10",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "DBD::Multi" : {
+         "file" : "lib/DBD/Multi.pm",
+         "version" : "1.01"
+      },
+      "DBD::Multi::Handler" : {
+         "file" : "lib/DBD/Multi.pm",
+         "version" : "1.01"
+      },
+      "DBD::Multi::db" : {
+         "file" : "lib/DBD/Multi.pm",
+         "version" : "1.01"
+      },
+      "DBD::Multi::dr" : {
+         "file" : "lib/DBD/Multi.pm",
+         "version" : "1.01"
+      },
+      "DBD::Multi::st" : {
+         "file" : "lib/DBD/Multi.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dwright/DBD-Multi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwright/DBD-Multi.git",
+         "web" : "https://github.com/dwright/DBD-Multi"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

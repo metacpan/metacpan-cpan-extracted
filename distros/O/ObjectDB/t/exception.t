@@ -1,41 +1,40 @@
-use Test::Spec;
-use Test::Fatal;
-
+use strict;
+use warnings;
 use lib 't/lib';
 
-use ObjectDB::Exception;
+use Test::More;
+use Test::Fatal;
+
 use Author;
 
-describe 'exception' => sub {
+use_ok 'ObjectDB::Exception';
 
-    it 'croaks' => sub {
-        ok exception { ObjectDB::Exception->throw('error') };
-    };
-
-    it 'stringifies' => sub {
-        like exception { ObjectDB::Exception->throw('error') }, qr/error/;
-    };
-
-    it 'save context' => sub {
-        like exception {
-            ObjectDB::Exception->throw('error', context => Author->new);
-        }, qr/: class='Author', table='author'/;
-    };
-
-    it 'save context sql' => sub {
-        like exception {
-            ObjectDB::Exception->throw(
-                'error',
-                sql => SQL::Composer->build(
-                    'select',
-                    columns => ['a'],
-                    from    => 'table',
-                    where   => [a => 'b']
-                )
-            );
-        }, qr/SELECT/;
-    };
-
+subtest 'croaks' => sub {
+    ok exception { ObjectDB::Exception->throw('error') };
 };
 
-runtests unless caller;
+subtest 'stringifies' => sub {
+    like exception { ObjectDB::Exception->throw('error') }, qr/error/;
+};
+
+subtest 'save context' => sub {
+    like exception {
+        ObjectDB::Exception->throw('error', context => Author->new);
+    }, qr/: class='Author', table='author'/;
+};
+
+subtest 'save context sql' => sub {
+    like exception {
+        ObjectDB::Exception->throw(
+            'error',
+            sql => SQL::Composer->build(
+                'select',
+                columns => ['a'],
+                from    => 'table',
+                where   => [ a => 'b' ]
+            )
+        );
+    }, qr/SELECT/;
+};
+
+done_testing;

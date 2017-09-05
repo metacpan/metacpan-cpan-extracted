@@ -2,7 +2,7 @@ package Net::PMP::Profile::Story;
 use Moose;
 extends 'Net::PMP::Profile';
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 has 'teaser'           => ( is => 'rw', isa => 'Str', );
 has 'contentencoded'   => ( is => 'rw', isa => 'Str', );

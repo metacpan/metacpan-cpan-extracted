@@ -13,12 +13,12 @@ __PACKAGE__->meta(
         book => {
             type  => 'many to one',
             class => 'Book',
-            map   => {book_id => 'id'}
+            map   => { book_id => 'id' }
         },
         tag => {
             type  => 'many to one',
             class => 'Tag',
-            map   => {tag_id => 'id'}
+            map   => { tag_id => 'id' }
         }
     }
 );

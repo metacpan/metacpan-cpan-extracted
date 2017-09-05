@@ -1,88 +1,88 @@
                                                                  Journaal
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                                                             EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                                                             EekBoek, 2013-12-31
 
 Datum       Boekstuk/Grootboek                Rek      Debet     Credit      BTW %  Tarief      Boekstuk/regel                  Relatie
 ------------------------------------------------------------------------------------------------------------------------------------------
-2007-01-31  Postbank:1                                                                          Afschrift 1
-2007-01-31    Crediteuren                    4100     104,65                                      *ADSL + Telefoon              KPN
-2007-01-19    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-01-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-01-31    Postbank                       2320                130,15                           Afschrift 1
+2013-01-31  Postbank:1                                                                          Afschrift 1
+2013-01-31    Crediteuren                    4100     104,65                                      *ADSL + Telefoon              KPN
+2013-01-19    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-01-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-01-31    Postbank                       2320                130,15                           Afschrift 1
 
-2007-02-28  Postbank:2                                                                          Afschrift 2
-2007-02-23    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-02-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-02-28    Postbank                       2320                 25,50                           Afschrift 2
+2013-02-28  Postbank:2                                                                          Afschrift 2
+2013-02-23    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-02-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-02-28    Postbank                       2320                 25,50                           Afschrift 2
 
-2007-03-31  Postbank:3                                                                          Afschrift 3
-2007-03-31    Postbank                       2320    3442,98                                      Afschrift 3
-2007-03-31    Crediteuren                    4100     101,52                                      *Telefoonkosten               KPN
-2007-03-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-03-09    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-03-18    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
+2013-03-31  Postbank:3                                                                          Afschrift 3
+2013-03-31    Postbank                       2320    3442,98                                      Afschrift 3
+2013-03-31    Crediteuren                    4100     101,52                                      *Telefoonkosten               KPN
+2013-03-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-03-09    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-03-18    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
 
-2007-04-30  Postbank:4                                                                          Afschrift 4
-2007-04-30    Postbank                       2320    3544,50                                      Afschrift 4
-2007-04-06    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-04-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-04-12    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
+2013-04-30  Postbank:4                                                                          Afschrift 4
+2013-04-30    Postbank                       2320    3544,50                                      Afschrift 4
+2013-04-06    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-04-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-04-12    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
 
-2007-05-31  Postbank:5                                                                          Afschrift 5
-2007-05-31    Postbank                       2320     472,28                                      Afschrift 5
-2007-05-31    Crediteuren                    4100     102,22                                      *Telefoonkosten               KPN
-2007-05-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-05-11    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-05-31    Debiteuren                     2200                600,00                           *Perl Cursus                  ACME
+2013-05-31  Postbank:5                                                                          Afschrift 5
+2013-05-31    Postbank                       2320     472,28                                      Afschrift 5
+2013-05-31    Crediteuren                    4100     102,22                                      *Telefoonkosten               KPN
+2013-05-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-05-11    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-05-31    Debiteuren                     2200                600,00                           *Perl Cursus                  ACME
 
-2007-06-30  Postbank:6                                                                          Afschrift 6
-2007-06-12    Debiteuren                     2200       5,00                                      *Perl Cursus                  ACME
-2007-06-30    Postbank                       2320     683,50                                      Afschrift 6
-2007-06-21    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-06-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-06-08    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
+2013-06-30  Postbank:6                                                                          Afschrift 6
+2013-06-12    Debiteuren                     2200       5,00                                      *Perl Cursus                  ACME
+2013-06-30    Postbank                       2320     683,50                                      Afschrift 6
+2013-06-21    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-06-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-06-08    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
 
-2007-07-31  Postbank:7                                                                          Afschrift 7
-2007-07-31    Crediteuren                    4100     104,66                                      *Telefoonkosten               KPN
-2007-07-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-07-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-07-31    Postbank                       2320                130,16                           Afschrift 7
+2013-07-31  Postbank:7                                                                          Afschrift 7
+2013-07-31    Crediteuren                    4100     104,66                                      *Telefoonkosten               KPN
+2013-07-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-07-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-07-31    Postbank                       2320                130,16                           Afschrift 7
 
-2007-08-31  Postbank:8                                                                          Afschrift 8
-2007-08-31    Postbank                       2320    1688,50                                      Afschrift 8
-2007-08-10    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-08-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-08-10    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
-2007-08-19    Debiteuren                     2200               1000,00                           *Pocket Reference             ORA
+2013-08-31  Postbank:8                                                                          Afschrift 8
+2013-08-31    Postbank                       2320    1688,50                                      Afschrift 8
+2013-08-10    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-08-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-08-10    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
+2013-08-19    Debiteuren                     2200               1000,00                           *Pocket Reference             ORA
 
-2007-09-30  Postbank:9                                                                          Afschrift 9
-2007-09-30    Crediteuren                    4100     108,72                                      *Telefoonkosten               KPN
-2007-09-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-09-17    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-09-30    Postbank                       2320                134,22                           Afschrift 9
+2013-09-30  Postbank:9                                                                          Afschrift 9
+2013-09-30    Crediteuren                    4100     108,72                                      *Telefoonkosten               KPN
+2013-09-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-09-17    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-09-30    Postbank                       2320                134,22                           Afschrift 9
 
-2007-10-31  Postbank:10                                                                         Afschrift 10
-2007-10-13    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-10-12    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-10-31    Postbank                       2320                 25,50                           Afschrift 10
+2013-10-31  Postbank:10                                                                         Afschrift 10
+2013-10-13    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-10-12    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-10-31    Postbank                       2320                 25,50                           Afschrift 10
 
-2007-11-30  Postbank:11                                                                         Afschrift 11
-2007-11-30    Crediteuren                    4100     109,67                                      *Telefoonkosten               KPN
-2007-11-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-11-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-11-30    Postbank                       2320                135,17                           Afschrift 11
+2013-11-30  Postbank:11                                                                         Afschrift 11
+2013-11-30    Crediteuren                    4100     109,67                                      *Telefoonkosten               KPN
+2013-11-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-11-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-11-30    Postbank                       2320                135,17                           Afschrift 11
 
-2007-12-07  Postbank:12                                                                         Afschrift 12
-2007-12-07    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-12-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-12-07    Postbank                       2320                 25,50                           Afschrift 12
+2013-12-07  Postbank:12                                                                         Afschrift 12
+2013-12-07    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-12-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-12-07    Postbank                       2320                 25,50                           Afschrift 12
 
-2007-12-09  Postbank:13                                                                         Eerste deel ADSL
-2007-12-09    Crediteuren                    4100      10,00                                      *Internet                     XS4ALL
-2007-12-09    Postbank                       2320                 10,00                           Eerste deel ADSL
+2013-12-09  Postbank:13                                                                         Eerste deel ADSL
+2013-12-09    Crediteuren                    4100      10,00                                      *Internet                     XS4ALL
+2013-12-09    Postbank                       2320                 10,00                           Eerste deel ADSL
 
-2007-12-10  Postbank:14                                                                         Tweede deel ADSL
-2007-12-10    Crediteuren                    4100      12,80                                      *Internet                     XS4ALL
-2007-12-10    Postbank                       2320                 12,80                           Tweede deel ADSL
+2013-12-10  Postbank:14                                                                         Tweede deel ADSL
+2013-12-10    Crediteuren                    4100      12,80                                      *Internet                     XS4ALL
+2013-12-10    Postbank                       2320                 12,80                           Tweede deel ADSL
 ------------------------------------------------------------------------------------------------------------------------------------------
             Totaal Dagboek Postbank                 10797,00   10797,00

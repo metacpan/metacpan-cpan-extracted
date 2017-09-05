@@ -54,7 +54,7 @@ plugins:
    - $self.build_file
 
  - +plugin: PromptIfStale
-   +version: 0.053
+   +version: 0.054
    check_all_plugins: 1
 
  - +plugin: CopyFilesFromBuild
@@ -167,7 +167,7 @@ plugins:
    +version: 1.05
 
  - +plugin: Test::Compile
-   +version: 2.056
+   +version: 2.057
 
  - +plugin: Test::ReportPrereqs
    +version: 0.027

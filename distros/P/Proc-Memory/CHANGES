@@ -1,9 +1,37 @@
 ==================================================
-Changes from 2016-08-26 00:00:00 +0000 to present.
+Changes from 2016-09-02 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2017-08-26 19:52:28 +0000
+version 0.009 at 2017-09-02 15:39:47 +0000
+------------------------------------------
+
+  Change: 92ba2ecf6426b19c9faa4904f5d395750a671317
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-02 17:38:59 +0000
+
+    Close handle in destructor and revise POD
+
+    regarding Solaris. This has now been tested working. :) 
+
+------------------------------------------
+version 0.008 at 2017-08-31 22:08:58 +0000
+------------------------------------------
+
+  Change: 262d6616ba240510cdffd6319ec2aeb2e0fdaaac
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-09-01 00:08:58 +0000
+
+    Update POD about supported platforms 
+
+  Change: ac3474580a8ae605d6656de1496c37d15e713608
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-08-26 21:59:27 +0000
+
+    Add Travis and AppVeyor Integration 
+
+------------------------------------------
+version 0.007 at 2017-08-26 19:51:48 +0000
 ------------------------------------------
 
   Change: fd5ae64949e14d22a1ce913dc8fa8986f434f4e0

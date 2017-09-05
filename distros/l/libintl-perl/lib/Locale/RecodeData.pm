@@ -3,7 +3,7 @@
 # vim: set autoindent shiftwidth=4 tabstop=4:
 
 # Virtual base class for Locale::Recode converters.
-# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2002-2017 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
@@ -149,7 +149,7 @@ an informative error message.
 
 =head1 AUTHOR
 
-Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+Copyright (C) 2002-2017 L<Guido Flohr|http://www.guido-flohr.net/>
 (L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
 code for details!code for details!
 

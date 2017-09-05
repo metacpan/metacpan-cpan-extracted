@@ -1,0 +1,35 @@
+native:
+  debian:
+    packages:
+      - pkg-config
+      - gettext
+      - libjpeg-dev
+      - libtiff4-dev
+      - libpng12-dev
+      - libfreetype6-dev
+      - libgif-dev
+      - libx11-dev
+      - libxml2-dev
+      - libpango1.0-dev
+      - libcairo2-dev
+  macos-homebrew:
+    packages:
+      - pkg-config
+      - autoconf
+      - automake
+      - libtool
+      - gettext
+      - pango
+      - cairo
+      - fontconfig
+      - libpng
+      - jpeg
+      - libtiff
+      - giflib
+      - libspiro
+      - libuninameslist
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-cairo
+      - mingw-w64-x86_64-libxml2
+      - mingw-w64-x86_64-pango

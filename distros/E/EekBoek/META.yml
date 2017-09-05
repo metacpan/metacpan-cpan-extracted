@@ -1,37 +1,43 @@
 ---
-name: EekBoek
-version: 2.02.05.1
+abstract: 'Bookkeeping software for small and medium-size businesses'
 author:
-  - Johan Vromans (jvromans@squirrel.nl)
-abstract: Elementary Bookkeeping (for the Dutch/European market)
-license: perl
-resources:
-  MailingList: http://lists.sourceforge.net/lists/listinfo/eekboek
-  homepage: http://www.eekboek.nl
-  license: http://dev.perl.org/licenses/
-requires:
-  Archive::Zip: 1.16
-  DBD::SQLite: 1.13
-  DBI: 1.40
-  Getopt::Long: 2.13
-  Term::ReadLine: 0
-  Term::ReadLine::Gnu: 0
+  - 'Johan Vromans (jvromans@squirrel.nl)'
 build_requires:
-  IPC::Run3: 0.034
-  Module::Build: 0.26
-recommends:
-  DBD::Pg: 1.41
-  Getopt::Long: 2.32
-  HTML::Entities: 1.35
+  ExtUtils::MakeMaker: '0'
+  IPC::Run3: '0.034'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.5503'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EekBoek
+no_index:
+  directory:
+    - t
+    - inc
+    - lib/EB
 provides:
   EekBoek:
     file: lib/EekBoek.pm
-    version: 2.02.05
-generated_by: Module::Build version 0.32
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
-no_index:
-  directory:
-    - inc
-    - lib/EB
+    version: v2.30.1
+recommends:
+  DBD::Pg: '1.41'
+  Getopt::Long: '2.32'
+  HTML::Entities: '1.35'
+requires:
+  Archive::Zip: '1.16'
+  DBD::SQLite: '1.13'
+  DBI: '1.40'
+  Getopt::Long: '2.13'
+  Term::ReadLine: '0'
+  Term::ReadLine::Gnu: '0'
+  perl: '5.008006'
+resources:
+  homepage: https://www.eekboek.nl
+  license: https://dev.perl.org/licenses/
+version: v2.030.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

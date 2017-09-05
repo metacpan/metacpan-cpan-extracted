@@ -1,5 +1,10 @@
 Revision history for Web::Request::Role::JSON
 
+1.005   2017-08-31T13:00:31
+    - feat: add content_type parameter to role, defaulting to
+      "application/json; charset=utf-8" (Klaus Ita)
+
+
 1.004   2017-06-13T12:39:32
     - return undef if there is no payload
 

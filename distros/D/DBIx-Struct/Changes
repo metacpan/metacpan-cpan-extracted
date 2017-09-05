@@ -1,3 +1,9 @@
+0.27 Fri Aug 31 08:40:00 CEST 2017
+         - mysql and test fixes 
+         
+0.26 Fri Aug 30 22:40:00 CEST 2017
+         - mysql fixes 
+         
 0.23 Fri May 19 16:40:00 CEST 2017
          - quote_identifier for insert and update 
          

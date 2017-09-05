@@ -1,6 +1,4 @@
-package MIME::AltWords;
-# Dat: `package MIME::AltWords0' would be incorrect. We don't need the zero.
-# copy of package MIME::Words (version 5.420);
+package MIME::AltWords0;
 # at Wed Sep 27 07:52:29 CEST 2006
 
 =head1 NAME
@@ -70,7 +68,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA);
 ### Exporting:
 use Exporter;
 %EXPORT_TAGS = (all => [qw(decode_mimewords encode_mimewords encode_mimeword
-			   )]);
+			   decode_mimewords_wantarray)]);
 Exporter::export_ok_tags('all');
 
 ### Inheritance:
@@ -88,49 +86,7 @@ use MIME::QuotedPrint;
 #
 #------------------------------
 
-### The package version, both in 1.23 style *and* usable by MakeMaker:
-$VERSION = "5.420";
-
-use vars qw($NONPRINT); #### pts ####
-
-### Nonprintables (controls + x7F + 8bit):
-$NONPRINT = "\\x00-\\x1F\\x7F-\\xFF"; 
-
-
 #------------------------------
-
-# _decode_Q STRING
-#     Private: used by _decode_header() to decode "Q" encoding, which is
-#     almost, but not exactly, quoted-printable.  :-P
-sub _decode_Q {
-    my $str = shift;
-    $str =~ s/_/\x20/g;                                # RFC-1522, Q rule 2
-    $str =~ s/=([\da-fA-F]{2})/pack("C", hex($1))/ge;  # RFC-1522, Q rule 1
-    $str;
-}
-
-# _encode_Q STRING
-#     Private: used by _encode_header() to decode "Q" encoding, which is
-#     almost, but not exactly, quoted-printable.  :-P
-sub _encode_Q {
-    my $str = shift;
-    $str =~ s{([_\?\=$NONPRINT])}{sprintf("=%02X", ord($1))}eog;
-    $str;
-}
-
-# _decode_B STRING
-#     Private: used by _decode_header() to decode "B" encoding.
-sub _decode_B {
-    my $str = shift;
-    decode_base64($str);
-}
-
-# _encode_B STRING
-#     Private: used by _decode_header() to decode "B" encoding.
-sub _encode_B {
-    my $str = shift;
-    encode_base64($str, '');
-}
 
 
 
@@ -171,70 +127,6 @@ Name of the mail field this string came from.  I<Currently ignored.>
 =back
 
 =cut
-
-sub decode_mimewords_wantarray {
-    my $encstr = shift;
-    my %params = @_;
-    my @tokens;
-    $@ = '';           ### error-return
-
-    ### Collapse boundaries between adjacent encoded words:
-    $encstr =~ s{(\?\=)\s*(\=\?)}{$1$2}gs;
-    pos($encstr) = 0;
-    ### print STDOUT "ENC = [", $encstr, "]\n";
-
-    ### Decode:
-    my ($charset, $encoding, $enc, $dec);
-    while (1) {
-	last if (pos($encstr) >= length($encstr));
-	my $pos = pos($encstr);               ### save it
-
-	### Case 1: are we looking at "=?..?..?="?
-	if ($encstr =~    m{\G             # from where we left off..
-			    =\?([^?]*)     # "=?" + charset +
-			     \?([bq])      #  "?" + encoding +
-			     \?([^?]+)     #  "?" + data maybe with spcs +
-			     \?=           #  "?="
-			    }xgi) {
-	    ($charset, $encoding, $enc) = ($1, lc($2), $3);
-	    $dec = (($encoding eq 'q') ? _decode_Q($enc) : _decode_B($enc));
-	    push @tokens, [$dec, $charset];
-	    next;
-	}
-
-	### Case 2: are we looking at a bad "=?..." prefix? 
-	### We need this to detect problems for case 3, which stops at "=?":
-	pos($encstr) = $pos;               # reset the pointer.
-	if ($encstr =~ m{\G=\?}xg) {
-	    $@ .= qq|unterminated "=?..?..?=" in "$encstr" (pos $pos)\n|;
-	    push @tokens, ['=?'];
-	    next;
-	}
-
-	### Case 3: are we looking at ordinary text?
-	pos($encstr) = $pos;               # reset the pointer.
-	if ($encstr =~ m{\G                # from where we left off...
-			 ([\x00-\xFF]*?    #   shortest possible string,
-			  \n*)             #   followed by 0 or more NLs,
-		         (?=(\Z|=\?))      # terminated by "=?" or EOS
-			}xg) {
-	    length($1) or die "MIME::AltWords0: internal logic err: empty token\n";
-	    push @tokens, [$1];
-	    next;
-	}
-	
-	if ($encstr=~m{\G([\x00-\xFF]*)[^\x00-\xFF]+}g) { #### pts ####
-	    $@.=qq|wide character in encoded string\n|;
-	    push @tokens, [$1] if 0!=length($1);
-	    next;
-	}
-
-	### Case 4: bug!
-	die "MIME::AltWords0: unexpected case:\n($encstr) pos $pos\n\t".
-	    "Please alert developer.\n";
-    }
-    return (wantarray ? @tokens : join('',map {$_->[0]} @tokens));
-}
 
 #------------------------------
 

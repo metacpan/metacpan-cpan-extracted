@@ -13,11 +13,11 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Peek/Poke other processes' address spaces",
   "AUTHOR" => "Ahmad Fatoum <athreef\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::libvas" => "0.15",
+    "Alien::libvas" => "0.202",
     "ExtUtils::MakeMaker" => 0
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::libvas" => "0.15",
+    "Alien::libvas" => "0.202",
     "ExtUtils::MakeMaker" => 0,
     "Inline::C" => 0
   },
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Proc::Memory",
   "PREREQ_PM" => {
-    "Alien::libvas" => "0.15",
+    "Alien::libvas" => "0.202",
     "Carp" => 0,
     "Inline" => "0.56",
     "Scalar::Util" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Alien::libvas" => "0.15",
+  "Alien::libvas" => "0.202",
   "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME => 'Net::IPAddress::Util',
-  AUTHOR => q{PWBENNETT},
+  AUTHOR => q{Paul Bennett <paul.w.bennett@gmail.com>},
   VERSION_FROM => 'lib/Net/IPAddress/Util.pm',
   ABSTRACT_FROM => 'lib/Net/IPAddress/Util.pm',
   ($ExtUtils::MakeMaker::VERSION >= 6.3002

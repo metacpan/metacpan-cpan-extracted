@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,23 +14,23 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 255eb417fbac0cb498d99ce4c6aa871229b68c3a COPYRIGHT
+SHA1 7b8698284f806c96847625dc75736c5e29854505 COPYRIGHT
 SHA1 df8cccf2efb0ae1a3b5b67cbad3da01e5d5d2087 CREDITS
-SHA1 f36320275a0714ba0c22753a04df09c1429304aa Changes
+SHA1 06ebe8bbc8998728202959f31912cd7e8d14c93b Changes
 SHA1 9304476a656062aebc7ec99dda542e277d3affc8 INSTALL
-SHA1 3b3d4e058223e91ddf5bb7fba2a77d084ae60a4a LICENSE
+SHA1 7afae05d67ecea9c5e9328c4c29442c9d343da86 LICENSE
 SHA1 d428227379cef1641f0ef849eaaccedcfb3676f9 MANIFEST
-SHA1 147cdf111a3c4a02b285c5bd1f45ca49609904fd META.json
-SHA1 2e5b40dc3220d2b8b35c883e1ef46350ab86f232 META.yml
-SHA1 5e0e66207c85ec6c02acc07416410c67897fe013 Makefile.PL
-SHA1 2d12d8f3cea92df4e0b5dd098d3d2ad5edb3a45c README
+SHA1 8503b931f720fa3292ab8194d93dc4912b85a3f1 META.json
+SHA1 48355d6bb3c71775c7fc026cba0b359a05fdb067 META.yml
+SHA1 8b39eb6c22e32d973396fbd96cbb746d96949463 Makefile.PL
+SHA1 c6ede1116bb15f7f89c791e851a940aa286171ba README
 SHA1 923010d9edd00c16c601951dcecf3ec2ec83fdd6 dist.ini
-SHA1 330b2a5e94d406985d4cb05cd8f78f11b651a002 doap.ttl
-SHA1 b841c097cabe90cad1051e74bf66adacffd0282f lib/Test/RDF.pm
+SHA1 d0bf478b6cfee20a337defe04a0c66fc866d3051 doap.ttl
+SHA1 bca065c925490bab637c7ab41b2ee41522ff52f1 lib/Test/RDF.pm
 SHA1 8c1510eabbc3a16dad03804bb61bd1b1ed44ebb9 t/00-load.t
 SHA1 45b601013f2b4a6f2f80b95a7708ff21f9212568 t/are_subgraphs.t
 SHA1 cf96f178cca61688f8ab8266f2d9964fb0c50984 t/has_literal.t
-SHA1 12ec3f77e3d86666c665e3c62fb5514b299c73be t/has_uri.t
+SHA1 7ce603fa473dd1bb5e741ef628d3d6b0bdbb6193 t/has_uri.t
 SHA1 4bceb9ac21385b04dc126913078ce35657d29713 t/hasnt_literal.t
 SHA1 e94673346e7b3d4b948eacd680570f54235a449b t/is_rdf.t
 SHA1 37cec96fe4bd6e1930b32a4bcac468de7c133f22 t/is_valid_rdf.t
@@ -38,19 +38,19 @@ SHA1 53a4d03276d84484ad3c5c12b3ffdcc08bddd5d1 t/isomorph_graphs.t
 SHA1 7768914589944c8c07140cc3bd0f5c82fd585a2e t/pattern_fail.t
 SHA1 80d80f06401ba7ccea49158e59a410680a676a81 t/pattern_ok.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iQIVAwUBVEA64X++6N86nkqlAQi4zQ/9EoBexHgsAj4KFyAJkGFsdujYuoRLW+d1
-/kIn5IcbGVH7F/744awEgRY6uNWNuzahBUn5mPBa9GCKu1fNGP9jDF4v/o7FvupV
-T/ydVOw9DZbKn/HAzGiVyjHhN9lGhWTf2KUsbjGxujQbZR3RIE0eV9oyhtHBSG3i
-wXfKbzxkksakU5B9pjBeVvTbyRMvKxrDWUmeVAz6IQIihpyPI5tei8S+YfxPSvoK
-5raSMdbRTDDAsocyNrDUyCBDC2Gmz/lbamtRGDJP/yOjjxOgoYyIwYfQcKEAUq/b
-rHeQYHrOxCu+wX2QkKCw5ZQufl8rVzrELCB9zS2IViVcCh6P3RNDieTunfvyD6pC
-QtS2pxvpd/dxIN44u6lqcLQljdW66IEhVIYWkU4/HQKsMKmblLa2v1SUVsHI0vhH
-LjTYV3tUFBLZ65XhlOO2zXzr/GcEfCncy3GVFLfOSt+fI22oKU76KnKJAG3ZG8xO
-NXVHAap3dapH6eyR/Lo/9rnVbUJ2HGb3L9FA3maMC7cQt4UWlXkdGpZVGCK6ayfK
-hLMDvaUk4ru6f80DUKExhhk3Ps0FM5QNDIOWYwuS3VAqNVrtizDhThHLBPpsZHlk
-kaqrJiS/Tkacquiubz1cu1K5xmqFYEjpYqoDlBh+bZy/cybDa6gcAD/zC1Opmgop
-2Tk0T+OHgSg=
-=Z1Xv
+iQIVAwUBWanWMX++6N86nkqlAQi/tw//ZIaM2ETv58q7Kgs/szC7qF6Knt4Mw50L
+zwn6o11CM3KvuE6G/eyU+yr4YNsF0t4W4GMQAjq59KobodZeYr0gaefpXWifVAlQ
+EsfkN4XMnZ5oQtyYQe4CP6NorEvcNnCtymS+7OvsJKorQNoSX76Eo4bzEzJkXsAt
+isPbdof3phat2zMvnZAhfTEdaixz4Nc+Rq80tx8tczBKsEOBKJt7lgBDUiBYsXlF
+TNMixbVvV4RtSQVZHraaGrBKVYbIoqMyX+3hmyQCAKEwdqSCrfIb2j7H7pNT/KQd
+ZVZQyIRQnCfMLBIISaPavE2yTO/I/XCp3z9mC9/1pOuKkmuF5ugkqcjOHoO5UFiH
+lb3Gb21mRmaoamrnOl/jXnIfyU4Sp0XSkk8oDgC3wynfkS3Qm6QohqwM3X+SF9zt
+azjI7UFrkW4vVHOTSnSIgqhfFBfhoFbdfF/mtPNvfkoWD9S8xt1rsBDgCdBlCPC1
+rzoxsMRYSwQ4cRuXSwgaRc4JoH7PdNn1x0BTXH5llLm1G+XY/Yuvwe0G5fnBP0DA
+SF6PFGSBFrFfwijkG6EoLL6CJ6oxmxsJRK0pzGeHwurh61xbbwnnlHCYv1DwDVAT
+hqICSPdzQLRWGLAbHUMeAhAyjIMsILHieV5bR0YUWEsh3sHcRSMshAsQLtJRuT4y
+ba5h2iO/RvY=
+=3HX2
 -----END PGP SIGNATURE-----

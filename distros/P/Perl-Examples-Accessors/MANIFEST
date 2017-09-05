@@ -12,6 +12,7 @@ lib/Perl/Examples/Accessors/Array.pm
 lib/Perl/Examples/Accessors/ClassAccessor.pm
 lib/Perl/Examples/Accessors/ClassAccessorArray.pm
 lib/Perl/Examples/Accessors/ClassAccessorArrayGlob.pm
+lib/Perl/Examples/Accessors/ClassAccessorPackedString.pm
 lib/Perl/Examples/Accessors/ClassInsideOut.pm
 lib/Perl/Examples/Accessors/ClassStruct.pm
 lib/Perl/Examples/Accessors/ClassTiny.pm
@@ -35,6 +36,7 @@ lib/Perl/Examples/Accessors/ObjectTinyXS.pm
 lib/Perl/Examples/Accessors/Scalar.pm
 lib/Perl/Examples/Accessors/SimpleAccessor.pm
 t/00-compile.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 weaver.ini

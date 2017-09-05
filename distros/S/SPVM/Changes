@@ -1,4 +1,33 @@
-0.0249
+0.0257 2017-09-05
+  - improve inline native source error message
+  - inline source is separated each
+0.0256 2017-09-04
+  - CBuilder output become quite.
+  - Fix some Windows compile error
+0.0255 2017-09-04
+  - detect automatically inline native function
+  - remove SPVM::Inline
+0.0254 2017-09-02
+  - Support inline native function. implement SPVM::Inline
+0.0253 2017-09-01
+  - fix exception bugs
+0.0252 2017-08-30
+  - allow enum last camma
+  - allow term last camma
+  - allow args last camma
+  - allow descripter last camma
+  - forbidden double comma
+0.0251 2017-08-30
+  - fix bug that if package is not exists, compile is ok.
+  - implement destructor
+    sub DESTROY ($self : Foo) : void {
+      
+    }
+0.0250 2017-08-29
+  - cleanup runtime
+  - cleanup api
+  - fix exception some bug
+0.0249 2017-08-25
   - string can't convert to byte[]
   - byte[] can't convert to string
   - allow $string->[0] to get byte value

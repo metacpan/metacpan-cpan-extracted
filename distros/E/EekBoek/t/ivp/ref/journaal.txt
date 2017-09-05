@@ -1,227 +1,227 @@
                                                                  Journaal
-Periode: 2007-01-01 t/m 2007-12-31
-EekBoek Demo Administratie                                                                                             EekBoek, 2007-12-31
+Periode: 2013-01-01 t/m 2013-12-31
+EekBoek Demo Administratie                                                                                             EekBoek, 2013-12-31
 
 Datum       Boekstuk/Grootboek                Rek      Debet     Credit      BTW %  Tarief      Boekstuk/regel                  Relatie
 ------------------------------------------------------------------------------------------------------------------------------------------
-2007-01-05  Inkoop:1                                                                            Internet                        XS4ALL
-2007-01-05    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-01-05    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-01-05    Crediteuren                    4100                 22,80                           Internet
+2013-01-05  Inkoop:1                                                                            Internet                        XS4ALL
+2013-01-05    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-01-05    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-01-05    Crediteuren                    4100                 22,80                           Internet
 
-2007-01-15  Inkoop:2                                                                            ADSL + Telefoon                 KPN
-2007-01-15    BTW Inkoop Hoog                4220      12,84                                      BTW Telefoonkosten
-2007-01-15    BTW Inkoop Hoog                4220       3,86                                      BTW ADSL
-2007-01-15    Telefoon- en faxkosten         6900      67,61                 19,00  Hoog          Telefoonkosten
-2007-01-15    Internetkosten                 6905      20,34                 19,00  Hoog          ADSL
-2007-01-15    Crediteuren                    4100                104,65                           ADSL + Telefoon
+2013-01-15  Inkoop:2                                                                            ADSL + Telefoon                 KPN
+2013-01-15    BTW Inkoop Hoog                4220      13,96                                      BTW Telefoonkosten
+2013-01-15    BTW Inkoop Hoog                4220       4,20                                      BTW ADSL
+2013-01-15    Telefoon- en faxkosten         6900      66,49                 21,00  Hoog          Telefoonkosten
+2013-01-15    Internetkosten                 6905      20,00                 21,00  Hoog          ADSL
+2013-01-15    Crediteuren                    4100                104,65                           ADSL + Telefoon
 
-2007-01-31  Postbank:1                                                                          Afschrift 1
-2007-01-31    Crediteuren                    4100     104,65                                      *ADSL + Telefoon              KPN
-2007-01-19    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-01-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-01-31    Postbank                       2320                130,15                           Afschrift 1
+2013-01-31  Postbank:1                                                                          Afschrift 1
+2013-01-31    Crediteuren                    4100     104,65                                      *ADSL + Telefoon              KPN
+2013-01-19    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-01-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-01-31    Postbank                       2320                130,15                           Afschrift 1
 
-2007-02-09  Inkoop:3                                                                            Internet                        XS4ALL
-2007-02-09    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-02-09    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-02-09    Crediteuren                    4100                 22,80                           Internet
+2013-02-09  Inkoop:3                                                                            Internet                        XS4ALL
+2013-02-09    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-02-09    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-02-09    Crediteuren                    4100                 22,80                           Internet
 
-2007-02-18  Verkoop:1                                                                           Perl Cursus                     ACME
-2007-02-18    Debiteuren                     2200    3570,00                                      Perl Cursus
-2007-02-18    BTW Verkoop Hoog               4200                570,00                           BTW Perl Cursus 1e bet.
-2007-02-18    Omzet cursussen                8400               3000,00      19,00  Hoog          Perl Cursus 1e bet.
+2013-02-18  Verkoop:1                                                                           Perl Cursus                     ACME
+2013-02-18    Debiteuren                     2200    3570,00                                      Perl Cursus
+2013-02-18    BTW Verkoop Hoog               4200                619,59                           BTW Perl Cursus 1e bet.
+2013-02-18    Omzet cursussen                8400               2950,41      21,00  Hoog          Perl Cursus 1e bet.
 
-2007-02-28  Postbank:2                                                                          Afschrift 2
-2007-02-23    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-02-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-02-28    Postbank                       2320                 25,50                           Afschrift 2
+2013-02-28  Postbank:2                                                                          Afschrift 2
+2013-02-23    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-02-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-02-28    Postbank                       2320                 25,50                           Afschrift 2
 
-2007-03-08  Inkoop:4                                                                            Internet                        XS4ALL
-2007-03-08    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-03-08    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-03-08    Crediteuren                    4100                 22,80                           Internet
+2013-03-08  Inkoop:4                                                                            Internet                        XS4ALL
+2013-03-08    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-03-08    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-03-08    Crediteuren                    4100                 22,80                           Internet
 
-2007-03-18  Inkoop:5                                                                            Telefoonkosten                  KPN
-2007-03-18    BTW Inkoop Hoog                4220      16,21                                      BTW ADSL + Telefoon
-2007-03-18    Telefoon- en faxkosten         6900      85,31                 19,00  Hoog          ADSL + Telefoon
-2007-03-18    Crediteuren                    4100                101,52                           Telefoonkosten
+2013-03-18  Inkoop:5                                                                            Telefoonkosten                  KPN
+2013-03-18    BTW Inkoop Hoog                4220      17,62                                      BTW ADSL + Telefoon
+2013-03-18    Telefoon- en faxkosten         6900      83,90                 21,00  Hoog          ADSL + Telefoon
+2013-03-18    Crediteuren                    4100                101,52                           Telefoonkosten
 
-2007-03-18  Verkoop:2                                                                           Perl Cursus                     ACME
-2007-03-18    Debiteuren                     2200    3570,00                                      Perl Cursus
-2007-03-18    BTW Verkoop Hoog               4200                570,00                           BTW Perl Cursus 2e bet.
-2007-03-18    Omzet cursussen                8400               3000,00      19,00  Hoog          Perl Cursus 2e bet.
+2013-03-18  Verkoop:2                                                                           Perl Cursus                     ACME
+2013-03-18    Debiteuren                     2200    3570,00                                      Perl Cursus
+2013-03-18    BTW Verkoop Hoog               4200                619,59                           BTW Perl Cursus 2e bet.
+2013-03-18    Omzet cursussen                8400               2950,41      21,00  Hoog          Perl Cursus 2e bet.
 
-2007-03-31  Postbank:3                                                                          Afschrift 3
-2007-03-31    Postbank                       2320    3442,98                                      Afschrift 3
-2007-03-31    Crediteuren                    4100     101,52                                      *Telefoonkosten               KPN
-2007-03-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-03-09    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-03-18    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
+2013-03-31  Postbank:3                                                                          Afschrift 3
+2013-03-31    Postbank                       2320    3442,98                                      Afschrift 3
+2013-03-31    Crediteuren                    4100     101,52                                      *Telefoonkosten               KPN
+2013-03-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-03-09    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-03-18    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
 
-2007-04-05  Inkoop:6                                                                            Internet                        XS4ALL
-2007-04-05    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-04-05    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-04-05    Crediteuren                    4100                 22,80                           Internet
+2013-04-05  Inkoop:6                                                                            Internet                        XS4ALL
+2013-04-05    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-04-05    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-04-05    Crediteuren                    4100                 22,80                           Internet
 
-2007-04-18  Verkoop:3                                                                           Perl Cursus                     ACME
-2007-04-18    Debiteuren                     2200     600,00                                      Perl Cursus
-2007-04-18    BTW Verkoop Hoog               4200                 95,80                           BTW Perl Cursus rest
-2007-04-18    Omzet cursussen                8400                504,20      19,00  Hoog          Perl Cursus rest
+2013-04-18  Verkoop:3                                                                           Perl Cursus                     ACME
+2013-04-18    Debiteuren                     2200     600,00                                      Perl Cursus
+2013-04-18    BTW Verkoop Hoog               4200                104,13                           BTW Perl Cursus rest
+2013-04-18    Omzet cursussen                8400                495,87      21,00  Hoog          Perl Cursus rest
 
-2007-04-30  Postbank:4                                                                          Afschrift 4
-2007-04-30    Postbank                       2320    3544,50                                      Afschrift 4
-2007-04-06    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-04-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-04-12    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
+2013-04-30  Postbank:4                                                                          Afschrift 4
+2013-04-30    Postbank                       2320    3544,50                                      Afschrift 4
+2013-04-06    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-04-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-04-12    Debiteuren                     2200               3570,00                           *Perl Cursus                  ACME
 
-2007-05-10  Inkoop:7                                                                            Internet                        XS4ALL
-2007-05-10    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-05-10    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-05-10    Crediteuren                    4100                 22,80                           Internet
+2013-05-10  Inkoop:7                                                                            Internet                        XS4ALL
+2013-05-10    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-05-10    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-05-10    Crediteuren                    4100                 22,80                           Internet
 
-2007-05-12  Verkoop:4                                                                           Perl Cursus                     ACME
-2007-05-12    BTW Verkoop Hoog               4200       0,80                                      BTW Perl Cursus rest
-2007-05-12    Omzet cursussen                8400       4,20                 19,00  Hoog          Perl Cursus rest
-2007-05-12    Debiteuren                     2200                  5,00                           Perl Cursus
+2013-05-12  Verkoop:4                                                                           Perl Cursus                     ACME
+2013-05-12    BTW Verkoop Hoog               4200       0,87                                      BTW Perl Cursus rest
+2013-05-12    Omzet cursussen                8400       4,13                 21,00  Hoog          Perl Cursus rest
+2013-05-12    Debiteuren                     2200                  5,00                           Perl Cursus
 
-2007-05-14  Verkoop:5                                                                           Ondersteuning                   ACME
-2007-05-14    Debiteuren                     2200     714,00                                      Ondersteuning
-2007-05-14    BTW Verkoop Hoog               4200                114,00                           BTW Consultancy
-2007-05-14    Omzet advisering               8100                600,00      19,00  Hoog          Consultancy
+2013-05-14  Verkoop:5                                                                           Ondersteuning                   ACME
+2013-05-14    Debiteuren                     2200     714,00                                      Ondersteuning
+2013-05-14    BTW Verkoop Hoog               4200                123,92                           BTW Consultancy
+2013-05-14    Omzet advisering               8100                590,08      21,00  Hoog          Consultancy
 
-2007-05-20  Inkoop:8                                                                            Telefoonkosten                  KPN
-2007-05-20    BTW Inkoop Hoog                4220      16,32                                      BTW ADSL + Telefoon
-2007-05-20    Telefoon- en faxkosten         6900      85,90                 19,00  Hoog          ADSL + Telefoon
-2007-05-20    Crediteuren                    4100                102,22                           Telefoonkosten
+2013-05-20  Inkoop:8                                                                            Telefoonkosten                  KPN
+2013-05-20    BTW Inkoop Hoog                4220      17,74                                      BTW ADSL + Telefoon
+2013-05-20    Telefoon- en faxkosten         6900      84,48                 21,00  Hoog          ADSL + Telefoon
+2013-05-20    Crediteuren                    4100                102,22                           Telefoonkosten
 
-2007-05-31  Postbank:5                                                                          Afschrift 5
-2007-05-31    Postbank                       2320     472,28                                      Afschrift 5
-2007-05-31    Crediteuren                    4100     102,22                                      *Telefoonkosten               KPN
-2007-05-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-05-11    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-05-31    Debiteuren                     2200                600,00                           *Perl Cursus                  ACME
+2013-05-31  Postbank:5                                                                          Afschrift 5
+2013-05-31    Postbank                       2320     472,28                                      Afschrift 5
+2013-05-31    Crediteuren                    4100     102,22                                      *Telefoonkosten               KPN
+2013-05-31    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-05-11    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-05-31    Debiteuren                     2200                600,00                           *Perl Cursus                  ACME
 
-2007-06-07  Inkoop:9                                                                            Internet                        XS4ALL
-2007-06-07    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-06-07    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-06-07    Crediteuren                    4100                 22,80                           Internet
+2013-06-07  Inkoop:9                                                                            Internet                        XS4ALL
+2013-06-07    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-06-07    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-06-07    Crediteuren                    4100                 22,80                           Internet
 
-2007-06-30  Postbank:6                                                                          Afschrift 6
-2007-06-12    Debiteuren                     2200       5,00                                      *Perl Cursus                  ACME
-2007-06-30    Postbank                       2320     683,50                                      Afschrift 6
-2007-06-21    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-06-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-06-08    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
+2013-06-30  Postbank:6                                                                          Afschrift 6
+2013-06-12    Debiteuren                     2200       5,00                                      *Perl Cursus                  ACME
+2013-06-30    Postbank                       2320     683,50                                      Afschrift 6
+2013-06-21    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-06-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-06-08    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
 
-2007-07-05  Inkoop:10                                                                           Internet                        XS4ALL
-2007-07-05    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-07-05    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-07-05    Crediteuren                    4100                 22,80                           Internet
+2013-07-05  Inkoop:10                                                                           Internet                        XS4ALL
+2013-07-05    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-07-05    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-07-05    Crediteuren                    4100                 22,80                           Internet
 
-2007-07-15  Inkoop:11                                                                           Telefoonkosten                  KPN
-2007-07-15    BTW Inkoop Hoog                4220      16,71                                      BTW ADSL + Telefoon
-2007-07-15    Telefoon- en faxkosten         6900      87,95                 19,00  Hoog          ADSL + Telefoon
-2007-07-15    Crediteuren                    4100                104,66                           Telefoonkosten
+2013-07-15  Inkoop:11                                                                           Telefoonkosten                  KPN
+2013-07-15    BTW Inkoop Hoog                4220      18,16                                      BTW ADSL + Telefoon
+2013-07-15    Telefoon- en faxkosten         6900      86,50                 21,00  Hoog          ADSL + Telefoon
+2013-07-15    Crediteuren                    4100                104,66                           Telefoonkosten
 
-2007-07-16  Verkoop:6                                                                           Ondersteuning                   ACME
-2007-07-16    Debiteuren                     2200     714,00                                      Ondersteuning
-2007-07-16    BTW Verkoop Hoog               4200                114,00                           BTW Consultancy
-2007-07-16    Omzet advisering               8100                600,00      19,00  Hoog          Consultancy
+2013-07-16  Verkoop:6                                                                           Ondersteuning                   ACME
+2013-07-16    Debiteuren                     2200     714,00                                      Ondersteuning
+2013-07-16    BTW Verkoop Hoog               4200                123,92                           BTW Consultancy
+2013-07-16    Omzet advisering               8100                590,08      21,00  Hoog          Consultancy
 
-2007-07-31  Postbank:7                                                                          Afschrift 7
-2007-07-31    Crediteuren                    4100     104,66                                      *Telefoonkosten               KPN
-2007-07-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-07-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-07-31    Postbank                       2320                130,16                           Afschrift 7
+2013-07-31  Postbank:7                                                                          Afschrift 7
+2013-07-31    Crediteuren                    4100     104,66                                      *Telefoonkosten               KPN
+2013-07-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-07-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-07-31    Postbank                       2320                130,16                           Afschrift 7
 
-2007-08-09  Inkoop:12                                                                           Internet                        XS4ALL
-2007-08-09    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-08-09    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-08-09    Crediteuren                    4100                 22,80                           Internet
+2013-08-09  Inkoop:12                                                                           Internet                        XS4ALL
+2013-08-09    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-08-09    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-08-09    Crediteuren                    4100                 22,80                           Internet
 
-2007-08-19  Verkoop:7                                                                           Pocket Reference                ORA
-2007-08-19    Debiteuren                     2200    1000,00                                      Pocket Reference
-2007-08-19    Omzet editing                  8300               1000,00      19,00  Hoog          Produktie boek
+2013-08-19  Verkoop:7                                                                           Pocket Reference                ORA
+2013-08-19    Debiteuren                     2200    1000,00                                      Pocket Reference
+2013-08-19    Omzet editing                  8300               1000,00      21,00  Hoog          Produktie boek
 
-2007-08-31  Postbank:8                                                                          Afschrift 8
-2007-08-31    Postbank                       2320    1688,50                                      Afschrift 8
-2007-08-10    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-08-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-08-10    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
-2007-08-19    Debiteuren                     2200               1000,00                           *Pocket Reference             ORA
+2013-08-31  Postbank:8                                                                          Afschrift 8
+2013-08-31    Postbank                       2320    1688,50                                      Afschrift 8
+2013-08-10    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-08-10    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-08-10    Debiteuren                     2200                714,00                           *Ondersteuning                ACME
+2013-08-19    Debiteuren                     2200               1000,00                           *Pocket Reference             ORA
 
-2007-09-06  Inkoop:13                                                                           Internet                        XS4ALL
-2007-09-06    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-09-06    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-09-06    Crediteuren                    4100                 22,80                           Internet
+2013-09-06  Inkoop:13                                                                           Internet                        XS4ALL
+2013-09-06    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-09-06    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-09-06    Crediteuren                    4100                 22,80                           Internet
 
-2007-09-16  Inkoop:14                                                                           Telefoonkosten                  KPN
-2007-09-16    BTW Inkoop Hoog                4220      17,36                                      BTW ADSL + Telefoon
-2007-09-16    Telefoon- en faxkosten         6900      91,36                 19,00  Hoog          ADSL + Telefoon
-2007-09-16    Crediteuren                    4100                108,72                           Telefoonkosten
+2013-09-16  Inkoop:14                                                                           Telefoonkosten                  KPN
+2013-09-16    BTW Inkoop Hoog                4220      18,87                                      BTW ADSL + Telefoon
+2013-09-16    Telefoon- en faxkosten         6900      89,85                 21,00  Hoog          ADSL + Telefoon
+2013-09-16    Crediteuren                    4100                108,72                           Telefoonkosten
 
-2007-09-30  Postbank:9                                                                          Afschrift 9
-2007-09-30    Crediteuren                    4100     108,72                                      *Telefoonkosten               KPN
-2007-09-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-09-17    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-09-30    Postbank                       2320                134,22                           Afschrift 9
+2013-09-30  Postbank:9                                                                          Afschrift 9
+2013-09-30    Crediteuren                    4100     108,72                                      *Telefoonkosten               KPN
+2013-09-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-09-17    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-09-30    Postbank                       2320                134,22                           Afschrift 9
 
-2007-10-11  Inkoop:15                                                                           Internet                        XS4ALL
-2007-10-11    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-10-11    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-10-11    Crediteuren                    4100                 22,80                           Internet
+2013-10-11  Inkoop:15                                                                           Internet                        XS4ALL
+2013-10-11    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-10-11    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-10-11    Crediteuren                    4100                 22,80                           Internet
 
-2007-10-31  Postbank:10                                                                         Afschrift 10
-2007-10-13    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-10-12    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-10-31    Postbank                       2320                 25,50                           Afschrift 10
+2013-10-31  Postbank:10                                                                         Afschrift 10
+2013-10-13    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-10-12    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-10-31    Postbank                       2320                 25,50                           Afschrift 10
 
-2007-11-07  Inkoop:16                                                                           Internet                        XS4ALL
-2007-11-07    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-11-07    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-11-07    Crediteuren                    4100                 22,80                           Internet
+2013-11-07  Inkoop:16                                                                           Internet                        XS4ALL
+2013-11-07    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-11-07    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-11-07    Crediteuren                    4100                 22,80                           Internet
 
-2007-11-17  Inkoop:17                                                                           Telefoonkosten                  KPN
-2007-11-17    BTW Inkoop Hoog                4220      17,51                                      BTW ADSL + Telefoon
-2007-11-17    Telefoon- en faxkosten         6900      92,16                 19,00  Hoog          ADSL + Telefoon
-2007-11-17    Crediteuren                    4100                109,67                           Telefoonkosten
+2013-11-17  Inkoop:17                                                                           Telefoonkosten                  KPN
+2013-11-17    BTW Inkoop Hoog                4220      19,03                                      BTW ADSL + Telefoon
+2013-11-17    Telefoon- en faxkosten         6900      90,64                 21,00  Hoog          ADSL + Telefoon
+2013-11-17    Crediteuren                    4100                109,67                           Telefoonkosten
 
-2007-11-30  Postbank:11                                                                         Afschrift 11
-2007-11-30    Crediteuren                    4100     109,67                                      *Telefoonkosten               KPN
-2007-11-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-11-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-11-30    Postbank                       2320                135,17                           Afschrift 11
+2013-11-30  Postbank:11                                                                         Afschrift 11
+2013-11-30    Crediteuren                    4100     109,67                                      *Telefoonkosten               KPN
+2013-11-30    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-11-08    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-11-30    Postbank                       2320                135,17                           Afschrift 11
 
-2007-12-06  Inkoop:18                                                                           Internet                        XS4ALL
-2007-12-06    BTW Inkoop Hoog                4220       3,64                                      BTW ÁDSL
-2007-12-06    Internetkosten                 6905      19,16                 19,00  Hoog          ÁDSL
-2007-12-06    Crediteuren                    4100                 22,80                           Internet
+2013-12-06  Inkoop:18                                                                           Internet                        XS4ALL
+2013-12-06    BTW Inkoop Hoog                4220       3,96                                      BTW ÁDSL
+2013-12-06    Internetkosten                 6905      18,84                 21,00  Hoog          ÁDSL
+2013-12-06    Crediteuren                    4100                 22,80                           Internet
 
-2007-12-07  Inkoop:20                                                                           Internet                        XS4ALL
-2007-12-07    BTW Inkoop Hoog                4220       3,64                                      BTW ADSL
-2007-12-07    Internetkosten                 6905      19,16                 19,00  Hoog          ADSL
-2007-12-07    Crediteuren                    4100                 22,80                           Internet
+2013-12-07  Inkoop:20                                                                           Internet                        XS4ALL
+2013-12-07    BTW Inkoop Hoog                4220       3,96                                      BTW ADSL
+2013-12-07    Internetkosten                 6905      18,84                 21,00  Hoog          ADSL
+2013-12-07    Crediteuren                    4100                 22,80                           Internet
 
-2007-12-07  Postbank:12                                                                         Afschrift 12
-2007-12-07    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
-2007-12-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
-2007-12-07    Postbank                       2320                 25,50                           Afschrift 12
+2013-12-07  Postbank:12                                                                         Afschrift 12
+2013-12-07    Crediteuren                    4100      22,80                                      *Internet                     XS4ALL
+2013-12-06    Bankkosten                     6980       2,70                  0,00  Nul           Girotel
+2013-12-07    Postbank                       2320                 25,50                           Afschrift 12
 
-2007-12-09  Postbank:13                                                                         Eerste deel ADSL
-2007-12-09    Crediteuren                    4100      10,00                                      *Internet                     XS4ALL
-2007-12-09    Postbank                       2320                 10,00                           Eerste deel ADSL
+2013-12-09  Postbank:13                                                                         Eerste deel ADSL
+2013-12-09    Crediteuren                    4100      10,00                                      *Internet                     XS4ALL
+2013-12-09    Postbank                       2320                 10,00                           Eerste deel ADSL
 
-2007-12-10  Postbank:14                                                                         Tweede deel ADSL
-2007-12-10    Crediteuren                    4100      12,80                                      *Internet                     XS4ALL
-2007-12-10    Postbank                       2320                 12,80                           Tweede deel ADSL
+2013-12-10  Postbank:14                                                                         Tweede deel ADSL
+2013-12-10    Crediteuren                    4100      12,80                                      *Internet                     XS4ALL
+2013-12-10    Postbank                       2320                 12,80                           Tweede deel ADSL
 
-2007-12-31  Memoriaal:1                                                                         Afschrijving inventaris
-2007-12-31    Afschr. kosten inv. & inr.     6800     411,26                  0,00  Nul           Afschrijving
-2007-12-31    Afschrijving inv. & inr.       1101                411,26                           Afschrijving
+2013-12-31  Memoriaal:1                                                                         Afschrijving inventaris
+2013-12-31    Afschr. kosten inv. & inr.     6800     411,26                  0,00  Nul           Afschrijving
+2013-12-31    Afschrijving inv. & inr.       1101                411,26                           Afschrijving
 
-2007-12-31  Memoriaal:2                                                                         Afschrijving computers
-2007-12-31    Afschr. kosten computers       6810     396,82                  0,00  Nul           Afschrijving
-2007-12-31    Afschrijving computers         1111                396,82                           Afschrijving
+2013-12-31  Memoriaal:2                                                                         Afschrijving computers
+2013-12-31    Afschr. kosten computers       6810     396,82                  0,00  Nul           Afschrijving
+2013-12-31    Afschrijving computers         1111                396,82                           Afschrijving
 ------------------------------------------------------------------------------------------------------------------------------------------
             Totaal                                  22705,92   22705,92

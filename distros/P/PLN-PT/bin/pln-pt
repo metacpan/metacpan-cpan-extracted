@@ -7,6 +7,8 @@ use strict;
 
 use PLN::PT;
 use Path::Tiny;
+binmode(STDOUT, ':utf8');
+binmode(STDIN, ':utf8');
 
 # get some args from the command line
 my $op = shift;
@@ -15,7 +17,7 @@ _help() unless $op;
 
 # get input from file, or stdin if no file arg is given
 my $input;
-if ($file) { $input = path($file)->slurp_raw; }
+if ($file) { $input = path($file)->slurp_utf8; }
 else { $input = join('', <STDIN>); }
 _help() unless $input;
 
@@ -25,17 +27,23 @@ my $opts = { output=>'raw' };
 if (lc($op) eq 'tokenizer') {
   print $pln->tokenizer($input, $opts);
 }
+elsif (lc($op) eq 'morph') {
+  print $pln->morph_analyzer($input, $opts);
+}
 elsif (lc($op) eq 'tagger') {
   print $pln->tagger($input, $opts);
 }
 elsif (lc($op) eq 'dep_parser') {
   print $pln->dep_parser($input, $opts);
 }
+elsif (lc($op) eq 'tf') {
+  print $pln->tf($input, $opts);
+}
 else { _help() }
 
 sub _help {
   print "Usage: pln-pt <operation> <input>\n",
-          "  operation: tokenizer, tagger, dep_parser\n";
+          "  operation: tokenizer, tagger, dep_parser, tf\n";
   exit;
 }
 
@@ -51,11 +59,21 @@ pln-pt - command line interface to http://api.pln.pt
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Nuno Carvalho <smash@cpan.org>
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

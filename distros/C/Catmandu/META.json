@@ -64,6 +64,7 @@
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Determined" : "0",
             "List::MoreUtils" : "0.33",
+            "List::MoreUtils::XS" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
             "MIME::Types" : "0",
@@ -114,7 +115,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.0602",
+   "version" : "1.0603",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -137,6 +138,6 @@
       "Upasana Shukla <me@upasana.me>",
       "Vitali Peil <vpeil@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -12,7 +12,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::RWSTAUNER;
 our $AUTHORITY = 'cpan:RWSTAUNER';
-$Pod::Weaver::PluginBundle::Author::RWSTAUNER::VERSION = '6.001';
+$Pod::Weaver::PluginBundle::Author::RWSTAUNER::VERSION = '6.002';
 # ABSTRACT: RWSTAUNER's Pod::Weaver config
 
 use Pod::Weaver::Config::Assembler;
@@ -139,7 +139,7 @@ Pod::Weaver::PluginBundle::Author::RWSTAUNER - RWSTAUNER's Pod::Weaver config
 
 =head1 VERSION
 
-version 6.001
+version 6.002
 
 =head1 SYNOPSIS
 

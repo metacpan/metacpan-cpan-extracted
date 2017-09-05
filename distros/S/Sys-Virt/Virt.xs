@@ -4166,6 +4166,31 @@ managed_save_remove(dom, flags=0)
 
 
 void
+managed_save_define_xml(dom, xml, flags=0)
+      virDomainPtr dom;
+      const char *xml;
+      unsigned int flags;
+PPCODE:
+      if (virDomainManagedSaveDefineXML(dom, xml, flags) < 0)
+          _croak_error();
+
+SV *
+managed_save_get_xml_description(dom, flags=0)
+      virDomainPtr dom;
+      unsigned int flags;
+  PREINIT:
+      char *xml;
+    CODE:
+      if (!(xml = virDomainManagedSaveGetXMLDesc(dom, flags)))
+          _croak_error();
+
+      RETVAL = newSVpv(xml, 0);
+      free(xml);
+  OUTPUT:
+      RETVAL
+
+
+void
 core_dump(dom, to, flags=0)
       virDomainPtr dom;
       const char *to;
@@ -5323,6 +5348,21 @@ migrate_set_max_downtime(dom, downtime, flags=0)
      downtimeVal = virt_SvIVull(downtime);
      if (virDomainMigrateSetMaxDowntime(dom, downtimeVal, flags) < 0)
          _croak_error();
+
+
+SV *
+migrate_get_max_downtime(dom, flags=0)
+      virDomainPtr dom;
+      unsigned int flags;
+  PREINIT:
+      unsigned long long downtime;
+    CODE:
+      if (virDomainMigrateGetMaxDowntime(dom, &downtime, flags) < 0)
+          _croak_error();
+
+      RETVAL = virt_newSVull(downtime);
+  OUTPUT:
+      RETVAL
 
 
 void
@@ -9322,6 +9362,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_FROM_XENXL, FROM_XENXL);
       REGISTER_CONSTANT(VIR_FROM_PERF, FROM_PERF);
       REGISTER_CONSTANT(VIR_FROM_LIBSSH, FROM_LIBSSH);
+      REGISTER_CONSTANT(VIR_FROM_RESCTRL, FROM_RESCTRL);
 
 
       REGISTER_CONSTANT(VIR_ERR_OK, ERR_OK);

@@ -14,8 +14,8 @@ sub wanted  {
   return if /modules\//;
 
   (my $dir = $File::Find::dir)=~s{examples/}{};
- 
-  my $cmd = "strun --purge-cache --root ./examples --story $dir";
+
+  my $cmd = "strun --purge-cache --root ./examples --story $dir --format production";
   (system($cmd) == 0)  or die "$cmd failed";
 
 }

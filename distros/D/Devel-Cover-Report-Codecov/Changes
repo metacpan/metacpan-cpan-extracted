@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel-Cover-Report-Codecov
 
+0.19 2017-08-31T14:43:49Z
+    - support uncoverable branches
+
 0.18 2017-05-16T15:15:30Z
     - support perl 5.26.x & good bye perl 5.8.x
 

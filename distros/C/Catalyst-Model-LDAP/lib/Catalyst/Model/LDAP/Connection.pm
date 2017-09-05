@@ -129,7 +129,7 @@ Catalyst::Model::LDAP::Connection - Convenience methods for Net::LDAP
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

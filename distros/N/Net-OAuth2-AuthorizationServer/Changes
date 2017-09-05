@@ -1,5 +1,9 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.16     2017-09-01
+        - Correct return type from verification of refresh token when
+          the refresh token is a JWT (GH #12, thanks to pierre-vigier)
+
 0.15     2017-05-12
         - Add support for jwt_claims_cb in call to ->token to allow the
           override or addition of claims to the JWT

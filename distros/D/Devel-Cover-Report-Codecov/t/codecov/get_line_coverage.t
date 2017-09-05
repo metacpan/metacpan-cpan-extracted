@@ -42,8 +42,19 @@ subtest branch => sub {
     my $branch = Test::MockObject->new;
     $branch->mock(covered => sub { 5 });
     $branch->mock(total => sub { 10 });
+    $branch->mock(error => sub { 5 });
 
     is get_line_coverage([ $statement ], [ $branch ]), '5/10';
+
+    subtest 'if uncoverable' => sub {
+        my $branch = Test::MockObject->new;
+        $branch->mock(covered => sub { 5 });
+        $branch->mock(total => sub { 10 });
+        $branch->mock(error => sub { 0 });
+
+        is get_line_coverage([ $statement ], [ $branch ]), '10/10';
+    };
+
 };
 
 done_testing;

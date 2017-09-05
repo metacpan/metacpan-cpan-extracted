@@ -48,11 +48,11 @@
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.0 (final)"
+#define VERSION "6.01 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 0
+#define VERSION_MINOR 01
 #endif
-#define VERSION_DATE "2017-06-13"
+#define VERSION_DATE "2017-08-13"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -103,8 +103,8 @@ static lzo_align_t __LZO_MMODEL wrkmem[LZO1X_1_MEM_COMPRESS];
 #define KONTO_CHECK_VARS
 #include "konto_check.h"
 
-   /* Flag, um die Änderungen zum Juni 2017 zu aktivieren */
-static int pz_aenderungen_aktivieren_2017_06;
+   /* Flag, um die Änderungen zum September 2017 zu aktivieren */
+static int pz_aenderungen_aktivieren_2017_09;
 
    /* falls die Variable verbose_debug gesetzt wird, werden bei einigen
     * Funktionen mittels perror() zusätzliche Debuginfos ausgegeben. Die
@@ -8154,6 +8154,9 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          /* SEB AG */
       case 45:
 
+            /* ab September 2017 entfällt die Regel 45, bleibt jedoch frei */
+         if(pz_aenderungen_aktivieren_2017_09)return OK;
+
             /* Einer nach der Standard IBAN-Regel ermittelten IBAN ist stets
              * der BIC ESSEDE5FXXX zuzuordnen.
              */
@@ -8508,170 +8511,8 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          /* Evangelische Darlehnsgenossenschaft eG */
       case 54:
             /* ab Juni 2017 entfällt die Regel 54, bleibt jedoch frei */
-         if(pz_aenderungen_aktivieren_2017_06)return OK;
+         return OK;
 
-            /* Spendenkonten */
-         if(k1==0)switch(k2){
-            case        500: strcpy(kto,"0000500500"); RETURN_OK_KTO_REPLACED;
-            case        502: strcpy(kto,"0000502502"); RETURN_OK_KTO_REPLACED;
-            case      18067: strcpy(kto,"0000180670"); RETURN_OK_KTO_REPLACED;
-            case     484848: strcpy(kto,"0000484849"); RETURN_OK_KTO_REPLACED;
-            case     636306: strcpy(kto,"0000063606"); RETURN_OK_KTO_REPLACED;
-            case     760440: strcpy(kto,"0000160440"); RETURN_OK_KTO_REPLACED;
-            case    1018413: strcpy(kto,"0010108413"); RETURN_OK_KTO_REPLACED;
-            case    2601577: strcpy(kto,"0026015776"); RETURN_OK_KTO_REPLACED;
-            case    5005000: strcpy(kto,"0000500500"); RETURN_OK_KTO_REPLACED;
-            case   10796740: strcpy(kto,"0010796743"); RETURN_OK_KTO_REPLACED;
-            case   11796740: strcpy(kto,"0011796743"); RETURN_OK_KTO_REPLACED;
-            case   12796740: strcpy(kto,"0012796743"); RETURN_OK_KTO_REPLACED;
-            case   13796740: strcpy(kto,"0013796743"); RETURN_OK_KTO_REPLACED;
-            case   14796740: strcpy(kto,"0014796743"); RETURN_OK_KTO_REPLACED;
-            case   15796740: strcpy(kto,"0015796743"); RETURN_OK_KTO_REPLACED;
-            case   16307000: strcpy(kto,"0163107000"); RETURN_OK_KTO_REPLACED;
-            case   16610700: strcpy(kto,"0166107000"); RETURN_OK_KTO_REPLACED;
-            case   16796740: strcpy(kto,"0016796743"); RETURN_OK_KTO_REPLACED;
-            case   17796740: strcpy(kto,"0017796743"); RETURN_OK_KTO_REPLACED;
-            case   18796740: strcpy(kto,"0018796743"); RETURN_OK_KTO_REPLACED;
-            case   19796740: strcpy(kto,"0019796743"); RETURN_OK_KTO_REPLACED;
-            case   20796740: strcpy(kto,"0020796743"); RETURN_OK_KTO_REPLACED;
-            case   21796740: strcpy(kto,"0021796743"); RETURN_OK_KTO_REPLACED;
-            case   22796740: strcpy(kto,"0022796743"); RETURN_OK_KTO_REPLACED;
-            case   23796740: strcpy(kto,"0023796743"); RETURN_OK_KTO_REPLACED;
-            case   24796740: strcpy(kto,"0024796743"); RETURN_OK_KTO_REPLACED;
-            case   25796740: strcpy(kto,"0025796743"); RETURN_OK_KTO_REPLACED;
-            case   26610700: strcpy(kto,"0266107000"); RETURN_OK_KTO_REPLACED;
-            case   26796740: strcpy(kto,"0026796743"); RETURN_OK_KTO_REPLACED;
-            case   27796740: strcpy(kto,"0027796743"); RETURN_OK_KTO_REPLACED;
-            case   28796740: strcpy(kto,"0028796743"); RETURN_OK_KTO_REPLACED;
-            case   29796740: strcpy(kto,"0029796743"); RETURN_OK_KTO_REPLACED;
-            case   45796740: strcpy(kto,"0045796743"); RETURN_OK_KTO_REPLACED;
-            case   50796740: strcpy(kto,"0050796743"); RETURN_OK_KTO_REPLACED;
-            case   51796740: strcpy(kto,"0051796743"); RETURN_OK_KTO_REPLACED;
-            case   52796740: strcpy(kto,"0052796743"); RETURN_OK_KTO_REPLACED;
-            case   53796740: strcpy(kto,"0053796743"); RETURN_OK_KTO_REPLACED;
-            case   54796740: strcpy(kto,"0054796743"); RETURN_OK_KTO_REPLACED;
-            case   55796740: strcpy(kto,"0055796743"); RETURN_OK_KTO_REPLACED;
-            case   56796740: strcpy(kto,"0056796743"); RETURN_OK_KTO_REPLACED;
-            case   57796740: strcpy(kto,"0057796743"); RETURN_OK_KTO_REPLACED;
-            case   58796740: strcpy(kto,"0058796743"); RETURN_OK_KTO_REPLACED;
-            case   59796740: strcpy(kto,"0059796743"); RETURN_OK_KTO_REPLACED;
-            case   60796740: strcpy(kto,"0060796743"); RETURN_OK_KTO_REPLACED;
-            case   61796740: strcpy(kto,"0061796743"); RETURN_OK_KTO_REPLACED;
-            case   62796740: strcpy(kto,"0062796743"); RETURN_OK_KTO_REPLACED;
-            case   63796740: strcpy(kto,"0063796743"); RETURN_OK_KTO_REPLACED;
-            case   64796740: strcpy(kto,"0064796743"); RETURN_OK_KTO_REPLACED;
-            case   65796740: strcpy(kto,"0065796743"); RETURN_OK_KTO_REPLACED;
-            case   66796740: strcpy(kto,"0066796743"); RETURN_OK_KTO_REPLACED;
-            case   67796740: strcpy(kto,"0067796743"); RETURN_OK_KTO_REPLACED;
-            case   68796740: strcpy(kto,"0068796743"); RETURN_OK_KTO_REPLACED;
-            case   69796740: strcpy(kto,"0069796743"); RETURN_OK_KTO_REPLACED;
-            default: break;
-         }
-         else if(k1==17 && k2==61070000){strcpy(kto,"0176107000"); RETURN_OK_KTO_REPLACED;}
-         else if(k1==22 && k2==10531180){strcpy(kto,"0201053180"); RETURN_OK_KTO_REPLACED;}
-
-         if(version>0){    /* gültig ab 3.3.2014 */
-            if(k1==0)switch(k2){
-               case   624044: return OK_IBAN_WITHOUT_KC_TEST;
-               case  4063060: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 20911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 21911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 22611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 46211991: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 50911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51111991: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51211991: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 51911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52111991: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52211991: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 52911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 53111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 53211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 53311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 57111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 58111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 58211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 58311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 58411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 58511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 80911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 81911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82111908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82211908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82311908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82411908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82511908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82611908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82711908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82811908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 82911908: return OK_IBAN_WITHOUT_KC_TEST;
-               case 99624044: return OK_IBAN_WITHOUT_KC_TEST;
-            }
-            else
-               if(k1==3 && k2==143869)return OK_IBAN_WITHOUT_KC_TEST;
-         }
-         RETURN_OK;
 
          /* Iban-Regel 0055.00 +§§§3 */
          /* BHW Kreditservice GmbH */
@@ -8684,54 +8525,58 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          RETURN_OK;
 
          /* Iban-Regel 0056.00 +§§§3 */
+         /* Iban-Regel 0056.01 (ab September 2017) +§§§3 */
          /* SEB AG */
       case 56:
-            /* Spendenkonten: nur mit festgelegten IBANs -> Konto und evl. BLZ/BIC anpassen */
-         if(k1==0)switch(k2){
-            case       36: strcpy(kto,"1010240003"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case       50: strcpy(kto,"1328506100"); if(b!=48010111){strcpy(blz,"48010111"); *bicp="ESSEDE5F480"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case       99: strcpy(kto,"1826063000"); if(b!=43010111){strcpy(blz,"43010111"); *bicp="ESSEDE5F430"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      110: strcpy(kto,"1015597802"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      240: strcpy(kto,"1010240000"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      333: strcpy(kto,"1011296100"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      555: strcpy(kto,"1600220800"); if(b!=10010111){strcpy(blz,"10010111"); *bicp="ESSEDE5F100"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      556: strcpy(kto,"1000556100"); if(b!=39010111){strcpy(blz,"39010111"); *bicp="ESSEDE5F390"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      606: strcpy(kto,"1967153801"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      700: strcpy(kto,"1070088000"); if(b!=26510111){strcpy(blz,"26510111"); *bicp="ESSEDE5F265"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      777: strcpy(kto,"1006015200"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case      999: strcpy(kto,"1010240001"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     1234: strcpy(kto,"1369152400"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     1313: strcpy(kto,"1017500000"); if(b!=57010111){strcpy(blz,"57010111"); *bicp="ESSEDE5F570"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     1888: strcpy(kto,"1241113000"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     1953: strcpy(kto,"1026500901"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     1998: strcpy(kto,"1547620500"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     2007: strcpy(kto,"1026500907"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     4004: strcpy(kto,"1635100100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     4444: strcpy(kto,"1304610900"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     5000: strcpy(kto,"1395676000"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     5510: strcpy(kto,"1611754300"); if(b!=29010111){strcpy(blz,"29010111"); *bicp="ESSEDE5F290"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     6060: strcpy(kto,"1000400200"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case     6800: strcpy(kto,"1296401301"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case    55555: strcpy(kto,"1027758200"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case    60000: strcpy(kto,"1005007001"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case    66666: strcpy(kto,"1299807801"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   102030: strcpy(kto,"1837501600"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   121212: strcpy(kto,"1249461502"); if(b!=70010111){strcpy(blz,"70010111"); *bicp="ESSEDE5F700"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   130500: strcpy(kto,"1413482100"); if(b!=30010111){strcpy(blz,"30010111"); *bicp="ESSEDE5F300"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   202020: strcpy(kto,"1213431002"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   414141: strcpy(kto,"1010555101"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case   666666: strcpy(kto,"1798758900"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-            case  5000000: strcpy(kto,"1403124100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
-         }
-         else if(k1==5 && k2==500500){
-            strcpy(kto,"1045720000");
-            if(b!=60010111){
-               strcpy(blz,"60010111");
-               *bicp="ESSEDE5F600";
-               return OK_BLZ_KTO_REPLACED;
+         if(!pz_aenderungen_aktivieren_2017_09 || (pz_aenderungen_aktivieren_2017_09 && version<1)){
+
+               /* Spendenkonten: nur mit festgelegten IBANs -> Konto und evl. BLZ/BIC anpassen */
+            if(k1==0)switch(k2){
+               case       36: strcpy(kto,"1010240003"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case       50: strcpy(kto,"1328506100"); if(b!=48010111){strcpy(blz,"48010111"); *bicp="ESSEDE5F480"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case       99: strcpy(kto,"1826063000"); if(b!=43010111){strcpy(blz,"43010111"); *bicp="ESSEDE5F430"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      110: strcpy(kto,"1015597802"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      240: strcpy(kto,"1010240000"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      333: strcpy(kto,"1011296100"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      555: strcpy(kto,"1600220800"); if(b!=10010111){strcpy(blz,"10010111"); *bicp="ESSEDE5F100"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      556: strcpy(kto,"1000556100"); if(b!=39010111){strcpy(blz,"39010111"); *bicp="ESSEDE5F390"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      606: strcpy(kto,"1967153801"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      700: strcpy(kto,"1070088000"); if(b!=26510111){strcpy(blz,"26510111"); *bicp="ESSEDE5F265"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      777: strcpy(kto,"1006015200"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case      999: strcpy(kto,"1010240001"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     1234: strcpy(kto,"1369152400"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     1313: strcpy(kto,"1017500000"); if(b!=57010111){strcpy(blz,"57010111"); *bicp="ESSEDE5F570"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     1888: strcpy(kto,"1241113000"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     1953: strcpy(kto,"1026500901"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     1998: strcpy(kto,"1547620500"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     2007: strcpy(kto,"1026500907"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     4004: strcpy(kto,"1635100100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     4444: strcpy(kto,"1304610900"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     5000: strcpy(kto,"1395676000"); if(b!=25010111){strcpy(blz,"25010111"); *bicp="ESSEDE5F250"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     5510: strcpy(kto,"1611754300"); if(b!=29010111){strcpy(blz,"29010111"); *bicp="ESSEDE5F290"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     6060: strcpy(kto,"1000400200"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case     6800: strcpy(kto,"1296401301"); if(b!=67010111){strcpy(blz,"67010111"); *bicp="ESSEDE5F670"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case    55555: strcpy(kto,"1027758200"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case    60000: strcpy(kto,"1005007001"); if(b!=50010111){strcpy(blz,"50010111"); *bicp="ESSEDE5FXXX"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case    66666: strcpy(kto,"1299807801"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   102030: strcpy(kto,"1837501600"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   121212: strcpy(kto,"1249461502"); if(b!=70010111){strcpy(blz,"70010111"); *bicp="ESSEDE5F700"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   130500: strcpy(kto,"1413482100"); if(b!=30010111){strcpy(blz,"30010111"); *bicp="ESSEDE5F300"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   202020: strcpy(kto,"1213431002"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   414141: strcpy(kto,"1010555101"); if(b!=38010111){strcpy(blz,"38010111"); *bicp="ESSEDE5F380"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case   666666: strcpy(kto,"1798758900"); if(b!=20010111){strcpy(blz,"20010111"); *bicp="ESSEDE5F200"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
+               case  5000000: strcpy(kto,"1403124100"); if(b!=37010111){strcpy(blz,"37010111"); *bicp="ESSEDE5F370"; return OK_BLZ_KTO_REPLACED;} else return OK_KTO_REPLACED;
             }
-            else
-               return OK_KTO_REPLACED;
+            else if(k1==5 && k2==500500){
+               strcpy(kto,"1045720000");
+               if(b!=60010111){
+                  strcpy(blz,"60010111");
+                  *bicp="ESSEDE5F600";
+                  return OK_BLZ_KTO_REPLACED;
+               }
+               else
+                  return OK_KTO_REPLACED;
+            }
          }
 
             /* für die folgenden BLZs sind nur zehnstelllige Kontonummern erlaubt: */
@@ -9330,8 +9175,8 @@ static void init_atoi_table(void)
    int i,ziffer;
    unsigned long l;
 
-      /* Änderungen zum 05.06.2017 aktivieren */
-   if(time(NULL)>1496613600 ||0)pz_aenderungen_aktivieren_2017_06=1;
+      /* Änderungen zum 04.09.2017 aktivieren */
+   if(time(NULL)>1504476000 ||0)pz_aenderungen_aktivieren_2017_09=1;
 
    /* ungültige Ziffern; Blanks und Tabs werden ebenfalls als ungültig
     * angesehen(!), da die Stellenzuordnung sonst nicht mehr stimmt. Ausnahme:
@@ -18432,7 +18277,13 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Variante 2:                                                        #
  * # Modulus 10, Gewichtung 2, 1, 2, 1, 2, 1, 2, 1, 2                   #
  * # Die Berechnung und mögliche Ergebnisse entsprechen der             #
- * # Methode 00.                                                        #
+ * # Methode 00. Führt die Berechnung nach Variante 2 zu einem          #
+ * # Prüfzifferfehler, so ist nach Variante 3 zu prüfen.                #
+ * #                                                                    #
+ * # Variante 3:                                                        #
+ * # Modulus 11, Gewichtung 2, 3, 4, 5, 6, 7, 2, 3, 4                   #
+ * # Die Berechnung und mögliche Ergebnisse entsprechen der             #
+ * # Methode 04.                                                        #
  * ######################################################################
  */
 
@@ -18513,6 +18364,30 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 #endif
          MOD_10_80;   /* pz%=10 */
          if(pz)pz=10-pz;
+         CHECK_PZX10;
+
+#if DEBUG>0
+      case 3122:
+         if(retvals){
+            retvals->methode="C2c";
+            retvals->pz_methode=3122;
+         }
+#endif
+            /* Variante 3, gültig ab September 2017 */
+         if(!pz_aenderungen_aktivieren_2017_09)return UNDEFINED_SUBMETHOD;
+         pz = (kto[0]-'0') * 4
+            + (kto[1]-'0') * 3
+            + (kto[2]-'0') * 2
+            + (kto[3]-'0') * 7
+            + (kto[4]-'0') * 6
+            + (kto[5]-'0') * 5
+            + (kto[6]-'0') * 4
+            + (kto[7]-'0') * 3
+            + (kto[8]-'0') * 2;
+
+         MOD_11_176;   /* pz%=11 */
+         if(pz)pz=11-pz;
+         INVALID_PZ10;
          CHECK_PZ10;
 
 
@@ -20503,7 +20378,6 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
             retvals->pz_methode=144;
          }
 #endif
-if(!pz_aenderungen_aktivieren_2017_06)return NOT_DEFINED;
 
    /* Variante 1: Berechnung nach der Methode 02 */
 #if DEBUG>0
@@ -21237,20 +21111,20 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 3:
          return __DATE__ ", " __TIME__;    /* Compilierdatum und -zeit */
       case 4:                              /* Datum der Prüfziffermethode */
-         if(pz_aenderungen_aktivieren_2017_06)
-            return "05.06.2017";
+         if(pz_aenderungen_aktivieren_2017_09)
+            return "04.09.2017";
          else
-            return "06.03.2017 (Aenderungen vom 05.06.2017 enthalten aber noch nicht aktiviert)";
+            return "05.06.2017 (Aenderungen vom 04.09.2017 enthalten aber noch nicht aktiviert)";
       case 5:
-        return "05.06.2017";
+        return "04.09.2017";
       case 6:
-        return "13. Juni 2017";            /* Klartext-Datum der Bibliotheksversion */
+        return "13. August 2017";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "0";             /* Unterversionszahl */
+        return "01";             /* Unterversionszahl */
    }
 }
 
@@ -24443,7 +24317,6 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 23050 "konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -26167,6 +26040,7 @@ DLL_EXPORT const char *pz2str(int pz,int *ret)
       case 3108: return "A8c";
       case 3111: return "B1c";
       case 3118: return "B8c";
+      case 3122: return "C2c";
       case 3125: return "C5c";
       case 3127: return "C7c";
       case 3128: return "C8c";
@@ -26317,7 +26191,7 @@ DLL_EXPORT int lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int 
 /* Funktion pz_aenderungen_enable() +§§§1 */
 /* ###########################################################################
  * # Die Funktion pz_aenderungen_enable() dient dazu, den Status des Flags   #
- * # pz_aenderungen_aktivieren_2017_06 abzufragen bzw. zu setzen. Falls die Variable #
+ * # pz_aenderungen_aktivieren_2017_09 abzufragen bzw. zu setzen. Falls die Variable #
  * # set 1 ist, werden die Änderungen aktiviert, falls sie 0 ist, werden     #
  * # die Änderungen deaktiviert. Bei allen anderen Werten wird das aktuelle  #
  * # Flag nicht verändert, sondern nur der Status zurückgegeben.             #
@@ -26333,8 +26207,8 @@ DLL_EXPORT int lut_keine_iban_berechnung(char *iban_blacklist,char *lutfile,int 
 
 DLL_EXPORT int pz_aenderungen_enable(int set)
 {
-   if(set==0 || set==1)pz_aenderungen_aktivieren_2017_06=set;
-   return pz_aenderungen_aktivieren_2017_06;
+   if(set==0 || set==1)pz_aenderungen_aktivieren_2017_09=set;
+   return pz_aenderungen_aktivieren_2017_09;
 }
 
 #if DEBUG>0

@@ -6,22 +6,23 @@ author:
   - 'Moritz Onken <onken@netcubed.de>'
   - 'Christopher J. Madsen <perl@cjmweb.net>'
 build_requires:
-  Dist::Zilla::Tester: 4.102340
-  Test::More: 0.88
+  Dist::Zilla::Tester: '4.102340'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dist-Zilla-Plugin-Repository
 no_index:
   directory:
     - t
 requires:
-  Dist::Zilla: 4.102340
+  Dist::Zilla: '4.102340'
 resources:
   repository: git://github.com/fayland/dist-zilla-plugin-repository.git
-version: 0.20
+version: '0.21'
+x_serialization_backend: 'YAML::Tiny version 1.70'

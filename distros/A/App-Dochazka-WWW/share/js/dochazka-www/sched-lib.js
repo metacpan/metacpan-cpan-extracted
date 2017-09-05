@@ -1,22 +1,22 @@
-// ************************************************************************* 
-// Copyright (c) 2014-2016, SUSE LLC
-// 
+// *************************************************************************
+// Copyright (c) 2014-2017, SUSE LLC
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // app/sched-lib.js
 //
@@ -40,6 +40,7 @@ define ([
     'current-user',
     'lib',
     'app/prototypes',
+    'stack',
     'start',
     'target'
 ], function (
@@ -48,6 +49,7 @@ define ([
     currentUser,
     coreLib,
     prototypes,
+    stack,
     start,
     target
 ) {
@@ -74,7 +76,6 @@ define ([
                 // success callback
                 sc = function (st) {
                     if (st.code === 'DISPATCH_RECORDS_FOUND') {
-
                         // if only one record is returned, it might be in a result_set
                         // or it might be alone in the payload
                         var rs = st.payload.result_set || st.payload,
@@ -82,12 +83,13 @@ define ([
                             mungedRS = [];
 
                         console.log("Found " + count + " schedules");
-                        for (var i = 0; i < count; i++) {
+                        for (var i=0; i<count; i++) {
                             mungedRS.push(mungeObjectForDisplay(rs[i]));
                         }
-                        coreLib.holdObject(mungedRS);
-                        target.pull('simpleScheduleBrowser').start();
-
+                        stack.push('simpleScheduleBrowser', {
+                            'pos': 0,
+                            'set': mungedRS
+                        });
                     }
                 },
                 // failure callback
@@ -149,8 +151,9 @@ define ([
                                 'remark': st.payload.remark
                             }
                         );
-                        scheduleForDisplay = mungeObjectForDisplay(scheduleObj);
-                        target.pull('schedDisplay').start();
+                        stack.push('schedDisplay', mungeObjectForDisplay(scheduleObj), {
+                            "xtarget": "schedLookup"
+                        });
                     }
                 },
                 // failure callback
@@ -208,8 +211,8 @@ define ([
                                 'remark': st.payload.remark
                             }
                         );
-                        scheduleForDisplay = mungeObjectForDisplay(scheduleObj);
-                        target.pull('schedDisplay').start();
+                        stack.unwindToTarget('mainSched');
+                        coreLib.displayError(st.text);
                     }
                 },
                 // failure callback
@@ -258,7 +261,7 @@ define ([
             createScheduleAjax(obj);
         },
 
-        schedGen = function (mode, afterTarget, schedObj) {
+        schedGen = function (mode, schedObj) {
             var rest = {
                     "path": 'schedule/sid/' + schedObj.sid,
                     "body": schedObj
@@ -267,13 +270,20 @@ define ([
                 sc = function (st) {
                     if (mode === "edit") {
                         dispMsg = "Edited schedule saved";
-                        scheduleForDisplay.scode = schedObj.scode;
-                        scheduleForDisplay.remark = schedObj.remark;
-                        if (browsing) {
+                        if (stack.grep('schedLookup')) {
+                            stack.unwindToTarget('actionSchedLookup', {
+                                "searchKeySchedID": schedObj.sid
+                            });
+                        } else if (stack.grep('simpleScheduleBrowser')) {
                             var obj = coreLib.dbrowserState.set[coreLib.dbrowserState.pos];
                             $.extend(coreLib.dbrowserState.obj, schedObj);
                             $.extend(obj, schedObj);
+                            stack.unwindToTarget('simpleScheduleBrowser');
+                        } else {
+                            dispMsg = "Don't know what to do here";
                         }
+                        // scheduleForDisplay.scode = schedObj.scode;
+                        // scheduleForDisplay.remark = schedObj.remark;
                     } else if (mode === "delete") {
                         dispMsg = "Schedule deleted";
                         if (browsing) {
@@ -285,11 +295,7 @@ define ([
                                 coreLib.dbrowserState.pos -= 1;
                             }
                         }
-                    }
-                    if (browsing) {
-                        target.pull('returnToBrowser').start();
-                    } else {
-                        target.pull(afterTarget).start();
+                        stack.unwindToFlag();
                     }
                     $("#result").html(dispMsg);
                 },
@@ -313,10 +319,10 @@ define ([
         actionSchedLookup: actionSchedLookup,
         createSchedule: createSchedule,
         schedEditSave: function (obj) {
-            schedGen('edit', 'schedDisplay', obj);
+            schedGen('edit', obj);
         },
         schedReallyDelete: function (obj) {
-            schedGen('delete', 'mainSched', obj);
+            schedGen('delete', obj);
         }
     };
 

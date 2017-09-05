@@ -3,7 +3,7 @@ package ObjectDB::Quoter;
 use strict;
 use warnings;
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 use base 'SQL::Composer::Quoter';
 
@@ -32,7 +32,7 @@ sub quote {
     foreach my $part (@parts) {
         my $relationship = $meta->get_relationship($part);
 
-        $name = $name ? $name . '_' . $relationship->name : $relationship->name;
+        $name      = $name ? $name . '_' . $relationship->name : $relationship->name;
         $rel_table = $relationship->class->meta->table;
         $meta      = $relationship->class->meta;
     }
@@ -41,8 +41,8 @@ sub quote {
         $column = $name . q{.} . $column;
 
         my $with = join q{.}, @parts;
-        push @{$self->{with}}, $with
-          unless first { $_ eq $with } @{$self->{with}};
+        push @{ $self->{with} }, $with
+          unless first { $_ eq $with } @{ $self->{with} };
     }
 
     return $self->SUPER::quote($column, $prefix);
@@ -51,7 +51,7 @@ sub quote {
 sub with {
     my $self = shift;
 
-    return @{$self->{with} || []};
+    return @{ $self->{with} || [] };
 }
 
 1;

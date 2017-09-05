@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 package Email::MIME::ContentType;
-# ABSTRACT: Parse a MIME Content-Type Header
-$Email::MIME::ContentType::VERSION = '1.021';
+# ABSTRACT: Parse a MIME Content-Type or Content-Disposition Header
+$Email::MIME::ContentType::VERSION = '1.022';
 use Carp;
 use Encode 2.87 qw(find_mime_encoding);
 use Exporter 5.57 'import';
-our @EXPORT = qw(parse_content_type);
+our @EXPORT = qw(parse_content_type parse_content_disposition);
 
 #pod =head1 SYNOPSIS
 #pod
@@ -41,6 +41,20 @@ our @EXPORT = qw(parse_content_type);
 #pod     subtype    => "x-stuff",
 #pod     attributes => {
 #pod       title => "This is even more ***fun*** isn't it!"
+#pod     }
+#pod   };
+#pod
+#pod   # Content-Disposition: attachment; filename=genome.jpeg;
+#pod   #   modification-date="Wed, 12 Feb 1997 16:29:51 -0500"
+#pod   my $cd = q(attachment; filename=genome.jpeg;
+#pod     modification-date="Wed, 12 Feb 1997 16:29:51 -0500");
+#pod   my $data = parse_content_disposition($cd);
+#pod
+#pod   $data = {
+#pod     type       => "attachment",
+#pod     attributes => {
+#pod       filename            => "genome.jpeg",
+#pod       "modification-date" => "Wed, 12 Feb 1997 16:29:51 -0500"
 #pod     }
 #pod   };
 #pod
@@ -107,6 +121,41 @@ sub parse_content_type {
     };
 }
 
+my $cd_default = 'attachment';
+
+sub parse_content_disposition {
+    my $cd = shift;
+
+    return parse_content_disposition($cd_default) unless defined $cd and length $cd;
+
+    _unfold_lines($cd);
+    _clean_comments($cd);
+
+    unless ($cd =~ s/^($re_token)//) {
+        unless ($STRICT_PARAMS and $cd =~ s/^($re_token_non_strict)//) {
+            carp "Invalid Content-Disposition '$cd'";
+            return parse_content_disposition($cd_default);
+        }
+    }
+
+    my $type = lc $1;
+
+    _clean_comments($cd);
+    $cd =~ s/\s+$//;
+
+    my $attributes = {};
+    if ($STRICT_PARAMS and length $cd and $cd !~ /^;/) {
+        carp "Missing semicolon before first Content-Disposition parameter '$cd'";
+    } else {
+        $attributes = _process_rfc2231(_parse_attributes($cd));
+    }
+
+    return {
+        type       => $type,
+        attributes => $attributes,
+    };
+}
+
 sub _unfold_lines {
     $_[0] =~ s/(?:\r\n|[\r\n])(?=[ \t])//g;
 }
@@ -127,7 +176,7 @@ sub _clean_comments {
                 substr $_[0], 0, 1, '';
             }
         }
-        carp "Unbalanced comment in Content-Type" if $level != 0 and $STRICT_PARAMS;
+        carp "Unbalanced comment" if $level != 0 and $STRICT_PARAMS;
         $ret |= ($_[0] =~ s/^\s+//);
     }
     return $ret;
@@ -160,7 +209,7 @@ sub _process_rfc2231 {
             if (defined $enc) {
                 $value = $enc->decode($value);
             } else {
-                carp "Unknown charset '$charset' in Content-Type value";
+                carp "Unknown charset '$charset' in attribute '$key' value";
             }
         }
         $attribs->{$key} = $value;
@@ -175,7 +224,7 @@ sub _parse_attributes {
     my $attribs = {};
     while (length $_) {
         s/^;// or $STRICT_PARAMS and do {
-            carp "Missing semicolon before Content-Type parameter '$_'";
+            carp "Missing semicolon before parameter '$_'";
             return $attribs;
         };
         _clean_comments($_);
@@ -184,7 +233,7 @@ sub _parse_attributes {
             # "Content-Type: text/plain;"
             # RFC 1521 section 3 says a parameter must exist if there is a
             # semicolon.
-            carp "Extra semicolon after last Content-Type parameter" if $STRICT_PARAMS;
+            carp "Extra semicolon after last parameter" if $STRICT_PARAMS;
             return $attribs;
         }
         my $attribute;
@@ -192,28 +241,28 @@ sub _parse_attributes {
             $attribute = lc $1;
         } else {
             if ($STRICT_PARAMS) {
-                carp "Illegal Content-Type parameter '$_'";
+                carp "Illegal parameter '$_'";
                 return $attribs;
             }
             if (s/^($re_token_non_strict)=//) {
                 $attribute = lc $1;
             } else {
                 unless (s/^([^;=\s]+)\s*=//) {
-                    carp "Cannot parse Content-Type parameter '$_'";
+                    carp "Cannot parse parameter '$_'";
                     return $attribs;
                 }
                 $attribute = lc $1;
             }
         }
         _clean_comments($_);
-        my $value = _extract_ct_attribute_value();
+        my $value = _extract_attribute_value();
         $attribs->{$attribute} = $value;
         _clean_comments($_);
     }
     return $attribs;
 }
 
-sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
+sub _extract_attribute_value { # EXPECTS AND MODIFIES $_
     my $value;
     while (length $_) {
         if (s/^($re_token)//) {
@@ -224,7 +273,7 @@ sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
             $value .= $sub;
         } elsif ($STRICT_PARAMS) {
             my $char = substr $_, 0, 1;
-            carp "Unquoted '$char' not allowed in Content-Type";
+            carp "Unquoted '$char' not allowed";
             return;
         } elsif (s/^($re_token_non_strict)//) {
             $value .= $1;
@@ -237,7 +286,7 @@ sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
         last if !length $_ or /^;/;
         if ($STRICT_PARAMS) {
             my $char = substr $_, 0, 1;
-            carp "Extra '$char' found after Content-Type parameter";
+            carp "Extra '$char' found after parameter";
             return;
         }
         if ($erased) {
@@ -266,6 +315,14 @@ sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
 #pod also present in the returned hashref, with the values of C<type> and C<subtype>
 #pod respectively.
 #pod
+#pod =func parse_content_disposition
+#pod
+#pod This routine is exported by default.
+#pod
+#pod This routine parses email Content-Disposition headers according to RFC 2183 and
+#pod RFC 2231.  It returns a hash as above, with entries for the C<type>, and a hash
+#pod of C<attributes>.
+#pod
 #pod =head1 WARNINGS
 #pod
 #pod This is not a valid content-type header, according to both RFC 1521 and RFC
@@ -278,6 +335,8 @@ sub _extract_ct_attribute_value { # EXPECTS AND MODIFIES $_
 #pod C<$Email::MIME::ContentType::STRICT_PARAMS> to a false value.  Please consider
 #pod localizing this assignment!
 #pod
+#pod Same applies for C<parse_content_disposition>.
+#pod
 #pod =cut
 
 __END__
@@ -288,11 +347,11 @@ __END__
 
 =head1 NAME
 
-Email::MIME::ContentType - Parse a MIME Content-Type Header
+Email::MIME::ContentType - Parse a MIME Content-Type or Content-Disposition Header
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 SYNOPSIS
 
@@ -330,6 +389,20 @@ version 1.021
     }
   };
 
+  # Content-Disposition: attachment; filename=genome.jpeg;
+  #   modification-date="Wed, 12 Feb 1997 16:29:51 -0500"
+  my $cd = q(attachment; filename=genome.jpeg;
+    modification-date="Wed, 12 Feb 1997 16:29:51 -0500");
+  my $data = parse_content_disposition($cd);
+
+  $data = {
+    type       => "attachment",
+    attributes => {
+      filename            => "genome.jpeg",
+      "modification-date" => "Wed, 12 Feb 1997 16:29:51 -0500"
+    }
+  };
+
 =head1 FUNCTIONS
 
 =head2 parse_content_type
@@ -346,6 +419,14 @@ For backward compatibility with a really unfortunate misunderstanding of RFC
 also present in the returned hashref, with the values of C<type> and C<subtype>
 respectively.
 
+=head2 parse_content_disposition
+
+This routine is exported by default.
+
+This routine parses email Content-Disposition headers according to RFC 2183 and
+RFC 2231.  It returns a hash as above, with entries for the C<type>, and a hash
+of C<attributes>.
+
 =head1 WARNINGS
 
 This is not a valid content-type header, according to both RFC 1521 and RFC
@@ -357,6 +438,8 @@ If a semicolon appears, a parameter must.  C<parse_content_type> will carp if
 it encounters a header of this type, but you can suppress this by setting
 C<$Email::MIME::ContentType::STRICT_PARAMS> to a false value.  Please consider
 localizing this assignment!
+
+Same applies for C<parse_content_disposition>.
 
 =head1 AUTHORS
 

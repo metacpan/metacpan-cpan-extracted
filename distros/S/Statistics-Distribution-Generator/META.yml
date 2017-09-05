@@ -6,11 +6,13 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Statistics::Descriptive: '0'
   Test::More: '0'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,6 +25,8 @@ requires:
   Exporter: '0'
   List::AllUtils: '0'
   overload: '0'
-  perl: '5.018000'
-  utf8: '0'
-version: '0.013'
+  perl: '5.010000'
+resources:
+  repository: git://github.com/PWBENNETT/Statistics-Distribution-Generator.git
+version: '1.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,7 +10,7 @@ use Scalar::Util qw( openhandle );
 use File::Basename;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.005';
+our $VERSION = '0.007';
 
 =head1 NAME
 

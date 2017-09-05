@@ -11,7 +11,7 @@ set of modules
 
 # VERSION
 
-0.21
+0.24
 
 # DESCRIPTION
 
@@ -51,6 +51,10 @@ module refer to the Pro module directly.
 # AUTHOR
 
 Lee Johnson - `leejo@cpan.org`
+
+# CONTRIBUTORS
+
+grifferz - `andy-github.com@strugglers.net`
 
 # LICENSE
 

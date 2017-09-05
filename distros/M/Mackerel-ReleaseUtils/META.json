@@ -4,7 +4,7 @@
       "Mackerel Developers <mackerel-developers@hatena.ne.jp>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.11",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Mackerel::ReleaseUtils" : {
          "file" : "lib/Mackerel/ReleaseUtils.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       },
       "Mackerel::ReleaseUtils::Log" : {
          "file" : "lib/Mackerel/ReleaseUtils/Log.pm"
@@ -75,11 +75,12 @@
          "web" : "https://github.com/mackerelio/Mackerel-ReleaseUtils"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_authority" : "cpan:SONGMU",
    "x_contributors" : [
       "Shoichi Kaji <skaji@cpan.org>",
-      "Songmu <y.songmu@gmail.com>"
+      "Songmu <y.songmu@gmail.com>",
+      "shibayu36 <shibayu36@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

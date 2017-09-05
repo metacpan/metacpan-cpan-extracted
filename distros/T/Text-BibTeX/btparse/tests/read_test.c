@@ -28,7 +28,7 @@ int main (void)
     * at eof -- but doesn't do the eof processing (that's for the next
     * call).
     */
-   infile = open_file ("empty.bib", DATA_DIR, filename);
+   infile = open_file ("empty.bib", DATA_DIR, filename, 255);
    CHECK (!feof (infile))
    entry = bt_parse_entry (infile, filename, 0, &entry_ok);
    CHECK (feof (infile))

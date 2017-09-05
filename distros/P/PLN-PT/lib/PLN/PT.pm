@@ -1,6 +1,6 @@
 package PLN::PT;
 # ABSTRACT: interface for the http://pln.pt web service
-$PLN::PT::VERSION = '0.005';
+$PLN::PT::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -27,6 +27,17 @@ sub tokenizer {
   $url .= '?' . $self->_args($opts);
 
   return $self->_post($url, $text, $opts);
+}
+
+sub morph_analyzer {
+  my ($self, $word, $opts) = @_;
+
+  $word =~ s/\// /g; # make it sane, if someone tries to go guessing
+
+  my $url = $self->_cat('morph', $word);
+  $url .= '?' . $self->_args($opts);
+
+  return $self->_get($url, $opts);
 }
 
 sub tagger {
@@ -150,7 +161,7 @@ PLN::PT - interface for the http://pln.pt web service
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -195,6 +206,14 @@ visit L<http://pln.pt/api>.
     razão
     .
 
+=head2 morph_analyzer
+
+Morphologic analysis for a single word, given as argument. For more
+information on the tagging operation visit L<http://pln.pt/api>.
+
+    $ echo cavalo | pln-pt morph
+    cavalo cavalo NCMS000 0.914011 cavalar VMIP1S0 0.0859891
+
 =head2 tagger
 
 Part-of-speech tagging the tokens in the text, given as argument, for more
@@ -219,17 +238,34 @@ on the dependency tree visit L<http://pln.pt/api>.
     4	razão	_	NOUN	n|F|S	(...)	3	dobj	_	_
     5	.	_	PUNCT	punc	(...)	3	punct	_
 
+=head2 tf
+
+Compute term frequency given a text.
+
+=head2 stopwords
+
+Retrieve lists of stop words.
+
 =head1 ACKNOWLEDGEMENTS
 
-This work is a result of the project “SmartEGOV: Harnessing EGOV for Smart
-Governance (Foundations, methods, Tools) / NORTE-01-0145-FEDER-000037”,
+This work is partially supported by the project “SmartEGOV: Harnessing EGOV for Smart Governance (Foundations, methods, Tools) / NORTE-01-0145-FEDER-000037”,
 supported by Norte Portugal Regional Operational Programme (NORTE 2020),
 under the PORTUGAL 2020 Partnership Agreement, through the European Regional
 Development Fund (EFDR).
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Nuno Carvalho <smash@cpan.org>
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

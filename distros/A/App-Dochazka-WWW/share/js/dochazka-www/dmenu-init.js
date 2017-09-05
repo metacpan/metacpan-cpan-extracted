@@ -1,22 +1,22 @@
-// ************************************************************************* 
-// Copyright (c) 2014-2015, SUSE LLC
-// 
+// *************************************************************************
+// Copyright (c) 2014-2017, SUSE LLC
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // app/dmenu.js
 //
@@ -50,8 +50,7 @@ define ([
             'menuText': 'Main',
             'title': 'Main menu',
             'aclProfile': 'passerby',
-            'entries': ['mainEmpl', 'mainPriv', 'mainSched', 'mainAdmin'],
-            'back': 'logout'
+            'entries': ['mainEmpl', 'mainPriv', 'mainSched', 'mainAdmin']
         });
 
         target.push('mainEmpl', {
@@ -60,8 +59,7 @@ define ([
             'menuText': 'Employee',
             'title': 'Employee menu',
             'aclProfile': 'passerby',
-            'entries': ['myProfile', 'ldapLookup', 'searchEmployee', 'masqEmployee'],
-            'back': 'mainMenu'
+            'entries': ['myProfileAction', 'ldapLookup', 'searchEmployee', 'masqEmployee']
         });
 
         target.push('mainPriv', {
@@ -70,8 +68,7 @@ define ([
             'menuText': 'Priv (status)',
             'title': 'Priv (status) menu',
             'aclProfile': 'passerby',
-            'entries': ['actionPrivHistory'],
-            'back': 'mainMenu'
+            'entries': ['actionPrivHistory']
         });
 
         target.push('mainSched', {
@@ -81,8 +78,7 @@ define ([
             'title': 'Schedule menu',
             'aclProfile': 'passerby',
             'entries': ['actionSchedHistory', 'schedLookup',
-                        'browseAllSchedules', 'schedNew'],
-            'back': 'mainMenu'
+                        'browseAllSchedules', 'schedNew']
         });
 
         target.push('mainAdmin', {
@@ -91,8 +87,7 @@ define ([
             'menuText': 'Adminitrivia',
             'title': 'Adminitrivia menu',
             'aclProfile': 'admin',
-            'entries': ['restServerDetails'],
-            'back': 'mainMenu'
+            'entries': ['restServerDetailsAction']
         });
 
         target.push('schedNew', {
@@ -101,10 +96,8 @@ define ([
             'menuText': 'Create a new schedule',
             'title': 'Create a new schedule - options',
             'aclProfile': 'admin',
-            'entries': ['schedNewBoilerplate', 'schedNewCustom'],
-            'back': 'mainSched'
+            'entries': ['schedNewBoilerplate', 'schedNewCustom']
         });
-
     };
 
 });

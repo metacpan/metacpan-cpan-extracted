@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Thu Jul 14 12:54:08 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  8 20:26:23 2011
-# Update Count    : 102
+# Last Modified On: Thu Jan 26 16:38:42 2017
+# Update Count    : 105
 # Status          : Unknown, Use with caution!
 
 package main;
@@ -97,7 +97,7 @@ sub numround_bankers {
 
 sub init_formats  {
 
-    assert( NUMGROUPS != AMTPRECISION, "NUMGROUPS != AMTPRECISION" );
+    confess( "NUMGROUPS != AMTPRECISION" ) unless NUMGROUPS != AMTPRECISION;
 
     ################ BTW display format ################
 

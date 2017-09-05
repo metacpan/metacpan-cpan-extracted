@@ -16,30 +16,32 @@ name: Spp
 provides:
   Spp:
     file: lib/Spp.pm
-    version: '1.02'
-  Spp::Ast::SppAst:
-    file: lib/Spp/Ast/SppAst.pm
+    version: '1.13'
+  Spp::Ast:
+    file: lib/Spp/Ast.pm
+  Spp::Builtin:
+    file: lib/Spp/Builtin.pm
   Spp::Cursor:
     file: lib/Spp/Cursor.pm
+  Spp::Grammar:
+    file: lib/Spp/Grammar.pm
   Spp::IsAtom:
     file: lib/Spp/IsAtom.pm
   Spp::IsChar:
     file: lib/Spp/IsChar.pm
-  Spp::LintAst:
-    file: lib/Spp/LintAst.pm
-  Spp::MatchGrammar:
-    file: lib/Spp/MatchGrammar.pm
-  Spp::Rule::SppRule:
-    file: lib/Spp/Rule/SppRule.pm
+  Spp::LintParser:
+    file: lib/Spp/LintParser.pm
+  Spp::Match:
+    file: lib/Spp/Match.pm
+  Spp::OptSppAst:
+    file: lib/Spp/OptSppAst.pm
   Spp::ToSpp:
     file: lib/Spp/ToSpp.pm
-  Spp::Tools:
-    file: lib/Spp/Tools.pm
 requires:
   JSON::XS: '0'
-  List::Util: '0'
+  List::MoreUtils: '0'
   perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.02'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

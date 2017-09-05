@@ -1,5 +1,5 @@
 // ************************************************************************* 
-// Copyright (c) 2014-2016, SUSE LLC
+// Copyright (c) 2014-2017, SUSE LLC
 // 
 // All rights reserved.
 // 
@@ -47,6 +47,7 @@ define ([
     "app/priv-lib",
     "app/sched-history-lib",
     "app/sched-lib",
+    "app/rest-lib",
     "html",
     "logout",
     "target",
@@ -58,6 +59,7 @@ define ([
     privLib,
     schedHistLib,
     schedLib,
+    restLib,
     html,
     logout,
     target,
@@ -69,14 +71,6 @@ define ([
 
     var act = {
 
-        // demo action from App::MFILE::WWW
-        "demoAction": function () {
-            $('#mainarea').html(html.demoAction);
-            setTimeout(function () {
-                    target.pull('mainMenu').start();
-                }, 1500);
-        },
-
         // general actions
         "drowselectListen": function () {
             start.drowselectListen();
@@ -86,11 +80,11 @@ define ([
         },
 
         // actions triggered from Employee menu
-        "myProfile": empLib.myProfile,
+        "myProfileAction": empLib.myProfileAction,
         "empProfileEditSave": empLib.empProfileEditSave,
         "ldapLookupSubmit": empLib.ldapLookupSubmit,
         "ldapSync": empLib.ldapSync,
-        "ldapSyncSelf": empLib.ldapSyncSelf,
+        "ldapSyncFromBrowser": empLib.ldapSyncFromBrowser,
         "actionEmplSearch": empLib.actionEmplSearch,
         "masqEmployee": empLib.masqEmployee,
 
@@ -99,17 +93,22 @@ define ([
         "actionPrivHistoryEdit": privLib.actionPrivHistoryEdit,
         "privHistorySaveAction": privLib.privHistorySaveAction,
         "privHistoryDeleteAction": privLib.privHistoryDeleteAction,
+        "privHistoryAddRecordAction": privLib.privHistoryAddRecordAction,
 
         // actions triggered from Schedule menu
         "actionSchedHistory": schedHistLib.actionSchedHistory,
         "actionSchedHistoryEdit": schedHistLib.actionSchedHistoryEdit,
         "schedHistorySaveAction": schedHistLib.schedHistorySaveAction,
         "schedHistoryDeleteAction": schedHistLib.schedHistoryDeleteAction,
+        "schedHistoryAddRecordAction": schedHistLib.schedHistoryAddRecordAction,
         "browseAllSchedules": schedLib.browseAllSchedules,
         "actionSchedLookup": schedLib.actionSchedLookup,
         "createSchedule": schedLib.createSchedule,
         "schedEditSave": schedLib.schedEditSave,
         "schedReallyDelete": schedLib.schedReallyDelete,
+
+        // actions triggered from Adminitrivia menu
+        "restServerDetailsAction": restLib.restServerDetailsAction,
 
         // return to (saved) browser state
         "returnToBrowser": function () {

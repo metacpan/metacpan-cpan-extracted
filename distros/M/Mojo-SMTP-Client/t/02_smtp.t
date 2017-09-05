@@ -1,6 +1,7 @@
 use strict;
 use Test::More;
 use Mojo::SMTP::Client;
+use Mojo::Exception;
 use Socket 'CRLF';
 use lib 't/lib';
 use Utils;
@@ -55,8 +56,31 @@ syswrite($sock, '500 host.net is busy'.CRLF);
 eval {
 	$smtp->send();
 };
-ok(my $e = $@, 'bad response');
+ok($e = $@, 'bad response');
 isa_ok($e, 'Mojo::SMTP::Client::Exception::Response');
+close $sock;
+kill 15, $pid;
+
+# 4
+($pid, $sock, $host, $port) = Utils::make_smtp_server();
+$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, autodie => 1);
+syswrite($sock, join(CRLF, '220 host.net', '220 hello ok', '220 from ok', '220 to ok', '220 quit ok').CRLF);
+
+$smtp->on(response => sub {
+	my $cmd = $_[1];
+	
+	if ($cmd == Mojo::SMTP::Client::CMD_EHLO) {
+		Mojo::Exception->throw("Throwed from response callback");
+	}
+});
+
+eval {
+	$smtp->send(hello => 'mymail.host', from => '', to => 'jorik@gmail.com', quit => 1);
+};
+$e = $@;
+is(ref $e, 'Mojo::Exception', 'got right exception');
+is($e->message, 'Throwed from response callback', 'with right message');
+
 close $sock;
 kill 15, $pid;
 

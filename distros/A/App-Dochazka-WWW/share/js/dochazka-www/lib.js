@@ -90,7 +90,7 @@ define ([
                name: 'ePpriv',
                aclProfileRead: 'inactive',
                aclProfileWrite: 'admin',
-               text: 'Privlevel',
+               text: 'Status',
                prop: 'priv',
                maxlen: 10
            },
@@ -100,6 +100,30 @@ define ([
                aclProfileWrite: 'admin',
                text: 'Effective',
                prop: 'effective',
+               maxlen: 30
+           },
+           'ePprivEffective': {
+               name: 'ePprivEffective',
+               aclProfileRead: 'inactive',
+               aclProfileWrite: 'admin',
+               text: 'Status since',
+               prop: 'privEffective',
+               maxlen: 30
+           },
+           'ePsched': {
+               name: 'ePsched',
+               aclProfileRead: 'inactive',
+               aclProfileWrite: 'admin',
+               text: 'Schedule',
+               prop: 'sched',
+               maxlen: 20
+           },
+           'ePschedEffective': {
+               name: 'ePschedEffective',
+               aclProfileRead: 'inactive',
+               aclProfileWrite: 'admin',
+               text: 'Schedule since',
+               prop: 'schedEffective',
                maxlen: 30
            },
            'LDAPdochazka': {
@@ -166,7 +190,7 @@ define ([
            },
            'sDcode': {
                name: 'sDcode',
-               aclProfileRead: 'admin',
+               aclProfileRead: 'inactive',
                aclProfileWrite: 'admin',
                text: 'Schedule code',
                prop: 'scode',
@@ -174,7 +198,7 @@ define ([
            },
            'sDid': {
                name: 'sDid',
-               aclProfileRead: 'admin',
+               aclProfileRead: 'inactive',
                aclProfileWrite: 'admin',
                text: 'Schedule ID',
                prop: 'sid',

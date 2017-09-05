@@ -22,6 +22,15 @@ This module also requires these libraries:
 
 ### INSTALLATION
 
+To compile libssh dependency on centos 6:
+
+```
+# mkdir build
+# cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DLIB_SUFFIX=64 -DLIB_INSTALL_DIR=/usr/lib64 ..
+# make
+# make install
+```
+
 To install Libssh::Session type the following:
 
 ```
@@ -29,6 +38,11 @@ To install Libssh::Session type the following:
 # make
 # make install
 ```
+
+### INFORMATION
+
+By default, the OpenSSH daemon authorize 10 sessions in parrallel for one connection. You can increase that number with option
+MaxSessions.
 
 ### BUGS/FEATURE REQUESTS
 

@@ -13,8 +13,6 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-
-
 use Device::PaloAlto::Firewall;
 
 unless ( $ENV{RELEASE_TESTING} ) {
@@ -25,18 +23,28 @@ unless ( $ENV{PA_TEST_URI} ) {
     plan ( skip_all => "No PA_TEST_URI environment variable provided" );
 }
 
+plan tests => 18;
+
 my $uri = $ENV{PA_TEST_URI};
 my $fw;
 
 $fw = Device::PaloAlto::Firewall->new(uri => $uri, username => 'test', password => 'test');
 
-lives_ok { $fw->system_info } "System Info";
-lives_ok { $fw->environmentals } "Environmentals";
-lives_ok { $fw->interfaces } "Interfaces";
-lives_ok { $fw->high_availability } "High Availability";
-lives_ok { $fw->ntp } "NTP";
-lives_ok { $fw->routing_table } "Routing Table";
-lives_ok { $fw->bgp_peers } "BGP Peers";
-lives_ok { $fw->panorama_status } "Panorama Status";
-lives_ok { $fw->ip_user_mapping } "IP User Mapping";
-lives_ok { $fw->userid_server_monitor } "Server Monitor";
+ok ( $fw->system_info(), "system_info()" );
+ok ( $fw->environmentals(), "environmentals()" );
+ok ( $fw->high_availability(), "high_availability()" );
+ok ( $fw->interfaces(), "interfaces()" );
+ok ( $fw->interface_counters_logical(), "interface_counters_logical()" );
+ok ( $fw->routing_table(), "routing_table()" );
+ok ( $fw->bgp_peers(), "bgp_peers()" );
+ok ( $fw->bgp_rib(), "bgp_rib()" );
+ok ( $fw->ospf_neighbours(), "ospf_neighbours()" );
+ok ( $fw->pim_neighbours(), "pim_neighbours()" );
+ok ( $fw->bfd_peers(), "bfd_peers()" );
+ok ( $fw->ntp(), "ntp()" );
+ok ( $fw->panorama_status(), "panorama_status()" );
+ok ( $fw->ip_user_mapping(), "ip_user_mapping()" );
+ok ( $fw->userid_server_monitor(), "userid_server_monitor()" );
+ok ( $fw->ike_peers(), "ike_peers()" );
+ok ( $fw->ipsec_peers(), "ipsec_peers()" );
+ok ( $fw->vpn_tunnels(), "vpn_tunnels()" );

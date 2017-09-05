@@ -19,7 +19,7 @@ one_row(
 	-having   => {"length(ref)" => {'>', 4}}
 );
 ($query, $bind) = TestConnector::query();
-ok( $query eq 'select * from list  GROUP BY ref  HAVING ( length(ref) > ? )'
+ok( $query eq 'select * from list  GROUP BY "ref"  HAVING ( length(ref) > ? )'
 	  && $bind eq "'4'",
 	'select with GROUP BY and HAVING'
 );
@@ -31,7 +31,7 @@ one_row(
 );
 ($query, $bind) = TestConnector::query();
 ok( $query eq
-	  'select * from list where id = ? GROUP BY ref  HAVING ( length(ref) > ? )'
+	  'select * from list where id = ? GROUP BY "ref"  HAVING ( length(ref) > ? )'
 	  && $bind eq "'1','4'",
 	'select with ID, GROUP BY and HAVING'
 );

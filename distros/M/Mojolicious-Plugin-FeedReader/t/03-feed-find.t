@@ -4,7 +4,7 @@ use Test::More;
 use Test::Mojo;
 use Mojo::URL;
 use FindBin;
-use Mojo::Util qw(slurp);
+use Mojo::File;
 
 use Mojolicious::Lite;
 plugin 'FeedReader';
@@ -13,8 +13,8 @@ get '/floo' => sub { shift->redirect_to('/link1.html'); };
 
 my $samples = File::Spec->catdir($FindBin::Bin, 'samples');
 push @{app->static->paths}, $samples;
-get '/olaf' =>sub { shift->render(data => slurp(File::Spec->catfile($samples, 'atom.xml')), format => 'html'); };
-get '/monks' =>sub { shift->render(data => slurp(File::Spec->catfile($samples, 'perlmonks.html')), format => 'htm'); };
+get '/olaf' =>sub { shift->render(data => Mojo::File->new(File::Spec->catfile($samples, 'atom.xml'))->slurp, format => 'html'); };
+get '/monks' =>sub { shift->render(data => Mojo::File->new(File::Spec->catfile($samples, 'perlmonks.html'))->slurp, format => 'htm'); };
 
 my $t = Test::Mojo->new(app);
 
