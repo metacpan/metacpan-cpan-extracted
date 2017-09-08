@@ -1,0 +1,11 @@
+---
+input:
+- elements:
+  - cluster/t/data/single.jsonl
+  format: ListFromFile
+  chunk_size: 2
+job_name: j.seqtk
+mode: Consecutive
+#seqtk_size_frac: 0.3
+seqtk_size_frac: 0.3
+#seqtk_seed: 13

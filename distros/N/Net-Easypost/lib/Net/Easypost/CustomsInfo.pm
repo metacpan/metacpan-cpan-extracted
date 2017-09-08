@@ -1,5 +1,5 @@
 package Net::Easypost::CustomsInfo;
-$Net::Easypost::CustomsInfo::VERSION = '0.20';
+$Net::Easypost::CustomsInfo::VERSION = '0.21';
 use JSON::MaybeXS;
 use Types::Standard qw(ArrayRef Bool Enum InstanceOf Str);
 
@@ -79,7 +79,7 @@ sub serialize {
    if ($self->customs_items) {
        foreach my $i (0 .. $#{ $self->customs_items }) {
 	   my $item = $self->customs_items->[$i];
-	   $obj->{$self->role . "[" . $item->role . "][$i][id]"} = $item->id;
+	   $obj->{$self->role . "[customs_items][$i][id]"} = $item->id;
        }
    }
 
@@ -112,7 +112,7 @@ Net::Easypost::CustomsInfo
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

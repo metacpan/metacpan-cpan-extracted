@@ -1,6 +1,8 @@
 package BioX::Workflow::Command::Utils::Files;
 
 use MooseX::App::Role;
+use namespace::autoclean;
+
 use MooseX::Types::Path::Tiny qw/AbsFile/;
 use File::Basename;
 use DateTime;

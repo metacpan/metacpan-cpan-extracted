@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 sub new {
     my $class = shift;
@@ -24,7 +24,7 @@ sub new {
     my $format = delete $args{'format'};
 
     my $module;
-    if($format =~ /^\+/) {
+    if($format =~ s/^\+//) {
         $module = $format;
     } else {
         $module = 'Bio::Grid::Run::SGE::Index::' . $format;
@@ -37,7 +37,7 @@ sub new {
 sub _load_module {
     my ( $module ) = @_;
 
-    eval "require $module";
+    eval "require $module; 1";
     if ($@) {
         confess "Failed to load module $module. $@";
     }

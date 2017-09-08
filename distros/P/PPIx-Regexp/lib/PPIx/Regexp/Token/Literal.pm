@@ -37,11 +37,13 @@ use base qw{ PPIx::Regexp::Token };
 use PPIx::Regexp::Constant qw{
     COOKIE_CLASS COOKIE_REGEX_SET
     LITERAL_LEFT_CURLY_ALLOWED
+    LITERAL_LEFT_CURLY_REMOVED_PHASE_1
+    LITERAL_LEFT_CURLY_REMOVED_PHASE_2
     MINIMUM_PERL MSG_PROHIBITED_BY_STRICT
     TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -269,12 +271,16 @@ The following is from perlop:
 	    my ( $tokenizer, $accept ) = @_;
 	    $tokenizer->strict()
 		or return $tokenizer->make_token( $accept,
-		'PPIx::Regexp::Token::NoOp' );
+		'PPIx::Regexp::Token::NoOp', {
+		    perl_version_removed	=> '5.027001',
+		},
+	    );
 	    return $tokenizer->make_token( $accept, TOKEN_UNKNOWN, {
 		    error	=> join( ' ',
 			'Empty Unicode character name',
 			MSG_PROHIBITED_BY_STRICT ),
 		    perl_version_introduced	=> '5.023008',
+		    perl_version_removed	=> '5.027001',
 		},
 	    );
 
@@ -453,6 +459,10 @@ because I don't understand the syntax.
 
 }
 
+sub __following_literal_left_curly_disallowed_in {
+    return LITERAL_LEFT_CURLY_REMOVED_PHASE_2;
+}
+
 {
     my $have_charnames_vianame;
 
@@ -467,6 +477,30 @@ because I don't understand the syntax.
     }
 }
 
+sub __perl_requirements_setup {
+    my ( $self ) = @_;
+    my $prev;
+    q<{> eq $self->content()	# }
+	and $prev = $self->sprevious_sibling()
+	and $prev->isa( 'PPIx::Regexp::Token::Literal' )
+	or return $self->SUPER::__perl_requirements_setup();
+    return (
+	{
+	    introduced	=> MINIMUM_PERL,
+	    removed	=> LITERAL_LEFT_CURLY_REMOVED_PHASE_1,
+	},
+	# TODO the following will be needed if this construction is
+	# re-allowed in 5.26.1:
+#	{
+#	    introduced	=> '5.026001',
+#	    removed	=> '6.027000',
+#	},
+	{
+	    introduced	=> '5.027001',
+	    removed	=> LITERAL_LEFT_CURLY_REMOVED_PHASE_2,
+	},
+    );
+}
 
 *__PPIX_TOKENIZER__repl = \&__PPIX_TOKENIZER__regexp;
 

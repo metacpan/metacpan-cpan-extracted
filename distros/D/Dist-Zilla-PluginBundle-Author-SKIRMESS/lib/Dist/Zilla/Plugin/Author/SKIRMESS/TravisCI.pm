@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -28,7 +28,9 @@ use namespace::autoclean;
 sub before_build {
     my ($self) = @_;
 
-    my $travis_yml = "language: perl\nperl:\n";
+    my $travis_yml = "# Automatically generated file\n# ";
+    $travis_yml .= ref $self;
+    $travis_yml .= q{ } . $self->VERSION . "\n\nlanguage: perl\nperl:\n";
 
     my @perl = grep { defined && !m{ ^ \s* $ }xsm } $self->_get_perl_version_to_check_with_travis();
     croak 'no perl versions selected for TravisCI' if !@perl;
@@ -75,6 +77,8 @@ sub _get_perl_version_to_check_with_travis {
 
     return @perl;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

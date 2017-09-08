@@ -4,7 +4,7 @@ use strict;
 
 # ABSTRACT: Mock the world with one object
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 our $AUTOLOAD;
 
@@ -30,7 +30,14 @@ sub __copy_xattr {
         }
     }
     return %copy;
+}
 
+sub can {
+    my ($self, $can) = @_;
+    if (!exists $self->{$can} && $self->{"X-Mock-Strict"}) {
+        return 0;
+    }
+    return 1;
 }
 
 sub AUTOLOAD {
@@ -113,7 +120,7 @@ Test::Mock::One - Mock the world with one object
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -205,7 +212,7 @@ The methods copy the X-Mock attributes from their parent to themselves.
 
 =head2 new
 
-Ways to override specific behaviours
+Instantiate a new Test::Mock::One object
 
 =over
 
@@ -233,6 +240,10 @@ Tell us how to stringify the object
 =back
 
 =head2 isa
+
+Returns true or false, depending on how X-Mock-ISA is set.
+
+=head2 can
 
 Returns true or false, depending on how X-Mock-Strict is set.
 

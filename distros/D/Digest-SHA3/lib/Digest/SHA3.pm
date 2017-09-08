@@ -8,7 +8,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 use Fcntl qw(O_RDONLY);
 use integer;
 
-$VERSION = '0.25';
+$VERSION = '0.26';
 
 require Exporter;
 require DynaLoader;
@@ -598,7 +598,7 @@ and lasting happiness."
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 Mark Shelor
+Copyright (C) 2012-2017 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

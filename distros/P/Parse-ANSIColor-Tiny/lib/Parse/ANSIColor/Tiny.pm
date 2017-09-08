@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Parse::ANSIColor::Tiny;
-# git description: v0.501-13-g0dfbfe4
+# git description: v0.600-2-gba6391f
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Determine attributes of ANSI-Colored string
-$Parse::ANSIColor::Tiny::VERSION = '0.600';
+$Parse::ANSIColor::Tiny::VERSION = '0.601';
 our @COLORS = qw( black red green yellow blue magenta cyan white );
 our %FOREGROUND = (
   (map { (               $COLORS[$_] =>  30 + $_ ) } 0 .. $#COLORS),
@@ -331,7 +331,7 @@ Parse::ANSIColor::Tiny - Determine attributes of ANSI-Colored string
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =for test_synopsis sub h { shift };
 

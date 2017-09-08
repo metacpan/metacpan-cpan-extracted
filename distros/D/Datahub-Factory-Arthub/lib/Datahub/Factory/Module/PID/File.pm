@@ -1,12 +1,13 @@
 package Datahub::Factory::Module::PID::File;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '0.92';
 
 use Catmandu;
 use Moose::Role;
-
 use URI::Split qw(uri_split);
+use namespace::clean;
 
 has path => (is => 'lazy');
 

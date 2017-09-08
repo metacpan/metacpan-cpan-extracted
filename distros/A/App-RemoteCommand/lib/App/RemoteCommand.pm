@@ -1,264 +1,74 @@
 package App::RemoteCommand;
 use strict;
 use warnings;
-use utf8;
-use Errno ();
-use File::Basename qw(basename);
+
+use App::RemoteCommand::Pool;
+use App::RemoteCommand::SSH;
+use App::RemoteCommand::Util 'prompt';
+
+use File::Basename ();
+use File::Temp ();
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
-use IO::Handle;
-use IO::Pty;
-use IO::Select;
-use List::Util qw(uniq);
-use Net::OpenSSH;
-use POSIX qw(strftime);
-use Parallel::ForkManager 1.16;
+use List::Util ();
+use POSIX 'strftime';
 use Pod::Usage 'pod2usage';
-use String::Glob::Permute qw(string_glob_permute);
-use Term::ReadKey 'ReadMode';
+use String::Glob::Permute 'string_glob_permute';
 
-sub prompt {
-    my $msg = shift;
-    local $| = 1;
-    print $msg;
-    ReadMode 'noecho', \*STDIN;
-    my $SIGNAL = "catch signal INT\n";
-    my $answer;
-    eval {
-        local $SIG{INT} = sub { die $SIGNAL };
-        $answer = <STDIN>;
-    };
-    my $error = $@;
-    ReadMode 'restore', \*STDIN;
-    print "\n";
-    die $error if $error;
-    chomp $answer;
-    $answer;
-}
+use constant TICK_SECOND => 0.1;
+use constant DEBUG => $ENV{PERL_RCOMMAND_DEBUG} ? 1 : 0;
 
-use constant CHUNK_SIZE => 1024 * 1024;
+our $VERSION = '0.92';
 
-my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", basename($0);
+my $SCRIPT = File::Basename::basename($0);
+my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", $SCRIPT;
+my $SUDO_FAIL = "Sorry, try again.";
 
-STDOUT->autoflush(1);
-
-our $VERSION = '0.04';
+sub logger { my $f = shift; $f = "-> $f\n"; warn @_ ? sprintf $f, @_ : $f }
 
 sub new {
-    my $class = shift;
-    bless {@_}, $class;
-}
-
-sub format { shift->{format} }
-
-sub make_format {
-    my ($self, %opt) = @_;
-    if ($opt{append_time} && $opt{append_hostname}) {
-        sub { my ($host, $msg) = @_; "[@{[strftime '%F %T', localtime]}][$host] $msg\n" };
-    } elsif ($opt{append_time}) {
-        sub { my ($host, $msg) = @_; "[@{[strftime '%F %T', localtime]}] $msg\n" };
-    } elsif ($opt{append_hostname}) {
-        sub { my ($host, $msg) = @_; "[$host] $msg\n" };
-    } else {
-        sub { my ($host, $msg) = @_; "$msg\n" };
-    }
+    my ($class, %option) = @_;
+    bless {
+        %option,
+        pending => [],
+        relay => App::RemoteCommand::Pool->new,
+        running => App::RemoteCommand::Pool->new,
+    }, $class;
 }
 
 sub run {
-    my $self = shift;
-    my $pm = Parallel::ForkManager->new($self->{concurrency});
-    my %exit; $pm->run_on_finish(sub {
-        my ($pid, $exit, $host, $signal) = @_;
-        $exit{$host} = { exit => $exit, signal => $signal };
-    });
+    my ($self, @argv) = @_;
+    $self = $self->new unless ref $self;
+    $self->parse_options(@argv);
+    $self->register;
 
-    my $signal_recieved = 0;
-    local $SIG{INT} = sub { $signal_recieved++ };
-
-    for my $host (@{ $self->{host} }) {
-        last if $signal_recieved;
-        $pm->start($host) and next;
-        if ($signal_recieved) {
-            warn $self->format->($host, "Internal error: catch signal INT, so do noting and exit.");
-            $pm->finish(255);
+    my $INT; local $SIG{INT} = sub { $INT++ };
+    my $TERM; local $SIG{TERM} = sub { $TERM++ };
+    while (1) {
+        if ($INT || $TERM) {
+            $self->handle_signal($TERM ? "TERM" : "INT");
+            $INT = $TERM = 0;
         }
-        $SIG{INT} = "DEFAULT";
-        my $exit = eval { $self->do_ssh($host) };
-        if (my $e = $@) {
-            chomp $e;
-            warn "$e\n";
-            $exit = 255;
-        }
-        $pm->finish($exit);
+        $self->one_tick;
+        last if @{$self->{pending}} == 0
+             && $self->{relay}->count == 0
+             && $self->{running}->count == 0;
     }
 
-    while (%{$pm->{processes}}) {
-        $pm->wait_all_children; # XXX perl wait function does not interrupted by signal...
-    }
-
-    my @success = grep { $exit{$_}{exit} == 0 && !$exit{$_}{signal} } sort keys %exit;
-    my @fail    = grep { $exit{$_}{exit} != 0 ||  $exit{$_}{signal} } sort keys %exit;
+    my @success = sort grep { $self->{exit}{$_} == 0 } keys %{$self->{exit}};
+    my @fail    = sort grep { $self->{exit}{$_} != 0 } keys %{$self->{exit}};
     if (!$self->{quiet}) {
         print STDERR "\e[32mSUCCESS\e[m $_\n" for @success;
-        print STDERR "\e[31mFAIL\e[m $_\n"   for @fail;
+        print STDERR "\e[31mFAIL\e[m $_\n"    for @fail;
     }
     return @fail ? 1 : 0;
-}
-
-sub make_command {
-    my ($self, @command) = @_;
-    my @prefix = ("env", "SUDO_PROMPT=$SUDO_PROMPT");
-    push @prefix, "sudo", "-u", $self->{sudo_user} if $self->{sudo_user};
-    if (@command == 1) {
-        (@prefix, "bash", "-c", $command[0]);
-    } else {
-        (@prefix, @command);
-    }
-}
-
-sub piping {
-    my ($self, $host, $in_fh, $out_fh, $keep) = @_;
-    my $len = sysread $in_fh, my $buffer, CHUNK_SIZE;
-    if (!defined $len) {
-        if ($! == Errno::EIO) {
-            # this happens when use ssh proxy, so skip
-        } else {
-            print STDERR $self->format->($host, "Internal error, sysread: $!");
-        }
-        return 0;
-    }
-    if ($len == 0) {
-        return 0;
-    }
-    my @split = split /\x0d\x0a|\x0a|\x0d/, $buffer;
-
-    if (@split > 1) {
-        print {$out_fh} $self->format->($host, $$keep . $split[0]);
-        print {$out_fh} $self->format->($host, $_) for @split[1 .. ($#split -1)];
-        $$keep = $split[-1];
-    } elsif (@split == 1) {
-        $$keep .= $split[0];
-    }
-
-    if ($buffer =~ /\n$/) {
-        print {$out_fh} $self->format->($host, $$keep);
-        $$keep = "";
-    }
-
-    if (length $$keep > CHUNK_SIZE) {
-        print {$out_fh} $self->format->($host, $$keep);
-        $$keep = "";
-    }
-    return $len;
-}
-
-sub do_ssh {
-    my ($self, $host) = @_;
-
-    my $ssh = Net::OpenSSH->new($host,
-        ( $self->{user} ? (user => $self->{user}) : () ),
-        ( $self->{identity} ? (key_path => $self->{identity}) : () ),
-        strict_mode => 0,
-        timeout => 5,
-        kill_ssh_on_timeout => 1,
-        master_opts => [
-            -o => "StrictHostKeyChecking=no",
-            -o => "UserKnownHostsFile=/dev/null",
-            -o => "LogLevel=quiet",
-        ],
-    );
-
-    my $internal_error = sub {
-        my $error = shift || $ssh->error || "";
-        $self->format->($host, "Internal error: $error");
-    };
-
-    die $internal_error->() if $ssh->error;
-
-    my $do_clean = sub {};
-    my @command;
-    if (my $script = $self->{script}) {
-        my $name = sprintf "/tmp/%s.%d.%d.%d", basename($0), time, $$, rand(1000);
-        $ssh->scp_put( $script, $name ) or die $internal_error->();
-        $do_clean = sub { $ssh->system("rm", "-f", $name) }; # don't check error
-        $ssh->system("chmod", "555", $name) or do { $do_clean->(); die $internal_error->() };
-        @command = ($name, @{$self->{script_arg}});
-    } else {
-        @command = @{$self->{command}};
-    }
-    my ($pty, $pid) = $ssh->open2pty($self->make_command(@command))
-        or do { $do_clean->(); die $internal_error->() };
-
-    my $signal_recieved = 0;
-    local $SIG{INT}  = sub { $signal_recieved++ };
-
-    my $select = IO::Select->new($pty);
-    my $keep = "";
-    my $need_password;
-    my $error;
-    while (1) {
-        last if $signal_recieved;
-        if ($select->can_read(1)) {
-            my $len = $self->piping($host, $pty => \*STDOUT, \$keep);
-            if ($len == 0) {
-                print STDOUT $self->format->($host, $keep) if $keep;
-                last;
-            }
-            if ($keep =~ /\Q$SUDO_PROMPT\E$/) {
-                $need_password = 1;
-                print STDOUT $self->format->($host, $keep);
-                $keep = "";
-            }
-        }
-        if ($need_password) {
-            if (my $sudo_password = $self->{sudo_password}) {
-                syswrite $pty, "$sudo_password\n";
-                $need_password = 0;
-            } else {
-                $error = "have to provide sudo passowrd first, try again with --ask-sudo-password option.";
-                last;
-            }
-        }
-    }
-    close $pty;
-    waitpid $pid, 0;
-    my $exit = $?;
-    $do_clean->();
-    if ($signal_recieved) {
-        die $internal_error->("catch signal INT");
-    } elsif ($error) {
-        die $internal_error->($error);
-    } else {
-        return $exit >> 8;
-    }
-}
-
-sub parse_host_arg {
-    my ($self, $host_arg) = @_;
-    [ uniq string_glob_permute($host_arg) ];
-}
-
-sub parse_host_file {
-    my ($self, $host_file) = @_;
-    open my $fh, "<", $host_file or die "Cannot open '$host_file': $!\n";
-    my @host;
-    while (my $line = <$fh>) {
-        $line =~ s/^\s+//; $line =~ s/\s+$//;
-        push @host, string_glob_permute($line) if $line =~ /^[^#\s]/;
-    }
-    [ uniq @host ];
 }
 
 sub parse_options {
     my ($self, @argv) = @_;
     local @ARGV = @argv;
-    my $deprecated = sub {
-        warn "WARNING: --$_[0] option is deprecated, please set it in your ~/.ssh/config\n";
-    };
     GetOptions
         "c|concurrency=i"     => \($self->{concurrency} = 5),
         "h|help"              => sub { pod2usage(verbose => 99, sections => 'SYNOPSIS|OPTIONS|EXAMPLES') },
-        "u|user=s"            => sub { $deprecated->("user"); $self->{user} = $_[1] },
-        "i|identity=s"        => sub { $deprecated->("identity"); $self->{identity} = $_[1] },
         "s|script=s"          => \($self->{script}),
         "v|version"           => sub { printf "%s %s\n", __PACKAGE__, $VERSION; exit },
         "a|ask-sudo-password" => \(my $ask_sudo_password),
@@ -281,8 +91,14 @@ sub parse_options {
         warn "COMMANDS or --script option is required\n";
         exit(2);
     }
-    if ($self->{script} && !-r $self->{script}) {
-        die "Cannot read script '$self->{script}'\n";
+    if ($self->{script}) {
+        open my $fh, "<", $self->{script} or die "$self->{script}: $!\n";
+        my $content = do { local $/; <$fh> };
+        my ($tempfh, $tempfile) = File::Temp::tempfile(UNLINK => 1, EXLOCK => 0);
+        print {$tempfh} $content;
+        close $tempfh;
+        chmod 0700, $tempfile;
+        $self->{script} = $tempfile;
     }
 
     $self->{format} = $self->make_format(
@@ -297,7 +113,213 @@ sub parse_options {
     $self->{host} = $host_file ? $self->parse_host_file($host_file)
                                : $self->parse_host_arg($host_arg);
     $self;
+}
 
+sub handle_signal {
+    my ($self, $name) = @_;
+    DEBUG and logger "handling signal $name";
+    for my $ssh ($self->{running}->all) {
+        $ssh->cancel;
+        if ($ssh->type eq "cmd") {
+            DEBUG and logger "kill %s, %d", $name, $ssh->pid;
+            kill $name => $ssh->pid;
+        }
+    }
+    @{$self->{pending}} = ();
+    $self->{relay}->remove_all; # this might block
+}
+
+sub one_tick {
+    my $self = shift;
+
+    DEBUG and logger "one tick";
+    DEBUG and logger "running %d, relay %d, pending %d",
+        $self->{running}->count, $self->{relay}->count, scalar @{$self->{pending}};
+
+    while ($self->{relay}->count + $self->{running}->count < $self->{concurrency} and my $ssh = shift @{$self->{pending}}) {
+        DEBUG and logger "start %s", $ssh->host;
+        $ssh->start;
+        $self->{relay}->add($ssh);
+    }
+
+    for my $ssh (grep { $_->is_ready } $self->{relay}->all) {
+        $self->{relay}->remove(host => $ssh->host);
+        if ($ssh->next and !$ssh->error) {
+             DEBUG and logger "next %s, pid %d", $ssh->host, $ssh->pid;
+             $self->{running}->add($ssh);
+        } else {
+            print $self->{format}->($ssh->host, $ssh->error || "FAILED");
+            $self->{exit}{$ssh->host} = 255;
+        }
+    }
+
+    if ($self->{running}->select->count == 0) {
+        select undef, undef, undef, TICK_SECOND;
+    }
+
+    my $NEED_STOP;
+    for my $fh ($self->{running}->select->can_read(TICK_SECOND)) {
+        my $ssh = $self->{running}->find(fh => $fh);
+        my $n = sysread $fh, my $buf, 64*1024;
+        my ($errno, $errmsg) = (0+$!, "$!");
+        DEBUG and logger "read %s, pid %d, len %s", $ssh->host, $ssh->pid, defined $n ? $n : 'undef';
+        if ($n) {
+            my $host = $ssh->host;
+            my $buffer = $ssh->buffer;
+            if (my @line = $buffer->add($buf)->get) {
+                print $self->{format}->($host, $_) for @line;
+                if ($ssh->sudo and @line == 1 and $line[0] eq $SUDO_FAIL) {
+                    $NEED_STOP++;
+                    $self->{running}->select->remove($fh);
+                    $ssh->delete_fh;
+                    close $fh;
+                }
+            }
+            if (!$ssh->sudo and $buffer->raw eq $SUDO_PROMPT) {
+                $ssh->sudo(1);
+                my ($line) = $buffer->get(1);
+                print $self->{format}->($host, $line);
+                if (my $sudo_password = $self->{sudo_password}) {
+                    syswrite $fh, "$sudo_password\n";
+                } else {
+                    $NEED_STOP++;
+                    my $err = "have to provide sudo passowrd first, try again with --ask-sudo-password option.";
+                    print $self->{format}->($host, $err);
+                    $self->{running}->select->remove($fh);
+                    $ssh->delete_fh;
+                    close $fh;
+                }
+            }
+        } elsif (!defined $n) {
+            if ($errno != Errno::EIO) { # this happens when use ssh proxy, so skip
+                print $self->{format}->($ssh->host, "sysread $errmsg");
+            }
+        }
+    }
+    @{$self->{pending}} = () if $NEED_STOP;
+
+    my $pid = waitpid -1, POSIX::WNOHANG;
+    my $exit = $?;
+    return if $pid == 0 || $pid == -1;
+
+    my $ssh = $self->{running}->remove(pid => $pid);
+    if (!$ssh) {
+        my $ssh;
+        if ($ssh = $self->{relay}->remove(master_pid => $pid)) {
+            # login fails, cannot resolve hostname, ...
+            DEBUG and logger "wait %s, master pid %d", $ssh->host, $pid;
+            $ssh->master_exited;
+            my $err = $ssh->error || "master process exited unexpectedly";
+            print $self->{format}->($ssh->host, $err);
+            $self->{exit}{$ssh->host} = $exit == 0 ? 255 : $exit;
+            return;
+        } elsif ($ssh = $self->{running}->remove(master_pid => $pid)) {
+            # THIS IS UNEXPECTED
+            DEBUG and logger "wait %s, master pid %d", $ssh->host, $pid;
+            $ssh->master_exited;
+            my $err = $ssh->error || "master process exited unexpectedly";
+            print $self->{format}->($ssh->host, $err);
+            $self->{exit}{$ssh->host} = $exit == 0 ? 255 : $exit;
+            return;
+        } else {
+            die "Must not reach here";
+        }
+    }
+    DEBUG and logger "wait %s, pid %d, exit %d", $ssh->host, $pid, $exit;
+    if (my $fh = $ssh->fh) {
+        my $rest = do { local $/; <$fh> };
+        my $buffer = $ssh->buffer;
+        $buffer->add($rest) if length $rest;
+        my @line = $buffer->get(1);
+        my $host = $ssh->host;
+        print $self->{format}->($host, $_) for @line;
+    }
+
+    if ($ssh->type eq 'cmd') {
+        $self->{exit}{$ssh->host} = $exit;
+        $ssh->cancel if $exit != 0;
+    }
+
+    if ($ssh->next) {
+        if (!$ssh->error) {
+            DEBUG and logger "next %s, pid %d", $ssh->host, $ssh->pid;
+            $self->{running}->add($ssh);
+        } else {
+            print $self->{format}->($ssh->host, $ssh->error || "FAILED");
+            $self->{exit}{$ssh->host} = 255 if $ssh->type eq "cmd";
+        }
+    }
+
+}
+
+sub register {
+    my $self = shift;
+
+    my @prefix = ("env", "SUDO_PROMPT=$SUDO_PROMPT");
+    push @prefix, "sudo", "-u", $self->{sudo_user} if $self->{sudo_user};
+
+    my (@ssh_cmd, $ssh_at_exit);
+    my @command;
+    if (my $script = $self->{script}) {
+        my $name = sprintf "/tmp/%s.%d.%d", $SCRIPT, time, rand(10_000);
+        push @ssh_cmd, sub {
+            my $ssh = shift;
+            my $pid = $ssh->scp_put({async => 1, copy_attrs => 1}, $script, $name);
+            return ($pid, undef);
+        };
+        $ssh_at_exit = sub {
+            my $ssh = shift;
+            my $pid = $ssh->system({async => 1}, "rm", "-f", $name);
+            return ($pid, undef);
+        };
+        @command = (@prefix, $name, @{$self->{script_arg}});
+    } else {
+        @command = @{$self->{command}};
+        unshift @command, "bash", "-c" if @command == 1;
+        unshift @command, @prefix;
+    }
+    DEBUG and logger "execute: %s", join(" ", map { qq('$_') } @command);
+    push @ssh_cmd, sub {
+        my $ssh = shift;
+        my ($fh, $pid) = $ssh->open2pty(@command);
+        return ($pid, $fh);
+    };
+
+    for my $host (@{$self->{host}}) {
+        my $ssh = App::RemoteCommand::SSH->new($host);
+        $ssh->add($_) for @ssh_cmd;
+        $ssh->at_exit($ssh_at_exit) if $ssh_at_exit;
+        push @{$self->{pending}}, $ssh;
+    }
+}
+
+sub make_format {
+    my ($self, %opt) = @_;
+    if ($opt{append_time} && $opt{append_hostname}) {
+        sub { my ($host, $msg) = @_; "[@{[strftime '%F %T', localtime]}][$host] $msg\n" };
+    } elsif ($opt{append_time}) {
+        sub { my ($host, $msg) = @_; "[@{[strftime '%F %T', localtime]}] $msg\n" };
+    } elsif ($opt{append_hostname}) {
+        sub { my ($host, $msg) = @_; "[$host] $msg\n" };
+    } else {
+        sub { my ($host, $msg) = @_; "$msg\n" };
+    }
+}
+
+sub parse_host_arg {
+    my ($self, $host_arg) = @_;
+    [ List::Util::uniq string_glob_permute($host_arg) ];
+}
+
+sub parse_host_file {
+    my ($self, $host_file) = @_;
+    open my $fh, "<", $host_file or die "Cannot open '$host_file': $!\n";
+    my @host;
+    while (my $line = <$fh>) {
+        $line =~ s/^\s+//; $line =~ s/\s+$//;
+        push @host, string_glob_permute($line) if $line =~ /^[^#\s]/;
+    }
+    [ List::Util::uniq @host ];
 }
 
 1;

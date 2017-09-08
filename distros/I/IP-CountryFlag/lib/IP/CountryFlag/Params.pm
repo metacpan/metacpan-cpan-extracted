@@ -1,6 +1,6 @@
 package IP::CountryFlag::Params;
 
-$IP::CountryFlag::Params::VERSION   = '0.08';
+$IP::CountryFlag::Params::VERSION   = '0.09';
 $IP::CountryFlag::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ IP::CountryFlag::Params - Placeholder for parameters for IP::CountryFlag.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -98,7 +98,7 @@ L<http://search.cpan.org/dist/IP-CountryFlag/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 - 2016 Mohammad S Anwar.
+Copyright (C) 2011 - 2017 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "File::Spec" : "3.31",
             "File::pushd" : "1.00",
             "IPC::Cmd" : "0.58",
-            "List::MoreUtils" : "0.22",
+            "List::Util" : "1.45",
             "Log::Message::Simple" : "0.06",
             "Module::CoreList" : "2.49",
             "Module::Load::Conditional" : "0.38",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/bingos/smokebrew"
       }
    },
-   "version" : "0.50",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.52",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

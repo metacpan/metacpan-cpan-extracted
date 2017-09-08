@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to sort candidates by most recent first
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has 'filter'   => undef;
@@ -56,13 +56,13 @@ Alien::Build::Plugin::Prefer::SortVersions - Plugin to sort candidates by most r
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
  use alienfile;
  
- plugin 'Prefer::SortVersions' => ();
+ plugin 'Prefer::SortVersions';
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,9 @@ In some cases you may need to use this plugin directly instead.
 This Prefer plugin sorts the packages that were retrieved from a dir listing, either
 directly from a Fetch plugin, or from a Decode plugin.  It Returns a listing with the
 items sorted from post preferable to least, and filters out any undesirable candidates.
+
+This plugin updates the file list to include the versions that are extracted, so they
+can be used by other plugins, such as L<Alien::Build::Plugin::Prefer::BadVersion>.
 
 =head1 PROPERTIES
 
@@ -120,7 +123,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -137,6 +140,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

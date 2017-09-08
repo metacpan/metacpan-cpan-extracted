@@ -22,7 +22,7 @@ run_job(
 sub do_worker_stuff {
     my ( $c, $result_prefix, $seq_file ) = @_;
 
-    INFO "Running $seq_file -> $result_prefix";
+    job->log->info("Running $seq_file -> $result_prefix");
 
     sleep 10;
     open my $seq_fh, '<', $seq_file      or confess "Can't open filehandle: $!";
@@ -37,5 +37,5 @@ sub do_worker_stuff {
     }
     $res_fh->close;
     $seq_fh->close;
-    return my_sys_non_fatal("cp $seq_file $result_prefix.orig");
+    return job->sys("cp $seq_file $result_prefix.orig");
 }

@@ -1,0 +1,31 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Module::Name - abstract text
+
+=head1 VERSION
+
+version 1.002003
+
+=head1 TEST
+
+This must go into the out.
+
+And display.
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Vadim Belman <vrurg@cpan.org>.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

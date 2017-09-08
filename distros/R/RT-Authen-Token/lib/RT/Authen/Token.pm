@@ -2,7 +2,7 @@ package RT::Authen::Token;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 RT::System->AddRight(Staff => ManageAuthTokens => 'Manage authentication tokens');
 
@@ -100,6 +100,13 @@ in case changes need to be made to your database.
 Add this line:
 
     Plugin( "RT::Authen::Token" );
+
+=item Update your Apache configuration
+
+If you are running RT under Apache, add the following directive to your RT
+Apache configuration to allow RT to access the Authorization header.
+
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
 =item Restart your webserver
 

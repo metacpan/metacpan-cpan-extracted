@@ -65,3 +65,29 @@ Revision history for Spp
 1.13    2017-9-4
         write_file would send a message to output when write ok!
         perl-tidy all source code.
+
+1.14    2017-9-4
+        spp.pl add not argument help.
+
+1.15    2017-9-5
+        match() from Match.pm to Spp.pm, could export to everyone.
+        delete :file specification get-file-text test.
+        delete _match_rule debug func().
+        Spp.pm is transfer with Spp.spp
+        Match.pm fix some bug. match-not() do not save cache correctly.
+        rename: is_str() => is_atom_str(), is_perl_str => is_str
+        
+1.16    2017-9-7
+        Spp/Match.pm match_sym() add:
+        ----------------------
+        if (is_false($match)) { return $match }
+        my $token_name = rest($name);
+        my $char = first($token_name);
+        if (is_char_upper($char)) { return [$token_name, $match] }
+        if ($char eq '_') { return ['true'] }
+        return $match;
+        ----------------------
+        could named capture string, or reject it!
+        LintParser.pm => LintAst.pm
+        Lint should do Ast.
+

@@ -1,7 +1,9 @@
 package BioX::Workflow::Command::Utils::Create;
 
 use MooseX::App::Role;
-use BioX::Workflow::Command::Utils::Traits qw(ArrayRefOfStrs);
+use namespace::autoclean;
+
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 use Storable qw(dclone);
 
 option 'rules' => (

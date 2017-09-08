@@ -1,5 +1,8 @@
 #!/usr/bin/perl -s
 
+# PODNAME: tmx-tokenize
+# ABSTRACT: Tokenizes translation units on a tmx file.
+
 use strict;
 use warnings;
 
@@ -41,11 +44,19 @@ $reader->for_tu( {
                      return $tu;
                  });
 
+__END__
+
+=pod
+
 =encoding UTF-8
 
 =head1 NAME
 
-tmx-tokenize - tokenizes translation units on a tmx file.
+tmx-tokenize - Tokenizes translation units on a tmx file.
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -72,15 +83,25 @@ regexp based tokenizer might be implemented.
 
 XML::TMX, Lingua::FreeLing3
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Alberto Manuel Brandão Simões
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-

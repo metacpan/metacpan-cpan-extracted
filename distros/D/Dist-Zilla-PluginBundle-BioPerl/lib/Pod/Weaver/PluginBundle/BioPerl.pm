@@ -1,5 +1,5 @@
 package Pod::Weaver::PluginBundle::BioPerl;
-$Pod::Weaver::PluginBundle::BioPerl::VERSION = '0.25';
+$Pod::Weaver::PluginBundle::BioPerl::VERSION = '0.26';
 use utf8;
 
 # ABSTRACT: Configure your POD like Bioperl does
@@ -97,7 +97,7 @@ Pod::Weaver::PluginBundle::BioPerl - Configure your POD like Bioperl does
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -197,11 +197,11 @@ web:
 
 =head1 AUTHOR
 
-CarnÃ« Draug <carandraug+dev@gmail.com>
+Carnë Draug <carandraug+dev@gmail.com>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2013-2017 by CarnÃ« Draug.
+This software is copyright (c) 2013-2017 by Carnë Draug.
 
 This software is available under the same terms as the perl 5 programming language system itself.
 

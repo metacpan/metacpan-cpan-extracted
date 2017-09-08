@@ -1,0 +1,38 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Module::Name - abstract text
+
+=head1 VERSION
+
+version 1.002003
+
+con1
+
+This is a test paragraph
+from src.pod
+
+This is a nested include.
+
+con2
+
+bla-bla-bla
+
+Chunk from F<in.pod>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Vadim Belman <vrurg@cpan.org>.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

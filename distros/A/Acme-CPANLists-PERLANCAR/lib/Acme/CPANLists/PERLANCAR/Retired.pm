@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Retired;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 our @Module_Lists = (
     # list: Retired modules
@@ -73,6 +73,15 @@ I didn't know about the `fallocate` command.
 _
                 'x.date' => '2017-07-18',
             },
+            {
+                module => 'Log::Any::App',
+                description => <<'_',
+
+I've written <pm:Log::ger::App> to be its successor.
+
+_
+                'x.date' => '2017-09-08',
+            },
         ],
     },
 );
@@ -92,7 +101,7 @@ Acme::CPANLists::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.25 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
+This document describes version 0.26 of Acme::CPANLists::PERLANCAR::Retired (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-09-08.
 
 =head1 MODULE LISTS
 
@@ -149,6 +158,11 @@ Alternate modules: L<PERLANCAR::Module::List>
 =item * L<App::CreateSparseFile>
 
 I didn't know about the C<fallocate> command.
+
+
+=item * L<Log::Any::App>
+
+I've written L<Log::ger::App> to be its successor.
 
 
 =back

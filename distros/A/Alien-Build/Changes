@@ -1,5 +1,32 @@
 Revision history for Alien-Build
 
+1.10      2017-09-07 20:57:25 -0400
+  - Production release identical to 1.09_01
+
+1.09_01   2017-09-07 07:34:40 -0400
+  - Fix test regression introduced in 1.08_01
+
+1.08_01   2017-09-05 22:26:36 -0400
+  - Add support for out-of-source builds
+  - The Build::CMake plugin now supports out-of-source builds
+  - The Build::Autoconf plugin now supports out-of-source builds
+  - Add extract install property
+  - Add out_of_source meta property
+  - Starting with this release, Alien::Base::ModuleBuild is no longer a prereq on
+    _development_ releases.  It will remain a prereq on production releases until at
+    least October 1st.  This is to help flush out any issues on cpantesters for this
+    upcoming transition.
+
+1.07_01   2017-09-05 09:21:13 -0400
+  - Fix windows test bug introduced in 1.06_01
+  - Add alien_rc to Test::Alien::Build
+
+1.06_01   2017-09-04 12:07:38 -0400
+  - Add Alien::Build::Plugin::Prefer::BadVersion
+  - Support for cd in a command sequence
+  - Added support for ALIEN_INSTALL_TYPE=default
+  - Added override hook (see Alien::Build::Manual::PluginAuthor)
+
 1.05      2017-08-28 20:08:29 -0400
   - add %{make_path} helper to Alien::Build::Interpolate::Default.
   - Fixed bug with read-only $_ triggered by Dist::Zilla::Plugin::AlienBuild (zmughal++)

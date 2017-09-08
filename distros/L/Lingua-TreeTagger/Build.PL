@@ -8,10 +8,11 @@ my $builder = Module::Build->new(
     module_name             => 'Lingua::TreeTagger',
     license                 => 'gpl',
     dist_author             => q{Aris Xanthos <aris.xanthos@unil.ch>},
-    dist_version            => '0.08',
+    dist_version            => '0.10',
     configure_requires => {
         'File::Spec'        => 0,
         'File::Which'       => 0,
+        'Module::Build'     => 0.42
     },
     build_requires => {
         'Test::More'        => 0,
@@ -135,15 +136,6 @@ if ( @installed_parameter_files == 0 ) {
 
     # Then store the prompted path.
     $treetagger_lib_path = $prompted_treetagger_lib_path;
-
-    # Discard unicode parameter files (not yet supported by the module).
-    @installed_parameter_files
-        = grep { $_ !~ /utf8/ } @installed_parameter_files;
-
-    # Throw exception if there is no non-unicode parameter file.
-    die "Sorry, there are only unicode parameter files in the 'lib' directory "
-      . "and those are not supported by the module (yet). Aborting install..."
-      if @installed_parameter_files == 0;
 }
 
 # Pick a parameter file for testing.

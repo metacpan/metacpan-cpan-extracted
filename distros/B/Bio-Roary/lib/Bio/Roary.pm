@@ -1,5 +1,5 @@
 package Bio::Roary;
-$Bio::Roary::VERSION = '3.9.1';
+$Bio::Roary::VERSION = '3.10.2';
 # ABSTRACT: Create a pan genome
 
 
@@ -156,7 +156,7 @@ Bio::Roary - Create a pan genome
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

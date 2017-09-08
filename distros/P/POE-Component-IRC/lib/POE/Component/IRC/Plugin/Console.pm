@@ -1,8 +1,6 @@
 package POE::Component::IRC::Plugin::Console;
-BEGIN {
-  $POE::Component::IRC::Plugin::Console::AUTHORITY = 'cpan:HINRIK';
-}
-$POE::Component::IRC::Plugin::Console::VERSION = '6.88';
+our $AUTHORITY = 'cpan:HINRIK';
+$POE::Component::IRC::Plugin::Console::VERSION = '6.90';
 use strict;
 use warnings FATAL => 'all';
 use Carp;

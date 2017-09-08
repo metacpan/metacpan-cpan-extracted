@@ -1,8 +1,6 @@
 package POE::Component::IRC::Plugin::AutoJoin;
-BEGIN {
-  $POE::Component::IRC::Plugin::AutoJoin::AUTHORITY = 'cpan:HINRIK';
-}
-$POE::Component::IRC::Plugin::AutoJoin::VERSION = '6.88';
+our $AUTHORITY = 'cpan:HINRIK';
+$POE::Component::IRC::Plugin::AutoJoin::VERSION = '6.90';
 use strict;
 use warnings FATAL => 'all';
 use Carp;

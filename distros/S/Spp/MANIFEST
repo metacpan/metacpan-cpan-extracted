@@ -9,9 +9,9 @@ lib/Spp/Cursor.pm
 lib/Spp/Grammar.pm
 lib/Spp/IsAtom.pm
 lib/Spp/IsChar.pm
-lib/Spp/LintParser.pm
+lib/Spp/LintAst.pm
 lib/Spp/Match.pm
-lib/Spp/OptSppAst.pm
+lib/Spp/OptAst.pm
 lib/Spp/ToSpp.pm
 MANIFEST			This list of files
 README.md

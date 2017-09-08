@@ -4,7 +4,7 @@ package Test::Class::Moose::Report::Method;
 
 use 5.10.0;
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 use Moose;
 use Carp;
@@ -79,7 +79,7 @@ Test::Class::Moose::Report::Method - Reporting on test methods
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 DESCRIPTION
 
@@ -124,13 +124,13 @@ Returns true if the current test method has the tag in question.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/test-class-moose/test-class-moose/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/test-class-moose/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
 
 =head1 AUTHORS
 

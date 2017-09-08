@@ -38,11 +38,11 @@ use base qw{ PPIx::Regexp::Element };
 
 use Carp;
 use List::Util qw{ max };
-use PPIx::Regexp::Constant qw{ MINIMUM_PERL NODE_UNKNOWN };
+use PPIx::Regexp::Constant qw{ FALSE MINIMUM_PERL NODE_UNKNOWN TRUE };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -60,6 +60,26 @@ sub __new {
 	$elem->_parent( $self );
     }
     return $self;
+}
+
+sub accepts_perl {
+    my ( $self, $version ) = @_;
+    foreach my $elem ( $self->elements() ) {
+	$elem->accepts_perl( $version )
+	    or return FALSE;
+    }
+    return TRUE;
+}
+
+# NOTE: this method is to be used ONLY for requirements_for_perl(). See
+# PPIx::Regexp::Element for exposure plans. IF it is exposed, that is
+# where it will be documented.
+sub __structured_requirements_for_perl {
+    my ( $self, $rslt ) = @_;
+    foreach my $elem ( $self->elements() ) {
+	$elem->__structured_requirements_for_perl( $rslt );
+    }
+    return $rslt;
 }
 
 =head2 child
@@ -202,9 +222,9 @@ This convenience method takes the same arguments as C<find>, but instead
 of the found objects themselves returns their parents. No parent will
 appear more than once in the output.
 
-The return is a reference to the array of parents if any were found. If
-none were found the return is false but defined. If an error occurred
-the return is C<undef>.
+This method returns a reference to the array of parents if any were
+found. If no parents were found the return is false but defined. If an
+error occurred the return is C<undef>.
 
 =cut
 

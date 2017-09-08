@@ -1,5 +1,8 @@
 Revision history for Swagger2-Markdown
 
+9.99     2017-09-07
+        - Dist is now DEPRECATED, use https://github.com/Rebilly/ReDoc instead
+
 0.12     2017-03-08
         - Fix t/010_api_blueprint.t with SKIP due to breaking changes in Swagger2
         - Add documentation regarding deprecation of Swagger2

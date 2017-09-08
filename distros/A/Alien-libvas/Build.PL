@@ -49,6 +49,7 @@ my $build = Alien::Base::ModuleBuild->new(
     alien_build_commands => [
                 Alien::CMake->config('prefix')
               . "/bin/cmake -DCMAKE_C_COMPILER_INIT=$Config{cc}"
+              . ' -DWITH_PIC=ON -DBUILD_MANUAL_TESTS=OFF'
               . ' -DCMAKE_INSTALL_PREFIX:PATH=%s CMakeLists.txt',
             "$cmake --build ."
      ],
@@ -61,7 +62,7 @@ my $build = Alien::Base::ModuleBuild->new(
 
     extra_compiler_flags => Alien::CMake->config('cflags'),
     extra_linker_flags   => Alien::CMake->config('libs'),
-#    alien_isolate_dynamic => 1,
+    alien_isolate_dynamic => 1,
 );
 
 $build->create_build_script;

@@ -2,8 +2,9 @@ package Datahub::Factory::Config;
 
 use Datahub::Factory::Sane;
 
-use Config::Simple;
+our $VERSION = '1.71';
 
+use Config::Simple;
 use Moo;
 use Catmandu;
 use namespace::clean;

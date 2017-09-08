@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::BioPerl;
-$Dist::Zilla::PluginBundle::BioPerl::VERSION = '0.25';
+$Dist::Zilla::PluginBundle::BioPerl::VERSION = '0.26';
 use utf8;
 
 # ABSTRACT: Build your distributions like Bioperl does
@@ -115,6 +115,10 @@ sub configure {
         ['Test::EOL' => {
             trailing_whitespace => $self->trailing_whitespace,
         }],
+        [Encoding => [
+             'encoding' => 'bytes',
+             'match' => '^t/data/',
+        ]],
         [PodWeaver => {
             config_plugin => '@BioPerl',
         }],
@@ -153,7 +157,7 @@ Dist::Zilla::PluginBundle::BioPerl - Build your distributions like Bioperl does
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -192,6 +196,13 @@ equivalent to:
 
   [Test::EOL]           ; create release tests for correct line endings
   trailing_whitespace = 1
+
+  ;; While data files for the test units are often text files, they
+  ;; need to be treated as bytes.  This has the side effect of having
+  ;; them ignored by [Test::NoTabs] and [Test::EOL]
+  [Encoding]
+  encoding = bytes
+  match = ^t/data/
 
   [PodWeaver]
   config_plugin = @BioPerl
@@ -365,13 +376,13 @@ Florian Ragwitz <rafl@debian.org>
 
 Sheena Scroggins
 
-CarnÃ« Draug <carandraug+dev@gmail.com>
+Carnë Draug <carandraug+dev@gmail.com>
 
 Chris Fields <cjfields1@gmail.com>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2010 by Florian Ragwitz, 2011 by Sheena Scroggins, and 2013-2017 by CarnÃ« Draug.
+This software is copyright (c) 2010 by Florian Ragwitz, 2011 by Sheena Scroggins, and 2013-2017 by Carnë Draug.
 
 This software is available under the same terms as the perl 5 programming language system itself.
 

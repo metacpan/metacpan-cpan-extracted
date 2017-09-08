@@ -1,5 +1,5 @@
 package App::SmokeBrew::Tools;
-$App::SmokeBrew::Tools::VERSION = '0.50';
+$App::SmokeBrew::Tools::VERSION = '0.52';
 #ABSTRACT: Various utility functions for smokebrew
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use Archive::Extract;
 use File::Fetch;
 use File::Spec;
-use List::MoreUtils qw[uniq];
+use List::Util qw[uniq];
 use Module::CoreList;
 use Perl::Version;
 use URI;
@@ -192,7 +192,7 @@ App::SmokeBrew::Tools - Various utility functions for smokebrew
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

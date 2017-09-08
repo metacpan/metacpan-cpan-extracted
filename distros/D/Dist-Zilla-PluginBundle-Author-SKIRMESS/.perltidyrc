@@ -1,3 +1,6 @@
+# Automatically generated file
+# Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC 0.008
+
 --maximum-line-length=0
 --break-at-old-comma-breakpoints
 --backup-and-modify-in-place

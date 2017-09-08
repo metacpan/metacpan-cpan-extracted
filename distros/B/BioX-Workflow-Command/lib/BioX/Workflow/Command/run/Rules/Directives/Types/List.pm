@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::List;
 
 use Moose::Role;
+use namespace::autoclean;
 
 =head2 Iterables
 
@@ -112,6 +113,7 @@ sub create_ITERABLE_attr {
     my $self = shift;
     my $meta = shift;
     my $k    = shift;
+    my $v = shift;
 
     my $t = $k;
     $t =~ s/_list//;

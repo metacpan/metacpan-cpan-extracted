@@ -1,5 +1,12 @@
 Revision history for MEME-Alphabet
 
+4.12.0.1.3    2017-09-05
+        Additional fix to the Weblogo 3 colour parameter generation.
+
+4.12.0.1.2    2017-09-05
+        Fixed Weblogo 3 colour parameter generation.
+        Removed duplicate email in module metadata.
+
 4.12.0.1.1    2017-08-31
         Minor improvements to module metadata and documentation.
 

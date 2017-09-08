@@ -16,6 +16,7 @@ use SPVM 'TestCase'; my $use_test_line = __LINE__;
 use SPVM 'std'; my $use_std_line = __LINE__;
 
 use SPVM 'TestCase::Inline';
+use SPVM 'TestCase::Inline2';
 
 use POSIX ();
 
@@ -40,6 +41,11 @@ use SPVM::std;
 
 # Start objects count
 my $start_objects_count = SPVM::get_objects_count();
+
+# Call subroutine
+{
+  ok(SPVM::TestCase::sin());
+}
 
 # Native subroutine
 {
@@ -267,9 +273,10 @@ is_deeply(
 );
 =cut
 
-# Inline
+# Inline 
 {
   ok(SPVM::TestCase::spvm_inline());
+  ok(SPVM::TestCase::spvm_inline2());
 }
 
 # Get object from freelist

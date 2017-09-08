@@ -44,13 +44,14 @@ sub write_test_file {
             {
                 its_a_rule => {
                     'local' => [
-                        { root_dir => 'data/raw' },
-                        { outdir   => '{$self->jellyfish_dir}' },
+                        { root_dir  => 'data/raw' },
+                        { outdir    => '{$self->jellyfish_dir}' },
+                        { some_glob => '{$self->root_dir}/Sample*' },
                         {
                             INPUT => '{$self->jellyfish_dir}/some_input_rule1'
                         },
                         { OUTPUT => '{$self->jellyfish_dir}/some_input_rule1' },
-                        { HPC => [ { 'deps' => 'some_dep' } ] }
+                        { HPC    => [ { 'deps' => 'some_dep' } ] }
                     ],
                     process =>
 'R1: INDIR: {$self->indir} INPUT: {$self->INPUT} outdir: {$self->outdir} OUTPUT: {$self->OUTPUT}',
@@ -82,8 +83,8 @@ sub construct_tests {
 
     write_test_file($test_dir);
 
-    my $t = File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' );
-    my $test = $test_methods->make_test_env( $t, );
+    my $t     = File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' );
+    my $test  = $test_methods->make_test_env( $t, );
     my $rules = $test->workflow_data->{rules};
 
     return ( $test, $test_dir, $rules );
@@ -92,10 +93,24 @@ sub construct_tests {
 sub test_001 {
     my ( $test, $test_dir, $rules ) = construct_tests;
 
-    is_deeply( $test->samples, ['Sample_01', 'Sample_02'] );
+    is_deeply( $test->samples, [ 'Sample_01', 'Sample_02' ] );
     ok(1);
 }
 
+sub test_002 {
+    my ( $test, $test_dir, $rules ) = construct_tests;
+
+    my $rule = $rules->[0];
+    _init_rule( $test, $rule );
+
+    $test->sample('Sample_01');
+    my $attr = $test->walk_attr;
+
+    is_deeply( $attr->some_glob,
+        [ File::Spec->catdir($attr->root_dir, 'Sample_01'), File::Spec->catdir($attr->root_dir, 'Sample_02') ] );
+
+    $test->post_process_rules;
+}
 
 sub _init_rule {
     my $test = shift;

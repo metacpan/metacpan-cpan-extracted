@@ -1,5 +1,5 @@
 package Bio::Roary::AccessoryBinaryFasta;
-$Bio::Roary::AccessoryBinaryFasta::VERSION = '3.9.1';
+$Bio::Roary::AccessoryBinaryFasta::VERSION = '3.10.2';
 # ABSTRACT: Output a FASTA file which represents the binary presence and absence of genes in the accessory genome
 
 
@@ -102,7 +102,7 @@ Bio::Roary::AccessoryBinaryFasta - Output a FASTA file which represents the bina
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

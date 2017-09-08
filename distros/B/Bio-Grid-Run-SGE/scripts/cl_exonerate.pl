@@ -33,9 +33,9 @@ run_job(
             $res_fh->close;
 
             my @cmd = ( $EXEC, @{ $c->{args} }, '--query', $query_seq, '--target', $target_seq );
-            INFO( "running ", join( " ", @cmd ) );
+            job->log->info( "running ", join( " ", @cmd ) );
 
-            my $success = my_sys_non_fatal( join( " ", @cmd, ">>$result_prefix" ) );
+            my $success = job->sys( join( " ", @cmd, ">>$result_prefix" ) );
 
             return $success;
         },

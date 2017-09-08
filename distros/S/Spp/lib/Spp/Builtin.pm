@@ -2,22 +2,22 @@ package Spp::Builtin;
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(all is_perl_str is_perl_array
-  read_file write_file str to_json from_json
+our @EXPORT = qw(all is_str is_array
+  read_file write_file concat to_json from_json
   start_with end_with first tail rest
-  trim len subarray to_end);
+  trim len subarray to_end append);
 
 use 5.012;
 no warnings "experimental";
 use JSON::XS qw(encode_json decode_json);
 use List::MoreUtils qw(all);
 
-sub is_perl_str {
+sub is_str {
    my $x = shift;
    return (ref($x) eq ref(''));
 }
 
-sub is_perl_array {
+sub is_array {
    my $x = shift;
    return (ref($x) eq ref([]));
 }
@@ -38,14 +38,14 @@ sub write_file {
    return $file;
 }
 
-sub str {
+sub concat {
    my @strs = @_;
    return join('', @strs);
 }
 
 sub to_json {
    my $data = shift;
-   if (is_perl_str($data)) {
+   if (is_str($data)) {
       my $json_str = encode_json([$data]);
       return substr($json_str, 1, -1);
    }
@@ -56,22 +56,22 @@ sub from_json { return decode_json(shift) }
 
 sub first {
    my $data = shift;
-   if (is_perl_str($data)) { return substr($data, 0, 1) }
-   if (is_perl_array($data)) { return $data->[0] }
+   if (is_str($data)) { return substr($data, 0, 1) }
+   if (is_array($data)) { return $data->[0] }
    die "could not first($data)";
 }
 
 sub tail {
    my $data = shift;
-   if (is_perl_str($data)) { return substr($data, -1) }
-   if (is_perl_array($data)) { return $data->[-1] }
+   if (is_str($data)) { return substr($data, -1) }
+   if (is_array($data)) { return $data->[-1] }
    die "Could not tail($data)";
 }
 
 sub rest {
    my $data = shift;
-   return substr($data, 1) if is_perl_str($data);
-   if (is_perl_array($data)) {
+   return substr($data, 1) if is_str($data);
+   if (is_array($data)) {
 
       # copy $data, splice would change array
       my @array = @{$data};
@@ -94,13 +94,13 @@ sub end_with {
 
 sub len {
    my $data = shift;
-   return scalar(@{$data}) if is_perl_array($data);
-   return length($data) if is_perl_str($data);
+   return scalar(@{$data}) if is_array($data);
+   return length($data) if is_str($data);
 }
 
 sub trim {
    my $str = shift;
-   if (is_perl_str($str)) {
+   if (is_str($str)) {
       $str =~ s/^\s+|\s+$//g;
       return $str;
    }
@@ -112,7 +112,7 @@ sub subarray {
 
    # make copy of $array, splice would change it
    my @array = @{$array};
-   if (is_perl_array($array)) {
+   if (is_array($array)) {
       if ($to > 0) {
          my $len = $to - $from + 1;
          my $sub_array = [splice @array, $from, $len];
@@ -134,6 +134,12 @@ sub to_end {
       push @chars, $char;
    }
    return join('', @chars);
+}
+
+sub append {
+   my ($array_one, $array_two) = @_;
+   push @{$array_one}, @{$array_two};
+   return $array_one;
 }
 
 1;

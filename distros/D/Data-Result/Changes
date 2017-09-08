@@ -1,2 +1,5 @@
 1.001
   - Inital Release
+1.002
+  - now makes use of the boolean module
+  - fix bug 122740

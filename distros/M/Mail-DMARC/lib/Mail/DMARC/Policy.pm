@@ -1,5 +1,5 @@
 package Mail::DMARC::Policy;
-our $VERSION = '1.20170222'; # VERSION
+our $VERSION = '1.20170906'; # VERSION
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ sub parse {
             $warned++;
             next;
         }
-        $policy{$tag} = $value;
+        $policy{lc $tag} = $value;
     }
     return bless \%policy, ref $self;    # inherited defaults + overrides
 }
@@ -194,7 +194,7 @@ Mail::DMARC::Policy - a DMARC policy in object format
 
 =head1 VERSION
 
-version 1.20170222
+version 1.20170906
 
 =head1 SYNOPSIS
 

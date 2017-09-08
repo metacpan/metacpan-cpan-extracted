@@ -46,8 +46,7 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Vars" : "0.009",
-            "Test::Version" : "2.05",
-            "blib" : "1.01"
+            "Test::Version" : "2.05"
          }
       },
       "runtime" : {
@@ -104,6 +103,7 @@
             "Test2::Tools::Class" : "0",
             "Test2::Tools::Compare" : "0",
             "Test2::Tools::Subtest" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "1.302015",
             "Test::Requires" : "0",
             "Test::Warnings" : "0",
@@ -114,110 +114,110 @@
    "provides" : {
       "Test::Class::Moose" : {
          "file" : "lib/Test/Class/Moose.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::AttributeRegistry" : {
          "file" : "lib/Test/Class/Moose/AttributeRegistry.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::CLI" : {
          "file" : "lib/Test/Class/Moose/CLI.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Config" : {
          "file" : "lib/Test/Class/Moose/Config.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Deprecated" : {
          "file" : "lib/Test/Class/Moose/Deprecated.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Executor::Parallel" : {
          "file" : "lib/Test/Class/Moose/Executor/Parallel.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Executor::Sequential" : {
          "file" : "lib/Test/Class/Moose/Executor/Sequential.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Load" : {
          "file" : "lib/Test/Class/Moose/Load.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Report" : {
          "file" : "lib/Test/Class/Moose/Report.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Report::Class" : {
          "file" : "lib/Test/Class/Moose/Report/Class.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Report::Instance" : {
          "file" : "lib/Test/Class/Moose/Report/Instance.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Report::Method" : {
          "file" : "lib/Test/Class/Moose/Report/Method.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Report::Time" : {
          "file" : "lib/Test/Class/Moose/Report/Time.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role" : {
          "file" : "lib/Test/Class/Moose/Role.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::AutoUse" : {
          "file" : "lib/Test/Class/Moose/Role/AutoUse.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::CLI" : {
          "file" : "lib/Test/Class/Moose/Role/CLI.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::Executor" : {
          "file" : "lib/Test/Class/Moose/Role/Executor.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::HasTimeReport" : {
          "file" : "lib/Test/Class/Moose/Role/HasTimeReport.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::ParameterizedInstances" : {
          "file" : "lib/Test/Class/Moose/Role/ParameterizedInstances.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Role::Reporting" : {
          "file" : "lib/Test/Class/Moose/Role/Reporting.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Runner" : {
          "file" : "lib/Test/Class/Moose/Runner.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Tutorial" : {
          "file" : "lib/Test/Class/Moose/Tutorial.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       },
       "Test::Class::Moose::Util" : {
          "file" : "lib/Test/Class/Moose/Util.pm",
-         "version" : "0.85"
+         "version" : "0.86"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/test-class-moose/test-class-moose/issues"
+         "web" : "https://github.com/houseabsolute/test-class-moose/issues"
       },
       "homepage" : "http://metacpan.org/release/Test-Class-Moose/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/test-class-moose/test-class-moose.git",
-         "web" : "https://github.com/test-class-moose/test-class-moose"
+         "url" : "git://github.com/houseabsolute/test-class-moose.git",
+         "web" : "https://github.com/houseabsolute/test-class-moose"
       }
    },
-   "version" : "0.85",
+   "version" : "0.86",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -357,7 +357,7 @@
                   "include_underscores" : 0
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002003",
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
                   "inherit_missing" : 1,
                   "inherit_version" : 1,
                   "meta_noindex" : 1
@@ -443,7 +443,7 @@
                }
             },
             "name" : "@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -465,7 +465,7 @@
                }
             },
             "name" : "@DROLSKY/PromptIfStale",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
@@ -651,7 +651,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -672,7 +672,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -905,7 +905,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -921,7 +921,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -953,7 +953,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -981,7 +981,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -998,12 +998,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.85",
+                  "tag" : "v0.86",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1023,7 +1023,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1063,7 +1063,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1083,7 +1083,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.7.4",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1200,6 +1200,6 @@
       "Tom Heady <tom@punch.net>",
       "Udo Oji <Velti@signor.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0229"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

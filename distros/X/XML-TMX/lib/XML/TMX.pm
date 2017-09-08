@@ -1,21 +1,32 @@
 package XML::TMX;
-# vim:sw=3:ts=3:et:
+$XML::TMX::VERSION = '0.36';
+# ABSTRACT: Perl extensions for managing TMX files
 
-use 5.004;
+use 5.010;
 use warnings;
 use strict;
 
 use parent 'Exporter';
 
-our $VERSION = '0.32';
 our @ISA = 'Exporter';
 our @EXPORT_OK = qw();
+
+
+1;
+
+__END__
+
+=pod
 
 =encoding utf-8
 
 =head1 NAME
 
 XML::TMX - Perl extensions for managing TMX files
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -26,26 +37,25 @@ XML::TMX - Perl extensions for managing TMX files
 XML::TMX is the top level module. At the moment it does not contain
 any useful code, so check sub-modules, please.
 
+=head1 AUTHORS
 
-=head1 SEE ALSO
+=over 4
 
-XML::TMX::Writer, XML::TMX::Reader, XML::TMX::FromPO
+=item *
 
-L<XML::Writer(3)>, TMX Specification L<https://www.gala-global.org/oscarStandards/tmx/tmx14b.html>
+Alberto Simões <ambs@cpan.org>
 
-=head1 AUTHOR
+=item *
 
-Alberto Simoes, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
+José João Almeida <jj@di.uminho.pt>
 
-Paulo Jorge Jesus Silva, E<lt>paulojjs@bragatel.ptE<gt>
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2012 by Projecto Natura
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

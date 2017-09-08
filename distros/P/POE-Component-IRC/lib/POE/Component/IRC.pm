@@ -1,8 +1,6 @@
 package POE::Component::IRC;
-BEGIN {
-  $POE::Component::IRC::AUTHORITY = 'cpan:HINRIK';
-}
-$POE::Component::IRC::VERSION = '6.88';
+our $AUTHORITY = 'cpan:HINRIK';
+$POE::Component::IRC::VERSION = '6.90';
 use strict;
 use warnings FATAL => 'all';
 use Carp;
@@ -214,6 +212,17 @@ sub _configure {
     if (!defined $self->{server} && !$spawned) {
         die "No IRC server specified\n" if !$ENV{IRCSERVER};
         $self->{server} = $ENV{IRCSERVER};
+    }
+
+    if (defined $self->{webirc}) {
+        if (!ref $self->{webirc} ne 'HASH') {
+            die "webirc param expects a hashref";
+        }
+        for my $expect_key (qw(pass user host ip)) {
+            if (!exists $self->{webirc}{$expect_key}) {
+                die "webirc value is missing key '$expect_key'";
+            }
+        }
     }
 
     return;
@@ -481,6 +490,13 @@ sub _send_login {
     $kernel->call($session, 'sl_login', 'CAP REQ :multi-prefix');
     $kernel->call($session, 'sl_login', 'CAP LS');
     $kernel->call($session, 'sl_login', 'CAP END');
+
+    # If we were told to use WEBIRC to spoof our host/IP, do so:
+    if (defined $self->{webirc}) {
+        $kernel->call($session => sl_login => 'WEBIRC '
+            . join " ", @{$self->{webirc}}{qw(pass user ip host)}
+        );
+    }
 
     if (defined $self->{password}) {
         $kernel->call($session => sl_login => 'PASS ' . $self->{password});
@@ -1792,6 +1808,12 @@ specified.
 =item * B<'socks_id'>, specify a SOCKS user_id. Default is none.
 
 =item * B<'useipv6'>, enable the use of IPv6 for connections.
+
+=item * B<'webirc'>, enable the use of WEBIRC to spoof host/IP.
+You must have a WEBIRC password set up on the IRC server/network (so will
+only work for servers which trust you to spoof the IP & host the connection
+is from) - value should be a hashref containing keys C<pass>, C<user>,
+C<host> and C<ip>.
 
 =back
 

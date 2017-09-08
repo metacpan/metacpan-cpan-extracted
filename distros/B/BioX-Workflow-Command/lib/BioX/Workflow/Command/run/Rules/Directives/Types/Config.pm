@@ -1,6 +1,8 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Config;
 
 use Moose::Role;
+use namespace::autoclean;
+
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Roles::File';
 
 use Config::Any;

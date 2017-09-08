@@ -5,21 +5,21 @@ use strict;
 use Test::More tests => 2;
 
 {
-	package Foo;
+    package Foo;
 
-	use Keyword::Simple;
+    use Keyword::Simple;
 
-	sub import {
-		Keyword::Simple::define peek => sub {
-			substr ${$_[0]}, 0, 0, "ok 1, 'synthetic test';";
-		};
-	}
+    sub import {
+        Keyword::Simple::define peek => sub {
+            substr ${$_[0]}, 0, 0, "ok 1, 'synthetic test';";
+        };
+    }
 
-	sub unimport {
-		Keyword::Simple::undefine 'peek';
-	}
+    sub unimport {
+        Keyword::Simple::undefine 'peek';
+    }
 
-	BEGIN { $INC{"Foo.pm"} = 1; }
+    BEGIN { $INC{"Foo.pm"} = 1; }
 }
 
 use Foo;

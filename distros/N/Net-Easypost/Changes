@@ -1,5 +1,8 @@
 Change history for Net-Easypost
 
+0.21        2017-09-06
+            - Contribution from @fendent that fixes an issue when creating CustomsInfo objects
+
 0.20        2017-05-15
             - Add test dependency for Test::Exception
             - Add JSON::PP::Boolean type to all boolean Moo attributes to avoid cpantesters failure

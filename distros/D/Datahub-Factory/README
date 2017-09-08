@@ -5,7 +5,7 @@ NAME
 
 SYNOPSIS
 
-    dhconveyor [ARGUMENTS] [OPTIONS]
+    dhconveyor \[ARGUMENTS\] \[OPTIONS\]
 
 DESCRIPTION
 
@@ -19,8 +19,9 @@ DESCRIPTION
     The output is pushed to a data sink.
 
     Datahub::Factory fetches data from several sources as specified by the
-    Importer settings, executes a Fix and sends it to a data sink, set by
-    Exporter. Several importer and exporter modules are supported.
+    _Importer_ settings, executes a Catmandu::Fix and sends it to a data
+    sink, set by _Exporter_. Several importer and exporter modules are
+    supported.
 
     Datahub::Factory contains Log4perl support to monitor conveyor belt
     operations.
@@ -57,42 +58,43 @@ COMMANDS
     Documentation about command line options.
 
     It is possible to provide either all importer and/or exporter options
-    on the command line, or to create a pipeline configuration file that
+    on the command line, or to create a _pipeline configuration file_ that
     sets those options.
 
  transport [OPTIONS]
+ <https://metacpan.org/pod/Datahub::Factory::Command::transport>
 
     Fetch data from a local or remote source, convert it to an exchange
     format and export the data.
 
 PLUGINS
 
-    Datahub::Factory uses a plugin-based architecture, making it easy to
+    _Datahub::Factory_ uses a plugin-based architecture, making it easy to
     extend with new functionality.
 
     New commands can be added by creating a Perl module that contains a
-    command_name.pm file in the lib/Datahub/Factory/Command path.
-    Datahub::Factory uses the Datahub::Factory::Command namespace and
+    `command_name.pm` file in the `lib/Datahub/Factory/Command` path.
+    _Datahub::Factory_ uses the Datahub::Factory::Command namespace and
     App::Cmd internally.
 
-    New Datahub::Factory::Importer, Exmporter and Fixer plugins can be
-    added in the same way, in the lib/Datahub/Factory/Importer, Exporter or
-    Fixer path. All plugins use the
-    Datahub::Factory::Importer/Exporter/Fixer namespace and the namespace
-    package as a Moose::Role.
+    New Datahub::Factory::Importer, Datahub::Factory::Exporter and
+    Datahub::Factory::Fixer plugins can be added in the same way, in the
+    lib/Datahub/Factory/Importer, lib/Datahub/Factory/Exporter or
+    lib/Datahub/Factory/Fixer path. All plugins use the
+    Datahub::Factory::Importer Datahub::Factoryy::Exporter or
+    Datahub::Factory::Fixer namespace and the namespace package as a
+    Moose::Role.
 
 AUTHORS
 
+    Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
     Pieter De Praetere <pieter@packed.be>
 
-    Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+COPYRIGHT AND LICENSE
 
-COPYRIGHT
+    This software is copyright (c) 2016 by PACKED, vzw, Vlaamse
+    Kunstcollectie, vzw.
 
-    Copyright 2016 - PACKED vzw, Vlaamse Kunstcollectie vzw
-
-LICENSE
-
-    This library is free software; you can redistribute it and/or modify it
-    under the terms of the GPLv3.
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the GNU General Public License, Version 3, June 2007.
 

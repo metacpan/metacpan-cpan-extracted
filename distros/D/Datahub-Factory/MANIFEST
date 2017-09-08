@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 README
+bin/dhconveyor
 conf/log4perl.conf
 conf/pipelines.d/example.ini
 conf/settings.example.ini
@@ -46,6 +47,5 @@ lib/Datahub/Factory/Logger.pm
 lib/Datahub/Factory/Pipeline.pm
 lib/Datahub/Factory/Sane.pm
 lib/Datahub/Factory/Util.pm
-script/dhconveyor
 t/author-pod-syntax.t
 t/basic.t

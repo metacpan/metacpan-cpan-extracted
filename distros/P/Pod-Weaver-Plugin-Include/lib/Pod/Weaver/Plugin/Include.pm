@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::Plugin::Include;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.5';
 
 # ABSTRACT: Support for including sections of Pod from other files
 
@@ -101,6 +101,10 @@ package Pod::Weaver::Plugin::Include::Transformer {
     sub _add_child {
         my $this = shift;
 
+        $this->logger->log_debug( "Adding a child:",
+            map { $_->as_pod_string } ( ref( $_[0] ) ? $_[0] : [ $_[0] ] ) );
+        $this->logger->log_debug("Skipping the child") if $this->_skipContent;
+
         return if $this->_skipContent;
 
         if ( ref( $_[0] ) eq 'ARRAY' ) {
@@ -126,6 +130,23 @@ package Pod::Weaver::Plugin::Include::Transformer {
         }
     }
 
+    sub _resetSkipIf {
+        my $this = shift;
+        my $para = shift;
+
+        $this->logger->log_debug( "_resetSkipIf for",
+            ref($para), ( $para->can('command') ? $para->command : "" ) );
+
+        if ( $this->_skipContent ) {
+            $this->_skipContent(0)
+              if $para->isa('Pod::Elemental::Element::Pod5::Command')
+              && $para->command eq 'tmpl';
+            $this->logger->log_debug( "PARA IS:", ref($para) );
+            $this->logger->log_debug( "Skipping content",
+                ( $this->_skipContent ? "on" : "off" ) );
+        }
+    }
+
     sub _process_children {
         my $this = shift;
         my ( $children, %params ) = @_;
@@ -144,6 +165,8 @@ package Pod::Weaver::Plugin::Include::Transformer {
 
         for ( my $i = 0 ; $i < @$children ; $i++ ) {
             my $para = $children->[$i];
+
+            $this->_resetSkipIf($para);
 
             if ( $para->isa('Pod::Elemental::Element::Pod5::Command') ) {
                 $logger->log_debug( ( $curSrc ? "[$curSrc] " : "" )
@@ -202,8 +225,8 @@ package Pod::Weaver::Plugin::Include::Transformer {
                             "': no valid name found"
                         );
                     }
-                    elsif ( $attrs->{hidden} ) {
-                        $this->_skipContent;
+                    else {
+                        $this->_skipContent( $attrs->{hidden} );
                     }
                 }
                 else {
@@ -240,7 +263,14 @@ package Pod::Weaver::Plugin::Include::Transformer {
         my $this = shift;
         return $this->callerPlugin->logger;
     }
+
+    __PACKAGE__->meta->make_immutable;
+    no Moose;
+
 }
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 
@@ -256,7 +286,7 @@ Pod::Weaver::Plugin::Include - Support for including sections of Pod from other 
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.5
 
 =head1 SYNOPSIS
 
@@ -310,6 +340,8 @@ included by a third-party pod:
     =item B<--option2>
     
     repeat
+    
+    =tmpl
     
     =cut
     
@@ -369,6 +401,8 @@ included by a third-party pod:
     
     =include options@mod2opts
     
+    =tmpl
+    
     =cut
     
     1;
@@ -418,9 +452,8 @@ command.
 Template's name must start with either a alpha char or underscore (C<_>) and
 continued with alpha-numeric or underscore.
 
-A template body is terminated either by another C<=tmpl> command or by C<=cut>.
-If C<=tmpl> doesn't have a name defined then it acts as a terminating command
-only. For example:
+A template body is terminated by another C<=tmpl> command. If C<=tmpl> doesn't
+have the name parameter then it acts as a terminating command only. For example:
 
     =head1 SECTION
     
@@ -441,6 +474,8 @@ only. For example:
     =tmpl -tmpl3
     
     Template 3
+    
+    =tmpl
     
     =cut
 

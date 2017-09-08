@@ -1,5 +1,5 @@
 package Statocles::Plugin::HTMLLint;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 # ABSTRACT: Check HTML for common errors and issues
 
 use Statocles::Base 'Class';
@@ -40,7 +40,7 @@ sub check_pages {
 
     for my $page ( @{ $event->pages } ) {
         if ( $page->DOES( 'Statocles::Page::Document' ) ) {
-            my $html = $page->render( site => $event->emitter );
+            my $html = "".$page->dom;
             my $page_url = $page->path;
 
             $lint->newfile( $page_url );
@@ -81,7 +81,7 @@ Statocles::Plugin::HTMLLint - Check HTML for common errors and issues
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 SYNOPSIS
 

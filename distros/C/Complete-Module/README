@@ -2,8 +2,8 @@ NAME
     Complete::Module - Complete with installed Perl module names
 
 VERSION
-    This document describes version 0.25 of Complete::Module (from Perl
-    distribution Complete-Module), released on 2017-07-11.
+    This document describes version 0.260 of Complete::Module (from Perl
+    distribution Complete-Module), released on 2017-09-08.
 
 SYNOPSIS
      use Complete::Module qw(complete_module);

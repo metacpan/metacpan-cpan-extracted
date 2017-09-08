@@ -1,0 +1,15 @@
+=pod
+
+=srcAlias src src.pod
+
+con1
+
+=include test@src.pod
+
+con2
+
+=include cont@src
+
+Chunk from F<in.pod>
+
+=cut

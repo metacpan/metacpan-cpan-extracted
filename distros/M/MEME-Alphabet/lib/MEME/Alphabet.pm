@@ -54,7 +54,7 @@ use Carp;
 use Fcntl qw(O_RDONLY);
 
 # pinned to the latest MEME Suite version (x.yy.z), and then versioned from there
-use version; our $VERSION = version->declare("v4.12.0.1.1");
+use version; our $VERSION = version->declare("v4.12.0.1.3");
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -912,15 +912,15 @@ sub translate_seq {
 sub get_Weblogo_colour_args {
     my $self = shift;
 
-    my $arg_string = '';
+    my $arg_string = "";
 
     foreach my $letter ($self->get_core()) {
         my $sym = $self->{lookup}->{$letter};
 
         # convert back from decoded hex, adding '#' prefix
-        my $HTML_colour = sprintf("#%X", $sym->{colour});
+        my $HTML_colour = sprintf("#%06X", $sym->{colour});
 
-        $arg_string .= '--color '.$HTML_colour.' '.$sym->{sym}.' '.$sym->{name}.' ';
+        $arg_string .= "--color '$HTML_colour' '$sym->{sym}' '$sym->{name}' ";
     }
 
     return $arg_string;

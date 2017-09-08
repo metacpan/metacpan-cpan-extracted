@@ -1,7 +1,7 @@
 ---
 abstract: 'Provides nucleobase alphabet capabilities for Perl code.'
 author:
-  - 'James Johnson <meme-suite@uw.edu>'
+  - 'James Johnson'
   - 'Timothy L. Bailey <meme-suite@uw.edu>'
 build_requires:
   Array::Compare: '0'
@@ -22,7 +22,7 @@ no_index:
 provides:
   MEME::Alphabet:
     file: lib/MEME/Alphabet.pm
-    version: v4.12.0.1.1
+    version: v4.12.0.1.3
 requires:
   Carp: '0'
   Exporter: '0'
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://bitbucket.org/cviner2/meme-alphabet/issues
   homepage: http://meme-suite.org
   repository: https://cviner2@bitbucket.org/cviner2/meme-alphabet
-version: v4.12.0.1.1
+version: v4.12.0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

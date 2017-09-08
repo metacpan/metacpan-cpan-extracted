@@ -1,5 +1,5 @@
 package smokebrew;
-$smokebrew::VERSION = '0.50';
+$smokebrew::VERSION = '0.52';
 #ABSTRACT: Automated Perl building and installation for CPAN Testers
 
 use strict;
@@ -19,7 +19,7 @@ smokebrew - Automated Perl building and installation for CPAN Testers
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

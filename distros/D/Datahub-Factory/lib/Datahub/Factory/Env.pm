@@ -2,12 +2,13 @@ package Datahub::Factory::Env;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Datahub::Factory::Util qw(require_package);
 use Moo;
 use Catmandu;
-use namespace::clean;
 use Config::Simple;
-use Data::Dumper qw(Dumper);
+use namespace::clean;
 
 with 'Datahub::Factory::Logger';
 

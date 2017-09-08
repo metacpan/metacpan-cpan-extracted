@@ -56,10 +56,14 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "web" : "https://github.com/graphql-perl/graphql-perl"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.06"
+   "version" : "0.07"
 }

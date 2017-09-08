@@ -11,10 +11,10 @@ use strict;
 use warnings;
 
 package Net::Airbrake::V2;
-# git description: v0.02-4-g4971881
+# git description: v0.02-6-g6136d47
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
-$Net::Airbrake::V2::VERSION = '0.03';
+$Net::Airbrake::V2::VERSION = '0.04';
 # ABSTRACT: Airbrake Notifier API V2 Client
 
 use Net::Airbrake 0.02;
@@ -257,7 +257,7 @@ Net::Airbrake::V2 - Airbrake Notifier API V2 Client
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

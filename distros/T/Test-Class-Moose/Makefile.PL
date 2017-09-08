@@ -59,12 +59,13 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Class" => 0,
     "Test2::Tools::Compare" => 0,
     "Test2::Tools::Subtest" => 0,
+    "Test2::V0" => 0,
     "Test::More" => "1.302015",
     "Test::Requires" => 0,
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.85",
+  "VERSION" => "0.86",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -106,6 +107,7 @@ my %FallbackPrereqs = (
   "Test2::Tools::Class" => 0,
   "Test2::Tools::Compare" => 0,
   "Test2::Tools::Subtest" => 0,
+  "Test2::V0" => 0,
   "Test::More" => "1.302015",
   "Test::Most" => 0,
   "Test::Requires" => 0,

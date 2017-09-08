@@ -1,10 +1,12 @@
 package Datahub::Factory::Exporter::JSON;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Moo;
 use Catmandu;
+use namespace::clean;
 
 with 'Datahub::Factory::Exporter';
 

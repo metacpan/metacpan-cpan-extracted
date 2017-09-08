@@ -56,7 +56,7 @@ use Catmandu;
 use Cache::LRU;
 use REST::Client;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 with 'Catmandu::Logger';
 
@@ -96,6 +96,24 @@ sub search {
 
     if ($opts{num}) {
         push @param , sprintf("nrOfResults=%d",$opts{num});
+    }
+
+    if (my $sort = $opts{sort}) {
+        my $direction;
+
+        if ($sort =~ /^[+]/) {
+            $direction = 'up';
+            $sort = substr($sort,1);
+        }
+        elsif ($sort =~ /^[-]/) {
+            $direction = 'down';
+            $sort = substr($sort,1);
+        }
+        else {
+            $direction = 'up';
+        }
+        push @param , sprintf("sort=%s",uri_escape($sort));
+        push @param , sprintf("direction=%s",uri_escape($direction));
     }
 
     $self->log->info("searching with params: " . join("&",@param));
@@ -222,9 +240,9 @@ sub export {
 
     my $browser  = LWP::UserAgent->new();
 
-    $browser->get($rest_url, ':content_cb' => $callback);
+    my $response = $browser->get($rest_url, ':content_cb' => $callback);
 
-    if ($browser->is_success) {
+    if ($response->is_success) {
         return 1;
     }
     else {
@@ -284,9 +302,15 @@ sub _rest_get {
 }
 
 
-=head1 SEE ALSO
+=head1 MODULES
 
 L<Catmandu::Importer::MediaHaven>
+
+L<Catmandu::Store::File::MediaHaven>
+
+L<Catmandu::Store::File::MediaHaven::Bag>
+
+L<Catmandu::Store::File::MediaHaven::Index>
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for Net-Airbrake-V2
 
+0.04      2017-09-06T14:42:16Z
+
+  - Update meta files.  No code changes.
+
 0.03      2016-04-11T01:17:09Z
 
   - Handle nested hash structures in vars (params, session, environment)

@@ -3,7 +3,7 @@ package ObjectDB::Related;
 use strict;
 use warnings;
 
-our $VERSION = '3.21';
+our $VERSION = '3.22';
 
 require Carp;
 

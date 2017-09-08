@@ -1,6 +1,11 @@
 Summary of important user-visible changes for dist-zilla-pluginbundle-Bioperl
 -----------------------------------------------------------------------------
 
+0.26      2017-09-07 20:05:18+01:00 Europe/London
+  * Set encoding of files in t/data as 'bytes'.  This also has the
+    side effect of removing them from :TestFiles which means they are
+    ignored by [Test::EOL] and [Test::NoTabs]
+
 0.25      2017-02-18 19:06:59+00:00 Europe/London
   * Update broken link on Feedback section to a page about the mailing lists.
 

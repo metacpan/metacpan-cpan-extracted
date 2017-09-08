@@ -1,5 +1,5 @@
 package App::SmokeBrew::IniFile;
-$App::SmokeBrew::IniFile::VERSION = '0.50';
+$App::SmokeBrew::IniFile::VERSION = '0.52';
 #ABSTRACT: Parse the smokebrew configuration file
 
 use strict;
@@ -36,7 +36,7 @@ App::SmokeBrew::IniFile - Parse the smokebrew configuration file
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

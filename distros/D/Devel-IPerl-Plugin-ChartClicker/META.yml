@@ -1,0 +1,34 @@
+---
+abstract: 'IPerl plugin to make Chart::Clicker charts displayable'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+  - 'Zhenyi Zhou <zhouzhen1@gmail.com>'
+build_requires:
+  Test::Most: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-IPerl-Plugin-ChartClicker
+requires:
+  Capture::Tiny: '0'
+  Chart::Clicker: '0'
+  Devel::IPerl::Display::PNG: '0'
+  Devel::IPerl::Display::SVG: '0'
+  File::Temp: '0'
+  Moo::Role: '0'
+  Role::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-ChartClicker
+  repository: https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-ChartClicker.git
+version: '0.008'
+x_serialization_backend: 'YAML::Tiny version 1.70'

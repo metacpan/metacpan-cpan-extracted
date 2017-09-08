@@ -39,6 +39,7 @@ lib/Connector/Proxy/Net/LDAP/Single.pm
 lib/Connector/Proxy/Proc/SafeExec.pm
 lib/Connector/Proxy/SOAP/Lite.pm
 lib/Connector/Proxy/YAML.pm
+lib/Connector/Tee.pm
 lib/Connector/Types.pm
 lib/Connector/Wrapper.pm
 Makefile.PL
@@ -68,6 +69,7 @@ t/01-proxy-net-ldap.t.disabled
 t/01-proxy-proc-safeexec-uid.t2
 t/01-proxy-proc-safeexec.t
 t/01-proxy-yaml.t
+t/01-tee.t
 t/01-wrapper.t
 t/10-proxy-dbi.t
 t/config/01-iterator.yaml
@@ -80,6 +82,7 @@ t/config/01-multi-yaml.yaml
 t/config/01-proxy-config-versioned-1.conf
 t/config/01-proxy-config-versioned-2.conf
 t/config/01-proxy-net-ldap.conf
+t/config/01-tee.yaml
 t/config/ARRAY0x7f8f22b936c0.txt
 t/config/ARRAY0x7f98bcd1fff8.txt
 t/config/ARRAY0x7faa3d030b28.txt

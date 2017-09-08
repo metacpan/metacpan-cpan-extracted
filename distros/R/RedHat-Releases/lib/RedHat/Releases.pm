@@ -1,7 +1,7 @@
 package RedHat::Releases;
 
-our $DATE = '2015-10-06'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ our $data = do {
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "biltmore",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.0.30",
      mariadb_version      => "--",
@@ -61,12 +61,12 @@ our $data = do {
      python_version       => 1.4,
      reldate              => "1997-04-23",
      ruby_version         => undef,
-     version              => 4.2,
+     version              => "4.2biltmore",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "hurricane",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.0.32",
      mariadb_version      => "--",
@@ -78,12 +78,12 @@ our $data = do {
      python_version       => 1.4,
      reldate              => "1997-11-10",
      ruby_version         => undef,
-     version              => "5.0",
+     version              => "5.0hurricane",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "manhattan",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.0.34",
      mariadb_version      => "--",
@@ -95,12 +95,12 @@ our $data = do {
      python_version       => "1.5.1",
      reldate              => "1998-05-11",
      ruby_version         => undef,
-     version              => 5.1,
+     version              => "5.1manhattan",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "apollo",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.0.36",
      mariadb_version      => "--",
@@ -112,12 +112,12 @@ our $data = do {
      python_version       => "1.5.1",
      reldate              => "1998-10-14",
      ruby_version         => undef,
-     version              => 5.2,
+     version              => "5.2apollo",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "hedwig",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.2.5",
      mariadb_version      => "--",
@@ -129,12 +129,12 @@ our $data = do {
      python_version       => "1.5.1",
      reldate              => "1999-04-19",
      ruby_version         => undef,
-     version              => "6.0",
+     version              => "6.0hedwig",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "cartman",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.2.12",
      mariadb_version      => "--",
@@ -146,12 +146,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "1999-09-27",
      ruby_version         => undef,
-     version              => 6.1,
+     version              => "6.1cartman",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "1.14.7",
-     code_name            => "zoot",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.2.14",
      mariadb_version      => "--",
@@ -163,12 +163,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "2000-03-08",
      ruby_version         => undef,
-     version              => 6.2,
+     version              => "6.2zoot",
    },
    {
      apache_httpd_version => "--",
      bash_version         => 2.04,
-     code_name            => "guiness",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.2.16",
      mariadb_version      => "--",
@@ -180,12 +180,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "2000-08-30",
      ruby_version         => undef,
-     version              => "7.0",
+     version              => "7.0guiness",
    },
    {
      apache_httpd_version => "--",
      bash_version         => 2.04,
-     code_name            => "seawolf",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.4.2",
      mariadb_version      => "--",
@@ -197,12 +197,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "2001-04-16",
      ruby_version         => undef,
-     version              => 7.1,
+     version              => "7.1seawolf",
    },
    {
      apache_httpd_version => "--",
      bash_version         => 2.05,
-     code_name            => "enigma",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.4.7",
      mariadb_version      => "--",
@@ -214,12 +214,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "2001-10-22",
      ruby_version         => undef,
-     version              => 7.2,
+     version              => "7.2enigma",
    },
    {
      apache_httpd_version => "--",
      bash_version         => "2.05a",
-     code_name            => "valhalla",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.4.18",
      mariadb_version      => "--",
@@ -231,12 +231,12 @@ our $data = do {
      python_version       => "1.5.2",
      reldate              => "2002-05-06",
      ruby_version         => undef,
-     version              => 7.3,
+     version              => "7.3valhalla",
    },
    {
      apache_httpd_version => "2.0.40",
      bash_version         => "2.05b",
-     code_name            => "psyche",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.4.18",
      mariadb_version      => "--",
@@ -248,12 +248,12 @@ our $data = do {
      python_version       => "2.2.1",
      reldate              => "2002-09-30",
      ruby_version         => undef,
-     version              => "8.0",
+     version              => "8.0psyche",
    },
    {
      apache_httpd_version => "2.0.40",
      bash_version         => "2.05b",
-     code_name            => "shrike",
+     code_name            => undef,
      eoldate              => undef,
      linux_version        => "2.4.20",
      mariadb_version      => "--",
@@ -265,7 +265,7 @@ our $data = do {
      python_version       => "2.2.2",
      reldate              => "2003-03-31",
      ruby_version         => undef,
-     version              => 9,
+     version              => "9shrike",
    },
    {
      apache_httpd_version => "--",
@@ -348,9 +348,9 @@ our $data = do {
      php_version          => "5.3.3",
      postgresql_version   => "8.4.20",
      python_version       => "2.6.6",
-     reldate              => "2014-10-14",
+     reldate              => "2017-03-21",
      ruby_version         => undef,
-     version              => "RHEL-6.6",
+     version              => "RHEL-6.9",
    },
    {
      apache_httpd_version => "2.4.6",
@@ -358,16 +358,16 @@ our $data = do {
      code_name            => undef,
      eoldate              => "2024-06",
      linux_version        => "3.10",
-     mariadb_version      => "5.5.41",
+     mariadb_version      => "5.5.56",
      mysql_version        => "--",
      nginx_version        => undef,
      perl_version         => "5.16.3",
      php_version          => "5.4.16",
-     postgresql_version   => "9.2.7",
+     postgresql_version   => "9.2.21",
      python_version       => "2.7.5",
-     reldate              => "2015-03-05",
+     reldate              => "2017-08-01",
      ruby_version         => undef,
-     version              => "RHEL-7.1",
+     version              => "RHEL-7.4",
    },
  ]
 
@@ -396,7 +396,7 @@ RedHat::Releases - List RedHat releases
 
 =head1 VERSION
 
-This document describes version 0.01 of RedHat::Releases (from Perl distribution RedHat-Releases), released on 2015-10-06.
+This document describes version 0.020 of RedHat::Releases (from Perl distribution RedHat-Releases), released on 2017-09-08.
 
 =head1 SYNOPSIS
 
@@ -414,7 +414,11 @@ L<http://distrowatch.com>.
 =head1 FUNCTIONS
 
 
-=head2 list_redhat_releases(%args) -> [status, msg, result, meta]
+=head2 list_redhat_releases
+
+Usage:
+
+ list_redhat_releases(%args) -> [status, msg, result, meta]
 
 RedHat releases.
 
@@ -1052,7 +1056,7 @@ Only return records where the 'ruby_version' field is less than specified value.
 
 Only return records where the 'ruby_version' field is greater than specified value.
 
-=item * B<sort> => I<str>
+=item * B<sort> => I<array[str]>
 
 Order records according to certain field(s).
 
@@ -1124,16 +1128,6 @@ that contains extra information.
 
 Return value:  (any)
 
-=head1 SEE ALSO
-
-L<Debian::Releases>
-
-L<Ubuntu::Releases>
-
-L<LinuxMint::Releases>
-
-L<CentOS::Releases>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/RedHat-Releases>.
@@ -1150,13 +1144,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Debian::Releases>
+
+L<Ubuntu::Releases>
+
+L<LinuxMint::Releases>
+
+L<CentOS::Releases>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# PODNAME: tsv2tmx
+# ABSTRACT: Create a TMX from a TSV file
+
 use warnings;
 use strict;
 use Getopt::Long;
@@ -79,16 +82,22 @@ sub readLine {
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
- 
+
 tsv2tmx - Create a TMX from a TSV file
- 
+
+=head1 VERSION
+
+version 0.36
+
 =head1 SYNOPSIS
- 
+
 tsv2tmx [options]
- 
+
  Options:
    --help            brief help message
    --man             full documentation
@@ -96,19 +105,24 @@ tsv2tmx [options]
    --sl=EN --tl=PT   describe source and target language names
    --header          treat first line as a heading
    --columns=1,2     specify which columns to extract
- 
+
+=head1 DESCRIPTION
+
+Useful to create translation memories from TSV files, that can be
+easily exported from spreadsheet software.
+
 =head1 OPTIONS
- 
+
 =over 8
- 
+
 =item B<--help>
- 
+
 Print a brief help message and exits.
- 
+
 =item B<--man>
- 
+
 Prints the manual page and exits.
- 
+
 =item B<--verbose> | B<-v>
 
 Activates the verbose mode.
@@ -132,31 +146,30 @@ of integers, separated by a comma. Columns indexes start at 0.
 Default to C<1,2>.
 
 =back
- 
-=head1 DESCRIPTION
- 
-Useful to create translation memories from TSV files, that can be
-easily exported from spreadsheet software.
 
-=head1 
- 
 =head1 SEE ALSO
 
 XML::TMX
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alberto Simões, C<< <ambs@cpan.org> >>
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016 by Projecto Natura
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-
-

@@ -22,7 +22,7 @@ run_job(
 sub do_worker_stuff {
     my ( $c, $result_prefix, $seq_file ) = @_;
 
-    INFO "Running $seq_file -> $result_prefix";
+    job->log->info("Running $seq_file -> $result_prefix");
 
     my ( $real_job_id, $task_id ) = split( /\./, $c->{job_id}, 2 );
     sleep 7;
@@ -39,8 +39,8 @@ sub do_worker_stuff {
     $res_fh->close;
     $seq_fh->close;
     if ( $task_id % 2 == 0 ) {
-        return my_sys_non_fatal("cp $seq_file $result_prefix.orig");
+        return job->sys("cp $seq_file $result_prefix.orig");
     } else {
-        return my_sys_non_fatal("cp");
+        return job->sys("cp");
     }
 }

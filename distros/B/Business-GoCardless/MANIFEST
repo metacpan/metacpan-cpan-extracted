@@ -38,6 +38,7 @@ t/business/gocardless/exception.t
 t/business/gocardless/merchant.t
 t/business/gocardless/paginator.t
 t/business/gocardless/payment.t
+t/business/gocardless/payout.t
 t/business/gocardless/preauthorization.t
 t/business/gocardless/pro.t
 t/business/gocardless/redirectflow.t

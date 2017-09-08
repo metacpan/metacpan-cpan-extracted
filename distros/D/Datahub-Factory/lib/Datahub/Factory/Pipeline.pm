@@ -2,10 +2,11 @@ package Datahub::Factory::Pipeline;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Moo;
-use namespace::clean;
 use Config::Simple;
-use Data::Dumper;
+use namespace::clean;
 
 has file_name    => (is => 'ro', required => 1);
 has config       => (is => 'lazy');

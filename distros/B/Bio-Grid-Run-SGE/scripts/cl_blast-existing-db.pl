@@ -18,9 +18,9 @@ run_job(
       push @cmd, @{ $c->{args} };
       push @cmd, '-i', $seq_file;
       push @cmd, '-o', $result_prefix . '.blast';
-      INFO "Running blastall @cmd";
-      my $success = my_sys_non_fatal(@cmd);
-      $success &&= my_sys_non_fatal( 'gzip', $result_prefix . '.blast' );
+      job->log->info("Running blastall @cmd");
+      my $success = job->sys(@cmd);
+      $success &&= job->sys( 'gzip', $result_prefix . '.blast' );
       return $success;
     },
     #post_task => \&Bio::Grid::Run::SGE::Util::concat_files,

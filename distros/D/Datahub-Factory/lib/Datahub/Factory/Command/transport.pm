@@ -2,6 +2,8 @@ package Datahub::Factory::Command::transport;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use parent 'Datahub::Factory::Cmd';
 
 use Moo;
@@ -9,9 +11,9 @@ use Module::Load;
 use Catmandu;
 use Catmandu::Util qw(data_at is_instance);
 use Datahub::Factory;
-use namespace::clean;
 use Datahub::Factory::Pipeline;
 use Datahub::Factory::Fixer::Condition;
+use namespace::clean;
 
 with 'Datahub::Factory::Flash';
 
@@ -324,8 +326,8 @@ block.
 
 =head1 AUTHORS
 
-Pieter De Praetere <pieter@packed.be>
 Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+Pieter De Praetere <pieter@packed.be>
 
 =head1 COPYRIGHT
 

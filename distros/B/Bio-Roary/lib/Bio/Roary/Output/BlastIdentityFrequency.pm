@@ -1,5 +1,5 @@
 package Bio::Roary::Output::BlastIdentityFrequency;
-$Bio::Roary::Output::BlastIdentityFrequency::VERSION = '3.9.1';
+$Bio::Roary::Output::BlastIdentityFrequency::VERSION = '3.10.2';
 # ABSTRACT:  Take in blast results and find the percentage identity graph
 
 
@@ -61,7 +61,7 @@ Bio::Roary::Output::BlastIdentityFrequency - Take in blast results and find the 
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Digest::SHA3.
 
+0.26  Wed Sep  6 02:23:08 MST 2017
+	- added 'quiet' option to sha3sum
+		-- thanks to Chris David for suggestion and initial patch
+		-- ref. rt.cpan.org #122750
+	- expanded sha3sum --help message
+		-- to explain use of escaped FILE names
+
 0.25  Wed Jul 27 20:04:40 MST 2016
 	- prevented sha3sum from possibly running malicious code
 		-- remove '.' from @INC before module loading

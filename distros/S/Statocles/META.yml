@@ -19,7 +19,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,118 +36,118 @@ no_index:
 provides:
   Statocles:
     file: lib/Statocles.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App:
     file: lib/Statocles/App.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Basic:
     file: lib/Statocles/App/Basic.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Blog:
     file: lib/Statocles/App/Blog.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Perldoc:
     file: lib/Statocles/App/Perldoc.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Plain:
     file: lib/Statocles/App/Plain.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Role::Store:
     file: lib/Statocles/App/Role/Store.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::App::Static:
     file: lib/Statocles/App/Static.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Base:
     file: lib/Statocles/Base.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Command:
     file: lib/Statocles/Command.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Deploy:
     file: lib/Statocles/Deploy.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Deploy::File:
     file: lib/Statocles/Deploy/File.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Deploy::Git:
     file: lib/Statocles/Deploy/Git.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Document:
     file: lib/Statocles/Document.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Event:
     file: lib/Statocles/Event.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Event::Pages:
     file: lib/Statocles/Event.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Image:
     file: lib/Statocles/Image.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Link:
     file: lib/Statocles/Link.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Link::Tree:
     file: lib/Statocles/Link/Tree.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page:
     file: lib/Statocles/Page.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page::Document:
     file: lib/Statocles/Page/Document.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page::File:
     file: lib/Statocles/Page/File.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page::List:
     file: lib/Statocles/Page/List.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page::ListItem:
     file: lib/Statocles/Page/ListItem.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Page::Plain:
     file: lib/Statocles/Page/Plain.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Person:
     file: lib/Statocles/Person.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Plugin:
     file: lib/Statocles/Plugin.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Plugin::HTMLLint:
     file: lib/Statocles/Plugin/HTMLLint.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Plugin::Highlight:
     file: lib/Statocles/Plugin/Highlight.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Plugin::LinkCheck:
     file: lib/Statocles/Plugin/LinkCheck.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Site:
     file: lib/Statocles/Site.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Store:
     file: lib/Statocles/Store.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Store::File:
     file: lib/Statocles/Store/File.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Template:
     file: lib/Statocles/Template.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Test:
     file: lib/Statocles/Test.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Theme:
     file: lib/Statocles/Theme.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Types:
     file: lib/Statocles/Types.pm
-    version: '0.084'
+    version: '0.085'
   Statocles::Util:
     file: lib/Statocles/Util.pm
-    version: '0.084'
+    version: '0.085'
 recommends:
   HTML::Lint::Pluggable: '0.06'
   PPI: '0'
@@ -162,6 +162,7 @@ requires:
   File::Share: '0'
   Git::Repository: '0'
   Import::Base: '0.012'
+  JSON::PP: '0'
   List::UtilsBy: '0.09'
   Mojolicious: '6.54'
   Moo: '2.000001'
@@ -181,7 +182,7 @@ resources:
   bugtracker: https://github.com/preaction/Statocles/issues
   homepage: http://preaction.me/statocles
   repository: https://github.com/preaction/Statocles.git
-version: '0.084'
+version: '0.085'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'djerius <djerius@cfa.harvard.edu>'
@@ -193,4 +194,4 @@ x_contributors:
   - 'tadegenban <tadegenban@gmail.com>'
   - 'Vladimir Lettiev <thecrux@gmail.com>'
   - 'William Lindley <wlindley@wlindley.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

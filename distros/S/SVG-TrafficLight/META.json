@@ -47,6 +47,6 @@
          "web" : "https://github.com/davorg/svg-trafficlight"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

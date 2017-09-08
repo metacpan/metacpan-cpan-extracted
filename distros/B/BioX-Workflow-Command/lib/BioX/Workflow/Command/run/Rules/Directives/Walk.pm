@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Walk;
 
 use Moose::Role;
+use namespace::autoclean;
 
 use Data::Walk;
 use Path::Tiny;

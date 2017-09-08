@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -37,6 +37,8 @@ options( test_one_dot => 0 );
 run_tests();
 TEST_BODY
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

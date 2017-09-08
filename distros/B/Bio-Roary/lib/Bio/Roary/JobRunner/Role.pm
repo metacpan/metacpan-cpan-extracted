@@ -1,5 +1,5 @@
 package Bio::Roary::JobRunner::Role;
-$Bio::Roary::JobRunner::Role::VERSION = '3.9.1';
+$Bio::Roary::JobRunner::Role::VERSION = '3.10.2';
 # ABSTRACT: A role to add job runner functionality
 
 
@@ -70,7 +70,7 @@ Bio::Roary::JobRunner::Role - A role to add job runner functionality
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

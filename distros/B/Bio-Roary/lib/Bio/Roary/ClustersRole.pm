@@ -1,6 +1,6 @@
 package Bio::Roary::ClustersRole;
 # ABSTRACT: A role to read a clusters file from CD hit 
-$Bio::Roary::ClustersRole::VERSION = '3.9.1';
+$Bio::Roary::ClustersRole::VERSION = '3.10.2';
 
 use Moose::Role;
 use Bio::Roary::Exceptions;
@@ -75,7 +75,7 @@ Bio::Roary::ClustersRole - A role to read a clusters file from CD hit
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

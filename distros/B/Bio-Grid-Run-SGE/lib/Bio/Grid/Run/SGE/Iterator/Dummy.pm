@@ -5,7 +5,7 @@ use Mouse;
 use warnings;
 use strict;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 has cur_comb     => ( is => 'rw', lazy_build => 1 );
 has cur_comb_idx => ( is => 'rw', lazy_build => 1 );
@@ -31,7 +31,7 @@ sub num_comb {
     return $self->indices->[0]->num_elem;
 }
 
-sub start {
+sub range {
 
 
 }

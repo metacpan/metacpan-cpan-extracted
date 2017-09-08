@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -26,7 +26,8 @@ has 'passive' => 0;
 
 has 'scheme'  => undef;
 
-sub _pick_fetch
+
+sub pick
 {
   my($self) = @_;
   
@@ -38,22 +39,24 @@ sub _pick_fetch
   
   if($self->scheme =~ /^https?$/)
   {
-    return 'HTTPTiny';
+    return ('Fetch::HTTPTiny', 'Decode::HTML');
   }
   elsif($self->scheme eq 'ftp')
   {
     if($ENV{ftp_proxy} || $ENV{all_proxy})
     {
-      return 'LWP';
+      return $self->scheme =~ /^ftps?/
+        ? ('Fetch::LWP', 'Decode::DirListing', 'Decode::HTML')
+        : ('Fetch::LWP', 'Decode::HTML');
     }
     else
     {
-      return 'NetFTP';
+      return ('Fetch::NetFTP');
     }
   }
   elsif($self->scheme eq 'file')
   {
-    return 'Local';
+    return ('Fetch::Local');
   }
   else
   {
@@ -70,42 +73,22 @@ sub init
 
   $meta->prop->{plugin_download_negotiate_default_url} = $self->url;
 
-  my $fetch = $self->_pick_fetch;
+  my($fetch, @decoders) = $self->pick;
   
-  $self->_plugin($meta, 'Fetch', $fetch, url => $self->url, ssl => $self->ssl, passive => $self->passive);
+  $self->subplugin($fetch,
+    url     => $self->url,
+    ssl     => $self->ssl,
+    ($fetch eq 'Fetch::NetFTP' ? (passive => $self->passive) : ()),
+  )->init($meta);
   
   if($self->version)
   {
-    if($fetch eq 'NetFTP' || $fetch eq 'Local')
-    {
-      # no decoder necessary
-    }
-    elsif($fetch eq 'LWP' && $self->scheme =~ /^ftps?/)
-    {
-      # could be either a DirListing or HTML !
-      $self->_plugin($meta, 'Decode', 'DirListing');
-      $self->_plugin($meta, 'Decode', 'HTML');
-    }
-    else
-    {
-      $self->_plugin($meta, 'Decode', 'HTML');
-    }
-    
-    $self->_plugin($meta, 'Prefer', 'SortVersions', 
+    $self->subplugin($_)->init($meta) for @decoders;
+    $self->subplugin('Prefer::SortVersions', 
       (defined $self->filter ? (filter => $self->filter) : ()),
       version => $self->version,
-    );
+    )->init($meta);
   }
-}
-
-sub _plugin
-{
-  my($self, $meta, $type, $name, %args) = @_;
-  my $class = "Alien::Build::Plugin::${type}::$name";
-  Module::Load::load($class);
-  delete $args{passive} unless $type eq 'Fetch' && $name eq 'NetFTP';
-  my $plugin = $class->new(%args);
-  $plugin->init($meta);
 }
 
 1;
@@ -122,7 +105,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -176,6 +159,14 @@ Perl SSL modules will be loaded.
 
 If using FTP, attempt a passive mode transfer first, before trying an active mode transfer.
 
+=head1 METHODS
+
+=head2 pick
+
+ my($fetch, @decoders) = $plugin->pick;
+
+Returns the fetch plugin and any optional decoders that should be used.
+
 =head1 SEE ALSO
 
 L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -202,7 +193,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -219,6 +210,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -13,6 +13,8 @@ use Test::Util qw/rewrite_shebang/;
 use File::Path qw/remove_tree/;
 use Path::Tiny;
 
+$ENV{BGRS_RC_FILE} = '';
+
 BEGIN { use_ok('Bio::Grid::Run::SGE'); }
 
 my $cl_env = File::Spec->rel2abs("scripts/cl_fail_on_purpose.pl");

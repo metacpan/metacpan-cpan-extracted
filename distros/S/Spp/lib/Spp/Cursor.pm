@@ -13,27 +13,17 @@ sub cursor {
    my ($str, $ns) = @_;
    $str = $str . chr(0);
    return {
-      str => $str,
-      ns  => $ns,
-      len => length($str),
-      off => 0,
-
-      # record line number of souce code
-      line => 1,
-
-      # pos in current
-      pos => 0,
-
-      # 1 open debug mode 2: open gather token info
-      debug => 0,
-
-      # match_rule trace depth
-      depth => 0,
-
-      # get max reach location
-      max_line => 1,
-      max_off  => 0,
-      max_pos  => 0,
+      str     => $str,
+      ns      => $ns,
+      len     => length($str),
+      off     => 0,
+      line    => 1,
+      pos     => 0,
+      mode    => 0,
+      depth   => 0,
+      maxoff  => 0,
+      maxline => 1,
+      maxpos  => 0,
    };
 }
 
@@ -47,10 +37,10 @@ sub go {
       $cursor->{pos}++;
    }
    $cursor->{off}++;
-   if ($cursor->{off} > $cursor->{max_off}) {
-      $cursor->{max_off}  = $cursor->{off};
-      $cursor->{max_line} = $cursor->{line};
-      $cursor->{max_pos}  = $cursor->{pos};
+   if ($cursor->{off} > $cursor->{maxoff}) {
+      $cursor->{maxoff}  = $cursor->{off};
+      $cursor->{maxline} = $cursor->{line};
+      $cursor->{maxpos}  = $cursor->{pos};
    }
 }
 
@@ -73,20 +63,20 @@ sub recover {
 
 sub get_char {
    my $cursor = shift;
-   return substr($cursor->{str}, $cursor->{off}, 1);
+   substr($cursor->{str}, $cursor->{off}, 1);
 }
 
 sub pre_char {
    my $cursor = shift;
-   return substr($cursor->{str}, $cursor->{off} - 1, 1);
+   substr($cursor->{str}, $cursor->{off} - 1, 1);
 }
 
 sub max_report {
    my $cursor   = shift;
    my $str      = $cursor->{str};
-   my $off      = $cursor->{max_off};
-   my $line     = $cursor->{max_line};
-   my $pos      = $cursor->{max_pos};
+   my $off      = $cursor->{maxoff};
+   my $line     = $cursor->{maxline};
+   my $pos      = $cursor->{maxpos};
    my $line_str = to_end(substr($str, $off - $pos));
    my $tip_str  = (' ' x $pos) . '^';
    return <<EOF;

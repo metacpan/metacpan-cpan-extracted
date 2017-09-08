@@ -1,7 +1,7 @@
 package BioX::Workflow::Command;
 
 use v5.10;
-our $VERSION = '2.2.1';
+our $VERSION = '2.2.3';
 
 use MooseX::App qw(Color);
 
@@ -33,6 +33,7 @@ after 'BUILD' => sub {
 };
 
 
+#This class is not compatible with namespace::autoclean...
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

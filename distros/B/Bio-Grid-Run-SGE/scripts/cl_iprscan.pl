@@ -21,8 +21,8 @@ run_job(
             push @cmd, '-seqtype', $c->{extra}{seqtype};
             push @cmd, '-i',       $seq_file;
             push @cmd, '-o',       $result_prefix . '.ipr';
-            INFO "Running iprscan: @cmd";
-            return my_sys_non_fatal(@cmd);
+            job->log->info("Running iprscan: @cmd");
+            return job->sys(@cmd);
         },
         post_task => \&Bio::Grid::Run::SGE::Util::concat_files,
     }

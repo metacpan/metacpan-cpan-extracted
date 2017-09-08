@@ -1,0 +1,67 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Array::Utils' => '0',
+                                      'Bio::Perl' => '0',
+                                      'Bio::SeqIO' => '0',
+                                      'Bio::Tools::GFF' => '0',
+                                      'Bio::TreeIO' => '0',
+                                      'Cwd' => '0',
+                                      'Digest::MD5::File' => '0',
+                                      'Exception::Class' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Copy' => '0',
+                                      'File::Find::Rule' => '0',
+                                      'File::Grep' => '0',
+                                      'File::Path' => '0',
+                                      'File::Slurper' => '0',
+                                      'File::Spec' => '0',
+                                      'File::Temp' => '0',
+                                      'File::Which' => '0',
+                                      'FindBin' => '0',
+                                      'Getopt::Long' => '0',
+                                      'Graph' => '0',
+                                      'Graph::Writer::Dot' => '0',
+                                      'List::Util' => '0',
+                                      'Log::Log4perl' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Role' => '0',
+                                      'POSIX' => '0',
+                                      'PerlIO::utf8_strict' => '0',
+                                      'Text::CSV' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'Env::Path' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::Files' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'Test::Output' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,5 +1,8 @@
 Revision history for Crypt::Image
 
+0.12  2017-09-06T12:00:00+01:00
+      - Updated copyright year information.
+
 0.11  2016-11-01T09:10:00+01:00
       - Updated test scripts (t/meta-json.t and t/meta-yml.t).
 

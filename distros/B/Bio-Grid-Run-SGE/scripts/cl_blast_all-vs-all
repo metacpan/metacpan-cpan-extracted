@@ -78,7 +78,7 @@ sub do_worker_stuff {
         @{ $c->{args} },
     );
 
-    return my_sys_non_fatal(@blast_cmd);
+    return job->sys(@blast_cmd);
 }
 
 sub mrproper {

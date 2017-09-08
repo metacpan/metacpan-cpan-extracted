@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::Author::OALDERS;
-$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000015';
+$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000016';
 use Moose;
 use namespace::autoclean;
 
@@ -70,7 +70,6 @@ sub configure {
         'MetaJSON',
         'MetaYAML',
         'Manifest',
-        'ManifestSkip',
         [ 'MetaNoIndex' => { directory => [ 'examples', 't', 'xt' ] } ],
         'MetaConfig',
         'MetaResources',
@@ -176,7 +175,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head2 configure
 

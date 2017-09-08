@@ -1,74 +1,150 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use File::Spec ();
+use File::Find ();
 
-sub merge_key_into {
-	my ($href, $target, $source) = @_;
-	%{$href->{$target}} = (%{$href->{$target}}, %{delete $href->{$source}});
+sub find_tests_recursively_in {
+    my ($dir) = @_;
+    -d $dir or die "$dir is not a directory";
+
+    my %seen;
+    my $wanted = sub {
+        /\.t\z/ or return;
+        my $directories = (File::Spec->splitpath($File::Find::name))[1];
+        my $depth = grep $_ ne '', File::Spec->splitdir($directories);
+        $seen{$depth} = 1;
+    };
+    File::Find::find($wanted, $dir);
+
+    join ' ',
+        map { $dir . '/*' x $_ . '.t' }
+        sort { $a <=> $b }
+        keys %seen
 }
 
-my %opt = (
-	NAME          => 'Keyword::Simple',
-	AUTHOR        => q{Lukas Mai <l.mai@web.de>},
-	VERSION_FROM  => 'lib/Keyword/Simple.pm',
-	ABSTRACT_FROM => 'lib/Keyword/Simple.pm',
+$::MAINT_MODE = !-f 'META.yml';
+my $settings_file = 'Makefile_PL_settings.plx';
+my %settings = %{do "./$settings_file" or die "Internal error: can't do $settings_file: ", $@ || $!};
 
-	LICENSE => 'perl',
-	PL_FILES => {},
+{
+    $settings{depend}{Makefile} .= " $settings_file";
+    $settings{LICENSE} ||= 'perl';
+    $settings{PL_FILES} ||= {};
 
-	MIN_PERL_VERSION => '5.12.0',
-	CONFIGURE_REQUIRES => {
-		'strict' => 0,
-		'warnings' => 0,
-		'ExtUtils::MakeMaker' => '6.48',
-	},
-	BUILD_REQUIRES => {},
-	TEST_REQUIRES => {
-		'strict' => 0,
-		'Dir::Self' => 0,
-		'Test::More' => 0,
-	},
-	PREREQ_PM => {
-		'Carp' => 0,
-		'XSLoader' => 0,
-		'warnings' => 0,
-		'B::Hooks::EndOfScope' => 0,
-	},
+    $settings{CONFIGURE_REQUIRES}{strict}                ||= 0;
+    $settings{CONFIGURE_REQUIRES}{warnings}              ||= 0;
+    $settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} ||= 0;
+    $settings{CONFIGURE_REQUIRES}{'File::Find'}          ||= 0;
+    $settings{CONFIGURE_REQUIRES}{'File::Spec'}          ||= 0;
 
-	depend => { Makefile => '$(VERSION_FROM)' },
-	dist   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean  => { FILES    => 'Keyword-Simple-*' },
+    my $module_file = $settings{NAME};
+    $module_file =~ s!::!/!g;
+    $module_file = "lib/$module_file.pm";
 
-	META_MERGE => {
-		'meta-spec' => { version => 2 },
-		resources => {
-			repository => {
-				url => 'git://github.com/mauke/Keyword-Simple',
-				web => 'https://github.com/mauke/Keyword-Simple',
-				type => 'git',
-			},
-		},
-	},
-);
+    $settings{VERSION_FROM}  ||= $module_file;
+    $settings{ABSTRACT_FROM} ||= $module_file;
 
-(my $mm_version = ExtUtils::MakeMaker->VERSION($opt{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'})) =~ tr/_//d;
+    $settings{test}{TESTS} ||= find_tests_recursively_in 't';
 
-if ($mm_version < 6.67_04) {
-	# Why? For the glory of satan, of course!
-	no warnings qw(redefine);
-	*ExtUtils::MM_Any::_add_requirements_to_meta_v1_4 = \&ExtUtils::MM_Any::_add_requirements_to_meta_v2;
+    $settings{DISTNAME} ||= do {
+        my $name = $settings{NAME};
+        $name =~ s!::!-!g;
+        $name
+    };
+
+    $settings{clean}{FILES} ||= "$settings{DISTNAME}-*";
+
+    $settings{dist}{COMPRESS} ||= 'gzip -9f';
+    $settings{dist}{SUFFIX}   ||= '.gz';
+
+    my $version = $settings{VERSION} || MM->parse_version($settings{VERSION_FROM});
+    if ($version =~ s/-TRIAL[0-9]*\z//) {
+        $settings{META_MERGE}{release_status} ||= 'unstable';
+        $settings{META_MERGE}{version} ||= $version;
+        $settings{XS_VERSION} ||= $version;
+    }
+
+    $settings{META_MERGE}{'meta-spec'}{version} ||= 2;
+    $settings{META_MERGE}{dynamic_config} ||= 0;
+
+    push @{$settings{META_MERGE}{no_index}{directory}}, 'xt';
+    if (my $dev = delete $settings{DEVELOP_REQUIRES}) {
+        @{$settings{META_MERGE}{prereqs}{develop}{requires}}{keys %$dev} = values %$dev;
+    }
+    if (my $rec = delete $settings{RECOMMENDS}) {
+        @{$settings{META_MERGE}{prereqs}{runtime}{recommends}}{keys %$rec} = values %$rec;
+    }
+
+    if (my $sug = delete $settings{SUGGESTS}) {
+        @{$settings{META_MERGE}{prereqs}{runtime}{suggests}}{keys %$sug} = values %$sug;
+    }
+
+    if (my $repo = delete $settings{REPOSITORY}) {
+        if (ref($repo) eq 'ARRAY') {
+            my ($type, @args) = @$repo;
+            if ($type eq 'github') {
+                my ($account, $project) = @args;
+                $project ||= '%d';
+                $project =~ s{%(L?)(.)}{
+                    my $x =
+                        $2 eq '%' ? '%' :
+                        $2 eq 'd' ? $settings{DISTNAME} :
+                        $2 eq 'm' ? $settings{NAME} :
+                        die "Internal error: unknown placeholder %$1$2";
+                    $1 ? lc($x) : $x
+                }seg;
+                my $addr = "github.com/$account/$project";
+                $repo = {
+                    type => 'git',
+                    url  => "git://$addr",
+                    web  => "https://$addr",
+                };
+            } else {
+                die "Internal error: unknown REPOSITORY type '$type'";
+            }
+        }
+        ref($repo) eq 'HASH' or die "Internal error: REPOSITORY must be a hashref, not $repo";
+        @{$settings{META_MERGE}{resources}{repository}}{keys %$repo} = values %$repo;
+    }
 }
+
+(do './maint/eumm-fixup.pl' || die $@ || $!)->(\%settings) if $::MAINT_MODE;
+
+(my $mm_version = ExtUtils::MakeMaker->VERSION) =~ tr/_//d;
 
 if ($mm_version < 6.63_03) {
-	merge_key_into \%opt, 'BUILD_REQUIRES', 'TEST_REQUIRES';
+    $settings{META_MERGE}{resources}{repository} = $settings{META_MERGE}{resources}{repository}{url}
+        if $settings{META_MERGE}{resources} &&
+           $settings{META_MERGE}{resources}{repository} &&
+           $settings{META_MERGE}{resources}{repository}{url};
+    delete $settings{META_MERGE}{'meta-spec'}{version};
+} elsif ($mm_version < 6.67_04) {
+    # Why? For the glory of satan, of course!
+    no warnings qw(redefine);
+    *ExtUtils::MM_Any::_add_requirements_to_meta_v1_4 = \&ExtUtils::MM_Any::_add_requirements_to_meta_v2;
 }
 
-if ($mm_version < 6.55_01) {
-	merge_key_into \%opt, 'CONFIGURE_REQUIRES', 'BUILD_REQUIRES';
+{
+    my $merge_key_into = sub {
+        my ($target, $source) = @_;
+        %{$settings{$target}} = (%{$settings{$target}}, %{delete $settings{$source}});
+    };
+
+    $merge_key_into->('BUILD_REQUIRES', 'TEST_REQUIRES')
+        if $mm_version < 6.63_03;
+
+    $merge_key_into->('CONFIGURE_REQUIRES', 'BUILD_REQUIRES')
+        if $mm_version < 6.55_01;
+
+    $merge_key_into->('PREREQ_PM', 'CONFIGURE_REQUIRES')
+        if $mm_version < 6.51_03;
 }
 
-if ($mm_version < 6.51_03) {
-	merge_key_into \%opt, 'PREREQ_PM', 'CONFIGURE_REQUIRES';
-}
+delete $settings{MIN_PERL_VERSION} if $mm_version < 6.47_01;
+delete $settings{META_MERGE}       if $mm_version < 6.46;
+delete $settings{LICENSE}          if $mm_version < 6.30_01;
+delete $settings{ABSTRACT_FROM}    if $mm_version < 6.06_03;
+delete $settings{AUTHOR}           if $mm_version < 6.06_03;
 
-WriteMakefile %opt;
+WriteMakefile %settings;

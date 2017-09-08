@@ -1,7 +1,7 @@
 undef $VERSION;
 
 package Bio::Roary::CommandLine::Roary;
-$Bio::Roary::CommandLine::Roary::VERSION = '3.9.1';
+$Bio::Roary::CommandLine::Roary::VERSION = '3.10.2';
 # ABSTRACT: Take in FASTA files of proteins and cluster them
 
 
@@ -149,7 +149,7 @@ sub BUILD {
         $self->perc_identity($perc_identity);
         if ( $perc_identity < 50 ) {
             $self->logger->error(
-"The percentage identity is too low. Either somethings wrong with your data, like contamination, or your doing something that the software isnt designed to support."
+"The percentage identity is too low. Either something is wrong with your data, like contamination, or your doing something that the software isnt designed to support."
             );
         }
     }
@@ -372,7 +372,7 @@ Bio::Roary::CommandLine::Roary - Take in FASTA files of proteins and cluster the
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

@@ -2,10 +2,10 @@
 
 	## sha3sum: filter for computing SHA-3 digests (ref. shasum)
 	##
-	## Copyright (C) 2012-2016 Mark Shelor, All Rights Reserved
+	## Copyright (C) 2012-2017 Mark Shelor, All Rights Reserved
 	##
-	## Version: 0.25
-	## Wed Jul 27 20:04:40 MST 2016
+	## Version: 0.26
+	## Wed Sep  6 02:23:08 MST 2017
 
 	## sha3sum SYNOPSIS adapted from GNU Coreutils sha1sum. Add
 	## "-a" option for algorithm selection,
@@ -44,8 +44,9 @@ sha3sum - Print or Check SHA-3 Checksums
                          all other characters ignored
    -p, --portable    read in portable mode (to be deprecated)
 
- The following two options are useful only when verifying checksums:
+ The following three options are useful only when verifying checksums:
    -s, --status      don't output anything, status code shows success
+   -q, --quiet       don't print OK for each successfully verified file
    -w, --warn        warn about improperly formatted checksum lines
 
    -h, --help        display this help and exit
@@ -55,7 +56,10 @@ sha3sum - Print or Check SHA-3 Checksums
  When checking, the input should be a former output of this program.
  The default mode is to print a line with checksum, a character
  indicating type (`*' for binary, ` ' for text, `U' for UNIVERSAL,
- `^' for BITS, `?' for portable), and name for each FILE.
+ `^' for BITS, `?' for portable), and name for each FILE.  The line
+ starts with a `\' character if the FILE name contains either newlines
+ or backslashes, which are then replaced by the two-character sequences
+ `\n' and `\\' respectively.
 
  Report sha3sum bugs to mshelor@cpan.org
 
@@ -84,7 +88,7 @@ computes the SHA3-384 digest of the 7-bit message I<0001100>:
 
 =head1 AUTHOR
 
-Copyright (c) 2012-2016 Mark Shelor <mshelor@cpan.org>.
+Copyright (c) 2012-2017 Mark Shelor <mshelor@cpan.org>.
 
 =head1 SEE ALSO
 
@@ -94,7 +98,7 @@ I<sha3sum> is implemented using the Perl module L<Digest::SHA3>.
 
 END_OF_POD
 
-my $VERSION = "0.25";
+my $VERSION = "0.26";
 
 
 	## Try to use Digest::SHA3.  If not installed, use the slower
@@ -136,7 +140,7 @@ select((select(STDERR), $| = 1)[0]);
 
 	## Collect options from command line
 
-my ($alg, $binary, $check, $text, $status, $warn, $help, $version);
+my ($alg, $binary, $check, $text, $status, $quiet, $warn, $help, $version);
 my ($portable, $BITS, $UNIVERSAL);
 
 eval { Getopt::Long::Configure ("bundling") };
@@ -144,6 +148,7 @@ GetOptions(
 	'b|binary' => \$binary, 'c|check' => \$check,
 	't|text' => \$text, 'a|algorithm=i' => \$alg,
 	's|status' => \$status, 'w|warn' => \$warn,
+	'q|quiet' => \$quiet,
 	'h|help' => \$help, 'v|version' => \$version,
 	'U|UNIVERSAL' => \$UNIVERSAL,
 	'0|01' => \$BITS,
@@ -162,6 +167,8 @@ usage(1, "sha3sum: --warn option used only when verifying checksums\n")
 	if $warn && !$check;
 usage(1, "sha3sum: --status option used only when verifying checksums\n")
 	if $status && !$check;
+usage(1, "sha3sum: --quiet option used only when verifying checksums\n")
+	if $quiet && !$check;
 
 
 	## Default to SHA3-224 unless overridden by command line option
@@ -233,7 +240,7 @@ sub verify {
 	my $checkfile = shift;
 	my ($err, $fmt_errs, $read_errs, $match_errs) = (0, 0, 0, 0);
 	my ($num_lines, $num_files) = (0, 0);
-	my ($bslash, $sum, $fname, $rsp, $digest);
+	my ($bslash, $sum, $fname, $rsp, $digest, $isOK);
 
 	local *FH;
 	$checkfile eq '-' and open(FH, '< -')
@@ -258,15 +265,16 @@ sub verify {
 		$rsp = "$fname: "; $num_files++;
 		($binary, $text, $UNIVERSAL, $BITS, $portable) =
 			map { $_ eq $modesym } ('*', ' ', 'U', '^', 'p');
+		$isOK = 0;
 		unless ($digest = sumfile($fname)) {
 			$rsp .= "FAILED open or read\n";
 			$err = 1; $read_errs++;
 		}
 		else {
-			if (lc($sum) eq $digest) { $rsp .= "OK\n" }
+			if (lc($sum) eq $digest) { $rsp .= "OK\n"; $isOK = 1 }
 			else { $rsp .= "FAILED\n"; $err = 1; $match_errs++ }
 		}
-		print $rsp unless $status;
+		print $rsp unless ($status || ($quiet && $isOK));
 	}
 	close(FH);
 	unless ($num_files) {

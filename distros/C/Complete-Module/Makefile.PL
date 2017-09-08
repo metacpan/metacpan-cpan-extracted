@@ -19,8 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Common" => "0.22",
     "Complete::Path" => "0.20",
-    "Exporter" => 0,
-    "List::MoreUtils" => 0,
+    "Exporter" => "5.57",
+    "List::Util" => "1.45",
     "strict" => 0,
     "warnings" => 0
   },
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "lib" => 0
   },
-  "VERSION" => "0.25",
+  "VERSION" => "0.260",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Complete::Common" => "0.22",
   "Complete::Path" => "0.20",
   "Complete::Util" => "0.57",
-  "Exporter" => 0,
+  "Exporter" => "5.57",
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::MoreUtils" => 0,
+  "List::Util" => "1.45",
   "Test::More" => "0.98",
   "lib" => 0,
   "strict" => 0,

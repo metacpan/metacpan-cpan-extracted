@@ -3,9 +3,13 @@ package Alien::Build::Plugin::Extract::Negotiate;
 use strict;
 use warnings;
 use Alien::Build::Plugin;
+use Alien::Build::Plugin::Extract::ArchiveTar;
+use Alien::Build::Plugin::Extract::ArchiveZip;
+use Alien::Build::Plugin::Extract::CommandLine;
+use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+format' => 'tar';
@@ -19,83 +23,61 @@ sub init
   $format = 'tar.bz2' if $format eq 'tbz';
   $format = 'tar.xz'  if $format eq 'txz';
   
-  my $extract = $self->_pick($format);
-  
-  $self->_plugin($meta, 'Extract', $extract, format => $format);
+  my $plugin = $self->pick($format);
+  $self->subplugin($plugin, format => $format)->init($meta);
+  $self;
 }
 
-sub _pick
+
+sub pick
 {
   my(undef, $format) = @_;
   
-  if($format eq 'tar')
+  if($format =~ /^tar(\.(gz|bz2))?$/)
   {
-    return 'ArchiveTar';
-  }
-  elsif($format eq 'tar.gz')
-  {
-    if(eval q{ require Archive::Tar; Archive::Tar->has_zlib_support })
+    if(Alien::Build::Plugin::Extract::ArchiveTar->available($format))
     {
-      return 'ArchiveTar';
+      return 'Extract::ArchiveTar';
     }
     else
     {
-      return 'CommandLine';
-    }
-  }
-  elsif($format eq 'tar.bz2')
-  {
-    if(eval q{ require Alien::Build::Plugin::Extract::ArchiveTar; Alien::Build::Plugin::Extract::ArchiveTar->_can_bz2 })
-    {
-      return 'ArchiveTar';
-    }
-    else
-    {
-      return 'CommandLine';
+      return 'Extract::CommandLine';
     }
   }
   elsif($format eq 'zip')
   {
     # Archive::Zip is not that reliable.  But if it is already installed it is probably working
-    if(eval q{ require Archive::Zip; 1 })
+    if(Alien::Build::Plugin::Extract::ArchiveZip->available($format))
     {
-      return 'ArchiveZip';
+      return 'Extract::ArchiveZip';
     }
     
     # if we don't have Archive::Zip, check if we have the unzip command
-    elsif(eval { require Alien::Build::Plugin::Extract::CommandLine; Alien::Build::Plugin::Extract::CommandLine->new->unzip_cmd })
+    elsif(Alien::Build::Plugin::Extract::CommandLine->available($format))
     {
-      return 'CommandLine';
+      return 'Extract::CommandLine';
     }
     
     # okay fine.  I will try to install Archive::Zip :(
+    # if this becomes a problem in the future we can
+    # create Alien::unzip and fallback on CommandLine instead.
     else
     {
-      return 'ArchiveZip';
+      return 'Extract::ArchiveZip';
     }
   }
   elsif($format eq 'tar.xz' || $format eq 'tar.Z')
   {
-    return 'CommandLine';
+    return 'Extract::CommandLine';
   }
   elsif($format eq 'd')
   {
-    return 'Directory';
+    return 'Extract::Directory';
   }
   else
   {
     die "do not know how to handle format: $format";
   }
-}
-
-sub _plugin
-{
-  my($self, $meta, $type, $name, @args) = @_;
-  my $class = "Alien::Build::Plugin::${type}::$name";
-  my $pm    = "Alien/Build/Plugin/$type/$name.pm";
-  require $pm;
-  my $plugin = $class->new(@args);
-  $plugin->init($meta); 
 }
 
 1;
@@ -112,7 +94,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -135,6 +117,14 @@ Plugin from your L<alienfile>.
 
 The expected format for the download.  Possible values include:
 C<tar>, C<tar.gz>, C<tar.bz2>, C<tar.xz>, C<zip>, C<d>.
+
+=head1 METHODS
+
+=head2 pick
+
+ my $name = Alien::Build::Plugin::Extract::Negotiate->pick($format);
+
+Returns the name of the best plugin for the given format.
 
 =head1 SEE ALSO
 
@@ -162,7 +152,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -179,6 +169,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

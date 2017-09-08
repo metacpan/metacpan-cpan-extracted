@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANLists-PERLANCAR
   homepage: https://metacpan.org/release/Acme-CPANLists-PERLANCAR
   repository: git://github.com/perlancar/perl-Acme-CPANLists-PERLANCAR.git
-version: '0.25'
+version: '0.26'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -100,7 +100,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.58'
+      version: '0.590'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -317,6 +317,10 @@ x_Dist_Zilla:
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.056'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::PERLANCAR/Test::Perl::Critic'
+      version: '3.001'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

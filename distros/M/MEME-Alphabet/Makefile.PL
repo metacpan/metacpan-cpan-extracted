@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => 'MEME::Alphabet',
     AUTHOR           => [
-        'James Johnson <meme-suite@uw.edu>',
+        'James Johnson',
         'Timothy L. Bailey <meme-suite@uw.edu>',
     ],
     VERSION_FROM     => 'lib/MEME/Alphabet.pm',
@@ -51,7 +51,7 @@ WriteMakefile(
         provides => {
             'MEME::Alphabet' => {
                 file    => 'lib/MEME/Alphabet.pm',
-                version => 'v4.12.0.1.1',
+                version => 'v4.12.0.1.3',
           },
         },
     },

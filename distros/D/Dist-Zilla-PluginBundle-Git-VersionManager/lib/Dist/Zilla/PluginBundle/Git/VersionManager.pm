@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: 69fbd84
+package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.001-6-gffba85c
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle that manages your version in git
 # KEYWORDS: bundle distribution git version Changes increment
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moose;
 with
@@ -42,13 +42,13 @@ around commit_files_after_release => sub {
 
 sub mvp_multivalue_args { qw(commit_files_after_release) }
 
-has _develop_requires => (
+has _develop_suggests => (
     isa => class_type('CPAN::Meta::Requirements'),
     lazy => 1,
     default => sub { CPAN::Meta::Requirements->new },
     handles => {
-        _add_minimum_develop_requires => 'add_minimum',
-        _develop_requires_as_string_hash => 'as_string_hash',
+        _add_minimum_develop_suggests => 'add_minimum',
+        _develop_suggests_as_string_hash => 'as_string_hash',
     },
 );
 
@@ -83,9 +83,13 @@ sub configure
                 ':version' => '2.020',
                 allow_dirty => [ $self->commit_files_after_release ],
             } ],
-        [ 'Git::Tag'            => {} ],
+        [ 'Git::Tag' ],
         [ 'BumpVersionAfterRelease::Transitional' => { ':version' => '0.004' } ],
-        [ 'NextRelease'         => { ':version' => '5.033', time_zone => 'UTC', format => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T' } ],
+        [ 'NextRelease'         => {
+                ':version' => '5.033',
+                time_zone => 'UTC',
+                format => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
+            } ],
         [ 'Git::Commit'         => 'post-release commit' => {
                 ':version' => '2.020',
                 allow_dirty => [ 'Changes' ],
@@ -96,9 +100,11 @@ sub configure
 
     # ensure that additional optional plugins are declared in prereqs
     $self->add_plugins(
-        [ 'Prereqs' => 'prereqs for @Git::VersionManager' =>
-        { '-phase' => 'develop', '-relationship' => 'requires',
-          %{ $self->_develop_requires_as_string_hash } } ]
+        [ 'Prereqs' => 'prereqs for @Git::VersionManager' => {
+                '-phase' => 'develop',
+                '-relationship' => 'suggests',
+              %{ $self->_develop_suggests_as_string_hash },
+          } ],
     );
 }
 
@@ -116,10 +122,10 @@ around add_plugins => sub
         # this plugin is provided in the local distribution
         next if $plugin_spec->[0] eq 'MetaProvides::Update';
 
-        # record develop prereq
+        # record develop-suggests prereq
         my $payload = ref $plugin_spec->[-1] ? $plugin_spec->[-1] : {};
         my $plugin = Dist::Zilla::Util->expand_config_package_name($plugin_spec->[0]);
-        $self->_add_minimum_develop_requires($plugin => $payload->{':version'} // 0);
+        $self->_add_minimum_develop_suggests($plugin => $payload->{':version'} // 0);
     }
 
     return $self->$orig(@plugins);
@@ -140,7 +146,7 @@ Dist::Zilla::PluginBundle::Git::VersionManager - A plugin bundle that manages yo
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -171,6 +177,8 @@ It is equivalent to the following configuration directly in a F<dist.ini>:
     [RewriteVersion::Transitional]
     :version = 0.004
 
+    [MetaProvides::Update]
+
     [CopyFilesFromRelease / copy Changes]
     filename = Changes
 
@@ -197,7 +205,7 @@ It is equivalent to the following configuration directly in a F<dist.ini>:
 
     [Prereqs / prereqs for @Git::VersionManager]
     -phase = develop
-    -relationship = requires
+    -relationship = suggests
     ...all the plugins this bundle uses...
 
 =for Pod::Coverage configure

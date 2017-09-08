@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::UpsideDownTextWithUnicode;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 our @Module_Lists = (
     {
@@ -35,7 +35,7 @@ Acme::CPANLists::PERLANCAR::UpsideDownTextWithUnicode - Modules that can flip La
 
 =head1 VERSION
 
-This document describes version 0.25 of Acme::CPANLists::PERLANCAR::UpsideDownTextWithUnicode (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
+This document describes version 0.26 of Acme::CPANLists::PERLANCAR::UpsideDownTextWithUnicode (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-09-08.
 
 =head1 MODULE LISTS
 

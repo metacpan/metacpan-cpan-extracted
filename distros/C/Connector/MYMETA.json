@@ -22,12 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config::Merge" : "0",
             "Config::Std" : "0",
             "Config::Versioned" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "ExtUtils::MakeMaker" : "6.59",
-            "Net::SSL" : "0",
+            "Proc::SafeExec" : "0",
             "Template" : "0",
             "Test::More" : "0",
             "YAML" : "0"
@@ -44,7 +45,6 @@
             "Config::Versioned" : "0.5",
             "DBI" : "0",
             "Net::LDAP" : "0",
-            "Net::SSL" : "0",
             "Proc::SafeExec" : "0",
             "Template" : "0",
             "Text::CSV_XS" : "0",
@@ -63,5 +63,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.21"
+   "version" : "1.23"
 }

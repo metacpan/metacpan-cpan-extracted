@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -29,6 +29,8 @@ use Test::MinimumVersion 0.008;
 all_minimum_version_from_metayml_ok();
 TEST_BODY
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

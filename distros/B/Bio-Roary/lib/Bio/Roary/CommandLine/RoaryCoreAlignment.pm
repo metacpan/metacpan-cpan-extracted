@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::RoaryCoreAlignment;
-$Bio::Roary::CommandLine::RoaryCoreAlignment::VERSION = '3.9.1';
+$Bio::Roary::CommandLine::RoaryCoreAlignment::VERSION = '3.10.2';
 # ABSTRACT: Take in the group statistics spreadsheet and the location of the gene multifasta files and create a core alignment.
 
 
@@ -154,7 +154,7 @@ Bio::Roary::CommandLine::RoaryCoreAlignment - Take in the group statistics sprea
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

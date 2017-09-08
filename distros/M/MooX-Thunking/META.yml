@@ -1,0 +1,30 @@
+---
+abstract: 'Allow Moo attributes to be "thunked"'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.42'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Thunking
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: '0'
+  Type::Tiny: '0'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/moox-thunking
+version: '0.03'

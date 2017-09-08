@@ -49,7 +49,7 @@ $idx_b->create( [$data_reversed_file] );
   my $it = Bio::Grid::Run::SGE::Iterator::AvsB->new( indices => [ $idx0, $idx1 ] );
 
   is( $it->num_comb, 42 * 55 );
-  $it->start( [ 0, 42 * 55 - 1 ] );
+  $it->range( [ 0, 42 * 55 - 1 ] );
   for ( my $i = 1; $i <= 42; $i++ ) {
     for ( my $j = 1; $j <= 55; $j++ ) {
       my $comb = $it->next_comb;
@@ -63,7 +63,7 @@ my $it_1 = Bio::Grid::Run::SGE::Iterator::AvsB->new( indices => [ $idx_a, $idx_b
 
 is( $it_1->num_comb, 45 * 45 );
 
-$it_1->start( [ 0, 99 ] );
+$it_1->range( [ 0, 99 ] );
 
 my $range_0_100 = catfile( $tmp_dir, "range-0-100.fa" );
 open my $range_0_100_fh, '>', $range_0_100 or die "Can't open filehandle: $!";
@@ -105,7 +105,7 @@ is( compare( $range_0_100, $ref_file ), 0, 'range 0 .. 100' );
   my $it = Bio::Grid::Run::SGE::Iterator::AvsB->new( indices => [ $idx0, $idx1 ] );
 
   is( $it->num_comb, 3 * 42 );
-  $it->start( [ 0, 42 * 3 - 1 ] );
+  $it->range( [ 0, 42 * 3 - 1 ] );
   for ( my $i = 1; $i <= 42; $i++ ) {
     for ( my $j = 1; $j <= 3; $j++ ) {
       my $comb = $it->next_comb;

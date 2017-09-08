@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Utils::Samples;
 
 use MooseX::App::Role;
+use namespace::autoclean;
 
 with 'BioX::Workflow::Command::run::Rules::Directives::Sample';
 with 'BioX::Workflow::Command::run::Rules::Rules';
@@ -59,8 +60,8 @@ sub get_samples {
     }
 
     my $text = $self->get_sample_rule;
+    $self->find_sample_glob( $attr, $text );
     $self->find_sample_file_find_rule( $attr, $text );
-    $self->find_sample_glob($attr, $text);
 
     if ( $self->has_no_samples ) {
         $self->app_log->warn('No samples were found!');
@@ -73,21 +74,21 @@ sub get_samples {
 }
 
 sub remove_excluded_samples {
-  my $self = shift;
+    my $self = shift;
 
-  return unless $self->has_samples;
-  return unless $self->has_exclude_samples;
+    return unless $self->has_samples;
+    return unless $self->has_exclude_samples;
 
-  my %sample_hash = ();
-  map { $sample_hash{$_} = 1 } @{$self->samples};
+    my %sample_hash = ();
+    map { $sample_hash{$_} = 1 } @{ $self->samples };
 
-  foreach my $sample ($self->all_exclude_samples){
-    delete $sample_hash{$sample};
-  }
+    foreach my $sample ( $self->all_exclude_samples ) {
+        delete $sample_hash{$sample};
+    }
 
-  my @new_samples  = keys %sample_hash;
-  @new_samples = sort(@new_samples);
-  $self->samples(\@new_samples);
+    my @new_samples = keys %sample_hash;
+    @new_samples = sort(@new_samples);
+    $self->samples( \@new_samples );
 }
 
 sub find_sample_glob {
@@ -95,10 +96,16 @@ sub find_sample_glob {
     my $attr = shift;
     my $text = shift;
 
+    return if $self->has_samples;
     return unless $attr->has_sample_glob;
 
     my @sample_files = glob( $attr->sample_glob );
-    return unless @sample_files;
+    if ( !@sample_files ) {
+        $self->app_log->warn( "No samples were found with the glob pattern '"
+              . $attr->sample_glob
+              . "'" );
+        return;
+    }
 
     @sample_files = sort(@sample_files);
     $self->sample_files( \@sample_files ) if @sample_files;

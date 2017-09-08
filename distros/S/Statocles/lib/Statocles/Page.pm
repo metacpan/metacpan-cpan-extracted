@@ -1,11 +1,12 @@
 package Statocles::Page;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 # ABSTRACT: Base role for rendering files
 
 use Statocles::Base 'Role';
 use Statocles::Template;
 use Statocles::Util qw( uniq_by );
 use Statocles::Person;
+use Mojo::DOM;
 
 #pod =attr site
 #pod
@@ -281,16 +282,6 @@ has search_priority => (
     default => sub { 0.5 },
 );
 
-# _rendered_html
-#
-# The HTML rendered from the page. Cached.
-
-has _rendered_html => (
-    is => 'rw',
-    isa => Str,
-    predicate => '_has_rendered_html',
-);
-
 # _content_sections
 #
 # The saved content sections from any rendered content templates. This
@@ -300,6 +291,31 @@ has _content_sections => (
     isa => HashRef,
     default => sub { {} },
 );
+
+#pod =attr dom
+#pod
+#pod A L<Mojo::DOM> object containing the HTML DOM of the rendered content for
+#pod this page. Any edits made to this object will be reflected in the file
+#pod written.
+#pod
+#pod Editing this DOM object is the recommended way to edit pages.
+#pod
+#pod =cut
+
+has dom => (
+    is => 'ro',
+    isa => InstanceOf['Mojo::DOM'],
+    lazy => 1,
+    default => sub { Mojo::DOM->new( shift->render ) },
+);
+
+#pod =method has_dom
+#pod
+#pod Returns true if the page can render a DOM
+#pod
+#pod =cut
+
+sub has_dom { 1 }
 
 #pod =method vars
 #pod
@@ -332,18 +348,12 @@ sub vars {
 #pod =cut
 
 sub render {
-    my ( $self, %args ) = @_;
-
-    if ( $self->_has_rendered_html ) {
-        $self->site->log->debug( 'Render page (cached): ' . $self->path );
-        return $self->_rendered_html;
-    }
+    my ( $self ) = @_;
 
     $self->site->log->debug( 'Render page: ' . $self->path );
 
     my %vars = (
         %{ $self->data },
-        %args,
         $self->vars,
     );
 
@@ -360,7 +370,6 @@ sub render {
         %vars,
     );
 
-    $self->_rendered_html( $html );
     return $html;
 }
 
@@ -455,7 +464,7 @@ Statocles::Page - Base role for rendering files
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 DESCRIPTION
 
@@ -573,7 +582,19 @@ engine to crawl, and which pages within your site should be given to users. It
 does not improve your rankings compared to other sites. See L<the sitemap
 protocol|http://sitemaps.org> for details.
 
+=head2 dom
+
+A L<Mojo::DOM> object containing the HTML DOM of the rendered content for
+this page. Any edits made to this object will be reflected in the file
+written.
+
+Editing this DOM object is the recommended way to edit pages.
+
 =head1 METHODS
+
+=head2 has_dom
+
+Returns true if the page can render a DOM
 
 =head2 vars
 

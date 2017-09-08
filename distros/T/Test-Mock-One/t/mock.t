@@ -33,11 +33,9 @@ use DateTime;
     ok(UNIVERSAL::isa($mock, 'Test::Mock::One'), "We are Test::Mock::One");
     isa_ok($mock, 'Foo', "Mocked our ISA");
 
-
     is($mock->foo, 'bar', 'returns string');
     is($mock->bar, 1,     'returns int');
     is($mock->code("'foo'"), "this is code: 'foo'", "Executed code");
-
 
     my $rv = $mock->array->foo;
     isa_ok($rv, "Foo", "Array mocks ISA");
@@ -46,12 +44,12 @@ use DateTime;
 
     cmp_deeply($mock->ArrayRef, [qw(foo bar baz)], "Array ref dealing");
     cmp_deeply($mock->HashRef, { foo => 'bar' }, "Hash ref dealing");
-    isa_ok($mock->time, 'DateTime');
+    isa_ok($mock->time, 'DateTime', "is a date time object");
 
     $rv = $mock->yep->baz->diaz;
     ok(UNIVERSAL::isa($rv, 'Test::Mock::One'), "Just keep calling");
 
-    is($mock->deep->foo, 'inside');
+    is($mock->deep->foo, 'inside', "deep inside");
 
     is($mock->deeper->underground, "jamiroquai", "We keep return \$self");
 }
@@ -100,12 +98,18 @@ use DateTime;
         "Strict mode does not allow undefined methods"
     );
 
+    can_ok($mock, 'foo');
+    ok(!$mock->can('bar'), "can't do bar");
+
     $mock = Test::Mock::One->new(
         "X-Mock-Strict" => 0,
         foo             => 1,
     );
     lives_ok(sub { $mock->foo }, "foo is allowed");
     lives_ok(sub { $mock->bar }, "bar is allowed");
+
+    can_ok($mock, 'foo', \"mock can foo");
+
 }
 
 {

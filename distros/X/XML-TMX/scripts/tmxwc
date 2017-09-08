@@ -1,4 +1,8 @@
 #!/usr/bin/perl -s
+
+# ABSTRACT: Gives statistics about tmx file.
+# PODNAME: tmxwc
+
 our($h);
 use XML::TMX::Reader;
 
@@ -22,29 +26,48 @@ print  "total: $TTU tu.\n" if $n > 1;
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-tmxwc - gives statistics about tmx files
+tmxwc - Gives statistics about tmx file.
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
  tmxwc  tmx1 [tmx2 ...]
 
-  -h     dont print filenames (default: print filenames)
+  -h     don't print filenames (default: print filenames)
 
 =head1 DESCRIPTION
 
 Gives statistical information about TMX files like the number of
 translation units.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alberto Simões, E<lt>ambs@cpan.orgE<gt>
+=over 4
 
-=head1 SEE ALSO
+=item *
 
-perl(1).
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

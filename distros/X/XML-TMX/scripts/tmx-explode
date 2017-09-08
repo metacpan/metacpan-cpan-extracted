@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# PODNAME: tmx-explode
+# ABSTRACT: Explodes tmx files in a file per language
+
 use warnings;
 use strict;
 
@@ -39,11 +42,19 @@ for my $file (@files) {
     print STDERR "DONE\n";
 }
 
+__END__
+
+=pod
+
 =encoding UTF-8
 
 =head1 NAME
 
-tmx-explode - explodes tmx files in a file per language
+tmx-explode - Explodes tmx files in a file per language
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -62,17 +73,25 @@ tmx-explode - explodes tmx files in a file per language
 Explodes a set of tmx files, creating a folder per language, and a
 file per tmx file.
 
-=head1 SEE ALSO
+=head1 AUTHORS
 
-perl(1)
+=over 4
 
-=head1 AUTHOR
+=item *
 
-Alberto Manuel Brandão Simões, E<lt>ambs@cpan.orgE<gt>
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Alberto Manuel Brandão Simões
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

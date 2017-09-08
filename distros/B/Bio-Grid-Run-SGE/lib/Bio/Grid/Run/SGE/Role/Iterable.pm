@@ -5,22 +5,22 @@ use Mouse::Role;
 use warnings;
 use strict;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 has indices => (is => 'rw', required => 1, isa => 'ArrayRef'); 
 has _iterating => (is => 'rw');
 has _range => (is => 'rw');
 
-requires qw/cur_comb_idx peek_comb_idx num_comb cur_comb next_comb start/;
+requires qw/cur_comb_idx peek_comb_idx num_comb cur_comb next_comb range/;
 
 sub BUILD { }
 
-before start => sub{
+before range => sub{
     my ($self, $idx_range) = @_;
     
     confess "range problems: [" . ( $idx_range ? join( ",", @$idx_range ) : $idx_range ) . "]"
         unless ( $idx_range && @$idx_range >= 2 );
-    confess "You specified a range that is bigger than the number of combinations"
+    confess "You specified a range that is bigger than the number of combinations ($idx_range->[0], $idx_range->[1]), ". $self->num_comb
         if ( $idx_range->[1] >= $self->num_comb );
         #FIXME more range checks
 
@@ -36,7 +36,7 @@ before start => sub{
 #};
     #create indices input files newer or if not exist
 
-#sub start { my ($self, $num_parts, $idx_range) = @_; }
+#sub range { my ($self, $num_parts, $idx_range) = @_; }
 
 
 1;

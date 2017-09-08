@@ -1,47 +1,17 @@
 package XML::TMX::FromPO;
+$XML::TMX::FromPO::VERSION = '0.36';
+# ABSTRACT: Generates a TMX file from a group of PO files
 
-use 5.004;
+use 5.010;
 use warnings;
 use strict;
 use XML::TMX::Writer;
 use Exporter ();
 
-use vars qw(@ISA @EXPORT_OK $VERSION);
 
-$VERSION = '0.32';
-@ISA = 'Exporter';
-@EXPORT_OK = qw(&new &parse_dir &create_tmx &clean_tmx);
+our @ISA = 'Exporter';
+our @EXPORT_OK = qw(&new &parse_dir &create_tmx &clean_tmx);
 
-=pod
-
-=encoding utf-8
-
-=head1 NAME
-
-XML::TMX::FromPO - Generates a TMX file from a group of PO files
-
-=head1 SYNOPSIS
-
-   use XML::TMX::FromPO;
-
-   my $conv = new XML::TMX::FromPO(OUTPUT => '%f.tmx');
-
-=head1 DESCRIPTION
-
-This module can be used to generate TMX files from a group of PO files.
-
-=head1 METHODS
-
-The following methods are available:
-
-=head2 new
-
-  $tmx = new XML::TMX::FromPO();
-
-Creates a new XML::TMX::FromPO object. Please check the L<COMMON
-CONFIGURATION> section for details on the options.
-
-=cut
 
 sub new {
    my $proto = shift;
@@ -68,11 +38,6 @@ sub new {
 }
 
 
-=head2 rec_get_po
-
-TODO: Document method
-
-=cut
 
 sub rec_get_po {
    my $self = shift;
@@ -122,11 +87,6 @@ sub rec_get_po {
 }
 
 
-=head2 parse_dir
-
-TODO: Document method
-
-=cut
 
 sub parse_dir {
    my $self = shift;
@@ -184,11 +144,6 @@ sub __add_en {
    }
 }
 
-=head2 create_tmx
-
-TODO: Document function
-
-=cut
 
 sub create_tmx {
    my $self = shift;
@@ -212,11 +167,6 @@ sub create_tmx {
    $tmx->end_tmx();
 }
 
-=head2 clean_tmx
-
-TODO: Document method
-
-=cut
 
 sub clean_tmx {
    my $self = shift;
@@ -325,7 +275,77 @@ sub __limpa {
 }
 
 
+
+sub __common_conf {
+   my $self = shift;
+   my %opt = @_;
+
+   if(defined($opt{LANG})) {
+      my @list;
+      for my $l (sort(split(/\s+/, $opt{LANG}))) {
+         push(@list, $l) if($l =~ /^[a-z0-9_]+$/i);
+      }
+      $self->{LANG} = \@list if(@list);
+   }
+
+   $self->{CONVERT} = $opt{CONVERT} if defined($opt{CONVERT});
+   $self->{OUTPUT}  = $opt{OUTPUT}  if defined($opt{OUTPUT});
+   $self->{DEBUG}   = $opt{DEBUG}   if defined($opt{DEBUG});
+}
+
+
+1;
+
+__END__
+
 =pod
+
+=encoding utf-8
+
+=head1 NAME
+
+XML::TMX::FromPO - Generates a TMX file from a group of PO files
+
+=head1 VERSION
+
+version 0.36
+
+=head1 SYNOPSIS
+
+   use XML::TMX::FromPO;
+
+   my $conv = new XML::TMX::FromPO(OUTPUT => '%f.tmx');
+
+=head1 DESCRIPTION
+
+This module can be used to generate TMX files from a group of PO files.
+
+=head1 METHODS
+
+The following methods are available:
+
+=head2 new
+
+  $tmx = new XML::TMX::FromPO();
+
+Creates a new XML::TMX::FromPO object. Please check the L<COMMON
+CONFIGURATION> section for details on the options.
+
+=head2 rec_get_po
+
+TODO: Document method
+
+=head2 parse_dir
+
+TODO: Document method
+
+=head2 create_tmx
+
+TODO: Document function
+
+=head2 clean_tmx
+
+TODO: Document method
 
 =head1 COMMON CONFIGURATION
 
@@ -356,40 +376,33 @@ Activate debugging information. Defaults to 0.
 
 =back
 
-=cut
-
-sub __common_conf {
-   my $self = shift;
-   my %opt = @_;
-
-   if(defined($opt{LANG})) {
-      my @list;
-      for my $l (sort(split(/\s+/, $opt{LANG}))) {
-         push(@list, $l) if($l =~ /^[a-z0-9_]+$/i);
-      }
-      $self->{LANG} = \@list if(@list);
-   }
-
-   $self->{CONVERT} = $opt{CONVERT} if defined($opt{CONVERT});
-   $self->{OUTPUT}  = $opt{OUTPUT}  if defined($opt{OUTPUT});
-   $self->{DEBUG}   = $opt{DEBUG}   if defined($opt{DEBUG});
-}
-
 =head1 SEE ALSO
 
 L<XML::TMX::Writer(3)>, L<gettext(1)>, L<recode(1)>, L<iconv(1)>
 
-=head1 AUTHOR
+=head1 CONTRIBUTORS
 
 Paulo Jorge Jesus Silva, E<lt>paulojjs@bragatel.ptE<gt>
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 by Paulo Jorge Jesus Silva
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

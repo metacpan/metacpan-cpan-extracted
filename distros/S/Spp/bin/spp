@@ -2,27 +2,38 @@
 
 use 5.012;
 no warnings "experimental";
+
 use Spp::Builtin qw(to_json);
 use Spp;
 
-my $action    = $ARGV[0];
-my $file      = $ARGV[1];
-my $text_file = $ARGV[2];
+my $action       = $ARGV[0];
+my $grammar_file = $ARGV[1];
+my $text_file    = $ARGV[2];
 
-# say "action: $action";
 given ($action) {
    when ('--repl')   { Spp::repl() }
    when ('--update') { Spp::update() }
-   when ('--lint')   { Spp::lint($file) }
-   when ('--spp') {
-      if (-e $file && -e $text_file) {
-         my $ast = Spp::spp($file, $text_file);
-         say to_json($ast);
+   when ('--lint')   { lint($grammar_file) }
+   when ('--parse') {
+      if (-e $grammar_file) {
+         if (-e $text_file) {
+            say spp($grammar_file, $text_file);
+         }
+         else { say "text file: <$text_file> not exist!" }
       }
-      else {
-         say "not exists grammar or text file";
-      }
+      else { say "grammar file: <$grammar_file> not exist!" }
    }
-   default { Spp::repl() }
+   default {
+      say "
+      :: test Spp rule is valid, or test rule match string.
+      spp --repl
+      :: update Spp Lanugage Grammar Ast with Grammar define.
+      spp --update
+      # lint grammar defined with <grammarr.spp>.
+      spp --lint grammar.spp
+      :: parse <file.text> with grammar defined with <grammar.spp>.
+      > spp --parse grammar.spp file.text";
+      Spp::repl();
+   }
 }
 

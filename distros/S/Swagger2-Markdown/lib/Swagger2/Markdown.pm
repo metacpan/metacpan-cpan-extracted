@@ -2,7 +2,7 @@ package Swagger2::Markdown;
 
 =head1 NAME
 
-Swagger2::Markdown - convert a Swagger2 spec to various markdown formats
+Swagger2::Markdown - DEPRECATED convert a Swagger2 spec to various markdown formats
 
 =for html
 <a href='https://travis-ci.org/Humanstate/swagger2-markdown?branch=master'><img src='https://travis-ci.org/Humanstate/swagger2-markdown.svg?branch=master' alt='Build Status' /></a>
@@ -10,13 +10,16 @@ Swagger2::Markdown - convert a Swagger2 spec to various markdown formats
 
 =head1 VERSION
 
-0.12
+9.99
 
 =head1 DEPRECATION WARNING
 
 The Swagger2 distribution is no longer actively maintained. Ergo, this distribution
 is no longer actively maintained. If you would like to create an OpenAPI2::Markdown
 then please feel free.
+
+If you're looking at generating API docs from your Swagger2/OpenAPI spec then take
+a look at L<https://github.com/Rebilly/ReDoc>
 
 =head1 SYNOPSIS
 
@@ -51,7 +54,7 @@ use Template;
 use Swagger2::Markdown::API::Blueprint;
 use Pod::Markdown;
 
-our $VERSION = '0.12';
+our $VERSION = '9.99';
 
 =head1 ATTRIBUTES
 

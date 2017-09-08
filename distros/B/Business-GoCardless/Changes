@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.25     2017-09-05
+        - Add missing attributes to Payout class for Pro API (GH #11)
+
 0.24     2017-09-05
         - Support the payout resource in an event (GH #10, thanks to grifferz)
 

@@ -18,27 +18,69 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
-    amount
+Note that app_ids, bank_reference, paid_at, and transaction_fees relate to the
+legacy (v1) basic API. These will be removed after the legacy API has been
+switched off
+
     app_ids
     bank_reference
-    created_at
-    id
     paid_at
     transaction_fees
+
+    amount
+    arrival_date
+    created_at
+    currency
+    deducted_fees
+    id
+    links
+    payout_type
+    reference
+    status
 
 =cut
 
+# TODO: remove legacy attributes
+
 has [ qw/
-    amount
     app_ids
     bank_reference
-    created_at
-    id
     paid_at
     transaction_fees
+
+    amount
+    arrival_date
+    created_at
+    currency
+    deducted_fees
+    id
+    links
+    payout_type
+    reference
+    status
 / ] => (
     is => 'rw',
 );
+
+sub uri {
+    my ( $self ) = @_;
+    my $endpoint = sprintf( $self->endpoint,$self->id );
+    return join( '/',$self->client->base_url . $endpoint );
+}
+
+=head1 Status checks on a payout
+
+    pending
+    paid
+
+    if ( $Payout->paid ) {
+        ...
+    }
+
+=cut
+
+sub pending     { return shift->status eq 'pending' }
+sub paid        { return shift->status eq 'paid' }
 
 =head1 AUTHOR
 

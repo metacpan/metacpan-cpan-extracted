@@ -1,5 +1,9 @@
 Revision history for Config-MVP-Writer-INI
 
+0.005     2017-09-06T14:50:08Z
+
+  - Update meta files.  No code changes.
+
 0.004     2015-06-04T23:25:30Z
 
   - Remove unused dependency on List::AllUtils/List::MoreUtils. (@ether++)

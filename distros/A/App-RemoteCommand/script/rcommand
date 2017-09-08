@@ -1,10 +1,9 @@
 #!perl
 use strict;
 use warnings;
-use utf8;
 use App::RemoteCommand;
 
-exit App::RemoteCommand->new->parse_options(@ARGV)->run;
+exit App::RemoteCommand->run(@ARGV);
 
 __END__
 
@@ -42,7 +41,6 @@ rcommand - simple remote command launcher
   > rcommand --ask-sudo-password --sudo root example.com 'service restart httpd'
   > rcommand --ask-sudo-password --sudo app example.com --script script.sh
 
-  HOST SYNTAX:
   HOSTS will be expand by String::Glob::Permute::string_glob_permute function.
   For example,
 

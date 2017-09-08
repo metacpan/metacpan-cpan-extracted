@@ -6,7 +6,7 @@ use 5.010;
 
 use Bio::Grid::Run::SGE;
 use Bio::Grid::Run::SGE::Master;
-use Bio::Grid::Run::SGE::Util qw/result_files my_sys_non_fatal INFO MSG expand_path/;
+use Bio::Grid::Run::SGE::Util qw/result_files expand_path/;
 use File::Spec::Functions qw(catfile);
 
 run_job(
@@ -16,7 +16,7 @@ run_job(
       my $success = 1;
       for my $in_file (@$in_files) {
         my @cmd = ( 'gzip', $in_file );
-        $success &&= my_sys_non_fatal(@cmd);
+        $success &&= job->sys(@cmd);
       }
 
       return $success;

@@ -10,15 +10,24 @@ use base qw{ PPIx::Regexp::Token };
 use Carp;
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
-sub __new {
-    my ( $class, $content, %arg ) = @_;
+{
+    my %when_removed = (
+	'\\N{}'	=> '5.027001',
+    );
 
-    defined $arg{perl_version_introduced}
-	or $arg{perl_version_introduced} = MINIMUM_PERL;
+    sub __new {
+	my ( $class, $content, %arg ) = @_;
 
-    return $class->SUPER::__new( $content, %arg );
+	defined $arg{perl_version_introduced}
+	    or $arg{perl_version_introduced} = MINIMUM_PERL;
+
+	exists $arg{perl_version_removed}
+	    or $arg{perl_version_removed} = $when_removed{$content};
+
+	return $class->SUPER::__new( $content, %arg );
+    }
 }
 
 # Return true if the token can be quantified, and false otherwise
@@ -26,11 +35,6 @@ sub can_be_quantified { return };
 
 sub explain {
     return 'Not significant';
-}
-
-sub perl_version_introduced {
-    my ( $self ) = @_;
-    return $self->{perl_version_introduced};
 }
 
 sub significant {

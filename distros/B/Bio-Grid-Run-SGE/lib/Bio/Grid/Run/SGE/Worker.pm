@@ -12,47 +12,43 @@ use File::Spec;
 use Bio::Grid::Run::SGE::Index;
 use Net::Domain qw(hostfqdn);
 use IO::Handle;
+use Try::Tiny;
 
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
-has [qw/config_file task/] => ( is => 'rw', required => 1 );
-has [qw/range _part_size/] => ( is => 'rw' );
-has job_id => ( is => 'rw', default => $ENV{JOB_ID} );
-has log_fh => ( is => 'rw' );
+has [qw/config env/] => ( is => 'rw', required => 1 );
+has [qw/task/]       => ( is => 'rw', required => 1 );
+has log => ( is => 'rw', required => 1 );
 
-has [qw/iterator config/] => ( is => 'rw', lazy_build => 1 );
-#id = task id
-has id => ( is => 'rw', default => 0 );
+has status_log_fh => ( is => 'rw' );
+
+has [qw/iterator/] => ( is => 'rw', lazy_build => 1 );
 
 sub BUILD {
   my ( $self, $args ) = @_;
 
-  confess "problems with accessing config file" unless ( $self->config_file && -f $self->config_file );
+  my $conf = $self->config;
+  my $env  = $self->env;
+
+  $env->{nslots} = $ENV{NSLOTS} // 1;
+
   confess "task is no code reference" unless ( $self->task && ref $self->task eq 'CODE' );
 
-  #task number, 1 based, set it here
-  $self->id( $ENV{SGE_TASK_ID} )
-    if ( exists( $ENV{SGE_TASK_ID} ) && $ENV{SGE_TASK_ID} ne 'undefined' && $self->id == 0 );
-
-  #$self->job_id( $ENV{JOB_ID} ) unless(defined $self->job_id);
-
   confess "given range is not in the correct format"
-    if ( $self->range && @{ $self->range } < 2 );
+    if ( $env->{range} && @{ $env->{range} } < 2 );
 
   $self->_determine_range;
 
-  my $log_file = catfile( $self->config->{log_dir},
-    sprintf( "%s.l%d.%d", $self->config->{job_name}, $self->job_id, $self->id ) );
-  $self->log($log_file);
-  open my $log_fh, '>', $log_file or confess "Can't open filehandle: $!";
-  $self->log_fh($log_fh);
+  my $log_file = catfile( $conf->{log_dir},
+    sprintf( "%s.l%d.%d", $env->{job_name_save}, $env->{job_id}, $env->{task_id} ) );
+  $self->log->info( "log: " . $log_file );
+  open my $status_log_fh, '>', $log_file or confess "Can't open filehandle: $!";
+  $self->status_log_fh($status_log_fh);
 
   $self->_log_current_settings;
 }
-
-sub _build_config { retrieve( $_[0]->config_file ) }
 
 sub _build_iterator {
   my ($self) = @_;
@@ -71,37 +67,38 @@ sub _build_iterator {
 }
 
 sub _determine_range {
-  my ($self) = @_;
-  my $c      = $self->config;
-  my $id     = $self->id;
+  my ($self)  = @_;
+  my $conf    = $self->config;
+  my $env     = $self->env;
+  my $task_id = $env->{task_id};
 
-  my ( $num_comb, $parts ) = ( $c->{num_comb}, $c->{parts} );
+  my ( $num_comb, $num_parts ) = ( $env->{num_comb}, $conf->{num_parts} );
 
-  $self->_part_size(1);
-  if ( $self->range ) {
+  $env->{part_size} = 1;
+  if ( $env->{range} ) {
     #we ran before (and failed) and now somebody restarts us with a given range
 
     return;
   }
 
   #make everyting 0 based
-  $id--;
+  $task_id--;
 
-  unless ($parts) {
-    $self->range( [ $id, $id ] );
+  unless ($num_parts) {
+    $env->{range} = [ $task_id, $task_id ];
     return;
   }
-  my $part_size = int( $num_comb / $parts );
+  my $part_size = int( $num_comb / $num_parts );
 
-  my $rest = $num_comb % $parts;
+  my $rest = $num_comb % $num_parts;
 
-  my $from = $part_size * $id;
+  my $from = $part_size * $task_id;
   my $to   = $from + $part_size - 1;
 
-  $self->range( [ $from, $to ] );
-  if ( $id < $rest ) {
+  $env->{range} = [ $from, $to ];
+  if ( $task_id < $rest ) {
     #do sth extra
-    push @{ $self->range }, ( $part_size * $parts ) + $id;
+    push @{ $env->{range} }, ( $part_size * $num_parts ) + $task_id;
   }
 
   return;
@@ -111,44 +108,54 @@ sub run {
   my ($self) = @_;
 
   my $iter = $self->iterator;
-  my $c    = $self->config;
+  my $conf = $self->config;
+  my $env  = $self->env;
 
-  chdir $c->{working_dir};
+  chdir $conf->{working_dir};
   #log something
   $self->log_status( "cwd: " . fastcwd() );
-  $self->log_status( "cmd: " . join( " ", @{ $c->{cmd} } ) );
+  # FIXME was ist cmd, script_bin???
+  #$self->log_status( "cmd: " . join( " ", @{ $c->{cmd} } ) );
   $self->log_status("run.begin");
 
   #time the whole stuff
   my $time_start = time;
   $self->log_status( "comp.begin: " . localtime($time_start) );
 
-  # create task iterator
-  my $next_task = $self->_create_task_iterator();
+  my $next_comb = $self->_create_comb_iterator();
 
   # adjust config for main task
-  $c->{part_size} = $self->_part_size;
-  $c->{job_id}    = $self->job_id . "." . $self->id;
-  $c->{nslots}    = $ENV{NSLOTS} // 1;
+  #$env->{job_id}    .= "." . $env->{task_id}
 
-  while ( my $task_params = $next_task->() ) {
-    my $infiles       = $task_params->{infiles};
-    my $result_prefix = $task_params->{result_prefix};
-    my $task_id       = $task_params->{task_id};
+  while ( my $comb = $next_comb->() ) {
+    my $infiles       = $comb->{infiles};
+    my $result_prefix = $comb->{result_prefix};
+    my $comb_idx      = $comb->{comb_idx};
+    $env->{comb_idx}      = $comb_idx;
+    $env->{is_first_comb} = $comb_idx == 0;
+
     # some input files are generated by us, some are original files
-    my $infile_is_temp = $task_params->{is_temp};
+    my $infile_is_temp = $comb->{is_temp};
 
     #stop time per task
     my $task_time = time;
 
     #RUN TASK
-    my $return_status = $self->task->( $c, $result_prefix, @{$infiles} );
+    my $return_status;
+    try {
+      $return_status = $self->task->( $result_prefix, @{$infiles} );
+    }
+    catch {
+      warn "caught error: $_";
+    };
+
     unless ($return_status) {
-      $self->log_status( "comp.task.exit.error:: $task_id " . join( "#\0#", @$infiles, $result_prefix ) );
+      $self->log_status("comp.task.exit.error:: $comb_idx");
+      # TODO document this
     } elsif ( $return_status < 0 ) {
-      $self->log_status("comp.task.exit.skip:: $task_id");
+      $self->log_status("comp.task.exit.skip:: $comb_idx");
     } else {
-      $self->log_status("comp.task.exit.success:: $task_id");
+      $self->log_status("comp.task.exit.success:: $comb_idx");
     }
 
     for ( my $i = 0; $i < @$infiles; $i++ ) {
@@ -157,14 +164,13 @@ sub run {
 
       my $infile = $infiles->[$i];
       next if ( $ENV{DEBUG} );
-      $self->log_status("comp.task.file.delete:: $task_id $infile");
+      $self->log_status("comp.task.file.delete:: $comb_idx $infile");
       unlink $infile;
     }
 
     $task_time = time - $task_time;
     $self->log_status(
-      "comp.task.time:: $task_id " . sprintf( "%dd %dh %dm %ds", ( gmtime($task_time) )[ 7, 2, 1, 0 ] ) );
-
+      "comp.task.time:: $comb_idx " . sprintf( "%dd %dh %dm %ds", ( gmtime($task_time) )[ 7, 2, 1, 0 ] ) );
   }
 
   my $time_end = time;
@@ -183,19 +189,21 @@ sub run {
 
 #0-based ranges
 
-sub _create_task_iterator {
+sub _create_comb_iterator {
   my ($self) = @_;
-  my $c      = $self->config;
-  my $iter   = $self->iterator;
+  my $conf   = $self->config;
+  my $env    = $self->env;
 
-  $iter->start( $self->range );
+  my $iter = $self->iterator;
+
+  $iter->range( $env->{range} );
   my $num_infiles = @{ $iter->indices };
 
   return sub {
-    my $task_id = $iter->peek_comb_idx;
+    my $comb_idx = $iter->peek_comb_idx;
 
     return
-      unless ( defined($task_id) );
+      unless ( defined($comb_idx) );
 
     my $comb = $iter->next_comb;
 
@@ -207,8 +215,8 @@ sub _create_task_iterator {
     die "different number of combinations than indices...????!!!" if ( $num_infiles != @$comb );
     for ( my $i = 0; $i < @$comb; $i++ ) {
       my $idx_type        = $iter->indices->[$i]->type;
-      my $infile_template = catfile( $c->{tmp_dir},
-        sprintf( "worker.j%d.%d.t%d.i%d.tmp", $self->job_id, $self->id, $task_id, $i ) );
+      my $infile_template = catfile( $conf->{tmp_dir},
+        sprintf( "worker.j%d.%d.c%d.i%d.tmp", $env->{job_id}, $env->{task_id}, $comb_idx, $i ) );
 
       if ( $idx_type && $idx_type eq 'direct' ) {
         push @infiles,      $comb->[$i];
@@ -222,14 +230,14 @@ sub _create_task_iterator {
       }
     }
 
-    my $result_prefix = catfile( $c->{result_dir},
-      sprintf( "%s.j%d.%d.t%d", $c->{job_name}, $self->job_id, $self->id, $task_id ) );
+    my $result_prefix = catfile( $conf->{result_dir},
+      sprintf( "%s.j%d.%d.c%d", $env->{job_name_save}, $env->{job_id}, $env->{task_id}, $comb_idx ) );
 
     return {
       infiles       => \@infiles,
       is_temp       => \@is_temp_file,
       result_prefix => $result_prefix,
-      task_id       => $task_id
+      comb_idx      => $comb_idx
     };
   };
 }
@@ -237,11 +245,13 @@ sub _create_task_iterator {
 sub _log_current_settings {
   my ($self) = @_;
 
+  my $conf = $self->config;
+  my $env  = $self->env;
+
   $self->log_status( "init: " . localtime(time) );
-  $self->log_status( "config: " . $self->config_file );
-  $self->log_status( "id: " . $self->id );
-  $self->log_status( "job_id: " . $self->job_id );
-  $self->log_status( "job_cmd: " . $self->config->{job_cmd} );
+  $self->log_status( "task_id: " . $env->{task_id} );
+  $self->log_status( "job_id: " . $env->{job_id} );
+  $self->log_status( "job_cmd: " . $env->{job_cmd} );
   $self->log_status( "hostname: " . hostfqdn() );
 
   $self->log_status("err: $ENV{SGE_STDERR_PATH}");
@@ -249,16 +259,15 @@ sub _log_current_settings {
 
   #@range = ( from, to, extra_element)
   #extra element caused by modulo leftover
-  $self->log_status("sge_task_id:  $ENV{SGE_TASK_ID}");
-  $self->log_status( "range: (" . join( ",", @{ $self->range } ) . ")" );
+  $self->log_status( "range: (" . join( ",", @{ $env->{range} } ) . ")" );
 }
 
 sub log_status {
   my ($self) = shift;
-  my $log_fh = $self->log_fh;
+  my $status_log_fh = $self->status_log_fh;
 
-  print $log_fh join( " ", @_ ), "\n";
-  $log_fh->flush;
+  say $status_log_fh join( " ", @_ );
+  $status_log_fh->flush;
 
   return;
 }

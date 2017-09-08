@@ -2,22 +2,25 @@
 
 package Bio::Grid::Run::SGE::Util::Blast;
 
+# FIXME as class/pkg/mouse 
 use warnings;
 use strict;
 use Carp;
 use Data::Dumper;
 use IO::Prompt::Tiny qw/prompt/;
-use Bio::Grid::Run::SGE::Util qw/my_sys INFO my_glob expand_path my_mkdir/;
+use Bio::Grid::Run::SGE::Util qw/my_glob expand_path my_mkdir/;
 use Cwd qw/fastcwd/;
 use Params::Validate qw(:all);
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 @EXPORT      = qw();
 %EXPORT_TAGS = ();
 @EXPORT_OK   = qw(formatdb makeblastdb);
+
+our $LOG =  Bio::Gonzales::Util::Log->new();
 
 sub makeblastdb {
     my ($c) = @_;
@@ -32,7 +35,7 @@ sub makeblastdb {
         }
     );
 
-    INFO( Dumper \%c );
+    $LOG->info( Dumper \%c );
     # formatdb
     my @reference_files = expand_path( @{ $c{db_seq_files} } );
 
@@ -43,7 +46,7 @@ sub makeblastdb {
         '-title', $c{db_name},
     );
 
-    INFO( 'makeblastdb: ', @makeblastdb_cmd );
+    $LOG->info( 'makeblastdb: ', @makeblastdb_cmd );
     if ( $c{no_prompt} || prompt( "run makeblastdb? [yn]", 'y' )  eq 'y') {
 
         my $olddir    = fastcwd;
@@ -53,9 +56,9 @@ sub makeblastdb {
         die unless ( -d $blast_dir );
 
         chdir $blast_dir;
-        INFO "creating blast db in " . fastcwd;
+        $LOG->info("creating blast db in " . fastcwd);
 
-        my_sys @makeblastdb_cmd;
+        system(@makeblastdb_cmd) == 0 or die "system failed: $?";
 
         chdir $olddir;
         return 1;
@@ -77,7 +80,7 @@ sub formatdb {
         }
     );
 
-    INFO( Dumper \%c );
+    $LOG->info( Dumper \%c );
     # formatdb
     my @reference_files = expand_path( @{ $c{db_seq_files} } );
 
@@ -87,7 +90,7 @@ sub formatdb {
         '-o', 'F', '-a', 'F', '-n', $c{db_name},
     );
 
-    INFO( 'formatdb: ', @formatdb_cmd );
+    $LOG->info( 'formatdb: ', @formatdb_cmd );
     if ( $c{no_prompt} || prompt( "run formatdb? [yn]", 'y' )  eq 'y') {
 
         my $olddir    = fastcwd;
@@ -97,9 +100,9 @@ sub formatdb {
         die unless ( -d $blast_dir );
 
         chdir $blast_dir;
-        INFO "creating blast db in " . fastcwd;
+        $LOG->info("creating blast db in " . fastcwd);
 
-        my_sys @formatdb_cmd;
+        system(@formatdb_cmd) == 0 or die "system failed: $?";
 
         chdir $olddir;
         return 1;

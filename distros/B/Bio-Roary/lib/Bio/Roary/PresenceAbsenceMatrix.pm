@@ -1,5 +1,5 @@
 package Bio::Roary::PresenceAbsenceMatrix;
-$Bio::Roary::PresenceAbsenceMatrix::VERSION = '3.9.1';
+$Bio::Roary::PresenceAbsenceMatrix::VERSION = '3.10.2';
 # ABSTRACT: Create a matrix with presence and absence
 
 
@@ -78,7 +78,7 @@ Bio::Roary::PresenceAbsenceMatrix - Create a matrix with presence and absence
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

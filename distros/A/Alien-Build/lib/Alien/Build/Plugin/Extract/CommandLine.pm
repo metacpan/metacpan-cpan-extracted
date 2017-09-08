@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+format' => 'tar';
@@ -147,6 +147,15 @@ sub handles
   return 1 if $ext eq 'zip' && $self->unzip_cmd;
   
   return;
+}
+
+
+sub available
+{
+  my(undef, $ext) = @_;
+
+  # this is actually the same as handles
+  __PACKAGE__->handles($ext);  
 }
 
 sub init
@@ -291,7 +300,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -344,6 +353,13 @@ The C<unzip> command, if available.  C<undef> if not available.
 Returns true if the plugin is able to handle the archive of the
 given format.
 
+=head2 available
+
+ Alien::Build::Plugin::Extract::CommandLine->available($ext);
+
+Returns true if the plugin is available to extract without
+installing anything new.
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::Extract::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -370,7 +386,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -387,6 +403,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

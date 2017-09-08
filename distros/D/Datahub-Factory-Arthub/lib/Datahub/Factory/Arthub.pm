@@ -1,7 +1,9 @@
 package Datahub::Factory::Arthub;
 
-use strict;
-our $VERSION = '0.9';
+use Datahub::Factory::Sane;
+use namespace::clean;
+
+our $VERSION = '0.92';
 
 1;
 __END__
@@ -20,28 +22,34 @@ It contains the following packages:
 
 =over
 
+=item L<Datahub::Factory::Importer::EIZ>
+
+An importer for the Erfgoed Inzicht organisation based on Adlib / OAI.
+
 =item L<Datahub::Factory::Importer::KMSKA>
 
-=item L<Datahub::Factory::Importer::MSK>
-
-=item L<Datahub::Factory::Module::PID>
+An importer for the Royal Musuem of Fine Arts Antwerp based on TMS.
 
 =item L<Datahub::Factory::Importer::VKC>
 
+An importer for the Flemish Art Collection based on Collective Access.
+
+=item L<Datahub::Factory::Exporter::>
+
+An exporter for the Arthub Flanders platform absed on LIDO and OAI.
+
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Pieter De Praetere E<lt>pieter at packed.be E<gt>
+Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+Pieter De Praetere <pieter@packed.be>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2017- PACKED vzw
+This software is copyright (c) 2016 by PACKED, vzw, Vlaamse Kunstcollectie, vzw.
 
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, June 2007.
 
 =head1 SEE ALSO
 

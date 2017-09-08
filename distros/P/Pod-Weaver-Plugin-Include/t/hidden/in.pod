@@ -1,0 +1,27 @@
+
+=head1 TEST
+
+=tmpl -t1
+
+This must be cut off
+
+=tmpl t2
+
+This must go into the out.
+
+=tmpl -t3
+
+Skip it again
+
+=cut
+
+=tmpl -t4
+
+Repeat skipping
+
+=tmpl t5
+
+And display.
+
+=cut
+

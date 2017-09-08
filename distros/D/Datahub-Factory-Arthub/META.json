@@ -1,12 +1,12 @@
 {
    "abstract" : "modules for the L<VKC Arthub|>",
    "author" : [
-      "Pieter De Praetere <pieter at packed.be >"
+      "Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -24,14 +24,19 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -39,12 +44,13 @@
          "requires" : {
             "Authen::NTLM" : "0",
             "Catmandu::AAT" : "0",
+            "Catmandu::Adlib" : "0",
             "Catmandu::Importer::DBI" : "0",
             "Catmandu::Store::DBI" : "0",
             "Catmandu::VIAF" : "0",
             "DBD::SQLite" : "0",
             "DBD::mysql" : "0",
-            "Datahub::Factory" : "0",
+            "Datahub::Factory" : "1.70",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Try::Tiny" : "0",
@@ -71,12 +77,12 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub"
       }
    },
-   "version" : "0.9",
+   "version" : "0.92",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -3,20 +3,21 @@
    "author" : [
       "Lukas Mai <l.mai@web.de>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Keyword-Simple",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -25,14 +26,22 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "3.005",
+            "Pod::Text" : "4.09",
+            "Test::Pod" : "1.22"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "B::Hooks::EndOfScope" : "0",
             "Carp" : "0",
             "XSLoader" : "0",
             "perl" : "5.012000",
@@ -41,7 +50,6 @@
       },
       "test" : {
          "requires" : {
-            "Dir::Self" : "0",
             "Test::More" : "0",
             "strict" : "0"
          }
@@ -55,5 +63,6 @@
          "web" : "https://github.com/mauke/Keyword-Simple"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

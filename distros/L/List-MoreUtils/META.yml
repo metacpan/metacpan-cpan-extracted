@@ -7,6 +7,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Storable: '0'
+  Test::LeakTrace: '0'
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,13 +22,12 @@ no_index:
   directory:
     - t
     - inc
-recommends:
-  List::MoreUtils::XS: '0.423'
 requires:
   Exporter::Tiny: '0.038'
+  List::MoreUtils::XS: '0.423'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=List-MoreUtils
   homepage: https://metacpan.org/release/List-MoreUtils
   repository: https://github.com/perl5-utils/List-MoreUtils.git
-version: '0.423'
+version: '0.425'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

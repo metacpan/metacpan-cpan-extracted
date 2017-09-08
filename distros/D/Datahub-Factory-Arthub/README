@@ -9,26 +9,36 @@ DESCRIPTION
 
     It contains the following packages:
 
+    Datahub::Factory::Importer::EIZ
+
+      An importer for the Erfgoed Inzicht organisation based on Adlib /
+      OAI.
+
     Datahub::Factory::Importer::KMSKA
 
-    Datahub::Factory::Importer::MSK
-
-    Datahub::Factory::Module::PID
+      An importer for the Royal Musuem of Fine Arts Antwerp based on TMS.
 
     Datahub::Factory::Importer::VKC
 
-AUTHOR
+      An importer for the Flemish Art Collection based on Collective
+      Access.
 
-    Pieter De Praetere <pieter at packed.be >
+    Datahub::Factory::Exporter::
 
-COPYRIGHT
+      An exporter for the Arthub Flanders platform absed on LIDO and OAI.
 
-    Copyright 2017- PACKED vzw
+AUTHORS
 
-LICENSE
+    Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+    Pieter De Praetere <pieter@packed.be>
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by PACKED, vzw, Vlaamse
+    Kunstcollectie, vzw.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the GNU General Public License, Version 3, June 2007.
 
 SEE ALSO
 

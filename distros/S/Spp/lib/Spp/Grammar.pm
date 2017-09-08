@@ -1,8 +1,8 @@
 package Spp::Grammar;
 
 use Exporter;
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(get_spp_grammar);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(get_spp_grammar);
 
 sub get_spp_grammar {
    return << 'EOF'
@@ -14,7 +14,7 @@ _comm     = '//' ~ $$ ;
 Spec      = Token \s* '=' |_ Lbranch Branch rule|+ |';' $| ;
 rule      = |
                Group
-               Token Str String Keyword Point
+               Token Str String Kstr Point
                Cclass Char Chclass
                Sym Expr Assert Any
                Look Not Till
@@ -25,7 +25,7 @@ Branch    = '|'  |_ Lbranch rule|+ '|' ;
 Group     = '{'  |_ Lbranch Branch rule|+ '}' ;
 
 Token     = [\a\-]+ ;
-Keyword   = ':' \S+ ;
+Kstr      = ':' \S+ ;
 Point     = '0x' \x+ ;
 
 Str       = \' |Chars Char|+ \' ;
@@ -54,7 +54,7 @@ Till      = '~' ;
 Sym       = [$@%] [\a\-?!>]+ ;
 Expr      = '(' |_ atom|+ ')' ;
 Array     = '[' |_ atom|* ']' ;
-atom      = | Int Expr Array Str String Sym Keyword | ;
+atom      = | Int Expr Array Str String Sym Kstr | ;
 Int       = \d+ ;
 
 EOF

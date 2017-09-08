@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,16 +20,16 @@ no_index:
 provides:
   Crypt::Image:
     file: lib/Crypt/Image.pm
-    version: '0.11'
+    version: '0.12'
   Crypt::Image::Axis:
     file: lib/Crypt/Image/Axis.pm
-    version: '0.11'
+    version: '0.12'
   Crypt::Image::Params:
     file: lib/Crypt/Image/Params.pm
-    version: '0.11'
+    version: '0.12'
   Crypt::Image::Util:
     file: lib/Crypt/Image/Util.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   GD::Image: '2.38'
   Math::Random: '0.71'
@@ -41,5 +41,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Crypt-Image.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

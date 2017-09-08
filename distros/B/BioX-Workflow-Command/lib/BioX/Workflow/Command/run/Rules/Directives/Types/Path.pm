@@ -1,6 +1,8 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Path;
 
 use Moose::Role;
+use namespace::autoclean;
+
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 use Path::Tiny;
 use Cwd;

@@ -1,6 +1,8 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Stash;
 
 use Moose::Role;
+use namespace::autoclean;
+
 use Data::Merger qw(merger);
 
 =head2 stash

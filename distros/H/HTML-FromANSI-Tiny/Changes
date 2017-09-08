@@ -1,5 +1,9 @@
 Revision history for HTML-FromANSI-Tiny
 
+0.105     2017-09-06T14:44:55Z
+
+  - Update meta files.  No code changes.
+
 0.104     2016-04-25T05:37:30Z
 
   - Add colors for 256 palette.

@@ -1,5 +1,18 @@
 Revision history for MariaDB-NonBlocking
 
+0.06    2017-09-06
+        * Work with AnyEvent, and utilize less watchers if
+          we can -- mostly if we are using EV.
+
+0.05    2017-08-31
+        * want_hashrefs was returning read-only undefs
+
+0.04    2017-07-31
+        * Copy the query string more aggressively, driver will not copy it.
+
+0.03    2017-07-31
+        * Leftover debugging statement
+
 0.02    2017-07-31
         * ->run_query_start() can now take query params
         * ->run_query_start() may optionally return an arrayref of hashrefs

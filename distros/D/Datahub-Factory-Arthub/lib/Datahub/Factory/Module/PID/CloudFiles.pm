@@ -1,12 +1,13 @@
 package Datahub::Factory::Module::PID::CloudFiles;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '0.92';
 
 use Moo;
 use Catmandu;
-
 use WebService::Rackspace::CloudFiles;
+use namespace::clean;
 
 with 'Datahub::Factory::Module::PID::File';
 

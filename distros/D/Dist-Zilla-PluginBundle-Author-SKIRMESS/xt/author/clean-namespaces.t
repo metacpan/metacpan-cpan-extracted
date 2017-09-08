@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces 0.007
+# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces 0.008
 
 use Test::CleanNamespaces;
 

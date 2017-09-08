@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -19,7 +19,13 @@ use namespace::autoclean;
 sub before_build {
     my ($self) = @_;
 
-    my $perltidyrc = <<'PERL_TIDY_RC';
+    my $myself    = ref $self;
+    my $myversion = $self->VERSION;
+
+    my $perltidyrc = <<"PERL_TIDY_RC";
+# Automatically generated file
+# $myself $myversion
+
 --maximum-line-length=0
 --break-at-old-comma-breakpoints
 --backup-and-modify-in-place
@@ -30,6 +36,8 @@ PERL_TIDY_RC
 
     return;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

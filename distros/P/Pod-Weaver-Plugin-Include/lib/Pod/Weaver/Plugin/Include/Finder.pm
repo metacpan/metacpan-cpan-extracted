@@ -1,7 +1,9 @@
 #
 package Pod::Weaver::Plugin::Include::Finder;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.5';
+
+our $VERSION = 'v0.1.901';
 
 # ABSTRACT: Finds source Pods in .pod files or modules.
 
@@ -14,11 +16,13 @@ use Pod::Elemental::Transformer::Pod5;
 use Moose;
 use namespace::autoclean;
 
+
 has cache => (
     is      => 'rw',
     isa     => 'HashRef[HashRef]',
     builder => 'init_cache',
 );
+
 
 has maps => (
     is      => 'rw',
@@ -27,10 +31,12 @@ has maps => (
     builder => 'init_maps',
 );
 
+
 has callerPlugin => (
     is  => 'ro',
     isa => 'Pod::Weaver::Plugin::Include',
 );
+
 
 has pod_path => (
     is      => 'rw',
@@ -38,6 +44,14 @@ has pod_path => (
     isa     => 'ArrayRef[Str]',
     builder => 'init_pod_path',
 );
+
+has logger => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'init_logger',
+    handles => [qw<log log_debug log_fatal>],
+);
+
 
 has _tmplSource => (
     is      => 'rw',
@@ -59,6 +73,7 @@ has _tmplContent => (
     default => sub { [] },
 );
 
+
 sub find_source {
     my $this = shift;
     my ($source) = @_;
@@ -71,6 +86,7 @@ sub find_source {
 
     return $podFile;
 }
+
 
 sub register_alias {
     my $this = shift;
@@ -85,10 +101,13 @@ sub register_alias {
     return $podFile;
 }
 
+
 sub _store_template {
     my $this = shift;
 
     return unless defined $this->_tmplName;
+    
+    $this->log_debug("Caching template", $this->_tmplName);
 
     $this->cache->{ $this->_tmplSource }{ $this->_tmplName } =
       $this->_tmplContent;
@@ -96,6 +115,16 @@ sub _store_template {
     $this->_clear_tmplName;
     $this->_clear_tmplContent;
 }
+
+sub _add2tmpl {
+    my $this = shift;
+    my $para = shift;
+    
+    if ($this->_tmplName) {
+        push @{$this->_tmplContent}, $para;
+    }
+}
+
 
 sub parse_tmpl {
     my $this = shift;
@@ -112,6 +141,7 @@ sub parse_tmpl {
                     ([\p{XPosixAlnum}_])*
                 )
                 \s*$
+## Please see file perltidy.ERR
             /xn;
 
         if ( $+{name} ) {
@@ -127,9 +157,14 @@ sub parse_tmpl {
     return $attrs;
 }
 
+
 sub load_file {
     my $this = shift;
     my ( $file, %opts ) = @_;
+
+    $this->log_debug( "Loading file " . $file );
+
+    my $showContent = 0;
 
     my $doc = Pod::Elemental->read_file($file);
     if ($doc) {
@@ -142,27 +177,25 @@ sub load_file {
             my $para = $children->[$i];
             if ( $para->isa('Pod::Elemental::Element::Pod5::Command') ) {
                 if ( $para->command eq 'tmpl' ) {
+                    $this->log_debug("Closing template by =tmpl");
                     $this->_store_template;
 
                     my $attrs = $this->parse_tmpl( $para->content );
+                    $showContent = $attrs->{name} eq 'test' if $attrs->{name};
                     $this->_tmplName( $attrs->{name} ) if $attrs->{name};
                 }
                 else {
-                    push @{ $this->_tmplContent }, $para;
+                    $this->_add2tmpl($para);
                 }
                 next ELEM;
             }
-            elsif ( $para->isa('Pod::Elemental::Element::Pod5::Nonpod') ) {
-
-                # If current pod segment ended – store template.
-                $this->_store_template;
-            }
             elsif ( defined $this->_tmplName ) {
-                push @{ $this->_tmplContent }, $para;
+                $this->_add2tmpl($para);
             }
         }
 
         # If any template was declared at the document end.
+        $this->log_debug("Closing any remaining template");
         $this->_store_template;
         $this->_clear_tmplSource;
     }
@@ -172,6 +205,7 @@ sub load_file {
 
     return defined $doc;
 }
+
 
 sub get_template {
     my $this = shift;
@@ -187,7 +221,13 @@ sub get_template {
         $fullName = $this->find_source( $opts{source} );
     }
 
+    $this->log( "Cannot find source file for [" . $opts{source} . "]" )
+      unless defined $fullName;
+
     return undef unless defined $fullName;
+
+    $this->log_debug(
+        "Found file $fullName for source [" . $opts{source} . "]" );
 
     unless ( $template = $this->cache->{$fullName}{ $opts{template} } ) {
         if ( my $doc = $this->load_file( $fullName, %opts ) ) {
@@ -214,6 +254,31 @@ sub init_pod_path {
       : [qw<./lib>];
 }
 
+sub init_logger {
+    my $this = shift;
+
+    my $logger;
+
+    if ( defined $this->callerPlugin ) {
+        $logger = $this->callerPlugin->logger;
+    }
+    else {
+        require Log::Dispatchouli;
+        $logger = Log::Dispatchouli->new(
+            {
+                ident     => '-Include::Finder',
+                to_stdout => 1,
+                log_pid   => 0,
+                debug     => 1,
+            }
+        );
+    }
+    return $logger;
+}
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
+
 1;
 
 __END__
@@ -228,7 +293,7 @@ Pod::Weaver::Plugin::Include::Finder - Finds source Pods in .pod files or module
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.5
 
 =head1 SYNOPSIS
 

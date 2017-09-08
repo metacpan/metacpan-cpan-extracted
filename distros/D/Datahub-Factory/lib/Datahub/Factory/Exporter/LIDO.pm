@@ -1,10 +1,12 @@
 package Datahub::Factory::Exporter::LIDO;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Moo;
 use Catmandu;
+use namespace::clean;
 
 has file_name => (is => 'ro');
 

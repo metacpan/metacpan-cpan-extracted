@@ -30,6 +30,7 @@ lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Version.pm
 lib/Dist/Zilla/Plugin/Author/SKIRMESS/TravisCI.pm
 lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
 lib/Dist/Zilla/Role/Author/SKIRMESS/Test/XT.pm
+perlcriticrc.local
 t/00-load.t
 xt/author/clean-namespaces.t
 xt/author/critic.t

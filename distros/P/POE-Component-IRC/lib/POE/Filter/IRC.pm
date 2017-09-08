@@ -1,8 +1,6 @@
 package POE::Filter::IRC;
-BEGIN {
-  $POE::Filter::IRC::AUTHORITY = 'cpan:HINRIK';
-}
-$POE::Filter::IRC::VERSION = '6.88';
+our $AUTHORITY = 'cpan:HINRIK';
+$POE::Filter::IRC::VERSION = '6.90';
 use strict;
 use warnings FATAL => 'all';
 use POE::Filter::Stackable;

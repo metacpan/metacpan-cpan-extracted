@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Hash;
 
 use Moose::Role;
+use namespace::autoclean;
 
 sub create_HASH_attr {
     my $self = shift;

@@ -1,12 +1,13 @@
 package Datahub::Factory::Exporter;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Catmandu;
 use Moose::Role;
-
 use Catmandu::Util qw(:io);
+use namespace::clean;
 
 has out => (
     is  => 'lazy'

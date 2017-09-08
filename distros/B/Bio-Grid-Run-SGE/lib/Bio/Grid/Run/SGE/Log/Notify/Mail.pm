@@ -7,34 +7,51 @@ use strict;
 use Carp;
 
 use 5.010;
-use Bio::Grid::Run::SGE::Util qw/my_glob MSG/;
+use Bio::Grid::Run::SGE::Util qw/my_glob/;
 
-our $VERSION = '0.042'; # VERSION
-use Mail::Sendmail;
+our $VERSION = '0.060'; # VERSION
+use Email::Sender::Simple qw(sendmail);
+use Email::Simple;
+use Email::Simple::Creator;
+use Email::Sender::Transport::SMTP;
+use Try::Tiny;
 
-has smtp_server => ( is => 'rw' );
-has 'dest'      => ( is => 'rw' );
+has server => ( is => 'rw', required   => 1 );
+has 'to'   => ( is => 'rw', required   => 1 );
+has 'from' => ( is => 'rw', required   => 1 );
+has log    => ( is => 'rw', 'required' => 1 );
 
 sub notify {
   my $self = shift;
   my $info = shift;
 
-  my ( $mail, $smtp_server ) = ( $self->dest, $self->smtp_server );
+  #subject => ...
+  #body => ...
 
-  unshift @{ $Mail::Sendmail::mailcfg{'smtp'} }, $smtp_server if ($smtp_server);
-  my %mail = (
-    to => $mail,
-    %$info
+  my $email = Email::Simple->create(
+    header => [
+      To      => $self->to,
+      From    => $self->from,
+      Subject => $info->{subject},
+    ],
+    body => $info->{body},
+  );
+  my $transport = Email::Sender::Transport::SMTP->new(
+    {
+      host => $self->server->{host},
+      port => $self->server->{port} // 25,
+    }
   );
 
   my $something_failed;
-  MSG("Sending mail to $mail.");
-  unless ( sendmail(%mail) ) {
-    $something_failed = 1;
-    MSG($Mail::Sendmail::error);
+  $self->log->info( "Sending mail to " . $self->to . "." );
+  try {
+    sendmail( $email, { transport => $transport } );
   }
-
-  MSG( "Mail log says:\n", $Mail::Sendmail::log );
+  catch {
+    $something_failed = 1;
+    $self->log->error("sendmail error: $_");
+  };
 
   return $something_failed;
 }

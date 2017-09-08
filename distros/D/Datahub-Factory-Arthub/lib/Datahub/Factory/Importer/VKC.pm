@@ -1,12 +1,12 @@
 package Datahub::Factory::Importer::VKC;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
 
-our $VERSION = '0.9';
+our $VERSION = '0.92';
 
 use Moo;
 use Catmandu;
+use namespace::clean;
 
 with 'Datahub::Factory::Importer';
 

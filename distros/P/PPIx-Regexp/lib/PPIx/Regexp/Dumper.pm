@@ -44,7 +44,7 @@ use PPIx::Regexp;
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 =head2 new
 
@@ -330,11 +330,7 @@ sub __nav {
 sub _perl_version {
     my ( undef, $elem ) = @_;		# Invocant unused
 
-    my $rslt = $elem->perl_version_introduced() . ' <= $]';
-    if ( my $max = $elem->perl_version_removed() ) {
-	$rslt .= ' < ' . $max;
-    }
-    return $rslt;
+    return $elem->requirements_for_perl();
 }
 
 sub _content {

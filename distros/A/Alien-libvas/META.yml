@@ -25,7 +25,7 @@ name: Alien-libvas
 provides:
   Alien::libvas:
     file: lib/Alien/libvas.pm
-    version: '0.204'
+    version: '0.210'
 recommends:
   IO::Socket::SSL: '0'
 requires:
@@ -34,5 +34,5 @@ requires:
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.204'
+version: '0.210'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

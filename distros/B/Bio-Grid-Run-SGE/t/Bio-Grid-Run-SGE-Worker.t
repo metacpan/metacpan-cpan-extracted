@@ -2,9 +2,10 @@ use warnings;
 use strict;
 use Data::Dumper;
 use Test::More skip_all => 1;
+#use Test::More;
 use Storable;
 use File::Temp qw/tempdir/;
-use Bio::Grid::Run::SGE::Util qw/my_glob my_sys expand_path my_mkdir/;
+use Bio::Grid::Run::SGE::Util qw/my_glob expand_path my_mkdir/;
 use File::Compare qw/compare/;
 use Bio::Grid::Run::SGE::Master;
 use Bio::Gonzales::Seq::IO qw/faslurp faspew/;
@@ -42,6 +43,7 @@ $ENV{JOB_ID} = $job_id;
 undef $Bio::Grid::Run::SGE::Master::RC_FILE;
 
 my $m1 = Bio::Grid::Run::SGE::Master->new(
+  config => {
     working_dir      => $td,
     submit_bin       => 't/Bio-Grid-Run-SGE-Master.qsub.pl',
     cmd              => ['t/Bio-Grid-Run-SGE-Master.script.pl'],
@@ -50,6 +52,8 @@ my $m1 = Bio::Grid::Run::SGE::Master->new(
     use_stdin        => 1,
     result_on_stdout => 1,
     mode           => 'Consecutive',
+  }, env => {},
+
 );
 
 my $cmd1 = $m1->cache_config( "$td/master_config" . $job_id );
@@ -73,7 +77,7 @@ my $m2 = Bio::Grid::Run::SGE::Master->new(
     use_stdin            => 1,
     result_on_stdout     => 1,
     mode               => 'Consecutive',
-    combinations_per_job => 2,
+    combinations_per_task => 2,
 );
 
 my $cmd2 = $m2->cache_config( "$td/master_config" . $job_id );
@@ -97,7 +101,7 @@ my $m3 = Bio::Grid::Run::SGE::Master->new(
     use_stdin            => 1,
     result_on_stdout     => 1,
     mode               => 'Consecutive',
-    combinations_per_job => 3,
+    combinations_per_task => 3,
 );
 
 my $cmd3 = $m3->cache_config("$td/master_config$job_id");

@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Git-Helpers",
   "EXE_FILES" => [
     "bin/cpan-repo",
+    "bin/delete-git-branches",
     "bin/gh-open",
     "bin/travis-open"
   ],
@@ -30,7 +31,11 @@ my %WriteMakefileArgs = (
     "Git::Sub" => 0,
     "MetaCPAN::Client" => 0,
     "Moo" => 0,
+    "MooX::Options" => 0,
+    "String::Trim" => 0,
     "Sub::Exporter" => 0,
+    "Term::ReadLine" => 0,
+    "Term::UI" => 0,
     "Try::Tiny" => 0,
     "Types::Standard" => 0,
     "URI" => 0,
@@ -52,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => "1.005",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "0.000011",
+  "VERSION" => "0.000013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,7 +78,11 @@ my %FallbackPrereqs = (
   "Git::Version" => 0,
   "MetaCPAN::Client" => 0,
   "Moo" => 0,
+  "MooX::Options" => 0,
+  "String::Trim" => 0,
   "Sub::Exporter" => 0,
+  "Term::ReadLine" => 0,
+  "Term::UI" => 0,
   "Test::Fatal" => 0,
   "Test::Git" => "1.313",
   "Test::More" => 0,

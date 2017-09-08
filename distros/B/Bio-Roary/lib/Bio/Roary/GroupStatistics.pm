@@ -1,5 +1,5 @@
 package Bio::Roary::GroupStatistics;
-$Bio::Roary::GroupStatistics::VERSION = '3.9.1';
+$Bio::Roary::GroupStatistics::VERSION = '3.10.2';
 # ABSTRACT: Add labels to the groups
 
 
@@ -240,7 +240,7 @@ Bio::Roary::GroupStatistics - Add labels to the groups
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

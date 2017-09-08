@@ -1,0 +1,110 @@
+#!/usr/bin/perl -s
+
+# PODNAME: tmx-explode
+# ABSTRACT: Explodes tmx files in a file per language
+
+use strict ;
+use Lingua::NATools::Client;
+use Data::Dumper;
+$Data::Dumper::Indent=1;
+$Data::Dumper::Terse=1;
+
+my $Gn1={};
+my $Gn2={};
+my $Geq=0;
+my $Geq2=0;
+my $t;
+my $perfeitas =0;
+my $nonumber  =0;
+my $pessimas  =0;
+my $delnumbers=0;
+my $desiguaist=0;  # size(bigger) > 2(size(shorter))
+my $iguais=0;
+our $debug = 1;
+my $tmx = shift or die;
+
+use XML::TMX::Reader;
+
+my $t = XML::TMX::Reader->new( $tmx );
+
+my $tun = 0;
+print "\n================($tmx)========\n";
+
+$t->for_tu( \&mycmp );
+
+print "\n comon numbers    = ",MScardinter($Gn1,$Gn2)*2, 
+      "\n eq-same-TU numbers = ", $Geq*2 ,
+      "\n total numbers    = ", $t= MScard($Gn1)+MScard($Gn2),
+      "\n TU               = $tun",
+      "\n good TU (Num>0)  = $perfeitas",
+      "\n good TU (Num=0)  = $nonumber",
+      "\n very bad  TU     = $pessimas ($delnumbers)",
+      "\n equal TU         = $iguais",
+      "\n size too diff TU = $desiguaist",
+      (($Geq*2.4 < $t )? "\n PROBLEMS - numbers too diff." : ""),
+      (($pessimas / $tun > 0.2 )? "\n PROBLEMS - too many bad TU" : ""),
+      "\n After del. bad TU:". $Geq2*2, "/" , $t-$delnumbers,"=", 
+                            ($Geq2*2)/( $t-$delnumbers),
+      "\n\n";
+
+sub mycmp{
+ $tun++;
+ my $tu = shift;
+ if(length($tu->{en}) > 30 && (length($tu->{en}) > 2 * length($tu->{pt}) ||
+                               length($tu->{pt}) > 2 * length($tu->{en}))){
+   print "remove $tun  = size is too different\n" if $debug ;
+   $desiguaist ++ ;
+ }
+ elsif(length($tu->{en}) > 30 && $tu->{en} eq $tu->{pt}){
+   print "remove $tun  = the TUs are equal.\n" if $debug ;
+   $iguais ++ ;
+ }
+ my $n1 = getn($tu->{en}); 
+ my $n2 = getn($tu->{pt}); 
+ my $n3 = MScardinter($n1,$n2);
+ $Geq  += $n3;
+ $Geq2  += $n3;
+ my $n4 = MScard($n1)+MScard($n2) ; 
+ $perfeitas ++ if $n4 == $n3*2 && $n4 > 0;
+ $nonumber  ++ if $n4 == $n3*2 && $n4 == 0;
+ if((3+ $n3) * 2.4 < 3+$n4 ) { 
+    $delnumbers += $n4;
+    $Geq2 -= $n3;
+    $pessimas ++;
+    print "remove $tun = Number in this TUs are too different\n" if $debug;
+    print "  ***EN\t$tu->{en}\n  ***PT\t$tu->{pt}\n"             if $debug;
+ }
+ MSaddto($Gn1,$n1);
+ MSaddto($Gn2,$n2);
+}
+
+sub MSaddto{         #   a = a U b
+ my ($m1,$m2)=@_;
+ for(keys %$m2){$m1->{$_} += $m2->{$_}}
+}
+
+sub MScardinter{     #   #(a /\ b)
+ my ($m1,$m2)=@_;
+ my $com = 0;
+ for(keys %$m2){ $com += $m1->{$_} > $m2->{$_} ? $m2->{$_} : $m1->{$_}}
+ $com
+}
+
+sub MScard{        # Multiset cardinal
+ my ($m1)=@_;
+ my $c = 0;
+ for(values %$m1){ $c += $_ }
+ $c
+}
+
+sub getn{     # get the multiset of the numbers present in the sentence
+ my $s=shift;
+ my %a=();
+ for( $s =~ m/(\d+)/g){$a{$_}++}
+ \%a
+}
+
+
+
+__END__
+

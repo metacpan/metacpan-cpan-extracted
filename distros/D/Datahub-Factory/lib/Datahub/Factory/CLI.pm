@@ -1,18 +1,15 @@
 package Datahub::Factory::CLI;
 
-use strict;
-use warnings;
-
 use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Datahub::Factory;
 use Log::Any::Adapter;
 use Log::Log4perl;
-use namespace::clean;
 use DateTime;
 use Term::ANSIColor qw(:constants);
-
-use Data::Dumper qw(Dumper);
+use namespace::clean;
 
 use parent qw(App::Cmd);
 

@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Avoided;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 our @Module_Lists = (
     {
@@ -28,6 +28,20 @@ alternative called <pm:Log::ger>.
 
 _
                 alternate_modules => ['Log::ger'],
+            },
+            {
+                'x.date' => '2017-09-08',
+                module => 'List::MoreUtils',
+                summary => 'License confusion and ',
+                description => <<'_',
+
+For more information, see https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/.
+
+Recent versions of <pm:List::Util> have implemented many functions from
+<pm:List::MoreUtils>.
+
+_
+                alternate_modules => ['List::Util', 'List::SomeUtils', 'List::AllUtils'],
             },
             {
                 module => 'Log::Any::IfLOG',
@@ -140,7 +154,7 @@ Acme::CPANLists::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.25 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
+This document describes version 0.26 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-09-08.
 
 =head1 MODULE LISTS
 
@@ -164,6 +178,16 @@ alternative called L<Log::ger>.
 
 
 Alternate modules: L<Log::ger>
+
+=item * L<List::MoreUtils> - License confusion and 
+
+For more information, see https://www.reddit.com/r/perl/comments/6ymdez/what_are_the_background_details_pertaining_to_the/.
+
+Recent versions of L<List::Util> have implemented many functions from
+L<List::MoreUtils>.
+
+
+Alternate modules: L<List::Util>, L<List::SomeUtils>, L<List::AllUtils>
 
 =item * L<Log::Any::IfLOG> - Retired workaround
 

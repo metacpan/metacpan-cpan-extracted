@@ -1,5 +1,5 @@
 package Mail::DMARC::PurePerl;
-our $VERSION = '1.20170222'; # VERSION
+our $VERSION = '1.20170906'; # VERSION
 use strict;
 use warnings;
 
@@ -12,9 +12,14 @@ sub init {
     $self->is_subdomain(0);
     $self->{header_from} = undef;
     $self->{header_from_raw} = undef;
+    $self->{envelope_to} = undef;
+    $self->{envelope_from} = undef;
+    $self->{source_ip} = undef;
     $self->{policy} = undef;
     $self->{result} = undef;
     $self->{report} = undef;
+    $self->{spf} = undef;
+    $self->{dkim} = undef;
     return;
 }
 
@@ -585,7 +590,7 @@ Mail::DMARC::PurePerl - Pure Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20170222
+version 1.20170906
 
 =head1 METHODS
 

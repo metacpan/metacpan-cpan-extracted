@@ -1,5 +1,5 @@
 package App::SmokeBrew::Types;
-$App::SmokeBrew::Types::VERSION = '0.50';
+$App::SmokeBrew::Types::VERSION = '0.52';
 #ABSTRACT: Moose types for smokebrew
 
 use strict;
@@ -51,7 +51,7 @@ App::SmokeBrew::Types - Moose types for smokebrew
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,14 @@
 package Datahub::Factory::Importer::EIZ;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '0.92';
 
 use Catmandu::Importer::OAI;
 use Moo;
 use URI::Split qw(uri_join);
 use File::Basename qw(fileparse);
+use namespace::clean;
 
 with 'Datahub::Factory::Importer';
 

@@ -1,5 +1,5 @@
 package Bio::Roary::AnalyseGroups;
-$Bio::Roary::AnalyseGroups::VERSION = '3.9.1';
+$Bio::Roary::AnalyseGroups::VERSION = '3.10.2';
 # ABSTRACT: Take in a groups file and the original FASTA files and create plots and stats
 
 
@@ -116,7 +116,7 @@ Bio::Roary::AnalyseGroups - Take in a groups file and the original FASTA files a
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

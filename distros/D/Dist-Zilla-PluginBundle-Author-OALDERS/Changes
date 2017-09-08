@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000016  2017-09-06 20:19:38Z
+    - Remove ManifestSkip plugin
+
 0.000015  2017-07-04 20:45:30Z
     - Exclude copy from release files from Git::GatherDir
     - Add Config::Slicer role

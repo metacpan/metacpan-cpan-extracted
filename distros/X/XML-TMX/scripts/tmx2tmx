@@ -1,5 +1,8 @@
 #!/usr/bin/perl -s
 
+# PODNAME: tmx2tmx
+# ABSTRACT: Utility to convert and filter TMX files
+
 use strict;
 use warnings;
 
@@ -17,64 +20,6 @@ our (
 
 # here we must take care that only one of the options is being used.
 
-=encoding utf-8
-
-=head1 NAME
-
-tmx2tmx - utility to convert and filter TMX files
-
-=head1 SYNOPSYS
-
-  tmx2tmx -cat file1.tmx ... filen.tmx > file.tmx
-
-  tmx2tmx -toTrados file1.tmx > file2.tmx
-
-  tmx2tmx -clean file1.tmx > file2.tmx
-
-  tmx2tmx -select=PT,EN multilingual.tmx > pt-en.tmx
-
-=head1 DESCRIPTION
-
-This utility processes TMX documents and return TMX documents. Tasks
-done with this utility include conversion between TMX versions and TMX
-cleaning.
-
-=head2 TRADOS conversion
-
-As you maybe know, TRADOS is a company producing computer software for
-translators. It includes WorkBench which imports TMX
-files. Unfortunately, the version I used do not import TMX version
-1.4.
-
-This process is done using the switch C<-toTrados>:
-
-  tmx2tmx -toTrados file.tmx > trados.tmx
-
-=head2 TMX Cleaning
-
-Specially when translation memories are created from anotated text, or
-extracted directly from the Internet using any automatic method. This
-switch is used to remove junk in translation units.
-
-This option tries to remove junk from TMX files, like empty pairs
-where one of the sides is empty, or removing other junk type.
-
-Use it this way:
-
-   tmx2tmx -clean file.tmx > file2.tmx
-
-=head2 Concatenating TMX
-
-   tmx2tmx -cat file1.tmx ... filen.tmx > file.tmx
-   ls | grep '.tmx$' | tmx2tmx -cat > file.tmx
-
-=head2 Select languages
-
-Select a bunch of languages:
-
-    tmx2tmx -select=PT,EN,FR huge.tmx > pt-en-fr.tmx
-
-=cut
 
 toTrados() if $toTrados;
 clean()    if $clean;
@@ -83,22 +28,6 @@ selectl()  if $select;
 
 die "No option supplied\n";
 
-=head1 SEE ALSO
-
-tmx2html, po2tmx, XML::TMX
-
-=head1 AUTHOR
-
-Alberto Simões, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2004 by Projecto Natura
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 
 
@@ -305,3 +234,95 @@ sub selectl {
     print "</body>\n</tmx>\n";
     exit;
 }
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tmx2tmx - Utility to convert and filter TMX files
+
+=head1 VERSION
+
+version 0.36
+
+=head1 DESCRIPTION
+
+This utility processes TMX documents and return TMX documents. Tasks
+done with this utility include conversion between TMX versions and TMX
+cleaning.
+
+=head2 TRADOS conversion
+
+As you maybe know, TRADOS is a company producing computer software for
+translators. It includes WorkBench which imports TMX
+files. Unfortunately, the version I used do not import TMX version
+1.4.
+
+This process is done using the switch C<-toTrados>:
+
+  tmx2tmx -toTrados file.tmx > trados.tmx
+
+=head2 TMX Cleaning
+
+Specially when translation memories are created from anotated text, or
+extracted directly from the Internet using any automatic method. This
+switch is used to remove junk in translation units.
+
+This option tries to remove junk from TMX files, like empty pairs
+where one of the sides is empty, or removing other junk type.
+
+Use it this way:
+
+   tmx2tmx -clean file.tmx > file2.tmx
+
+=head2 Concatenating TMX
+
+   tmx2tmx -cat file1.tmx ... filen.tmx > file.tmx
+   ls | grep '.tmx$' | tmx2tmx -cat > file.tmx
+
+=head2 Select languages
+
+Select a bunch of languages:
+
+    tmx2tmx -select=PT,EN,FR huge.tmx > pt-en-fr.tmx
+
+=head1 SYNOPSYS
+
+  tmx2tmx -cat file1.tmx ... filen.tmx > file.tmx
+
+  tmx2tmx -toTrados file1.tmx > file2.tmx
+
+  tmx2tmx -clean file1.tmx > file2.tmx
+
+  tmx2tmx -select=PT,EN multilingual.tmx > pt-en.tmx
+
+=head1 SEE ALSO
+
+tmx2html, po2tmx, XML::TMX
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

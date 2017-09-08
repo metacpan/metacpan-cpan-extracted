@@ -2,10 +2,12 @@ package Datahub::Factory::Importer;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Catmandu;
 use Moose::Role;
-use namespace::clean;
 use Try::Tiny;
+use namespace::clean;
 
 has importer => (is  => 'lazy');
 has logger   => (is => 'lazy');

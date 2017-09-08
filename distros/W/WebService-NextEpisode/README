@@ -1,0 +1,34 @@
+NAME
+
+    WebService::NextEpisode - Fetch air date from next-episode.net
+
+SYNOPSIS
+
+        $ perl -MWebService::NextEpisode -e 'print WebService::NextEpisode::of "Better Call Saul"'
+        Mon Jun 05, 2017
+
+METHODS AND ARGUMENTS
+
+    of($show)
+
+      Retrieves air date of next epsiode of $show
+
+GIT REPOSITORY
+
+    http://github.com/athreef/WebService-NextEpisode
+
+SEE ALSO
+
+    The Perl Home Page <http://www.perl.org/>
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

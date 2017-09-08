@@ -1,5 +1,5 @@
 package Bio::Roary::External::Mafft;
-$Bio::Roary::External::Mafft::VERSION = '3.9.1';
+$Bio::Roary::External::Mafft::VERSION = '3.10.2';
 # ABSTRACT: Wrapper to run mafft
 
 
@@ -75,7 +75,7 @@ Bio::Roary::External::Mafft - Wrapper to run mafft
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

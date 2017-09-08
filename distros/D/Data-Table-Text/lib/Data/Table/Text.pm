@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20170901';
+our $VERSION = '20170902';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -17,6 +17,8 @@ use File::Glob qw(:bsd_glob);
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
+use JSON;
+use MIME::Base64;
 use utf8;
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
@@ -388,6 +390,28 @@ END
        }
      }
    }
+ }
+
+#1 Encoding and Decoding                                                        # Encode and decode using Json and Mime
+
+sub encodeJson($)                                                               # Encode Perl to Json
+ {my ($string) = @_;                                                            # Data to encode
+  encode_json($string)
+ }
+
+sub decodeJson($)                                                               # Decode Perl from Json
+ {my ($string) = @_;                                                            # Data to decode
+  decode_json($string)
+ }
+
+sub encodeBase64($)                                                             # Encode a string in base 64
+ {my ($string) = @_;                                                            # String to encode
+  encode_base64($string)
+ }
+
+sub decodeBase64($)                                                             # Decode a string in base 64
+ {my ($string) = @_;                                                            # String to decode
+  decode_base64($string)
  }
 
 #1 Powers                                                                       # Integer powers of two
@@ -1052,7 +1076,7 @@ if (0 and !caller)
 # Export
 #-------------------------------------------------------------------------------
 
-require Exporter;
+use Exporter qw(import);
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
@@ -1062,8 +1086,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys containingPowerOfTwo
 containingFolder convertImageToJpx currentDirectory currentDirectoryAbove
-dateStamp dateTimeStamp
-extractDocumentation
+dateStamp dateTimeStamp decodeJson decodeBase64
+encodeJson encodeBase64 extractDocumentation
 fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
 formatTableBasic fullFileName
@@ -1314,7 +1338,7 @@ Full name of a file
 
 =head3 printFullFileName()
 
-Print a file name on a separate line with escaping so it can be use easily from the command line
+Print a file name on a separate line with escaping so it can be used easily from the command line
 
 
 =head2 Temporary
@@ -1366,7 +1390,7 @@ Search the specified directory trees for files that match the specified extensio
 
 =head3 matchPath($)
 
-Given an absolute path find out how much of the path exists
+Given an absolute path find out how much of the path actually exists
 
   1  $file  File name
 
@@ -1388,9 +1412,9 @@ Read binary file - a file whose contents are not to be interpreted as unicode
 
 =head3 makePath($)
 
-Make a path for a file name or a folder
+Make the path for the specified file name or folder
 
-  1  $path  Path
+  1  $file  File
 
 =head3 writeFile($$)
 
@@ -1431,13 +1455,29 @@ Convert an image to jpx format
   2  $target  Target folder (as multiple files will be created)
   3  $size    Size of each tile
 
+=head1 Json
+
+Encode and decode Json
+
+=head2 encodeJson($)
+
+Encode Perl to Json
+
+  1  $string  Data to encode
+
+=head2 decodeJson($)
+
+Decode Perl from Json
+
+  1  $string  Data to decode
+
 =head1 Powers
 
 Integer powers of two
 
 =head2 powerOfTwo($)
 
-Test whether a number is a power of two, return the power if it is else undef
+Test whether a number is a power of two, return the power if it is else B<undef>
 
   1  $n  Number to check
 
@@ -1562,7 +1602,7 @@ Actions on strings
 
 =head2 indentString($$)
 
-Indent lines contained in a string or formatted table by the specified amount
+Indent lines contained in a string or formatted table by the specified string
 
   1  $string  The string of lines to indent
   2  $indent  The indenting string
@@ -1618,7 +1658,7 @@ and:
 
   #...
 
-where n is either 1 or 2 indicating the heading level of the section and the # is in column 1.
+where n is either 1, 2 or 3 indicating the heading level of the section and the # is in column 1.
 
 Methods are formatted as:
 
@@ -1628,6 +1668,10 @@ Methods are formatted as:
 FLAGS can be any combination of:
 
 =over
+
+=item I
+
+method of interest to new users
 
 =item P
 
@@ -1645,7 +1689,13 @@ die rather than received a returned B<undef> result
 
 Other flags will be handed to the method extractDocumentationFlags(flags to process, method name) found in the file being documented, this method should return [the additional documentation for the method, the code to implement the flag].
 
-Text following 'Example:' in the comment (if present) will be placed after the parameters list as an example.
+Text following 'Example:' in the comment (if present) will be placed after the parameters list as an example. Lines containing comments consisting of '#T'.methodName will also be aggregated as an example.
+
+Lines formatted as:
+
+  #C emailAddress text
+
+will be aggregated in the acknowledgments section at the end of the documentation.
 
 The character sequence \n in the comment will be expanded to one new line and \m to two new lines.
 
@@ -1729,154 +1779,158 @@ Extract a line of a test
 =head1 Index
 
 
-L<appendFile|/appendFile>
+1 L<appendFile|/appendFile>
 
-L<checkFile|/checkFile>
+2 L<checkFile|/checkFile>
 
-L<checkFilePath|/checkFilePath>
+3 L<checkFilePath|/checkFilePath>
 
-L<checkFilePathDir|/checkFilePathDir>
+4 L<checkFilePathDir|/checkFilePathDir>
 
-L<checkFilePathExt|/checkFilePathExt>
+5 L<checkFilePathExt|/checkFilePathExt>
 
-L<checkKeys|/checkKeys>
+6 L<checkKeys|/checkKeys>
 
-L<containingFolder|/containingFolder>
+7 L<containingFolder|/containingFolder>
 
-L<containingPowerOfTwo|/containingPowerOfTwo>
+8 L<containingPowerOfTwo|/containingPowerOfTwo>
 
-L<containingPowerOfTwoX|/containingPowerOfTwo>
+9 L<containingPowerOfTwoX|/containingPowerOfTwo>
 
-L<convertImageToJpx|/convertImageToJpx>
+10 L<convertImageToJpx|/convertImageToJpx>
 
-L<currentDirectory|/currentDirectory>
+11 L<currentDirectory|/currentDirectory>
 
-L<currentDirectoryAbove|/currentDirectoryAbove>
+12 L<currentDirectoryAbove|/currentDirectoryAbove>
 
-L<dateStamp|/dateStamp>
+13 L<dateStamp|/dateStamp>
 
-L<dateTimeStamp|/dateTimeStamp>
+14 L<dateTimeStamp|/dateTimeStamp>
 
-L<denormalizeFolderName|/denormalizeFolderName>
+15 L<decodeJson|/decodeJson>
 
-L<extractDocumentation|/extractDocumentation>
+16 L<denormalizeFolderName|/denormalizeFolderName>
 
-L<extractTest|/extractTest>
+17 L<encodeJson|/encodeJson>
 
-L<fileList|/fileList>
+18 L<extractDocumentation|/extractDocumentation>
 
-L<fileModTime|/fileModTime>
+19 L<extractTest|/extractTest>
 
-L<fileOutOfDate|/fileOutOfDate>
+20 L<fileList|/fileList>
 
-L<fileOutOfDateX|/fileOutOfDate>
+21 L<fileModTime|/fileModTime>
 
-L<filePath|/filePath>
+22 L<fileOutOfDate|/fileOutOfDate>
 
-L<filePathDir|/filePathDir>
+23 L<fileOutOfDateX|/fileOutOfDate>
 
-L<filePathExt|/filePathExt>
+24 L<filePath|/filePath>
 
-L<fileSize|/fileSize>
+25 L<filePathDir|/filePathDir>
 
-L<findDirs|/findDirs>
+26 L<filePathExt|/filePathExt>
 
-L<findFiles|/findFiles>
+27 L<fileSize|/fileSize>
 
-L<formatTable|/formatTable>
+28 L<findDirs|/findDirs>
 
-L<formatTableA|/formatTableA>
+29 L<findFiles|/findFiles>
 
-L<formatTableAA|/formatTableAA>
+30 L<formatTable|/formatTable>
 
-L<formatTableAH|/formatTableAH>
+31 L<formatTableA|/formatTableA>
 
-L<formatTableBasic|/formatTableBasic>
+32 L<formatTableAA|/formatTableAA>
 
-L<formatTableH|/formatTableH>
+33 L<formatTableAH|/formatTableAH>
 
-L<formatTableHA|/formatTableHA>
+34 L<formatTableBasic|/formatTableBasic>
 
-L<formatTableHH|/formatTableHH>
+35 L<formatTableH|/formatTableH>
 
-L<fullFileName|/fullFileName>
+36 L<formatTableHA|/formatTableHA>
 
-L<genLValueArrayMethods|/genLValueArrayMethods>
+37 L<formatTableHH|/formatTableHH>
 
-L<genLValueHashMethods|/genLValueHashMethods>
+38 L<fullFileName|/fullFileName>
 
-L<genLValueScalarMethods|/genLValueScalarMethods>
+39 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+40 L<genLValueHashMethods|/genLValueHashMethods>
 
-L<imageSize|/imageSize>
+41 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-L<indentString|/indentString>
+42 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-L<isBlank|/isBlank>
+43 L<imageSize|/imageSize>
 
-L<javaPackage|/javaPackage>
+44 L<indentString|/indentString>
 
-L<keyCount|/keyCount>
+45 L<isBlank|/isBlank>
 
-L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+46 L<javaPackage|/javaPackage>
 
-L<loadArrayFromLines|/loadArrayFromLines>
+47 L<keyCount|/keyCount>
 
-L<loadHashArrayFromLines|/loadHashArrayFromLines>
+48 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-L<loadHashFromLines|/loadHashFromLines>
+49 L<loadArrayFromLines|/loadArrayFromLines>
 
-L<makePath|/makePath>
+50 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-L<matchPath|/matchPath>
+51 L<loadHashFromLines|/loadHashFromLines>
 
-L<nws|/nws>
+52 L<makePath|/makePath>
 
-L<pad|/pad>
+53 L<matchPath|/matchPath>
 
-L<parseFileName|/parseFileName>
+54 L<nws|/nws>
 
-L<perlPackage|/perlPackage>
+55 L<pad|/pad>
 
-L<powerOfTwo|/powerOfTwo>
+56 L<parseFileName|/parseFileName>
 
-L<powerOfTwoX|/powerOfTwo>
+57 L<perlPackage|/perlPackage>
 
-L<printFullFileName|/printFullFileName>
+58 L<powerOfTwo|/powerOfTwo>
 
-L<quoteFile|/quoteFile>
+59 L<powerOfTwoX|/powerOfTwo>
 
-L<readBinaryFile|/readBinaryFile>
+60 L<printFullFileName|/printFullFileName>
 
-L<readFile|/readFile>
+61 L<quoteFile|/quoteFile>
 
-L<renormalizeFolderName|/renormalizeFolderName>
+62 L<readBinaryFile|/readBinaryFile>
 
-L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+63 L<readFile|/readFile>
 
-L<temporaryDirectory|/temporaryDirectory>
+64 L<renormalizeFolderName|/renormalizeFolderName>
 
-L<temporaryFile|/temporaryFile>
+65 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-L<temporaryFolder|/temporaryFolder>
+66 L<temporaryDirectory|/temporaryDirectory>
 
-L<timeStamp|/timeStamp>
+67 L<temporaryFile|/temporaryFile>
 
-L<trim|/trim>
+68 L<temporaryFolder|/temporaryFolder>
 
-L<writeBinaryFile|/writeBinaryFile>
+69 L<timeStamp|/timeStamp>
 
-L<writeFile|/writeFile>
+70 L<trim|/trim>
 
-L<xxx|/xxx>
+71 L<writeBinaryFile|/writeBinaryFile>
+
+72 L<writeFile|/writeFile>
+
+73 L<xxx|/xxx>
 
 =head1 Installation
 
 This module is written in 100% Pure Perl and, thus, it is easy to read, use,
 modify and install.
 
-Standard Module::Build process for building and installing modules:
+Standard L<Module::Build> process for building and installing modules:
 
   perl Build.PL
   ./Build
@@ -1937,7 +1991,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 84;
+use Test::More tests => 87;
 
 #Test::More->builder->output("/dev/null");
 
@@ -2213,4 +2267,20 @@ if ($^O !~ m/\AMSWin32\Z/)                                                      
  }
 else
  {ok 1 for 1..4;
+ }
+
+if (1)
+ {my $a = {a=>1,b=>2, c=>[1..2]};
+  my $A = encodeJson($a);
+  my $b = decodeJson($A);
+  is_deeply $a, $b, "json $A";
+ }
+
+if (1)
+ {my $a = "Hello World" x 10;
+  my $A = encodeBase64($a);
+  my $B = $A =~ s([\n# ]) ()gsr;
+  my $b = decodeBase64($B);
+  ok $a eq $b, "Mime $B";
+  ok $a eq $b, "$b";
  }

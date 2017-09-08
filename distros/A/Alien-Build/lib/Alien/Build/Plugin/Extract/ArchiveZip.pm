@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+format' => 'zip';
@@ -18,6 +18,14 @@ sub handles
   return 1 if $ext eq 'zip';
   
   return;
+}
+
+
+sub available
+{
+  my(undef, $ext) = @_;
+  
+  !! ( $ext eq 'zip' && eval { require Archive::Zip; 1} );
 }
 
 sub init
@@ -50,7 +58,7 @@ Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -81,6 +89,12 @@ Gives a hint as to the expected format.  This should always be C<zip>.
 Returns true if the plugin is able to handle the archive of the
 given format.
 
+=head2 available
+
+ Alien::Build::Plugin::Extract::ArchiveZip->available($ext);
+
+Returns true if the plugin has what it needs right now to extract from the given format
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::Extract::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -107,7 +121,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -124,6 +138,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

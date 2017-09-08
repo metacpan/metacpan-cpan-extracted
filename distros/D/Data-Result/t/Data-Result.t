@@ -38,6 +38,10 @@ ok(!$class->new_false('testing'),'Data::Result->new_false should be fale');
 is_deeply({%{$class->new_false('msg')}},{msg=>'msg',is_true=>0,extra=>undef},'False Structure validation');
 is_deeply({%{$class->new_true('msg')}},{data=>'msg',is_true=>1,extra=>undef},'True Structure validation');
 
+isa_ok($class->new(is_true=>1)->is_true,'boolean');
+isa_ok($class->new(is_true=>0)->is_false,'boolean');
+
+ok($class->new(is_true=>0)->is_false,'is_false should return true');
 
 
 done_testing;

@@ -1,5 +1,5 @@
 package App::SmokeBrew::BuildPerl;
-$App::SmokeBrew::BuildPerl::VERSION = '0.50';
+$App::SmokeBrew::BuildPerl::VERSION = '0.52';
 #ABSTRACT: build and install a particular version of Perl
 
 use strict;
@@ -166,7 +166,7 @@ App::SmokeBrew::BuildPerl - build and install a particular version of Perl
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

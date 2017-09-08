@@ -1,5 +1,5 @@
 package Statocles::Test;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 # ABSTRACT: Common test routines for Statocles
 
 use Statocles::Base;
@@ -203,7 +203,7 @@ sub test_pages {
             next;
         }
 
-        my $output = $page->render( site => $site );
+        my $output = $page->render;
 
         # Handle filehandles from render
         if ( ref $output eq 'GLOB' ) {
@@ -364,7 +364,7 @@ Statocles::Test - Common test routines for Statocles
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 DESCRIPTION
 

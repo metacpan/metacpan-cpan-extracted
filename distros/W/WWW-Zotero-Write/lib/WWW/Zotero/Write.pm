@@ -18,11 +18,11 @@ WWW::Zotero::Write - Perl interface to the Zotero Write API
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -34,6 +34,7 @@ This module use L<Zotero Write API|https://www.zotero.org/support/dev/web_api/v3
 
 =head1 SYNOPSIS
 
+      use Data::Dumper;
       use WWW::Zotero::Write;
       #key is the zotero key for the library
       my $client = WWW::Zotero::Write->new(key => 'Inlfxd ... ');
@@ -48,6 +49,12 @@ This module use L<Zotero Write API|https://www.zotero.org/support/dev/web_api/v3
            print Dumper ($same), "\n", Dumper($failed), "\n";
            die "Collection not added";
          }
+        my @keys;
+        for my $c ( sort { $a <=> $b } keys %$ok ) {
+            push @keys, $ok->{$c};
+         }
+
+         # $keys[ $pos ] contains the key of $items[ $pos ]
 
        # %data is a hash of fields => values pairs.
        # fields are  key (mandatory), name, parentCollection, relations
@@ -79,7 +86,6 @@ This module use L<Zotero Write API|https://www.zotero.org/support/dev/web_api/v3
 
         $client->deleteItems( \@itemkeys, group => $groupid ) or die("Can't delete items");
 
-
         my $template = $client->itemTemplate("book");
         $template->{titre} = "Hello World";
         $template->{date} = "2017";
@@ -94,6 +100,12 @@ This module use L<Zotero Write API|https://www.zotero.org/support/dev/web_api/v3
                 print Dumper ($same), "\n", Dumper($failed), "\n";
                 die "Items not added to Zotero";
         }
+        my @keys;
+        for my $c ( sort { $a <=> $b } keys %$ok ) {
+            print $c, " ", $ok->{$c}, "\n";
+            push @keys, $ok->{$c};
+         }
+         # $keys[ $pos ] contains the key of $items[ $pos ]
 
         #@v is an array of tags values
         $client->deleteTags(\@v, group=>$groupid) or die "Can't delete tags";
@@ -104,11 +116,15 @@ has last_modif_ver => ( is => 'rw' );
 
 =head2 addCollections($coll_array_ref, user => $userid | group => $groupid)
 
-Add an array of collection 
+Add an array of collection.
+
 Param: the array ref of hash ref with collection name and parent key 
 [{"name"=>"coll name", "parentCollection"=> "parent key"}, {}]
+
 Param: the group or the user id
+
 Returns undef if the ResponseCode is not 200 (409: Conflit, 412: Precondition failed)
+
 Returns an array with three hash ref (or undef if the hash are empty): changed, unchanged, failed. 
 The keys are the index of the hash received in argument. The values are the keys given by zotero
 
@@ -123,10 +139,13 @@ sub addCollections {
 
 =head2 updateCollection ($data, group => $groupid | user => $userid)
 
-Update an existing collection
+Update an existing collection.
+
 Param: hash ref of key value pairs. The zotero key of the collection must be present in the hash. 
-        Others fields are  name, parentCollection, relations
-Param: the group id (hash key: group) or the user id (hash key: user)
+        Others fields are  name, parentCollection, relations.
+
+Param: the group id (hash key: group) or the user id (hash key: user).
+
 Returns an array with three hash ref (or undef if the hash are empty): changed, unchanged, failed. 
 
 =cut
@@ -147,11 +166,16 @@ sub updateCollection {
 
 =head2 addItems($items, group => $groupid | user => $userid)
 
-Add an array of items 
-Param: the array ref of hash ref with completed item templates 
-Param: the group id (hash key: group) or the user id (hash key: user)
-Returns undef if the ResponseCode is not 200 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Add an array of items.
+
+Param: the array ref of hash ref with completed item templates. 
+
+Param: the group id (hash key: group) or the user id (hash key: user).
+
+Returns undef if the ResponseCode is not 200 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
+
 Returns an array with three hash ref (or undef if the hash are empty): changed, unchanged, failed. 
+
 The keys are the index of the hash received in argument. The values are the keys given by zotero
 
 =cut
@@ -164,11 +188,16 @@ sub addItems {
 
 =head2 updateItems($data, group => $groupid | user => $userid)
 
-Update an array of items
-Param: the array ref of hash ref which must include the key of the item, the version of the item and the new value
-Param: the group id or the user id pass with the hash keys group or user
-Returns undef if the ResponseCode is not 200 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Update an array of items.
+
+Param: the array ref of hash ref which must include the key of the item, the version of the item and the new value.
+
+Param: the group id or the user id pass with the hash keys group or user.
+
+Returns undef if the ResponseCode is not 200 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
+
 Returns an array with three hash ref (or undef if the hashes are empty): changed, unchanged, failed. 
+
 The keys are the index of the hash received in argument. The values are the keys given by zotero
 
 =cut
@@ -190,10 +219,13 @@ sub updateItems {
 
 =head2 deleteItems($keys, group => $groupid | user => $userid)
 
-Delete an array of items
-Param: the array ref of item keys to delete
-Param: the group or the user id, pass with the hash keys user or group
-Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Delete an array of items.
+
+Param: the array ref of item keys to delete.
+
+Param: the group or the user id, pass with the hash keys user or group.
+
+Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
 
 =cut
 
@@ -205,10 +237,13 @@ sub deleteItems {
 
 =head2 deleteCollections($keys, group => $groupid | user => $userid)
 
-Delete an array of collections
-Param: the array ref of collection keys to delete
-Param: the group or the user id, pass with the keys group or user
-Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Delete an array of collections.
+
+Param: the array ref of collection keys to delete.
+
+Param: the group or the user id, pass with the keys group or user.
+
+Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
 
 =cut
 
@@ -222,10 +257,13 @@ sub deleteCollections {
 
 =head2 deleteSearches($keys, group => $groupid | user => $userid)
 
-Delete an array of searches
-Param: the array ref of search key to delete
-Param: the group or the user id, pass with the keys group or user
-Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Delete an array of searches.
+
+Param: the array ref of search key to delete.
+
+Param: the group or the user id, pass with the keys group or user.
+
+Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
 
 =cut
 
@@ -239,10 +277,13 @@ sub deleteSearches {
 
 =head2 deleteTags($keys, group => $groupid | user => $userid)
 
-Delete an array of tags
-Param: the array ref of tags to delete
-Param: the group or the user id, pass with the keys group or user
-Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests)
+Delete an array of tags.
+
+Param: the array ref of tags to delete.
+
+Param: the group or the user id, pass with the keys group or user.
+
+Returns undef if the ResponseCode is not 204 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
 
 =cut
 
@@ -269,8 +310,8 @@ sub _delete_this {
 
 sub _add_this {
     my ( $self, $groupid, $userid, $data, $metadata ) = @_;
-    confess "Can't treat more then 25 elements"
-        if ( scalar @$data > 25 );
+    confess "Can't treat more then 50 elements"
+        if ( scalar @$data > 50 );
     $self->_header_last_modif_ver( $groupid, $userid );
     my $url      = $self->_build_url( $groupid, $userid ) . "/$metadata";
     my $token    = encode_json($data);
@@ -290,6 +331,7 @@ sub _check_response {
     if ( $success_code eq "200" ) {
 
         my $data = decode_json($res);
+       
         my @results;
         for my $href ( $data->{success}, $data->{unchanged}, $data->{failed} )
         {

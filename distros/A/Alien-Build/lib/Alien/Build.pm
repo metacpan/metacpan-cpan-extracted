@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -133,12 +133,12 @@ sub load
     $class->meta;
   }};
 
-  my @preload = qw( Core::Setup Core::Download Core::FFI );
+  my @preload = qw( Core::Setup Core::Download Core::FFI Core::Override );
   push @preload, @Alien::Build::rc::PRELOAD;
   push @preload, split ';', $ENV{ALIEN_BUILD_PRELOAD}
     if defined $ENV{ALIEN_BUILD_PRELOAD};
   
-  my @postload = qw( Core::Legacy Core::Gather );
+  my @postload = qw( Core::Legacy Core::Gather Core::Tail );
   push @postload, @Alien::Build::rc::POSTLOAD;
   push @postload, split ';', $ENV{ALIEN_BUILD_POSTLOAD}
     if defined $ENV{ALIEN_BUILD_POSTLOAD};
@@ -360,9 +360,11 @@ sub probe
   local $CWD = $self->root;
   my $dir;
   
-  my $env = $ENV{ALIEN_INSTALL_TYPE} || '';
+  my $env = $self->_call_hook('override');
   my $type;
   my $error;
+  
+  $env = '' if $env eq 'default';
   
   if($env eq 'share')
   {
@@ -521,6 +523,15 @@ sub extract
   {
     die "tried to call extract before download";
   }
+
+  my $nick_name = 'build';
+
+  if($self->meta_prop->{out_of_source})
+  {
+    $nick_name = 'extract';
+    my $extract = $self->install_prop->{extract};
+    return $extract if defined $extract && -d $extract;
+  }
   
   my $tmp;
   local $CWD;
@@ -532,11 +543,18 @@ sub extract
       # called build instead of extract, because this 
       # will be used for the build step, and technically
       # extract is a substage of build anyway.
-      $tmp = Alien::Build::TempDir->new($self, "build");
+      $tmp = Alien::Build::TempDir->new($self, $nick_name);
       $CWD = "$tmp";
     },
     verify => sub {
-      my @list = grep { $_->basename !~ /^\./ && $_->basename ne 'pax_global_header' } _path('.')->children;
+    
+      my $path = '.';
+      if($self->meta_prop->{out_of_source} && $self->install_prop->{extract})
+      {
+        $path = $self->install_prop->{extract};
+      }
+    
+      my @list = grep { $_->basename !~ /^\./ && $_->basename ne 'pax_global_header' } _path($path)->children;
       
       my $count = scalar @list;
       
@@ -560,6 +578,7 @@ sub extract
   
   }, 'extract', $archive);
   
+  $self->install_prop->{extract} ||= $ret;
   $ret ? $ret : ();
 }
 
@@ -574,6 +593,8 @@ sub build
   
   my $stage = _path($self->install_prop->{stage});
   $stage->mkpath;
+  
+  my $tmp;
   
   if($self->install_type eq 'share')
   {
@@ -590,7 +611,15 @@ sub build
       $self->_call_hook(
       {
         before => sub {
-          $CWD = $self->extract;
+          if($self->meta_prop->{out_of_source})
+          {
+            $self->extract;
+            $CWD = $tmp = Alien::Build::TempDir->new($self, 'build');
+          }
+          else
+          {
+            $CWD = $tmp = $self->extract;
+          }
           if($self->meta_prop->{destdir})
           {
             $destdir = Alien::Build::TempDir->new($self, 'destdir');
@@ -959,7 +988,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -1171,6 +1200,15 @@ on windows!
 
 =back
 
+=item out_of_source
+
+Build in a different directory from the where the source code is stored.
+In autoconf this is referred to as a "VPATH" build.  Everyone else calls this
+an "out-of-source" build.  When this property is true, instead of extracting
+to the source build root, the downloaded source will be extracted to an source
+extraction directory and the source build root will be empty.  You can use the
+C<extract> install property to get the location of the extracted source.
+
 =item start_url
 
 The default or start URL used by fetch plugins.
@@ -1197,9 +1235,20 @@ which are understood by the MSYS tools, but not by Perl.  You should
 only use this if you are using L<Alien::Build::Plugin::Autoconf> in
 your L<alienfile>.
 
+=item download
+
+The location of the downloaded archive (tar.gz, or similar) or directory.
+
 =item env
 
 Environment variables to override during the build stage.
+
+=item extract
+
+The location of the last source extraction.  For a "out-of-source" build
+(see the C<out_of_source> meta property above), this will only be set once.
+For other types of builds, the source code may be extracted multiple times,
+and thus this property may change.
 
 =item old
 
@@ -1626,6 +1675,8 @@ L<Alien::Build> responds to these environment variables:
 =item ALIEN_INSTALL_TYPE
 
 If set to C<share> or C<system>, it will override the system detection logic.
+If set to C<default>, it will use the default setting for the L<alienfile>.
+The behavior of other values is undefined.
 
 =item ALIEN_BUILD_RC
 
@@ -1709,6 +1760,25 @@ L<Alien::Build::Manual::PluginAuthor>
 
 L<alienfile>, L<Alien::Build::MM>, L<Alien::Build::Plugin>, L<Alien::Base>, L<Alien>
 
+=head1 THANKS
+
+L<Alien::Base> was originally written by Joel Berger, the rest of this project would
+not have been possible without him getting the project started.  Thanks to his support
+I have been able to augment the original L<Alien::Base> system with a reliable set
+of tools (L<Alien::Build>, L<alienfile>, L<Test::Alien>), which make up this toolset.
+
+The original L<Alien::Base> is still copyright (c) 2012-2017 Joel Berger.  It has
+the same license as the rest of the Alien::Build and related tools distributed as
+C<Alien-Build>.  Joel Berger thanked a number of people who helped in in the development
+of L<Alien::Base>, in the documentation for that module.
+
+I would also like to acknowledge the other memebers of the Perl5-Alien github
+organization, Zakariyya Mughal (sivoais, ZMUGHAL) and mohawk (ETJ).  Also important
+in the early development of L<Alien::Build> were the early adopters Chase Whitener
+(genio, CAPOEIRAB, author of L<Alien::libuv>), William N. Braswell, Jr (willthechill,
+WBRASWELL, author of L<Alien::JPCRE2> and L<Alien::PCRE2>) and Ahmad Fatoum (a3f,
+ATHREEF, author of L<Alien::libudev> and L<Alien::LibUSB>).
+
 =head1 AUTHOR
 
 Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
@@ -1731,7 +1801,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -1748,6 +1818,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

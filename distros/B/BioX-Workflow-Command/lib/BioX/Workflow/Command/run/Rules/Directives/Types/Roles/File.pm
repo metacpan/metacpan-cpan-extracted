@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Roles::File;
 
 use Moose::Role;
+use namespace::autoclean;
 
 sub check_file_exists {
     my $self = shift;
@@ -19,8 +20,7 @@ sub check_file_exists {
     my $file = $self->interpol_directive( $v->{file} );
     if ( !-e $file ) {
         $self->app_log->warn( 'You have a key ' . $k );
-        $self->app_log->warn( 'With file ' . $file );
-        $self->app_log->warn('Which does not exist');
+        $self->app_log->warn( 'File: ' . $file. ' does not exist.' );
         $self->$k($v);
         return 0;
     }

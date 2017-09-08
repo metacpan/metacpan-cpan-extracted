@@ -14,6 +14,8 @@ WriteMakefile(
       Carp 1.42
       namespace::clean 0.27
       Data::Dumper  2.167
+      boolean       0.46
+      Scalar::Util  0
       Test::More    1.302073
     )
     

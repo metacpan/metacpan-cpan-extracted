@@ -5,16 +5,18 @@ use strict;
 
 use Mouse;
 
+use IO::Handle;
 use Carp;
 use List::Util qw/sum/;
 use List::MoreUtils qw/uniq/;
 use Bio::Gonzales::Util::File qw/open_on_demand is_newer/;
+use Bio::Grid::Run::SGE::Util qw/glob_list/;
 use Data::Dumper;
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
-has 'sep' => ( is => 'rw', required => 1, isa => 'Str' );
+has 'sep'     => ( is => 'rw', default => '' );
 has 'sep_pos' => ( is => 'rw', default => '^' );
 has 'ignore_first_sep'     => ( is => 'rw' );
 has 'sep_remove'           => ( is => 'rw' );
@@ -48,14 +50,14 @@ sub create {
 
   confess 'No write permission, set write_flag to write' unless ( $self->writeable );
 
-  my $abs_input_files = $self->_glob_input_files($input_files);
+  my $abs_input_files = glob_list($input_files);
 
   if ( $self->_is_indexed($abs_input_files) ) {
-    print STDERR "SKIPPING INDEXING STEP, THE INDEX IS UP TO DATE\n";
+    $self->log->info("SKIPPING INDEXING STEP, THE INDEX IS UP TO DATE");
     return $self;
   }
 
-  print STDERR "INDEXING ....\n";
+  $self->log->info("INDEXING ....");
 
   my $chunk_size = $self->chunk_size;
 
@@ -64,14 +66,14 @@ sub create {
 
   my $put_sep_at_chunk_end = $self->sep_pos eq '$';
 
-  my $rsep = $self->sep;
-  $rsep = qr/$rsep/;
+  my $rsep = $self->sep // '';
+  $rsep = qr/$rsep/ if ($rsep);
 
   for my $f (@$abs_input_files) {
 
     # start of file is the first (chunk) element
-    my @file_idx  = (0);
-    my $num_elems = 1;
+    my @file_idx         = (0);
+    my $num_elems        = 1;
     my $chunk_elem_count = 1;
 
     open my $fh, '<', $f or confess "Can't open filehandle $f: $!";
@@ -80,7 +82,7 @@ sub create {
       next;
     }
     while (<$fh>) {
-      if (/$rsep/) {
+      if ( !$rsep || /$rsep/ ) {
         if ( $chunk_elem_count && $chunk_elem_count % $chunk_size == 0 ) {
 
           push @file_idx, tell($fh) - ( $put_sep_at_chunk_end ? 0 : length($_) );
@@ -177,7 +179,6 @@ sub get_elem {
       . fastcwd();
     $self->_current_file_idx($cur_file_idx);
     $self->_current_fh($fh);
-
   }
 
   # index within the file

@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::RoaryPostAnalysis;
-$Bio::Roary::CommandLine::RoaryPostAnalysis::VERSION = '3.9.1';
+$Bio::Roary::CommandLine::RoaryPostAnalysis::VERSION = '3.10.2';
 # ABSTRACT: Perform the post analysis on the pan genome
 
 
@@ -248,7 +248,7 @@ Bio::Roary::CommandLine::RoaryPostAnalysis - Perform the post analysis on the pa
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

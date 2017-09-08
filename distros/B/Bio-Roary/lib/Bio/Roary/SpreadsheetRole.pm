@@ -1,5 +1,5 @@
 package Bio::Roary::SpreadsheetRole;
-$Bio::Roary::SpreadsheetRole::VERSION = '3.9.1';
+$Bio::Roary::SpreadsheetRole::VERSION = '3.10.2';
 # ABSTRACT: Read and write a spreadsheet
 
 use Moose::Role;
@@ -72,7 +72,7 @@ Bio::Roary::SpreadsheetRole - Read and write a spreadsheet
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

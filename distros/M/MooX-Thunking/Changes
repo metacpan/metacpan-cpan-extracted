@@ -1,0 +1,9 @@
+0.03 Wed Sep  6 07:39:03 BST 2017
+ - switch back to "before" technique so works with roles
+ - add test of roles behaviour
+
+0.02 Wed Sep  6 06:36:49 BST 2017
+ - switch to BUILDARGS technique
+
+0.01 Wed Sep  6 06:36:49 BST 2017
+ - initial release

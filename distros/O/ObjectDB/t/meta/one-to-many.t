@@ -4,6 +4,7 @@ use lib 't/lib';
 
 use Test::More;
 use Test::Fatal;
+use TestEnv;
 
 use_ok 'ObjectDB::Meta::Relationship::OneToMany';
 

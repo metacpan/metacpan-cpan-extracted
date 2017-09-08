@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2012-06-01 00:00:00 +0000 to present.
+Changes from 2012-09-06 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.52 at 2017-09-05 17:52:49 +0000
+-----------------------------------------
+
+  Change: 3ac0410c319c70ef270cedec402aa953ad699769
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-09-05 18:52:49 +0000
+
+    Release engineering for 0.52 
+
+  Change: 5732d7de88e9d28c9668618d1b4dcca6b64ff2ca
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-09-05 08:38:52 +0000
+
+    Remove requirement on List::MoreUtils 
 
 -----------------------------------------
 version 0.50 at 2017-05-31 10:13:27 +0000
@@ -111,5 +127,5 @@ version 0.38 at 2012-11-26 10:05:57 +0000
     Use Config to find a suitable default for 'make' 
 
 =================================================
-Plus 18 releases after 2012-06-01 00:00:00 +0000.
+Plus 18 releases after 2012-09-06 00:00:00 +0000.
 =================================================

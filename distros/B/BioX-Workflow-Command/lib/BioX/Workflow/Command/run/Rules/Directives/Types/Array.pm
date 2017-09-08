@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::Array;
 
 use Moose::Role;
+use namespace::autoclean;
 
 sub create_ARRAY_attr {
     my $self = shift;
@@ -22,6 +23,18 @@ sub create_ARRAY_attr {
             },
         )
     );
+}
+
+sub transform_aoh {
+  my $self = shift;
+  my $k = shift;
+  my $v = shift;
+  my $lookup = shift || 'k';
+
+  my @data = map { {$lookup => $_} } @{$v};
+
+  $self->$k(\@data);
+  
 }
 
 1;

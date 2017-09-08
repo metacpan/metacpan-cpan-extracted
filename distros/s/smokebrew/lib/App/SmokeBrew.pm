@@ -1,5 +1,5 @@
 package App::SmokeBrew;
-$App::SmokeBrew::VERSION = '0.50';
+$App::SmokeBrew::VERSION = '0.52';
 #ABSTRACT: The guts of smokebrew
 
 use strict;
@@ -306,7 +306,7 @@ App::SmokeBrew - The guts of smokebrew
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

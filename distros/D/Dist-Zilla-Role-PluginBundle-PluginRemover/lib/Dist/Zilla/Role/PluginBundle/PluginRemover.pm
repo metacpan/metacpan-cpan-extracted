@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Role::PluginBundle::PluginRemover;
-# git description: v0.103-2-g66c81d3
+# git description: v0.104-1-g5f9ab18
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Add '-remove' functionality to a bundle
-$Dist::Zilla::Role::PluginBundle::PluginRemover::VERSION = '0.104';
+$Dist::Zilla::Role::PluginBundle::PluginRemover::VERSION = '0.105';
 use Moose::Role;
 use Dist::Zilla::Util ();
 
@@ -85,7 +85,7 @@ Dist::Zilla::Role::PluginBundle::PluginRemover - Add '-remove' functionality to 
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SYNOPSIS
 

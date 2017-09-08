@@ -1,48 +1,64 @@
 {
-   "abstract" : "TMX tools",
+   "abstract" : "Perl extensions for managing TMX files",
    "author" : [
-      "Projecto Natura"
+      "Alberto Sim\u00f5es <ambs@cpan.org>",
+      "Jos\u00e9 Jo\u00e3o Almeida <jj@di.uminho.pt>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "XML-TMX",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.41"
+         }
+      },
       "runtime" : {
          "requires" : {
+            "DB_File" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
             "Exporter" : "0",
+            "Fcntl" : "0",
             "File::BOM" : "0",
+            "File::Temp" : "0",
             "Getopt::Long" : "0",
             "Pod::Usage" : "0",
-            "Test::Pod" : "1.00",
-            "Test::Pod::Coverage" : "0.08",
-            "XML::DT" : "0.57"
+            "XML::DT" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Lingua::FreeLing3" : "0",
+            "Lingua::PT::PLNbase" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
+

@@ -1,0 +1,32 @@
+level1:
+  level2:
+    level3@: connector:tee
+
+tee:
+  class: Connector::Tee
+  accept: "\\A[a-z]+\\z"
+  branches:
+   - static
+   - conn1
+   - conn2
+   - conn3
+
+  nodes:
+    static:
+       test: NO
+    conn1@: connector:connectors.conn1
+    conn2@: connector:connectors.conn2
+    conn3@: connector:connectors.conn3
+
+connectors:
+  conn1:
+    class: Connector::Builtin::Static
+    LOCATION: 123
+
+  conn2:
+    class: Connector::Builtin::Static
+    LOCATION: ok
+
+  conn3:
+    class: Connector::Proxy::YAML
+    LOCATION: t/config/config.yaml

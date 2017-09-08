@@ -73,3 +73,7 @@ Vi_QuickFix_1_134 Sun Jan  6 23:56:31 CET 2008
          $^X now instead of 'perl'.  That would account for "mysterious"
          fails with cpan testers.
        - released
+
+Vi_QuickFix_1_135 Tue Sep  5 18:48:37 CEST 2017
+        - work around bug in Tie::Stdhandle::BINMODE
+

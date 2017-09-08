@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MediaHaven/issues
   homepage: https://github.com/LibreCat/Catmandu-MediaHaven
   repository: https://github.com/LibreCat/Catmandu-MediaHaven.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

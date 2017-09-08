@@ -6,8 +6,4 @@ language: perl
 
 # Try to get debug from inst stuff
 install:
-    - cpanm --notest Config::Std
-    - cpanm --notest Config::Merge
-    - cpanm --notest Config::Versioned
-    - cpanm --notest Template Proc::SafeExec 
     - cpanm --installdeps --notest .

@@ -5,12 +5,9 @@ use lib 't/lib';
 use Carp;
 use TestPW;
 
-for my $test (qw<simple circular circular-noerr>) {
-    my $input = weaver_input("t/$test");
-
-    my $weaver = Pod::Weaver->new_from_config( { root => "t/$test", } );
-
-    test_basic( $test, $weaver, $input );
+for my $test (qw<simple circular circular-noerr hidden continuous after_tmpl>) {
+    
+    TestPW->run_in_dir($test);
 }
 
 done_testing;

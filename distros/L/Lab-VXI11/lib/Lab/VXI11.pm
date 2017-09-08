@@ -20,7 +20,7 @@ our @EXPORT = qw(
 	DEVICE_UDP
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

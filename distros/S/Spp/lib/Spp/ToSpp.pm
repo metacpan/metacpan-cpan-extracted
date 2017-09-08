@@ -47,7 +47,7 @@ sub to_spp {
       when ('Rtoken')   { return $value }
       when ('Sym')      { return $value }
       when ('Int')      { return $value }
-      default           { die "unknown atom to Spp: |$name|" }
+      default { die "unknown atom to Spp: |$name|" }
    }
 }
 
@@ -58,7 +58,7 @@ sub rules_to_spp {
 
 sub group_to_spp {
    my $rule = shift;
-   return str("{", rules_to_spp($rule), "}");
+   return "{" . rules_to_spp($rule) . "}";
 }
 
 sub branch_to_spp {
@@ -68,39 +68,39 @@ sub branch_to_spp {
 
 sub lbranch_to_spp {
    my $branch = shift;
-   return str("||", rules_to_spp($branch), "||");
+   return "||" . rules_to_spp($branch) . "||";
 }
 
 sub rept_to_spp {
    my $rule = shift;
    my ($rept, $atom) = @{$rule};
-   return str(to_spp($atom), $rept);
+   return to_spp($atom) . $rept;
 }
 
 sub look_to_spp {
    my $rule = shift;
    my ($rept, $atom, $look) = @{$rule};
-   return str(to_spp($atom), $rept, to_spp($look));
+   return to_spp($atom) . $rept . to_spp($look);
 }
 
 sub chclass_to_spp {
    my $atoms = shift;
-   return str("[", atoms_to_spp($atoms), "]");
+   return "[" . atoms_to_spp($atoms) . "]";
 }
 
 sub nchclass_to_spp {
    my $atoms = shift;
-   return str("[^", atoms_to_spp($atoms), "]");
+   return "[^" . atoms_to_spp($atoms) . "]";
 }
 
 sub str_to_spp {
    my $str = shift;
-   return str("'", $str, "'");
+   return "'" . $str . "'";
 }
 
 sub cclass_to_spp {
    my $cclass = shift;
-   return str("\\", $cclass);
+   return "\\" . $cclass;
 }
 
 sub char_to_spp {

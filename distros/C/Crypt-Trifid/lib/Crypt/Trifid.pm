@@ -1,6 +1,6 @@
 package Crypt::Trifid;
 
-$Crypt::Trifid::VERSION   = '0.07';
+$Crypt::Trifid::VERSION   = '0.08';
 $Crypt::Trifid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Trifid - Interface to the Trifid cipher.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -228,7 +228,7 @@ L<http://search.cpan.org/dist/Crypt-Trifid/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2016 Mohammad S Anwar.
+Copyright (C) 2014 - 2017 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

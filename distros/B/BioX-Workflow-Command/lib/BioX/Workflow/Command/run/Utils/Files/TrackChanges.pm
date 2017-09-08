@@ -1,14 +1,14 @@
 package BioX::Workflow::Command::run::Utils::Files::TrackChanges;
 
 use MooseX::App::Role;
+use namespace::autoclean;
+
 use Data::Walk;
 use File::Details;
 use File::stat;
 use Time::localtime;
 use File::Basename;
 use DateTime::Format::Strptime;
-
-with 'BioX::Workflow::Command::Utils::Files::TrackChanges';
 
 =head3 files
 

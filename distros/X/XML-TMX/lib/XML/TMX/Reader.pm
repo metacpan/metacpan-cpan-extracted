@@ -1,57 +1,19 @@
 package XML::TMX::Reader;
+$XML::TMX::Reader::VERSION = '0.36';
+# ABSTRACT: Perl extension for reading TMX files
 
 use 5.010;
 use warnings;
 use strict;
 use Exporter ();
-use vars qw($VERSION @ISA @EXPORT_OK);
 
 use XML::DT;
 use XML::TMX::Writer;
 use File::BOM qw( open_bom);
 
-$VERSION = '0.32';
-@ISA = 'Exporter';
-@EXPORT_OK = qw();
+our @ISA = 'Exporter';
+our @EXPORT_OK = qw();
 
-=encoding utf-8
-
-=head1 NAME
-
-XML::TMX::Reader - Perl extension for reading TMX files
-
-=head1 SYNOPSIS
-
-   use XML::TMX::Reader;
-
-   my $reader = XML::TMX::Reader->new( $filename );
-
-   $reader -> for_tu( sub {
-       my $tu = shift;
-       #blah blah blah
-   });
-
-   @used_languages = $reader->languages;
-
-   $reader->to_html()
-
-=head1 DESCRIPTION
-
-This module provides a simple way for reading TMX files.
-
-=head1 METHODS
-
-The following methods are available:
-
-=head2 C<new>
-
-This method creates a new XML::TMX::Reader object. This process checks
-for the existence of the file and extracts some meta-information from
-the TMX header;
-
-  my $reader = XML::TMX::Reader->new("my.tmx");
-
-=cut
 
 sub new {
     my ($class, $file) = @_;
@@ -120,17 +82,6 @@ sub _parse_header {
                         ));
 }
 
-=head2 C<ignore_markup>
-
-This method is used to set the flag to ignore (or not) markup inside
-translation unit segments. The default is to ignore those markup.
-
-If called without parameters, it sets the flag to ignore the
-markup. If you don't want to do that, use
-
-  $reader->ignore_markup(0);
-
-=cut
 
 sub ignore_markup {
   my ($self, $opt) = @_;
@@ -138,13 +89,6 @@ sub ignore_markup {
   $self->{ignore_markup} = $opt;
 }
 
-=head2 C<languages>
-
-This method returns the languages being used on the specified
-translation memory. Note that the module does not check for language
-code correctness or existence.
-
-=cut
 
 sub languages {
     my $self = shift;
@@ -159,90 +103,6 @@ sub languages {
     return keys %languages;
 }
 
-=head2 C<for_tu>
-
-Use C<for_tu> to process all translation units from a TMX file.
-This version iterates for all tu (one at the time)
-
-The configuration hash is a reference to a Perl hash. At the moment
-these are valid options:
-
-=over
-
-=item C<-verbose>
-
-Set this option to a true value and a counter of the number of
-processed translation units will be printed to stderr.
-
-=item C<-output> | C<output>
-
-Filename to output the changed TMX to. Note that if you use this
-option, your function should return a hash reference where keys are
-language names, and values their respective translation.
-
-=item C<gen_tu>
-
-Write at most C<gen_tu> TUs
-
-=item C<proc_tu>
-
-Process at most C<proc_tu> TUs
-
-=item C<patt>
-
-Only process TU that match C<patt>.
-
-=item C<-raw>
-
-Pass the XML directly to the method instead of parsing it.
-
-=item C<-verbatim>
-
-Use segment contents verbatim, without any normalization.
-
-=item C<-prop>
-
-A hashref of properties to be B<added> to the TMX header block.
-
-=item C<-note>
-
-An arrayref of notes to be B<added> to the TMX header block.
-
-=item C<-header>
-
-A boolean value. If set to true, the heading tags (and closing tag) of
-the TMX file are written. Otherwise, only the translation unit tags
-are written.
-
-=back
-
-The function will receive two arguments:
-
-=over
-
-=item *
-
-a reference to a hash which maps:
-
-the language codes to the respective translation unit segment;
-
-a special key "-prop" that maps property names to properties;
-
-a special key "-note" that maps to a list of notes.
-
-=item *
-
-a reference to a hash which contains the attributes for those
-translation unit tag;
-
-=back
-
-If you want to process the TMX and return it again, your function
-should return an hash reference where keys are the languages, and
-values their respective translation.
-
-
-=cut
 
 sub _merge_notes {
     my ($orig, $new) = @_;
@@ -426,13 +286,6 @@ sub for_tu {
     $tmx->end_tmx if $conf->{-header} && $outputingTMX;
 }
 
-=head2 C<to_html>
-
-Use this method to create a nice HTML file with the translation
-memories. Notice that this method is not finished yet, and relies on
-some images, on some specific locations.
-
-=cut
 
 sub to_html {
   my $self = shift;
@@ -462,6 +315,158 @@ sub for_tu2 {
     &for_tu;
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+XML::TMX::Reader - Perl extension for reading TMX files
+
+=head1 VERSION
+
+version 0.36
+
+=head1 SYNOPSIS
+
+   use XML::TMX::Reader;
+
+   my $reader = XML::TMX::Reader->new( $filename );
+
+   $reader -> for_tu( sub {
+       my $tu = shift;
+       #blah blah blah
+   });
+
+   @used_languages = $reader->languages;
+
+   $reader->to_html()
+
+=head1 DESCRIPTION
+
+This module provides a simple way for reading TMX files.
+
+=head1 METHODS
+
+The following methods are available:
+
+=head2 C<new>
+
+This method creates a new XML::TMX::Reader object. This process checks
+for the existence of the file and extracts some meta-information from
+the TMX header;
+
+  my $reader = XML::TMX::Reader->new("my.tmx");
+
+=head2 C<ignore_markup>
+
+This method is used to set the flag to ignore (or not) markup inside
+translation unit segments. The default is to ignore those markup.
+
+If called without parameters, it sets the flag to ignore the
+markup. If you don't want to do that, use
+
+  $reader->ignore_markup(0);
+
+=head2 C<languages>
+
+This method returns the languages being used on the specified
+translation memory. Note that the module does not check for language
+code correctness or existence.
+
+=head2 C<for_tu>
+
+Use C<for_tu> to process all translation units from a TMX file.
+This version iterates for all tu (one at the time)
+
+The configuration hash is a reference to a Perl hash. At the moment
+these are valid options:
+
+=over
+
+=item C<-verbose>
+
+Set this option to a true value and a counter of the number of
+processed translation units will be printed to stderr.
+
+=item C<-output> | C<output>
+
+Filename to output the changed TMX to. Note that if you use this
+option, your function should return a hash reference where keys are
+language names, and values their respective translation.
+
+=item C<gen_tu>
+
+Write at most C<gen_tu> TUs
+
+=item C<proc_tu>
+
+Process at most C<proc_tu> TUs
+
+=item C<patt>
+
+Only process TU that match C<patt>.
+
+=item C<-raw>
+
+Pass the XML directly to the method instead of parsing it.
+
+=item C<-verbatim>
+
+Use segment contents verbatim, without any normalization.
+
+=item C<-prop>
+
+A hashref of properties to be B<added> to the TMX header block.
+
+=item C<-note>
+
+An arrayref of notes to be B<added> to the TMX header block.
+
+=item C<-header>
+
+A boolean value. If set to true, the heading tags (and closing tag) of
+the TMX file are written. Otherwise, only the translation unit tags
+are written.
+
+=back
+
+The function will receive two arguments:
+
+=over
+
+=item *
+
+a reference to a hash which maps:
+
+the language codes to the respective translation unit segment;
+
+a special key "-prop" that maps property names to properties;
+
+a special key "-note" that maps to a list of notes.
+
+=item *
+
+a reference to a hash which contains the attributes for those
+translation unit tag;
+
+=back
+
+If you want to process the TMX and return it again, your function
+should return an hash reference where keys are the languages, and
+values their respective translation.
+
+=head2 C<to_html>
+
+Use this method to create a nice HTML file with the translation
+memories. Notice that this method is not finished yet, and relies on
+some images, on some specific locations.
+
 =head2 C<for_tu2>
 
 deprecated. use C<for_tu>
@@ -470,21 +475,29 @@ deprecated. use C<for_tu>
 
 L<XML::Writer(3)>, TMX Specification L<https://www.gala-global.org/oscarStandards/tmx/tmx14b.html>
 
-=head1 AUTHOR
-
-Alberto Simoes, E<lt>albie@alfarrabio.di.uminho.ptE<gt>
+=head1 CONTRIBUTORS
 
 Paulo Jorge Jesus Silva, E<lt>paulojjs@bragatel.ptE<gt>
 
-J.João Almeida, E<lt>jj@di.uminho.ptE<gt>
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2012 by Projecto Natura
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -1,11 +1,14 @@
 package Datahub::Factory::Module::PID::WebFile;
 
 use Datahub::Factory::Sane;
+
+our $VERSION = '0.92';
+
 use Moo;
 use Catmandu;
-
 use LWP::UserAgent;
 use URI::Split qw(uri_split);
+use namespace::clean;
 
 with 'Datahub::Factory::Module::PID::File';
 

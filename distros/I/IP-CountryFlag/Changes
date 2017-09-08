@@ -1,5 +1,8 @@
 Revision history for IP::CountryFlag
 
+0.09    Fri Sep 08 12:00:00 2017
+        - Updated copyright year information.
+
 0.08    Mon Sep 05 09:55:00 2016
         - Updated copyright year information.
         - Tidied up unit test script t/00-load.t.

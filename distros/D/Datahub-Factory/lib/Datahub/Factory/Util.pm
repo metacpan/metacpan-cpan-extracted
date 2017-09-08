@@ -2,6 +2,8 @@ package Datahub::Factory::Util;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Exporter qw(import);
 use Scalar::Util  ();
 use Ref::Util     ();

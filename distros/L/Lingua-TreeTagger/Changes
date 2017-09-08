@@ -34,3 +34,11 @@ Revision history for TreeTagger
         Modified test files to reflect the fact that utf8 parameters are now
         standard, made xml serialization more robust, fixed issues in tests
         and POD (patches kindly contributed by Alberto Simoes).
+        
+0.09    2017-09-07
+        Removed old code that required at least one non-ut8 parameter file to 
+        install.
+        
+0.10    2017-09-07
+        Fix an issue with pm files version numbers.
+        

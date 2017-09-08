@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Task::GettingTempDir;
 
-our $DATE = '2017-07-28'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 our @Module_Lists = (
     {
@@ -45,7 +45,7 @@ Acme::CPANLists::PERLANCAR::Task::GettingTempDir - Getting system-wide temporary
 
 =head1 VERSION
 
-This document describes version 0.25 of Acme::CPANLists::PERLANCAR::Task::GettingTempDir (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-28.
+This document describes version 0.26 of Acme::CPANLists::PERLANCAR::Task::GettingTempDir (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-09-08.
 
 =head1 MODULE LISTS
 

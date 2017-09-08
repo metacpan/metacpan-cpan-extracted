@@ -8,7 +8,7 @@ use File::Temp ();
 use Path::Tiny ();
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+format' => 'tar';
@@ -16,11 +16,30 @@ has '+format' => 'tar';
 
 sub handles
 {
-  my($class, $ext) = @_;
+  my(undef, $ext) = @_;
   
   return 1 if $ext =~ /^(tar|tar.gz|tar.bz2|tbz|taz)$/;
   
   return;
+}
+
+
+sub available
+{
+  my(undef, $ext) = @_;
+  
+  if($ext eq 'tar.gz')
+  {
+    return !! eval { require Archive::Tar; Archive::Tar->has_zlib_support };
+  }
+  elsif($ext eq 'tar.bz2')
+  {
+    return !! eval { require Archive::Tar; Archive::Tar->has_bzip2_support && __PACKAGE__->_can_bz2 };
+  }
+  else
+  {
+    return $ext eq 'tar';
+  }
 }
 
 sub init
@@ -83,7 +102,7 @@ Alien::Build::Plugin::Extract::ArchiveTar - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -118,6 +137,12 @@ correctly, since compressed archives require extra Perl modules to be installed.
 Returns true if the plugin is able to handle the archive of the
 given format.
 
+=head2 available
+
+ Alien::Build::Plugin::Extract::ArchiveTar->available($ext);
+
+Returns true if the plugin has what it needs right now to extract from the given format
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::Extract::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -144,7 +169,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -161,6 +186,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

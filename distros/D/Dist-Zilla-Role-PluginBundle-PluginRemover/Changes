@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Role-PluginBundle-PluginRemover
 
+0.105     2017-09-06T14:15:20Z
+
+  - Update meta files.  No code changes.
+
 0.104     2017-01-09T02:08:48Z
 
   - Use newer List::Util instead of List::MoreUtils.

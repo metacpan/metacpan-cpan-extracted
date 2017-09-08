@@ -35,7 +35,7 @@
    "provides" : {
       "Spp" : {
          "file" : "lib/Spp.pm",
-         "version" : "1.13"
+         "version" : "1.16"
       },
       "Spp::Ast" : {
          "file" : "lib/Spp/Ast.pm"
@@ -55,14 +55,14 @@
       "Spp::IsChar" : {
          "file" : "lib/Spp/IsChar.pm"
       },
-      "Spp::LintParser" : {
-         "file" : "lib/Spp/LintParser.pm"
+      "Spp::LintAst" : {
+         "file" : "lib/Spp/LintAst.pm"
       },
       "Spp::Match" : {
          "file" : "lib/Spp/Match.pm"
       },
-      "Spp::OptSppAst" : {
-         "file" : "lib/Spp/OptSppAst.pm"
+      "Spp::OptAst" : {
+         "file" : "lib/Spp/OptAst.pm"
       },
       "Spp::ToSpp" : {
          "file" : "lib/Spp/ToSpp.pm"
@@ -74,6 +74,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.13",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

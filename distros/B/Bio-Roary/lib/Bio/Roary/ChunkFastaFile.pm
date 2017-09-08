@@ -1,5 +1,5 @@
 package Bio::Roary::ChunkFastaFile;
-$Bio::Roary::ChunkFastaFile::VERSION = '3.9.1';
+$Bio::Roary::ChunkFastaFile::VERSION = '3.10.2';
 # ABSTRACT: Take in a FASTA file and chunk it up into smaller pieces.
 
 
@@ -77,7 +77,7 @@ Bio::Roary::ChunkFastaFile - Take in a FASTA file and chunk it up into smaller p
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

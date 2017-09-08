@@ -16,8 +16,8 @@ run_job(
             my ( $c, $result_prefix, $cmd_in_file ) = @_;
 
             my $cmd = (slurpc($cmd_in_file))[0];
-            INFO("running $cmd");
-            my $success = my_sys_non_fatal($cmd);
+            job->log->info("running $cmd");
+            my $success = job->sys($cmd);
 
             return $success;
         },

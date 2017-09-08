@@ -1,6 +1,8 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::CSV;
 
 use Moose::Role;
+use namespace::autoclean;
+
 use Text::CSV::Slurp;
 
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Roles::File';

@@ -30,5 +30,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://gitlab.com/waterkip/test-mock-one.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

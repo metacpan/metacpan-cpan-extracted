@@ -1,5 +1,5 @@
 package Statocles::Page::File;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 # ABSTRACT: A page wrapping a file (handle)
 
 use Statocles::Base 'Class';
@@ -38,6 +38,22 @@ has fh => (
 # cases.
 sub vars { die "Unimplemented" }
 
+#pod =attr dom
+#pod
+#pod This page has no DOM, so trying to access it throws an exception.
+#pod
+#pod =cut
+
+sub dom { die "Unimplemented" }
+
+#pod =method has_dom
+#pod
+#pod Returns false. This page has no DOM.
+#pod
+#pod =cut
+
+sub has_dom { 0 }
+
 #pod =method render
 #pod
 #pod     my $fh = $page->render;
@@ -66,7 +82,7 @@ Statocles::Page::File - A page wrapping a file (handle)
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 SYNOPSIS
 
@@ -98,11 +114,19 @@ The path to the file.
 
 The file handle containing the contents of the page.
 
+=head2 dom
+
+This page has no DOM, so trying to access it throws an exception.
+
 =head1 METHODS
 
 =head2 vars
 
 Dies. This page has no templates and no template variables.
+
+=head2 has_dom
+
+Returns false. This page has no DOM.
 
 =head2 render
 

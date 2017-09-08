@@ -3,125 +3,179 @@ package GraphQL::Schema;
 use 5.014;
 use strict;
 use warnings;
+use Moo;
+use Types::Standard -all;
+use GraphQL::Type::Library -all;
+use Return::Type;
+use Function::Parameters;
+
+our $VERSION = '0.02';
 
 =head1 NAME
 
-GraphQL::Schema - Perl implementation
-
-=head1 VERSION
-
-Version 0.02
-
-=cut
-
-our $VERSION = '0.02';
+GraphQL::Schema - GraphQL schema object
 
 =head1 SYNOPSIS
 
   use GraphQL::Schema;
+  use GraphQL::Type::Object;
+  my $schema = GraphQL::Schema->new(
+    query => GraphQL::Type::Object->new(
+      name => 'Query',
+      fields => {
+        getObject => {
+          type => $interfaceType,
+          resolve => sub {
+            return {};
+          }
+        }
+      }
+    )
+  );
 
-=head1 EXPORT
+=head1 DESCRIPTION
 
-None.
+Class implementing GraphQL schema.
 
-=head1 SUBROUTINES/METHODS
+=head1 ATTRIBUTES
 
-=head2 function1
+=head2 query
 
 =cut
 
-sub function1 {
+has query => (is => 'ro', isa => InstanceOf['GraphQL::Type::Object'], required => 1);
+
+=head2 mutation
+
+=cut
+
+has mutation => (is => 'ro', isa => InstanceOf['GraphQL::Type::Object']);
+
+=head2 subscription
+
+=cut
+
+has subscription => (is => 'ro', isa => InstanceOf['GraphQL::Type::Object']);
+
+=head2 types
+
+=cut
+
+has types => (
+  is => 'ro',
+  isa => ArrayRef[ConsumerOf['GraphQL::Role::Named']],
+  default => sub { [] },
+);
+
+=head2 directives
+
+=cut
+
+has directives => (is => 'ro', isa => ArrayRef[InstanceOf['GraphQL::Directive']]);
+
+=head1 METHODS
+
+=head2 get_possible_types($abstract_type)
+
+In this schema, get all of either the implementation types
+(if interface) or possible types (if union) of the C<$abstract_type>.
+
+=cut
+
+has _name2type => (is => 'lazy', isa => Map[StrNameValid, ConsumerOf['GraphQL::Role::Named']]);
+sub _build__name2type {
+  my ($self) = @_;
+  my @types = grep $_, map $self->$_, qw(query mutation subscription); # TODO also __Schema
+  push @types, @{ $self->types || [] };
+  my %name2type;
+  my @bad = map $_->name, grep {
+    my $already = $name2type{$_->name}||0;
+    $already != ($name2type{$_->name} = $_) and $already
+  } map @{ _expand_type($_) }, @types;
+  die "non-unique types named @bad" if @bad;
+  \%name2type;
 }
 
-=head2 function2
-
-=cut
-
-sub function2 {
+fun _expand_type(
+  (InstanceOf['GraphQL::Type']) $type,
+) :ReturnType(ArrayRef[InstanceOf['GraphQL::Type']]) {
+  my @types = ($type);
+  push @types, ($type, map @{ _expand_type($_) }, @{ $type->interfaces || [] })
+    if $type->isa('GraphQL::Type::Object');
+  push @types, ($type, map @{ _expand_type($_) }, $type->get_types)
+    if $type->isa('GraphQL::Type::Union');
+  if (grep $type->DOES($_), qw(GraphQL::Role::FieldsInput GraphQL::Role::FieldsOutput)) {
+    my $fields = $type->fields||{};
+    push @types, map {
+      ($_->{type}, (map @{ _expand_type($_->type) }, @{ $_->{args}||[] }))
+    } values %$fields;
+  }
+  \@types;
 }
 
-=head1 AUTHOR
+has _interface2types => (is => 'lazy', isa => Map[StrNameValid, ArrayRef[InstanceOf['GraphQL::Type::Object']]]);
+sub _build__interface2types {
+  my ($self) = @_;
+  my $name2type = $self->_name2type||{};
+  my %interface2types;
+  map {
+    my $o = $_;
+    map {
+      push @{$interface2types{$_->name}}, $o;
+      # TODO assert_object_implements_interface
+    } @{ $o->interfaces||[] };
+  } grep $_->isa('GraphQL::Type::Object'), values %$name2type;
+  \%interface2types;
+}
 
-Ed J, C<< <etj at cpan.org> >>
+method get_possible_types(
+  (ConsumerOf['GraphQL::Role::Abstract']) $abstract_type
+) :ReturnType(ArrayRef[InstanceOf['GraphQL::Type::Object']]) {
+  return $abstract_type->get_types if $abstract_type->isa('GraphQL::Type::Union');
+  $self->_interface2types->{$abstract_type->name} || [];
+}
 
-=head1 BUGS
+=head2 is_possible_type($abstract_type, $possible_type)
 
-Please report any bugs or feature requests to C<bug-graphql at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc GraphQL
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=GraphQL>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/GraphQL>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/GraphQL>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/GraphQL/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Ed J.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+In this schema, is the given C<$possible_type> either an implementation
+(if interface) or a possibility (if union) of the C<$abstract_type>?
 
 =cut
+
+has _possible_type_map => (is => 'rw', isa => Map[StrNameValid, Map[StrNameValid, Bool]]);
+method is_possible_type(
+  (ConsumerOf['GraphQL::Role::Abstract']) $abstract_type,
+  (InstanceOf['GraphQL::Type::Object']) $possible_type,
+) :ReturnType(Bool) {
+  my $map = $self->_possible_type_map || {};
+  return $map->{$abstract_type->name}{$possible_type->name}
+    if $map->{$abstract_type->name}; # we know about the abstract_type
+  my @possibles = @{ $self->get_possible_types($abstract_type)||[] };
+  die <<EOF if !@possibles;
+Could not find possible implementing types for @{[$abstract_type->name]}
+in schema. Check that schema.types is defined and is an array of
+all possible types in the schema.
+EOF
+  $map->{$abstract_type->name} = { map { ($_->name => 1) } @possibles };
+  $self->_possible_type_map($map);
+  $map->{$abstract_type->name}{$possible_type->name};
+}
+
+=head2 assert_object_implements_interface($type, $iface)
+
+In this schema, does the given C<$type> implement interface C<$iface>? If
+not, throw exception.
+
+=cut
+
+method assert_object_implements_interface(
+  (ConsumerOf['GraphQL::Role::Abstract']) $abstract_type,
+  (InstanceOf['GraphQL::Type::Object']) $possible_type,
+) {
+  my @types = @{ $self->types };
+  return;
+}
+
+__PACKAGE__->meta->make_immutable();
 
 1;

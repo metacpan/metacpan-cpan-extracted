@@ -1,5 +1,5 @@
 package Net::Easypost::Request;
-$Net::Easypost::Request::VERSION = '0.20';
+$Net::Easypost::Request::VERSION = '0.21';
 use Moo;
 
 use Carp qw(croak);
@@ -69,7 +69,7 @@ Net::Easypost::Request
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

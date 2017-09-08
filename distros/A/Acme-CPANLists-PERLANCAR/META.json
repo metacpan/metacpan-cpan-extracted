@@ -22,6 +22,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          },
@@ -96,9 +97,14 @@
             "JSON::XS" : "0",
             "K" : "0",
             "L" : "0",
+            "List::AllUtils" : "0",
+            "List::MoreUtils" : "0",
+            "List::SomeUtils" : "0",
+            "List::Util" : "0",
             "Locale::Scope" : "0",
             "Locale::Tie" : "0",
             "Log::Any" : "0",
+            "Log::Any::App" : "0",
             "Log::Any::IfLOG" : "0",
             "Log::ger" : "0",
             "M" : "0",
@@ -147,7 +153,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANLists-PERLANCAR"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -247,7 +253,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.58"
+            "version" : "0.590"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -521,6 +527,11 @@
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
             "version" : "2.056"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
+            "version" : "3.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

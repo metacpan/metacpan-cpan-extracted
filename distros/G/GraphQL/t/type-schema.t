@@ -3,34 +3,36 @@ use 5.014;
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 BEGIN {
-plan skip_all => 'work in progress';
-  use_ok( 'GraphQL::Type' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Type::Interface' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Type::Object' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Schema' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Type::Scalar', qw($String) ) || print "Bail out!\n";
 }
 
-my $implementingType;
-my $interfaceType = GraphQL::Type::Interface->new(
+my $implementing_type;
+my $interface_type = GraphQL::Type::Interface->new(
   name => 'Interface',
-  fields => { fieldName => { type => 'GraphQLString' } },
-  resolveType => sub {
-    return $implementingType;
+  fields => { field_name => { type => $String } },
+  resolve_type => sub {
+    return $implementing_type;
   },
 );
 
-$implementingType = GraphQL::Type::Object->new(
+$implementing_type = GraphQL::Type::Object->new(
   name => 'Object',
-  interfaces => [ $interfaceType ],
-  fields => { fieldName => { type => 'GraphQLString', resolve => sub { '' } }},
+  interfaces => [ $interface_type ],
+  fields => { field_name => { type => $String, resolve => sub { '' } }},
 );
 
-my $schema = new GraphQL::Schema(
-  query => new GraphQLObjectType(
+my @schema_args = (
+  query => GraphQL::Type::Object->new(
     name => 'Query',
     fields => {
       getObject => {
-        type => $interfaceType,
+        type => $interface_type,
         resolve => sub {
           return {};
         }
@@ -38,5 +40,14 @@ my $schema = new GraphQL::Schema(
     }
   )
 );
+my $schema = GraphQL::Schema->new(@schema_args);
+throws_ok {
+  $schema->is_possible_type($interface_type, $implementing_type)
+} qr/not find possible implementing/, 'readable error if no types given';
+
+$schema = GraphQL::Schema->new(@schema_args, types => [ $implementing_type ]);
+lives_and {
+  ok $schema->is_possible_type($interface_type, $implementing_type)
+} 'no error if types given';
 
 done_testing;

@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package HTML::FromANSI::Tiny;
-# git description: v0.103-6-g909cd91
+# git description: v0.104-2-g306f93b
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Easily convert colored command line output to HTML
-$HTML::FromANSI::Tiny::VERSION = '0.104';
+$HTML::FromANSI::Tiny::VERSION = '0.105';
 our @COLORS = map { "#$_" }
 qw(
   000  f33  2c2  bb0  55c  d3d  0cc  bbb
@@ -211,7 +211,7 @@ HTML::FromANSI::Tiny - Easily convert colored command line output to HTML
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SYNOPSIS
 

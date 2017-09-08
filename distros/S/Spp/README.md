@@ -1,11 +1,5 @@
 Spp -- String Prepare Parser
 
-Consecrate this project to God, for he has turmoil the accent
-at Babel. In the last days, he gave the spirit of oneness to 
-set a benchmark for believers in all lands, and in many 
-fields, the rising standards were recognized to prepare
- for his arrival.
-
 Spp is a powerful tool parse string.
 
 Spp Could use Parse text to AST according its grammar.
@@ -19,6 +13,7 @@ To install this tool, please install Perl5 in your computer.
     > cpan
     > install Spp
     > spp
+
     This is Spp REPL, type enter to exit.
     >> str = 'abcde'; text = 'abcdefg'
     'abcde'
@@ -53,11 +48,9 @@ branch would return first rule which matched.
 
 ## longest branch
 
-longest branch would return longest-matching-string rule.
+longest branch would return longest-matching-string.
 
     || branch-one branch-two branch-three ||
-
-if more than one branch matched, then return longest matching rule.
 
 ## Token
 
@@ -78,54 +71,51 @@ if name starts with uppercase, then it is Name Token:
 
 if name starts with lowercase, then it would not naming:
 
-    >> Lower = \l+ ; text = 'abcdEF'
-    ["Lower","abcd"]
+    >> lower = \l+ ; text = 'abcdEF'
+    ["abcd"]
 
 if name starts with \_, then match would be reject after match.
 
-    comment = '#' ~ $$; // return true or false
+    >> _true = 'true' ; text = 'true'
+    ['true']
 
 ## Not
 
-if some rule not permit follow other rule:
+The <end> of EBNF is defined: if next line starts with blank then is not end.
+    
+    rule = some-rule end
+    end   = \n ! [^\s]
 
-    space = rule ! { \n [^\s] };
-
-Some language (EBNF) define end, if next line starts with blank then is not end.
-
-    spec  = branch-one | branch-two | branch-three
-    new_spec  =  'this is spec'
-      
 ## Char Class
 
-   \a  alpha  a..z A..Z 'a' 'b' 'A'
-   \d  digit  0..9
-   \h  hspace
-   \l  lowercase a..z
-   \s  space or enter
-   \u  uppercase A..Z
-   \v  vspace
-   \w  words  [\a_-]
-   \x  xdigit 0..9 a..f A..F
+    \a  alpha  a..z A..Z 'a' 'b' 'A'
+    \d  digit  0..9
+    \h  hspace
+    \l  lowercase a..z
+    \s  space or enter
+    \u  uppercase A..Z
+    \v  vspace
+    \w  words  [\a_-]
+    \x  xdigit 0..9 a..f A..F
 
 ## Chars Class
 
-   [\sab]
-   [^ab]
+    [\sab]
+    [^ab]
 
 ## string
 
-   str = :abcd
-   str = 'abcd'
+    str = :abcd
+    str = 'abcd'
 
 ## Char
 
-   char = \n \r \f \t \" \' \\ \; ;
+    char = \n \r \f \t \" \' \\ \; ;
 
 ## Comment
 
-   // this is comment
-   comment = '//' ~ $$ ;
+    // this is comment
+    comment = '//' ~ $$ ;
 
 ## branch
     >>  rule = |:abc :abcd|; text = :abcd

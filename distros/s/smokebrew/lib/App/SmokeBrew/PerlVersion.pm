@@ -1,5 +1,5 @@
 package App::SmokeBrew::PerlVersion;
-$App::SmokeBrew::PerlVersion::VERSION = '0.50';
+$App::SmokeBrew::PerlVersion::VERSION = '0.52';
 #ABSTRACT: Moose role for perl versions
 
 use strict;
@@ -47,7 +47,7 @@ App::SmokeBrew::PerlVersion - Moose role for perl versions
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

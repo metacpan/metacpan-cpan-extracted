@@ -19,7 +19,7 @@ my $it_1 = Bio::Grid::Run::SGE::Iterator->new( mode => 'AllvsAllNoRep', indices 
 
 is( $it_1->num_comb, 325 );
 
-$it_1->start( [0, $it_1->num_comb -1 ]);
+$it_1->range( [0, $it_1->num_comb -1 ]);
 
 my $i = 0;
 my @result;

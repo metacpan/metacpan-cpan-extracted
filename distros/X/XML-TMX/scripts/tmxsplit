@@ -1,5 +1,8 @@
 #!/usr/bin/perl -s
 
+# PODNAME: tmxsplit
+# ABSTRACT: Splits a TMX file several files, one for each language
+
 use strict;
 use utf8;
 use XML::DT;
@@ -100,11 +103,17 @@ sub myprint{
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-tmxsplit - splits a TMX file several files, one for each language
+tmxsplit - Splits a TMX file several files, one for each language
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -129,16 +138,25 @@ The names for output files is based on the first tmx file supplied.
 
  -cutmaxlen=n -- cut translations by the n character
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alberto Simões, albie@di.uminho.pt
+=over 4
 
-J.Joao Almeida, jj@di.uminho.pt
+=item *
 
-=head1 SEE ALSO
+Alberto Simões <ambs@cpan.org>
 
-perl(1).
+=item *
 
-tmx2cqp(1)
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

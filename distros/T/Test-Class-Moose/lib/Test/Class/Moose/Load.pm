@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 use File::Find;
 use File::Spec;
@@ -89,7 +89,7 @@ Test::Class::Moose::Load - Load L<Test::Class::Moose> classes automatically.
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -279,13 +279,13 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Class-Load>. I will be
 notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
-Bugs may be submitted at L<https://github.com/test-class-moose/test-class-moose/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/test-class-moose/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
 
 =head1 AUTHORS
 

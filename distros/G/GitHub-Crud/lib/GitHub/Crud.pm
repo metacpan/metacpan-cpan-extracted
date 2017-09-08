@@ -1,42 +1,52 @@
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Create, Read, Update, Delete files on GitHub
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
+#podDocumentation
 
 package GitHub::Crud;
+use v5.16;
+our $VERSION = '20170902';
 use warnings FATAL => qw(all);
 use strict;
-use Carp;
+use Carp qw(confess);
 use Data::Dump qw(dump);
-use Data::Table::Text qw(:all);
+use Data::Table::Text qw(dateTimeStamp decodeBase64 decodeJson encodeBase64 filePath genLValueScalarMethods readFile temporaryFile writeFile xxx);
 use Digest::SHA1 qw(sha1_hex);
-use File::Temp qw(tempfile);
-use MIME::Base64;
 
-our $VERSION = '2017.615';
+my $url         = "https://api.github.com/repos";                               # Github api url
+my $credentials = 'personalAccessToken.data';                                   # This file is not shipped with the distribution as it contains user specific data
+my $develop     = -e $credentials;                                              # Set to true if developing
 
-my $develop = 0;                                                                # Set to true if developing
-my $pat = '40 chars length access token from GitHub';                           # A sample access token that is only used during the tesing of this module
+my ($pat, $testUserid, $testRepository, $testUrl, $testSecret) = sub            # A sample access token that is not included in the distribution
+ {return (undef) x 5 unless $develop;
+  split /\n/, readFile($credentials);
+ }->();
 
-Data::Table::Text::genLValueScalarMethods(
-  qw(branch),                                                                   # Optional: branch name (you should create this branch manually first) or omit it for the default branch which is usually 'master'
-  qw(gitFile),                                                                  # REQUIRED: File name on GitHub - this name can contain /
-  qw(personalAccessToken),                                                      # REQUIRED: a personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
-  qw(repository),                                                               # REQUIRED: the name of your repository - you should create this repository first, manually
-  qw(userid),                                                                   # REQUIRED: your user id on GitHub
-  qw(onFail),                                                                   # Optional: a 𝘀𝘂𝗯 that will be called if a failure is detected, otherwise I will confess
- );
+#1 Attributes                                                                   # Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
+
+genLValueScalarMethods(qw(branch));                                             # Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
+genLValueScalarMethods(qw(failed));                                             # Defined if the last request to Github failed else B<undef>.
+genLValueScalarMethods(qw(fileList));                                           # Reference to an array of files produced by L<list|/list>
+genLValueScalarMethods(qw(gitFile));                                            # File name on GitHub - this name can contain '/'
+genLValueScalarMethods(qw(gitFolder));                                          # Folder name on GitHub - this name can contain '/'
+genLValueScalarMethods(qw(personalAccessToken));                                # A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
+genLValueScalarMethods(qw(readData));                                           # Data produced by L<read|/read>
+genLValueScalarMethods(qw(repository));                                         # The name of your repository - you should create this repository first
+genLValueScalarMethods(qw(response));                                           # A reference to GitHub's response to the latest request
+genLValueScalarMethods(qw(secret));                                             # The secret for a web hook
+genLValueScalarMethods(qw(url));                                                # The url for a web hook
+genLValueScalarMethods(qw(userid));                                             # Your userid on GitHub
+genLValueScalarMethods(qw(writeData));                                          # Data to be written by L<write|/write>
+
+# Supporting packages
 
 sub GitHub::Crud::Response::new($$)                                             # Execute a request against GitHub and decode the response
- {use Carp;
-  use Data::Dump qw(dump);
-  use Data::Table::Text qw(:all);
-  use JSON;
-  use MIME::Base64;
-
-  my ($gitHub, $request) = @_;
+ {my ($gitHub, $request) = @_;
 
   my $R = bless {command=>$request}, "GitHub::Crud::Response";                  # Construct the response
+
   my $r = xxx $request, qr(HTTP);
 
   $r =~ s/\r//gs;                                                               # Internet line ends
@@ -46,7 +56,7 @@ sub GitHub::Crud::Response::new($$)                                             
    {shift @r; $http = shift @r;
    }
 
-  if ($http =~ "HTTP/1.1" and $http =~ /200|201|404/)
+  if ($http =~ "HTTP/1.1" and $http =~ /200|201|404|422/)
    {my $ps = 0;                                                                 # Parse the response
     my @data;
     my %can;
@@ -69,25 +79,23 @@ sub GitHub::Crud::Response::new($$)                                             
        {push @data, $_;
        }
      }
+
     if (keys %can and $develop)                                                 # List of new methods required
      {say STDERR "qw($_)," for(sort keys %can);
      }
 
     if (@data)                                                                  # Save any data
      {my $j = join ' ', @data;
-      my $p = $R->data = bless decode_json($j), "GitHub::Crud::Response::Data";
-      if (my $c = $p->content)
-       {my $d = $R->content = decode_base64($c);                                # Decode the data
+      my $p = $R->data = bless decodeJson($j), "GitHub::Crud::Response::Data";
+      if (ref($p) =~ m/hash/is and my $c = $p->content)
+       {$R->content = decodeBase64($c);                                         # Decode the data
        }
      }
 
-    return $R
+    return $gitHub->response = $R;                                              # Return successful response
    }
   else
-   {if (my $f = $gitHub->onFail)
-     {return $gitHub->$f($r);
-     }
-    confess "Unexpected response from GitHub:\n", $r;
+   {confess "Unexpected response from GitHub:\n", $r;                           # Confess to failure
    }
  }
 
@@ -129,6 +137,7 @@ qw(X_OAuth_Scopes),
 qw(X_RateLimit_Limit),
 qw(X_RateLimit_Remaining),
 qw(X_RateLimit_Reset),
+qw(X_Runtime_rack),
 qw(X_Served_By),
 qw(X_Timer),
 qw(X_XSS_Protection),
@@ -209,8 +218,7 @@ sub refOrBranch($$)
 
 #1 Methods available
 
-sub new                                                                         # Create a new GitHub object
-
+sub new                                                                         # Create a new GitHub object.
  {my $curl = qx(curl -V);                                                       # Check Curl
   if ($curl =~ /command not found/)
    {confess "Command 𝗰𝘂𝗿𝗹 not found"
@@ -218,7 +226,43 @@ sub new                                                                         
   return bless {}
  }
 
-sub readData($)                                                                 # Read data from a file on GitHub
+sub list($)                                                                     # List the files and folders in a GitHub repository.\mRequired parameters: L<userid|/userid>, L<repository|/repository>.\mOptional parameters: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the list operation is successful, L<failed|/failed> is set to false and L<fileList|/fileList> is set to refer to an array of the file names found.\mIf the list operation fails then L<failed|/failed> is set to true and L<fileList|/fileList> is set to refer to an empty array.\mReturns the list of file names found or empty list if no files were found.
+ {my ($gitHub) = @_;                                                            # GitHub object
+  my $user = $gitHub->userid;     $user or confess "userid required";
+  my $repo = $gitHub->repository; $repo or confess "repository required";
+  my $path = $gitHub->gitFolder || '';
+  my $bran = $gitHub->refOrBranch(1);
+  my $pat  = $gitHub->patKey(0);
+
+  my $s = filePath("curl -si $pat $url",$user,$repo, qq(contents), $path.$bran);
+
+  my $r = GitHub::Crud::Response::new($gitHub, $s);                             # Get response
+
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  $gitHub->failed = $status != 200;
+
+  if ($gitHub->failed)                                                          # No file list supplied
+   {$gitHub->fileList = [];
+   }
+  else
+   {for(@{$r->data})
+     {bless $_, "GitHub::Crud::Response::Data";
+     }
+    $gitHub->fileList = [map{$_->name} @{$r->data}];                            # List of files
+   }
+
+  @{$gitHub->fileList}
+ }
+
+if (0 and !caller)
+ {my $g = GitHub::Crud::new();
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
+  $g->gitFolder  = "images";
+  say STDERR "list:\n", join ' ', $g->list;                                     # aaa.png bbb.png
+ }
+
+sub read($)                                                                     # Read data from a file on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to read.\mOptional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $user = $gitHub->userid;     $user or confess "userid required";
   my $repo = $gitHub->repository; $repo or confess "repository required";
@@ -226,23 +270,33 @@ sub readData($)                                                                 
   my $bran = $gitHub->refOrBranch(1);
   my $pat  = $gitHub->patKey(0);
 
-  my $s = filePath
-   ("curl -si $pat https://api.github.com/repos", $user, $repo,
-     qq(contents), $file.$bran);
+  my $s = filePath("curl -si $pat $url",$user,$repo, qq(contents), $file.$bran);
 
-  GitHub::Crud::Response::new($gitHub, $s);
+  my $r = GitHub::Crud::Response::new($gitHub, $s);                             # Get response from GitHub
+
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  $gitHub->failed = $status != 200;
+
+  if ($gitHub->failed)                                                          # No file list supplied
+   {$gitHub->readData = undef;
+   }
+  else
+   {$gitHub->readData = decodeBase64($r->data->content);
+   }
+
+  $gitHub->readData
  }
 
-if (0)
+if (0 and !caller)
  {my $g = GitHub::Crud::new();
-  $g->userid     = "philiprbrenan";
-  $g->repository = "horses";
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
   $g->gitFile    = "test.html";
-  my $r = $g->readData;
-  say STDERR "Read:\n", dump($r);
+  my $s = $g->readData;
+  say STDERR "Read:\n", dump($g->read);
  }
 
-sub writeData($$)                                                               # Write data into a GitHub file, creating the file if it is not there already
+sub write($$)                                                                   # Write data into a GitHub file, creating the file if it is not already present.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile>, L<patKey|/patKey>, L<writeData|/writeData>.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
  {my ($gitHub, $data) = @_;                                                     # GitHub object, data to be written
   defined($data) or confess "data required";
   my $pat  = $gitHub->patKey(1);
@@ -251,37 +305,38 @@ sub writeData($$)                                                               
   my $file = $gitHub->gitFile;    $file or confess "gitFile required";
   my $bran = $gitHub->refOrBranch(0) || '?';
 
-  my $r    = $gitHub->readData;
-  my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';
-  my $denc = encode_base64($data) =~ s/\n//gsr;
+  $gitHub->read;                                                                # Read the file to get its sha it exists
+  my $r    = $gitHub->response;                                                 # Get response
+  my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';             # Sha of existing file or blank string if no existing file
+  my $denc = encodeBase64($data) =~ s/\n//gsr;
 
-  my (undef, $tmpFile) = tempfile();                                            # Create a temporary file for the data to be written otherwise the command line invocation of 𝗰𝘂𝗿𝗹  might become too long
-
-  writeFile($tmpFile, qq({"message": "", "content": "$denc" $sha}));            # Write encoded content to temporary file
-
-  my $u = filePath
-   ("https://api.github.com/repos",
-    $user, $repo, qw(contents), $file.$bran.qq( -d @).$tmpFile
-   );
-
+  writeFile(my $tmpFile = temporaryFile(),                                      # Write encoded content to temporary file
+            qq({"message": "", "content": "$denc" $sha}));
+  my $d = qq( -d @).$tmpFile;
+  my $u = filePath($url, $user, $repo, qw(contents), $file.$bran.$d);
   my $s = "curl -si -X PUT $pat $u";                                            # Curl command
-  my $w = GitHub::Crud::Response::new($gitHub, $s);                             # Execute command to create response
+  my $R = GitHub::Crud::Response::new($gitHub, $s);                             # Execute command to create response
   unlink $tmpFile;                                                              # Cleanup
-  $w                                                                            # Return response
+
+  my ($status) = split / /, $R->Status;                                         # Check response code
+  my $success = $status == 200 ? 'updated' : $status == 201 ? 'created' : undef;# Updated, created
+  $gitHub->failed = $success ? undef : 1;
+  $success                                                                      # Return true on success
  }
 
-if (0)
+if (0 and !caller)
  {my $g = GitHub::Crud::new();
-  $g->userid     = "philiprbrenan";
-  $g->repository = "horses";
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
   $g->gitFile    = "test4.html";
   $g->personalAccessToken = $pat;
-  my $d = dateTimeStamp;
-  my $w = $g->writeData("$d\n"x1000);
-  say STDERR "Write:\n", dump($w);
+  my $d = (dateTimeStamp."\n") x 10;
+  my $w = $g->write($d);
+  my $r = $g->read;
+  say STDERR $r;                                                                # 10 dateTimeStamps
  }
 
-sub deleteData($)                                                               # Delete a file already on GitHub
+sub delete($)                                                                   # Delete a file already present on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile>, L<patKey|/patKey>.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the delete was successful else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat  = $gitHub->patKey(1);
   my $user = $gitHub->userid;     $user or confess "userid required";
@@ -289,75 +344,113 @@ sub deleteData($)                                                               
   my $file = $gitHub->gitFile;    $file or confess "gitFile required";
   my $bran = $gitHub->refOrBranch(0);
 
-  my $r    = $gitHub->readData;
-  my $sha  = ' -d \'{"message": "", "sha": "'. $r->data->sha .'"}\'';
-
-  my $u = filePath
-   ("https://api.github.com/repos", $user, $repo, qw(contents),
-    $file.$bran.$sha);
-
-  my $s = "curl -si -X DELETE $pat $u";
-  my $d = GitHub::Crud::Response::new($gitHub, $s);
-  $d
+  $gitHub->read;
+  my $sha = sub
+   {return '' if $gitHub->failed;
+    ' -d \'{"message": "", "sha": "'. $gitHub->response->data->sha .'"}\'';
+   }->();
+  my $u = filePath($url, $user, $repo, qw(contents), $file.$bran.$sha);
+  my $d = "curl -si -X DELETE $pat $u";
+  my $r = GitHub::Crud::Response::new($gitHub, $d);
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  my $success = $status == 200;
+  $gitHub->failed = $success ? undef : 1;
+  $success ? 1 : undef                                                          # Return true on success
  }
 
-if (0)
+if (0 and !caller)
  {my $g = GitHub::Crud::new();
-  $g->userid     = "philiprbrenan";
-  $g->repository = "horses";
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
   $g->gitFile    = "test4.html";
   $g->personalAccessToken = $pat;
-  my $d = $g->deleteFile;
+  my $d = $g->delete;
   say STDERR "Delete:\n", dump($d);
+ }
+
+sub listWebHooks($)                                                             # List web hooks..\mRequired: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. \mIf the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the list  operation was successful else false.
+ {my ($gitHub) = @_;                                                            # GitHub object
+  my $pat  = $gitHub->patKey(1);
+  my $user = $gitHub->userid;     $user or confess "userid required";
+  my $repo = $gitHub->repository; $repo or confess "repository required";
+  my $bran = $gitHub->refOrBranch(0);
+
+  my $u    = filePath($url, $user, $repo, qw(hooks));
+  my $s    = "curl -si $pat $u";
+  my $r    = GitHub::Crud::Response::new($gitHub, $s);
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  my $success = $status == 200;
+  $gitHub->failed = $success ? undef : 1;
+  $success ? 1 : undef                                                          # Return true on success
+ }
+
+if (0 and !caller)
+ {my $g = GitHub::Crud::new();
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
+  $g->personalAccessToken = $pat;
+  $g->listWebHooks;
+ }
+
+sub createPushWebHook($)                                                        # Create a web hook..\mRequired: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.\mOptional: L<secret|/secret>.\mIf the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the web hook was created successfully else false.
+ {my ($gitHub) = @_;                                                            # GitHub object
+  my $pat    = $gitHub->patKey(1);
+  my $user   = $gitHub->userid;     $user   or confess "userid required";
+  my $repo   = $gitHub->repository; $repo   or confess "repository required";
+  my $webUrl = $gitHub->url;        $webUrl or confess "url required";
+  my $bran   = $gitHub->refOrBranch(0);
+  my $secret = $gitHub->secret;
+
+  my $sj = $secret ? qq(, "secret": "$secret") : '';                            # Secret for Json
+
+  writeFile(my $tmpFile = temporaryFile(), my $json = <<END);                   # Write web hook definition
+  {"name": "web", "active": true, "events": ["push"],
+   "config": {"url": "$webUrl", "content_type": "json" $sj}
+  }
+END
+  my $d = q( -d @).$tmpFile;
+  my $u = filePath($url, $user, $repo, qw(hooks));
+  my $s = "curl -si -X POST $pat $u $d";                                        # Create url
+  my $r = GitHub::Crud::Response::new($gitHub, $s);
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  my $success = $status == 201;
+  unlink $tmpFile;                                                              # Cleanup
+  $gitHub->failed = $success ? undef : 1;
+  $success ? 1 : undef                                                          # Return true on success
+ }
+
+if (0 and !caller)
+ {my $g = GitHub::Crud::new();
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
+  $g->url        = $testUrl;
+  $g->secret     = $testSecret;
+  $g->personalAccessToken = $pat;
+  my $d = $g->createPushWebHook;
+  say STDERR "Create web hook:\n", dump($d);
  }
 
 #-------------------------------------------------------------------------------
 # Tests
 #-------------------------------------------------------------------------------
 
-if (0 and !caller)
+if (1 and !caller)
  {my $g = GitHub::Crud::new();
-  $g->userid     = "philiprbrenan";
-  $g->repository = "horses";
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
   $g->gitFile    = "testFromAppaApps.html";
   $g->personalAccessToken = $pat;
 
-  my $d = dateTimeStamp."\n";
+  my $d = join '-', 1..9;
 
   say STDERR
-     "\n Write : \n\n", dump($g->writeData($d x 1000)),
-   "\n\n Read 1: \n\n", dump($g->readData->content),
-   "\n\n Delete: \n\n", dump($g->deleteData),
-   "\n\n Read 2: \n\n", dump($g->readData);
+     "Write : ", dump($g->write($d)),
+   "\nRead 1: ", dump($g->read),
+   "\nDelete: ", dump($g->delete),
+   "\nRead 2: ", dump($g->read);
  }
 
-#-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
-sub test
- {eval join('', <GitHub::Crud::DATA>) || die $@
- }
-
-test unless caller();
-
-# Documentation
-#extractDocumentation unless caller;
-
-#-------------------------------------------------------------------------------
-# Export
-#-------------------------------------------------------------------------------
-
-require Exporter;
-
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-
-@ISA          = qw(Exporter);
-@EXPORT       = qw();
-@EXPORT_OK    = qw();
-%EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
-
-1;
+#podDocumentation
 
 =pod
 
@@ -379,104 +472,252 @@ Create, Read, Update, Delete files on GitHub as described at:
 
 =head1 Example
 
+Create a file by writing some of data to it, read the file to get its contents,
+delete the file, then try to read the deleted file again:
+
  use GitHub::Crud;
 
- {my $g = GitHub::Crud::new();
-  $g->userid     = "philiprbrenan";
-  $g->repository = "horses";
-  $g->gitFile    = "test4.html";
-  $g->personalAccessToken = $pat;
+  my $g = GitHub::Crud::new();
+     $g->userid              = "...";
+     $g->repository          = "test";
+     $g->gitFile             = "test.html";
+     $g->personalAccessToken = "...";
 
-  my $d = dateTimeStamp."\n";
+  my $d = join '-', 1..9;
 
   say STDERR
-     "\n Write : \n\n", dump($g->writeData($d x 100)),
-   "\n\n Read 1: \n\n", dump($g->readData->content),
-   "\n\n Delete: \n\n", dump($g->deleteData),
-   "\n\n Read 2: \n\n", dump($g->readData);
- }
+     "Write : ", dump($g->write($d)),
+   "\nRead 1: ", dump($g->read),
+   "\nDelete: ", dump($g->delete),
+   "\nRead 2: ", dump($g->read);
 
-Creates a file by writing 100 lines of data to it, reads the file to get its
-attributes and contents, deletes the file, then tries to read the deleted file.
+Produces:
 
-=head1 Parameters
+ Write : 'created';
+ Read 1: "1-2-3-4-5-6-7-8-9"
+ Delete: 1
+ Read 2: undef
 
-The following parameters are available:
+=head1 Description
 
-=head2 branch
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
-Optional: branch name (you should create this branch manually first) or omit it
-for the default branch which is usually 'master'
 
-=head2 gitFile
 
-REQUIRED: File name on GitHub - this name can contain /
+=head1 Attributes
 
-=head2 personalAccessToken
+Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
 
-REQUIRED: a personal access token with scope "public_repo" as generated on
-page:
+=head2 branch :lvalue
 
-  https://github.com/settings/tokens
+Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
 
-You can delete this token on the same page to maintain the security of your
-GitHub account.
 
-=head2 repository
+=head2 failed :lvalue
 
-REQUIRED: the name of your repository - you should create this repository
-first, manually
+Defined if the last request to Github failed else B<undef>.
 
-=head2 userid
 
-REQUIRED: your user id on GitHub
+=head2 fileList :lvalue
 
-=head2 onFail
+Reference to an array of files produced by L<list|/list>
 
-Optional: a 𝘀𝘂𝗯 that will be called if a failure is detected, otherwise
 
- Carp::confess
+=head2 gitFile :lvalue
 
-is called to display an error message
+File name on GitHub - this name can contain '/'
+
+
+=head2 gitFolder :lvalue
+
+Folder name on GitHub - this name can contain '/'
+
+
+=head2 personalAccessToken :lvalue
+
+A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
+
+
+=head2 readData :lvalue
+
+Data produced by L<read|/read>
+
+
+=head2 repository :lvalue
+
+The name of your repository - you should create this repository first
+
+
+=head2 response :lvalue
+
+A reference to GitHub's response to the latest request
+
+
+=head2 secret :lvalue
+
+The secret for a web hook
+
+
+=head2 url :lvalue
+
+The url for a web hook
+
+
+=head2 userid :lvalue
+
+Your userid on GitHub
+
+
+=head2 writeData :lvalue
+
+Data to be written by L<write|/write>
+
 
 =head1 Methods available
 
 =head2 new()
 
-Create a new GitHub object
+Create a new GitHub object.
 
-=head2 readData($gitHub)
 
-Read data from a file on GitHub
+=head2 list($)
 
-     Parameter  Description
-  1  $gitHub    GitHub object
+List the files and folders in a GitHub repository.
 
-=head2 writeData($gitHub, $data)
+Required parameters: L<userid|/userid>, L<repository|/repository>.
 
-Write data into a GitHub file, creating the file if it is not there already
+Optional parameters: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
 
-     Parameter  Description
-  1  $gitHub    GitHub object
-  2  $data      data to be written
+If the list operation is successful, L<failed|/failed> is set to false and L<fileList|/fileList> is set to refer to an array of the file names found.
 
-=head2 deleteData($gitHub)
+If the list operation fails then L<failed|/failed> is set to true and L<fileList|/fileList> is set to refer to an empty array.
 
-Delete a file already on GitHub
+Returns the list of file names found or empty list if no files were found.
 
-     Parameter  Description
-  1  $gitHub    GitHub object
+  1  $gitHub  GitHub object
+
+=head2 read($)
+
+Read data from a file on GitHub.
+
+Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to read.
+
+Optional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
+
+If the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.
+
+If the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.
+
+Returns the data read or B<undef> if no file was found.
+
+  1  $gitHub  GitHub object
+
+=head2 write($$)
+
+Write data into a GitHub file, creating the file if it is not already present.
+
+Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile>, L<patKey|/patKey>, L<writeData|/writeData>.
+
+Optional parameters: L<refOrBranch|/refOrBranch>.
+
+If the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
+
+Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
+
+  1  $gitHub  GitHub object
+  2  $data    Data to be written
+
+=head2 delete($)
+
+Delete a file already present on GitHub.
+
+Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile>, L<patKey|/patKey>.
+
+Optional parameters: L<refOrBranch|/refOrBranch>.
+
+If the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
+
+Returns true if the delete was successful else false.
+
+  1  $gitHub  GitHub object
+
+=head2 listWebHooks($)
+
+List web hooks..
+
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
+
+If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
+
+Returns true if the list  operation was successful else false.
+
+  1  $gitHub  GitHub object
+
+=head2 createPushWebHook($)
+
+Create a web hook..
+
+Required: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.
+
+Optional: L<secret|/secret>.
+
+If the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
+
+Returns true if the web hook was created successfully else false.
+
+  1  $gitHub  GitHub object
+
 
 =head1 Index
 
-L</deleteData($gitHub)>
-L</new()>
-L</readData($gitHub)>
-L</writeData($gitHub, $data)>
+
+1 L<branch|/branch>
+
+2 L<createPushWebHook|/createPushWebHook>
+
+3 L<delete|/delete>
+
+4 L<failed|/failed>
+
+5 L<fileList|/fileList>
+
+6 L<gitFile|/gitFile>
+
+7 L<gitFolder|/gitFolder>
+
+8 L<list|/list>
+
+9 L<listWebHooks|/listWebHooks>
+
+10 L<new|/new>
+
+11 L<personalAccessToken|/personalAccessToken>
+
+12 L<read|/read>
+
+13 L<readData|/readData>
+
+14 L<repository|/repository>
+
+15 L<response|/response>
+
+16 L<secret|/secret>
+
+17 L<url|/url>
+
+18 L<userid|/userid>
+
+19 L<write|/write>
+
+20 L<writeData|/writeData>
 
 =head1 Installation
 
-Standard Module::Build process for building and installing modules:
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
+
+Standard L<Module::Build> process for building and installing modules:
 
   perl Build.PL
   ./Build
@@ -485,19 +726,42 @@ Standard Module::Build process for building and installing modules:
 
 =head1 Author
 
-philiprbrenan@gmail.com
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-http://www.appaapps.com
+L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2017 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl itself.
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
 
 =cut
 
+
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
+# 𝗣𝗲𝗿𝗹
+#podDocumentation
+# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/
+# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents
+# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents/images
+# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents/images/aaa.png
 __DATA__
 use Test::More tests => 1;
 

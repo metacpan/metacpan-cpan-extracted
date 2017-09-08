@@ -1,33 +1,38 @@
 ---
-_worker_config_file: /tmp/lXGH5pgD5r/cluster_job.tmp/cluster_job.config.dat
-cmd:
-- t/Bio-Grid-Run-SGE-Master.script.pl
-extra:
-  result_on_stdout: 1
-  use_stdin: 1
-input:
-- elements:
-  - t/data/test.fa
-  format: General
-  sep: ^>
-job_cmd: /tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl -t 1-45 -S PERL -N cluster_job -e /tmp/lXGH5pgD5r/cluster_job.tmp/err
-  -o /tmp/lXGH5pgD5r/cluster_job.tmp/out /tmp/lXGH5pgD5r/cluster_job.tmp/env.cluster_job.pl t/Bio-Grid-Run-SGE-Master.script.pl --worker /tmp/lXGH5pgD5r/master_config
-job_name: cluster_job
-mode: Dummy
-num_comb: 45
-parts: 45
-range:
-  - 1
-  - 45
-prefix_output_dirs: 1
-perl_bin: PERL
-result_dir: /tmp/lXGH5pgD5r/result
-log_dir: /tmp/lXGH5pgD5r/result
-stderr_dir: /tmp/lXGH5pgD5r/tmp/err
-idx_dir: /tmp/lXGH5pgD5r/idx
-stdout_dir: /tmp/lXGH5pgD5r/tmp/out
-submit_bin: /tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl
-submit_params: []
-tmp_dir: /tmp/lXGH5pgD5r/tmp
-working_dir: /tmp/lXGH5pgD5r
-args: []
+config:
+  idx_dir: /tmp/lXGH5pgD5r/idx
+  input:
+  - elements:
+    - t/data/test.fa
+    format: General
+    idx_file: /tmp/lXGH5pgD5r/idx/cluster_job.0.idx
+    sep: ^>
+  job_name: cluster_job
+  log_dir: /tmp/lXGH5pgD5r/cluster_job.tmp/log
+  mode: Dummy
+  num_parts: 45
+  prefix_output_dirs: 1
+  result_dir: /tmp/lXGH5pgD5r/cluster_job.result
+  stderr_dir: /tmp/lXGH5pgD5r/cluster_job.tmp/err
+  stdout_dir: /tmp/lXGH5pgD5r/cluster_job.tmp/out
+  submit_bin: /tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl
+  submit_params: []
+  tmp_dir: /tmp/lXGH5pgD5r/cluster_job.tmp
+  working_dir: /tmp/lXGH5pgD5r
+  custom_config_setting: 2
+env:
+  job_id: -1
+  job_cmd: '/tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl -t 1-45 -S PERL
+    -N cluster_job -e /tmp/lXGH5pgD5r/cluster_job.tmp/err -o /tmp/lXGH5pgD5r/cluster_job.tmp/out
+    /tmp/lXGH5pgD5r/cluster_job.tmp/env.cluster_job.pl t/Bio-Grid-Run-SGE-Master.script.pl
+    --stage worker /tmp/lXGH5pgD5r/cluster_job.tmp/cluster_job.job.conf.json '
+  job_name_save: cluster_job
+  job_range:
+  - '1'
+  - '45'
+  num_comb: 45
+  perl_bin: PERL
+  script_bin: t/Bio-Grid-Run-SGE-Master.script.pl
+  script_dir: t/
+  worker_config_file: /tmp/lXGH5pgD5r/cluster_job.tmp/cluster_job.job.conf.json
+  worker_env_script: /tmp/lXGH5pgD5r/cluster_job.tmp/env.cluster_job.pl

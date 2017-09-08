@@ -5,25 +5,35 @@ use strict;
 use 5.010;
 use POSIX qw/strftime/;
 
-use Getopt::Std;
 use Pod::Usage;
 use File::Copy;
 use File::Spec;
 
-our $VERSION = '0.042'; # VERSION
-my %opt;
+use Pod::Usage;
+use Getopt::Long;
 
-# sections needed: NAME, SYNOPSIS, DESCRIPTION
-getopts('') or pod2usage( -exitstatus => 1, -verbose => 0 );
+my %opt = ();
+GetOptions( \%opt, 'help', 'date_suffix|dsfx', 'date_prefix|dpfx' ) or pod2usage(2);
 
-my $dir    = shift;
-my $prefix = shift;
+pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
+pod2usage(2)
+  unless ( @ARGV && @ARGV > 0 );
 
-die "no prefix" unless ($prefix);
+our $VERSION = '0.060'; # VERSION
+
+# FIXME sections needed: NAME, SYNOPSIS, DESCRIPTION
+
+my $dir    = shift @ARGV;
+my $prefix = shift @ARGV;
+
 pod2usage( -exitstatus => 1, -verbose => 0, -message => "$dir is not a directory" ) unless ( -d $dir );
 
-my $date = strftime( "%Y-%m-%d", localtime );
-$prefix = $date . "_" . $prefix unless ( $prefix eq '.' );
+my $date = strftime( "%Y-%m-%d", localtime() );
+unless ( $prefix eq '.' ) {
+  $prefix .= "_" . $date if ( $opt{'date_suffix'} );
+  $prefix = $date . "_" . $prefix if ( $opt{'date_prefix'} );
+}
+
 say STDERR "prefix is > $prefix <";
 
 for my $sd ( '', 'bin', 'conf' ) {
@@ -41,6 +51,9 @@ sub clone_dir {
 
   my @files = glob("$dir/*.yml");
   push @files, glob("$dir/*.pl");
+  push @files, glob("$dir/*.md");
+  push @files, glob("$dir/*.rst");
+  push @files, glob("$dir/*.json");
   push @files, glob("$dir/*.py");
   push @files, glob("$dir/*.R");
   push @files, glob("$dir/*.sh");
@@ -71,6 +84,8 @@ __END__
    --help      detailed help message
    --version   show script version
    <prefix>    (see detailed help)
+   --dpfx      add date in front of the prefix
+   --dsfx      add date to the end of the prefix
 
 =head1 DESCRIPTION
 

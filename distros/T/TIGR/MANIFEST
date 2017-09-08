@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+lib/TIGR/FASTA/Grammar.pm
+lib/TIGR/FASTA/Iterator.pm
+lib/TIGR/FASTA/Reader.pm
+lib/TIGR/FASTA/Record.pm
+lib/TIGR/FASTA/Writer.pm
+lib/TIGR/Foundation.pm
+lib/TIGR/HmmTools.pm
+Makefile.PL
+MANIFEST			This list of files
+Provides.pm.PL
+README
+script/convert_hmmscan_to_htab.pl
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig::LibPkgConf
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -15,6 +15,14 @@ has '+pkg_name' => sub {
 
 
 has minimum_version => undef;
+
+
+use constant _min_version => '0.04';
+
+sub available
+{
+  !!eval { require PkgConfig::LibPkgConf; PkgConfig::LibPkgConf->VERSION(_min_version) };
+}
 
 sub init
 {
@@ -25,11 +33,11 @@ sub init
   if($caller ne 'Alien::Build::Plugin::PkgConfig::Negotiate')
   {
     # Also update in Neotiate.pm
-    $meta->add_requires('configure' => 'PkgConfig::LibPkgConf::Client' => '0.04');
+    $meta->add_requires('configure' => 'PkgConfig::LibPkgConf::Client' => _min_version);
   
     if(defined $self->minimum_version)
     {
-      $meta->add_requires('configure' => 'PkgConfig::LibPkgConf::Util' => '0.04');
+      $meta->add_requires('configure' => 'PkgConfig::LibPkgConf::Util' => _min_version);
     }
   }
   
@@ -112,7 +120,7 @@ Alien::Build::Plugin::PkgConfig::LibPkgConf - Probe system and determine library
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -145,6 +153,14 @@ names must be present.
 
 The minimum required version that is acceptable version as provided by the system.
 
+=head1 METHODS
+
+=head2 available
+
+ my $bool = Alien::Build::Plugin::PkgConfig::LibPkgConf->available;
+
+Returns true if the necessary prereqs for this plugin are I<already> installed.
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::PkgConfig::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -171,7 +187,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -188,6 +204,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

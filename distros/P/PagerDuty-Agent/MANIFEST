@@ -1,0 +1,20 @@
+.travis.yml
+Changes
+INSTALL
+lib/PagerDuty/Agent.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-construction.t
+t/11-events.t
+t/12-service-call.t
+t/13-does-not-die.t
+t/90-perl-critic.t
+t/91-pod-coverage.t
+t/92-pod-syntax.t
+t/93-spelling.t
+t/94-changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

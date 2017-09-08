@@ -30,8 +30,13 @@ sub test_001 : Tags(req) {
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Path');
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Config');
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::CSV');
+    require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Glob');
+    require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Mustache');
     require_ok('BioX::Workflow::Command::run::Rules::Directives::Types::Roles::File');
     require_ok('BioX::Workflow::Command::run::Rules::Rules');
+
+    require_ok('BioX::Workflow::Command::run::Rules::Directives::Interpolate::Mustache');
+    require_ok('BioX::Workflow::Command::run::Rules::Directives::Interpolate::Text');
 
     require_ok('BioX::Workflow::Command::Utils::Create');
     require_ok('BioX::Workflow::Command::Utils::Files');

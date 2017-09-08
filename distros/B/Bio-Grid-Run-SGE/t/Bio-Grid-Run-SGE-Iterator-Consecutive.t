@@ -18,7 +18,7 @@ my $it_1 = Bio::Grid::Run::SGE::Iterator::Consecutive->new( indices => [$idx_a] 
 
 is( $it_1->num_comb, 3 );
 
-$it_1->start( [0, $it_1->num_comb -1 ]);
+$it_1->range( [0, $it_1->num_comb -1 ]);
 
 my @result;
 while ( my $comb = $it_1->next_comb ) {
@@ -27,7 +27,7 @@ while ( my $comb = $it_1->next_comb ) {
 
 is( join("", @result), join("",  'a' .. 'z' ) );
 
-$it_1->start( [0, $it_1->num_comb -1 ]);
+$it_1->range( [0, $it_1->num_comb -1 ]);
 
 
 my $comb = $it_1->next_comb;
@@ -47,7 +47,7 @@ my $it_2 = Bio::Grid::Run::SGE::Iterator::Consecutive->new( indices => [$idx_b] 
 
 is( $it_2->num_comb, 45 );
 
-$it_2->start( [ 1, 5, 3 ] );
+$it_2->range( [ 1, 5, 3 ] );
 
 my $range_1_5_3 = catfile($tmp_dir, "range-1-5-3.fa");
 open my $range_1_5_3_fh, '>', $range_1_5_3 or die "Can't open filehandle: $!";

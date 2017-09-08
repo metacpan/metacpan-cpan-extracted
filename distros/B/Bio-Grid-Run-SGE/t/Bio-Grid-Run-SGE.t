@@ -2,12 +2,14 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 use Carp;
+use Bio::Gonzales::Util::Log;
 
 BEGIN {
   use_ok('Bio::Grid::Run::SGE');
 
   use_ok("Bio::Grid::Run::SGE::Log::Analysis");
 }
+our $LOG =  Bio::Gonzales::Util::Log->new();
 
 my $d;
 sub TEST { $d = $_[0]; }
@@ -47,19 +49,22 @@ EOF
   $fh->close;
 
   Bio::Grid::Run::SGE::Log::Analysis->new(
-    c => {
-      cmd         => [qw/a b c d e/],
+    config => {
+      script_bin => 'a b c d e',
       perl_bin    => '/test/perl',
       stderr_dir  => $dir,
       stdout_dir  => $dir,
       working_dir => $dir,
       submit_bin  => 'qsub',
       log_dir     => $dir,
-      job_id      => 234,
       job_name    => 'testjob',
       tmp_dir     => $dir,
       stderr_dir  => $dir
+    }, env => {
+      job_id      => 234,
+      job_name_save    => 'testjob',
     },
+    log => $LOG,
     config_file => 'aaa'
   );
 }

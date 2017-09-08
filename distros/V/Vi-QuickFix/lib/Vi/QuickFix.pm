@@ -6,7 +6,7 @@ use strict; use warnings;
 
 our $VERSION;
 BEGIN {
-    $VERSION = ('$Revision: 1.134 $' =~ /(\d+.\d+)/)[ 0];
+    $VERSION = ('$Revision: 1.135 $' =~ /(\d+.\d+)/)[ 0];
 }
 
 unless ( caller ) {
@@ -140,7 +140,12 @@ my $end_entiteled = $$;
 END {
     # issue warning (only original process, and not in exec mode)
     unless ( is_silent or exec_mode() or $$ != $end_entiteled ) {
-        my $invocation_at = "at $invocation{file} line $invocation{line}";
+        my $invocation_at;
+        if ( %invocation ) {
+            $invocation_at = "at $invocation{file} line $invocation{line}";
+        } else {
+            $invocation_at = "at -M";
+        }
         warn "QuickFix ($relay) active $invocation_at\n";
     }
     # silently remove objects
@@ -274,6 +279,12 @@ sub WRITE {
     my ( $scalar, $length) = @_;
     Vi::QuickFix::err_out( $scalar);
     $fh->Tie::StdHandle::WRITE( @_);
+}
+
+# work around buggy BINMODE in Tie::Stdhandle
+
+sub BINMODE {
+    binmode($_[0], $_[1])
 }
 
 sub id { 'STDERR' }

@@ -7,7 +7,6 @@ META.json
 META.yml
 README.pod
 t/00-report-buildlog.t
-t/01-report-libtest.t
 t/02-report-prereqs.t
 t/03-query-lib.t
 t/04-init-lib.t

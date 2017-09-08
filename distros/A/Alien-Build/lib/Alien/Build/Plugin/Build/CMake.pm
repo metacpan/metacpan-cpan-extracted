@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub cmake_generator
@@ -84,7 +84,7 @@ sub init
 
   $meta->default_hook(
     build => [
-      ['%{cmake}', @args, '.' ],
+      ['%{cmake}', @args, '%{.install.extract}' ],
       ['%{make}' ],
       ['%{make}', 'install' ],
     ],
@@ -127,7 +127,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ version 1.05
      [ '%{cmake}',
          @{ meta->prop->{plugin_build_cmake}->{args} },
          # ... put extra cmake args here ...
-         '.'
+         '%{.install.extract}'
      ],
      '%{make}',
      '%{make} install',
@@ -160,6 +160,8 @@ but for the moment includes:
  -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true    \
  -DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix} \
  -DCMAKE_MAKE_PROGRAM:PATH=%{make}
+
+This plugin supports out-of-source builds via the meta property C<out_of_source>.
 
 =head1 METHODS
 
@@ -224,7 +226,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -241,6 +243,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

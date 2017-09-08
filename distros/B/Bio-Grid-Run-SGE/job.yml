@@ -1,0 +1,7 @@
+---
+input:
+- format: 'List'
+  elements:  [ 'a', 'b', 'c', 'd', 'e', 'f' ]
+job_name: "test"
+mode: 'Consecutive'
+submit_bin: 'bin/qfake.pl'

@@ -116,6 +116,16 @@ L<perl_version_removed()|/perl_version_removed> will return the version
 in which they were removed. When the new functionality appears, the
 parse produced by this software will reflect the new functionality.
 
+B<NOTE> that a literal left curly after a literal character was made an
+error in Perl 5.25.1, but became a warning again in 5.27.1 due to its
+use in GNU Autoconf.  Whether it will ever become illegal again is not
+clear to me based on the contents of F<perl5271delta>. At the moment
+C<PPIx::Regexp> considers this usage to have been removed in 5.25.1, and
+this will not change based on anything in 5.27.x. But if 5.26.1 comes
+out allowing this usage, the removal version will become C<undef>. The
+same will apply to any other usages that were re-allowed in 5.27.1, if I
+can identify them.
+
 =back
 
 There are very probably other examples of this. When they come to light
@@ -151,7 +161,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 =head2 new
 
@@ -734,6 +744,36 @@ to that version of Perl, it was simply parsed as C<v>. So
 
 prints "yes" under Perl 5.8.9, but "no" under 5.10.0. C<PPIx::Regexp>
 generally assumes the more modern parse in cases like this.
+
+=head2 Equivocation
+
+Very occasionally, a construction will be removed and then added back --
+and then, conceivably, removed again. In this case, the plan is for
+L<perl_version_introduced()|PPIx::Regexp/perl_version_introduced> to
+return the earliest version in which the construction appeared, and
+L<perl_version_removed()> to return the version after the last version
+in which it appeared (whether production or development), or C<undef> if
+it is in the highest-numbered Perl.
+
+The constructions involved in this are:
+
+=head3 Un-escaped literal left curly after literal
+
+That is, something like C<< qr<x{> >>.
+
+This was made an error in C<5.25.1>, and it was an error in C<5.26.0>.
+But it became a warning again in C<5.27.1>. The F<perl5271delta> says it
+was re-instated because the changes broke GNU Autoconf, and the warning
+message says it will be removed in Perl C<5.30>.
+
+Accordingly,
+L<perl_version_introduced()|PPIx::Regexp/perl_version_introduced>
+returns C<5.0>. At the moment
+L<perl_version_removed()|PPIx::Regexp/perl_version_removed> returns
+C<'5.025001'>, but if this construction warns in Perl C<5.26.1> this
+will become C<undef>. This is not quite the same as described above, but
+is consistent with the L<NOTICE|/NOTICE> near the beginning of this
+document.
 
 =head2 Static Parsing
 

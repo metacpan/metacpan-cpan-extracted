@@ -83,13 +83,15 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                   'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Perl::Tidy' => '20170521',
                                    'Test::Code::TidyAll' => '0.49',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010',
                                    'strict' => '0',
                                    'warnings' => '0'

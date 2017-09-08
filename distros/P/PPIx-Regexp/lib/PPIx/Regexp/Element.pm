@@ -36,16 +36,72 @@ use warnings;
 use 5.006;
 
 use Carp;
+use List::Util qw{ max min };
 use List::MoreUtils qw{ firstidx };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr weaken };
 
 use PPIx::Regexp::Constant qw{
+    FALSE
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
-    MINIMUM_PERL TOKEN_UNKNOWN
+    MINIMUM_PERL
+    TOKEN_UNKNOWN
+    TRUE
 };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
+
+=head2 accepts_perl
+
+ $token->accepts_perl( '5.020' )
+     and say 'This works under Perl 5.20';
+
+This method returns a true value if the token is acceptable under the
+specified version of Perl, and a false value otherwise. Unless the token
+(or its contents) have been equivocated on, the result is simply what
+you would expect based on testing the results of
+L<perl_version_introduced()|/perl_version_introduced> and
+L<perl_version_removed()|/perl_version_removed> versus the given Perl
+version number.
+
+This method was added in version 0.051_01.
+
+=cut
+
+sub accepts_perl {
+    my ( $self, $version ) = @_;
+    foreach my $check ( $self->__perl_requirements() ) {
+	$version < $check->{introduced}
+	    and next;
+	defined $check->{removed}
+	    and $version >= $check->{removed}
+	    and next;
+	return TRUE;
+    }
+    return FALSE;
+}
+
+# Return the Perl requirements, constructing if necessary. The
+# requirements are simply an array of hashes containing keys:
+#   {introduced} - The Perl version introduced;
+#   {removed} - The Perl version removed (or undef)
+# The requirements are evaluated by iterating through the array,
+# returning a true value if the version of Perl being tested falls
+# inside any of the half-open (on the right) intervals.
+sub __perl_requirements {
+    my ( $self ) = @_;
+    return @{ $self->{perl_requirements} ||=
+	[ $self->__perl_requirements_setup() ] };
+}
+
+# Construct the array returned by __perl_requirements().
+sub __perl_requirements_setup {
+    my ( $self ) = @_;
+    return {
+	introduced	=> $self->perl_version_introduced(),
+	removed		=> $self->perl_version_removed(),
+    };
+}
 
 =head2 ancestor_of
 
@@ -321,8 +377,14 @@ documentation, the results of this method should be viewed with caution,
 if not downright skepticism.
 
 There are also cases which are ambiguous in various ways. For those see
-L<PPIx::Regexp/RESTRICTIONS>, and especially
-L<PPIx::Regexp/Changes in Syntax>.
+the L<PPIx::Regexp|PPIx::Regexp> documentation, particularly
+L<Changes in Syntax|PPIx::Regexp/Changes in Syntax>.
+
+Very occasionally, a construct will be removed and then added back. If
+this happens, this method will return the B<lowest> version in which the
+construct appeared. For the known instances of this, see
+the L<PPIx::Regexp|PPIx::Regexp> documentation, particularly
+L<Equivocation|PPIx::Regexp/Equivocation>.
 
 =cut
 
@@ -339,6 +401,14 @@ All the I<caveats> to
 L<perl_version_introduced()|/perl_version_introduced> apply here also,
 though perhaps less severely since although many features have been
 introduced since 5.0, few have been removed.
+
+Very occasionally, a construct will be removed and then added back. If
+this happens, this method will return the C<undef> if the construct is
+present in the highest-numbered version of Perl (whether production or
+development), or the version after the highest-numbered version in which
+it appeared otherwise. For the known instances of this, see the
+L<PPIx::Regexp|PPIx::Regexp> documentation, particularly
+L<Equivocation|PPIx::Regexp/Equivocation>.
 
 =cut
 
@@ -359,6 +429,29 @@ sub previous_sibling {
 	or return;
     $inx or return;
     return $self->_parent()->$method( $inx - 1 );
+}
+
+=head2 requirements_for_perl
+
+ say $token->requirements_for_perl();
+
+This method returns a string representing the Perl requirements for a
+given module. This should only be used for informational purposes, as
+the format of the string may be subject to change.
+
+This method was added in version 0.051_01.
+
+=cut
+
+sub requirements_for_perl {
+    my ( $self ) = @_;
+    my @req;
+    foreach my $r ( @{ $self->__structured_requirements_for_perl( [] ) } ) {
+	push @req, defined $r->{removed} ?
+	"$r->{introduced} <= \$] < $r->{removed}" :
+	"$r->{introduced} <= \$]";
+    }
+    return join ' || ', @req;
 }
 
 =head2 significant
@@ -402,6 +495,41 @@ sub sprevious_sibling {
 	$sib->significant() and return $sib;
     }
     return;
+}
+
+# NOTE: This method is to be used ONLY for requirements_for_perl(). I
+# _may_ eventually expose it, but at the moment I do not consider it
+# stable. The exposure would be
+# sub structured_requirements_for_perl {
+#     my ( $self ) = @_;
+#     return $self->__structured_requirements_for_perl( [] );
+# }
+sub __structured_requirements_for_perl {
+    my ( $self, $rslt ) = @_;
+    if ( @{ $rslt } ) {
+	my @merged;
+	foreach my $left ( $self->__perl_requirements() ) {
+	    foreach my $right ( @{ $rslt } ) {
+		my $min = max( $left->{introduced}, $right->{introduced} );
+		my $max = defined $left->{removed} ?
+		    defined $right->{removed} ?
+			min( $left->{removed}, $right->{removed} ) :
+			$left->{removed} :
+		    $right->{removed};
+		defined $max
+		    and $max <= $min
+		    and next;
+		push @merged, {
+		    introduced	=> $min,
+		    removed		=> $max,
+		};
+	    }
+	}
+	@{ $rslt } = @merged;
+    } else {
+	@{ $rslt } = $self->__perl_requirements();
+    }
+    return $rslt;
 }
 
 =head2 tokens
@@ -543,6 +671,10 @@ sub __error {
 # deprecation will be done in at least two separate phases. It exists
 # for the use of PPIx::Regexp::Token::Literal->perl_version_removed, and
 # MUST NOT be called by any other code.
+# Note that the perldelta for 5.25.1 and 5.26.0 do not acknowledge tha
+# phased deprecation, and pretend that everything was done on the phase
+# 1 schedule. This appears to be deliberate per
+# https://rt.perl.org/Ticket/Display.html?id=131352
 sub __following_literal_left_curly_disallowed_in {
     return LITERAL_LEFT_CURLY_REMOVED_PHASE_1;
 }

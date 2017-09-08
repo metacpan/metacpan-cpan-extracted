@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -29,6 +29,8 @@ use Test::Mojibake;
 all_files_encoding_ok( grep { -d } qw( bin lib t xt ) );
 TEST_BODY
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

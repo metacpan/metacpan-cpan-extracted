@@ -1,5 +1,5 @@
 package Bio::Roary::External::CheckTools;
-$Bio::Roary::External::CheckTools::VERSION = '3.9.1';
+$Bio::Roary::External::CheckTools::VERSION = '3.10.2';
 # ABSTRACT: Check external executables are available and are the correct version
 
 
@@ -47,17 +47,17 @@ my %tools = (
     },
     'mafft' => {
         GETVER => "mafft --version < /dev/null 2>&1",
-        REGEXP => qr/v($BIDEC) /,
+        REGEXP => qr/(\d+\.\d+) /,
         NEEDED => 1,
     },
     'kraken' => {
         GETVER => "kraken --version | head -n 1",
-        REGEXP => qr/Kraken version kraken-(\d+\.\d+\.\d+.*)/,
+        REGEXP => qr/(\d+\.\d+\.\d+.*)/,
         NEEDED => 0,
     },
     'kraken-report' => {
         GETVER => "kraken-report --version | head -n 1",
-        REGEXP => qr/Kraken version kraken-(\d+\.\d+\.\d+.*)/,
+        REGEXP => qr/(\d+\.\d+\.\d+.*)/,
         NEEDED => 0,
     },
 	'Rscript'  => {
@@ -68,7 +68,7 @@ my %tools = (
     },
 
     # prank version also performs an update check so cant use it
-    'prank' => { NEEDED => 1 },
+    'prank' => { NEEDED => 0 },
 
     # now just the standard unix tools we need
     'grep' => { NEEDED => 1 },
@@ -191,7 +191,7 @@ Bio::Roary::External::CheckTools - Check external executables are available and 
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 Functionality borrowed from PROKKA by Torsten Seemann.

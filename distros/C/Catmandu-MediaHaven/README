@@ -60,9 +60,15 @@ METHODS
     Export the binary content of a record from the MediaHaven server. The
     callback will retrieve a stream of data when the download is available,
 
-SEE ALSO
+MODULES
 
     Catmandu::Importer::MediaHaven
+
+    Catmandu::Store::File::MediaHaven
+
+    Catmandu::Store::File::MediaHaven::Bag
+
+    Catmandu::Store::File::MediaHaven::Index
 
 AUTHOR
 

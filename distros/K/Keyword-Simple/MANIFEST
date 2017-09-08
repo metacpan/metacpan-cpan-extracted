@@ -1,13 +1,15 @@
 Changes
+lib/Keyword/Simple.pm
+Makefile.PL
+Makefile_PL_settings.plx
 MANIFEST
 MANIFEST.SKIP
-Makefile.PL
-README
 Simple.xs
-lib/Keyword/Simple.pm
 t/00-load.t
 t/basic.t
+t/eval.t
 t/lineno.t
-t/pod.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Keyword::Simple POD (added by maint/eumm-fixup.pl)

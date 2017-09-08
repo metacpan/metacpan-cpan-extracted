@@ -4,6 +4,8 @@ use Modern::Perl;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Carp qw(croak);
+use Scalar::Util qw(blessed);
+use boolean;
 use namespace::clean;
 
 use overload
@@ -12,7 +14,7 @@ use overload
   bool=>sub { $_[0]->is_true },
 ;
 
-our $VERSION='1.0001';
+our $VERSION='1.0002';
 
 =head1 NAME
 
@@ -77,6 +79,7 @@ Data::Result provides the following constructor arguments
 Required arguments:
 
   is_true: true or fale
+    # if not blessed it will be converted to a boolean true or false object
 
 Optional arguments
 
@@ -90,6 +93,7 @@ has is_true=>(
   is=>'rw',
   isa=>Bool,
   required=>1,
+  coerce=>sub { blessed $_[0] ? $_[0] : $_[0] ? true : false }
 );
 
 has msg=>(
@@ -165,6 +169,10 @@ sub DEMOLISH {
 }
 
 =back
+
+=head1 See Also
+
+L<boolean>
 
 =head1 AUTHOR
 

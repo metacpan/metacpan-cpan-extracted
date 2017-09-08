@@ -9,7 +9,7 @@ use Fcntl qw(O_RDONLY);
 use integer;
 use Carp qw(croak);
 
-$VERSION = '5.96';
+$VERSION = '5.97';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1563,6 +1563,7 @@ The author is particularly grateful to
 	Sean Burke
 	Chris Carey
 	Alexandr Ciornii
+	Chris David
 	Jim Doble
 	Thomas Drugeon
 	Julius Duque
@@ -1587,7 +1588,7 @@ the M and the last R were missing."
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2016 Mark Shelor
+Copyright (C) 2003-2017 Mark Shelor
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

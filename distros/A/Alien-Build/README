@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.05
+    version 1.10
 
 SYNOPSIS
 
@@ -205,6 +205,16 @@ PROPERTIES
 	Note that cygwin and msys are considered unix even though they run
 	on windows!
 
+    out_of_source
+
+      Build in a different directory from the where the source code is
+      stored. In autoconf this is referred to as a "VPATH" build. Everyone
+      else calls this an "out-of-source" build. When this property is true,
+      instead of extracting to the source build root, the downloaded source
+      will be extracted to an source extraction directory and the source
+      build root will be empty. You can use the extract install property to
+      get the location of the extracted source.
+
     start_url
 
       The default or start URL used by fetch plugins.
@@ -226,9 +236,21 @@ PROPERTIES
       should only use this if you are using Alien::Build::Plugin::Autoconf
       in your alienfile.
 
+    download
+
+      The location of the downloaded archive (tar.gz, or similar) or
+      directory.
+
     env
 
       Environment variables to override during the build stage.
+
+    extract
+
+      The location of the last source extraction. For a "out-of-source"
+      build (see the out_of_source meta property above), this will only be
+      set once. For other types of builds, the source code may be extracted
+      multiple times, and thus this property may change.
 
     old
 
@@ -626,7 +648,8 @@ ENVIRONMENT
     ALIEN_INSTALL_TYPE
 
       If set to share or system, it will override the system detection
-      logic.
+      logic. If set to default, it will use the default setting for the
+      alienfile. The behavior of other values is undefined.
 
     ALIEN_BUILD_RC
 
@@ -697,6 +720,28 @@ SEE ALSO
 
     alienfile, Alien::Build::MM, Alien::Build::Plugin, Alien::Base, Alien
 
+THANKS
+
+    Alien::Base was originally written by Joel Berger, the rest of this
+    project would not have been possible without him getting the project
+    started. Thanks to his support I have been able to augment the original
+    Alien::Base system with a reliable set of tools (Alien::Build,
+    alienfile, Test::Alien), which make up this toolset.
+
+    The original Alien::Base is still copyright (c) 2012-2017 Joel Berger.
+    It has the same license as the rest of the Alien::Build and related
+    tools distributed as Alien-Build. Joel Berger thanked a number of
+    people who helped in in the development of Alien::Base, in the
+    documentation for that module.
+
+    I would also like to acknowledge the other memebers of the Perl5-Alien
+    github organization, Zakariyya Mughal (sivoais, ZMUGHAL) and mohawk
+    (ETJ). Also important in the early development of Alien::Build were the
+    early adopters Chase Whitener (genio, CAPOEIRAB, author of
+    Alien::libuv), William N. Braswell, Jr (willthechill, WBRASWELL, author
+    of Alien::JPCRE2 and Alien::PCRE2) and Ahmad Fatoum (a3f, ATHREEF,
+    author of Alien::libudev and Alien::LibUSB).
+
 AUTHOR
 
     Author: Graham Ollis <plicease@cpan.org>
@@ -719,7 +764,7 @@ AUTHOR
 
     Zaki Mughal (zmughal)
 
-    mohawk2
+    mohawk (mohawk2, ETJ)
 
     Vikas N Kumar (vikasnkumar)
 
@@ -736,6 +781,10 @@ AUTHOR
     Nicholas Shipp (nshp)
 
     Juan Julián Merelo Guervós (JJ)
+
+    Joel Berger (JBERGER)
+
+    Petr Pisar (ppisar)
 
 COPYRIGHT AND LICENSE
 

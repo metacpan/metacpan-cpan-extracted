@@ -6,14 +6,14 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+pkg_name' => sub {
   Carp::croak "pkg_name is a required property";
 };
 
-has bin_name => sub {
+sub _bin_name {
 
   # We prefer pkgconf to pkg-config because it seems to be the future.
 
@@ -26,6 +26,8 @@ has bin_name => sub {
         ? 'pkg-config'
         : undef;
 };
+
+has bin_name => \&_bin_name;
 
 
 has minimum_version => undef;
@@ -45,6 +47,12 @@ sub _val
   else
   { $build->runtime_prop->{$prop_name} = $string }
   ();
+}
+
+
+sub available
+{
+  !!_bin_name();
 }
 
 sub init
@@ -141,7 +149,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -170,6 +178,14 @@ names must be present.
 
 The minimum required version that is acceptable version as provided by the system.
 
+=head1 METHODS
+
+=head2 available
+
+ my $bool = Alien::Build::Plugin::PkgConfig::CommandLine->available;
+
+Returns true if the necessary prereqs for this plugin are I<already> installed.
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::PkgConfig::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -196,7 +212,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -213,6 +229,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

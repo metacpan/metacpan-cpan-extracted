@@ -2,6 +2,7 @@ package BioX::Workflow::Command::run;
 
 use v5.10;
 use MooseX::App::Command;
+use namespace::autoclean;
 
 use File::Path qw(make_path);
 
@@ -19,7 +20,7 @@ with 'BioX::Workflow::Command::Utils::Files';
 with 'BioSAILs::Utils::Files::CacheDir';
 with 'BioSAILs::Utils::CacheUtils';
 
-command_short_description 'Run your workflow';
+command_short_description 'Run your workflow.';
 command_long_description
   'Run your workflow, process the variables, and create all your directories.';
 
@@ -66,8 +67,6 @@ before 'BUILD' => sub {
     make_path( File::Spec->catdir( $self->cache_dir, '.biox-cache', 'logs' ) );
     make_path( File::Spec->catdir( $self->cache_dir, '.biox-cache', 'workflows' ) );
 };
-
-no Moose;
 
 __PACKAGE__->meta->make_immutable;
 

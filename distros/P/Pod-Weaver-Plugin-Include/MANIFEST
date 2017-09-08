@@ -11,6 +11,9 @@ lib/Pod/Weaver/Plugin/Include.pm
 lib/Pod/Weaver/Plugin/Include/Finder.pm
 t/010-weaving.t
 t/020-finder.t
+t/after_tmpl/in.pm
+t/after_tmpl/out.pod
+t/after_tmpl/weaver.ini
 t/circular-noerr/in.pod
 t/circular-noerr/l1.pod
 t/circular-noerr/l2.pod
@@ -23,6 +26,14 @@ t/circular/l2.pod
 t/circular/l3.pod
 t/circular/out.pod
 t/circular/weaver.ini
+t/continuous/in.pod
+t/continuous/level3.pod
+t/continuous/out.pod
+t/continuous/src.pod
+t/continuous/weaver.ini
+t/hidden/in.pod
+t/hidden/out.pod
+t/hidden/weaver.ini
 t/lib/TestPW.pm
 t/simple/in.pod
 t/simple/level3.pod

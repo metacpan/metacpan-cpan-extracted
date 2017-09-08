@@ -1,6 +1,6 @@
 # NAME
 
-Swagger2::Markdown - convert a Swagger2 spec to various markdown formats
+Swagger2::Markdown - DEPRECATED convert a Swagger2 spec to various markdown formats
 
 <div>
 
@@ -10,13 +10,16 @@ Swagger2::Markdown - convert a Swagger2 spec to various markdown formats
 
 # VERSION
 
-0.12
+9.99
 
 # DEPRECATION WARNING
 
 The Swagger2 distribution is no longer actively maintained. Ergo, this distribution
 is no longer actively maintained. If you would like to create an OpenAPI2::Markdown
 then please feel free.
+
+If you're looking at generating API docs from your Swagger2/OpenAPI spec then take
+a look at [https://github.com/Rebilly/ReDoc](https://github.com/Rebilly/ReDoc)
 
 # SYNOPSIS
 

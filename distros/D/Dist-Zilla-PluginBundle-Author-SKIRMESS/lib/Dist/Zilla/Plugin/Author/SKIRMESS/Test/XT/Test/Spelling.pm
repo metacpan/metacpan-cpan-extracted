@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 
@@ -58,6 +58,8 @@ sub _get_stopwords {
 
     return uniq sort @stopwords;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

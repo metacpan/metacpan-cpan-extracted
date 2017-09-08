@@ -1,3 +1,28 @@
+0.052		2017-09-07	T. R. Wyant
+    RT 122715: Clarify Node->find_parents() documentation. Thanks to
+    Salvatore Bonaccorso for letting me know about this problem..
+
+    Further deprecate tokenizer method prior() in favor of
+    prior_significant_token().
+
+
+    Add requirements_for_perl(). This is analogous to the
+    CPAN::Meta::Requirements method requirements_for_module(), though
+    the output is formatted differently. Also put in the actual
+    requirements for an un-escaped literal left curly after a constant,
+    which was removed in 5.25.1 and reinstated in 5.27.1.
+
+    Add accepts_perl(). This is analogous to
+    CPAN::Meta::Requirements->accepts_module(). I decided that
+    CPAN::Meta;:Requirements was overkill, but this may turn out to be
+    the wrong decision, so I will be careful what I expose.
+
+    Document behavior of perl_version_introduced() and
+    perl_version_removed() when a feature is re-introduced after
+    removal, or re-removed after re-introduction.
+
+    \N{} (empty curlys) removed in 5.27.1.
+
 0.051		2017-01-29	T. R. Wyant
   Support whitespace inside [] if /xx in effect.
     Starting with Perl 5.25.9, a space or tab appearing inside a bracketed

@@ -2,6 +2,8 @@ package BioX::Workflow::Command::stats;
 
 use v5.10;
 use MooseX::App::Command;
+use namespace::autoclean;
+
 use Log::Log4perl qw(:easy);
 use DateTime;
 use Text::ASCIITable;
@@ -14,43 +16,25 @@ use Path::Tiny;
 
 extends qw(  BioX::Workflow::Command );
 
-use BioX::Workflow::Command::Utils::Traits qw(ArrayRefOfStrs);
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
+
 use BioX::Workflow::Command::run::Rules::Directives;
 
 with 'BioX::Workflow::Command::Utils::Log';
 with 'BioX::Workflow::Command::run::Utils::Samples';
 with 'BioX::Workflow::Command::run::Utils::Attributes';
-with 'BioX::Workflow::Command::run::Utils::Rules';
+with 'BioX::Workflow::Command::run::Rules::Rules';
 with 'BioX::Workflow::Command::run::Utils::WriteMeta';
 with 'BioX::Workflow::Command::run::Utils::Files::TrackChanges';
 with 'BioX::Workflow::Command::run::Utils::Files::ResolveDeps';
 with 'BioX::Workflow::Command::Utils::Files';
-# with 'BioX::Workflow::Command::Utils::Plugin';
+with 'BioX::Workflow::Command::Utils::Log';
 
 command_short_description 'Get the status of INPUT/OUTPUT for your workflow';
 command_long_description
   'If you are unsure on where you are in your workflow, run this step. '
   . 'It will give you a breakdown of rules with associated files, '
   . 'and whether or not they have been created or modified. ';
-
-has 'app_log' => (
-    is      => 'rw',
-    default => sub {
-        my $self = shift;
-        Log::Log4perl->init( \ <<'EOT');
-  log4perl.category = FATAL, Screen
-  log4perl.appender.Screen = \
-      Log::Log4perl::Appender::ScreenColoredLevels
-  log4perl.appender.Screen.layout = \
-      Log::Log4perl::Layout::PatternLayout
-  log4perl.appender.Screen.layout.ConversionPattern = \
-      [%d] %m %n
-EOT
-        return get_logger();
-    },
-    lazy => 1,
-);
-
 
 has 'table_log' => (
     is      => 'rw',
@@ -73,6 +57,11 @@ our $human = Number::Bytes::Human->new(
     bs          => 1024,
     round_style => 'round',
     precision   => 2
+);
+
+has 'add_row' => (
+    is      => 'rw',
+    default => 0,
 );
 
 sub execute {
@@ -106,7 +95,7 @@ around 'pre_FILES' => sub {
     return unless $self->has_files;
     return unless $self->files;
 
-    $DB::single=2;
+    $DB::single = 2;
 
     for my $file ( $self->all_files ) {
         $self->preprocess_row( $file, $cond );
@@ -160,6 +149,7 @@ sub gen_row {
             push( @trow, '' );
         }
         $self->table_log->addRow( \@trow );
+        $self->add_row(1);
     }
 }
 
@@ -211,6 +201,7 @@ sub iter_file_chunks {
 after 'template_process' => sub {
     my $self = shift;
 
+    return unless $self->add_row;
     try {
         $self->table_log->addRowLine();
     }
@@ -219,7 +210,6 @@ after 'template_process' => sub {
 around 'print_process_workflow' => sub {
 };
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

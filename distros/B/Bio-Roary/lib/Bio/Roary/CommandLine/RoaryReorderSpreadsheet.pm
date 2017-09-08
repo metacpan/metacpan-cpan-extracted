@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::RoaryReorderSpreadsheet;
-$Bio::Roary::CommandLine::RoaryReorderSpreadsheet::VERSION = '3.9.1';
+$Bio::Roary::CommandLine::RoaryReorderSpreadsheet::VERSION = '3.10.2';
 # ABSTRACT: Take in a tree and a spreadsheet and output a reordered spreadsheet
 
 
@@ -106,7 +106,7 @@ Bio::Roary::CommandLine::RoaryReorderSpreadsheet - Take in a tree and a spreadsh
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

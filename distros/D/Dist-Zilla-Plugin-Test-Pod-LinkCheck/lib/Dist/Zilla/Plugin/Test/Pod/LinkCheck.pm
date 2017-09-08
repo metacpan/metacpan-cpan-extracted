@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::Pod::LinkCheck;
-# git description: v1.002-2-g70004b4
+# git description: v1.003-0-gcb2f3ab
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Add author tests for POD links
-$Dist::Zilla::Plugin::Test::Pod::LinkCheck::VERSION = '1.003';
+$Dist::Zilla::Plugin::Test::Pod::LinkCheck::VERSION = '1.004';
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
 with 'Dist::Zilla::Role::PrereqSource';
@@ -50,7 +50,7 @@ Dist::Zilla::Plugin::Test::Pod::LinkCheck - Add author tests for POD links
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

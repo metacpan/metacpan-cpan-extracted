@@ -2,6 +2,8 @@ package Datahub::Factory::Logger;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Moo::Role;
 use MooX::Aliases;
 use namespace::clean;

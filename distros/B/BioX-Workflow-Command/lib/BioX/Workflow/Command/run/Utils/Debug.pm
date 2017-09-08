@@ -1,8 +1,9 @@
 package BioX::Workflow::Command::run::Utils::Debug;
 
-use Storable qw(dclone);
-
 use Moose::Role;
+use namespace::autoclean;
+
+use Storable qw(dclone);
 
 =head1 BioX::Workflow::Command::run::utils::Debug
 

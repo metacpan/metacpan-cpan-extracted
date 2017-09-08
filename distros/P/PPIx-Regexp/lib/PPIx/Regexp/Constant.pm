@@ -3,7 +3,7 @@ package PPIx::Regexp::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 use base qw{ Exporter };
 
@@ -12,6 +12,7 @@ our @EXPORT_OK = qw{
     COOKIE_QUANT
     COOKIE_QUOTE
     COOKIE_REGEX_SET
+    FALSE
     LITERAL_LEFT_CURLY_ALLOWED
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
@@ -23,12 +24,16 @@ our @EXPORT_OK = qw{
     STRUCTURE_UNKNOWN
     TOKEN_LITERAL
     TOKEN_UNKNOWN
+    TRUE
 };
 
 use constant COOKIE_CLASS	=> ']';
 use constant COOKIE_QUANT	=> '}';
 use constant COOKIE_QUOTE	=> '\\E';
 use constant COOKIE_REGEX_SET	=> '])';
+
+use constant FALSE		=> 0;
+use constant TRUE		=> 1;
 
 use constant LITERAL_LEFT_CURLY_ALLOWED		=> undef;
 use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_1	=> '5.025001';

@@ -29,6 +29,13 @@ directories
 sub write_test_file {
     my $test_dir = shift;
 
+    my $template = <<EOF;
+{{sample}}
+{{#some_list}}
+List: {{.}}
+{{/some_list}}
+Basename: {{basename_input}}
+EOF
     my $href = {
         global => [
             { sample_rule       => "(Sample_.*)" },
@@ -45,11 +52,15 @@ sub write_test_file {
             {
                 jellyfish => {
                     'local' => [
-                        { root_dir => 'data/raw' },
+                        { root_dir           => 'data/raw' },
+                        { some_list          => [ 1, 2, 3, 4 ] },
+                        { some_glob => 'data/raw/*'},
+                        { template_mustache  => $template },
                         { register_namespace => ['Test::Custom::Eval'] },
                         {
                             INPUT => '{$self->jellyfish_dir}/some_input_rule1'
                         },
+                        { basename_input => '{ basename($self->INPUT) }'},
                         { OUTPUT => '{$self->jellyfish_dir}/some_input_rule1' },
                         { HPC    => [ { 'deps' => 'some_dep' } ] }
                     ],
@@ -83,8 +94,9 @@ sub construct_tests {
 
     write_test_file($test_dir);
 
-    my $t     = File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' );
-    my $test  = $test_methods->make_test_env( $t,['--exclude_samples', 'Sample_03'] );
+    my $t = File::Spec->catdir( $test_dir, 'conf', 'test1.1.yml' );
+    my $test =
+      $test_methods->make_test_env( $t, [ '--exclude_samples', 'Sample_03' ] );
     my $rules = $test->workflow_data->{rules};
 
     return ( $test, $test_dir, $rules );
@@ -102,13 +114,34 @@ sub test_001 {
 
     $test->post_process_rules;
 
-    is_deeply( $test->exclude_samples, [ 'Sample_03' ] );
+    is_deeply( $test->exclude_samples, ['Sample_03'] );
     is_deeply( $test->samples, [ 'Sample_01', 'Sample_02' ] );
 
-    ok((-d 'data/processed/Sample_01/jellyfish'));
-    ok((-d 'data/processed/Sample_02/jellyfish'));
+    ok( ( -d 'data/processed/Sample_01/jellyfish' ) );
+    ok( ( -d 'data/processed/Sample_02/jellyfish' ) );
 
-    is_deeply($test->process_obj->{jellyfish}->{text}, ['HELLO FROM JELLYFISH!', 'HELLO FROM JELLYFISH!']);
+    is_deeply( $test->process_obj->{jellyfish}->{text},
+        [ 'HELLO FROM JELLYFISH!', 'HELLO FROM JELLYFISH!' ] );
+}
+
+sub test_002 {
+    my ( $test, $test_dir, $rules ) = construct_tests;
+    my $rule = $rules->[0];
+    _init_rule( $test, $rule );
+
+    # $test->sample('Sample_01');
+    my $attr = $test->walk_attr;
+
+    my $text = $attr->render_mustache( $attr->template_mustache, 0 );
+    my $expect = <<EOF;
+__DUMMYSAMPLE123456789__
+List: 1
+List: 2
+List: 3
+List: 4
+Basename: some_input_rule1
+EOF
+    is( $text, $expect, 'Mustache template matches' );
 }
 
 sub _init_rule {
@@ -129,10 +162,10 @@ use Moose::Role;
 use namespace::autoclean;
 
 sub eval_rule_jellyfish {
-  my $self = shift;
-  my $process = shift;
+    my $self    = shift;
+    my $process = shift;
 
-  return 'HELLO FROM JELLYFISH!';
+    return 'HELLO FROM JELLYFISH!';
 }
 
 1;

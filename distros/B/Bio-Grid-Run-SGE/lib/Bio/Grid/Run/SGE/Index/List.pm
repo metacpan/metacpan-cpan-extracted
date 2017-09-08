@@ -10,7 +10,7 @@ use List::MoreUtils qw/uniq/;
 
 with 'Bio::Grid::Run::SGE::Role::Indexable';
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 sub BUILD {
   my ($self) = @_;
@@ -30,12 +30,12 @@ sub BUILD {
 before 'create' => sub {
   my $self = shift;
 
-  print STDERR "SKIPPING INDEXING STEP, THE INDEX IS UP TO DATE\n"
+  $self->log->info("SKIPPING INDEXING STEP, THE INDEX IS UP TO DATE")
     if ( $self->_is_indexed );
 
   $self->_check_writable;
 
-  print STDERR "INDEXING ....\n";
+  $self->log->info("INDEXING ....");
 };
 
 sub create {

@@ -1,5 +1,18 @@
 Revision history for Datahub-Factory-VKC
 
+0.92  2017-09-06 10:59:08 CEST
+
+    - Changed: updated documentation and licensing
+
+0.91  2017-09-05 14:18:12 CEST
+
+    - Changed: improved import headers and our $VERSION.
+    - Changed: minimal required version of Datahub::Factory is 1.70.
+    - Added: a dist.ini for dist / dzil milla
+    - fixed: missing Catmandu::Adlib dependency
+    - changed: moved TMS::Index to a dedicated KMSKA namespace
+    - added: missing dependency DBD::mysql
+
 0.9  2017-06-08 11:27:39 CEST
     - changed: conform to new Catmandu::Store::Datahub API
     - added: Arthub Exporter module

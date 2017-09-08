@@ -166,12 +166,15 @@ has 'sample' => (
 
 Boolean value get new samples based on indir/sample_rule or no
 
-Samples are found at the beginning of the workflow, based on the global indir variable and the file_find.
+Samples are found at the beginning of the workflow, based on the global indir
+variable and the file_find.
 
-Chances are you don't want to set resample to true. These files probably won't exist outside of the indirectory until the pipeline is run.
+Chances are you don't want to set resample to true. These files probably won't
+exist outside of the indirectory until the pipeline is run.
 
-One example of doing so, shown in the gemini.yml in the examples directory, is looking for uncompressed files, .vcf extension, compressing them, and
-then resampling based on the .vcf.gz extension.
+One example of doing so, shown in the gemini.yml in the examples directory, is
+looking for uncompressed files, .vcf extension, compressing them, and then
+resampling based on the .vcf.gz extension.
 
 =cut
 

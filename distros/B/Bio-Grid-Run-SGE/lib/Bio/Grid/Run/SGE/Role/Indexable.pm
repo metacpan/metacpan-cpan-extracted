@@ -7,8 +7,9 @@ use strict;
 
 use Storable qw/nstore retrieve/;
 use Bio::Grid::Run::SGE::Util qw/my_glob/;
+use Bio::Gonzales::Util::Log;
 
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.060'; # VERSION
 
 requires qw/num_elem create get_elem type close/;
 
@@ -17,35 +18,36 @@ has idx_file  => ( is => 'rw', required => 1 );
 has idx       => ( is => 'rw', default => sub { [] } );
 has chunk_size => ( is => 'ro', default => 1 );
 has _reindexing_necessary => ( is => 'rw' );
-has _internal_info => ( is => 'rw', default => sub { {} } );
+has _internal_info        => ( is => 'rw', default => sub { {} } );
+has log                   => ( is => 'rw', default => sub { Bio::Gonzales::Util::Log->new } );
 
 sub _load_index {
-    my ($self) = @_;
+  my ($self) = @_;
 
-    my $idx = retrieve $self->idx_file;
-    if ( !ref $idx eq 'HASH' ) {
-        warn "existing index is in old format, REINDEXING NECESSARY";
-        $self->_reindexing_necessary(1);
-    }
+  my $idx = retrieve $self->idx_file;
+  if ( !ref $idx eq 'HASH' ) {
+    $self->log->warn("existing index is in old format, REINDEXING NECESSARY");
+    $self->_reindexing_necessary(1);
+  }
 
-    if ( $idx->{class} ne blessed($self) ) {
-        warn "existing index is of type "
-            . $idx->{class}
-            . " and not of type "
-            . blessed($self)
-            . ", REINDEXING NECESSARY";
-        $self->_reindexing_necessary(1);
-    }
-    if ( !$idx->{chunk_size} || $self->chunk_size != $idx->{chunk_size} ) {
-        warn "chunk_size differs between old index and new index, REINDEXING NECESSARY";
-        $self->_reindexing_necessary(1);
-    }
-    unless ( $self->_reindexing_necessary ) {
-        $self->idx( $idx->{data} );
-        $self->_internal_info( $idx->{internal_info} ) if(defined($idx->{internal_info}));
-    }
+  if ( $idx->{class} ne blessed($self) ) {
+    $self->log->warn( "existing index is of type "
+        . $idx->{class}
+        . " and not of type "
+        . blessed($self)
+        . ", REINDEXING NECESSARY" );
+    $self->_reindexing_necessary(1);
+  }
+  if ( !$idx->{chunk_size} || $self->chunk_size != $idx->{chunk_size} ) {
+    $self->log->warn("chunk_size differs between old index and new index, REINDEXING NECESSARY");
+    $self->_reindexing_necessary(1);
+  }
+  unless ( $self->_reindexing_necessary ) {
+    $self->idx( $idx->{data} );
+    $self->_internal_info( $idx->{internal_info} ) if ( defined( $idx->{internal_info} ) );
+  }
 
-    return;
+  return;
 }
 
 #sub BUILD { }
@@ -55,52 +57,35 @@ sub _load_index {
 #};
 
 sub _store {
-    my ($self) = @_;
+  my ($self) = @_;
 
-    nstore(
-        {
-            data          => $self->idx,
-            chunk_size    => $self->chunk_size,
-            class         => blessed($self),
-            internal_info => $self->_internal_info
-        },
-        $self->idx_file
-    );
+  nstore(
+    {
+      data          => $self->idx,
+      chunk_size    => $self->chunk_size,
+      class         => blessed($self),
+      internal_info => $self->_internal_info
+    },
+    $self->idx_file
+  );
 }
 
 sub _check_range_fatal {
-    my ( $self, @range ) = @_;
+  my ( $self, @range ) = @_;
 
-    my $num_elem = $self->num_elem;
-    confess "Given range NOT VALID range: $range[0]-$range[1], entries: $num_elem"
-        if ( @range < 2
-        || $num_elem < $range[0] + 1
-        || $num_elem < $range[1] + 1
-        || $range[0] < 0
-        || $range[1] < 0 );
+  my $num_elem = $self->num_elem;
+  confess "Given range NOT VALID range: $range[0]-$range[1], entries: $num_elem"
+    if ( @range < 2
+    || $num_elem < $range[0] + 1
+    || $num_elem < $range[1] + 1
+    || $range[0] < 0
+    || $range[1] < 0 );
 
-    if ( @range >= 3 ) {
-        confess "Given range NOT VALID extra element: $range[2], entries: $num_elem"
-            if ( $num_elem < $range[2] + 1 || $range[2] < 0 );
-    }
-    return;
-}
-
-sub _glob_input_files {
-    my ( $self, $input_files ) = @_;
-
-    my @abs_input_files;
-    for my $glob_pattern (@$input_files) {
-        my @files = my_glob($glob_pattern);
-        next unless ( @files > 0 );
-        for my $f (@files) {
-            confess "Couldn't find/access $f" unless ( -f $f || -d $f);
-        }
-        push @abs_input_files, @files;
-    }
-    confess "INDEX: no input files found" unless ( @abs_input_files > 0 );
-
-    return \@abs_input_files;
+  if ( @range >= 3 ) {
+    confess "Given range NOT VALID extra element: $range[2], entries: $num_elem"
+      if ( $num_elem < $range[2] + 1 || $range[2] < 0 );
+  }
+  return;
 }
 
 1;

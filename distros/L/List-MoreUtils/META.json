@@ -46,19 +46,15 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "List::MoreUtils::XS" : "0.423"
-         },
          "requires" : {
-            "Exporter::Tiny" : "0.038"
+            "Exporter::Tiny" : "0.038",
+            "List::MoreUtils::XS" : "0.423"
          }
       },
       "test" : {
-         "recommends" : {
-            "Test::LeakTrace" : "0"
-         },
          "requires" : {
             "Storable" : "0",
+            "Test::LeakTrace" : "0",
             "Test::More" : "0.96"
          }
       }
@@ -76,6 +72,6 @@
          "web" : "https://github.com/perl5-utils/List-MoreUtils"
       }
    },
-   "version" : "0.423",
+   "version" : "0.425",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

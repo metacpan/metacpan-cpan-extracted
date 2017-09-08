@@ -33,3 +33,14 @@ WriteMakefile(
     OBJECT            => '$(O_FILES)', # link all the C files too
     $debug ? (DEFINE => '-DDEBUG') : ()
 );
+
+# Run create_lib_dll script after running LD
+sub MY::postamble {
+
+  my $make =<<"EOS";
+dynamic ::
+\tperl create_lib_dll.pl
+EOS
+
+  return $make;
+}

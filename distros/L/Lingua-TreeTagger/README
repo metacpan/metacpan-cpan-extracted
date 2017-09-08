@@ -1,4 +1,4 @@
-Lingua-TreeTagger version 0.08
+Lingua-TreeTagger version 0.09
 
 This module provides a simple object-oriented interface to the TreeTagger
 part-of-speech tagger created by Helmut Schmid.
@@ -48,7 +48,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010-2015 Aris Xanthos
+Copyright (C) 2010-2017 Aris Xanthos
 
 This program is released under the following license: GPL
 

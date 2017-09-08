@@ -2,12 +2,13 @@ package Datahub::Factory::Fixer::Fix;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Moo;
 use Catmandu;
 use namespace::clean;
-#use Data::Dumper qw(Dumper);
 
-has file_name     => (is => 'ro', required => 1, isa => sub { 
+has file_name     => (is => 'ro', required => 1, isa => sub {
     if (!defined($_[0])) {
         Catmandu::BadArg->throw(
             message => 'Required argument "file_name" undefined'

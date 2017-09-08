@@ -4,7 +4,7 @@ package Test::Class::Moose::Runner;
 
 use 5.10.0;
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 use Moose 2.0000;
 use Carp;
@@ -91,7 +91,7 @@ Test::Class::Moose::Runner - Runner for Test::Class::Moose tests
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -277,6 +277,11 @@ L<Test::Class::Moose::Config> rather than the runner itself. This may change
 in a future release, in which case this method will simply return the runner
 itself for backwards compatibility.
 
+=head2 C<< $runner->test_report >>
+
+This returns a L<Test::Class::Moose::Report> for the runner. After running
+tests you can use this object to get information about the test run.
+
 =head1 PARALLEL RUNNING
 
 Running tests in parallel requires you to have L<Parallel::ForkManager>
@@ -304,13 +309,13 @@ run.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/test-class-moose/test-class-moose/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/test-class-moose/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
 
 =head1 AUTHORS
 

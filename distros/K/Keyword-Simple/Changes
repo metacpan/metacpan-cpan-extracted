@@ -1,5 +1,9 @@
 Revision history for Keyword-Simple
 
+0.04    2017-09-08
+        - Fix crash when using keywords in string eval (RT #122983).
+        - Document that keywords are broken in s//.../e.
+
 0.03    2014-10-19
         - Add note to POD about requiring perl v5.12.
 

@@ -1,9 +1,8 @@
 package Datahub::Factory::Exporter::Arthub;
 
-use strict;
-use warnings;
-
 use Datahub::Factory::Sane;
+
+our $VERSION = '0.92';
 
 use Lido::XML;
 use Moo;

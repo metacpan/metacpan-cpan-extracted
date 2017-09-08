@@ -1,7 +1,7 @@
 package Complete::Module;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.260'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 #use Log::Any '$log';
 
 use Complete::Common qw(:all);
-use List::MoreUtils qw(uniq);
+use List::Util qw(uniq);
 
 our %SPEC;
 require Exporter;
@@ -222,7 +222,7 @@ Complete::Module - Complete with installed Perl module names
 
 =head1 VERSION
 
-This document describes version 0.25 of Complete::Module (from Perl distribution Complete-Module), released on 2017-07-11.
+This document describes version 0.260 of Complete::Module (from Perl distribution Complete-Module), released on 2017-09-08.
 
 =head1 SYNOPSIS
 

@@ -88,7 +88,9 @@ my @files = (
     't/tags.t',
     't/test_class_is_not_loaded.t',
     't/test_control_methods.t',
-    't/test_control_methods_skip.t'
+    't/test_control_methods_skip.t',
+    't/timing.t',
+    't/timinglib/TestFor/Timing.pm'
 );
 
 notabs_ok($_) foreach @files;

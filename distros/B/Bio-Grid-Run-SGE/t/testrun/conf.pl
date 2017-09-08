@@ -8,5 +8,5 @@
 
     input => [ { format => 'general', sep => '^>', files => [ ...] }, '...'],
     mode => 'AvsB',
-    parts  => 3,
+    num_parts  => 3,
 );

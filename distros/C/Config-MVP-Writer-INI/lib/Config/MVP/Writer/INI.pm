@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Config::MVP::Writer::INI;
-# git description: v0.003-3-gfc75cb5
+# git description: v0.004-1-g89f27f0
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Build an INI file for Config::MVP
-$Config::MVP::Writer::INI::VERSION = '0.004';
+$Config::MVP::Writer::INI::VERSION = '0.005';
 use Moose;
 use Moose::Util::TypeConstraints;
 use List::Util ();
@@ -189,9 +189,9 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Randy Stauner ACKNOWLEDGEMENTS Etheridge Karen TODO cpan testmatrix url
-annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata
-placeholders metacpan
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS TODO cpan testmatrix url annocpan anno
+bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+metacpan
 
 =head1 NAME
 
@@ -199,7 +199,9 @@ Config::MVP::Writer::INI - Build an INI file for Config::MVP
 
 =head1 VERSION
 
-version 0.004
+version 0.005
+
+=for test_synopsis my @sections;
 
 =head1 SYNOPSIS
 
@@ -289,8 +291,6 @@ For convenience a few specification shortcuts are recognized:
   is         => 'ro',
   isa        => union([qw( ArrayRef Bool )]),
 );
-
-=for test_synopsis my @sections;
 
 =head1 WARNING
 

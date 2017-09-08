@@ -1,5 +1,8 @@
 #!/usr/bin/perl -s
 
+# PODNAME: tmxclean
+# ABSTRACT: Simple tool to clean TMX files
+
 use v5.10;
 use strict;
 use warnings;
@@ -58,15 +61,23 @@ sub help {
     exit 1;
 }
 
+__END__
+
+=pod
+
 =encoding UTF-8
 
 =head1 NAME
 
-tmx-clean - clean TMX files ???
+tmxclean - Simple tool to clean TMX files
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
-  $ tmx-clean file.tmx  # ???
+  $ tmx-clean file.tmx
 
 =head1 DESCRIPTION
 
@@ -78,5 +89,26 @@ Removes the Translation units that
 =head1 SEE ALSO
 
 XML::TMX
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

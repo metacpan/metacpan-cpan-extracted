@@ -1,47 +1,61 @@
 Revision history for Perl extension XML::TMX.
 
-0.32   Sex Ago 11 21:57:56 WEST 2017
+0.36   2017-09-08
+       - Minor package Fixes (Nuno Smash Carvalho)
+
+0.35   2017-09-07
+       - Remove spurious Emacs temp files.
+
+0.34   2017-09-06
+       - Minor Dist::Zilla improvements;
+       - Use File::Temp on some tests;
+
+0.33   2017-09-05
+       - Distribution based on Dist::Zilla
+       - Documentation Improvements
+
+0.32   2017-08-11
        - Added better handling of files with BOM
        - Added better handling of tmx2tmx -cat, handling input encodings
        	 (still needing extra work with BOM files)
 
-0.31   Mon Jan 11 19:32:33 WET 2016
+0.31   2016-01-11
        - Fixed utf8 POD.
 
-0.30   Mon Jan 11 19:07:37 WET 2016
+0.30   2016-01-11
        - Added tsv2tmx script.
 
-0.29   Sat Oct 10 20:04:11 WEST 2015
+0.29   2015-10-10
        - Consistent version numbers
 
-0.28   Thu Sep 17 14:24:20 WEST 2015
+0.28   2015-09-17
        - Fixed TMX spec URL (thanks to Alexander Becker)
 
-0.27   Mon Aug 31 18:14:12 WEST 2015
+0.27   2015-08-31
        - Fixed tmx-POStagger.
 
-0.26   Tue Apr 28 19:08:28 WEST 2015
+0.26   2015-04-28
        - Fixed bug when processing CDATA elements.
        - Added -raw option to for_tu
        - Reworked TMX annotated format.
        - Various improvements in tmx-POStagger.
 
-0.25   Tue Jul 30 16:06:58 WEST 2013
+0.25   2013-07-30
        - tmx2tmx -cat : fix a bug related with a missing ":utf8"
        - tmxclean -len: remove tu if len > 50 and len-min * 2 < len-max
        - tmxclean -eq:  remove tu if equal ( seg(l1)=seg(l2) )
        - output formatting of the TMX slightly changed (tu = lines/5) 
 
-0.24   Thu Nov 29 11:51:03 WET 2012
+0.24   2012-11-29
        - Require Perl v5.10
 
-0.23   Nov 24, 2012
+0.23   2012-11-24
         - sort languages when writing (good for tests)
 
-0.22   Jun 6, 2012
+0.22   2012-06-06
         - more UTF-8 pod stuff
 
-0.21   Jun 5, 2012
+0.21   2012-06-05
         - properly encode UTF-8
 
        Scripts
@@ -62,70 +76,68 @@ Revision history for Perl extension XML::TMX.
         - handle header props and notes
         - more testing
 
-0.20   Jan 31, 2012
+0.20   2012-01-31
         - add 'verbose' option to for_tu family of methods
 
-0.19   Jan 27, 2012
+0.19   2012-01-27
         - fix 'ignore_markup' in Reader.pm (thanks to Achim Ruopp)
 
-0.18   Feb 09, 2011
+0.18   2011-02-09
         - tmxwc working for multiple files;
         - Fixed tmxuniq to work without complaining on unicode;
 
-0.17   Dec 22, 2008
+0.17   2008-12-22
 	- Added tmxwc and tmxclean scripts.
 
-0.16   Fev  5, 2007
+0.16   2007-02-05
 	- refactored for_tu2 function (it used $&, $` and $').
 
-0.15   Dec  9, 2006
+0.15   2006-12-09
         - new for_tu2 function that will soon replace for_tu
           more efficient for big files
         - languages function just checks the first few 100 TUs
 
-0.14   Jun  7, 2006
+0.14   2006-06-07
         - in XML::TMX::Writer, if we know the encoding, use binmode
 	  to force it.
 
-0.13   Jul 20, 2005
+0.13   2005-06-20
 	- for_tu now handles direct output for another TMX file.
 	- removed some newlined in the output.
 
-0.12   Jul 17, 2005
+0.12   2005-07-17
 	- added some tests to XML::TMX::Writer;
 	- changed test names to be tested in order;
 
-0.11   Jul 12, 2005
+0.11   2005-07-12
 	- corrected stupid bug lying around since 0.05
 
-0.10   Sep 30, 2004 
-0.09    - problem with upload to CPAN;
-0.09    - problem with upload to CPAN;
+0.10   2004-11-30
 	- added pod and pod-coverage tests;
         - added documentation;
 
-0.07   May 18, 2004
+0.07   2004-05-18
         - option to remove sub-tags is now global and not specific for
           the for_tu command;
 
-0.06   Apr 22, 2004
+0.06   2004-04-22
         - corrected bug on test files
 	- tmx2tmx is installed
 	- tmx2tmx conversion to TRADOS TMX1.1 format
 	- tmx2tmx basic TMX cleaner
 
-0.05   Jan 07, 2004
+0.05   2004-01-07
 	- removed dependency with XML::Writer;
 	- option to remove sub-tags when processing <tu>s;
 
-0.04   Nov 11, 2003
+0.04   2003-11-11
 	- use xml:lang instead of lang if the first exists
 
-0.03   Oct 12, 2003
+0.03   2003-10-12
 	- Many bugs were found. Here is a working version (we hope)
 
-0.02   Oct 09, 2003
+0.02   2003-10-09
 	- Corrected warnings with perl 5.8.1
 
-0.01   Sep 14, 2003
+0.01   2003-09-14
 	- Created XML::TMX::{Reader|Query}

@@ -1,18 +1,909 @@
-SYNOPSIS
+NAME
+    LinuxMint::Releases - List LinuxMint releases
 
+VERSION
+    This document describes version 0.030 of LinuxMint::Releases (from Perl
+    distribution LinuxMint-Releases), released on 2017-09-08.
+
+SYNOPSIS
      use LinuxMint::Releases qw(list_linuxmint_release);
      my $res = list_linuxmint_releases(detail=>1);
      # raw data is in $LinuxMint::Releases::data;
 
 DESCRIPTION
-
     This module contains list of LinuxMint releases. Data source is
-    currently at: https://github.com/perlancar/gudangdata-distrowatch
+    currently at: <https://github.com/perlancar/gudangdata-distrowatch>
     (table/linuxmint_release) which in turn is retrieved from
-    http://distrowatch.com.
+    <http://distrowatch.com>.
+
+FUNCTIONS
+  list_linuxmint_releases
+    Usage:
+
+     list_linuxmint_releases(%args) -> [status, msg, result, meta]
+
+    REPLACE ME.
+
+    REPLACE ME
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   apache_httpd_version => *str*
+
+        Only return records where the 'apache_httpd_version' field equals
+        specified value.
+
+    *   apache_httpd_version.contains => *str*
+
+        Only return records where the 'apache_httpd_version' field contains
+        specified text.
+
+    *   apache_httpd_version.in => *array[str]*
+
+        Only return records where the 'apache_httpd_version' field is in the
+        specified values.
+
+    *   apache_httpd_version.is => *str*
+
+        Only return records where the 'apache_httpd_version' field equals
+        specified value.
+
+    *   apache_httpd_version.isnt => *str*
+
+        Only return records where the 'apache_httpd_version' field does not
+        equal specified value.
+
+    *   apache_httpd_version.max => *str*
+
+        Only return records where the 'apache_httpd_version' field is less
+        than or equal to specified value.
+
+    *   apache_httpd_version.min => *str*
+
+        Only return records where the 'apache_httpd_version' field is
+        greater than or equal to specified value.
+
+    *   apache_httpd_version.not_contains => *str*
+
+        Only return records where the 'apache_httpd_version' field does not
+        contain specified text.
+
+    *   apache_httpd_version.not_in => *array[str]*
+
+        Only return records where the 'apache_httpd_version' field is not in
+        the specified values.
+
+    *   apache_httpd_version.xmax => *str*
+
+        Only return records where the 'apache_httpd_version' field is less
+        than specified value.
+
+    *   apache_httpd_version.xmin => *str*
+
+        Only return records where the 'apache_httpd_version' field is
+        greater than specified value.
+
+    *   bash_version => *str*
+
+        Only return records where the 'bash_version' field equals specified
+        value.
+
+    *   bash_version.contains => *str*
+
+        Only return records where the 'bash_version' field contains
+        specified text.
+
+    *   bash_version.in => *array[str]*
+
+        Only return records where the 'bash_version' field is in the
+        specified values.
+
+    *   bash_version.is => *str*
+
+        Only return records where the 'bash_version' field equals specified
+        value.
+
+    *   bash_version.isnt => *str*
+
+        Only return records where the 'bash_version' field does not equal
+        specified value.
+
+    *   bash_version.max => *str*
+
+        Only return records where the 'bash_version' field is less than or
+        equal to specified value.
+
+    *   bash_version.min => *str*
+
+        Only return records where the 'bash_version' field is greater than
+        or equal to specified value.
+
+    *   bash_version.not_contains => *str*
+
+        Only return records where the 'bash_version' field does not contain
+        specified text.
+
+    *   bash_version.not_in => *array[str]*
+
+        Only return records where the 'bash_version' field is not in the
+        specified values.
+
+    *   bash_version.xmax => *str*
+
+        Only return records where the 'bash_version' field is less than
+        specified value.
+
+    *   bash_version.xmin => *str*
+
+        Only return records where the 'bash_version' field is greater than
+        specified value.
+
+    *   code_name => *str*
+
+        Only return records where the 'code_name' field equals specified
+        value.
+
+    *   code_name.contains => *str*
+
+        Only return records where the 'code_name' field contains specified
+        text.
+
+    *   code_name.in => *array[str]*
+
+        Only return records where the 'code_name' field is in the specified
+        values.
+
+    *   code_name.is => *str*
+
+        Only return records where the 'code_name' field equals specified
+        value.
+
+    *   code_name.isnt => *str*
+
+        Only return records where the 'code_name' field does not equal
+        specified value.
+
+    *   code_name.max => *str*
+
+        Only return records where the 'code_name' field is less than or
+        equal to specified value.
+
+    *   code_name.min => *str*
+
+        Only return records where the 'code_name' field is greater than or
+        equal to specified value.
+
+    *   code_name.not_contains => *str*
+
+        Only return records where the 'code_name' field does not contain
+        specified text.
+
+    *   code_name.not_in => *array[str]*
+
+        Only return records where the 'code_name' field is not in the
+        specified values.
+
+    *   code_name.xmax => *str*
+
+        Only return records where the 'code_name' field is less than
+        specified value.
+
+    *   code_name.xmin => *str*
+
+        Only return records where the 'code_name' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   eoldate => *date*
+
+        Only return records where the 'eoldate' field equals specified
+        value.
+
+    *   eoldate.in => *array[date]*
+
+        Only return records where the 'eoldate' field is in the specified
+        values.
+
+    *   eoldate.is => *date*
+
+        Only return records where the 'eoldate' field equals specified
+        value.
+
+    *   eoldate.isnt => *date*
+
+        Only return records where the 'eoldate' field does not equal
+        specified value.
+
+    *   eoldate.max => *date*
+
+        Only return records where the 'eoldate' field is less than or equal
+        to specified value.
+
+    *   eoldate.min => *date*
+
+        Only return records where the 'eoldate' field is greater than or
+        equal to specified value.
+
+    *   eoldate.not_in => *array[date]*
+
+        Only return records where the 'eoldate' field is not in the
+        specified values.
+
+    *   eoldate.xmax => *date*
+
+        Only return records where the 'eoldate' field is less than specified
+        value.
+
+    *   eoldate.xmin => *date*
+
+        Only return records where the 'eoldate' field is greater than
+        specified value.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   linux_version => *str*
+
+        Only return records where the 'linux_version' field equals specified
+        value.
+
+    *   linux_version.contains => *str*
+
+        Only return records where the 'linux_version' field contains
+        specified text.
+
+    *   linux_version.in => *array[str]*
+
+        Only return records where the 'linux_version' field is in the
+        specified values.
+
+    *   linux_version.is => *str*
+
+        Only return records where the 'linux_version' field equals specified
+        value.
+
+    *   linux_version.isnt => *str*
+
+        Only return records where the 'linux_version' field does not equal
+        specified value.
+
+    *   linux_version.max => *str*
+
+        Only return records where the 'linux_version' field is less than or
+        equal to specified value.
+
+    *   linux_version.min => *str*
+
+        Only return records where the 'linux_version' field is greater than
+        or equal to specified value.
+
+    *   linux_version.not_contains => *str*
+
+        Only return records where the 'linux_version' field does not contain
+        specified text.
+
+    *   linux_version.not_in => *array[str]*
+
+        Only return records where the 'linux_version' field is not in the
+        specified values.
+
+    *   linux_version.xmax => *str*
+
+        Only return records where the 'linux_version' field is less than
+        specified value.
+
+    *   linux_version.xmin => *str*
+
+        Only return records where the 'linux_version' field is greater than
+        specified value.
+
+    *   mariadb_version => *str*
+
+        Only return records where the 'mariadb_version' field equals
+        specified value.
+
+    *   mariadb_version.contains => *str*
+
+        Only return records where the 'mariadb_version' field contains
+        specified text.
+
+    *   mariadb_version.in => *array[str]*
+
+        Only return records where the 'mariadb_version' field is in the
+        specified values.
+
+    *   mariadb_version.is => *str*
+
+        Only return records where the 'mariadb_version' field equals
+        specified value.
+
+    *   mariadb_version.isnt => *str*
+
+        Only return records where the 'mariadb_version' field does not equal
+        specified value.
+
+    *   mariadb_version.max => *str*
+
+        Only return records where the 'mariadb_version' field is less than
+        or equal to specified value.
+
+    *   mariadb_version.min => *str*
+
+        Only return records where the 'mariadb_version' field is greater
+        than or equal to specified value.
+
+    *   mariadb_version.not_contains => *str*
+
+        Only return records where the 'mariadb_version' field does not
+        contain specified text.
+
+    *   mariadb_version.not_in => *array[str]*
+
+        Only return records where the 'mariadb_version' field is not in the
+        specified values.
+
+    *   mariadb_version.xmax => *str*
+
+        Only return records where the 'mariadb_version' field is less than
+        specified value.
+
+    *   mariadb_version.xmin => *str*
+
+        Only return records where the 'mariadb_version' field is greater
+        than specified value.
+
+    *   mysql_version => *str*
+
+        Only return records where the 'mysql_version' field equals specified
+        value.
+
+    *   mysql_version.contains => *str*
+
+        Only return records where the 'mysql_version' field contains
+        specified text.
+
+    *   mysql_version.in => *array[str]*
+
+        Only return records where the 'mysql_version' field is in the
+        specified values.
+
+    *   mysql_version.is => *str*
+
+        Only return records where the 'mysql_version' field equals specified
+        value.
+
+    *   mysql_version.isnt => *str*
+
+        Only return records where the 'mysql_version' field does not equal
+        specified value.
+
+    *   mysql_version.max => *str*
+
+        Only return records where the 'mysql_version' field is less than or
+        equal to specified value.
+
+    *   mysql_version.min => *str*
+
+        Only return records where the 'mysql_version' field is greater than
+        or equal to specified value.
+
+    *   mysql_version.not_contains => *str*
+
+        Only return records where the 'mysql_version' field does not contain
+        specified text.
+
+    *   mysql_version.not_in => *array[str]*
+
+        Only return records where the 'mysql_version' field is not in the
+        specified values.
+
+    *   mysql_version.xmax => *str*
+
+        Only return records where the 'mysql_version' field is less than
+        specified value.
+
+    *   mysql_version.xmin => *str*
+
+        Only return records where the 'mysql_version' field is greater than
+        specified value.
+
+    *   nginx_version => *str*
+
+        Only return records where the 'nginx_version' field equals specified
+        value.
+
+    *   nginx_version.contains => *str*
+
+        Only return records where the 'nginx_version' field contains
+        specified text.
+
+    *   nginx_version.in => *array[str]*
+
+        Only return records where the 'nginx_version' field is in the
+        specified values.
+
+    *   nginx_version.is => *str*
+
+        Only return records where the 'nginx_version' field equals specified
+        value.
+
+    *   nginx_version.isnt => *str*
+
+        Only return records where the 'nginx_version' field does not equal
+        specified value.
+
+    *   nginx_version.max => *str*
+
+        Only return records where the 'nginx_version' field is less than or
+        equal to specified value.
+
+    *   nginx_version.min => *str*
+
+        Only return records where the 'nginx_version' field is greater than
+        or equal to specified value.
+
+    *   nginx_version.not_contains => *str*
+
+        Only return records where the 'nginx_version' field does not contain
+        specified text.
+
+    *   nginx_version.not_in => *array[str]*
+
+        Only return records where the 'nginx_version' field is not in the
+        specified values.
+
+    *   nginx_version.xmax => *str*
+
+        Only return records where the 'nginx_version' field is less than
+        specified value.
+
+    *   nginx_version.xmin => *str*
+
+        Only return records where the 'nginx_version' field is greater than
+        specified value.
+
+    *   perl_version => *str*
+
+        Only return records where the 'perl_version' field equals specified
+        value.
+
+    *   perl_version.contains => *str*
+
+        Only return records where the 'perl_version' field contains
+        specified text.
+
+    *   perl_version.in => *array[str]*
+
+        Only return records where the 'perl_version' field is in the
+        specified values.
+
+    *   perl_version.is => *str*
+
+        Only return records where the 'perl_version' field equals specified
+        value.
+
+    *   perl_version.isnt => *str*
+
+        Only return records where the 'perl_version' field does not equal
+        specified value.
+
+    *   perl_version.max => *str*
+
+        Only return records where the 'perl_version' field is less than or
+        equal to specified value.
+
+    *   perl_version.min => *str*
+
+        Only return records where the 'perl_version' field is greater than
+        or equal to specified value.
+
+    *   perl_version.not_contains => *str*
+
+        Only return records where the 'perl_version' field does not contain
+        specified text.
+
+    *   perl_version.not_in => *array[str]*
+
+        Only return records where the 'perl_version' field is not in the
+        specified values.
+
+    *   perl_version.xmax => *str*
+
+        Only return records where the 'perl_version' field is less than
+        specified value.
+
+    *   perl_version.xmin => *str*
+
+        Only return records where the 'perl_version' field is greater than
+        specified value.
+
+    *   php_version => *str*
+
+        Only return records where the 'php_version' field equals specified
+        value.
+
+    *   php_version.contains => *str*
+
+        Only return records where the 'php_version' field contains specified
+        text.
+
+    *   php_version.in => *array[str]*
+
+        Only return records where the 'php_version' field is in the
+        specified values.
+
+    *   php_version.is => *str*
+
+        Only return records where the 'php_version' field equals specified
+        value.
+
+    *   php_version.isnt => *str*
+
+        Only return records where the 'php_version' field does not equal
+        specified value.
+
+    *   php_version.max => *str*
+
+        Only return records where the 'php_version' field is less than or
+        equal to specified value.
+
+    *   php_version.min => *str*
+
+        Only return records where the 'php_version' field is greater than or
+        equal to specified value.
+
+    *   php_version.not_contains => *str*
+
+        Only return records where the 'php_version' field does not contain
+        specified text.
+
+    *   php_version.not_in => *array[str]*
+
+        Only return records where the 'php_version' field is not in the
+        specified values.
+
+    *   php_version.xmax => *str*
+
+        Only return records where the 'php_version' field is less than
+        specified value.
+
+    *   php_version.xmin => *str*
+
+        Only return records where the 'php_version' field is greater than
+        specified value.
+
+    *   postgresql_version => *str*
+
+        Only return records where the 'postgresql_version' field equals
+        specified value.
+
+    *   postgresql_version.contains => *str*
+
+        Only return records where the 'postgresql_version' field contains
+        specified text.
+
+    *   postgresql_version.in => *array[str]*
+
+        Only return records where the 'postgresql_version' field is in the
+        specified values.
+
+    *   postgresql_version.is => *str*
+
+        Only return records where the 'postgresql_version' field equals
+        specified value.
+
+    *   postgresql_version.isnt => *str*
+
+        Only return records where the 'postgresql_version' field does not
+        equal specified value.
+
+    *   postgresql_version.max => *str*
+
+        Only return records where the 'postgresql_version' field is less
+        than or equal to specified value.
+
+    *   postgresql_version.min => *str*
+
+        Only return records where the 'postgresql_version' field is greater
+        than or equal to specified value.
+
+    *   postgresql_version.not_contains => *str*
+
+        Only return records where the 'postgresql_version' field does not
+        contain specified text.
+
+    *   postgresql_version.not_in => *array[str]*
+
+        Only return records where the 'postgresql_version' field is not in
+        the specified values.
+
+    *   postgresql_version.xmax => *str*
+
+        Only return records where the 'postgresql_version' field is less
+        than specified value.
+
+    *   postgresql_version.xmin => *str*
+
+        Only return records where the 'postgresql_version' field is greater
+        than specified value.
+
+    *   python_version => *str*
+
+        Only return records where the 'python_version' field equals
+        specified value.
+
+    *   python_version.contains => *str*
+
+        Only return records where the 'python_version' field contains
+        specified text.
+
+    *   python_version.in => *array[str]*
+
+        Only return records where the 'python_version' field is in the
+        specified values.
+
+    *   python_version.is => *str*
+
+        Only return records where the 'python_version' field equals
+        specified value.
+
+    *   python_version.isnt => *str*
+
+        Only return records where the 'python_version' field does not equal
+        specified value.
+
+    *   python_version.max => *str*
+
+        Only return records where the 'python_version' field is less than or
+        equal to specified value.
+
+    *   python_version.min => *str*
+
+        Only return records where the 'python_version' field is greater than
+        or equal to specified value.
+
+    *   python_version.not_contains => *str*
+
+        Only return records where the 'python_version' field does not
+        contain specified text.
+
+    *   python_version.not_in => *array[str]*
+
+        Only return records where the 'python_version' field is not in the
+        specified values.
+
+    *   python_version.xmax => *str*
+
+        Only return records where the 'python_version' field is less than
+        specified value.
+
+    *   python_version.xmin => *str*
+
+        Only return records where the 'python_version' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   reldate => *date*
+
+        Only return records where the 'reldate' field equals specified
+        value.
+
+    *   reldate.in => *array[date]*
+
+        Only return records where the 'reldate' field is in the specified
+        values.
+
+    *   reldate.is => *date*
+
+        Only return records where the 'reldate' field equals specified
+        value.
+
+    *   reldate.isnt => *date*
+
+        Only return records where the 'reldate' field does not equal
+        specified value.
+
+    *   reldate.max => *date*
+
+        Only return records where the 'reldate' field is less than or equal
+        to specified value.
+
+    *   reldate.min => *date*
+
+        Only return records where the 'reldate' field is greater than or
+        equal to specified value.
+
+    *   reldate.not_in => *array[date]*
+
+        Only return records where the 'reldate' field is not in the
+        specified values.
+
+    *   reldate.xmax => *date*
+
+        Only return records where the 'reldate' field is less than specified
+        value.
+
+    *   reldate.xmin => *date*
+
+        Only return records where the 'reldate' field is greater than
+        specified value.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   ruby_version => *str*
+
+        Only return records where the 'ruby_version' field equals specified
+        value.
+
+    *   ruby_version.contains => *str*
+
+        Only return records where the 'ruby_version' field contains
+        specified text.
+
+    *   ruby_version.in => *array[str]*
+
+        Only return records where the 'ruby_version' field is in the
+        specified values.
+
+    *   ruby_version.is => *str*
+
+        Only return records where the 'ruby_version' field equals specified
+        value.
+
+    *   ruby_version.isnt => *str*
+
+        Only return records where the 'ruby_version' field does not equal
+        specified value.
+
+    *   ruby_version.max => *str*
+
+        Only return records where the 'ruby_version' field is less than or
+        equal to specified value.
+
+    *   ruby_version.min => *str*
+
+        Only return records where the 'ruby_version' field is greater than
+        or equal to specified value.
+
+    *   ruby_version.not_contains => *str*
+
+        Only return records where the 'ruby_version' field does not contain
+        specified text.
+
+    *   ruby_version.not_in => *array[str]*
+
+        Only return records where the 'ruby_version' field is not in the
+        specified values.
+
+    *   ruby_version.xmax => *str*
+
+        Only return records where the 'ruby_version' field is less than
+        specified value.
+
+    *   ruby_version.xmin => *str*
+
+        Only return records where the 'ruby_version' field is greater than
+        specified value.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   version => *str*
+
+        Only return records where the 'version' field equals specified
+        value.
+
+    *   version.contains => *str*
+
+        Only return records where the 'version' field contains specified
+        text.
+
+    *   version.in => *array[str]*
+
+        Only return records where the 'version' field is in the specified
+        values.
+
+    *   version.is => *str*
+
+        Only return records where the 'version' field equals specified
+        value.
+
+    *   version.isnt => *str*
+
+        Only return records where the 'version' field does not equal
+        specified value.
+
+    *   version.max => *str*
+
+        Only return records where the 'version' field is less than or equal
+        to specified value.
+
+    *   version.min => *str*
+
+        Only return records where the 'version' field is greater than or
+        equal to specified value.
+
+    *   version.not_contains => *str*
+
+        Only return records where the 'version' field does not contain
+        specified text.
+
+    *   version.not_in => *array[str]*
+
+        Only return records where the 'version' field is not in the
+        specified values.
+
+    *   version.xmax => *str*
+
+        Only return records where the 'version' field is less than specified
+        value.
+
+    *   version.xmin => *str*
+
+        Only return records where the 'version' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LinuxMint-Releases>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LinuxMint-Releases>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LinuxMint-Releases>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Debian::Releases
 
     Ubuntu::Releases
@@ -20,4 +911,13 @@ SEE ALSO
     RedHat::Releases
 
     CentOS::Releases
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

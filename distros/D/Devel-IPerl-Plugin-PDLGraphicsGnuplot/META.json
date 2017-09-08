@@ -1,0 +1,58 @@
+{
+   "abstract" : "IPerl plugin to make PDL::Graphics::Gnuplot plots displayable",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-IPerl-Plugin-PDLGraphicsGnuplot",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Devel::IPerl::Display::PNG" : "0",
+            "Devel::IPerl::Display::SVG" : "0",
+            "File::Temp" : "0",
+            "Moo::Role" : "0",
+            "PDL::Graphics::Gnuplot" : "0",
+            "Role::Tiny" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "PDL" : "0",
+            "PDL::Constants" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot.git",
+         "web" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-PDLGraphicsGnuplot"
+      }
+   },
+   "version" : "0.008",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0238"
+}
+

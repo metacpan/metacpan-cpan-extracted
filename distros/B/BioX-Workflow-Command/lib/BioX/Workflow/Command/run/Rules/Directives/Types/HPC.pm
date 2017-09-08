@@ -1,6 +1,7 @@
 package BioX::Workflow::Command::run::Rules::Directives::Types::HPC;
 
 use Moose::Role;
+use namespace::autoclean;
 
 has 'HPC' => (
     is      => 'rw',

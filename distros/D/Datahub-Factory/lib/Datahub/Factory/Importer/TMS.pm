@@ -1,14 +1,15 @@
 package Datahub::Factory::Importer::TMS;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Moo;
 use Catmandu;
-
 use DBI;
 use Log::Log4perl;
 use Config::Simple;
+use namespace::clean;
 
 use Datahub::Factory::Importer::TMS::Index;
 

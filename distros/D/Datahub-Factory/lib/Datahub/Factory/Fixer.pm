@@ -2,8 +2,11 @@ package Datahub::Factory::Fixer;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Catmandu;
 use Moose::Role;
+use namespace::clean;
 
 has fixer  => (is => 'lazy');
 has logger => (is => 'lazy');

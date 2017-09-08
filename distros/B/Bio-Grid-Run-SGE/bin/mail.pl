@@ -14,7 +14,7 @@ my $address = shift;
 my %mail = (
   To      => $address,
   From    => "$ENV{USER}\@$ENV{HOSTNAME}",
-  Message => 'Completed job at ' . localtime,
+  Message => 'Completed job at ' . localtime(),
   Subject => "$ENV{JOB_NAME} job_id:$ENV{JOB_ID}/sge_task_id:$ENV{SGE_TASK_ID} COMPLETED",
 
 );

@@ -1,5 +1,5 @@
 package Bio::Roary::Output::DifferenceBetweenSets;
-$Bio::Roary::Output::DifferenceBetweenSets::VERSION = '3.9.1';
+$Bio::Roary::Output::DifferenceBetweenSets::VERSION = '3.10.2';
 # ABSTRACT:  Given two sets of isolates and a group file, output whats unique in each and whats in common
 
 
@@ -119,7 +119,7 @@ Bio::Roary::Output::DifferenceBetweenSets - Given two sets of isolates and a gro
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

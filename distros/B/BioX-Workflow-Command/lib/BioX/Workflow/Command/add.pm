@@ -3,6 +3,8 @@ package BioX::Workflow::Command::add;
 use v5.10;
 
 use MooseX::App::Command;
+use namespace::autoclean;
+
 use YAML;
 
 extends 'BioX::Workflow::Command';
@@ -11,8 +13,8 @@ with 'BioX::Workflow::Command::Utils::Create';
 with 'BioX::Workflow::Command::Utils::Files';
 with 'BioX::Workflow::Command::Utils::Log';
 
-command_short_description 'Create a new workflow';
-command_long_description 'Create a new workflow';
+command_short_description 'Add rules to an existing workflow.';
+command_long_description 'Add rules to an existing workflow.';
 
 =head1 BioX::Workflow::Command::add
 
@@ -50,7 +52,6 @@ sub execute {
     $self->fh->close;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

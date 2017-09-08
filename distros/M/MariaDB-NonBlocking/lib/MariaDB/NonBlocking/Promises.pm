@@ -6,39 +6,268 @@ use warnings;
 
 BEGIN {
     my $loaded_ok;
+    local $@;
     eval { require Sub::StrictDecl; $loaded_ok = 1; };
     Sub::StrictDecl->import if $loaded_ok;
 }
 
-use Promises ();  # for deferred
+use Carp     (); # for confess
+use Promises (); # for deferred
 
 # Better to import this, since it is a custom op
 use Ref::Util qw(is_ref is_arrayref);
+use Scalar::Util qw(weaken);
 
-# We use EV directly, because we might need to wait on
-# both reads AND writes on a handle, and doing that through
-# AnyEvent means maintaining multiple IO watchers.
-use EV ();
+use AnyEvent;
 
 use MariaDB::NonBlocking ':all';
 
-sub _decide_what_watchers_we_need {
-    my $wait_on = 0;
-    $wait_on |= EV::READ  if $_[0] & MYSQL_WAIT_READ;
-    $wait_on |= EV::WRITE if $_[0] & MYSQL_WAIT_WRITE;
+my $IS_EV;
 
+# is anyevent using EV? If so, cut the middleman and
+# use EV directly, since we can reuse/reset watchers,
+# as well as use IO watchers for both read and write
+# polling.
+# EV lets us cut down the number of watchers created
+# per connection significantly.
+AnyEvent::post_detect {
+    $IS_EV = ($AnyEvent::MODEL//'') eq 'AnyEvent::Impl::EV'
+};
+
+use constant ();
+
+BEGIN {
+    my $loaded_ok;
+    local $@;
+    eval { require EV; $loaded_ok = 1; };
+
+    # Because we use Sub::StrictDecl, we cannot
+    # use EV::foo() directly, since those may
+    # not be loaded.
+
+    if ( $loaded_ok ) {
+        # EV loaded fine.  Add some aliases
+        *EV_READ  = \*EV::READ;
+        *EV_WRITE = \*EV::WRITE;
+        *EV_TIMER = \*EV::TIMER;
+        *EV_io    = \*EV::io;
+        *EV_timer = \*EV::timer;
+        *EV_now_update = \*EV::now_update;
+    }
+    else {
+        # EV failed to load.  Add some useless
+        # aliases to tide us over.
+        constant->import({
+            EV_READ  => 0,
+            EV_WRITE => 1,
+            EV_TIMER => 2,
+        });
+        *EV_io         = sub {};
+        *EV_timer      = sub {};
+        *EV_now_update = sub {};
+    }
+}
+
+sub _mysql_watchers_to_ev_watchers {
+    my $wait_on = 0;
+    $wait_on |= EV_READ  if $_[0] & MYSQL_WAIT_READ;
+    $wait_on |= EV_WRITE if $_[0] & MYSQL_WAIT_WRITE;
     return $wait_on;
 }
 
-sub ev_event_to_mysql_event {
+sub _ev_event_to_mysql_event {
     return MYSQL_WAIT_TIMEOUT
-        if $_[0] & EV::TIMER;
+        if $_[0] & EV_TIMER;
 
     my $events = 0;
-    $events |= MYSQL_WAIT_READ  if $_[0] & EV::READ;
-    $events |= MYSQL_WAIT_WRITE if $_[0] & EV::WRITE;
+    $events |= MYSQL_WAIT_READ  if $_[0] & EV_READ;
+    $events |= MYSQL_WAIT_WRITE if $_[0] & EV_WRITE;
 
     return $events;
+}
+
+our %WATCHER_POOL;
+our $WATCHER_POOL_MAX = 2; # keep two standby watchers alive at most
+sub __return_watcher {
+    return unless $IS_EV; # watcher pool is only useful in EV; elsewhere we
+                          # cannot reuse watchers
+    my ($watcher_type, $watcher) = @_;
+    return unless $watcher;
+    my $pool = $WATCHER_POOL{$watcher_type} //= [];
+    return if @$pool >= $WATCHER_POOL_MAX;
+    $watcher->stop; # includes $watcher->clear_pending;
+    $watcher->keepalive(0);
+    push @$pool, $watcher;
+}
+sub __stop_or_return_watcher {
+    my $args         = $_[0] // {};
+    my $watcher_type = $args->{watcher_type};
+    my $storage      = $args->{storage};
+    if ( !$IS_EV ) {
+        return __return_watcher(
+            $watcher_type,
+            delete $storage->{$watcher_type},
+        );
+    }
+
+    # Keep the watcher in $storage so that we'll reuse it.
+    my $watcher = $storage->{$watcher_type};
+    $watcher->stop; # includes $watcher->clear_pending;
+    $watcher->keepalive(0);
+    return;    
+}
+sub __return_all_watchers {
+    my ($watchers) = @_;
+    return unless $watchers; # can be undef if the object went out of scope
+    foreach my $watcher_type ( keys %$watchers ) {
+        my $watcher = delete $watchers->{$watcher_type};
+        next unless $IS_EV;
+        $watcher_type = 'io'    if index($watcher_type, 'io')    != -1;
+        $watcher_type = 'timer' if index($watcher_type, 'timer') != -1;
+        __return_watcher($watcher_type, $watcher);
+    }
+}
+
+sub __return_all_watchers_for_multiple_sockets {
+    my $socket_to_watchers = $_[0] // {}; # undue caution...
+    __return_all_watchers($_) for values %$socket_to_watchers;
+    %$socket_to_watchers = ();
+}
+
+sub __wrap_ev_cb {
+    my ($cb) = @_;
+    return sub {
+        my (undef, $ev_event) = @_;
+        my $events_for_mysql  = _ev_event_to_mysql_event($ev_event);
+        $cb->($events_for_mysql);
+    }
+}
+
+sub __grab_watcher {
+    my ($args) = @_;
+
+    my $watcher_type = $args->{watcher_type};
+    my $watcher_args = $args->{watcher_args};
+    my $storage      = $args->{storage};
+
+    if ( exists $storage->{$watcher_type} ) {
+        Carp::confess("Overriding a $watcher_type watcher!  How did this happen?");
+    }
+
+    if ( $IS_EV ) {
+        # If we are using EV, reuse a watcher if we can.
+        my $cb = __wrap_ev_cb($watcher_args->[2]);
+
+        my $existing_watcher = pop @{ $WATCHER_POOL{$watcher_type} //= [] };
+
+        $storage->{$watcher_type} = $existing_watcher;
+
+        if ( $watcher_type eq 'io' ) {
+            my $ev_mask = _mysql_watchers_to_ev_watchers($watcher_args->[1]);
+
+            if ( !$existing_watcher ) {
+                # No pre-existing watcher for us to use;
+                # make a new one!
+                $storage->{$watcher_type} = EV_io(
+                    $watcher_args->[0],
+                    $ev_mask,
+                    $cb
+                );
+                return;
+            }
+
+            $existing_watcher->set(
+                    $watcher_args->[0],
+                    $ev_mask,
+            );
+        }
+        elsif ( index($watcher_type, 'timer') != -1 ) {
+            EV_now_update();
+            if ( !$existing_watcher ) {
+                $storage->{$watcher_type} = EV_timer(
+                    $watcher_args->[0],
+                    $watcher_args->[1],
+                    $cb
+                );
+                return;
+            }
+            $existing_watcher->set(
+                    $watcher_args->[0],
+                    $watcher_args->[1],
+            );
+        }
+        else {
+            die "Unhandled watcher type: $watcher_type";
+        }
+
+        $existing_watcher->cb($cb);
+        $existing_watcher->keepalive(1);
+        $existing_watcher->start;
+
+        return;
+    }
+    else {
+        # Slightly easier, really.  Less performant since
+        # we never reuse watchers.
+        if ( index($watcher_type, 'timer') != -1 ) {
+            my $cb         = $watcher_args->[2];
+            my $wrapped_cb = sub { return $cb->(MYSQL_WAIT_TIMEOUT) };
+            AnyEvent->now_update;
+            $storage->{$watcher_type} = AnyEvent->timer(
+                after    => $watcher_args->[0],
+                interval => $watcher_args->[1],
+                cb       => $wrapped_cb,
+            );
+        }
+        elsif ( $watcher_type eq 'io' ) {
+            # We might need a read watcher, we might need
+            # a write watcher.. we might need both : (
+
+            # drop any previous watchers
+            delete @{$storage}{qw/io_r io_w/};
+
+            # amusingly, this is broken in libuv, since
+            # you cannot have two watchers on the same fd;
+            # AnyEvent works around it though, so all is good.
+            my $wait_for      = $watcher_args->[1];
+            my $cb            = $watcher_args->[2];
+            $storage->{io_r} = AnyEvent->io(
+                fh   => $watcher_args->[0],
+                poll => "r",
+                cb   => sub { $cb->(MYSQL_WAIT_READ) }
+            ) if $wait_for & MYSQL_WAIT_READ;
+            $storage->{io_w} = AnyEvent->io(
+                fh   => $watcher_args->[0],
+                poll => "w",
+                cb   => sub { $cb->(MYSQL_WAIT_WRITE) }
+            ) if $wait_for & MYSQL_WAIT_WRITE;
+        }
+        else {
+            die "Unhandled watcher type: $watcher_type";
+        }
+        return;
+    }
+}
+
+sub __reset_current_watcher_or_grab_a_new_one {
+    return &__grab_watcher unless $IS_EV;
+
+    # Got an EV watcher -- means we can go ahead and
+    # just stop the one we have here.
+
+    my $args = $_[0];
+
+    my $watcher_type = $args->{watcher_type};
+    my $watcher      = $args->{storage}->{$watcher_type};
+
+    return &__grab_watcher unless $watcher;
+
+    my $watcher_args = $args->{watcher_args};
+
+    # simply reset the watcher and be happy
+    my $ev_mask = _mysql_watchers_to_ev_watchers($watcher_args->[1]);
+    $watcher->set($watcher_args->[0], $ev_mask);
+    $watcher->cb(__wrap_ev_cb($watcher_args->[2]));
 }
 
 sub ____run {
@@ -98,27 +327,38 @@ sub ____run {
         return $wait_for;
     };
 
-    my %watchers;
-    # TODO alarms
+    my $all_watchers = {};
     CONNECTION:
-    foreach my $maria ( @$connections ) {
+    foreach my $outside_maria ( @$connections ) {
         last CONNECTION if @errors;
 
-        my $wait_for = $call_start->($maria);
+        my $wait_for = $call_start->($outside_maria);
 
         if ( !$wait_for ) {
             # Nothing to wait for!
             # See if we can still use this connection
-            redo CONNECTION if $have_work_for_conn->($maria);
+            redo CONNECTION if $have_work_for_conn->($outside_maria);
             # Otherwise, move on to the next connection
             next CONNECTION;
         }
 
         # Need to wait on the query
-        my $socket_fd         = $maria->mysql_socket_fd;
-        my $previous_wait_for = $wait_for;
+        my $socket_fd         = $outside_maria->mysql_socket_fd;
+        my $previous_wait_for = $wait_for & ~MYSQL_WAIT_TIMEOUT;
 
-        my $mysql_socket_ready_callback = sub {
+        $all_watchers->{$socket_fd} = $outside_maria->{watchers} //= {};
+        # $all_watchers holds a weakref to the actual watchers in
+        # our objects
+        weaken($all_watchers->{$socket_fd});
+        # ^ $all_watchers => { 3 => weak($maria->{watchers}), ... }
+
+        # $maria is weakened here, as otherwise we would
+        # have this cycle:
+        # $maria->{watchers}{any}{cb} => sub { ...; $maria; ...; }
+        my $maria = $outside_maria;
+        weaken($maria);
+
+        my $watcher_ready_cb = sub {
             if ( $extras->{cancel} ) {
                 # Right... this needs some explanation.
                 # Consider this situation:
@@ -152,23 +392,31 @@ sub ____run {
                 # If the promise is already rejected or resolved,
                 # then we just return from this loop; otherwise we
                 # reject it.
-                undef %watchers;
+                __return_all_watchers_for_multiple_sockets($all_watchers);
                 $deferred->reject("Manual cancellation, reason: $extras->{cancel}")
                     if $deferred->is_in_progress;
                 return;
             }
 
             if ( @errors ) { # Error in another connection
-                delete $watchers{$socket_fd};
+                __return_all_watchers(delete $all_watchers->{$socket_fd});
                 return;
             }
 
-            my (undef, $ev_event) = @_;
+            if ( !$maria ) {
+                $deferred->reject("Connection object went away")
+                    if $deferred->is_in_progress;
+                __return_all_watchers_for_multiple_sockets($all_watchers);
+                return;
+            }
 
-            # Always release the timer.
-            delete $watchers{$socket_fd}->{timer};
+            my ($events_for_mysql) = @_;
 
-            my $events_for_mysql = ev_event_to_mysql_event($ev_event);
+            # Always stop/release the timers!
+            __stop_or_return_watcher({
+                watcher_type => 'timer',
+                storage      => $maria->{watchers},
+            }) if exists $maria->{watchers}{timer};
 
             my $wait_for;
             local $@;
@@ -197,8 +445,9 @@ sub ____run {
             }
 
             if ( @errors ) {
-                undef %watchers; # Destroy ALL watchers, otherwise
-                                 # we might leak some!
+                __return_all_watchers_for_multiple_sockets($all_watchers);
+                    # Destroy ALL watchers, otherwise
+                    # we might leak some!
                 # We got an error above.  Reject the promise and bail
                 $deferred->reject(@errors);
                 return;
@@ -208,8 +457,8 @@ sub ____run {
             # means we are done with all queries for this dbh,
             # so decrease the condvar counter
             if ( !$wait_for ) {
-                delete $watchers{$socket_fd}; # BOI!!
-                if ( !keys %watchers ) {
+                __return_all_watchers(delete $all_watchers->{$socket_fd}); # BOI!!
+                if ( !keys %$all_watchers ) {
                     # Ran all the queries! We can resolve and go home
                     $deferred->resolve(\@per_query_results);
                     return;
@@ -219,67 +468,85 @@ sub ____run {
                 return;
             }
             else {
-                if ( $wait_for != $previous_wait_for ) {
-                    $previous_wait_for = $wait_for;
-                    my $new_ev_mask = _decide_what_watchers_we_need($wait_for);
-                    # Server wants us to wait on something else, so
-                    # we can't reuse the previous watcher.
-                    # e.g. we had a watcher waiting on the socket
-                    # being readable, but we need to wait for it to
-                    # become writeable (or both) instead.
-                    # This almost never happens.
-                    delete $watchers{$socket_fd}->{io};
-                    $watchers{$socket_fd}->{io} = EV::io(
-                                        $socket_fd,
-                                        $new_ev_mask,
-                                        __SUB__,
-                                      );
-                }
-
                 if ( $wait_for & MYSQL_WAIT_TIMEOUT ) {
+                    # remove for the next check if()
+                    $wait_for &= ~MYSQL_WAIT_TIMEOUT;
                     # A timeout was specified with the connection.
-                    # This will call this same callback, with $ev_event
-                    # as EV::TIMEOUT; query_cont will eventually call
+                    # This will call this same callback;
+                    # query_cont will eventually call
                     # the relevant _cont method with MYSQL_WAIT_TIMEOUT,
                     # and let the driver decide what to do next.
                     my $timeout_ms = $maria->get_timeout_value_ms();
+                    __reset_current_watcher_or_grab_a_new_one({
+                        watcher_type => 'timer',
+                        storage      => $maria->{watchers},
+                        watcher_args => [
+                            # EV wants (fractional) seconds
+                            $timeout_ms/1000,
+                            0, # do not repeat
+                            __SUB__,
+                        ],
                     # Bug in the client lib makes the no-timeout case come
                     # back as 0 timeout.  So only create the timer if we
                     # actually have a timeout.
                     # https://lists.launchpad.net/maria-developers/msg09971.html
-                    EV::now_update();
-                    $watchers{$socket_fd}->{timer} = EV::timer(
-                                            # EV wants (fractional) seconds
-                                            $timeout_ms/1000,
-                                            0, # do not repeat
-                                            __SUB__,
-                                       ) if $timeout_ms;
+                    }) if $timeout_ms;
+                }
+
+                if ( $wait_for != $previous_wait_for ) {
+                    $previous_wait_for = $wait_for;
+                    # Server wants us to wait on something else, so
+                    # we can't reuse the previous mask.
+                    # e.g. we had a watcher waiting on the socket
+                    # being readable, but we need to wait for it to
+                    # become writeable (or both) instead.
+                    # This almost never happens, but we need to
+                    # support it for SSL renegotiation.
+                    __reset_current_watcher_or_grab_a_new_one({
+                        watcher_type => 'io',
+                        storage      => $maria->{watchers},
+                        watcher_args => [
+                            $socket_fd,
+                            $wait_for,
+                            __SUB__,
+                        ]
+                    });
                 }
             }
             return;
         };
 
-        $watchers{$socket_fd}->{io} = EV::io(
-            $socket_fd,
-            _decide_what_watchers_we_need($wait_for),
-            $mysql_socket_ready_callback,
-        );
+        __grab_watcher({
+            watcher_type => 'io',
+            storage      => $outside_maria->{watchers},
+            watcher_args => [
+                $socket_fd,
+                $wait_for & ~MYSQL_WAIT_TIMEOUT,
+                $watcher_ready_cb,
+            ]
+        });
 
-        EV::now_update();
-        $watchers{$socket_fd}->{timer_global} = EV::timer(
-            $perl_timeout,
-            0, # no repeat
-            sub {
-                undef %watchers;
+        __grab_watcher({
+            watcher_type => 'timer_global',
+            storage      => $outside_maria->{watchers},
+            watcher_args => [
+                $perl_timeout,
+                0, # no repeat
+                sub {
+                    __return_all_watchers_for_multiple_sockets(
+                        $all_watchers
+                    );
 
-                push @errors, "$type execution was interrupted by perl, maximum execution time exceeded (timeout=$perl_timeout)";
-                $deferred->reject(@errors);
-            },
-        ) if $perl_timeout;
+                    push @errors,
+                        "$type execution was interrupted by perl, maximum execution time exceeded (timeout=$perl_timeout)";
+                    $deferred->reject(@errors);
+                },
+            ]
+        }) if $perl_timeout;
     }
 
     my $promise = $deferred->promise;
-    if ( !keys %watchers ) {
+    if ( !keys %$all_watchers ) {
         # All queries on all connections finished immediately.
         # So reject or resolve as necessary
         if ( @errors ) {

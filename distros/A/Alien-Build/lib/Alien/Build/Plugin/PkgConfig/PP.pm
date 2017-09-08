@@ -7,7 +7,7 @@ use Carp ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -16,6 +16,14 @@ has '+pkg_name' => sub {
 
 
 has minimum_version => undef;
+
+
+use constant _min_version => '0.14026';
+
+sub available
+{
+  !!eval { require PkgConfig; PkgConfig->VERSION(_min_version) };
+}
 
 sub _cleanup
 {
@@ -32,7 +40,7 @@ sub init
   
   if($caller ne 'Alien::Build::Plugin::PkgConfig::Negotiate')
   {
-    $meta->add_requires('configure' => 'PkgConfig' => '0.14026');
+    $meta->add_requires('configure' => 'PkgConfig' => _min_version);
   }
   
   my($pkg_name, @alt_names) = (ref $self->pkg_name) ? (@{ $self->pkg_name }) : ($self->pkg_name);
@@ -127,7 +135,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -156,6 +164,14 @@ names must be present.
 
 The minimum required version that is acceptable version as provided by the system.
 
+=head1 METHODS
+
+=head2 available
+
+ my $bool = Alien::Build::Plugin::PkgConfig::PP->available;
+
+Returns true if the necessary prereqs for this plugin are I<already> installed.
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::PkgConfig::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -182,7 +198,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -199,6 +215,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

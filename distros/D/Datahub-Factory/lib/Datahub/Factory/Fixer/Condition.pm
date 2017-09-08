@@ -1,10 +1,10 @@
 package Datahub::Factory::Fixer::Condition;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '1.71';
 
 use Datahub::Factory;
-
 use Moo;
 use Catmandu;
 use Catmandu::Util qw(data_at);

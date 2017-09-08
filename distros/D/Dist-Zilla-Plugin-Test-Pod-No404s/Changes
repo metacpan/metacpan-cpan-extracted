@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Test-Pod-No404s
 
+1.004     2017-09-06T14:16:51Z
+
+  - Update meta files.  No code changes.
+
 1.003     2016-05-22T04:25:31Z
 
   - Make this an author test rather than a release test. It should pass on all

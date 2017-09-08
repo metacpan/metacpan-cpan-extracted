@@ -15,9 +15,9 @@ run_job(
             my ( $c, $result_file, $seq_file ) = @_;
 
             my $cmd = "$ENV{HOME}/bin/muscle -in $seq_file -out $result_file -maxiters $c->{extra}{max_iters}";
-            INFO "Running muscle: $cmd";
+            job->log->info("Running muscle: $cmd");
 
-            return my_sys_non_fatal($cmd);
+            return job->sys($cmd);
         },
     }
 );

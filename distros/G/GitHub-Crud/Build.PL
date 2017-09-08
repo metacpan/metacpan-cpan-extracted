@@ -1,3 +1,4 @@
+use v5.8.0;
 use Module::Build;
 
 my $b = Module::Build->new
@@ -6,17 +7,16 @@ my $b = Module::Build->new
   dist_abstract => 'Create, Read, Update, Delete files on GitHub',
   license       => 'perl',
   requires      =>
-   {Carp=>0,
-    Data::Dump=>0,
-    Data::Table::Text=>2017.505,
+   {Carp        =>0,
+    Data::Dump  =>0,
+    Data::Table::Text=>'20170902',
     Digest::SHA1=>0,
-    File::Temp=>0,
-    JSON=>0,
-    MIME::Base64=>0,
+    Test::More  =>0,
+    Test2::API  =>0,
    },
-  configure_requires => {'Module::Build' => 0.42},
+  configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
-  perl          => '5.16.0',
+  perl          => '5.8.0',
  );
 
 $b->create_build_script();

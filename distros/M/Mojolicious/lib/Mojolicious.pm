@@ -58,7 +58,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.44';
+our $VERSION  = '7.45';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -881,6 +881,8 @@ Charlie Brady
 
 Chas. J. Owens IV
 
+Chase Whitener
+
 Christian Hansen
 
 chromatic
@@ -912,6 +914,8 @@ Dominique Dumont
 Dotan Dimet
 
 Douglas Christopher Wilson
+
+Ettore Di Giacinto
 
 Eugen Konkov
 
@@ -1046,6 +1050,8 @@ Roy Storey
 Ryan Jendoubi
 
 Salvador Fandino
+
+Santiago Zarate
 
 Sascha Kiefer
 

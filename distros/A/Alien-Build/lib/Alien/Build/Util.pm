@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use base qw( Exporter );
 use Path::Tiny qw( path );
+use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
-our @EXPORT_OK = qw( _mirror _dump _destdir_prefix );
+our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config );
 
 # usage: _mirror $source_directory, $dest_direction, \%options
 #
@@ -107,6 +108,12 @@ sub _destdir_prefix
   path($destdir)->child($prefix)->stringify;
 }
 
+sub _perl_config
+{
+  my($key) = @_;
+  $Config{$key};
+}
+
 1;
 
 __END__
@@ -121,7 +128,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 DESCRIPTION
 
@@ -159,7 +166,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -176,6 +183,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

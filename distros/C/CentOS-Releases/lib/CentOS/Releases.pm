@@ -1,7 +1,7 @@
 package CentOS::Releases;
 
-our $DATE = '2016-08-19'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -110,9 +110,9 @@ our $data = do {
      php_version          => "5.3.3",
      postgresql_version   => "8.4.20",
      python_version       => "2.6.6",
-     reldate              => "2016-05-25",
+     reldate              => "2017-04-05",
      ruby_version         => undef,
-     version              => 6.8,
+     version              => 6.9,
    },
    {
      apache_httpd_version => "2.4.6",
@@ -120,16 +120,16 @@ our $data = do {
      code_name            => undef,
      eoldate              => "2024-06",
      linux_version        => "3.10",
-     mariadb_version      => "5.5.44",
+     mariadb_version      => "5.5.52",
      mysql_version        => "--",
      nginx_version        => undef,
      perl_version         => "5.16.3",
      php_version          => "5.4.16",
-     postgresql_version   => "9.2.13",
+     postgresql_version   => "9.2.18",
      python_version       => "2.7.5",
-     reldate              => "2015-12-14",
+     reldate              => "2016-12-12",
      ruby_version         => undef,
-     version              => "7-1511",
+     version              => "7-1611",
    },
  ]
 
@@ -158,7 +158,7 @@ CentOS::Releases - List CentOS releases
 
 =head1 VERSION
 
-This document describes version 0.02 of CentOS::Releases (from Perl distribution CentOS-Releases), released on 2016-08-19.
+This document describes version 0.030 of CentOS::Releases (from Perl distribution CentOS-Releases), released on 2017-09-08.
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,11 @@ which in turn is retrieved from L<http://distrowatch.com>.
 =head1 FUNCTIONS
 
 
-=head2 list_centos_releases(%args) -> [status, msg, result, meta]
+=head2 list_centos_releases
+
+Usage:
+
+ list_centos_releases(%args) -> [status, msg, result, meta]
 
 CentOS releases.
 
@@ -917,7 +921,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

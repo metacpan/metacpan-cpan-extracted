@@ -1,10 +1,12 @@
 package Datahub::Factory::Importer::OAI;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
 
-use Catmandu::Importer::OAI;
+our $VERSION = '1.71';
+
 use Moo;
+use Catmandu::Importer::OAI;
+use namespace::clean;
 
 with 'Datahub::Factory::Importer';
 

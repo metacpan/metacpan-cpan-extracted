@@ -1,3 +1,10 @@
+0.26    2017-09-08 (PERLANCAR)
+
+	- Add Log::Any::App to list of retired modules.
+
+	- Add List::MoreUtils to list of modules to be avoided.
+
+
 0.25    2017-07-28 (PERLANCAR)
 
 	- Add module list: CLIWithUndo.

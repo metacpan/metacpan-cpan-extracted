@@ -1,10 +1,24 @@
 #!/usr/bin/perl -s
+
+# PODNAME: tmxuniq
+# ABSTRACT: removes duplicated translation units from TMXs
+
+BEGIN {
+  eval "require Lingua::PT::PLNbase";
+  if ($@) {
+    print STDERR
+      "This script requires Lingua::PT::PLNbase to run. We suggest installing\n",
+      "it using CPAN: http://www.cpan.org/modules/INSTALL.html\n";
+    exit(0);
+  }
+}
+
 use DB_File;
 use Fcntl ;
-use Lingua::PT::PLNbase;
 use XML::TMX::Reader;
 use Digest::MD5 qw(md5_hex);
 use Encode;
+use Lingua::PT::PLNbase
 
 our ($cont,$id,$dig,$tok,$o,$fast);
 
@@ -77,9 +91,17 @@ sub n {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 tmxuniq - removes duplicated translation units from TMXs
+
+=head1 VERSION
+
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -97,12 +119,29 @@ Memory eXange format).
  -tok -- tokenize/normalize text
  -o=out.tmx -- (with 1 argument) redefine output (default = input._)
 
-=head1 AUTHOR
-
-J.Joao Almeida, jj@di.uminho.pt
-
 =head1 SEE ALSO
 
 perl(1).
 
-=cut      
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Alberto Simões <ambs@cpan.org>
+
+=item *
+
+José João Almeida <jj@di.uminho.pt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2017 by Projeto Natura <natura@di.uminho.pt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

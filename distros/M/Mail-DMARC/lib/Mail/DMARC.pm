@@ -1,5 +1,5 @@
 package Mail::DMARC;
-our $VERSION = '1.20170222'; # VERSION
+our $VERSION = '1.20170906'; # VERSION
 use strict;
 use warnings;
 
@@ -292,7 +292,7 @@ Mail::DMARC - Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20170222
+version 1.20170906
 
 =head1 SYNOPSIS
 
@@ -616,13 +616,17 @@ Davide Migliavacca <shari@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Benny Pedersen Jean Paul Galea Making GitHub Delicious. Marc Bradshaw Priyadi Iman Nurcahyo Ricardo Signes
+=for stopwords Benny Pedersen ColocateUSA.net Jean Paul Galea Making GitHub Delicious. Marc Bradshaw Priyadi Iman Nurcahyo Ricardo Signes
 
 =over 4
 
 =item *
 
 Benny Pedersen <me@junc.eu>
+
+=item *
+
+ColocateUSA.net <company@colocateusa.net>
 
 =item *
 
@@ -643,6 +647,10 @@ Marc Bradshaw <marc@marcbradshaw.net>
 =item *
 
 Priyadi Iman Nurcahyo <priyadi@priyadi.net>
+
+=item *
+
+Priyadi Iman Nurcahyo <priyadi@users.noreply.github.com>
 
 =item *
 

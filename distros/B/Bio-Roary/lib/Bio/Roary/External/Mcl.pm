@@ -1,5 +1,5 @@
 package Bio::Roary::External::Mcl;
-$Bio::Roary::External::Mcl::VERSION = '3.9.1';
+$Bio::Roary::External::Mcl::VERSION = '3.10.2';
 # ABSTRACT: Wrapper around MCL which takes in blast results and outputs clustered results
 
 
@@ -101,7 +101,7 @@ Bio::Roary::External::Mcl - Wrapper around MCL which takes in blast results and 
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

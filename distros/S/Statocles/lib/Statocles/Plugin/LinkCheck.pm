@@ -1,10 +1,9 @@
 package Statocles::Plugin::LinkCheck;
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 # ABSTRACT: Check links and images for validity during build
 
 use Statocles::Base 'Class';
 with 'Statocles::Plugin';
-use Mojo::DOM;
 use Mojo::Util qw( url_escape url_unescape );
 
 #pod =attr ignore
@@ -43,7 +42,7 @@ sub check_pages {
     for my $page ( @{ $event->pages } ) {
         $page_paths{ $page->path } = 1;
         if ( $page->DOES( 'Statocles::Page::Document' ) ) {
-            my $dom = Mojo::DOM->new( $page->render( site => $event->emitter ) );
+            my $dom = $page->dom;
 
             for my $attr ( qw( src href ) ) {
                 for my $el ( $dom->find( "[$attr]" )->each ) {
@@ -122,7 +121,7 @@ Statocles::Plugin::LinkCheck - Check links and images for validity during build
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 SYNOPSIS
 

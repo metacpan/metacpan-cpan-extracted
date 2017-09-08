@@ -1,5 +1,21 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.009  2017-09-04 10:48:45 UTC
+
+  - Add a comment to .perlcriticrc that the file is automatically generated
+  - Add a comment to .perltidyrc that the file is automatically generated
+  - Add a comment to .travis.yml that the file is automatically generated
+  - Added "__PACKAGE__->meta->make_immutable" to all modules
+  - Added all core policies but Documentation::RequirePodSections,
+    InputOutput::RequireBriefOpen and Modules::RequireVersionVar
+  - Added all policies from the Perl::Critic::Moose package in the default
+    Perl::Critic policy
+  - Added support for a perlcritic.local file which can be used to overwrite
+    defaults and add or remove policies on a per project basis
+  - Changed the .perlcriticrc to use 'only = 1' and list all used policies
+    instead of 'theme = core'
+  - The .perlcriticrc is now always recreated (overwritten) during a build
+
 0.008  2017-08-30 21:24:52 UTC
 
   - Removed an occurrence of 'Use of uninitialized value'

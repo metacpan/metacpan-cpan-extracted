@@ -1,0 +1,63 @@
+{
+   "abstract" : "A perl PagerDuty client",
+   "author" : [
+      "comScore, Inc"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PagerDuty-Agent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "Sys::Hostname" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "HTTP::Response" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Test::CPAN::Changes::ReallyStrict" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "1.03",
+            "Test::Warn" : "0.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

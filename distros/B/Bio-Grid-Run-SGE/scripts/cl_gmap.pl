@@ -22,10 +22,10 @@ run_job(
         task => sub {
             my ( $c, $result_prefix, $in_file ) = @_;
 
-            INFO("mapping $in_file");
+            job->log->info("mapping $in_file");
             my $cmd =                 "$GMAP_EXEC -d $c->{extra}{genome} -D $c->{extra}{gmapdb} $c->{extra}{args} --format=gff3_gene $in_file >$result_prefix.gff3";
-            INFO("running $cmd");
-            my $success = my_sys_non_fatal($cmd);
+            job->log->info(("running $cmd");
+            my $success = job->sys($cmd);
 
             return $success;
         },

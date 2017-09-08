@@ -2,6 +2,7 @@ package BioX::Workflow::Command::run::Rules::Directives;
 
 use Moose;
 use namespace::autoclean;
+
 use Moose::Util qw/apply_all_roles/;
 
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::HPC';
@@ -11,7 +12,9 @@ with 'BioX::Workflow::Command::run::Rules::Directives::Types::Stash';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Hash';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Array';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::CSV';
+with 'BioX::Workflow::Command::run::Rules::Directives::Types::Glob';
 with 'BioX::Workflow::Command::run::Rules::Directives::Types::Config';
+with 'BioX::Workflow::Command::run::Rules::Directives::Types::Mustache';
 with 'BioX::Workflow::Command::run::Rules::Directives::Interpolate';
 with 'BioX::Workflow::Command::run::Rules::Directives::Sample';
 with 'BioX::Workflow::Command::run::Rules::Directives::Walk';
@@ -45,7 +48,12 @@ has 'register_process_directives' => (
     },
 );
 
-##TODO add this so that we can have user defined types
+=head3 register_namespace
+
+A user can define their own custom types and processes.
+
+=cut
+
 has 'register_namespace' => (
     traits  => ['Array'],
     is      => 'rw',
@@ -66,10 +74,20 @@ has 'register_namespace' => (
             catch {
                 $self->app_log->warn(
                     'There was an error registering role ' . $role );
-                $self->app_log->warn("$_\n");
-            }
+                $self->app_log->warn( $@ . "\n" );
+            };
         }
     },
+);
+
+has 'template_type' => (
+    is            => 'rw',
+    isa           => 'Str',
+    default       => 'Text',
+    documentation => 'BioX supports two templating engines out of the box -'
+      . ' Text::Template and Template::Mustache. Default is Text.'
+      . 'You can register another type by registering the namespace of your templating engine.'
+      . 'It is not recommended to mix and match templating engines.'
 );
 
 has 'override_process' => (
@@ -85,6 +103,13 @@ has 'override_process' => (
         clear_override_process => 'unset',
     },
 );
+
+has 'run_stats' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 1,
+);
+
 
 ##Add in support for chunks
 ##This is useful for features where we want to do things like
@@ -149,12 +174,11 @@ sub create_attr {
                 }
             }
 
-            try{
-            $self->$k($v) if defined $v;
+            try {
+                $self->$k($v) if defined $v;
             }
-            catch{
-                $self->app_log->warn(
-                    'There was an assiging key. ' . $k );
+            catch {
+                $self->app_log->warn( 'There was an assiging key. ' . $k );
                 $self->app_log->warn("$_\n");
             }
         }
@@ -162,29 +186,6 @@ sub create_attr {
     }
 
     $meta->make_immutable;
-}
-
-sub search_registered_types {
-    my $self = shift;
-    my $meta = shift;
-    my $k    = shift;
-    my $v    = shift;
-
-    foreach my $key ( keys %{ $self->register_types } ) {
-        next unless exists $self->register_types->{$key}->{lookup};
-        next unless exists $self->register_types->{$key}->{builder};
-        my $lookup_ref = $self->register_types->{$key}->{lookup};
-        my $builder    = $self->register_types->{$key}->{builder};
-
-        foreach my $lookup ( @{$lookup_ref} ) {
-            if ( $k =~ m/$lookup/ ) {
-                $self->$builder( $meta, $k, $v );
-                return 1;
-            }
-        }
-    }
-
-    return 0;
 }
 
 sub create_reg_attr {
@@ -219,6 +220,40 @@ sub create_blank_attr {
     );
 }
 
+=head3 search_registered_types
+
+A user can register custom types through the plugin system of in the workflow with 'register_namespace'.
+
+Namespaces must be Moose Roles.
+
+See BioX::Workflow::Command::run::Rules::Types::CSV for more information
+
+=cut
+
+sub search_registered_types {
+    my $self = shift;
+    my $meta = shift;
+    my $k    = shift;
+    my $v    = shift;
+
+    foreach my $key ( keys %{ $self->register_types } ) {
+        next unless exists $self->register_types->{$key}->{lookup};
+        next unless exists $self->register_types->{$key}->{builder};
+        my $lookup_ref = $self->register_types->{$key}->{lookup};
+        my $builder    = $self->register_types->{$key}->{builder};
+
+        foreach my $lookup ( @{$lookup_ref} ) {
+            if ( $k =~ m/$lookup/ ) {
+                $self->$builder( $meta, $k, $v );
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+
 sub BUILD { }
 
 after 'BUILD' => sub {
@@ -226,7 +261,6 @@ after 'BUILD' => sub {
     $self->interpol_directive_cache( {} );
 };
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

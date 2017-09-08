@@ -1,7 +1,7 @@
 package LinuxMint::Releases;
 
-our $DATE = '2016-02-24'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-09-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -368,6 +368,23 @@ our $data = do {
      ruby_version         => undef,
      version              => 17.3,
    },
+   {
+     apache_httpd_version => "--",
+     bash_version         => 4.3,
+     code_name            => "sonya",
+     eoldate              => "2021-04",
+     linux_version        => 4.8,
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.22.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "2.7.11",
+     reldate              => "2017-07-02",
+     ruby_version         => undef,
+     version              => 18.2,
+   },
  ]
 
 };
@@ -395,7 +412,7 @@ LinuxMint::Releases - List LinuxMint releases
 
 =head1 VERSION
 
-This document describes version 0.02 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2016-02-24.
+This document describes version 0.030 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2017-09-08.
 
 =head1 SYNOPSIS
 
@@ -412,7 +429,11 @@ which in turn is retrieved from L<http://distrowatch.com>.
 =head1 FUNCTIONS
 
 
-=head2 list_linuxmint_releases(%args) -> [status, msg, result, meta]
+=head2 list_linuxmint_releases
+
+Usage:
+
+ list_linuxmint_releases(%args) -> [status, msg, result, meta]
 
 REPLACE ME.
 
@@ -1154,7 +1175,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

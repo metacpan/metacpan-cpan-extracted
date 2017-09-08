@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{
     MINIMUM_PERL TOKEN_LITERAL TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 {
 
@@ -188,6 +188,10 @@ our $VERSION = '0.051';
 # where it transpired that un-escaped literal left curlies were not
 # giving warnings/errors in /.{/, /\p{...}{/, and /\P{...}{/, but were
 # for all the others that bin into this class (e.g. /\s{/).
+# Note that the perldelta for 5.25.1 and 5.26.0 do not acknowledge tha
+# phased deprecation, and pretend that everything was done on the phase
+# 1 schedule. This appears to be deliberate per
+# https://rt.perl.org/Ticket/Display.html?id=131352
 sub __following_literal_left_curly_disallowed_in {
     my ( $self ) = @_;
     q<.> eq ( my $content = $self->content() )

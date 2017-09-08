@@ -1,6 +1,7 @@
 # -*- cperl -*-
 use Test::More tests => 10;
 
+use File::Temp;
 use XML::TMX::Reader;
 ok 1;
 
@@ -30,9 +31,11 @@ $reader->for_tu( sub {
 		   $count++;
 		 });
 
+my $tmp = File::Temp->new(SUFFIX=>'.tmx', UNLINK => 0);
+
 is($count, 7, "counting tu's with for_tu");
 
-$reader->for_tu( { -output => "t/_tmp.tmx", },
+$reader->for_tu( { -output => $tmp->filename },
                  sub {
                      my $tu = shift;
                      $tu->{-prop}={q=>[77], aut=>["jj","ambs"]};
@@ -40,21 +43,24 @@ $reader->for_tu( { -output => "t/_tmp.tmx", },
                      $tu;
 		 });
 
-ok( -f "t/_tmp.tmx");
+ok( -f $tmp->filename );
 
-$reader = XML::TMX::Reader->new('t/_tmp.tmx');
-ok $reader,"loading t/_tmp.tmx";
+$reader = XML::TMX::Reader->new( $tmp->filename );
+ok $reader,"loading " . $tmp->filename;
 
-$reader->for_tu( {output => "t/_tmp2.tmx", },
+
+my $tmp2 = File::Temp->new(SUFFIXE=>'.tmx', UNLINK => 0);
+
+$reader->for_tu( {output => $tmp2->filename },
                  sub {
-                     my $tu = shift;
-                     for (keys %{$tu->{-prop}}){
-                         $tu->{-prop}{$_} .= "batatas";
-                     }
-                     for (@{$tu->{-note}}){
-                         $_ = "$_ cabolas"
-                     }
-                     $tu;
+		   my $tu = shift;
+		   for (keys %{$tu->{-prop}}){
+		     $tu->{-prop}{$_} .= "batatas";
+		   }
+		   for (@{$tu->{-note}}){
+		     $_ = "$_ cabolas"
+		   }
+		   $tu;
                  });
 
 my @langs = $reader->languages;
@@ -63,5 +69,6 @@ is(@langs, 2 , "languages".join(",",@langs));
 
 ok(grep { $_ eq "EN-GB" } @langs, "en");
 ok(grep { $_ eq "PT-PT" } @langs, "pt");
-unlink( "t/_tmp.tmx");
-unlink( "t/_tmp2.tmx");
+
+unlink( $tmp->filename );
+unlink( $tmp2->filename );

@@ -1,5 +1,10 @@
 Revision history for Test::Mock::One
 
+0.006     2017-09-06 21:55:44Z
+
+    * Add can() functionality
+    * Update documentation
+
 0.005     2017-09-04 19:40:37Z
 
     * Allow copy of X-Mock attributes

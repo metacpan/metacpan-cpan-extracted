@@ -1,12 +1,12 @@
 {
    "abstract" : "A conveyor belt which transports data from a data source to a data sink.",
    "author" : [
-      "Pieter De Praetere <pieter@packed.be>"
+      "Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -24,9 +24,14 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
@@ -41,24 +46,22 @@
          },
          "requires" : {
             "App::Cmd" : "0",
-            "Catmandu" : "1.0602",
+            "Catmandu" : "1.0603",
             "Catmandu::Importer::XML" : "0",
             "Catmandu::LIDO" : "0",
             "Catmandu::OAI" : "0",
             "Catmandu::Solr" : "0",
             "Catmandu::Store::Datahub" : "0",
-            "Catmandu::Store::Resolver" : "0",
             "Config::Simple" : "0",
             "DateTime" : "0",
-            "Hash::Merge" : "0",
-            "LWP::UserAgent" : "0",
-            "Lido::XML" : "0",
             "Log::Any" : "0",
+            "Log::Any::Adapter" : "0",
             "Log::Log4perl" : "0",
             "Module::Load" : "0",
             "Moo" : "0",
             "MooX::Aliases" : "0",
             "MooX::Role::Logger" : "0",
+            "Moose::Role" : "0",
             "Ref::Util" : "0",
             "Sub::Exporter" : "0",
             "Term::ANSIColor" : "0",
@@ -69,7 +72,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.96"
+            "Log::Any::Adapter::Log4perl" : "0",
+            "Log::Any::Test" : "1.03",
+            "Log::Log4perl" : "0",
+            "Test::Deep" : "0.112",
+            "Test::Exception" : "0.43",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.96",
+            "Test::Pod" : "0"
          }
       }
    },
@@ -85,10 +95,11 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.6.1",
+   "version" : "1.71",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
+      "Pieter De Praetere <pieter@packed.be>",
       "Yogendra Sharma <eh.yogendra@gmail.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"

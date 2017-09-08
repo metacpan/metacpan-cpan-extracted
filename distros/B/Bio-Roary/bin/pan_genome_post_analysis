@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::RoaryPostAnalysis;
-$Bio::Roary::Main::RoaryPostAnalysis::VERSION = '3.9.1';
+$Bio::Roary::Main::RoaryPostAnalysis::VERSION = '3.10.2';
 # ABSTRACT: Perform the post analysis on the pan genome
 # PODNAME: pan_genome_post_analysis
 
@@ -25,7 +25,7 @@ pan_genome_post_analysis - Perform the post analysis on the pan genome
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

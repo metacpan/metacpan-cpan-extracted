@@ -14,9 +14,9 @@ BEGIN {
     use_ok( 'Spp::Grammar' ) || print "Bail out!\n";
     use_ok( 'Spp::IsAtom') || print "Bail out!\n";
     use_ok( 'Spp::IsChar' ) || print "Bail out!\n";
-    use_ok( 'Spp::LintParser' ) || print "Bail out!\n";
+    use_ok( 'Spp::LintAst' ) || print "Bail out!\n";
     use_ok( 'Spp::Match' ) || print "Bail out!\n";
-    use_ok( 'Spp::OptSppAst' ) || print "Bail out!\n";
+    use_ok( 'Spp::OptAst' ) || print "Bail out!\n";
     use_ok( 'Spp::ToSpp' ) || print "Bail out!\n";
 }
 

@@ -10,9 +10,11 @@ xs_ok {xs => $xs, verbose => 1}, with_subtest {
     my($module) = @_;
 
     my $lib_ver    = $module->xs_version_lib;
-    diag "library version $lib_ver\n";
+    diag "library version: $lib_ver\n";
     my $header_ver = $module->xs_version_header;
-    diag "header  version $header_ver\n";
+    diag "header  version: $header_ver\n";
+    my $backend    = $module->xs_backend;
+    diag "Backend in use:  $backend\n";
 
     is $lib_ver, $header_ver, "Header and library versions don't match!";
 };
@@ -34,10 +36,18 @@ const char* xs_version_header(const char *class) {
     return VAS_VERSION;
 }
 
+const char* xs_backend(const char *class) {
+    return vas_backend(vas_self());
+}
+
+
 MODULE = TA_MODULE PACKAGE = TA_MODULE
 
 const char *xs_version_lib(class);
  const char *class;
 
 const char *xs_version_header(class);
+ const char *class;
+
+const char *xs_backend(class);
  const char *class;

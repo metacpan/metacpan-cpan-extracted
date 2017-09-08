@@ -1,15 +1,17 @@
 #
+use v5.24;
+
 package TestPW;
-use strict;
-use warnings;
+use File::Spec;
 use Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(
-  slurp_file
-  test_basic weaver_input
-  compare_pod_ok
-);
-our $Data = do { local $/; <DATA> };
+
+#our @ISA    = qw(Exporter);
+#our @EXPORT = qw(
+#  slurp_file
+#  test_basic weaver_input
+#  compare_pod_ok
+#);
+our $fakePerl = do { local $/; <DATA> };
 
 use Test::More 0.96;
 use Test::Differences 0.500;
@@ -18,12 +20,13 @@ use Test::MockObject 1.09;
 use PPI;
 
 use Pod::Elemental 0.102360;
-use Pod::Elemental::Selectors -all;
-use Pod::Elemental::Transformer::Pod5;
-use Pod::Elemental::Transformer::Nester;
 
 use Pod::Weaver;
 require Software::License::BSD;
+
+use Moose;
+use namespace::autoclean;
+with qw<Pod::Elemental::PerlMunger>;
 
 my $zilla = Test::MockObject->new();
 $zilla->set_always( is_trial => 0 );
@@ -36,20 +39,116 @@ $zilla->mock( copyright_holder => sub { $_[0]->license->holder } );
 # proposed changes to Pod::Weaver::Section::Legal look for a license file.  we can ignore that for these tests.
 $zilla->set_always( files => [] );
 
+has dir => ( is => 'rw', );
+
+has testName => ( is => 'rw', );
+
+has inFile => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initInFile',
+);
+
+has inSource => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initInSource',
+);
+
+# fromPod is true if source is loaded from .pod, not .pm
+has fromPod => ( is => 'rw', lazy => 1, builder => 'initFromPod', );
+
+has expected => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initExpected',
+);
+
+has args => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initArgs',
+);
+
+has weaver => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => 'initWeaver',
+);
+
+# Used only when fromPod is true.
+has docPod => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initDocPod',
+);
+
+# User only when fromPod is true. Will contain fake Perl code PPI.
+has docPPI => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => 'initDocPPI',
+);
+
 sub slurp_file { local ( @ARGV, $/ ) = @_; <> }
 
-sub test_basic {
-    my ( $testName, $weaver, $input ) = @_;
-    my $expected = $input->{expected};
+sub run_in_dir {
+    shift if $_[0]->isa(__PACKAGE__);    # Take TestPW->run_in_dir into account.
+    my $dir = shift;
 
-    # copied/modified from Pod::Weaver tests (Pod-Weaver-3.101632/t/basic.t)
-    my $woven = $weaver->weave_document($input);
+    my $tDir = File::Spec->catdir( "t", $dir );
+
+    my $tester = __PACKAGE__->new( dir => $tDir, testName => $dir, );
+
+    $tester->run;
+}
+
+sub run {
+    my $this = shift;
+
+    my $outStr;
+
+    if ( $this->fromPod ) {
+        my $doc = $this->weaver->weave_document(
+            {
+                %{ $this->args },
+                pod_document => $this->docPod,
+                ppi_document => $this->docPPI,
+            }
+        );
+        $outStr = $doc->as_pod_string;
+    }
+    else {
+        $outStr = $this->munge_perl_string( $this->inSource, $this->args );
+    }
     
-    #say STDERR $woven->as_pod_string;
+    #say STDERR $outStr;
 
-    compare_pod_ok( $woven->as_pod_string, $expected,
-        "test $testName: exactly the pod string we wanted after weaving!",
+    compare_pod_ok(
+        $outStr,
+        $this->expected,
+        "test "
+          . $this->testName
+          . ": exactly the pod string we wanted after weaving!",
     );
+}
+
+sub munge_perl_string {
+    my $this = shift;
+    my ( $doc, $args ) = @_;
+
+    my $newDoc = $this->weaver->weave_document(
+        {
+            %$args,
+            pod_document => $doc->{pod},
+            ppi_document => $doc->{ppi},
+        }
+    );
+
+    return {
+        pod => $newDoc,
+        ppi => $doc->{ppi},
+    };
 }
 
 sub compare_pod_ok {
@@ -63,6 +162,9 @@ sub compare_pod_ok {
 
 sub normalize {
     local $_ = $_[0];
+    
+    # Skip any Perl code before __END__ - as returned by munge_perl_string().
+    s/^.*\n__END__\R\R?//s;
 
     # Pod::Elemental 0.103003 has a bug that produces an extra newline...
     # It was fixed in the next version, but who cares about an extra newline...
@@ -70,27 +172,49 @@ sub normalize {
     return $_;
 }
 
-sub weaver_input {
-    my ($dir) = @_;
-    my $base = $dir ? "$dir/" : 't/eg/';
+sub initInFile {
+    my $this = shift;
 
-    # copied/modified from Pod::Weaver tests (Pod-Weaver-3.101632/t/basic.t)
-    my $in_pod   = slurp_file("${base}in.pod");
-    my $expected = slurp_file("${base}out.pod");
-    my $document = Pod::Elemental->read_string($in_pod);
-    
-    my $perl_document = $Data;
-    my $ppi_document  = PPI::Document->new( \$perl_document );
+    my $base = $this->dir;
+    my $inFile;
+  SCAN: foreach my $ext (qw<pod pm>) {
+        my $file = File::Spec->catfile( $base, "in.${ext}" );
+        if ( -e $file && -f $file ) {
+            $inFile = $file;
+            last SCAN;
+        }
+    }
+
+    die "No input file found in " . $this->dir unless defined $inFile;
+    $this->_canRead( $inFile, 'input file' );
+
+    return $inFile;
+}
+
+sub initFromPod {
+    my $this = shift;
+
+    return $this->inFile =~ /\.pod$/;
+}
+
+sub initInSource {
+    my $this = shift;
+
+    my $in = slurp_file( $this->inFile );
+
+    if ( $this->fromPod ) {
+        $in =
+          "# PODNAME: " . $this->testName . "\n# ABSTRACT: no abstract\n" . $in;
+    }
+
+    return $in;
+}
+
+sub initArgs {
+    my $this = shift;
 
     return {
-        pod_document => $document,
-        ppi_document => $ppi_document,
-
-        # below configuration modified by rwstauner
-        expected => $expected,
-
         version => '1.002003',
-
         authors => [ 'Vadim Belman <vrurg@cpan.org>', ],
         license => Software::License::BSD->new(
             {
@@ -98,8 +222,40 @@ sub weaver_input {
                 holder => 'Vadim Belman <vrurg@cpan.org>'
             }
         ),
-        zilla => $zilla,
+        zilla    => $zilla,
+        filename => $this->inFile,
     };
+}
+
+sub initWeaver {
+    my $this = shift;
+
+    return Pod::Weaver->new_from_config( { root => $this->dir, } );
+}
+
+sub initDocPod {
+    my $this = shift;
+    return Pod::Elemental->read_string( slurp_file( $this->inFile ) );
+}
+
+sub initDocPPI {
+    my $this = shift;
+    return PPI::Document->new(\$fakePerl);
+}
+
+sub initExpected {
+    my $this = shift;
+    my $outFile = File::Spec->catfile( $this->dir, "out.pod" );
+    $this->_canRead( $outFile, 'out.pod' );
+    return slurp_file($outFile);
+}
+
+sub _canRead {
+    my $this = shift;
+    my ( $file, $alias ) = @_;
+    die "No $alias found in dir " . $this->dir unless -e $file;
+    die "$file isn't a plain file"             unless -f $file;
+    die "$file is not readable"                unless -r $file;
 }
 
 1;

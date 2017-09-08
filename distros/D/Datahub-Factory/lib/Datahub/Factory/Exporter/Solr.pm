@@ -2,9 +2,12 @@ package Datahub::Factory::Exporter::Solr;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '1.71';
+
 use Moo;
 use Catmandu;
 use HTTP::Headers;
+use namespace::clean;
 
 with 'Datahub::Factory::Exporter';
 

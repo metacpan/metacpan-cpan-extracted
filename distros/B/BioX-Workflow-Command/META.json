@@ -4,13 +4,13 @@
       "Jillian Rowe <jillian.e.rowe@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "BioX-Workflow-Command",
    "no_index" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.18",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
@@ -44,8 +44,6 @@
             "BioSAILs::Utils::LoadConfigs" : "0",
             "BioSAILs::Utils::Plugin" : "0",
             "BioSAILs::Utils::Traits" : "0",
-            "BioX::Workflow::Command::Utils::Traits" : "0",
-            "BioX::Workflow::Command::run::Utils::Rules" : "0",
             "Config::Any" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
@@ -77,6 +75,8 @@
             "Safe" : "0",
             "Storable" : "0",
             "String::Approx" : "0",
+            "Template::Mustache" : "0",
+            "Template::Mustache::Trait" : "0",
             "Text::ASCIITable" : "0",
             "Text::CSV::Slurp" : "0",
             "Text::Template" : "0",
@@ -117,7 +117,7 @@
          "web" : "https://github.com/biosails/BioX-Workflow-Command"
       }
    },
-   "version" : "2.2.1",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "2.2.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

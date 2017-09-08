@@ -1,9 +1,7 @@
 package POE::Component::IRC::Plugin::BotCommand;
-BEGIN {
-  $POE::Component::IRC::Plugin::BotCommand::AUTHORITY = 'cpan:HINRIK';
-}
+our $AUTHORITY = 'cpan:HINRIK';
 # vim: set expandtab ts=4 sw=4 ai:
-$POE::Component::IRC::Plugin::BotCommand::VERSION = '6.88';
+$POE::Component::IRC::Plugin::BotCommand::VERSION = '6.90';
 use strict;
 use warnings FATAL => 'all';
 use Carp;
@@ -149,7 +147,7 @@ sub _handle_cmd {
                             my @values = @{ $self->{Commands}->{$cmd}->{$_} };
                             shift @values;
 
-                            use List::MoreUtils qw(none);
+                            use List::Util qw(none);
                             # Check if argument has one of possible values
                             if (none { $_ eq $in_arg} @values) {
                                 $irc->yield($self->{Method}, $where,
@@ -180,8 +178,10 @@ sub _handle_cmd {
             my @errors = ref $errors eq 'ARRAY'
                 ? @$errors
                 : 'You are not authorized to use this command.';
-            for my $error (@errors) {
-                $irc->yield($self->{Method}, $where, $error);
+            if (!$self->{Ignore_unauthorized}) {
+                for my $error (@errors) {
+                    $irc->yield($self->{Method}, $where, $error);
+                }
             }
             return;
         }

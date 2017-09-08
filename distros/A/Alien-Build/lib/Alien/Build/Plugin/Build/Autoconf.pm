@@ -7,7 +7,7 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has with_pic       => 1;
@@ -71,7 +71,17 @@ sub init
       
       $intr->replace_helper(
         configure => sub {
-          my $configure = _win ? 'sh configure' : './configure';
+          my $configure;
+          
+          if($build->meta_prop->{out_of_source})
+          {
+            my $extract = $build->install_prop->{extract};
+            $configure = _win ? "sh $extract/configure" : "$extract/configure";
+          }
+          else
+          {
+            $configure = _win ? 'sh configure' : './configure';
+          }
           $configure .= ' --prefix=' . $prefix;
           $configure .= ' --with-pic' if $self->with_pic;
           $configure;
@@ -134,7 +144,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -157,6 +167,9 @@ required for autoconf style projects on windows.
 The other thing that this plugin does is that it does a double staged C<DESTDIR> install.
 The author has found this improves the overall reliability of L<Alien> modules that are
 based on autoconf packages.
+
+This plugin supports out-of-source builds (known in autoconf terms as "VPATH" builds) via
+the meta property C<out_of_source>.
 
 =head1 PROPERTIES
 
@@ -216,7 +229,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -233,6 +246,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

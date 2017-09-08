@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
+use TestEnv;
 
 use Test::More;
 use Test::Fatal;

@@ -6,8 +6,9 @@ on test => sub {
 	    requires 'Test::More', '0.96';
 };
 
-requires 'Datahub::Factory';
+requires 'Datahub::Factory', '1.70';
 requires 'Catmandu::Importer::DBI';
+requires 'Catmandu::Adlib';
 requires 'DBD::mysql';
 requires 'DBD::SQLite';
 requires 'WebService::Rackspace::CloudFiles';
@@ -20,3 +21,4 @@ requires 'Catmandu::AAT';
 requires 'Catmandu::VIAF';
 requires 'Catmandu::Store::DBI';
 requires 'DBD::SQLite';
+requires 'DBD::mysql';

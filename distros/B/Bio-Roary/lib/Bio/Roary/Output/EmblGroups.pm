@@ -1,5 +1,5 @@
 package Bio::Roary::Output::EmblGroups;
-$Bio::Roary::Output::EmblGroups::VERSION = '3.9.1';
+$Bio::Roary::Output::EmblGroups::VERSION = '3.10.2';
 # ABSTRACT: Create a tab/embl file with the features for drawing pretty pictures
 
 
@@ -244,7 +244,7 @@ Bio::Roary::Output::EmblGroups - Create a tab/embl file with the features for dr
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

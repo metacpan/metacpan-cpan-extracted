@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -41,11 +41,11 @@
    "provides" : {
       "Crypt::Trifid" : {
          "file" : "lib/Crypt/Trifid.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Crypt::Trifid::Utils" : {
          "file" : "lib/Crypt/Trifid/Utils.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -56,5 +56,6 @@
          "web" : "https://github.com/manwar/Crypt-Trifid"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -2,6 +2,7 @@ package BioX::Workflow::Command::new;
 
 use v5.10;
 use MooseX::App::Command;
+use namespace::autoclean;
 
 use Storable qw(dclone);
 use YAML;
@@ -15,8 +16,8 @@ extends 'BioX::Workflow::Command';
 with 'BioX::Workflow::Command::Utils::Create';
 with 'BioX::Workflow::Command::Utils::Files';
 
-command_short_description 'Create a new workflow';
-command_long_description 'Create a new workflow';
+command_short_description 'Create a new workflow.';
+command_long_description 'Create a new workflow.';
 
 =head1 BioX::Workflow::Command::new
 
@@ -65,7 +66,6 @@ sub execute {
     $self->fh->close;
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;

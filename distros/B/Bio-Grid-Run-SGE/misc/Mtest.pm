@@ -6,7 +6,7 @@ use strict;
 use File::Spec;
 use Config::Auto;
 use Data::Dumper;
-use Bio::Grid::Run::SGE::Util qw/my_glob my_sys expand_path my_mkdir expand_path_rel/;
+use Bio::Grid::Run::SGE::Util qw/my_glob expand_path my_mkdir expand_path_rel/;
 use Cwd;
 use Config;
 use Bio::Gonzales::Util::Cerial;
@@ -60,17 +60,17 @@ has 'input' => ( is => 'rw', required => 1, isa => 'ArrayRef' );
 
 has 'extra' => ( is => 'rw' );
 
-# one can supply parts or combinations per job
-has 'parts' => ( is => 'rw', default => 0 );
-has 'combinations_per_job' => ( is => 'rw' );
+# one can supply num_parts or combinations per job
+has 'num_parts' => ( is => 'rw', default => 0 );
+has 'combinations_per_task' => ( is => 'rw' );
 
 has 'job_name' => ( is => 'rw', default => 'cluster_job' );
 has 'job_id' => ( is => 'rw' );
 
 has 'method' => ( is => 'rw', required => 1 );
 
-has '_worker_config_file' => ( is => 'rw', lazy_build => 1 );
-has '_worker_env_script'  => ( is => 'rw', lazy_build => 1 );
+has 'worker_config_file' => ( is => 'rw', lazy_build => 1 );
+has 'worker_env_script'  => ( is => 'rw', lazy_build => 1 );
 has 'submit_bin'          => ( is => 'rw', default    => 'qsub' );
 has 'submit_params'       => ( is => 'rw', default    => sub { [] }, isa => 'ArrayRef[Str]' );
 has 'perl_bin'            => ( is => 'rw', default    => $Config{perlpath} );
@@ -81,7 +81,7 @@ has 'args' => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
 
 has 'iterator' => ( is => 'rw', lazy_build => 1 );
 
-sub num_slots { return shift->parts(@_) }
+sub num_slots { return shift->num_parts(@_) }
 
 sub _build_log_dir {
   my ($self) = @_;

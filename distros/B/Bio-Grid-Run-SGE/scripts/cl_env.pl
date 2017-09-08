@@ -11,28 +11,29 @@ use Bio::Gonzales::Util::Cerial;
 
 use File::Spec;
 
-run_job(
-  {
-    task => sub {
-      my ( $c, $result_prefix, $idx_item ) = @_;
+job->run({
+    'task' => sub {
+      my ( $result_prefix, $idx_item ) = @_;
 
-      INFO "Running $idx_item->[0] -> $result_prefix";
+      job->log->info("Running $idx_item->[0] -> $result_prefix");
+      job->log->warn("Running $idx_item->[0] -> $result_prefix");
+      job->log->error("Running $idx_item->[0] -> $result_prefix");
+      job->log->debug("Running $idx_item->[0] -> $result_prefix");
+
       jspew( $result_prefix . ".env.json",  \%ENV );
       jspew( $result_prefix . ".item.json", $idx_item );
-      sleep 3;
+      sleep 1;
 
       return 1;
     },
     post_task => sub {
-      my $c = shift;
-      open my $fh, '>', File::Spec->catfile( $c->{result_dir}, 'finished' )
+      open my $fh, '>', File::Spec->catfile( job->config('result_dir'), 'finished' )
         or die "Can't open filehandle: $!";
-      say $fh $c->{job_id};
+      say $fh job->env("job_id");
       $fh->close;
     },
     usage => \&usage,
-  }
-);
+});
 
 sub usage {
   return <<EOF;

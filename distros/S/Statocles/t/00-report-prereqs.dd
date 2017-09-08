@@ -21,6 +21,7 @@ do { my $x = {
                                       'File::Share' => '0',
                                       'Git::Repository' => '0',
                                       'Import::Base' => '0.012',
+                                      'JSON::PP' => '0',
                                       'List::UtilsBy' => '0.09',
                                       'Mojolicious' => '6.54',
                                       'Moo' => '2.000001',

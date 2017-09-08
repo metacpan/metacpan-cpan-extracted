@@ -5,7 +5,7 @@ use strict;
 
 use Carp;
 
-use Bio::Grid::Run::SGE::Util qw/my_glob my_sys INFO run_job/;
+use Bio::Grid::Run::SGE::Util qw/my_glob run_job/;
 use Data::Dumper;
 use Bio::Grid::Run::SGE::Master;
 die "not updated yet";

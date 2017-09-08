@@ -4,7 +4,7 @@ package Dist::Zilla::Plugin::MetaProvides::Update;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin to fix "provides" metadata after [RewriteVersion] modified $VERSION declarations
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moose;
 with 'Dist::Zilla::Role::FileMunger';
@@ -89,7 +89,7 @@ Dist::Zilla::Plugin::MetaProvides::Update - A plugin to fix "provides" metadata 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

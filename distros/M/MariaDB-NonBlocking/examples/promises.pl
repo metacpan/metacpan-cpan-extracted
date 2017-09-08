@@ -57,16 +57,18 @@ my @queries = (
         [ "select 1, rand(464), ? as my_param", undef, ["query param"]],
     ],
     [
-        "select sleep(1)"
+        "select sleep(1)",
     ],
     [
-        "select sleep(1)"
+        "select sleep(2)"
     ],
 );
 
 sub run_queries {
     my @all_connections; # used to disconnect all handles in case of an error
-    my $extras = {}; # Used to cancel all promises in case of an error
+    my $extras = {
+        perl_timeout => 0.03
+    }; # Used to cancel all promises in case of an error
 
     my @promises;
     for (1..3) {
@@ -99,6 +101,9 @@ sub run_queries {
                         $extras,
                        );
             },
+            sub {
+                say "Rejected! @_"
+            },
         );
     }
 
@@ -116,16 +121,17 @@ sub run_queries {
         $_->disconnect for grep defined,
                            map @{$_//[]},
                            @all_connections;
-        @all_connections = ();
-        # ^ At this point, the connections for this promise will
-        # be freed.
 
         die $_[0]; # rethrow
     };
 
-    return collect_all_resolve_or_reject(
-                map $_->catch($handle_errors), @promises
-           );
+    collect_all_resolve_or_reject(
+        map $_->catch($handle_errors), @promises
+    )->finally(sub {
+        @all_connections = ();
+        # ^ At this point, the connections for this promise will
+        # be freed.
+    });
 }
 
 {

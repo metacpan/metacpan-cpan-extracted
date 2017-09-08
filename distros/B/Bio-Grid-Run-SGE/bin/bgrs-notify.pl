@@ -11,6 +11,7 @@ use Bio::Grid::Run::SGE::Config;
 use Getopt::Long;
 use Proc::Daemon;
 
+our $LOG =  Bio::Gonzales::Util::Log->new();
 my %opt = ();
 GetOptions( \%opt, 'daemonize|d', 'process|p=i', 'verbose|v' ) or die "option parsing error";
 
@@ -24,7 +25,7 @@ if ( $opt{process} ) {
   }
 }
 
-my $msg = shift // 'Wollte nur mal Hallo sagen!';
+my $msg = $ENV{bgrs_notify_msg} // shift // 'Wollte nur mal Hallo sagen!';
 say STDERR $msg if ( $opt{verbose} );
 
 if ( $msg eq '-' ) {
@@ -34,10 +35,10 @@ if ( $msg eq '-' ) {
 my $attempts = 3;
 my $c        = Bio::Grid::Run::SGE::Config->new->config;
 
-$c->{notify}{jabber} = [ $c->{notify}{jabber} ] unless ( ref $c->{notify}{jabber} );
+$c->{notify}{jabber} = [ $c->{notify}{jabber} ] unless ( ref $c->{notify}{jabber} eq 'ARRAY' );
 for my $jid ( @{ $c->{notify}{jabber} } ) {
 
-  my $n = Bio::Grid::Run::SGE::Log::Notify::Jabber->new($jid);
+  my $n = Bio::Grid::Run::SGE::Log::Notify::Jabber->new(%$jid, log => $LOG);
 
   for ( my $i = 0; $i < $attempts; $i++ ) {
     last unless ( $n->notify( { message => $msg, from => "jobbot" } ) );

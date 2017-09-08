@@ -2,13 +2,14 @@ package Datahub::Factory::Module::PID;
 
 use Datahub::Factory::Sane;
 
+our $VERSION = '0.92';
+
 use Datahub::Factory::Module::PID::CloudFiles;
 use Datahub::Factory::Module::PID::WebFile;
-
 use File::Basename qw(fileparse);
-
 use Catmandu;
 use Moo;
+use namespace::clean;
 
 has pid_module         => (is => 'ro', default => 'lwp');
 has pid_username       => (is => 'ro');

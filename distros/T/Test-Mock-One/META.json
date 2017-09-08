@@ -83,7 +83,7 @@
          "web" : "https://gitlab.com/waterkip/test-mock-one"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

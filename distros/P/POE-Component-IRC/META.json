@@ -2,30 +2,30 @@
    "abstract" : "A fully event-driven IRC client module",
    "author" : [
       "Chris Williams <chris@bingosnet.co.uk>",
-      "Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>"
+      "Hinrik \u00d6rn Sigur\u00f0sson <hinrik.sig@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POE-Component-IRC",
    "no_index" : {
       "directory" : [
+         "examples",
          "t",
-         "xt",
          "utils",
-         "examples"
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -39,7 +39,7 @@
          },
          "requires" : {
             "IRC::Utils" : "0.12",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.33",
             "POE" : "1.311",
             "POE::Component::Syndicator" : "0",
             "POE::Driver::SysRW" : "0",
@@ -76,7 +76,8 @@
          "web" : "http://github.com/bingos/poe-component-irc"
       }
    },
-   "version" : "6.88",
-   "x_authority" : "cpan:HINRIK"
+   "version" : "6.90",
+   "x_authority" : "cpan:HINRIK",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

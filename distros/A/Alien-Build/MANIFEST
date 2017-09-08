@@ -37,6 +37,7 @@ corpus/dist/foo-1.00/foo.c
 corpus/dist2/foo.tar
 corpus/lib/Alien/Build/Plugin/Download/Foo.pm
 corpus/lib/Alien/Build/Plugin/Fetch/Corpus.pm
+corpus/lib/Alien/Build/Plugin/Fetch/Foo.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Controller.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Negotiate.pm
 corpus/lib/Alien/Build/Plugin/RogerRamjet.pm
@@ -123,7 +124,9 @@ lib/Alien/Build/Plugin/Core/Download.pm
 lib/Alien/Build/Plugin/Core/FFI.pm
 lib/Alien/Build/Plugin/Core/Gather.pm
 lib/Alien/Build/Plugin/Core/Legacy.pm
+lib/Alien/Build/Plugin/Core/Override.pm
 lib/Alien/Build/Plugin/Core/Setup.pm
+lib/Alien/Build/Plugin/Core/Tail.pm
 lib/Alien/Build/Plugin/Decode.pod
 lib/Alien/Build/Plugin/Decode/DirListing.pm
 lib/Alien/Build/Plugin/Decode/DirListingFtpcopy.pm
@@ -149,6 +152,7 @@ lib/Alien/Build/Plugin/PkgConfig/MakeStatic.pm
 lib/Alien/Build/Plugin/PkgConfig/Negotiate.pm
 lib/Alien/Build/Plugin/PkgConfig/PP.pm
 lib/Alien/Build/Plugin/Prefer.pod
+lib/Alien/Build/Plugin/Prefer/BadVersion.pm
 lib/Alien/Build/Plugin/Prefer/SortVersions.pm
 lib/Alien/Build/Plugin/Probe.pod
 lib/Alien/Build/Plugin/Probe/CBuilder.pm
@@ -178,6 +182,7 @@ t/alien_base__system_installed.t
 t/alien_base_wrapper.t
 t/alien_build.t
 t/alien_build_commandsequence.t
+t/alien_build_commandsequence__cd.t
 t/alien_build_interpolate.t
 t/alien_build_interpolate_default.t
 t/alien_build_meta.t
@@ -192,7 +197,9 @@ t/alien_build_plugin_core_download.t
 t/alien_build_plugin_core_ffi.t
 t/alien_build_plugin_core_gather.t
 t/alien_build_plugin_core_legacy.t
+t/alien_build_plugin_core_override.t
 t/alien_build_plugin_core_setup.t
+t/alien_build_plugin_core_tail.t
 t/alien_build_plugin_decode_dirlisting.t
 t/alien_build_plugin_decode_dirlistingftpcopy.t
 t/alien_build_plugin_decode_html.t
@@ -214,7 +221,9 @@ t/alien_build_plugin_pkgconfig_commandline.t
 t/alien_build_plugin_pkgconfig_libpkgconf.t
 t/alien_build_plugin_pkgconfig_makestatic.t
 t/alien_build_plugin_pkgconfig_negotiate.t
+t/alien_build_plugin_pkgconfig_negotiate__pick.t
 t/alien_build_plugin_pkgconfig_pp.t
+t/alien_build_plugin_prefer_badversion.t
 t/alien_build_plugin_prefer_sortversions.t
 t/alien_build_plugin_probe_cbuilder.t
 t/alien_build_plugin_probe_commandline.t
@@ -237,7 +246,6 @@ t/test_alien__ffi_ok.t
 t/test_alien__ffi_ok__acme.t
 t/test_alien__helper_ok.t
 t/test_alien__interpolate_template_ok.t
-t/test_alien__run_ok.t
 t/test_alien__xs_ok.t
 t/test_alien__xs_ok__acme.t
 t/test_alien__xs_ok__no_compiler.t
@@ -245,6 +253,7 @@ t/test_alien__xs_ok__with_xs_load.t
 t/test_alien_build.t
 t/test_alien_cancompile.t
 t/test_alien_canplatypus.t
+t/test_alien_run.t
 t/test_alien_synthetic.t
 xt/author/eol.t
 xt/author/no_tabs.t

@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 use Moose::Role;
 use Benchmark qw(timediff timestr :hireswallclock);
@@ -41,14 +41,14 @@ has 'time' => (
 has 'start_time' => (
     is      => 'ro',
     isa     => 'Num',
-    lazy    => 0,
+    lazy    => 1,
     default => sub { $_[0]->_start_benchmark->[0] },
 );
 
 has 'end_time' => (
     is      => 'ro',
     isa     => 'Num',
-    lazy    => 0,
+    lazy    => 1,
     default => sub { $_[0]->_end_benchmark->[0] },
 );
 
@@ -81,7 +81,7 @@ Test::Class::Moose::Role::HasTimeReport - Report timing role
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 DESCRIPTION
 
@@ -111,13 +111,13 @@ Returns the end time for the report as an epoch value.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/test-class-moose/test-class-moose/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/test-class-moose/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
 
 =head1 AUTHORS
 

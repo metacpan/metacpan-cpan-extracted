@@ -1,5 +1,5 @@
 package Bio::Roary::SequenceLengths;
-$Bio::Roary::SequenceLengths::VERSION = '3.9.1';
+$Bio::Roary::SequenceLengths::VERSION = '3.10.2';
 # ABSTRACT:  Take in a fasta file and create a hash with the length of each sequence
 
 
@@ -43,7 +43,7 @@ Bio::Roary::SequenceLengths - Take in a fasta file and create a hash with the le
 
 =head1 VERSION
 
-version 3.9.1
+version 3.10.2
 
 =head1 SYNOPSIS
 

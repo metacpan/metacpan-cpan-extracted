@@ -5,6 +5,8 @@ $Description => ''
 </%ARGS>
 <%INIT>
 my $token = RT::AuthToken->new($session{CurrentUser});
+# Don't require password for systems with some form of federated auth
+my %res = $session{'CurrentUser'}->CurrentUserRequireToSetPassword();
 my ($error, $authstring);
 
 if (!$Owner) {
@@ -13,10 +15,10 @@ if (!$Owner) {
 elsif (!length($Description)) {
     $error = loc("Description cannot be blank.");
 }
-elsif (!length($Password)) {
+elsif ($res{'CanSet'} && !length($Password)) {
     $error = loc("Please enter your current password.");
 }
-elsif (!$session{CurrentUser}->IsPassword($Password) ) {
+elsif ($res{'CanSet'} && !$session{CurrentUser}->IsPassword($Password) ) {
     $error = loc("Please enter your current password correctly.");
 }
 else {

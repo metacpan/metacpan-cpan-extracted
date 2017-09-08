@@ -22,7 +22,7 @@ sub do_worker_stuff {
 
     my $cmd = "$ENV{HOME}/usr/bin/fprotdist -sequence $seq_file -outfile $result_prefix";
     
-    INFO "Running fprotdist $cmd";
+    job->log->info("Running fprotdist $cmd");
 
-    return my_sys_non_fatal($cmd);
+    return job->sys($cmd);
 }

@@ -1,5 +1,5 @@
 package App::SmokeBrew::Plugin;
-$App::SmokeBrew::Plugin::VERSION = '0.50';
+$App::SmokeBrew::Plugin::VERSION = '0.52';
 #ABSTRACT: A Moose role for smokebrew plugins
 
 use strict;
@@ -81,7 +81,7 @@ App::SmokeBrew::Plugin - A Moose role for smokebrew plugins
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 

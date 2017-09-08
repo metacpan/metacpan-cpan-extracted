@@ -1,3 +1,20 @@
+0.0260 2017-09-08
+  - fix windows dll bugs
+0.0259 2017-09-06
+  - add Math module
+  - add Math::sin function
+  - add Math->PI constant
+  - add Math->E constant
+0.0258 2017-09-06
+  - fix temporary inline file name.
+  - support inline native config
+    __CONFIG__
+  - support inline config following options
+    CC
+    CCFLAGS
+    LD
+    LDDLFLAGS
+    OPTIMIZE
 0.0257 2017-09-05
   - improve inline native source error message
   - inline source is separated each

@@ -17,7 +17,7 @@ run_job(
 sub do_worker_stuff {
     my ( $c, $result_prefix, $file ) = @_;
 
-    INFO "Running $file -> $result_prefix";
+    job->log->info( "Running $file -> $result_prefix");
     open my $file_fh, '<', $file or confess "Can't open filehandle: $!";
     die "geil" if($ENV{SGE_TASK_ID} % 2 == 0);
 

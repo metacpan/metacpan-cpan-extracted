@@ -3,11 +3,14 @@ package Alien::Build::Plugin::PkgConfig::Negotiate;
 use strict;
 use warnings;
 use Alien::Build::Plugin;
-use Config;
+use Alien::Build::Plugin::PkgConfig::CommandLine;
+use Alien::Build::Plugin::PkgConfig::LibPkgConf;
+use Alien::Build::Plugin::PkgConfig::PP;
+use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -17,34 +20,41 @@ has '+pkg_name' => sub {
 
 has minimum_version => undef;
 
-sub _pick
+
+sub pick
 {
   my($class) = @_;
 
   return $ENV{ALIEN_BUILD_PKG_CONFIG} if $ENV{ALIEN_BUILD_PKG_CONFIG};
   
-  if(eval q{ use PkgConfig::LibPkgConf 0.04; 1 })
+  if(Alien::Build::Plugin::PkgConfig::LibPkgConf->available)
   {
     return 'PkgConfig::LibPkgConf';
   }
   
-  require Alien::Build::Plugin::PkgConfig::CommandLine;
-  if(Alien::Build::Plugin::PkgConfig::CommandLine->new(pkg_name => 'foo')->bin_name)
+  if(Alien::Build::Plugin::PkgConfig::CommandLine->available)
   {
-    unless($^O eq 'solaris' && $Config{ptrsize} == 8)
+    unless(_perl_config('osname') eq 'solaris' && _perl_config('ptrsize') == 8)
     {
       return 'PkgConfig::CommandLine';
     }
   }
   
-  return 'PkgConfig::PP';
+  if(Alien::Build::Plugin::PkgConfig::PP->available)
+  {
+    return 'PkgConfig::PP';
+  }
+  else
+  {
+    Carp::carp("Could not find an appropriate pkg-config implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
+  }
 }
 
 sub init
 {
   my($self, $meta) = @_;
 
-  my $plugin = $self->_pick;
+  my $plugin = $self->pick;
   Alien::Build->log("Using PkgConfig plugin: $plugin");
   
   if(ref($self->pkg_name) eq 'ARRAY')
@@ -74,7 +84,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -97,6 +107,14 @@ The package name.
 =head2 minimum_version
 
 The minimum required version that is acceptable version as provided by the system.
+
+=head1 METHODS
+
+=head2 pick
+
+ my $name = Alien::Build::Plugijn::PkgConfig::Negotiate->pick;
+
+Returns the name of the negotiated plugin.
 
 =head1 ENVIRONMENT
 
@@ -135,7 +153,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -152,6 +170,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

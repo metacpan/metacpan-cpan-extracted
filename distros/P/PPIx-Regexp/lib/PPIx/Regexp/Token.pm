@@ -53,7 +53,7 @@ use base qw{PPIx::Regexp::Element};
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
 
-our $VERSION = '0.051';
+our $VERSION = '0.052';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 0;
 
@@ -68,7 +68,7 @@ sub __new {
 	content => $content,
     };
 
-    foreach my $key ( qw{ perl_version_introduced } ) {
+    foreach my $key ( qw{ perl_version_introduced perl_version_removed } ) {
 	defined $arg{$key}
 	    and $self->{$key} = $arg{$key};
     }
@@ -85,8 +85,13 @@ sub content {
 sub perl_version_introduced {
     my ( $self ) = @_;
     return defined $self->{perl_version_introduced} ?
-    $self->{perl_version_introduced} :
-    MINIMUM_PERL;
+	$self->{perl_version_introduced} :
+	MINIMUM_PERL;
+}
+
+sub perl_version_removed {
+    my ( $self ) = @_;
+    return $self->{perl_version_removed};
 }
 
 sub unescaped_content {

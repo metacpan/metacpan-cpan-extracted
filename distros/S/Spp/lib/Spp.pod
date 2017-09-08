@@ -4,13 +4,13 @@ Spp - String prepare Parser
 
 =head1 VERSION
 
-Version 1.13
+Version 1.16
 
 =head1 SYNOPSIS
 
 Spp is a tool which parse string, according grammar write with Spp language.
 
-    > spp
+    > spp --repl
 
 then shell would ouput:
 
@@ -19,26 +19,32 @@ then shell would ouput:
     
 Lint grammar.file:
 
-    > spp grammar.file
+    > spp --lint grammar.file
 
 Parse text.file according grammar.file
 
-    > spp grammar.file text.file
+    > spp --parse grammar.file text.file
     
 Spp also could use as Module:
 
     use 5.012;
-    use Spp qw(spp);
+    use Spp qw(spp parse);
+    sue Spp::Builtin qw(read_file to_json);
     
     my $ast = spp($grammar_file, $string_file);
+    lint($grammar_file);
     say to_json($ast);
+    my $grammar_text = read_file($grammar_file);
+    lint_grammar($grammar_text);
+    my $string_text = read_file($string_file);
+    $ast = parse($grammar_text, $string_text);    
 
 =head1 EXPORT
 
-    spp
-    lint
-    update
-    repl
+   lint
+   lint_grammarr
+   parse
+   spp
 
 =head1 AUTHOR
 

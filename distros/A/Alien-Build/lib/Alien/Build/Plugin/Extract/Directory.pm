@@ -7,7 +7,7 @@ use Alien::Build::Util qw( _mirror );
 use Path::Tiny ();
 
 # ABSTRACT: Plugin to extract a downloaded directory to a build directory
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 has '+format' => 'd';
@@ -15,8 +15,15 @@ has '+format' => 'd';
 
 sub handles
 {
-  my($class, $ext) = @_;
+  my(undef, $ext) = @_;
   $ext eq 'd' ? 1 : ();
+}
+
+
+sub available
+{
+  my(undef, $ext) = @_;
+  __PACKAGE__->handles($ext);
 }
 
 sub init
@@ -26,13 +33,22 @@ sub init
   $meta->register_hook(
     extract => sub {
       my($build, $src) = @_;
+      
       die "not a directory: $src" unless -d $src;
-      my $dst = Path::Tiny::path('.')->absolute;
-      # Please note: _mirror and Alien::Build::Util are ONLY
-      # allowed to be used by core plugins.  If you are writing
-      # a non-core plugin it may be removed.  That is why it
-      # is private.
-      _mirror $src => $dst, { verbose => 1 };
+
+      if($build->meta_prop->{out_of_source})
+      {
+        $build->install_prop->{extract} = Path::Tiny->new($src)->absolute->stringify;
+      }
+      else
+      {
+        my $dst = Path::Tiny->new('.')->absolute;
+        # Please note: _mirror and Alien::Build::Util are ONLY
+        # allowed to be used by core plugins.  If you are writing
+        # a non-core plugin it may be removed.  That is why it
+        # is private.
+        _mirror $src => $dst, { verbose => 1 };
+      }
     }
   );
 }
@@ -51,7 +67,7 @@ Alien::Build::Plugin::Extract::Directory - Plugin to extract a downloaded direct
 
 =head1 VERSION
 
-version 1.05
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -82,6 +98,14 @@ Should always set to C<d> (for directories).
 Returns true if the plugin is able to handle the archive of the
 given format.  Only returns true for C<d> (for directory).
 
+=head2 available
+
+ Alien::Build::Plugin::Extract::Directory->available($ext);
+ $plugin->available($ext);
+
+Returns true if the plugin can extract the given format with
+what is already installed.
+
 =head1 SEE ALSO
 
 L<Alien::Build::Plugin::Extract::Negotiate>, L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
@@ -108,7 +132,7 @@ Brian Wightman (MidLifeXis)
 
 Zaki Mughal (zmughal)
 
-mohawk2
+mohawk (mohawk2, ETJ)
 
 Vikas N Kumar (vikasnkumar)
 
@@ -125,6 +149,10 @@ Kang-min Liu (劉康民, gugod)
 Nicholas Shipp (nshp)
 
 Juan Julián Merelo Guervós (JJ)
+
+Joel Berger (JBERGER)
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

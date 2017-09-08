@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Receive;
-our $VERSION = '1.20170222'; # VERSION
+our $VERSION = '1.20170906'; # VERSION
 use strict;
 use warnings;
 
@@ -407,7 +407,7 @@ Mail::DMARC::Report::Receive - process incoming DMARC reports
 
 =head1 VERSION
 
-version 1.20170222
+version 1.20170906
 
 =head1 DESCRIPTION
 

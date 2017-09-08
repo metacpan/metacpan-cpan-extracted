@@ -7,9 +7,9 @@ build_requires:
   Test::Differences: '0.61'
   Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,15 +17,15 @@ meta-spec:
 name: POE-Component-IRC
 no_index:
   directory:
-    - t
-    - xt
-    - utils
     - examples
+    - t
+    - utils
+    - xt
 recommends:
   POE::Component::Client::DNS: '0.99'
 requires:
   IRC::Utils: '0.12'
-  List::MoreUtils: '0'
+  List::Util: '1.33'
   POE: '1.311'
   POE::Component::Syndicator: '0'
   POE::Driver::SysRW: '0'
@@ -42,5 +42,6 @@ resources:
   homepage: http://metacpan.org/release/POE-Component-IRC
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bingos/poe-component-irc.git
-version: '6.88'
+version: '6.90'
 x_authority: cpan:HINRIK
+x_serialization_backend: 'YAML::Tiny version 1.70'

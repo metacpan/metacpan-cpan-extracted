@@ -27,5 +27,7 @@ requires:
   Type::Tiny: '0'
   perl: '5.014'
 resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.06'
+version: '0.07'

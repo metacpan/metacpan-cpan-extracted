@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::Pod::No404s;
-# git description: v1.002-6-g036a4c2
+# git description: v1.003-0-gfa2da2a
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Add author tests for POD HTTP links
-$Dist::Zilla::Plugin::Test::Pod::No404s::VERSION = '1.003';
+$Dist::Zilla::Plugin::Test::Pod::No404s::VERSION = '1.004';
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
 with 'Dist::Zilla::Role::PrereqSource';
@@ -50,7 +50,7 @@ Dist::Zilla::Plugin::Test::Pod::No404s - Add author tests for POD HTTP links
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

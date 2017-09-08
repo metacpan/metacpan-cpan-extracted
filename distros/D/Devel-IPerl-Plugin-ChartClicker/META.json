@@ -1,0 +1,57 @@
+{
+   "abstract" : "IPerl plugin to make Chart::Clicker charts displayable",
+   "author" : [
+      "Zakariyya Mughal <zmughal@cpan.org>",
+      "Zhenyi Zhou <zhouzhen1@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-IPerl-Plugin-ChartClicker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Chart::Clicker" : "0",
+            "Devel::IPerl::Display::PNG" : "0",
+            "Devel::IPerl::Display::SVG" : "0",
+            "File::Temp" : "0",
+            "Moo::Role" : "0",
+            "Role::Tiny" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-ChartClicker",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-ChartClicker.git",
+         "web" : "https://github.com/EntropyOrg/p5-Devel-IPerl-Plugin-ChartClicker"
+      }
+   },
+   "version" : "0.008",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0238"
+}
+

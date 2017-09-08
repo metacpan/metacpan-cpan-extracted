@@ -1,5 +1,21 @@
 Revision history for Datahub-Factory
 
+1.71  2017-09-06 10:54:08 CEST
+
+    - Fixed: Licensing via GPv3 on milla release.
+    - Fixed: missing Moose::Role.
+
+1.70  2017-09-05 14:03:04 CEST
+
+    - Changed: improved milla / dzil release flow.
+    - Added: missing dependencies for testing in cpanfile.
+    - Added: first iteration for .travis.yml file.
+    - Changed: Clean up use imports for all modules.
+    - Changed: Moved dhconveyor executable from script/ to bin/ directory for Module::Build.
+    - Changed: Use Module::Build instead of Module::Build::Tiny.
+    - Changed: Removed non-used dependencies which should be resolved automatically.
+    - Changed: Upgraded Catmandu 1.0602 to 1.0603.
+
 1.6.1  2017-09-04 09:11:34 CEST
 
     - Fixed: faulty references to deprecated Datahub::Factory::PipelineConfig.

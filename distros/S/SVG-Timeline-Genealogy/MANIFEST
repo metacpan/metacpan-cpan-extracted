@@ -6,11 +6,9 @@ lib/SVG/Timeline/Genealogy.pm
 lib/SVG/Timeline/Genealogy/Person.pm
 Makefile.PL
 MANIFEST			This list of files
-SVG-Timeline-Genealogy-0.0.1/META.json
-SVG-Timeline-Genealogy-0.0.1/META.yml
+META.json
+META.yml
 t/01-basic.t
 t/load.t
 xt/pod-coverage.t
 xt/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -20,6 +20,7 @@ all_pod_files_spelling_ok ();
 
 1;
 __DATA__
+Autoconf
 charnames
 errstr
 hocery
@@ -57,6 +58,7 @@ tokenizers
 tokenizes
 tokenizing
 trigraphs
+Un
 unicode
 unterminated
 UTF

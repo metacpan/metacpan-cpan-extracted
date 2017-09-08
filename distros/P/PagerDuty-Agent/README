@@ -1,0 +1,45 @@
+PagerDuty::Agent version 0.01
+
+PagerDuty::Agent is a module for submitting events to PagerDuty.
+
+SYNOPSIS
+
+  use PagerDuty::Agent;
+
+  my $agent = PagerDuty::Agent->new( routing_key => '3fcc9112463424b599f996f9e780dfc6' );
+
+  # trigger an event, then resolve it
+  my $dedup_key = $agent->trigger_event( 'something is terribly wrong!' );
+
+  if ( $dedup_key ) {
+    print "Event created, dedup_key = $dedup_key\n";
+
+    print "Event successfully resolved\n"
+      if $agent->resolve_event( $dedup_key );
+  }
+
+  # additional context can be passed in
+  $agent->trigger_event(
+    summary   => 'something is terribly wrong!',
+    severity  => 'critical',
+    dedup_key => 'abc123',
+  );
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Perl 5.8 or later.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by comScore, Inc
+
+The full text of this license can be found in the LICENSE file included with this module.

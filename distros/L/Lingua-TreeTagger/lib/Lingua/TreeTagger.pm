@@ -9,7 +9,7 @@ use Carp;
 use Lingua::TreeTagger::TaggedText;
 use Lingua::TreeTagger::ConfigData;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 #===============================================================================
@@ -587,7 +587,7 @@ Installing and using this module requires a working version of TreeTagger
 Windows users are advised to follow the installation instructions given on page
 L<http://www.smo.uhi.ac.uk/~oduibhin/oideasra/interfaces/winttinterface.htm>.
 There is also a L<Lingua::TreeTagger::Installer> module created by Alberto 
-Simões (this distribution is not directly related to the present
+Simoes (this distribution is not directly related to the present
 one).
 
 The particular set of TreeTagger parameter files installed on the user's
@@ -656,7 +656,7 @@ Aris Xanthos  (aris.xanthos@unil.ch)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2014 Aris Xanthos (aris.xanthos@unil.ch).
+Copyright (c) 2010-2017 Aris Xanthos (aris.xanthos@unil.ch).
 
 This program is released under the GPL license (see
 L<http://www.gnu.org/licenses/gpl.html>).
