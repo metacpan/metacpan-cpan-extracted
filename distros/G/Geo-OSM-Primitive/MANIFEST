@@ -1,0 +1,16 @@
+Changes
+lib/Geo/OSM/Primitive.pm
+lib/Geo/OSM/Primitive/Node.pm
+lib/Geo/OSM/Primitive/Relation.pm
+lib/Geo/OSM/Primitive/Way.pm
+Makefile.PL
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README
+README.md
+t/001-load.t
+t/001-loat.t
+t/002-node-new.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

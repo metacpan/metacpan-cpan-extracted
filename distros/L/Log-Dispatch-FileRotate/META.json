@@ -23,36 +23,36 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::NextRelease" : "0",
-            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Filter" : "0",
             "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
             "Software::License::Perl_5" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::Signature" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Date::Manip" : "0",
+            "Exporter" : "0",
             "Fcntl" : "0",
             "File::Spec" : "0",
             "Log::Dispatch::File" : "0",
             "Log::Dispatch::Output" : "0",
-            "Params::Validate" : "0",
             "base" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
-            "version" : "0"
+            "version" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Encode" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0.018",
             "Test::More" : "0.88",
             "Test::Warn" : "0",
-            "perl" : "5.006",
-            "warnings" : "0"
+            "perl" : "5.008",
+            "utf8" : "0"
          }
       }
    },
@@ -69,7 +69,7 @@
          "web" : "https://github.com/mschout/perl-log-dispatch-filerotate"
       }
    },
-   "version" : "1.30",
+   "version" : "1.34",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

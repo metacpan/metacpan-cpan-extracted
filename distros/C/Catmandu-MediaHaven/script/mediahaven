@@ -1,0 +1,174 @@
+#!perl
+
+=head1 NAME
+
+mediahaven - a Zeticon MediaHaven command-line interface
+
+=head1 SYNOPSIS
+
+    usage: mediahaven [options] search [QUERY] [START] [NUM]
+    usage: mediahaven [options] record ID
+    usage: mediahaven [options] edit ID FIELD VALUE [VALUE...]
+    usage: mediahaven [options] export ID [FILE]
+
+    options:
+        --url=...
+        --username=...
+        --password=...
+        --exporter=...
+
+=cut
+
+use strict;
+
+use Catmandu;
+use Catmandu::MediaHaven;
+use IO::File;
+use IO::Handle;
+use Cwd ();
+use Getopt::Long;
+
+Catmandu->default_load_path(Cwd::getcwd);
+
+my $url      = undef;
+my $username = undef;
+my $password = undef;
+my $exporter = 'YAML';
+
+if (my $cfg = Catmandu->config->{mediahaven}) {
+    $url      = $cfg->{url};
+    $username = $cfg->{username};
+    $password = $cfg->{password};
+}
+
+GetOptions ("url=s"      => \$url ,
+            "username=s" => \$username ,
+            "password=s" => \$password ,
+            "exporter=s" => \$exporter) || usage();
+
+my $cmd = shift;
+
+usage() unless $cmd;
+
+my $mh = Catmandu::MediaHaven->new(
+                url      => $url ,
+                username => $username,
+                password => $password,
+         );
+
+die "failed to create a MediaHaven connection: $!" unless $mh;
+
+if (0) {}
+elsif ($cmd eq 'search') {
+  cmd_search(@ARGV);
+}
+elsif ($cmd eq 'record') {
+  cmd_record(@ARGV);
+}
+elsif ($cmd eq 'edit') {
+  cmd_edit(@ARGV);
+}
+elsif ($cmd eq 'export') {
+  cmd_export(@ARGV);
+}
+else {
+  usage();
+}
+
+sub cmd_search {
+    my ($query,$start,$num) = @_;
+
+    my $result = $mh->search($query, start => $start , num => $num);
+
+    die "search failed" unless defined($result);
+
+    my $e = Catmandu->exporter($exporter);
+
+    my $n = 0;
+    for my $res (@{$result->{mediaDataList}}) {
+        $e->add($res);
+        $n++;
+    }
+
+    $e->commit;
+}
+
+sub cmd_record {
+    my ($id) = @_;
+
+    die "usage: record $id" unless $id;
+
+    my $result = $mh->record($id);
+
+    die "search failed" unless defined($result);
+
+    my $e = Catmandu->exporter($exporter);
+
+    $e->add($result);
+
+    $e->commit;
+}
+
+sub cmd_edit {
+    my ($id,$field,@values) = @_;
+
+    die "usage: edit $id $field @values" unless $id && $field && @values;
+
+    my $result = $mh->edit($id,$field,@values);
+
+    die "search failed" unless defined($result);
+
+    my $e = Catmandu->exporter($exporter);
+
+    $e->add($result);
+
+    $e->commit;
+}
+
+sub cmd_export {
+    my ($id,$file) = @_;
+
+    die "usage: export $id" unless $id;
+
+    my $out;
+
+    if ($file) {
+        $out = IO::File->new(">$file") || die "failed to open $file for writing: $!";
+    }
+    else {
+        $out = IO::Handle->new();
+        $out->fdopen(fileno(STDOUT),"w") || die "failed to open STDOUT for writing:$!";
+    }
+
+    $out->binmode(':raw');
+
+    my $bytes = 0;
+    $mh->export($id, sub {
+        my $data = shift;
+        # Support the Dancer send_file "write" callback
+        if ($out->can('syswrite')) {
+            $bytes += $out->syswrite($data) || die "failed to write : $!";
+        }
+        else {
+            $bytes += $out->write($data) || die "failed to write : $!";;
+        }
+    });
+
+    print "Exported $bytes bytes\n";
+}
+
+sub usage {
+    print STDERR <<EOF;
+usage: $0 [options] search [QUERY] [START] [NUM]
+usage: $0 [options] record ID
+usage: $0 [options] edit ID FIELD VALUE [VALUE...]
+usage: $0 [options] export ID [FILE]
+
+options:
+    --url=...
+    --username=...
+    --password=...
+    --exporter=...
+EOF
+    exit 1;
+}

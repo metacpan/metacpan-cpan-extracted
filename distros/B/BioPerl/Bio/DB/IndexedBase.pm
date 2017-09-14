@@ -4,7 +4,6 @@
 # You may distribute this module under the same terms as perl itself
 #
 
-
 =head1 NAME
 
 Bio::DB::IndexedBase - Base class for modules using indexed sequence files
@@ -127,7 +126,7 @@ use tied(%db) to recover the Bio::DB::IndexedBase object and call its methods.
  }
 
 In addition, you may invoke the FIRSTKEY and NEXTKEY tied hash methods directly
-to retrieve the first and next ID in the database, respectively. This allows to
+to retrieve the first and next ID in the database, respectively. This allows one to
 write the following iterative loop using just the object-oriented interface:
 
  my $db = Bio::DB::IndexedBase->new('/path/to/file');
@@ -246,6 +245,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use IO::File;
 use AnyDBM_File;
 use Fcntl;
@@ -264,49 +264,48 @@ use constant DNA       => 1;
 use constant RNA       => 2;
 use constant PROTEIN   => 3;
 
+# You can avoid dying if you want but you may get incorrect results
 use constant DIE_ON_MISSMATCHED_LINES => 1;
-# you can avoid dying if you want but you may get incorrect results
-
-
-# Compiling the below regular expressions speeds up the Pure Perl
-# seq/subseq() from Bio::DB::Fasta by about 7% from 7.76s to 7.22s
-# over 32358 calls on Variant Effect Prediction data.
-my $nl = qr/\n/;
-my $cr = qr/\r/;
 
 # Remove carriage returns (\r) and newlines (\n) from a string.  When
 # called from subseq, this can take a signficiant portion of time, in
 # Variant Effect Prediction. Therefore we compile the match portion.
 sub _strip_crnl {
-    my $str = shift;
-    $str =~ s/$nl//g;
-    $str =~ s/$cr//g;
-    return $str;
-}
-
-# C can do perfrom _strip_crnl much faster. But this requires the
-# Inline::C module which we don't require people to have. So we make
-# this optional by wrapping the C code in an eval. If the eval works,
-# the Perl strip_crnl() function is overwritten.
-eval q{
-    use Inline C  => <<'END_OF_C_CODE';
-    /* Strip all new line (\n) and carriage return (\r) characters
-       from string str
-    */
-    char* _strip_crnl(char* str) {
-        char *s;
-        char *s2 = str;
-        for (s = str; *s; *s++) {
+    eval 'require Inline::C';
+    if ( $INC{'Inline/C.pm'} ) {
+        # C can do _strip_crnl much faster. But this requires the
+        # Inline::C module which we don't require people to have. So we make
+        # this optional by wrapping the C code in an eval. If the eval works,
+        # the Perl strip_crnl() function is overwritten.
+        Inline->bind(
+            C => q(
+        /*
+        Strip all newlines (\n) and carriage returns (\r) from the string
+        */
+        char* _strip_crnl(char* str) {
+          char *s;
+          char *s2 = str;
+          for (s = str; *s; *s++) {
             if (*s != '\n' && *s != '\r') {
               *s2++ = *s;
             }
+          }
+          *s2 = '\0';
+          return str;
         }
-        *s2 = '\0';
-        return str;
+        )
+        );
+    } else {
+        # "tr" is much faster than the regex, with "s"
+        *Bio::DB::IndexedBase::_strip_crnl = sub {
+            my $str = shift;
+            $str =~ tr/\n\r//d;
+            return $str;
+        };
     }
-END_OF_C_CODE
-};
 
+    return _strip_crnl(@_);
+}
 
 =head2 new
 
@@ -393,7 +392,7 @@ sub new {
         require Cwd;
         $dirname = Cwd::getcwd();
     } else {
-	$self->{index_name} ||= $self->_default_index_name($path);
+  $self->{index_name} ||= $self->_default_index_name($path);
         if (-d $path) {
             # because Win32 glob() is broken with respect to long file names
             # that contain whitespace.
@@ -505,7 +504,10 @@ sub get_all_primary_ids  {
     return keys %{shift->{offsets}};
 }
 
+{
+no warnings 'once';
 *ids = *get_all_ids = \&get_all_primary_ids;
+}
 
 
 =head2 index_file
@@ -623,7 +625,10 @@ sub get_Seq_by_id {
     return $self->{obj_class}->new($self, $id);
 }
 
+{
+no warnings 'once';
 *get_Seq_by_version = *get_Seq_by_primary_id = *get_Seq_by_acc = \&get_Seq_by_id;
+}
 
 
 =head2 _calculate_offsets
@@ -835,8 +840,9 @@ sub _fh {
     my ($self, $id) = @_;
     $self->throw('Need to provide a sequence ID') if not defined $id;
     my $file = $self->file($id) or return;
-    return $self->_fhcache( File::Spec->catfile($self->{dirname}, $file) ) or
-        $self->throw( "Can't open file $file");
+    return eval {
+      $self->_fhcache( File::Spec->catfile($self->{dirname}, $file));
+    } or $self->throw( "Can't open file $file" );
 }
 
 

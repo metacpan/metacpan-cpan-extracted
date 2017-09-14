@@ -1,0 +1,53 @@
+{
+   "abstract" : "Collection of Perl modules to render OpenStreetMap data encaspulated via L<Geo::OSM::Primitive>, possibly stored in a L<Geo::OSM::DBI> database.",
+   "author" : [
+      "RenÃ© Nyffenegger <rene.nyffenegger@adp-gmbh.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-OSM-Render",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geo::OSM::Primitive::Node" : "0",
+            "Geo::OSM::Primitive::Way" : "0",
+            "SVG" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Geo::Coordinates::Converter::LV03" : "0.02",
+            "Test::File" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

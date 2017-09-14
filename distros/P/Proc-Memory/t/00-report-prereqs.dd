@@ -9,7 +9,8 @@ do { my $x = {
                         'requires' => {
                                         'Alien::libvas' => '0.202',
                                         'ExtUtils::MakeMaker' => '0',
-                                        'Inline::C' => '0'
+                                        'Inline::C' => '0',
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -17,8 +18,11 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
+                                      'Test::Version' => '1',
                                       'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
@@ -30,6 +34,7 @@ do { my $x = {
                                       'Inline' => '0.56',
                                       'Scalar::Util' => '0',
                                       'Sentinel' => '0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -41,7 +46,11 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.010'
                                  }
                  }
      };

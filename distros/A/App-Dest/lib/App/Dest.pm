@@ -16,7 +16,7 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 my $env;
 
@@ -253,7 +253,7 @@ sub status {
                     print "  + $b\n";
                 }
                 else {
-                    ( my $action = $b ) =~ s,/(?:deploy|verify|revert)$,,;
+                    ( my $action = $b ) =~ s,/(?:deploy|verify|revert)(?:\.[^\/]+)?$,,;
                     print "  $action\n" unless ( $seen_actions{$action}++ );
                     print "    M $b\n";
                 }
@@ -597,10 +597,12 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)
+
+=for test_synopsis BEGIN { die "SKIP: skip synopsis check because it's non-Perl\n"; }
 
 =head1 SYNOPSIS
 
@@ -659,8 +661,6 @@ pseudo real world situation.
 Note that using C<dest> for production deployment, provisioning, or configuration
 management is not advised. Use a full-featured configuration management tool
 instead.
-
-=for test_synopsis BEGIN { die "SKIP: skip synopsis check because it's non-Perl\n"; }
 
 =head1 COMMANDS
 

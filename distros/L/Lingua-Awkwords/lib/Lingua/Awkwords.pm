@@ -12,7 +12,7 @@ use Lingua::Awkwords::Parser;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has pattern => (
     is      => 'rw',
@@ -32,8 +32,8 @@ has tree => ( is => 'rwp' );
 #   ... = Lingua::Awkwords::Parser->new->from_string(q{ ...
 # in the calling code
 sub parse_string {
-    my ($self_or_class, $str) = @_;
-    return Lingua::Awkwords::Parser->new->from_string( $str );
+    my ( $self_or_class, $str ) = @_;
+    return Lingua::Awkwords::Parser->new->from_string($str);
 }
 
 sub render {
@@ -43,8 +43,17 @@ sub render {
     return $tree->render;
 }
 
+# utility routine for use with ->walk
+sub set_filter {
+    my $filter = shift;
+    return sub {
+        my $self = shift;
+        $self->filter_with($filter) if $self->can('filter_with');
+    };
+}
+
 sub walk {
-    my ($self, $callback) = @_;
+    my ( $self, $callback ) = @_;
     my $tree = $self->tree;
     croak "no pattern supplied" if !defined $tree;
     $tree->walk($callback);
@@ -168,6 +177,19 @@ Where the parse tree is stored.
 
 =back
 
+=head1 FUNCTIONS
+
+=over 4
+
+=item I<set_filter>
+
+Utility routine for use with B<walk>. Returns a subroutine that sets the
+I<filter_with> attribute to the given value.
+
+  $la->walk( Lingua::Awkwords::set_filter('X') );
+
+=back
+
 =head1 METHODS
 
 =over 4
@@ -225,33 +247,11 @@ diphthongs (mostly in the second syllable) via
 
   say join ' ', map { $tree->render } 1 .. 10;
 
-The default filter of the empty string can be problematical, as one may
-not know whether a filter has been applied to the result, or the word
-may be filtered into an incorrect form. The above trees with filters can
-be modified as follows
-
-  $tree->walk( set_filter('X') );
-
-  # more or less the equivalent of a let-over-lambda in LISP
-  sub set_filter {
-      my $filter = shift;
-      return sub {
-          my $self = shift;
-          $self->filter_with($filter) if $self->can('filter_with');
-      };
-  }
-
-to instead replace filtered values with C<X> and then enough words
-generated minus those filtered via
-
-  my @words;
-  while (1) {
-      my $possible = $tree->render;
-      next if $possible =~ m/X/;
-      push @words, $possible;
-      last if @words >= 10;
-  }
-  say join ' ', @words;
+The default filter of the empty string can be problematical, as one
+may not know whether a filter has been applied to the result, or the
+word may be filtered into an incorrect form. Consult the C<eg/>
+directory of this module's distribution for example code that
+customizes the filter value.
 
 =head1 BUGS
 

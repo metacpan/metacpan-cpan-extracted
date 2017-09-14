@@ -1,10 +1,8 @@
 package Hadoop::HDFS::Command;
-
+$Hadoop::HDFS::Command::VERSION = '0.003';
 use 5.010;
 use strict;
 use warnings;
-
-our $VERSION = '0.001';
 
 use Capture::Tiny   ();
 use Carp            ();
@@ -15,7 +13,7 @@ use Getopt::Long    ();
 use IPC::Cmd        ();
 use Ref::Util       ();
 use Time::HiRes   qw( time );
-use Types::Standard qw(Bool);
+use Types::Standard qw(Bool Str);
 
 { use Moo; }
 
@@ -38,6 +36,20 @@ has enable_log => (
     default => sub { 0 },
     lazy    => 1,
 );
+
+has 'runas' => (
+    is      => 'rw',
+    isa     => Str,
+    default => getpwuid $<,
+    lazy    => 1,
+);
+
+before ['_capture', '_capture_with_stdin'] => sub {
+    my ($self, $options, @cmd) = @_;
+    unshift @cmd, 'sudo', '-u', $self->runas
+        unless $self->runas eq getpwuid $<;
+    @_ = ($self, $options, @cmd);
+};
 
 sub dfs {
     my $self = shift;
@@ -288,6 +300,106 @@ sub _dfs_put {
     return @response;
 }
 
+sub _dfs_test {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( d e f s z );
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    eval {
+        $self->_capture(
+            $options,
+            $self->cmd_hdfs,
+            qw( dfs -test ),
+            ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+            @{ $paths },
+        );
+        return 1;
+    } or return 0;
+}
+
+sub _dfs_mkdir {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( p );
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -mkdir ),
+        ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+        @{ $paths },
+    );
+
+    # just a confirmation message
+    return @response
+}
+
+sub _dfs_chmod {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( p );
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -chmod ),
+        ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+        @{ $paths },
+    );
+
+    # just a confirmation message
+    return @response
+}
+
+sub _dfs_chown {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( p );
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -chown ),
+        ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+        @{ $paths },
+    );
+
+    # just a confirmation message
+    return @response
+}
+
 sub _parse_options {
     my $self = shift;
     # TODO: collect dfs generic options
@@ -444,7 +556,7 @@ Hadoop::HDFS::Command
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -525,10 +637,10 @@ The C<@subcommand_args> can have these defined: C<-s>, C<-h>.
     my @rv = $hdfs->dfs( du => @subcommand_args => $hdfs_path );
     my @rv = $hdfs->dfs( du => qw( -h -s ) => "/tmp" );
     my @rv = $hdfs->dfs(
-                {   
+                {
                     ignore_fail => 1,
                     silent      => 1,
-                },  
+                },
                 du => -s => @hdfs_paths,
             );
 
@@ -551,14 +663,14 @@ remaining records.
             if ( $file->{type} eq 'dir' ) {
                 # do something
             }
-            
+
             # skip this one, but continue processing
             return 1 if $file->{type} ne 'file';
-            
+
             # do something
-            
+
             return if $something_really_bad_so_end_this_processor;
-            
+
             # continue processing
             return 1;
         },
@@ -586,6 +698,30 @@ The C<@subcommand_args> can have these defined: C<-f>, C<-p>, C<-l>
 The C<@subcommand_args> can have these defined: C<-f>, C<-r>, C<-skipTrash>
 
     $hdfs->dfs( rm => @subcommand_args, $hdfs_path );
+
+=head3 test
+
+The C<@subcommand_args> can have these defined: C<-d>, C<-e>, C<-f>, C<-s>, C<-z>
+
+    $hdfs->dfs( test => @subcommand_args, $hdfs_path );
+
+=head3 mkdir
+
+The C<@subcommand_args> can have these defined: C<-p>
+
+    $hdfs->dfs( mkdir => @subcommand_args, $path );
+
+=head3 chmod
+
+The C<@subcommand_args> can have these defined: C<-R>
+
+    $hdfs->dfs( chmod => @subcommand_args, $mode, $path );
+
+=head3 chown
+
+The C<@subcommand_args> can have these defined: C<-R>
+
+    $hdfs->dfs( chown => @subcommand_args, $OWNERCOLONGROUP, $path );
 
 =head1 SEE ALSO
 

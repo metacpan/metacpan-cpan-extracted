@@ -67,3 +67,22 @@ Revision history for Perl extension Net::Telnet::Cisco.
 	- send_wakeup() written to help use module with Livingston Portmasters.
 	- warnings() and ignore_warnings() allow some error-strings to be ignored.
 	- fixed warning in prompt_append()
+
+1.11  Mon Sep 11 08:00:00 EDT 2017
+    - Updated to new module layout (lib/).
+    - Remove .cvsignore
+    - Added simple t\*.t tests.
+	- Makefile.PL:  updated version dependencies
+    - Cisco.pm:
+        Added 'use warnings;'.
+        Added warnings() to fix RT 48904.
+        Added fhopen() to fix RT 19285.
+        Added POD for last_cmd.
+        Updated new() to fix RT 19260.
+        Updated _normalize() to fix RT 7796, 39882, 102753, 118170.
+        Changed check for '' instead of not defined for $en_level to catch 
+          enable() success or failure.
+        Changed @out to $out[] in cmd() to fix RT 2592.
+        Changed prompt_append() to _prompt_append() [private].
+        Changed re_sans_delims() to _re_sans_delims() [private].
+    - test.pl: make Term::ReadKey conditional.

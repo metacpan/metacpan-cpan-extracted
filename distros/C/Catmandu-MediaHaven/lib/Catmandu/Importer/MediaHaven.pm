@@ -1,46 +1,90 @@
 package Catmandu::Importer::MediaHaven;
 
+use Catmandu::Sane;
+
+our $VERSION = '0.05';
+
+use Moo;
+use Cpanel::JSON::XS;
+use Catmandu::MediaHaven;
+use namespace::clean;
+
+with 'Catmandu::Importer';
+
+has 'url'           => (is => 'ro' , required => 1);
+has 'username'      => (is => 'ro' , required => 1);
+has 'password'      => (is => 'ro' , required => 1);
+has 'mediahaven'    => (is => 'lazy');
+
+sub _build_mediahaven {
+    my ($self) = @_;
+    Catmandu::MediaHaven->new(
+        url      => $self->url,
+        username => $self->username,
+        password => $self->password,
+    );
+}
+
+sub generator {
+    my ($self) = @_;
+
+    my $res = $self->mediahaven->search();
+
+    sub {
+        state $results = $res->{mediaDataList};
+        state $total   = $res->{totalNrOfResults};
+        state $index   = 0;
+
+        $index++;
+
+        if (@$results > 0) {
+            return shift @$results;
+        }
+        elsif ($index < $total) {
+            my $res = $self->mediahaven->search(undef, start => $index+1);
+            $results = $res->{mediaDataList};
+            $index++;
+            return shift @$results;
+        }
+        return undef;
+    };
+}
+
+1;
+
+__END__
+
+=pod
+
 =head1 NAME
 
-Catmandu::Importer::MediaHaven - Package that imports Zeticon MediaHaven records
+Catmandu::Importer::MediaHaven - a importer that extracts Zeticon MediaHaven records
 
 =head1 SYNOPSIS
 
-   # From the command line
-   $ cat catmandu.yml
-   ---
-   importer:
-        mh:
-            package: MediaHaven
-            options:
-                url: https://archief.viaa.be/mediahaven-rest-api/resources/media
-                username: ...
-                password: ...
-   $ catmandu convert mh to YAML
+    # From the commandline
+    $ cat catmandu.yml
+    ---
+    importer:
+         mh:
+             package: MediaHaven
+             options:
+                 url: https://archief.viaa.be/mediahaven-rest-api/resources/media
+                 username: ...
+                 password: ...
+                 fix:  |
+                    ...
+                    <fixes required to translate MediaHaven records to metadata>
+                    ...
 
-   use Catmandu
-
-   my $importer = Catmandu->importer('BagIt',
-                        url      => ... ,
-                        username => ... ,
-                        password => ... ,
-                  );
-
-    my $n = $importer->each(sub {
-        my $hashref = $_[0];
-        # ...
-    });
-
+    $ catmandu convert YAML to mh < records.yml
 
 =head1 METHODS
 
-This module inherits all methods of L<Catmandu::Importer> and by this
-L<Catmandu::Iterable>.
+=head2 new(%connection_parameters)
 
-=head1 CONFIGURATION
-
-In addition to the configuration provided by L<Catmandu::Importer> the importer can
-be configured with the following parameters:
+Create a new Catmandu::Store::File::MediaHaven with the following connection
+parameters:
 
 =over
 
@@ -58,69 +102,26 @@ Required. Password used to connect to MediaHaven.
 
 =back
 
+=head1 INHERITED METHODS
+
+This Catmandu::Exporter::MediaHaven implements
+
+=over 3
+
+=item L<Catmandu::Importer>
+
+=item L<Catmandu::Logger>
+
+=item L<Catmandu::Iterable>
+
+=item L<Catmandu::Fixable>
+
+=item L<Catmandu::Serializer>
+
+=back
+
 =head1 SEE ALSO
 
-L<Catmandu>,
-L<Catmandu::Importer>,
-L<Catmandu::MediaHaven>
-
-=head1 AUTHOR
-
-Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>
-
-=head1 LICENSE AND COPYRIGHT
-
-This program is free software; you can redistribute it and/or modify it under the terms
-of either: the GNU General Public License as published by the Free Software Foundation;
-or the Artistic License.
-
-See L<http://dev.perl.org/licenses/> for more information.
+L<Catmandu::Exporter::MediaHaven>
 
 =cut
-
-use Catmandu::Sane;
-
-our $VERSION = '0.03';
-
-use Moo;
-use Catmandu::MediaHaven;
-use namespace::clean;
-
-with 'Catmandu::Importer';
-
-has 'url'          => (is => 'ro' , required => 1);
-has 'username'     => (is => 'ro' , required => 1);
-has 'password'     => (is => 'ro' , required => 1);
-
-sub generator {
-    my ($self) = @_;
-
-    my $mh = Catmandu::MediaHaven->new(
-        url      => $self->url,
-        username     => $self->username,
-        password     => $self->password,
-    );
-
-    my $res = $mh->search();
-
-    sub {
-        state $results = $res->{mediaDataList};
-        state $total   = $res->{totalNrOfResults};
-        state $index   = 0;
-
-        $index++;
-
-        if (@$results > 1) {
-            return shift @$results;
-        }
-        elsif ($index < $total) {
-            my $res = $mh->search(undef, start => $index+1);
-            $results = $res->{mediaDataList};
-            $index++;
-            return shift @$results;
-        }
-        return undef;
-    };
-}
-
-1;

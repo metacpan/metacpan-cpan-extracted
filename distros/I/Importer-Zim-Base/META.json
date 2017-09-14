@@ -1,0 +1,79 @@
+{
+   "abstract" : "Base module for Importer::Zim",
+   "author" : [
+      "Adriano Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Importer-Zim-Base",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "constant" : "0",
+            "perl" : "5.018",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Importer::Zim::Base" : {
+         "file" : "lib/Importer/Zim/Base.pm",
+         "version" : "v0.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-Importer-Zim-Base/issues"
+      },
+      "homepage" : "https://github.com/aferreira/cpan-Importer-Zim-Base",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aferreira/cpan-Importer-Zim-Base.git",
+         "web" : "https://github.com/aferreira/cpan-Importer-Zim-Base"
+      }
+   },
+   "version" : "0.3.0",
+   "x_contributors" : [
+      "Adriano Ferreira <a.r.ferreira@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
+}
+

@@ -13,7 +13,7 @@ Statocles::Help::Content - How to use Statocles to write content
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 DESCRIPTION
 

@@ -45,5 +45,5 @@ requires:
   Net::CIDR::Lite: '0'
   SOAP::Lite: '0'
   Storable: '0'
-version: v1.9.11
+version: v1.9.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

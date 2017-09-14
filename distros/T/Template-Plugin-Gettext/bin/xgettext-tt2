@@ -1,0 +1,167 @@
+#! /usr/bin/env perl
+
+# Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>, 
+# all rights reserved.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+
+use Getopt::Long;
+use Locale::Messages qw(setlocale LC_MESSAGES);
+use Locale::TextDomain qw(Template-Plugin-Gettext);
+
+use Locale::XGettext::TT2;
+
+Locale::Messages::setlocale(LC_MESSAGES, "");
+
+my %options;
+
+Locale::XGettext::TT2->newFromArgv(\@ARGV)->run->output;
+
+=head1 xgettext-tt2
+
+Extract translatable strings from Template Toolkit 2 templates
+
+=head1 SYNOPSIS
+
+    xgettext-tt2 [OPTIONS] INPUTFILES
+    xgettext-tt2 [OPTIONS] --files-from=FILELIST
+
+=head1 DESCRIPTION
+
+The program B<xgettext-tt2> extracts translatable strings from
+templates for the Template Toolkit version 2 (see
+L<http://www.template-toolkit.org>).
+
+For an overview of all command line options try the command
+"perldoc Locale::XGettext" or "man Locale::XGettext".  The online
+version of the manual page is available at L<https://github.com/gflohr/Locale-XGettext/blob/master/lib/Locale/XGettext.pod>.
+
+=head1 DEFAULT KEYWORDS
+
+The program uses the following built-in default keywords supported by
+L<Template::Plugin::Gettext>:
+
+=over 4
+
+=item *
+
+gettext:1
+
+=item *
+
+ngettext:1,2
+
+=item *
+
+pgettext:1c,2
+
+=item *
+
+gettextp:1,2c
+
+=item *
+
+npgettext:1c,2,3
+
+=item *
+
+ngettextp:1,2,3c
+
+=item *
+
+xgettext:1
+
+=item *
+
+nxgettext:1,2
+
+=item *
+
+pxgettext:1c,2
+
+=item *
+
+xgettextp:1,2c
+
+=item *
+
+npxgettext:1c,2,3
+
+=item *
+
+nxgettextp:1,2,3c
+
+=back
+
+=head1 DEFAULT KEYWORDS
+
+The program has the following built-in default flags supported by
+L<Template::Plugin::Gettext>:
+
+=over 4
+
+=item *
+
+xgettext:1:perl-brace-format
+
+=item *
+
+nxgettext:1:perl-brace-format
+
+=item *
+
+nxgettext:2:perl-brace-format
+
+=item *
+
+pxgettext:2:perl-brace-format
+
+=item *
+
+xgettextp:1:perl-brace-format
+
+=item *
+
+npxgettext:2:perl-brace-format
+
+=item *
+
+npxgettext:3:perl-brace-format
+
+=item *
+
+nxgettextp:1:perl-brace-format
+
+=item *
+
+nxgettextp:2:perl-brace-format
+
+=back
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr (http://www.guido-flohr.net/).
+License LGPLv3+: L<GNU General Public License version 3 or later|http://gnu.org/licenses/lgpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Template>, L<Locale::XGettext>, L<Template::Plugin::Gettext>,
+L<xgettext>, L<perl>

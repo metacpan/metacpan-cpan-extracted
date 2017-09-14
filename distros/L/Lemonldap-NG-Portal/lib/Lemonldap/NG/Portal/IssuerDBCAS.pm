@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::_CAS;
 use base qw(Lemonldap::NG::Portal::_CAS Lemonldap::NG::Portal::_LibAccess);
 use URI;
 
-our $VERSION = '1.9.8';
+our $VERSION = '1.9.12';
 
 ## @method void issuerDBInit()
 # Nothing to do
@@ -89,7 +89,8 @@ sub issuerForUnAuthUser {
         $self->lmLog( "URL $url detected as an CAS LOGOUT URL", 'debug' );
 
         # GET parameters
-        my $logout_url = $self->param('url');
+        my $logout_url     = $self->param('url');        # CAS 2.0
+        my $logout_service = $self->param('service');    # CAS 3.0
 
         if ($logout_url) {
 
@@ -101,6 +102,13 @@ sub issuerForUnAuthUser {
             $self->{activeTimer} = 0;
 
             return PE_CONFIRM;
+        }
+
+        if ($logout_service) {
+            $self->lmLog( "User will be redirected to $logout_service",
+                'debug' );
+            $self->{urldc} = $logout_service;
+            return $self->_sub('autoRedirect');
         }
 
         return PE_LOGOUT_OK;
@@ -697,7 +705,8 @@ sub issuerForAuthUser {
         $self->lmLog( "URL $url detected as an CAS LOGOUT URL", 'debug' );
 
         # GET parameters
-        my $logout_url = $self->param('url');
+        my $logout_url     = $self->param('url');        # CAS 2.0
+        my $logout_service = $self->param('service');    # CAS 3.0
 
         # Delete linked CAS sessions
         $self->deleteCasSecondarySessions($session_id);
@@ -719,6 +728,13 @@ sub issuerForAuthUser {
             $self->{activeTimer} = 0;
 
             return PE_CONFIRM;
+        }
+
+        if ($logout_service) {
+            $self->lmLog( "User will be redirected to $logout_service",
+                'debug' );
+            $self->{urldc} = $logout_service;
+            return $self->_sub('autoRedirect');
         }
 
         return PE_LOGOUT_OK;

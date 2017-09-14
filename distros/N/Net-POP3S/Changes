@@ -25,3 +25,7 @@ Revision history for Perl extension Net::POP3S.
 0.07  Thu Apr 08 20:00:00 2017
     - fix on Ticket #121006 "Timeout option doesn't work"
        (thanks, <emanuele.tomasi .. aruba.it>)
+
+0.08  Wed Sep 13 07:00:00 2017
+    - move starttls code from constructor and enabling starttls() as a method.
+

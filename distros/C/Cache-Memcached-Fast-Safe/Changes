@@ -1,5 +1,9 @@
 Revision history for Perl extension Cache::Memcached::Fast::Safe
 
+0.06 2017-09-11T06:01:39Z
+
+        - Optimzed sanitize method. Thank you mono0x!
+
 0.05 2015-03-09T14:52:06Z
 
         - support touch/touch_multi (Thank you spiritloose)

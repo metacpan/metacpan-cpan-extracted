@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
-                  'leading_digits' => '2[23]',
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
+                  'leading_digits' => '2[23]'
                 },
                 {
                   'leading_digits' => '
@@ -38,31 +38,31 @@ my $formatters = [
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '9',
-                  'pattern' => '(9)(\\d{4})(\\d{4})'
+                  'pattern' => '(9)(\\d{4})(\\d{4})',
+                  'leading_digits' => '9'
                 },
                 {
-                  'pattern' => '(44)(\\d{3})(\\d{4})',
-                  'leading_digits' => '44'
+                  'leading_digits' => '44',
+                  'pattern' => '(44)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '([68]00)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             60|
             8
-          '
+          ',
+                  'pattern' => '([68]00)(\\d{3})(\\d{3,4})'
                 },
                 {
                   'leading_digits' => '60',
                   'pattern' => '(600)(\\d{3})(\\d{2})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '1',
-                  'pattern' => '(1230)(\\d{3})(\\d{4})'
+                  'pattern' => '(1230)(\\d{3})(\\d{4})',
+                  'leading_digits' => '1'
                 },
                 {
-                  'pattern' => '(\\d{5})(\\d{4})',
-                  'leading_digits' => '219'
+                  'leading_digits' => '219',
+                  'pattern' => '(\\d{5})(\\d{4})'
                 },
                 {
                   'leading_digits' => '[1-9]',
@@ -71,11 +71,29 @@ my $formatters = [
               ];
 
 my $validators = {
+                'pager' => '',
+                'geographic' => '
+          2(?:
+            1962\\d{4}|
+            2\\d{7}|
+            32[0-467]\\d{5}
+          )|
+          (?:
+            3[2-5]|
+            [47][1-35]|
+            5[1-3578]|
+            6[13-57]|
+            9[3-9]
+          )\\d{7}
+        ',
+                'personal_number' => '',
+                'voip' => '44\\d{7}',
+                'specialrate' => '(600\\d{7,8})',
                 'fixed_line' => '
           2(?:
             1962\\d{4}|
             2\\d{7}|
-            32[0-2467]\\d{5}
+            32[0-467]\\d{5}
           )|
           (?:
             3[2-5]|
@@ -89,7 +107,7 @@ my $validators = {
           2(?:
             1962\\d{4}|
             2\\d{7}|
-            32[0-2467]\\d{5}
+            32[0-467]\\d{5}
           )|
           (?:
             3[2-5]|
@@ -99,28 +117,10 @@ my $validators = {
             9[3-9]
           )\\d{7}
         ',
-                'voip' => '44\\d{7}',
                 'toll_free' => '
           800\\d{6}|
           1230\\d{7}
-        ',
-                'pager' => '',
-                'geographic' => '
-          2(?:
-            1962\\d{4}|
-            2\\d{7}|
-            32[0-2467]\\d{5}
-          )|
-          (?:
-            3[2-5]|
-            [47][1-35]|
-            5[1-3578]|
-            6[13-57]|
-            9[3-9]
-          )\\d{7}
-        ',
-                'specialrate' => '(600\\d{7,8})',
-                'personal_number' => ''
+        '
               };
 my %areanames = (
   5622 => "Santiago\,\ Metropolitan\ Region",

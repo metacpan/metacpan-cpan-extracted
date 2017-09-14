@@ -16,4 +16,14 @@ my $obj;
 $obj = Thunking->new(children => sub { [$obj] });
 is_deeply $obj->children, [ $obj ];
 
+$obj = Thunking->new(children => [$obj]);
+is_deeply $obj->children, [ $obj ];
+
+$obj = Thunking->new(children => sub { { key => 'delayed wrong type' } });
+eval { $obj->children };
+isnt $@, '', 'exception on wrong type from thunk';
+
+eval { Thunking->new(children => { key => 'wrong type' }) };
+isnt $@, '', 'exception on wrong type';
+
 done_testing;

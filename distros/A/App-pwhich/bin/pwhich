@@ -1,13 +1,13 @@
-#!/usr/bin/perl
+#!perl
 
-use 5.008001;
 use strict;
 use warnings;
+#use lib::findbin '../lib'; # dev-only
 use App::pwhich;
 
 # PODNAME: pwhich
-# ABSTRACT: Perl-only `which'
-our $VERSION = '1.14'; # VERSION
+# ABSTRACT: Pure Perl implementation of which
+our $VERSION = '1.15'; # VERSION
 
 exit App::pwhich::main(@ARGV);
 
@@ -19,11 +19,11 @@ __END__
 
 =head1 NAME
 
-pwhich - Perl-only `which'
+pwhich - Pure Perl implementation of which
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -31,17 +31,18 @@ version 1.14
  $ pwhich -a perl          # print all matches
  $ pwhich perl perldoc ... # look for multiple programs
  $ pwhich -a perl perldoc ...
+ $ pwhich -s perl          # silent mode
 
 =head1 DESCRIPTION
 
-`pwhich' is a command-line utility program for finding paths to other
+C<pwhich> is a command-line utility program for finding paths to other
 programs based on the user's C<PATH>. It is similar to the usually Unix
 tool `which', and tries to emulate its functionality, but is written
 purely in Perl (uses the module C<File::Which>), so is portable.
 
 =head2 Calling syntax
 
- $ pwhich [-a] [-v] programname [programname ...]
+ $ pwhich [-a] [-s] [-v] programname [programname ...]
 
 =head2 Options
 
@@ -52,6 +53,11 @@ purely in Perl (uses the module C<File::Which>), so is portable.
 The option I<-a> will make C<pwhich> print all matches found in the
 C<PATH> variable instead of just the first one. Each match is printed
 on a separate line.
+
+=item -s
+
+No output, just return 0 if any of the executables are found, or 1
+if none are found.
 
 =item -v
 
@@ -85,7 +91,12 @@ provide any documentation on how you might use it.
 
 =back
 
-=cut
+=head1 CAVEATS
+
+This module does not know about built-in shell commands, as the built-in
+command C<which> and C<where> ususally do.
+
+This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 
 =head1 AUTHOR
 

@@ -1,0 +1,29 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="line">
+    <div class="line">
+       Label: <input type="text" name="label" value="{{line.label}}" /><br><br>
+       Start Marker: <select name="startMarker">
+                 {{#select line.startMarker}}
+                 <option value="none"><&|/l&>none</&></option>
+                 <option value="arrowhead"><&|/l&>arrowhead</&></option>
+                 <option value="diamond"><&|/l&>diamond</&></option>
+                 {{/select}}
+                 </select><br>
+       End Marker: <select name="endMarker">
+                 {{#select line.endMarker}}
+                 <option value="none"><&|/l&>none</&></option>
+                 <option value="arrowhead"><&|/l&>arrowhead</&></option>
+                 <option value="diamond"><&|/l&>diamond</&></option>
+                 {{/select}}
+                 </select><br>
+       Style: <select name="style">
+                 {{#select line.style}}
+                 <option value="solid"><&|/l&>solid</&></option>
+                 <option value="dashed"><&|/l&>dashed</&></option>
+                 <option value="dotted"><&|/l&>dotted</&></option>
+                 {{/select}}
+             </select><br>
+        <button class="clone"><&|/l&>Clone Line</&></button><br>
+        <button class="delete"><&|/l&>Delete Line</&></button>
+    </div>
+</script>
+

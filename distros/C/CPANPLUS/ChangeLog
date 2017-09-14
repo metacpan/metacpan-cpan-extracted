@@ -1,3 +1,7 @@
+0.9170      Wed Sep 13 19:40:37 BST 2017
+
+* Fix RT#122849 problems with parse_module()
+
 0.9168      Sun May 14 14:17:26 BST 2017
 
 * fix typo in YAML_BACKEND environment variable

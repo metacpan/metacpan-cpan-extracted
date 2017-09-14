@@ -1,4 +1,4 @@
-# Copyright 2006, 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -85,6 +85,8 @@ sub INIT_INSTANCE {
   $self->pack_start ($renderer, 0);
   $self->set_attributes ($renderer, markup => 0);
 
+  # default Favourites symlist, unless it's empty and All is not in which
+  # case use All
   require App::Chart::Gtk2::Symlist::Favourites;
   my $symlist = App::Chart::Gtk2::Symlist::Favourites->instance;
   if ($symlist->is_empty) {
@@ -116,7 +118,7 @@ sub SET_PROPERTY {
     ### Ticker: "$self changed symlist"
     my $symlist = $newval;
     if (defined $symlist && ! $symlist->isa('App::Chart::Gtk2::Symlist')) {
-      croak "App::Chart::Gtk2::Ticker.symlist must be a App::Chart::Gtk2::Symlist";
+      croak "App::Chart::Gtk2::Ticker.symlist must be an App::Chart::Gtk2::Symlist";
     }
     $self->{$pname} = $newval;  # per default GET_PROPERTY
 
@@ -294,8 +296,9 @@ window for a given symlist (L<App::Chart::Gtk2::Symlist>)
 
 =item C<< App::Chart::Gtk2::Ticker->new (key => value, ...) >>
 
-Create and return a C<App::Chart::Gtk2::Ticker> widget.  Optional key/value pairs
-can be given to set initial properties as per C<< Glib::Object->new >>.
+Create and return a C<App::Chart::Gtk2::Ticker> widget.  Optional key/value
+pairs can be given to set initial properties as per
+C<< Glib::Object->new >>.
 
 =item C<< $ticker->menu() >>
 
@@ -327,7 +330,29 @@ A Symlist object which is the stock symbols to display.
 
 =head1 SEE ALSO
 
-L<App::Chart::Gtk2::TickerMain>, L<App::Chart::Gtk2::Symlist>, C<Gtk2::Ex::TickerView>
+L<App::Chart::Gtk2::TickerMain>,
+L<App::Chart::Gtk2::Symlist>,
+C<Gtk2::Ex::TickerView>
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/chart/index.html>
+
+=head1 LICENCE
+
+Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
+
+Chart is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3, or (at your option) any later version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Chart; see the file F<COPYING>.  Failing that, see
+L<http://www.gnu.org/licenses/>.
 
 =cut
-

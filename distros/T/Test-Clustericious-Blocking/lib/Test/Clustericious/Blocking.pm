@@ -13,7 +13,7 @@ use base qw( Exporter );
 our @EXPORT = qw( blocking );
 
 # ABSTRACT: Run blocking code in a process using an unholy combination of forks and Mojolicious
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub blocking (&)
@@ -42,7 +42,7 @@ Test::Clustericious::Blocking - Run blocking code in a process using an unholy c
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

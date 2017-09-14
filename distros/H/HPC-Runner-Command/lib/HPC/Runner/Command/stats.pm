@@ -4,6 +4,7 @@ use MooseX::App::Command;
 use Moose::Util qw/apply_all_roles/;
 extends 'HPC::Runner::Command';
 
+use MooseX::Types::Path::Tiny qw/File Path Paths AbsPath AbsFile/;
 with 'HPC::Runner::Command::Logger::JSON';
 with 'HPC::Runner::Command::stats::Logger::JSON::Summary';
 with 'HPC::Runner::Command::stats::Logger::JSON::Long';
@@ -13,6 +14,7 @@ use JSON;
 use File::Find::Rule;
 use File::stat;
 use File::Spec;
+use File::Slurp;
 use Path::Tiny;
 use File::Basename;
 use Capture::Tiny ':all';
@@ -99,11 +101,10 @@ has 'task_data' => (
 );
 
 parameter 'stats_type' => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => 'JSON',
-    documentation =>
-      'hpcrunner.pl stats JSON/Sqlite/Elasticsearch .',
+    is            => 'rw',
+    isa           => 'Str',
+    default       => 'JSON',
+    documentation => 'hpcrunner.pl stats JSON/Sqlite/Elasticsearch .',
 );
 
 sub BUILD {
@@ -147,16 +148,11 @@ sub iter_submissions {
     my $results = $self->get_submissions();
 
     foreach my $result ( @{$results} ) {
-        $self->clear_archive;
-        $self->data_tar($result);
-        capture {
-            $self->archive->read( $self->data_tar );
-        };
-        my $basename = $self->data_tar->basename('.tar.gz');
+        $self->data_dir($result);
         my $submission_file =
-          File::Spec->catdir( $basename, 'submission.json' );
-        if ( $self->archive->contains_file($submission_file) ) {
-            my $submission_json = $self->archive->get_content($submission_file);
+          File::Spec->catdir( $self->data_dir, 'submission.json' );
+        if ( -e $submission_file ) {
+            my $submission_json = read_file($submission_file);
             my $submission      = decode_json($submission_json);
             my $jobref          = $submission->{jobs};
 
@@ -166,7 +162,7 @@ sub iter_submissions {
         }
         else {
             $self->screen_log->info( 'Data Tar '
-                  . $self->data_tar
+                  . $self->data_dir
                   . ' does not contain any submission info!' );
         }
     }
@@ -178,15 +174,15 @@ sub get_submissions {
 
 ## Skip over this searching nonsense
     my $results;
-    if ( $self->has_data_tar && $self->data_tar->exists ) {
-        my $file = $self->data_tar;
+    if ( $self->has_data_dir && $self->data_dir->exists ) {
+        my $file = $self->data_dir;
         $results = ["$file"];
     }
-    elsif ( $self->has_data_tar && !$self->data_tar->exists ) {
+    elsif ( $self->has_data_dir && !$self->data_dir->exists ) {
         $self->screen_log->fatal(
             'You have supplied a data tar that does not exist.');
         $self->screen_log->fatal(
-            'Data Tar ' . $self->data_tar . ' does not exist' );
+            'Data Tar ' . $self->data_dir . ' does not exist' );
         exit 1;
     }
     else {
@@ -200,11 +196,12 @@ sub search_submission {
     my $self = shift;
 
     my $data_path = "";
+    my $data_dir = File::Spec->catdir( $self->cache_dir, '.hpcrunner-data' );
     if ( $self->project ) {
-        $data_path = File::Spec->catdir( $self->data_dir, $self->project );
+        $data_path = File::Spec->catdir( $data_dir, $self->project );
     }
     else {
-        $data_path = File::Spec->catdir( $self->data_dir );
+        $data_path = $data_dir;
     }
 
     if ( !path($data_path)->exists && path($data_path)->is_dir ) {
@@ -214,8 +211,11 @@ sub search_submission {
         );
     }
 
+    $self->screen_log->info( 'Searching for submissions in ' . $data_dir );
+
     ##TODO In the case of a lot of submissions - get the most recent directory
-    my @files = File::Find::Rule->file()->name('*.tar.gz')->in($data_path);
+    my @files = File::Find::Rule->directory()->maxdepth(2)->name(qr/.*UID.*/)
+      ->in($data_path);
     if ( !$self->json ) {
         $self->screen_log->info( 'Found ' . scalar @files . ' submissions.' );
         $self->screen_log->info('Reporting on the most recent.')

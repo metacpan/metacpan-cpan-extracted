@@ -57,7 +57,7 @@ around new => sub ( $orig, $self, @ ) {
     }
 
     # serialize CBOR + HEX
-    $boot_args = P->data->to_cbor( $boot_args, encode => $DATA_ENC_HEX )->$*;
+    $boot_args = unpack 'H*', P->data->to_cbor($boot_args)->$*;
 
     my $cmd = [];
 

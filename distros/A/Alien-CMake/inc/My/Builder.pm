@@ -10,7 +10,7 @@ use File::Spec::Functions qw(catdir catfile splitpath catpath rel2abs abs2rel);
 use File::Path qw(make_path remove_tree);
 use File::Copy qw(cp);
 use File::Copy::Recursive qw(dircopy);
-use File::Fetch;
+use File::Fetch 0.50;
 use File::Find;
 use Archive::Extract;
 use Digest::SHA qw(sha1_hex);

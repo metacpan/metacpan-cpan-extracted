@@ -1,5 +1,8 @@
 Revision history for Perl module MooseX::Fastly::Role:
 
+0.04 Tue 12 Sep 2017 19:16:00 BST
+    - Call correct method to get service ids for purge all
+
 0.03 Mon 16 Jan 2017 21:20:20 GMT
     - Add cdn_api() to get Net::Fastly back
     - Add cdn_services() back to get Net::Fastly::Services

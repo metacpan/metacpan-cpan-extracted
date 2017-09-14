@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             17(?:
               [02358]|
@@ -34,10 +35,10 @@ my $formatters = [
             )|
             2[4-9]|
             [34]
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+          '
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             1(?:
               5[24]|
@@ -56,8 +57,7 @@ my $formatters = [
               2[25]|
               3[26]
             )
-          ',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
+          '
                 },
                 {
                   'leading_digits' => '
@@ -98,8 +98,8 @@ my $formatters = [
                   'pattern' => '(800)(\\d{3})'
                 },
                 {
-                  'pattern' => '(800)(\\d{2})(\\d{2,4})',
-                  'leading_digits' => '800'
+                  'leading_digits' => '800',
+                  'pattern' => '(800)(\\d{2})(\\d{2,4})'
                 }
               ];
 
@@ -139,6 +139,7 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'pager' => '',
                 'specialrate' => '(
           (?:
             810|
@@ -196,7 +197,6 @@ my $validators = {
           )\\d{7}|
           800\\d{3,7}
         ',
-                'pager' => '',
                 'voip' => '249\\d{6}'
               };
 my %areanames = (

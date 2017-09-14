@@ -5,6 +5,10 @@ use strict;
 
 use Test::Most;
 
+my $warn_show = "This warning will be displayed\n";
+my $warn_noshow = "This warning will not be displayed\n";
+my $die = "This die will not be displayed\n";
+
 LOG4PERL: {
 	eval 'use Log::Log4perl';
 
@@ -29,21 +33,29 @@ LOG4PERL: {
 			# Log.WarnDie
 
 			Log::WarnDie->dispatcher(Log::Log4perl->get_logger('Log.WarnDie'));
+			Log::WarnDie->filter(\&filter);
 
 			my $tlogger = Test::Log4perl->get_logger('Log.WarnDie');
 
 			Test::Log4perl->start();
 
-			my $warn = "This warning will be displayed\n";
-			$tlogger->warn($warn);
+			$tlogger->warn($warn_show);
 
-			warn $warn;
+			warn $warn_show;
 
-			my $die = "This die will not be displayed\n";
+			warn $warn_noshow;
+
 			eval {die $die};
 			$tlogger->fatal($die);
 
 			Test::Log4perl->end('Test logs all OK');
 		}
 	}
+}
+
+sub filter {
+	return 1 if($_[0] eq $warn_show);
+	return 1 if($_[0] eq $die);
+
+	return 0;
 }

@@ -2,6 +2,7 @@ package Math::Prime::Util::PPFE;
 use strict;
 use warnings;
 use Math::Prime::Util::PP;
+use Math::Prime::Util::Entropy;
 
 # The PP front end, only loaded if XS is not used.
 # It is intended to load directly into the MPU namespace.
@@ -39,6 +40,40 @@ if (CSPRNG_CHACHA) {
 } else {
   die "Bad CSPRNG choice";
 }
+sub srand {
+  my($seed) = @_;
+  croak "secure option set, manual seeding disabled" if $Math::Prime::Util::_Config{'secure'};
+  if (!defined $seed) {
+    my $nbytes = (~0 == 4294967295) ? 4 : 8;
+    $seed = entropy_bytes( $nbytes );
+    $seed = unpack(($nbytes==4) ? "L" : "Q", $seed);
+  }
+  Math::Prime::Util::GMP::seed_csprng(8,pack("LL",$seed))
+    if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
+  Math::Prime::Util::_srand($seed);
+}
+sub csrand {
+  my($seed) = @_;
+  croak "secure option set, manual seeding disabled" if $Math::Prime::Util::_Config{'secure'} && defined $seed;
+  $seed = entropy_bytes( 64 ) unless defined $seed;
+  Math::Prime::Util::GMP::seed_csprng(length($seed),$seed)
+    if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
+  Math::Prime::Util::_csrand($seed);
+  1; # Don't return the seed
+}
+sub entropy_bytes {
+  my($bytes) = @_;
+  croak "entropy_bytes: input must be integer bytes between 1 and 4294967295"
+    if !defined($bytes) || $bytes < 1 || $bytes > 4294967295 || $bytes != int($bytes);
+  my $data = Math::Prime::Util::Entropy::entropy_bytes($bytes);
+  if (!defined $data) {
+    # We can't find any entropy source!  Highly unusual.
+    Math::Prime::Util::_srand();
+    $data = random_bytes($bytes);
+  }
+  croak "entropy_bytes internal got wrong amount!" unless length($data) == $bytes;
+  $data;
+}
 
 # Fill all the mantissa bits for our NV, regardless of 32-bit or 64-bit Perl.
 {
@@ -54,7 +89,7 @@ if (CSPRNG_CHACHA) {
   my $_tonv_128 = $_tonv_96;  $_tonv_128/= 2.0 for 1..32;
   if ($uvbits == 64) {
     if ($nvbits <= 32) {
-      *drand = sub { my $d = irand32() * $_tonv_32;  $d *= $_[0] if $_[0];  $d; };
+      *drand = sub { my $d = irand() * $_tonv_32;  $d *= $_[0] if $_[0];  $d; };
     } elsif ($nvbits <= 64) {
       *drand = sub { my $d = irand64() * $_tonv_64;  $d *= $_[0] if $_[0];  $d; };
     } else {
@@ -102,6 +137,13 @@ if (CSPRNG_CHACHA) {
 *random_maurer_prime = \&Math::Prime::Util::PP::random_maurer_prime;
 *random_shawe_taylor_prime =\&Math::Prime::Util::PP::random_shawe_taylor_prime;
 *miller_rabin_random = \&Math::Prime::Util::PP::miller_rabin_random;
+*random_semiprime = \&Math::Prime::Util::PP::random_semiprime;
+*random_unrestricted_semiprime = \&Math::Prime::Util::PP::random_unrestricted_semiprime;
+
+*numtoperm = \&Math::Prime::Util::PP::numtoperm;
+*permtonum = \&Math::Prime::Util::PP::permtonum;
+*randperm = \&Math::Prime::Util::PP::randperm;
+*shuffle = \&Math::Prime::Util::PP::shuffle;
 
 sub moebius {
   if (scalar @_ <= 1) {
@@ -795,6 +837,9 @@ sub forcomb (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
 sub forperm (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   Math::Prime::Util::PP::forperm(@_);
 }
+sub forderange (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  Math::Prime::Util::PP::forderange(@_);
+}
 
 sub vecreduce (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, @v) = @_;
@@ -814,47 +859,35 @@ sub vecreduce (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
 
 sub vecany (&@) {       ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  { my $pp; local *_ = \$pp;
-    for my $v (@_) { $pp = $v; return 1 if $sub->(); }
-  }
-  undef;
+  $sub->() and return 1 foreach @_;
+  0;
 }
 sub vecall (&@) {       ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  { my $pp; local *_ = \$pp;
-    for my $v (@_) { $pp = $v; return if !$sub->(); }
-  }
+  $sub->() or return 0 foreach @_;
   1;
 }
 sub vecnone (&@) {      ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  { my $pp; local *_ = \$pp;
-    for my $v (@_) { $pp = $v; return if $sub->(); }
-  }
+  $sub->() and return 0 foreach @_;
   1;
 }
 sub vecnotall (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  { my $pp; local *_ = \$pp;
-    for my $v (@_) { $pp = $v; return 1 if !$sub->(); }
-  }
+  $sub->() or return 1 foreach @_;
   undef;
 }
 
 sub vecfirst (&@) {     ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  #for (@_) { return $_ if &{$sub}(); }  return undef;
-  { my $pp; local *_ = \$pp;
-    for my $v (@_) { $pp = $v; return $v if $sub->(); }
-  }
+  $sub->() and return $_ foreach @_;
   undef;
 }
 
 sub vecfirstidx (&@) {     ## no critic qw(ProhibitSubroutinePrototypes)
   my $sub = shift;
-  { my $pp; local *_ = \$pp; my $i = 0;
-    for my $v (@_) { $pp = $v; return $i if $sub->(); $i++; }
-  }
+  my $i = 0;
+  ++$i and $sub->() and return $i-1 foreach @_;
   -1;
 }
 

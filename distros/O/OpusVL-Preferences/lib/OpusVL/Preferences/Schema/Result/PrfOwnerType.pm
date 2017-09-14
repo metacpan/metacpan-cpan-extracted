@@ -72,7 +72,7 @@ OpusVL::Preferences::Schema::Result::PrfOwnerType
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

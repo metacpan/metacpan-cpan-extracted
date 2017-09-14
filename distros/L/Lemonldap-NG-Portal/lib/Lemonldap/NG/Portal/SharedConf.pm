@@ -165,7 +165,7 @@ compatible portals using a central configuration database.
   else {
     # Write here the html form used to authenticate with CGI methods.
     # $portal->error returns the error message if athentification failed
-    # Warning: by defaut, input names are "user" and "password"
+    # Warning: by default, input names are "user" and "password"
     print $portal->header('text/html; charset=utf-8'); # DON'T FORGET THIS (see L<CGI(3)>)
     print "...";
     print '<form method="POST">';

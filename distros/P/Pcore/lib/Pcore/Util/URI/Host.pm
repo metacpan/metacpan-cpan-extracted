@@ -40,7 +40,6 @@ has root_label_utf8      => ( is => 'lazy', init_arg => undef );
 our $TLD;
 our $PUB_SUFFIX;
 
-# NOTE host should be in UTF-8 or ASCII punycoded, UTF-8 encoded - is invalid value
 around new => sub ( $orig, $self, $host ) {
 
     # removing double "."
@@ -52,9 +51,7 @@ around new => sub ( $orig, $self, $host ) {
     # removing trailing "."
     substr $host, -1, 1, q[] if substr( $host, -1, 1 ) eq q[.];
 
-    $host = domain_to_ascii($host) if utf8::is_utf8($host);
-
-    return bless { name => lc $host }, __PACKAGE__;
+    return bless { name => domain_to_ascii $host }, __PACKAGE__;
 };
 
 sub update_all ( $self ) {
@@ -393,7 +390,7 @@ sub _build_root_label_utf8 ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 306                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 303                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

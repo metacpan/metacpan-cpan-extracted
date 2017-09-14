@@ -36,19 +36,17 @@ $dispatcher->add($file_logger);
 
 $dispatcher->info('write with successful lock');
 
-my $lockfile = $file_logger->{lf};
-
-# make the lockfile unwriteable
-chmod 0, $lockfile;
+# mock out lock() so it returns failure
+no warnings qw(redefine once);
+*Log::Dispatch::FileRotate::Mutex::lock = sub { return 0 };
 
 warning_like {
     $dispatcher->info('Write with unsuccessful lock');
-} qr/\d+ Log::Dispatch::FileRotate failed to get lock/;
+} [qr/\d+ Log::Dispatch::FileRotate failed to get lock/,
+   qr/\d+ Log::Dispatch::FileRotate not logging/];
 
 open my $fh, '<', $tempdir->child('myerrs.log')->stringify or die "can't open logfile: $!";
 my $content = do { local $/ = undef; <$fh> };
 is $content, 'write with successful lock';
-
-chmod 0644, $lockfile;
 
 done_testing;

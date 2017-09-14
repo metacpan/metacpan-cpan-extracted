@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More 0.82 tests => 20;
+use Test::More 0.82 tests => 18;
 
 use lib 't';
 use MyTestHelpers;
@@ -82,33 +82,21 @@ is (App::Chart::symbol_source_help ('^NZ50'),
 
 
 #------------------------------------------------------------------------------
-# dm_str_to_nearest_iso()
-
-SKIP: {
-  $have_test_mocktime or skip 'due to Test::MockTime not available', 2;
-
-  Test::MockTime::set_fixed_time ('1981-01-01T00:00:00Z');
-  ok (App::Chart::Suffix::NZ::dm_str_to_nearest_iso ('1 Nov'),  '1980-11-01');
-  ok (App::Chart::Suffix::NZ::dm_str_to_nearest_iso ('20 Jan'), '1981-01-20');
-}
-
-
-#------------------------------------------------------------------------------
 # dividend_parse
 
-foreach my $elem ([ [ 'FOO.NZ','5 Dec','5 Jan',
+foreach my $elem ([ [ 'FOO.NZ','05/12/2017','05/01/2018',
                       '0.55c', 'NZD', '0.0000'],
                     '0.0055', '0.00', undef ],
 
-                  [ [ 'FOO.NZ','5 Dec','5 Jan',
+                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
                       '15.000c', 'NZD', '7.3881c'],
                     '0.15', '0.073881', undef ],
 
-                  [ [ 'FOO.NZ','5 Dec','5 Jan',
+                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
                       '15.00c', 'GBP', '7.3881c'],
                     undef, undef, '0.15 + 0.073881 GBP' ],
 
-                  [ [ 'FOO.NZ','5 Dec','5 Jan',
+                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
                       '15.00c', 'GBP', ''],
                     undef, undef, '0.15 GBP' ],
 
@@ -122,4 +110,5 @@ foreach my $elem ([ [ 'FOO.NZ','5 Dec','5 Jan',
   is ($div->{'note'}, $want_note, "note");
 }
 
+#------------------------------------------------------------------------------
 exit 0;

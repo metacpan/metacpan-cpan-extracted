@@ -22,49 +22,71 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'pattern' => '([2-489])(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-489]'
+                  'leading_digits' => '[2-489]',
+                  'pattern' => '([2-489])(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '([57]\\d)(\\d{3})(\\d{4})',
                   'leading_digits' => '[57]'
                 },
                 {
-                  'leading_digits' => '153',
-                  'pattern' => '(153)(\\d{1,2})(\\d{3})(\\d{4})'
+                  'pattern' => '(153)(\\d{1,2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '153'
                 },
                 {
-                  'leading_digits' => '1[7-9]',
-                  'pattern' => '(1)([7-9]\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(1)([7-9]\\d{2})(\\d{3})(\\d{3})',
+                  'leading_digits' => '1[7-9]'
                 },
                 {
-                  'leading_digits' => '125',
-                  'pattern' => '(1255)(\\d{3})'
+                  'pattern' => '(1255)(\\d{3})',
+                  'leading_digits' => '125'
                 },
                 {
-                  'pattern' => '(1200)(\\d{3})(\\d{3})',
-                  'leading_digits' => '120'
+                  'leading_digits' => '120',
+                  'pattern' => '(1200)(\\d{3})(\\d{3})'
                 },
                 {
                   'leading_digits' => '121',
                   'pattern' => '(1212)(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '15',
-                  'pattern' => '(1599)(\\d{6})'
+                  'pattern' => '(1599)(\\d{6})',
+                  'leading_digits' => '1599'
                 },
                 {
-                  'pattern' => '(\\d{4})',
-                  'leading_digits' => '[2-689]'
+                  'pattern' => '(151)(\\d{1,2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '151'
+                },
+                {
+                  'leading_digits' => '[2-689]',
+                  'pattern' => '(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
+                'voip' => '
+          7(?:
+            18\\d|
+            2[23]\\d|
+            3[237]\\d|
+            47\\d|
+            6[58]\\d|
+            7\\d{2}|
+            8(?:
+              2\\d|
+              33|
+              55|
+              77|
+              81
+            )|
+            9[2579]\\d
+          )\\d{5}
+        ',
+                'fixed_line' => '
           (?:
             153\\d{1,2}|
             [2-489]
@@ -85,10 +107,15 @@ my $validators = {
           [2-689]\\d{3}|
           1599\\d{6}
         )',
-                'personal_number' => '',
+                'toll_free' => '
+          1(?:
+            80[019]\\d{3}|
+            255
+          )\\d{3}
+        ',
                 'mobile' => '
           5(?:
-            [02-47-9]\\d{2}|
+            [0-47-9]\\d{2}|
             5(?:
               01|
               2[23]|
@@ -103,37 +130,14 @@ my $validators = {
             6[2-9]\\d
           )\\d{5}
         ',
-                'fixed_line' => '
+                'pager' => '',
+                'personal_number' => '',
+                'geographic' => '
           (?:
             153\\d{1,2}|
             [2-489]
           )\\d{7}
-        ',
-                'voip' => '
-          7(?:
-            18\\d|
-            2[23]\\d|
-            3[237]\\d|
-            47\\d|
-            6[58]\\d|
-            7\\d{2}|
-            8(?:
-              2\\d|
-              33|
-              55|
-              77|
-              81
-            )|
-            9[2579]\\d
-          )\\d{5}
-        ',
-                'toll_free' => '
-          1(?:
-            80[019]\\d{3}|
-            255
-          )\\d{3}
-        ',
-                'pager' => ''
+        '
               };
 my %areanames = (
   9722 => "Jerusalem",

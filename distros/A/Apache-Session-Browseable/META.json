@@ -61,6 +61,10 @@
          "file" : "lib/Apache/Session/Browseable/MySQL.pm",
          "version" : "v1.2.5"
       },
+      "Apache::Session::Browseable::MySQLJSON" : {
+         "file" : "lib/Apache/Session/Browseable/MySQLJSON.pm",
+         "version" : "v1.2.5"
+      },
       "Apache::Session::Browseable::Oracle" : {
          "file" : "lib/Apache/Session/Browseable/Oracle.pm",
          "version" : "v1.2.2"

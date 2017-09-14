@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -25,6 +25,13 @@ use App::Chart::Download;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+{
+  # "null" volume
+  # SELECT * FROM daily WHERE volume LIKE "%null%";
+  # DELETE FROM daily WHERE volume LIKE "%null%";
+  exit 0;
+}
 
 {
   # find daily data without info record

@@ -7,14 +7,14 @@ use File::Which qw( which );
 use Getopt::Std qw( getopts );
 
 # ABSTRACT: Perl-only `which`
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub main
 {
   local @ARGV = @_;
   
   my %opts;
-  getopts('av', \%opts) || return _usage();
+  getopts('avs', \%opts) || return _usage();
   
   return _version() if $opts{v};
   
@@ -28,11 +28,14 @@ sub main
     
     # We might end up with @result = (undef) -> 1 elem
     @result = () unless defined $result[0];
-    print "$_\n" for grep { defined } @result;
+    unless($opts{s})
+    {
+      print "$_\n" for grep { defined } @result;
+    }
     
     unless (@result)
     {
-      print STDERR "$0: no $file in PATH\n";
+      print STDERR "$0: no $file in PATH\n" unless $opts{s};
       return 1;
     }
   }
@@ -42,9 +45,10 @@ sub main
 
 sub _version
 {
+  my $my_version = $App::pwhich::VERSION || 'dev';
   print <<"END_TEXT";
 This is pwhich running File::Which version $File::Which::VERSION
-                       App::pwhich version $App::pwhich::VERSION
+                       App::pwhich version $my_version
 
 Copyright 2002 Per Einar Ellefsen
 
@@ -61,9 +65,10 @@ END_TEXT
 sub _usage
 {
   print <<"END_TEXT";
-Usage: $0 [-a] [-v] programname [programname ...]
+Usage: $0 [-a] [-s] [-v] programname [programname ...]
       -a        Print all matches in PATH, not just the first.
       -v        Prints version and exits
+      -s        Silent mode
 
 END_TEXT
   1;
@@ -83,7 +88,11 @@ App::pwhich - Perl-only `which`
 
 =head1 VERSION
 
-version 1.14
+version 1.15
+
+=head1 SYNOPSIS
+
+ perldoc pwhich
 
 =head1 DESCRIPTION
 
@@ -101,6 +110,13 @@ Bugs should be reported via the GitHub issue tracker
 L<https://github.com/plicease/App-pwhich/issues>
 
 For other issues, contact the maintainer.
+
+=head1 CAVEATS
+
+This module does not know about built-in shell commands, as the built-in
+command C<which> and C<where> ususally do.
+
+This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 
 =head1 SEE ALSO
 
@@ -120,8 +136,6 @@ This module purports to "check that a command is available", but does not
 provide any documentation on how you might use it.
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

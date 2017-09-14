@@ -264,8 +264,9 @@ sub process_hpc_meta {
 
     if ( $jobname eq 'hpcjob_001' ) {
 
-# Could also just be using global defs...
-# $self->app_log->warn('You have not defined a job name. It is best practice to defined jobnames, but we will define hpcjob_001 for you.');
+    # Could also just be using global defs... $self->app_log->warn('You have not
+    # defined a job name. It is best practice to defined jobnames, but we will
+    # define hpcjob_001 for you.');
         $self->apply_global_directives( $t1, $t2 );
         $self->apply_job_directives( $t1, $t2 );
     }
@@ -281,7 +282,7 @@ sub apply_global_directives {
     my $t1   = shift;
     my $t2   = shift;
 
-    if ($t1) {
+    if ( $t1 && $self->can($t1) ) {
         $self->$t1($t2);
     }
 }
@@ -295,8 +296,9 @@ sub apply_job_directives {
     if ( $self->jobs->{ $self->jobname }->can($t1) ) {
         $self->jobs->{ $self->jobname }->$t1($t2);
     }
-    else{
-      ##Warnings
+    else {
+        ##Warnings
+        $self->app_log->warn( 'You tried to assign ' . $t1 . ' to ' . $t2 );
     }
 }
 

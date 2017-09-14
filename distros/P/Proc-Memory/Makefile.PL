@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.010;
 use ExtUtils::MakeMaker;
 
 use Alien::libvas;
@@ -23,6 +24,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Proc-Memory",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Proc::Memory",
   "PREREQ_PM" => {
     "Alien::libvas" => "0.202",
@@ -36,9 +38,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::More" => 0,
+    "blib" => "1.01"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,10 +60,13 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Inline" => "0.56",
   "Scalar::Util" => 0,
   "Sentinel" => 0,
   "Test::More" => 0,
+  "blib" => "1.01",
   "strict" => 0,
   "warnings" => 0
 );

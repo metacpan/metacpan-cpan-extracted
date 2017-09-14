@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-WHMCS
 
+0.09    2017-09-12
+    - add addclientnote
+    - requires WHMCS 7.0+ (old version please use v0.08 instead)
+
 0.08    2014-10-21
     - add deleteorder (by mschout)
 

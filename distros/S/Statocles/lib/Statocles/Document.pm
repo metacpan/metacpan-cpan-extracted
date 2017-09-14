@@ -1,5 +1,5 @@
 package Statocles::Document;
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 # ABSTRACT: Base class for all Statocles documents
 
 use Statocles::Base 'Class';
@@ -335,6 +335,29 @@ has data => (
     is => 'rw',
 );
 
+#pod =attr disable_content_template
+#pod
+#pod     ---
+#pod     disable_content_template: true
+#pod     ---
+#pod
+#pod This disables processing the content as a template. This can speed up processing
+#pod when the content is not using template directives. 
+#pod
+#pod This can be also set in the application
+#pod (L<Statocles::App/disable_content_template>), or for the entire site
+#pod (L<Statocles::Site/disable_content_template>).
+#pod
+#pod =cut
+
+has disable_content_template => (
+    is => 'ro',
+    isa => Bool,
+    lazy => 1,
+    default => 0,
+    predicate => 'has_disable_content_template',
+);
+
 around BUILDARGS => sub {
     my ( $orig, $self, @args ) = @_;
     my $args = $self->$orig( @args );
@@ -359,7 +382,7 @@ Statocles::Document - Base class for all Statocles documents
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 DESCRIPTION
 
@@ -580,6 +603,19 @@ immediately in the document content, and later in the page template.
 Every document's content is parsed as a template. The C<data> attribute can be
 used in the template to allow for some structured data that would be cumbersome
 to have to mark up time and again.
+
+=head2 disable_content_template
+
+    ---
+    disable_content_template: true
+    ---
+
+This disables processing the content as a template. This can speed up processing
+when the content is not using template directives. 
+
+This can be also set in the application
+(L<Statocles::App/disable_content_template>), or for the entire site
+(L<Statocles::Site/disable_content_template>).
 
 =head1 SEE ALSO
 

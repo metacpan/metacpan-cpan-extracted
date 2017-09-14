@@ -8,7 +8,7 @@ package Fake::Encode;
 # Copyright (c) 2016, 2017 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$Fake::Encode::VERSION = '0.05';
+$Fake::Encode::VERSION = '0.07';
 
 # > I sent PAUSE Distribution file: Fake-Encode-0.03.tar.gz, then I got a
 # > message "Status: Decreasing version number"
@@ -24,7 +24,6 @@ $Fake::Encode::VERSION = '0.05';
 #
 # Get rid of that first line! :-)
 
-BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use 5.00503;
 use strict;
 

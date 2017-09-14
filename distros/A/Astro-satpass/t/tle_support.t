@@ -17,7 +17,7 @@ note <<'EOD';
 The following tests check manipulation of the canned statuses
 EOD
 
-cmp_ok elements( Astro::Coord::ECI::TLE->status( 'show' ) ), '==', 92,
+cmp_ok elements( Astro::Coord::ECI::TLE->status( 'show' ) ), '==', 91,
     'Astro::Coord::ECI::TLE->status() items initially';
 
 Astro::Coord::ECI::TLE->status( 'clear' );

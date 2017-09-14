@@ -5,6 +5,11 @@ use Test2::IPC;
 use Test2::Tools::Tiny;
 use Test2::Util qw/CAN_THREAD CAN_REALLY_FORK USE_THREADS get_tid/;
 
+ok(1, "Just to get things initialized.");
+
+# This test relies on TAP being the default formatter for non-canon instances
+$ENV{T2_FORMATTER} = 'TAP';
+
 my $CLASS = 'Test2::API::Instance';
 
 my $one = $CLASS->new;
@@ -353,7 +358,7 @@ if (CAN_REALLY_FORK) {
 
 {
     my $ctx = bless {
-        trace => Test2::Util::Trace->new(frame => ['Foo::Bar', 'Foo/Bar.pm', 42, 'xxx']),
+        trace => Test2::EventFacet::Trace->new(frame => ['Foo::Bar', 'Foo/Bar.pm', 42, 'xxx']),
         hub => Test2::Hub->new(),
     }, 'Test2::API::Context';
     $one->contexts->{1234} = $ctx;

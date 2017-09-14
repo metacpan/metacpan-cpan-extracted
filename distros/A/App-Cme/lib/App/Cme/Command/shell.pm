@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with a shell
 
 package App::Cme::Command::shell ;
-$App::Cme::Command::shell::VERSION = '1.022';
+$App::Cme::Command::shell::VERSION = '1.023';
 use strict;
 use warnings;
 use 5.10.1;
@@ -29,6 +29,7 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "open-item=s" => "open a specific item of the configuration" ],
+        [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "quiet!"      => "Suppress progress messages" ],
         [ "bare!"       => "run bare terminal UI"],
         $class->cme_global_options,
@@ -77,7 +78,7 @@ App::Cme::Command::shell - Edit the configuration of an application with a shell
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

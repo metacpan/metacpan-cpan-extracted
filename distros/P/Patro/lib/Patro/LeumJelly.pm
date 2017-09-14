@@ -6,21 +6,34 @@ use Carp;
 use Storable;
 use MIME::Base64 ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
+
+my %proxyClasses = (
+    'Patro::N1' => 0,    # HASH
+    'Patro::N2' => 1,    # SCALAR
+    'Patro::N3' => 0,    # CODE
+    'Patro::N4' => 0,    # ARRAY
+    'Patro::N5' => 0,    # GLOB
+    'Patro::N6' => 1,);  # REF
 
 sub isProxyRef {
     my ($pkg) = @_;
-    return $pkg eq 'Patro::N1' || $pkg eq 'Patro::N2' || $pkg eq 'Patro::N3';
+    return defined $proxyClasses{$pkg};
 }
 
 sub handle {
     my ($proxy) = @_;
-    if (CORE::ref($proxy) eq 'Patro::N2') {
+    if ($proxyClasses{ CORE::ref($proxy) }) {
 	return $proxy;
     } else {
 	return ${$proxy};
     }
 }
+
+########################################
+
+# bonus discovery about Storable serialization --
+# storage order is deterministic
 
 sub serialize {
     return MIME::Base64::encode_base64( 
@@ -39,7 +52,9 @@ sub deserialize {
     }
 }
 
-# return a Patro::N1 or Patro::N2 object appropriate for the
+########################################
+
+# return a Patro::Nx object appropriate for the
 # object metadata (containing id, ref, reftype values) and client.
 sub getproxy {
     my ($objdata,$client) = @_;
@@ -58,11 +73,17 @@ sub getproxy {
 	return bless $proxy, 'Patro::N2';
     }
 
+    if ($proxy->{reftype} eq 'REF') {
+	require Patro::N6;
+	bless $proxy, 'Patro::N6';
+	return $proxy;
+    }
+    
     if ($proxy->{reftype} eq 'ARRAY') {
-	require Patro::N1;
+	require Patro::N4;
 	tie my @a, 'Patro::Tie::ARRAY', $proxy;
 	$proxy->{array} = \@a;
-	return bless \$proxy, 'Patro::N1';
+	return bless \$proxy, 'Patro::N4';
     }
 
     if ($proxy->{reftype} eq 'HASH') {
@@ -84,9 +105,18 @@ sub getproxy {
 		    args => [ @_ ],
 		    command => 'invoke',
 		    id => $proxy->{id}
-		} );
+		}, @_ );
 	};
 	return bless \$proxy, 'Patro::N3';
+    }
+
+    if ($proxy->{reftype} eq 'GLOB') {
+	require Patro::N5;
+	require Symbol;
+	my $fh = Symbol::gensym();
+	tie *$fh, 'Patro::Tie::HANDLE', $proxy;
+	$proxy->{handle} = \*$fh;
+	return bless \$proxy, 'Patro::N5';
     }
 
     croak "unsupported remote object reftype '$objdata->{reftype}'";
@@ -94,13 +124,15 @@ sub getproxy {
 
 # make a request through a Patro::N's client, return the response
 sub proxy_request {
-    my ($proxy,$request) = @_;
-    my $socket = $proxy->{socket};
+    my $proxy = shift;
+    my $request = shift;
+    my ($socket,$proxy_id,$_DESTROY,$proxy_client)
+	= Patro::_fetch($proxy,qw(socket id _DESTROY client));
     if (!defined $request->{context}) {
 	$request->{context} = defined(wantarray) ? 1 + wantarray : 0;
     }
     if (!defined $request->{id}) {
-	$request->{id} = $proxy->{id};
+	$request->{id} = $proxy_id;
     }
 
     if ($request->{has_args}) {
@@ -108,7 +140,7 @@ sub proxy_request {
 	# we should convert it to ... what?
 	foreach my $arg (@{$request->{args}}) {
 	    if (isProxyRef(ref($arg))) {
-		my $id = handle($arg)->{id};
+		my $id = Patro::_fetch(handle($arg),"id");
 		$arg = bless \$id, '.Patroon';
 	    }
 	}
@@ -116,7 +148,7 @@ sub proxy_request {
 
     my $sreq = serialize($request);
     my $resp;
-    if ($proxy->{_DESTROY}) {
+    if ($_DESTROY) {
 	no warnings 'closed';
 	print {$socket} $sreq . "\n";
 	$resp = readline($socket);
@@ -128,13 +160,45 @@ sub proxy_request {
 	return serialize({context => 0, response => ""});
     }
     croak if ref($resp);
-    $resp = deserialize_response($resp, $proxy->{client});
+    $resp = deserialize_response($resp, $proxy_client);
     if ($resp->{error}) {
 	croak $resp->{error};
+    }
+    if ($resp->{warn}) {
+	carp $resp->{warn};
     }
     if (exists $resp->{disconnect_ok}) {
 	return $resp;
     }
+
+    # before returning, handle side effects
+    if ($resp->{out} && ref($resp->{out}) eq 'ARRAY') {
+	for (my $i=0; $i<@{$resp->{out}}; ) {
+	    my $index = $resp->{out}[$i++];
+	    my $val = $resp->{out}[$i++];
+	    eval { $_[$index] = $val };
+	    if ($@) {
+		next if $resp->{sideA} &&
+		    $@ =~ /Modification of a read-only .../ &&
+		    $_[$index] eq $val;
+		::xdiag("failed ",[ $_[$index], $val ]);
+		croak $@;
+	    }
+	}
+    }
+    if (defined $resp->{errno}) {
+	# the remote call set $!
+	$! = $resp->{errno};
+    }
+    if (defined $resp->{child_error}) {
+	# the remote call set $?
+	$? = $resp->{child_error};
+    }
+    if (defined $resp->{eval_error}) {
+	# the remote call set $@
+	$@ = $resp->{eval_error};
+    }
+
     if ($resp->{context} == 0) {
 	return;
     }
@@ -171,12 +235,16 @@ sub deserialize_response {
 				      @{$response->{response}} ];
 	}
     }
+    if ($response->{out}) {
+	$response->{out} = [ map depatrol($client,$_,$response->{meta}),
+			     @{$response->{out}} ];
+    }
     return $response;
 }
 
 sub depatrol {
     my ($client, $obj, $meta) = @_;
-    if (ref($obj) ne 'SCALAR') {
+    if (CORE::ref($obj) ne '.Patrobras') {
 	return $obj;
     }
     my $id = $$obj;
@@ -186,10 +254,11 @@ sub depatrol {
 	return $client->{proxies}{$id};
     }
     warn "depatrol: reference $id $obj is not referred to in meta";
+    bless $obj, 'SCALAR';
     return $obj;
 }
 
-# overload handling for Patro::N1 and Patro::N2
+# overload handling for Patro::N1, Patro::N2, and Patro::N4. N3 and N5 too?
 
 my %numeric_ops = map { $_ => 1 }
 qw# + - * / % ** << >> += -= *= /= %= **= <<= >>= <=> < <= > >= == != ^ ^=
@@ -201,12 +270,13 @@ qw# + - * / % ** << >> += -= *= /= %= **= <<= >>= <=> < <= > >= == != ^ ^=
 sub overload_handler {
     my ($ref, $y, $swap, $op) = @_;
     my $handle = handle($ref);
-    my $overloads = $handle->{overloads};
+    my ($overloads,$handle_id) = Patro::_fetch($handle,"overloads","id");
+
     if ($overloads && $overloads->{$op}) {
 	# operation is overloaded in the remote object.
 	# ask the server to compute the operation result
 	return proxy_request( $handle,
-	    { id => $handle->{id},
+	    { id => $handle_id,
 	      topic => 'OVERLOAD',
 	      command => $op,
 	      has_args => 1,
@@ -250,7 +320,26 @@ sub overload_handler {
     return eval "\$str $op \$y";
 }
 
+sub deref_handler {
+    my $obj = shift;
+    my $op = pop;
 
+    my $handle = handle($obj);
+    my ($overloads,$handle_id) = Patro::_fetch($handle,"overloads","id");
+    if ($overloads && $overloads->{$op}) {
+	# operation is overloaded in the remote object.
+	# ask the server to compute the operation result
+	return proxy_request( $handle,
+	    { id => $handle_id,
+	      topic => 'OVERLOAD',
+	      command => $op,
+	      has_args => 0 } );
+    }
+    if ($op eq '@{}') { croak "Not an ARRAY reference" }
+    if ($op eq '%{}') { croak "Not a HASH reference" }
+    if ($op eq '&{}') { croak "Not a CODE reference" }
+    croak "Patro: invalid dereference $op";
+}
 1;
 
 =head1 NAME

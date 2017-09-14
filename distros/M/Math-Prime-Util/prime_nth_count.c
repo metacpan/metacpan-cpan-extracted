@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ptypes.h"
 #define FUNC_popcnt 1
 #define FUNC_isqrt 1
-#include "util.h"
+#include "ptypes.h"
 #include "sieve.h"
 #include "cache.h"
 #include "lmo.h"
 #include "constants.h"
 #include "prime_nth_count.h"
+#include "util.h"
 
 #include <math.h>
 #if _MSC_VER || defined(__IBMC__) || defined(__IBMCPP__) || (defined(__STDC_VERSION__) && __STDC_VERSION >= 199901L)
@@ -397,7 +397,10 @@ UV prime_count_lower(UV n)
   fl1 = logl(n);
   fl2 = fl1 * fl1;
 
-  if (n < UVCONST(4000000000)) {
+  if (n <= 300000) { /* Quite accurate and avoids calling Li for speed. */
+    a = (n < 70200) ? 947 : (n < 176000) ? 904 : 829;
+    lower = fn / (fl1 - 1 - 1/fl1 - 2.85/fl2 - 13.15/(fl1*fl2) + a/(fl2*fl2));
+  } else if (n < UVCONST(4000000000)) {
     /* Loose enough that FP differences in Li(n) should be ok. */
     a = (n <     88783) ?   4.0L
       : (n <    300000) ?  -3.0L
@@ -476,6 +479,13 @@ UV prime_count_upper(UV n)
   return (UV) floorl(upper);
 }
 
+static void simple_nth_limits(UV *lo, UV *hi, long double n, long double logn, long double loglogn) {
+  const long double a = (n < 228) ? .6483 : (n < 948) ? .8032 : (n < 2195) ? .8800 : (n < 39017) ? .9019 : .9484;
+  *lo = n * (logn + loglogn - 1.0 + ((loglogn-2.10)/logn));
+  *hi = n * (logn + loglogn - a);
+  if (*hi < *lo) *hi = MPU_MAX_PRIME;
+}
+
 /* The nth prime will be less or equal to this number */
 UV nth_prime_upper(UV n)
 {
@@ -489,9 +499,8 @@ UV nth_prime_upper(UV n)
   flog2n = logl(flogn);    /* Note distinction between log_2(n) and log^2(n) */
 
   if (n < 688383) {
-    UV lo = fn * (flogn + flog2n - 1.0 + ((flog2n-2.10)/flogn));
-    UV hi = fn * (flogn + flog2n - ((n <= 39017) ? 0 : 0.9484) );
-    if (hi < lo) hi = MPU_MAX_PRIME;
+    UV lo,hi;
+    simple_nth_limits(&lo, &hi, fn, flogn, flog2n);
     while (lo < hi) {
       UV mid = lo + (hi-lo)/2;
       if (prime_count_lower(mid) < n) lo = mid+1;
@@ -502,8 +511,13 @@ UV nth_prime_upper(UV n)
 
   /* Dusart 2010 page 2 */
   upper = fn * (flogn + flog2n - 1.0 + ((flog2n-2.00)/flogn));
-  /* Axler 2013 page viii Korollar G */
-  if (n >= 8009824) upper -= fn * ((flog2n*flog2n-6*flog2n+10.273)/(2*flogn*flogn));
+  if        (n >= 46254381) {
+     /* Axler 2017 http//arxiv.org/pdf/1706.03651.pdf Corollary 1.2 */
+    upper -= fn * ((flog2n*flog2n-6*flog2n+10.667)/(2*flogn*flogn));
+  } else if (n >=  8009824) {
+    /* Axler 2013 page viii Korollar G */
+    upper -= fn * ((flog2n*flog2n-6*flog2n+10.273)/(2*flogn*flogn));
+  }
 
   if (upper >= (long double)UV_MAX) {
     if (n <= MPU_MAX_PRIME_IDX) return MPU_MAX_PRIME;
@@ -527,12 +541,8 @@ UV nth_prime_lower(UV n)
 
   /* For small values, do a binary search on the inverse prime count */
   if (n < 2000000) {
-    /* Use Dusart 2010 page 2 bounds for the endpoints */
-    UV lo = fn * (flogn + flog2n - 1.0 + ((flog2n-2.10)/flogn));
-    UV hi = (n < 5000)
-          ?  lo + 300
-          :  fn * (flogn + flog2n - 1.0 + ((flog2n-1.95)/flogn));
-    if (hi < lo) hi = MPU_MAX_PRIME;
+    UV lo,hi;
+    simple_nth_limits(&lo, &hi, fn, flogn, flog2n);
     while (lo < hi) {
       UV mid = lo + (hi-lo)/2;
       if (prime_count_upper(mid) < n) lo = mid+1;
@@ -541,8 +551,11 @@ UV nth_prime_lower(UV n)
     return lo;
   }
 
-  /* Axler 2013 page vii Korollar I, for all n >= 2 */
-  lower = fn * (flogn + flog2n-1.0 + ((flog2n-2.00)/flogn) - ((flog2n*flog2n-6*flog2n+11.847)/(2*flogn*flogn)));
+  { /* Axler 2017 http//arxiv.org/pdf/1706.03651.pdf Corollary 1.4 */
+    double b1 = (n < 56000000)  ?  11.200  :  11.508;
+    lower = fn * (flogn + flog2n-1.0 + ((flog2n-2.00)/flogn) - ((flog2n*flog2n-6*flog2n+b1)/(2*flogn*flogn)));
+  }
+
   return (UV) ceill(lower);
 }
 
@@ -874,12 +887,15 @@ static const UV sum_table_2e8[] =
   do {  UV _n = n; \
         if (_n > (UV_MAX-lo)) { hi++; if (hi == 0) overflow = 1; } \
         lo += _n;   } while (0)
+#define SET_128(hi, lo, n) \
+  do { hi = (UV) (((n) >> 64) & UV_MAX); \
+       lo = (UV) (((n)      ) & UV_MAX); } while (0)
 
 /* Legendre method for prime sum */
 int sum_primes128(UV n, UV *hi_sum, UV *lo_sum) {
 #if BITS_PER_WORD == 64 && HAVE_UINT128
   uint128_t *V, *S;
-  UV j, k, r = isqrt(n), r2 = r + n/(r+1);;
+  UV j, k, r = isqrt(n), r2 = r + n/(r+1);
 
   New(0, V, r2+1, uint128_t);
   New(0, S, r2+1, uint128_t);
@@ -898,8 +914,7 @@ int sum_primes128(UV n, UV *hi_sum, UV *lo_sum) {
       S[a] -= p * (S[b] - sp);   /* sp = sum of primes less than p */
     }
   } END_DO_FOR_EACH_PRIME;
-  *hi_sum = (UV) ((S[r2] >> 64) & UV_MAX);
-  *lo_sum = (UV) ((S[r2]      ) & UV_MAX);
+  SET_128(*hi_sum, *lo_sum, S[r2]);
   Safefree(V);
   Safefree(S);
   return 1;
@@ -980,4 +995,13 @@ int sum_primes(UV low, UV high, UV *return_sum) {
   }
   if (!overflow && return_sum != 0)  *return_sum = sum;
   return !overflow;
+}
+
+double ramanujan_sa_gn(UV un)
+{
+  long double n = (long double) un;
+  long double logn = logl(n);
+  long double log2 = logl(2);
+
+  return (double)( (logn + logl(logn) - log2 - 0.5) / (log2 + 0.5) );
 }

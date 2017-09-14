@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.022';
+$App::Cme::Common::VERSION = '1.023';
 use strict;
 use warnings;
 use 5.10.1;
@@ -37,6 +37,7 @@ sub cme_global_options {
       [ "create!"            => "start from scratch."],
       [ "root-dir=s"         => "Change root directory. Mostly used for test"],
       [ "file=s"             => "Specify a target file"],
+      # to be deprecated
       [ "backend=s"          => "Specify a read/write backend"],
       [ "trace|stack-trace!" => "Provides a full stack trace when exiting on error"],
       [ "verbose=s"         => "Verbosity level (1, 2, 3  or info, debug, trace)"],
@@ -83,6 +84,11 @@ sub process_args {
 
     my $command = (split('::', ref($self)))[-1] ;
 
+    if ($appli_info->{$application}{require_config_file}
+            and $appli_info->{$application}{require_backend_argument}) {
+        die "Error in $root_model model: cannot have both require_config_file and require_backend_argument.\n";
+    }
+
     # @ARGV should be [ $config_file ] [ modification_instructions ]
     my $config_file;
     if ( $appli_info->{$application}{require_config_file} ) {
@@ -102,7 +108,7 @@ sub process_args {
             my $message = $appli_info->{$application}{backend_argument_info} ;
             my $insert = $message ? " ( $message )": '';
             die "application $application requires a 3rd argument$insert. "
-                . "I.e. 'cme $command $application <backend_arg>'";
+                . "I.e. 'cme $command $application <backend_arg>'\n";
         }
     }
 
@@ -264,7 +270,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

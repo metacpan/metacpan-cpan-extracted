@@ -212,6 +212,11 @@ ok( IS_CONFOBJ->(conf => $conf_obj),    "Configure object found" );
             $mod->package_name,     # package name
             $mod->version,          # version
         ],
+        'Digest-SHA1' => [
+            'EUNOXS',
+            'Digest-SHA1',
+            '2.13',
+        ],
     );
 
     while ( my($guess, $attr) = splice @map, 0, 2 ) {

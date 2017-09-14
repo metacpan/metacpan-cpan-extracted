@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual describes how to install and use Chart, version 261.
+<!-- This manual describes how to install and use Chart, version 262.
 
 Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
 
@@ -8,11 +8,11 @@ Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation; either version 3, or (at your option) any later version
 (Copying). -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.4.90, http://www.gnu.org/software/texinfo/ -->
 <head>
 <title>Chart Manual</title>
 
-<meta name="description" content="How to install and use the Chart program, version 261.">
+<meta name="description" content="How to install and use the Chart program, version 262.">
 <meta name="keywords" content="Chart Manual">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
@@ -83,7 +83,7 @@ Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Previou
 <h1 class="top">Chart</h1>
 
 
-<p>This manual describes how to install and use Chart, version 261.
+<p>This manual describes how to install and use Chart, version 262.
 </p>
 <p>Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
 </p>
@@ -288,16 +288,16 @@ Here are some other notes,
 <dd><p>Various optional features and their required Perl modules are set out in the
 <code>optional_features</code> section of <samp>META.yml</samp>.  Some of the smart Perl
 install tools might offer them in an automated way, otherwise look at
-<samp>META.yml</samp> and install desired things manually.  The most interesting
-options include <code>Finance::Quote</code> (see <a href="#Finance-Quote">Finance Quote</a>), Genius Trader
-and TA-Lib (see <a href="#Other-Indicator-Packages">Other Indicator Packages</a>).
+<samp>META.yml</samp> or <samp>Makefile.PL</samp> and install desired things manually.
+The most interesting options include <code>Finance::Quote</code> (see <a href="#Finance-Quote">Finance Quote</a>), Genius Trader and TA-Lib (see <a href="#Other-Indicator-Packages">Other Indicator Packages</a>).
 </p>
 </dd>
 <dt>HTTP Compression</dt>
 <dd><p>If suitable modules are available then LWP is set to request compression in
-HTTP downloads.  Only a few servers will do this, but it saves download size
-when the server does.  Gzip decompression uses <code>IO::Uncompress::Gunzip</code>
-which comes with Perl so should be available always.
+HTTP downloads.  Various servers will do this and it saves download size when
+the server does.  Gzip is the most common and its decompression uses
+<code>IO::Uncompress::Gunzip</code> which comes with Perl so should be available
+always.
 </p>
 
 </dd>
@@ -307,9 +307,9 @@ which comes with Perl so should be available always.
 <a name="index-OpenSSL"></a>
 <p>For <code>https</code> protocol the <code>LWP::Protocol::https</code> module is required.
 In libwww 6 and up it comes separately and expresses its required supporting
-modules.  In libwww 5 see the <samp>README.SSL</samp> on the recommended
-<code>Crypt::SSLeay</code> module (using OpenSSL).  Data sources needing
-<code>https</code> include <a href="#MLC-Funds">MLC Funds</a>.
+modules.  In libwww 5 see its <samp>README.SSL</samp> on the recommended
+<code>Crypt::SSLeay</code> module (using OpenSSL).  Many data sources need
+<code>https</code>, including <a href="#Yahoo-Finance">Yahoo Finance</a>.
 </p>
 
 </dd>
@@ -4761,27 +4761,13 @@ Next: <a href="#Download" accesskey="n" rel="next">Download</a>, Previous: <a hr
 
 <a name="index-Ctrl_002dI"></a>
 <p>The View/Intraday menu entry (<tt class="key">Ctrl-I</tt>) or the Intraday button in the
-watchlist (see <a href="#Watchlist">Watchlist</a>) opens an intraday data window for the current
+watchlist (see <a href="#Watchlist">Watchlist</a>) opens an intraday image window for the current
 symbol, showing trading today, or so-far today.
 </p>
-<p>Intraday graphs are only available from some data sources (see <a href="#Data-Sources">Data Sources</a>).  Yahoo and Barchart provides graphs, which means most stocks and
-indexes are covered.
+<p>Alas there are no longer any data sources with intraday images.
 </p>
-<a name="index-Alt_002dR"></a>
-<p>The default display is 1-day, downloaded when the window is opened (then
-cached).  The option menu can select other timeframes such as 5-day, depending
-on the data source.  The underlined mnemonics &ldquo;5&rdquo; etc in the menu are
-accelerator keys, eg. <tt class="key">Alt-5</tt>.  Click on Refresh (<tt class="key">Alt-R</tt>) to update
-as trading progresses through the day.
-</p>
-<p>Multiple intraday windows can be opened, or a new symbol entered in the text
-box to view a different symbol (press <tt class="key">Return</tt> or click the &ldquo;Enter&rdquo;
-button).
-</p>
-<p>To see the intraday for a symbol not in the database or watchlist just open an
-intraday window for any symbol (or no symbol at all) then enter the desired
-one.
-</p>
+
+
 
 <hr>
 <a name="Download"></a>
@@ -4862,110 +4848,20 @@ further copying or distribution is generally not allowed (and this will
 include derived forms like the graphs drawn by Chart).
 </p>
 <table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top">&bull; <a href="#Barchart" accesskey="1">Barchart</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Finance-Quote" accesskey="1">Finance Quote</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Finance-Quote" accesskey="2">Finance Quote</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#MLC-Funds" accesskey="2">MLC Funds</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#MLC-Funds" accesskey="3">MLC Funds</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#New-Zealand-Stock-Exchange" accesskey="3">New Zealand Stock Exchange</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#New-Zealand-Stock-Exchange" accesskey="4">New Zealand Stock Exchange</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Reserve-Bank-of-Australia" accesskey="4">Reserve Bank of Australia</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Reserve-Bank-of-Australia" accesskey="5">Reserve Bank of Australia</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Thrift-Savings-Plan" accesskey="5">Thrift Savings Plan</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Thrift-Savings-Plan" accesskey="6">Thrift Savings Plan</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
-</td></tr>
-<tr><td align="left" valign="top">&bull; <a href="#Yahoo-Finance" accesskey="7">Yahoo Finance</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="#Yahoo-Finance" accesskey="6">Yahoo Finance</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
-
-
-
-
-
-<p>&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
-</p><hr>
-<a name="Barchart"></a>
-<div class="header">
-<p>
-Next: <a href="#Finance-Quote" accesskey="n" rel="next">Finance Quote</a>, Previous: <a href="#Data-Sources" accesskey="p" rel="prev">Data Sources</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
-</div>
-<a name="Barchart-1"></a>
-<h3 class="section">16.1 Barchart</h3>
-<a name="index-barchart_002ecom"></a>
-
-<p><a href="http://www.barchart.com">http://www.barchart.com</a>
-</p>
-<p>Barchart provides the following for various futures exchanges around the
-world,
-</p>
-<ul>
-<li> Intraday graphs.
-</li><li> Historical data, but only for the past 5 days, and no volume figures.
-</li><li> Historical data as graphs.
-</li></ul>
-
-<p>All information is for personal use only, see the terms at
-</p>
-<blockquote>
-<p><a href="http://www2.barchart.com/agreement.asp">http://www2.barchart.com/agreement.asp</a> <br>
-<a href="http://www2.barchart.com/ddfplus.asp">http://www2.barchart.com/ddfplus.asp</a>
-</p></blockquote>
-
-<p>In Chart symbols are the exchange commodity code and an exchange suffix as
-described below, with a month code letter and year, like &lsquo;<samp>CLZ10.NYM</samp>&rsquo;
-for December 2010 crude oil.
-</p>
-
-<p>Barchart has some different commodity codes than the exchanges, but Chart
-always uses the exchange codes.  Some Barchart pages show symbols with just
-one digit for the year, but Chart always uses two like &lsquo;<samp>10</samp>&rsquo; above.
-</p>
-<p>Five days of historical data is very limited, but you can accumulate it to at
-least get a short term picture.  Further data as graphs is available, and
-Chart has that as a &ldquo;Daily&rdquo; option in the intraday dialog
-(see <a href="#Intraday">Intraday</a>).  (Further historical data as figures is available to
-subscribers, not currently supported by Chart.)
-</p>
-<p>For some of the exchanges below quotes are also available from Yahoo
-(see <a href="#Yahoo-Finance">Yahoo Finance</a>).  The download from Yahoo is much smaller and is hence
-preferred.
-</p>
-
-<a name="Commodity-Exchange"></a>
-<h4 class="subsection">16.1.1 Commodity Exchange</h4>
-<a name="index-Commodity-Exchange"></a>
-<a name="index-COMEX"></a>
-
-<a name="index-_002eCMX"></a>
-<p>COMEX is the metals division of NYMEX (see below).  COMEX daily data is
-obtained from Barchart and quotes from Yahoo (delayed 30 minutes).  In Chart
-symbols have a &lsquo;<samp>.CMX</samp>&rsquo; suffix (as per Yahoo), for example &lsquo;<samp>GCM16.CMX</samp>&rsquo;
-for June 2016 gold.
-The exchange has a full symbols directory
-</p>
-<blockquote>
-<p><a href="http://www.nymex.com/cc_main.aspx">http://www.nymex.com/cc_main.aspx</a>
-</p></blockquote>
-
-
-
-<a name="New-York-Mercantile-Exchange"></a>
-<h4 class="subsection">16.1.2 New York Mercantile Exchange</h4>
-<a name="index-New-York-Mercantile-Exchange"></a>
-<a name="index-NYMEX"></a>
-
-<p><a href="http://www.nymex.com">http://www.nymex.com</a>
-</p>
-<a name="index-_002eNYM"></a>
-<p>NYMEX daily data is obtained from Barchart and quotes from Yahoo (delayed 30
-minutes).  In Chart symbols have a &lsquo;<samp>.NYM</samp>&rsquo; suffix (as per Yahoo), for
-example &lsquo;<samp>CLZ15.NYM</samp>&rsquo; for December 2015 crude oil.
-The exchange has a full symbols directory
-</p>
-<blockquote>
-<p><a href="http://www.nymex.com/cc_main.aspx">http://www.nymex.com/cc_main.aspx</a>
-</p></blockquote>
 
 
 
@@ -4977,10 +4873,10 @@ The exchange has a full symbols directory
 <a name="Finance-Quote"></a>
 <div class="header">
 <p>
-Next: <a href="#MLC-Funds" accesskey="n" rel="next">MLC Funds</a>, Previous: <a href="#Barchart" accesskey="p" rel="prev">Barchart</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#MLC-Funds" accesskey="n" rel="next">MLC Funds</a>, Previous: <a href="#Data-Sources" accesskey="p" rel="prev">Data Sources</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="Finance-Quote-1"></a>
-<h3 class="section">16.2 Finance Quote</h3>
+<h3 class="section">16.1 Finance Quote</h3>
 <a name="index-Finance_003a_003aQuote"></a>
 <a name="index-FQ"></a>
 
@@ -5013,7 +4909,7 @@ simple add-ons you might not need to configure anything.
 Next: <a href="#New-Zealand-Stock-Exchange" accesskey="n" rel="next">New Zealand Stock Exchange</a>, Previous: <a href="#Finance-Quote" accesskey="p" rel="prev">Finance Quote</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="MLC-Funds-1"></a>
-<h3 class="section">16.3 MLC Funds</h3>
+<h3 class="section">16.2 MLC Funds</h3>
 <a name="index-MLC-Funds"></a>
 <a name="index-Funds_002c-MLC"></a>
 
@@ -5062,11 +4958,11 @@ product names together),
 Next: <a href="#Reserve-Bank-of-Australia" accesskey="n" rel="next">Reserve Bank of Australia</a>, Previous: <a href="#MLC-Funds" accesskey="p" rel="prev">MLC Funds</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="New-Zealand-Stock-Exchange-1"></a>
-<h3 class="section">16.4 New Zealand Stock Exchange</h3>
+<h3 class="section">16.3 New Zealand Stock Exchange</h3>
 <a name="index-New-Zealand-Stock-Exchange"></a>
 <a name="index-NZX"></a>
 
-<p><a href="http://www.nzx.com">http://www.nzx.com</a>
+<p><a href="https://www.nzx.com">https://www.nzx.com</a>
 </p>
 <p>NZX provides
 </p>
@@ -5080,13 +4976,13 @@ Next: <a href="#Reserve-Bank-of-Australia" accesskey="n" rel="next">Reserve Bank
 <p>The NZX web site is for non-commercial or personal use only, see the terms at
 </p>
 <blockquote>
-<p><a href="http://www.nzx.com/Contact_us/terms">http://www.nzx.com/Contact_us/terms</a>
+<p><a href="https://www.nzx.com/terms">https://www.nzx.com/terms</a>
 </p></blockquote>
 
 <a name="index-_002eNZ"></a>
 <p>In Chart NZX symbols follow the Yahoo convention, which is the exchange symbol
-and a &lsquo;<samp>.NZ</samp>&rsquo; suffix, for example &lsquo;<samp>TEL.NZ</samp>&rsquo; for Telecom New Zealand.
-The NZX home page above has a search to lookup symbols (as does Yahoo).
+and a &lsquo;<samp>.NZ</samp>&rsquo; suffix, for example &lsquo;<samp>FBU.NZ</samp>&rsquo;.  The NZX home page above
+has a search to lookup symbols (as does Yahoo).
 </p>
 
 <hr>
@@ -5096,7 +4992,7 @@ The NZX home page above has a search to lookup symbols (as does Yahoo).
 Next: <a href="#Thrift-Savings-Plan" accesskey="n" rel="next">Thrift Savings Plan</a>, Previous: <a href="#New-Zealand-Stock-Exchange" accesskey="p" rel="prev">New Zealand Stock Exchange</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="Reserve-Bank-of-Australia-1"></a>
-<h3 class="section">16.5 Reserve Bank of Australia</h3>
+<h3 class="section">16.4 Reserve Bank of Australia</h3>
 <a name="index-Reserve-Bank-of-Australia"></a>
 <a name="index-RBA"></a>
 <a name="index-Australian-dollar"></a>
@@ -5182,7 +5078,7 @@ downloads (see <a href="#Installing">Installing</a>).
 Next: <a href="#Yahoo-Finance" accesskey="n" rel="next">Yahoo Finance</a>, Previous: <a href="#Reserve-Bank-of-Australia" accesskey="p" rel="prev">Reserve Bank of Australia</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="Thrift-Savings-Plan-1"></a>
-<h3 class="section">16.6 Thrift Savings Plan</h3>
+<h3 class="section">16.5 Thrift Savings Plan</h3>
 <a name="index-Thrift-Savings-Plan"></a>
 <a name="index-TSP"></a>
 <a name="index-Funds_002c-TSP"></a>
@@ -5214,7 +5110,7 @@ that module installed (it comes with the main <code>Finance::Quote</code>).
 Previous: <a href="#Thrift-Savings-Plan" accesskey="p" rel="prev">Thrift Savings Plan</a>, Up: <a href="#Data-Sources" accesskey="u" rel="up">Data Sources</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="Yahoo-Finance-1"></a>
-<h3 class="section">16.7 Yahoo Finance</h3>
+<h3 class="section">16.6 Yahoo Finance</h3>
 <a name="index-Yahoo-Finance"></a>
 <a name="index-New-York-Stock-Exchange"></a>
 <a name="index-NYSE"></a>
@@ -5227,25 +5123,23 @@ Previous: <a href="#Thrift-Savings-Plan" accesskey="p" rel="prev">Thrift Savings
 (see <a href="#Yahoo-Exchanges">Yahoo Exchanges</a>),
 </p>
 <ul>
-<li> Quotes, real-time for indexes and delayed for stocks.
-</li><li> Intraday graphs.
-</li><li> Historical data and splits.
-</li><li> Historical and upcoming dividends.
+<li> Quotes, real-time for indexes and delayed for shares.
+</li><li> Historical daily data, dividends and splits.
+</li><li> Upcoming dividends.
 </li></ul>
 
-<p>Yahoo does not allow commercial use, see the note at the bottom of the home
-page, and the terms of service at
+<p>Yahoo does not allow commercial use, see the terms of service at
 </p>
 <blockquote>
-<p><a href="http://docs.yahoo.com/info/terms/">http://docs.yahoo.com/info/terms/</a>
+<p><a href="https://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm">https://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm</a>
 </p></blockquote>
 
 <p>Chart uses the Yahoo stock symbol conventions.  For US stocks (AMEX, Nasdaq,
 NYSE) this is just the exchange symbol like &lsquo;<samp>AAPL</samp>&rsquo; for Apple Computer.
 Stocks from elsewhere are the exchange symbol and a suffix, like &lsquo;<samp>BMW.DE</samp>&rsquo;
 for BMW on Xetra.  See <a href="#Yahoo-Exchanges">Yahoo Exchanges</a>, below, for those supported in
-Chart.  Yahoo has a search at the following location (and at the
-country-specific sites),
+Chart.  Yahoo has a symbol lookup on most pages (and at the country-specific
+sites),
 </p>
 <blockquote>
 <p><a href="http://finance.yahoo.com/lookup">http://finance.yahoo.com/lookup</a>
@@ -5256,19 +5150,15 @@ country-specific sites),
 <p>Some currency cross-rates are available, they take a form such as
 &lsquo;<samp>AUDUSD=X</samp>&rsquo; for the value of one Australian dollar in US dollars.  Some
 spot metals prices are available in a similar form, for example
-&lsquo;<samp>XAUUSD=X</samp>&rsquo; for Gold in US dollars.  These may be just quotes, without
-historical data available.
+&lsquo;<samp>XAUUSD=X</samp>&rsquo; for Gold in US dollars.
 </p>
-<p>It&rsquo;s not clear when new end-of-day data becomes available, sometimes it seems
-to be once the exchange opens for the following day, other times it seems
-further delayed.  Chart will attempt to download after 10:30am the following
-trading day (in the exchange&rsquo;s timezone).
+<p>Yahoo gives some information on market closing times, but Chart doesn&rsquo;t make
+use of that.  A day&rsquo;s trading is written as daily data at 6pm (in the
+exchange&rsquo;s timezone).  Before that the current day is a latest quote.  The
+downloads are slightly overlapped so that if 6pm was too soon then its prices
+are replaced on a subsequent download.
 </p>
-<p>Dividends are re-downloaded weekly.  They seem to be a bit patchy, with not
-all dividends actually appearing in the data for some stocks.  The most recent
-dividend on the quotes pages is added to the database, so the latest should be
-available at least.
-</p>
+
 <table class="menu" border="0" cellspacing="0">
 <tr><td align="left" valign="top">&bull; <a href="#Yahoo-Exchanges" accesskey="1">Yahoo Exchanges</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
@@ -5284,7 +5174,7 @@ available at least.
 Previous: <a href="#Yahoo-Finance" accesskey="p" rel="prev">Yahoo Finance</a>, Up: <a href="#Yahoo-Finance" accesskey="u" rel="up">Yahoo Finance</a> &nbsp; [<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <a name="Yahoo-Exchanges-1"></a>
-<h4 class="subsection">16.7.1 Yahoo Exchanges</h4>
+<h4 class="subsection">16.6.1 Yahoo Exchanges</h4>
 
 <p>See also <a href="#New-Zealand-Stock-Exchange">New Zealand Stock Exchange</a>, which uses Yahoo and is described
 in its own section.
@@ -5306,9 +5196,6 @@ in its own section.
 <tr><td><a name="index-_002eOB"></a>
 &lsquo;<samp>.OB</samp>&rsquo;</td><td><a name="index-Over-the-Counter"></a>
 <a name="index-OTC"></a></td><td>Over the Counter (OTC) <br> <a href="http://www.otcbb.com">http://www.otcbb.com</a></td></tr>
-<tr><td></td></tr>
-<tr><td>&lsquo;<samp>.PK</samp>&rsquo;</td><td><a name="index-_002ePK"></a>
-<a name="index-Pink-Sheets"></a></td><td>Pink Sheets <br> <a href="http://www.pinksheets.com">http://www.pinksheets.com</a></td></tr>
 <tr><td></td></tr>
 <tr><td>&lsquo;<samp>.BA</samp>&rsquo;</td><td>Argentina
 <a name="index-_002eBA"></a>
@@ -5906,7 +5793,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-_002eBM"><code>.BM</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eBO"><code>.BO</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eCL"><code>.CL</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-_002eCMX"><code>.CMX</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eCO"><code>.CO</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eD"><code>.D</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eDE"><code>.DE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
@@ -5930,13 +5816,11 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-_002eMU"><code>.MU</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eMX"><code>.MX</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eNS"><code>.NS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-_002eNYM"><code>.NYM</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eNZ"><code>.NZ</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#New-Zealand-Stock-Exchange">New Zealand Stock Exchange</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eNZ-1"><code>.NZ</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eOB"><code>.OB</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eOL"><code>.OL</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002ePA"><code>.PA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-_002ePK"><code>.PK</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eSA"><code>.SA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eSG"><code>.SG</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002eSI"><code>.SI</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
@@ -5962,7 +5846,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-Alert-list">Alert list</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Annotations">Annotations</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Alerts-list">Alerts list</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Symbol-Lists">Symbol Lists</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-All-list">All list</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Symbol-Lists">Symbol Lists</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Alt_002dR"><tt class="key">Alt-R</tt></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Intraday">Intraday</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-American-Stock-Exchange">American Stock Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-AMEX">AMEX</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Finance">Yahoo Finance</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-AMEX-1">AMEX</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
@@ -6011,7 +5894,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th><a name="Concept-Index_cp_letter-B">B</a></th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Barcelona-Stock-Exchange">Barcelona Stock Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-barchart_002ecom"><code>barchart.com</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Bash">Bash</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Invocation">Invocation</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-bash_005fcompletion"><code>bash_completion</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#Invocation">Invocation</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-BCBA">BCBA</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
@@ -6077,10 +5959,8 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-Coefficient_002c-correlation">Coefficient, correlation</a>:</td><td>&nbsp;</td><td valign="top"><a href="#R_002dSquared-Index">R-Squared Index</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Coefficient_002c-regression">Coefficient, regression</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Linear-Regression">Linear Regression</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-COG">COG</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Centre-of-Gravity-Oscillator">Centre of Gravity Oscillator</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-COMEX">COMEX</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Command-line">Command line</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Invocation">Invocation</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Commodity-channel-index">Commodity channel index</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Commodity-Channel-Index">Commodity Channel Index</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Commodity-Exchange">Commodity Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Commodity-name-translations">Commodity name translations</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Internationalization">Internationalization</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Common-calculations">Common calculations</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Common-Calculations">Common Calculations</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Completion_002c-command-line">Completion, command line</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Invocation">Invocation</a></td></tr>
@@ -6397,7 +6277,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-National-Stock-Exchange-of-India">National Stock Exchange of India</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Negative-volume-index">Negative volume index</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Negative-Volume-Index">Negative Volume Index</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Netherlands">Netherlands</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-New-York-Mercantile-Exchange">New York Mercantile Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-New-York-Stock-Exchange">New York Stock Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Finance">Yahoo Finance</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-New-York-Stock-Exchange-1">New York Stock Exchange</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-New-Zealand">New Zealand</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
@@ -6408,7 +6287,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-Notes">Notes</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Annotations">Annotations</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-NSE">NSE</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-NVI">NVI</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Negative-Volume-Index">Negative Volume Index</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-NYMEX">NYMEX</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Barchart">Barchart</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-NYSE">NYSE</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Finance">Yahoo Finance</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-NYSE-1">NYSE</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-NZX">NZX</a>:</td><td>&nbsp;</td><td valign="top"><a href="#New-Zealand-Stock-Exchange">New Zealand Stock Exchange</a></td></tr>
@@ -6446,7 +6324,6 @@ Next: <a href="#Function-Index" accesskey="n" rel="next">Function Index</a>, Pre
 <tr><td></td><td valign="top"><a href="#index-Pee_002c-M_002e-H_002e">Pee, M. H.</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Trend-Intensity-Index">Trend Intensity Index</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-PFE">PFE</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Polarized-Fractal-Efficiency">Polarized Fractal Efficiency</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-PGO">PGO</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Pretty-Good-Oscillator">Pretty Good Oscillator</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-Pink-Sheets">Pink Sheets</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Yahoo-Exchanges">Yahoo Exchanges</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Polarized-fractal-efficiency">Polarized fractal efficiency</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Polarized-Fractal-Efficiency">Polarized Fractal Efficiency</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-PostScript-manual">PostScript manual</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Installing">Installing</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-Preferences_002c-locale">Preferences, locale</a>:</td><td>&nbsp;</td><td valign="top"><a href="#Internationalization">Internationalization</a></td></tr>

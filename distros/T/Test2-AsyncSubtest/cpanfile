@@ -2,8 +2,8 @@ requires "Carp" => "0";
 requires "Exporter" => "0";
 requires "Scalar::Util" => "0";
 requires "Scope::Guard" => "0";
-requires "Test2" => "1.302032";
-requires "Test2::Suite" => "0.000034";
+requires "Test2" => "1.302096";
+requires "Test2::Suite" => "0.000075";
 requires "Time::HiRes" => "0";
 requires "perl" => "5.008001";
 

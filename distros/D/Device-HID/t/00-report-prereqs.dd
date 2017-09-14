@@ -9,7 +9,8 @@ do { my $x = {
                         'requires' => {
                                         'Alien::HIDAPI' => '0',
                                         'ExtUtils::MakeMaker' => '0',
-                                        'Inline::C' => '0'
+                                        'Inline::C' => '0',
+                                        'perl' => '5.006'
                                       }
                       },
        'develop' => {
@@ -17,13 +18,23 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41'
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Version' => '1',
+                                      'blib' => '1.01',
+                                      'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::HIDAPI' => '0.004'
+                                      'Alien::HIDAPI' => '0.004',
+                                      'Carp' => '0',
+                                      'Device::HID::XS' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -33,7 +44,12 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::HexString' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.006'
                                  }
                  }
      };

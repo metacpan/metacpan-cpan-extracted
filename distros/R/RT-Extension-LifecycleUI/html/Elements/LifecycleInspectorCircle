@@ -1,0 +1,17 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="circle">
+    <div class="circle">
+       Label: <input type="text" name="label" value="{{circle.label}}" /><br><br>
+       Border: <input type="checkbox" name="renderStroke" {{#if circle.renderStroke}}checked=checked{{/if}} data-show-hide=".color-control[data-field=stroke], .stroke-style"> <span class="color-control" data-field="stroke"><span class="current-color" title="{{circle.stroke}}" style="background-color: {{circle.stroke}}">&nbsp;</span> <button class="change-color"><&|/l&>Change</&></button></span><br>
+       <div class="stroke-style">Style: <select name="strokeStyle">
+                 {{#select circle.strokeStyle}}
+                 <option value="solid"><&|/l&>solid</&></option>
+                 <option value="dashed"><&|/l&>dashed</&></option>
+                 <option value="dotted"><&|/l&>dotted</&></option>
+                 {{/select}}
+             </select>
+        </div>
+        Fill: <input type="checkbox" name="renderFill" {{#if circle.renderFill}}checked=checked{{/if}} data-show-hide=".color-control[data-field=fill]"> <span class="color-control" data-field="fill"><span class="current-color" title="{{circle.fill}}" style="background-color: {{circle.fill}}">&nbsp;</span> <button class="change-color"><&|/l&>Change</&></button></span><br>
+        <button class="clone"><&|/l&>Clone Circle</&></button><br>
+        <button class="delete"><&|/l&>Delete Circle</&></button>
+    </div>
+</script>

@@ -1,12 +1,15 @@
 package HPC::Runner::Command::submit_jobs::Utils::Scheduler::Files;
 
 use Moose::Role;
+use namespace::autoclean;
+
 use IO::File;
 
 #Travis test fails without this
 use IO::Interactive;
 use File::Path qw(make_path remove_tree);
 use File::Copy;
+use File::Spec;
 use Data::Dumper;
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::Files
@@ -135,10 +138,10 @@ sub prepare_sched_file {
 
     if ( $self->use_batches ) {
         $self->slurmfile(
-            $self->outdir . "/$jobname" . "_" . $batch_counter . ".sh" );
+            File::Spec->catdir($self->outdir , "$jobname" . "_" . $batch_counter . ".sh") );
     }
     else {
-        $self->slurmfile( $self->outdir . "/$jobname" . ".sh" );
+        $self->slurmfile( File::Spec->catdir($self->outdir , "$jobname" . ".sh") );
     }
 }
 

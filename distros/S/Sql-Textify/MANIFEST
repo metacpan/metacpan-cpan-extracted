@@ -1,0 +1,28 @@
+.gitattributes
+Changes
+ignore.txt
+lib/Sql/Textify.pm
+Makefile.PL
+MANIFEST
+README.pod
+script/Sql-textify.sublime-build
+script/sqltextify.pl
+t/01use.t
+t/02pod.t
+t/03podcoverage.NO
+t/03podspelling.NO
+t/04textify.t
+t/05sqlite.t
+t/sqlite.tests/create.html-record
+t/sqlite.tests/create.html-table
+t/sqlite.tests/create.markdown-record
+t/sqlite.tests/create.markdown-table
+t/sqlite.tests/create.sql
+t/sqlite.tests/select.html-record
+t/sqlite.tests/select.html-table
+t/sqlite.tests/select.markdown-record
+t/sqlite.tests/select.markdown-table
+t/sqlite.tests/select.sql
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

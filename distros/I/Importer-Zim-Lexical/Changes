@@ -1,0 +1,28 @@
+
+Release history for Importer-Zim-Lexical
+
+0.4.0     2017-09-13 13:15:36-07:00 America/Los_Angeles
+
+    - Depend on Importer::Zim::Base 0.3.0
+    - Support to "use IMPORTER MODULE => { -strict => 0 }...
+    - Debugging enabled with IMPORTER_ZIM_DEBUG
+    - t/02-basic.t: Importer is well behaved by default
+    - t/02-basic.t: -strict => 0 for importing the not-exportable
+
+v0.3     2017-09-10 19:21:43-07:00 America/Los_Angeles
+
+    - Use Sub::Inject
+
+v0.2     2017-09-06 18:30:45-07:00 America/Los_Angeles
+
+    - Depend on Importer::Zim::Base 0.2.0, which brings
+    - Support to "use IMPORTER MODULE => { -version => VERSION }...
+    - Support to "use IMPORTER MODULE => :TAG"
+
+v0.1     2017-09-05 17:50:07-07:00 America/Los_Angeles
+
+    - Initial version
+
+v0.0     2017-09-05 17:39:00-07:00 America/Los_Angeles
+
+    - Initial commit

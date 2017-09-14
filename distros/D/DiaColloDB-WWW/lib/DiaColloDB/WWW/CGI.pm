@@ -36,7 +36,7 @@ BEGIN {
 ##======================================================================
 ## globals
 
-our $VERSION = "0.02.002";
+our $VERSION = "0.02.003";
 our @ISA  = qw(DiaColloDB::Logger);
 
 ##======================================================================
@@ -455,7 +455,13 @@ sub requestQuery { return $_[0]{request_query}; }
 sub httpReferer { return $_[0]{http_referer}; }
 sub httpHost { return $_[0]{http_host}; }
 sub serverAddr { return $_[0]{server_addr}; }
-sub serverPort { return $_[0]{server_port} || ($ENV{HTTPS} ? 443 : 80); }
+sub serverPort {
+  return $_[0]{server_port} if ($_[0]{server_port});
+  my $host = $_[0]->httpHost;
+  return $1 if ($host && $host =~ /:([0-9]+)$/);
+  return $ENV{HTTPS} ? 443 : 80; ##-- guess port from scheme
+}
+
 
 ## $uri    = $dbcgi->uri()
 ## $uri    = $dbcgi->uri($uri)
@@ -468,7 +474,7 @@ sub uri {
   return URI->new(
 		  #($host ? "http://$host" : "file://")
 		  ($host ? "${scheme}://$host" : "file://") ##-- guess scheme from HTTPS environment variable
-		  .($port==($scheme eq 'https' ? 443 : 80) ? '' : ":$port")
+		  .( ($host && $host =~ /:[0-9]+$/) || $port==($scheme eq 'https' ? 443 : 80) ? '' : ":$port" )
 		  .$dbcgi->requestUri
 		 );
 }
@@ -486,6 +492,7 @@ sub uriCanonical { $_[0]->uri($_[1])->canonical->as_string; }
 sub uriAbs { $_[0]->uri($_[1])->abs->as_string; }
 
 ## $dir = $dbcgi->uriDir($uri?)
+##  + returns URI up to but not including query or fragment, truncating any trailing slashes
 sub uriDir {
   my $uri = $_[0]->uri($_[1])->as_string;
   $uri =~ s{[?#].*$}{};

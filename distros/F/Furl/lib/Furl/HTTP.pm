@@ -4,7 +4,7 @@ use warnings;
 use base qw/Exporter/;
 use 5.008001;
 
-our $VERSION = '3.11';
+our $VERSION = '3.12';
 
 use Carp ();
 use Furl::ConnectionCache;
@@ -270,7 +270,15 @@ sub request {
 
     local $SIG{PIPE} = 'IGNORE';
     my $sock         = $self->{connection_pool}->steal($host, $port);
-    my $in_keepalive = defined $sock;
+    my $in_keepalive;
+    if (defined $sock) {
+        if ($self->_do_select(0, $sock, 0)) {
+            close $sock;
+            undef $sock;
+        } else {
+            $in_keepalive = 1;
+        }
+    }
     if(!$in_keepalive) {
         my $err_reason;
         if ($proxy) {
@@ -278,9 +286,13 @@ sub request {
                 = $self->_parse_url($proxy);
             my $proxy_authorization;
             if (defined $proxy_user) {
+                _requires('URI/Escape.pm',
+                    'Basic auth');
+                my($unescape_proxy_user) = URI::Escape::uri_unescape($proxy_user);
+                my($unescape_proxy_pass) = URI::Escape::uri_unescape($proxy_pass);
                 _requires('MIME/Base64.pm',
                     'Basic auth');
-                $proxy_authorization = 'Basic ' . MIME::Base64::encode_base64("$proxy_user:$proxy_pass","");
+                $proxy_authorization = 'Basic ' . MIME::Base64::encode_base64("$unescape_proxy_user:$unescape_proxy_pass","");
             }
             if ($scheme eq 'http') {
                 ($sock, $err_reason)
@@ -331,8 +343,11 @@ sub request {
             push @headers, 'Proxy-Authorization', $self->{proxy_authorization};
         }
         if (defined $username) {
+            _requires('URI/Escape.pm', 'Basic auth');
+            my($unescape_username) = URI::Escape::uri_unescape($username);
+            my($unescape_password) = URI::Escape::uri_unescape($password);
             _requires('MIME/Base64.pm', 'Basic auth');
-            push @headers, 'Authorization', 'Basic ' . MIME::Base64::encode_base64("${username}:${password}","");
+            push @headers, 'Authorization', 'Basic ' . MIME::Base64::encode_base64("${unescape_username}:${unescape_password}","");
         }
 
         # set Cookie header
@@ -867,20 +882,26 @@ sub do_select {
             $! = 0;
             return 0;
         }
-        my($rfd, $wfd);
-        my $efd = '';
-        vec($efd, fileno($sock), 1) = 1;
-        if ($is_write) {
-            $wfd = $efd;
-        } else {
-            $rfd = $efd;
-        }
-        my $nfound   = select($rfd, $wfd, $efd, $timeout);
+        my $nfound = $self->_do_select($is_write, $sock, $timeout);
         return 1 if $nfound > 0;
         return 0 if $nfound == -1 && $! == EINTR && $self->{stop_if}->();
         $now = time;
     }
     die 'not reached';
+}
+
+sub _do_select {
+    my($self, $is_write, $sock, $timeout) = @_;
+    my($rfd, $wfd);
+    my $efd = '';
+    vec($efd, fileno($sock), 1) = 1;
+    if ($is_write) {
+        $wfd = $efd;
+    } else {
+        $rfd = $efd;
+    }
+    my $nfound = select($rfd, $wfd, $efd, $timeout);
+    return $nfound;
 }
 
 # returns (positive) number of bytes read, or undef if the socket is to be closed

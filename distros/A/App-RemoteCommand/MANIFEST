@@ -12,6 +12,7 @@ lib/App/RemoteCommand.pm
 lib/App/RemoteCommand/LineBuffer.pm
 lib/App/RemoteCommand/Pool.pm
 lib/App/RemoteCommand/SSH.pm
+lib/App/RemoteCommand/Select.pm
 lib/App/RemoteCommand/Tutorial.pod
 lib/App/RemoteCommand/Util.pm
 script/rcommand

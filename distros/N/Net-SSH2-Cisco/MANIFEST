@@ -4,6 +4,7 @@ MANIFEST
 README
 test.pl
 t/00-Net-SSH2-Cisco.t
+t/02-pod-coverage.t
 lib/Net/SSH2/Cisco.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

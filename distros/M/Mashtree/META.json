@@ -35,6 +35,7 @@
             "Bio::Matrix::IO" : "0",
             "Bio::Tree::DistanceFactory" : "0",
             "Bio::Tree::Statistics" : "0",
+            "DBD::SQLite" : "0",
             "DBI" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
@@ -47,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.15",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

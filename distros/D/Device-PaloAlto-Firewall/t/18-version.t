@@ -17,7 +17,7 @@ my $test = $fw->tester();
 # System Info 
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( system_info_vm() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->system_info(), 'HASH', "system_info() returns a HASHREF");
+isa_ok( $fw->system_info(), 'HASH' );
 
 # When reading the tests below, when we talk about "higher" or "lower", we're referring to the 
 # argument passed to the method. I.e. "Higher sub-version" means the argument passed should be greater than

@@ -13,6 +13,7 @@ use Scalar::Util qw(blessed);
 # Reference to the previous parameters sent
 
 our $DISPATCHER;
+our $FILTER;
 our $STDERR;
 our $LAST;
 
@@ -27,7 +28,7 @@ Log::WarnDie - Log standard Perl warnings and errors on a log handler
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -51,8 +52,14 @@ Version 0.08
 
     Log::WarnDie->dispatcher( undef ); # same
 
+    Log::WarnDie->filter(\&filter);
     warn "This is a warning"; # no longer dispatched
     die "Sorry it didn't work out"; # no longer dispatched
+
+    # Filter out File::stat noise
+    sub filter {
+	    return ($_[0] !~ /^S_IFFIFO is not a valid Fcntl macro/);
+    }
 
 =head1 DESCRIPTION
 
@@ -74,7 +81,7 @@ enabled at any time for critical sections of code.
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SUBROUTINES/METHODS
 
@@ -112,6 +119,9 @@ sub PRINT {
 # Make sure it appears on the original STDERR as well
 
     shift;
+    if($FILTER) {
+    	return unless($FILTER->(@_));
+    }
     if ($DISPATCHER) {
         $DISPATCHER->error( @_ )
          unless $LAST and @$LAST == @_ and join( '',@$LAST ) eq join( '',@_ );
@@ -139,6 +149,9 @@ sub PRINTF {
 # Make sure it appears on the original STDERR as well
 
     shift;
+    if($FILTER) {
+    	return unless($FILTER->(@_));
+    }
     if ($DISPATCHER) {
         $DISPATCHER->error( @_ )
          unless $LAST and @$LAST == @_ and join( '',@$LAST ) eq join( '',@_ );
@@ -213,6 +226,12 @@ BEGIN {
 
     $WARN = $SIG{__WARN__};
     $SIG{__WARN__} = sub {
+	if($FILTER) {
+		unless($FILTER->(@_)) {
+			$WARN ? $WARN->( @_ ) : CORE::warn( @_ );
+			return;
+		}
+	}
         if ($DISPATCHER) {
             $LAST = \@_;
 	    if(ref($DISPATCHER) =~ /^Log::Log4perl/) {
@@ -233,7 +252,20 @@ BEGIN {
 
     $DIE = $SIG{__DIE__};
     $SIG{__DIE__} = sub {
-        if ($DISPATCHER) {
+	# File::stat goes to long efforts to not display the Fcntl message - then we go and display it,
+	#	so let's not do that
+	# TODO: would be better to set a list of messages to be filtered out
+	if ($DISPATCHER && ($_[0] !~ /^S_IFFIFO is not a valid Fcntl macro/)) {
+		if($FILTER) {
+			unless($FILTER->(@_)) {
+				if($DIE) {
+					$DIE->(@_);
+				} else {
+					return unless((defined $^S) && ($^S == 0));	# Ignore errors in eval
+					CORE::die(@_);
+				}
+			}
+		}
             $LAST = \@_;
 	    if(ref($DISPATCHER) =~ /^Log::Log4perl/) {
 		$DISPATCHER->fatal( @_ );
@@ -305,6 +337,22 @@ sub dispatcher {
 
     $DISPATCHER;
 } #dispatcher
+
+=head2 filter
+
+Class method to set and/or get the current output filter
+
+The given callback function should return 1 to output the given message, or 0
+to drop it.
+Useful for noisy messages such as File::stat giving S_IFFIFO is not a valid Fcntl macro.
+
+=cut
+
+sub filter {
+	return $FILTER unless @_ > 1;
+	$FILTER = $_[1];
+}
+
 
 #---------------------------------------------------------------------------
 

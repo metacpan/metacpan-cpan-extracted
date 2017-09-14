@@ -5,7 +5,7 @@ use v5.10.0;  # recursive regex subgroups
 
 use Exporter 5.57 qw(import);
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
 our @EXPORT_OK = qw(
     $URL_SEARCH_RE
@@ -124,7 +124,7 @@ our $URL_SEARCH_RE = do {
     my $query = qr{
         (
             (?:
-                [a-zA-Z0-9\-._~!\$&'*+,;=:\@/?]
+                [a-zA-Z0-9\-._~!\$&'*+,;=:\@/?\\{}]
             |
                 $pct_enc
             |
@@ -140,10 +140,8 @@ our $URL_SEARCH_RE = do {
     my $fragment = $query;
 
     qr{
-        (?:
-            $protocol ://
-            (?: $userinfo \@ )?
-        )
+        $protocol ://
+        (?: $userinfo \@ )?
         $host (?: : [0-9]+ )?
         $path?
         (?: \? $query )?
@@ -181,6 +179,8 @@ __END__
 
 =encoding utf8
 
+=for highlighter language=perl
+
 =head1 NAME
 
 URL::Search - search for URLs in plain text
@@ -214,6 +214,8 @@ use C</\b$URL_SEARCH_RE/>.
 
 It tries to exclude artifacts of the surrounding text:
 
+=for highlighter
+
   Is mayonnaise an instrument? (https://en.wikipedia.org/wiki/Instrument,
   https://en.wikipedia.org/wiki/Mayonnaise_(instrument))
 
@@ -235,6 +237,8 @@ This function takes a string and returns a list of all contained URLs.
 It uses L<C<$URL_SEARCH_RE>|/C<$URL_SEARCH_RE>> to find matches.
 
 Example:
+
+=for highlighter language=perl
 
   my $text = 'Visit us at http://html5zombo.com. Also, https://archive.org';
   my @urls = extract_urls $text;
@@ -282,13 +286,56 @@ hyperlink all embedded URLs:
   }
   # result is in $html
 
+=begin :README
+
+=head1 INSTALLATION
+
+To download and install this module, use your favorite CPAN client, e.g.
+L<C<cpan>|cpan>:
+
+=for highlighter language=sh
+
+    cpan URL::Search
+
+Or L<C<cpanm>|cpanm>:
+
+    cpanm URL::Search
+
+To do it manually, run the following commands (after downloading and unpacking
+the tarball):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=end :README
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+L<C<perldoc>|perldoc> command.
+
+=for highlighter language=sh
+
+    perldoc URL::Search
+
+You can also look for information at
+L<https://metacpan.org/pod/URL::Search>.
+
+To see a list of open bugs, visit
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=URL-Search>.
+
+To report a new bug, send an email to
+C<bug-URL-Search [at] rt.cpan.org>.
+
 =head1 AUTHOR
 
 Lukas Mai, C<< <l.mai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2016 Lukas Mai.
+Copyright 2016, 2017 Lukas Mai.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

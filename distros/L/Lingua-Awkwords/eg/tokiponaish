@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+#
+# Generates words similar to what toki pona uses, only with a diphthong
+# in the second syllable.
+
+use 5.14.0;
+use warnings;
+
+use Lingua::Awkwords::Subpattern;
+use Lingua::Awkwords;
+
+my $words_to_generate = int( shift // 20 );
+
+# these weights taken from a toki pona word corpus
+my $c = Lingua::Awkwords->parse_string(
+    q{ j*10/k*30/l*44/m*22/n*50/p*27/s*30/t*15/w*14 });
+my $v = Lingua::Awkwords->parse_string(q{ a*76/e*41/i*55/o*36/u*25 });
+
+Lingua::Awkwords::Subpattern->set_patterns(
+    C => $c,
+    V => $v,
+);
+
+my $cv  = Lingua::Awkwords->parse_string(q{ CV^ji^ti^wo^wu });
+my $cvv = Lingua::Awkwords->parse_string(q{ CVV^ji^ti^wo^wu^aa^ee^ii^oo^uu });
+
+Lingua::Awkwords::Subpattern->set_patterns(
+    A => $cv,
+    B => $cvv,
+);
+
+my $tree = Lingua::Awkwords->new(
+    pattern => q{
+    [ a[B*4/BA*4/A/AA/BAA*2/AAA] / [AB*4/ABA*4/A/AA/ABA*2/AAA] ] [n/*5]
+},
+);
+
+$tree->walk( Lingua::Awkwords::set_filter('X') );
+
+while (1) {
+    my $possible = $tree->render;
+
+    if ( $possible =~ m/X/ ) {
+        # could also log the reject rate here, in the event the filters
+        # are a bit too efficient...
+        next;
+    }
+
+    say $possible;
+
+    last if --$words_to_generate < 1;
+}

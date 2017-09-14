@@ -22,19 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164949;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
-                  'leading_digits' => '2',
-                  'pattern' => '(2)(\\d{3})(\\d{4})'
+                  'pattern' => '(2)(\\d{3})(\\d{4})',
+                  'leading_digits' => '2'
                 },
                 {
+                  'pattern' => '([13-9]\\d)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             14|
             [3-9]
-          ',
-                  'pattern' => '([13-9]\\d)(\\d{3})(\\d{3,4})'
+          '
                 },
                 {
                   'pattern' => '(1[89]00)(\\d{3})(\\d{3})',
@@ -43,6 +43,26 @@ my $formatters = [
               ];
 
 my $validators = {
+                'mobile' => '
+          (?:
+            14|
+            6[1-6]|
+            [89]\\d
+          )\\d{7}
+        ',
+                'toll_free' => '1800\\d{6}',
+                'fixed_line' => '
+          (?:
+            2\\d|
+            3[2-9]|
+            4[2-5]|
+            5[2-6]|
+            7[3-7]
+          )\\d{6}
+        ',
+                'specialrate' => '(1900\\d{6})',
+                'voip' => '6[08]\\d{7}',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             2\\d|
@@ -52,27 +72,7 @@ my $validators = {
             7[3-7]
           )\\d{6}
         ',
-                'specialrate' => '(1900\\d{6})|(1\\d{3})',
-                'personal_number' => '',
-                'voip' => '6[08]\\d{7}',
-                'pager' => '',
-                'toll_free' => '1800\\d{6}',
-                'mobile' => '
-          (?:
-            14|
-            6[1-6]|
-            [89]\\d
-          )\\d{7}
-        ',
-                'fixed_line' => '
-          (?:
-            2\\d|
-            3[2-9]|
-            4[2-5]|
-            5[2-6]|
-            7[3-7]
-          )\\d{6}
-        '
+                'pager' => ''
               };
 my %areanames = (
   662 => "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",

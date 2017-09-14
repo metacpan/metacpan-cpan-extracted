@@ -15,6 +15,7 @@ SV* from_chars_i8 (string_view str, SV* pos, int base = 10) : ALIAS(from_chars_i
         case 5: uint16_t tmp6; res = std::from_chars(ptr, end, tmp6, base); RETVAL = newSVuv(tmp6); break;
         case 6: uint32_t tmp7; res = std::from_chars(ptr, end, tmp7, base); RETVAL = newSVuv(tmp7); break;
         case 7: uint64_t tmp8; res = std::from_chars(ptr, end, tmp8, base); RETVAL = newSVuv(tmp8); break;
+        default: croak("SHOULD NOT HAPPEN");
     }
     sv_setuv(pos, res.ptr - str.data());
     if (res.ec) XSRETURN_UNDEF;

@@ -1,4 +1,71 @@
 package Mojolicious::Plugin::Surveil;
+use Mojo::Base 'Mojolicious::Plugin';
+
+use Mojo::JSON qw(encode_json decode_json);
+
+our $VERSION = '0.02';
+
+sub register {
+  my ($self, $app, $config) = @_;
+
+  $config->{events} ||= [qw(click touchstart touchcancel touchend)];
+
+  push @{$app->renderer->classes}, __PACKAGE__;
+  $self->_after_render_hook($app, $config);
+  $self->_default_route($app, $config) unless $config->{path};
+}
+
+sub _after_render_hook {
+  my ($self, $app, $config) = @_;
+  my $enable_param = $config->{enable_param};
+
+  $app->hook(
+    after_render => sub {
+      my ($c, $output, $format) = @_;
+      return if $format ne 'html';
+      return if $enable_param and !$c->param($enable_param);
+      my $js = $self->_javascript_code($c, $config);
+      $$output =~ s!</head>!$js</head>!;
+    }
+  );
+}
+
+sub _default_route {
+  my ($self, $app, $config) = @_;
+
+  $config->{path} = '/mojolicious/plugin/surveil';
+
+  $app->routes->websocket($config->{path})->to(
+    cb => sub {
+      my $c = shift;
+      $c->inactivity_timeout(60);
+      $c->on(
+        message => sub {
+          my $action = decode_json $_[1];
+          my ($type, $target) = (delete $action->{type}, delete $action->{target});
+          $app->log->debug(qq(Event "$type" on "$target" @{[encode_json $action]}));
+        }
+      );
+    }
+  );
+}
+
+sub _javascript_code {
+  my ($self, $c, $config) = @_;
+  my $scheme = $c->req->url->to_abs->scheme || 'http';
+
+  $scheme =~ s!^http!ws!;
+
+  $c->render_to_string(
+    template    => 'mojolicious/plugin/surveil',
+    events      => encode_json($config->{events}),
+    surveil_url => $c->url_for($config->{path})->to_abs->scheme($scheme),
+  );
+}
+
+1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -6,7 +73,7 @@ Mojolicious::Plugin::Surveil - Surveil user actions
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 DESCRIPTION
 
@@ -32,7 +99,6 @@ Use default logging:
 Use custom route:
 
   use Mojolicious::Lite;
-  use Mojo::JSON "j";
 
   plugin surveil => { path => "/surveil" };
 
@@ -76,13 +142,6 @@ that was taken. (The format of the logging is EXPERIMENTAL)
 
 =back
 
-=cut
-
-use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::JSON 'j';
-
-our $VERSION = '0.01';
-
 =head1 METHODS
 
 =head2 register
@@ -91,60 +150,6 @@ our $VERSION = '0.01';
 
 Used to add an "after_render" hook into the application which adds a
 JavaScript to every HTML document.
-
-=cut
-
-sub register {
-  my ($self, $app, $config) = @_;
-
-  $config->{events} ||= [qw( click touchstart touchcancel touchend )];
-
-  push @{ $app->renderer->classes }, __PACKAGE__;
-  $self->_after_render_hook($app, $config);
-  $self->_default_route($app, $config) unless $config->{path};
-}
-
-sub _after_render_hook {
-  my ($self, $app, $config) = @_;
-  my $enable_param = $config->{enable_param};
-
-  $app->hook(after_render => sub {
-    my ($c, $output, $format) = @_;
-    return if $format ne 'html';
-    return if $enable_param and !$c->param($enable_param);
-    my $js = $self->_javascript_code($c, $config);
-    $$output =~ s!<head>!<head>$js!;
-  });
-}
-
-sub _default_route {
-  my ($self, $app, $config) = @_;
-
-  $config->{path} = '/mojolicious/plugin/surveil';
-
-  $app->routes->websocket($config->{path})->to(cb => sub {
-    my $c = shift;
-    $c->inactivity_timeout(60);
-    $c->on(message => sub {
-      my $action = j $_[1];
-      my ($type, $target) = (delete $action->{type}, delete $action->{target});
-      $app->log->debug(qq(Event "$type" on "$target" @{[j $action]}));
-    });
-  });
-}
-
-sub _javascript_code {
-  my ($self, $c, $config) = @_;
-  my $scheme = $c->req->url->to_abs->scheme || 'http';
-
-  $scheme =~ s!^http!ws!;
-
-  $c->render_to_string(
-    template => 'mojolicious/plugin/surveil',
-    events => j($config->{events}),
-    surveil_url => $c->url_for($config->{path})->to_abs->scheme($scheme),
-  );
-}
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -159,15 +164,20 @@ Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
 
-1;
 __DATA__
 @@ mojolicious/plugin/surveil.html.ep
 <script type="text/javascript">
-window.addEventListener('load', function(e) {
+window.addEventListener("load", function(e) {
   var events = <%== $events %>;
-  var socket = new WebSocket('<%= $surveil_url %>');
+  var socket = new WebSocket("<%= $surveil_url %>");
+  var console = window.console = window.console || {};
+
+  console.surveil = function() {
+    socket.send(JSON.stringify({type: "console", target: "window", message: Array.prototype.slice.call(arguments)}));
+  };
+
   socket.onopen = function() {
-    socket.send(JSON.stringify({ type: 'load', target: 'window' }));
+    socket.send(JSON.stringify({type: "load", target: "window"}));
     for (i = 0; i < events.length; i++) {
       document.body.addEventListener(events[i], function(e) {
         var data = { extra: {} };
@@ -176,9 +186,8 @@ window.addEventListener('load', function(e) {
           if (prop.match(/^[A-Z]/)) continue;
           data[prop] = e[prop];
         }
-        console.log(e);
-        data.target = [e.target.tagName.toLowerCase(), e.target.id ? '#' + e.target.id : '', e.target.className ? '.' + e.target.className.replace(/ /g, '.') : ''].join('');
-        if (data.target.href) data.extra.href = '' + data.target.href;
+        data.target = [e.target.tagName.toLowerCase(), e.target.id ? "#" + e.target.id : "", e.target.className ? "." + e.target.className.replace(/ /g, ".") : ""].join("");
+        if (data.target.href) data.extra.href = "" + data.target.href;
         socket.send(JSON.stringify(data));
       });
     }

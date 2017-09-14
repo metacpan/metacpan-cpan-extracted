@@ -1,6 +1,6 @@
 package Apache::Session::Browseable;
 
-our $VERSION = '1.2.5';
+our $VERSION = '1.2.6';
 
 print STDERR "Use a sub module of Apache::Session::Browseable such as Apache::Session::Browseable::File";
 
@@ -11,78 +11,64 @@ __END__
 
 Apache::Session::Browseable - Add index and search methods to Apache::Session
 
-=head1 SYNOPSIS
-
-  use Apache::Session::Browseable::MySQL;
-
-  my $args = {
-       DataSource => 'dbi:mysql:sessions',
-       UserName   => $db_user,
-       Password   => $db_pass,
-       LockDataSource => 'dbi:mysql:sessions',
-       LockUserName   => $db_user,
-       LockPassword   => $db_pass,
-
-       # Choose your browseable fileds
-       Index          => 'uid mail',
-  };
-  
-  # Use it like Apache::Session
-  my %session;
-  tie %session, 'Apache::Session::Browseable::MySQL', $id, $args;
-  $session{uid} = 'me';
-  $session{mail} = 'me@me.com';
-  $session{unindexedField} = 'zz';
-  untie %session;
-  
-  # Apache::Session::Browseable add some global class methods
-  #
-  # 1) search on a field (indexed or not)
-  # a. get full sessions
-  my $hash = Apache::Session::Browseable::MySQL->searchOn( $args, 'uid', 'me' );
-  foreach my $id (keys %$hash) {
-    print $id . ":" . $hash->{$id}->{mail} . "\n";
-  }
-  # b. get only some fields
-  my $hash = Apache::Session::Browseable::MySQL->searchOn( $args, 'uid', 'me', 'mail', 'uid' );
-  foreach my $id (keys %$hash) {
-    print $id . ":" . $hash->{$id}->{mail} . "\n";
-    print "       " . $hash->{$id}->{uid} . "\n";
-  }
-  # c. search with a pattern
-  my $hash = Apache::Session::Browseable::MySQL->searchOnExpr( $args, 'uid', 'm*' );
-  ...
-
-  # 2) Parse all sessions
-  # a. get all sessions
-  my $hash = Apache::Session::Browseable::MySQL->get_key_from_all_sessions($args);
-
-  # b. get some fields from all sessions
-  my $hash = Apache::Session::Browseable::MySQL->get_key_from_all_sessions($args, ['uid','mail'])
-
-  # c. execute something with datas from each session :
-  #    Example : get uid and mail if mail domain is
-  my $hash = Apache::Session::Browseable::MySQL->get_key_from_all_sessions(
-              $args,
-              sub {
-                 my ( $session, $id ) = @_;
-                 if ( $session->{mail} =~ /mydomain.com$/ ) {
-                     return { $session->{uid}, $session->{mail} };
-                 }
-              }
-  );
-  foreach my $id (keys %$hash) {
-    print $id . ":" . $hash->{$id}->{uid} . "=>" . $hash->{$id}->{mail} . "\n";
-  }
-
 =head1 DESCRIPTION
 
 Apache::Session::browseable provides some class methods to manipulate all
 sessions and add the capability to index some fields to make research faster.
 
+It has been written to increase performances of LemonLDAP::NG. Read the
+chosen module documentation carefully to set the indexes.
+
+=head1 AVAILABLE MODULES
+
+=head2 SQL databases
+
+=head3 PostgreSQL
+
+=over
+
+=item L<Apache::Session::Browseable::Postgres>
+
+=item L<Apache::Session::Browseable::PgHstore>: uses "hstore" field
+
+=item L<Apache::Session::Browseable::PjJSON>: uses "json/jsonb" field
+
+=back
+
+=head3 MySQL or MariaDB
+
+=over
+
+=item L<Apache::Session::Browseable::MySQL>: for MySQL and MariaDB
+
+=item L<Apache::Session::Browseable::MySQLJSON>: for MySQL only, uses "json" field
+
+=back
+
+=head3 Other
+
+=over
+
+=item L<Apache::Session::Browseable::Informix>
+
+=item L<Apache::Session::Browseable::Oracle>
+
+=item L<Apache::Session::Browseable::SQLite>
+
+=back
+
+=head2 NoSQL
+
+=over
+
+=item L<Apache::Session::Browseable::Redis>
+
+=back
+
 =head1 SEE ALSO
 
-L<Apache::Session>
+L<Apache::Session>, L<http://lemonldap-ng.org>,
+L<https://lemonldap-ng.org/documentation/2.0/performances#performance_test>
 
 =head1 AUTHOR
 
@@ -92,8 +78,15 @@ Xavier Guimard, E<lt>x.guimard@free.frE<gt>
 
 =encoding utf8
 
-Copyright (C) 2009-2017 by Xavier Guimard
-              2013-2017 by Clément Oudot
+Copyright (C):
+
+=over
+
+=item 2009-2017 by Xavier Guimard
+
+=item 2013-2017 by Clément Oudot
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

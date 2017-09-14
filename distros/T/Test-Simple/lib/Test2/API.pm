@@ -2,12 +2,14 @@ package Test2::API;
 use strict;
 use warnings;
 
+use Test2::Util qw/USE_THREADS/;
+
 BEGIN {
     $ENV{TEST_ACTIVE} ||= 1;
     $ENV{TEST2_ACTIVE} = 1;
 }
 
-our $VERSION = '1.302086';
+our $VERSION = '1.302096';
 
 
 my $INST;
@@ -16,10 +18,21 @@ sub test2_set_is_end { ($ENDING) = @_ ? @_ : (1) }
 sub test2_get_is_end { $ENDING }
 
 use Test2::API::Instance(\$INST);
+
 # Set the exit status
 END {
     test2_set_is_end(); # See gh #16
     $INST->set_exit();
+}
+
+sub CLONE {
+    my $init = test2_init_done();
+    my $load = test2_load_done();
+
+    return if $init && $load;
+
+    require Carp;
+    Carp::croak "Test2 must be fully loaded before you start a new thread!\n";
 }
 
 # See gh #16
@@ -38,7 +51,8 @@ BEGIN {
     }
 }
 
-use Test2::Util::Trace();
+use Test2::EventFacet::Trace();
+use Test2::Util::Trace(); # Legacy
 
 use Test2::Hub::Subtest();
 use Test2::Hub::Interceptor();
@@ -56,17 +70,21 @@ use Test2::Event::Subtest();
 
 use Carp qw/carp croak confess longmess/;
 use Scalar::Util qw/blessed weaken/;
-use Test2::Util qw/get_tid clone_io/;
+use Test2::Util qw/get_tid clone_io pkg_to_file/;
 
 our @EXPORT_OK = qw{
     context release
     context_do
     no_context
-    intercept
+    intercept intercept_deep
     run_subtest
 
     test2_init_done
     test2_load_done
+    test2_load
+    test2_start_preload
+    test2_stop_preload
+    test2_in_preload
 
     test2_set_is_end
     test2_get_is_end
@@ -122,6 +140,11 @@ my $STDERR = clone_io(\*STDERR);
 sub test2_stdout { $STDOUT ||= clone_io(\*STDOUT) }
 sub test2_stderr { $STDERR ||= clone_io(\*STDERR) }
 
+sub test2_post_preload_reset {
+    test2_reset_io();
+    $INST->post_preload_reset;
+}
+
 sub test2_reset_io {
     $STDOUT = clone_io(\*STDOUT);
     $STDERR = clone_io(\*STDERR);
@@ -129,6 +152,11 @@ sub test2_reset_io {
 
 sub test2_init_done { $INST->finalized }
 sub test2_load_done { $INST->loaded }
+
+sub test2_load          { $INST->load }
+sub test2_start_preload { $ENV{T2_IN_PRELOAD} = 1; $INST->start_preload }
+sub test2_stop_preload  { $ENV{T2_IN_PRELOAD} = 0; $INST->stop_preload }
+sub test2_in_preload    { $INST->preload }
 
 sub test2_pid     { $INST->pid }
 sub test2_tid     { $INST->tid }
@@ -163,7 +191,17 @@ sub test2_ipc_set_timeout     { $INST->set_ipc_timeout(@_) }
 sub test2_ipc_get_timeout     { $INST->ipc_timeout() }
 sub test2_ipc_enable_shm      { $INST->ipc_enable_shm }
 
-sub test2_formatter     { $INST->formatter }
+sub test2_formatter     {
+    if ($ENV{T2_FORMATTER} && $ENV{T2_FORMATTER} =~ m/^(\+)?(.*)$/) {
+        my $formatter = $1 ? $2 : "Test2::Formatter::$2";
+        my $file = pkg_to_file($formatter);
+        require $file;
+        return $formatter;
+    }
+
+    return $INST->formatter;
+}
+
 sub test2_formatters    { @{$INST->formatters} }
 sub test2_formatter_add { $INST->add_formatter(@_) }
 sub test2_formatter_set {
@@ -302,12 +340,15 @@ sub context {
     # hit with how often this needs to be called.
     my $trace = bless(
         {
-            frame => [$pkg, $file, $line, $sub],
-            pid   => $$,
-            tid   => get_tid(),
-            cid   => 'C' . $CID++,
+            frame    => [$pkg, $file, $line, $sub],
+            pid      => $$,
+            tid      => get_tid(),
+            cid      => 'C' . $CID++,
+            hid      => $hid,
+            nested   => $hub->{nested},
+            buffered => $hub->{buffered},
         },
-        'Test2::Util::Trace'
+        'Test2::EventFacet::Trace'
     );
 
     # Directly bless the object here, calling new is a noticeable performance
@@ -394,7 +435,29 @@ sub release($;$) {
 
 sub intercept(&) {
     my $code = shift;
+    my $ctx = context();
 
+    my $events = _intercept($code, deep => 0);
+
+    $ctx->release;
+
+    return $events;
+}
+
+sub intercept_deep(&) {
+    my $code = shift;
+    my $ctx = context();
+
+    my $events = _intercept($code, deep => 1);
+
+    $ctx->release;
+
+    return $events;
+}
+
+sub _intercept {
+    my $code = shift;
+    my %params = @_;
     my $ctx = context();
 
     my $ipc;
@@ -409,7 +472,7 @@ sub intercept(&) {
     );
 
     my @events;
-    $hub->listen(sub { push @events => $_[1] });
+    $hub->listen(sub { push @events => $_[1] }, inherit => $params{deep});
 
     $ctx->stack->top; # Make sure there is a top hub before we begin.
     $ctx->stack->push($hub);
@@ -447,24 +510,26 @@ sub run_subtest {
     my ($name, $code, $params, @args) = @_;
 
     $params = {buffered => $params} unless ref $params;
-    my $buffered      = delete $params->{buffered};
     my $inherit_trace = delete $params->{inherit_trace};
 
     my $ctx = context();
 
-    $ctx->note($name) unless $buffered;
-
     my $parent = $ctx->hub;
+
+    # If a parent is buffered then the child must be as well.
+    my $buffered = $params->{buffered} || $parent->{buffered};
+
+    $ctx->note($name) unless $buffered;
 
     my $stack = $ctx->stack || $STACK;
     my $hub = $stack->new_hub(
         class => 'Test2::Hub::Subtest',
         buffered => $buffered,
         %$params,
+        buffered => $buffered,
     );
 
     my @events;
-    $hub->set_nested( $parent->isa('Test2::Hub::Subtest') ? $parent->nested + 1 : 1 );
     $hub->listen(sub { push @events => $_[1] });
 
     if ($buffered) {
@@ -472,14 +537,6 @@ sub run_subtest {
             my $hide = $format->can('hide_buffered') ? $format->hide_buffered : 1;
             $hub->format(undef) if $hide;
         }
-    }
-    elsif (! $parent->format) {
-        # If our parent has no format that means we're in a buffered subtest
-        # and now we're trying to run a streaming subtest. There's really no
-        # way for that to work, so we need to force the use of a buffered
-        # subtest here as
-        # well. https://github.com/Test-More/test-more/issues/721
-        $buffered = 1;
     }
 
     if ($inherit_trace) {
@@ -545,7 +602,7 @@ sub run_subtest {
         }
     }
 
-    $hub->finalize($trace, 1)
+    $hub->finalize($trace->snapshot(hid => $hub->hid, nested => $hub->nested, buffered => $buffered), 1)
         if $ok
         && !$hub->no_ending
         && !$hub->ended;
@@ -664,6 +721,35 @@ generated by the test system:
     my_ok(@$events == 2, "got 2 events, the pass and the fail");
     my_ok($events->[0]->pass, "first event passed");
     my_ok(!$events->[1]->pass, "second event failed");
+
+=head3 DEEP EVENT INTERCEPTION
+
+Normally C<intercept { ... }> only intercepts events sent to the main hub (as
+added by intercept itself). Nested hubs, such as those created by subtests,
+will not be intercepted. This is normally what you will still see the nested
+events by inspecting the subtest event. However there are times where you want
+to verify each event as it is sent, in that case use C<intercept_deep { ... }>.
+
+    my $events = intercept_Deep {
+        buffered_subtest foo => sub {
+            ok(1, "pass");
+        };
+    };
+
+C<$events> in this case will contain 3 items:
+
+=over 4
+
+=item The event from C<ok(1, "pass")>
+
+=item The plan event for the subtest
+
+=item The subtest event itself, with the first 2 events nested inside it as children.
+
+=back
+
+This lets you see the order in which the events were sent, unlike
+C<intercept { ... }> which only lets you see events as the main hub sees them.
 
 =head2 OTHER API FUNCTIONS
 

@@ -1,19 +1,13 @@
-package Net::Async::Pusher;
+package Net::Async::Pusher 0.004;
 # ABSTRACT: use pusher.com with IO::Async
 use strict;
 use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.002';
-
 =head1 NAME
 
 Net::Async::Pusher - support for pusher.com streaming event API
-
-=head1 VERSION
-
-version 0.001
 
 =head1 SYNOPSIS
 
@@ -73,13 +67,13 @@ Resolves to a L<Net::Async::Pusher::Connection>.
 =cut
 
 sub connect {
-	my ($self, %args) = @_;
-	$self->add_child(
-		my $conn = Net::Async::Pusher::Connection->new(
-			key => $args{key} // die "need a key"
-		)
-	);
-	$conn->connect
+    my ($self, %args) = @_;
+    $self->add_child(
+        my $conn = Net::Async::Pusher::Connection->new(
+            key => $args{key} // die "need a key"
+        )
+    );
+    $conn->connect
 }
 
 1;
@@ -92,4 +86,4 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2016. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.

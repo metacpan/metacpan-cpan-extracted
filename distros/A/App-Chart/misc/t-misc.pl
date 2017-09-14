@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -25,6 +25,16 @@ use POSIX;
 use Encode qw(:fallback_all);
 use I18N::Langinfo qw(langinfo CODESET);
 
+{
+  my $retry = 0;
+  foreach my $x (10,20,30) {
+    print $x;
+    if ($x == 20) {
+      if ($retry++ < 2) { redo; }
+    }
+  }
+  exit 0;
+}
 {
   require Data::Dumper;
   print Data::Dumper->new([\@INC],['@INC'])->Dump;

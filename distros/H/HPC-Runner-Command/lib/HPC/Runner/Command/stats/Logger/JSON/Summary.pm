@@ -1,8 +1,11 @@
 package HPC::Runner::Command::stats::Logger::JSON::Summary;
+
 use Moose::Role;
+use namespace::autoclean;
 
 use JSON;
 use Try::Tiny;
+use File::Slurp;
 
 ##This is probably mostly the same across plugins
 sub iter_tasks_summary {
@@ -28,12 +31,11 @@ sub count_running_tasks {
     my $submission_id = shift;
     my $jobname       = shift;
 
-    my $basename = $self->data_tar->basename('.tar.gz');
     my $running_file =
-      File::Spec->catdir( $basename, $jobname, 'running.json' );
+      File::Spec->catdir( $self->data_dir, $jobname, 'running.json' );
 
-    if ( $self->archive->contains_file($running_file) ) {
-        my $running_json = $self->archive->get_content($running_file);
+    if ( -e $running_file ) {
+        my $running_json = read_file($running_file);
         ##TODO Add in some error checking
         my $running;
         try {
@@ -55,12 +57,11 @@ sub get_running_tasks {
     my $submission_id = shift;
     my $jobname       = shift;
 
-    my $basename = $self->data_tar->basename('.tar.gz');
     my $running_file =
-      File::Spec->catdir( $basename, $jobname, 'running.json' );
+      File::Spec->catdir( $self->data_dir, $jobname, 'running.json' );
 
-    if ( $self->archive->contains_file($running_file) ) {
-        my $running_json = $self->archive->get_content($running_file);
+    if ( -e $running_file ) {
+        my $running_json = read_file($running_file);
         ##TODO Add in some error checking
         my $running = decode_json($running_json);
         return $running;
@@ -76,12 +77,11 @@ sub get_completed_tasks {
     my $submission_id = shift;
     my $jobname       = shift;
 
-    my $basename = $self->data_tar->basename('.tar.gz');
     my $complete_file =
-      File::Spec->catdir( $basename, $jobname, 'complete.json' );
+      File::Spec->catdir( $self->data_dir, $jobname, 'complete.json' );
 
-    if ( $self->archive->contains_file($complete_file) ) {
-        my $complete_json = $self->archive->get_content($complete_file);
+    if ( -e $complete_file ) {
+        my $complete_json = read_file($complete_file);
         ##TODO Add in some error checking
         my $complete = decode_json($complete_json);
         return $complete;
@@ -119,12 +119,11 @@ sub search_complete {
     my $jobname = shift;
     my $success = shift;
 
-    my $basename = $self->data_tar->basename('.tar.gz');
     my $complete_file =
-      File::Spec->catdir( $basename, $jobname, 'complete.json' );
+      File::Spec->catdir( $self->data_dir, $jobname, 'complete.json' );
 
-    if ( $self->archive->contains_file($complete_file) ) {
-        my $complete_json = $self->archive->get_content($complete_file);
+    if ( -e $complete_file ) {
+        my $complete_json = read_file($complete_file);
         my $complete;
         try {
             $complete = decode_json($complete_json);

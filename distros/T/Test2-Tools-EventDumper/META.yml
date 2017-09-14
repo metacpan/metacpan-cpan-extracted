@@ -6,17 +6,18 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test2-Tools-EventDumper
 requires:
-  Test2: '1.302015'
-  Test2::Suite: '0.000030'
+  Test2: '1.302096'
+  Test2::Suite: '0.000075'
   perl: '5.008001'
 resources:
   bugtracker: http://github.com/Test-More/Test2-Tools-EventDumper/issues
   repository: http://github.com/Test-More/Test2-Tools-EventDumper/
-version: '0.000007'
+version: '0.000009'
+x_serialization_backend: 'YAML::Tiny version 1.70'

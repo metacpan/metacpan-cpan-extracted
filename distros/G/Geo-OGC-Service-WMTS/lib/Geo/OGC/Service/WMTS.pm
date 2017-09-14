@@ -32,11 +32,58 @@ In a psgi script write something like
 =head1 DESCRIPTION
 
 This module aims to provide the operations defined by the Open
-Geospatial Consortium's Web Map Tile Service standard.
+Geospatial Consortium's Web Map Tile Service standard. Additionally,
+this module aims to support WMS used as WMTS and TMS.
 
-This module is a plugin for the Geo::OGC::Service framework.
+This module is designed to be a part of the Geo::OGC::Service framework.
 
-Additionally, this module aims to support WMS used as WMTS and TMS.
+A Geo::OGC::Service::WMTS object is a content providing service object
+created by a Geo::OGC::Service object. As described in the
+documentation of Geo::OGC::Service a service object is created as a
+result of a service request. A Geo::OGC::Service::WMTS object is a
+hash reference, which contains keys env, request, plugin, config,
+service, and optionally posted, filter, and parameters.
+
+=over
+
+=item env 
+
+The PSGI $env.
+
+=item request 
+
+A Plack::Request object constructed from the $env;
+
+=item plugin 
+
+The plugin object given as an argument to Geo::OGC::Service in its
+constructor as a top level attribute or as a service specific
+attribute.
+
+=item config 
+
+The configuration for this service as constructed by the
+Geo::OGC::Service object.
+
+=item service 
+
+The name of the requested service (WMTS, WMS, or TMS).
+
+=item posted 
+
+A XML::LibXML documentElement of the POSTed XML.
+
+=item filter 
+
+A XML::LibXML documentElement contructed from a filter GET parameter.
+
+=item parameters 
+
+A hash made from Plack::Request->parameters (thus removing its multi
+value nature). The keys are all converted to lower case and the values
+are decoded to Perl's internal format assuming they are UTF-8.
+
+=back
 
 =head1 CONFIGURATION
 
@@ -52,9 +99,78 @@ Known top level keys in the hash are 'resource', 'blank', 'debug', and
 'TileSets'. TileSets is an array of hashes. The keys of a TileSet hash
 are Layers, Format, Resolutions, SRS, BoundingBox, path, and ext.
 
+=head2 PLUGIN
+
+The plugin object can be used to modify the config object in response
+time.
+
+A Geo::OGC::Service::WMTS object calls the plugin object's config
+method with arguments ($config, $self) before the config is used to
+create a response to a GetCapabilities request, and in RESTful service
+if layer name is not defined. The config method is not called for each
+tile request and thus the configuration should probably have parameter
+serve_arbitrary_layers set to true.
+
+A Geo::OGC::Service::WMTS object calls the plugin object's process method
+when making the tile if the plugin object exists. The method is given
+as argument a hash reference with the following keys:
+
+=over
+
+=item dataset 
+
+The GDAL dataset of the layer, if the layer has a configuration
+parameter 'file'.
+
+=item tile 
+
+A Geo::OGC::Service::WMTS::Tile object made from the request. The
+extent is from projection, which is deduced from the tilematrixset
+parameter.
+
+=item service 
+
+The Geo::OGC::Service::WMTS object.
+
+=item headers 
+
+Currently ['Content-Type' => "image/png"]
+
+=back
+
 =head2 EXPORT
 
-None by default.
+None by default. Package globals include
+
+=over
+
+=item $radius_of_earth_at_equator 
+
+6378137
+
+=item $standard_pixel_size 
+
+0.28/1000
+
+=item $tile_width 
+
+256
+
+=item $tile_height 
+
+256
+
+=item $originShift3857 
+
+Math::Trig::pi * $radius_of_earth_at_equator
+
+=item %projections 
+
+Hash of 'EPSG:nnnn' => {identifier => x, crs => x, extent => {SRS =>
+x, minx => x, maxx => x, miny => x, maxy => x}}. Currently contains
+EPSG:3857 and EPSG:3067.
+
+=back
 
 =head2 METHODS
 
@@ -80,7 +196,7 @@ use Geo::OGC::Service;
 use vars qw(@ISA);
 push @ISA, qw(Geo::OGC::Service::Common);
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 our $radius_of_earth_at_equator = 6378137;
 our $standard_pixel_size = 0.28 / 1000;
@@ -733,6 +849,43 @@ sub log {
     say STDERR Dumper($msg);
 }
 
+=pod
+
+=head3 Geo::OGC::Service::WMTS::Tile
+
+A class for the dimensions of the tile to be sent to the
+client. Methods are
+
+=over
+
+=item Geo::OGC::Service::WMTS::Tile->new($extent, $parameters) 
+
+$extent should be a reference to a hash of minx, maxx, miny, and
+maxy. $parameters should be a reference to a has of tilematrix,
+tilecol, and tilerow.
+
+=item size 
+
+The width and height of the tile in pixels. These come originally from
+the Geo::OGC::Service::WMTS globals.
+
+=item projwin 
+
+An array (minx maxy maxx miny).
+
+=item extent 
+
+A Geo::GDAL::Extent object of the tile extent.
+
+=item expand($pixels) 
+
+Expand (or shrink) the tile $pixels pixels. Useful for some processing
+tasks.
+
+=back
+
+=cut
+
 {
     package Geo::OGC::Service::WMTS::Tile;
     sub new {
@@ -758,6 +911,7 @@ sub log {
         my ($self) = @_;
         return @{$self}[0..1];
     }
+    *size = *tile;
     sub projwin {
         my ($self) = @_;
         return @{$self}[2..5];
@@ -810,7 +964,7 @@ Ari Jolma, E<lt>ari.jolma at gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Ari Jolma
+Copyright (C) 2015- by Ari Jolma
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

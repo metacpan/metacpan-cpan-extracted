@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -224,7 +224,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.826
+This document describes MCE::Shared::Sequence version 1.828
 
 =head1 DESCRIPTION
 
@@ -232,54 +232,54 @@ A number sequence class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Sequence;
+ use MCE::Shared::Sequence;
 
-   my $seq_a = MCE::Shared::Sequence->new( $begin, $end, $step, $fmt );
+ my $seq_a = MCE::Shared::Sequence->new( $begin, $end, $step, $fmt );
 
-   my $seq_b = MCE::Shared::Sequence->new(
-      { chunk_size => 10, bounds_only => 1 },
-      $begin, $end, $step, $fmt
-   );
+ my $seq_b = MCE::Shared::Sequence->new(
+    { chunk_size => 10, bounds_only => 1 },
+    $begin, $end, $step, $fmt
+ );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $seq_a = MCE::Shared->sequence( 1, 100 );
+ my $seq_a = MCE::Shared->sequence( 1, 100 );
 
-   my $seq_b = MCE::Shared->sequence(
-      { chunk_size => 10, bounds_only => 1 },
-      1, 100
-   );
+ my $seq_b = MCE::Shared->sequence(
+    { chunk_size => 10, bounds_only => 1 },
+    1, 100
+ );
 
-   # example
+ # example
 
-   use MCE::Hobo;
+ use MCE::Hobo;
 
-   sub parallel_a {
-      my ( $id ) = @_;
-      while ( defined ( my $num = $seq_a->next ) ) {
-         print "$id: $num\n";
-      }
-   }
+ sub parallel_a {
+    my ( $id ) = @_;
+    while ( defined ( my $num = $seq_a->next ) ) {
+       print "$id: $num\n";
+    }
+ }
 
-   sub parallel_b {
-      my ( $id ) = @_;
-      while ( my ( $beg, $end ) = $seq_b->next ) {
-         for my $num ( $beg .. $end ) {
-            print "$id: $num\n";
-         }
-      }
-   }
+ sub parallel_b {
+    my ( $id ) = @_;
+    while ( my ( $beg, $end ) = $seq_b->next ) {
+       for my $num ( $beg .. $end ) {
+          print "$id: $num\n";
+       }
+    }
+ }
 
-   MCE::Hobo->new( \&parallel_a, $_ ) for 1 .. 2;
-   MCE::Hobo->new( \&parallel_b, $_ ) for 3 .. 4;
+ MCE::Hobo->new( \&parallel_a, $_ ) for 1 .. 2;
+ MCE::Hobo->new( \&parallel_b, $_ ) for 3 .. 4;
 
-   # ... do other work ...
+ # ... do other work ...
 
-   MCE::Hobo->waitall();
+ MCE::Hobo->waitall();
 
 =head1 API DOCUMENTATION
 
@@ -293,7 +293,7 @@ Constructs a new object. C<step>, if omitted, defaults to C<1> if C<begin> is
 smaller than C<end> or C<-1> if C<begin> is greater than C<end>. The C<format>
 string is passed to C<sprintf> behind the scene (% may be omitted).
 
-   $seq_n_formatted = sprintf( "%4.1f", $seq_n );
+ $seq_n_formatted = sprintf( "%4.1f", $seq_n );
 
 Two options C<chunk_size> and C<bounds_only> are supported, which default to
 1 and 0 respectively. Chunking reduces the number of IPC calls to and from the
@@ -303,95 +303,95 @@ If C<bounds_only => 1> is specified, the C<next> method computes the C<begin>
 and C<end> values only for the chunk and not the numbers in between (hence
 boundaries only).
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   # demo 1
-   $seq1 = MCE::Shared->sequence(
-      { chunk_size => 10, bounds_only => 0 },
-      1, 20
-   );
+ # demo 1
+ $seq1 = MCE::Shared->sequence(
+    { chunk_size => 10, bounds_only => 0 },
+    1, 20
+ );
 
-   # @chunk = $seq1->next;  # ( qw/  1  2  3  4  5  6  7  8  9 10 / )
-   # @chunk = $seq1->next;  # ( qw/ 11 12 13 14 15 16 17 18 19 20 / )
+ # @chunk = $seq1->next;  # ( qw/  1  2  3  4  5  6  7  8  9 10 / )
+ # @chunk = $seq1->next;  # ( qw/ 11 12 13 14 15 16 17 18 19 20 / )
 
-   while ( my @chunk = $seq1->next ) {
-      ...
-   }
+ while ( my @chunk = $seq1->next ) {
+    ...
+ }
 
-   # demo 2
-   $seq2 = MCE::Shared->sequence(
-      { chunk_size => 10, bounds_only => 1 },
-      1, 100
-   );
+ # demo 2
+ $seq2 = MCE::Shared->sequence(
+    { chunk_size => 10, bounds_only => 1 },
+    1, 100
+ );
 
-   # ( $beg, $end ) = $seq2->next;  # (  1,  10 )
-   # ( $beg, $end ) = $seq2->next;  # ( 11,  20 )
-   # ( $beg, $end ) = $seq2->next;  # ( 21,  30 )
-   #    ...
-   # ( $beg, $end ) = $seq2->next;  # ( 81,  90 )
-   # ( $beg, $end ) = $seq2->next;  # ( 91, 100 )
+ # ( $beg, $end ) = $seq2->next;  # (  1,  10 )
+ # ( $beg, $end ) = $seq2->next;  # ( 11,  20 )
+ # ( $beg, $end ) = $seq2->next;  # ( 21,  30 )
+ #    ...
+ # ( $beg, $end ) = $seq2->next;  # ( 81,  90 )
+ # ( $beg, $end ) = $seq2->next;  # ( 91, 100 )
 
-   while ( my ( $beg, $end ) = $seq2->next ) {
-      for my $i ( $beg .. $end ) {
-         ...
-      }
-   }
+ while ( my ( $beg, $end ) = $seq2->next ) {
+    for my $i ( $beg .. $end ) {
+       ...
+    }
+ }
 
 Parameters may be given later with C<rewind> before calling C<next>.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Sequence;
+ use MCE::Shared::Sequence;
 
-   $seq = MCE::Shared::Sequence->new;
-   $seq->rewind( -1, 1, 0.1, "%4.1f" );
+ $seq = MCE::Shared::Sequence->new;
+ $seq->rewind( -1, 1, 0.1, "%4.1f" );
 
-   $seq = MCE::Shared::Sequence->new(
-      { chunk_size => 10, bounds_only => 1 }, 1, 100
-   );
+ $seq = MCE::Shared::Sequence->new(
+    { chunk_size => 10, bounds_only => 1 }, 1, 100
+ );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $seq = MCE::Shared->sequence;
-   $seq->rewind( 1, 100 );
+ $seq = MCE::Shared->sequence;
+ $seq->rewind( 1, 100 );
 
-   $seq = MCE::Shared->sequence(
-      { chunk_size => 10, bounds_only => 1 }, 1, 100
-   );
+ $seq = MCE::Shared->sequence(
+    { chunk_size => 10, bounds_only => 1 }, 1, 100
+ );
 
 =item next
 
 Returns the next computed sequence(s). An undefined value is returned when
 the computed C<begin> value exceeds the value held by C<end>.
 
-   # default: { chunk_size => 1, bounds_only => 0 }
-   $seq = MCE::Shared->sequence( 1, 100 );
+ # default: { chunk_size => 1, bounds_only => 0 }
+ $seq = MCE::Shared->sequence( 1, 100 );
 
-   while ( defined ( my $num = $seq->next ) ) {
-      ...
-   }
+ while ( defined ( my $num = $seq->next ) ) {
+    ...
+ }
 
-   # chunking
-   $seq = MCE::Shared->sequence(
-      { chunk_size => 10 }, 1, 100
-   );
+ # chunking
+ $seq = MCE::Shared->sequence(
+    { chunk_size => 10 }, 1, 100
+ );
 
-   while ( my @chunk = $seq->next ) {
-      ...
-   }
+ while ( my @chunk = $seq->next ) {
+    ...
+ }
 
-   # chunking, boundaries only
-   $seq = MCE::Shared->sequence(
-      { chunk_size => 10, bounds_only => 1 }, 1, 100
-   );
+ # chunking, boundaries only
+ $seq = MCE::Shared->sequence(
+    { chunk_size => 10, bounds_only => 1 }, 1, 100
+ );
 
-   while ( my ( $beg, $end ) = $seq->next ) {
-      for my $i ( $beg .. $end ) {
-         ...
-      }
-   }
+ while ( my ( $beg, $end ) = $seq->next ) {
+    for my $i ( $beg .. $end ) {
+       ...
+    }
+ }
 
 =item rewind ( { options }, begin, end [, step, format ] )
 
@@ -400,21 +400,21 @@ the computed C<begin> value exceeds the value held by C<end>.
 Sets the initial value back to the value held by C<begin> when no arguments
 are given. Otherwise, resets the sequence with given criteria.
 
-   $seq->rewind;
+ $seq->rewind;
 
-   $seq->rewind( { chunk_size => 10, bounds_only => 1 }, 1, 100 );
+ $seq->rewind( { chunk_size => 10, bounds_only => 1 }, 1, 100 );
 
-   while ( my ( $beg, $end ) = $seq->next ) {
-      for my $i ( $beg .. $end ) {
-         ...
-      }
-   }
+ while ( my ( $beg, $end ) = $seq->next ) {
+    for my $i ( $beg .. $end ) {
+       ...
+    }
+ }
 
-   $seq->rewind( 1, 100 );
+ $seq->rewind( 1, 100 );
 
-   while ( defined ( my $num = $seq->next ) ) {
-      ...
-   }
+ while ( defined ( my $num = $seq->next ) ) {
+    ...
+ }
 
 =back
 

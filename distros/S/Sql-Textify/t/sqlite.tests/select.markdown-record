@@ -1,0 +1,21 @@
+# Record 1
+
+Column      | Value    
+------------|----------
+id          | 1        
+description | first row
+
+# Record 2
+
+Column      | Value     
+------------|-----------
+id          | 2         
+description | second row
+
+# Record 3
+
+Column      | Value    
+------------|----------
+id          | 3        
+description | third row
+

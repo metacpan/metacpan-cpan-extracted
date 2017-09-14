@@ -20,7 +20,6 @@ static const UV mr_bases_const2[1] = {2};
 /******************************************************************************/
 
 
-
 static int jacobi_iu(IV in, UV m) {
   int j = 1;
   UV n = (in < 0) ? -in : in;
@@ -40,13 +39,13 @@ static int jacobi_iu(IV in, UV m) {
 }
 
 static UV select_extra_strong_parameters(UV n, UV increment) {
-  UV P = 3;
+  int j;
+  UV D, P = 3;
   while (1) {
-    UV D = P*P - 4;
-    /* TODO: We should not do this test. */
-    if (gcd_ui(D, n) > 1 && gcd_ui(D, n) != n) return 0;
-    if (jacobi_iu(D, n) == -1)
-      break;
+    D = P*P - 4;
+    j = jacobi_iu(D, n);
+    if (j == 0) return 0;
+    if (j == -1) break;
     if (P == (3+20*increment) && is_perfect_square(n)) return 0;
     P += increment;
     if (P > 65535)
@@ -59,17 +58,19 @@ static UV select_extra_strong_parameters(UV n, UV increment) {
 /* Fermat pseudoprime */
 int is_pseudoprime(UV const n, UV a)
 {
-  if (n < 5) return (n == 2 || n == 3);
+  if (n < 4) return (n == 2 || n == 3);
+  if (!(n&1) && !(a&1)) return 0;
   if (a < 2) croak("Base %"UVuf" is invalid", a);
   if (a >= n) {
     a %= n;
-    if ( a <= 1 || a == n-1 )
-      return 1;
+    if (a <= 1)    return (a == 1);
+    if (a == n-1)  return !(a & 1);
   }
+
 #if USE_MONTMATH
   if (n & 1) {   /* The Montgomery code only works for odd n */
     const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
-    const uint64_t monta = mont_geta(a, n);
+    const uint64_t monta = (a == 2)  ?  mont_get2(n)  :  mont_geta(a, n);
     return mont_powmod(monta, n-1, n) == mont1;
   }
 #endif
@@ -85,8 +86,8 @@ int is_euler_pseudoprime(UV const n, UV a)
   if (a > 2) {
     if (a >= n) {
       a %= n;
-      if ( a <= 1 || a == n-1 )
-        return 1;
+      if (a <= 1)    return (a == 1);
+      if (a == n-1)  return !(a & 1);
     }
     if ((n % a) == 0) return 0;
   }
@@ -162,9 +163,11 @@ int miller_rabin(UV const n, const UV *bases, int nbases)
   for (b = 0; b < nbases; b++) {
     UV x, a = bases[b];
     if (a < 2)  croak("Base %"UVuf" is invalid", a);
-    if (a >= n) a %= n;
-    if ( (a <= 1) || (a == n-1) )
-      continue;
+    if (a >= n) {
+      a %= n;
+      if (a == 0 || (a == n-1 && a&1)) return 0;
+    }
+    if (a == 1 || a == n-1) continue;
     /* n is a strong pseudoprime to base a if either:
      *    a^d = 1 mod n
      *    a^(d2^r) = -1 mod n for some r: 0 <= r <= s-1
@@ -494,7 +497,8 @@ int lucasv(IV* V, IV P, IV Q, UV k)
 /* Lucas tests:
  *  0: Standard
  *  1: Strong
- *  2: Extra Strong (Mo/Jones/Grantham)
+ *  2: Stronger (Strong + page 1401 extra tests)
+ *  3: Extra Strong (Mo/Jones/Grantham)
  *
  * None of them have any false positives for the BPSW test.  Also see the
  * "almost extra strong" test.
@@ -507,28 +511,39 @@ int is_lucas_pseudoprime(UV n, int strength)
   if (n < 7) return (n == 2 || n == 3 || n == 5);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
 
-  if (strength < 2) {
+  if (strength < 3) {
     UV Du = 5;
     IV sign = 1;
+    int j;
     while (1) {
       D = Du * sign;
-      if (gcd_ui(Du, n) > 1 && gcd_ui(Du, n) != n) return 0;
-      if (jacobi_iu(D, n) == -1)
-        break;
+      j = jacobi_iu(D, n);
+      if (j != 1 && Du != n) break;
       if (Du == 21 && is_perfect_square(n)) return 0;
       Du += 2;
       sign = -sign;
     }
+    if (j != -1) return 0;
     P = 1;
     Q = (1 - D) / 4;
+    if (strength == 2 && Q == -1) P=Q=D=5;  /* Method A* */
+    /* Check gcd(n,2QD). gcd(n,2D) already done. */
+    Qk = (Q >= 0)  ?  Q % n  :  n-(((UV)(-Q)) % n);
+    if (gcd_ui(Qk,n) != 1) return 0;
   } else {
     P = select_extra_strong_parameters(n, 1);
     if (P == 0) return 0;
     Q = 1;
     D = P*P - 4;
-    if (gcd_ui(D, n) > 1 && gcd_ui(D, n) != n) return 0;
   }
   MPUassert( D == (P*P - 4*Q) , "is_lucas_pseudoprime: incorrect DPQ");
+
+#if 0   /* Condition 2, V_n+1 = 2Q mod n */
+{ UV us, vs, qs; lucas_seq(&us, &vs, &qs, n, P, Q, n+1); return (vs == addmod(Q,Q,n)); }
+#endif
+#if 0   /* Condition 3, n is a epsp(Q) */
+return is_euler_pseudoprime(n,Qk);
+#endif
 
   d = n+1;
   s = 0;
@@ -542,6 +557,9 @@ int is_lucas_pseudoprime(UV n, int strength)
     const uint64_t montP = (P == 1) ? mont1
                          : (P >= 0) ? mont_geta(P, n)
                          : n - mont_geta(-P, n);
+    const uint64_t montQ = (Q == 1) ? mont1
+                         : (Q >= 0) ? mont_geta(Q, n)
+                         : n - mont_geta(-Q, n);
     const uint64_t montD = (D >= 0) ? mont_geta(D, n)
                          : n - mont_geta(-D, n);
     UV b;
@@ -574,8 +592,6 @@ int is_lucas_pseudoprime(UV n, int strength)
       }
       Qk = (sign == 1) ? mont1 : n-mont1;
     } else {
-      const uint64_t montQ = (Q >= 0) ? mont_geta(Q, n)
-                           : n - mont_geta(-Q, n);
       Qk = montQ;
       while (b--) {
         U = mont_mulmod(U, V, n);
@@ -591,6 +607,7 @@ int is_lucas_pseudoprime(UV n, int strength)
         }
       }
     }
+
     if (strength == 0) {
       if (U == 0)
         return 1;
@@ -605,6 +622,24 @@ int is_lucas_pseudoprime(UV n, int strength)
           Qk = mont_sqrmod(Qk,n);
         }
       }
+    } else if (strength == 2) {
+      UV Ql = 0, Qj = 0;
+      int qjacobi, is_slpsp = 0;
+      if (U == 0)
+        is_slpsp = 1;
+      while (s--) {
+        if (V == 0)
+          is_slpsp = 1;
+        Ql = Qk;
+        V = submod( mont_sqrmod(V,n), addmod(Qk,Qk,n), n);
+        Qk = mont_sqrmod(Qk,n);
+      }
+      if (!is_slpsp)                  return 0; /* slpsp */
+      if (V != addmod(montQ,montQ,n)) return 0; /* V_{n+1} != 2Q mod n */
+      qjacobi = jacobi_iu(Q,n);
+      Qj = (qjacobi == 0) ? 0 : (qjacobi == 1) ? montQ : n-montQ;
+      if (Ql != Qj)                   return 0; /* n is epsp base Q */
+      return 1;
     } else {
       if ( U == 0 && (V == mont2 || V == (n-mont2)) )
         return 1;
@@ -636,6 +671,25 @@ int is_lucas_pseudoprime(UV n, int strength)
         Qk = sqrmod(Qk, n);
       }
     }
+  } else if (strength == 2) {
+    UV Ql, Qj = 0;
+    UV Qu = (Q >= 0)  ?  Q % n  :  n-(((UV)(-Q)) % n);
+    int qjacobi, is_slpsp = 0;
+    if (U == 0)
+      is_slpsp = 1;
+    while (s--) {
+      if (V == 0)
+        is_slpsp = 1;
+      Ql = Qk;
+      V = mulsubmod(V, V, addmod(Qk,Qk,n), n);
+      Qk = sqrmod(Qk, n);
+    }
+    if (!is_slpsp)                  return 0; /* slpsp */
+    if (V != addmod(Qu,Qu,n))       return 0; /* V_{n+1} != 2Q mod n */
+    qjacobi = jacobi_iu(Q,n);
+    Qj = (qjacobi == 0) ? 0 : (qjacobi == 1) ? Qu : n-Qu;
+    if (Ql != Qj)                   return 0; /* n is epsp base Q */
+    return 1;
   } else {
     if ( U == 0 && (V == 2 || V == (n-2)) )
       return 1;
@@ -1059,20 +1113,26 @@ int is_frobenius_khashin_pseudoprime(UV n)
  */
 int is_frobenius_underwood_pseudoprime(UV n)
 {
-  int bit;
+  int j, bit;
   UV x, result, a, b, np1, len, t1;
   IV t;
 
   if (n < 7) return (n == 2 || n == 3 || n == 5);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
-  if (is_perfect_square(n)) return 0;
 
-  x = 0;
-  t = -1;
-  while ( jacobi_iu( t, n ) != -1 ) {
-    x++;
+  for (x = 0; x < 1000000; x++) {
+    if (x==2 || x==4 || x==7 || x==8 || x==10 || x==14 || x==16 || x==18)
+      continue;
     t = (IV)(x*x) - 4;
+    j = jacobi_iu(t, n);
+    if (j == -1) break;
+    if (j == 0 || (x == 20 && is_perfect_square(n)))
+      return 0;
   }
+  if (x >= 1000000) croak("FU test failure, unable to find suitable a");
+  t1 = gcd_ui(n, (x+4)*(2*x+5));
+  if (t1 != 1 && t1 != n)
+    return 0;
   np1 = n+1;
   { UV v = np1; len = 1;  while (v >>= 1) len++; }
 
@@ -1159,7 +1219,7 @@ int is_frobenius_underwood_pseudoprime(UV n)
  * instead we'll use a table. */
 #define NUM_KNOWN_MERSENNE_PRIMES 49
 static const uint32_t _mersenne_primes[NUM_KNOWN_MERSENNE_PRIMES] = {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941,11213,19937,21701,23209,44497,86243,110503,132049,216091,756839,859433,1257787,1398269,2976221,3021377,6972593,13466917,20996011,24036583,25964951,30402457,32582657,37156667,42643801,43112609,57885161,74207281};
-#define LAST_CHECKED_MERSENNE 39621209
+#define LAST_CHECKED_MERSENNE 40364833
 int is_mersenne_prime(UV p)
 {
   int i;

@@ -1,0 +1,30 @@
+---
+abstract: 'Collection of Perl modules to render OpenStreetMap data encaspulated via L<Geo::OSM::Primitive>, possibly stored in a L<Geo::OSM::DBI> database.'
+author:
+  - 'RenÃ© Nyffenegger <rene.nyffenegger@adp-gmbh.ch>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Geo::Coordinates::Converter::LV03: '0.02'
+  Test::File: '0'
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-OSM-Render
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Geo::OSM::Primitive::Node: '0'
+  Geo::OSM::Primitive::Way: '0'
+  SVG: '0'
+  perl: '5.006'
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

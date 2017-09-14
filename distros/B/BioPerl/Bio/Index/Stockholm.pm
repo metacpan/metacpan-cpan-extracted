@@ -13,7 +13,7 @@
 
 =head1 NAME
 
-Bio::Index::Stockholm
+Bio::Index::Stockholm - Interface for indexing Stockholm files
 
 =head1 SYNOPSIS
 
@@ -307,7 +307,7 @@ sub default_id_parser {
  Usage   : $value = $self->write_flag();
            $self->write_flag($value);
  Function: Gets or sets the value of write_flag, which
-           is wether the dbm file should be opened with
+           is whether the dbm file should be opened with
            write access.
  Returns : The current value of write_flag (default 0)
  Args    : Value of write_flag if setting, or none if
@@ -342,7 +342,7 @@ sub default_id_parser {
            file contents and not an object
 
            WARNING: you must parse the record deliminter
-           *yourself*. Abstract wont do this for you
+           *yourself*. Abstract won't do this for you
            So this code
 
            $fh = $index->get_stream($myid);

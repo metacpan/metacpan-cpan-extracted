@@ -1,0 +1,5 @@
+---
+clickhouse:
+  host: 'clickhouse-proxy.example.com'
+  port: 8123
+  timeout: 10

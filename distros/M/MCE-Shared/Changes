@@ -1,6 +1,47 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.828 Wed Sep 12 23:00:00 EST 2017
+
+  * Removed extra "=over" command in documentation.
+
+1.827 Tue Sep 12 17:00:00 EST 2017
+
+  [BUG FIXES]
+
+  * Fixed bug in MCE::Shared::Queue. Thank you, Tomohiro Hosaka.
+
+  [ENHANCEMENTS]
+
+  * Refactored MCE::Hobo, MCE::Shared, and MCE::Shared::Server.
+  * Preserve lexical type for numbers during IPC.
+
+  * Added Coro and Win32::GUI to list for enabling posix_exit.
+  * Added encoder and decoder methods for overriding serialization.
+  * Added parallel HTTP get demonstration using AnyEvent to MCE::Hobo.
+  * Added Inline::Python, Logger, and Tie::File demonstrations to MCE::Shared.
+  * Added DBM-Sharing section to the POD documentation.
+  * Added iterator method to MCE::Cache.
+
+  * Improved auto-dereferencing for shared arrays, hashes, and scalars.
+  * Improved open method for non-shared file-handles in MCE::Shared::Handle.
+  * Improved shared-PDL support. Updated MCE::Cookbook on Github.
+  * Improved signal handling, including nested parallel-sessions.
+  * Improved running MCE::Hobo and MCE::Shared with PDL.
+  * Improved taint mode via perl -T.
+
+  * In MCE::Hobo, waitall and waitone are now aliases to wait_all and
+    wait_one respectively for backwards compatibility.
+
+  * No longer loads threads on the Windows platform in MCE::Shared::Server.
+    This enables MCE::Hobo to spin faster, including lesser memory consumption.
+    Threads isn't required to run MCE::Hobo.
+
+  * Removed extra white-space from POD documentation.
+  * Validated MCE::Hobo and MCE::Shared on SmartOS.
+
+  * Bumped MCE dependency to 1.830.
+
 1.826 Wed May 03 03:00:00 EST 2017
 
   * Reduced memory consumption.

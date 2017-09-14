@@ -2,10 +2,10 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use Scalar::Util qw/openhandle/;
-use Test2::Util qw/clone_io CAN_REALLY_FORK/;
+use Test2::Util qw/clone_io CAN_REALLY_FORK pkg_to_file/;
 use Test2::Harness::Util qw/write_file/;
 
 sub viable {
@@ -16,11 +16,10 @@ sub viable {
 
     return 0 if $ENV{HARNESS_PERL_SWITCHES};
 
-    return 0 if @{$test->switches};
+    my $job = $test->job;
 
-    if (my $headers = $test->headers) {
-        return 0 if exists($headers->{features}->{preload}) && !$headers->{features}->{preload};
-    }
+    # -w switch is ok, otherwise it is a no-go
+    return 0 if grep { !m/\s*-w\s*/ } @{$job->switches};
 
     return 1;
 }
@@ -29,17 +28,56 @@ sub run {
     my $class = shift;
     my ($test) = @_;
 
+    my $job = $test->job;
+    my $preloads = $job->preload || [];
+
+    $_->pre_fork($job) for @$preloads;
+
     my $pid = fork();
     die "Failed to fork: $!" unless defined $pid;
 
     # In parent
     return ($pid, undef) if $pid;
 
-    # In Child
-    my $file = $test->file;
+    $_->post_fork($job) for @$preloads;
 
-    my $env = $test->env_vars;
-    $ENV{$_} = $env->{$_} for keys %$env;
+    # toggle -w switch late
+    $^W = 1 if grep { m/\s*-w\s*/ } @{$job->switches};
+
+    $SIG{TERM} = 'DEFAULT';
+    $SIG{INT} = 'DEFAULT';
+    $SIG{HUP} = 'DEFAULT';
+
+    for my $mod (@{$job->load || []}) {
+        my $file = pkg_to_file($mod);
+        require $file;
+    }
+
+    my $importer = eval <<'    EOT' or die $@;
+package main;
+#line 0 "-"
+sub { shift->import(@_) }
+    EOT
+
+    for my $mod (@{$job->load_import || []}) {
+        my @args;
+        if ($mod =~ s/=(.*)$//) {
+            @args = split /,/, $1;
+        }
+        my $file = pkg_to_file($mod);
+        local $0 = '-';
+        require $file;
+        $importer->($mod, @args);
+    }
+
+    # In Child
+    my $file = $job->file;
+
+    my $env = $job->env_vars;
+    {
+        no warnings 'uninitialized';
+        $ENV{$_} = $env->{$_} for keys %$env;
+    }
 
     $ENV{T2_HARNESS_FORKED}  = 1;
     $ENV{T2_HARNESS_PRELOAD} = 1;
@@ -66,7 +104,7 @@ sub run {
     my $stderr = clone_io(\*STDERR);
     my $die = sub { print $stderr @_; exit 255 };
 
-    write_file($in_file, $test->input);
+    write_file($in_file, $job->input);
 
     close(STDIN) or die "Could not close STDIN: $!";
     open(STDIN, '<', $in_file) or die "Could not re-open STDIN";
@@ -89,20 +127,22 @@ sub run {
         Test2::API::test2_post_preload_reset();
     }
 
-    push @INC => @{$test->libs};
+    push @INC => @{$job->libs};
 
-    unless ($test->no_stream) {
+    if ($job->use_stream) {
         $ENV{T2_FORMATTER} = 'Stream';
         require Test2::Formatter::Stream;
         Test2::Formatter::Stream->import(file => $event_file);
     }
 
-    if ($test->times) {
+    if ($job->times) {
         require Test2::Plugin::Times;
         Test2::Plugin::Times->import();
     }
 
-    @ARGV = @{$test->args};
+    @ARGV = @{$job->args};
+
+    $_->pre_launch($job) for @$preloads;
 
     return (undef, $file);
 }

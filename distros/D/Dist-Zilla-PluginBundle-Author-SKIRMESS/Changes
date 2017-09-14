@@ -1,5 +1,40 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.010  2017-09-10 16:43:32 UTC
+
+  - Added Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
+  - All generated files are now created by
+    Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase during the
+    "Before Build" phase. For release builds of the bundle itself, the
+    files are recreated again during the "Munge Files" phase to have the
+    new version stamped in them during and not the old version.
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Changes
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::DistManifest
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::EOL
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Kwalitee
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::MinimumVersion
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Mojibake
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::NoTabs
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod::No404s
+  - Removed
+    Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Portability::Files
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Spelling
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version
+  - Removed Dist::Zilla::Plugin::Author::SKIRMESS::TravisCI
+  - Removed Dist::Zilla::Role::Author::SKIRMESS::Test::XT
+
 0.009  2017-09-04 10:48:45 UTC
 
   - Add a comment to .perlcriticrc that the file is automatically generated

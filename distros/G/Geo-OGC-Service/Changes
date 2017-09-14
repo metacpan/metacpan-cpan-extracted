@@ -1,3 +1,9 @@
+0.14, Sep 11, 2017
+  * Fix the POD.
+
+0.13, Sep 11, 2017
+  * Get the encoding always from the request object.
+
 0.12, Jun 20, 2017
   * Fix XMLWriter::element so that it does not try to modify read-only values.
   * Require Perl 5.12

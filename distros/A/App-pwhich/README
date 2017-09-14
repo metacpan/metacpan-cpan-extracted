@@ -1,10 +1,10 @@
 NAME
 
-    pwhich - Perl-only `which'
+    pwhich - Pure Perl implementation of which
 
 VERSION
 
-    version 1.14
+    version 1.15
 
 SYNOPSIS
 
@@ -12,17 +12,18 @@ SYNOPSIS
      $ pwhich -a perl          # print all matches
      $ pwhich perl perldoc ... # look for multiple programs
      $ pwhich -a perl perldoc ...
+     $ pwhich -s perl          # silent mode
 
 DESCRIPTION
 
-    `pwhich' is a command-line utility program for finding paths to other
+    pwhich is a command-line utility program for finding paths to other
     programs based on the user's PATH. It is similar to the usually Unix
     tool `which', and tries to emulate its functionality, but is written
     purely in Perl (uses the module File::Which), so is portable.
 
  Calling syntax
 
-     $ pwhich [-a] [-v] programname [programname ...]
+     $ pwhich [-a] [-s] [-v] programname [programname ...]
 
  Options
 
@@ -31,6 +32,11 @@ DESCRIPTION
       The option -a will make pwhich print all matches found in the PATH
       variable instead of just the first one. Each match is printed on a
       separate line.
+
+    -s
+
+      No output, just return 0 if any of the executables are found, or 1 if
+      none are found.
 
     -v
 
@@ -58,6 +64,14 @@ SEE ALSO
       not
 
       provide any documentation on how you might use it.
+
+CAVEATS
+
+    This module does not know about built-in shell commands, as the
+    built-in command which and where ususally do.
+
+    This module is fully supported back to Perl 5.8.1. It may work on
+    5.8.0.
 
 AUTHOR
 

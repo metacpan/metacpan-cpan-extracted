@@ -1,5 +1,5 @@
 package Statocles::App;
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 # ABSTRACT: Base role for Statocles applications
 
 use Statocles::Base 'Role', 'Emitter';
@@ -70,6 +70,26 @@ has _templates => (
 has template_dir => (
     is => 'ro',
     isa => Str,
+);
+
+#pod =attr disable_content_template
+#pod
+#pod This disables processing the content in this application as a template.
+#pod This can speed up processing when the content is not using template
+#pod directives.
+#pod
+#pod This can be also set in the document
+#pod (L<Statocles::Document/disable_content_template>), or for the entire site
+#pod (L<Statocles::Site/disable_content_template>).
+#pod
+#pod =cut
+
+has disable_content_template => (
+    is => 'ro',
+    isa => Bool,
+    lazy => 1,
+    default => 0,
+    predicate => 'has_disable_content_template',
 );
 
 #pod =method pages
@@ -187,7 +207,7 @@ Statocles::App - Base role for Statocles applications
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 SYNOPSIS
 
@@ -241,6 +261,16 @@ method|/template>.
 =head2 template_dir
 
 The directory (inside the theme directory) to use for this app's templates.
+
+=head2 disable_content_template
+
+This disables processing the content in this application as a template.
+This can speed up processing when the content is not using template
+directives.
+
+This can be also set in the document
+(L<Statocles::Document/disable_content_template>), or for the entire site
+(L<Statocles::Site/disable_content_template>).
 
 =head1 METHODS
 

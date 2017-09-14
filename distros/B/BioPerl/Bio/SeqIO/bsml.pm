@@ -162,13 +162,16 @@ my $nvtoken = ": ";  # The token used if a name/value pair has to be stuffed
 
 =cut
 
-# LS: this seems to get overwritten on line 1317, generating a redefinition error.  Dead code?
-# CAT: This was inappropriately added in revision 1.10 - I added the check for existance of a sequence factory to the actual _initialize
+# LS: this seems to get overwritten on line 1317, generating a redefinition error.
+# Dead code?
+# CAT: This was inappropriately added in revision 1.10 - I added the check for
+# existence of a sequence factory to the actual _initialize
 # sub _initialize {
 #   my($self,@args) = @_;
 #   $self->SUPER::_initialize(@args);
 #   if( ! defined $self->sequence_factory ) {
-#       $self->sequence_factory(Bio::Seq::SeqFactory->new(-verbose => $self->verbose(), -type => 'Bio::Seq::RichSeq'));
+#       $self->sequence_factory(Bio::Seq::SeqFactory->new(-verbose => $self->verbose(),
+#         -type => 'Bio::Seq::RichSeq'));
 #   }
 # }
 
@@ -608,7 +611,12 @@ sub to_bsml {
 	my $seqRefs = []; my $featRefs = [];
 	# Array references to hold <Attribute> values (not objects):
 	my $seqDesc = [];
-	push @{$seqDesc}, ["comment" , "This file generated to BSML 2.2 standards - joins will be collapsed to a single feature enclosing all members of the join"];
+    push @{$seqDesc},
+    [
+    "comment",
+    "This file generated to BSML 2.2 standards - " .
+    "joins will be collapsed to a single feature enclosing all members of the join"
+    ];
 	push @{$seqDesc}, ["description" , eval{$bioSeq->desc}];
 	for my $kwd ( eval{$bioSeq->get_keywords} ) {
 	    push @{$seqDesc}, ["keyword" , $kwd];
@@ -749,7 +757,7 @@ sub to_bsml {
 		next if (defined $args->{SKIPTAGS} &&
 			 $args->{SKIPTAGS} =~ /all/i);
 		# Tags can consume a lot of CPU cycles, and can often be
-		# rather non-informative, so -skiptags can allow total or
+		# rather non-informative, so -skiptags can allow one total or
 		# selective omission of tags.
 		for my $tag ($bioFeat->all_tags()) {
 		    next if (exists $args->{SKIPTAGS}{$tag});
@@ -833,7 +841,7 @@ sub to_bsml {
            document, where $mimetype is the value designated by this
            key. For generic XML use text/xml, for BSML use text/x-bsml
 
-   -return This option will be supressed, since the nature of this
+   -return This option will be suppressed, since the nature of this
            method is to print out the XML document. If you wish to
            retrieve the <Sequence> objects generated, use the to_bsml
            method directly.

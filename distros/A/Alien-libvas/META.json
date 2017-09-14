@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0",
+            "Alien::Base::ModuleBuild" : "0.046",
             "Alien::CMake" : "0.07",
             "File::Which" : "0",
             "Module::Build" : "0"
@@ -34,7 +34,6 @@
          },
          "requires" : {
             "Alien::Base" : "0.030",
-            "File::ShareDir" : "1.00",
             "perl" : "5.010"
          }
       },
@@ -51,7 +50,7 @@
    "provides" : {
       "Alien::libvas" : {
          "file" : "lib/Alien/libvas.pm",
-         "version" : "0.210"
+         "version" : "0.211"
       }
    },
    "release_status" : "stable",
@@ -60,6 +59,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.210",
+   "version" : "0.211",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

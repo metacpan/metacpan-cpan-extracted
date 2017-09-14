@@ -22,18 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             [12]|
-            3[24-8]|
-            4[24-8]|
+            [34][24-8]|
             5[2-8]|
             7[3-8]
-          '
+          ',
+                  'pattern' => '(\\d)(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
                   'pattern' => '([3-7]\\d)(\\d{3})(\\d{3})',
@@ -58,7 +57,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'geographic' => '
           (?:
             1\\d|
@@ -68,27 +66,9 @@ my $validators = {
             7[3-8]
           )\\d{6}
         ',
-                'specialrate' => '(
-          90\\d{4,6}|
-          89[1-3]\\d{2,5}
-        )',
-                'toll_free' => '80\\d{4,6}',
+                'personal_number' => '',
                 'pager' => '',
-                'voip' => '
-          (?:
-            59|
-            8[1-3]
-          )\\d{6}
-        ',
-                'fixed_line' => '
-          (?:
-            1\\d|
-            [25][2-8]|
-            3[24-8]|
-            4[24-8]|
-            7[3-8]
-          )\\d{6}
-        ',
+                'toll_free' => '80\\d{4,6}',
                 'mobile' => '
           (?:
             [37][01]\\d|
@@ -99,6 +79,25 @@ my $validators = {
               9[69]
             )
           )\\d{5}
+        ',
+                'specialrate' => '(
+          90\\d{4,6}|
+          89[1-3]\\d{2,5}
+        )',
+                'fixed_line' => '
+          (?:
+            1\\d|
+            [25][2-8]|
+            3[24-8]|
+            4[24-8]|
+            7[3-8]
+          )\\d{6}
+        ',
+                'voip' => '
+          (?:
+            59|
+            8[1-3]
+          )\\d{6}
         '
               };
 

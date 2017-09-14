@@ -9,7 +9,7 @@ require DynaLoader;
 require Exporter;
 use vars qw(@ISA $VERSION @EXPORT_OK);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 @ISA = qw(Inline DynaLoader Exporter);
 @EXPORT_OK = qw(rb_eval
 		rb_call_function
@@ -207,35 +207,6 @@ sub info {
     return $info;
 }
 
-sub _eval_support_code {
-    rb_eval(<<'END');
-def inline_ruby_class_grokker(*classes)
-    if classes == []
-	ObjectSpace.each_object(Class) do |x|
-	    yield ['classes', x.name]
-	end
-	ObjectSpace.each_object(Module) do |x|
-	    yield ['modules', x.name]
-	end
-	Kernel.methods.each do |x|
-	    yield ['functions', x]
-	end
-    else
-	classes.each do |k|
-	    n = {}
-	    begin
-		n['methods'] = eval "#{k}.methods"
-		n['imethods'] = eval "#{k}.instance_methods"
-	    rescue Exception
-		p "Exception: " + $!
-	    end
-	    yield [k, n]
-	end
-    end
-end
-END
-}
-
 #==========================================================================
 # Run the code, study the main namespace, and cache the results.
 #==========================================================================
@@ -274,9 +245,12 @@ sub build {
     }
 
     # Get more details about the classes and modules.
-    # FIXME! Is the quoting correct?
-    my $classes_arg = join ', ', map { quotemeta $_ } keys %{$post->{classes}};
-    my $c = rb_eval(<<EOF);
+    my $c = {};
+    if (keys %{$post->{classes} || {}}) {
+        my $classes_arg = join ', ',
+                          map { '"' . (quotemeta $_) . '"' }
+                          keys %{$post->{classes}};
+        $c = rb_eval(<<EOF);
 Proc.new {
     ns = {}
     classes = [$classes_arg]
@@ -292,9 +266,14 @@ Proc.new {
     ns
 }.call
 EOF
+    }
 
-    my $modules_arg = join ', ', map { quotemeta $_ } keys %{$post->{modules}};
-    my $m = rb_eval(<<EOF);
+    my $m = {};
+    if (%{$post->{modules} || {}}) {
+        my $modules_arg = join ', ',
+                          map { '"' . (quotemeta $_) . '"' }
+                          keys %{$post->{modules}};
+        $m = rb_eval(<<EOF);
 Proc.new {
     ns = {}
     classes = [$modules_arg]
@@ -310,6 +289,7 @@ Proc.new {
     ns
 }.call
 EOF
+    }
 
     # And the namespace is:
     my %namespace = (

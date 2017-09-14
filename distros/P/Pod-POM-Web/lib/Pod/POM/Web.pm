@@ -17,13 +17,13 @@ use Alien::GvaScript 1.021000;      # javascript files
 use Encode::Guess;                  # guessing if pod source is utf8 or latin1
 use Config;                         # where are the script directories
 use Getopt::Long    qw/GetOptions/; # parsing options from command-line
-use Module::Metadata;               # get version number from module
+use Module::Metadata 1.000033;      # get version number from module
 
 #----------------------------------------------------------------------
 # globals
 #---------------------------------------------------------------------
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 # some subdirs never contain Pod documentation
 my @ignore_toc_dirs = qw/auto unicore/; 

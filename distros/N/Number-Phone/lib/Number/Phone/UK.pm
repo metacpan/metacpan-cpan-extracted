@@ -7,7 +7,7 @@ use Number::Phone::UK::Data;
 
 use base 'Number::Phone';
 
-our $VERSION = 1.66;
+our $VERSION = 1.67;
 
 my $cache = {};
 
@@ -34,6 +34,26 @@ sub new {
     } else { return undef; }
 }
 
+=head1 DATABASE
+
+Number::Phone::UK uses a large database, access via L<Number::Phone::UK::Data>. This
+database lives in a file, and normally only the little bits of it that you access will
+ever get loaded into memory. This means, however, that creating Number::Phone::UK objects
+almost always involves disk access and so is slow compared to data for some other
+countries. There are two ways to avoid this slowness.
+
+First, if you don't need all the functionality you can use L<Number::Phone::Lib>.
+
+Second, if you can accept slow startup - eg when your server starts - then you can call
+C<Number::Phone::UK::Data->slurp()> from your code, which will pull the entire database
+into memory. This will take a few minutes, and on a 64-bit machine will consume of the
+order of 200MB of memory.
+
+The database uses L<DBM::Deep>. This apparently has some problems if you connect to it,
+C<fork()>, and then try to access the database from multiple processes. We attempt to
+work around this by re-connecting to the database after forking. This is, of course,
+not a problem if you C<slurp()> the database before forking.
+
 =head1 METHODS
 
 The following methods from Number::Phone are overridden:
@@ -57,8 +77,8 @@ sub _get_class {
   my $class = shift;
   my $number = shift;
   foreach my $prefix (_prefixes($number)) {
-    if(exists($Number::Phone::UK::Data::db->{subclass}->{$prefix})) {
-      my $subclass = join('::', $class, $Number::Phone::UK::Data::db->{subclass}->{$prefix});
+    if(exists(Number::Phone::UK::Data::db()->{subclass}->{$prefix})) {
+      my $subclass = join('::', $class, Number::Phone::UK::Data::db()->{subclass}->{$prefix});
       eval "use $subclass";
       return $subclass;
     }
@@ -107,12 +127,12 @@ sub is_valid {
     return $cache->{$number}->{is_valid} = 0 if($cleaned_number =~ /^([27]|11)/ && length($cleaned_number) != 10);
 
     $cache->{$number}->{is_allocated} = 
-        grep { $Number::Phone::UK::Data::db->{telco_and_length}->{$_} } @prefixes;
+        grep { Number::Phone::UK::Data::db()->{telco_and_length}->{$_} } @prefixes;
 
     if($cache->{$number}->{is_allocated}) {
-        my($telco_and_length) = map { $Number::Phone::UK::Data::db->{telco_and_length}->{$_} } grep { $Number::Phone::UK::Data::db->{telco_and_length}->{$_} } @prefixes;
-        $cache->{$number}->{operator} = $Number::Phone::UK::Data::db->{telco_format}->{$telco_and_length}->{telco};
-        $cache->{$number}->{format} = $Number::Phone::UK::Data::db->{telco_format}->{$telco_and_length}->{format};
+        my($telco_and_length) = map { Number::Phone::UK::Data::db()->{telco_and_length}->{$_} } grep { Number::Phone::UK::Data::db()->{telco_and_length}->{$_} } @prefixes;
+        $cache->{$number}->{operator} = Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length}->{telco};
+        $cache->{$number}->{format} = Number::Phone::UK::Data::db()->{telco_format}->{$telco_and_length}->{format};
 
         if($cache->{$number}->{format} =~ /\+/) {
             my($arealength, $subscriberlength) = split(/\+/, $cache->{$number}->{format});
@@ -123,8 +143,8 @@ sub is_valid {
             $cache->{$number}->{subscriber} = substr($cleaned_number, $arealength);
             $cache->{$number}->{areaname} = (
                 map {
-                    $Number::Phone::UK::Data::db->{areanames}->{$_}
-                } grep { $Number::Phone::UK::Data::db->{areanames}->{$_} } @prefixes
+                    Number::Phone::UK::Data::db()->{areanames}->{$_}
+                } grep { Number::Phone::UK::Data::db()->{areanames}->{$_} } @prefixes
             )[0];
             if(!grep { length($cache->{$number}->{subscriber}) == $_ } @subscriberlengths) {
                 # number wrong length!
@@ -191,7 +211,7 @@ foreach my $is (qw(
         if(!exists($cache->{${$self}}->{"is_$is"})) {
           $cache->{${$self}}->{"is_$is"} = 
             grep {
-              $Number::Phone::UK::Data::db->{
+              Number::Phone::UK::Data::db()->{
                 { geographic      => 'geo_prefices',
                   network_service => 'network_svc_prefices',
                   tollfree        => 'free_prefices',

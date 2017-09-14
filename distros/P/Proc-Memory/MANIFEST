@@ -8,10 +8,14 @@ Makefile.PL
 README
 dist.ini
 lib/Proc/Memory.pm
+t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/new.t
 t/poke.t
 t/self-rw.t
 xt/author/00-compile.t
+xt/author/critic.t
 xt/author/pod-syntax.t
+xt/author/test-version.t
+xt/release/minimum-version.t

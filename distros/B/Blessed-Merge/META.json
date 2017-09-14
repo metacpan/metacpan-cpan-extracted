@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "JSONP" : "1.61",
+            "JSONP" : "1.74",
             "Test::More" : "0"
          }
       },
@@ -35,12 +35,13 @@
          "requires" : {
             "Carp" : "0",
             "Combine::Keys" : "0.08",
+            "Import::Export" : "0.04",
             "Scalar::Util" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

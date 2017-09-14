@@ -1,24 +1,31 @@
 package Net::WHMCS;
-$Net::WHMCS::VERSION = '0.08';
-
+$Net::WHMCS::VERSION = '0.09';
 # ABSTRACT: interface to the WHMCS billing and support system
 
 use Moo;
 use Carp 'croak';
 
-has 'WHMCS_URL'      => ( is => 'rw', required => 1 );
-has 'WHMCS_USERNAME' => ( is => 'rw', required => 1 );
-has 'WHMCS_PASSWORD' => ( is => 'rw', required => 1 );
-has 'WHMCS_API_ACCESSKEY' => ( is => 'rw' );
+has 'WHMCS_URL' => (
+    is       => 'rw',
+    required => 1
+);
+has 'WHMCS_USERNAME' => (
+    is       => 'rw',
+    required => 1
+);
+has 'WHMCS_PASSWORD' => (
+    is       => 'rw',
+    required => 1
+);
+has 'WHMCS_API_ACCESSKEY' => (is => 'rw');
 
 sub _build_args {
     my ($self) = @_;
 
-    my $args = { WHMCS_URL => $self->WHMCS_URL };
+    my $args = {WHMCS_URL => $self->WHMCS_URL};
     $args->{WHMCS_USERNAME}      = $self->WHMCS_USERNAME;
     $args->{WHMCS_PASSWORD}      = $self->WHMCS_PASSWORD;
-    $args->{WHMCS_API_ACCESSKEY} = $self->WHMCS_API_ACCESSKEY
-      if $self->WHMCS_API_ACCESSKEY;
+    $args->{WHMCS_API_ACCESSKEY} = $self->WHMCS_API_ACCESSKEY if $self->WHMCS_API_ACCESSKEY;
 
     return $args;
 }
@@ -28,28 +35,28 @@ use Net::WHMCS::Order;
 use Net::WHMCS::Support;
 use Net::WHMCS::Miscellaneous;
 
-has 'client' => ( is => 'lazy' );
+has 'client' => (is => 'lazy');
 
 sub _build_client {
-    Net::WHMCS::Client->new( (shift)->_build_args() );
+    Net::WHMCS::Client->new((shift)->_build_args());
 }
 
-has 'order' => ( is => 'lazy' );
+has 'order' => (is => 'lazy');
 
 sub _build_order {
-    Net::WHMCS::Order->new( (shift)->_build_args() );
+    Net::WHMCS::Order->new((shift)->_build_args());
 }
 
-has 'support' => ( is => 'lazy' );
+has 'support' => (is => 'lazy');
 
 sub _build_support {
-    Net::WHMCS::Support->new( (shift)->_build_args() );
+    Net::WHMCS::Support->new((shift)->_build_args());
 }
 
-has 'misc' => ( is => 'lazy' );
+has 'misc' => (is => 'lazy');
 
 sub _build_misc {
-    Net::WHMCS::Miscellaneous->new( (shift)->_build_args() );
+    Net::WHMCS::Miscellaneous->new((shift)->_build_args());
 }
 
 1;
@@ -66,7 +73,7 @@ Net::WHMCS - interface to the WHMCS billing and support system
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -87,7 +94,7 @@ version 0.08
 
 =head1 DESCRIPTION
 
-L<http://docs.whmcs.com/API#Internal_API>
+L<https://developers.whmcs.com/api/>
 
 NOTE: the modules are incomplete. please feel free to fork on github L<https://github.com/fayland/perl-Net-WHMCS> and send me pull requests.
 
@@ -143,7 +150,7 @@ Fayland Lam <fayland@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Fayland Lam.
+This software is copyright (c) 2017 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

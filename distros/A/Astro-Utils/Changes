@@ -1,5 +1,8 @@
 Revision history for Astro::Utils
 
+0.03  Tue Sep 12 12:00:00 2017
+      - Updated copyright year information.
+
 0.02  Tue Feb 02 10:10:00 2016
       - Added key 'provides' to the Makefile.PL script.
 

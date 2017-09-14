@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -25,10 +25,18 @@ use File::Spec;
 my $bash_version = `bash --version`;
 my $have_bash = ($? == 0 ? 1 : 0);
 diag "have_bash $have_bash";
-diag "bash_version ", explain $bash_version;
+diag "bash_version: ", explain $bash_version;
 
 $have_bash
   or plan skip_all => 'bash not available';
+
+my $sqlite3_version = `sqlite3 --version`;
+my $have_sqlite3 = ($? == 0 ? 1 : 0);
+diag "have_sqlite3 $have_sqlite3";
+diag "sqlite3_version: ", explain $sqlite3_version;
+
+$have_sqlite3
+  or plan skip_all => 'sqlite3 not available';
 
 plan tests => 2;
 

@@ -4,8 +4,11 @@ use strict;
 use warnings;
 use SOAP::Lite;
 
-use vars qw( @ISA );
-@ISA = qw( SOAP::Serializer );
+use base qw( SOAP::Serializer );
+
+our $VERSION = '0.301';
+$VERSION = eval $VERSION;
+
 
 #**************************************************************************
 # encode_object( $object, $name, $type, $attr )

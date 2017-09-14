@@ -1,0 +1,8 @@
+{
+	"cmd": ["sqltextify", "-s", "$file"],
+	"selector": "source.sql",
+
+	"windows": {
+		"cmd": ["sqltextify.bat", "-s", "$file"],
+	}
+}

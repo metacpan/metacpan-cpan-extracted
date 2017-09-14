@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.10.0;
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 use Package::DeprecationManager 0.16 -deprecations => {
     'Test::Class::Moose::Config::args' => '0.79',
@@ -28,7 +28,7 @@ Test::Class::Moose::Deprecated - Managed deprecation warnings for Test::Class::M
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 DESCRIPTION
 

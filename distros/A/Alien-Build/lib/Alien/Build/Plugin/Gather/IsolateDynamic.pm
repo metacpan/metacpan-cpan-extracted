@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _destdir_prefix );
 use File::Copy ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 
 sub init
@@ -68,7 +68,7 @@ Alien::Build::Plugin::Gather::IsolateDynamic - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 SYNOPSIS
 

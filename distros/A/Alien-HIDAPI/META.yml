@@ -7,12 +7,17 @@ build_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::Alien: '0.05'
   Test::More: '0'
+  blib: '1.01'
+  perl: '5.008'
 configure_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -31,7 +36,7 @@ no_index:
 provides:
   Alien::HIDAPI:
     file: lib/Alien/HIDAPI.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -42,7 +47,7 @@ resources:
   bugtracker: https://github.com/athreef/Alien-HIDAPI/issues
   homepage: https://github.com/athreef/Alien-HIDAPI
   repository: https://github.com/athreef/Alien-HIDAPI.git
-version: '0.07'
+version: '0.08'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -186,7 +191,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AlienBuild
       name: AlienBuild
-      version: '0.20'
+      version: '0.22'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -238,7 +243,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -255,7 +260,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -268,11 +273,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.07
+          tag: v0.08
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -286,7 +291,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.14.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -302,7 +307,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.14.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -310,6 +315,47 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ChangelogFromGit
       name: ChangelogFromGit
       version: '0.016'
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      config:
+        Dist::Zilla::Plugin::Git::CommitBuild:
+          branch: build/%b
+          build_root: ~
+          message: 'Build results of %h (on %b)'
+          multiple_inheritance: 0
+          release_branch: ~
+          release_message: 'Build results of %h (on %b)'
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.1
+          repo_root: .
+      name: Git::CommitBuild
+      version: '2.042'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: Test::Compile
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

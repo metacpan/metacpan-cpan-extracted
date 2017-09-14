@@ -4,8 +4,8 @@
   # Description: diacollo: common variables
  %]
 [% TRY %]
-  [%#-- try to load ../common.ttk for dstar web environment --%]
-  [% PROCESS "../common.ttk" root_dir="../" %]
+  [%#-- try to load ../common.ttk for dstar web environment; set root_url=root_dir for relative links --%]
+  [% PROCESS "../common.ttk" root_dir="../" root_url=root_dir %]
   [% SET diacollo_standalone = '' %]
 [% CATCH %]
   [%#-- standalone mode: simulate dstar/web/common.ttk --%]
@@ -227,14 +227,29 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   dc_root       = cdb.uriDir();
   dcp_url_base  =  dc_root _ "/profile.perl";
   dcp_url_local = "./profile.perl";
-  ##--
-  ddc_url_root  = dstar.www_url || (diacollo_standalone ? '' : root_url);
+ ##
+ ##-- ddc_url_root : for KWIC-links (relative); formerly =dstar.www_url (absolute)
+ ddc_url_root = (diacollo_standalone ? '' : root_dir);
 %]
 [% SET
-   uroot    = cdb.uuri(dc_root);
-   uprofile = cdb.uuri(dcp_url_base, user_query);
-   uplocal  = cdb.uuri(dcp_url_local, user_query);
-%]
+   uroot        = cdb.uuri(dc_root);
+   uprofile_abs = cdb.uuri(dcp_url_base, user_query);
+   uprofile_rel = cdb.uuri(dcp_url_local, user_query);
+ %]
+[%# PERL
+  ##-- DEBUG
+  print STDERR "DCDEBUG: --\n";
+  print STDERR "DCDEBUG: root_dir=", $stash->get('root_dir'), "\n";
+  print STDERR "DCDEBUG: root_url=", $stash->get('root_url'), "\n";
+  print STDERR "DCDEBUG: dc_root=", $stash->get('dc_root'), "\n";
+  print STDERR "DCDEBUG: cdb.httpHost=", $stash->get('cdb.httpHost'), "\n";
+  print STDERR "DCDEBUG: cdb.serverPort=", $stash->get('cdb.serverPort'), "\n";
+  print STDERR "DCDEBUG: cdb.requestUri=", $stash->get('cdb.requestUri'), "\n";
+  print STDERR "DCDEBUG: cdb.uri=", $stash->get('cdb.uri'), "\n";
+  print STDERR "DCDEBUG: cdb.uriDir=", $stash->get('cdb.uriDir'), "\n";
+  print STDERR "DCDEBUG: --\n";
+#END %]
+
 
 [%##---------------------------------------------------------
   ## db open

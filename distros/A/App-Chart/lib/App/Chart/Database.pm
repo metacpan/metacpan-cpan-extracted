@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -312,6 +312,9 @@ C<$symbol>.
 Read or write extra data associated with C<$symbol>.  C<$key> is a string
 describing the data, C<$value> is a string or C<undef>.  C<undef> means
 delete the data.
+
+C<$symbol> can be the empty string "" for global extra data.  Some data
+sources cache information this way.
 
 =back
 

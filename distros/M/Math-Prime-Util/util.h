@@ -7,6 +7,9 @@ extern int  _XS_get_verbose(void);
 extern void _XS_set_verbose(int v);
 extern int  _XS_get_callgmp(void);
 extern void _XS_set_callgmp(int v);
+/* Disable all manual seeding */
+extern int  _XS_get_secure(void);
+extern void _XS_set_secure(void);
 
 extern int is_prime(UV x);
 extern UV  next_prime(UV x);
@@ -81,6 +84,10 @@ extern int to_digit_string(char *s, UV n, int base, int length);
 extern int to_string_128(char s[40], IV hi, UV lo);
 
 extern int is_catalan_pseudoprime(UV n);
+
+extern int num_to_perm(UV rank, int n, int *vec);
+extern int perm_to_num(int n, int *vec, UV *rank);
+extern void randperm(UV n, UV k, UV *S);
 
 extern UV gcdz(UV x, UV y);
 

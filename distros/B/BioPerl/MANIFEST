@@ -710,10 +710,6 @@ Bio/Tools/Phylo/Gerp.pm
 Bio/Tools/Phylo/Gumby.pm
 Bio/Tools/Phylo/Molphy.pm
 Bio/Tools/Phylo/Molphy/Result.pm
-Bio/Tools/Phylo/PAML.pm
-Bio/Tools/Phylo/PAML/Codeml.pm
-Bio/Tools/Phylo/PAML/ModelResult.pm
-Bio/Tools/Phylo/PAML/Result.pm
 Bio/Tools/Phylo/Phylip/ProtDist.pm
 Bio/Tools/pICalculator.pm
 Bio/Tools/Prediction/Exon.pm
@@ -998,7 +994,6 @@ scripts/utilities/bp_mrtrans.pl
 scripts/utilities/bp_mutate.pl
 scripts/utilities/bp_netinstall.pl
 scripts/utilities/bp_nrdb.pl
-scripts/utilities/bp_pairwise_kaks.pl
 scripts/utilities/bp_remote_blast.pl
 scripts/utilities/bp_revtrans-motif.pl
 scripts/utilities/bp_search2alnblocks.pl
@@ -1074,8 +1069,6 @@ t/data/5X_1895.FASTXY
 t/data/8HVP.pdb
 t/data/a_thaliana.blastn
 t/data/AAC12660.fa
-t/data/aaml.mlc
-t/data/aaml_pairwise.mlc
 t/data/AB077698.gb
 t/data/acefile.ace.1
 t/data/acefile.singlets
@@ -1106,8 +1099,6 @@ t/data/bad_dbfa/bug3172.fa
 t/data/bad_dbfa/shotdb.fa
 t/data/badfasta.fa
 t/data/barns-combined.nex
-t/data/baseml.pairwise
-t/data/baseml.usertree
 t/data/basic-bush.nex
 t/data/basic-ladder.nex
 t/data/BC000007.gbk
@@ -1137,7 +1128,6 @@ t/data/blosum62.bla
 t/data/BN000066-tpa.embl
 t/data/bootstrap.tre
 t/data/BOSS_DROME.FASTP_v35_04
-t/data/branchSite.mlc
 t/data/brassica_ATH.WUBLASTN
 t/data/bug1986.blast2
 t/data/bug1986.blastp
@@ -1156,7 +1146,6 @@ t/data/bug2982.embl
 t/data/bug2982.gb
 t/data/bug3021.gmap
 t/data/bug3086.embl
-t/data/bug3331.mlc
 t/data/c200-vs-yeast.BLASTN
 t/data/c200-vs-yeast.BLASTN.m8
 t/data/calm.swiss
@@ -1173,27 +1162,7 @@ t/data/characters.nexml.old.xml
 t/data/cmsearch.multi.out
 t/data/cmsearch.nohit.out
 t/data/cmsearch_output.txt
-t/data/codeml.mlc
-t/data/codeml315.mlc
-t/data/codeml4.mlc
-t/data/codeml43.mlc
-t/data/codeml43_nssites.mlc
-t/data/codeml45.mlc
 t/data/codeml45b.mlc
-t/data/codeml_lysozyme/2NG.dN
-t/data/codeml_lysozyme/2NG.dS
-t/data/codeml_lysozyme/2NG.tt
-t/data/codeml_lysozyme/4fold.nuc
-t/data/codeml_lysozyme/lnf
-t/data/codeml_lysozyme/lysozymeSmall.ctl
-t/data/codeml_lysozyme/lysozymeSmall.trees
-t/data/codeml_lysozyme/lysozymeSmall.txt
-t/data/codeml_lysozyme/mlc
-t/data/codeml_lysozyme/rst
-t/data/codeml_lysozyme/rst1
-t/data/codeml_lysozyme/rub
-t/data/codeml_nan.mlc
-t/data/codeml_nssites.mlc
 t/data/compLD_missingtest.prettybase
 t/data/compLD_test.prettybase
 t/data/component.ontology.test
@@ -1419,7 +1388,6 @@ t/data/lucy.seq
 t/data/lucy.stderr
 t/data/lysozyme6.protml
 t/data/lysozyme6.simple.protml
-t/data/M0.mlc
 t/data/M12730.gb
 t/data/map_hem/HEM1-HEM12.fa
 t/data/map_hem/HEM1-HEM12.fa.revcom
@@ -1595,6 +1563,7 @@ t/data/prints.out
 t/data/promoterwise.out
 t/data/protpars.phy
 t/data/protpars_longid.phy
+t/data/ps_scan/out.PrositeScan
 t/data/pseudowise.out
 t/data/psi_xml.dat
 t/data/psiblastreport.out
@@ -1634,6 +1603,7 @@ t/data/seg.out
 t/data/semicolon.newick
 t/data/seqdatabase.ini
 t/data/seqfeaturedb/test.gff3
+t/data/seqfile-no-desc.pir
 t/data/seqfile.pir
 t/data/seqs.fas
 t/data/sequencefamily.dat
@@ -1650,7 +1620,6 @@ t/data/signalp.summary
 t/data/sim4.for.for
 t/data/sim4.for.rev
 t/data/sim4.rev
-t/data/singleNSsite.mlc
 t/data/singlescore.gbk
 t/data/singlet_w_CT.ace
 t/data/so.obo
@@ -1799,8 +1768,6 @@ t/data/withrefm.906
 t/data/worm_fam_2785.cdna
 t/data/X98338_Adh-mRNA.gb
 t/data/yeast.tRNAscanSE
-t/data/yn00.mlc
-t/data/yn00_45.mlc
 t/data/YP_007988852.gp
 t/data/ZABJ4EA7014.CH878695.1.blast.txt
 t/Draw/Pictogram.t
@@ -2039,11 +2006,11 @@ t/Tools/Lucy.t
 t/Tools/Match.t
 t/Tools/Phylo/Gerp.t
 t/Tools/Phylo/Molphy.t
-t/Tools/Phylo/PAML.t
 t/Tools/Phylo/Phylip/ProtDist.t
 t/Tools/pICalculator.t
 t/Tools/Primer3.t
 t/Tools/Promoterwise.t
+t/Tools/PrositeScan.t
 t/Tools/Pseudowise.t
 t/Tools/QRNA.t
 t/Tools/RandDistFunctions.t

@@ -1,7 +1,7 @@
 package CPANPLUS::Internals::Utils::Autoflush;
 
 use vars qw[$VERSION];
-$VERSION = "0.9168";
+$VERSION = "0.9170";
 
 BEGIN { my $old = select STDERR; $|++; select $old; $|++; };
 

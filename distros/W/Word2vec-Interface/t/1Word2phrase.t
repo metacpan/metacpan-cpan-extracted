@@ -42,7 +42,6 @@ $word2phrase->SetThreshold( 100 );
 
 $word2phrase->SetW2PDebug( 0 );
 ok( $word2phrase->GetW2PDebug() == 0 );
-$word2phrase->SetW2PDebug( 2 );
 
 my $oldPath = $word2phrase->GetWorkingDir();
 $word2phrase->SetWorkingDir( "test/path" );

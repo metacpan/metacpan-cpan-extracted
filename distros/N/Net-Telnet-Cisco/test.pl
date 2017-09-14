@@ -6,9 +6,13 @@
 use Test::More tests => 32;
 #use Test::More qw/no_plan/;
 use ExtUtils::MakeMaker qw/prompt/;
-use Term::ReadKey;
 use Carp;
 use Cwd;
+my $HAVE_Term_ReadKey = 0;
+eval "use Term::ReadKey";
+if(!$@) {
+    $HAVE_Term_ReadKey = 1
+}
 
 use vars qw/$ROUTER $PASSWD $LOGIN $S $EN_PASS $PASSCODE/;
 
@@ -92,12 +96,15 @@ SKIP: {
     ok( @confg = $S->cmd('show run'),	"cmd() long"		);
 
     # breaks
+SKIP: {
+    skip("ios_break test unreliable", 1);
     $old_timeout = $S->timeout;
     $S->timeout(1);
     $S->errmode(sub { $S->ios_break });
     @break_confg = $S->cmd('show run');
     $S->timeout($old_timeout);
     ok( @break_confg < @confg,		"ios_break()"		);
+}
 
     # Error handling
     my $seen;

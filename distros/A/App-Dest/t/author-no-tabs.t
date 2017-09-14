@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -23,12 +23,12 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
+    't/author-portability.t',
+    't/author-synopsis.t',
     't/deploy.t',
     't/init.t',
     't/prereqs.t',
     't/release-kwalitee.t',
-    't/release-portability.t',
-    't/release-synopsis.t',
     't/status.t',
     't/watches.t'
 );

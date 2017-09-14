@@ -2,7 +2,7 @@ package Test2::Event::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '1.302086';
+our $VERSION = '1.302096';
 
 
 BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -17,6 +17,22 @@ sub summary {
 }
 
 sub diagnostics { 1 }
+
+sub facet_data {
+    my $self = shift;
+    my $out = $self->common_facet_data;
+
+    $out->{errors} = [
+        {
+            tag     => 'ERROR',
+            fail    => 1,
+            details => $self->{+ERROR},
+        }
+    ];
+
+    return $out;
+}
+
 
 1;
 

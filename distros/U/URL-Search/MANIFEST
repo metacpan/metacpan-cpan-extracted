@@ -1,11 +1,11 @@
 Changes
-MANIFEST
-MANIFEST.SKIP
+lib/URL/Search.pm
 Makefile.PL
 Makefile_PL_settings.plx
-README
-lib/URL/Search.pm
+MANIFEST
+MANIFEST.SKIP
 t/test.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from URL::Search POD (added by maint/eumm-fixup.pl)

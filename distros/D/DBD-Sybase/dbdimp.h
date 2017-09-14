@@ -1,5 +1,5 @@
 /*
- $Id: dbdimp.h,v 1.44 2013/04/03 20:16:20 mpeppler Exp $
+ $Id: dbdimp.h,v 1.45 2017/09/10 14:31:45 mpeppler Exp $
 
  Copyright (c) 1997-2011  Michael Peppler
 
@@ -50,6 +50,7 @@ struct imp_drh_st {
 };
 
 #define MAX_SQL_SIZE 255
+#define VERSION_SIZE 20
 
 /* Define dbh implementor data structure */
 struct imp_dbh_st {
@@ -96,7 +97,7 @@ struct imp_dbh_st {
 	char tds_keepalive[16];
 	char serverType[32];
 
-	char serverVersion[15];
+	char serverVersion[VERSION_SIZE];
 	char serverVersionString[255];
 
 	int isDead;

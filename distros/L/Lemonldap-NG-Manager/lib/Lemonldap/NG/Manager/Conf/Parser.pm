@@ -316,6 +316,7 @@ sub _scanNodes {
                     }
                     elsif ($h) {
                         hdebug("  $target: opened node");
+                        $self->confChanged(1);
                         $self->set( $target, $key, $leaf->{title},
                             $leaf->{data} );
                     }
@@ -881,7 +882,7 @@ sub set {
 
 sub defaultValue {
     my ( $self, $target ) = @_;
-    hdebug("# defautValue($target)");
+    hdebug("# defaultValue($target)");
     die unless ($target);
     my $res = eval {
         &Lemonldap::NG::Manager::Attributes::attributes()->{$target}

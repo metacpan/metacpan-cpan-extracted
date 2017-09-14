@@ -43,6 +43,8 @@ my $conf_dir = $wr_dir->child('/etc');
 $conf_dir->mkpath;
 
 my $conf_file = $conf_dir->child("popularity-contest.conf");
+# created with -backup option
+my $backup_file = $conf_dir->child("popularity-contest.conf.old");
 
 my $perl_path = Probe::Perl->find_perl_interpreter();
 
@@ -78,7 +80,7 @@ $conf_file->spew_utf8(@orig);
 
 subtest "minimal modification" => sub {
     # test minimal modif (re-order)
-    my @test_cmd = (qw/modify popcon -save -root-dir/, $wr_dir->stringify);
+    my @test_cmd = (qw/modify popcon -save -backup -root-dir/, $wr_dir->stringify);
     my $ok = test_app( 'App::Cme' => \@test_cmd );
     is ($ok->exit_code, 0, 'all went well' ) or diag("Failed command cme @test_cmd");
     is($ok->error, undef, 'threw no exceptions');
@@ -89,6 +91,10 @@ subtest "minimal modification" => sub {
     my $re = $^V lt 5.18.1 ? qr/yes"\n+MY/ : qr/yes"\nMY/;
     file_contents_like $conf_file->stringify,   $re, "reordered file";
     file_contents_unlike $conf_file->stringify, qr/removed/,   "double comment is removed";
+
+    # check backup
+    ok($backup_file->is_file, "backup file was created");
+    file_contents_like $backup_file->stringify, qr/should be removed/, "backup file contains original comment";
 };
 
 subtest "modification with wrong parameter" => sub {

@@ -1,3 +1,33 @@
+commit 0d052f784d4b67b545ae00bd505033aa14bb65d8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Sep 13 23:33:14 2017 +0930
+
+    VERSION increment: 1.248
+
+commit 4f486a265b1362749941085049ceebdc3715e58b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Sep 13 23:32:10 2017 +0930
+
+    Pulled Compile.pm extend CGI code committed in last change - already exists in WebDyne.pm. Extended there instead
+
+commit 88d407365699e3e119d3d8955fc03951700c7ddb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Sep 13 22:43:24 2017 +0930
+
+    VERSION increment: 1.247
+
+commit e7518c058384f9c6a05efa745dd74628a289da23
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Sep 13 22:43:02 2017 +0930
+
+    Prepare for release
+
+commit 2acb34f9974adde5baa495606b7a613016b34b95
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Sep 13 22:38:34 2017 +0930
+
+    Add ability to extend CGI with missing tags, add support for HTML5 'header' element
+
 commit e472d22e8269d94896175b461612b21aaed9efa3
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Tue Dec 6 15:50:13 2016 +1030
@@ -83,6 +113,18 @@ Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Thu Dec 10 09:49:00 2015 +1030
 
     Mute LIST_CONTEXT_WARN warnings from CGI
+
+commit 32eed49b801e198ed65bd417710748900e00c87c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 28 23:25:12 2015 +0930
+
+    VERSION increment: 1.241
+
+commit 2e80b8c399faf78cd597d825991f9c917e2913a4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 28 23:24:46 2015 +0930
+
+    Fix failure with CGI 4.14 and above, fix CGI warning about param in list context, minor fix to way empty eval result checked
 
 commit 0ca01b925b1212f46c389d19fc21d6f92d781ea5
 Author: Andrew Speer <andrew.speer@isolutions.com.au>

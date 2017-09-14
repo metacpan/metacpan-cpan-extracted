@@ -1,0 +1,30 @@
+---
+abstract: 'communicate with ClickHouse UDP proxy'
+author:
+  - 'Andrey Kuzmin <kak-tus@mail.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Environ-ClickHouse-Proxy
+no_index:
+  directory:
+    - t
+    - inc
+    - example
+    - t
+requires:
+  App::Environ: '0.18'
+  Cpanel::JSON::XS: '0'
+  IO::Socket: '0'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/kak-tus/App-Environ-ClickHouse-Proxy.git
+version: '0.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

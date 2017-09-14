@@ -1,5 +1,8 @@
 package Spp::Ast;
 
+use 5.012;
+no warnings "experimental";
+
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(get_spp_ast);

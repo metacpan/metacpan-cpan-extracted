@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 38;
+use Test::More tests => 44;
 
 use lib 't';
 use MyTestHelpers;
@@ -46,6 +46,32 @@ if ($have_test_mocktime) {
   diag "Test::MockTime version ", Test::MockTime->VERSION;
   diag "Test::MockTime::DateCalc version ", Test::MockTime::DateCalc->VERSION;
 }
+
+#------------------------------------------------------------------------------
+# crunch_trailing_nines()
+
+is (App::Chart::Yahoo::decimal_add_low('123',1), '124');
+is (App::Chart::Yahoo::decimal_add_low('123.45',1), '123.46');
+is (App::Chart::Yahoo::decimal_add_low('123.45',-2), '123.43');
+is (App::Chart::Yahoo::crunch_trailing_nines('30.000001'), '30.000000');
+is (App::Chart::Yahoo::crunch_trailing_nines('30.299999'), '30.300000');
+
+
+#------------------------------------------------------------------------------
+# http_cookies_from_string()
+
+{
+  # round trip ->as_string(), primarily to see that the hack in
+  # http_cookies_from_string() is ok
+  #
+  my $str = <<'HERE';
+Set-Cookie3: foo="bar"; path="/"; domain=.example.com; path_spec; expires="2037-06-02 20:00:00Z"; version=0
+HERE
+  my $cookies = App::Chart::Yahoo::http_cookies_from_string($str);
+  my $got = $cookies->as_string;
+  ok ($got,$str);
+}
+
 
 #------------------------------------------------------------------------------
 # $index_pred

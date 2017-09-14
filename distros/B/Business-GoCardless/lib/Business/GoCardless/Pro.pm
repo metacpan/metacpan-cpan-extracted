@@ -267,18 +267,35 @@ GoCardless webhook:
 
     my $Webhook = $GoCardless->webhook( $json_data,$signature );
 
+Note that GoCardless may continue to send old style webhooks even after you have
+migrated from the Basic to the Pro API, so to handle this the logic in this method
+will check the payload and if it is a legacy webhook will return a legacy Webhook
+object. You can check this like so:
+
+    if ( $Webhook->is_legacy ) {
+        # process webhook using older legacy code
+        ...
+    } else {
+        # process webhook using new style code
+        ...
+    }
+
 =cut
 
 sub webhook {
     my ( $self,$data,$signature ) = @_;
 
-    return Business::GoCardless::Webhook::V2->new(
+    my $webhook = Business::GoCardless::Webhook::V2->new(
         client     => $self->client,
         json       => $data,
         # load ordering handled by setting _signature rather than signature
         # signature will be set in the json trigger
         _signature => $signature,
     );
+
+    return $webhook->has_legacy_data
+        ? $webhook->legacy_webhook
+        : $webhook;
 }
 
 sub _list {

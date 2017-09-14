@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.09 2017-09-08T16:29:30Z
+    - add/update some methods (thx AnotherOneAckap)
+
 0.08 2016-08-12T01:57:54Z
     - fix test (thx ArcticSnowman)
 

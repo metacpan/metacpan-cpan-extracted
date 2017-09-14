@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 04/08/2017                                                             #
+#    Revised: 02/06/2017                                                             #
 #    UMLS Similarity Word2Phrase Executable Interface Module                         #
 #                                                                                    #
 ######################################################################################
@@ -89,11 +89,10 @@ sub new
     # Try To Locate Word2Vec Executable Files Path
     for my $dir ( @INC )
     {
-        $self->{ _word2PhraseExeDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                                    # Test Directory
-        $self->{ _word2PhraseExeDir } = "$dir/lib/Word2Vec/External/Word2vec" if ( -e "$dir/lib/Word2Vec/External/Word2vec" );          # Distribution Package Test Directory
-        $self->{ _word2PhraseExeDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                              # Dev Directory
-        $self->{ _word2PhraseExeDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );                        # Dev Directory
-        $self->{ _word2PhraseExeDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );                  # Release Directory
+        $self->{ _word2PhraseExeDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                       # Test Directory
+        $self->{ _word2PhraseExeDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                 # Dev Directory
+        $self->{ _word2PhraseExeDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );           # Dev Directory
+        $self->{ _word2PhraseExeDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );     # Release Directory
     }
 
     # Open File Handler if checked variable is true

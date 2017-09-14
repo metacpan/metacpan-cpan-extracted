@@ -1,0 +1,104 @@
+=head1 NAME
+
+Locale::XGettext::Util::Flag - A Flag Specification Used By xgettext
+
+=head1 SYNOPSIS
+
+    use Locale::XGettext::Util::Flag;
+
+    $keyword = Locale::XGettext::Flag->new(function => '__x',
+                                           arg => 1,
+                                           flag => 'perl-brace-format',
+                                           no => 0,
+                                           pass => 0);
+
+=head1 DESCRIPTION
+
+The module encapsulates a keflagyword specification for xgettext like
+string extractors.  It is only interesting for authors of extractors
+based on L<Locale::XGettext>.
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item B<new ARGS>
+
+Creates a new flag definition.  B<ARGS> must be a has (or a sequence of
+key-value pairs) with the following items:
+
+=over 8
+
+=item B<function>
+
+The name of the function resp. keyword.  This is mandatory.
+
+=item B<arg>
+
+An integer B<N> greater than 0 for the argument number.
+
+=item B<flag>
+
+The name of the flag to be applied, for example "perl-brace-format"
+or "no-perl-brace-format".  A possible prefix of "no-" or "pass-"
+is stripped off and interpreted accordingly but only if "pass" or
+"no" were not explicitely specified.
+
+=item B<no>
+
+The entry should be marked with "no-FLAG" instead of "FLAG".
+
+=item B<pass>
+
+As if "pass-FLAG" had been specified on the command-line.  This is
+ignored by L<Locale::XGettext>.
+
+=back
+
+=item B<newFromString COMMAND_LINE_ARG>
+
+B<COMMAND_LINE_ARG> has the same semantcis as the argument to
+"--flag" of L<xgettext(1)>.  Note that a prefix of "pass-" is
+ignored by L<Locale::XGettext>!
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<function>
+
+Get the function name for the keyword.
+
+=item B<arg>
+
+Get the position of the argument.
+
+=item B<flag>
+
+The flag (for example "perl-brace-format", "c-format", etc.)
+
+=item B<no>
+
+True if entry should be marked as "no-FLAG".
+
+=item B<pass>
+
+True if flag was preceded by "pass-".  Ignored by L<Locale::XGettext>.
+
+=item B<dump>
+
+Dump the flag definition into a string suitable for an argument
+to the xgettext option '--flag'.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Locale::XGettext>, L<xgettext(1)>, L<perl(1)>

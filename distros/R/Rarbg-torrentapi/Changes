@@ -1,5 +1,8 @@
 Revision history for Rarbg-torrentapi
 
+v0.1.5  2017-09-10 18:16:16 CEST
+        - PR #1 --> Fix ranked attribute. by baptistecdr
+
 v0.1.4  2015-09-30 16:59:43 CEST
         - Fixed tests. CPAN Testers sometimes don't have internet connection
           It seems last fix did not work for all. Using Test::LWP::UserAgent now.

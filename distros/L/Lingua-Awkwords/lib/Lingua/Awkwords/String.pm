@@ -9,7 +9,7 @@ use warnings;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has string => ( is => 'ro' );
 

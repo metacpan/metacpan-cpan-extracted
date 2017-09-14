@@ -163,7 +163,7 @@
 	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
       </div>
       <div class="content">
-	<div class="rawURL"><b>Raw URL:</b> <a id="rawLink" href="[% uprofile |html %]" style="display:none">[% uprofile |html %]</a></div>
+	<div class="rawURL"><b>Raw URL:</b> <a id="rawLink" href="[% uprofile_rel |html %]" style="display:none">[% uprofile_abs |html %]</a></div>
 	<div id="statusRel">
 	  <div id="status" class="status" title="(click to dismiss)">
 	    <img class="icon"></img>

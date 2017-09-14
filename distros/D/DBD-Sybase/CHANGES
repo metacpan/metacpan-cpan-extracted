@@ -1,4 +1,8 @@
-$Id: CHANGES,v 1.90 2013/04/03 20:16:20 mpeppler Exp $
+$Id: CHANGES,v 1.91 2017/09/10 14:31:45 mpeppler Exp $
+
+Release 1.16
+
+    Fix buffer overflow with ASE 16.x
 
 Release 1.15
 

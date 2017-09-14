@@ -137,7 +137,6 @@ sub putwatch {
 }
 
 sub _read_watch_file {
-    my $watch_file;
     open( my $watch_file, '<', 'dest.watch' ) or die $!;
     my @watch_file = map { chomp; $_ } <$watch_file>;
     return \@watch_file;

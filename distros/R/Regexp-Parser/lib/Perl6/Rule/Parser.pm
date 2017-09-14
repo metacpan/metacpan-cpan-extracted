@@ -1,7 +1,9 @@
 package Perl6::Rule::Parser;
 
-use base 'Regexp::Parser';
+use strict;
+use warnings;
 
+use parent qw{Regexp::Parser};
 
 my ($nest_eval, $nest_logical);
 $nest_eval    = qr[ (?> [^\\{}]+ | \\. | { (??{ $nest_eval    }) } )* ]x;
@@ -9,10 +11,10 @@ $nest_logical = qr[ (?> [^\\{}]+ | \\. | { (??{ $nest_logical }) } )* ]x;
 
 
 our $non_nest_brack = qr{
-  \[ [^]]* \] |
-   { [^}]*  } |
-   < [^>]*  > |
-  \( [^)]* \)
+  \{ [^\}]* \} |
+  \< [^\>]* \> |
+  \( [^\)]* \) |
+  \[ [^\]]* \]
 }x;
 
 
@@ -59,12 +61,12 @@ sub init {
       return $S->$c($cc) if $S->can($c);
       --&RxPOS;
 
-      $S->warn(RPe_BADESC, $c = $n, "") if $n =~ /[a-zA-Z]/;
+      $S->warn($S->RPe_BADESC, $c = $n, "") if $n =~ /[a-zA-Z]/;
 
       return $S->object(exact => $n, $c);
     }
 
-    $S->error(RPe_ESLASH);
+    $S->error($S->RPe_ESLASH);
   });
 
   $self->add_handler('\b' => sub {
@@ -75,7 +77,7 @@ sub init {
 
   $self->add_handler('\B' => sub {
     my ($S, $cc) = @_;
-    $S->warn(RPe_BADESC, "B", " in character class") if $cc;
+    $S->warn($S->RPe_BADESC, "B", " in character class") if $cc;
     return $S->force_object(anyof_char => 'B') if $cc;
     return $S->object(bound => nbound => '\B');
   });
@@ -95,7 +97,7 @@ sub init {
       return $S->object(exact => join("", $S->nchar(@names)), "\\c[$n]");
     }
 
-    $S->error(0, "Missing right %s on \\%s", 'brace', "c$1") if ${&Rx} =~ m{ \G ([[({<]) }xgc;
+    $S->error(0, "Missing right %s on \\%s", 'brace', "c$1") if ${&Rx} =~ m{ \G ([\[(\{<]) }xgc;
     $S->error(0, "Missing brackets on \\%s", 'c');
   });
 
@@ -114,7 +116,7 @@ sub init {
       return $S->object(exact_comp => join("", $S->nchar(@names)), "\\C[$n]");
     }
 
-    $S->error(0, "Missing right %s on \\%s", 'brace', "C$1") if ${&Rx} =~ m{ \G ([[({<]) }xgc;
+    $S->error(0, "Missing right %s on \\%s", 'brace', "C$1") if ${&Rx} =~ m{ \G ([\[(\{<]) }xgc;
     $S->error(0, "Missing brackets on \\%s", 'C');
   });
 
@@ -255,7 +257,7 @@ sub init {
       return $S->object(exact => join("", map chr(hex), @hex), "\\x[$h]");
     }
 
-    $S->error(0, "Missing right %s on \\%s", 'brace', "x$1") if ${&Rx} =~ m{ \G ([[({<]) }xgc;
+    $S->error(0, "Missing right %s on \\%s", 'brace', "x$1") if ${&Rx} =~ m{ \G ([\{\[(<]) }xgc;
 
     if (${&Rx} =~ m{ \G ( [a-fA-F0-9]+ ) }xgc) {
       return $S->force_object(anyof_char => chr(hex $1), "\\x$1") if $cc;
@@ -265,7 +267,7 @@ sub init {
     $S->warn(0, "Illegal hexadecimal digit '%s' ignored", substr(${&Rx}, &RxPOS, 1));
     return $S->force_object(anyof_char => "\0", "\\x[0]") if $cc;
     return $S->object(exact => "\0", "\\x[0]");
-  }
+  });
 
   $self->add_handler('\X' => sub {
     my ($S, $cc) = @_;
@@ -284,7 +286,7 @@ sub init {
       return $S->object(exact_comp => join("", map chr(hex), @hex), "\\X[$h]");
     }
 
-    $S->error(0, "Missing right %s on \\%s", 'brace', "X$1") if ${&Rx} =~ m{ \G ([[({<]) }xgc;
+    $S->error(0, "Missing right %s on \\%s", 'brace', "X$1") if ${&Rx} =~ m{ \G ([\[(\{<]) }xgc;
 
     if (${&Rx} =~ m{ \G ( [a-fA-F0-9]+ ) }xgc) {
       return $S->force_object(anyof_char_comp => chr(hex $1), "\\X$1") if $cc;
@@ -294,7 +296,7 @@ sub init {
     $S->warn(0, "Illegal hexadecimal digit '%s' ignored", substr(${&Rx}, &RxPOS, 1));
     return $S->force_object(anyof_char_comp => "\0", "\\X[0]") if $cc;
     return $S->object(exact_comp => "\0", "\\X[0]");
-  }
+  });
 
   $self->add_handler('\0' => sub {
     my ($S, $cc) = @_;
@@ -313,7 +315,7 @@ sub init {
       return $S->object(exact => join("", map chr(oct), @oct), "\\0[$o]");
     }
 
-    $S->error(0, "Missing right %s on \\%s", 'brace', "0$1") if ${&Rx} =~ m{ \G ([[({<]) }xgc;
+    $S->error(0, "Missing right %s on \\%s", 'brace', "0$1") if ${&Rx} =~ m{ \G ([\[(\{<]) }xgc;
 
     if (${&Rx} =~ m{ \G ( [0-7]+ ) }xgc) {
       return $S->force_object(anyof_char => chr(oct $1), "\\0$1") if $cc;
@@ -508,11 +510,11 @@ sub init {
   # nprop (not a unicode property)
   $self->add_handler('\P' => sub {
     my ($S, $cc) = @_;
-    $S->error(RPe_EMPTYB, 'P') if ${&Rx} !~ m{ \G (.) }xgcs;
+    $S->error($self->RPe_EMPTYB, 'P') if ${&Rx} !~ m{ \G (.) }xgcs;
 
     my $name = $1;
     if ($name eq '{') {
-      $S->error(RPe_RBRACE, 'P') if ${&Rx} !~ m{ \G ([^\}]*) \} }xgc;
+      $S->error($self->RPe_RBRACE, 'P') if ${&Rx} !~ m{ \G ([^\}]*) \} }xgc;
       $name = $1;
     }
 
@@ -523,11 +525,11 @@ sub init {
   # prop (a unicode property)
   $self->add_handler('\p' => sub {
     my ($S, $cc) = @_;
-    $S->error(RPe_EMPTYB, 'p') if ${&Rx} !~ m{ \G (.) }xgcs;
+    $S->error($self->RPe_EMPTYB, 'p') if ${&Rx} !~ m{ \G (.) }xgcs;
 
     my $name = $1;
     if ($name eq '{') {
-      $S->error(RPe_RBRACE, 'p') if ${&Rx} !~ m{ \G ([^\}]*) \} }xgc;
+      $S->error($self->RPe_RBRACE, 'p') if ${&Rx} !~ m{ \G ([^\}]*) \} }xgc;
       $name = $1;
     }
 
@@ -538,7 +540,7 @@ sub init {
   # clump (a unicode clump)
   $self->add_handler('\X' => sub {
     my ($S, $cc) = @_;
-    $S->warn(RPe_BADESC, 'X', ' in character class') if $cc;
+    $S->warn($S->RPe_BADESC, 'X', ' in character class') if $cc;
     return $S->force_object(anyof_char => 'X') if $cc;
     return $S->object(clump => '\X');
   });
@@ -551,7 +553,7 @@ sub init {
     my $num = $1;
 
     if ($num eq '{') {
-      $S->error(RPe_RBRACE, 'x') if ${&Rx} !~ m{ \G ( [^\}]* ) \} }xgc;
+      $S->error($self->RPe_RBRACE, 'x') if ${&Rx} !~ m{ \G ( [^\}]* ) \} }xgc;
       $num = $1;
       $brace = 1;
     }
@@ -650,7 +652,7 @@ sub init {
       my ($min, $range, $max) = ($1, $2, $3);
       $max = $min unless $range;
       push @{ $S->{next} }, qw< minmod >;
-      $S->error(RPe_BCURLY) if length($max) and $min > $max;
+      $S->error($self->RPe_BCURLY) if length($max) and $min > $max;
       return $S->object(quant => $min, $max);
     }
     return $S->object(exact => '{');
@@ -679,7 +681,7 @@ sub init {
 
     my $pos = &RxPOS;
     if (${&Rx} =~ m{ \G ([:.=]) .*? \1 ] }xgc) {
-      $S->warn(RPe_OUTPOS, $1, $1);
+      $S->warn($S->RPe_OUTPOS, $1, $1);
       &RxPOS = $pos;
     }
 
@@ -710,7 +712,7 @@ sub init {
         my ($how, $neg, $name) = ($1, $2, $3);
         my $posix = "POSIX_$name";
         if ($S->can($posix)) { $$ret = $S->$posix($neg, $how) }
-        else { $S->error(RPe_BADPOS, "$how$neg$name$how") }
+        else { $S->error($S->RPe_BADPOS, "$how$neg$name$how") }
       }
       elsif (${&Rx} =~ m{ \G (.) }xgcs) {
         $$ret = $S->force_object(anyof_char => $1);
@@ -718,8 +720,8 @@ sub init {
 
       if ($ret == \$lhs) {
         if (${&Rx} =~ m{ \G (?= - ) }xgc) {
-          if ($lhs->visual =~ /^(?:\[[:.=]|\\[dDsSwWpP])/) {
-            $S->warn(RPe_FRANGE, $lhs->visual, "");
+          if ($lhs->visual =~ /^(?:\[\[:.=]|\\[dDsSwWpP])/) {
+            $S->warn($S->RPe_FRANGE, $lhs->visual, "");
             $ret = $lhs;
             last;
           }
@@ -731,12 +733,12 @@ sub init {
       }
       elsif ($ret == \$rhs) {
         if ($rhs->visual =~ /^(?:\[[:.=]|\\[dDsSwWpP])/) {
-          $S->warn(RPe_FRANGE, $lhs->visual, $rhs->visual);
+          $S->warn($S->RPe_FRANGE, $lhs->visual, $rhs->visual);
           &RxPOS = $before_range;
           $ret = $lhs;
         }
         elsif ($lhs->visual gt $rhs->visual) {
-          $S->error(RPe_IRANGE, $lhs->visual, $rhs->visual);
+          $S->error($S->RPe_IRANGE, $lhs->visual, $rhs->visual);
         }
         else {
           $ret = $S->object(anyof_range => $lhs, $rhs);
@@ -751,7 +753,7 @@ sub init {
   # end of char class
   $self->add_handler('cce]' => sub {
     my ($S) = @_;
-    $S->error(RPe_LBRACK) if ${&Rx} !~ m{ \G ] }xgc;
+    $S->error($S->RPe_LBRACK) if ${&Rx} !~ m{ \G ] }xgc;
     return $S->object(anyof_close => "]");
   });
 
@@ -766,7 +768,7 @@ sub init {
   # closing paren coming from an opening paren
   $self->add_handler('c)' => sub {
     my ($S) = @_;
-    $S->error(RPe_LPAREN) if ${&Rx} !~ m{ \G \) }xgc;
+    $S->error($S->RPe_LPAREN) if ${&Rx} !~ m{ \G \) }xgc;
     pop @{ $S->{flags} };
     return $S->object(close =>);
   });
@@ -782,7 +784,7 @@ sub init {
       &RxPOS--;
     }
     else {
-      $S->error(RPe_SEQINC);
+      $S->error($S->RPe_SEQINC);
     }
 
     # flag assertion or non-capturing group
@@ -802,7 +804,7 @@ sub init {
         next;
       }
       my $bad = substr ${&Rx}, $old;
-      $S->error(RPe_NOTREC, &RxPOS - $old, $bad);
+      $S->error($S->RPe_NOTREC, &RxPOS - $old, $bad);
     }
 
     &RxPOS++ if $off =~ s/^-//;
@@ -815,7 +817,7 @@ sub init {
         next;
       }
       my $bad = substr ${&Rx}, $old;
-      $S->error(RPe_NOTREC, &RxPOS - $old, $bad);
+      $S->error($S->RPe_NOTREC, &RxPOS - $old, $bad);
     }
 
     if (${&Rx} =~ m{ \G ([:)]) }xgc) {
@@ -831,27 +833,27 @@ sub init {
 
     &RxPOS++;
     my $l = length($on.$off) + 2;
-    $S->error(RPe_NOTREC, $l, substr(${&Rx}, $old));
+    $S->error($S->RPe_NOTREC, $l, substr(${&Rx}, $old));
   });
 
   # comment
   $self->add_handler('(?#' => sub {
     my ($S) = @_;
     ${&Rx} =~ m{ \G [^)]* }xgc;
-    $S->error(RPe_NOTERM) unless ${&Rx} =~ m{ \G \) }xgc;
+    $S->error($S->RPe_NOTERM) unless ${&Rx} =~ m{ \G \) }xgc;
     return;
   });
 
   # not implemented (?$...)
   $self->add_handler('(?$' => sub {
     my ($S) = @_;
-    $S->error(RPe_NOTREC, 1, substr(${&Rx}, &RxPOS - 1));
+    $S->error($S->RPe_NOTREC, 1, substr(${&Rx}, &RxPOS - 1));
   });
 
   # not implemented (?@...)
   $self->add_handler('(?@' => sub {
     my ($S) = @_;
-    $S->error(RPe_NOTREC, 1, substr(${&Rx}, &RxPOS - 1));
+    $S->error($S->RPe_NOTREC, 1, substr(${&Rx}, &RxPOS - 1));
   });
 
   # look-ahead
@@ -880,7 +882,7 @@ sub init {
       return $S->$n if $S->can($n);
     }
 
-    $S->error(RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
+    $S->error($S->RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
   });
 
   # look-behind
@@ -914,7 +916,7 @@ sub init {
       push @{ $S->{flags} }, &Rf;
       return $S->object(eval => $1);
     }
-    $S->error(RPe_NOTBAL);
+    $S->error($S->RPe_NOTBAL);
   });
 
   # logical prefix
@@ -927,7 +929,7 @@ sub init {
       return $S->$n if $S->can($n);
     }
 
-    $S->error(RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
+    $S->error($S->RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
   });
 
   # logical
@@ -937,7 +939,7 @@ sub init {
       push @{ $S->{flags} }, &Rf;
       return $S->object(logical => $1);
     }
-    $S->error(RPe_NOTBAL);
+    $S->error($S->RPe_NOTBAL);
   });
 
   # logical prefix
@@ -950,13 +952,13 @@ sub init {
       return $S->$n if $S->can($n);
     }
 
-    $S->error(RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
+    $S->error($S->RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
   });
 
   # logical
   $self->add_handler('(?p{' => sub {
     my ($S) = @_;
-    $S->warn(RPe_LOGDEP);
+    $S->warn($S->RPe_LOGDEP);
     my $c = "(??{";
     return $S->$c;
   });
@@ -991,12 +993,12 @@ sub init {
 
     if (${&Rx} =~ m{ \G ( [1-9]\d* ) }xgc) {
       my $n = $1;
-      $S->error(RPe_SWNREC) if ${&Rx} !~ m{ \G \) }xgc;
+      $S->error($S->RPe_SWNREC) if ${&Rx} !~ m{ \G \) }xgc;
       push @{ $S->{next} }, qw< ifthen|2 ifthen| ifthen_atom >;
       return $S->object(groupp => $n);
     }
 
-    $S->error(RPe_SWUNKN, &RxCUR);
+    $S->error($S->RPe_SWUNKN, &RxCUR);
   });
 
   # atom inside an ifthen
@@ -1023,7 +1025,7 @@ sub init {
   $self->add_handler('ifthen|2' => sub {
     my ($S) = @_;
     return if ${&Rx} !~ m{ \G \| }xgc;
-    $S->error(RPe_SWBRAN);
+    $S->error($S->RPe_SWBRAN);
   });
 
   $self->add_handler('ifthen(?' => sub {
@@ -1038,7 +1040,7 @@ sub init {
       &RxPOS -= length $1;
     }
 
-    $S->error(RPe_SEQINC);
+    $S->error($S->RPe_SEQINC);
   });
 }
 

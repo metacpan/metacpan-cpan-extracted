@@ -32,7 +32,7 @@ use Glib;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 261;
+our $VERSION = 263;
 
 use Locale::Messages 1.16; # version 1.16 for turn_utf_8_on()
 BEGIN {
@@ -335,11 +335,16 @@ sub count_decimals {
 
 #------------------------------------------------------------------------------
 
-sub max_maybe {
-  return max (grep {defined} @_);
-}
+# Return min or max of the arguments, ignoring any undefs.
+# If no args (no undefs that is) then return undef.
+# List::Util min() and max() return undef for no args, but they want all args
+# to be numeric.
+#
 sub min_maybe {
   return min (grep {defined} @_);
+}
+sub max_maybe {
+  return max (grep {defined} @_);
 }
 
 #------------------------------------------------------------------------------

@@ -22,22 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
+                  'pattern' => '([2-9]\\d)(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             [2-7]|
             [89]1
-          ',
-                  'pattern' => '([2-9]\\d)(\\d{3})(\\d{2})(\\d{2})'
+          '
                 },
                 {
+                  'pattern' => '([89]\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             8[047]|
             90
-          ',
-                  'pattern' => '([89]\\d{2})(\\d{3})(\\d{3})'
+          '
                 },
                 {
                   'leading_digits' => '860',
@@ -46,21 +46,10 @@ my $formatters = [
               ];
 
 my $validators = {
-                'specialrate' => '(84[0248]\\d{6})|(90[016]\\d{6})|(5[18]\\d{7})',
-                'geographic' => '
-          (?:
-            2[12467]|
-            3[1-4]|
-            4[134]|
-            5[256]|
-            6[12]|
-            [7-9]1
-          )\\d{7}
-        ',
-                'personal_number' => '878\\d{6}',
                 'voip' => '',
                 'toll_free' => '800\\d{6}',
-                'pager' => '74[0248]\\d{6}',
+                'mobile' => '7[5-9]\\d{7}',
+                'specialrate' => '(84[0248]\\d{6})|(90[016]\\d{6})|(5[18]\\d{7})',
                 'fixed_line' => '
           (?:
             2[12467]|
@@ -71,7 +60,18 @@ my $validators = {
             [7-9]1
           )\\d{7}
         ',
-                'mobile' => '7[5-9]\\d{7}'
+                'pager' => '74[0248]\\d{6}',
+                'geographic' => '
+          (?:
+            2[12467]|
+            3[1-4]|
+            4[134]|
+            5[256]|
+            6[12]|
+            [7-9]1
+          )\\d{7}
+        ',
+                'personal_number' => '878\\d{6}'
               };
 my %areanames = (
   4121 => "Lausanne",

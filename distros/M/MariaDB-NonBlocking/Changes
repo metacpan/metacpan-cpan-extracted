@@ -1,5 +1,10 @@
 Revision history for MariaDB-NonBlocking
 
+0.07    2017-09-13
+        * DESTROY() will now reject all pending promises.
+        * AnyEvent::detect() will be called before the first
+          query, assuming nothing else called it first.
+
 0.06    2017-09-06
         * Work with AnyEvent, and utilize less watchers if
           we can -- mostly if we are using EV.

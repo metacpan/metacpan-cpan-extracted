@@ -1,5 +1,11 @@
 Revision history for Graph::Easy::As_svg:
 
+0.27        2017-09-08
+  * Fix a circular requires/provides.
+    + See: https://github.com/shlomif/Graph-Easy-As_svg/issues/1
+    + Thanks to @ssoriche for the report, Grinnz for the pull-req and other
+      people from #distzilla on irc.perl.org for providing insights.
+
 0.26        2017-04-15
   * dzil fixes - bump the $VERSION in lib/Graph/Easy/As_svg.pm .
     + See: https://rt.cpan.org/Ticket/Display.html?id=121124

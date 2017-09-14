@@ -3,12 +3,13 @@ abstract: 'Log to Files that Archive/Rotate Themselves'
 author:
   - 'Michael Schout <mschout@cpan.org>'
 build_requires:
+  Encode: '0'
   POSIX: '0'
   Path::Tiny: '0.018'
   Test::More: '0.88'
   Test::Warn: '0'
-  perl: '5.006'
-  warnings: '0'
+  perl: '5.008'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -21,18 +22,19 @@ meta-spec:
 name: Log-Dispatch-FileRotate
 requires:
   Date::Manip: '0'
+  Exporter: '0'
   Fcntl: '0'
   File::Spec: '0'
   Log::Dispatch::File: '0'
   Log::Dispatch::Output: '0'
-  Params::Validate: '0'
   base: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   version: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-FileRotate
   homepage: http://search.cpan.org/dist/Log-Dispatch-FileRotate/
   repository: git://github.com/mschout/perl-log-dispatch-filerotate.git
-version: '1.30'
+version: '1.34'
 x_serialization_backend: 'YAML::Tiny version 1.69'

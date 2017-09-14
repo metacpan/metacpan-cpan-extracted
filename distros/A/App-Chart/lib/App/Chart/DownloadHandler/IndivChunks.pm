@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -31,7 +31,7 @@ sub new {
   my ($class, %options) = @_;
   $options{'name'} or croak "missing name for ".__PACKAGE__;
   $options{'chunk_size'} or croak "missing chunk_size for ".__PACKAGE__;
-  $options{'url_func'} or croak "missing chunk_size for ".__PACKAGE__;
+  $options{'url_func'} or croak "missing url_func for ".__PACKAGE__;
 
   return $class->SUPER::new (%options,
                              proc => \&indivchunks_download,

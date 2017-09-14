@@ -4,7 +4,7 @@ package Test::Class::Moose;
 
 use 5.10.0;
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 use Moose 2.0000;
 use Carp;
@@ -222,7 +222,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 
@@ -249,7 +249,7 @@ version 0.86
 
 =head1 DESCRIPTION
 
-See the L<Test::Class::Moose home page|http://test-class-moose.github.io/test-class-moose/> for
+See the L<Test::Class::Moose home page|http://houseabsolute.github.io/test-class-moose/> for
 a summary.
 
 C<Test::Class::Moose> is a powerful testing framework for Perl. Out of the box
@@ -1151,7 +1151,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
+=for stopwords Andy Jack Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Jeremy Krieg Jonathan C. Otsuka Stowe Karen Etheridge mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
 
 =over 4
 
@@ -1210,6 +1210,10 @@ Olaf Alders <olaf@wundersolutions.com>
 =item *
 
 Paul Boyd <pboyd@dev3l.net>
+
+=item *
+
+Paul Williams <kwakwaversal@gmail.com>
 
 =item *
 

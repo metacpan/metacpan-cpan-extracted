@@ -4,21 +4,29 @@ use Test2::Bundle::More;
 use Test::Alien 0.05;
 use Alien::libvas;
 
+sub propagate_error {
+    my $module = shift;
+    diag 'vas_error: ' . $module->xs_vas_error if $module->xs_vas_error
+}
+
 alien_ok 'Alien::libvas';
 my $xs = do { local $/; <DATA> };
 xs_ok {xs => $xs, verbose => 1}, with_subtest {
     my($module) = @_;
 
     my $handle = $module->xs_vas_open($$); # Opening own VAS always succeeds
+    propagate_error($module);
     ok $handle, "Opening own pid $$ => $handle";
 
     my $ptr = $module->xs_val(42);
 
     my $ret = $module->xs_vas_read($handle, $ptr);
+    propagate_error($module);
 
     is $ret, 42, "Reading static variable";
 
     my $nbytes = $module->xs_vas_write($handle, $ptr, 1337);
+    propagate_error($module);
 
     is $nbytes, $module->xs_sizeof_int, "Writing an int to static variable";
 
@@ -38,7 +46,7 @@ __DATA__
 #include <vas.h>
 
 void* xs_vas_open(const char *s, int pid) {
-    return vas_open(pid, 0);
+    return vas_open(pid, VAS_O_REPORT_ERROR);
 }
 
 int xs_vas_read(const char *s, void* vas, unsigned long src) {
@@ -56,6 +64,10 @@ int xs_vas_write(const char *s, void* vas, unsigned long dst, int src) {
 
 void xs_vas_close(const char *s, void *handle) {
     vas_close(handle);
+}
+
+const char *xs_vas_error(const char *s) {
+    return vas_error(NULL);
 }
 
 void *xs_val(const char *s, int newval) {
@@ -94,6 +106,9 @@ int xs_vas_read(class, handle, src);
  const char *class;
  void *handle;
  unsigned long src;
+
+const char *xs_vas_error(class);
+ const char *class;
 
 void *xs_val(class, newval);
  const char *class;

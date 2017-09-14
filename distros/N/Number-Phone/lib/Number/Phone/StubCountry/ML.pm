@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[246-9]'
+                  'leading_digits' => '[246-9]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
                   'pattern' => '(\\d{4})',
@@ -39,8 +39,8 @@ my $formatters = [
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'geographic' => '
+                'voip' => '',
+                'fixed_line' => '
           (?:
             2(?:
               0(?:
@@ -66,7 +66,10 @@ my $validators = {
             8[239]\\d{2}
           )\\d{4}
         ',
-                'fixed_line' => '
+                'toll_free' => '80\\d{6}',
+                'pager' => '',
+                'personal_number' => '',
+                'geographic' => '
           (?:
             2(?:
               0(?:
@@ -80,10 +83,7 @@ my $validators = {
             )|
             44[1239]\\d
           )\\d{4}
-        ',
-                'toll_free' => '80\\d{6}',
-                'pager' => '',
-                'voip' => ''
+        '
               };
 my %areanames = (
   223202 => "Bamako",
@@ -101,7 +101,7 @@ my %areanames = (
   223214 => "Mopti",
   223215 => "Kayes",
   223216 => "Sikasso",
-  223218 => "Gao\ and\ Kidal",
+  223218 => "Gao\/Kidal",
   223219 => "Tombouctou",
   223442 => "Bamako",
   223443 => "Bamako",

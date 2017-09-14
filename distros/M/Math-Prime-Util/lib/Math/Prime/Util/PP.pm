@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.65';
+  $Math::Prime::Util::PP::VERSION = '0.66';
 }
 
 BEGIN {
@@ -1533,15 +1533,17 @@ sub nth_prime_upper {
   my $flog2n = log($flogn);  # Note distinction between log_2(n) and log^2(n)
 
   my $upper;
-  if      ($n >= 8009824) {  # Axler 2013 page viii Korollar G
+  if      ($n >= 46254381) {  # Axler 2017 Corollary 1.2
+    $upper = $n * ( $flogn  +  $flog2n-1.0  +  (($flog2n-2.00)/$flogn)  -  (($flog2n*$flog2n - 6*$flog2n + 10.667)/(2*$flogn*$flogn)) );
+  } elsif ($n >=  8009824) {  # Axler 2013 page viii Korollar G
     $upper = $n * ( $flogn  +  $flog2n-1.0  +  (($flog2n-2.00)/$flogn)  -  (($flog2n*$flog2n - 6*$flog2n + 10.273)/(2*$flogn*$flogn)) );
-  } elsif ($n >= 688383) {   # Dusart 2010 page 2
+  } elsif ($n >=  688383) {   # Dusart 2010 page 2
     $upper = $n * ( $flogn  +  $flog2n - 1.0 + (($flog2n-2.00)/$flogn) );
-  } elsif ($n >= 178974) {   # Dusart 2010 page 7
+  } elsif ($n >=  178974) {   # Dusart 2010 page 7
     $upper = $n * ( $flogn  +  $flog2n - 1.0 + (($flog2n-1.95)/$flogn) );
-  } elsif ($n >=  39017) {   # Dusart 1999 page 14
+  } elsif ($n >=   39017) {   # Dusart 1999 page 14
     $upper = $n * ( $flogn  +  $flog2n - 0.9484 );
-  } elsif ($n >=      6) {   # Modified Robin 1983, for 6-39016 only
+  } elsif ($n >=       6) {   # Modified Robin 1983, for 6-39016 only
     $upper = $n * ( $flogn  +  0.6000 * $flog2n );
   } else {
     $upper = $n * ( $flogn  +  $flog2n );
@@ -1568,7 +1570,9 @@ sub nth_prime_lower {
   # Dusart 2010 page 2, for all n >= 3
   #my $lower = $n * ($flogn + $flog2n - 1.0 + (($flog2n-2.10)/$flogn));
   # Axler 2013 page viii Korollar I, for all n >= 2
-  my $lower = $n * ($flogn + $flog2n-1.0 + (($flog2n-2.00)/$flogn) - (($flog2n*$flog2n - 6*$flog2n + 11.847)/(2*$flogn*$flogn)) );
+  #my $lower = $n * ($flogn + $flog2n-1.0 + (($flog2n-2.00)/$flogn) - (($flog2n*$flog2n - 6*$flog2n + 11.847)/(2*$flogn*$flogn)) );
+  # Axler 2017 Corollary 1.4
+  my $lower = $n * ($flogn + $flog2n-1.0 + (($flog2n-2.00)/$flogn) - (($flog2n*$flog2n - 6*$flog2n + 11.508)/(2*$flogn*$flogn)) );
 
   return int($lower + 0.999999999);
 }
@@ -3224,10 +3228,14 @@ sub is_strong_pseudoprime {
     return 1 unless @bases;
   }
 
-  # Die on invalid bases
-  foreach my $base (@bases) { croak "Base $base is invalid" if $base < 2 }
-  # Make sure we handle big bases ok.
-  @bases = grep { $_ > 1 }  map { ($_ >= $n) ? $_ % $n : $_ }  @bases;
+  my @newbases;
+  for my $base (@bases) {
+    croak "Base $base is invalid" if $base < 2;
+    $base %= $n if $base >= $n;
+    return 0 if $base == 0 || ($base == $n-1 && ($base % 2) == 1);
+    push @newbases, $base;
+  }
+  @bases = @newbases;
 
   if ( ref($n) eq 'Math::BigInt' ) {
 
@@ -3701,7 +3709,7 @@ sub lucas_sequence {
   croak "lucas_sequence: P out of range" if abs($P) >= $n;
   croak "lucas_sequence: Q out of range" if abs($Q) >= $n;
 
-  if ($Math::Prime::Util::_GMPfunc{"lucas_sequence"}) {
+  if ($Math::Prime::Util::_GMPfunc{"lucas_sequence"} && $Math::Prime::Util::GMP::VERSION >= 0.30) {
     return map { ($_ > ''.~0) ? Math::BigInt->new(''.$_) : $_ }
            Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $k);
   }
@@ -6145,17 +6153,23 @@ sub forcomb {
     while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
   }
 }
-sub forperm {
-  my($sub, $n, $k) = @_;
-  _validate_positive_integer($n);
-  croak "Too many arguments for forperm" if defined $k;
-  $k = $n;
-  return $sub->() if $n == 0;
-  return $sub->(0) if $n == 1;
+sub _forperm {
+  my($sub, $n, $all_perm) = @_;
+  my $k = $n;
   my @c = reverse 0 .. $k-1;
   my $inc = 0;
+  my $send = 1;
   while (1) {
-    $sub->(reverse @c);
+    if (!$all_perm) {   # Derangements via simple filtering.
+      $send = 1;
+      for my $p (0 .. $#c) {
+        if ($c[$p] == $k-$p-1) {
+          $send = 0;
+          last;
+        }
+      }
+    }
+    $sub->(reverse @c) if $send;
     if (++$inc & 1) {
       @c[0,1] = @c[1,0];
       next;
@@ -6168,6 +6182,22 @@ sub forperm {
     @c[$j,$m] = @c[$m,$j];
     @c[0..$j-1] = reverse @c[0..$j-1];
   }
+}
+sub forperm {
+  my($sub, $n, $k) = @_;
+  _validate_positive_integer($n);
+  croak "Too many arguments for forperm" if defined $k;
+  return $sub->() if $n == 0;
+  return $sub->(0) if $n == 1;
+  _forperm($sub, $n, 1);
+}
+sub forderange {
+  my($sub, $n, $k) = @_;
+  _validate_positive_integer($n);
+  croak "Too many arguments for forderange" if defined $k;
+  return $sub->() if $n == 0;
+  return if $n == 1;
+  _forperm($sub, $n, 0);
 }
 
 sub _multiset_permutations {
@@ -6203,6 +6233,91 @@ sub _multiset_permutations {
   }
 }
 
+sub numtoperm {
+  my($n,$k) = @_;
+  _validate_positive_integer($n);
+  _validate_positive_integer($k);
+  return () if $n == 0;
+  return (0) if $n == 1;
+  my $f = factorial($n-1);
+  $k %= vecprod($f,$n) if int($k/$f) >= $n;
+  my @S = map { $_ } 0 .. $n-1;
+  my @V;
+  while ($n-- > 0) {
+    my $i = int($k/$f);
+    push @V, splice(@S,$i,1);
+    last if $n == 0;
+    $k -= $i*$f;
+    $f /= $n;
+  }
+  @V;
+}
+
+sub permtonum {
+  my $A = shift;
+  croak "permtonum argument must be an array reference"
+    unless ref($A) eq 'ARRAY';
+  my $n = scalar(@$A);
+  return 0 if $n == 0;
+  {
+    my %S;
+    for my $v (@$A) {
+      croak "permtonum invalid permutation array"
+        if !defined $v || $v < 0 || $v >= $n || $S{$v}++;
+    }
+  }
+  my $f = factorial($n-1);
+  my $rank = 0;
+  for my $i (0 .. $n-2) {
+    my $k = 0;
+    for my $j ($i+1 .. $n-1) {
+      $k++ if $A->[$j] < $A->[$i];
+    }
+    $rank = Math::Prime::Util::vecsum($rank, Math::Prime::Util::vecprod($k,$f));
+    $f /= $n-$i-1;
+  }
+  $rank;
+}
+
+sub randperm {
+  my($n,$k) = @_;
+  _validate_positive_integer($n);
+  if (defined $k) {
+    _validate_positive_integer($k);
+  }
+  $k = $n if !defined($k) || $k > $n;
+  return () if $k == 0;
+
+  my @S;
+  if ("$k"/"$n" <= 0.30) {
+    my %seen;
+    my $v;
+    for my $i (1 .. $k) {
+      do { $v = Math::Prime::Util::urandomm($n); } while $seen{$v}++;
+      push @S,$v;
+    }
+  } else {
+    @S = map { $_ } 0..$n-1;
+    for my $i (0 .. $n-2) {
+      last if $i >= $k;
+      my $j = Math::Prime::Util::urandomm($n-$i);
+      @S[$i,$i+$j] = @S[$i+$j,$i];
+    }
+    $#S = $k-1;
+  }
+  return @S;
+}
+
+sub shuffle {
+  my @S=@_;
+  # Note: almost all the time is spent in urandomm.
+  for (my $i = $#S; $i >= 1; $i--) {
+    my $j = Math::Prime::Util::urandomm($i+1);
+    @S[$i,$j] = @S[$j,$i];
+  }
+  @S;
+}
+
 ###############################################################################
 #       Random numbers
 ###############################################################################
@@ -6219,7 +6334,7 @@ sub urandomb {
 }
 sub urandomm {
   my($n) = @_;
-  _validate_positive_integer($n);
+  # _validate_positive_integer($n);
   return Math::Prime::Util::_reftyped($_[0], Math::Prime::Util::GMP::urandomm($n))
     if $Math::Prime::Util::_GMPfunc{"urandomm"};
   return 0 if $n <= 1;
@@ -6339,6 +6454,112 @@ sub miller_rabin_random {
   1;
 }
 
+sub random_semiprime {
+  my($b) = @_;
+  return 0 if defined $b && int($b) < 0;
+  _validate_positive_integer($b,4);
+
+  my $n;
+  my $min = ($b <= MPU_MAXBITS)  ?  (1 << ($b-1))  :  BTWO->copy->bpow($b-1);
+  my $max = $min + ($min - 1);
+  my $L = $b >> 1;
+  my $N = $b - $L;
+  my $one = ($b <= MPU_MAXBITS) ? 1 : BONE;
+  do {
+    $n = $one * random_nbit_prime($L) * random_nbit_prime($N);
+  } while $n < $min || $n > $max;
+  $n = _bigint_to_int($n) if ref($n) && $n->bacmp(BMAX) <= 0;
+  $n;
+}
+
+sub random_unrestricted_semiprime {
+  my($b) = @_;
+  return 0 if defined $b && int($b) < 0;
+  _validate_positive_integer($b,3);
+
+  my $n;
+  my $min = ($b <= MPU_MAXBITS)  ?  (1 << ($b-1))  :  BTWO->copy->bpow($b-1);
+  my $max = $min + ($min - 1);
+
+  if ($b <= 64) {
+    do {
+      $n = $min + urandomb($b-1);
+    } while !Math::Prime::Util::is_semiprime($n);
+  } else {
+    # Try to get probabilities right for small divisors
+    my %M = (
+      2 => 1.91218397452243,
+      3 => 1.33954826555021,
+      5 => 0.854756717114822,
+      7 => 0.635492301836862,
+      11 => 0.426616792046787,
+      13 => 0.368193843118344,
+      17 => 0.290512701603111,
+      19 => 0.263359264658156,
+      23 => 0.222406328935102,
+      29 => 0.181229250520242,
+      31 => 0.170874199059434,
+      37 => 0.146112155735473,
+      41 => 0.133427839963585,
+      43 => 0.127929010905662,
+      47 => 0.118254609086782,
+      53 => 0.106316418106489,
+      59 => 0.0966989675438643,
+      61 => 0.0938833658008547,
+      67 => 0.0864151823151671,
+      71 => 0.0820822953188297,
+      73 => 0.0800964416340746,
+      79 => 0.0747060914833344,
+      83 => 0.0714973706654851,
+      89 => 0.0672115468436284,
+      97 => 0.0622818892486191,
+      101 => 0.0600855891549939,
+      103 => 0.0590613570015407,
+      107 => 0.0570921135626976,
+      109 => 0.0561691667641485,
+      113 => 0.0544330141081874,
+      127 => 0.0490620204315701,
+    );
+    my ($p,$r);
+    $r = Math::Prime::Util::drand();
+    for my $prime (2..127) {
+      next unless defined $M{$prime};
+      my $PR = $M{$prime} / $b  +  0.19556 / $prime;
+      if ($r <= $PR) {
+        $p = $prime;
+        last;
+      }
+      $r -= $PR;
+    }
+    if (!defined $p) {
+      # Idea from Charles Greathouse IV, 2010.  The distribution is right
+      # at the high level (small primes weighted more and not far off what
+      # we get with the uniform selection), but there is a noticeable skew
+      # toward primes with a large gap after them.  For instance 3 ends up
+      # being weighted as much as 2, and 7 more than 5.
+      #
+      # Since we handled small divisors earlier, this is less bothersome.
+      my $M = 0.26149721284764278375542683860869585905;
+      my $weight = $M + log($b * log(2)/2);
+      my $minr = log(log(131));
+      do {
+        $r  = Math::Prime::Util::drand($weight) - $M;
+      } while $r < $minr;
+      # Using Math::BigFloat::bexp is ungodly slow, so avoid at all costs.
+      my $re = exp($r);
+      my $a = ($re < log(~0)) ? int(exp($re)+0.5)
+                              : _upgrade_to_float($re)->bexp->bround->as_int;
+      $p = $a < 2 ? 2 : Math::Prime::Util::prev_prime($a+1);
+    }
+    my $ranmin = ref($min) ? $min->badd($p-1)->bdiv($p)->as_int : int(($min+$p-1)/$p);
+    my $ranmax = ref($max) ? $max->bdiv($p)->as_int : int($max/$p);
+    my $q = random_prime($ranmin, $ranmax);
+    $n = Math::Prime::Util::vecprod($p,$q);
+  }
+  $n = _bigint_to_int($n) if ref($n) && $n->bacmp(BMAX) <= 0;
+  $n;
+}
+
 1;
 
 __END__
@@ -6358,7 +6579,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.65
+Version 0.66
 
 
 =head1 SYNOPSIS

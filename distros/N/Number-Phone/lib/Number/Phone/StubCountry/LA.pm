@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'pattern' => '(20)(\\d{2})(\\d{3})(\\d{3})',
-                  'leading_digits' => '20'
+                  'leading_digits' => '20',
+                  'pattern' => '(20)(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
                   'leading_digits' => '
@@ -38,13 +38,13 @@ my $formatters = [
                   'pattern' => '([2-8]\\d)(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(30)(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '30'
+                  'leading_digits' => '30',
+                  'pattern' => '(30)(\\d{2})(\\d{2})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             2[13]|
@@ -57,15 +57,16 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'personal_number' => '',
+                'pager' => '',
                 'mobile' => '
           20(?:
             2[2389]|
             5[24-689]|
             7[6-8]|
-            9[15-9]
+            9[125-9]
           )\\d{6}
         ',
+                'toll_free' => '',
                 'fixed_line' => '
           (?:
             2[13]|
@@ -78,9 +79,8 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'voip' => '',
-                'pager' => '',
-                'toll_free' => ''
+                'specialrate' => '',
+                'voip' => ''
               };
 
     sub new {

@@ -1,5 +1,7 @@
 Revision history for Perl module Mojo::XMLRPC
 
+0.02 2017-09-08
+  - The previous release inadvertently required Mojolicious 7.0 exactly when that should rather have been the minimum
 0.01 2017-08-22
   - Initial release
 

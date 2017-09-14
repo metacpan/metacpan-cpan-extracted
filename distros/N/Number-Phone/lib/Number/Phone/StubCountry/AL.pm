@@ -22,36 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
-                  'pattern' => '(4)(\\d{3})(\\d{4})',
-                  'leading_digits' => '4[0-6]'
+                  'leading_digits' => '4[0-6]',
+                  'pattern' => '(4)(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '6',
-                  'pattern' => '(6\\d)(\\d{3})(\\d{4})'
+                  'pattern' => '(6\\d)(\\d{3})(\\d{4})',
+                  'leading_digits' => '6'
                 },
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             [2358][2-5]|
             4[7-9]
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+          '
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3,5})',
                   'leading_digits' => '
             [235][16-9]|
-            8[016-9]|
-            [79]
+            [79]|
+            8[016-9]
           '
                 }
               ];
 
 my $validators = {
-                'personal_number' => '700[2-9]\\d{4}',
+                'pager' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -114,10 +114,16 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'specialrate' => '(808[1-9]\\d{2})|(900[1-9]\\d{2})',
-                'pager' => '',
-                'toll_free' => '800\\d{4}',
+                'personal_number' => '700[2-9]\\d{4}',
                 'voip' => '',
+                'mobile' => '
+          6(?:
+            [689][2-9]|
+            7[2-6]
+          )\\d{6}
+        ',
+                'toll_free' => '800\\d{4}',
+                'specialrate' => '(808[1-9]\\d{2})|(900[1-9]\\d{2})',
                 'fixed_line' => '
           (?:
             2(?:
@@ -179,12 +185,6 @@ my $validators = {
               )
             )
           )\\d{4}
-        ',
-                'mobile' => '
-          6(?:
-            [689][2-9]|
-            7[2-6]
-          )\\d{6}
         '
               };
 my %areanames = (

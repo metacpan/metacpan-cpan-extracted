@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Simple::Header;
 # ABSTRACT: the header of an Email::Simple message
-$Email::Simple::Header::VERSION = '2.213';
+$Email::Simple::Header::VERSION = '2.214';
 use Carp ();
 
 require Email::Simple;
@@ -283,6 +283,29 @@ sub header_set {
   $self->header_raw_set($field, @data);
 }
 
+#pod =method header_raw_prepend
+#pod
+#pod   $header->header_raw_prepend($field => $value);
+#pod
+#pod This method adds a new instance of the name field as the first field in the
+#pod header.
+#pod
+#pod =cut
+
+sub header_raw_prepend {
+  my ($self, $field, $value) = @_;
+
+  Carp::confess("tried to prepend raw header with undefined field name")
+    unless defined $field;
+
+  Carp::confess(qq{tried to prepend raw header "$field" with undefined value})
+    unless defined $value;
+
+  unshift @{ $self->{headers} }, $field => $value;
+
+  return;
+}
+
 #pod =method crlf
 #pod
 #pod This method returns the newline string used in the header.
@@ -376,7 +399,7 @@ Email::Simple::Header - the header of an Email::Simple message
 
 =head1 VERSION
 
-version 2.213
+version 2.214
 
 =head1 SYNOPSIS
 
@@ -462,6 +485,13 @@ name for the method and which you'll see most often.  In general, though, it's
 better to be explicit and use L<header_raw_set>.  (In Email::MIME,
 L<header_str_set> exists for letting the library do the header encoding for
 you.)
+
+=head2 header_raw_prepend
+
+  $header->header_raw_prepend($field => $value);
+
+This method adds a new instance of the name field as the first field in the
+header.
 
 =head2 crlf
 

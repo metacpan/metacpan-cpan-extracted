@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/skaji/App-RemoteCommand/issues
   homepage: https://github.com/skaji/App-RemoteCommand
   repository: https://github.com/skaji/App-RemoteCommand.git
-version: '0.92'
+version: '0.95'
 x_contributors:
   - 'Shoichi Kaji <skaji@outlook.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

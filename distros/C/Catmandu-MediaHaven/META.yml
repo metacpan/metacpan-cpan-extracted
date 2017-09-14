@@ -27,14 +27,20 @@ no_index:
 requires:
   Cache::LRU: '0'
   Catmandu: '1.06'
+  Date::Parse: '0'
+  Getopt::Long: '0'
+  HTTP::Request: '0'
+  IO: '0'
   IO::Socket::SSL: '2.015'
+  JSON: '0'
+  Moo: '0'
   REST::Client: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MediaHaven/issues
   homepage: https://github.com/LibreCat/Catmandu-MediaHaven
   repository: https://github.com/LibreCat/Catmandu-MediaHaven.git
-version: '0.03'
+version: '0.05'
 x_contributors:
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

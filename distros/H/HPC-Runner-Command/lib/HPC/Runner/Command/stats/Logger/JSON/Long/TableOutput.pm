@@ -14,7 +14,7 @@ sub iter_jobs_long {
     my $jobref     = shift;
 
     my $submission_id = $submission->{uuid};
-    my $table         = $self->build_table($submission, $submission_id);
+    my $table = $self->build_table( $submission, $submission_id );
 
     $table->setCols(
         [
@@ -59,8 +59,8 @@ sub iter_tasks_long {
 
         my $end_time = $task->{exit_time} || '';
         my $duration = $task->{duration}  || '';
+        my $task_id  = $task->{task_id}   || '';
         my $exit_code = $task->{exit_code};
-        my $task_id = $task->{task_id} || '';
 
         if ( !defined $exit_code ) {
             $exit_code = '';
@@ -74,6 +74,7 @@ sub iter_tasks_long {
         );
 
     }
+    $table->addRowLine();
 }
 
 1;

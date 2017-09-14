@@ -4,7 +4,7 @@
       "Chris Reinhardt <crein@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,9 +48,10 @@
          "web" : "https://github.com/ctriv/perl-Plack-Middleware-Debug-LWP"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_contributors" : [
       "Mark Ng <cpan@markng.co.uk>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

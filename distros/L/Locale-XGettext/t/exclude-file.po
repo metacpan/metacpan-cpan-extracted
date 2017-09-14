@@ -1,0 +1,6 @@
+msgid "Hello, world!"
+msgstr ""
+
+msgctxt "override"
+msgid "Hello, Mars!"
+msgstr ""

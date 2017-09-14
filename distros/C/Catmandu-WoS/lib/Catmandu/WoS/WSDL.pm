@@ -2,7 +2,7 @@ package Catmandu::WoS::WSDL;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub xml {
     state $xml = do {binmode DATA, 'encoding(utf-8)'; local $/; <DATA>};

@@ -4,8 +4,6 @@
 ##
 ###############################################################################
 
-package MCE::Shared::Base;
-
 use strict;
 use warnings;
 
@@ -13,7 +11,9 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+package MCE::Shared::Base;
+
+our $VERSION = '1.828';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -157,7 +157,7 @@ sub _find_hash {
    $q =~ s/(!ref)\(key\)/$1(\$_)/gi;
 
    # Minidb (HoH) field
-   if ( $params->{'hfind'} ) {
+   if ( exists $params->{'hfind'} ) {
       $q =~ s/\$_ /:%: /g;  # preserve $_ from hash key mods above
       $q =~ s/([^:%\(\t ]+)[ ]+(==|!=|<|<=|>|>=|eq|ne|lt|le|gt|ge|=~|!~)/\$data->{\$_}{'$1'} $2/gi;
       $q =~ s/:%: /\$_ /g;  # restore hash key mods
@@ -166,7 +166,7 @@ sub _find_hash {
    }
 
    # Minidb (HoA) field
-   elsif ( $params->{'lfind'} ) {
+   elsif ( exists $params->{'lfind'} ) {
       $q =~ s/\$_ /:%: /g;  # preserve $_ from hash key mods above
       $q =~ s/([^:%\(\t ]+)[ ]+(==|!=|<|<=|>|>=|eq|ne|lt|le|gt|ge|=~|!~)/\$data->{\$_}['$1'] $2/gi;
       $q =~ s/:%: /\$_ /g;  # restore hash key mods
@@ -243,13 +243,6 @@ sub _croak {
 
 package MCE::Shared::Base::Common;
 
-use strict;
-use warnings;
-
-use 5.010001;
-
-no warnings qw( threads recursion uninitialized numeric );
-
 # pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
 sub pipeline {
@@ -302,7 +295,7 @@ MCE::Shared::Base - Base package for helper classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Base version 1.826
+This document describes MCE::Shared::Base version 1.828
 
 =head1 DESCRIPTION
 

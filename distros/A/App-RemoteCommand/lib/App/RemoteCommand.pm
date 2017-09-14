@@ -4,34 +4,34 @@ use warnings;
 
 use App::RemoteCommand::Pool;
 use App::RemoteCommand::SSH;
-use App::RemoteCommand::Util 'prompt';
+use App::RemoteCommand::Select;
+use App::RemoteCommand::Util qw(prompt DEBUG logger);
 
 use File::Basename ();
+use File::Copy ();
 use File::Temp ();
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
+use IO::Select;
 use List::Util ();
 use POSIX 'strftime';
 use Pod::Usage 'pod2usage';
 use String::Glob::Permute 'string_glob_permute';
 
 use constant TICK_SECOND => 0.1;
-use constant DEBUG => $ENV{PERL_RCOMMAND_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.92';
+our $VERSION = '0.95';
 
 my $SCRIPT = File::Basename::basename($0);
 my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", $SCRIPT;
 my $SUDO_FAIL = "Sorry, try again.";
-
-sub logger { my $f = shift; $f = "-> $f\n"; warn @_ ? sprintf $f, @_ : $f }
 
 sub new {
     my ($class, %option) = @_;
     bless {
         %option,
         pending => [],
-        relay => App::RemoteCommand::Pool->new,
         running => App::RemoteCommand::Pool->new,
+        select => App::RemoteCommand::Select->new,
     }, $class;
 }
 
@@ -45,13 +45,14 @@ sub run {
     my $TERM; local $SIG{TERM} = sub { $TERM++ };
     while (1) {
         if ($INT || $TERM) {
-            $self->handle_signal($TERM ? "TERM" : "INT");
+            my $signal = $TERM ? "TERM" : "INT";
+            warn "\nCatch SIG$signal, try to shutdown gracefully...\n";
+            DEBUG and logger "handling signal %s", $signal;
+            $self->cancel($signal);
             $INT = $TERM = 0;
         }
         $self->one_tick;
-        last if @{$self->{pending}} == 0
-             && $self->{relay}->count == 0
-             && $self->{running}->count == 0;
+        last if @{$self->{pending}} == 0 && $self->{running}->count == 0;
     }
 
     my @success = sort grep { $self->{exit}{$_} == 0 } keys %{$self->{exit}};
@@ -92,12 +93,11 @@ sub parse_options {
         exit(2);
     }
     if ($self->{script}) {
-        open my $fh, "<", $self->{script} or die "$self->{script}: $!\n";
-        my $content = do { local $/; <$fh> };
         my ($tempfh, $tempfile) = File::Temp::tempfile(UNLINK => 1, EXLOCK => 0);
-        print {$tempfh} $content;
+        File::Copy::copy($self->{script}, $tempfh)
+            or die "copy $self->{script} to tempfile: $!";
         close $tempfh;
-        chmod 0700, $tempfile;
+        chmod 0755, $tempfile;
         $self->{script} = $tempfile;
     }
 
@@ -115,141 +115,100 @@ sub parse_options {
     $self;
 }
 
-sub handle_signal {
-    my ($self, $name) = @_;
-    DEBUG and logger "handling signal $name";
-    for my $ssh ($self->{running}->all) {
-        $ssh->cancel;
-        if ($ssh->type eq "cmd") {
-            DEBUG and logger "kill %s, %d", $name, $ssh->pid;
-            kill $name => $ssh->pid;
-        }
-    }
+sub cancel {
+    my ($self, $signal) = @_;
     @{$self->{pending}} = ();
-    $self->{relay}->remove_all; # this might block
+    for my $ssh ($self->{running}->all) {
+        $ssh->cancel($signal);
+    }
 }
 
 sub one_tick {
     my $self = shift;
 
-    DEBUG and logger "one tick";
-    DEBUG and logger "running %d, relay %d, pending %d",
-        $self->{running}->count, $self->{relay}->count, scalar @{$self->{pending}};
+    DEBUG and logger "one tick running %d, pending %d", $self->{running}->count, scalar @{$self->{pending}};
 
-    while ($self->{relay}->count + $self->{running}->count < $self->{concurrency} and my $ssh = shift @{$self->{pending}}) {
-        DEBUG and logger "start %s", $ssh->host;
-        $ssh->start;
-        $self->{relay}->add($ssh);
+    while ($self->{running}->count < $self->{concurrency} and my $ssh = shift @{$self->{pending}}) {
+        $self->{running}->add($ssh);
     }
 
-    for my $ssh (grep { $_->is_ready } $self->{relay}->all) {
-        $self->{relay}->remove(host => $ssh->host);
-        if ($ssh->next and !$ssh->error) {
-             DEBUG and logger "next %s, pid %d", $ssh->host, $ssh->pid;
-             $self->{running}->add($ssh);
-        } else {
-            print $self->{format}->($ssh->host, $ssh->error || "FAILED");
-            $self->{exit}{$ssh->host} = 255;
-        }
-    }
-
-    if ($self->{running}->select->count == 0) {
+    if ($self->{select}->count == 0) {
         select undef, undef, undef, TICK_SECOND;
     }
 
-    my $NEED_STOP;
-    for my $fh ($self->{running}->select->can_read(TICK_SECOND)) {
-        my $ssh = $self->{running}->find(fh => $fh);
-        my $n = sysread $fh, my $buf, 64*1024;
+    # We close fh explicitly; otherwise it happens that
+    # perl warns "unnable to close filehandle properly: Input/output error" under ssh proxy
+    SELECT:
+    for my $ready ($self->{select}->can_read(TICK_SECOND)) {
+        my ($fh, $pid, $host, $buffer) = @{$ready}{qw(fh pid host buffer)};
+        my $len = sysread $fh, my $buf, 64*1024;
         my ($errno, $errmsg) = (0+$!, "$!");
-        DEBUG and logger "read %s, pid %d, len %s", $ssh->host, $ssh->pid, defined $n ? $n : 'undef';
-        if ($n) {
-            my $host = $ssh->host;
-            my $buffer = $ssh->buffer;
+        DEBUG and logger "READ %s, pid %d, len %s", $host, $pid, defined $len ? $len : 'undef';
+        if ($len) {
             if (my @line = $buffer->add($buf)->get) {
                 print $self->{format}->($host, $_) for @line;
-                if ($ssh->sudo and @line == 1 and $line[0] eq $SUDO_FAIL) {
-                    $NEED_STOP++;
-                    $self->{running}->select->remove($fh);
-                    $ssh->delete_fh;
+                if ($ready->{sudo} and @line == 1 and $line[0] eq $SUDO_FAIL) {
+                    $self->{select}->remove(fh => $fh);
                     close $fh;
+                    next SELECT;
                 }
             }
-            if (!$ssh->sudo and $buffer->raw eq $SUDO_PROMPT) {
-                $ssh->sudo(1);
+
+            if ($buffer->raw eq $SUDO_PROMPT) {
+                $ready->{sudo}++;
                 my ($line) = $buffer->get(1);
                 print $self->{format}->($host, $line);
                 if (my $sudo_password = $self->{sudo_password}) {
                     syswrite $fh, "$sudo_password\n";
                 } else {
-                    $NEED_STOP++;
                     my $err = "have to provide sudo passowrd first, try again with --ask-sudo-password option.";
                     print $self->{format}->($host, $err);
-                    $self->{running}->select->remove($fh);
-                    $ssh->delete_fh;
+                    $self->{select}->remove(fh => $fh);
                     close $fh;
                 }
             }
-        } elsif (!defined $n) {
+        } elsif (!defined $len) {
             if ($errno != Errno::EIO) { # this happens when use ssh proxy, so skip
-                print $self->{format}->($ssh->host, "sysread $errmsg");
+                print $self->{format}->($host, "sysread $errmsg");
             }
+        } else {
+            my @line = $buffer->get(1);
+            print $self->{format}->($host, $_) for @line;
+            $self->{select}->remove(fh => $fh);
+            close $fh;
         }
     }
-    @{$self->{pending}} = () if $NEED_STOP;
 
     my $pid = waitpid -1, POSIX::WNOHANG;
     my $exit = $?;
-    return if $pid == 0 || $pid == -1;
 
-    my $ssh = $self->{running}->remove(pid => $pid);
-    if (!$ssh) {
-        my $ssh;
-        if ($ssh = $self->{relay}->remove(master_pid => $pid)) {
-            # login fails, cannot resolve hostname, ...
-            DEBUG and logger "wait %s, master pid %d", $ssh->host, $pid;
-            $ssh->master_exited;
-            my $err = $ssh->error || "master process exited unexpectedly";
-            print $self->{format}->($ssh->host, $err);
-            $self->{exit}{$ssh->host} = $exit == 0 ? 255 : $exit;
-            return;
-        } elsif ($ssh = $self->{running}->remove(master_pid => $pid)) {
-            # THIS IS UNEXPECTED
-            DEBUG and logger "wait %s, master pid %d", $ssh->host, $pid;
-            $ssh->master_exited;
-            my $err = $ssh->error || "master process exited unexpectedly";
-            print $self->{format}->($ssh->host, $err);
-            $self->{exit}{$ssh->host} = $exit == 0 ? 255 : $exit;
-            return;
-        } else {
-            die "Must not reach here";
-        }
-    }
-    DEBUG and logger "wait %s, pid %d, exit %d", $ssh->host, $pid, $exit;
-    if (my $fh = $ssh->fh) {
-        my $rest = do { local $/; <$fh> };
-        my $buffer = $ssh->buffer;
-        $buffer->add($rest) if length $rest;
-        my @line = $buffer->get(1);
-        my $host = $ssh->host;
-        print $self->{format}->($host, $_) for @line;
-    }
-
-    if ($ssh->type eq 'cmd') {
-        $self->{exit}{$ssh->host} = $exit;
-        $ssh->cancel if $exit != 0;
-    }
-
-    if ($ssh->next) {
-        if (!$ssh->error) {
-            DEBUG and logger "next %s, pid %d", $ssh->host, $ssh->pid;
-            $self->{running}->add($ssh);
-        } else {
-            print $self->{format}->($ssh->host, $ssh->error || "FAILED");
-            $self->{exit}{$ssh->host} = 255 if $ssh->type eq "cmd";
+    if (my $remove = $self->{select}->remove(pid => $pid)) {
+        my ($fh, $pid, $host, $buffer) = @{$remove}{qw(fh pid host buffer)};
+        if ($fh) {
+            # We use select() here; otherwise it happens that
+            # <$fh> is blocked under ssh proxy
+            my $select = IO::Select->new($fh);
+            while ($select->can_read(TICK_SECOND)) {
+                my $len = sysread $fh, my $buf, 64*1024;
+                if (defined $len && $len > 0) {
+                    $buffer->add($buf);
+                } else {
+                    last;
+                }
+            }
+            my @line = $buffer->get(1);
+            print $self->{format}->($host, $_) for @line;
+            close $fh;
         }
     }
 
+    for my $ssh ($self->{running}->all) {
+        my $is_running = $ssh->one_tick(pid => $pid, exit => $exit, select => $self->{select});
+        if (!$is_running) {
+            $self->{exit}{$ssh->host} = $ssh->exit;
+            $self->{running}->remove($ssh);
+        }
+    }
 }
 
 sub register {
@@ -278,7 +237,7 @@ sub register {
         unshift @command, "bash", "-c" if @command == 1;
         unshift @command, @prefix;
     }
-    DEBUG and logger "execute: %s", join(" ", map { qq('$_') } @command);
+    DEBUG and logger "execute %s", join(" ", map { qq('$_') } @command);
     push @ssh_cmd, sub {
         my $ssh = shift;
         my ($fh, $pid) = $ssh->open2pty(@command);

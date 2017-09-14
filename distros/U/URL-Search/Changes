@@ -1,5 +1,9 @@
 Revision history for URL-Search
 
+0.000005  2017-09-09
+          - allow unescaped { } \ in query strings (apparently Pale Moon does
+            this)
+
 0.000004  2017-04-16
           - don't rely on '.' in @INC
 

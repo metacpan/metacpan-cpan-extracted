@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Send::SMTP;
-our $VERSION = '1.20170906'; # VERSION
+our $VERSION = '1.20170911'; # VERSION
 use strict;
 use warnings;
 
@@ -64,14 +64,21 @@ sub connect_smtp_tls {
         Timeout         => 12,
         Port            => $self->config->{smtp}{smarthost} ? 587 : 25,
         Hello           => $self->get_helo_hostname,
-        doSSL           => 'starttls',
-        SSL_verify_mode => 0,
         Debug           => $self->verbose ? 1 : 0,
         )
         or do {
             warn "SSL connection failed\n"; ## no critic (Carp)
             return;
         };
+
+    my $tls_supported = $smtp->supports('STARTTLS');
+    if ( defined ( $tls_supported ) ) {
+        $smtp->starttls();
+    }
+    else {
+        warn "server does not support STARTTLS\n"; ## no critic (Carp)
+        return;
+    }
 
     my $c = $self->config->{smtp};
     if ( $c->{smarthost} && $c->{smartuser} && $c->{smartpass} ) {
@@ -206,8 +213,12 @@ sub assemble_message {
 sub get_timestamp_rfc2822 {
     my ($self, @args) = @_;
     my @ts = scalar @args ? @args : localtime;
-    return POSIX::strftime( '%a, %d %b %Y %H:%M:%S %z', @ts );
-};
+    my $locale = setlocale(LC_CTYPE);
+    setlocale(LC_ALL, 'C');
+    my $timestamp = POSIX::strftime( '%a, %d %b %Y %H:%M:%S %z', @ts );
+    setlocale(LC_ALL, $locale);
+    return $timestamp;
+}
 
 sub get_helo_hostname {
     my $self = shift;
@@ -228,7 +239,7 @@ Mail::DMARC::Report::Send::SMTP - utility methods for sending reports via SMTP
 
 =head1 VERSION
 
-version 1.20170906
+version 1.20170911
 
 =head2 SUBJECT FIELD
 

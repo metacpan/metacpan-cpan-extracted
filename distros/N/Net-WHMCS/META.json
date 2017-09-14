@@ -4,13 +4,13 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-WHMCS",
    "prereqs" : {
@@ -50,10 +50,11 @@
          "web" : "https://github.com/fayland/perl-Net-WHMCS"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Michael Schout <mschout@gkg.net>",
       "Neil Bowers <neil@bowers.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

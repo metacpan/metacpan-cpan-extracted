@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic 0.008
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.010
 
 use File::Spec;
 
@@ -16,10 +16,10 @@ use Test::Perl::Critic;
 my @dirs = qw(bin lib t xt);
 
 my @ignores = ();
-
-my %ignore = map { $_ => 1 } @ignores;
-
-my @files = grep { !exists $ignore{$_} } all_perl_files(@dirs);
+my %file;
+@file{ all_perl_files(@dirs) } = ();
+delete @file{@ignores};
+my @files = keys %file;
 
 if ( @files == 0 ) {
     BAIL_OUT('no files to criticize found');

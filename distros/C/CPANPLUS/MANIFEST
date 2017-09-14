@@ -135,6 +135,7 @@ t/dummy-CPAN/authors/01mailrc.txt.gz
 t/dummy-CPAN/authors/id/EUNOXS/Bundle-Foo-Bar-0.01.tar.gz
 t/dummy-CPAN/authors/id/EUNOXS/CHECKSUMS
 t/dummy-CPAN/authors/id/EUNOXS/CPANPLUS-0.01.tar.gz
+t/dummy-CPAN/authors/id/EUNOXS/Digest-SHA1-2.13.tar.gz
 t/dummy-CPAN/authors/id/EUNOXS/Foo-Bar-0.01.meta
 t/dummy-CPAN/authors/id/EUNOXS/Foo-Bar-0.01.readme
 t/dummy-CPAN/authors/id/EUNOXS/Foo-Bar-0.01.tar.gz

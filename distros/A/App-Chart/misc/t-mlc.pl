@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -24,13 +24,13 @@ use HTTP::Response;
 use App::Chart::Suffix::MLC;
 
 {
-  my $resp = HTTP::Response->new();
-  my $content = File::Slurp::slurp ($ENV{'HOME'}.'/chart/samples/mlc/mlc.data');
-  $resp->content($content);
-  $resp->content_type('text/html');
-  my $h = App::Chart::Suffix::MLC::parse ($resp);
+  my $content = File::Slurp::slurp ($ENV{'HOME'}.'/chart/samples/mlc/mlc2.data');
+  my $resp = HTTP::Response->new(200, 'OK',
+                                 ['Content-Type' => 'text/html; charset=utf-8'],
+                                 $content);
+  my $h = App::Chart::Suffix::MLC::parse ('FOO.MLC',$resp);
   print Dumper ($h);
-  App::Chart::Download::write_latest_group ($h);
-  App::Chart::Download::write_daily_group ($h);
+  # App::Chart::Download::write_latest_group ($h);
+  # App::Chart::Download::write_daily_group ($h);
   exit 0;
 }

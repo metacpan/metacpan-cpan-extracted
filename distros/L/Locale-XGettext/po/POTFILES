@@ -1,0 +1,6 @@
+../bin/xgettext-txt
+../lib/Locale/XGettext/Text.pm
+../lib/Locale/XGettext/Util/Flag.pm
+../lib/Locale/XGettext/Util/Keyword.pm
+../lib/Locale/XGettext/Util/POEntries.pm
+../lib/Locale/XGettext.pm

@@ -1,0 +1,38 @@
+=head1 Locale::XGettext::TT2
+
+Extract translatable strings from template files for the
+Template Toolkit version 2.
+
+=head1 SYNOPSIS
+
+    xgettext-tt2 --help
+
+=head1 DESCRIPTION
+
+B<Locale::XGettext::TT2> is the parser backend for
+L<xgettext-tt2>.  It is based on L<Locale::XGerttext>.
+
+See L<https://github.com/gflohr/Template-Plugin-Gettext>
+for the big picture.
+
+See L<Locale::XGettext> for an overview of all methods.
+
+See L<xgettext-tt2> (or try "perldoc xgettext-tt2" or
+"man xgettext-tt2") for information on invocation.
+
+See L<Template::Plugin::Gettext> to learn more about how
+to mark strings in templates as translatable.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr (http://www.guido-flohr.net/).
+License LGPLv3+: L<GNU General Public License version 3 or later|http://gnu.org/licenses/lgpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Template::Plugin::Gettext>, L<Locale::XGettext>, L<xgettext-tt2>,
+L<perl>, L<xgettext>

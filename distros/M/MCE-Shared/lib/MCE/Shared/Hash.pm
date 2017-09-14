@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -312,7 +312,7 @@ MCE::Shared::Hash - Hash helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Hash version 1.826
+This document describes MCE::Shared::Hash version 1.828
 
 =head1 DESCRIPTION
 
@@ -320,98 +320,98 @@ A hash helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Hash;
+ use MCE::Shared::Hash;
 
-   my $ha = MCE::Shared::Hash->new( @pairs );
+ my $ha = MCE::Shared::Hash->new( @pairs );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $ha = MCE::Shared->hash( @pairs );
+ my $ha = MCE::Shared->hash( @pairs );
 
-   # hash-like dereferencing
+ # hash-like dereferencing
 
-   my $val = $ha->{$key};
-   $ha->{$key} = $val;
+ my $val = $ha->{$key};
+ $ha->{$key} = $val;
 
-   %{$ha} = ();
+ %{$ha} = ();
 
-   # OO interface
+ # OO interface
 
-   if ( !defined ( $val = $ha->get("some_key") ) ) {
-      $val = $ha->set( some_key => "some_value" );
-   }
+ if ( !defined ( $val = $ha->get("some_key") ) ) {
+    $val = $ha->set( some_key => "some_value" );
+ }
 
-   $val   = $ha->set( $key, $val );
-   $val   = $ha->get( $key );
-   $val   = $ha->delete( $key );              # del is an alias for delete
-   $bool  = $ha->exists( $key );
-   void   = $ha->clear();
-   $len   = $ha->len();                       # scalar keys %{ $ha }
-   $len   = $ha->len( $key );                 # length $ha->{ $key }
+ $val   = $ha->set( $key, $val );
+ $val   = $ha->get( $key );
+ $val   = $ha->delete( $key );              # del is an alias for delete
+ $bool  = $ha->exists( $key );
+ void   = $ha->clear();
+ $len   = $ha->len();                       # scalar keys %{ $ha }
+ $len   = $ha->len( $key );                 # length $ha->{ $key }
 
-   $ha2   = $ha->clone( @keys );              # @keys is optional
-   $ha3   = $ha->flush( @keys );
-   $iter  = $ha->iterator( @keys );           # ($key, $val) = $iter->()
-   @keys  = $ha->keys( @keys );
-   %pairs = $ha->pairs( @keys );
-   @vals  = $ha->values( @keys );             # vals is an alias for values
+ $ha2   = $ha->clone( @keys );              # @keys is optional
+ $ha3   = $ha->flush( @keys );
+ $iter  = $ha->iterator( @keys );           # ($key, $val) = $iter->()
+ @keys  = $ha->keys( @keys );
+ %pairs = $ha->pairs( @keys );
+ @vals  = $ha->values( @keys );             # vals is an alias for values
 
-   $len   = $ha->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
-   $cnt   = $ha->mdel( @keys );
-   @vals  = $ha->mget( @keys );
-   $bool  = $ha->mexists( @keys );            # true if all keys exists
-   $len   = $ha->mset( $key/$val pairs );     # merge is an alias for mset
+ $len   = $ha->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
+ $cnt   = $ha->mdel( @keys );
+ @vals  = $ha->mget( @keys );
+ $bool  = $ha->mexists( @keys );            # true if all keys exists
+ $len   = $ha->mset( $key/$val pairs );     # merge is an alias for mset
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $len   = $ha->append( $key, $string );     #   $val .= $string
-   $val   = $ha->decr( $key );                # --$val
-   $val   = $ha->decrby( $key, $number );     #   $val -= $number
-   $val   = $ha->getdecr( $key );             #   $val--
-   $val   = $ha->getincr( $key );             #   $val++
-   $val   = $ha->incr( $key );                # ++$val
-   $val   = $ha->incrby( $key, $number );     #   $val += $number
-   $old   = $ha->getset( $key, $new );        #   $o = $v, $v = $n, $o
+ $len   = $ha->append( $key, $string );     #   $val .= $string
+ $val   = $ha->decr( $key );                # --$val
+ $val   = $ha->decrby( $key, $number );     #   $val -= $number
+ $val   = $ha->getdecr( $key );             #   $val--
+ $val   = $ha->getincr( $key );             #   $val++
+ $val   = $ha->incr( $key );                # ++$val
+ $val   = $ha->incrby( $key, $number );     #   $val += $number
+ $old   = $ha->getset( $key, $new );        #   $o = $v, $v = $n, $o
 
-   # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
+ # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
 
-   @vals  = $ha->pipeline(                    # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals  = $ha->pipeline(                    # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
 For normal hash behavior, the TIE interface is supported.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Hash;
+ use MCE::Shared::Hash;
 
-   tie my %ha, "MCE::Shared::Hash";
+ tie my %ha, "MCE::Shared::Hash";
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   tie my %ha, "MCE::Shared";
+ tie my %ha, "MCE::Shared";
 
-   # usage
+ # usage
 
-   my $val;
+ my $val;
 
-   if ( !defined ( $val = $ha{some_key} ) ) {
-      $val = $ha{some_key} = "some_value";
-   }
+ if ( !defined ( $val = $ha{some_key} ) ) {
+    $val = $ha{some_key} = "some_value";
+ }
 
-   $ha{some_key} = 0;
+ $ha{some_key} = 0;
 
-   tied(%ha)->incrby("some_key", 20);
-   tied(%ha)->incrby(some_key => 20);
+ tied(%ha)->incrby("some_key", 20);
+ tied(%ha)->incrby(some_key => 20);
 
 =head1 SYNTAX for QUERY STRING
 
@@ -420,54 +420,54 @@ is described below. In the context of sharing, the query mechanism is beneficial
 for the shared-manager process. It is able to perform the query where the data
 resides versus the client-process grep locally involving lots of IPC.
 
-   o Basic demonstration
+ o Basic demonstration
 
-     @keys = $ha->keys( "query string given here" );
-     @keys = $ha->keys( "val =~ /pattern/" );
+   @keys = $ha->keys( "query string given here" );
+   @keys = $ha->keys( "val =~ /pattern/" );
 
-   o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
-   o Multiple expressions delimited by :AND or :OR, mixed case allowed
+ o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
+ o Multiple expressions delimited by :AND or :OR, mixed case allowed
 
-     "key eq 'some key' :or (val > 5 :and val < 9)"
-     "key eq some key :or (val > 5 :and val < 9)"
-     "key =~ /pattern/i :And val =~ /pattern/i"
-     "val eq foo baz :OR key !~ /pattern/i"
+   "key eq 'some key' :or (val > 5 :and val < 9)"
+   "key eq some key :or (val > 5 :and val < 9)"
+   "key =~ /pattern/i :And val =~ /pattern/i"
+   "val eq foo baz :OR key !~ /pattern/i"
 
-     * key matches on keys in the hash
-     * likewise, val matches on values
+   * key matches on keys in the hash
+   * likewise, val matches on values
 
-   o Quoting is optional inside the string
+ o Quoting is optional inside the string
 
-     "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
-     "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
 
 Examples.
 
-   # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
-   # key/val means to match against actual key/val respectively
+ # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
+ # key/val means to match against actual key/val respectively
 
-   @keys  = $ha->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
-   @keys  = $ha->keys( "key eq some key :or (val > 5 :and val < 9)" );
+ @keys  = $ha->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
+ @keys  = $ha->keys( "key eq some key :or (val > 5 :and val < 9)" );
 
-   @keys  = $ha->keys( "key =~ /$pattern/i" );
-   @keys  = $ha->keys( "key !~ /$pattern/i" );
-   @keys  = $ha->keys( "val =~ /$pattern/i" );
-   @keys  = $ha->keys( "val !~ /$pattern/i" );
+ @keys  = $ha->keys( "key =~ /$pattern/i" );
+ @keys  = $ha->keys( "key !~ /$pattern/i" );
+ @keys  = $ha->keys( "val =~ /$pattern/i" );
+ @keys  = $ha->keys( "val !~ /$pattern/i" );
 
-   %pairs = $ha->pairs( "key == $number" );
-   %pairs = $ha->pairs( "key != $number :and val > 100" );
-   %pairs = $ha->pairs( "key <  $number :or key > $number" );
-   %pairs = $ha->pairs( "val <= $number" );
-   %pairs = $ha->pairs( "val >  $number" );
-   %pairs = $ha->pairs( "val >= $number" );
+ %pairs = $ha->pairs( "key == $number" );
+ %pairs = $ha->pairs( "key != $number :and val > 100" );
+ %pairs = $ha->pairs( "key <  $number :or key > $number" );
+ %pairs = $ha->pairs( "val <= $number" );
+ %pairs = $ha->pairs( "val >  $number" );
+ %pairs = $ha->pairs( "val >= $number" );
 
-   @vals  = $ha->vals( "key eq $string" );
-   @vals  = $ha->vals( "key ne $string with space" );
-   @vals  = $ha->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
-   @vals  = $ha->vals( "val le $string :and val eq 'foo bar'" );
-   @vals  = $ha->vals( "val le $string :and val eq foo bar" );
-   @vals  = $ha->vals( "val gt $string" );
-   @vals  = $ha->vals( "val ge $string" );
+ @vals  = $ha->vals( "key eq $string" );
+ @vals  = $ha->vals( "key ne $string with space" );
+ @vals  = $ha->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
+ @vals  = $ha->vals( "val le $string :and val eq 'foo bar'" );
+ @vals  = $ha->vals( "val le $string :and val eq foo bar" );
+ @vals  = $ha->vals( "val gt $string" );
+ @vals  = $ha->vals( "val ge $string" );
 
 =head1 API DOCUMENTATION
 
@@ -481,27 +481,27 @@ many use cases, the OO interface is recommended for best performance.
 
 Constructs a new object, with an optional list of key-value pairs.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Hash;
+ use MCE::Shared::Hash;
 
-   $ha = MCE::Shared::Hash->new( @pairs );
-   $ha = MCE::Shared::Hash->new( );
+ $ha = MCE::Shared::Hash->new( @pairs );
+ $ha = MCE::Shared::Hash->new( );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $ha = MCE::Shared->hash( @pairs );
-   $ha = MCE::Shared->hash( );
+ $ha = MCE::Shared->hash( @pairs );
+ $ha = MCE::Shared->hash( );
 
 =item assign ( key, value [, key, value, ... ] )
 
 Clears the hash, then sets multiple key-value pairs and returns the number of
 keys stored in the hash. This is equivalent to C<clear>, C<mset>.
 
-   $len = $ha->assign( "key1" => "val1", "key2" => "val2" );  # 2
-   $len = %{$ha} = ( "key1" => "val1", "key2" => "val2" );    # 4
+ $len = $ha->assign( "key1" => "val1", "key2" => "val2" );  # 2
+ $len = %{$ha} = ( "key1" => "val1", "key2" => "val2" );    # 4
 
 API available since 1.007.
 
@@ -509,8 +509,8 @@ API available since 1.007.
 
 Removes all key-value pairs from the hash.
 
-   $ha->clear;
-   %{$ha} = ();
+ $ha->clear;
+ %{$ha} = ();
 
 =item clone ( key [, key, ... ] )
 
@@ -518,16 +518,16 @@ Creates a shallow copy, a C<MCE::Shared::Hash> object. It returns an exact
 copy if no arguments are given. Otherwise, the object includes only the given
 keys. Keys that do not exist in the hash will have the C<undef> value.
 
-   $ha2 = $ha->clone( "key1", "key2" );
-   $ha2 = $ha->clone;
+ $ha2 = $ha->clone( "key1", "key2" );
+ $ha2 = $ha->clone;
 
 =item delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the hash.
 
-   $val = $ha->delete( "some_key" );
-   $val = delete $ha->{ "some_key" };
+ $val = $ha->delete( "some_key" );
+ $val = delete $ha->{ "some_key" };
 
 =item del
 
@@ -537,8 +537,8 @@ C<del> is an alias for C<delete>.
 
 Determines if a key exists in the hash.
 
-   if ( $ha->exists( "some_key" ) ) { ... }
-   if ( exists $ha->{ "some_key" } ) { ... }
+ if ( $ha->exists( "some_key" ) ) { ... }
+ if ( exists $ha->{ "some_key" } ) { ... }
 
 =item flush ( key [, key, ... ] )
 
@@ -548,8 +548,8 @@ Same as C<clone>. Though, clears all existing items before returning.
 
 Gets the value of a hash key or C<undef> if the key does not exists.
 
-   $val = $ha->get( "some_key" );
-   $val = $ha->{ "some_key" };
+ $val = $ha->get( "some_key" );
+ $val = $ha->{ "some_key" };
 
 =item iterator ( key [, key, ... ] )
 
@@ -562,12 +562,12 @@ The list of keys to return is set when the closure is constructed. Later keys
 added to the hash are not included. Subsequently, the C<undef> value is
 returned for deleted keys.
 
-   $iter = $ha->iterator;
-   $iter = $ha->iterator( "key1", "key2" );
+ $iter = $ha->iterator;
+ $iter = $ha->iterator( "key1", "key2" );
 
-   while ( my ( $key, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
 
 =item iterator ( "query string" )
 
@@ -575,14 +575,14 @@ Returns a code reference for iterating a list of key-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
 The syntax for the C<query string> is described above.
 
-   $iter = $ha->iterator( "val eq some_value" );
-   $iter = $ha->iterator( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   $iter = $ha->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
-   $iter = $ha->iterator( "key =~ /$pattern/" );
+ $iter = $ha->iterator( "val eq some_value" );
+ $iter = $ha->iterator( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ $iter = $ha->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
+ $iter = $ha->iterator( "key =~ /$pattern/" );
 
-   while ( my ( $key, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
 
 =item keys ( key [, key, ... ] )
 
@@ -590,13 +590,13 @@ Returns all keys in the hash when no arguments are given. Otherwise, returns
 the given keys in the same order. Keys that do not exist will have the C<undef>
 value. In scalar context, returns the size of the hash.
 
-   @keys = $ha->keys( "key1", "key2" );
+ @keys = $ha->keys( "key1", "key2" );
 
-   @keys = $ha->keys;     # faster
-   @keys = keys %{$ha};   # involves TIE overhead
+ @keys = $ha->keys;     # faster
+ @keys = keys %{$ha};   # involves TIE overhead
 
-   $len  = $ha->keys;     # ditto
-   $len  = keys %{$ha};
+ $len  = $ha->keys;     # ditto
+ $len  = keys %{$ha};
 
 =item keys ( "query string" )
 
@@ -604,10 +604,10 @@ Returns only keys that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @keys = $ha->keys( "val eq some_value" );
-   @keys = $ha->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @keys = $ha->keys( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ha->keys( "key =~ /$pattern/" );
+ @keys = $ha->keys( "val eq some_value" );
+ @keys = $ha->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @keys = $ha->keys( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ha->keys( "key =~ /$pattern/" );
 
 =item len ( key )
 
@@ -615,37 +615,37 @@ Returns the size of the hash when no arguments are given. For the given key,
 returns the length of the value stored at key or the C<undef> value if the
 key does not exists.
 
-   $size = $ha->len;
-   $len  = $ha->len( "key1" );
-   $len  = length $ha->{ "key1" };
+ $size = $ha->len;
+ $len  = $ha->len( "key1" );
+ $len  = length $ha->{ "key1" };
 
 =item mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the hash and returns the number of keys deleted.
 A given key which does not exist in the hash is not counted.
 
-   $cnt = $ha->mdel( "key1", "key2" );
+ $cnt = $ha->mdel( "key1", "key2" );
 
 =item mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the hash. A false value is
 returned otherwise.
 
-   if ( $ha->mexists( "key1", "key2" ) ) { ... }
+ if ( $ha->mexists( "key1", "key2" ) ) { ... }
 
 =item mget ( key [, key, ... ] )
 
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the hash.
 
-   ( $val1, $val2 ) = $ha->mget( "key1", "key2" );
+ ( $val1, $val2 ) = $ha->mget( "key1", "key2" );
 
 =item mset ( key, value [, key, value, ... ] )
 
 Sets multiple key-value pairs in a hash and returns the number of keys stored
 in the hash.
 
-   $len = $ha->mset( "key1" => "val1", "key2" => "val2" );
+ $len = $ha->mset( "key1" => "val1", "key2" => "val2" );
 
 =item merge
 
@@ -658,10 +658,10 @@ returns key-value pairs for the given keys in the same order. Keys that do not
 exist will have the C<undef> value. In scalar context, returns the size of the
 hash.
 
-   @pairs = $ha->pairs( "key1", "key2" );
+ @pairs = $ha->pairs( "key1", "key2" );
 
-   @pairs = $ha->pairs;
-   $len   = $ha->pairs;
+ @pairs = $ha->pairs;
+ $len   = $ha->pairs;
 
 =item pairs ( "query string" )
 
@@ -669,10 +669,10 @@ Returns only key-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
 described above. In scalar context, returns the size of the resulting list.
 
-   @pairs = $ha->pairs( "val eq some_value" );
-   @pairs = $ha->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @pairs = $ha->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len   = $ha->pairs( "key =~ /$pattern/" );
+ @pairs = $ha->pairs( "val eq some_value" );
+ @pairs = $ha->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @pairs = $ha->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len   = $ha->pairs( "key =~ /$pattern/" );
 
 =item pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
@@ -682,25 +682,25 @@ process. The C<pipeline> method is fully C<wantarray>-aware and receives a list
 of commands and their arguments. In scalar or list context, it returns data
 from the last command in the pipeline.
 
-   @vals = $ha->pipeline(                     # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals = $ha->pipeline(                     # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
-   $len = $ha->pipeline(                      # 3, same as $ha->len
-      [ "set", foo => "i_i" ],
-      [ "set", bar => "j_j" ],
-      [ "set", baz => "k_k" ],
-      [ "len" ]
-   );
+ $len = $ha->pipeline(                      # 3, same as $ha->len
+    [ "set", foo => "i_i" ],
+    [ "set", bar => "j_j" ],
+    [ "set", baz => "k_k" ],
+    [ "len" ]
+ );
 
-   $ha->pipeline(
-      [ "set", foo => "m_m" ],
-      [ "set", bar => "n_n" ],
-      [ "set", baz => "o_o" ]
-   );
+ $ha->pipeline(
+    [ "set", foo => "m_m" ],
+    [ "set", bar => "n_n" ],
+    [ "set", baz => "o_o" ]
+ );
 
 Current API available since 1.809.
 
@@ -708,11 +708,11 @@ Current API available since 1.809.
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
-   @vals = $ha->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ]
-   );
+ @vals = $ha->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ]
+ );
 
 Current API available since 1.809.
 
@@ -720,8 +720,8 @@ Current API available since 1.809.
 
 Sets the value of the given hash key and returns its new value.
 
-   $val = $ha->set( "key", "value" );
-   $val = $ha->{ "key" } = "value";
+ $val = $ha->set( "key", "value" );
+ $val = $ha->{ "key" } = "value";
 
 =item values ( key [, key, ... ] )
 
@@ -729,13 +729,13 @@ Returns all values in the hash when no arguments are given. Otherwise, returns
 values for the given keys in the same order. Keys that do not exist will have
 the C<undef> value. In scalar context, returns the size of the hash.
 
-   @vals = $ha->values( "key1", "key2" );
+ @vals = $ha->values( "key1", "key2" );
 
-   @vals = $ha->values;     # faster
-   @vals = values %{$ha};   # involves TIE overhead
+ @vals = $ha->values;     # faster
+ @vals = values %{$ha};   # involves TIE overhead
 
-   $len  = $ha->values;     # ditto
-   $len  = values %{$ha};
+ $len  = $ha->values;     # ditto
+ $len  = values %{$ha};
 
 =item values ( "query string" )
 
@@ -743,10 +743,10 @@ Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @vals = $ha->values( "val eq some_value" );
-   @vals = $ha->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @vals = $ha->values( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ha->values( "key =~ /$pattern/" );
+ @vals = $ha->values( "val eq some_value" );
+ @vals = $ha->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @vals = $ha->values( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ha->values( "key =~ /$pattern/" );
 
 =item vals
 
@@ -769,49 +769,49 @@ L<http://redis.io/commands#strings> with key representing the hash key.
 
 Appends a value to a key and returns its new length.
 
-   $len = $ha->append( $key, "foo" );
+ $len = $ha->append( $key, "foo" );
 
 =item decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
-   $num = $ha->decr( $key );
+ $num = $ha->decr( $key );
 
 =item decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
-   $num = $ha->decrby( $key, 2 );
+ $num = $ha->decrby( $key, 2 );
 
 =item getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
-   $old = $ha->getdecr( $key );
+ $old = $ha->getdecr( $key );
 
 =item getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
-   $old = $ha->getincr( $key );
+ $old = $ha->getincr( $key );
 
 =item getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
-   $old = $ha->getset( $key, "baz" );
+ $old = $ha->getset( $key, "baz" );
 
 =item incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
-   $num = $ha->incr( $key );
+ $num = $ha->incr( $key );
 
 =item incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
-   $num = $ha->incrby( $key, 2 );
+ $num = $ha->incrby( $key, 2 );
 
 =back
 

@@ -1,26 +1,28 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.30';
+$Log::Dispatch::FileRotate::VERSION = '1.34';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
 use strict;
 
-use Log::Dispatch::Output;
+use base 'Log::Dispatch::Output';
 
-use base qw( Log::Dispatch::Output );
+use Date::Manip;
+use File::Spec;
+use Log::Dispatch::File;
+use Log::Dispatch::FileRotate::Mutex;
 
-use Log::Dispatch::File;   # We are a wrapper around Log::Dispatch::File
+sub DESTROY {
+    my $self = shift;
 
-use Date::Manip;  # For time based recurring rotations
-use File::Spec;   # For file-names
-use Fcntl ':flock'; # import LOCK_* constants
+    # get rid of current LDF
+    if ($self->{LDF}) {
+        delete $self->{LDF};
+    }
+}
 
-use Params::Validate qw(validate SCALAR BOOLEAN);
-Params::Validate::validation_options( allow_extra => 1 );
 
-
-sub new
-{
+sub new {
     my $proto = shift;
     my $class = ref $proto || $proto;
 
@@ -28,79 +30,99 @@ sub new
 
     my $self = bless {}, $class;
 
-	# Turn ON/OFF debugging as required
-	$self->{debug} = $p{DEBUG};
+    # Turn ON/OFF debugging as required
+    $self->{debug} = $p{DEBUG};
     $self->_basic_init(%p);
-    $self->{'LDF'} =  Log::Dispatch::File->new(%p);  # Our log
-	$self->{'timer'} = sub { time() } unless defined $self->{'timer'};
+    $self->{LDF}   = Log::Dispatch::File->new(%p);  # Our log
 
-	# Keep a copy of interesting stuff as well
-	$self->{params} = \%p;
+    unless (defined $self->{timer}) {
+        $self->{timer} = sub { time };
+    }
 
-	# Size defaults to 10meg in all failure modes, hopefully
-	my $ten_meg = 1024*1024*10;
-	my $two_gig = 1024*1024*1024*2;
-	my $size = $ten_meg;
-	if (defined $p{size}) {
-		# allow perl-literal style nubers 10_000_000 -> 10000000
-		$p{size} =~ s/_//g;
-		$size = $p{size};
-	}
-	$size = $ten_meg unless $size =~ /^\d+$/ && $size < $two_gig && $size > 0;
-	$self->{size} = $size;
+    # Keep a copy of interesting stuff as well
+    $self->{params} = \%p;
 
-	# Max number of files defaults to 1. No limit enforced here. Only
-	# positive whole numbers allowed
-	$self->{max}  = $p{max};
-	$self->{max}  = 1 unless defined $self->{max} && $self->{max} =~ /^\d+$/ && $self->{max} > 0 ;
+    # Size defaults to 10meg in all failure modes, hopefully
+    my $ten_meg = 1024*1024*10;
+    my $two_gig = 1024*1024*1024*2;
+    my $size    = $ten_meg;
 
-	# Get a name for our Lock file
-	my $name = $self->{params}->{filename};
-	my ($vol, $dir, $f) = File::Spec->splitpath($name);
-	$dir = '.' unless $dir;
-	$f = $name unless $f;
+    if (defined $p{size}) {
+        # allow perl-literal style nubers 10_000_000 -> 10000000
+        $p{size} =~ s/_//g;
+        $size = $p{size};
+    }
 
-	my $lockfile = File::Spec->catpath($vol, $dir, ".".$f.".LCK");
-	$self->debug("Lock file is $lockfile");
-	$self->{lf} = $lockfile;
+    unless ($size =~ /^\d+$/ && $size < $two_gig && $size > 0) {
+        $size = $ten_meg;
+    }
 
-	# Have we been called with a time based rotation pattern then setup
-	# timebased stuff. TZ is important and must match current TZ or all
-	# bets are off!
-	if(defined $p{'TZ'})
-	{
-		# Date::Manip deprecated TZ= in 6.x.  In order to maintain backwards
-		# compat with 5.8, we use TZ if setdate is not avilable.  Otherwise we
-		# use setdate.
-		require version;
-		if (version->parse(DateManipVersion()) < version->parse('6.0'))
-		{
-			Date_Init("TZ=".$p{'TZ'});
-		}
-		else
-		{
-			# Date::Manip 6.x deprecates TZ, use  SetDate instead
-			Date_Init("setdate=now,".$p{'TZ'});
-		}
-	}
-	if(defined $p{'DatePattern'})
-	{
-		$self->setDatePattern($p{'DatePattern'});
-	}
+    $self->{size} = $size;
 
-	$self->{check_both} = ($p{check_both}) ? 1 : 0;
+    # Max number of files defaults to 1. No limit enforced here. Only
+    # positive whole numbers allowed
+    $self->{max} = $p{max};
 
-	# Flag this as first creation point
-	$self->{'new'} = 1;
+    unless (defined $self->{max} && $self->{max} =~ /^\d+$/ && $self->{max} > 0) {
+        $self->{max}  = 1
+    }
+
+    # Get a name for our Lock file
+    my $name = $self->{params}->{filename};
+    my ($vol, $dir, $f) = File::Spec->splitpath($name);
+    $dir ||= '.';
+    $f   ||= $name;
+
+    $self->{lf} = File::Spec->catpath($vol, $dir, ".${f}.LCK");
+    $self->debug('Lock file is '.$self->{lf});
+
+    # Have we been called with a time based rotation pattern then setup
+    # timebased stuff. TZ is important and must match current TZ or all
+    # bets are off!
+    if (defined $p{TZ}) {
+        # Date::Manip deprecated TZ= in 6.x.  In order to maintain backwards
+        # compat with 5.8, we use TZ if setdate is not avilable.  Otherwise we
+        # use setdate.
+        require version;
+        if (version->parse(DateManipVersion()) < version->parse('6.0')) {
+            Date_Init("TZ=".$p{TZ});
+        }
+        else {
+            # Date::Manip 6.x deprecates TZ, use  SetDate instead
+            Date_Init("setdate=now,".$p{TZ});
+        }
+    }
+
+    if (defined $p{DatePattern}) {
+        $self->setDatePattern($p{DatePattern});
+    }
+
+    $self->{check_both} = $p{check_both} ? 1 : 0;
+
+    # User callback to rotate the file.
+    $self->{user_constraint} = $p{user_constraint};
+
+    # A post rotate callback.
+    $self->{post_rotate} = $p{post_rotate};
+
+    # Flag this as first creation point
+    $self->{new} = 1;
 
     return $self;
+}
+
+
+sub filename {
+    my $self = shift;
+
+    return $self->{params}->{filename};
 }
 
 
 ###########################################################################
 #
 # Subroutine setDatePattern
-#       
+#
 #       Args: a single string or ArrayRef of strings
 #
 #       Rtns: Nothing
@@ -108,208 +130,262 @@ sub new
 # Description:
 #     Set a recurrance for file rotation. We accept Date::Manip
 #     recurrances and the log4j/DailyRollingFileAppender patterns
-#       
-#     Date:Manip =>              
-#			0:0:0:0:5:30:0       every 5 hours and 30 minutes
-#			0:0:0:2*12:30:0      every 2 days at 12:30 (each day)
-#			3*1:0:2:12:0:0       every 3 years on Jan 2 at noon
 #
-#	  DailyRollingFileAppender =>
-#			yyyy-MM
-#			yyyy-ww
-#			yyyy-MM-dd
-#			yyyy-MM-dd-a
-#			yyyy-MM-dd-HH
-#			yyyy-MM-dd-HH-MM
+#     Date:Manip =>
+#           0:0:0:0:5:30:0       every 5 hours and 30 minutes
+#           0:0:0:2*12:30:0      every 2 days at 12:30 (each day)
+#           3*1:0:2:12:0:0       every 3 years on Jan 2 at noon
+#
+#     DailyRollingFileAppender =>
+#           yyyy-MM
+#           yyyy-ww
+#           yyyy-MM-dd
+#           yyyy-MM-dd-a
+#           yyyy-MM-dd-HH
+#           yyyy-MM-dd-HH-MM
 #
 # To specify multiple recurances in a single string seperate them with a
 # comma: yyyy-MM-dd,0:0:0:2*12:30:0
 #
-sub setDatePattern
-{
-    my $self = shift;        # My object
-    my($arg) = shift;
+sub setDatePattern {
+    my ($self, $arg) = @_;
 
-	local($_);               # Don't crap on $_
-	my @pats = ();
+    local($_);               # Don't crap on $_
+    my @pats = ();
 
-	my %lookup = (
-		#					 Y:M:W:D:H:M:S
-		'yyyy-mm'		=> 	'0:1*0:1:0:0:0',  # Every Month
-		'yyyy-ww'		=> 	'0:0:1*0:0:0:0',  # Every week
-		'yyyy-dd'		=> 	'0:0:0:1*0:0:0',  # Every day 
-		'yyyy-mm-dd'	=> 	'0:0:0:1*0:0:0',  # Every day 
-		'yyyy-dd-a'		=> 	'0:0:0:1*12:0:0', # Every day 12noon
-		'yyyy-mm-dd-a'	=> 	'0:0:0:1*12:0:0', # Every day 12noon
-		'yyyy-dd-hh'	=> 	'0:0:0:0:1*0:0',  # Every hour
-		'yyyy-mm-dd-hh'	=> 	'0:0:0:0:1*0:0',  # Every hour
-		'yyyy-dd-hh-mm'	=> 	'0:0:0:0:0:1*0',  # Every minute
-		'yyyy-mm-dd-hh-mm'	=> 	'0:0:0:0:0:1*0',  # Every minute
-	);
+    my %lookup = (
+        #                      Y:M:W:D:H:M:S
+        'yyyy-mm'          => '0:1*0:1:0:0:0',     # Every Month
+        'yyyy-ww'          => '0:0:1*0:0:0:0',     # Every week
+        'yyyy-dd'          => '0:0:0:1*0:0:0',     # Every day
+        'yyyy-mm-dd'       => '0:0:0:1*0:0:0',     # Every day
+        'yyyy-dd-a'        => '0:0:0:1*12:0:0',    # Every day 12noon
+        'yyyy-mm-dd-a'     => '0:0:0:1*12:0:0',    # Every day 12noon
+        'yyyy-dd-hh'       => '0:0:0:0:1*0:0',     # Every hour
+        'yyyy-mm-dd-hh'    => '0:0:0:0:1*0:0',     # Every hour
+        'yyyy-dd-hh-mm'    => '0:0:0:0:0:1*0',     # Every minute
+        'yyyy-mm-dd-hh-mm' => '0:0:0:0:0:1*0',     # Every minute
+    );
 
-	# Convert arg to array
-	if( ref($arg) eq 'ARRAY' )
-	{
-		@pats = @$arg;
-	}
-	elsif( !ref($arg) )
-	{
-		$arg =~ s/\s+//go;
-		@pats = split(/;/,$arg);
-	}
-	else
-	{
-		die "Bad reference type argument ".ref($arg);
-	}
+    # Convert arg to array
+    if (ref $arg eq 'ARRAY') {
+        @pats = @$arg;
+    }
+    elsif (!ref $arg) {
+        $arg =~ s/\s+//go;
+        @pats = split /;/, $arg;
+    }
+    else {
+        die "Bad reference type argument ".ref $arg;
+    }
 
-	# Handle (possibly multiple) recurrances
-	foreach my $pat (@pats)
-	{
-		# Convert any log4j patterns across
-		if($pat =~ /^yyyy/i) # Then log4j style
-		{
-			$pat = lc($pat); # Use lowercase lookup
-			# Default to daily on bad pattern
-			unless(grep($pat eq $_,keys %lookup))
-			{
-				warn "Bad Rotation pattern ($pat) using yyyy-dd\n";
-				$pat = 'yyyy-dd';
-			}
-			$pat = $lookup{$pat};
-		}
+    # Handle (possibly multiple) recurrances
+    foreach my $pat (@pats) {
+        # Convert any log4j patterns across
+        if ($pat =~ /^yyyy/i) {
+            # log4j style
+            $pat = $lookup{lc $pat};
 
-		my $abs = $self->_get_next_occurance($pat);
-		$self->debug("Adding [dates,pat] =>[$abs,$pat]");
-		my $ref = [$abs, $pat];
-		push(@{$self->{'recurrance'}}, $ref);
+            # Default to daily on bad pattern
+            unless (defined $pat) {
+                warn "Bad Rotation pattern ($pat) using yyyy-dd\n";
+                $pat = 'yyyy-dd';
+            }
+        }
 
-	}
+        my $abs = $self->_get_next_occurance($pat);
 
-}
+        $self->debug("Adding [dates,pat] =>[$abs,$pat]");
 
+        my $ref = [$abs, $pat];
 
-
-sub log_message
-{
-    my $self = shift;
-    my %p = @_;
-
-	my $max_size = $self->{size};
-	my $numfiles = $self->{max};
-	my $name     = $self->{params}->{filename};
-	my $fh       = $self->{LDF}->{fh};
-
-	# Prime our time based data outside the critical code area
-	my ($in_time_mode,$time_to_rotate) = $self->time_to_rotate();
-
-	# Handle critical code for logging. No changes if someone else is in.  We
-	# lock a lockfile, not the actual log filehandle because locking doesn't
-	# work properly if the logfile was opened in a parent process for example.
-	my $lfh;
-	unless ($lfh = flopen($self->{lf})) {
-		warn "$$ Log::Dispatch::FileRotate failed to get lock: $!. Not logging.\n";
-		return;
-	}
-
-	$self->debug("got lock");
-
-	my $have_to_rotate = 0;
-	my $size   = (stat($fh))[7];   # Stat the handle to get real size
-	my $inode  = (stat($fh))[1];   # get real inode
-	my $finode = (stat($name))[1]; # Stat the name for comparision
-	$self->debug("s=$size, i=$inode, f=".
-			(defined $finode ? $finode : "undef") .
-			", n=$name");
-
-	# If finode and inode are the same then nobody has done a rename
-	# under us and we can continue. Otherwise just close and reopen.
-	if(!defined($finode) || $inode != $finode)
-	{
-		# Oops someone moved things on us. So just reopen our log
-		delete $self->{LDF};  # Should get rid of current LDF
-		$self->{LDF} =  Log::Dispatch::File->new(%{$self->{params}});  # Our log
-
-		$self->debug("Someone else rotated: normal log");
-	}
-	else
-	{
-		my $check_both = $self->{check_both};
-		my $rotate_by_size = ($size >= $max_size) ? 1 : 0;
-		if(($in_time_mode && $time_to_rotate) ||
-		   (!$in_time_mode && $rotate_by_size) ||
-		   ($rotate_by_size && $check_both))
-		{
-			$have_to_rotate = 1;
-		}
-
-		$self->debug("in time mode: $in_time_mode; time to rotate: $time_to_rotate;"
-			." rotate by size: $rotate_by_size; check_both: $check_both;"
-			." have to rotate: $have_to_rotate");
-	}
-
-	if($have_to_rotate)
-	{
-		# Shut down the log
-		delete $self->{LDF};  # Should get rid of current LDF
-
-		my $idx = $numfiles -1;
-
-		$self->debug("Rotating");
-		while($idx >= 0)
-		{
-			if($idx <= 0)
-			{
-				$self->debug("rename $name $name.1");
-				rename($name, "$name.1");
-			}
-			else
-			{
-				$self->debug("rename $name.$idx $name.".($idx+1));
-				rename("$name.$idx", "$name.".($idx+1));
-			}
-
-			$idx--;
-		}
-		$self->debug("Rotating Done");
-
-		# reopen the logfile for writing.
-		$self->{LDF} =  Log::Dispatch::File->new(%{$self->{params}});  # Our log
-
-		# Write it out
-		$self->debug("rotated: normal log");
-	}
-
-	$self->logit($p{message});
-
-	$self->debug("releasing lock");
-	safe_flock($lfh, LOCK_UN);
-}
-
-sub DESTROY
-{
-    my $self = shift;
-
-    if ( $self->{LDF} )
-    {
-		delete $self->{LDF};  # Should get rid of current LDF
+        push @{$self->{recurrance}}, $ref;
     }
 }
 
-sub logit
-{
-	my $self = $_[0];
 
-	$self->lock();
-	$self->{LDF}->log_message(message => $_[1]);
-	$self->unlock();
-	return;
+sub log_message {
+    my ($self, %p) = @_;
+
+    my $mutex = $self->rotate(1);
+
+    unless (defined $mutex) {
+        $self->error('not logging');
+        return;
+    }
+
+    $self->debug('normal log');
+
+    $self->logit($p{message});
+
+    $self->debug('releasing lock');
+
+    $mutex->unlock;
 }
 
+
+sub rotate {
+    my ($self, $hold_lock) = @_;
+    # NOTE: $hold_lock is internal use only!
+
+    my $max_size = $self->{size};
+    my $numfiles = $self->{max};
+    my $name     = $self->filename();
+    my $fh       = $self->{LDF}->{fh};
+
+    # Prime our time based data outside the critical code area
+    my ($in_time_mode,$time_to_rotate) = $self->time_to_rotate();
+
+    my $user_rotation = 0;
+    if (ref $self->{user_constraint} eq 'CODE') {
+        eval {
+            $user_rotation = &{$self->{user_constraint}}();
+
+            1;
+        } or do {
+            $self->error("user's callback error: $@");
+        };
+    }
+
+    # Handle critical code for logging. No changes if someone else is in.  We
+    # lock a lockfile, not the actual log filehandle since the log filehandle
+    # will change if we rotate the logs.
+    my $mutex = $self->mutex_for_path($self->{lf});
+
+    unless ($mutex->lock) {
+        $self->error("failed to get lock: $!");
+        return;
+    }
+
+    $self->debug('got lock');
+
+    my $have_to_rotate = 0;
+    my ($inode, $size) = (stat $fh)[1,7]; # real inode and size
+    my $finode         = (stat $name)[1]; # inode of filename for comparision
+
+    $self->debug("s=$size, i=$inode, f=".
+            (defined $finode ? $finode : "undef") .
+            ", n=$name");
+
+    # If finode and inode are the same then nobody has done a rename
+    # under us and we can continue. Otherwise just close and reopen.
+    if (!defined $finode || $inode != $finode) {
+        # Oops someone moved things on us. So just reopen our log
+        delete $self->{LDF};  # Should get rid of current LDF
+        $self->{LDF} =  Log::Dispatch::File->new(%{$self->{params}});  # Our log
+
+        $self->debug('Someone else rotated');
+    }
+    else {
+        my $check_both = $self->{check_both};
+        my $rotate_by_size = ($size >= $max_size) ? 1 : 0;
+
+        if(($in_time_mode && $time_to_rotate) ||
+           (!$in_time_mode && $rotate_by_size) ||
+           ($rotate_by_size && $check_both) ||
+           ($user_rotation))
+        {
+            $have_to_rotate = 1;
+        }
+
+        $self->debug("in time mode: $in_time_mode; time to rotate: $time_to_rotate;"
+            ." rotate by size: $rotate_by_size; check_both: $check_both;"
+            ." user rotation: $user_rotation; have to rotate: $have_to_rotate");
+    }
+
+    if ($have_to_rotate) {
+        # Shut down the log
+        delete $self->{LDF};  # Should get rid of current LDF
+
+        $self->debug('Rotating');
+        $self->_for_each_file(\&_move_file);
+        $self->debug('Rotating Done');
+
+        # reopen the logfile for writing.
+        $self->{LDF} =  Log::Dispatch::File->new(%{$self->{params}});  # Our log
+
+        if (ref $self->{post_rotate} eq 'CODE') {
+            $self->debug('Calling user post-rotate callback');
+            $self->_for_each_file($self->{post_rotate});
+        }
+    }
+
+    if ($hold_lock) {
+        return $mutex;
+    }
+
+    $mutex->unlock;
+
+    return $have_to_rotate;
+}
+
+sub _for_each_file {
+    my ($self, $callback) = @_;
+
+    my $basename = $self->filename();
+    my $idx      = $self->{max} - 1;
+
+    while ($idx >= 0) {
+        my $filename = $basename;
+
+        if ($idx) {
+            $filename .= ".$idx";
+        }
+
+        eval {
+            if (-f $filename) {
+                &{$callback}($filename, $idx, $self);
+            }
+
+            1;
+        } or do {
+            $self->error("callback error: $@");
+        };
+
+        $idx--;
+    }
+
+    return undef;
+}
+
+sub _move_file {
+    my ($filename, $idx, $fileRotate) = @_;
+
+    my $basename = $fileRotate->filename();
+    my $newfile  = $basename . '.' . ($idx+1);
+
+    $fileRotate->debug("rename $filename $newfile");
+
+    rename $filename, $newfile;
+
+    return undef;
+}
+
+sub logit {
+    my ($self, $message) = @_;
+
+    # Make sure we are at the EOF
+    seek $self->{LDF}{fh}, 0, 2;
+
+    $self->{LDF}->log_message(message => $message);
+
+    return;
+}
+
+{
+    my %MUTEXES;
+
+    sub mutex_for_path {
+        my ($self, $path) = @_;
+
+        $MUTEXES{$path} ||= Log::Dispatch::FileRotate::Mutex->new($path);
+    }
+}
 
 ###########################################################################
 #
 # Subroutine time_to_rotate
-#       
+#
 #       Args: none
 #
 #       Rtns: (1,n)  if we are in time mode and its time to rotate
@@ -323,101 +399,93 @@ sub logit
 #
 # If we have just been created then the first recurrance is an indication
 # to check against the log file.
-#       
-#       
-#	my ($in_time_mode,$time_to_rotate) = $self->time_to_rotate();
-sub time_to_rotate
-{
-    my $self   = shift;        # My object
-	my $mode   = defined($self->{'recurrance'});
-	my $rotate = 0;
+#
+#
+#   my ($in_time_mode,$time_to_rotate) = $self->time_to_rotate();
+sub time_to_rotate {
+    my $self = shift;
 
-	if($mode)
-	{
-		# Then do some checking and update ourselves if we think we need
-		# to rotate. Wether we rotate or not is up to our caller. We
-		# assume they know what they are doing!
+    my $mode   = defined $self->{recurrance};
+    my $rotate = 0;
 
-		# Only stat the log file here if we are in our first invocation.
-		my $ftime = 0;
-		if($self->{'new'})
-		{
-			# Last time the log file was changed
-			$ftime   = (stat($self->{LDF}{fh}))[9];
+    if ($mode) {
+        # Then do some checking and update ourselves if we think we need
+        # to rotate. Wether we rotate or not is up to our caller. We
+        # assume they know what they are doing!
 
-			# In Date::Manip format
-			# $ftime   = ParseDate(scalar(localtime($ftime)));
-		}
+        # Only stat the log file here if we are in our first invocation.
+        my $ftime = $self->{new}
+            ? (stat $self->{LDF}{fh})[9]
+            : 0;
 
-		# Check need for rotation. Loop through our recurrances looking
-		# for expiration times. Any we find that have expired we update.
-		my $tm    = $self->{timer}->();
-		my @recur = @{$self->{'recurrance'}};
-		@{$self->{'recurrance'}} = ();
-		for my $rec (@recur)
-		{
-			my ($abs,$pat) = @$rec;
+        # Check need for rotation. Loop through our recurrances looking
+        # for expiration times. Any we find that have expired we update.
+        my $tm    = $self->{timer}->();
+        my @recur = @{$self->{recurrance}};
 
-			# Extra checking
-			unless(defined $abs && $abs)
-			{
-				warn "Bad time found for recurrance pattern $pat: $abs\n";
-				next;
-			}
-			my $dorotate = 0;
+        $self->{recurrance} = [];
 
-			# If this is first time through
-			if($self->{'new'})
-			{
-				# If it needs a rotate then flag it
-				if($ftime <= $abs)
-				{
-					# Then we need to rotate
-					$self->debug("Need rotate file($ftime) <= $abs");
-					$rotate++;
-					$dorotate++;  # Just for debugging
-				}
+        for my $rec (@recur) {
+            my ($abs, $pat) = @$rec;
 
-				# Move to next occurance regardless
-				$self->debug("Dropping initial occurance($abs)");
-				$abs = $self->_get_next_occurance($pat);
-				unless(defined $abs && $abs)
-				{
-					warn "Next occurance is null for $pat\n";
-					$abs = 0;
-				}
-			}
-			# Elsif it is time to rotate
-			#elsif(Date_Cmp($abs,$tm) <= 0)
-			elsif($abs <= $tm)
-			{
-				# Then we need to rotate
-				$self->debug("Need rotate $abs <= $tm");
-				$abs = $self->_get_next_occurance($pat);
-				unless(defined $abs && $abs)
-				{
-					warn "Next occurance is null for $pat\n";
-					$abs = 0;
-				}
-				$rotate++;
-				$dorotate++;  # Just for debugging
-			}
-			push(@{$self->{'recurrance'}},[$abs,$pat]) if $abs;
-			$self->debug("time_to_rotate(mode,rotate,next) => ($mode,$dorotate,$abs)");
-		}
-		
-	}
+            # Extra checking
+            unless (defined $abs && $abs) {
+                warn "Bad time found for recurrance pattern $pat: $abs\n";
+                next;
+            }
 
-	$self->{'new'} = 0;  # No longer brand-spankers
+            my $dorotate = 0;
 
-	$self->debug("time_to_rotate(mode,rotate) => ($mode,$rotate)");
-	return wantarray ? ($mode,$rotate) : $rotate;
+            # If this is first time through
+            if ($self->{new}) {
+                # If it needs a rotate then flag it
+                if ($ftime <= $abs) {
+                    # Then we need to rotate
+                    $self->debug("Need rotate file($ftime) <= $abs");
+                    $rotate++;
+                    $dorotate++;  # Just for debugging
+                }
+
+                # Move to next occurance regardless
+                $self->debug("Dropping initial occurance($abs)");
+                $abs = $self->_get_next_occurance($pat);
+                unless (defined $abs && $abs) {
+                    warn "Next occurance is null for $pat\n";
+                    $abs = 0;
+                }
+            }
+            elsif ($abs <= $tm) {
+                # Then we need to rotate
+                $self->debug("Need rotate $abs <= $tm");
+                $abs = $self->_get_next_occurance($pat);
+                unless (defined $abs && $abs) {
+                    warn "Next occurance is null for $pat\n";
+                    $abs = 0;
+                }
+
+                $rotate++;
+                $dorotate++;  # Just for debugging
+            }
+
+            if ($abs) {
+                push @{$self->{recurrance}}, [$abs, $pat];
+            }
+
+            $self->debug("time_to_rotate(mode,rotate,next) => ($mode,$dorotate,$abs)");
+        }
+    }
+
+    $self->{new} = 0;  # No longer brand-spankers
+
+    $self->debug("time_to_rotate(mode,rotate) => ($mode,$rotate)");
+
+    return wantarray ? ($mode, $rotate) : $rotate;
 }
 
 ###########################################################################
 #
 # Subroutine _gen_occurance
-#       
+#
 #       Args: Date::Manip occurance pattern
 #
 #       Rtns: array of dates for next few events
@@ -426,253 +494,175 @@ sub time_to_rotate
 #  time. This can be used to see if we need to rotate on start up. We are
 #  often called by CGI (short lived) proggies :-(
 #
-sub _gen_occurance
-{
-    my $self = shift;        # My object
-    my $pat  = shift;
+sub _gen_occurance {
+    my ($self, $pat, $initial) = @_;
 
-	# Do we return an initial occurance before the current time?
-	my $initial = shift || 0;
+    # Do we return an initial occurance before the current time?
+    $initial ||= 0;
 
-	my $range = '';
-	my $base  = 'now'; # default to calcs based on the current time
+    my $range = '';
+    my $base  = 'now'; # default to calcs based on the current time
 
-	if($pat =~ /^0:0:0:0:0/) # Small recurrance less than 1 hour
-	{
-		$range = "4 hours later";
-		$base  = "1 hours ago" if $initial;
-	}
-	elsif($pat =~ /^0:0:0:0/) # recurrance less than 1 day
-	{
-		$range = "4 days later";
-		$base  = "1 days ago" if $initial;
-	}
-	elsif($pat =~ /^0:0:0:/) #  recurrance less than 1 week
-	{
-		$range = "4 weeks later";
-		$base  = "1 weeks ago" if $initial;
-	}
-	elsif($pat =~ /^0:0:/) #  recurrance less than 1 month
-	{
-		$range = "4 months later";
-		$base  = "1 months ago" if $initial;
-	}
-	elsif($pat =~ /^0:/) #  recurrance less than 1 year
-	{
-		$range = "24 months later";
-		$base  = "24 months ago" if $initial;
-	}
-	else # years
-	{
-		my($yrs) = $pat =~ m/^(\d+):/;
-		$yrs = 1 unless $yrs;
-		my $months = $yrs * 4 * 12;
+    if ($pat =~ /^0:0:0:0:0/) {
+        # Small recurrance less than 1 hour
+        $range = "4 hours later";
+        $base  = "1 hours ago" if $initial;
+    }
+    elsif ($pat =~ /^0:0:0:0/) {
+        # recurrance less than 1 day
+        $range = "4 days later";
+        $base  = "1 days ago" if $initial;
+    }
+    elsif ($pat =~ /^0:0:0:/) {
+        # recurrance less than 1 week
+        $range = "4 weeks later";
+        $base  = "1 weeks ago" if $initial;
+    }
+    elsif ($pat =~ /^0:0:/) {
+        # recurrance less than 1 month
+        $range = "4 months later";
+        $base  = "1 months ago" if $initial;
+    }
+    elsif ($pat =~ /^0:/) {
+        # recurrance less than 1 year
+        $range = "24 months later";
+        $base  = "24 months ago" if $initial;
+    }
+    else {
+        # years
+        my ($yrs) = $pat =~ m/^(\d+):/;
 
-		$range = "$months months later";
-		$base  = "$months months ago" if $initial;
-	}
+        $yrs ||= 1;
 
-	# The next date must start at least 1 second away from now other wise
-	# we may rotate for every message we recieve with in this second :-(
-	my $start = DateCalc($base,"+ 1 second");
+        my $months = $yrs * 4 * 12;
 
-	$self->debug("ParseRecur($pat,$base,$start,$range);");
-	my @dates = ParseRecur($pat,$base,$start,$range);
+        $range = "$months months later";
+        $base  = "$months months ago" if $initial;
+    }
 
-	# Just in case we have a bad parse or our assumptions are wrong.
-	# We default to days
-	unless(scalar @dates >= 2)
-	{
-		warn "Failed to parse ($pat). Going daily\n";
-		@dates = ParseRecur('0:0:0:1*0:0:0',"now","now","1 months later");
-		if($initial)
-		{
-			@dates = ParseRecur('0:0:0:1*0:0:0',"2 days ago","2 days ago","1 months later");
-		}
-	}
+    # The next date must start at least 1 second away from now other wise
+    # we may rotate for every message we recieve with in this second :-(
+    my $start = DateCalc($base,"+ 1 second");
 
-	# Convert the dates to seconds since the epoch so we can use
-	# numerical comparision instead of textual
-	my @epochs = ();
-	my @a = ('%Y','%m','%d','%H','%M','%S');
-	foreach(@dates)
-	{
-		my($y,$m,$d,$h,$mn,$s) = Date::Manip::UnixDate($_, @a);
-		my $e = Date_SecsSince1970GMT($m,$d,$y,$h,$mn,$s);
-		$self->debug("Date to epochs ($_) => ($e)");
-		push @epochs, $e;
-	}
+    $self->debug("ParseRecur($pat,$base,$start,$range);");
 
-	# Clean out all but the one previous to now if we are doing an
-	# initial occurance
-	my $now = time();
-	if($initial)
-	{
-		my $before = '';
-		while(@epochs && ( $epochs[0] <= $now) )
-		{
-			$before = shift(@epochs);
-			#warn "Shifting $before\n";
-		}
-		#warn "Unshifting $before\n";
-		unshift(@epochs,$before) if $before;
-	}
-	else
-	{
-		# Clean out dates that occur before now, being careful not to loop
-		# forever (thanks James).
-		shift(@epochs) while @epochs && ( $epochs[0] <= $now);
-	}
+    my @dates = ParseRecur($pat,$base,$start,$range);
 
-	$self->debug("Recurrances are at: ".join("\n\t", @dates));
+    # Just in case we have a bad parse or our assumptions are wrong.
+    # We default to days
+    unless (scalar @dates >= 2) {
+        warn "Failed to parse ($pat). Going daily\n";
 
-	warn "No recurrances found! Probably a timezone issue!\n" unless @dates;
+        if ($initial) {
+            @dates = ParseRecur('0:0:0:1*0:0:0',"2 days ago","2 days ago","1 months later");
+        }
+        else {
+            @dates = ParseRecur('0:0:0:1*0:0:0',"now","now","1 months later");
+        }
+    }
 
-	return @epochs;
+    # Convert the dates to seconds since the epoch so we can use
+    # numerical comparision instead of textual
+    my @epochs = ();
+    my @a = ('%Y','%m','%d','%H','%M','%S');
+    foreach (@dates) {
+        my ($y,$m,$d,$h,$mn,$s) = Date::Manip::UnixDate($_, @a);
+
+        my $e = Date_SecsSince1970GMT($m,$d,$y,$h,$mn,$s);
+
+        $self->debug("Date to epochs ($_) => ($e)");
+
+        push @epochs, $e;
+    }
+
+    # Clean out all but the one previous to now if we are doing an
+    # initial occurance
+    my $now = time;
+
+    if ($initial) {
+        my $before = '';
+
+        while (@epochs && $epochs[0] <= $now) {
+            $before = shift @epochs;
+        }
+
+        if ($before) {
+            unshift @epochs, $before;
+        }
+    }
+    else {
+        # Clean out dates that occur before now, being careful not to loop
+        # forever (thanks James).
+        while (@epochs && $epochs[0] <= $now) {
+            shift @epochs;
+        }
+    }
+
+    $self->debug("Recurrances are at: ". join "\n\t", @dates);
+
+    warn "No recurrances found! Probably a timezone issue!\n" unless @dates;
+
+    return @epochs;
 }
 
 ###########################################################################
 #
 # Subroutine _get_next_occurance
-#       
+#
 #       Args: Date::Manip occurance pattern
 #
 #       Rtns: date
 #
 # We don't want to call Date::Manip::ParseRecur too often as it is very
 # expensive. So, we cache what is returned from _gen_occurance().
-sub _get_next_occurance
-{
-    my $self = shift;        # My object
-    my $pat  = shift;
+sub _get_next_occurance {
+    my ($self, $pat) = @_;
 
-	# (ms) Throw out expired occurances
-	my $now = $self->{timer}->();
-	if(defined $self->{'dates'}{$pat})
-	{
-		while( @{$self->{'dates'}{$pat}} )
-		{
-			last if $self->{'dates'}{$pat}->[0] >= $now;
-			shift @{$self->{'dates'}{$pat}};
-		}
-	}
+    # (ms) Throw out expired occurances
+    my $now = $self->{timer}->();
 
-	# If this is first time then generate some new ones including one
-	# before our time to test against the log file
-	if(!defined $self->{'dates'}{$pat})
-	{
-		@{$self->{'dates'}{$pat}} = $self->_gen_occurance($pat,1);
-	}
-	# Elsif close to the end of what we have
-	elsif( scalar(@{$self->{'dates'}{$pat}}) < 2)
-	{
-		@{$self->{'dates'}{$pat}} = $self->_gen_occurance($pat);
-	}
-	
-	return( shift(@{$self->{'dates'}{$pat}}) );
+    if (defined $self->{dates}{$pat}) {
+        while (@{$self->{dates}{$pat}}) {
+            last if $self->{dates}{$pat}->[0] >= $now;
+            shift @{$self->{dates}{$pat}};
+        }
+    }
+
+    # If this is first time then generate some new ones including one
+    # before our time to test against the log file
+    unless (defined $self->{'dates'}{$pat}) {
+        @{$self->{'dates'}{$pat}} = $self->_gen_occurance($pat,1);
+    }
+    elsif (scalar(@{$self->{'dates'}{$pat}}) < 2) {
+        # close to the end of what we have
+        @{$self->{'dates'}{$pat}} = $self->_gen_occurance($pat);
+    }
+
+    return shift @{$self->{'dates'}{$pat}};
 }
 
-# Lock and unlock routines. For when we need to write a message.
-sub lock 
-{
-	my $self = shift;
 
-	safe_flock($self->{LDF}->{fh},LOCK_EX);
+sub debug {
+    my ($self, $message) = @_;
 
-	# Make sure we are at the EOF
-	seek($self->{LDF}->{fh}, 0, 2);
+    return unless $self->{debug};
 
-	$self->debug("Locked");
-	return;
+    warn localtime . " $$ $message\n";
+
+    return;
 }
 
-sub unlock 
-{
-	my $self = shift;
+sub error {
+    my ($self, $message) = @_;
 
-	safe_flock($self->{LDF}->{fh},LOCK_UN);
-	$self->debug("unLocked");
+    chomp $message;
+
+    warn "$$ " . __PACKAGE__ . " $message\n";
 }
 
-# Inspired by BSD's flopen(), returns filehandle on success
-sub flopen {
-	my $path = shift;
+1;
 
-	my $flags = LOCK_EX;
-
-	my $fh;
-
-	while (1) {
-		unless (open $fh, '>>', $path) {
-			return;
-		}
-
-		unless (safe_flock($fh, $flags)) {
-			return;
-		}
-
-		my @path_stat = stat $path;
-		unless (@path_stat) {
-			# file disappeared fron under our feet
-			close $fh;
-			next;
-		}
-
-		my @fh_stat = stat $fh;
-		unless (@fh_stat) {
-			# This should never happen
-			return;
-		}
-
-		unless ($^O =~ /^MSWin/) {
-			# stat on a filehandle and path return different "dev" and "rdev"
-			# fields on windows
-			if ($path_stat[0] != $fh_stat[0]) {
-				# file was changed under our feet. try again;
-				close $fh;
-				next;
-			}
-		}
-
-		# check that device and inode are the same for the path and fh
-		if ($path_stat[1] != $fh_stat[1])
-		{
-			# file was changed under our feet. try again;
-			close $fh;
-			next;
-		}
-
-		return $fh;
-	}
-}
-
-sub safe_flock {
-	my ($fh, $flags) = @_;
-
-	while (1) {
-		unless (flock $fh, $flags) {
-			# retry if we were interrupted or we are in non-blocking and the file is locked
-			next if $!{EAGAIN} or $!{EWOULDBLOCK};
-
-			return 0;
-		}
-		else {
-			return 1;
-		}
-	}
-}
-
-sub debug
-{
-	my $self = shift;
-	my ($message) = @_;
-
-	return unless($self->{debug});
-
-	warn localtime() . " $$ $message\n";
-
-	return;
-}
+__END__
 
 =pod
 
@@ -682,7 +672,7 @@ Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.30
+version 1.34
 
 =head1 SYNOPSIS
 
@@ -710,135 +700,164 @@ version 1.30
 
 =head1 DESCRIPTION
 
-This module provides a simple object for logging to files under the
-Log::Dispatch::* system, and automatically rotating them according to
-different constraints. This is basically a Log::Dispatch::File wrapper
-with additions. To that end the arguments
+This module extends the base class L<Log::Dispatch::Output> to provides a
+simple object for logging to files under the Log::Dispatch::* system, and
+automatically rotating them according to different constraints. This is
+basically a L<Log::Dispatch::File> wrapper with additions.
 
-	name, min_level, filename and  mode
+=head2 Rotation
 
-behave the same as Log::Dispatch::File. So see its man page 
-(perldoc Log::Dispatch::File)
+There are three different constraints which decide when a file must be
+rotated.
 
-The arguments size and max specify the maximum size and maximum
-number of log files created. The size defaults to 10M and the max number
-of files defaults to 1. If DatePattern is not defined then we default to
-working in size mode. That is, use size values for deciding when to rotate.
+The first is by size: when the log file grows more the a specified
+size, then it's rotated.
 
-Once DatePattern is defined FileRotate will move into time mode. Once this
-happens file rotation ignores size constraints, unless check_both, and uses
-the defined date pattern constraints.
-
-If you setup a config file using Log::Log4perl::init_and_watch() or the
-like, you can switch between modes just by commenting out the DatePattern
-line.
-
-When using DatePattern make sure TZ is defined correctly and that the TZ
-you use is understood by Date::Manip. We use Date::Manip to generate our
-recurrences. Bad TZ equals bad recurrences equals surprises! Read the
-Date::Manip man page for more details on TZ.
-
-DatePattern will default to a daily rotate if your entered pattern is
+The second constraint is with occurrences. If a L</DatePattern> is defined, a
+file rotation ignores size constraint (unless C<check_both>) and uses the
+defined date pattern constraints. When using L</DatePattern> make sure TZ is
+defined correctly and that the TZ you use is understood by Date::Manip. We use
+Date::Manip to generate our recurrences. Bad TZ equals bad recurrences equals
+surprises! Read the L<Date::Manip> man page for more details on
+TZ. L</DatePattern> will default to a daily rotate if your entered pattern is
 incorrect. You will also get a warning message.
 
-If you have multiple writers that were started at different times you
-will find each writer will try to rotate the log file at a recurrence
-calculated from its start time. To sync all the writers just use a config
-file and update it after starting your last writer. This will cause
-Log::Dispatch::FileRotate->new() to be called by each of the writers
-close to the same time, and if your recurrences aren't too close together
-all should sync up just nicely.
+You can also check both constraints together by using the C<check_both>
+parameter.
 
-I initially assumed a long running process but it seems people are using
-this module as part of short running CGI programs. So, now we look at the
-last modified time stamp of the log file and compare it to a previous
-occurance of a DatePattern, on startup only. If the file stat shows
-the mtime to be earlier than the previous recurrance then I rotate the
-log file.
+The latter constraint is a user callback. This function is called outside the
+restricted area (see L</Concurrency>) and,
+if it returns a true value, a rotation will happen unconditionally.
 
-We handle multiple writers using flock().
+All check are made before logging. The C<rotate> method leaves us check these
+constraints without logging anything.
+
+To let more power at the user, a C<post_rotate> callback it'll call after every
+rotation.
+
+=head2 Concurrency
+
+Multiple writers are allowed by this module. There is a restricted area where
+only one writer can be inside. This is done by using an external lock file,
+which name is "C<.filename.LCK>" (never deleted).
+
+The user constraint and the L</DatePattern> constraint are checked outside this
+restricted area. So, when you write a callback, don't rely on the logging
+file because it can disappear under your feet.
+
+Within this restricted area we:
+
+=over 4
+
+=item *
+
+check the size constraint
+
+=item *
+
+eventually rotate the log file
+
+=item *
+
+if it's defined, call the C<post_rotate> function
+
+=item *
+
+write the log message
+
+=back
 
 =head1 METHODS
 
 =head2 new(%p)
 
-This method takes a hash of parameters.  The following options are
-valid:
+The constructor takes the following parameters in addition to parameters
+documented in L<Log::Dispatch::File>:
 
 =over 4
 
-=item -- name ($)
+=item max ($)
 
-The name of the object (not the filename!).  Required.
+The maximum number of log files to create. Default 1.
 
-=item -- size ($)
+=item size ($)
 
-The maximum (or close to) size the log file can grow too.
+The maximum (or close to) size the log file can grow too. Default 10M.
 
-=item -- max ($)
+=item DatePattern ($)
 
-The maximum number of log files to create.
+The L</DatePattern> as defined above.
 
-=item -- TZ ($)
+=item TZ ($)
 
 The TimeZone time based calculations should be done in. This should match
-Date::Manip's concept of timezones and of course your machines timezone.
+L<Date::Manip>'s concept of timezones and of course your machines timezone.
 
-=item -- DatePattern ($)
+=item check_both ($)
 
-The DatePattern as defined above.
+1 for checking L</DatePattern> and size concurrently, 0 otherwise.  Default 0.
 
-=item -- check_both ($)
+=item user_constraint (\&)
 
-1 for checking both constrains, 0 otherwise (the default).
+If this callback is defined and returns true, a rotation will happen
+unconditionally.
 
-=item -- min_level ($)
+=item post_rotate (\&)
 
-The minimum logging level this object will accept.  See the
-Log::Dispatch documentation for more information.  Required.
+This callback is called after that all files were rotated. Will be called one
+time for every rotated file (in reverse order) with this arguments:
 
-=item -- max_level ($)
+=over 4
 
-The maximum logging level this obejct will accept.  See the
-Log::Dispatch documentation for more information.  This is not
-required.  By default the maximum is the highest possible level (which
-means functionally that the object has no maximum).
+=item C<filename>
 
-=item -- filename ($)
+the path of the rotated file
 
-The filename to be opened for writing. This is the base name. Rotated log
-files will be renamed filename.1 thru to filename.C<max>. Where max is the
-paramater defined above.
+=item C<index>
 
-=item -- mode ($)
+the index of the rotated file from C<max>-1 to 0, in the latter case
+C<filename> is the new, empty, log file
 
-The mode the file should be opened with.  Valid options are 'write',
-'>', 'append', '>>', or the relevant constants from Fcntl.  The
-default is 'write'.
+=item C<fileRotate>
 
-=item -- autoflush ($)
+a object reference to this instance
 
-Whether or not the file should be autoflushed.  This defaults to true.
+=back
 
-=item -- callbacks( \& or [ \&, \&, ... ] )
+With this, you can have infinite files renaming each time the rotated file
+log. E.g:
 
-This parameter may be a single subroutine reference or an array
-reference of subroutine references.  These callbacks will be called in
-the order they are given and passed a hash containing the following keys:
+  my $file = Log::Dispatch::FileRotate
+  ->new(
+        ...
+        post_rotate => sub {
+          my ($filename, $idx, $fileRotate) = @_;
+          if ($idx == 1) {
+            use POSIX qw(strftime);
+            my $basename = $fileRotate->filename();
+            my $newfilename =
+              $basename . '.' . strftime('%Y%m%d%H%M%S', localtime());
+            $fileRotate->debug("moving $filename to $newfilename");
+            rename($filename, $newfilename);
+          }
+        },
+       );
 
- ( message => $log_message, level => $log_level )
+B<Note>: this is called within the restricted area (see L</Concurrency>). This
+means that any other concurrent process is locked in the meanwhile. For the
+same reason, don't use the C<log()> or C<log_message()> methods because you
+will get a deadlock!
 
-The callbacks are expected to modify the message and then return a
-single scalar containing that modified message.  These callbacks will
-be called when either the C<log> or C<log_to> methods are called and
-will only be applied to a given message once.
-
-=item -- DEBUG ($)
+=item DEBUG ($)
 
 Turn on lots of warning messages to STDERR about what this module is
 doing if set to 1. Really only useful to me.
 
 =back
+
+=head2 filename()
+
+Returns the log filename.
 
 =head2 setDatePattern( $ or [ $, $, ... ] )
 
@@ -854,12 +873,40 @@ details.
 
 Sends a message to the appropriate output.  Generally this shouldn't
 be called directly but should be called through the C<log()> method
-(in Log::Dispatch::Output).
+(in L<Log::Dispatch::Output>).
+
+=head2 rotate()
+
+Rotates the file, if it has to be done. You can call this method if you want to
+check, and eventually do, a rotation without logging anything.
+
+Returns 1 if a rotation was done, 0 otherwise. C<undef> on error.
+
+=head2 debug($)
+
+If C<DEBUG> is true, prints a standard warning message.
+
+=head1 Tip
+
+If you have multiple writers that were started at different times you
+will find each writer will try to rotate the log file at a recurrence
+calculated from its start time. To sync all the writers just use a config
+file and update it after starting your last writer. This will cause
+C<new()> to be called by each of the writers
+close to the same time, and if your recurrences aren't too close together
+all should sync up just nicely.
+
+I initially assumed a long running process but it seems people are using
+this module as part of short running CGI programs. So, now we look at the
+last modified time stamp of the log file and compare it to a previous
+occurance of a L</DatePattern>, on startup only. If the file stat shows
+the mtime to be earlier than the previous recurrance then I rotate the
+log file.
 
 =head1 DatePattern
 
-As I said earlier we use Date::Manip for generating our recurrence
-events. This means we can understand Date::Manip's recurrence patterns
+As I said earlier we use L<Date::Manip> for generating our recurrence
+events. This means we can understand L<Date::Manip>'s recurrence patterns
 and the normal log4j DatePatterns. We don't use DatePattern to define the
 extension of the log file though.
 
@@ -885,7 +932,7 @@ semicolon:
 This says we want to rotate every day AND every 2 days at 12:30. Put in
 as many as you like.
 
-A complete description of Date::Manip recurrences is beyond us here
+A complete description of L<Date::Manip> recurrences is beyond us here
 except to quote (from the man page):
 
            A recur description is a string of the format
@@ -917,7 +964,7 @@ except to quote (from the man page):
 
 compression, signal based rotates, proper test suite
 
-Could possibly use Logfile::Rotate as well/instead.
+Could possibly use L<Logfile::Rotate> as well/instead.
 
 =head1 SEE ALSO
 
@@ -925,7 +972,9 @@ Could possibly use Logfile::Rotate as well/instead.
 
 =item *
 
-L<Log::Dispatch::File::Stamped> - log directly to timestamped files
+L<Log::Dispatch::File::Stamped>
+
+Log directly to timestamped files.
 
 =back
 
@@ -965,8 +1014,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-
-
-# vim: noet

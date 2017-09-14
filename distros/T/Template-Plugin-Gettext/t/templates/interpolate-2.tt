@@ -1,0 +1,3 @@
+[% USE gtx = Gettext %]
+Okay, single-quoted string without interpolation.
+[% gtx.gettext('Hello, $world!') %]

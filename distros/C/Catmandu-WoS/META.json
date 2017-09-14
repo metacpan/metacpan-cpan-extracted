@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-WoS"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

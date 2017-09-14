@@ -36,6 +36,9 @@ my @results = (
     [URL => 'http://موقع.وزارة-الأتصالات.مصر/最近更改'],
     [TEXT => "\netc."],
     [URL => 'http://поддомен.example.com/déjà-vu?utf8=✓'],
+    [TEXT => "\n"],
+    [URL => 'https://grep.metacpan.org/search?size=20&q=map\s*\{\s*\%24_\s*\}&qd=&qft='],
+    [TEXT => '   # incidentally'],
 );
 
 my $corpus = join '', map $_->[1], @results;

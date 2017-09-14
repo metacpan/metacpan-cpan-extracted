@@ -14,7 +14,7 @@ configure {
     requires 'Path::Tiny';
 };
 
-my $cpu_count = Sys::Info->new()->device('CPU')->count;
+my $cpu_count = $ENV{ALIEN_XGBOOST_CPUCOUNT} || Sys::Info->new()->device('CPU')->count;
 my $name      = 'xgboost';
 my $command   = 'xgboost' . $Config{'_exe'};
 
@@ -45,7 +45,7 @@ share {
         '%{make}' . " -j $cpu_count",
         '%{mkdir_deep} "%{.install.stage}/dynamic"',
         '%{mkdir_deep} "%{.install.stage}/bin"',
-        ['%{cp}', $command, '%{.install.stage}/bin/'],
+        ['%{cp} ' . $command . ' "%{.install.stage}/bin/"'],
         sub {
             my ($build) = @_;
             path($_)->copy( path( $build->install_prop->{stage} )->child('dynamic')->child( path($_)->basename ) )

@@ -12,10 +12,6 @@ sure you change the first line.
 
 Net::Async::Pusher::Connection - represents one L<Net::Async::Pusher> server connection
 
-=head1 VERSION
-
-version 0.001
-
 =head1 DESCRIPTION
 
 Provides basic integration with the L<https://pusher.com|Pusher> API. This implements
@@ -73,4 +69,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2016. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+

@@ -21,7 +21,7 @@ WriteMakefile(
         resources => {
             license => 'http://dev.perl.org/licenses/',
             homepage => 'http://wiki.github.com/toddr/Regexp-Parser',
-#            bugtracker => 'http://code.google.com/p/Regexp-Parser/issues/list',
+            bugtracker => 'https://github.com/toddr/Regexp-Parser/issues',
             repository => 'http://github.com/toddr/Regexp-Parser/tree/master',
 #            MailingList => 'http://groups.google.com/group/Regexp-Parser',
         },

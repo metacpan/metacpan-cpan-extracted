@@ -1,6 +1,25 @@
 Revision history for Patro
 --------------------------
 
+0.14	2017-09-12
+	- Support for proxies to dirhandles through the functions
+	  that take dirhandles.
+
+0.13	2017-09-11
+        - Support for proxies to REF type objects and references
+	- Support filehandle functions like truncate, flock, etc.
+	  on proxy filehandles
+	- Better support for side-effects of proxy function calls
+        - removed Patro/CODE/Shareable.pm
+
+0.12	2017-09-08
+	- Support for most common ops with proxy filehandles
+	- Some support for side-effects of proxy function/method calls
+	  (updates to @_,$!,$?)
+	- Secure mode (on by default, use :insecure tag to disable)
+	  that prevents server from running some insecure operations
+	  in a proxy request
+
 0.11	2017-08-27
 	- Use Storable + MIME::Base64 for serialization instead of Data::Dumper
 	- Include fixes and workarounds for thread-shared code references

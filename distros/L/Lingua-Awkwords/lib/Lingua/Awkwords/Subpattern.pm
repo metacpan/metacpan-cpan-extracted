@@ -11,12 +11,10 @@ use Carp qw(confess croak);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # these defaults set from what the online version does at
 # http://akana.conlang.org/tools/awkwords/
-#
-# NOTE that set_patterns clobbers these
 my %patterns = (
     C => [qw/p t k s m n/],
     N => [qw/m n/],
@@ -36,6 +34,10 @@ has target => ( is => 'rwp', );
 ########################################################################
 #
 # METHODS
+
+sub get_patterns {
+    return %patterns;
+}
 
 sub is_pattern {
     my ( undef, $pat ) = @_;
@@ -73,7 +75,7 @@ sub set_patterns {
     my $class_or_self = shift;
     # TODO error checking here may be beneficial if callers are in the
     # habit of passing in data that blows up on ->render or ->walk
-    %patterns = @_;
+    %patterns = ( %patterns, @_ );
     return $class_or_self;
 }
 
@@ -174,6 +176,11 @@ each time.
 =head1 METHODS
 
 =over 4
+
+=item B<get_patterns>
+
+Returns the presently set (global) patterns and their corresponding
+values as a list of keys and values.
 
 =item B<is_pattern> I<pattern>
 

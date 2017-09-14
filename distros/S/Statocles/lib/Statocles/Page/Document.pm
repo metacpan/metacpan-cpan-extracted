@@ -1,5 +1,5 @@
 package Statocles::Page::Document;
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 # ABSTRACT: Render document objects into HTML
 
 use Statocles::Base 'Class';
@@ -102,8 +102,37 @@ has '+data' => (
     },
 );
 
+#pod =attr disable_content_template
+#pod
+#pod If true, disables the processing of the content as a template. This will
+#pod improve performance if you're not using any template directives in your content.
+#pod
+#pod This can be set in the document (L<Statocles::Document/disable_content_template>),
+#pod the application (L<Statocles::App/disable_content_template>), or the site
+#pod (L<Statocles::Site/disable_content_template>).
+#pod
+#pod =cut
+
+has disable_content_template => (
+    is => 'ro',
+    isa => Str,
+    lazy => 1,
+    default => sub {
+        my ( $self ) = @_;
+        return $self->document && $self->document->has_disable_content_template ? $self->document->disable_content_template && "document"
+            : $self->app && $self->app->has_disable_content_template ? $self->app->disable_content_template && "application"
+            : $self->site && $self->site->has_disable_content_template ? $self->site->disable_content_template && "site"
+            : "";
+    },
+);
+
 sub _render_content_template {
     my ( $self, $content, $vars ) = @_;
+    if ( my $by = $self->disable_content_template ) {
+        $self->site->log->debug( $self->path . ' content template processing disabled by ' . $by );
+        return $content;
+    }
+    $self->site->log->debug( $self->path . ' processing content template ' );
     my $tmpl = $self->site->theme->build_template( $self->path, $content );
     my $doc = $self->document;
     if ( $doc->store ) {
@@ -272,7 +301,7 @@ Statocles::Page::Document - Render document objects into HTML
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 DESCRIPTION
 
@@ -307,6 +336,15 @@ most important attributes are:
 =head2 data
 
 The C<data> hash for this page. Defaults to the C<data> attribute from the Document.
+
+=head2 disable_content_template
+
+If true, disables the processing of the content as a template. This will
+improve performance if you're not using any template directives in your content.
+
+This can be set in the document (L<Statocles::Document/disable_content_template>),
+the application (L<Statocles::App/disable_content_template>), or the site
+(L<Statocles::Site/disable_content_template>).
 
 =head2 next
 

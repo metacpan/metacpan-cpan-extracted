@@ -1,46 +1,49 @@
-Return-MultiLevel
+NAME
 
-Return across multiple call levels
-
-
+    Return::MultiLevel - return across multiple call levels
 
 INSTALLATION
 
-To install this module, run the following commands:
+    To download and install this module, use your favorite CPAN client, e.g.
+    "cpan":
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        cpan Return::MultiLevel
+
+    Or "cpanm":
+
+        cpanm Return::MultiLevel
+
+    To do it manually, run the following commands (after downloading and
+    unpacking the tarball):
+
+        perl Makefile.PL
+        make
+        make test
+        make install
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    After installing, you can find documentation for this module with the
+    "perldoc" command.
 
-    perldoc Return::MultiLevel
+        perldoc Return::MultiLevel
 
-You can also look for information at:
+    You can also look for information at
+    <https://metacpan.org/pod/Return::MultiLevel>.
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Return-MultiLevel
+    To see a list of open bugs, visit
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Return-MultiLevel>.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Return-MultiLevel
+    To report a new bug, send an email to "bug-Return-MultiLevel [at]
+    rt.cpan.org".
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Return-MultiLevel
+COPYRIGHT & LICENSE
 
-    MetaCPAN
-        https://metacpan.org/module/Return::MultiLevel
+    Copyright 2013-2014 Lukas Mai.
 
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-COPYRIGHT AND LICENCE
+    See <http://dev.perl.org/licenses/> for more information.
 
-Copyright (C) 2013-2014 Lukas Mai
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.

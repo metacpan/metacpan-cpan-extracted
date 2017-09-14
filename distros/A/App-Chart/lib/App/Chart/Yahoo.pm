@@ -170,7 +170,6 @@ sub exchanges_data {
      freq_days => EXCHANGES_UPDATE_DAYS,
      parse     => \&exchanges_parse);
 }
-
 sub exchanges_parse {
   my ($content) = @_;
   my $h = {};
@@ -508,90 +507,191 @@ sub decode_hms {
 #
 # This uses the historical prices page like
 #
-#     http://finance.yahoo.com/q/hp?s=AMP.AX
+#     https://finance.yahoo.com/quote/AMP.AX/history?p=AMP.AX
 #
-# which has a CSV link like
+# which puts a cookie like
 #
-#     http://ichart.finance.yahoo.com/table.csv?s=NABHA.AX&d=5&e=26&f=2015&g=d&a=3&b=26&c=2015&ignore=.csv
+#     Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
 #
-# #     http://ichart.finance.yahoo.com/table.csv?s=IFN.AX&d=6&e=8&f=2009&g=d&a=9&b=28&c=2005&ignore=.csv
+# and contains buried within a mountain of hideous script
 #
-# or on the national sites like au.finance.yahoo.com with a redirector like
+#     "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
 #
-#     http://au.rd.yahoo.com/finance/quotes/internal/historical/download/*http://ichart.finance.yahoo.com/table.csv?s=AMP.AX&d=10&e=26&f=2007&g=d&a=0&b=4&c=2000&ignore=.csv
+# The \u002F is backslash character etc which is script string for "/"
+# character.  The crumb is included in a CSV download query like
 #
-# If there's no data at all in the requested range the response is a 404
-# (with various bits of HTML in the body).
+#     https://query1.finance.yahoo.com/v7/finance/download/AMP.AX?period1=1503810440&period2=1504415240&interval=1d&events=history&crumb=hdDX/HGsZ0Q
+#
+# period1 is the start time, period2 the end time, both as Unix seconds
+# since 1 Jan 1970.  Not sure of the timezone needed.  Some experiments
+# suggest it depends on the timezone of the symbol.  http works as well as
+# https.  The result is like
+#
+#     Date,Open,High,Low,Close,Adj Close,Volume
+#     2017-09-07,30.299999,30.379999,30.000000,30.170000,30.170000,3451099
+#
+# The "9999s" are some dodgy rounding off to what should be usually at most
+# 3 decimal places.
+#
+# Response is 404 if no such symbol, 401 unauthorized if no cookie or crumb.
+#
+# "events=div" gives dividends like
+#
+#     Date,Dividends
+#     2017-08-11,0.161556
+#
+# "events=div" gives splits like, for a consolidation (GXY.AX)
+#
+#     Date,Stock Splits
+#     2017-05-22,1/5
+#
+#----------------
+# For reference, there's a similar further which is json format (%7C = "|")
+#
+#     https://query2.finance.yahoo.com/v8/finance/chart/IBM?formatted=true&lang=en-US&region=US&period1=1504028419&period2=1504428419&interval=1d&events=div%7Csplit&corsDomain=finance.yahoo.com
+#
+# This doesn't require a cookie and crumb, has some info like symbol
+# timezone.  The numbers look like they're rounded through 32-bit floating
+# point, for example "142.55999755859375" which is 142.55 in a 23-bit
+# mantissa.  log(14255000)/log(2) = 23.76 bits
+#
+# All prices look like they are split-adjusted, which is ok if that's what
+# you ant and are downloading a full data set, but bad for incremental since
+# you don't know when a change is applied.
+#
 
-App::Chart::DownloadHandler::IndivChunks->new
+App::Chart::DownloadHandler->new
   (name       => __('Yahoo'),
    pred       => $download_pred,
    available_tdate_by_symbol => \&daily_available_tdate,
    available_tdate_extra     => 2,
-   url_func   => \&daily_url,
-   parse      => \&daily_parse,
+   url_and_cookiejar_func    => \&daily_url_and_cookiejar,
+   proc       => \&daily_download,
    chunk_size => 150);
 
 sub daily_available_tdate {
   my ($symbol) = @_;
+
+  # Sep 2017: daily data is present for the current day's trade, during the
+  # trading session.  Try reckoning it complete at 6pm.
   return App::Chart::Download::tdate_today_after
-    (10,30, App::Chart::TZ->for_symbol ($symbol))
-      - 1;
+    (18,0, App::Chart::TZ->for_symbol ($symbol));
+
+  # return App::Chart::Download::tdate_today_after
+  #   (10,30, App::Chart::TZ->for_symbol ($symbol))
+  #     - 1;
 }
 
-sub daily_url {
-  my ($symbol, $lo_tdate, $hi_tdate) = @_;
-  my ($lo_year, $lo_month, $lo_day) = App::Chart::tdate_to_ymd ($lo_tdate);
-  my ($hi_year, $hi_month, $hi_day) = App::Chart::tdate_to_ymd ($hi_tdate);
-  return 'http://ichart.finance.yahoo.com/table.csv?'
-    . 's=' . URI::Escape::uri_escape ($symbol)
-    . '&d=' . ($hi_month - 1)
-    . '&e=' . $hi_day
-    . '&f=' . $hi_year
-    . '&g=d'
-    . '&a=' . ($lo_month - 1)
-    . '&b=' . $lo_day
-    . '&c=' . $lo_year
-    . '&ignore=.csv';
+sub daily_download {
+  my ($symbol_list) = @_;
+  App::Chart::Download::status (__('Yahoo daily data'));
+
+  # App::Chart::Download::verbose_message ("Yahoo crumb $crumb cookies\n"
+  #                                        . $jar->as_string);
+
+  my $crumb_errors = 0;
+ SYMBOL: foreach my $symbol (@$symbol_list) {
+    my $lo_tdate = App::Chart::Download::start_tdate_for_update (@$symbol_list);
+    my $hi_tdate = daily_available_tdate ($symbol);
+
+    App::Chart::Download::status
+        (__('Yahoo data'), $symbol,
+         App::Chart::Download::tdate_range_string ($lo_tdate, $hi_tdate));
+
+    my $lo_timet = tdate_to_unix($lo_tdate - 2);
+    my $hi_timet = tdate_to_unix($hi_tdate + 2);
+
+    my $data  = daily_cookie_data($symbol);
+    if (! defined $data) {
+      print "Yahoo $symbol does not exist";
+      next SYMBOL;
+    }
+    my $crumb = URI::Escape::uri_escape($data->{'crumb'});
+    my $jar = http_cookies_from_string($data->{'cookies'} // '');
+
+    my $h = { source          => __PACKAGE__,
+              prefer_decimals => 2,
+              date_format   => 'ymd',
+            };
+    foreach my $elem (['history',\&daily_parse],
+                      ['div',    \&daily_parse_div],
+                      ['split',  \&daily_parse_split]) {
+      my ($events,$parse) = @$elem;
+      my $url = "http://query1.finance.yahoo.com/v7/finance/download/"
+        . URI::Escape::uri_escape($symbol)
+        . "?period1=$lo_timet&period2=$hi_timet&interval=1d&events=$events&crumb=$crumb";
+
+      my $resp = App::Chart::Download->get ($url,
+                                            allow_401 => 1,
+                                            allow_404 => 1,
+                                            cookie_jar => $jar,
+                                           );
+      if ($resp->code == 401) {
+        if (++$crumb_errors >= 2) { die "Yahoo: crumb authorization failed"; }
+        App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
+        redo SYMBOL;
+      }
+      if ($resp->code == 404) {
+        print "Yahoo $symbol does not exist";
+        next SYMBOL;
+      }
+      $parse->($symbol,$resp,$h, $hi_tdate);
+    }
+    ### $h
+    App::Chart::Download::write_daily_group ($h);
+  }
 }
 
 sub daily_parse {
-  my ($symbol, $resp) = @_;
+  my ($symbol, $resp, $h, $hi_tdate) = @_;
   my @data = ();
-  my $h = { source          => __PACKAGE__,
-            prefer_decimals => 2,
-            data            => \@data };
+  $h->{'data'} = \@data;
+  my $hi_tdate_iso = App::Chart::tdate_to_iso($hi_tdate);
 
   my $body = $resp->decoded_content (raise_error => 1);
   my @line_list = App::Chart::Download::split_lines($body);
 
-  # "Adj. Close*" in the past
-  # "Adj Close" as of Jan 2007
-  if ($line_list[0] !~ /^Date,Open,High,Low,Close,Volume,Adj\.? Close\*?/) {
+  unless ($line_list[0] =~ /^Date,Open,High,Low,Close,Adj Close,Volume/) {
     die "Yahoo: unrecognised daily data headings: " . $line_list[0];
   }
   shift @line_list;
 
   foreach my $line (@line_list) {
-    my ($date, $open, $high, $low, $close, $volume, $adj_volume)
+    my ($date, $open, $high, $low, $close, $adj_volume, $volume)
       = split (/,/, $line);
 
-    if ($index_pred->match($symbol)) {
-      # Indexes which aren't calculated intraday have open==high==low==close
-      # and volume==0, eg. ^WIL5.  Use the close alone in this case, with
-      # the effect of drawing line segments instead of OHLC or Candle
-      # figures with no range.
+    $date = daily_date_to_iso ($date);
+    if ($date gt $hi_tdate_iso) {
+      # Sep 2017: There's a daily data record during the trading day, but
+      # want to write the database only at the end of trading.
+      next;
+    }
 
-      if ($open == $high && $high == $low && $low == $close && $volume == 0) {
+    # Sep 2017 have seen "null,null,null,...", maybe for non-trading days
+    foreach my $field ($open, $high, $low, $close, $adj_volume, $volume) {
+      if ($field eq 'null') {
+        $field = undef;
+      }
+    }
+
+    if ($index_pred->match($symbol)) {
+      # In the past indexes which not calculated intraday had
+      # open==high==low==close and volume==0, eg. ^WIL5.  Use the close
+      # alone in this case, with the effect of drawing line segments instead
+      # of OHLC or Candle figures with no range.
+
+      if (defined $open && defined $high && defined $low && defined $close
+          && $open == $high && $high == $low && $low == $close && $volume == 0){
         $open = undef;
         $high = undef;
         $low = undef;
       }
 
     } else {
-      # Shares with no trades have volume==0, open==low==close==bid price,
-      # and high==offer price, from some time during the day, maybe the end
-      # of day.  Zap all the prices in this case.
+      # In the past shares with no trades had volume==0,
+      # open==low==close==bid price, and high==offer price, from some time
+      # during the day, maybe the end of day.  Zap all the prices in this
+      # case.
       #
       # For a public holiday it might be good to zap the volume to undef
       # too, but don't have anything to distinguish holiday, suspension,
@@ -603,12 +703,13 @@ sub daily_parse {
       # show a high<low, so massage high/low to open/close range if the high
       # looks like a crossed offer.
 
-      if ($high < $low) {
+      if (defined $high && defined $low && $high < $low) {
         $high = App::Chart::max_maybe ($open, $close);
         $low  = App::Chart::min_maybe ($open, $close);
       }
 
-      if ($open == $low && $low == $close && $volume == 0) {
+      if (defined $open && defined $low && defined $close && defined $volume
+          && $open == $low && $low == $close && $volume == 0) {
         $open  = undef;
         $high  = undef;
         $low   = undef;
@@ -617,14 +718,145 @@ sub daily_parse {
     }
 
     push @data, { symbol => $symbol,
-                  date   => daily_date_to_iso ($date),
-                  open   => $open,
-                  high   => $high,
-                  low    => $low,
-                  close  => $close,
+                  date   => $date,
+                  open   => crunch_trailing_nines($open),
+                  high   => crunch_trailing_nines($high),
+                  low    => crunch_trailing_nines($low),
+                  close  => crunch_trailing_nines($close),
                   volume => $volume };
   }
   return $h;
+}
+sub daily_parse_div {
+  my ($symbol, $resp, $h) = @_;
+  my @dividends = ();
+  $h->{'dividends'} = \@dividends;
+
+  my $body = $resp->decoded_content (raise_error => 1);
+  my @line_list = App::Chart::Download::split_lines($body);
+
+  # Date,Dividends
+  # 2015-11-04,1.4143
+  # 2016-05-17,1.41428
+  # 2017-05-16,1.4143
+  # 2016-11-03,1.4143
+
+  unless ($line_list[0] =~ /^Date,Dividends/) {
+    warn "Yahoo: unrecognised dividend headings: " . $line_list[0];
+    return;
+  }
+  shift @line_list;
+
+  foreach my $line (@line_list) {
+    my ($date, $amount) = split (/,/, $line);
+
+    push @dividends, { symbol  => $symbol,
+                       ex_date => daily_date_to_iso ($date),
+                       amount  => $amount };
+  }
+  return $h;
+}
+sub daily_parse_split {
+  my ($symbol, $resp, $h) = @_;
+  my @splits = ();
+  $h->{'splits'} = \@splits;
+
+  my $body = $resp->decoded_content (raise_error => 1);
+  my @line_list = App::Chart::Download::split_lines($body);
+
+  # GXY.AX split so $10 shares become $2
+  # Date,Stock Splits
+  # 2017-05-22,1/5
+
+  unless ($line_list[0] =~ /^Date,Stock Splits/) {
+    warn "Yahoo: unrecognised split headings: " . $line_list[0];
+    return;
+  }
+  shift @line_list;
+
+  foreach my $line (@line_list) {
+    my ($date, $ratio) = split (/,/, $line);
+    my ($old, $new) = split m{/}, $ratio;
+
+    push @splits, { symbol  => $symbol,
+                    date    => daily_date_to_iso ($date),
+                    new     => $new,
+                    old     => $old };
+  }
+  return $h;
+}
+
+# $str is a string like "30.299999"
+# Return it with trailing 9s turned into trailing 0s.
+sub crunch_trailing_nines {
+  my ($str) = @_;
+  if (defined $str) {
+    if ($str =~ /(.*)\.(...9+)$/) {
+      return decimal_add_low($str,1);
+    }
+    if ($str =~ /(.*)\.(....*01)$/) {
+      return decimal_add_low($str,-1);
+    }
+  }
+  return $str;
+}
+sub decimal_add_low {
+  my ($str, $add) = @_;
+  $str =~ /(.*)\.(.+)$/ or return $str+$add;
+  my $pre  = $1;
+  my $post = $2;
+  $str = $pre * 10**length($post) + $post + $add;
+  substr($str, -length($post),0, '.');
+  return $str;
+}
+
+# return a hashref 
+#   { cookies => string,   # in format HTTP::Cookies ->as_string()
+#     crumb   => string
+#   }
+#
+# If no such $symbol then return undef;
+#
+# Any $symbol which exists is good enough to get a crumb for all later use.
+# Could hard-code something likely here, but better to go from the symbol
+# which is wanted.
+# 
+sub daily_cookie_data {
+  my ($symbol) = @_;
+  require App::Chart::Pagebits;
+  $symbol = URI::Escape::uri_escape($symbol);
+  return App::Chart::Pagebits::get
+    (name      => __('Yahoo daily cookie'),
+     url       => "https://finance.yahoo.com/quote/$symbol/history?p=$symbol",
+     key       => 'yahoo-daily-cookies',
+     freq_days => 3,
+     parse     => \&daily_cookie_parse,
+     allow_404 => 1);
+}
+sub daily_cookie_parse {
+  my ($content, $resp) = @_;
+
+  # script like, with backslash escaping on "\uXXXX"
+  #"CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
+  #
+  $content =~ /"CrumbStore":\{"crumb":"([^"]*)"}/
+    or die "Yahoo daily data: CrumbStore not found";
+  my $crumb = App::Chart::Yahoo::javascript_string_unquote($1);
+
+  # header like
+  # Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
+  #
+  # Expiry time is +1 year, but dunno if would really work that long.
+  # 
+  require HTTP::Cookies;
+  my $jar = HTTP::Cookies->new;
+  $jar->extract_cookies($resp);
+  my $cookies_str = $jar->as_string;
+
+  App::Chart::Download::verbose_message ("Yahoo new crumb $crumb\n"
+                                         . $cookies_str);
+  return { crumb   => $crumb,
+           cookies => $cookies_str };
 }
 
 # return tdate for a date STR from historical data
@@ -638,6 +870,29 @@ sub daily_date_to_iso {
   } else {
     return $str;
   }
+}
+
+# Return seconds since 00:00:00, 1 Jan 1970 GMT.
+sub tdate_to_unix {
+  my ($tdate) = @_;
+  my ($year, $month, $day) = App::Chart::tdate_to_ymd ($tdate);
+  require Time::Local;
+  return Time::Local::timegm (0, 0, 0, $day, $month-1, $year-1900);
+}
+
+# $str is a string from previous HTTP::Cookies ->as_string()
+# Return a new HTTP::Cookies object with that content.
+sub http_cookies_from_string {
+  my ($str) = @_;
+  require File::Temp;
+  my $fh = File::Temp->new (TEMPLATE => 'chart-XXXXXX',
+                            TMPDIR => 1);
+  print $fh "#LWP-Cookies-1.0\n", $str or die;
+  close $fh or die;
+  require HTTP::Cookies;
+  my $jar = HTTP::Cookies->new;
+  $jar->load($fh->filename);
+  return $jar;
 }
 
 
@@ -710,72 +965,40 @@ sub info_parse {
 }
 
 
-#-----------------------------------------------------------------------------
-# intraday images
+#------------------------------------------------------------------------------
+# undo javascript string backslash quoting in STR, per
 #
-# Images are fetched from the yahoo charts section, gifs like
+#     https://developer.mozilla.org/en/JavaScript/Guide/Values,_Variables,_and_Literals#String_Literals
 #
-#     http://ichart.finance.yahoo.com/z?s=%5EGSPC&t=1d&q=l&l=off&z=l&p=s
+# Encode::JavaScript::UCS does \u, but not the rest
 #
-# or the link from au.finance.yahoo.com is say
+# cf Java as such not quite the same:
+#   unicode: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#100850
+#   strings: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#101089
 #
-#     http://cchart.yahoo.com/z?s=CML.AX&t=5d&l=off&z=l&q=l&i=au
-#
-# Those two hostnames resolve to the same IP, don't know which one is
-# really meant to be used.
-#
-# The parts are
-#
-#     s=SYMBOL
-#     t=1d   1 day
-#       5d   5 days
-#     q=l    line
-#       b    bar
-#       c    candle
-#     l=on   logarithmic
-#       off  linear
-#     z=m    medium size
-#       l    large size
-#     a=  comma separated list of indicators
-#       v    volume
-#       vm   volume moving average
-#       r14  RSI
-#
-# Unfortunately there's no last-modified or etag to indicate when the image
-# has nothing new yet, or is unchanged outside trading hours.
-
-# the futures charts from yahoo don't look too good, eg OU07.CBT, so stay
-# with barchart for them
-sub is_intraday_symbol {
-  my ($symbol) = @_;
-  my $suffix = App::Chart::symbol_suffix ($symbol);
-  return (length($suffix) <= 3
-          && $latest_pred->match($symbol));
-}
-my $intraday_pred = App::Chart::Sympred::Proc->new (\&is_intraday_symbol);
-
-foreach my $n (1, 5) {
-  App::Chart::IntradayHandler->new
-      (pred => $intraday_pred,
-       proc => \&intraday_url,
-       mode => "${n}d",
-       name => __nx('_{n} Day',
-                    '_{n} Days',
-                    $n,
-                    n => $n));
+my %javascript_backslash = ('b' => "\b",   # backspace
+                            'f' => "\f",   # formfeed
+                            'n' => "\n",   # newline
+                            'r' => "\r",
+                            't' => "\t",   # tab
+                            'v' => "\013", # vertical tab
+                           );
+sub javascript_string_unquote {
+  my ($str) = @_;
+  $str =~ s{\\(?:
+              ((?:[0-3]?[0-7])?[0-7]) # $1 \377 octal latin-1
+            |x([0-9a-fA-F]{2})        # $2 \xFF hex latin-1
+            |u([0-9a-fA-F]{4})        # $3 \uFFFF hex unicode
+            |(.)                      # $4 \n etc escapes
+            )
+         }{
+           (defined $1 ? chr(oct($1))
+            : defined $4 ? ($javascript_backslash{$4} || $4)
+            : chr(hex($2||$3)))   # \x,\u hex
+         }egx;
+  return $str;
 }
 
-sub intraday_url {
-  my ($self, $symbol, $mode) = @_;
-  App::Chart::Download::status (__x('Yahoo intraday {symbol} {mode}',
-                                    symbol => $symbol,
-                                    mode => $mode));
-  return 'http://ichart.finance.yahoo.com/z?s='
-    . URI::Escape::uri_escape ($symbol)
-      . '&t=' . $mode
-        . '&l=off&z=m&q=l&a=v';
-}
-
-
+#------------------------------------------------------------------------------
 1;
 __END__

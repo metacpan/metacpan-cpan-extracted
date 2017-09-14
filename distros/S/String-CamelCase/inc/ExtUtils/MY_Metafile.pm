@@ -267,6 +267,22 @@ sub _gen_meta_yml
 	$yaml->{license}      = $this->{LICENSE};
 	foreach my $key (keys %$yaml)
 	{
+		if( ref($yaml->{$key}) eq 'ARRAY' )
+		{
+			my $val = $yaml->{$key};
+			if( @$val == 0 )
+			{
+				my $pad = ' 'x(12-length($key));
+				$yaml->{$key} = sprintf('%s:%s %s', $key, $pad, '[]');
+			}else
+			{
+				$yaml->{$key} = "$key:\n";
+				foreach my $elem (@$val)
+				{
+					$yaml->{$key} .= '  - ' . $elem . "\n";
+				}
+			}
+		}
 		if( $yaml->{$key} )
 		{
 			my $pad = ' 'x(12-length($key));

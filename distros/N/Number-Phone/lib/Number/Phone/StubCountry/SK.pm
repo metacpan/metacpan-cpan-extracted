@@ -22,24 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
-                  'pattern' => '(2)(1[67])(\\d{3,4})',
-                  'leading_digits' => '21[67]'
+                  'leading_digits' => '21[67]',
+                  'pattern' => '(2)(1[67])(\\d{3,4})'
                 },
                 {
                   'leading_digits' => '[3-5]',
                   'pattern' => '([3-5]\\d)(1[67])(\\d{2,3})'
                 },
                 {
-                  'pattern' => '(2)(\\d{3})(\\d{3})(\\d{2})',
-                  'leading_digits' => '2'
+                  'leading_digits' => '2',
+                  'pattern' => '(2)(\\d{3})(\\d{3})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '[3-5]',
-                  'pattern' => '([3-5]\\d)(\\d{3})(\\d{2})(\\d{2})'
+                  'pattern' => '([3-5]\\d)(\\d{3})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[3-5]'
                 },
                 {
                   'leading_digits' => '[689]',
@@ -52,44 +52,7 @@ my $formatters = [
               ];
 
 my $validators = {
-                'toll_free' => '800\\d{6}',
                 'pager' => '9090\\d{3}',
-                'voip' => '
-          6(?:
-            02|
-            5[0-4]|
-            9[0-6]
-          )\\d{6}
-        ',
-                'fixed_line' => '
-          2(?:
-            1(?:
-              6\\d{3,4}|
-              7\\d{3}
-            )|
-            [2-9]\\d{7}
-          )|
-          [3-5][1-8](?:
-            1(?:
-              6\\d{2,3}|
-              7\\d{3}
-            )|
-            \\d{7}
-          )
-        ',
-                'mobile' => '
-          9(?:
-            0(?:
-              [1-8]\\d|
-              9[1-9]
-            )|
-            (?:
-              1[0-24-9]|
-              [45]\\d
-            )\\d
-          )\\d{5}
-        ',
-                'personal_number' => '',
                 'geographic' => '
           2(?:
             1(?:
@@ -106,12 +69,49 @@ my $validators = {
             \\d{7}
           )
         ',
+                'personal_number' => '',
+                'voip' => '
+          6(?:
+            02|
+            5[0-4]|
+            9[0-6]
+          )\\d{6}
+        ',
+                'mobile' => '
+          9(?:
+            0(?:
+              [1-8]\\d|
+              9[1-9]
+            )|
+            (?:
+              1[0-24-9]|
+              [45]\\d
+            )\\d
+          )\\d{5}
+        ',
+                'toll_free' => '800\\d{6}',
                 'specialrate' => '(8[5-9]\\d{7})|(
           9(?:
             [78]\\d{7}|
             00\\d{6}
           )
-        )|(96\\d{7})'
+        )|(96\\d{7})',
+                'fixed_line' => '
+          2(?:
+            1(?:
+              6\\d{3,4}|
+              7\\d{3}
+            )|
+            [2-9]\\d{7}
+          )|
+          [3-5][1-8](?:
+            1(?:
+              6\\d{2,3}|
+              7\\d{3}
+            )|
+            \\d{7}
+          )
+        '
               };
 my %areanames = (
   4212 => "Bratislava",

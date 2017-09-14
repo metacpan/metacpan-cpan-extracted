@@ -44,7 +44,7 @@ Create table with columns for indexed fields. Example for Lemonldap::NG:
       _whatToTrace text,
       _session_kind text,
       _utime bigint,
-      ipAddr text
+      ipAddr varchar(64)
   );
 
 Add indexes:

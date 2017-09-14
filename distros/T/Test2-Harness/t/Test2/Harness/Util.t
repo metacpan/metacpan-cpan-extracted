@@ -2,22 +2,24 @@ use Test2::Bundle::Extended -target => 'Test2::Harness::Util';
 
 use ok $CLASS => ':ALL';
 
-use File::Temp qw/tempfile/;
+use File::Temp qw/tempfile tempdir/;
 
 imported_ok qw{
+    close_file
+    fqmod
+    local_env
+    maybe_open_file
+    maybe_read_file
+    open_file
     read_file
     write_file
     write_file_atomic
-    open_file
-    close_file
-    maybe_read_file
-    maybe_open_file
-    file_stamp
 };
 
+my ($line) = split /\n/, read_file(__FILE__), 2;
 like(
-    read_file(__FILE__),
-    qr/^\Quse Test2::Bundle::Extended -target => 'Test2::Harness::Util';\E$/m,
+    $line,
+    q{use Test2::Bundle::Extended -target => 'Test2::Harness::Util';},
     "Read file (only checking first line)"
 );
 
@@ -40,7 +42,7 @@ is(
 );
 
 ok(my $fh = open_file(__FILE__), "opened file");
-ok(my $line = <$fh>, "Can read from file, default mode is 'read'");
+ok($line = <$fh>, "Can read from file, default mode is 'read'");
 ok(lives { close_file($fh) }, "Closed file");
 ok(dies { close_file($fh) }, "already closed");
 
@@ -61,12 +63,41 @@ is(
     "maybe_open_file is undef when file does not exist"
 );
 
-is(
-    file_stamp(__FILE__),
-    (stat(__FILE__))[9],
-    "file_stamp"
-);
+is(fqmod('Foo::Bar', 'Baz'),       'Foo::Bar::Baz',      "fqmod on postfix");
+is(fqmod('Foo::Bar', 'Baz::Bat'),  'Foo::Bar::Baz::Bat', "fqmod on longer postfix");
+is(fqmod('Foo::Bar', '+Baz'),      'Baz',                "fqmod on fq");
+is(fqmod('Foo::Bar', '+Baz::Bat'), 'Baz::Bat',           "fqmod on longer fq");
 
-#TODO: write_file_atomic
+no warnings 'uninitialized';
+local $ENV{FOO} = 'old';
+local $ENV{BAZ};
+local $ENV{REPLACE_A} = 'old';
+local $ENV{REPLACE_B} = undef;
+local $ENV{REPLACE_C} = 'old';
+
+local_env {FOO => 'bar', BAZ => 'bat', REPLACE_A => 'xxx', REPLACE_B => 'xxx', REPLACE_C => undef} => sub {
+    is($ENV{FOO}, 'bar', "Replaced existing");
+    is($ENV{BAZ}, 'bat', "Replaced missing");
+
+    is($ENV{REPLACE_A}, 'xxx', "REPLACE_A was set, but we will change it");
+    is($ENV{REPLACE_B}, 'xxx', "REPLACE_B was set, but we will change it");
+    is($ENV{REPLACE_C}, undef, "REPLACE_C was set, but we will change it");
+
+    $ENV{REPLACE_A} = undef;
+    $ENV{REPLACE_B} = 'new';
+    $ENV{REPLACE_C} = 'new'
+};
+
+is($ENV{FOO}, 'old', "Restored existing");
+is($ENV{BAZ}, undef, "Removed missing");
+
+is($ENV{REPLACE_A}, undef, "REPLACE_A was changed");
+is($ENV{REPLACE_B}, 'new', "REPLACE_B was changed");
+is($ENV{REPLACE_C}, 'new', "REPLACE_C was changed");
+
+my $tmp = tempdir(CLEANUP => 1, TMPDIR => 1);
+write_file_atomic(File::Spec->canonpath("$tmp/xxx"), "data");
+$fh = open_file(File::Spec->canonpath("$tmp/xxx"), '<');
+is(<$fh>, "data", "read data from file");
 
 done_testing;

@@ -1,0 +1,17 @@
+
+Release history for Importer-Zim
+
+0.2.0     2017-09-13 14:47:24-07:00 America/Los_Angeles
+
+    - Add SEE ALSO pod section
+    - add DESCRIPTION pod section
+    - Require +Lexical 0.4.0+
+
+v0.1     2017-09-11 11:10:27-07:00 America/Los_Angeles
+
+    - Support pluggable importer, like '+Lexical' or 'Importer::Zim::Lexical'
+    - Require minimum version for Importer::Zim::Lexical
+
+v0.0     2017-09-02
+
+    - Initial commit

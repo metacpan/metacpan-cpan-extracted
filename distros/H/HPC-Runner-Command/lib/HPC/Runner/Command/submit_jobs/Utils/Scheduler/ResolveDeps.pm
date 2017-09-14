@@ -16,7 +16,8 @@ use Try::Tiny;
 use Memoize;
 use Array::Compare;
 
-with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps::BuildTaskDeps';
+with
+'HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps::BuildTaskDeps';
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps;
 
@@ -84,8 +85,11 @@ sub schedule_jobs {
         $self->schedule( $dep->schedule_all );
     }
     catch {
-        $self->app_log->fatal(
-            'There was a problem creating your schedule. Aborting mission!');
+        # $DB::single=2;
+        $self->app_log->fatal( 'There was a problem creating your schedule.'
+              . ' Please ensure there are no cyclic dependencies. '
+              . 'Aborting mission!' );
+        $self->app_log->fatal($@);
         exit 1;
     }
 
@@ -100,7 +104,7 @@ Run a sanity check on the schedule. All the job deps should have existing job na
 sub sanity_check_schedule {
     my $self = shift;
 
-    #$DB::single = 2;
+    $DB::single = 2;
 
     my @jobnames = keys %{ $self->graph_job_deps };
     @jobnames = sort(@jobnames);
@@ -113,6 +117,7 @@ sub sanity_check_schedule {
 
     #Search the dependencies for matching jobs
     foreach my $job (@jobnames) {
+        $DB::single = 2;
         my $row = [];
         my $ref = $self->graph_job_deps->{$job};
         push( @$row, $job );
@@ -122,6 +127,7 @@ sub sanity_check_schedule {
 
         #TODO This should be a proper error
         foreach my $r (@$ref) {
+            $DB::single = 2;
 
             if ( !exists $self->graph_job_deps->{$r} ) {
                 $ref->[$y] = "**$r**";
@@ -140,6 +146,11 @@ sub sanity_check_schedule {
                     $self->app_log->fatal(
                         "No potential matches were found for dependency $r");
                 }
+            }
+            elsif ( "$r" eq "$job" ) {
+                $self->app_log->fatal(
+"Job dep $r deps upon itself. This schedule is not possible."
+                );
             }
 
             $y++;
@@ -168,7 +179,6 @@ sub sanity_check_schedule {
 
     return $search;
 }
-
 
 =head3 chunk_commands
 
@@ -317,11 +327,11 @@ sub resolve_max_array_size {
 
 #TODO get rid of this
 sub return_ranges {
-    my $self        = shift;
+    my $self = shift;
 
     my $batch_start = shift;
     my $batch_end   = shift;
-    my $num_arrays = shift;
+    my $num_arrays  = shift;
 
     my $new_array;
     if ( $num_arrays == 1 ) {
@@ -367,8 +377,7 @@ sub assign_batch_stats {
     my $self      = shift;
     my $cmd_count = shift;
 
-    $self->jobs->{ $self->current_job }->{cmd_start} =
-      $self->total_cmd_counter;
+    $self->jobs->{ $self->current_job }->{cmd_start} = $self->total_cmd_counter;
     foreach my $batch ( @{ $self->jobs->{ $self->current_job }->batches } ) {
         $self->current_batch($batch);
 
@@ -406,7 +415,7 @@ sub assign_batches {
 
     my $x = 0;
     my $y = 1;
-    $self->jobs->{$self->current_job}->{batch_index_start} = 1;
+    $self->jobs->{ $self->current_job }->{batch_index_start} = 1;
     while ( my @vals = $iter->() ) {
 
         my $batch_cmds = \@vals;
@@ -433,7 +442,7 @@ sub assign_batches {
         $y = $y + $self->jobs->{ $self->current_job }->commands_per_node;
     }
 
-    $self->jobs->{$self->current_job}->{batch_index_end} = $x;
+    $self->jobs->{ $self->current_job }->{batch_index_end} = $x;
 }
 
 =head3 assign_batch_tags
@@ -489,6 +498,5 @@ sub parse_meta {
 
     return ( $t1, $2 );
 }
-
 
 1;

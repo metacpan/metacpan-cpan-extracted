@@ -14,8 +14,6 @@
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
-#include "const-c.inc"
-
 #include <complex.h>
 #include <ctype.h>
 #ifdef I_DIRENT
@@ -82,6 +80,8 @@
 #define HOST_NAME_MAX 255
 #endif
 
+#include "const-c.inc"
+
 typedef int SysRet;   /* returns 0 as "0 but true" */
 typedef int SysRet0;  /* returns 0 as 0 */
 typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
@@ -137,10 +137,10 @@ _readlink50c(char *path, int *dirfd) {
     return NULL;
 
   while (1) {
-    if (dirfd)
-      linklen = readlinkat(*dirfd, path, buf, bufsize);
-    else
+    if (dirfd == NULL)
       linklen = readlink(path, buf, bufsize);
+    else
+      linklen = readlinkat(*dirfd, path, buf, bufsize);
 
     if (linklen >= 0) {
       if ((size_t)linklen < bufsize || linklen == SSIZE_MAX) {
@@ -162,25 +162,146 @@ _readlink50c(char *path, int *dirfd) {
   }
 }
 
-static int
-_writev50c(pTHX_ int fd, AV *ioAV, off_t *offset) {
-  struct iovec *iov;
-  struct iovec iov_elt;
-  int ioAVcnt, iovcnt, i, rv;
-  SV **av_elt;
+static void
+_free_iov(struct iovec *iov, int cnt) {
+  int i;
 
-  ioAVcnt = av_len(ioAV) + 1;
-  if (ioAVcnt <= 0)
+  if (iov)
+    for (i = 0; i < cnt; i++)
+      if (iov[i].iov_base)
+        Safefree(iov[i].iov_base);
+}
+
+static int
+_readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset) {
+  int iovcnt, i, rv;
+  struct iovec *iov;
+  void *iov_base;
+  /* iov_len is a size_t but it is an error if the sum of the iov_len values
+     exceeds SSIZE_MAX ... Dafuq? */
+  size_t iov_len, iov_sum, sv_cur;
+
+#ifdef __CYGWIN__
+  if (offset != NULL)
+    return -1;
+#endif
+  
+  for (i = 0; i < 2; i++) {
+    if (SvROK(buffers)) {
+      buffers = SvRV(buffers);
+      if (SvTYPE(buffers) == SVt_PVAV)
+        break;
+      if (i == 0)
+        continue;
+    }
+    croak("buffers is not an array reference");
+  }
+
+  iovcnt = av_len(sizes) + 1;
+  if (iovcnt <= 0)
     return 0;
 
-  Newxc(iov, ioAVcnt, struct iovec, struct iovec);
+  Newxz(iov, iovcnt, struct iovec);
   if (!iov)
     return -1;
 
-  iovcnt = 0;
+  for (i = 0; i < iovcnt; i++) {
+    SV **size = av_fetch(sizes, i, 0);
+    if (size && SvOK(*size)) {
+      iov_len = SvUV(*size);
+      if (iov_len) {
+        Newx(iov_base, iov_len, char);
+        if (!iov_base) {
+          _free_iov(iov, i);
+          Safefree(iov);
+          return -1;
+        }
+        iov[i].iov_base = iov_base;
+        iov[i].iov_len = iov_len;
+      }
+    }
+  }
 
-  for (i = 0; i < ioAVcnt; i++) {
-    av_elt = av_fetch(ioAV, i, 0);
+  if (offset == NULL)
+    rv = readv(fd, iov, iovcnt);
+#ifndef __CYGWIN__
+  else
+    rv = preadv(fd, iov, iovcnt, SvOK(offset) ? SvUV(offset) : 0);
+#endif
+
+  if (rv <= 0) {
+    _free_iov(iov, iovcnt);
+    Safefree(iov);
+    return rv;
+  }
+
+  for (iov_sum = 0, i = 0; i < iovcnt; i++) {
+    iov_base = iov[i].iov_base;
+    iov_len = iov[i].iov_len;
+    iov_sum += iov_len;
+
+    if (iov_sum <= rv)
+      /* current buffer filled completely */
+      sv_cur = iov_len;
+    else if (iov_sum - rv < iov_len)
+      /* current buffer filled partly */
+      sv_cur = iov_len - (iov_sum - rv);
+    else {
+      /* no data was read into remaining buffers */
+      _free_iov(iov + i, iovcnt - i);
+      Safefree(iov);
+      return rv;
+    }
+
+    SV *tmp_sv = iov_len ? newSV_type(SVt_PV) : newSVpvn("", 0);
+
+    if (!tmp_sv) {
+      _free_iov(iov + i, iovcnt - i);
+      Safefree(iov);
+      return -1;
+    }
+
+    if (iov_len) {
+      if (sv_cur != iov_len)
+        Renew(iov_base, sv_cur, char);
+      SvPV_set(tmp_sv, iov_base);
+      SvCUR_set(tmp_sv, sv_cur);
+      SvLEN_set(tmp_sv, sv_cur);
+      SvPOK_only(tmp_sv);
+      SvTAINTED_on(tmp_sv);
+    }
+
+    if (!av_store((AV*)buffers, i, tmp_sv))
+      SvREFCNT_dec(tmp_sv);
+  }
+
+  Safefree(iov);
+  return rv;
+}
+
+static int
+_writev50c(pTHX_ int fd, AV *buffers, SV *offset) {
+  struct iovec *iov;
+  struct iovec iov_elt;
+  int i, rv;
+
+#ifdef __CYGWIN__
+  if (offset != NULL)
+    return -1;
+#endif
+  
+  const int bufcnt = av_len(buffers) + 1;
+  if (bufcnt <= 0)
+    return 0;
+
+  Newxc(iov, bufcnt, struct iovec, struct iovec);
+  if (!iov)
+    return -1;
+
+  int iovcnt = 0;
+
+  for (i = 0; i < bufcnt; i++) {
+    SV **av_elt = av_fetch(buffers, i, 0);
     if (av_elt && SvOK(*av_elt)) {
       iov_elt.iov_base = (void*)SvPV(*av_elt, iov_elt.iov_len);
       if (iov_elt.iov_len)
@@ -192,14 +313,10 @@ _writev50c(pTHX_ int fd, AV *ioAV, off_t *offset) {
     rv = 0;
   else if (offset == NULL) 
     rv = writev(fd, iov, iovcnt);
-  else {
-#ifdef __CYGWIN__
-    /* no pwritev() on cygwin */
-    rv = -1;
-#else
-    rv = pwritev(fd, iov, iovcnt, *offset);
+#ifndef __CYGWIN__
+  else
+    rv = pwritev(fd, iov, iovcnt, SvOK(offset) ? SvUV(offset) : 0);
 #endif
-  }
 
   Safefree(iov);
   return rv;
@@ -290,7 +407,7 @@ atoll(char *str);
 char*
 basename(char *path);
 
-# ifndef __CYGWIN__
+#ifndef __CYGWIN__
 int
 catclose(nl_catd catd);
 
@@ -300,7 +417,7 @@ catgets(nl_catd catd, int set_id, int msg_id, char *dflt);
 nl_catd
 catopen(char *name, int oflag);
 
-# else
+#else
 void
 catclose(...);
     PPCODE:
@@ -316,20 +433,21 @@ catopen(...);
     PPCODE:
         croak("catopen() not available");
 
-# endif
+#endif
 
 clock_t
 clock();
 
-# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 1000000) || \
-     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
-     
+#if !defined(CLOCK_REALTIME) || \
+    (defined(__FreeBSD_version)  && __FreeBSD_version  < 1000000) || \
+    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+
 void
 clock_getcpuclockid(...);
     PPCODE:
         croak("clock_getcpuclockid() not available");
 
-# else
+#else
 clockid_t
 clock_getcpuclockid(pid_t pid = PerlProc_getpid());
     INIT:
@@ -341,9 +459,25 @@ clock_getcpuclockid(pid_t pid = PerlProc_getpid());
     OUTPUT:
         RETVAL
 
-# endif
+#endif
 
-# ifdef CLOCK_REALTIME
+#ifndef CLOCK_REALTIME
+void
+clock_getres(...);
+    PPCODE:
+        croak("clock_getres() not available");
+
+void
+clock_gettime(...);
+    PPCODE:
+        croak("clock_gettime() not available");
+
+void
+clock_settime(...);
+    PPCODE:
+        croak("clock_settime() not available");
+
+#else
 void
 clock_getres(clockid_t clock_id = CLOCK_REALTIME);
     ALIAS:
@@ -362,13 +496,18 @@ clock_getres(clockid_t clock_id = CLOCK_REALTIME);
             mPUSHi(res.tv_nsec);
         }
 
-# else
-void
-clock_getres(...);
-    PPCODE:
-        croak("clock_getres() not available");
+int
+clock_settime(clockid_t clock_id, time_t sec, long nsec);
+    INIT:
+        struct timespec tp = { sec, nsec };
+    CODE:
+        RETVAL = clock_settime(clock_id, &tp);
+        if (RETVAL)
+            XSRETURN_UNDEF;
+    OUTPUT:
+        RETVAL
 
-# endif
+#endif
 
 #define RETURN_NANOSLEEP_REMAIN(ret) {                      \
     if (ret == 0 || errno == EINTR) {                       \
@@ -384,15 +523,17 @@ clock_getres(...);
         XSRETURN_UNDEF;                                     \
 }
 
-# if (defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000) || \
-     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || \
-      defined(__OpenBSD__)
+#if !defined(CLOCK_REALTIME) || \
+    (defined(__FreeBSD_version) && __FreeBSD_version < 1101000) || \
+    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || \
+    defined(__OpenBSD__)
+
 void
 clock_nanosleep(...);
     PPCODE:
         croak("clock_nanosleep not available");
 
-# else
+#else
 void
 clock_nanosleep(clockid_t clock_id, int flags, time_t sec, long nsec);
     INIT:
@@ -402,9 +543,9 @@ clock_nanosleep(clockid_t clock_id, int flags, time_t sec, long nsec);
         errno = clock_nanosleep(clock_id, flags, &request, &remain);
         RETURN_NANOSLEEP_REMAIN(errno)
 
-# endif
+#endif
 
-# ifdef HAS_NANOSLEEP
+#ifdef HAS_NANOSLEEP
 void
 nanosleep(time_t sec, long nsec);
     INIT:
@@ -416,23 +557,13 @@ nanosleep(time_t sec, long nsec);
         ret = nanosleep(&request, &remain);
         RETURN_NANOSLEEP_REMAIN(ret)
 
-# else
+#else
 void
 nanosleep(...);
     PPCODE:
         croak("nanosleep() not available");
         
 #endif
-
-int
-clock_settime(clockid_t clock_id, time_t sec, long nsec);
-    INIT:
-        struct timespec tp = { sec, nsec };
-    CODE:
-        if ((RETVAL = clock_settime(clock_id, &tp)))
-            XSRETURN_UNDEF;
-    OUTPUT:
-        RETVAL
 
 char *
 confstr(int name);
@@ -489,7 +620,7 @@ fnmatch(char *pattern, char *string, int flags);
 int
 killpg(pid_t pgrp, int sig);
 
-# if defined(__FreeBSD__) || defined(__CYGWIN__)
+#if defined(__FreeBSD__) || defined(__CYGWIN__)
 void
 getdate(...);
     PPCODE:
@@ -500,7 +631,7 @@ getdate_err();
     PPCODE:
         croak("getdate_err() not available");
 
-# else
+#else
 void
 getdate(char *string);
     INIT:
@@ -528,44 +659,53 @@ getdate_err();
     OUTPUT:
         RETVAL
 
-# endif
+#endif
 
 void
-strptime(char *s, char *format, SV *sec = &PL_sv_undef, SV *min = &PL_sv_undef, SV *hour = &PL_sv_undef, SV *mday = &PL_sv_undef, SV *mon = &PL_sv_undef, SV *year = &PL_sv_undef, SV *wday = &PL_sv_undef, SV *yday = &PL_sv_undef, SV *isdst = &PL_sv_undef);
-    INIT:
+strptime(char *s, char *format, SV *sec = NULL, SV *min = NULL, SV *hour = NULL, SV *mday = NULL, SV *mon = NULL, SV *year = NULL, SV *wday = NULL, SV *yday = NULL, SV *isdst = NULL);
+    PREINIT:
         char *remainder;
-        struct tm tm;
+        struct tm tm = { -1, -1, -1, -1, -1, INT_MIN, -1, -1, -1 };
     PPCODE:
-        tm.tm_sec = sec == &PL_sv_undef ? INT_MIN : SvIV(sec);
-        tm.tm_min = min == &PL_sv_undef ? INT_MIN : SvIV(min);
-        tm.tm_hour = hour == &PL_sv_undef ? INT_MIN : SvIV(hour);
-        tm.tm_mday = mday == &PL_sv_undef ? INT_MIN : SvIV(mday);
-        tm.tm_mon = mon == &PL_sv_undef ? INT_MIN : SvIV(mon);
-        tm.tm_year = year == &PL_sv_undef ? INT_MIN : SvIV(year);
-        tm.tm_wday = wday == &PL_sv_undef ? INT_MIN : SvIV(wday);
-        tm.tm_yday = yday == &PL_sv_undef ? INT_MIN : SvIV(yday);
-        tm.tm_isdst = isdst == &PL_sv_undef ? INT_MIN : SvIV(isdst);
+    {
+      if (sec && SvOK(sec))
+        tm.tm_sec = SvIV(sec);
+      if (min && SvOK(min))
+        tm.tm_min = SvIV(min);
+      if (hour && SvOK(hour))
+        tm.tm_hour = SvIV(hour);
+      if (mday && SvOK(mday))
+        tm.tm_mday = SvIV(mday);
+      if (mon && SvOK(mon))
+        tm.tm_mon = SvIV(mon);
+      if (year && SvOK(year))
+        tm.tm_year = SvIV(year);
+      if (wday && SvOK(wday))
+        tm.tm_wday = SvIV(wday);
+      if (yday && SvOK(yday))
+        tm.tm_yday = SvIV(yday);
+      if (isdst && SvOK(isdst))
+        tm.tm_isdst = SvIV(isdst);
 
-        remainder = strptime(s, format, &tm);
+      remainder = strptime(s, format, &tm);
 
-        if (remainder == NULL) {
-            if (GIMME != G_ARRAY)
-                XSRETURN_UNDEF;
-        }
-        else if (GIMME != G_ARRAY)
-                mPUSHi(remainder - s);
+      if (remainder) {
+        if (GIMME != G_ARRAY)
+          mPUSHi(remainder - s);
         else {
-            EXTEND(SP, 9);
-            PUSHs(tm.tm_sec == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_sec)));
-            PUSHs(tm.tm_min == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_min)));
-            PUSHs(tm.tm_hour == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_hour)));
-            PUSHs(tm.tm_mday == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_mday)));
-            PUSHs(tm.tm_mon == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_mon)));
-            PUSHs(tm.tm_year == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_year)));
-            PUSHs(tm.tm_wday == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_wday)));
-            PUSHs(tm.tm_yday == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_yday)));
-            PUSHs(tm.tm_isdst == INT_MIN ? &PL_sv_undef : sv_2mortal(newSViv(tm.tm_isdst)));
+          EXTEND(SP, 9);
+          tm.tm_sec < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_sec);
+          tm.tm_min < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_min);
+          tm.tm_hour < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_hour);
+          tm.tm_mday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_mday);
+          tm.tm_mon < 0  ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_mon);
+          tm.tm_year == INT_MIN ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_year);
+          tm.tm_wday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_wday);
+          tm.tm_yday < 0 ? PUSHs(&PL_sv_undef) : mPUSHi(tm.tm_yday);
+          mPUSHi(tm.tm_isdst);
         }
+      }
+    }
 
 long
 gethostid();
@@ -801,14 +941,14 @@ chown(char *path, uid_t owner, gid_t group);
 SysRet
 lchown(char *path, uid_t owner, gid_t group);
 
-# ifdef HAS_ACCESS
+#ifdef HAS_ACCESS
 SysRet
 access(char *path, int mode);
 
 SysRet
 faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
 
-# else
+#else
 void
 access(...);
   PPCODE:
@@ -819,7 +959,7 @@ faccessat(...);
   PPCODE:
     croak("faccessat() not available");
 
-# endif
+#endif
 
 SysRet
 fchdir(psx_fd_t dirfd);
@@ -836,13 +976,13 @@ fchown(psx_fd_t fd, uid_t owner, gid_t group);
 SysRet
 fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
 
-# if !defined(HAS_FSYNC) || (defined(__FreeBSD__) && defined(__FreeBSD_version) && __FreeBSD_version < 1101000)
+#if !defined(HAS_FSYNC) || (defined(__FreeBSD_version) && __FreeBSD_version < 1101000)
 void
 fdatasync(...);
     PPCODE:
         croak("fdatasync not available");
 
-# else
+#else
 SysRet
 fdatasync(psx_fd_t fd);
 
@@ -927,17 +1067,17 @@ lstat(char *path);
         if (ret == 0)
             RETURN_STAT_BUF(buf);
 
-# ifdef HAS_FSYNC
+#ifdef HAS_FSYNC
 SysRet
 fsync(psx_fd_t fd);
 
-# else
+#else
 void
 fsync(...);
     PPCODE:
         croak("fsync() not available");
 
-# endif
+#endif
 
 SysRet
 ftruncate(psx_fd_t fd, off_t length);
@@ -986,12 +1126,6 @@ mkstemp(char *template);
             }
         }
 
-#
-# POSIX::open(), read() and write() return "0 but true" for 0, which
-# is not quite what you want. We return a real 0. Since we require
-# Perl 5.10 as a minimum, you can say "open(...) // die ...".
-#
-
 FILE*
 fdopen(psx_fd_t fd, char *mode);
 
@@ -1036,6 +1170,12 @@ fdopendir(psx_fd_t fd);
   OUTPUT:
     RETVAL
 
+
+##
+## POSIX::open(), read() and write() return "0 but true" for 0, which
+## is not quite what you want. We return a real 0.
+##
+
 SysRet0
 open(char *path, int oflag = O_RDONLY, mode_t mode = 0600);
 
@@ -1045,12 +1185,7 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
     int got_fd, dir_fd, path_fd;
     int return_handle = 0;
     struct stat st;
-    DIR *dir;
-    FILE *file;
     GV *gv = NULL;
-    IO *io;
-    PerlIO *fp;
-    SV *retvalsv;
   PPCODE:
   {
     if (!SvOK(dirfdsv))
@@ -1078,24 +1213,27 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
        * file handle.
        */
       gv = newGVgen(PACKNAME);
-      io = GvIOn(gv);
       if (S_ISDIR(st.st_mode)) {
-        if ((dir = fdopendir(path_fd))) {
+        DIR *dir = fdopendir(path_fd);
+        if (dir) {
+          IO *io = GvIOn(gv);
           IoDIRP(io) = dir;
           return_handle = 1;
         }
       }
-      else if ((file = fdopen(path_fd, flags2raw(oflag)))) {
-        fp = PerlIO_importFILE(file, 0);
-        if (fp) { /* && do_open(gv, "+<&", 3, FALSE, 0, 0, fp)) */
-          IoIFP(io) = fp;
-          return_handle = 1;
+      else {
+        const char *raw = flags2raw(oflag);
+        FILE *file = fdopen(path_fd, raw);
+        if (file) {
+          PerlIO *fp = PerlIO_importFILE(file, raw);
+          if (fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp))
+            return_handle = 1;
         }
       }
     }
 
     if (return_handle) {
-      retvalsv = newRV_inc((SV*)gv);
+      SV *retvalsv = newRV_inc((SV*)gv);
       retvalsv = sv_bless(retvalsv, GvSTASH(gv));
       mPUSHs(retvalsv);
     }
@@ -1131,7 +1269,7 @@ read(psx_fd_t fd, SV *buf, size_t count);
         RETVAL
 
 SysRet0
-write(psx_fd_t fd, SV *buf, SV *count = &PL_sv_undef);
+write(psx_fd_t fd, SV *buf, SV *count=NULL);
     INIT:
         const char *cbuf;
         STRLEN buf_cur, nbytes;
@@ -1144,7 +1282,7 @@ write(psx_fd_t fd, SV *buf, SV *count = &PL_sv_undef);
         if (!buf_cur)
           RETVAL = 0;
         else {
-          if (count == &PL_sv_undef)
+          if (count == NULL || !SvOK(count))
             nbytes = buf_cur;
           else {
             nbytes = SvUV(count);
@@ -1159,30 +1297,51 @@ write(psx_fd_t fd, SV *buf, SV *count = &PL_sv_undef);
         RETVAL
 
 SysRet0
-writev(psx_fd_t fd, AV *ioAV);
-  CODE:
-    RETVAL = _writev50c(aTHX_ fd, ioAV, NULL);
-  OUTPUT:
-    RETVAL
+readv(psx_fd_t fd, SV *buffers, AV *sizes);
+    PROTOTYPE: $\[@$]$
+    CODE:
+        RETVAL = _readv50c(aTHX_ fd, buffers, sizes, NULL);
+    OUTPUT:
+        RETVAL
 
-# ifdef __CYGWIN__
+SysRet0
+writev(psx_fd_t fd, AV *buffers);
+    CODE:
+        RETVAL = _writev50c(aTHX_ fd, buffers, NULL);
+    OUTPUT:
+        RETVAL
+
+#if defined(__CYGWIN__) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 600000)
+void
+preadv(...);
+  PPCODE:
+    croak("preadv() not available");
+
 void
 pwritev(...);
   PPCODE:
     croak("pwritev() not available");
 
-# else
+#else
 SysRet0
-pwritev(psx_fd_t fd, AV *ioAV, off_t offset);
+preadv(psx_fd_t fd, SV *buffers, AV *sizes, SV *offset=&PL_sv_undef);
+  PROTOTYPE: $\[@$]@
   CODE:
-    RETVAL = _writev50c(aTHX_ fd, ioAV, &offset);
+    RETVAL = _readv50c(aTHX_ fd, buffers, sizes, offset);
   OUTPUT:
     RETVAL
 
-# endif
+SysRet0
+pwritev(psx_fd_t fd, AV *buffers, SV *offset=&PL_sv_undef);
+  CODE:
+    RETVAL = _writev50c(aTHX_ fd, buffers, offset);
+  OUTPUT:
+    RETVAL
+
+#endif
 
 SysRet0
-pread(psx_fd_t fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset = 0);
+pread(psx_fd_t fd, SV *buf, size_t nbytes, SV *offset=NULL, off_t buf_offset=0);
     INIT:
       STRLEN
         buf_cur,  /* The actual string length in buf */
@@ -1217,10 +1376,13 @@ pread(psx_fd_t fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset =
         Zero(cbuf + buf_cur, buf_offset - buf_cur, char);
 
       /* now fscking finally read teh data */
-      if (nbytes)
-        RETVAL = pread(fd, cbuf + buf_offset, nbytes, file_offset);
+      if (nbytes) {
+        off_t f_offset = (offset != NULL && SvOK(offset)) ? SvUV(offset) : 0;
+        RETVAL = pread(fd, cbuf + buf_offset, nbytes, f_offset);
+      }
       else
         RETVAL = 0;
+
       if (RETVAL >= 0) {
         SvCUR_set(buf, buf_offset + RETVAL);
         SvPOK_only(buf);
@@ -1232,9 +1394,9 @@ pread(psx_fd_t fd, SV *buf, off_t file_offset, size_t nbytes, off_t buf_offset =
         RETVAL
 
 SysRet0
-pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, off_t buf_offset = 0);
+pwrite(psx_fd_t fd, SV *buf, SV *count=NULL, SV *offset=NULL, off_t buf_offset=0);
   INIT:
-    STRLEN buf_cur, nbytes, max_nbytes;
+    STRLEN buf_cur, i_count, max_nbytes;
     const char *cbuf;
   CODE:
   {
@@ -1251,15 +1413,17 @@ pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, of
         XSRETURN_UNDEF;
       }
       max_nbytes = buf_cur - buf_offset;
-      if (sv_nbytes == &PL_sv_undef)
-        nbytes = max_nbytes;
+      if (count == NULL || !SvOK(count))
+        i_count = max_nbytes;
       else {
-        nbytes = SvUV(sv_nbytes);
-        if (nbytes > max_nbytes)
-          nbytes = max_nbytes;
+        i_count = SvUV(count);
+        if (i_count > max_nbytes)
+          i_count = max_nbytes;
       }
-      if (nbytes)
-        RETVAL = pwrite(fd, cbuf + buf_offset, nbytes, file_offset);
+      if (i_count) {
+        off_t f_offset = (offset != NULL && SvOK(offset)) ? SvUV(offset) : 0;
+        RETVAL = pwrite(fd, cbuf + buf_offset, i_count, f_offset);
+      }
       else
         RETVAL = 0;
     }
@@ -1267,10 +1431,40 @@ pwrite(psx_fd_t fd, SV *buf, off_t file_offset, SV *sv_nbytes = &PL_sv_undef, of
   OUTPUT:
     RETVAL
 
+#ifdef POSIX_FADV_NORMAL
+SysRet
+posix_fadvise(psx_fd_t fd, off_t offset, off_t len, int advice);
+  CODE:
+    errno = posix_fadvise(fd, offset, len, advice);
+    RETVAL = errno ? -1 : 0;
+  OUTPUT:
+    RETVAL
+
+SysRet
+posix_fallocate(psx_fd_t fd, off_t offset, off_t len);
+  CODE:
+    errno = posix_fallocate(fd, offset, len);
+    RETVAL = errno ? -1 : 0;
+  OUTPUT:
+    RETVAL
+
+#else
+void
+posix_fadvise(...);
+    PPCODE:
+        croak("posix_fadvise() not available");
+
+void
+posix_fallocate(...);
+    PPCODE:
+        croak("posix_fallocate() not available");
+
+#endif
+
 char *
 ptsname(int fd);
 
-# ifdef HAS_READLINK
+#ifdef HAS_READLINK
 char *
 readlink(char *path);
     CODE:
@@ -1291,7 +1485,7 @@ readlinkat(psx_fd_t dirfd, char *path);
         if (RETVAL != NULL)
             Safefree(RETVAL);
 
-# else
+#else
 void
 readlink(...);
   PPCODE:
@@ -1302,14 +1496,13 @@ readlinkat(...);
   PPCODE:
     croak("readlinkat() not available");
 
-# endif
+#endif
 
-#
-# POSIX::remove() fails to remove a symlink to a directory
-# because it incorrectly re-implements remove() in Perl as
-# "(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])".
-# POSIX requires remove() to be equivalent to unlink() for non-directories.
-#
+##
+## POSIX::remove() is incorrectly implemented as:
+## "(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])".
+## POSIX requires remove() to be equivalent to unlink() for non-directories.
+##
 SysRet
 remove(char *path);
 
@@ -1337,7 +1530,7 @@ unlink(char *path);
 SysRet
 unlinkat(psx_fd_t dirfd, char *path, int flags = 0);
 
-# ifdef UTIME_NOW
+#ifdef UTIME_NOW
 SysRet
 futimens(psx_fd_t fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     INIT:
@@ -1358,7 +1551,7 @@ utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long 
     OUTPUT:
         RETVAL
 
-# else
+#else
 void
 futimens(...);
     PPCODE:
@@ -1369,7 +1562,7 @@ utimensat(...);
     PPCODE:
         croak("futimensat() not available");
 
-# endif
+#endif
 
 ## Integer and real number arithmetic
 #####################################
@@ -1451,18 +1644,19 @@ fdim(double x, double y);
 NV
 floor(double x);
 
-# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 504000) || \
-     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+#if (defined(__FreeBSD_version)  && __FreeBSD_version  < 504000) || \
+    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+
 void
 fma(...);
     PPCODE:
         croak("fma() not available");
 
-# else
+#else
 NV
 fma(double x, double y, double z);
 
-# endif
+#endif
 
 NV
 fmax(double x, double y);
@@ -1527,18 +1721,18 @@ logb(double x);
 long
 lround(double x);
 
-# if (defined(__FreeBSD__) && defined(__FreeBSD_version)  && __FreeBSD_version  < 503001) || \
-     (defined(__NetBSD__)  && defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
+#if (defined(__FreeBSD_version)  && __FreeBSD_version  < 503001) || \
+    (defined(__NetBSD_Version__) && __NetBSD_Version__ < 800000000)
 void
 nearbyint(...);
     PPCODE:
         croak("nearbyint() not available");
 
-# else
+#else
 NV
 nearbyint(double x);
 
-# endif
+#endif
 
 NV
 nextafter(double x, double y);
@@ -1583,7 +1777,7 @@ yn(int n, double x);
 ## Complex arithmetic functions
 ###############################
 
-# ifdef _Complex_I
+#ifdef _Complex_I
 NV
 cabs(double re, double im);
     INIT:
@@ -1593,15 +1787,15 @@ cabs(double re, double im);
     OUTPUT:
         RETVAL
 
-# else
+#else
 void
 cabs(...);
     PPCODE:
         croak("cabs() not available");
 
-# endif
+#endif
 
-# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 800000)
+#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 800000)
 void
 carg(...);
     PPCODE:
@@ -1617,7 +1811,7 @@ csqrt(...);
     PPCODE:
         croak("csqrt() not available");
 
-# else
+#else
 NV
 carg(double re, double im);
     INIT:
@@ -1643,9 +1837,9 @@ cproj(double re, double im);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
 
-# endif
+#endif
 
-# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 503001)
+#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 503001)
 void
 cimag(...);
     PPCODE:
@@ -1661,7 +1855,7 @@ creal(...);
     PPCODE:
         croak("creal() not available");
 
-# else
+#else
 NV
 cimag(double re, double im);
     ALIAS:
@@ -1684,9 +1878,9 @@ cimag(double re, double im);
     OUTPUT:
         RETVAL
 
-# endif
+#endif
 
-# if defined(_Complex_I) && !defined(__FreeBSD__)
+#if defined(_Complex_I) && !defined(__FreeBSD__)
 void
 cpow(double re_x, double im_x, double re_y, double im_y);
     INIT:
@@ -1708,7 +1902,7 @@ clog(double re, double im);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
 
-# else
+#else
 void
 cpow(...);
     PPCODE:
@@ -1721,15 +1915,15 @@ clog(...);
         /* https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=221341 */
         croak("clog() not available");
 
-# endif
+#endif
 
-# if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 900000)
+#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 900000)
 void
 cexp(...);
     PPCODE:
         croak("cexp() not available");
 
-# else
+#else
 void
 cexp(double re, double im);
     INIT:
@@ -1740,7 +1934,7 @@ cexp(double re, double im);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
 
-# endif
+#endif
 
 void
 cacos(double re, double im);
@@ -1757,14 +1951,14 @@ cacos(double re, double im);
         ctan = 10
         ctanh = 11
     INIT:
-#if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
+#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
         ;
 #else
         double complex z = re + im * _Complex_I;
         double complex result;
 #endif
     PPCODE:
-#if !defined(_Complex_I) || (defined(__FreeBSD__) && defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
+#if !defined(_Complex_I) || (defined(__FreeBSD_version) &&  __FreeBSD_version < 1000000)
         PERL_UNUSED_VAR(re);
         PERL_UNUSED_VAR(im);
         PERL_UNUSED_VAR(ix);
@@ -1811,6 +2005,14 @@ cacos(double re, double im);
         mPUSHn(creal(result));
         mPUSHn(cimag(result));
 #endif
+
+
+## DESTROY is called when a file handle we created (e.g. in openat)
+## is cleaned up. This is just a dummy to silence AUTOLOAD. We leave
+## it up to Perl to take the necessary steps.
+void
+DESTROY(...);
+PPCODE:
 
 
 BOOT:

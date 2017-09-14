@@ -18,7 +18,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 48;
+use Test::More tests => 54;
 use Locale::TextDomain ('App-Chart');
 
 use lib 't';
@@ -28,7 +28,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require App::Chart;
 
 
-my $want_version = 261;
+my $want_version = 263;
 is ($App::Chart::VERSION, $want_version, 'VERSION variable');
 is (App::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { App::Chart->VERSION($want_version); 1 },
@@ -37,6 +37,18 @@ is (App::Chart->VERSION,  $want_version, 'VERSION class method');
   ok (! eval { App::Chart->VERSION($check_version); 1 },
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# min_maybe()
+# max_maybe()
+
+is (App::Chart::min_maybe(1,2,3), 1, "min_maybe()");
+is (App::Chart::max_maybe(1,2,3), 3);
+is (App::Chart::min_maybe(3, undef), 3);
+is (App::Chart::max_maybe(undef, 3), 3);
+is (App::Chart::min_maybe(undef), undef);
+is (App::Chart::max_maybe(undef), undef);
+
 
 #------------------------------------------------------------------------------
 # datafilename()

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -138,7 +138,7 @@ sub len {
       SHR_O_CVW => 'O~CVW',  # Condvar wait
    };
 
-   my ( $_DAU_R_SOCK_REF, $_DAU_R_SOCK, $_obj, $_CV, $_id );
+   my ( $_DAU_R_SOCK_REF, $_DAU_R_SOCK, $_obj, $_id );
 
    my %_output_function = (
 
@@ -146,14 +146,14 @@ sub len {
          $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
          chomp($_id = <$_DAU_R_SOCK>);
 
-         $_CV = $_obj->{ $_id } || do {
+         my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
          };
-         for my $_i (1 .. $_CV->{_count}) {
-            1 until syswrite($_CV->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
+         for my $_i (1 .. $_var->{_count}) {
+            1 until syswrite($_var->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
          }
 
-         $_CV->{_count} = 0;
+         $_var->{_count} = 0;
          print {$_DAU_R_SOCK} $LF;
 
          return;
@@ -163,12 +163,12 @@ sub len {
          $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
          chomp($_id = <$_DAU_R_SOCK>);
 
-         $_CV = $_obj->{ $_id } || do {
+         my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
          };
-         if ( $_CV->{_count} >= 0 ) {
-            1 until syswrite($_CV->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
-            $_CV->{_count} -= 1;
+         if ( $_var->{_count} >= 0 ) {
+            1 until syswrite($_var->{_cw_sock}, $LF) || ($! && !$!{'EINTR'});
+            $_var->{_count} -= 1;
          }
 
          print {$_DAU_R_SOCK} $LF;
@@ -180,11 +180,11 @@ sub len {
          $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
          chomp($_id = <$_DAU_R_SOCK>);
 
-         $_CV = $_obj->{ $_id } || do {
+         my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
          };
 
-         $_CV->{_count} -= 1;
+         $_var->{_count} -= 1;
          print {$_DAU_R_SOCK} $LF;
 
          return;
@@ -194,11 +194,11 @@ sub len {
          $_DAU_R_SOCK = ${ $_DAU_R_SOCK_REF };
          chomp($_id = <$_DAU_R_SOCK>);
 
-         $_CV = $_obj->{ $_id } || do {
+         my $_var = $_obj->{ $_id } || do {
             print {$_DAU_R_SOCK} $LF;
          };
 
-         $_CV->{_count} += 1;
+         $_var->{_count} += 1;
          print {$_DAU_R_SOCK} $LF;
 
          return;
@@ -235,6 +235,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized numeric once );
 
+use Time::HiRes qw( sleep );
 use bytes;
 
 no overloading;
@@ -371,7 +372,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.826
+This document describes MCE::Shared::Condvar version 1.828
 
 =head1 DESCRIPTION
 
@@ -380,94 +381,94 @@ primitives for conditional locking.
 
 =head1 SYNOPSIS
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $cv = MCE::Shared->condvar( 0 );
+ my $cv = MCE::Shared->condvar( 0 );
 
-   # OO interface
+ # OO interface
 
-   $val = $cv->set( $val );
-   $val = $cv->get();
-   $len = $cv->len();
+ $val = $cv->set( $val );
+ $val = $cv->get();
+ $len = $cv->len();
 
-   # conditional locking primitives
+ # conditional locking primitives
 
-   $cv->lock();
-   $cv->unlock();
-   $cv->broadcast(0.05);     # delay before broadcasting
-   $cv->broadcast();
-   $cv->signal(0.05);        # delay before signaling
-   $cv->signal();
-   $cv->timedwait(2.5);
-   $cv->wait();
+ $cv->lock();
+ $cv->unlock();
+ $cv->broadcast(0.05);     # delay before broadcasting
+ $cv->broadcast();
+ $cv->signal(0.05);        # delay before signaling
+ $cv->signal();
+ $cv->timedwait(2.5);
+ $cv->wait();
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $val = $cv->append( $string );     #   $val .= $string
-   $val = $cv->decr();                # --$val
-   $val = $cv->decrby( $number );     #   $val -= $number
-   $val = $cv->getdecr();             #   $val--
-   $val = $cv->getincr();             #   $val++
-   $val = $cv->incr();                # ++$val
-   $val = $cv->incrby( $number );     #   $val += $number
-   $old = $cv->getset( $new );        #   $o = $v, $v = $n, $o
+ $val = $cv->append( $string );     #   $val .= $string
+ $val = $cv->decr();                # --$val
+ $val = $cv->decrby( $number );     #   $val -= $number
+ $val = $cv->getdecr();             #   $val--
+ $val = $cv->getincr();             #   $val++
+ $val = $cv->incr();                # ++$val
+ $val = $cv->incrby( $number );     #   $val += $number
+ $old = $cv->getset( $new );        #   $o = $v, $v = $n, $o
 
 =head1 EXAMPLE
 
 The following example demonstrates barrier synchronization.
 
-   use MCE;
-   use MCE::Shared;
-   use Time::HiRes qw(usleep);
+ use MCE;
+ use MCE::Shared;
+ use Time::HiRes qw(usleep);
 
-   my $num_workers = 8;
-   my $count = MCE::Shared->condvar(0);
-   my $state = MCE::Shared->scalar('ready');
+ my $num_workers = 8;
+ my $count = MCE::Shared->condvar(0);
+ my $state = MCE::Shared->scalar('ready');
 
-   my $microsecs = ( lc $^O =~ /mswin|mingw|msys|cygwin/ ) ? 0 : 200;
+ my $microsecs = ( lc $^O =~ /mswin|mingw|msys|cygwin/ ) ? 0 : 200;
 
-   # The lock is released upon entering ->broadcast, ->signal, ->timedwait,
-   # and ->wait. For performance reasons, the condition variable is *not*
-   # re-locked prior to exiting the call. Therefore, obtain the lock when
-   # synchronization is desired subsequently.
+ # The lock is released upon entering ->broadcast, ->signal, ->timedwait,
+ # and ->wait. For performance reasons, the condition variable is *not*
+ # re-locked prior to exiting the call. Therefore, obtain the lock when
+ # synchronization is desired subsequently.
 
-   sub barrier_sync {
-      usleep($microsecs) while $state->get eq 'down';
+ sub barrier_sync {
+    usleep($microsecs) while $state->get eq 'down';
 
-      $count->lock;
-      $state->set('up'), $count->incr;
+    $count->lock;
+    $state->set('up'), $count->incr;
 
-      if ($count->get == $num_workers) {
-         $count->decr, $state->set('down');
-         $count->broadcast;
-      }
-      else {
-         $count->wait while $state->get eq 'up';
-         $count->lock;
-         $state->set('ready') if $count->decr == 0;
-         $count->unlock;
-      }
-   }
+    if ($count->get == $num_workers) {
+       $count->decr, $state->set('down');
+       $count->broadcast;
+    }
+    else {
+       $count->wait while $state->get eq 'up';
+       $count->lock;
+       $state->set('ready') if $count->decr == 0;
+       $count->unlock;
+    }
+ }
 
-   sub user_func {
-      my $id = MCE->wid;
-      for (1 .. 400) {
-         MCE->print("$_: $id\n");
-         barrier_sync();  # made possible by MCE::Shared::Condvar
-       # MCE->sync();     # same thing via the MCE-Core API
-      }
-   }
+ sub user_func {
+    my $id = MCE->wid;
+    for (1 .. 400) {
+       MCE->print("$_: $id\n");
+       barrier_sync();  # made possible by MCE::Shared::Condvar
+     # MCE->sync();     # same thing via the MCE-Core API
+    }
+ }
 
-   my $mce = MCE->new(
-      max_workers => $num_workers,
-      user_func   => \&user_func
-   )->run;
+ my $mce = MCE->new(
+    max_workers => $num_workers,
+    user_func   => \&user_func
+ )->run;
 
-   # Time taken from a 2.6 GHz machine running Mac OS X.
-   # threads::shared:   0.207s  Perl threads
-   #   forks::shared:  36.426s  child processes
-   #     MCE::Shared:   0.353s  child processes
-   #        MCE Sync:   0.062s  child processes
+ # Time taken from a 2.6 GHz machine running Mac OS X.
+ # threads::shared:   0.207s  Perl threads
+ #   forks::shared:  36.426s  child processes
+ #     MCE::Shared:   0.353s  child processes
+ #        MCE Sync:   0.062s  child processes
 
 =head1 API DOCUMENTATION
 
@@ -478,31 +479,31 @@ The following example demonstrates barrier synchronization.
 Constructs a new condition variable. Its value defaults to C<0> when C<value>
 is not specified.
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $cv = MCE::Shared->condvar( 100 );
-   $cv = MCE::Shared->condvar;
+ $cv = MCE::Shared->condvar( 100 );
+ $cv = MCE::Shared->condvar;
 
 =item set ( value )
 
 Sets the value associated with the C<cv> object. The new value is returned
 in scalar context.
 
-   $val = $cv->set( 10 );
-   $cv->set( 10 );
+ $val = $cv->set( 10 );
+ $cv->set( 10 );
 
 =item get
 
 Returns the value associated with the C<cv> object.
 
-   $val = $cv->get;
+ $val = $cv->get;
 
 =item len
 
 Returns the length of the value. It returns the C<undef> value if the value
 is not defined.
 
-   $len = $var->len;
+ $len = $var->len;
 
 =item lock
 
@@ -510,14 +511,14 @@ Attempts to grab the lock and waits if not available. Multiple calls to
 C<$cv->lock> by the same process or thread is safe. The mutex will remain
 locked until C<$cv->unlock> is called.
 
-   $cv->lock;
+ $cv->lock;
 
 =item unlock
 
 Releases the lock. A held lock by an exiting process or thread is released
 automatically.
 
-   $cv->unlock;
+ $cv->unlock;
 
 =item signal ( [ floating_seconds ] )
 
@@ -526,8 +527,8 @@ that's C<wait>ing on that variable. The variable is *not* locked upon return.
 
 Optionally, delay C<floating_seconds> before signaling.
 
-   $count->signal;
-   $count->signal( 0.5 );
+ $count->signal;
+ $count->signal( 0.5 );
 
 =item broadcast ( [ floating_seconds ] )
 
@@ -538,8 +539,8 @@ in a condition C<wait> on the variable, rather than only one. The variable is
 
 Optionally, delay C<floating_seconds> before broadcasting.
 
-   $count->broadcast;
-   $count->broadcast( 0.5 );
+ $count->broadcast;
+ $count->broadcast( 0.5 );
 
 =item wait
 
@@ -547,7 +548,7 @@ Releases a held lock on the variable. Then, waits until another thread does a
 C<signal> or C<broadcast> for the same variable. The variable is *not* locked
 upon return.
 
-   $count->wait() while $state->get() eq "bar";
+ $count->wait() while $state->get() eq "bar";
 
 =item timedwait ( floating_seconds )
 
@@ -558,7 +559,7 @@ C<floating_seconds>.
 A false value is returned if the timeout is reached, and a true value otherwise.
 In either case, the variable is *not* locked upon return.
 
-   $count->timedwait( 10 ) while $state->get() eq "foo";
+ $count->timedwait( 10 ) while $state->get() eq "foo";
 
 =back
 
@@ -577,49 +578,49 @@ L<http://redis.io/commands#strings> without the key argument.
 
 Appends a value at the end of the current value and returns its new length.
 
-   $len = $cv->append( "foo" );
+ $len = $cv->append( "foo" );
 
 =item decr
 
 Decrements the value by one and returns its new value.
 
-   $num = $cv->decr;
+ $num = $cv->decr;
 
 =item decrby ( number )
 
 Decrements the value by the given number and returns its new value.
 
-   $num = $cv->decrby( 2 );
+ $num = $cv->decrby( 2 );
 
 =item getdecr
 
 Decrements the value by one and returns its old value.
 
-   $old = $cv->getdecr;
+ $old = $cv->getdecr;
 
 =item getincr
 
 Increments the value by one and returns its old value.
 
-   $old = $cv->getincr;
+ $old = $cv->getincr;
 
 =item getset ( value )
 
 Sets the value and returns its old value.
 
-   $old = $cv->getset( "baz" );
+ $old = $cv->getset( "baz" );
 
 =item incr
 
 Increments the value by one and returns its new value.
 
-   $num = $cv->incr;
+ $num = $cv->incr;
 
 =item incrby ( number )
 
 Increments the value by the given number and returns its new value.
 
-   $num = $cv->incrby( 2 );
+ $num = $cv->incrby( 2 );
 
 =back
 
@@ -635,34 +636,34 @@ isn't possible, construct C<condvar> and C<queue> before other classes.
 On systems without C<IO::FDPass>, the manager process is delayed until sharing
 other classes or started explicitly.
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $has_IO_FDPass = $INC{'IO/FDPass.pm'} ? 1 : 0;
+ my $has_IO_FDPass = $INC{'IO/FDPass.pm'} ? 1 : 0;
 
-   my $cv  = MCE::Shared->condvar();
-   my $que = MCE::Shared->queue();
+ my $cv  = MCE::Shared->condvar();
+ my $que = MCE::Shared->queue();
 
-   MCE::Shared->start() unless $has_IO_FDPass;
+ MCE::Shared->start() unless $has_IO_FDPass;
 
 Regarding mce_open, C<IO::FDPass> is needed for constructing a shared-handle
 from a non-shared handle not yet available inside the shared-manager process.
 The workaround is to have the non-shared handle made before the shared-manager
 is started. Passing a file by reference is fine for the three STD* handles.
 
-   # The shared-manager knows of \*STDIN, \*STDOUT, \*STDERR.
+ # The shared-manager knows of \*STDIN, \*STDOUT, \*STDERR.
 
-   mce_open my $shared_in,  "<",  \*STDIN;   # ok
-   mce_open my $shared_out, ">>", \*STDOUT;  # ok
-   mce_open my $shared_err, ">>", \*STDERR;  # ok
-   mce_open my $shared_fh1, "<",  "/path/to/sequence.fasta";  # ok
-   mce_open my $shared_fh2, ">>", "/path/to/results.log";     # ok
+ mce_open my $shared_in,  "<",  \*STDIN;   # ok
+ mce_open my $shared_out, ">>", \*STDOUT;  # ok
+ mce_open my $shared_err, ">>", \*STDERR;  # ok
+ mce_open my $shared_fh1, "<",  "/path/to/sequence.fasta";  # ok
+ mce_open my $shared_fh2, ">>", "/path/to/results.log";     # ok
 
-   mce_open my $shared_fh, ">>", \*NON_SHARED_FH;  # requires IO::FDPass
+ mce_open my $shared_fh, ">>", \*NON_SHARED_FH;  # requires IO::FDPass
 
 The L<IO::FDPass> module is known to work reliably on most platforms.
 Install 1.1 or later to rid of limitations described above.
 
-   perl -MIO::FDPass -le "print 'Cheers! Perl has IO::FDPass.'"
+ perl -MIO::FDPass -le "print 'Cheers! Perl has IO::FDPass.'"
 
 =head1 INDEX
 

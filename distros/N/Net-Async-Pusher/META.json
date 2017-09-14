@@ -4,7 +4,7 @@
       "Tom Molesworth <cpan@perlsite.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "perl" : "5.010001"
+            "perl" : "5.012000"
          }
       },
       "configure" : {
@@ -30,27 +30,30 @@
             "Test::More" : "0",
             "Test::Pod" : "1.41",
             "Test::Synopsis" : "0",
-            "Test::Version" : "1",
-            "version" : "0.9901"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "Future" : "0.30",
-            "HTML::Entities" : "0",
             "IO::Async" : "0.64",
             "IO::Async::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Log::Any" : "0",
             "Mixin::Event::Dispatch" : "1.006",
             "Net::Async::WebSocket::Client" : "0",
+            "Ryu::Async" : "0.006",
             "Variable::Disposition" : "0.004",
             "curry" : "0",
             "parent" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -68,7 +71,7 @@
       },
       "homepage" : "http://search.cpan.org/dist/Net-Async-Pusher/"
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

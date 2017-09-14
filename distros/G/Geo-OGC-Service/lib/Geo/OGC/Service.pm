@@ -40,8 +40,61 @@ will be there real soon now.
 
 =head1 DESCRIPTION
 
-This module provides a to_app method for booting a web service.
-Geo::OGC::Service is a subclass of Plack::Component.
+Geo::OGC::Service is a subclass of Plack::Component and a middleware
+between a web client and an actual content providing service object.
+A Geo::OGC::Service object has a to_app method for booting a web
+service.
+
+A Geo::OGC::Service object creates a specialized service object as a
+result of a web service request. The specialized service object is a
+hash reference blessed into an appropriate class (the class is deduced
+from GET parameter, POSTed service name, or from the script name in
+the case of RESTful services). The new object contains keys env,
+request, plugin, config, service, and optionally posted, filter, and
+parameters.
+
+=over
+
+=item env
+
+The PSGI $env.
+
+=item request
+
+A Plack::Request object constructed from the $env;
+
+=item plugin 
+
+The plugin object given as an argument to Geo::OGC::Service in its
+constructor as a top level attribute or as a service specific
+attribute.
+
+=item config 
+
+The constructed configuration for the web service.
+
+=item service 
+
+The name of the requested service.
+
+=item parameters 
+
+A hash made from Plack::Request->parameters (thus removing its multi
+value nature). The keys are all converted to lower case and the values
+are decoded to Perl's internal format assuming they are in the
+encoding defined $request->content_encoding (or UTF-8).
+
+=item posted 
+
+A XML::LibXML documentElement of the POSTed XML. The XML is decoded
+into Perl's internal format.
+
+=item filter 
+
+A XML::LibXML documentElement contructed from a filter GET
+parameter. The XML is decoded into Perl's internal format.
+
+=back
 
 =head2 SERVICE CONFIGURATION
 
@@ -55,7 +108,8 @@ Setting up a PSGI service consists typically of three things:
 
    exec starman --daemonize --error-log /var/log/starman/log --l localhost:5000 /var/www/service/service.psgi
 
-3) Add a proxy service to your apache configuration
+3) Add a proxy service to your httpd configuration. For Apache it
+would be something like this:
 
    <Location /Service>
      ProxyPass http://localhost:5000
@@ -67,7 +121,7 @@ configuration file, for example
 
 /var/www/etc/service.conf
 
-(make sure this file is not served by apache)
+(make sure this file is not served by your httpd)
 
 The configuration must be in JSON format. I.e., something like
 
@@ -145,7 +199,7 @@ use parent qw/Plack::Component/;
 
 binmode STDERR, ":utf8"; 
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 =pod
 
@@ -363,18 +417,18 @@ sub service {
         # service
         # config
     };
+
+    my $encoding = $request->content_encoding // 'utf8';
     
     my %names;
     for my $key (sort keys %$parameters) {
         $names{lc($key)} = $key;
-        $parameters->{$key} = decode utf8 => $parameters->{$key};
+        $parameters->{$key} = decode $encoding => $parameters->{$key};
     }
 
     my $post = $names{postdata} // $names{'xforms:model'};
-    $post = $post ? $parameters->{$post} : $request->content;
-    my $encoding = $request->content_encoding // 'utf8';
-    $post = decode $encoding => $post;
-
+    $post = $post ? $parameters->{$post} : decode($encoding, $request->content);
+  
     if ($post) {
         my $parser = XML::LibXML->new(no_blanks => 1);
         my $dom;
@@ -932,7 +986,7 @@ Ari Jolma, E<lt>ari.jolma at gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Ari Jolma
+Copyright (C) 2015- by Ari Jolma
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

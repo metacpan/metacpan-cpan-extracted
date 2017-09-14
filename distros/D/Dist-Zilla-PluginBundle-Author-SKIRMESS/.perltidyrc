@@ -1,5 +1,5 @@
 # Automatically generated file
-# Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC 0.008
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.010
 
 --maximum-line-length=0
 --break-at-old-comma-breakpoints

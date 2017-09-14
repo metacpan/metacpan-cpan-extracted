@@ -20,13 +20,16 @@ use SPVM::Array::Object;
 use File::Temp 'tempdir';
 use ExtUtils::CBuilder;
 use Config;
+use DynaLoader;
+use SPVM::Build;
+use File::Basename 'basename';
 
 
 use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0260';
+our $VERSION = '0.0265';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -57,7 +60,7 @@ sub import {
     }
   }
   
-  return undef;
+  return;
 }
 
 sub _get_dll_file {
@@ -66,31 +69,31 @@ sub _get_dll_file {
   # DLL file name
   my $dll_base_name = $package_name;
   $dll_base_name =~ s/^.*:://;
-  my $dll_file_tail = 'auto/' . $package_name . '/' . $dll_base_name;
-  $dll_file_tail =~ s/::/\//g;
-  my $dll_file;
+  my $shared_lib_file_tail = 'auto/' . $package_name . '.native' . '/' . $dll_base_name;
+  $shared_lib_file_tail =~ s/::/\//g;
+  my $shared_lib_file;
   for my $dl_shared_object (@DynaLoader::dl_shared_objects) {
     my $dl_shared_object_no_ext = $dl_shared_object;
     # remove .so, xs.dll .dll, etc
     while ($dl_shared_object_no_ext =~ s/\.[^\/\.]+$//) {
       1;
     }
-    if ($dl_shared_object_no_ext =~ /\Q$dll_file_tail\E$/) {
-      $dll_file = $dl_shared_object;
+    if ($dl_shared_object_no_ext =~ /\Q$shared_lib_file_tail\E$/) {
+      $shared_lib_file = $dl_shared_object;
       last;
     }
   }
   
-  return $dll_file;
+  return $shared_lib_file;
 }
 
 sub search_native_address {
-  my ($dll_file, $sub_abs_name) = @_;
+  my ($shared_lib_file, $sub_abs_name) = @_;
   
   my $native_address;
   
-  if ($dll_file) {
-    my $dll_libref = DynaLoader::dl_load_file($dll_file);
+  if ($shared_lib_file) {
+    my $dll_libref = DynaLoader::dl_load_file($shared_lib_file);
     if ($dll_libref) {
       my $sub_abs_name_c = $sub_abs_name;
       $sub_abs_name_c =~ s/:/_/g;
@@ -118,20 +121,29 @@ sub get_sub_native_address {
   }
   
   my $dll_package_name = $package_name;
-  my $dll_file = _get_dll_file($dll_package_name);
-  my $native_address = search_native_address($dll_file, $sub_abs_name);
-
-  # Search inline dlls
+  my $shared_lib_file = _get_dll_file($dll_package_name);
+  my $native_address = search_native_address($shared_lib_file, $sub_abs_name);
+  
+  # Try runtime compile
   unless ($native_address) {
-    my $package_name_tmp = $package_name;
-    $package_name_tmp =~ s/:/_/g;
-    for my $dll_file (@INLINE_DLL_FILES) {
-      if ($dll_file =~ /\Q$package_name_tmp/) {
-        $native_address = search_native_address($dll_file, $sub_abs_name);
-        if ($native_address) {
-          last;
-        }
-      }
+    
+    my $module_name = $package_name;
+    $module_name =~ s/^SPVM:://;
+    my $module_dir = get_use_package_path($module_name);
+    $module_dir =~ s/\.spvm$//;
+    
+    my $module_name_slash = $package_name;
+    $module_name_slash =~ s/::/\//g;
+    
+    $module_dir =~ s/$module_name_slash$//;
+    $module_dir =~ s/\/$//;
+    
+    my $shared_lib_file = SPVM::Build::build_shared_lib(
+      module_dir => $module_dir,
+      module_name => "SPVM::$module_name"
+    );
+    if ($shared_lib_file) {
+      $native_address = search_native_address($shared_lib_file, $sub_abs_name);
     }
   }
   
@@ -139,155 +151,14 @@ sub get_sub_native_address {
 }
 
 sub bind_native_subs {
-  my $native_sub_names = get_native_sub_names();
-  for my $native_sub_name (@$native_sub_names) {
-    my $native_sub_name_spvm = "SPVM::$native_sub_name";
-    my $native_address = get_sub_native_address($native_sub_name_spvm);
+  my $native_func_names = get_native_sub_names();
+  for my $native_func_name (@$native_func_names) {
+    my $native_func_name_spvm = "SPVM::$native_func_name";
+    my $native_address = get_sub_native_address($native_func_name_spvm);
     unless ($native_address) {
-      confess "Can't find native address($native_sub_name())";
+      confess "Can't find native address($native_func_name())";
     }
-    bind_native_sub($native_sub_name, $native_address);
-  }
-}
-
-sub compile_inline_native_subs {
-  
-  my $inline_package_names = get_inline_package_names();
-  
-  for my $package_name (@$inline_package_names) {
-    my $spvm_file = get_inline_file($package_name);
-    
-    my $temp_dir = tempdir;
-    
-    open my $spvm_fh, '<', $spvm_file
-      or confess "Can't open $spvm_file: $!";
-    
-    my $native_src;
-    my $config_src;
-    my $state = '';
-    my $native_first_line = 1;
-    my $config_first_line = 1;
-    while (my $line = <$spvm_fh>) {
-      if ($line =~ /__NATIVE__/) {
-        $state = 'native';
-        next;
-      }
-      elsif ($line =~ /__CONFIG__/) {
-        $state = 'config';
-        next;
-      }
-
-      if ($state eq 'native') {
-        if ($native_first_line) {
-          $native_src .= "#line " . ($. + 1) . "\"$spvm_file\"";
-          $native_first_line = 0;
-        }
-        $native_src .= $line;
-      }
-      elsif ($state eq 'config') {
-        if ($config_first_line) {
-          $config_src .= "use strict;\nuse warnings;\n";
-          $config_first_line = 0;
-        }
-        $config_src .= $line;
-      }
-    }
-    
-    my $package_name_under_score = $package_name;
-    $package_name_under_score =~ s/:/_/g;
-    
-    my $native_src_file = "$temp_dir/SPVM__${package_name_under_score}.c";
-    
-    open my $native_src_fh, '>', $native_src_file
-      or die "Can't open $native_src_file:$!";
-    
-    print $native_src_fh "$native_src\n";
-    
-    close $native_src_fh;
-    
-    my $api_header_include_dir = $INC{"SPVM.pm"};
-    $api_header_include_dir =~ s/\.pm$//;
-
-    my $config;
-    if (defined $config_src) {
-      $config = eval $config_src;
-      
-      if ($@) {
-        confess "Can't parse __CONFIG__ section at $spvm_file: $@\n$config_src";
-      }
-      if (ref $config ne 'HASH') {
-        confess "__CONFIG__ section must return hash reference";
-      }
-    }
-    
-    # Convert ExtUitls::MakeMaker config to ExtUtils::CBuilder config
-    my $cbuilder_new_config = {};
-    my $cbuilder_compile_config = {};
-    my $cbuilder_link_config = {};
-    if ($config) {
-      # OPTIMIZE
-      if (defined $config->{OPTIMIZE}) {
-        $cbuilder_new_config->{optimize} = delete $config->{OPTIMIZE};
-      }
-      else {
-        # Default is -O3
-        $cbuilder_new_config->{optimize} = '-O3';
-      }
-      
-      # CC
-      if (defined $config->{CC}) {
-        $cbuilder_new_config->{cc} = delete $config->{CC};
-      }
-
-      # CCFLAGS
-      if (defined $config->{CCFLAGS}) {
-        $cbuilder_new_config->{ccflags} = delete $config->{CCFLAGS};
-      }
-      
-      # LD
-      if (defined $config->{LD}) {
-        $cbuilder_new_config->{ld} = delete $config->{LD};
-      }
-      
-      # LDDLFLAGS
-      if (defined $config->{LDDLFLAGS}) {
-        $cbuilder_new_config->{lddlflags} = delete $config->{LDDLFLAGS};
-      }
-      
-      my @keys = keys %$config;
-      if (@keys) {
-        confess "$keys[0] is not supported option";
-      }
-    }
-    
-    my $quiet = 1;
-    my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_new_config);
-    my $obj_file = $cbuilder->compile(
-      source => $native_src_file,
-      include_dirs => [$api_header_include_dir]
-    );
-    
-    # This is required for Windows
-    my $native_sub_names = get_native_sub_names_from_package($package_name);
-    my $dl_func_list = [];
-    for my $native_sub_name (@$native_sub_names) {
-      my $dl_func = "SPVM__$native_sub_name";
-      $dl_func =~ s/:/_/g;
-      push @$dl_func_list, $dl_func;
-    }
-    my $boot_name = "boot_SPVM__${package_name_under_score}";
-    push @$dl_func_list, $boot_name;
-    
-    my $lib_file_name = "$temp_dir/SPVM__${package_name_under_score}.$Config{dlext}";
-    
-    my $lib_file = $cbuilder->link(
-      objects => $obj_file,
-      module_name => "SPVM::$package_name",
-      dl_func_list => $dl_func_list,
-      lib_file => $lib_file_name
-    );
-    
-    push @INLINE_DLL_FILES, $lib_file;
+    bind_native_sub($native_func_name, $native_address);
   }
 }
 
@@ -295,12 +166,19 @@ sub compile_inline_native_subs {
 CHECK {
   require XSLoader;
   XSLoader::load('SPVM', $VERSION);
-
-  # I want to load dll file from Package name
-  # but XSLoader::load call boot_ function and error occur
-  # so I surround eval. This is very bad hack
-  XSLoader::load('SPVM::std', $VERSION);
-  XSLoader::load('SPVM::Math', $VERSION);
+  
+  # Load standard library
+  my @dll_file_bases = ('std', 'Math');
+  for my $shared_lib_file_base (@dll_file_bases) {
+    my $shared_lib_file_rel = "auto/SPVM/$shared_lib_file_base.native/$shared_lib_file_base.$Config{dlext}";
+    for my $module_dir (@INC) {
+      my $shared_lib_file = "$module_dir/$shared_lib_file_rel";
+      if (-f $shared_lib_file) {
+        DynaLoader::dl_load_file($shared_lib_file);
+        push @DynaLoader::dl_shared_objects, $shared_lib_file;
+      }
+    }
+  }
   
   # Compile SPVM source code
   compile();
@@ -311,8 +189,8 @@ CHECK {
   # Free compiler
   free_compiler();
   
-  # Compile inline native subroutine
-  compile_inline_native_subs();
+  # Compile extension native subroutine
+  # compile_extension_native_subs();
   
   # Bind native subroutines
   bind_native_subs();

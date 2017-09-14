@@ -1,0 +1,24 @@
+---
+abstract: 'Abstract base classes for the three Open Street Map primitives: L<node|Geo::OSM::Primitive::Node>, L<way|Geo::OSM::Primitive::Way> and L<relation|Geo::OSM::Primitive::Relation>.'
+author:
+  - 'RenÃ© Nyffenegger <rene.nyffenegger@adp-gmbh.ch>'
+build_requires:
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-OSM-Primitive
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,6 +3,8 @@ use Devel::GlobalDestruction;
 use strict;
 use warnings;
 
+# Patro::N3. Proxy class for CODE type references
+
 use Carp ();
 use Socket ();
 use Data::Dumper ();
@@ -38,6 +40,8 @@ sub DESTROY {
 	}
     }
 }
+
+# is an AUTOLOAD method useful here?
 
 ############################################################
 

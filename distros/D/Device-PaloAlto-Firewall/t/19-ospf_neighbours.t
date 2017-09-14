@@ -17,7 +17,7 @@ my $test = $fw->tester();
 # No configuration
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ospf_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ospf_neighbours(), 'ARRAY', "No OSPF configured returns ARRAYREF" );
+isa_ok( $fw->ospf_neighbours(), 'ARRAY' );
 is_deeply( $fw->ospf_neighbours(), [] , "No OSPF configured returns an empty ARRAYREF" );
 
 ok( !$test->ospf_neighbours_up(neighbours => ['192.168.122.30']), "OSPF not configured returns 0");
@@ -25,7 +25,7 @@ ok( !$test->ospf_neighbours_up(neighbours => ['192.168.122.30']), "OSPF not conf
 # OSPF configured no neighbours
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ospf_configured_no_neighbours() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ospf_neighbours(), 'ARRAY', "No OSPF neighbours returns ARRAYREF" );
+isa_ok( $fw->ospf_neighbours(), 'ARRAY' );
 is_deeply( $fw->ospf_neighbours(), [] , "No OSPF neighbours returns an empty ARRAYREF" );
 
 ok( !$test->ospf_neighbours_up(neighbours => ['192.168.122.30']), "OSPF with no neighbours returns 0");
@@ -33,7 +33,7 @@ ok( !$test->ospf_neighbours_up(neighbours => ['192.168.122.30']), "OSPF with no 
 # OSPF configured with  neighbours
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ospf_configured_with_neighbours() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ospf_neighbours(), 'ARRAY', "No IPSEC configured returns ARRAYREF" );
+isa_ok( $fw->ospf_neighbours(), 'ARRAY' );
 
 ok( $test->ospf_neighbours_up(neighbours => ['192.168.122.30']), "OSPF with a neighbour returns 1");
 ok( $test->ospf_neighbours_up(neighbours => ['192.168.122.30', '192.168.124.2']), "OSPF with a multiple neighbours returns 1");

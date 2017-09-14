@@ -4,16 +4,16 @@ package Apache::Session::Serialize::JSON;
 use strict;
 use JSON qw(to_json from_json);
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.6';
 
 sub serialize {
     my $session = shift;
 
-    $session->{serialized} = to_json( $session->{data} );
+    $session->{serialized} = to_json( $session->{data}, { allow_nonref => 1 } );
 }
 
 sub unserialize {
-    my ($session,$next) = @_;
+    my ( $session, $next ) = @_;
 
     my $data = _unserialize( $session->{serialized}, $next );
     die "Session could not be unserialized" unless defined $data;
@@ -23,7 +23,7 @@ sub unserialize {
 sub _unserialize {
     my ( $serialized, $next ) = @_;
     my $tmp;
-    eval { $tmp = from_json($serialized) };
+    eval { $tmp = from_json( $serialized, { allow_nonref => 1 } ) };
     if ($@) {
         require Storable;
         $next ||= \&Storable::thaw;

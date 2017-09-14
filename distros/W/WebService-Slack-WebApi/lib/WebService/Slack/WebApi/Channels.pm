@@ -11,13 +11,15 @@ use WebService::Slack::WebApi::Generator (
     },
     create => {
         name => 'Str',
+        validate => { isa => 'Bool', optional => 1 },
     },
     history => {
         channel   => 'Str',
+        count     => { isa => 'Int',  optional => 1 },
+        inclusive => { isa => 'Bool', optional => 1 },
         latest    => { isa => 'Str',  optional => 1 },
         oldest    => { isa => 'Str',  optional => 1 },
-        inclusive => { isa => 'Bool', optional => 1 },
-        count     => { isa => 'Int',  optional => 1 },
+        unreads   => { isa => 'Bool', optional => 1 },
     },
     info => {
         channel => 'Str',
@@ -27,7 +29,8 @@ use WebService::Slack::WebApi::Generator (
         user    => 'Str',
     },
     join => {
-        name => 'Str',
+        name     => 'Str',
+        validate => { isa => 'Bool', optional => 1 },
     },
     kick => {
         channel => 'Str',
@@ -37,15 +40,23 @@ use WebService::Slack::WebApi::Generator (
         channel => 'Str',
     },
     list => {
+        cursor           => { isa => 'Str',  optional => 1 },
         exclude_archived => { isa => 'Bool', optional => 1 },
+        exclude_members  => { isa => 'Bool', optional => 1 },
+        limit            => { isa => 'Int',  optional => 1 },
     },
     mark => {
         channel => 'Str',
         ts      => 'Str',
     },
     rename => {
-        channel => 'Str',
-        name    => 'Str',
+        channel  => 'Str',
+        name     => 'Str',
+        validate => { isa => 'Bool', optional => 1 },
+    },
+    replies => {
+        channel   => 'Str',
+        thread_ts => 'Str',
     },
     set_purpose => {
         channel => 'Str',

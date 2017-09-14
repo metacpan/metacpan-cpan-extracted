@@ -10,3 +10,8 @@ inotify-hookable \
     --watch-directories t \
     --watch-files t/test_class_tests.t \
     --on-modify-command "${RSYNC_HPC}; ${RSYNC_BIOSAILS}; ${RSYNC_SQL}; prove -l -v t/test_class_tests.t"
+
+
+
+#    --on-modify-command "${RSYNC_HPC}; ${RSYNC_BIOSAILS}; ${RSYNC_SQL}; prove -l -v t/test_class_tests.t"
+#    --on-modify-command "prove -l -v t/test_class_tests.t"

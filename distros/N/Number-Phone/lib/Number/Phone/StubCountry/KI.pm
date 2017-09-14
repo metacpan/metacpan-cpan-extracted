@@ -22,38 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [];
 
 my $validators = {
-                'toll_free' => '',
-                'pager' => '',
-                'voip' => '
-          30(?:
-             0[01]\\d{2}|
-             12(?:
-                11|
-                20
-             )
-          )\\d{2}
-        ',
-                'mobile' => '7[23]0\\d{5}',
-                'fixed_line' => '
-          (?:
-            [24]\\d|
-            3[1-9]|
-            50|
-            8[0-5]
-          )\\d{3}|
-          7(?:
-            27|
-            31|
-            5[0-4]
-          )\\d{5}
-        ',
-                'personal_number' => '',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             [24]\\d|
@@ -61,11 +34,86 @@ my $validators = {
             50|
             8[0-5]
           )\\d{3}|
-          7(?:
-            27|
-            31|
-            5[0-4]
-          )\\d{5}
+          (?:
+            65(?:
+              02[12]|
+              12[56]|
+              22[89]|
+              [3-5]00
+            )|
+            7(?:
+              27\\d{2}|
+              3100|
+              5(?:
+                02[12]|
+                12[56]|
+                22[89]|
+                [34](?:
+                  00|
+                  81
+                )|
+                500
+              )
+            )
+          )\\d{3}
+        ',
+                'personal_number' => '',
+                'pager' => '',
+                'mobile' => '
+          (?:
+            6(?:
+              200[01]|
+              30[01]\\d
+            )|
+            7(?:
+              200[01]|
+              3(?:
+                0[0-5]\\d|
+                140
+              )
+            )
+          )\\d{3}
+        ',
+                'toll_free' => '',
+                'fixed_line' => '
+          (?:
+            [24]\\d|
+            3[1-9]|
+            50|
+            8[0-5]
+          )\\d{3}|
+          (?:
+            65(?:
+              02[12]|
+              12[56]|
+              22[89]|
+              [3-5]00
+            )|
+            7(?:
+              27\\d{2}|
+              3100|
+              5(?:
+                02[12]|
+                12[56]|
+                22[89]|
+                [34](?:
+                  00|
+                  81
+                )|
+                500
+              )
+            )
+          )\\d{3}
+        ',
+                'specialrate' => '',
+                'voip' => '
+          30(?:
+            0[01]\\d{2}|
+            12(?:
+              11|
+              20
+            )
+          )\\d{2}
         '
               };
 my %areanames = (
@@ -79,8 +127,8 @@ my %areanames = (
   68628 => "Bikenibeu",
   68629 => "Bikenibeu",
   68630 => "Tarawa",
-  68631 => "Abaokoro",
-  68632 => "Abaokoro",
+  68631 => "North\ Tarawa",
+  68632 => "North\ Tarawa",
   68633 => "Abaiang",
   68634 => "Marakei",
   68635 => "Butaritari",
@@ -98,12 +146,27 @@ my %areanames = (
   68647 => "Nikunau",
   68648 => "Tamana",
   68649 => "Arorae",
-  686727 => "Gilbert\ Islands",
-  686750 => "South\ Tarawa",
-  686751 => "South\ Tarawa",
-  686752 => "South\ Tarawa",
-  686753 => "Line\ Islands",
-  686754 => "Phoenix\ Islands",
+  68665021 => "Bairiki",
+  68665022 => "Bairiki",
+  68665125 => "Betio",
+  68665126 => "Betio",
+  68665228 => "Bikenibeu",
+  68665229 => "Bikenibeu",
+  68665300 => "Gilbert\ Islands",
+  68665400 => "Gilbert\ Islands",
+  68665500 => "Phoenix\ Islands",
+  68672700 => "Gilbert\ Islands",
+  68675021 => "Bairiki",
+  68675022 => "Bairiki",
+  68675125 => "Betio",
+  68675126 => "Betio",
+  68675228 => "Bikenibeu",
+  68675229 => "Bikenibeu",
+  68675300 => "Gilbert\ Islands",
+  68675381 => "Line\ Islands",
+  68675400 => "Phoenix\ Islands",
+  68675481 => "Line\ Islands",
+  68675500 => "Phoenix\ Islands",
   68681 => "Kiritimati",
   68682 => "Kiritimati",
   68683 => "Fanning",

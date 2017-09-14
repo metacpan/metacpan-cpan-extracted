@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.022';
+$App::Cme::Command::run::VERSION = '1.023';
 use strict;
 use warnings;
 use 5.10.1;
@@ -43,6 +43,7 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "arg=s@"  => "fix only a subset of a configuration tree" ],
+        [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "quiet!"  => "Suppress progress messages" ],
         [ "doc!"    => "show documention of script" ],
         [ "list!"   => "list available scripts" ],
@@ -212,7 +213,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.022';
+$App::Cme::Run::Var::VERSION = '1.023';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -238,7 +239,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,45 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<script type="text/javascript" src="<%RT->Config->Get('WebPath')%>/static/js/farbtastic.js"></script>
+
+<form action="<%RT->Config->Get('WebPath')%>/Admin/Lifecycles/Modify.html" name="ModifyLifecycle" method="post" enctype="multipart/form-data">
+<input type="hidden" class="hidden" name="Name" value="<% $LifecycleObj->Name %>" />
+<input type="hidden" class="hidden" name="Type" value="<% $LifecycleObj->Type %>" />
+
+<& /Elements/LifecycleGraph, Lifecycle => $LifecycleObj->Name, Editing => 1 &>
+
+<& /Elements/Submit, Label => loc('Save Changes') &>
+
+</form>
+<%INIT>
+my ($title, @results);
+my $LifecycleObj = RT::Lifecycle->new();
+$LifecycleObj->Load(Name => $Name, Type => $Type);
+
+Abort("Invalid lifecycle") unless $LifecycleObj->Name
+                               && $LifecycleObj->{data}{type} eq $Type;
+
+$title = loc("Modify lifecycle [_1]", $LifecycleObj->Name);
+
+if ($Config) {
+    my ($ok, $msg) = RT::Extension::LifecycleUI->UpdateLifecycle(
+        CurrentUser  => $session{CurrentUser},
+        LifecycleObj => $LifecycleObj,
+        NewConfig    => JSON::from_json($Config),
+    );
+    push @results, $msg;
+}
+
+# This code does automatic redirection if any updates happen.
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Arguments => { Name => $LifecycleObj->Name, Type => $LifecycleObj->Type },
+);
+</%INIT>
+<%ARGS>
+$Name => undef
+$Type => undef
+$Config => undef
+</%ARGS>

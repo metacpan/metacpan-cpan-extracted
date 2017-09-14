@@ -17,7 +17,7 @@ my $test = $fw->tester();
 # No BGP Configured
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_bgp_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->bgp_rib(), 'ARRAY', "No BGP returns ARRAYREF" );
+isa_ok( $fw->bgp_rib(), 'ARRAY' );
 is_deeply( $fw->bgp_rib(), [] , "No BGP returns an empty ARRAYREF" );
 
 ok( !$test->bgp_prefixes_in_rib(prefixes => ['1.1.1.0/24']), "BGP not configured returns 0" );
@@ -25,7 +25,7 @@ ok( !$test->bgp_prefixes_in_rib(prefixes => ['1.1.1.0/24']), "BGP not configured
 # BGP up and configured, but not prefixes in the loc RiB
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( empty_loc_rib() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->bgp_rib(), 'ARRAY', "Nothing in loc RIB returns ARRAYREF" );
+isa_ok( $fw->bgp_rib(), 'ARRAY' );
 is_deeply( $fw->bgp_rib(), [] , "Nothing in loc RIB returns an empty ARRAYREF" );
 
 ok( !$test->bgp_prefixes_in_rib(prefixes => ['1.1.1.0/24']), "No prefices in RIB returns 0" );
@@ -33,7 +33,7 @@ ok( !$test->bgp_prefixes_in_rib(prefixes => ['1.1.1.0/24']), "No prefices in RIB
 # BGP up and prefix in the loc RIB
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( loc_rib() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->bgp_rib(), 'ARRAY', "Prefixes in loc RIB return an ARRAYREF" );
+isa_ok( $fw->bgp_rib(), 'ARRAY' );
 
 ok( !$test->bgp_prefixes_in_rib(prefixes => ['1.1.1.0/24']), "No prefices in RIB returns 0" );
 

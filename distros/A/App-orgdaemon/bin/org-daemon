@@ -18,7 +18,7 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Getopt::Long;
 use List::Util qw(max);
@@ -55,6 +55,8 @@ use Tk::PNG;
     sub file     { $_[0]->{file} }
     # line in org file
     sub line     { $_[0]->{line} }
+    # tags
+    sub tags     { @{ $_[0]->{tags} || [] } }
 
     ## methods
     sub id {
@@ -123,6 +125,7 @@ my $use_emacsclient_eval = 1;
 my $emacsclient_fmt_cmd;
 my $show_version;
 my $overview_widget = 'hlist';
+my @ignore_tags;
 
 my $mw;
 my $lb;
@@ -133,6 +136,7 @@ our %window_for_date;    # ($date_id -> $tk_window), for a (maybe) currently dis
 my %seen_early_warning; # ($date_id -> 1)
 my %seen_due_date;      # ($date_id -> 1)
 my $with_move_button;
+my $use_anyevent;
 
 sub normal_repeater {
     $lb->repeat($recheck_interval*1000, sub { tk_do_one_iteration() });
@@ -518,7 +522,7 @@ sub check_for_updates {
 	}
 	delete $open_warning{$org_file};
 	if (!$org_data->{modified} || $org_data->{modified} < $modtime) {
-	    my @new_org_data_dates = find_dates_in_org_file($org_file, include_timeless => $include_timeless, time_fallback => $time_fallback);
+	    my @new_org_data_dates = find_relevant_dates_in_org_file($org_file, include_timeless => $include_timeless, time_fallback => $time_fallback, ignore_tags => \@ignore_tags);
 	    my %old_org_data_dates; # id -> date
 	    if ($org_data->{dates}) {
 		for my $date (@{ $org_data->{dates} }) {
@@ -544,10 +548,24 @@ sub check_for_updates {
     $changes;
 }
 
+# Filter the output of find_dates_in_org_file: due dates which
+# are currently not display (no %window_for_date entry) are
+# removed from the result
+sub find_relevant_dates_in_org_file {
+    my(@args) = @_;
+    grep {
+	(
+	 $_->state ne 'due' ||
+	 ($window_for_date{$_->id} && Tk::Exists($window_for_date{$_->id}))
+	)
+    } find_dates_in_org_file(@args);
+}
+
 sub find_dates_in_org_file {
     my($file, %opts) = @_;
     my $include_timeless = delete $opts{include_timeless};
     my $time_fallback = delete $opts{time_fallback} || '00:00';
+    my %ignore_tags = map {($_,1)} @{ delete $opts{ignore_tags} || [] };
     die "Unhandled options: " . join(" ", %opts) if %opts;
 
     my @dates;
@@ -661,6 +679,18 @@ sub find_dates_in_org_file {
 		if ($text =~ m{^\*+\s+(?:DONE|WONTFIX)\b}) {
 		    next; # ignore DONE and WONTFIX items
 		}
+		my @tags;
+		if ($text =~ m{\s:(\S+):(\s|$)}) {
+		    @tags = split /:/, $1;
+		    my $next;
+		    for (@tags) {
+			if ($ignore_tags{$_}) {
+			    $next = 1;
+			    last;
+			}
+		    }
+		    next if $next;
+		}
 		my %date_params = (epoch => $epoch,
 				   date  => $date,
 				   time  => $time,
@@ -671,6 +701,7 @@ sub find_dates_in_org_file {
 				   file  => $file,
 				   line  => $linenumber,
 				   seek  => $last_seek,
+				   tags  => \@tags,
 				  );
 
 		my $early_warning_secs;
@@ -686,11 +717,7 @@ sub find_dates_in_org_file {
 
 		my $date = Emacs::Org::Daemon::Date->new(%date_params);
 		my $date_state = $date->state;
-		if (
-		    ($date_state eq 'due' && $window_for_date{$date->id} && Tk::Exists($window_for_date{$date->id}))
-		    ||
-		    $date_state =~ m{^(wait|early)}
-		   ) {
+		if ($date_state =~ m{^(wait|early|due)}) {
 		    push @dates, $date;
 		}
 	    }
@@ -743,14 +770,17 @@ GetOptions(
 	   'emacsclient-eval!' => \$use_emacsclient_eval,
 	   'emacsclient-cmd=s' => \$emacsclient_fmt_cmd,
 	   'overview-widget=s' => \$overview_widget,
+	   'ignore-tag=s@' => \@ignore_tags,
 	   'v|version' => \$show_version,
 	   'move-button!' => \$with_move_button,
+	   'use-anyevent' => \$use_anyevent,
 	  )
     or die <<EOF;
 $0 [--debug] [--early-warning=seconds] [--early-warning-timeless=seconds] [--recheck-interval=seconds]
 \t[--no-emacsclient-eval] [--emacsclient-cmd=...]
 \t[--overview-widget=...] [--move-button]
 \t[--[no-]include-timeless] [--time-fallback HH:MM]
+\t[--ignore-tag=... ...]
 \torgfile ...
 $0 --version
 EOF
@@ -895,6 +925,37 @@ $mw->protocol('WM_DELETE_WINDOW', sub {
 # so make sure we change into a non-removable directory.
 chdir '/';
 
+my @anyevent_notifiers;
+if ($use_anyevent) {
+    require AnyEvent::Filesys::Notify;
+    require File::Basename;
+    my %dirs_to_basenames;
+    for my $org_file (keys %org_files) {
+	my($dirname, $basename) = (File::Basename::dirname($org_file), File::Basename::basename($org_file));
+	push @{ $dirs_to_basenames{$dirname} }, $basename;
+    }
+    for my $dir (keys %dirs_to_basenames) {
+	my $all_basenames = "(^|/)(" . join("|", map { quotemeta $_ } @{ $dirs_to_basenames{$dir} }) . ')$';
+	$all_basenames = qr{$all_basenames};
+	my $notifier = AnyEvent::Filesys::Notify->new
+	    (
+	     dirs     => [ $dir ],
+	     # no need for interval, the Tk recheck_interval is still enabled
+	     filter   => sub { $_[0] =~ $all_basenames },
+	     cb       => sub {
+		 my (@events) = @_;
+		 if ($debug) {
+		     warn "AnyEvent::Filesys::Notify got events:\n";
+		     require Data::Dumper;
+		     print STDERR Data::Dumper->new([@events],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
+		 }
+		 tk_do_one_iteration();
+	     },
+	    );
+	push @anyevent_notifiers, $notifier;
+    }
+}
+
 #$mw->WidgetDump;
 MainLoop;
 
@@ -962,6 +1023,12 @@ possible value is C<listbox>.
 The early warning and alarm windows will get an additional "move"
 button (displayed with a right arrow: E<x2192>) for moving the window
 quickly to the right screen border.
+
+=item --use-anyevent (EXPERIMENTAL!)
+
+Use L<AnyEvent::Filesys::Notify> for getting file modification events.
+Probably not useful on systems using kevent (*BSD).
+C<--recheck-interval> is still applied for periodic checks.
 
 =back
 

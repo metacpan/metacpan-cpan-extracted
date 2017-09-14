@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Alien::Build::Plugin;
 
 # ABSTRACT: Make plugin for Alien::Build
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 
 has '+make_type' => undef;
@@ -79,7 +79,7 @@ Alien::Build::Plugin::Build::Make - Make plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 SYNOPSIS
 

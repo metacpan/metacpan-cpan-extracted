@@ -11,7 +11,7 @@ ok( -d $test_bin, 'Found test-bin' );
 
 # Set up for running the test application
 @PATH = ($test_bin);
-push @PATH, File::Spec->catdir( 'corpus', 'test-bin-win' ) if $^O eq 'cygwin';
+push @PATH, File::Spec->catdir( 'corpus', 'test-bin-win' ) if $^O =~ /^(cygwin|msys)$/;
 unless (
   File::Which::IS_VMS
   or

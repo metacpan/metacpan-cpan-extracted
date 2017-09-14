@@ -1,5 +1,8 @@
 Revision history for Perl module Alien::Base.
 
+0.046 2017-09-13 20:54:21 -0400
+  - Run alien_install_commands before any Perl tests in t/
+
 0.045 2017-08-29 04:51:05 -0400
   - Fix broken skip in t/alien_base_modulebuild_pkgconfig.t
 

@@ -10,7 +10,8 @@ do { my $x = {
                         'requires' => {
                                         'Alien::Build' => '0.32',
                                         'Alien::Build::MM' => '0.32',
-                                        'ExtUtils::MakeMaker' => '6.52'
+                                        'ExtUtils::MakeMaker' => '6.52',
+                                        'perl' => '5.006'
                                       }
                       },
        'develop' => {
@@ -18,6 +19,7 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
                                       'blib' => '1.01',
@@ -40,8 +42,12 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '6.52',
                                    'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
                                    'Test::Alien' => '0.05',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.008'
                                  }
                  }
      };

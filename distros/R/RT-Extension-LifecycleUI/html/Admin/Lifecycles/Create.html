@@ -1,0 +1,90 @@
+<& /Admin/Elements/Header, Title => loc("Admin Lifecycles") &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form action="<%RT->Config->Get('WebPath')%>/Admin/Lifecycles/Create.html" name="CreateLifecycle" method="post" enctype="multipart/form-data">
+
+<table>
+<tr><td align="right"><&|/l&>Lifecycle Name</&>:</td>
+<td><input name="Name" value="<% $Name %>" /></td>
+</tr>
+
+<tr><td align="right"><&|/l&>Type</&>:</td>
+<td><select name="Type">
+% for my $type (@types) {
+<option value="<% $type %>" <% $type eq $Type ? "selected=selected" : "" %>><% loc($type) %></option>
+% }
+</select></td></tr>
+
+<tr><td align="right"><&|/l&>Clone Lifecycle</&>:</td><td>
+<label><input type="radio" name="Clone" value="" <% ($Clone//'') eq '' ? "checked=checked" : "" %> /> (none)</label>
+
+% for my $type (@types) {
+<div class="type" data-type="<% $type %>">
+% for my $lifecycle (@{ $lifecycles{$type} }) {
+<label><input type="radio" name="Clone" value="<% $lifecycle %>" <% ($Clone//'') eq $lifecycle ? "checked=checked" : "" %> /> <% $lifecycle %></label><br>
+% }
+</div>
+% }
+</td></tr>
+</table>
+
+<& /Elements/Submit, Name => 'Create', Label => loc('Create') &>
+
+<script type="text/javascript">
+jQuery(function () {
+    var showType = function (resetClone) {
+        var type = jQuery('select[name=Type]').val();
+        jQuery('.type').hide();
+        jQuery('.type[data-type="'+type+'"]').show();
+        if (resetClone) {
+            jQuery('input[name=Clone][value=""]').prop('checked', true);
+        }
+    };
+    showType(false);
+    jQuery('select[name=Type]').change(function () { showType(true) });
+});
+</script>
+<%INIT>
+my @results;
+
+my @types = List::MoreUtils::uniq(
+    'ticket',
+    'asset',
+    sort keys %RT::Lifecycle::LIFECYCLES_TYPES,
+);
+
+my %lifecycles;
+
+for my $type (@types) {
+    @{ $lifecycles{$type} } = sort { loc($a) cmp loc($b) }
+                              grep { $_ ne 'approvals' }
+                              RT::Lifecycle->ListAll($type);
+}
+
+if ($Create) {
+    my ($ok, $msg) = RT::Extension::LifecycleUI->CreateLifecycle(
+        CurrentUser => $session{CurrentUser},
+        Name        => $Name,
+        Type        => $Type,
+        Clone       => $Clone,
+    );
+
+    if ($ok) {
+        MaybeRedirectForResults(
+            Actions   => [ $msg ],
+            Path      => 'Admin/Lifecycles/Modify.html',
+            Arguments => { Type => $Type, Name => $Name },
+        );
+    }
+    else {
+        push @results, $msg if !$ok;
+    }
+}
+</%INIT>
+<%ARGS>
+$Name => undef
+$Type => 'ticket'
+$Clone => undef
+$Create => undef
+</%ARGS>

@@ -4,7 +4,7 @@
       "RenÃ© Nyffenegger <rene.nyffenegger@adp-gmbh.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Simple" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -34,9 +34,14 @@
          "requires" : {
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,25 @@
+
+Release history for Importer-Zim-Base
+
+0.3.0     2017-09-13 12:49:00-07:00 America/Los_Angeles
+
+    - If no explicit symbols are given, default to @EXPORT
+    - Implement "use IMPORTER MODULE => {-strict => 0}..."
+    - By default, only import exportable symbols
+    - Don't create things if they don't exist
+    - Debugging enabled with IMPORTER_ZIM_DEBUG
+    - Handle explicit prefix &func
+    - Refuse to handle non-subroutine symbols
+
+v0.2     2017-09-06 17:58:58-07:00 America/Los_Angeles
+
+    - Implement "use IMPORTER MODULE => :TAG"
+    - Implement "use IMPORTER MODULE => {-version => V}..."
+
+v0.1     2017-09-05 17:31:00-07:00 America/Los_Angeles
+
+    - Initial version
+
+v0.0  2017-09-05
+
+    - Initial commit

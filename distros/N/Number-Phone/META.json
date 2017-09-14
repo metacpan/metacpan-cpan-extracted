@@ -4,8 +4,9 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "unknown"
    ],
    "meta-spec" : {
@@ -24,21 +25,27 @@
          "requires" : {
             "ExtUtils::Install" : "0",
             "ExtUtils::MakeMaker" : "6.52",
-            "ExtUtils::Manifest" : "0"
+            "ExtUtils::Manifest" : "0",
+            "File::ShareDir::Install" : "0.11"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::Install" : "0",
             "ExtUtils::MakeMaker" : "6.52",
-            "ExtUtils::Manifest" : "0"
+            "ExtUtils::Manifest" : "0",
+            "File::ShareDir::Install" : "0.11"
          }
       },
       "runtime" : {
          "requires" : {
+            "Cwd" : "0",
             "DBM::Deep" : "2.0008",
             "Digest::MD5" : "0",
-            "Scalar::Util" : "0",
+            "File::Basename" : "0",
+            "File::ShareDir" : "1.104",
+            "File::Spec" : "0",
+            "Scalar::Util" : "1.48",
             "Test::More" : "0.96",
             "Test::utf8" : "0"
          }
@@ -53,5 +60,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Number-Phone"
       }
    },
-   "version" : "3.4001"
+   "version" : "3.4002",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

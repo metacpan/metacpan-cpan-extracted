@@ -20,6 +20,11 @@ $deeply->( \%uniq, { a => undef, i => undef, u => undef } );
 isa_ok( Lingua::Awkwords::Subpattern->set_patterns( X => ['x'] ),
     'Lingua::Awkwords::Subpattern' );
 
+# 0.05 no longer clobbers on set_patterns, confirm module default
+# still present
+my %pat = Lingua::Awkwords::Subpattern::get_patterns;
+$deeply->( $pat{V}, [qw/a i u/] );
+
 $picker = Lingua::Awkwords::Subpattern->new( pattern => 'X' );
 is( $picker->render, 'x' );
 
@@ -58,4 +63,4 @@ Lingua::Awkwords::Subpattern->update_pattern( P => $pattern );
 $picker = Lingua::Awkwords::Subpattern->new( pattern => 'P' );
 is( $picker->render, 'pattern' );
 
-plan tests => 14;
+plan tests => 15;

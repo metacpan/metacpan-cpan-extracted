@@ -1,5 +1,9 @@
 See also the git repository.
 
+ * 0.05 - set_patterns no longer clobbers (for easier updates of
+   multiple subpatterns). get_patterns to diagnose what the
+   patterns are. set_filter utility subroutine generator. eg/
+   example scripts added.
  * 0.04 - srand learnings related to tests.
  * 0.03 - fixed various bugs in Subpattern ->walk. Subpatterns now close
    over what they point to at time of object creation instead of at walk

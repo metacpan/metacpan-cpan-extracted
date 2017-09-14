@@ -2,19 +2,23 @@
 use Test2::Bundle::More;
 use Test::Alien 0.05;
 use Alien::libvas;
+use Config;
 
 alien_ok 'Alien::libvas';
 my $xs = do { local $/; <DATA> };
-diag "Checking libvas version";
 xs_ok {xs => $xs, verbose => 1}, with_subtest {
     my($module) = @_;
 
+    diag "Checking libvas version";
     my $lib_ver    = $module->xs_version_lib;
-    diag "library version: $lib_ver\n";
+    diag "library version:     $lib_ver\n";
     my $header_ver = $module->xs_version_header;
-    diag "header  version: $header_ver\n";
+    diag "header  version:     $header_ver\n";
     my $backend    = $module->xs_backend;
-    diag "Backend in use:  $backend\n";
+    diag "Backend in use:      $backend\n";
+
+    diag "Perl's Pointer size: " . (8 * $Config{ptrsize}) . " bit";
+
 
     is $lib_ver, $header_ver, "Header and library versions don't match!";
 };

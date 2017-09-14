@@ -1,5 +1,9 @@
 Revision history for String-CamelCase
 
+0.03    Mon Sep 11 23:38:29 JST 2017
+        push @INC "." at Makefile.PL
+        Thanks to xsawyerx.
+
 0.02    Mon Dec 28 08:28:44 JST 2009
         fix pod syntax (no code changes).
         Thanks to Pedro Melo and Tokuhiro Matsuno.

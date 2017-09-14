@@ -2,7 +2,7 @@ package Test2::Tools::EventDumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -300,7 +300,7 @@ sub get_rows {
         $val = $event->{$field};
     }
 
-    if ($settings->{convert_trace} && $field eq 'trace' && blessed($val) && $val->isa('Test2::Util::Trace')) {
+    if ($settings->{convert_trace} && $field eq 'trace' && blessed($val) && ($val->isa('Test2::Util::Trace') || $val->isa('Test2::EventFacet::Trace'))) {
         my $file = $settings->{adjust_filename}->($val->file);
         return (
             [],

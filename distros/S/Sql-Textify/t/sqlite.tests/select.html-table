@@ -1,0 +1,21 @@
+<table>
+<thead>
+  <th>id</th>
+  <th>description</th>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>first row</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>second row</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>third row</td>
+</tr>
+</tbody>
+</table>
+

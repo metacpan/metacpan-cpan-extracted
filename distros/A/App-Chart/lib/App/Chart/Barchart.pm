@@ -1,4 +1,4 @@
-# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 Kevin Ryde
+# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -13,6 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with Chart.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Broken by hideous recent barchart.com site.
 
 
 package App::Chart::Barchart;
@@ -299,6 +302,18 @@ sub dash_frac_to_decimals {
   }
 }
 
+sub dm_str_to_nearest_iso {
+  my ($str) = @_;
+  require Date::Parse;
+  my ($sec, $min, $hour, $mday, $mon, $year) = Date::Parse::strptime($str);
+  if ($year) {
+    $year += 1900;
+  } else {
+    $year = App::Chart::Download::month_to_nearest_year ($mon+1);
+  }
+  return App::Chart::ymd_to_iso ($year, $mon+1, $mday);
+}
+
 
 #-----------------------------------------------------------------------------
 # 5-day download
@@ -573,3 +588,217 @@ sub intraday_resp_to_url {
 
 1;
 __END__
+
+
+
+
+
+# ---------------------------------------------------------------------------
+# @node Barchart, Finance Quote, Data Sources, Data Sources
+# @section Barchart
+# @cindex @code{barchart.com}
+# 
+# @uref{http://www.barchart.com}
+# 
+# Barchart provides the following for various futures exchanges around the
+# world,
+# 
+# @itemize
+# @c @item
+# @c Quotes updated every 5 minutes, delayed according to the exchange.
+# @c @item
+# @c Intraday graphs.
+# @item
+# Historical data, but only for the past 5 days, and no volume figures.
+# @item
+# Historical data as graphs.
+# @end itemize
+# 
+# All information is for personal use only, see the terms at
+# 
+# @quotation
+# @uref{http://www2.barchart.com/agreement.asp} @*
+# @uref{http://www2.barchart.com/ddfplus.asp}
+# @end quotation
+# 
+# In Chart symbols are the exchange commodity code and an exchange suffix as
+# described below, with a month code letter and year, like @samp{CLZ10.NYM}
+# for December 2010 crude oil.
+# @c SYMBOL: CLZ10.NYM
+# 
+# @c The commodity alone is the current front month, like
+# @c @samp{GC.CMX} for gold, or 
+# @c @c SYMBOL: GC.CMX
+# 
+# Barchart has some different commodity codes than the exchanges, but Chart
+# always uses the exchange codes.  Some Barchart pages show symbols with just
+# one digit for the year, but Chart always uses two like @samp{10} above.
+# 
+# Five days of historical data is very limited, but you can accumulate it to at
+# least get a short term picture.  Further data as graphs is available, and
+# Chart has that as a ``Daily'' option in the intraday dialog
+# (@pxref{Intraday}).  (Further historical data as figures is available to
+# subscribers, not currently supported by Chart.)
+# 
+# For some of the exchanges below quotes are also available from Yahoo
+# (@pxref{Yahoo Finance}).  The download from Yahoo is much smaller and is hence
+# preferred.
+# 
+# @c @ifinfo
+# @c @sp 1
+# @c @end ifinfo
+# @c @subsection Chicago Board of Trade
+# @c @cindex Chicago Board of Trade
+# @c @cindex CBOT
+# @c 
+# @c @uref{http://www.cbot.com}
+# @c 
+# @c @cindex @code{.CBOT}
+# @c CBOT data is obtained from Barchart, and quotes from Yahoo (delayed 10
+# @c minutes).  In Chart symbols have a @samp{.CBOT} suffix, for example
+# @c @samp{O.CBOT} for oats.  Symbols (and trading hours) can be found at
+# @c @c SYMBOL: O.CBOT
+# @c 
+# @c @quotation
+# @c @uref{http://www.cbot.com/cbot/pub/page/0@comma{}3181@comma{}932@comma{}00.html}
+# @c @end quotation
+# @c 
+# @c For some contracts Barchart has different symbols, but Chart always uses the
+# @c exchange symbols.
+# @c 
+# @c @ifinfo
+# @c @sp 1
+# @c @end ifinfo
+# @c @subsection Chicago Mercantile Exchange
+# @c @cindex Chicago Mercantile Exchange
+# @c @cindex CME
+# @c 
+# @c @uref{http://www.cme.com}
+# @c 
+# @c @cindex @code{.CME}
+# @c CME data is obtained from Barchart, and quotes from Yahoo (delayed 10
+# @c minutes).  In Chart symbols have a @samp{.CME} suffix, for example
+# @c @samp{SP.CME} for S&P 500 futures.  Symbols can be found at
+# @c @c SYMBOL: SP.CME
+# @c 
+# @c @quotation
+# @c @uref{http://www.cme.com/trading/res/cch/cmeprdcode2439.html}
+# @c @end quotation
+# @c 
+# @c For some contracts Barchart has different symbols, but Chart always uses the
+# @c exchange symbols.
+# 
+# @ifinfo
+# @sp 1
+# @end ifinfo
+# @subsection Commodity Exchange
+# @cindex Commodity Exchange
+# @cindex COMEX
+# 
+# @cindex @code{.CMX}
+# COMEX is the metals division of NYMEX (see below).  COMEX daily data is
+# obtained from Barchart and quotes from Yahoo (delayed 30 minutes).  In Chart
+# symbols have a @samp{.CMX} suffix (as per Yahoo), for example @samp{GCM16.CMX}
+# for June 2016 gold.
+# @c SYMBOL: GCM16.CMX
+# The exchange has a full symbols directory
+# 
+# @quotation
+# @uref{http://www.nymex.com/cc_main.aspx}
+# @end quotation
+# 
+# @c   Available symbols and months can be found at
+# @c @quotation
+# @c @uref{http://www2.barchart.com/futexch.asp?exch=comex&code=BSTK}
+# @c @end quotation
+# 
+# @c @ifinfo
+# @c @sp 1
+# @c @end ifinfo
+# @c @subsection New York Board of Trade (ICE Futures U.S.)
+# @c @cindex NYBOT
+# @c @cindex ICE Futures U.S.
+# @c 
+# @c @uref{https://www.theice.com/nybot.jhtml}
+# @c 
+# @c @cindex @code{.NYBOT}
+# @c @cindex @code{.NYBOT}
+# @c NYBOT data is obtained from Barchart, and quotes from Yahoo (delayed 30
+# @c minutes).  In Chart, contract symbols have a @samp{.NYBOT} suffix.  The
+# @c commodity code alone is the front month, like @samp{CC.NYBOT} for cocoa.  Or a
+# @c specific month can be given, like @samp{CTX07.WTB} for November 2007 cotton.
+# @c Commodity codes can be found at
+# @c @c SYMBOL: CC.NYBOT
+# @c @c SYMBOL: CTX07.NYBOT
+# @c 
+# @c @quotation
+# @c @uref{https://www.theice.com/publicdocs/NYBOT_Products.pdf}
+# @c @end quotation
+# 
+# @ifinfo
+# @sp 1
+# @end ifinfo
+# @subsection New York Mercantile Exchange
+# @cindex New York Mercantile Exchange
+# @cindex NYMEX
+# 
+# @uref{http://www.nymex.com}
+# 
+# @cindex @code{.NYM}
+# NYMEX daily data is obtained from Barchart and quotes from Yahoo (delayed 30
+# minutes).  In Chart symbols have a @samp{.NYM} suffix (as per Yahoo), for
+# example @samp{CLZ15.NYM} for December 2015 crude oil.
+# @c SYMBOL: CLZ15.NYM
+# The exchange has a full symbols directory
+# 
+# @quotation
+# @uref{http://www.nymex.com/cc_main.aspx}
+# @end quotation
+# 
+# @c Available symbols and months can be found at
+# @c 
+# @c @quotation
+# @c @uref{http://www2.barchart.com/futexch.asp?exch=nymex&code=BSTK}
+# @c @end quotation
+# 
+# 
+# @c @ifinfo
+# @c @sp 1
+# @c @end ifinfo
+# @c @subsection Singapore International Money Exchange
+# @c @cindex Singapore International Money Exchange
+# @c @cindex Singapore Stock Exchange
+# @c @cindex SIMEX
+# @c @cindex SGX
+# @c 
+# @c @uref{http://www.sgx.com}
+# @c 
+# @c @cindex @code{.SIMEX}
+# @c SIMEX is the derivatives arm of the Singapore Stock Exchange.  SIMEX symbols
+# @c have a @samp{.SIMEX} suffix, for example @samp{NK.SIMEX} for Nikkei 225
+# @c futures.
+# @c @c SYMBOL: NK.SIMEX
+# @c 
+# @c @c  The terms and conditions at www.sgx.com (the last of the ``useful links''
+# @c @c  at the right hand side of the home page) say linking is allowed but not
+# @c @c  deep linking is not allowed.  Dunno what that means, maybe it's nothing
+# @c @c  except the home page, though if that were the case you'd think it would
+# @c @c  say that.  In any case give directions instead of links.
+# @c @c
+# @c @c  (Prohibitions on publishing the URL of something already freely accessible
+# @c @c  seem pretty dubious, though it's not some passive object, but somebody
+# @c @c  else's computer, and is more or less an invitation to use that in a way
+# @c @c  they don't want, which would be at best highly irresponsible.)
+# @c @c
+# @c Symbols can be found on the contract specifications pages.  On the home page
+# @c under ``Products and Services'' choose ``Derivatives'' then either the
+# @c ``Equity Index Futures / Options'' or ``Interest Rate Futures / Options''
+# @c items.  Those two pages then have selection boxes to see each contract.
+# @c 
+# @c The MSCI Japan contract (symbol @samp{JP}) is not available from Barchart, but
+# @c all other contracts are.  Intra-day graphs are not available.
+# @c 
+# @c Barchart has its own set of contract symbols, but Chart uses the exchange
+# @c symbols.
+
+

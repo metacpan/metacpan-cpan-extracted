@@ -11,7 +11,7 @@ build_requires:
   Test2::Suite: '0.000030'
   Test::Alien: '0.05'
 configure_requires:
-  Alien::Base::ModuleBuild: '0'
+  Alien::Base::ModuleBuild: '0.046'
   Alien::CMake: '0.07'
   File::Which: '0'
   Module::Build: '0'
@@ -25,14 +25,13 @@ name: Alien-libvas
 provides:
   Alien::libvas:
     file: lib/Alien/libvas.pm
-    version: '0.210'
+    version: '0.211'
 recommends:
   IO::Socket::SSL: '0'
 requires:
   Alien::Base: '0.030'
-  File::ShareDir: '1.00'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.210'
+version: '0.211'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

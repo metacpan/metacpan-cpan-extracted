@@ -1,5 +1,5 @@
 package Plack::Middleware::Debug::LWP;
-$Plack::Middleware::Debug::LWP::VERSION = '0.2';
+$Plack::Middleware::Debug::LWP::VERSION = '0.3';
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ Plack::Middleware::Debug::LWP - LWP Profiling Panel
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,11 @@ sub run {
 		
 		my @lines;
 		my ($time, $requests);
-		while (my ($req, $stats) = each %$profile) {
+		
+		for my $req (sort {
+			$profile->{$a}->{time_of_first_sample} <=> $profile->{$b}->{time_of_first_sample}
+		} keys %$profile) {
+			my $stats = $profile->{$req};
 			my $summary = sprintf("%.5f/%d (%.5f avg)", $stats->{total_duration}, $stats->{count}, $stats->{total_duration} / $stats->{count});
 			push(@lines, $req, $summary);
 			$requests += $stats->{count};

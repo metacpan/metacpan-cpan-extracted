@@ -294,7 +294,7 @@ sub DEMOLISH ( $self, $global ) {
 
             local $/;
 
-            my $deps = Cpanel::JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->decode(<$fh>);
+            my $deps = Cpanel::JSON::XS->new->utf8->decode(<$fh>);
 
             $index->@{ $deps->@* } = ();
         }
@@ -357,7 +357,7 @@ sub DEMOLISH ( $self, $global ) {
 
             seek $fh, 0, SEEK_SET or die;
 
-            print {$fh} Cpanel::JSON::XS->new->ascii(0)->latin1(0)->utf8(1)->pretty(1)->canonical(1)->encode( [ sort keys $index->%* ] );
+            print {$fh} Cpanel::JSON::XS->new->utf8->canonical->pretty->encode( [ sort keys $index->%* ] );
         }
 
         close $fh or die;
@@ -381,7 +381,7 @@ sub DEMOLISH ( $self, $global ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 333                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 297, 360             | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 7                    |
+## |    2 | 360                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 101                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

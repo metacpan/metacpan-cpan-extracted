@@ -1,0 +1,53 @@
+{
+   "abstract" : "get instance of HTTP::ClickHouse in App::Environ environment",
+   "author" : [
+      "Andrey Kuzmin <kak-tus@mail.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Environ-ClickHouse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "example",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Environ" : "0.18",
+            "HTTP::ClickHouse" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kak-tus/App-Environ-ClickHouse.git",
+         "web" : "https://github.com/kak-tus/App-Environ-ClickHouse"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

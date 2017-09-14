@@ -57,7 +57,7 @@
          "url" : "git://github.com/sparky/perl-Net-Curl.git"
       }
    },
-   "version" : 0.38,
+   "version" : 0.39,
    "x_contributors" : [
       "Bálint Szilakszi",
       "Fuji, Goro",
@@ -68,7 +68,10 @@
       "Andy Jack",
       "Ferenc Erki",
       "Nick Kostyria",
-      "Daniel Ruoso"
+      "Daniel Ruoso",
+      "H.Merijn Brand",
+      "Yanick Champoux",
+      "Slaven Rezić"
    ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -442,7 +442,9 @@ my_rb_eval(str)
     PREINIT:
 	SV*	pl_retval;
     PPCODE:
-	Printf(("About to evaluate some Ruby code.\n"));
+	Printf(("About to evaluate some Ruby code:\n"));
+        Printf(("%s\n", str));
+        Printf(("__END__"));
 #ifdef rb_set_errinfo
     rb_set_errinfo(Qnil); /* reset GET_THREAD()->errinfo */
 #endif

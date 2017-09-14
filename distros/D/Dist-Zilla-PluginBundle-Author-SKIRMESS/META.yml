@@ -22,66 +22,12 @@ no_index:
     - t
     - xt
 provides:
-  Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Perl/Tidy/RC.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/CPAN/Meta.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/CPAN/Meta/JSON.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Changes:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Changes.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/CleanNamespaces.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::DistManifest:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/DistManifest.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::EOL:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/EOL.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Kwalitee:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Kwalitee.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::MinimumVersion:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/MinimumVersion.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Mojibake:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Mojibake.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::NoTabs:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/NoTabs.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Perl/Critic.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Pod.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod::No404s:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Pod/No404s.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Portability::Files:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Portability/Files.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Spelling:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Spelling.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/Test/XT/Test/Version.pm
-    version: '0.009'
-  Dist::Zilla::Plugin::Author::SKIRMESS::TravisCI:
-    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/TravisCI.pm
-    version: '0.009'
+  Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase:
+    file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm
+    version: '0.010'
   Dist::Zilla::PluginBundle::Author::SKIRMESS:
     file: lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
-    version: '0.009'
-  Dist::Zilla::Role::Author::SKIRMESS::Test::XT:
-    file: lib/Dist/Zilla/Role/Author/SKIRMESS/Test/XT.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Carp: '0'
   Config::Std: '0'
@@ -137,11 +83,11 @@ requires:
   Dist::Zilla::Plugin::VerifyPhases: '0'
   Dist::Zilla::Plugin::VersionFromMainModule: '0'
   Dist::Zilla::Role::BeforeBuild: '0'
-  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::FileMunger: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
   List::MoreUtils: '0'
   Moose: '0.99'
-  Moose::Role: '0'
   Path::Tiny: '0'
   namespace::autoclean: '0.09'
   perl: '5.006'
@@ -151,7 +97,7 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS/issues
   homepage: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS
   repository: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -180,78 +126,6 @@ x_Dist_Zilla:
           skip: []
       name: '@Author::SKIRMESS/stale modules, build'
       version: '0.054'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Changes
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Changes'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CleanNamespaces'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CPAN::Meta'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::DistManifest
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::DistManifest'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::EOL
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::EOL'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Kwalitee
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Kwalitee'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::MinimumVersion
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::MinimumVersion'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Mojibake
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Mojibake'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::NoTabs
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::NoTabs'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Perl::Critic'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Pod'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod::No404s
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Pod::No404s'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Portability::Files
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Portability::Files'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Spelling
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Spelling'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Version'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::TravisCI
-      name: '@Author::SKIRMESS/Author::SKIRMESS::TravisCI'
-      version: '0.008'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Perl::Tidy::RC'
-      version: '0.008'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -307,6 +181,10 @@ x_Dist_Zilla:
       name: '@Author::SKIRMESS/ReversionOnRelease'
       version: '0.06'
     -
+      class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
+      name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
+      version: '0.010'
+    -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
       version: '6.010'
@@ -317,6 +195,9 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - .perlcriticrc
+            - .perltidyrc
+            - .travis.yml
             - Changes
             - META.json
             - META.yml
@@ -324,6 +205,22 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - xt/author/clean-namespaces.t
+            - xt/author/critic.t
+            - xt/author/minimum_version.t
+            - xt/author/mojibake.t
+            - xt/author/no-tabs.t
+            - xt/author/pod-no404s.t
+            - xt/author/pod-spell.t
+            - xt/author/pod-syntax.t
+            - xt/author/portability.t
+            - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/eol.t
+            - xt/release/kwalitee.t
+            - xt/release/manifest.t
+            - xt/release/meta-json.t
+            - xt/release/meta-yaml.t
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
@@ -535,6 +432,9 @@ x_Dist_Zilla:
           commit_msg: '%v'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - .perlcriticrc
+            - .perltidyrc
+            - .travis.yml
             - Changes
             - INSTALL
             - LICENSE
@@ -544,6 +444,22 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - xt/author/clean-namespaces.t
+            - xt/author/critic.t
+            - xt/author/minimum_version.t
+            - xt/author/mojibake.t
+            - xt/author/no-tabs.t
+            - xt/author/pod-no404s.t
+            - xt/author/pod-spell.t
+            - xt/author/pod-syntax.t
+            - xt/author/portability.t
+            - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/eol.t
+            - xt/release/kwalitee.t
+            - xt/release/manifest.t
+            - xt/release/meta-json.t
+            - xt/release/meta-yaml.t
           allow_dirty_match:
             - (?^:\.pm$)
           changelog: Changes
@@ -561,7 +477,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.009'
+          tag: '0.010'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

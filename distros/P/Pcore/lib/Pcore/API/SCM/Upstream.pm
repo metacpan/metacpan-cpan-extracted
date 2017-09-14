@@ -44,7 +44,7 @@ has repo_id        => ( is => 'ro', isa => Str, required => 1 );
 
 sub BUILDARGS ( $self, $args ) {
     if ( $args->{uri} ) {
-        if ( $args->{uri} =~ m[(bitbucket[.]org|github[.]com)[/:]([[:alnum:]-]+)/([[:alnum:]-]+)([.]git)?]sm ) {
+        if ( $args->{uri} =~ m[(bitbucket[.]org|github[.]com)[/:]([[:alnum:]-]+)/([[:alnum:]_-]+)([.]git)?]sm ) {
             my $has_git_suffix = $4;
 
             $args->{repo_namespace} = $2;

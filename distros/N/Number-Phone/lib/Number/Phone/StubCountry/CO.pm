@@ -22,26 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164947;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d)(\\d{7})',
                   'leading_digits' => '
             1(?:
+              [2-7]|
               8[2-9]|
               9(?:
                 09|
                 [1-3]
-              )|
-              [2-7]
+              )
             )|
             [24-8]
-          ',
-                  'pattern' => '(\\d)(\\d{7})'
+          '
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{7})',
-                  'leading_digits' => '3'
+                  'leading_digits' => '3',
+                  'pattern' => '(\\d{3})(\\d{7})'
                 },
                 {
                   'leading_digits' => '
@@ -58,17 +58,12 @@ my $formatters = [
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'geographic' => '[124-8][2-9]\\d{6}',
                 'specialrate' => '(
           19(?:
             0[01]|
             4[78]
           )\\d{7}
         )',
-                'toll_free' => '1800\\d{7}',
-                'pager' => '',
-                'voip' => '',
                 'fixed_line' => '[124-8][2-9]\\d{6}',
                 'mobile' => '
           3(?:
@@ -77,7 +72,12 @@ my $validators = {
             2[0-3]|
             5[01]
           )\\d{7}
-        '
+        ',
+                'toll_free' => '1800\\d{7}',
+                'voip' => '',
+                'personal_number' => '',
+                'geographic' => '[124-8][2-9]\\d{6}',
+                'pager' => ''
               };
 my %areanames = (
   5712 => "Bogotá",

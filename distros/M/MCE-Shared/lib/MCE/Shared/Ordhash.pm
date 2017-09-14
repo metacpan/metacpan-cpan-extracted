@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -48,6 +48,7 @@ use overload (
    q("")    => \&MCE::Shared::Base::_stringify,
    q(0+)    => \&MCE::Shared::Base::_numify,
    q(%{})   => sub {
+      no overloading;
       $_[0]->[_HREF] || do {
          # no circular reference to original, therefore no memory leaks
          tie my %h, __PACKAGE__.'::_href', bless([ @{ $_[0] } ], __PACKAGE__);
@@ -56,6 +57,8 @@ use overload (
    },
    fallback => 1
 );
+
+no overloading;
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
@@ -778,7 +781,8 @@ sub len {
 
 # For on-demand hash-like dereferencing.
 
-package MCE::Shared::Ordhash::_href;
+package # hide from rpm
+   MCE::Shared::Ordhash::_href;
 
 sub TIEHASH { $_[1] }
 
@@ -798,7 +802,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.826
+This document describes MCE::Shared::Ordhash version 1.828
 
 =head1 DESCRIPTION
 
@@ -819,116 +823,116 @@ new level of performance, for a pure-Perl ordered hash implementation.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Ordhash;
+ use MCE::Shared::Ordhash;
 
-   my $oh = MCE::Shared::Ordhash->new( @pairs );
+ my $oh = MCE::Shared::Ordhash->new( @pairs );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $oh = MCE::Shared->ordhash( @pairs );
+ my $oh = MCE::Shared->ordhash( @pairs );
 
-   # hash-like dereferencing
+ # hash-like dereferencing
 
-   my $val = $oh->{$key};
-   $oh->{$key} = $val;
+ my $val = $oh->{$key};
+ $oh->{$key} = $val;
 
-   %{$oh} = ();
+ %{$oh} = ();
 
-   # OO interface
+ # OO interface
 
-   if ( !defined ( $val = $oh->get("some_key") ) ) {
-      $val = $oh->set( some_key => "some_value" );
-   }
+ if ( !defined ( $val = $oh->get("some_key") ) ) {
+    $val = $oh->set( some_key => "some_value" );
+ }
 
-   $val   = $oh->set( $key, $val );
-   $val   = $oh->get( $key );
-   $val   = $oh->delete( $key );              # del is an alias for delete
-   $bool  = $oh->exists( $key );
-   void   = $oh->clear();
-   $len   = $oh->len();                       # scalar keys %{ $oh }
-   $len   = $oh->len( $key );                 # length $oh->{ $key }
-   @pair  = $oh->pop();
-   $len   = $oh->push( @pairs );
-   @pair  = $oh->shift();
-   $len   = $oh->unshift( @pairs );
-   %pairs = $oh->splice( $offset, $length, @pairs );
+ $val   = $oh->set( $key, $val );
+ $val   = $oh->get( $key );
+ $val   = $oh->delete( $key );              # del is an alias for delete
+ $bool  = $oh->exists( $key );
+ void   = $oh->clear();
+ $len   = $oh->len();                       # scalar keys %{ $oh }
+ $len   = $oh->len( $key );                 # length $oh->{ $key }
+ @pair  = $oh->pop();
+ $len   = $oh->push( @pairs );
+ @pair  = $oh->shift();
+ $len   = $oh->unshift( @pairs );
+ %pairs = $oh->splice( $offset, $length, @pairs );
 
-   $oh2   = $oh->clone( @keys );              # @keys is optional
-   $oh3   = $oh->flush( @keys );
-   $iter  = $oh->iterator( @keys );           # ($key, $val) = $iter->()
-   @keys  = $oh->keys( @keys );
-   %pairs = $oh->pairs( @keys );
-   @vals  = $oh->values( @keys );             # vals is an alias for values
+ $oh2   = $oh->clone( @keys );              # @keys is optional
+ $oh3   = $oh->flush( @keys );
+ $iter  = $oh->iterator( @keys );           # ($key, $val) = $iter->()
+ @keys  = $oh->keys( @keys );
+ %pairs = $oh->pairs( @keys );
+ @vals  = $oh->values( @keys );             # vals is an alias for values
 
-   $len   = $oh->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
-   $cnt   = $oh->mdel( @keys );
-   @vals  = $oh->mget( @keys );
-   $bool  = $oh->mexists( @keys );            # true if all keys exists
-   $len   = $oh->mset( $key/$val pairs );     # merge is an alias for mset
+ $len   = $oh->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
+ $cnt   = $oh->mdel( @keys );
+ @vals  = $oh->mget( @keys );
+ $bool  = $oh->mexists( @keys );            # true if all keys exists
+ $len   = $oh->mset( $key/$val pairs );     # merge is an alias for mset
 
-   @vals  = $oh->sort();                      # by val $a <=> $b default
-   @vals  = $oh->sort( "desc" );              # by val $b <=> $a
-   @vals  = $oh->sort( "alpha" );             # by val $a cmp $b
-   @vals  = $oh->sort( "alpha desc" );        # by val $b cmp $a
+ @vals  = $oh->sort();                      # by val $a <=> $b default
+ @vals  = $oh->sort( "desc" );              # by val $b <=> $a
+ @vals  = $oh->sort( "alpha" );             # by val $a cmp $b
+ @vals  = $oh->sort( "alpha desc" );        # by val $b cmp $a
 
-   @vals  = $oh->sort( "key" );               # by key $a <=> $b
-   @vals  = $oh->sort( "key desc" );          # by key $b <=> $a
-   @vals  = $oh->sort( "key alpha" );         # by key $a cmp $b
-   @vals  = $oh->sort( "key alpha desc" );    # by key $b cmp $a
+ @vals  = $oh->sort( "key" );               # by key $a <=> $b
+ @vals  = $oh->sort( "key desc" );          # by key $b <=> $a
+ @vals  = $oh->sort( "key alpha" );         # by key $a cmp $b
+ @vals  = $oh->sort( "key alpha desc" );    # by key $b cmp $a
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $len   = $oh->append( $key, $string );     #   $val .= $string
-   $val   = $oh->decr( $key );                # --$val
-   $val   = $oh->decrby( $key, $number );     #   $val -= $number
-   $val   = $oh->getdecr( $key );             #   $val--
-   $val   = $oh->getincr( $key );             #   $val++
-   $val   = $oh->incr( $key );                # ++$val
-   $val   = $oh->incrby( $key, $number );     #   $val += $number
-   $old   = $oh->getset( $key, $new );        #   $o = $v, $v = $n, $o
+ $len   = $oh->append( $key, $string );     #   $val .= $string
+ $val   = $oh->decr( $key );                # --$val
+ $val   = $oh->decrby( $key, $number );     #   $val -= $number
+ $val   = $oh->getdecr( $key );             #   $val--
+ $val   = $oh->getincr( $key );             #   $val++
+ $val   = $oh->incr( $key );                # ++$val
+ $val   = $oh->incrby( $key, $number );     #   $val += $number
+ $old   = $oh->getset( $key, $new );        #   $o = $v, $v = $n, $o
 
-   # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
+ # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
 
-   @vals  = $oh->pipeline(                    # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals  = $oh->pipeline(                    # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
 For normal hash behavior, the TIE interface is supported.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Ordhash;
+ use MCE::Shared::Ordhash;
 
-   tie my %oh, "MCE::Shared::Ordhash", @pairs;
-   tie my %oh, "MCE::Shared::Ordhash";
+ tie my %oh, "MCE::Shared::Ordhash", @pairs;
+ tie my %oh, "MCE::Shared::Ordhash";
 
-   # construction for sharing with other threads and processes
-   # the ordered option is needed to know to use MCE::Shared::Ordhash
+ # construction for sharing with other threads and processes
+ # the ordered option is needed to know to use MCE::Shared::Ordhash
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   tie my %oh, "MCE::Shared", { ordered => 1 }, @pairs;
-   tie my %oh, "MCE::Shared", ordered => 1;
+ tie my %oh, "MCE::Shared", { ordered => 1 }, @pairs;
+ tie my %oh, "MCE::Shared", ordered => 1;
 
-   # usage
+ # usage
 
-   my $val;
+ my $val;
 
-   if ( !defined ( $val = $oh{some_key} ) ) {
-      $val = $oh{some_key} = "some_value";
-   }
+ if ( !defined ( $val = $oh{some_key} ) ) {
+    $val = $oh{some_key} = "some_value";
+ }
 
-   $oh{some_key} = 0;
+ $oh{some_key} = 0;
 
-   tied(%oh)->incrby("some_key", 20);
-   tied(%oh)->incrby(some_key => 20);
+ tied(%oh)->incrby("some_key", 20);
+ tied(%oh)->incrby(some_key => 20);
 
 =head1 SYNTAX for QUERY STRING
 
@@ -937,54 +941,54 @@ is described below. In the context of sharing, the query mechanism is beneficial
 for the shared-manager process. It is able to perform the query where the data
 resides versus the client-process grep locally involving lots of IPC.
 
-   o Basic demonstration
+ o Basic demonstration
 
-     @keys = $oh->keys( "query string given here" );
-     @keys = $oh->keys( "val =~ /pattern/" );
+   @keys = $oh->keys( "query string given here" );
+   @keys = $oh->keys( "val =~ /pattern/" );
 
-   o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
-   o Multiple expressions delimited by :AND or :OR, mixed case allowed
+ o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
+ o Multiple expressions delimited by :AND or :OR, mixed case allowed
 
-     "key eq 'some key' :or (val > 5 :and val < 9)"
-     "key eq some key :or (val > 5 :and val < 9)"
-     "key =~ /pattern/i :And val =~ /pattern/i"
-     "val eq foo baz :OR key !~ /pattern/i"
+   "key eq 'some key' :or (val > 5 :and val < 9)"
+   "key eq some key :or (val > 5 :and val < 9)"
+   "key =~ /pattern/i :And val =~ /pattern/i"
+   "val eq foo baz :OR key !~ /pattern/i"
 
-     * key matches on keys in the hash
-     * likewise, val matches on values
+   * key matches on keys in the hash
+   * likewise, val matches on values
 
-   o Quoting is optional inside the string
+ o Quoting is optional inside the string
 
-     "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
-     "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
 
 Examples.
 
-   # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
-   # key/val means to match against actual key/val respectively
+ # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
+ # key/val means to match against actual key/val respectively
 
-   @keys  = $oh->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
-   @keys  = $oh->keys( "key eq some key :or (val > 5 :and val < 9)" );
+ @keys  = $oh->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
+ @keys  = $oh->keys( "key eq some key :or (val > 5 :and val < 9)" );
 
-   @keys  = $oh->keys( "key =~ /$pattern/i" );
-   @keys  = $oh->keys( "key !~ /$pattern/i" );
-   @keys  = $oh->keys( "val =~ /$pattern/i" );
-   @keys  = $oh->keys( "val !~ /$pattern/i" );
+ @keys  = $oh->keys( "key =~ /$pattern/i" );
+ @keys  = $oh->keys( "key !~ /$pattern/i" );
+ @keys  = $oh->keys( "val =~ /$pattern/i" );
+ @keys  = $oh->keys( "val !~ /$pattern/i" );
 
-   %pairs = $oh->pairs( "key == $number" );
-   %pairs = $oh->pairs( "key != $number :and val > 100" );
-   %pairs = $oh->pairs( "key <  $number :or key > $number" );
-   %pairs = $oh->pairs( "val <= $number" );
-   %pairs = $oh->pairs( "val >  $number" );
-   %pairs = $oh->pairs( "val >= $number" );
+ %pairs = $oh->pairs( "key == $number" );
+ %pairs = $oh->pairs( "key != $number :and val > 100" );
+ %pairs = $oh->pairs( "key <  $number :or key > $number" );
+ %pairs = $oh->pairs( "val <= $number" );
+ %pairs = $oh->pairs( "val >  $number" );
+ %pairs = $oh->pairs( "val >= $number" );
 
-   @vals  = $oh->vals( "key eq $string" );
-   @vals  = $oh->vals( "key ne $string with space" );
-   @vals  = $oh->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
-   @vals  = $oh->vals( "val le $string :and val eq 'foo bar'" );
-   @vals  = $oh->vals( "val le $string :and val eq foo bar" );
-   @vals  = $oh->vals( "val gt $string" );
-   @vals  = $oh->vals( "val ge $string" );
+ @vals  = $oh->vals( "key eq $string" );
+ @vals  = $oh->vals( "key ne $string with space" );
+ @vals  = $oh->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
+ @vals  = $oh->vals( "val le $string :and val eq 'foo bar'" );
+ @vals  = $oh->vals( "val le $string :and val eq foo bar" );
+ @vals  = $oh->vals( "val gt $string" );
+ @vals  = $oh->vals( "val ge $string" );
 
 =head1 API DOCUMENTATION
 
@@ -999,27 +1003,27 @@ performance.
 
 Constructs a new object, with an optional list of key-value pairs.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Ordhash;
+ use MCE::Shared::Ordhash;
 
-   $oh = MCE::Shared::Ordhash->new( @pairs );
-   $oh = MCE::Shared::Ordhash->new( );
+ $oh = MCE::Shared::Ordhash->new( @pairs );
+ $oh = MCE::Shared::Ordhash->new( );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $oh = MCE::Shared->ordhash( @pairs );
-   $oh = MCE::Shared->ordhash( );
+ $oh = MCE::Shared->ordhash( @pairs );
+ $oh = MCE::Shared->ordhash( );
 
 =item assign ( key, value [, key, value, ... ] )
 
 Clears the hash, then sets multiple key-value pairs and returns the number of
 keys stored in the hash. This is equivalent to C<clear>, C<mset>.
 
-   $len = $oh->assign( "key1" => "val1", "key2" => "val2" );  # 2
-   $len = %{$oh} = ( "key1" => "val1", "key2" => "val2" );    # 4
+ $len = $oh->assign( "key1" => "val1", "key2" => "val2" );  # 2
+ $len = %{$oh} = ( "key1" => "val1", "key2" => "val2" );    # 4
 
 API available since 1.007.
 
@@ -1027,8 +1031,8 @@ API available since 1.007.
 
 Removes all key-value pairs from the hash.
 
-   $oh->clear;
-   %{$oh} = ();
+ $oh->clear;
+ %{$oh} = ();
 
 =item clone ( key [, key, ... ] )
 
@@ -1037,16 +1041,16 @@ copy if no arguments are given. Otherwise, the object includes only the given
 keys in the same order. Keys that do not exist in the hash will have the
 C<undef> value.
 
-   $oh2 = $oh->clone( "key1", "key2" );
-   $oh2 = $oh->clone;
+ $oh2 = $oh->clone( "key1", "key2" );
+ $oh2 = $oh->clone;
 
 =item delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the hash.
 
-   $val = $oh->delete( "some_key" );
-   $val = delete $oh->{ "some_key" };
+ $val = $oh->delete( "some_key" );
+ $val = delete $oh->{ "some_key" };
 
 =item del
 
@@ -1056,8 +1060,8 @@ C<del> is an alias for C<delete>.
 
 Determines if a key exists in the hash.
 
-   if ( $oh->exists( "some_key" ) ) { ... }
-   if ( exists $oh->{ "some_key" } ) { ... }
+ if ( $oh->exists( "some_key" ) ) { ... }
+ if ( exists $oh->{ "some_key" } ) { ... }
 
 =item flush ( key [, key, ... ] )
 
@@ -1067,8 +1071,8 @@ Same as C<clone>. Though, clears all existing items before returning.
 
 Gets the value of a hash key or C<undef> if the key does not exists.
 
-   $val = $oh->get( "some_key" );
-   $val = $oh->{ "some_key" };
+ $val = $oh->get( "some_key" );
+ $val = $oh->{ "some_key" };
 
 =item iterator ( key [, key, ... ] )
 
@@ -1081,12 +1085,12 @@ The list of keys to return is set when the closure is constructed. Later keys
 added to the hash are not included. Subsequently, the C<undef> value is
 returned for deleted keys.
 
-   $iter = $oh->iterator;
-   $iter = $oh->iterator( "key1", "key2" );
+ $iter = $oh->iterator;
+ $iter = $oh->iterator( "key1", "key2" );
 
-   while ( my ( $key, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
 
 =item iterator ( "query string" )
 
@@ -1094,14 +1098,14 @@ Returns a code reference for iterating a list of key-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
 The syntax for the C<query string> is described above.
 
-   $iter = $oh->iterator( "val eq some_value" );
-   $iter = $oh->iterator( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   $iter = $oh->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
-   $iter = $oh->iterator( "key =~ /$pattern/" );
+ $iter = $oh->iterator( "val eq some_value" );
+ $iter = $oh->iterator( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ $iter = $oh->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
+ $iter = $oh->iterator( "key =~ /$pattern/" );
 
-   while ( my ( $key, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
 
 =item keys ( key [, key, ...] )
 
@@ -1109,13 +1113,13 @@ Returns hash keys in the same insertion order when no arguments are given.
 Otherwise, returns the given keys in the same order. Keys that do not exist
 will have the C<undef> value. In scalar context, returns the size of the hash.
 
-   @keys = $oh->keys( "key1", "key2" );
+ @keys = $oh->keys( "key1", "key2" );
 
-   @keys = $oh->keys;     # faster
-   @keys = keys %{$oh};   # involves TIE overhead
+ @keys = $oh->keys;     # faster
+ @keys = keys %{$oh};   # involves TIE overhead
 
-   $len  = $oh->keys;     # ditto
-   $len  = keys %{$oh};
+ $len  = $oh->keys;     # ditto
+ $len  = keys %{$oh};
 
 =item keys ( "query string" )
 
@@ -1123,10 +1127,10 @@ Returns only keys that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @keys = $oh->keys( "val eq some_value" );
-   @keys = $oh->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @keys = $oh->keys( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $oh->keys( "key =~ /$pattern/" );
+ @keys = $oh->keys( "val eq some_value" );
+ @keys = $oh->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @keys = $oh->keys( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $oh->keys( "key =~ /$pattern/" );
 
 =item len ( key )
 
@@ -1134,37 +1138,37 @@ Returns the size of the hash when no arguments are given. For the given key,
 returns the length of the value stored at key or the C<undef> value if the
 key does not exists.
 
-   $size = $oh->len;
-   $len  = $oh->len( "key1" );
-   $len  = length $oh->{ "key1" };
+ $size = $oh->len;
+ $len  = $oh->len( "key1" );
+ $len  = length $oh->{ "key1" };
 
 =item mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the hash and returns the number of keys deleted.
 A given key which does not exist in the hash is not counted.
 
-   $cnt = $oh->mdel( "key1", "key2" );
+ $cnt = $oh->mdel( "key1", "key2" );
 
 =item mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the hash. A false value is
 returned otherwise.
 
-   if ( $oh->mexists( "key1", "key2" ) ) { ... }
+ if ( $oh->mexists( "key1", "key2" ) ) { ... }
 
 =item mget ( key [, key, ... ] )
 
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the hash.
 
-   ( $val1, $val2 ) = $oh->mget( "key1", "key2" );
+ ( $val1, $val2 ) = $oh->mget( "key1", "key2" );
 
 =item mset ( key, value [, key, value, ... ] )
 
 Sets multiple key-value pairs in a hash and returns the number of keys stored
 in the hash.
 
-   $len = $oh->mset( "key1" => "val1", "key2" => "val2" );
+ $len = $oh->mset( "key1" => "val1", "key2" => "val2" );
 
 =item merge
 
@@ -1177,10 +1181,10 @@ Otherwise, returns key-value pairs for the given keys in the same order. Keys
 that do not exist will have the C<undef> value. In scalar context, returns the
 size of the hash.
 
-   @pairs = $oh->pairs( "key1", "key2" );
+ @pairs = $oh->pairs( "key1", "key2" );
 
-   @pairs = $oh->pairs;
-   $len   = $oh->pairs;
+ @pairs = $oh->pairs;
+ $len   = $oh->pairs;
 
 =item pairs ( "query string" )
 
@@ -1188,10 +1192,10 @@ Returns only key-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
 described above. In scalar context, returns the size of the resulting list.
 
-   @pairs = $oh->pairs( "val eq some_value" );
-   @pairs = $oh->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @pairs = $oh->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len   = $oh->pairs( "key =~ /$pattern/" );
+ @pairs = $oh->pairs( "val eq some_value" );
+ @pairs = $oh->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @pairs = $oh->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len   = $oh->pairs( "key =~ /$pattern/" );
 
 =item pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
@@ -1201,25 +1205,25 @@ process. The C<pipeline> method is fully C<wantarray>-aware and receives a list
 of commands and their arguments. In scalar or list context, it returns data
 from the last command in the pipeline.
 
-   @vals = $oh->pipeline(                     # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals = $oh->pipeline(                     # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
-   $len = $oh->pipeline(                      # 3, same as $oh->len
-      [ "set", foo => "i_i" ],
-      [ "set", bar => "j_j" ],
-      [ "set", baz => "k_k" ],
-      [ "len" ]
-   );
+ $len = $oh->pipeline(                      # 3, same as $oh->len
+    [ "set", foo => "i_i" ],
+    [ "set", bar => "j_j" ],
+    [ "set", baz => "k_k" ],
+    [ "len" ]
+ );
 
-   $oh->pipeline(
-      [ "set", foo => "m_m" ],
-      [ "set", bar => "n_n" ],
-      [ "set", baz => "o_o" ]
-   );
+ $oh->pipeline(
+    [ "set", foo => "m_m" ],
+    [ "set", bar => "n_n" ],
+    [ "set", baz => "o_o" ]
+ );
 
 Current API available since 1.809.
 
@@ -1227,11 +1231,11 @@ Current API available since 1.809.
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
-   @vals = $oh->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ]
-   );
+ @vals = $oh->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ]
+ );
 
 Current API available since 1.809.
 
@@ -1240,9 +1244,9 @@ Current API available since 1.809.
 Removes and returns the last key-value pair or value in scalar context of the
 ordered hash. If there are no keys in the hash, returns the undefined value.
 
-   ( $key, $val ) = $oh->pop;
+ ( $key, $val ) = $oh->pop;
 
-   $val = $oh->pop;
+ $val = $oh->pop;
 
 =item purge
 
@@ -1250,7 +1254,7 @@ A utility method for purging any *tombstones* in the keys array. It also
 resets a couple counters internally. Call this method before serializing
 to a file, which is the case in C<MCE::Shared::Minidb>.
 
-   $oh->purge;
+ $oh->purge;
 
 =item push ( key, value [, key, value, ... ] )
 
@@ -1258,23 +1262,23 @@ Appends one or multiple key-value pairs to the tail of the ordered hash and
 returns the new length. Any keys already existing in the hash are re-inserted
 with the new values.
 
-   $len = $oh->push( "key1", "val1", "key2", "val2" );
+ $len = $oh->push( "key1", "val1", "key2", "val2" );
 
 =item set ( key, value )
 
 Sets the value of the given hash key and returns its new value.
 
-   $val = $oh->set( "key", "value" );
-   $val = $oh->{ "key" } = "value";
+ $val = $oh->set( "key", "value" );
+ $val = $oh->{ "key" } = "value";
 
 =item shift
 
 Removes and returns the first key-value pair or value in scalar context of the
 ordered hash. If there are no keys in the hash, returns the undefined value.
 
-   ( $key, $val ) = $oh->shift;
+ ( $key, $val ) = $oh->shift;
 
-   $val = $oh->shift;
+ $val = $oh->shift;
 
 =item sort ( "BY key [ ASC | DESC ] [ ALPHA ]" )
 
@@ -1284,23 +1288,23 @@ Returns sorted keys in list context, leaving the elements intact. In void
 context, sorts the hash in-place. By default, sorting is numeric and applied
 to values when no arguments are given.
 
-   @keys = $oh->sort( "BY val" );
+ @keys = $oh->sort( "BY val" );
 
-   $oh->sort();
+ $oh->sort();
 
 If the keys or values contain string values and you want to sort them
 lexicographically, specify the C<ALPHA> modifier.
 
-   @keys = $oh->sort( "BY key ALPHA" );
+ @keys = $oh->sort( "BY key ALPHA" );
 
-   $oh->sort( "BY val ALPHA" );
+ $oh->sort( "BY val ALPHA" );
 
 The default is C<ASC> for sorting the hash from small to large. In order to
 sort the hash from large to small, specify the C<DESC> modifier.
 
-   @keys = $oh->sort( "BY val DESC ALPHA" );
+ @keys = $oh->sort( "BY val DESC ALPHA" );
 
-   $oh->sort( "BY key DESC ALPHA" );
+ $oh->sort( "BY key DESC ALPHA" );
 
 =item splice ( offset [, length [, key, value, ... ] ] )
 
@@ -1308,9 +1312,9 @@ Removes the key-value pairs designated by C<offset> and C<length> from the
 ordered hash, and replaces them with C<key-value pairs>, if any. The behavior
 is similar to the Perl C<splice> function.
 
-   @pairs = $oh->splice( 20, 2, @pairs );
-   @pairs = $oh->splice( 20, 2 );
-   @pairs = $oh->splice( 20 );
+ @pairs = $oh->splice( 20, 2, @pairs );
+ @pairs = $oh->splice( 20, 2 );
+ @pairs = $oh->splice( 20 );
 
 =item unshift ( key, value [, key, value, ... ] )
 
@@ -1318,7 +1322,7 @@ Prepends one or multiple key-value pairs to the head of the ordered hash and
 returns the new length. Any keys already existing in the hash are re-inserted
 with the new values.
 
-   $len = $oh->unshift( "key1", "val1", "key2", "val2" );
+ $len = $oh->unshift( "key1", "val1", "key2", "val2" );
 
 =item values ( key [, key, ... ] )
 
@@ -1327,13 +1331,13 @@ Otherwise, returns values for the given keys in the same order. Keys that do
 not exist will have the C<undef> value. In scalar context, returns the size
 of the hash.
 
-   @vals = $oh->values( "key1", "key2" );
+ @vals = $oh->values( "key1", "key2" );
 
-   @vals = $oh->values;     # faster
-   @vals = values %{$oh};   # involves TIE overhead
+ @vals = $oh->values;     # faster
+ @vals = values %{$oh};   # involves TIE overhead
 
-   $len  = $oh->values;     # ditto
-   $len  = values %{$oh};
+ $len  = $oh->values;     # ditto
+ $len  = values %{$oh};
 
 =item values ( "query string" )
 
@@ -1341,10 +1345,10 @@ Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @vals = $oh->values( "val eq some_value" );
-   @vals = $oh->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @vals = $oh->values( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $oh->values( "key =~ /$pattern/" );
+ @vals = $oh->values( "val eq some_value" );
+ @vals = $oh->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @vals = $oh->values( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $oh->values( "key =~ /$pattern/" );
 
 =item vals
 
@@ -1367,49 +1371,49 @@ L<http://redis.io/commands#strings> with key representing the hash key.
 
 Appends a value to a key and returns its new length.
 
-   $len = $oh->append( $key, "foo" );
+ $len = $oh->append( $key, "foo" );
 
 =item decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
-   $num = $oh->decr( $key );
+ $num = $oh->decr( $key );
 
 =item decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
-   $num = $oh->decrby( $key, 2 );
+ $num = $oh->decrby( $key, 2 );
 
 =item getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
-   $old = $oh->getdecr( $key );
+ $old = $oh->getdecr( $key );
 
 =item getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
-   $old = $oh->getincr( $key );
+ $old = $oh->getincr( $key );
 
 =item getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
-   $old = $oh->getset( $key, "baz" );
+ $old = $oh->getset( $key, "baz" );
 
 =item incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
-   $num = $oh->incr( $key );
+ $num = $oh->incr( $key );
 
 =item incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
-   $num = $oh->incrby( $key, 2 );
+ $num = $oh->incrby( $key, 2 );
 
 =back
 
@@ -1434,108 +1438,108 @@ The following simulates a usage pattern inside L<MCE::Hobo> involving random
 key deletion. For example, an application joining a list of Hobos provided by
 C<MCE::Hobo->list_joinable>.
 
-   use MCE::Shared::Ordhash;
-   use List::Util 'shuffle';
-   use Time::HiRes 'time';
+ use MCE::Shared::Ordhash;
+ use List::Util 'shuffle';
+ use Time::HiRes 'time';
 
-   srand 0;
+ srand 0;
 
-   my $oh = MCE::Shared::Ordhash->new();
-   my $num_keys = 200000;
-   my $start = time();
+ my $oh = MCE::Shared::Ordhash->new();
+ my $num_keys = 200000;
+ my $start = time();
 
-   $oh->set($_,$_) for 1 .. $num_keys;
+ $oh->set($_,$_) for 1 .. $num_keys;
 
-   for ( shuffle $oh->keys ) {
-      $oh->delete($_);
-   }
+ for ( shuffle $oh->keys ) {
+    $oh->delete($_);
+ }
 
-   printf "duration: %7.03f secs\n", time() - $start;
+ printf "duration: %7.03f secs\n", time() - $start;
 
 Both the runtime and memory consumption are captured for the demonstration.
 Results are included for MCE::Shared::Hash (unordered hash) for comparison.
 
-   for ( shuffle $oh->keys ) { $oh->delete($_) }
+ for ( shuffle $oh->keys ) { $oh->delete($_) }
 
-   0.378 secs.  35 MB  MCE::Shared::Hash (unordered)
-   0.437 secs.  49 MB  Tie::Hash::Indexed (XS)
-   0.743 secs.  54 MB  MCE::Shared::Ordhash
-   1.028 secs.  60 MB  Hash::Ordered
-   1.752 secs. 112 MB  Tie::LLHash
-    > 42 mins.  66 MB  Tie::IxHash
+ 0.378 secs.  35 MB  MCE::Shared::Hash (unordered)
+ 0.437 secs.  49 MB  Tie::Hash::Indexed (XS)
+ 0.743 secs.  54 MB  MCE::Shared::Ordhash
+ 1.028 secs.  60 MB  Hash::Ordered
+ 1.752 secs. 112 MB  Tie::LLHash
+  > 42 mins.  66 MB  Tie::IxHash
 
 Using the same demonstration above, another usage pattern inside L<MCE::Hobo>
 involves orderly hash-key deletion. For example, waiting for and joining all
 Hobos provided by C<MCE::Hobo->list>.
 
-   for ( $oh->keys ) { $oh->delete($_) }
+ for ( $oh->keys ) { $oh->delete($_) }
 
-   0.353 secs.  35 MB  MCE::Shared::Hash (unordered)
-   0.349 secs.  49 MB  Tie::Hash::Indexed (XS)
-   0.452 secs.  41 MB  MCE::Shared::Ordhash
-   0.735 secs.  54 MB  Hash::Ordered
-   1.338 secs. 112 MB  Tie::LLHash
-    > 42 mins.  66 MB  Tie::IxHash
+ 0.353 secs.  35 MB  MCE::Shared::Hash (unordered)
+ 0.349 secs.  49 MB  Tie::Hash::Indexed (XS)
+ 0.452 secs.  41 MB  MCE::Shared::Ordhash
+ 0.735 secs.  54 MB  Hash::Ordered
+ 1.338 secs. 112 MB  Tie::LLHash
+  > 42 mins.  66 MB  Tie::IxHash
 
 No matter if orderly or randomly, even backwards, hash-key deletion in
 C<MCE::Shared::Ordhash> performs reasonably well. The following provides
 the construction used for the modules mentioned.
 
-   my $oh = Hash::Ordered->new();
-      $oh->set($_,$_);   $oh->keys;  $oh->delete($_);
+ my $oh = Hash::Ordered->new();
+    $oh->set($_,$_);   $oh->keys;  $oh->delete($_);
 
-   my $oh = Tie::Hash::Indexed->new();
-      $oh->set($_,$_);   $oh->keys;  $oh->delete($_);
+ my $oh = Tie::Hash::Indexed->new();
+    $oh->set($_,$_);   $oh->keys;  $oh->delete($_);
 
-   my $oh = Tie::IxHash->new();
-      $oh->STORE($_,$_); $oh->Keys;  $oh->DELETE($_);
+ my $oh = Tie::IxHash->new();
+    $oh->STORE($_,$_); $oh->Keys;  $oh->DELETE($_);
 
-   my $oh = tie my %hash, 'Tie::LLHash';
-      $oh->last($_,$_);  keys %hash; $oh->DELETE($_);
+ my $oh = tie my %hash, 'Tie::LLHash';
+    $oh->last($_,$_);  keys %hash; $oh->DELETE($_);
 
 Hash::Ordered is supported for use with MCE::Shared. This includes on-demand
 hash-like dereferencing, similarly to C<hash> and C<ordhash>.
 
-   use feature 'say';
+ use feature 'say';
 
-   use MCE::Hobo;
-   use MCE::Shared;
-   use Hash::Ordered; # 0.010 or later
+ use MCE::Hobo;
+ use MCE::Shared;
+ use Hash::Ordered; # 0.010 or later
 
-   my $ha = MCE::Shared->hash();    # shared MCE::Shared::Hash
-   my $oh = MCE::Shared->ordhash(); # shared MCE::Shared::Ordhash
+ my $ha = MCE::Shared->hash();    # shared MCE::Shared::Hash
+ my $oh = MCE::Shared->ordhash(); # shared MCE::Shared::Ordhash
 
-   my $ho = MCE::Shared->share( Hash::Ordered->new() );
+ my $ho = MCE::Shared->share( Hash::Ordered->new() );
 
-   sub parallel_task {
-      my ($id) = @_;
+ sub parallel_task {
+    my ($id) = @_;
 
-      # OO interface
-      if ($id == 1) {
-         $ha->set("$id", "foo");
-         $oh->set("$id", "foo");
-         $ho->set("$id", "foo");
-      }
-      # hash-like dereferencing
-      elsif ($id == 2) {
-         $ha->{"$id"} = "baz";
-         $oh->{"$id"} = "baz";
-         $ho->{"$id"} = "baz";
-      }
+    # OO interface
+    if ($id == 1) {
+       $ha->set("$id", "foo");
+       $oh->set("$id", "foo");
+       $ho->set("$id", "foo");
+    }
+    # hash-like dereferencing
+    elsif ($id == 2) {
+       $ha->{"$id"} = "baz";
+       $oh->{"$id"} = "baz";
+       $ho->{"$id"} = "baz";
+    }
 
-      return;
-   }
+    return;
+ }
 
-   MCE::Hobo->create("parallel_task", $_) for 1..2;
-   MCE::Hobo->waitall;
+ MCE::Hobo->create("parallel_task", $_) for 1..2;
+ MCE::Hobo->waitall;
 
-   say $ha->{"1"};     # foo
-   say $oh->{"1"};
-   say $ho->{"1"};
+ say $ha->{"1"};     # foo
+ say $oh->{"1"};
+ say $ho->{"1"};
 
-   say $ha->get("2");  # baz
-   say $oh->get("2");
-   say $ho->get("2");
+ say $ha->get("2");  # baz
+ say $oh->get("2");
+ say $ho->get("2");
 
 =head1 SEE ALSO
 

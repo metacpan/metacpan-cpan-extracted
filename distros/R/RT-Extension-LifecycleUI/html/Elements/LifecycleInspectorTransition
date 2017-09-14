@@ -1,0 +1,21 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="transition">
+    <div class="transition">
+       Transition from <a href="#" class="select-status" data-name="{{transition.from}}">{{transition.from}}</a> to <a href="#" class="select-status" data-name="{{transition.to}}">{{transition.to}}</a><br><br>
+       Right: <input type="text" name="right" value="{{transition.right}}"><br>
+       Style: <select name="style">
+                 {{#select transition.style}}
+                 <option value="solid"><&|/l&>solid</&></option>
+                 <option value="dashed"><&|/l&>dashed</&></option>
+                 <option value="dotted"><&|/l&>dotted</&></option>
+                 {{/select}}
+             </select><br>
+
+        <ul class="actions">
+        {{#each transition.actions}}
+            {{> lifecycleui_action action=this lifecycle=../lifecycle}}
+        {{/each}}
+        </ul>
+        <button class="add-action"><&|/l&>Add Action</&></button><br>
+        <button class="delete"><&|/l&>Delete Transition</&></button>
+    </div>
+</script>

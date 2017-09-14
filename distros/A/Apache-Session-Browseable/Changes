@@ -67,3 +67,6 @@ Revision history for Perl extension Apache::Session::Browseable.
 1.2.5  Thu Apr 4 07:09:23 2017
     - PostgreSQL "hstore" and "json" support
     - Add "deleteIfLowerThan" method
+
+1.2.6
+    - Force allow_nonref option (#14)

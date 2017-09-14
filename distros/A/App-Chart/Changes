@@ -16,6 +16,13 @@ You should have received a copy of the GNU General Public License
 along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 263, September 2017
+    - fix Ticker tests for when empty database
+
+Version 262, September 2017
+    - Yahoo daily data site changes
+    - NZX dividends changes
+
 Version 261, July 2017
     - withdraw undocumented M-X .MON, not ready to use
 
@@ -30,7 +37,7 @@ Version 258, July 2016
     - new CHART_DIRECTORY environment variable
 
 Version 257, May 2016
-    - Fix for quotes from symbols not otherwise in database
+    - fix for quotes from symbols not otherwise in database
 
 Version 256, May 2016
     - Trading Room gone

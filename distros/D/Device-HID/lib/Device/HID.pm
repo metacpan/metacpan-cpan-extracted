@@ -3,7 +3,7 @@ use warnings;
 package Device::HID;
 
 # ABSTRACT: Perl Interface to HIDAPI
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Carp;
 use Device::HID::XS qw(:all);
@@ -74,13 +74,13 @@ sub new {
     };
 
     if (@_ == 1) {
-        $self = { path => @_, %$self };
+        $self = { %$self, path => @_ };
     } else {
-        $self = { @_, %$self };
+        $self = { %$self, @_ };
         croak "vendor and product can not be null" unless defined $self->{vendor} && defined $self->{product};
     }
 
-    _open($self) or return undef;
+    _open($self) or return;
 
 	bless $self, $class;
 	return $self;
@@ -133,7 +133,7 @@ retry:
     if ($ret == -1) {
         my $msg = "Error in read_data"; # fixme use hid_error!
         $self->{autodie} and croak $msg or carp $msg;
-        return undef;
+        return;
     }
     if ($self->{renew}) {
         $self->{renew} = 0;
@@ -215,7 +215,7 @@ sub renew_on_timeout  {
 
 sub DESTROY {
     my $self = shift;
-    hid_close($self->{handle});
+    hid_close($self->{handle}) if defined $self->{handle};
 }
 
 # Usually, no need to call this one directly

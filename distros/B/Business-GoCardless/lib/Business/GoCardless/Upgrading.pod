@@ -138,6 +138,27 @@ information. Also see the C<Mandate restrictions> section in the GoCardless upgr
 (L<https://support.gocardless.com/hc/en-us/articles/115000451505-Guide-to-upgrading>) as
 there are some considerations depending on the mandate type.
 
+=head1 What about legacy webhooks
+
+Note that GoCardless may continue to send old style webhooks even after you have
+migrated from the Basic to the Pro API, so to handle this the V2 Webhook object has
+logic to check this:
+
+    my $Webhook = $GoCardless->webhook( $json_data,$signature );
+
+    if ( $Webhook->is_legacy ) {
+        # process webhook using older legacy code
+        ...
+    } else {
+        # process webhook using new style code
+        ...
+    }
+
+See the docs for L<Business::GoCardless::Webhook::V2> and
+L<Business::GoCardless::Webhook>. Note that to support this you will also need to
+make sure either you set the value of $ENV{'GOCARDLESS_APP_SECRET'} to your previous
+Basic API app_secret or your new webhook_secret is the same as your old app_secret otherwise signatures will not be valid.
+
 =head1 AUTHOR
 
 Lee Johnson - C<leejo@cpan.org>

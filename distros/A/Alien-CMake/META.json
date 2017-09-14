@@ -21,7 +21,7 @@
             "Digest::SHA" : "0",
             "File::Copy" : "0",
             "File::Copy::Recursive" : "0",
-            "File::Fetch" : "0",
+            "File::Fetch" : "0.50",
             "File::Find" : "0",
             "File::Path" : "2.07",
             "File::ShareDir" : "0",
@@ -35,7 +35,7 @@
             "Archive::Extract" : "0",
             "Digest::SHA" : "0",
             "File::Copy::Recursive" : "0",
-            "File::Fetch" : "0",
+            "File::Fetch" : "0.50",
             "File::Find" : "0",
             "File::Path" : "2.07",
             "File::Spec" : "0",
@@ -54,7 +54,7 @@
    "provides" : {
       "Alien::CMake" : {
          "file" : "lib/Alien/CMake.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -606,6 +606,7 @@ misc/ticker.el
 misc/toplevel.pl
 misc/treecolumnalign.pl
 misc/two_face.pm
+misc/unused.pl
 misc/vruler.pl
 misc/zip.pl
 misc/zip2.pl
@@ -627,6 +628,7 @@ t/AppChartTestHelpers.pm
 t/Aroon.t
 t/ATH.t
 t/AX.t
+t/Barchart.t
 t/bash-completion.bash
 t/bash-completion.t
 t/Calculation.t

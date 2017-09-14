@@ -18,7 +18,7 @@ use Exporter qw(import);
 use XSLoader qw();
 
 BEGIN {
-    our $VERSION = '0.06';
+    our $VERSION = '0.07';
 };
 XSLoader::load(__PACKAGE__);
 

@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 use parent 'Module::Build';
 
@@ -475,10 +475,8 @@ sub ACTION_alien_code {
   return;
 }
 
-sub ACTION_test {
-  my $self = shift;
-  $self->SUPER::ACTION_test;
-
+sub ACTION_alien_test {
+  my $self = shift;  
   print "Testing library (if applicable) ... ";
   if ($self->config_data( 'install_type' ) eq 'share') {
     if (defined (my $wdir = $self->config_data( 'working_directory' ))) {
@@ -487,6 +485,12 @@ sub ACTION_test {
     }
   }
   print "Done\n";
+}
+
+sub ACTION_test {
+  my $self = shift;
+  $self->depends_on('alien_test');
+  $self->SUPER::ACTION_test;
 }
 
 sub ACTION_install {

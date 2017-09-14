@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    02/06/2017                                                             #
-#    Revised: 04/01/2017                                                             #
+#    Revised: 05/24/2017                                                             #
 #    UMLS Similarity Word2Vec Package Utility Module                                 #
 #                                                                                    #
 ######################################################################################
@@ -27,7 +27,7 @@ use Cwd;
 
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 
 ######################################################################################
@@ -113,6 +113,36 @@ sub IsFileOrDirectory
 
     return "file" if ( -f $path );
     return "dir" if ( -d $path );
+}
+
+sub IsWordOrCUITerm
+{
+    my ( $self, $term ) = @_;
+    
+    # Check(s)
+    $self->WriteLog( "IsFileWordOrCUIFile - Error: String Term Not Defined" ) if !defined( $term );
+    return undef if !defined( $term );
+    
+    $self->WriteLog( "IsFileWordOrCUIFile - Error: String Term Eq Empty String" ) if ( $term eq "" );
+    return undef if ( $term eq "" );
+    
+    # Perform Check
+    $term = lc( $term );
+    my @terms = split( 'c', $term );
+    
+    # Return Word Term If There Are Not Two Elements After Splitting
+    return "word" if( @terms != 2 );
+    
+    # If $term Is CUI, Then First Element Should Be Empty String
+    return "word" if ( $terms[0] ne "" );
+    
+    # Remove Numbers From Second Element
+    $terms[1] =~ s/[0-9]//g;
+    
+    # If $term Is CUI, Then After Removing All Number From Second Element An Empty String Is All That Is Left
+    return "word" if ( $terms[1] ne "" );
+    
+    return "cui";
 }
 
 sub GetFilesInDirectory
@@ -366,6 +396,38 @@ Example:
  print( "Path Type Is A File\n" ) if $result eq "file";
  print( "Path Type Is A Directory\n" ) if $result eq "dir";
  print( "Path Type Is Unknown\n" ) if $result eq "unknown";
+
+ undef( $util );
+
+=head3 IsWordOrCUITerm
+
+Description:
+
+ Checks whether the passed string argument is word or CUI term.
+
+Input:
+
+ $string   -> Word or CUI string term
+
+Output:
+
+ $string -> Returns "cui", "word" or undef
+
+Example:
+
+ use Word2vec::Util;
+
+ my $util = Word2vec::Util->new();
+
+ my $result = $util->IsWordOrCUITerm( "Cookie" );
+
+ print( "Passed String Argument Term Type: \"$result\"\n" ) if defined( $result );
+ print( "Cannot Determine String Argument Term Type\n" )    if !defined( $result );
+ 
+ my $result = $util->IsWordOrCUITerm( "C08132016" );
+ 
+ print( "Passed String Argument Term Type: \"$result\"\n" ) if defined( $result );
+ print( "Cannot Determine String Argument Term Type\n" )    if !defined( $result );
 
  undef( $util );
 

@@ -6,11 +6,17 @@ build_requires:
   Alien::HIDAPI: '0.004'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::HexString: '0'
   Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
 configure_requires:
   Alien::HIDAPI: '0'
   ExtUtils::MakeMaker: '0'
   Inline::C: '0'
+  perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -29,14 +35,19 @@ no_index:
 provides:
   Device::HID:
     file: lib/Device/HID.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Alien::HIDAPI: '0.004'
+  Carp: '0'
+  Device::HID::XS: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/athreef/Device-HID/issues
   homepage: https://github.com/athreef/Device-HID
   repository: https://github.com/athreef/Device-HID.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -64,6 +75,10 @@ x_Dist_Zilla:
           phase: build
           type: requires
       name: BuildRequires
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker::Awesome
@@ -243,7 +258,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -296,6 +311,55 @@ x_Dist_Zilla:
           version: '0.006'
       name: ReadmePodInRoot
       version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      config:
+        Dist::Zilla::Plugin::Git::CommitBuild:
+          branch: build/%b
+          build_root: ~
+          message: 'Build results of %h (on %b)'
+          multiple_inheritance: 0
+          release_branch: ~
+          release_message: 'Build results of %h (on %b)'
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.1
+          repo_root: .
+      name: Git::CommitBuild
+      version: '2.042'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: Test::Perl::Critic
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: Test::Compile
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

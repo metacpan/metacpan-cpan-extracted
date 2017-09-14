@@ -58,7 +58,7 @@ sub SIGDIE {
         return CORE::die $e;    # set $@ to $e
     }
 
-    # ERROR, !defined $^S - parsing module, eval, or main program, true - executing an eval
+    # ERROR, !defined $^S - parsing module, eval, or main program, true - executing in eval
     elsif ( !defined $^S || $^S ) {
         if ( !$IGNORE_ERRORS ) {
             local $@;

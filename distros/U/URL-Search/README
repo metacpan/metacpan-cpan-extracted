@@ -1,46 +1,48 @@
-URL-Search
+NAME
 
-search for URLs in plain text
-
+    URL::Search - search for URLs in plain text
 
 INSTALLATION
 
-To install this module, run the following commands:
+    To download and install this module, use your favorite CPAN client, e.g.
+    "cpan":
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        cpan URL::Search
+
+    Or "cpanm":
+
+        cpanm URL::Search
+
+    To do it manually, run the following commands (after downloading and
+    unpacking the tarball):
+
+        perl Makefile.PL
+        make
+        make test
+        make install
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    After installing, you can find documentation for this module with the
+    "perldoc" command.
 
-    perldoc URL::Search
+        perldoc URL::Search
 
-You can also look for information at:
+    You can also look for information at
+    <https://metacpan.org/pod/URL::Search>.
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=URL-Search
+    To see a list of open bugs, visit
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=URL-Search>.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/URL-Search
+    To report a new bug, send an email to "bug-URL-Search [at] rt.cpan.org".
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/URL-Search
+COPYRIGHT & LICENSE
 
-    MetaCPAN
-        https://metacpan.org/module/URL::Search
+    Copyright 2016, 2017 Lukas Mai.
 
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-COPYRIGHT AND LICENCE
-
-Written by Lukas Mai, 2016.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+    See <http://dev.perl.org/licenses/> for more information.
 

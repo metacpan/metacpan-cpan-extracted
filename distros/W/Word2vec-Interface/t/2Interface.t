@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.010;
  
-use Test::Simple tests => 75;
+use Test::Simple tests => 74;
 use Word2vec::Interface;
 
 my $interface = Word2vec::Interface->new();
@@ -94,17 +94,17 @@ my @fileNameVtr = qw( compute-accuracy distance word2phrase word2vec word-analog
 
 for my $fileName ( @fileNameVtr )
 {
-    ok( $interface->CompileSourceFile( $interface->GetWord2VecDir(), $fileName ) == 1 ) if ( $fileName ne "word2vec" );
+    ok( $interface->_CompileSourceFile( $interface->GetWord2VecDir(), $fileName ) == 1 ) if ( $fileName ne "word2vec" );
 }
 
 for my $fileName ( @fileNameVtr )
 {
-    ok( $interface->CheckIfSourceFileExists( $interface->GetWord2VecDir(), $fileName ) == 1 );
+    ok( $interface->_CheckIfSourceFileExists( $interface->GetWord2VecDir(), $fileName ) == 1 );
 }
 
 for my $fileName ( @fileNameVtr )
 {
-    ok( $interface->CheckIfExecutableFileExists( $interface->GetWord2VecDir(), $fileName ) == 1 );
+    ok( $interface->_CheckIfExecutableFileExists( $interface->GetWord2VecDir(), $fileName ) == 1 );
 }
 
 ok( defined( $interface->GetFileType( "samples/compoundword.txt" ) ) );
@@ -171,13 +171,13 @@ ok( $interface->CLCompoundifyTextInFile( "samples/precompoundexample.txt", "comp
 ok( -e "compoundedtext.txt" && -s "compoundedtext.txt" );
 
 # Advanced Function Testing (Similarity Average, Compounds & Summed)
-$interface->W2VReadTrainedVectorDataFromFile( "vectors.bin", 1 );
+$interface->W2VReadTrainedVectorDataFromFile( "vectors.bin" );
 ok( $interface->CLSimilarityAvg( "samples/MiniMayoSRS.terms" ) == 0 );
-ok( -e "samples/MiniMayoSRS.terms.avg_results" && -s "samples/MiniMayoSRS.terms.avg_results" );
+ok( -e "MiniMayoSRS.terms.avg_results" && -s "MiniMayoSRS.terms.avg_results" );
 ok( $interface->CLSimilarityComp( "samples/MiniMayoSRS.terms" ) == 0 );
-ok( -e "samples/MiniMayoSRS.terms.comp_results" && -s "samples/MiniMayoSRS.terms.comp_results" );
+ok( -e "MiniMayoSRS.terms.comp_results" && -s "MiniMayoSRS.terms.comp_results" );
 ok( $interface->CLSimilaritySum( "samples/MiniMayoSRS.terms" ) == 0 );
-ok( -e "samples/MiniMayoSRS.terms.sum_results" && -s "samples/MiniMayoSRS.terms.sum_results" );
+ok( -e "MiniMayoSRS.terms.sum_results" && -s "MiniMayoSRS.terms.sum_results" );
 
 
 # Generate WSD List
@@ -217,24 +217,24 @@ ok( $interface->CLWordSenseDisambiguation( "samples/ACE.instances.sval", "sample
 ok( $interface->CLWordSenseDisambiguation( undef, undef, "vectors.bin", undef, "wsdtestlist.txt" ) == 0 );
 
 # Advanced Function Testing (WSD Read List)
-ok( keys( %{ $interface->WSDReadList( "wsdtestlist.txt" ) } ) > 0 );
+ok( keys( %{ $interface->_WSDReadList( "wsdtestlist.txt" ) } ) > 0 );
 
 # Advanced Function Testing (Stop List Generation)
 ok( defined( $interface->_WSDStop( "samples/stoplist" ) ) );
 
 
 # Clean Up
-ok( $interface->CleanWord2VecDirectory() == 0 );
-unlink( "textcorpus.txt" )     if ( -e "textcorpus.txt" );
-unlink( "phrasecorpus.txt" )   if ( -e "phrasecorpus.txt" );
-unlink( "vectors.bin" )        if ( -e "vectors.bin" );
-unlink( "binaryvectors.bin" )  if ( -e "binaryvectors.bin" );
-unlink( "densevectors.bin" )   if ( -e "densevectors.bin" );
-unlink( "sparsevectors.bin" )  if ( -e "sparsevectors.bin" );
-unlink( "compoundedtext.txt" ) if ( -e "compoundedtext.txt" );
-unlink( "wsdtestlist.txt" )    if ( -e "wsdtestlist.txt" );
-unlink( "samples/MiniMayoSRS.terms.avg_results" ) if ( -e "samples/MiniMayoSRS.terms.avg_results" );
-unlink( "samples/MiniMayoSRS.terms.comp_results" ) if ( -e "samples/MiniMayoSRS.terms.comp_results" );
-unlink( "samples/MiniMayoSRS.terms.sum_results" ) if ( -e "samples/MiniMayoSRS.terms.sum_results" );
+unlink( "textcorpus.txt"                         ) if ( -e "textcorpus.txt"                             );
+unlink( "phrasecorpus.txt"                       ) if ( -e "phrasecorpus.txt"                           );
+unlink( "vectors.bin"                            ) if ( -e "vectors.bin"                                );
+unlink( "binaryvectors.bin"                      ) if ( -e "binaryvectors.bin"                          );
+unlink( "densevectors.bin"                       ) if ( -e "densevectors.bin"                           );
+unlink( "sparsevectors.bin"                      ) if ( -e "sparsevectors.bin"                          );
+unlink( "compoundedtext.txt"                     ) if ( -e "compoundedtext.txt"                         );
+unlink( "wsdtestlist.txt"                        ) if ( -e "wsdtestlist.txt"                            );
+unlink( "MiniMayoSRS.terms.avg_results"          ) if ( -e "MiniMayoSRS.terms.avg_results"              );
+unlink( "MiniMayoSRS.terms.comp_results"         ) if ( -e "MiniMayoSRS.terms.comp_results"             );
+unlink( "MiniMayoSRS.terms.sum_results"          ) if ( -e "MiniMayoSRS.terms.sum_results"              );
+unlink( "samples/ACE.instances.sval.results.txt" ) if ( -e "samples/ACE.instances.sval.results.txt"     );
 
 undef( $interface );

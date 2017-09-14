@@ -1,0 +1,116 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="canvas">
+    <div class="canvas">
+        Lifecycle: {{lifecycle.name}}<br><br>
+        Type: {{lifecycle.type}}<br>
+
+        {{#if lifecycle.is_ticket}}
+        Lifecycle on Tickets: <select name="ticket_display">
+                     {{#select lifecycle.ticket_display}}
+                       <option value="hidden"><&|/l&>hidden</&>
+                       <option value="readonly"><&|/l&>read-only</&>
+                       <option value="interactive"><&|/l&>interactive</&>
+                     {{/select}}
+                   </select><br>
+        {{/if}}
+        <br>
+
+        On Create: <select name="on_create">
+                     {{#select lifecycle.defaults.on_create}}
+                       <option value=""><&|/l&>(no value)</&></option>
+                       {{#each lifecycle.statuses}}
+                         <option value="{{this}}">{{this}}</option>
+                       {{/each}}
+                     {{/select}}
+                   </select><br>
+
+        Approved: <select name="approved">
+                     {{#select lifecycle.defaults.approved}}
+                       <option value=""><&|/l&>(no value)</&></option>
+                       {{#each lifecycle.statuses}}
+                         <option value="{{this}}">{{this}}</option>
+                       {{/each}}
+                     {{/select}}
+                   </select><br>
+
+        Denied: <select name="denied">
+                     {{#select lifecycle.defaults.denied}}
+                       <option value=""><&|/l&>(no value)</&></option>
+                       {{#each lifecycle.statuses}}
+                         <option value="{{this}}">{{this}}</option>
+                       {{/each}}
+                     {{/select}}
+                   </select><br>
+
+        Reminder on Open: <select name="reminder_on_open">
+                     {{#select lifecycle.defaults.reminder_on_open}}
+                       <option value=""><&|/l&>(no value)</&></option>
+                       {{#each lifecycle.statuses}}
+                         <option value="{{this}}">{{this}}</option>
+                       {{/each}}
+                     {{/select}}
+                   </select><br>
+
+        Reminder on Resolve: <select name="reminder_on_resolve">
+                     {{#select lifecycle.defaults.reminder_on_resolve}}
+                       <option value=""><&|/l&>(no value)</&></option>
+                       {{#each lifecycle.statuses}}
+                         <option value="{{this}}">{{this}}</option>
+                       {{/each}}
+                     {{/select}}
+                   </select><br>
+        <br>
+        
+        <ul class="toplevel">
+          <li><a href="javascript:void(0)" class="menu-item add-status"><&|/l&>Add Status</&></a></li>
+          <li class="has-children"><a href="javascript:void(0)" class="menu-item">Add Decoration...</a>
+              <ul>
+                  <li><a href="javascript:void(0)" class="menu-item add-text">Add Label</a></li>
+                  <li><a href="javascript:void(0)" class="menu-item add-polygon" data-type="Triangle">Add Triangle</a></li>
+                  <li><a href="javascript:void(0)" class="menu-item add-polygon" data-type="Rectangle">Add Rectangle</a></li>
+                  <li><a href="javascript:void(0)" class="menu-item add-circle">Add Circle</a></li>
+                  <li><a href="javascript:void(0)" class="menu-item add-line">Add Line</a></li>
+              </ul>
+          </li>
+          <li class="has-children"><a href="javascript:void(0)" class="menu-item">Select Status...</a>
+              <ul>
+              {{#each lifecycle.statuses}}
+              <li><a href="javascript:void(0)" class="menu-item select-status" data-name="{{this}}">{{this}}</a></li>
+              {{/each}}
+              </ul>
+           </li>
+          <li class="has-children"><a href="javascript:void(0)" class="menu-item">Select Transition...</a>
+              <ul>
+              {{#each lifecycle.statuses}}
+              <li class="has-children"><a href="javascript:void(0)" class="menu-item select-status" data-name="{{this}}"><&|/l, "{{this}}"&>from [_1]</&></a>
+                <ul>
+                  {{#with this as |from|}}
+                  {{#with ../lifecycle as |lc|}}
+                  {{#each lc.statuses}}
+                    <li class="menu-item {{#if (canSelectTransition from this lc)}}{{else}}hidden{{/if}}"><a href="#" class="menu-item select-transition" data-from="{{from}}" data-to="{{this}}"><&|/l, "{{this}}"&>to [_1]</&></a></li>
+                  {{/each}}
+                  {{/with}}
+                  {{/with}}
+                </ul>
+              </li>
+              {{/each}}
+              </ul>
+           </li>
+           <li class="has-children"><a href="javascript:void(0)" class="menu-item">Select Decoration...</a>
+              <ul>
+              {{#each lifecycle.decorations.text}}
+              <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.text}}</a></li>
+              {{/each}}
+              {{#each lifecycle.decorations.polygon}}
+              <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+              {{/each}}
+              {{#each lifecycle.decorations.circle}}
+              <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+              {{/each}}
+              {{#each lifecycle.decorations.line}}
+              <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+              {{/each}}
+              </ul>
+           </li>
+        </ul>
+    </div>
+</script>

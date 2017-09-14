@@ -1,5 +1,11 @@
 Revision history for org-daemon.
 
+1.05	2017-09-09
+	- new option: --ignore-tag
+	- new experimental option: --use-anyevent
+	- code refactoring: find_dates_in_org_file ->
+	  find_relevant_dates_in_org_file
+
 1.04	2017-05-06
 	- find_dates_in_org_file provides seek position
 

@@ -17,8 +17,8 @@ Catmandu::MediaHaven - Tools to communicate with the Zeticon MediaHaven server
 
     die "search failed" unless defined($result);
 
-    for my $res (@{$result->mediaDataList}) {
-        my $id = $res->{externalId};
+    for my $res (@{$result->{mediaDataList}}) {
+        my $id = $res->{fragmentId};
         my $date = $res->{data};
 
         print "$id $date\n";
@@ -47,6 +47,7 @@ Create a new connection to the MediaHaven server.
 
 =cut
 use Moo;
+use HTTP::Request::Common;
 use LWP::Simple;
 use URI::Escape;
 use JSON;
@@ -56,14 +57,14 @@ use Catmandu;
 use Cache::LRU;
 use REST::Client;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 with 'Catmandu::Logger';
 
 has 'url'          => (is => 'ro' , required => 1);
 has 'username'     => (is => 'ro' , required => 1);
 has 'password'     => (is => 'ro' , required => 1);
-has 'record_query' => (is => 'ro' , default => sub { "q=%%2B(MediaObjectExternalId:%s)"; });
+has 'record_query' => (is => 'ro' , default => sub { "q=%%2B(MediaObjectFragmentId:%s)"; });
 has 'sleep'        => (is => 'ro' , default => sub { 1 });
 
 has 'cache'        => (is => 'lazy');
@@ -183,6 +184,38 @@ sub record {
     }
 }
 
+=head2 edit($id,$field,@values)
+
+Edit the metadata of a record
+
+=cut
+sub edit {
+    my ($self,$id,$field,@values) = @_;
+
+    croak "need an id and $field" unless defined($id) && defined($field);
+
+    $self->log->info("edit record $id");
+
+    my $record = $self->record($id);
+
+    unless ($record) {
+        $self->log->error("no such record $id");
+        return undef;
+    }
+
+    my $fragmentId = $record->{fragmentId};
+
+    my @param;
+
+    for (@values) {
+        push @param , 'value' , $_;
+    }
+
+    my $res = $self->_rest_post("$fragmentId/$field", @param);
+    
+    return $res;
+}
+
 =head2 export($id, $callback)
 
 Export the binary content of a record from the MediaHaven server. The callback
@@ -198,7 +231,10 @@ sub export {
 
     my $record = $self->record($id);
 
-    return undef unless $record;
+    unless ($record) {
+        $self->log->error("no such record $id");
+        return undef;
+    }
 
     my $mediaObjectId = $record->{mediaObjectId};
 
@@ -264,19 +300,33 @@ sub _get_json {
 }
 
 sub _post_json {
-    my ($self,$url) = @_;
+    my ($self,$url,$body) = @_;
 
     $self->log->debug($url);
 
     my $client = REST::Client->new();
-    $client->POST($url);
-    my $json = $client->responseContent();
 
-    my $location = $self->_rest_base( $client->responseHeader('Location') );
+    if ($body) {
+        my $response = $client->getUseragent->request(POST $url , $body , Content_Type => 'form-data');
 
-    my $perl = decode_json $json;
+        if ($response->is_success) {
+            return { ok => 1};
+        }
+        else {
+            my $json = $response->decoded_content;
+            return decode_json $json;
+        }
+    }
+    else {
+        $client->POST($url);
+        my $json = $client->responseContent();
 
-    ($perl,$location);
+        my $location = $self->_rest_base( $client->responseHeader('Location') );
+
+        my $perl = decode_json $json;
+
+        wantarray ? ($perl,$location) : $perl;
+    }
 }
 
 sub _rest_base {
@@ -301,6 +351,15 @@ sub _rest_get {
     $self->_get_json($media_url);
 }
 
+sub _rest_post {
+    my ($self,$fragment,@param) = @_;
+
+    my $media_url = $self->_rest_base .
+                    '/' .
+                    $fragment;
+
+    $self->_post_json($media_url,\@param);
+}
 
 =head1 MODULES
 

@@ -3,7 +3,7 @@ use warnings;
 package Proc::Memory;
 
 # ABSTRACT: Peek/Poke other processes' address spaces
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Carp;
 use Sentinel;
@@ -95,11 +95,11 @@ Peeks at the given memory address. C<pack-string> defaults to C<'C'> (A single b
 sub peek {
     my $self = shift;
     my $addr = shift;
-    my $fmt = shift // 'C';
+    my $fmt = shift() // 'C';
     $fmt eq 'C'
         or croak 'Pack strings not supported yet';
 
-    my $buf = xs_vas_read($self->{vas}, $addr, 1);
+    my $buf = xs_vas_read($self->{vas}, $addr, 1); # FIXME $addr shouldn't be an ulong
     return $buf;
 }
 
@@ -224,7 +224,7 @@ void *xs_vas_open(int pid, int flags) {
 
 SV *xs_vas_read(void* vas, unsigned long src, size_t size) {
     char *dst;
-    ssize_t nbytes;
+    int nbytes;
 
     SV *sv = newSV(0);
     Newx(dst, size, char);

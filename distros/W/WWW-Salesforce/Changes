@@ -1,6 +1,21 @@
-Revision history for Perl extension WWW::Salesforce.
+Revision history for Perl extension WWW-Salesforce
 
-0.25 Nov 13 2015
+0.301     2017-09-13
+    - Get rid of the last of the 'use vars' pragma
+    - Fix errant version number
+
+0.300     2017-09-13
+    - Fixed some spelling errors
+    - Made IO::Socket::SSL v1.94 a prereq (TLS v1.1)
+    - Added a cpanfile to maintain prereqs
+    - Added the license file to the dist
+    - Got rid of the 'use vars' pragma
+    - Moved to Dist::Zilla for maintenance
+    - Fixed license discrepancies. We've always stated that it's under the same
+      license as Perl itself, but accidentally introduced Artistic 2.0 in the
+      META. That has been put back to the Perl_5 license.
+
+0.25 Nov 12 2015
     - change login URL from www.salesforce.com to login.salesforce.com [github/dclendenan]
       - www.salesforce.com will no longer be an API login endpoint as of Jan 1 2016
 

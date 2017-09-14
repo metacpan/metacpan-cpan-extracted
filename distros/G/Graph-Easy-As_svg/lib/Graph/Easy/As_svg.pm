@@ -4,7 +4,7 @@
 #############################################################################
 
 package Graph::Easy::As_svg;
-$Graph::Easy::As_svg::VERSION = '0.26';
+$Graph::Easy::As_svg::VERSION = '0.27';
 use 5.010;
 
 
@@ -137,8 +137,9 @@ sub _sprintf
 #############################################################################
 #############################################################################
 
-package Graph::Easy;
-$Graph::Easy::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy;
+
 use strict;
 
 BEGIN
@@ -724,8 +725,9 @@ EOSVG
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Node::Cell;
-$Graph::Easy::Node::Cell::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Node::Cell;
+
 sub as_svg
   {
   '';
@@ -743,8 +745,9 @@ sub _correct_size_svg
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Group::Cell;
-$Graph::Easy::Group::Cell::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Group::Cell;
+
 sub as_svg
   {
   my ($self,$x, $y, $indent) = @_;
@@ -824,8 +827,9 @@ sub _svg_background
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Group;
-$Graph::Easy::Group::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Group;
+
 sub as_svg
   {
   # output all cells of the group as svg
@@ -845,8 +849,9 @@ sub as_svg
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Edge;
-$Graph::Easy::Edge::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Edge;
+
 use Graph::Easy::Edge::Cell qw/EDGE_HOLE/;
 
 sub as_svg
@@ -879,8 +884,9 @@ sub as_svg
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Node::Empty;
-$Graph::Easy::Node::Empty::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Node::Empty;
+
 sub as_svg
   {
   # empty nodes are not rendered at all
@@ -890,8 +896,9 @@ sub as_svg
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Node;
-$Graph::Easy::Node::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Node;
+
 BEGIN
   {
   *_sprintf = \&Graph::Easy::As_svg::_sprintf;
@@ -1461,8 +1468,9 @@ sub _correct_size_svg
 #############################################################################
 #############################################################################
 
-package Graph::Easy::Edge::Cell;
-$Graph::Easy::Edge::Cell::VERSION = '0.26';
+package # hide from PAUSE
+  Graph::Easy::Edge::Cell;
+
 BEGIN
   {
   *_sprintf = \&Graph::Easy::As_svg::_sprintf;
@@ -2125,7 +2133,7 @@ Graph::Easy::As_svg - Output a Graph::Easy as Scalable Vector Graphics (SVG)
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -2152,7 +2160,7 @@ X<grafics>
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 EXPORT
 
@@ -2185,7 +2193,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/Graph-Easy-As_svg/issues
+L<https://github.com/shlomif/Graph-Easy-As_svg/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

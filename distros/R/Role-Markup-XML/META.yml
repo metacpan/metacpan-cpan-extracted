@@ -32,4 +32,4 @@ resources:
   homepage: http://doriantaylor.com/
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-role-markup-xml.git
-version: '0.04'
+version: '0.06'

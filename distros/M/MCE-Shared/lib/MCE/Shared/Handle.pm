@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (InputOutput::ProhibitTwoArgOpen)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -26,16 +26,16 @@ use bytes;
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_reset_flg = 1;
 
+sub _croak {
+   goto &MCE::Shared::Base::_croak;
+}
+
 sub import {
    if (!exists $INC{'MCE/Shared.pm'}) {
       no strict 'refs'; no warnings 'redefine';
       *{ caller().'::mce_open' } = \&open;
    }
    return;
-}
-
-sub _croak {
-   goto &MCE::Shared::Base::_croak;
 }
 
 sub TIEHANDLE {
@@ -52,7 +52,14 @@ sub TIEHANDLE {
    }
 
    bless my $fh = \do { no warnings 'once'; local *FH }, $class;
-   $fh->OPEN(@_) or _croak("open error: $!") if @_;
+
+   if (@_) {
+      if ( !defined wantarray ) {
+         $fh->OPEN(@_) or _croak("open error: $!");
+      } else {
+         $fh->OPEN(@_) or return '';
+      }
+   }
 
    $fh;
 }
@@ -67,20 +74,28 @@ sub EOF     { eof($_[0]) }
 sub TELL    { tell($_[0]) }
 sub FILENO  { fileno($_[0]) }
 sub SEEK    { seek($_[0], $_[1], $_[2]) }
-sub CLOSE   { close($_[0]) if defined fileno($_[0]) }
-sub BINMODE { binmode($_[0], $_[1] || ':raw') }
+sub CLOSE   { close($_[0]) if defined(fileno $_[0]) }
+sub BINMODE { binmode($_[0], $_[1] // ':raw') ? 1 : '' }
 sub GETC    { getc($_[0]) }
 
 sub OPEN {
+   my $ret;
+
    close($_[0]) if defined fileno($_[0]);
 
    if ( @_ == 3 && ref $_[2] && defined( my $_fd = fileno($_[2]) ) ) {
-      return CORE::open($_[0], $_[1]."&=$_fd");
+      $ret = CORE::open($_[0], $_[1]."&=$_fd");
+   }
+   else {
+      $ret = ( @_ == 2 )
+         ? CORE::open($_[0], $_[1])
+         : CORE::open($_[0], $_[1], $_[2]);
    }
 
-   ( @_ == 2 )
-      ? CORE::open($_[0], $_[1])
-      : CORE::open($_[0], $_[1], $_[2]);
+   # enable autoflush
+   select(( select($_[0]), $| = 1 )[0]) if $ret;
+
+   $ret;
 }
 
 sub open (@) {
@@ -228,6 +243,10 @@ sub WRITE {
    $wrote;
 }
 
+{
+   no strict 'refs'; *{ __PACKAGE__.'::new' } = \&TIEHANDLE;
+}
+
 ###############################################################################
 ## ----------------------------------------------------------------------------
 ## Server functions.
@@ -296,11 +315,10 @@ sub WRITE {
             CORE::open($_fh, $_args->[0]) or do { $_err = 0+$! };
          }
 
-         # flush IO immediately
+         # enable autoflush
          select(( select($_fh), $| = 1 )[0]) unless $_err;
 
          *{ $_obj->{ $_id } } = *{ $_fh };
-
          print {$_DAU_R_SOCK} $_err.$LF;
 
          return;
@@ -649,7 +667,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.826
+This document describes MCE::Shared::Handle version 1.828
 
 =head1 DESCRIPTION
 
@@ -657,63 +675,69 @@ A handle helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
+ # shorter, mce_open is an alias for MCE::Shared::Handle::open
 
-   use MCE::Shared::Handle;
+ use MCE::Shared::Handle;
 
-   MCE::Shared::Handle->open( my $fh, "<", "bio.fasta" );
-   MCE::Shared::Handle::open  my $fh, "<", "bio.fasta";
+ MCE::Shared::Handle->open( my $fh, "<", "bio.fasta" )
+    or die "open error: $!";
+ MCE::Shared::Handle::open  my $fh, "<", "bio.fasta"
+    or die "open error: $!";
 
-   mce_open my $fh, "<", "bio.fasta" or die "open error: $!";
+ mce_open my $fh, "<", "bio.fasta" or die "open error: $!";
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
+ # shorter, mce_open is an alias for MCE::Shared::open
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   MCE::Shared->open( my $fh, "<", "bio.fasta" );
-   MCE::Shared::open  my $fh, "<", "bio.fasta";
+ MCE::Shared->open( my $fh, "<", "bio.fasta" )
+    or die "open error: $!";
+ MCE::Shared::open  my $fh, "<", "bio.fasta"
+    or die "open error: $!";
 
-   mce_open my $fh, "<", "bio.fasta" or die "open error: $!";
+ mce_open my $fh, "<", "bio.fasta" or die "open error: $!";
 
-   # example, output is serialized, not garbled
+ # example, output is serialized, not garbled
 
-   use MCE::Hobo;
-   use MCE::Shared;
+ use MCE::Hobo;
+ use MCE::Shared;
 
-   mce_open my $ofh, ">>", \*STDOUT  or die "open error: $!";
-   mce_open my $ifh, "<", "file.log" or die "open error: $!";
+ mce_open my $ofh, ">>", \*STDOUT  or die "open error: $!";
+ mce_open my $ifh, "<", "file.log" or die "open error: $!";
 
-   sub parallel {
-      $/ = "\n"; # can set the input record separator
-      while (my $line = <$ifh>) {
-         printf {$ofh} "[%5d] %s", $., $line;
-      }
-   }
+ sub parallel {
+    $/ = "\n"; # can set the input record separator
+    while (my $line = <$ifh>) {
+       printf {$ofh} "[%5d] %s", $., $line;
+    }
+ }
 
-   MCE::Hobo->create( \&parallel ) for 1 .. 4;
+ MCE::Hobo->create( \&parallel ) for 1 .. 4;
 
-   $_->join() for MCE::Hobo->list();
+ $_->join() for MCE::Hobo->list();
 
-   # handle functions
+ # handle functions
 
-   my $bool = eof($ifh);
-   my $off  = tell($ifh);
-   my $fd   = fileno($ifh);
-   my $char = getc($ifh);
-   my $line = readline($ifh);
+ my $bool = eof($ifh);
+ my $off  = tell($ifh);
+ my $fd   = fileno($ifh);
+ my $char = getc($ifh);
+ my $line = readline($ifh);
 
-   binmode $ifh;
-   seek $ifh, 10, 0;
-   read $ifh, my($buf), 80;
+ binmode $ifh;
+ seek $ifh, 10, 0;
+ read $ifh, my($buf), 80;
 
-   print  {$ofh} "foo\n";
-   printf {$ofh} "%s\n", "bar";
+ print  {$ofh} "foo\n";
+ printf {$ofh} "%s\n", "bar";
 
-   open $ofh, ">>", \*STDERR;
-   syswrite $ofh, "shared handle to STDERR\n";
+ open $ofh, ">>", \*STDERR;
+ syswrite $ofh, "shared handle to STDERR\n";
 
-   close $ifh;
-   close $ofh;
+ close $ifh;
+ close $ofh;
 
 =head1 API DOCUMENTATION
 
@@ -730,39 +754,39 @@ whose filename is given by C<expr>, and associates it with C<filehandle>.
 When omitting error checking at the application level, MCE::Shared emits
 a message and stop if open fails.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Handle;
+ use MCE::Shared::Handle;
 
-   MCE::Shared::Handle->open( my $fh, "<", "file.log" ) or die "$!";
-   MCE::Shared::Handle::open  my $fh, "<", "file.log"   or die "$!";
+ MCE::Shared::Handle->open( my $fh, "<", "file.log" ) or die "$!";
+ MCE::Shared::Handle::open  my $fh, "<", "file.log"   or die "$!";
 
-   mce_open my $fh, "<", "file.log" or die "$!"; # ditto
+ mce_open my $fh, "<", "file.log" or die "$!"; # ditto
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   MCE::Shared->open( my $fh, "<", "file.log" ) or die "$!";
-   MCE::Shared::open  my $fh, "<", "file.log"   or die "$!";
+ MCE::Shared->open( my $fh, "<", "file.log" ) or die "$!";
+ MCE::Shared::open  my $fh, "<", "file.log"   or die "$!";
 
-   mce_open my $fh, "<", "file.log" or die "$!"; # ditto
+ mce_open my $fh, "<", "file.log" or die "$!"; # ditto
 
 Simple examples to open a file for reading:
 
-   # mce_open is exported by MCE::Shared or MCE::Shared::Handle.
-   # It creates a shared file handle with MCE::Shared present
-   # or a non-shared handle otherwise.
+ # mce_open is exported by MCE::Shared or MCE::Shared::Handle.
+ # It creates a shared file handle with MCE::Shared present
+ # or a non-shared handle otherwise.
 
-   mce_open my $fh, "< input.txt"     or die "open error: $!";
-   mce_open my $fh, "<", "input.txt"  or die "open error: $!";
-   mce_open my $fh, "<", \*STDIN      or die "open error: $!";
+ mce_open my $fh, "< input.txt"     or die "open error: $!";
+ mce_open my $fh, "<", "input.txt"  or die "open error: $!";
+ mce_open my $fh, "<", \*STDIN      or die "open error: $!";
 
 and for writing:
 
-   mce_open my $fh, "> output.txt"    or die "open error: $!";
-   mce_open my $fh, ">", "output.txt" or die "open error: $!";
-   mce_open my $fh, ">", \*STDOUT     or die "open error: $!";
+ mce_open my $fh, "> output.txt"    or die "open error: $!";
+ mce_open my $fh, ">", "output.txt" or die "open error: $!";
+ mce_open my $fh, ">", \*STDOUT     or die "open error: $!";
 
 =back
 
@@ -774,75 +798,75 @@ size. Also, chunk IO supports the special "\n>"-like record separator.
 That anchors ">" at the start of the line. Workers receive record(s) beginning
 with ">" and ending with "\n".
 
-   # non-shared handle ---------------------------------------------
+ # non-shared handle ---------------------------------------------
 
-   use MCE::Shared::Handle;
+ use MCE::Shared::Handle;
 
-   mce_open my $fh, '<', 'bio.fasta' or die "open error: $!";
+ mce_open my $fh, '<', 'bio.fasta' or die "open error: $!";
 
-   # shared handle -------------------------------------------------
+ # shared handle -------------------------------------------------
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   mce_open my $fh, '<', 'bio.fasta' or die "open error: $!";
+ mce_open my $fh, '<', 'bio.fasta' or die "open error: $!";
 
-   # 'k' or 'm' indicates kibiBytes (KiB) or mebiBytes (MiB) respectively.
-   # Read continues reading until reaching the record separator or EOF.
-   # Optionally, one may specify the record separator.
+ # 'k' or 'm' indicates kibiBytes (KiB) or mebiBytes (MiB) respectively.
+ # Read continues reading until reaching the record separator or EOF.
+ # Optionally, one may specify the record separator.
 
-   $/ = "\n>";
+ $/ = "\n>";
 
-   while ( read($fh, my($buf), '2k') ) {
-      print "# chunk number: $.\n";
-      print "$buf\n";
-   }
+ while ( read($fh, my($buf), '2k') ) {
+    print "# chunk number: $.\n";
+    print "$buf\n";
+ }
 
 C<$.> contains the chunk_id above or the record_number below. C<readline($fh)>
 or C<<$fh>> may be used for reading a single record.
 
-   while ( my $buf = <$fh> ) {
-      print "# record number: $.\n";
-      print "$buf\n";
-   }
+ while ( my $buf = <$fh> ) {
+    print "# record number: $.\n";
+    print "$buf\n";
+ }
 
 The following provides a parallel demonstration. Workers receive the next chunk
 from the shared-manager process where the actual read takes place. MCE::Shared
 also works with C<threads>, C<forks>, and likely other parallel modules.
 
-   use MCE::Hobo;       # (change to) use threads; (or) use forks;
-   use MCE::Shared;
-   use feature qw( say );
+ use MCE::Hobo;       # (change to) use threads; (or) use forks;
+ use MCE::Shared;
+ use feature qw( say );
 
-   my $pattern  = 'something';
-   my $hugefile = 'somehuge.log';
+ my $pattern  = 'something';
+ my $hugefile = 'somehuge.log';
 
-   my $result = MCE::Shared->array();
-   mce_open my $fh, "<", $hugefile or die "open error: $!";
+ my $result = MCE::Shared->array();
+ mce_open my $fh, "<", $hugefile or die "open error: $!";
 
-   sub task {
-      # the trailing 'k' or 'm' for size enables chunk IO
-      while ( read $fh, my( $slurp_chunk ), "640k" ) {
-         my $chunk_id = $.;
-         # process chunk only if a match is found; ie. fast scan
-         # optionally, comment out the if statement and closing brace
-         if ( $slurp_chunk =~ /$pattern/m ) {
-            my @matches;
-            while ( $slurp_chunk =~ /([^\n]+\n)/mg ) {
-               my $line = $1; # save $1 to not lose the value
-               push @matches, $line if ( $line =~ /$pattern/ );
-            }
-            $result->push( @matches ) if @matches;
-         }
-      }
-   }
+ sub task {
+    # the trailing 'k' or 'm' for size enables chunk IO
+    while ( read $fh, my( $slurp_chunk ), "640k" ) {
+       my $chunk_id = $.;
+       # process chunk only if a match is found; ie. fast scan
+       # optionally, comment out the if statement and closing brace
+       if ( $slurp_chunk =~ /$pattern/m ) {
+          my @matches;
+          while ( $slurp_chunk =~ /([^\n]+\n)/mg ) {
+             my $line = $1; # save $1 to not lose the value
+             push @matches, $line if ( $line =~ /$pattern/ );
+          }
+          $result->push( @matches ) if @matches;
+       }
+    }
+ }
 
-   MCE::Hobo->create('task') for 1 .. 4;
+ MCE::Hobo->create('task') for 1 .. 4;
 
-   # do something else
+ # do something else
 
-   MCE::Hobo->waitall();
+ MCE::Hobo->waitall();
 
-   say $result->len();
+ say $result->len();
 
 For comparison, the same thing using C<MCE::Flow>. MCE workers read the file
 directly when given a plain path, so will have lesser overhead. However, the
@@ -851,31 +875,31 @@ run time is similar if one were to pass a file handle instead to mce_flow_f.
 The benefit of chunk IO is from lesser IPC for the shared-manager process
 (above). Likewise, for the mce-manager process (below).
 
-   use MCE::Flow;
-   use feature qw( say );
+ use MCE::Flow;
+ use feature qw( say );
 
-   my $pattern  = 'something';
-   my $hugefile = 'somehuge.log';
+ my $pattern  = 'something';
+ my $hugefile = 'somehuge.log';
 
-   my @result = mce_flow_f {
-      max_workers => 4, chunk_size => '640k',
-      use_slurpio => 1,
-   },
-   sub {
-      my ( $mce, $slurp_ref, $chunk_id ) = @_;
-      # process chunk only if a match is found; ie. fast scan
-      # optionally, comment out the if statement and closing brace
-      if ( $$slurp_ref =~ /$pattern/m ) {
-         my @matches;
-         while ( $$slurp_ref =~ /([^\n]+\n)/mg ) {
-            my $line = $1; # save $1 to not lose the value
-            push @matches, $line if ( $line =~ /$pattern/ );
-         }
-         MCE->gather( @matches ) if @matches;
-      }
-   }, $hugefile;
+ my @result = mce_flow_f {
+    max_workers => 4, chunk_size => '640k',
+    use_slurpio => 1,
+ },
+ sub {
+    my ( $mce, $slurp_ref, $chunk_id ) = @_;
+    # process chunk only if a match is found; ie. fast scan
+    # optionally, comment out the if statement and closing brace
+    if ( $$slurp_ref =~ /$pattern/m ) {
+       my @matches;
+       while ( $$slurp_ref =~ /([^\n]+\n)/mg ) {
+          my $line = $1; # save $1 to not lose the value
+          push @matches, $line if ( $line =~ /$pattern/ );
+       }
+       MCE->gather( @matches ) if @matches;
+    }
+ }, $hugefile;
 
-   say scalar( @result );
+ say scalar( @result );
 
 =head1 CREDITS
 
@@ -889,34 +913,34 @@ isn't possible, construct C<condvar> and C<queue> before other classes.
 On systems without C<IO::FDPass>, the manager process is delayed until sharing
 other classes or started explicitly.
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $has_IO_FDPass = $INC{'IO/FDPass.pm'} ? 1 : 0;
+ my $has_IO_FDPass = $INC{'IO/FDPass.pm'} ? 1 : 0;
 
-   my $cv  = MCE::Shared->condvar();
-   my $que = MCE::Shared->queue();
+ my $cv  = MCE::Shared->condvar();
+ my $que = MCE::Shared->queue();
 
-   MCE::Shared->start() unless $has_IO_FDPass;
+ MCE::Shared->start() unless $has_IO_FDPass;
 
 Regarding mce_open, C<IO::FDPass> is needed for constructing a shared-handle
 from a non-shared handle not yet available inside the shared-manager process.
 The workaround is to have the non-shared handle made before the shared-manager
 is started. Passing a file by reference is fine for the three STD* handles.
 
-   # The shared-manager knows of \*STDIN, \*STDOUT, \*STDERR.
+ # The shared-manager knows of \*STDIN, \*STDOUT, \*STDERR.
 
-   mce_open my $shared_in,  "<",  \*STDIN;   # ok
-   mce_open my $shared_out, ">>", \*STDOUT;  # ok
-   mce_open my $shared_err, ">>", \*STDERR;  # ok
-   mce_open my $shared_fh1, "<",  "/path/to/sequence.fasta";  # ok
-   mce_open my $shared_fh2, ">>", "/path/to/results.log";     # ok
+ mce_open my $shared_in,  "<",  \*STDIN;   # ok
+ mce_open my $shared_out, ">>", \*STDOUT;  # ok
+ mce_open my $shared_err, ">>", \*STDERR;  # ok
+ mce_open my $shared_fh1, "<",  "/path/to/sequence.fasta";  # ok
+ mce_open my $shared_fh2, ">>", "/path/to/results.log";     # ok
 
-   mce_open my $shared_fh, ">>", \*NON_SHARED_FH;  # requires IO::FDPass
+ mce_open my $shared_fh, ">>", \*NON_SHARED_FH;  # requires IO::FDPass
 
 The L<IO::FDPass> module is known to work reliably on most platforms.
 Install 1.1 or later to rid of limitations described above.
 
-   perl -MIO::FDPass -le "print 'Cheers! Perl has IO::FDPass.'"
+ perl -MIO::FDPass -le "print 'Cheers! Perl has IO::FDPass.'"
 
 =head1 INDEX
 

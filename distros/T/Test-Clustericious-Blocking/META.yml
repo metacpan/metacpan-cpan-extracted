@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/clustericious/Test-Clustericious-Blocking/issues
   homepage: https://metacpan.org/pod/Test::Clustericious::Blocking
   repository: git://github.com/clustericious/Test-Clustericious-Blocking.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

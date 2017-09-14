@@ -9,9 +9,9 @@ package MCE::Util;
 use strict;
 use warnings;
 
-no warnings qw( threads recursion uninitialized );
+no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.829';
+our $VERSION = '1.830';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -58,10 +58,10 @@ sub get_ncpu {
       local $_ = lc $^O;
 
       /linux/ && do {
-         my ($count, $fh);
+         my ( $count, $fh );
          if ( open $fh, '<', '/proc/stat' ) {
-             $count = grep { /^cpu\d/ } <$fh>;
-             close $fh;
+            $count = grep { /^cpu\d/ } <$fh>;
+            close $fh;
          }
          $ncpu = $count if $count;
          last OS_CHECK;
@@ -74,12 +74,19 @@ sub get_ncpu {
       };
 
       /aix/ && do {
-         my @output = `pmcycles -m 2>/dev/null`;
-         if (@output) {
-            $ncpu = scalar @output;
-         } else {
-            @output = `lsdev -Cc processor -S Available 2>/dev/null`;
-            $ncpu = scalar @output if @output;
+         my @output = `lparstat -i 2>/dev/null | grep "^Online Virtual CPUs"`;
+         if ( @output ) {
+            $output[0] =~ /(\d+)\n$/;
+            $ncpu = $1 if $1;
+         }
+         if ( !$ncpu ) {
+            @output = `pmcycles -m 2>/dev/null`;
+            if ( @output ) {
+               $ncpu = scalar @output;
+            } else {
+               @output = `lsdev -Cc processor -S Available 2>/dev/null`;
+               $ncpu = scalar @output if @output;
+            }
          }
          last OS_CHECK;
       };
@@ -87,6 +94,12 @@ sub get_ncpu {
       /gnu/ && do {
          chomp( my @output = `nproc 2>/dev/null` );
          $ncpu = $output[0] if @output;
+         last OS_CHECK;
+      };
+
+      /haiku/ && do {
+         my @output = `sysinfo -cpu 2>/dev/null | grep "^CPU #"`;
+         $ncpu = scalar @output if @output;
          last OS_CHECK;
       };
 
@@ -444,7 +457,7 @@ MCE::Util - Utility functions
 
 =head1 VERSION
 
-This document describes MCE::Util version 1.829
+This document describes MCE::Util version 1.830
 
 =head1 SYNOPSIS
 
@@ -474,17 +487,17 @@ This is important for apps which are IO-bound.
 
  my $mce = MCE->new(
 
-   max_workers => 'auto',       ##  1 on HW with 1-lcores;  2 on  2-lcores
-   max_workers =>  16,          ## 16 on HW with 4-lcores; 16 on 32-lcores
+ max_workers => 'auto',       ##  1 on HW with 1-lcores;  2 on  2-lcores
+ max_workers =>  16,          ## 16 on HW with 4-lcores; 16 on 32-lcores
 
-   max_workers => 'auto',       ##  4 on HW with 4-lcores;  8 on 16-lcores
-   max_workers => 'auto*1.5',   ##  4 on HW with 4-lcores; 12 on 16-lcores
-   max_workers => 'auto*2.0',   ##  4 on HW with 4-lcores; 16 on 16-lcores
-   max_workers => 'auto/2.0',   ##  2 on HW with 4-lcores;  4 on 16-lcores
-   max_workers => 'auto+3',     ##  4 on HW with 4-lcores; 11 on 16-lcores
-   max_workers => 'auto-1',     ##  3 on HW with 4-lcores;  7 on 16-lcores
+ max_workers => 'auto',       ##  4 on HW with 4-lcores;  8 on 16-lcores
+ max_workers => 'auto*1.5',   ##  4 on HW with 4-lcores; 12 on 16-lcores
+ max_workers => 'auto*2.0',   ##  4 on HW with 4-lcores; 16 on 16-lcores
+ max_workers => 'auto/2.0',   ##  2 on HW with 4-lcores;  4 on 16-lcores
+ max_workers => 'auto+3',     ##  4 on HW with 4-lcores; 11 on 16-lcores
+ max_workers => 'auto-1',     ##  3 on HW with 4-lcores;  7 on 16-lcores
 
-   max_workers => MCE::Util::get_ncpu,   ## run on all lcores
+ max_workers => MCE::Util::get_ncpu,   ## run on all lcores
  );
 
 In summary:

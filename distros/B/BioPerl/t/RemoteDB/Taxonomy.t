@@ -1,5 +1,4 @@
 # -*-Perl-*- Test Harness script for Bioperl
-# $Id$
 
 use strict;
 
@@ -8,7 +7,7 @@ BEGIN {
     use Bio::Root::Test;
 
     test_begin(
-        -tests            => 214,
+        -tests            => 220,
         -requires_modules => [qw(DB_File
                                  LWP::UserAgent
                                  XML::Twig )]
@@ -172,12 +171,14 @@ for my $db ($db_entrez, $db_flatfile) {
         is_deeply \@ids, [200795, 32061];
 
         $id = $db->get_taxonids('Chloroflexi (class)');
-        $db eq $db_entrez ? is($id, undef) : is($id, 32061);
+        $db eq $db_entrez ? is($id, 'No hit') : is($id, 32061);
 
         @ids = $db->get_taxonids('Rhodotorula');
-        cmp_ok @ids, '>=' , 2;
+        cmp_ok @ids, '>=' , 1;
         if ($db eq $db_entrez) {
-            ok grep { $_ == 592558 } @ids;
+            diag(join(",", @ids));
+            # From NCBI: Taxid 592558 was merged into taxid 5533 on June 16, 2017
+            is( (grep { $_ == 592558 } @ids), 0, 'Value no longer found');
             ok grep { $_ == 5533 } @ids;
         } else {
             # note the locally cached flatfile is out-of-date, but technically
@@ -452,18 +453,18 @@ SKIP: {
     test_skip(-tests => 12, -requires_networking => 1);
 
     my $db=Bio::DB::Taxonomy->new(-source=>"entrez");
-    
+
     my @taxa = qw(viruses Deltavirus unclassified plasmid);
-    
+
     for my $taxon (@taxa) {
         test_taxid($db, $taxon);
     }
-    
+
     sub test_taxid {
         my ($db, $taxa) = @_;
         my @taxonids = $db->get_taxonids($taxa);
         cmp_ok(scalar(@taxonids), '>', 0, "Got IDs returned for $taxa:".join(',', @taxonids));
-        my $taxon; 
+        my $taxon;
         lives_ok { $taxon = $db->get_taxon(-taxonid => pop @taxonids) } "IDs generates a Bio::Taxonomy::Node";
         if (defined $taxon) {
             like( $taxon->scientific_name, qr/$taxa/i, "Name returned matches $taxa");
@@ -471,4 +472,34 @@ SKIP: {
             ok(0, "No taxon object returned for $taxa");
         }
     }
+}
+
+# tests for #212
+SKIP: {
+        test_skip( -tests => 6, -requires_networking => 1 );
+
+        my $db = Bio::DB::Taxonomy->new( -source => "entrez" );
+
+        # String                 | What I expect | What I get
+        # ---------------------- | ------------- | ----------
+        # 'Lissotriton vulgaris' | 8324          | 8324
+        # 'Chlorella vulgaris'   | 3077          | 3077
+        # 'Phygadeuon solidus'   | 1763951       | 1763951
+        # 'Ovatus'               | 666060        | 666060
+        # 'Phygadeuon ovatus'    | "No hit"      | 666060
+        # 'Trimorus ovatus'      | "No hit"      | 666060
+
+        my @ids;
+        @ids = $db->get_taxonids('Lissotriton vulgaris');
+        is $ids[0], 8324, 'Correct: Lissotriton vulgaris';
+        @ids = $db->get_taxonids('Chlorella vulgaris');
+        is $ids[0], 3077, 'Correct: Chlorella vulgaris';
+        @ids = $db->get_taxonids('Phygadeuon solidus');
+        is $ids[0], 1763951, 'Correct: Phygadeuon solidus';
+        @ids = $db->get_taxonids('Ovatus');
+        is $ids[0], 666060, 'Correct: Ovatus';
+        @ids = $db->get_taxonids('Phygadeuon ovatus');
+        is $ids[0], 'No hit', 'Correct: No hit';
+        @ids = $db->get_taxonids('Trimorus ovatus');
+        is $ids[0], 'No hit', 'Correct: No hit';
 }

@@ -51,28 +51,20 @@ $deeply->(
     my $subtree2 = Lingua::Awkwords->parse_string(q{ y/b^y^b });
     isa_ok( $subtree2, 'Lingua::Awkwords::OneOf' );
 
-    $subtree1->walk( set_filter('xxx') );
+    $subtree1->walk( Lingua::Awkwords::set_filter('xxx') );
     is( $subtree1->render, 'xxx' );
 
-    $subtree2->walk( set_filter('yyy') );
+    $subtree2->walk( Lingua::Awkwords::set_filter('yyy') );
     is( $subtree2->render, 'yyy' );
 
     Lingua::Awkwords::Subpattern->update_pattern( J => $subtree1 );
     Lingua::Awkwords::Subpattern->update_pattern( K => $subtree2 );
 
     $la->pattern(q{ JK });
-    $la->walk( set_filter('z') );
+    $la->walk( Lingua::Awkwords::set_filter('z') );
 
     # OP -> z and y|b also now -> z
     is( $la->render, 'zz' );
-
-    sub set_filter {
-        my $filter = shift // 'default';
-        return sub {
-            my $self = shift;
-            $self->filter_with($filter) if $self->can('filter_with');
-        };
-    }
 }
 
 plan tests => 9;

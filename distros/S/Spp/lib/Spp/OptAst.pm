@@ -1,20 +1,18 @@
 package Spp::OptAst;
 
+use 5.012;
+no warnings "experimental";
+
 use Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(opt_spp_ast);
 
-use 5.012;
-no warnings "experimental";
 use Spp::Builtin;
-use Spp::IsChar;
-use Spp::IsAtom;
+use Spp::Core;
 
 sub opt_spp_ast {
    my $ast   = shift;
    my $atoms = [];
-
-   # when single spec, data structure is same with multi
    if (is_atom($ast)) {
       my ($name, $spec) = @{$ast};
       if ($name eq 'Spec') {
@@ -22,8 +20,6 @@ sub opt_spp_ast {
       }
    }
    for my $atom (@{$ast}) {
-
-      # say to_json($atom);
       my ($name, $spec) = @{$atom};
       if ($name eq 'Spec') {
          push @{$atoms}, opt_spp_spec($spec);
@@ -35,7 +31,6 @@ sub opt_spp_ast {
 sub opt_spp_spec {
    my $atoms = shift;
    my $token = $atoms->[0];
-   die("spec name not token") if !is_atom_token($token);
    my $name      = $token->[1];
    my $rules     = rest($atoms);
    my $opt_rules = opt_spp_rules($rules);
@@ -79,10 +74,12 @@ sub opt_spp_atom {
       when ('Expr')    { return opt_spp_expr($value) }
       when ('Sym')     { return opt_spp_sym($value) }
       when ('Array')   { return opt_spp_array($value) }
-      when (['Assert', 'Any', 'Till', 'Not', 'Int']) {
-         return $atom
-      }
-      default { die "unknown Spp atom to opt: |$name|" }
+      when ('Assert')  { return $atom }
+      when ('Any')     { return $atom }
+      when ('Till')    { return $atom }
+      when ('Not')     { return $atom }
+      when ('Int')     { return $atom }
+      default { error("unknown Spp atom to opt: |$name|") }
    }
 }
 
@@ -116,14 +113,14 @@ sub opt_spp_lbranch {
 
 sub opt_spp_kstr {
    my $kstr = shift;
-   my $str  = rest($kstr);
+   my $str  = substr($kstr, 1);
    return ['Char', $str] if len($str) == 1;
    return ['Str', $str];
 }
 
 sub opt_spp_cclass {
    my $cclass = shift;
-   return ['Cclass', tail($cclass)];
+   return ['Cclass', substr($cclass, -1)];
 }
 
 sub opt_spp_char {
@@ -133,7 +130,7 @@ sub opt_spp_char {
 
 sub opt_spp_escape_char {
    my $str  = shift;
-   my $char = tail($str);
+   my $char = substr($str, -1);
    given ($char) {
       when ('b') { return ' ' }
       when ('f') { return "\f" }
@@ -193,8 +190,7 @@ sub gather_spp_tillnot {
          if (is_atom_tillnot($atom)) {
             $flag  = 1;
             $cache = $atom;
-         }
-         else {
+         } else {
             push @opt_atoms, $atom;
          }
       }
@@ -204,8 +200,7 @@ sub gather_spp_tillnot {
             $cache = [$name, $atom];
             push @opt_atoms, $cache;
             $flag = 0;
-         }
-         else {
+         } else {
             die('Till/Not duplicate');
          }
       }
@@ -224,29 +219,24 @@ sub gather_spp_look {
       if ($flag == 0) {
          if (is_atom_look($atom)) {
             die("Look token less prefix atom: $atom");
-         }
-         else {
+         } else {
             $cache = $atom;
             $flag  = 1;
          }
-      }
-      elsif ($flag == 1) {
+      } elsif ($flag == 1) {
          if (is_atom_look($atom)) {
             $look = $atom->[1];
             $flag = 2;
-         }
-         else {
+         } else {
             push @opt_atoms, $cache;
             $cache = $atom;
          }
-      }
-      else {
+      } else {
          if (!is_atom_look($atom)) {
             $cache = ['Look', [$look, $cache, $atom]];
             push @opt_atoms, $cache;
             $flag = 0;
-         }
-         else {
+         } else {
             die("Look token repeat");
          }
       }
@@ -293,7 +283,7 @@ sub opt_spp_token {
    return ['Ntoken', $name] if is_char_upper($char);
    return ['Ctoken', $name] if is_char_lower($char);
    return ['Rtoken', $name] if $char eq '_';
-   die("Unknown token: <$name> to Opt");
+   die "Unknown token: <$name> to Opt";
 }
 
 sub opt_spp_expr {
@@ -304,7 +294,7 @@ sub opt_spp_expr {
       $opt_atoms->[0] = $action->[1];
       return ['Expr', $opt_atoms];
    }
-   die("Expr not action: {$action->[1]}");
+   die "Expr not action: {$action->[1]}";
 }
 
 sub opt_spp_sym {

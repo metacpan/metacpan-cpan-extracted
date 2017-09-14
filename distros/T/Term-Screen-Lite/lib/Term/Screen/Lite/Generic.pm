@@ -1,6 +1,6 @@
 package Term::Screen::Lite::Generic;
 
-$Term::Screen::Lite::Generic::VERSION = '0.03';
+$Term::Screen::Lite::Generic::VERSION = '0.04';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Term::Screen::Lite::Generic - Unix/Linux platform interface to terminal screen.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -74,7 +74,7 @@ L<http://search.cpan.org/dist/Term-Screen-Lite/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Mohammad S Anwar.
+Copyright (C) 2015 - 2017 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

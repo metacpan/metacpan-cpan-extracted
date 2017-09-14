@@ -1,0 +1,3 @@
+[% USE gtx = Gettext %]
+Okay, no variables inside.
+[% gtx.gettext("Hello, world!\n") %]

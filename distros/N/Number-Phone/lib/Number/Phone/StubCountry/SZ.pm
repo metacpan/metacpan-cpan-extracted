@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164949;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
@@ -32,14 +32,14 @@ my $formatters = [
               ];
 
 my $validators = {
-                'geographic' => '2[2-5]\\d{6}',
-                'specialrate' => '',
-                'personal_number' => '',
-                'fixed_line' => '2[2-5]\\d{6}',
-                'mobile' => '7[6-8]\\d{6}',
                 'voip' => '',
+                'fixed_line' => '2[2-9]\\d{6}',
+                'specialrate' => '',
+                'mobile' => '7[6-9]\\d{6}',
                 'toll_free' => '0800\\d{4}',
-                'pager' => ''
+                'pager' => '',
+                'personal_number' => '',
+                'geographic' => '2[2-9]\\d{6}'
               };
 my %areanames = (
   2682207 => "Nhlangano\,\ Shiselweni\ district",
@@ -78,6 +78,10 @@ my %areanames = (
   2682528 => "Malkerns\,\ Manzini\ district",
   2682538 => "Mankayane\,\ Manzini\ district",
   2682548 => "Ludzeludze\,\ Manzini\ district",
+  26826 => "Hhohho",
+  26827 => "Manzini",
+  26828 => "Lubombo",
+  26829 => "Shiselweni",
 );
     sub new {
       my $class = shift;

@@ -1,5 +1,8 @@
 Revision history for Test-Clustericious-Blocking
 
+0.06      2017-09-13 11:47:40 -0400
+  - Test2 compatability fix (gh#5 Slaven Rezić++)
+
 0.05      2017-07-14 10:54:09 -0400
   - Migrate to Test2::V0
 

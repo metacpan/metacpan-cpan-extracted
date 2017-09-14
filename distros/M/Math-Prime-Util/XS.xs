@@ -13,14 +13,14 @@
 #define NEED_HvNAME_get
 #include "ppport.h"
 
-#include "ptypes.h"
-#include "cache.h"
-#include "sieve.h"
-#include "sieve_cluster.h"
 #define FUNC_gcd_ui 1
 #define FUNC_isqrt 1
 #define FUNC_ipow 1
 #define FUNC_popcnt 1
+#include "ptypes.h"
+#include "cache.h"
+#include "sieve.h"
+#include "sieve_cluster.h"
 #include "util.h"
 #include "primality.h"
 #include "factor.h"
@@ -29,6 +29,7 @@
 #include "aks.h"
 #include "constants.h"
 #include "mulmod.h"
+#include "entropy.h"
 #include "csprng.h"
 #include "random_prime.h"
 #include "ramanujan_primes.h"
@@ -89,11 +90,6 @@
       if (CvDEPTH(multicall_cv) > 1) SvREFCNT_inc(multicall_cv);
 #else
 #  define FIX_MULTICALL_REFCOUNT
-#endif
-
-#if (PERL_REVISION <= 5 && PERL_VERSION < 8)
-#  include <time.h>
-#  define Perl_seed(pTHX) ((U32)time(NULL))
 #endif
 
 #ifndef CvISXSUB
@@ -377,35 +373,29 @@ PPCODE:
   return; /* skip implicit PUTBACK, returning @_ to caller, more efficient*/
 
 
-void _csrand(IN SV* seed)
+void csrand(IN SV* seed = 0)
   PREINIT:
     unsigned char* data;
     STRLEN size;
   PPCODE:
-    data = (unsigned char*) SvPV(seed, size);
-    csprng_seed(size, data);
-#ifdef BENCH_CSPRNG
-    {
-      struct timeval t0, t1;
-      unsigned char buf[32768];
-      int i, loop = 100000;
-      double usec, usec_per_byte;
-      gettimeofday(&t0, 0);
-      for (i = 0; i < loop; i++)
-        csprng_rand_bytes(32768, buf);
-      gettimeofday(&t1, 0);
-      usec = (t1.tv_sec-t0.tv_sec) * 1000000.0 + (t1.tv_usec - t0.tv_usec);
-      usec_per_byte = usec / (32768*100000.0);
-      printf("CSPRNG runs at %.3lf ns/word\n", 4 * usec_per_byte * 1000.0);
-    }
-#endif
-
-UV _srand(IN UV seedval = 0)
-  CODE:
     if (items == 0) {
-      /* Use Perl's function to get a pretty random 32-bit value */
-      seedval = Perl_seed(aTHX);
+      New(0, data, 64, unsigned char);
+      get_entropy_bytes(64, data);
+      csprng_seed(64, data);
+      Safefree(data);
+    } else if (_XS_get_secure()) {
+      croak("secure option set, manual seeding disabled");
+    } else {
+      data = (unsigned char*) SvPV(seed, size);
+      csprng_seed(size, data);
     }
+
+UV srand(IN UV seedval = 0)
+  CODE:
+    if (_XS_get_secure())
+      croak("secure option set, manual seeding disabled");
+    if (items == 0)
+      get_entropy_bytes(sizeof(UV), (unsigned char*) &seedval);
     csprng_srand(seedval);
     RETVAL = seedval;
   OUTPUT:
@@ -449,17 +439,34 @@ SV* random_bytes(IN UV n)
   OUTPUT:
     RETVAL
 
+SV* entropy_bytes(IN UV n)
+  PREINIT:
+    char* sptr;
+  CODE:
+    RETVAL = newSV(n == 0 ? 1 : n);
+    SvPOK_only(RETVAL);
+    SvCUR_set(RETVAL, n);
+    sptr = SvPVX(RETVAL);
+    get_entropy_bytes(n, (unsigned char*)sptr);
+    sptr[n] = '\0';
+  OUTPUT:
+    RETVAL
+
 UV _is_csprng_well_seeded()
   ALIAS:
     _XS_get_verbose = 1
     _XS_get_callgmp = 2
-    _get_prime_cache_size = 3
+    _XS_get_secure = 3
+    _XS_set_secure = 4
+    _get_prime_cache_size = 5
   CODE:
     switch (ix) {
       case 0:  RETVAL = is_csprng_well_seeded(); break;
       case 1:  RETVAL = _XS_get_verbose(); break;
       case 2:  RETVAL = _XS_get_callgmp(); break;
-      case 3:
+      case 3:  RETVAL = _XS_get_secure(); break;
+      case 4:  _XS_set_secure(); RETVAL = 1; break;
+      case 5:
       default: RETVAL = get_prime_cache(0,0); break;
     }
   OUTPUT:
@@ -995,16 +1002,14 @@ chinese(...)
   PROTOTYPE: @
   PREINIT:
     int i, status;
-    UV* an;
-    UV ret;
+    UV ret, *an;
+    SV **psva, **psvn;
   PPCODE:
     status = 1;
     New(0, an, 2*items, UV);
     ret = 0;
     for (i = 0; i < items; i++) {
       AV* av;
-      SV** psva;
-      SV** psvn;
       if (!SvROK(ST(i)) || SvTYPE(SvRV(ST(i))) != SVt_PVAV || av_len((AV*)SvRV(ST(i))) != 1)
         croak("chinese arguments are two-element array references");
       av = (AV*) SvRV(ST(i));
@@ -1022,7 +1027,9 @@ chinese(...)
     Safefree(an);
     if (status == -1) XSRETURN_UNDEF;
     if (status)       XSRETURN_UV(ret);
+    psvn = av_fetch((AV*) SvRV(ST(0)), 1, 0);
     _vcallsub_with_gmp(0.32,"chinese");
+    OBJECTIFY_RESULT( (psvn ? *psvn : 0), ST(0));
     return; /* skip implicit PUTBACK */
 
 void
@@ -1106,7 +1113,7 @@ is_prime(IN SV* svn, ...)
           case 4:  ret = is_aks_prime(n); break;
           case 5:  ret = is_lucas_pseudoprime(n, 0); break;
           case 6:  ret = is_lucas_pseudoprime(n, 1); break;
-          case 7:  ret = is_lucas_pseudoprime(n, 2); break;
+          case 7:  ret = is_lucas_pseudoprime(n, 3); break;
           case 8:  {
                      /* IV P = 1, Q = -1; */ /* Fibonacci polynomial */
                      IV P = 0, Q = 0;        /* Q=2,P=least odd s.t. (D|n)=-1 */
@@ -1334,21 +1341,25 @@ next_prime(IN SV* svn)
 void urandomb(IN UV bits)
   ALIAS:
     random_ndigit_prime = 1
-    random_nbit_prime = 2
-    random_shawe_taylor_prime = 3
-    random_maurer_prime = 4
-    random_proven_prime = 5
-    random_strong_prime = 6
+    random_semiprime = 2
+    random_unrestricted_semiprime = 3
+    random_nbit_prime = 4
+    random_shawe_taylor_prime = 5
+    random_maurer_prime = 6
+    random_proven_prime = 7
+    random_strong_prime = 8
   PREINIT:
     UV res, minarg;
   PPCODE:
     switch (ix) {
       case 1:  minarg =   1; break;
-      case 2:
-      case 3:
+      case 2:  minarg =   4; break;
+      case 3:  minarg =   3; break;
       case 4:
-      case 5:  minarg =   2; break;
-      case 6:  minarg = 128; break;
+      case 5:
+      case 6:
+      case 7:  minarg =   2; break;
+      case 8:  minarg = 128; break;
       default: minarg =   0; break;
     }
     if (minarg > 0 && bits < minarg)
@@ -1357,11 +1368,13 @@ void urandomb(IN UV bits)
       switch (ix) {
         case 0:  res = urandomb(bits); break;
         case 1:  res = random_ndigit_prime(bits); break;
-        case 2:
-        case 3:
+        case 2:  res = random_semiprime(bits); break;
+        case 3:  res = random_unrestricted_semiprime(bits); break;
         case 4:
         case 5:
         case 6:
+        case 7:
+        case 8:
         default: res = random_nbit_prime(bits); break;
       }
       if (res || ix == 0) XSRETURN_UV(res);
@@ -1369,11 +1382,13 @@ void urandomb(IN UV bits)
     switch (ix) {
       case 0:  _vcallsub_with_gmp(0.43,"urandomb"); break;
       case 1:  _vcallsub_with_gmp(0.42,"random_ndigit_prime"); break;
-      case 2:  _vcallsub_with_gmp(0.42,"random_nbit_prime"); break;
-      case 3:  _vcallsub_with_gmp(0.43,"random_shawe_taylor_prime"); break;
-      case 4:
-      case 5:  _vcallsub_with_gmp(0.43,"random_maurer_prime"); break;
+      case 2:  _vcallsub_with_gmp(0.00,"random_semiprime"); break;
+      case 3:  _vcallsub_with_gmp(0.00,"random_unrestricted_semiprime"); break;
+      case 4:  _vcallsub_with_gmp(0.42,"random_nbit_prime"); break;
+      case 5:  _vcallsub_with_gmp(0.43,"random_shawe_taylor_prime"); break;
       case 6:
+      case 7:  _vcallsub_with_gmp(0.43,"random_maurer_prime"); break;
+      case 8:
       default: _vcallsub_with_gmp(0.43,"random_strong_prime"); break;
     }
     OBJECTIFY_RESULT(ST(0), ST(0));
@@ -1884,6 +1899,81 @@ carmichael_lambda(IN SV* svn)
       default: _vcallsub_with_pp("ramanujan_tau"); break;
     }
     return; /* skip implicit PUTBACK */
+
+void
+numtoperm(IN UV n, IN SV* svk)
+  PREINIT:
+    UV k;
+    int i, S[32];
+  PPCODE:
+    if (n == 0)
+      XSRETURN_EMPTY;
+    if (n < 32 && _validate_int(aTHX_ svk, 1) == 1) {
+      k = my_svuv(svk);
+      if (num_to_perm(k, n, S)) {
+        dMY_CXT;
+        EXTEND(SP, (IV)n);
+        for (i = 0; i < (int)n; i++)
+          PUSH_NPARITY( S[i] );
+        XSRETURN(n);
+      }
+    }
+    _vcallsubn(aTHX_ GIMME_V, VCALL_PP, "numtoperm", items, 0);
+    return;
+
+void
+permtonum(IN SV* svp)
+  PREINIT:
+    AV *av;
+    UV val, num;
+    int plen, i;
+  PPCODE:
+    if ((!SvROK(svp)) || (SvTYPE(SvRV(svp)) != SVt_PVAV))
+      croak("permtonum argument must be an array reference");
+    av = (AV*) SvRV(svp);
+    plen = av_len(av);
+    if (plen < 32) {
+      int V[32], A[32] = {0};
+      for (i = 0; i <= plen; i++) {
+        SV **iv = av_fetch(av, i, 0);
+        if (iv == 0 || _validate_int(aTHX_ *iv, 1) != 1) break;
+        val = my_svuv(*iv);
+        if (val > (UV)plen || A[val] != 0) break;
+        A[val] = i+1;
+        V[i] = val;
+      }
+      if (i > plen && perm_to_num(plen+1, V, &num))
+        XSRETURN_UV(num);
+    }
+    _vcallsub_with_pp("permtonum");
+    return;
+
+void
+randperm(IN UV n, IN UV k = 0)
+  PREINIT:
+    UV i, *S;
+  PPCODE:
+    if (items == 1) k = n;
+    if (k > n) k = n;
+    if (k == 0) XSRETURN_EMPTY;
+    New(0, S, n, UV);  /* TODO: k? */
+    randperm(n, k, S);
+    EXTEND(SP, (IV)k);
+    for (i = 0; i < k; i++)
+      PUSHs(sv_2mortal(newSViv( S[i] )));
+    Safefree(S);
+
+void shuffle(...)
+  PREINIT:
+    int i;
+  PPCODE:
+    if (items == 0)
+      XSRETURN_EMPTY;
+    for (i = 0; i < items-1; i++) {
+      UV j = urandomm32(items-i);
+      { SV* t = ST(i); ST(i) = ST(i+j); ST(i+j) = t; }
+    }
+    XSRETURN(items);
 
 void
 sumdigits(SV* svn, UV ibase = 255)
@@ -2408,6 +2498,7 @@ void
 forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
   ALIAS:
     forperm = 1
+    forderange = 2
   PROTOTYPE: &$;$
   PREINIT:
     UV i, n, k, j, m;
@@ -2445,7 +2536,12 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     }
 
     while (1) {
-      { dSP; ENTER; PUSHMARK(SP);                /* Send the values */
+      if (ix == 2)
+        for (i = 0; i < k; i++)
+          if (cm[k-i-1]-1 == i)
+            break;
+      if (ix < 2 || i == k) {
+        dSP; ENTER; PUSHMARK(SP);
         EXTEND(SP, ((IV)k));
         for (i = 0; i < k; i++) { PUSHs(svals[ cm[k-i-1]-1 ]); }
         PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;

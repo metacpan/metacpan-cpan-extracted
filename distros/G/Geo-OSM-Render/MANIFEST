@@ -1,0 +1,29 @@
+Changes
+lib/Geo/OSM/Render.pm
+lib/Geo/OSM/Render/Projection.pm
+lib/Geo/OSM/Render/Projection/CH_LV03.pm
+lib/Geo/OSM/Render/Projection/Ident.pm
+lib/Geo/OSM/Render/Renderer.pm
+lib/Geo/OSM/Render/Renderer/SVG.pm
+lib/Geo/OSM/Render/Viewport.pm
+lib/Geo/OSM/Render/Viewport/Clipped.pm
+lib/Geo/OSM/Render/Viewport/UnClipped.pm
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/001-load.svg
+t/001-load.t
+t/002-svg-new-max_width_height.svg
+t/002-svg-new-max_width_height.t
+t/003-svg-render-nodes.svg
+t/003-svg-render-nodes.t
+t/coordinates-node-to-map.t
+t/projection-ch_lv03.t
+t/projection-ident.t
+t/viewport-clipped.t
+t/viewport-unclipped.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

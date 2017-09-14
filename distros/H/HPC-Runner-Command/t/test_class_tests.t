@@ -2,6 +2,8 @@ use File::Spec::Functions qw( catdir  );
 use FindBin qw( $Bin  );
 use Test::Class::Moose::Load catdir( $Bin, 'lib' );
 use Test::Class::Moose::Runner;
+##Tests fail on travis without this
+use IO::Interactive;
 
 ##Run the main applications tests
 if ( $ENV{'TRAVIS'} || $ENV{'DEV'} ) {

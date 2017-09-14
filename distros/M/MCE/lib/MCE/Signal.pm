@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.829';
+our $VERSION = '1.830';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -23,19 +23,10 @@ tie $tmp_dir, 'MCE::Signal::_tmpdir';
 use Carp ();
 
 BEGIN {
-   local $@;
-
    $main_proc_id =  $$;
    $prog_name    =  $0;
    $prog_name    =~ s{^.*[\\/]}{}g;
    $prog_name    =  'perl' if ($prog_name eq '-e' || $prog_name eq '-');
-
-   if ($^O eq 'MSWin32' && !$INC{'threads.pm'}) {
-      eval 'use threads; use threads::shared';
-   }
-   elsif ($INC{'threads.pm'} && !$INC{'threads/shared.pm'}) {
-      eval 'use threads::shared';
-   }
 
    return;
 }
@@ -52,15 +43,7 @@ our %EXPORT_TAGS = (
 sub _NOOP {}
 
 END {
-   if ($$ == $main_proc_id) {
-      if (defined $MCE::Signal::SIGNAME) {
-         $SIG{ $MCE::Signal::SIGNAME } = 'DEFAULT';
-         CORE::kill($MCE::Signal::SIGNAME, $$);
-      }
-      else {
-         MCE::Signal::stop_and_exit($?);
-      }
-   }
+   MCE::Signal->stop_and_exit($?) if ($$ == $main_proc_id);
 }
 
 ###############################################################################
@@ -119,14 +102,16 @@ sub import {
 ###############################################################################
 
 ## Set traps to catch signals.
-$SIG{HUP}  = \&stop_and_exit;  # UNIX SIG  1
-$SIG{INT}  = \&stop_and_exit;  # UNIX SIG  2
-$SIG{PIPE} = \&stop_and_exit;  # UNIX SIG 13
-$SIG{QUIT} = \&stop_and_exit;  # UNIX SIG  3
-$SIG{TERM} = \&stop_and_exit;  # UNIX SIG 15
+if ( !$_is_MSWin32 ) {
+   $SIG{HUP}  = \&stop_and_exit;  # UNIX SIG  1
+   $SIG{INT}  = \&stop_and_exit;  # UNIX SIG  2
+   $SIG{PIPE} = \&stop_and_exit;  # UNIX SIG 13
+   $SIG{QUIT} = \&stop_and_exit;  # UNIX SIG  3
+   $SIG{TERM} = \&stop_and_exit;  # UNIX SIG 15
 
-## MCE handles the reaping of its children.
-$SIG{CHLD} = 'DEFAULT' unless $_is_MSWin32;
+   ## MCE handles the reaping of its children.
+   $SIG{CHLD} = 'DEFAULT';
+}
 
 my $_safe_clean = 0;
 
@@ -198,7 +183,11 @@ my %_sig_name_lkup = map { $_ => 1 } qw(
    CHLD __DIE__ HUP INT PIPE QUIT TERM __WARN__
 );
 
-my $_handler_cnt : shared = 0;
+my $_count = 0;
+
+my $_handler_count = $INC{'threads/shared.pm'}
+   ? threads::shared::share($_count)
+   : \$_count;
 
 sub stop_and_exit {
    shift @_ if (defined $_[0] && $_[0] eq 'MCE::Signal');
@@ -206,27 +195,19 @@ sub stop_and_exit {
    my ($_exit_status, $_is_sig, $_sig_name) = ($?, 0, $_[0] || 0);
    $SIG{__DIE__} = $SIG{__WARN__} = \&_NOOP;
 
-   if (!defined $MCE::Signal::STATUS) {
-      if (!exists $_sig_name_lkup{ $_sig_name }) {
-         $MCE::Signal::STATUS = $_sig_name if ($_sig_name =~ /^\d+$/);
-      } else {
-         $SIG{INT} = $SIG{$_sig_name} = \&_NOOP;
-         $MCE::Signal::STATUS = $_is_sig = $MCE::Signal::KILLED = 1;
-         $MCE::Signal::STATUS = 255 if ($_sig_name eq '__DIE__');
-         $MCE::Signal::STATUS = 0 if ($_sig_name eq 'PIPE');
-      }
+   if (exists $_sig_name_lkup{$_sig_name}) {
+      $SIG{INT} = $SIG{$_sig_name} = \&_NOOP,
+      $_is_sig  = $MCE::Signal::KILLED = 1;
+      $_exit_status = 255 if ($_sig_name eq '__DIE__');
+      $_exit_status = 0   if ($_sig_name eq 'PIPE');
    }
 
    ## Main process.
    if ($$ == $main_proc_id) {
-      lock $_handler_cnt if $INC{'threads/shared.pm'};
 
-      if (++$_handler_cnt == 1) {
+      if (++${ $_handler_count } == 1) {
          ## Kill process group if signaled.
          if ($_is_sig == 1) {
-            if ($_sig_name eq 'INT' || $_sig_name eq 'TERM') {
-               $MCE::Signal::SIGNAME = $_sig_name;
-            }
             ($_sig_name eq 'PIPE')
                ? CORE::kill('PIPE', $_is_MSWin32 ? -$$ : -getpgrp)
                : CORE::kill('INT' , $_is_MSWin32 ? -$$ : -getpgrp);
@@ -243,6 +224,12 @@ sub stop_and_exit {
 
          ## Signal process group to die.
          if ($_is_sig == 1) {
+            if ($_sig_name eq 'PIPE' && $INC{'MCE/Hobo.pm'}) {
+               CORE::kill('QUIT', $_is_MSWin32 ? -$$ : -getpgrp);
+            }
+            if ($_sig_name eq 'INT' && -t STDIN) { ## no critic
+               print {*STDERR} "\n";
+            }
             if ($INC{'threads.pm'} && ($] lt '5.012000' || threads->tid())) {
                ($_no_kill9 == 1 || $_sig_name eq 'PIPE')
                   ? CORE::kill('INT', $_is_MSWin32 ? -$$ : -getpgrp)
@@ -257,7 +244,6 @@ sub stop_and_exit {
 
    ## Child processes.
    elsif ($_is_sig) {
-      lock $_handler_cnt if $INC{'threads/shared.pm'};
 
       ## Windows support, from nested workers.
       if ($_is_MSWin32) {
@@ -273,9 +259,7 @@ sub stop_and_exit {
    }
 
    ## Exit with status.
-   ( defined $MCE::Signal::STATUS )
-      ? CORE::exit( $MCE::Signal::STATUS )
-      : CORE::exit( $_exit_status );
+   CORE::exit($_exit_status);
 }
 
 ###############################################################################
@@ -443,7 +427,7 @@ MCE::Signal - Temporary directory creation/cleanup and signal handling
 
 =head1 VERSION
 
-This document describes MCE::Signal version 1.829
+This document describes MCE::Signal version 1.830
 
 =head1 SYNOPSIS
 
@@ -493,11 +477,9 @@ The following are available options and their meanings.
                      A message is displayed with the location afterwards
 
  -use_dev_shm      - Create the temporary directory under /dev/shm
-
  -no_kill9         - Do not kill -9 after receiving a signal to terminate
 
  -setpgrp          - Calls setpgrp to set the process group for the process
-
                      This option ensures all workers terminate when reading
                      STDIN for MCE releases 1.511 and below.
 

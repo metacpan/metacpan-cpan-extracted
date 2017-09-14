@@ -2,7 +2,7 @@ package Test2::Event::Ok;
 use strict;
 use warnings;
 
-our $VERSION = '1.302086';
+our $VERSION = '1.302096';
 
 
 BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -46,6 +46,33 @@ sub summary {
     }
 
     return $name;
+}
+
+sub extra_amnesty {
+    my $self = shift;
+    return unless defined($self->{+TODO}) || ($self->{+EFFECTIVE_PASS} && !$self->{+PASS});
+    return {
+        tag       => 'TODO',
+        details   => $self->{+TODO},
+    };
+}
+
+sub facet_data {
+    my $self = shift;
+
+    my $out = $self->common_facet_data;
+
+    $out->{assert}  = {
+        no_debug => 1,                # Legacy behavior
+        pass     => $self->{+PASS},
+        details  => $self->{+NAME},
+    };
+
+    if (my @exra_amnesty = $self->extra_amnesty) {
+        unshift @{$out->{amnesty}} => @exra_amnesty;
+    }
+
+    return $out;
 }
 
 1;

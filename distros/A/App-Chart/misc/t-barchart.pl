@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2015, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -28,17 +28,7 @@ use App::Chart::Barchart;
 
 
 {
-  my $resp = HTTP::Response->new(200, 'OK');
-  my $content = slurp("$ENV{HOME}/chart/samples/barchart/CLZ16.html");
-  $resp->content($content);
-  $resp->content_type('text/html');
-  my $h = App::Chart::Barchart::fiveday_parse ('CLZ16.NYM', $resp);
-  print Dumper ($h);
-  # App::Chart::Download::write_latest_group ($h);
-  exit 0;
-}
-{
-  my $symbol = 'GCZ10.CMX';
+  my $symbol = 'GCZ17.CMX';
   my $mode = '1d';
   require App::Chart::IntradayHandler;
   $App::Chart::option{'verbose'} = 2;
@@ -48,6 +38,17 @@ use App::Chart::Barchart;
   $handler->download ($symbol);
   exit 0;
 }
+{
+  my $resp = HTTP::Response->new(200, 'OK');
+  my $content = slurp("$ENV{HOME}/chart/samples/barchart/CLZ16.html");
+  $resp->content($content);
+  $resp->content_type('text/html');
+  my $h = App::Chart::Barchart::fiveday_parse ('CLZ16.NYM', $resp);
+  print Dumper ($h);
+  # App::Chart::Download::write_latest_group ($h);
+  exit 0;
+}
+
 
 {
   my $req_url = 'http://www.barchart.com/chart.php?sym=CLZ10&style=technical&p=I&d=O&im=&sd=&ed=&size=M&log=0&t=BAR&v=2&g=1&evnt=1&late=1&o1=&o2=&o3=&x=41&y=11&indicators=&addindicator=&submitted=1&fpage=&txtDate=#jump';

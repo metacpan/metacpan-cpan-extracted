@@ -4,7 +4,7 @@
       "Daisuke Murase <typester@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Test::RedisServer" : {
          "file" : "lib/Test/RedisServer.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -73,13 +73,15 @@
          "web" : "https://github.com/typester/Test-RedisServer"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_authority" : "cpan:TYPESTER",
    "x_contributors" : [
-      "Jeremy Zawodny <jzawodn@craigslist.org>",
-      "Ivan Baidakou <dmol@gmx.com>",
       "Daisuke Murase <typester@gmail.com>",
+      "Ivan Baidakou <dmol@gmx.com>",
+      "Jeremy Zawodny <jzawodn@craigslist.org>",
+      "Robin Smidsrød <robin@smidsrod.no>",
       "Sean Smith <ssmith@localhost.localdomain>",
       "Songmu <y.songmu@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

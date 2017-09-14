@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.61';
+our $VERSION = '1.76';
 
 =encoding utf8
 
@@ -67,7 +67,7 @@ You must declare the instance variable, remember to use I<local our>.
 
 	sub yoursubname
 	{
-		my $namedparam = $j->params->namedparam; 
+		my $namedparam = $j->params->namedparam;
 		$j->table->fields = $sh->{NAME};
 		$j->table->data = $sh->fetchall_arrayref;
 	}
@@ -82,7 +82,7 @@ option setting methods allow for chained calls:
 
 	sub yoursubname
 	{
-		my $namedparam = $j->params->namedparam; 
+		my $namedparam = $j->params->namedparam;
 		$j->table->fields = $sh->{NAME};
 		$j->table->data = $sh->fetchall_arrayref;
 	}
@@ -118,10 +118,10 @@ it is equivalent to:
 
 you can even build a tree:
 
-	$jsonp->first->second = 'hello!'; 
+	$jsonp->first->second = 'hello!';
 	print $jsonp->first->second; # will print "hello!"
 
-it is the same as: 
+it is the same as:
 
 	$jsonp->{first}->{second} = 'hello!';
 	print $jsonp->{first}->{second};
@@ -183,7 +183,7 @@ IMPORTANT NOTE 3: deserialized booleans from JSON are turned into referenes to s
         say !! $j->testbool->true;
         say !! $j->testbool->false;
 
-NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, if you want to serialize a deeper branch than the root one:
+NOTE: in order to get a "pretty print" via serialize method you will need to either call I<debug> or I<pretty> methods before serialize, use I<pretty> if you want to serialize a deeper branch than the root one:
 
 	my $j = JSONP->new->debug;
         $j->firstnode->a = 5;
@@ -224,7 +224,7 @@ sub import
 	die 'not valid variable name' unless $name =~ /^[a-z][0-9a-zA-Z_]{0,31}$/;
 	my $symbol = caller() . '::' . $name;
 	{
-		no strict 'refs';
+		no strict 'refs'; ## no critic
 		*$symbol = \JSONP->new;
 	}
 }
@@ -325,12 +325,12 @@ sub run
 			-httponly	=> 1
 		};
 		$cookie->{-expires} = "+$$self{_session_expiration}s" if $self->{_session_expiration};
-		$header->{-cookie} = $r->cookie($cookie); 
+		$header->{-cookie} = $r->cookie($cookie);
 	}
 
 	if (! ! $session && defined &$map || $isloginsub) {
 		eval {
-			no strict 'refs';
+			no strict 'refs'; ## no critic
 			my $outcome = &$map($sid);
 			$self->{_authenticated} = $outcome if $isloginsub;
 		};
@@ -348,8 +348,9 @@ sub run
 	# give a nice JSON "true"/"false" output for authentication
 	$self->authenticated = $self->{_authenticated} ? \1 : \0;
 
+	my $callback;
 	unless($self->{_passthrough}){
-		my $callback = $self->params->callback if $self->{_request_method} eq 'GET';
+		$callback = $self->params->callback if $self->{_request_method} eq 'GET';
 		if($callback){
 			$callback = $callback =~ /^([a-z][0-9a-zA-Z_]{1,63})$/ ? $1 : '';
 			$self->raiseError('invalid callback') unless $callback;
@@ -367,7 +368,11 @@ sub run
 			print $r->header($header);
 			print $self->{_html};
 		} else {
-			$header->{'-attachment'} = $self->{_sendfile} =~ /([^\/]+)$/ ? $1 : '';
+			if ($self->{_inline}) {
+				$header->{'-disposition'} = 'inline';
+			} else {
+				$header->{'-attachment'} = $self->{_sendfile} =~ /([^\/]+)$/ ? $1 : '';
+			}
 			print $r->header($header);
 			print $self->_slurp($self->{_sendfile});
 		}
@@ -404,7 +409,7 @@ sub html
 
 =head3 sendfile
 
-use this method if you need to return a file instead of JSON, pass the full file path as as argument. Mime type will be set always to I<application/octet-stream>.
+use this method if you need to return a file instead of JSON, pass the full file path as as argument. MIME type will be set always to I<application/octet-stream>.
 
 	yoursubname
 	{
@@ -420,6 +425,24 @@ sub sendfile
 	$self->{_passthrough} = 1;
 	$self->{_mimetype} = 'application/octet-stream';
 	$self->{_sendfile} = $filepath;
+	$self;
+}
+
+=head3 file
+
+call this method to send a file with custom MIME type and/or if you want to set it as inline.
+
+	$j->file('path to file', $mimetype, $isInline);
+
+=cut
+
+sub file
+{
+	my ($self, $filepath, $mime, $inline) = @_;
+	$self->{_passthrough} = 1;
+	$self->{_mimetype} = $mime;
+	$self->{_sendfile} = $filepath;
+	$self->{_inline} = $inline;
 	$self;
 }
 
@@ -510,7 +533,7 @@ sub query
 =head3 plain_json
 
 B<this function is deprecated and has no effect anymore, now a plain JSON request will be returned if no I<callback> parameter will be provided.>
-call this function to enable output in simple JSON format (not enclosed within jquery_callback_name()... ). Do this only when your script is on the same domain of static content. This method can be useful also during testing of your application. You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true. 
+call this function to enable output in simple JSON format (not enclosed within jquery_callback_name()... ). Do this only when your script is on the same domain of static content. This method can be useful also during testing of your application. You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
 
 =cut
 
@@ -538,7 +561,7 @@ sub aaa
 	else {
 		my $map = caller() . '::' . $sub;
 		{
-			no strict 'refs';
+			no strict 'refs'; ## no critic
 			die "given AAA function does not exist" unless defined &$map;
 			$self->{_aaa_sub} = \&$map;
 		}
@@ -561,7 +584,7 @@ sub login
 	else {
 		my $map = caller() . '::' . $sub;
 		{
-			no strict 'refs';
+			no strict 'refs'; ## no critic
 			die "given login function does not exist" unless defined &$map;
 			$self->{_login_sub} = \&$map;
 		}
@@ -584,7 +607,7 @@ sub logout
 	else {
 		my $map = caller() . '::' . $sub;
 		{
-			no strict 'refs';
+			no strict 'refs'; ## no critic
 			die "given logout function does not exist" unless defined &$map;
 			$self->{_logout_sub} = \&$map;
 		}
@@ -711,7 +734,7 @@ call this method to serialize and output a subtree:
 	$j->sublist->graft->('newbranchname', '[{"name" : "first one"}, {"name" : "second one"}]');
 	print $j->sublist->newbranchname->[1]->name; will print "second one"
 	$j->subtree->newbranchname->graft('subtree', '{"name" : "some string", "count" : 4}');
-	print $j->subtree->newbranchname->subtree->serialize; # will print '{"name" : "some string", "count" : 4}' 
+	print $j->subtree->newbranchname->subtree->serialize; # will print '{"name" : "some string", "count" : 4}'
 
 IMPORTANT NOTE: do not assign any reference to a sub to any node, example:
 
@@ -725,24 +748,22 @@ sub serialize
 {
 	my ($self) = @_;
 	my $out;
+	my $pretty = reftype $self eq 'HASH' && $self->{_pretty} ? 1 : 0;
 	eval{
-		$out = JSON->new->utf8->pretty($$self{_pretty} // 0)->allow_blessed->convert_blessed->encode($self);
-	};
-	
-	$out = $@ ? 'invalid JSON' : $out;
+		$out = JSON->new->ascii->pretty($pretty)->allow_blessed->convert_blessed->encode($self);
+	} || $@;
 }
 
 sub _bless_tree
 {
 	my ($self, $node) = @_;
-	my $isarray = ref $node eq 'ARRAY';
-	my $ishash  = ref $node eq 'HASH';
-	return unless $isarray || $ishash;
+	my $refnode = ref $node;
+	return unless $refnode eq 'HASH' || $refnode eq 'ARRAY';
 	bless $node, ref $self;
-	if ($ishash){
+	if ($refnode eq 'HASH'){
 		$self->_bless_tree($node->{$_}) for keys %$node;
 	}
-	if ($isarray){
+	if ($refnode eq 'ARRAY'){
 		$self->_bless_tree($_) for @$node;
 	}
 	$node;
@@ -751,15 +772,9 @@ sub _bless_tree
 sub TO_JSON
 {
 	my $self = shift;
-	return 'true'  if ref $self eq 'SCALAR' && $$self == 1;
-	return 'false' if ref $self eq 'SCALAR' && $$self == 0;
 	my $output;
 
-	if(reftype $self eq 'ARRAY'){
-		$output = [];
-		push @$output, $_ for @$self;
-		return $output;
-	}
+	return [@$self] if reftype $self eq 'ARRAY';
 
 	$output = {};
 	for(keys %$self){
@@ -783,16 +798,15 @@ sub DESTROY{}
 sub AUTOLOAD : lvalue
 {
 	my $classname =  ref $_[0];
-	my $validname = '[a-zA-Z][a-zA-Z0-9_]*'; 
+	my $validname = '[a-zA-Z][a-zA-Z0-9_]*';
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;
 	die "illegal key name, must be of $validname form\n$AUTOLOAD" unless $key;
+	my $miss = Want::want('REF OBJECT') ? {} : '';
 	my $retval = $_[0]->{$key};
-	my $isNode = Want::want('REF OBJECT')  ? {} : undef;
-	undef $retval if $isNode && ! reftype($retval);
-	my $isBool = Want::want('SCALAR BOOL') && reftype($retval) && reftype($retval) eq 'SCALAR';
+	my $isBool = Want::want('SCALAR BOOL') && ((reftype($retval) // '') eq 'SCALAR');
 	$retval = $$retval if $isBool;
-	$_[0]->{$key} = $_[1] // $retval // $isNode // '';
+	$_[0]->{$key} = $_[1] // $retval // $miss;
 	$_[0]->_bless_tree($_[0]->{$key}) if ref $_[0]->{$key} eq 'HASH' || ref $_[0]->{$key} eq 'ARRAY';
 	$_[0]->{$key};
 }
@@ -831,6 +845,7 @@ Remember to always:
 
 the author would be happy to receive suggestions and bug notification. If somebody would like to send code and automated tests for this module, I will be happy to integrate it.
 The code for this module is tracked on this L<GitHub page|https://github.com/ANSI-C/JSONP>.
+Many thanks to L<Robert Acock|https://metacpan.org/author/LNATION> for providing improvement suggestions and bug reports.
 
 =head1 LICENSE
 

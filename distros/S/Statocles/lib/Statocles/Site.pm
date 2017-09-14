@@ -1,5 +1,5 @@
 package Statocles::Site;
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 # ABSTRACT: An entire, configured website
 
 use Statocles::Base 'Class', 'Emitter';
@@ -389,6 +389,25 @@ has markdown => (
     is => 'ro',
     isa => HasMethods['markdown'],
     default => sub { Text::Markdown->new },
+);
+
+#pod =attr disable_content_template
+#pod
+#pod This disables processing the content as a template. This can speed up processing
+#pod when the content is not using template directives. 
+#pod
+#pod This can be also set in the application
+#pod (L<Statocles::App/disable_content_template>), or for each document
+#pod (L<Statocles::Document/disable_content_template>).
+#pod
+#pod =cut
+
+has disable_content_template => (
+    is => 'ro',
+    isa => Bool,
+    lazy => 1,
+    default => 0,
+    predicate => 'has_disable_content_template',
 );
 
 # The current deploy we're writing to
@@ -829,7 +848,7 @@ Statocles::Site - An entire, configured website
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 SYNOPSIS
 
@@ -1044,6 +1063,15 @@ The Text::Markdown object to use to turn Markdown into HTML. Defaults to a
 plain Text::Markdown object.
 
 Any object with a "markdown" method will work here.
+
+=head2 disable_content_template
+
+This disables processing the content as a template. This can speed up processing
+when the content is not using template directives. 
+
+This can be also set in the application
+(L<Statocles::App/disable_content_template>), or for each document
+(L<Statocles::Document/disable_content_template>).
 
 =head2 pages
 

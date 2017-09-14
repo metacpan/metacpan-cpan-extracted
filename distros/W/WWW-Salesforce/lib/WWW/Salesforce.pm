@@ -1,30 +1,26 @@
 package WWW::Salesforce;
 
-use 5.008001;
-
 use strict;
 use warnings;
 
 use SOAP::Lite;    # ( +trace => 'all', readable => 1, );#, outputxml => 1, );
-use Data::Dumper;
+use DateTime;
+# use Data::Dumper;
 use WWW::Salesforce::Constants;
 use WWW::Salesforce::Deserializer;
 use WWW::Salesforce::Serializer;
 
-use vars qw(
-  $VERSION $SF_URI $SF_PREFIX $SF_PROXY $SF_SOBJECT_URI $SF_URIM $SF_APIVERSION $WEB_PROXY
-);
+our $VERSION = '0.301';
+$VERSION = eval $VERSION;
 
-$VERSION = '0.25';
-
-$SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/8.0';
-$SF_URI         = 'urn:partner.soap.sforce.com';
-$SF_PREFIX      = 'sforce';
-$SF_SOBJECT_URI = 'urn:sobject.partner.soap.sforce.com';
-$SF_URIM        = 'http://soap.sforce.com/2006/04/metadata';
-$SF_APIVERSION  = '23.0';
+our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/8.0';
+our $SF_URI         = 'urn:partner.soap.sforce.com';
+our $SF_PREFIX      = 'sforce';
+our $SF_SOBJECT_URI = 'urn:sobject.partner.soap.sforce.com';
+our $SF_URIM        = 'http://soap.sforce.com/2006/04/metadata';
+our $SF_APIVERSION  = '23.0';
 # set webproxy if firewall blocks port 443 to SF_PROXY
-$WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
+our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
 
 =encoding utf8
@@ -63,7 +59,7 @@ sub new {
 
 =head2 login( HASH )
 
-The C<login> method returns an object of type WWW::Salesforce if the login attempt was successful, and 0 otherwise. Upon a successful login, the sessionId is saved and the serverUrl set properly so that developers need not worry about setting these values manually. Upon failure, the method dies with an error string.
+The C<login> method returns an object of type WWW::Salesforce if the login attempt was successful, and C<0> otherwise. Upon a successful login, the C<sessionId> is saved and the serverUrl set properly so that developers need not worry about setting these values manually. Upon failure, the method dies with an error string.
 
 The following are the accepted input parameters:
 
@@ -237,7 +233,7 @@ sub create {
 =head2 delete( ARRAY )
 
 Deletes one or more individual objects from your organization's data.
-This subroutine takes as input an array of SCALAR values, where each SCALAR is an sObjectId.
+This subroutine takes as input an array of SCALAR values, where each SCALAR is an C<sObjectId>.
 
 =cut
 
@@ -474,9 +470,48 @@ sub get_session_header {
 }
 
 
+=head2 get_session_id()
+
+Gets the Salesforce SID
+
+=cut
+
+sub get_session_id {
+    my ($self) = @_;
+
+    return $self->{sf_sid};
+}
+
+
+=head2 get_user_id()
+
+Gets the Salesforce UID
+
+=cut
+
+sub get_user_id {
+    my ($self) = @_;
+
+    return $self->{sf_uid};
+}
+
+
+=head2 get_username()
+
+Gets the Salesforce Username
+
+=cut
+
+sub get_username {
+    my ($self) = @_;
+
+    return $self->{sf_user};
+}
+
+
 =head2 getDeleted( HASH )
 
-Retrieves the list of individual objects that have been deleted within the given timespan for the specified object.
+Retrieves the list of individual objects that have been deleted within the given time span for the specified object.
 
 =over
 
@@ -536,7 +571,7 @@ sub getDeleted {
 
 =head2 getServerTimestamp()
 
-Retrieves the current system timestamp (GMT) from the sforce Web service.
+Retrieves the current system timestamp (GMT) from the Salesforce web service.
 
 =cut
 
@@ -555,7 +590,7 @@ sub getServerTimestamp {
 
 =head2 getUpdated( HASH )
 
-Retrieves the list of individual objects that have been updated (added or changed) within the given timespan for the specified object.
+Retrieves the list of individual objects that have been updated (added or changed) within the given time span for the specified object.
 
 =over
 
@@ -644,7 +679,7 @@ sub getUserInfo {
 
 Ends the session for the logged-in user issuing the call. No arguments are needed.
 Useful to avoid hitting the limit of ten open sessions per login.
-http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_calls_logout.htm
+L<Logout API Call|http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_calls_logout.htm>
 
 =cut
 
@@ -925,7 +960,8 @@ sub retrieve {
 
 =item searchString
 
-The search string to be used in the query. For example, "find {4159017000} in phone fields returning contact(id, phone, firstname, lastname), lead(id, phone, firstname, lastname), account(id, phone, name)"
+The search string to be used in the query. For example,
+C<< find {4159017000} in phone fields returning contact(id, phone, firstname, lastname), lead(id, phone, firstname, lastname), account(id, phone, name) >>
 
 =back
 
@@ -1004,6 +1040,21 @@ sub setPassword {
         die( $r->faultstring() );
     }
     return $r;
+}
+
+
+=head2 sf_date
+
+Converts a time in Epoch seconds to the date format that Salesforce likes
+
+=cut
+
+sub sf_date {
+    my $self = shift;
+    my $secs = shift || time;
+    my $dt = DateTime->from_epoch(epoch=>$secs);
+    $dt->set_time_zone('local');
+    return $dt->strftime(q(%FT%T.%3N%z));
 }
 
 
@@ -1087,7 +1138,7 @@ sub update {
 
 Updates or inserts one or more objects in your organization's data.  If the data doesn't exist on Salesforce, it will be inserted.  If it already exists it will be updated.
 
-This subroutine takes as input a B<type> value which names the type of object to update (e.g. Account, User).  It also takes a B<key> value which specifies the unique key Salesforce should use to determine if it needs to update or insert.  If B<key> is not given it will default to 'Id' which is Salesforces own internal unique ID.  This key can be any of Salesforces default fields or an custom field marked as an external key.
+This subroutine takes as input a B<type> value which names the type of object to update (e.g. Account, User).  It also takes a B<key> value which specifies the unique key Salesforce should use to determine if it needs to update or insert.  If B<key> is not given it will default to 'Id' which is Salesforce's own internal unique ID.  This key can be any of Salesforce's default fields or an custom field marked as an external key.
 
 Finally, this method takes one or more perl HASH references containing the fields (the keys of the hash) and the values of the record that will be updated.
 
@@ -1508,7 +1559,7 @@ sub get_field_list {
 =head2 get_tables()
 
 Returns a reference to an array of hash references
-Each hash gives the properties for each salesforce object
+Each hash gives the properties for each Salesforce object
 
 =cut
 
@@ -1605,7 +1656,7 @@ Byrne Reese wrote the original Salesforce module.
 
 =head1 COPYRIGHT
 
-Copyright 2010-2015 Fred Moyer, All rights reserved.
+Copyright 2010-2016 Fred Moyer, All rights reserved.
 
 Copyright 2005-2007 Chase Whitener.
 

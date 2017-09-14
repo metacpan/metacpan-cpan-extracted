@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.006;
 use ExtUtils::MakeMaker;
 
 use Alien::HIDAPI;
@@ -23,16 +24,25 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Device-HID",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Device::HID",
   "PREREQ_PM" => {
-    "Alien::HIDAPI" => "0.004"
+    "Alien::HIDAPI" => "0.004",
+    "Carp" => 0,
+    "Device::HID::XS" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::HexString" => 0,
+    "Test::More" => 0,
+    "blib" => "1.01"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,9 +56,17 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Alien::HIDAPI" => "0.004",
+  "Carp" => 0,
+  "Device::HID::XS" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::More" => 0
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Test::HexString" => 0,
+  "Test::More" => 0,
+  "blib" => "1.01",
+  "strict" => 0,
+  "warnings" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

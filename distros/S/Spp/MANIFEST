@@ -4,17 +4,16 @@ bin/spp
 lib/Spp.pm
 lib/Spp.pod
 lib/Spp/Builtin.pm
+lib/Spp/Core.pm
 lib/Spp/Ast.pm
 lib/Spp/Cursor.pm
 lib/Spp/Grammar.pm
-lib/Spp/IsAtom.pm
-lib/Spp/IsChar.pm
 lib/Spp/LintAst.pm
 lib/Spp/Match.pm
 lib/Spp/OptAst.pm
 lib/Spp/ToSpp.pm
 MANIFEST			This list of files
-README.md
+README
 t/00-load.t
 t/01-to-spp.t
 t/manifest.t

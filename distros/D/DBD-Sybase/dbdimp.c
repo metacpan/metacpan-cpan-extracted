@@ -1,4 +1,4 @@
-/* $Id: dbdimp.c,v 1.115 2013/04/03 20:16:20 mpeppler Exp $
+/* $Id: dbdimp.c,v 1.116 2017/09/10 14:31:45 mpeppler Exp $
 
  Copyright (c) 1997-2011  Michael Peppler
 
@@ -1634,7 +1634,11 @@ static int extract_version(char *buff, char *ver) {
 		if ((p = strchr(buff, '/'))) {
 			++p;
 			if ((s = strchr(p, '/'))) {
-				strncpy(ver, p, s - p);
+				int len = s - p;
+				if (len >= VERSION_SIZE) {
+					len = VERSION_SIZE;
+				}
+				strncpy(ver, p, len);
 			} else {
 				strncpy(ver, p, 10);
 			}

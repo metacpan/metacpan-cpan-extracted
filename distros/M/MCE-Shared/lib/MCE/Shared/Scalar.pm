@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -101,7 +101,7 @@ MCE::Shared::Scalar - Scalar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Scalar version 1.826
+This document describes MCE::Shared::Scalar version 1.828
 
 =head1 DESCRIPTION
 
@@ -109,59 +109,59 @@ A scalar helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Scalar;
+ use MCE::Shared::Scalar;
 
-   my $var = MCE::Shared::Scalar->new( $val );
+ my $var = MCE::Shared::Scalar->new( $val );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $var = MCE::Shared->scalar( $val );
+ my $var = MCE::Shared->scalar( $val );
 
-   # scalar-like dereferencing
+ # scalar-like dereferencing
 
-   my $val = ${ $var };
-   ${ $var } = $val;
+ my $val = ${ $var };
+ ${ $var } = $val;
 
-   # OO interface
+ # OO interface
 
-   $val = $var->set( $val );
-   $val = $var->get();
-   $len = $var->len();
+ $val = $var->set( $val );
+ $val = $var->get();
+ $len = $var->len();
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $val = $var->append( $string );     #   $val .= $string
-   $val = $var->decr();                # --$val
-   $val = $var->decrby( $number );     #   $val -= $number
-   $val = $var->getdecr();             #   $val--
-   $val = $var->getincr();             #   $val++
-   $val = $var->incr();                # ++$val
-   $val = $var->incrby( $number );     #   $val += $number
-   $old = $var->getset( $new );        #   $o = $v, $v = $n, $o
+ $val = $var->append( $string );     #   $val .= $string
+ $val = $var->decr();                # --$val
+ $val = $var->decrby( $number );     #   $val -= $number
+ $val = $var->getdecr();             #   $val--
+ $val = $var->getincr();             #   $val++
+ $val = $var->incr();                # ++$val
+ $val = $var->incrby( $number );     #   $val += $number
+ $old = $var->getset( $new );        #   $o = $v, $v = $n, $o
 
 For normal scalar behavior, the TIE interface is supported.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Scalar;
+ use MCE::Shared::Scalar;
 
-   tie my $var, "MCE::Shared::Scalar";
+ tie my $var, "MCE::Shared::Scalar";
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   tie my $var, "MCE::Shared";
+ tie my $var, "MCE::Shared";
 
-   # usage
+ # usage
 
-   $var = 0;
+ $var = 0;
 
-   tied($var)->incrby(20);
+ tied($var)->incrby(20);
 
 =head1 API DOCUMENTATION
 
@@ -175,44 +175,44 @@ many use cases, the OO interface is recommended for best performance.
 
 Constructs a new object. Its value is undefined when C<value> is not specified.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Scalar;
+ use MCE::Shared::Scalar;
 
-   $var = MCE::Shared::Scalar->new( "foo" );
-   $var = MCE::Shared::Scalar->new;
+ $var = MCE::Shared::Scalar->new( "foo" );
+ $var = MCE::Shared::Scalar->new;
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $var = MCE::Shared->scalar( "bar" );
-   $var = MCE::Shared->scalar;
+ $var = MCE::Shared->scalar( "bar" );
+ $var = MCE::Shared->scalar;
 
 =item set ( value )
 
 Preferably, set the value via the OO interface. Otherwise, C<TIE> is activated
 on-demand for setting the value. The new value is returned in scalar context.
 
-   $val = $var->set( "baz" );
-   $var->set( "baz" );
-   ${$var} = "baz";
+ $val = $var->set( "baz" );
+ $var->set( "baz" );
+ ${$var} = "baz";
 
 =item get
 
 Likewise, obtain the value via the OO interface. C<TIE> is utilized for
 retrieving the value otherwise.
 
-   $val = $var->get;
-   $val = ${$var};
+ $val = $var->get;
+ $val = ${$var};
 
 =item len
 
 Returns the length of the value. It returns the C<undef> value if the value
 is not defined.
 
-   $len = $var->len;
-   length ${$var};
+ $len = $var->len;
+ length ${$var};
 
 =back
 
@@ -231,49 +231,49 @@ L<http://redis.io/commands#strings> without the key argument.
 
 Appends a value at the end of the current value and returns its new length.
 
-   $len = $var->append( "foo" );
+ $len = $var->append( "foo" );
 
 =item decr
 
 Decrements the value by one and returns its new value.
 
-   $num = $var->decr;
+ $num = $var->decr;
 
 =item decrby ( number )
 
 Decrements the value by the given number and returns its new value.
 
-   $num = $var->decrby( 2 );
+ $num = $var->decrby( 2 );
 
 =item getdecr
 
 Decrements the value by one and returns its old value.
 
-   $old = $var->getdecr;
+ $old = $var->getdecr;
 
 =item getincr
 
 Increments the value by one and returns its old value.
 
-   $old = $var->getincr;
+ $old = $var->getincr;
 
 =item getset ( value )
 
 Sets the value and returns its old value.
 
-   $old = $var->getset( "baz" );
+ $old = $var->getset( "baz" );
 
 =item incr
 
 Increments the value by one and returns its new value.
 
-   $num = $var->incr;
+ $num = $var->incr;
 
 =item incrby ( number )
 
 Increments the value by the given number and returns its new value.
 
-   $num = $var->incrby( 2 );
+ $num = $var->incrby( 2 );
 
 =back
 

@@ -16,3 +16,4 @@ lib/Regexp/Parser/Handlers.pm
 lib/Regexp/Parser/Objects.pm
 lib/Perl6/Rule/Parser.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

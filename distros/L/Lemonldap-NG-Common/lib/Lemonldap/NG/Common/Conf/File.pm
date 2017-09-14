@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use JSON;
 use Encode;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.12';
 our $initDone;
 
 sub Lemonldap::NG::Common::Conf::_lock {
@@ -87,7 +87,7 @@ sub store {
         return UNKNOWN_ERROR;
     }
     binmode(FILE);
-    my $f = to_json($fields);
+    my $f = to_json( $fields, { allow_nonref => 1 } );
     print FILE $f;
     close FILE;
     umask($mask);
@@ -106,7 +106,7 @@ sub load {
         }
         binmode FILE;
         $f = join( '', <FILE> );
-        eval { $ret = from_json($f) };
+        eval { $ret = from_json( $f, { allow_nonref => 1 } ) };
         if ($@) {
             print STDERR "$@\n";
             $Lemonldap::NG::Common::Conf::msg .=

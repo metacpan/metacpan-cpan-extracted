@@ -1,5 +1,14 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.95  2017-09-13 22:47:21 JST
+  - Fix file permission
+
+0.94  2017-09-11 21:25:18 JST
+  - Close pipes more properly
+
+0.93  2017-09-10 17:47:30 JST
+  - Improve internal event-loop
+
 0.92  2017-09-07 03:41:18 JST
   - Improve handling of "No route to host" and "Could not resolve hostname"
 

@@ -44,17 +44,14 @@ use constant DEBUG => 0;
 
 sub get {
   my ($class, $url, %options) = @_;
+  ### Download get(): $url
 
   # URI object becomes string
   $url = "$url";
 
   my $ua = $options{'ua'} || do { require App::Chart::UserAgent;
                                   App::Chart::UserAgent->instance };
-  if (exists $options{'cookie_jar'}) {
-    $ua->cookie_jar ($options{'cookie_jar'});
-  } else {
-    $ua->cookie_jar ({});
-  }
+  $ua->cookie_jar ($options{'cookie_jar'});  # undef for none
 
   require HTTP::Request;
   my $method = $options{'method'} || 'GET';
@@ -112,6 +109,7 @@ sub get {
   }
 
   if ($resp->is_success
+      || ($options{'allow_401'} && $resp->code == 401)
       || ($options{'allow_404'} && $resp->code == 404)
       || (($etag || $lastmod) && $resp->code == 304)) {
     substatus (__('processing'));

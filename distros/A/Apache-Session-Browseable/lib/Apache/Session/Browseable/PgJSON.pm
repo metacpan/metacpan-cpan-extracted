@@ -78,11 +78,11 @@ sub deleteIfLowerThan {
     my $query;
     if ( $rule->{or} ) {
         $query = join ' OR ',
-          map { "cast(a_session ->> '$_' as integer) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
+          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
     }
     elsif ( $rule->{and} ) {
         $query = join ' AND ',
-          map { "cast(a_session ->> '$_' as integer) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
+          map { "cast(a_session ->> '$_' as bigint) < $rule->{or}->{$_}" } keys %{ $rule->{or} };
     }
     if ( $rule->{not} ) {
         $query = "($query) AND "
@@ -162,7 +162,7 @@ Create table:
 
   CREATE UNLOGGED TABLE sessions (
       id varchar(64) not null primary key,
-      a_session json,
+      a_session jsonb,
   );
 
 Optionaly, add indexes on some fields. Example for Lemonldap::NG:
@@ -181,7 +181,7 @@ Apache::Session::Browseable provides some class methods to manipulate all
 sessions and add the capability to index some fields to make research faster.
 
 Apache::Session::Browseable::PgJSON implements it for PosqtgreSQL databases
-using "json" type to be able to browse sessions.
+using "json" or "jsonb" type to be able to browse sessions.
 
 =head1 SEE ALSO
 

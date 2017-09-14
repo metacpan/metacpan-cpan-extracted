@@ -9,29 +9,49 @@ use Carp;
 use base 'Exporter';
 our @EXPORT = qw(patronize getProxies);
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
+
+BEGIN {
+    if (defined &CORE::read) {
+	*CORE::GLOBAL::read = sub (*\$$;$) {
+	    $Patro::read_sysread_flag = 'read';
+	    goto &CORE::read if defined &CORE::read;
+	};
+	*CORE::GLOBAL::sysread = sub (*\$$;$) {
+	    $Patro::read_sysread_flag = 'sysread';
+	    goto &CORE::sysread if defined &CORE::sysread;
+	};
+    } else {
+	$Patro::read_sysread_flag = 'read?';
+    }
+    *CORE::GLOBAL::ref = \&Patro::ref;
+    *CORE::GLOBAL::truncate = \&Patro::_truncate;
+    *CORE::GLOBAL::stat = \&Patro::_stat;
+    *CORE::GLOBAL::flock = \&Patro::_flock;
+    *CORE::GLOBAL::fcntl = \&Patro::_fcntl;
+
+    *CORE::GLOBAL::sysopen = \&Patro::_sysopen;
+    *CORE::GLOBAL::lstat = \&Patro::_lstat;
+
+    *CORE::GLOBAL::opendir = \&Patro::_opendir;
+    *CORE::GLOBAL::closedir = \&Patro::_closedir;
+    *CORE::GLOBAL::readdir = \&Patro::_readdir;
+    *CORE::GLOBAL::seekdir = \&Patro::_seekdir;
+    *CORE::GLOBAL::telldir = \&Patro::_telldir;
+    *CORE::GLOBAL::rewinddir = \&Patro::_rewinddir;
+    *CORE::GLOBAL::chdir = \&Patro::_chdir;
+}
 
 sub import {
     my ($class, @args) = @_;
     my @tags = grep /^:/, @args;
     @args = grep !/^:/, @args;
+    $Patro::SECURE = 1;
     foreach my $tag (@tags) {
 	if ($tag eq ':test') {
 	    require Patro::Server;
 	    Patro::Server->TEST_MODE;
-	    # some tests will check if the remote object has changed
-	    # after being manipulated by the proxy. This can only
-	    # happen with a threaded server (or with certain objects
-	    # that do not maintain state in local memory), so we should
-	    # skip those tests if we are using the forked server.
-	    *ok_threaded = sub {
-		if ($Patro::Server::threads_avail) {
-		    goto &Test::More::ok;
-		} else {
-		    Test::More::ok(1, $_[1] ? "$_[1] - SKIPPED" :
-		       "skip test that requires threaded server");
-		}
-	    };
+
 	    # a poor man's Data::Dumper, but works for Patro::N objects.
 	    *xjoin = sub {
 		join(",", map { my $r = $_;
@@ -41,21 +61,25 @@ sub import {
 			"{".xjoin(map{"$_:'".$r->{$_}."'"}sort keys %$r)."}" 
 				} : $_ } @_)
 	    };
-	    push @EXPORT, 'ok_threaded', 'xjoin';
-	    eval q~END {
-	        if ($Patro::Server::threads_avail) {
-	            $_->detach for threads->list(threads::running);
-	        }
-	    }~;
+	    push @EXPORT, 'xjoin';
+	}
+	if ($tag eq ':insecure') {
+	    $Patro::SECURE = 0;
 	}
     }
-    if (eval "use threads;1") {
-	require Patro::CODE::Shareable;
-	Patro::CODE::Shareable->import;
-	Patro::CODE::Shareable->export_to_level(1, 'Patro::CODE::Shareable',
-						    'share','shared_clone');
-	*Patro::Server::shared_clone = *shared_clone;
-	*Patro::Server::share = *share;
+
+    if (defined($ENV{PATRO_THREADS}) &&
+	!$ENV{PATRO_THREADS}) {
+	$INC{'threads.pm'} = 1;
+    }		
+    eval "use threads;1";
+    eval "use threadsx::shared";
+    $Patro::Server::threads_avail = $threads::threads;
+    if (!defined &threads::tid) {
+	*threads::tid = sub { 0 };
+    }
+    if ($ENV{PATRO_THREADS} && !$Patro::Server::threads_avail) {
+	warn "Threaded Patro server was requested but was not available\n";
     }
     Patro->export_to_level(1, 'Patro', @args, @EXPORT);
 }
@@ -70,13 +94,14 @@ sub patronize {
     return $server->{config};
 }
 
-sub ref {
-    my $ref = CORE::ref($_[0]);
+sub ref (_) {
+    my $obj = @_ ? $_[0] : $_;
+    my $ref = CORE::ref($obj);
     if (!Patro::LeumJelly::isProxyRef($ref)) {
 	return $ref;
     }
-    my $handle = Patro::LeumJelly::handle($_[0]);
-    return $handle->{ref};
+    my $handle = Patro::LeumJelly::handle($obj);
+    return _fetch($handle, "ref");
 }
 
 sub reftype {
@@ -85,26 +110,54 @@ sub reftype {
 	return Scalar::Util::reftype($_[0]);
     }
     my $handle = Patro::LeumJelly::handle($_[0]);
-    return $handle->{reftype};
+    return _fetch($handle, "reftype");
+}
+
+sub _allrefs {
+    return (CORE::ref($_[0]), Patro::ref($_[0]),
+	    Scalar::Util::reftype($_[0]), Patro::reftype($_[0]));
 }
 
 sub client {
     if (!Patro::LeumJelly::isProxyRef(CORE::ref($_[0]))) {
 	return;     # not a remote proxy object
     }
-    return Patro::LeumJelly::handle($_[0])->{client};
+    return _fetch(Patro::LeumJelly::handle($_[0]),"client");
+}
+
+sub _fetch {
+    # _fetch HASH, LIST
+    #     where HASH is an object that overloads the '%{}' 
+    #     operator, temporarily unbless it, fetch values for
+    #     one or more keys, and restore the original blessing.
+    #     Returns the retrieved values.
+    
+    my ($hash, @keys) = @_;
+    my $ref = CORE::ref($hash);
+    my @r;
+    if (!$ref) {
+	@r = @{$hash}{@keys};
+    } else {
+	bless $hash, '###';
+	@r = @{$hash}{@keys};
+	bless $hash, $ref;
+    }
+    return wantarray ? @r : @r > 0 ? $r[-1] : undef;
 }
 
 sub main::xdiag {
+    my @lt = localtime;
+    my $lt = sprintf "%02d:%02d:%02d", @lt[2,1,0];
+    my $pid = $$;
+    $pid .= "-" . threads->tid if $threads::threads;
+    my @msg = map { CORE::ref($_)
+		        ? CORE::ref($_) =~ /^Patro::N/
+			? "<" . CORE::ref($_) . ">"
+			: Data::Dumper::Dumper($_) : $_ } @_;
     if ($INC{'Test/More.pm'}) {
-	my @lt = localtime;
-	my $lt = sprintf "%02d:%02d:%02d", @lt[2,1,0];
-	my $pid = $$;
-	$pid .= "-" . threads->tid if $threads::threads;
-	Test::More::diag("xdiag $pid $lt: ",
-	    map { CORE::ref($_) ? Data::Dumper::Dumper($_) : $_ } @_ );
+	Test::More::diag("xdiag $pid $lt: ",@msg);
     } else {
-	print STDERR "xdiag: ", Data::Dumper::Dumper(@_),"\n";
+	print STDERR "xdiag $pid $lt: @msg\n";
     }
 }
 
@@ -159,14 +212,125 @@ sub new {
 
 sub getProxies {
     my $patro = shift;
-    if (CORE::ref($patro) eq 'HASH') {
-	# arg to getProxies is config hash, not Patro object
-	my $cfg = $patro;
-	$patro = Patro->new($cfg);
+    if (CORE::ref($patro) ne 'Patro') {
+	$patro = Patro->new($patro);
     }
-    return @{$patro->{objs}};
+    return wantarray ? @{$patro->{objs}} : $patro->{objs}[0];
 }
 
+########################################
+
+sub _truncate {
+    my ($fh,$len) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+	return $fh->_tied->__('TRUNCATE',1,$len);
+    } else {
+	return CORE::truncate($fh,$len);
+    }
+}
+
+sub _fcntl {
+    my ($fh,$func,$scalar) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+	return $fh->_tied->__('FCNTL',1,$func,$scalar);
+    } else {
+	return CORE::fcntl($fh,$func,$scalar);
+    }
+}
+
+sub _stat {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+	my $context = defined(wantarray) + wantarray + 0;
+	return $fh->_tied->__('STAT',$context);
+    } else {
+	return CORE::stat $fh;
+    }
+}
+
+sub _flock {
+    my ($fh,$op) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+	return $fh->_tied->__('FLOCK',1,$op);
+    } else {
+	return CORE::flock($fh,$op);
+    }
+}
+
+sub _sysopen {
+    my ($fh,$fname,$mode,$perm) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('SYSOPEN',1,$fname,$mode,$perm);
+    } elsif (defined ($perm)) {
+        return CORE::sysopen($fh,$fname,$mode,$perm);
+    } else {
+        return CORE::sysopen($fh,$fname,$mode);
+    }
+}
+
+sub _lstat (;*) {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+	my $context = defined(wantarray) + wantarray + 0;
+	return $fh->_tied->__('LSTAT',$context);
+    }
+    return CORE::lstat $fh;
+}
+
+sub _opendir (*$) {
+    if (CORE::ref($_[0]) eq 'Patro::N5') {
+        return $_[0]->_tied->__('OPENDIR',1,$_[1]);
+    }
+    return CORE::opendir($_[0],$_[1]);
+}
+
+sub _closedir (*) {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('CLOSEDIR',1);
+    }
+    return CORE::closedir($fh);
+}
+
+sub _readdir (*) {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('READDIR',undef);
+    }
+    return CORE::readdir($fh);
+}
+
+sub _seekdir (*$) {
+    my ($fh,$pos) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('SEEKDIR',1,$pos);
+    }
+    return CORE::seekdir($fh,$pos);
+}
+
+sub _telldir (*) {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('TELLDIR',1);
+    }
+    return CORE::telldir($fh);
+}
+
+sub _rewinddir (*) {
+    my ($fh) = @_;
+    if (CORE::ref($fh) eq 'Patro::N5') {
+        return $fh->_tied->__('REWINDDIR',1);
+    }
+    return CORE::rewinddir($fh);
+}
+
+sub _chdir (;$) {
+    my ($fh) = @_;
+    if ($fh && CORE::ref($fh) eq 'Patro::N5') {
+	return $fh->_tied->__('CHDIR',1);
+    }
+    return CORE::chdir($fh);
+}
 
 1;
 
@@ -174,9 +338,11 @@ sub getProxies {
 
 Patro - proxy access to remote objects
 
+
 =head1 VERSION
 
-0.11
+0.14
+
 
 =head1 SYNOPSIS
 
@@ -263,13 +429,64 @@ remote object.
     sub prod { my $self = shift; my $z=1; $z*=$_ for @{$_[0]->{vals}}; $z }
 
     # host 2
-    use Patro;'
+    use Patro;
     my $proxy = getProxies('config');
     print $proxy->prod;      # calls Barfie::prod($obj) on host1, 2 * 5 => 10
     $proxy += 4;             # calls Barfie '+=' sub on host1
     print $proxy->prod;      # 6 * 9 => 54
 
+=item * Code references
+
+Patro supports sharing code references and data structures that contain
+code references (think dispatch tables). Proxies to these code references
+can invoke the code, which will then run on the server.
+
+    # host 1
+    use Patro;
+    my $foo = sub { $_[0] + 42 };
+    my $d = {
+        f1 => sub { $_[0] + $_[1] },
+        f2 => sub { $_[0] * $_[1] },
+        f3 => sub { int( $_[0] / ($_[1] || 1) ) },
+        g1 => sub { $_[0] += $_[1]; 18 },
+    };
+    patronize($foo,$d)->to_file('config');
+    ...
+
+    # host 2
+    use Patro;
+    my ($p_foo, $p_d) = getProxies('config');
+    print $p_foo->(17);        # "59"   (42+17)
+    print $p_d->{f1}->(7,33);  # "40"   (7+33)
+    print $p_d->{f3}->(33,7);  # "4"    int(33/7)
+    ($x,$y) = (5,6);
+    $p_d->{g1}->($x,$y);
+    print $x;                  # "11"   ($x:6 += 5)
+
+=item * filehandles
+
+Filehandles can also be shared through the Patro framework.
+
+    # host 1
+    use Patro;
+    open my $fh, '>', 'host1.log';
+    patronize($fh)->to_file('config');
+    ...
+
+    # host 2
+    use Patro;
+    my $ph = getProxies('config');
+    print $ph "A log message for the server\n";
+
+Calling C<open> through a proxy filehandle presents some security concerns.
+A client could read or write any file on the server host visible to the
+server's user id. Or worse, a client could open a pipe through the handle
+to run an arbitrary command on the server. C<open> and C<close> operations
+on proxy filehandles will not be allowed unless the process running the
+Patro server imports C<Patro> with the C<:insecure> tag.
+
 =back
+
 
 =head1 FUNCTIONS
 
@@ -327,6 +544,7 @@ Returns the IPC client object used by the given proxy to communicate
 with the remote object server. The client object contains information
 about how to communicate with the server and other connection 
 configuration.
+
 
 =head1 PROXIES
 
@@ -448,6 +666,56 @@ If the environment variable C<PATRO_THREADS> is set, C<Patro> will use
 it to determine whether to use a forked server or a threaded server
 to provide proxy access to objects. If this variable is not set,
 C<Patro> will use threads if the L<threads> module can be loaded.
+
+
+=head1 LIMITATIONS
+
+The C<-X> file test operations on a proxy filehandle depend on
+the file test implementation in L<overload>, which is available
+only in Perl v5.12 or better.
+
+When the server uses forks (because threads are unavailable or
+because L<"PATRO_THREADS"> was set to a false value), it is less
+practical to share variables between processes.
+When you manipulate a proxy reference, you are
+manipulating the copy of the reference running in a different process
+than the remote server. So you will not observe a change in the
+reference on the server (unless you use a class that does not save
+state in local memory, like L<Forks::Queue>).
+
+
+=head1 DOCUMENTATION AND SUPPORT
+
+Up-to-date (blead version) sources for C<Patro> are on github at
+L<https://github.com/mjob/p5-patro>
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Patro
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+Report bugs and request missing features at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Patro>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Patro>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Patro>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Patro/>
+
+=back
+
 
 =head1 LICENSE AND COPYRIGHT
 

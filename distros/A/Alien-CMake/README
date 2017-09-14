@@ -3,7 +3,7 @@ NAME
     <http://cmake.org/>
 
 VERSION
-    Version 0.09
+    Version 0.11
 
 SYNOPSIS
     Alien::CMake during its installation does one of the following:
@@ -43,7 +43,7 @@ DESCRIPTION
     download very old binaries for some platforms (some from the 2.x
     series). In addition Alien::cmake3 will build from source if binaries
     are not available for your platform. Also Alien::cmake3 integrates more
-    naturally with alienfile and ALien::Build.
+    naturally with alienfile and Alien::Build.
 
     In short "Alien::CMake" can be used to detect and get configuration
     settings from an already installed CMake. It offers also an option to

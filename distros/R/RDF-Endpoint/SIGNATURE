@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,26 +14,26 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 dd9d9581b9e5df5f7dbcc2c3507372bd0d419548 Changes
-SHA1 53a33b6961236c0bd5a5ce4ddcd832caa133576e Changes.ttl
-SHA1 b20412f9de7fb61587c392bbccc641482bee90a9 Changes.xml
+SHA1 b0bc9b31f974621704f22946a4a138149c05b845 Changes
+SHA1 f6e708b2108ba080ca41a9bc8a81069a64972a27 Changes.ttl
+SHA1 e713d133a95f0d9360cdcd14b2d71e57fa3777c9 Changes.xml
 SHA1 14a506260237169ed443ed15a269369cee605be3 LICENSE
 SHA1 a880a04c60560af52246e3e4014b68a1c29e4e36 MANIFEST
-SHA1 b776e0dad07a42c5481abaa5b3b459dfe4c369e9 META.yml
-SHA1 4edd6b2bd8a7457ff784843a82efb45418d2ea43 Makefile.PL
-SHA1 06be763f4ff46edc11904e961b43f18437cb86f2 README
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 cbd7759d9ee3fc640b7e146ab46b5fca15d2f252 META.yml
+SHA1 ecf59b06da7774ff442c352f8e9eaffd209e48a7 Makefile.PL
+SHA1 aa41899f8d0b06e1cac0e5f6b465a0fe46f017b7 README
+SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
+SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
+SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
 SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 defb8debea68def5cc54273ebcca344e1f39789e lib/RDF/Endpoint.pm
+SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
+SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
+SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
+SHA1 fa532ce949d1c607589aded93d5ea1d49a27e5d8 inc/Module/Install/Scripts.pm
+SHA1 f7882569ead92975e7559e169c2a2e86c3de1e57 inc/Module/Install/Share.pm
+SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
+SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
+SHA1 a26945da61ef18683098dbd763602baee5731ce3 lib/RDF/Endpoint.pm
 SHA1 084485f2e97af1bc0e8e74a72d5f14a57348a368 rdf_endpoint.json
 SHA1 e9be4ad1506ad066ef2a5efb5b11b6cfacee90fd scripts/endpoint.psgi
 SHA1 19ac766464ef05698ac985e2a42e87dbb7912f3f share/index.html
@@ -65,10 +65,9 @@ SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a t/pod.t
 SHA1 9115f7ffe1933ad736dc292f3c89595b36ed6aa2 t/pod_coverage.t
 SHA1 9eb5c0dd1f1e99ad3d05afaae4d3179b714f94a5 t/psgi.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAlhub/cACgkQhPK6VMqoyC2LhgCfTd/vrZ0xqGV9WwXD7AkvKFlW
-SvAAoIA3dboBr74v4hpOzK0tCDiC65Rv
-=In87
+iEYEARECAAYFAlm5p2wACgkQhPK6VMqoyC06OwCeIUgmJ/wAcQt5Cq0dtc5uwrEP
+j8cAoK5PTiINBybdc3dRGiVEGW7kGMoI
+=j4Gj
 -----END PGP SIGNATURE-----

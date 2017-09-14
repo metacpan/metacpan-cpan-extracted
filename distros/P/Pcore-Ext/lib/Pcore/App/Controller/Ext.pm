@@ -6,7 +6,6 @@ use Pcore::Share::Ext_v6_2_0;
 use Pcore::Share::WWW;
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
-use Pcore::Util::Text qw[decode_utf8];
 use JavaScript::Packer qw[];
 use JavaScript::Beautifier qw[];
 
@@ -287,7 +286,7 @@ sub _get_app_locale ( $self, $locale ) {
 
     my $data->{locale} = {
         class_name => $ext_app->{l10n_class_name},
-        messages   => \decode_utf8( to_json( $locale_messages, readable => 1 )->$* ),
+        messages   => to_json( $locale_messages, canonical => 1 ),
         plural_form_exp => $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 'null',
     };
 
@@ -451,7 +450,7 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 363                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 362                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -26,7 +26,7 @@ my @full_script = $^O eq 'MSWin32' || !$use_blib ? ($^X, $org_daemon) : ($org_da
     my $res = run [@full_script, '--help'], '2>', \my $stderr;
     ok !$res, 'script run failed';
     like $stderr, qr{Unknown option: help};
-    like $stderr, qr{\Qorg-daemon [--debug] [--early-warning=seconds] [--early-warning-timeless=seconds] [--recheck-interval=seconds]\E\n\t\Q[--no-emacsclient-eval] [--emacsclient-cmd=...]\E\n\t\Q[--overview-widget=...] [--move-button]\E\n\t\Q[--[no-]include-timeless] [--time-fallback HH:MM]\E\n\t\Qorgfile ...\E}, 'usage';
+    like $stderr, qr{\Qorg-daemon [--debug] [--early-warning=seconds] [--early-warning-timeless=seconds] [--recheck-interval=seconds]\E\n\t\Q[--no-emacsclient-eval] [--emacsclient-cmd=...]\E\n\t\Q[--overview-widget=...] [--move-button]\E\n\t\Q[--[no-]include-timeless] [--time-fallback HH:MM]\E\n\t\Q[--ignore-tag=... ...]\E\n\t\Qorgfile ...\E}, 'usage';
 }
 
 {

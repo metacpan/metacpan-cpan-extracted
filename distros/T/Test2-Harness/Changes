@@ -1,3 +1,65 @@
+0.001009  2017-09-12 23:10:05-07:00 America/Los_Angeles
+
+    - Better docs
+    - More testing
+    - Minor bug fixes
+
+0.001008  2017-09-12 13:49:05-07:00 America/Los_Angeles
+
+    NOW Feature-complete!
+    (Needs docs and tests)
+
+    - Fix dep versions in dist.ini
+    - Improve test coverage
+    - Better test.pl detection by yath command
+    - Add color/no-color options
+    - Support for project .yath.rc files
+    - Make sure $VERSION is in correct files
+    - Add 'help' command
+    - Add 'init' command
+    - More hooks for preload modules
+    - Several bug fixes
+    - Make it so that preload+fork does not add a stack layer
+    - unify to only one 'yath' script
+    - Split persist into multiple commands
+    - Create a plugin system, Add TCM plugin to split out later
+    - Remove pre-import option
+    - Better default log location+name
+    - Move CommandShared/Harness -> App/Command.pm
+    - Add --no-long option
+    - Add --exclude option
+    - Bind lib & blib earlier, use absolute paths
+    - Fix parser error on '}'
+    - Allow -w in tests after preload
+    - Handle timers better
+
+0.001007  2017-09-11 21:40:28-07:00 America/Los_Angeles
+
+    - Properly pass args given via '::'
+    - Honor NO-STREAM header
+    - Persist now reloads when a file is changed
+
+0.001006  2017-09-06 14:24:18-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix replay
+    - Add pre-import
+    - Add load and load-import options
+    - Add persistent harness
+
+0.001005  2017-09-05 21:59:21-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix some bugs
+    - Remove accidentally added file
+    - Do not hang when waiting after control+c
+    - Restructure Run/Runner to be more sane
+    - Fix bugs, break out test file and queue
+    - Add extra space in help dialog
+    - Restructure common command options
+    - Better queue handling
+    - Put test and replay common logic in one place
+    - Fix bugs in replay
+    - Put common logic for test and replay commands in a single place.
+
 0.001004  2017-08-31 21:02:34-07:00 America/Los_Angeles
 
     - Make test.pl ok with preload

@@ -34,7 +34,8 @@
          "requires" : {
             "Alien::HIDAPI" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "Inline::C" : "0"
+            "Inline::C" : "0",
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -42,13 +43,23 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "1",
+            "blib" : "1.01",
+            "perl" : "5.006"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::HIDAPI" : "0.004"
+            "Alien::HIDAPI" : "0.004",
+            "Carp" : "0",
+            "Device::HID::XS" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -58,14 +69,19 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::HexString" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Device::HID" : {
          "file" : "lib/Device/HID.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -80,7 +96,7 @@
          "web" : "https://github.com/athreef/Device-HID"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -117,6 +133,11 @@
                }
             },
             "name" : "BuildRequires",
+            "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "TestRequires",
             "version" : "6.010"
          },
          {
@@ -350,7 +371,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.004",
+                  "tag" : "v0.005",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -422,6 +443,68 @@
             },
             "name" : "ReadmePodInRoot",
             "version" : "0.163250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::CommitBuild" : {
+                  "branch" : "build/%b",
+                  "build_root" : null,
+                  "message" : "Build results of %h (on %b)",
+                  "multiple_inheritance" : 0,
+                  "release_branch" : null,
+                  "release_message" : "Build results of %h (on %b)"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.14.1",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "Git::CommitBuild",
+            "version" : "2.042"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "MinimumPerl",
+            "version" : "1.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
+            "name" : "Test::MinimumVersion",
+            "version" : "2.000007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Version",
+            "name" : "Test::Version",
+            "version" : "1.09"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : 0,
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : [],
+                  "switch" : []
+               }
+            },
+            "name" : "Test::Compile",
+            "version" : "2.056"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

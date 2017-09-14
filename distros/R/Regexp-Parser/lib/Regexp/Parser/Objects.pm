@@ -83,7 +83,7 @@ use NEXT;
 {
   # \A ^ \B \b \G \Z \z $
   package Regexp::Parser::anchor;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
   push @Regexp::Parser::bol::ISA, __PACKAGE__;
   push @Regexp::Parser::bound::ISA, __PACKAGE__;
   push @Regexp::Parser::gpos::ISA, __PACKAGE__;
@@ -109,7 +109,7 @@ use NEXT;
 {
   # . \C
   package Regexp::Parser::reg_any;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $type, $vis) = @_;
@@ -128,7 +128,7 @@ use NEXT;
 {
   # \w \W
   package Regexp::Parser::alnum;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $neg) = @_;
@@ -163,7 +163,7 @@ use NEXT;
 {
   # \s \S
   package Regexp::Parser::space;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $neg) = @_;
@@ -198,7 +198,7 @@ use NEXT;
 {
   # \d \D
   package Regexp::Parser::digit;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $neg) = @_;
@@ -232,7 +232,7 @@ use NEXT;
 
 {
   package Regexp::Parser::anyof;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $neg, @data) = @_;
@@ -306,7 +306,7 @@ use NEXT;
 
 {
   package Regexp::Parser::anyof_char;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $data, $vis) = @_;
@@ -325,7 +325,7 @@ use NEXT;
 
 {
   package Regexp::Parser::anyof_range;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $lhs, $rhs) = @_;
@@ -352,7 +352,7 @@ use NEXT;
 
 {
   package Regexp::Parser::anyof_class;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $type, $neg, $how) = @_;
@@ -413,7 +413,7 @@ use NEXT;
 
 {
   package Regexp::Parser::anyof_close;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx) = @_;
@@ -440,7 +440,7 @@ use NEXT;
 
 {
   package Regexp::Parser::prop;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $type, $neg) = @_;
@@ -475,7 +475,7 @@ use NEXT;
 
 {
   package Regexp::Parser::clump;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $vis) = @_;
@@ -492,7 +492,7 @@ use NEXT;
 
 {
   package Regexp::Parser::branch;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx) = @_;
@@ -585,7 +585,7 @@ use NEXT;
 
 {
   package Regexp::Parser::exact;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $data, $vis) = @_;
@@ -635,7 +635,7 @@ use NEXT;
 
 {
   package Regexp::Parser::quant;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $min, $max, $data) = @_;
@@ -755,7 +755,7 @@ use NEXT;
 {
   # ( non-capturing
   package Regexp::Parser::group;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $on, $off, @data) = @_;
@@ -830,7 +830,7 @@ use NEXT;
 {
   # ( capturing
   package Regexp::Parser::open;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $nparen, @data) = @_;
@@ -905,7 +905,7 @@ use NEXT;
 {
   # ) closing
   package Regexp::Parser::close;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $nparen) = @_;
@@ -976,7 +976,7 @@ use NEXT;
 {
   # ) for non-captures
   package Regexp::Parser::tail;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx) = @_;
@@ -1035,7 +1035,7 @@ use NEXT;
 {
   # \1 (backrefs)
   package Regexp::Parser::ref;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $nparen) = @_;
@@ -1067,7 +1067,7 @@ use NEXT;
 
 {
   package Regexp::Parser::assertion;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   push @Regexp::Parser::ifmatch::ISA, __PACKAGE__;
   push @Regexp::Parser::unlessm::ISA, __PACKAGE__;
@@ -1239,7 +1239,7 @@ use NEXT;
 {
   # the N in (?(N)t|f) when N is a number
   package Regexp::Parser::groupp;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $nparen) = @_;
@@ -1349,7 +1349,7 @@ use NEXT;
 
 {
   package Regexp::Parser::flags;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $on, $off) = @_;
@@ -1385,7 +1385,7 @@ use NEXT;
 
 {
   package Regexp::Parser::minmod;
-  push @ISA, qw( Regexp::Parser::__object__ );
+  our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
     my ($class, $rx, $data) = @_;

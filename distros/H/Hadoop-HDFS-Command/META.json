@@ -4,7 +4,7 @@
       "Burak Gursoy <burak@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "cli",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Hadoop-HDFS-Command",
    "prereqs" : {
@@ -76,10 +76,10 @@
          "web" : "https://github.com/Perl-Hadoop/Hadoop-HDFS-Command"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

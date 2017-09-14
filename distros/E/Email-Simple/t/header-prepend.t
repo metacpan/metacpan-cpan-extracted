@@ -1,6 +1,7 @@
 #!perl
 use strict;
-use Test::More tests => 4;
+use warnings;
+use Test::More;
 
 # This test is not here to encourage you to muck about in the object guts, but
 # to provide a test for when Email::Simple has a way to provide optional
@@ -19,15 +20,7 @@ END_MESSAGE
 my $email = Email::Simple->new($email_text);
 isa_ok($email, "Email::Simple");
 
-sub Email::Simple::header_prepend {
-  my ($self, $field, @values) = @_;
-
-  for my $value (reverse @values) {
-    unshift @{ $self->header_obj->{headers} }, $field, $value;
-  }
-}
-
-$email->header_prepend(Alpha => 'this header comes firstest');
+$email->header_raw_prepend(Alpha => 'this header comes firstest');
 
 is_deeply(
   [ $email->header_pairs ],
@@ -40,7 +33,8 @@ is_deeply(
   "we can prepend an existing header",
 );
 
-$email->header_prepend('Zero' => 'this header comes zeroeth', 'and 0+1th');
+$email->header_raw_prepend('Zero' => 'and 0+1th');
+$email->header_raw_prepend('Zero' => 'this header comes zeroeth');
 
 is_deeply(
   [ $email->header_pairs ],
@@ -54,3 +48,5 @@ is_deeply(
   ],
   "we can prepend mutiply, too, and to a new header",
 );
+
+done_testing;

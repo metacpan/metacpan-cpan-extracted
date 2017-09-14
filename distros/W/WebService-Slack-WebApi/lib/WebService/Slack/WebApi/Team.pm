@@ -7,10 +7,22 @@ use parent 'WebService::Slack::WebApi::Base';
 
 use WebService::Slack::WebApi::Generator (
     access_logs => {
-        count => { isa => 'Int', optional => 1 },
-        page  => { isa => 'Int', optional => 1 },
+        before => { isa => 'Int', optional => 1 },
+        count  => { isa => 'Int', optional => 1 },
+        page   => { isa => 'Int', optional => 1 },
     },
-    info => {},
+    billable_info => {
+        user => { isa => 'Str', optional => 1 },
+    },
+    info => +{},
+    integration_logs => {
+        app_id      => { isa => 'Str', optional => 1 },
+        change_type => { isa => 'Str', optional => 1 },
+        count       => { isa => 'Int', optional => 1 },
+        page        => { isa => 'Int', optional => 1 },
+        service_id  => { isa => 'Str', optional => 1 },
+        user        => { isa => 'Str', optional => 1 },
+    },
 );
 
 1;

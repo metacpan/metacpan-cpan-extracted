@@ -22,57 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164949;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
-                  'leading_digits' => '12',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '12'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{6})',
-                  'leading_digits' => '6'
+                  'leading_digits' => '6',
+                  'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d)(\\d{2})(\\d{2})',
                   'leading_digits' => '
-              13|
-              [2-5]
-            '
+            13|
+            [2-5]
+          '
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            1(?:
-              2\\d|
-              3[1-9]
-            )|
-            2(?:
-              22|
-              4[0-35-8]
-            )|
-            3(?:
-              22|
-              4[03-9]
-            )|
-            4(?:
-              22|
-              3[128]|
-              4\\d|
-              6[15]
-            )|
-            5(?:
-              22|
-              5[7-9]|
-              6[014-689]
-            )
-          )\\d{5}
-        ',
-                'specialrate' => '',
-                'personal_number' => '',
-                'mobile' => '6[1-9]\\d{6}',
+                'voip' => '',
                 'fixed_line' => '
           (?:
             1(?:
@@ -100,9 +71,38 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '',
+                'specialrate' => '',
+                'mobile' => '6[1-9]\\d{6}',
                 'toll_free' => '',
-                'pager' => ''
+                'pager' => '',
+                'geographic' => '
+          (?:
+            1(?:
+              2\\d|
+              3[1-9]
+            )|
+            2(?:
+              22|
+              4[0-35-8]
+            )|
+            3(?:
+              22|
+              4[03-9]
+            )|
+            4(?:
+              22|
+              3[128]|
+              4\\d|
+              6[15]
+            )|
+            5(?:
+              22|
+              5[7-9]|
+              6[014-689]
+            )
+          )\\d{5}
+        ',
+                'personal_number' => ''
               };
 
     sub new {

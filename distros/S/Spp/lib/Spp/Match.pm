@@ -8,9 +8,8 @@ our @ISA    = qw(Exporter);
 our @EXPORT = qw(match_rule);
 
 use Spp::Builtin;
+use Spp::Core;
 use Spp::Cursor;
-use Spp::IsChar;
-use Spp::IsAtom;
 
 sub match_rule {
    my ($rule, $cursor) = @_;
@@ -36,15 +35,17 @@ sub match_rule {
       when ('Any') { match_any($value, $cursor) }
       when ('Expr') { match_expr($value, $cursor) }
       when ('Sym') { match_sym($value, $cursor) }
-      default { die "unknown rule type $name to match!" }
+      default { 
+         error("unknown rule type |$name|!")
+      }
    }
 }
 
 sub match_any {
    my ($any, $cursor) = @_;
-   my $char = get_char($cursor);
+   my $char = $cursor->get_char;
    if ($char eq chr(0)) { return ['false'] }
-   go($cursor);
+   $cursor->go;
    return $char;
 }
 
@@ -52,24 +53,24 @@ sub match_assert {
    my ($assert, $cursor) = @_;
    given ($assert) {
       when ('^') {
-         return ['true'] if $cursor->{off} == 0;
+         return ['true'] if $cursor->off == 0;
          return ['false'];
       }
       when ('$') {
-         return ['true'] if get_char($cursor) eq chr(0);
+         return ['true'] if $cursor->get_char eq chr(0);
          return ['false'];
       }
       when ('^^') {
-         return ['true'] if pre_char($cursor) eq "\n";
-         return ['true'] if $cursor->{off} == 0;
+         return ['true'] if $cursor->pre_char eq "\n";
+         return ['true'] if $cursor->off == 0;
          return ['false'];
       }
       when ('$$') {
-         return ['true'] if get_char($cursor) eq "\n";
-         return ['true'] if get_char($cursor) eq chr(0);
+         return ['true'] if $cursor->get_char eq "\n";
+         return ['true'] if $cursor->get_char eq chr(0);
          return ['false'];
       }
-      default { die "error assert char: <$assert>!" }
+      default { error("error assert char: <$assert>!") }
    }
 }
 
@@ -86,60 +87,57 @@ sub match_rules {
 
 sub match_branch {
    my ($branch, $cursor) = @_;
-   my $cache = cache($cursor);
+   my $cache = $cursor->cache;
    for my $rule (@{$branch}) {
       my $match = match_rule($rule, $cursor);
       if (is_match($match)) { return $match }
-      recover($cursor, $cache);
+      $cursor->recover($cache);
    }
    return ['false'];
 }
 
 sub match_lbranch {
    my ($branch, $cursor) = @_;
-   my $cache     = cache($cursor);
+   my $cache     = $cursor->cache;
    my $max_match = ['false'];
    my $max_cache = $cache;
    for my $rule (@{$branch}) {
       my $match = match_rule($rule, $cursor);
       if (is_match($match)) {
-         if ($cursor->{off} >= $max_cache->[1]) {
-            $max_cache = cache($cursor);
+         if ($cursor->off >= $max_cache->[1]) {
+            $max_cache = $cursor->cache;
             $max_match = $match;
          }
       }
-      recover($cursor, $cache);
+      $cursor->recover($cache);
    }
-   recover($cursor, $max_cache);
+   $cursor->recover($max_cache);
    return $max_match;
 }
 
 sub match_ntoken {
    my ($name, $cursor) = @_;
-   my $rule  = $cursor->{ns}->{$name};
-   my $cache = cache($cursor);
+   my $rule  = $cursor->{'ns'}{$name};
+   my $cache = $cursor->cache;
    my $match = match_rule($rule, $cursor);
    return $match if is_bool($match);
    my $from  = $cache->[1];
-   my $len   = $cursor->{off} - $from;
-   my $str   = substr($cursor->{str}, $from, $len);
+   my $len   = $cursor->off - $from;
+   my $str   = substr($cursor->str, $from, $len);
    my $cname = '$' . $name;
-   $cursor->{ns}->{$cname} = ['Str', $str];
-   if ($cursor->{'mode'} != 0) {
-      push @{$cache}, $len;
-      return name_match_pos($name, $match, $cache);
-   }
-   return name_match($name, $match);
+   $cursor->{'ns'}{$cname} = ['Str', $str];
+   push @{$cache}, $len;
+   return name_match($name, $match, $cache);
 }
 
 sub match_ctoken {
    my ($name, $cursor) = @_;
    my $rule  = $cursor->{'ns'}{$name};
-   my $from  = $cursor->{'off'};
+   my $from  = $cursor->off;
    my $match = match_rule($rule, $cursor);
    return $match if is_bool($match);
-   my $len   = $cursor->{'off'} - $from;
-   my $str   = substr($cursor->{'str'}, $from, $len);
+   my $len   = $cursor->off - $from;
+   my $str   = substr($cursor->str, $from, $len);
    my $cname = '$' . $name;
    $cursor->{'ns'}{$cname} = ['Str', $str];
    return $match;
@@ -147,7 +145,7 @@ sub match_ctoken {
 
 sub match_rtoken {
    my ($name, $cursor) = @_;
-   my $rule = $cursor->{ns}{$name};
+   my $rule = $cursor->{'ns'}{$name};
    my $match = match_rule($rule, $cursor);
    return ['false'] if is_false($match);
    return ['true'];
@@ -155,10 +153,10 @@ sub match_rtoken {
 
 sub match_not {
    my ($rule, $cursor) = @_;
-   my $cache = cache($cursor);
+   my $cache = $cursor->cache;
    my $match = match_rule($rule, $cursor);
    if (is_false($match)) {
-      recover($cursor, $cache);
+      $cursor->recover($cache);
       return ['true'];
    }
    return ['false'];
@@ -167,15 +165,15 @@ sub match_not {
 sub match_till {
    my ($rule, $cursor) = @_;
    my @buf = ();
-   while ($cursor->{off} < $cursor->{len}) {
-      my $char = get_char($cursor);
+   while ($cursor->off < $cursor->len) {
+      my $char = $cursor->get_char;
       my $match = match_rule($rule, $cursor);
       if (is_match($match)) {
          my $gather_str - join '', @buf;
          return gather_match($gather_str, $match);
       }
       push @buf, $char;
-      go($cursor);
+      $cursor->go;
    }
    return ['false'];
 }
@@ -187,11 +185,11 @@ sub match_rept {
    my ($rept, $atom) = @{$rule};
    my ($min,  $max)  = get_rept_time($rept);
    while ($time != $max) {
-      my $cache = cache($cursor);
+      my $cache = $cursor->cache;
       my $match = match_rule($atom, $cursor);
       if (is_false($match)) {
          return ['false'] if $time < $min;
-         recover($cursor, $cache);
+         $cursor->recover($cache);
          return $gather;
       }
       $time++;
@@ -208,7 +206,7 @@ sub get_rept_time {
       when ('+')  { return (1, -1) } 
       when ('*?') { return (0, -1) }
       when ('+?') { return (1, -1) }
-      default { die "error rept str: <$rept>!" }
+      default { error("error rept str: <$rept>!") }
    }
 }
 
@@ -218,11 +216,11 @@ sub match_look {
    my ($min, $max) = get_rept_time($rept);
    my ($gather, $time)   = (['true'], 0);
    while ($time != $max) {
-      my $cache = cache($cursor);
+      my $cache = $cursor->cache;
       my $match = match_rule($atom, $cursor);
       if (is_false($match)) {
          return ['false'] if $time > $min;
-         recover($cursor, $cache);
+         $cursor->recover($cache);
          $match = match_rule($look, $cursor);
          return ['false'] if is_false($match);
          return gather_match($gather, $match);
@@ -230,12 +228,12 @@ sub match_look {
       $time++;
       $gather = gather_match($gather, $match);
       if ($time >= $min) {
-         $cache = cache($cursor);
+         $cache = $cursor->cache;
          $match = match_rule($look, $cursor);
          if (is_match($match)) {
             return gather_match($gather, $match)
          }
-         recover($cursor, $cache);
+         $cursor->recover($cache);
       }
    }
    return ['false'];
@@ -244,25 +242,25 @@ sub match_look {
 sub match_str {
    my ($str, $cursor) = @_;
    for my $char (split('', $str)) {
-      if ($char ne get_char($cursor)) { return ['false'] }
-      go($cursor);
+      if ($char ne $cursor->get_char) { return ['false'] }
+      $cursor->go;
    }
    return $str;
 }
 
 sub match_char {
    my ($char, $cursor) = @_;
-   return ['false'] if $char ne get_char($cursor);
-   go($cursor);
+   return ['false'] if $char ne $cursor->get_char;
+   $cursor->go;
    return $char;
 }
 
 sub match_chclass {
    my ($atoms, $cursor) = @_;
-   my $char = get_char($cursor);
+   my $char = $cursor->get_char;
    for my $atom (@{$atoms}) {
       if (match_catom($atom, $char)) {
-         go($cursor);
+         $cursor->go;
          return $char;
       }
    }
@@ -271,12 +269,12 @@ sub match_chclass {
 
 sub match_nchclass {
    my ($atoms, $cursor) = @_;
-   my $char = get_char($cursor);
+   my $char = $cursor->get_char;
    return ['false'] if $char eq chr(0);
    for my $atom (@{$atoms}) {
       return ['false'] if match_catom($atom, $char);
    }
-   go($cursor);
+   $cursor->go;
    return $char;
 }
 
@@ -287,16 +285,16 @@ sub match_catom {
       when ("Range") { match_range($value, $char) }
       when ("Cclass") { is_match_cclass($value, $char) }
       when ("Char") { return $value eq $char }
-      default { die("unknown chclass node: <$name>!") }
+      default { error("unknown chclass node: <$name>!") }
    }
 }
 
 sub match_cclass {
    my ($cclass, $cursor) = @_;
-   my $char = get_char($cursor);
+   my $char = $cursor->get_char;
    return ['false'] if $char eq chr(0);
    if (is_match_cclass($cclass, $char)) {
-      go($cursor);
+      $cursor->go;
       return $char;
    }
    return ['false'];
@@ -323,7 +321,7 @@ sub is_match_cclass {
       when ('W') { return !is_char_words($char) }
       when ('x') { return is_char_xdigit($char) }
       when ('X') { return !is_char_xdigit($char) }
-      default    { die "unknown cclass $cchar" }
+      default    { error("unknown cclass $cchar") }
    }
 }
 
@@ -335,16 +333,16 @@ sub match_range {
 
 sub match_expr {
    my ($expr, $cursor) = @_;
-   my $atom = eval_expr($expr, $cursor->{ns});
+   my $atom = eval_expr($expr, $cursor);
    return match_atom($atom, $cursor);
 }
 
 sub match_sym {
    my ($name, $cursor) = @_;
-   my $value = eval_sym($name, $cursor->{ns});
+   my $value = eval_sym($name, $cursor);
    my $match = match_atom($value, $cursor);
    if (is_false($match)) { return $match }
-   my $token_name = rest($name);
+   my $token_name = substr($name, 1);
    my $char = first($token_name);
    if (is_char_upper($char)) { return [$token_name, $match] }
    if ($char eq '_') { return ['true'] }
@@ -358,7 +356,7 @@ sub match_atom {
    given ($name) {
       when ('Array') { return match_array($value, $cursor) }
       when ('Str') { return match_str($value, $cursor) }
-      default { die "not implement atom $name" }
+      default { error("not implement atom $name!") }
    }
 }
 
@@ -368,18 +366,11 @@ sub match_array {
    return match_lbranch($array, $cursor);
 }
 
-sub name_match_pos {
+sub name_match {
    my ($name, $match, $pos) = @_;
    if (is_true($match)) { return $match }
    if (is_atom($match)) { return [$name, [$match], $pos] }
    return [$name, $match, $pos];
-}
-
-sub name_match {
-   my ($name, $match) = @_;
-   if (is_true($match)) { return $match }
-   if (is_atom($match)) { return [$name, [$match]] }
-   return [$name, $match];
 }
 
 sub gather_match {
@@ -400,89 +391,90 @@ sub gather_match {
 }
 
 sub eval_atom {
-   my ($atom, $ns) = @_;
+   my ($atom, $cursor) = @_;
    my ($name, $value) = @{$atom};
    given ($name) {
       when ('Str')   { return $atom }
-      when ('Sym')   { return eval_sym($value, $ns) }
-      when ('Expr')  { return eval_expr($value, $ns) }
-      when ('Array') { return eval_array($value, $ns) }
-      default { die "Could not eval atom: <$name>!"; }
+      when ('Sym')   { return eval_sym($value, $cursor) }
+      when ('Expr')  { return eval_expr($value, $cursor) }
+      when ('Array') { return eval_array($value, $cursor) }
+      default {
+         $cursor->error("Could not eval atom: <$name>!");
+      }
    }
 }
 
 sub eval_sym {
-   my ($name, $ns) = @_;
-   if (exists $ns->{$name}) { return $ns->{$name} }
-   die "variable not define: <$name>.";
+   my ($name, $cursor) = @_;
+   if (exists $cursor->{'ns'}{$name}) {
+      return $cursor->{'ns'}{$name};
+   }
+   $cursor->error("variable not define: <$name>.");
 }
 
 sub eval_expr {
-   my ($expr, $ns) = @_;
+   my ($expr, $cursor) = @_;
    my $name = shift @{$expr};
    given ($name) {
-      when ('push') { eval_push($expr, $ns) }
-      when ('my') { eval_my($expr, $ns) }
-      when ('say') { eval_say($expr, $ns) }
-      default { die "not implement action: <$name>."; }
+      when ('push') { eval_push($expr, $cursor) }
+      when ('my')   { eval_my($expr, $cursor) }
+      when ('say')  { eval_say($expr, $cursor) }
+      default { 
+         $cursor->error("not implement action: <$name>.");
+      }
    }
 }
 
 sub eval_array {
-   my ($array, $ns) = @_;
+   my ($array, $cursor) = @_;
    if (len($array) == 0) {
       return ['Array', $array]
    }
-   my $atoms = eval_atoms($array, $ns);
+   my $atoms = eval_atoms($array, $cursor);
    return ['Array', $atoms];
 }
 
 sub eval_push {
-   my ($atoms, $ns) = @_;
+   my ($atoms, $cursor) = @_;
    my $sym = $atoms->[0];
    if (is_atom_sym($sym)) {
-      my $eval_atoms = eval_atoms($atoms, $ns);
+      my $eval_atoms = eval_atoms($atoms, $cursor);
       my ($array, $element) = @{$eval_atoms};
       push @{ $array->[1] }, $element;
       my $name = $sym->[1];
-      $ns->{$name} = $array;
+      $cursor->{'ns'}{$name} = $array;
       return ['true'];
    }
-   die 'push only accept array symbol!';
+   $cursor->error('push only accept array symbol!');
 }
 
 sub eval_my {
-   my ($atoms, $ns) = @_;
+   my ($atoms, $cursor) = @_;
    my $sym = $atoms->[0];
-   my $value = eval_atom($atoms->[1], $ns);
+   my $value = eval_atom($atoms->[1], $cursor);
    if (is_atom_sym($sym)) {
       my $name = $sym->[1];
-      $ns->{$name} = $value;
+      $cursor->{'ns'}{$name} = $value;
       return ['true'];
    }
-   die 'only assign symbol!';
+   $cursor->error('only assign symbol!');
 }
 
 sub eval_say {
-   my ($atoms, $ns) = @_;
-   my $eval_atoms = eval_atoms($atoms, $ns);
+   my ($atoms, $cursor) = @_;
+   my $eval_atoms = eval_atoms($atoms, $cursor);
    my $str = $eval_atoms->[0];
    if (is_atom_str($str)) {
       say $str->[1];
       return ['true'];
    }
    my $type = $str->[0];
-   die "say only accept Str: <$type>";
+   $cursor->error("say only accept Str: <$type>");
 }
 
 sub eval_atoms {
-   my ($atoms, $ns) = @_;
-   my $eval_atoms = [];
-   for my $atom (@{$atoms}) {
-      my $eval_atom = eval_atom($atom, $ns);
-      push @{$eval_atoms}, $eval_atom;
-   }
-   return $eval_atoms;
+   my ($atoms, $cursor) = @_;
+   return [ map { eval_atom($_, $cursor) } @{$atoms} ];
 }
 
 1;

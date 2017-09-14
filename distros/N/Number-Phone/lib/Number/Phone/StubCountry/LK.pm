@@ -22,46 +22,54 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[1-689]',
-                  'pattern' => '(\\d{2})(\\d{1})(\\d{6})'
+                  'pattern' => '(\\d{2})(\\d{1})(\\d{6})',
+                  'leading_digits' => '[1-689]'
                 },
                 {
-                  'leading_digits' => '7',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '7'
                 }
               ];
 
 my $validators = {
-                'mobile' => '7[0125-8]\\d{7}',
+                'voip' => '',
                 'fixed_line' => '
+          1(?:
+            1[2-57]\\d{6}|
+            973\\d{5}
+          )|
           (?:
-            [189]1|
             2[13-7]|
             3[1-8]|
             4[157]|
             5[12457]|
-            6[35-7]
+            6[35-7]|
+            [89]1
           )[2-57]\\d{6}
         ',
-                'pager' => '',
+                'specialrate' => '',
                 'toll_free' => '',
-                'voip' => '',
+                'mobile' => '7[0125-8]\\d{7}',
+                'pager' => '',
                 'personal_number' => '',
                 'geographic' => '
+          1(?:
+            1[2-57]\\d{6}|
+            973\\d{5}
+          )|
           (?:
-            [189]1|
             2[13-7]|
             3[1-8]|
             4[157]|
             5[12457]|
-            6[35-7]
+            6[35-7]|
+            [89]1
           )[2-57]\\d{6}
-        ',
-                'specialrate' => ''
+        '
               };
 my %areanames = (
   9411 => "Colombo",

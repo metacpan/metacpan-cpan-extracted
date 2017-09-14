@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.65';
+  $ntheory::VERSION = '0.66';
 }
 
 BEGIN {
@@ -128,6 +128,7 @@ Tags:
   forcomb { ... } n, k                loop over combinations
   forperm { ... } n                   loop over permutations
   formultiperm { ... } \@n            loop over multiset permutations
+  forderange { ... } n                loop over derangements
   prime_iterator                      returns a simple prime iterator
   prime_iterator_object               returns a prime iterator object
 
@@ -156,6 +157,8 @@ Tags:
   random_maurer_prime_with_cert(n)    as above and include certificate
   random_shawe_taylor_prime(n)        random n-bit prime with S-T alg.
   random_shawe_taylor_prime_with_cert(n) as above including certificate
+  random_unrestricted_semiprime(n)    random n-bit semiprime
+  random_semiprime(n)                 as above with equal size factors
 
 =head2 LISTS
 
@@ -238,6 +241,10 @@ Tags:
   harmfrac(n)                         Harmonic number as (num,den)
   harmreal(n)                         Harmonic number as BigFloat
   stirling(n,m,[type])                Stirling numbers of 1st or 2nd type
+  numtoperm(n,k)                      kth lexico permutation of n elems
+  permtonum([a,b,...])                permutation number of given perm
+  randperm(n,[k])                     random permutation of n elems
+  shuffle(...)                        random permutation of an array
 
 =head2 NON-INTEGER MATH
 

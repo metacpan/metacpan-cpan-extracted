@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -96,6 +96,7 @@ sub iteration {
         }
 
         push @events => $self->{+FEEDER}->poll($self->{+BATCH_SIZE});
+
         last unless @events;
 
         for my $event (@events) {
@@ -106,7 +107,6 @@ sub iteration {
             $_->log_event($event) for @{$self->{+LOGGERS}};
 
             if ($job_id) {
-                # This will transform the events, possibly by adding facets
                 my $watcher = $self->{+WATCHERS}->{$job_id};
 
                 unless ($watcher) {
@@ -123,6 +123,7 @@ sub iteration {
                     $self->{+ACTIVE}->{$job_id} = $watcher if $live;
                 }
 
+                # This will transform the events, possibly by adding facets
                 my $f;
                 ($event, $f) = $watcher->process($event);
 
@@ -153,7 +154,7 @@ sub check_timeout {
 
     my $stamp = time;
 
-    return if $watcher->job->no_timeout;
+    return unless $watcher->job->use_timeout;
 
     my $delta = $stamp - $watcher->last_event;
 

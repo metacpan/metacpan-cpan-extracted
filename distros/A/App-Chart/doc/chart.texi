@@ -425,15 +425,16 @@ Here are some other notes,
 Various optional features and their required Perl modules are set out in the
 @code{optional_features} section of @file{META.yml}.  Some of the smart Perl
 install tools might offer them in an automated way, otherwise look at
-@file{META.yml} and install desired things manually.  The most interesting
-options include @code{Finance::Quote} (@pxref{Finance Quote}), Genius Trader
-and TA-Lib (@pxref{Other Indicator Packages}).
+@file{META.yml} or @file{Makefile.PL} and install desired things manually.
+The most interesting options include @code{Finance::Quote} (@pxref{Finance
+Quote}), Genius Trader and TA-Lib (@pxref{Other Indicator Packages}).
 
 @item HTTP Compression
 If suitable modules are available then LWP is set to request compression in
-HTTP downloads.  Only a few servers will do this, but it saves download size
-when the server does.  Gzip decompression uses @code{IO::Uncompress::Gunzip}
-which comes with Perl so should be available always.
+HTTP downloads.  Various servers will do this and it saves download size when
+the server does.  Gzip is the most common and its decompression uses
+@code{IO::Uncompress::Gunzip} which comes with Perl so should be available
+always.
 
 @c FIXME: not included yet
 @c the only the BSX and ZSE servers are known
@@ -446,9 +447,9 @@ which comes with Perl so should be available always.
 @cindex OpenSSL
 For @code{https} protocol the @code{LWP::Protocol::https} module is required.
 In libwww 6 and up it comes separately and expresses its required supporting
-modules.  In libwww 5 see the @file{README.SSL} on the recommended
-@code{Crypt::SSLeay} module (using OpenSSL)@.  Data sources needing
-@code{https} include @ref{MLC Funds}.
+modules.  In libwww 5 see its @file{README.SSL} on the recommended
+@code{Crypt::SSLeay} module (using OpenSSL)@.  Many data sources need
+@code{https}, including @ref{Yahoo Finance}.
 
 @c @item @command{lha}
 @c @cindex LHa
@@ -5108,27 +5109,28 @@ trade, and the exchange timezone location.
 
 @cindex @key{Ctrl-I}
 The View/Intraday menu entry (@key{Ctrl-I}) or the Intraday button in the
-watchlist (@pxref{Watchlist}) opens an intraday data window for the current
+watchlist (@pxref{Watchlist}) opens an intraday image window for the current
 symbol, showing trading today, or so-far today.
 
-Intraday graphs are only available from some data sources (@pxref{Data
-Sources}).  Yahoo and Barchart provides graphs, which means most stocks and
-indexes are covered.
+Alas there are no longer any data sources with intraday images.
 
-@cindex @key{Alt-R}
-The default display is 1-day, downloaded when the window is opened (then
-cached).  The option menu can select other timeframes such as 5-day, depending
-on the data source.  The underlined mnemonics ``5'' etc in the menu are
-accelerator keys, eg.@: @key{Alt-5}.  Click on Refresh (@key{Alt-R}) to update
-as trading progresses through the day.
+@c are only
+@c available from a few data sources (@pxref{Data Sources}).
 
-Multiple intraday windows can be opened, or a new symbol entered in the text
-box to view a different symbol (press @key{Return} or click the ``Enter''
-button).
-
-To see the intraday for a symbol not in the database or watchlist just open an
-intraday window for any symbol (or no symbol at all) then enter the desired
-one.
+@c @cindex @key{Alt-R}
+@c The default display is 1-day, downloaded when the window is opened (then
+@c cached).  The option menu can select other timeframes such as 5-day, depending
+@c on the data source.  The underlined mnemonics ``5'' etc in the menu are
+@c accelerator keys, eg.@: @key{Alt-5}.  Click on Refresh (@key{Alt-R}) to update
+@c as trading progresses through the day.
+@c 
+@c Multiple intraday windows can be opened, or a new symbol entered in the text
+@c box to view a different symbol (press @key{Return} or click the ``Enter''
+@c button).
+@c 
+@c To see the intraday for a symbol not in the database or watchlist just open an
+@c intraday window for any symbol (or no symbol at all) then enter the desired
+@c one.
 
 
 @c ---------------------------------------------------------------------------
@@ -5200,7 +5202,6 @@ further copying or distribution is generally not allowed (and this will
 include derived forms like the graphs drawn by Chart).
 
 @menu
-* Barchart::
 * Finance Quote::
 * MLC Funds::
 * New Zealand Stock Exchange::
@@ -5270,215 +5271,6 @@ include derived forms like the graphs drawn by Chart).
 @c @end quotation
 
 
----------------------------------------------------------------------------
-@node Barchart, Finance Quote, Data Sources, Data Sources
-@section Barchart
-@cindex @code{barchart.com}
-
-@uref{http://www.barchart.com}
-
-Barchart provides the following for various futures exchanges around the
-world,
-
-@itemize
-@c @item
-@c Quotes updated every 5 minutes, delayed according to the exchange.
-@item
-Intraday graphs.
-@item
-Historical data, but only for the past 5 days, and no volume figures.
-@item
-Historical data as graphs.
-@end itemize
-
-All information is for personal use only, see the terms at
-
-@quotation
-@uref{http://www2.barchart.com/agreement.asp} @*
-@uref{http://www2.barchart.com/ddfplus.asp}
-@end quotation
-
-In Chart symbols are the exchange commodity code and an exchange suffix as
-described below, with a month code letter and year, like @samp{CLZ10.NYM}
-for December 2010 crude oil.
-@c SYMBOL: CLZ10.NYM
-
-@c The commodity alone is the current front month, like
-@c @samp{GC.CMX} for gold, or 
-@c @c SYMBOL: GC.CMX
-
-Barchart has some different commodity codes than the exchanges, but Chart
-always uses the exchange codes.  Some Barchart pages show symbols with just
-one digit for the year, but Chart always uses two like @samp{10} above.
-
-Five days of historical data is very limited, but you can accumulate it to at
-least get a short term picture.  Further data as graphs is available, and
-Chart has that as a ``Daily'' option in the intraday dialog
-(@pxref{Intraday}).  (Further historical data as figures is available to
-subscribers, not currently supported by Chart.)
-
-For some of the exchanges below quotes are also available from Yahoo
-(@pxref{Yahoo Finance}).  The download from Yahoo is much smaller and is hence
-preferred.
-
-@c @ifinfo
-@c @sp 1
-@c @end ifinfo
-@c @subsection Chicago Board of Trade
-@c @cindex Chicago Board of Trade
-@c @cindex CBOT
-@c 
-@c @uref{http://www.cbot.com}
-@c 
-@c @cindex @code{.CBOT}
-@c CBOT data is obtained from Barchart, and quotes from Yahoo (delayed 10
-@c minutes).  In Chart symbols have a @samp{.CBOT} suffix, for example
-@c @samp{O.CBOT} for oats.  Symbols (and trading hours) can be found at
-@c @c SYMBOL: O.CBOT
-@c 
-@c @quotation
-@c @uref{http://www.cbot.com/cbot/pub/page/0@comma{}3181@comma{}932@comma{}00.html}
-@c @end quotation
-@c 
-@c For some contracts Barchart has different symbols, but Chart always uses the
-@c exchange symbols.
-@c 
-@c @ifinfo
-@c @sp 1
-@c @end ifinfo
-@c @subsection Chicago Mercantile Exchange
-@c @cindex Chicago Mercantile Exchange
-@c @cindex CME
-@c 
-@c @uref{http://www.cme.com}
-@c 
-@c @cindex @code{.CME}
-@c CME data is obtained from Barchart, and quotes from Yahoo (delayed 10
-@c minutes).  In Chart symbols have a @samp{.CME} suffix, for example
-@c @samp{SP.CME} for S&P 500 futures.  Symbols can be found at
-@c @c SYMBOL: SP.CME
-@c 
-@c @quotation
-@c @uref{http://www.cme.com/trading/res/cch/cmeprdcode2439.html}
-@c @end quotation
-@c 
-@c For some contracts Barchart has different symbols, but Chart always uses the
-@c exchange symbols.
-
-@ifinfo
-@sp 1
-@end ifinfo
-@subsection Commodity Exchange
-@cindex Commodity Exchange
-@cindex COMEX
-
-@cindex @code{.CMX}
-COMEX is the metals division of NYMEX (see below).  COMEX daily data is
-obtained from Barchart and quotes from Yahoo (delayed 30 minutes).  In Chart
-symbols have a @samp{.CMX} suffix (as per Yahoo), for example @samp{GCM16.CMX}
-for June 2016 gold.
-@c SYMBOL: GCM16.CMX
-The exchange has a full symbols directory
-
-@quotation
-@uref{http://www.nymex.com/cc_main.aspx}
-@end quotation
-
-@c   Available symbols and months can be found at
-@c @quotation
-@c @uref{http://www2.barchart.com/futexch.asp?exch=comex&code=BSTK}
-@c @end quotation
-
-@c @ifinfo
-@c @sp 1
-@c @end ifinfo
-@c @subsection New York Board of Trade (ICE Futures U.S.)
-@c @cindex NYBOT
-@c @cindex ICE Futures U.S.
-@c 
-@c @uref{https://www.theice.com/nybot.jhtml}
-@c 
-@c @cindex @code{.NYBOT}
-@c @cindex @code{.NYBOT}
-@c NYBOT data is obtained from Barchart, and quotes from Yahoo (delayed 30
-@c minutes).  In Chart, contract symbols have a @samp{.NYBOT} suffix.  The
-@c commodity code alone is the front month, like @samp{CC.NYBOT} for cocoa.  Or a
-@c specific month can be given, like @samp{CTX07.WTB} for November 2007 cotton.
-@c Commodity codes can be found at
-@c @c SYMBOL: CC.NYBOT
-@c @c SYMBOL: CTX07.NYBOT
-@c 
-@c @quotation
-@c @uref{https://www.theice.com/publicdocs/NYBOT_Products.pdf}
-@c @end quotation
-
-@ifinfo
-@sp 1
-@end ifinfo
-@subsection New York Mercantile Exchange
-@cindex New York Mercantile Exchange
-@cindex NYMEX
-
-@uref{http://www.nymex.com}
-
-@cindex @code{.NYM}
-NYMEX daily data is obtained from Barchart and quotes from Yahoo (delayed 30
-minutes).  In Chart symbols have a @samp{.NYM} suffix (as per Yahoo), for
-example @samp{CLZ15.NYM} for December 2015 crude oil.
-@c SYMBOL: CLZ15.NYM
-The exchange has a full symbols directory
-
-@quotation
-@uref{http://www.nymex.com/cc_main.aspx}
-@end quotation
-
-@c Available symbols and months can be found at
-@c 
-@c @quotation
-@c @uref{http://www2.barchart.com/futexch.asp?exch=nymex&code=BSTK}
-@c @end quotation
-
-
-@c @ifinfo
-@c @sp 1
-@c @end ifinfo
-@c @subsection Singapore International Money Exchange
-@c @cindex Singapore International Money Exchange
-@c @cindex Singapore Stock Exchange
-@c @cindex SIMEX
-@c @cindex SGX
-@c 
-@c @uref{http://www.sgx.com}
-@c 
-@c @cindex @code{.SIMEX}
-@c SIMEX is the derivatives arm of the Singapore Stock Exchange.  SIMEX symbols
-@c have a @samp{.SIMEX} suffix, for example @samp{NK.SIMEX} for Nikkei 225
-@c futures.
-@c @c SYMBOL: NK.SIMEX
-@c 
-@c @c  The terms and conditions at www.sgx.com (the last of the ``useful links''
-@c @c  at the right hand side of the home page) say linking is allowed but not
-@c @c  deep linking is not allowed.  Dunno what that means, maybe it's nothing
-@c @c  except the home page, though if that were the case you'd think it would
-@c @c  say that.  In any case give directions instead of links.
-@c @c
-@c @c  (Prohibitions on publishing the URL of something already freely accessible
-@c @c  seem pretty dubious, though it's not some passive object, but somebody
-@c @c  else's computer, and is more or less an invitation to use that in a way
-@c @c  they don't want, which would be at best highly irresponsible.)
-@c @c
-@c Symbols can be found on the contract specifications pages.  On the home page
-@c under ``Products and Services'' choose ``Derivatives'' then either the
-@c ``Equity Index Futures / Options'' or ``Interest Rate Futures / Options''
-@c items.  Those two pages then have selection boxes to see each contract.
-@c 
-@c The MSCI Japan contract (symbol @samp{JP}) is not available from Barchart, but
-@c all other contracts are.  Intra-day graphs are not available.
-@c 
-@c Barchart has its own set of contract symbols, but Chart uses the exchange
-@c symbols.
-
-
 @c ---------------------------------------------------------------------------
 @c Changed ...
 @c
@@ -5513,7 +5305,7 @@ The exchange has a full symbols directory
 
 
 @c ---------------------------------------------------------------------------
-@node Finance Quote, MLC Funds, Barchart, Data Sources
+@node Finance Quote, MLC Funds, Data Sources, Data Sources
 @section Finance Quote
 @cindex @code{Finance::Quote}
 @cindex FQ
@@ -5595,7 +5387,8 @@ product names together),
 @cindex New Zealand Stock Exchange
 @cindex NZX
 
-@uref{http://www.nzx.com}
+@c Sep 2017 the http redirects to https
+@uref{https://www.nzx.com}
 
 NZX provides
 
@@ -5610,14 +5403,14 @@ Quotes, historical data and other information is obtained from Yahoo
 The NZX web site is for non-commercial or personal use only, see the terms at
 
 @quotation
-@uref{http://www.nzx.com/Contact_us/terms}
+@uref{https://www.nzx.com/terms}
 @end quotation
 
 @cindex @code{.NZ}
 In Chart NZX symbols follow the Yahoo convention, which is the exchange symbol
-and a @samp{.NZ} suffix, for example @samp{TEL.NZ} for Telecom New Zealand.
-The NZX home page above has a search to lookup symbols (as does Yahoo).
-@c SYMBOL: TEL.NZ
+and a @samp{.NZ} suffix, for example @samp{FBU.NZ}.  The NZX home page above
+has a search to lookup symbols (as does Yahoo).
+@c SYMBOL: FBU.NZ
 
 
 @c ---------------------------------------------------------------------------
@@ -5770,28 +5563,27 @@ Yahoo provides the following for many stock exchanges around the world
 
 @itemize
 @item
-Quotes, real-time for indexes and delayed for stocks.
+Quotes, real-time for indexes and delayed for shares.
+@c @item
+@c Intraday graphs.
 @item
-Intraday graphs.
+Historical daily data, dividends and splits.
 @item
-Historical data and splits.
-@item
-Historical and upcoming dividends.
+Upcoming dividends.
 @end itemize
 
-Yahoo does not allow commercial use, see the note at the bottom of the home
-page, and the terms of service at
+Yahoo does not allow commercial use, see the terms of service at
 
 @quotation
-@uref{http://docs.yahoo.com/info/terms/}
+@uref{https://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm}
 @end quotation
 
 Chart uses the Yahoo stock symbol conventions.  For US stocks (AMEX, Nasdaq,
 NYSE) this is just the exchange symbol like @samp{AAPL} for Apple Computer.
 Stocks from elsewhere are the exchange symbol and a suffix, like @samp{BMW.DE}
 for BMW on Xetra.  See @ref{Yahoo Exchanges}, below, for those supported in
-Chart.  Yahoo has a search at the following location (and at the
-country-specific sites),
+Chart.  Yahoo has a symbol lookup on most pages (and at the country-specific
+sites),
 @c SYMBOL: AAPL
 @c SYMBOL: BMW.DE
 
@@ -5804,20 +5596,20 @@ country-specific sites),
 Some currency cross-rates are available, they take a form such as
 @samp{AUDUSD=X} for the value of one Australian dollar in US dollars.  Some
 spot metals prices are available in a similar form, for example
-@samp{XAUUSD=X} for Gold in US dollars.  These may be just quotes, without
-historical data available.
+@samp{XAUUSD=X} for Gold in US dollars.
 @c SYMBOL: AUDUSD=X
 @c SYMBOL: XAUUSD=X
 
-It's not clear when new end-of-day data becomes available, sometimes it seems
-to be once the exchange opens for the following day, other times it seems
-further delayed.  Chart will attempt to download after 10:30am the following
-trading day (in the exchange's timezone).
+Yahoo gives some information on market closing times, but Chart doesn't make
+use of that.  A day's trading is written as daily data at 6pm (in the
+exchange's timezone).  Before that the current day is a latest quote.  The
+downloads are slightly overlapped so that if 6pm was too soon then its prices
+are replaced on a subsequent download.
 
-Dividends are re-downloaded weekly.  They seem to be a bit patchy, with not
-all dividends actually appearing in the data for some stocks.  The most recent
-dividend on the quotes pages is added to the database, so the latest should be
-available at least.
+@c Dividends are re-downloaded weekly.  They seem to be a bit patchy, with not
+@c all dividends actually appearing in the data for some stocks.  The most recent
+@c dividend on the quotes pages is added to the database, so the latest should be
+@c available at least.
 
 @menu
 * Yahoo Exchanges::
@@ -5908,11 +5700,11 @@ in its own section.
 @tab Over the Counter (OTC) @* @uref{http://www.otcbb.com}
 @item
 
-@item @nisamp{.PK} @tab
-@cindex @code{.PK}
-@cindex Pink Sheets
-@tab Pink Sheets @* @uref{http://www.pinksheets.com}
-@item
+@c @item @nisamp{.PK} @tab
+@c @cindex @code{.PK}
+@c @cindex Pink Sheets
+@c @tab Pink Sheets @* @uref{http://www.pinksheets.com}
+@c @item
 
 @item @nisamp{.BA} @tab Argentina
 @cindex @code{.BA}

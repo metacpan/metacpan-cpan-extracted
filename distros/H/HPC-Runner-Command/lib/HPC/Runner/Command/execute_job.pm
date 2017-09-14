@@ -40,9 +40,6 @@ sub BUILD {
     if(exists $job_meta->{job_cmd_start}){
       $self->counter($job_meta->{job_cmd_start} + $self->batch_index_start);
     }
-
-    # my $tar = $self->set_archive;
-    # $self->archive($tar);
 }
 
 sub execute {

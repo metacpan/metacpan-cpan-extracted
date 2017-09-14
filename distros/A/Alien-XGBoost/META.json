@@ -18,7 +18,6 @@
          "requires" : {
             "Alien::Build" : "1.04",
             "Alien::Build::MM" : "0.32",
-            "Alien::git" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "FFI::CheckLib" : "0",
             "FFI::Platypus" : "0",
@@ -53,6 +52,8 @@
          "requires" : {
             "Alien::Base" : "0",
             "Alien::Build" : "1.04",
+            "Alien::cmake3" : "0",
+            "Alien::git" : "0",
             "base" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/pablrod/p5-Alien-XGBoost"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

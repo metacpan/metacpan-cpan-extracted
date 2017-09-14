@@ -3,15 +3,18 @@ abstract: 'Perl-only `which`'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Per Einar Ellefsen <pereinar@cpan.org>'
+  - 'Adam Kennedy <adamk@cpan.org>'
 build_requires:
-  Test::More: '0.94'
+  Capture::Tiny: '0'
+  Test2::Mock: '0.000060'
+  Test2::V0: '0.000060'
   Test::Script: '0'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +25,11 @@ requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plicease/App-pwhich/issues
-  homepage: http://perl.wdlabs.com/App-pwhich
+  homepage: https://metacpan.org/pod/App::pwhich
   repository: git://github.com/plicease/App-pwhich.git
-version: '1.14'
+version: '1.15'
+x_contributors:
+  - 'Per Einar Ellefsen <pereinar@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Adam Kennedy <adamk@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

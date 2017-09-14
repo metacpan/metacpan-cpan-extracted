@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use SOAP::Lite;
 
-use vars qw( @ISA );
+our $VERSION = '0.301';
+$VERSION = eval $VERSION;
 
-@ISA = qw( SOAP::Deserializer );
+use base qw( SOAP::Deserializer );
 use strict 'refs';
 
 #**************************************************************************
@@ -35,7 +36,7 @@ BEGIN {
         my $method_name = "as_" . $class;
         my $class_name  = "WWW::Salesforce::" . $class;
         my $method_body = <<END_OF_SUB;
-            
+
             sub $method_name {
                 my (\$self,\$f,\$name,\$attr) = splice(\@_,0,4);
                 my \$ns = pop;
@@ -90,5 +91,4 @@ sub as_Array {
     return \@Array;
 }
 
-#magically delicious
 1;

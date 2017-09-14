@@ -1,0 +1,4 @@
+name = "Plack-Middleware-QueryCounter"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+readme_from="lib/Plack/Middleware/QueryCounter/DBI.pm"

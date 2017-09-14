@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+
+BEGIN { push @INC, "." }
 use inc::ExtUtils::MY_Metafile qw(my_metafile);
 
 my_metafile {

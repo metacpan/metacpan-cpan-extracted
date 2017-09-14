@@ -1,0 +1,23 @@
+=head1 NAME
+
+Locale::XGettext::Util::POEntries - A Container for PO Entries
+
+=head1 SYNOPSIS
+
+    die "Locale::XGettext::Util::Keyword should not be used";
+
+=head1 DESCRIPTION
+
+This module is internally used by L<Locale::XGettext>.  It is not
+part of the API and should not be used.
+
+=for Pod::Coverage .*
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Locale::XGettext>, L<xgettext(1)>, L<perl(1)>

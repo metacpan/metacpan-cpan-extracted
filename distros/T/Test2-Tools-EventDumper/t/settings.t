@@ -5,6 +5,10 @@ use Test2::API qw/intercept/;
 
 use Test2::Tools::EventDumper qw/dump_event dump_events/;
 
+use Test2::Util::Trace;
+my $trace_class = $INC{'Test2/EventFacet/Trace.pm'} ? 'Test2::EventFacet::Trace' : 'Test2::Util::Trace';
+
+
 my $file = 'settings.t';
 my %lines;
 
@@ -452,7 +456,7 @@ event Ok => sub {
     call name => 'pass';
     call pass => 1;
     call effective_pass => 1;
-    call trace => T(); # Unknown value: Test2::Util::Trace
+    call trace => T(); # Unknown value: $trace_class
 }
 EOT
 
@@ -463,26 +467,26 @@ array {
         call name => 'pass';
         call pass => 1;
         call effective_pass => 1;
-        call trace => T(); # Unknown value: Test2::Util::Trace
+        call trace => T(); # Unknown value: $trace_class
     };
 
     event Subtest => sub {
         call name => 'foo';
         call pass => 1;
         call effective_pass => 1;
-        call trace => T(); # Unknown value: Test2::Util::Trace
+        call trace => T(); # Unknown value: $trace_class
 
         call subevents => array {
             event Ok => sub {
                 call name => 'pass';
                 call pass => 1;
                 call effective_pass => 1;
-                call trace => T(); # Unknown value: Test2::Util::Trace
+                call trace => T(); # Unknown value: $trace_class
             };
 
             event Plan => sub {
                 call max => 1;
-                call trace => T(); # Unknown value: Test2::Util::Trace
+                call trace => T(); # Unknown value: $trace_class
             };
             end();
         };

@@ -13,6 +13,5 @@ if($@ || ($warnings::unused::VERSION < 0.04)) {
 	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
 } else {
 	use_ok('Log::WarnDie');
-	new_ok('Log::WarnDie');
-	plan tests => 2;
+	plan tests => 1;
 }

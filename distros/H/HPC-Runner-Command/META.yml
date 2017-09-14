@@ -12,10 +12,12 @@ build_requires:
   Test::Class::Moose::Runner: '0'
   Test::More: '0'
   Text::Diff: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -98,14 +100,12 @@ requires:
   YAML::XS: '0'
   namespace::autoclean: '0'
   perl: '5.010'
-  strict: '0'
   utf8: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/biosails/HPC-Runner-Command/issues
   homepage: https://github.com/biosails/HPC-Runner-Command
   repository: https://github.com/biosails/HPC-Runner-Command.git
-version: 3.2.10
+version: 3.2.11
 x_contributors:
   - 'Travis CI <nobody@nobody.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

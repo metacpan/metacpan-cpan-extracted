@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -29,6 +29,9 @@ use App::Chart;
 
 use Glib::Object::Subclass
   'Gtk2::Ex::TreeModelFilter::Draggable';
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 use constant { UP_SPAN => '<span foreground="green">',
 
@@ -150,8 +153,10 @@ C<App::Chart::Gtk2::TickerModel> is a subclass of C<Gtk2::TreeModelFilter>,
 =head1 DESCRIPTION
 
 A C<App::Chart::Gtk2::TickerModel> object presents the data from a given
-C<App::Chart::Gtk2::Symlist> in a form suitable for the C<App::Chart::Gtk2::Ticker>
-widget.  Currently this is its sole use.
+C<App::Chart::Gtk2::Symlist> in a form suitable for the
+C<App::Chart::Gtk2::Ticker> widget.  This means presenting each symbol as
+symbol, price, and some Pango spans for up/down colour.  Currently this is
+its sole use.
 
 =head1 FUNCTIONS
 
@@ -179,5 +184,26 @@ present a different symlist create a new model.
 =head1 SEE ALSO
 
 L<App::Chart::Gtk2::Ticker>
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/chart/index.html>
+
+=head1 LICENCE
+
+Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
+
+Chart is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3, or (at your option) any later version.
+
+Chart is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Chart; see the file F<COPYING>.  Failing that, see
+L<http://www.gnu.org/licenses/>.
 
 =cut

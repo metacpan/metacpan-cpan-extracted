@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::RedisServer
 
+0.21 2017-09-14T10:33:42Z
+    - Fixed detection of Redis ready state reached, which changed with Redis 4.x (issue #6)
+      (Robin Smidsrød)
+
 0.20 2015-06-08T16:35:26Z
     - Fixed grammar and typos, fixed pod_spell test, fixed MYMETA error in cover test (ncstang)
     - use Mouse; no Any::Moose;

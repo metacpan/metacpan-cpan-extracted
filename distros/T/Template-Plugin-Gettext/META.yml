@@ -1,0 +1,37 @@
+---
+abstract: 'Gettext Support For the Template Toolkit Version 2'
+author:
+  - 'Guido Flohr <guido.flohr@cantanea.com>'
+build_requires:
+  Locale::XGettext::Util::Keyword: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Gettext
+requires:
+  Cwd: '0'
+  Getopt::Long: '0'
+  Locale::Messages: '0'
+  Locale::TextDomain: '1.20'
+  Locale::Util: '0'
+  Locale::XGettext: '0'
+  Template: '0'
+  Template::Parser: '0'
+  Template::Plugin: '0'
+  base: '0'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/gflohr/Template-Plugin-Gettext/issues
+  homepage: http://www.guido-flohr.net/en/projects#template-plugin-xgettext
+  repository: git://github.com/gflohr/Template-Plugin-Gettext.git
+version: '0.1'
+x_serialization_backend: 'YAML::Tiny version 1.70'

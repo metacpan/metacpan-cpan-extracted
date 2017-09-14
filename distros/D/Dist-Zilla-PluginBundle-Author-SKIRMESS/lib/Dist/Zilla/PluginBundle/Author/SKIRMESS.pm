@@ -4,9 +4,12 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Moose 0.99;
+
+use Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase;
+
 use namespace::autoclean 0.09;
 
 with qw(
@@ -36,6 +39,8 @@ has travis_ci_ignore_perl => (
 sub configure {
     my $self = shift;
 
+    my @generated_files = Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase->files();
+
     $self->add_plugins(
 
         # Check at build/release time if modules are out of date
@@ -46,32 +51,6 @@ sub configure {
                 module => [ $self->meta->name ],
             }
         ],
-
-        'Author::SKIRMESS::Test::XT::Test::Changes',
-        'Author::SKIRMESS::Test::XT::Test::CleanNamespaces',
-        'Author::SKIRMESS::Test::XT::Test::CPAN::Meta',
-        'Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON',
-        'Author::SKIRMESS::Test::XT::Test::DistManifest',
-        'Author::SKIRMESS::Test::XT::Test::EOL',
-        'Author::SKIRMESS::Test::XT::Test::Kwalitee',
-        'Author::SKIRMESS::Test::XT::Test::MinimumVersion',
-        'Author::SKIRMESS::Test::XT::Test::Mojibake',
-        'Author::SKIRMESS::Test::XT::Test::NoTabs',
-        'Author::SKIRMESS::Test::XT::Test::Perl::Critic',
-        'Author::SKIRMESS::Test::XT::Test::Pod',
-        'Author::SKIRMESS::Test::XT::Test::Pod::No404s',
-        'Author::SKIRMESS::Test::XT::Test::Portability::Files',
-        [ 'Author::SKIRMESS::Test::XT::Test::Spelling', { stopwords => $self->stopwords } ],
-        'Author::SKIRMESS::Test::XT::Test::Version',
-
-        [
-            'Author::SKIRMESS::TravisCI',
-            {
-                travis_ci_ignore_perl => $self->travis_ci_ignore_perl,
-            }
-        ],
-
-        'Author::SKIRMESS::Perl::Tidy::RC',
 
         # Check at build/release time if modules are out of date
         [
@@ -107,6 +86,16 @@ sub configure {
             }
         ],
 
+        # Must run after ReversionOnRelease because it adds the version of
+        # the bundle to the generated files
+        [
+            'Author::SKIRMESS::RepositoryBase',
+            {
+                stopwords             => $self->stopwords,
+                travis_ci_ignore_perl => $self->travis_ci_ignore_perl,
+            }
+        ],
+
         # Update the next release number in your changelog
         [
             'NextRelease',
@@ -120,7 +109,7 @@ sub configure {
         [
             'Git::Check',
             {
-                allow_dirty => [qw( Changes cpanfile dist.ini Makefile.PL META.json META.yml README.md )],
+                allow_dirty => [ qw( Changes cpanfile dist.ini Makefile.PL META.json META.yml README.md ), @generated_files ],
             }
         ],
 
@@ -309,7 +298,7 @@ sub configure {
             'Git::Commit',
             {
                 commit_msg        => '%v',
-                allow_dirty       => [qw(Changes cpanfile dist.ini INSTALL LICENSE Makefile.PL META.json META.yml README.md)],
+                allow_dirty       => [ qw(Changes cpanfile dist.ini INSTALL LICENSE Makefile.PL META.json META.yml README.md), @generated_files ],
                 allow_dirty_match => '\.pm$',
             }
         ],

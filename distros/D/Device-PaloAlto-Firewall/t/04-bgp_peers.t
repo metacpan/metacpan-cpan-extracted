@@ -25,7 +25,7 @@ dies_ok { $fw->bgp_peers(rtr => 'default') } 'Incorrect parameter dies';
 dies_ok { $test->bgp_peers_up() } 'Not specifying \'peer_ips =>\' dies';
 
 ### Tests when the firewall is not configured with BGP ###
-isa_ok( $fw->bgp_peers(), 'ARRAY', "No BGP peers configured returns ARRAYREF" );
+isa_ok( $fw->bgp_peers(), 'ARRAY' );
 is_deeply( $fw->bgp_peers(), [] , "No BGP peers configured returns an empty ARRAYREF" );
 
 ok( !$test->bgp_peers_up(peer_ips => ['192.168.122.30']), 'No configured BGP');

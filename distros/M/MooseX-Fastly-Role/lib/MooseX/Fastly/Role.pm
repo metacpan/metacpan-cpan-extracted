@@ -1,5 +1,5 @@
 package MooseX::Fastly::Role;
-$MooseX::Fastly::Role::VERSION = '0.03';
+$MooseX::Fastly::Role::VERSION = '0.04';
 use Moose::Role;
 use Net::Fastly 1.08;
 use Carp;
@@ -115,7 +115,7 @@ Purge all is called on all services
 sub cdn_purge_all {
     my ( $self, $args ) = @_;
 
-    my $services = $self->_cdn_service_ids();
+    my $services = $self->_cdn_service_ids_from_config();
 
     foreach my $service_id ( @{$services} ) {
         foreach my $key ( @{ $args->{keys} || [] } ) {
@@ -232,6 +232,11 @@ sub _build_cdn_services {
 =head1 AUTHOR
 
 Leo Lapworth <LLAP@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the terms same as Perl 5.
 
 =cut
 

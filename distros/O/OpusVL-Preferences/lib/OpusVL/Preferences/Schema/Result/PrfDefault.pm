@@ -244,6 +244,7 @@ sub mask_function
     my $self = shift;
     return sub {
         my $val = shift;
+        return $val unless length $self->mask_char;
         return mask_text($self->mask_char, $self->display_mask, $val);
     };
 }
@@ -262,7 +263,7 @@ OpusVL::Preferences::Schema::Result::PrfDefault
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

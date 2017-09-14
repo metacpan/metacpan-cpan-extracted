@@ -22,42 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164947;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{6,7})',
-                  'leading_digits' => '7'
+                  'leading_digits' => '7',
+                  'pattern' => '(\\d)(\\d{6,7})'
                 },
                 {
                   'leading_digits' => '[2-4]',
                   'pattern' => '(\\d{2})(\\d{4,6})'
                 },
                 {
-                  'leading_digits' => '5',
-                  'pattern' => '(\\d)(\\d{7})'
+                  'pattern' => '(\\d)(\\d{7})',
+                  'leading_digits' => '5'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          2[1-4]\\d{5,6}|
-          3(?:
-            1\\d{6}|
-            [23]\\d{4,6}
-          )|
-          4(?:
-            [125]\\d{5,6}|
-            [36]\\d{6}|
-            [78]\\d{4,6}
-          )|
-          7\\d{6,7}
-        ',
-                'specialrate' => '',
-                'personal_number' => '',
                 'voip' => '',
-                'toll_free' => '',
-                'pager' => '',
                 'fixed_line' => '
           2[1-4]\\d{5,6}|
           3(?:
@@ -71,7 +54,24 @@ my $validators = {
           )|
           7\\d{6,7}
         ',
-                'mobile' => '5\\d{7}'
+                'specialrate' => '',
+                'mobile' => '5\\d{7}',
+                'toll_free' => '',
+                'pager' => '',
+                'geographic' => '
+          2[1-4]\\d{5,6}|
+          3(?:
+            1\\d{6}|
+            [23]\\d{4,6}
+          )|
+          4(?:
+            [125]\\d{5,6}|
+            [36]\\d{6}|
+            [78]\\d{4,6}
+          )|
+          7\\d{6,7}
+        ',
+                'personal_number' => ''
               };
 my %areanames = (
   5321 => "Guantánamo\ Province",

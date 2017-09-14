@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-NextEpisode",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "WebService::NextEpisode",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -25,9 +26,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::More" => 0,
+    "Test::RequiresInternet" => 0,
+    "blib" => "1.01"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,8 +44,12 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTML::TreeBuilder::XPath" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "LWP::Simple" => 0,
   "Test::More" => 0,
+  "Test::RequiresInternet" => 0,
+  "blib" => "1.01",
   "strict" => 0,
   "warnings" => 0
 );

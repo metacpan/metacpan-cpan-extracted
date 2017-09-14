@@ -5,7 +5,7 @@
 # Alias for Lemonldap::NG::SharedConf
 package Lemonldap::NG::Portal;
 
-our $VERSION = '1.9.11';
+our $VERSION = '1.9.12';
 use Lemonldap::NG::Portal::SharedConf;
 use base 'Lemonldap::NG::Portal::SharedConf';
 
@@ -55,7 +55,7 @@ system.
       # $portal->error returns the error message if authentication failed
       # You can force the language in error like this :
       #   print $portal->error('fr')
-      # Warning: by defaut, input names are "user" and "password"
+      # Warning: by default, input names are "user" and "password"
       print $portal->header('text/html; charset=utf8'); # DON'T FORGET THIS (see L<CGI(3)>)
       print "<html> ...";
       print '<form method="POST">';

@@ -2,11 +2,10 @@ package Math::Prime::Util;
 use strict;
 use warnings;
 use Carp qw/croak confess carp/;
-use Math::Prime::Util::Entropy;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.65';
+  $Math::Prime::Util::VERSION = '0.66';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -35,7 +34,8 @@ our @EXPORT_OK =
       lucas_sequence lucasu lucasv
       primes twin_primes ramanujan_primes sieve_prime_cluster sieve_range
       forprimes forcomposites foroddcomposites fordivisors
-      forpart forcomp forcomb forperm formultiperm
+      forpart forcomp forcomb forperm forderange formultiperm
+      numtoperm permtonum randperm shuffle
       prime_iterator prime_iterator_object
       next_prime  prev_prime
       prime_count
@@ -52,6 +52,7 @@ our @EXPORT_OK =
       random_proven_prime random_proven_prime_with_cert
       random_maurer_prime random_maurer_prime_with_cert
       random_shawe_taylor_prime random_shawe_taylor_prime_with_cert
+      random_semiprime random_unrestricted_semiprime
       primorial pn_primorial consecutive_integer_lcm gcdext chinese
       gcd lcm factor factor_exp divisors valuation hammingweight
       todigits fromdigits todigitstring sumdigits
@@ -85,48 +86,13 @@ sub import {
       ${"${pkg}::a"} = ${"${pkg}::a"};
       ${"${pkg}::b"} = ${"${pkg}::b"};
     }
-    my @options = grep $_ ne '-nobigint', @_;
-    $_[0]->_import_nobigint if @options != @_;
-    @_ = @options;
+    foreach my $opt (qw/nobigint secure/) {
+      my @options = grep $_ ne "-$opt", @_;
+      $_Config{$opt} = 1 if @options != @_;
+      @_ = @options;
+    }
+    _XS_set_secure() if $_Config{'xs'} && $_Config{'secure'};
     goto &Exporter::import;
-}
-
-sub _import_nobigint {
-  $_Config{'nobigint'} = 1;
-  1;
-}
-
-#############################################################################
-
-sub entropy_bytes {
-  my($bytes) = @_;
-  croak "Must get an integer bytes between 1 and 4294967295"
-  if !defined($bytes) || $bytes < 1 || $bytes > 4294967295 || $bytes != int($bytes);
-  my $data = Math::Prime::Util::Entropy::entropy_bytes($bytes);
-  if (!defined $data) {
-    # We can't find any entropy source!  Highly unusual.
-    Math::Prime::Util::_srand();
-    $data = random_bytes($bytes);
-  }
-  croak "entropy_bytes internal got wrong amount!" unless length($data) == $bytes;
-  $data;
-}
-
-sub srand {
-  my($seed) = @_;
-  if (!defined $seed) {
-    my $nbytes = (~0 == 4294967295) ? 4 : 8;
-    $seed = entropy_bytes( $nbytes );
-    $seed = unpack(($nbytes==4) ? "L" : "Q", $seed);
-  }
-  Math::Prime::Util::_srand($seed);
-}
-
-sub csrand {
-  my($seed) = @_;
-  $seed = entropy_bytes( 64 ) unless defined $seed;
-  Math::Prime::Util::_csrand($seed);
-  1; # Don't return the seed
 }
 
 #############################################################################
@@ -171,6 +137,7 @@ BEGIN {
 
   Math::Prime::Util::csrand();
 
+  $_Config{'secure'} = 0;
   $_Config{'nobigint'} = 0;
   $_Config{'gmp'} = 0;
   # See if they have the GMP module and haven't requested it not to be used.
@@ -960,7 +927,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01
+=for stopwords Möbius Deléglise Bézout uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01 subfactorial
 
 =for test_synopsis use v5.14;  my($k,$x);
 
@@ -972,7 +939,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.65
+Version 0.66
 
 
 =head1 SYNOPSIS
@@ -1430,6 +1397,12 @@ and hence give the size.
 
 Like forpart and forcomb, the index return values are read-only.  Any
 attempt to modify them will result in undefined behavior.
+
+
+=head2 forderange
+
+Similar to forperm, but iterates over derangements.  This is the set of
+permutations skipping any which maps an element to its original position.
 
 
 =head2 formultiperm
@@ -2970,7 +2943,7 @@ return C<euler_phi(-n)> for C<n E<lt> 0>.  Mathematica returns 0 for C<n = 0>,
 Pari pre-2.6.2 raises and exception, and Pari 2.6.2 and newer returns 2.
 
 If called with two arguments, they define a range C<low> to C<high>, and the
-function returns an array with the totient of every n from low to high
+function returns a list with the totient of every n from low to high
 inclusive.
 
 
@@ -3338,6 +3311,59 @@ a good approximation to the number of primes less than C<n>, this function
 is a good simple approximation to the nth prime.
 
 
+=head2 numtoperm
+
+  @p = numtoperm(10,654321);  # @p=(1,8,2,7,6,5,3,4,9,0)
+
+Given two non-negative integers C<n> and C<k>, return the
+rank C<k> lexicographic permutation of C<n> elements.
+
+This will match iteration number C<k> (zero based) of L</forperm>.
+C<k> can be assumed to be mod C<n!>.
+
+This corresponds to Pari's C<numtoperm(n,k)> function, though it uses
+an implementation specific ordering rather than lexicographic.
+
+=head2 permtonum
+
+  $k = permtonum([1,8,2,7,6,5,3,4,9,0]);  # $k = 654321
+
+Given an array reference containing integers from C<0> to C<n>,
+returns the lexicographic permutation rank of the set.  This is
+the inverse of the L</numtoperm> function.  All integers up to
+C<n> must be present.
+
+This will match iteration number C<k> (zero based) of L</forperm>.
+The result will be between C<0> and C<n!-1>.
+
+This corresponds to Pari's C<permtonum(n)> function, though it uses
+an implementation specific ordering rather than lexicographic.
+
+=head2 randperm
+
+  @p = randperm(100);   # returns shuffled 0..99
+  @p = randperm(100,4)  # returns 4 elements from shuffled 0..99
+  @s = @data[randperm(1+$#data)];  # shuffle an array
+
+With a single argument C<n>, this returns a random permutation of the
+values from C<0> to C<n-1>.
+
+When given a second argument C<k>, the returned list will have only C<k>
+elements.  This is more efficient than truncating the full shuffled list.
+
+The randomness comes from our CSPRNG.
+
+=head2 shuffle
+
+  @shuffled = shuffle(@data);
+
+Takes a list as input, and returns a random permutation of the list.
+Like randperm, the randomness comes from our CSPRNG.
+
+This function is similar to the C<shuffle> function in L<List::Util>.
+The main difference is the random source.
+
+
 =head1 RANDOM NUMBERS
 
 =head2 OVERVIEW
@@ -3457,6 +3483,8 @@ resources and is typically slow -- on the computer that produced
 the L</random_bytes> chart above, using C<dd> generated the same
 13 MB/s performance as our L</entropy_bytes> function.
 
+The actual performance will be highly system dependent.
+
 =head2 urandomb
 
   $n32 = urandomb(32);    # Classic irand32, returns a UV
@@ -3484,6 +3512,10 @@ entropy.  No more than 1024 bytes will be used.
 
 With no argument, reseeds using system entropy, which is preferred.
 
+If the C<secure> configuration has been set, then this will croak if
+given an argument.  This allows for control of reseeding with entropy
+the module gets itself, but not user supplied.
+
 =head2 srand
 
 Takes a single UV argument and seeds the CSPRNG with it, as well as
@@ -3498,6 +3530,9 @@ behaviour for C<undef>, empty string, empty list, etc. is slightly
 different (we treat these as 0).
 
 This function is not exported with the ":all" tag, but is with ":rand".
+
+If the C<secure> configuration has been set, this function will croak.
+Manual seeding using C<srand> is not compatible with cryptographic security.
 
 =head2 rand
 
@@ -3698,6 +3733,36 @@ L</is_provable_prime_with_cert>, and can be parsed by L</verify_prime> or
 any other software that understands MPU primality certificates.
 The proof construction consists of a single chain of C<Pocklington> types.
 
+
+=head2 random_semiprime
+
+Takes a positive integer number of bits C<bits>, returns a
+random semiprime of exactly C<bits> bits.
+The result has exactly two prime factors (hence semiprime).
+
+The factors will be approximately equal size, which is typical
+for cryptographic use.  For example, a 64-bit semiprime of this
+type is the product of two 32-bit primes.
+C<bits> must be C<4> or greater.
+
+Some effort is taken to select uniformly from the universe of
+C<bits>-bit semiprimes.  This takes slightly longer than some
+methods that do not select uniformly.
+
+=head2 random_unrestricted_semiprime
+
+Takes a positive integer number of bits C<bits>, returns a
+random semiprime of exactly C<bits> bits.
+The result has exactly two prime factors (hence semiprime).
+
+The factors are uniformly selected from the universe of all
+C<bits>-bit semiprimes.  This means semiprimes with one factor
+equal to C<2> will be most common, C<3> next most common, etc.
+C<bits> must be C<3> or greater.
+
+Some effort is taken to select uniformly from the universe of
+C<bits>-bit semiprimes.  This takes slightly longer than some
+methods that do not select uniformly.
 
 
 =head1 UTILITY FUNCTIONS
@@ -4307,6 +4372,25 @@ The L<Bell numbers|https://en.wikipedia.org/wiki/Bell_number> B_n:
 Convert from binary to hex (3000x faster than Math::BaseConvert):
 
   my $hex_string = todigitstring(fromdigits($bin_string,2),16);
+
+Calculate and print derangements using permutations:
+
+  my @data = qw/a b c d/;
+  forperm { say "@data[@_]" unless vecany { $_[$_]==$_ } 0..$#_ } @data;
+  # Using forderange directly is faster
+
+Compute the subfactorial of n (L<OEIS A000166|http://oeis.org/A000166>):
+
+  sub subfactorial { my $n = shift;
+    vecsum(map{ vecprod((-1)**($n-$_),binomial($n,$_),factorial($_)) }0..$n);
+  }
+
+Compute subfactorial (number of derangements) using simple recursion:
+
+  sub subfactorial { my $n = shift;
+    use bigint;
+    ($n < 1)  ?  1  :  $n * subfactorial($n-1) + (-1)**$n;
+  }
 
 
 =head1 PRIMALITY TESTING NOTES

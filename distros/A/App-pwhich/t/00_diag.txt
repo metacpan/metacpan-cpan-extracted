@@ -1,4 +1,0 @@
-ExtUtils::MakeMaker
-File::Which
-Test::More
-Test::Script

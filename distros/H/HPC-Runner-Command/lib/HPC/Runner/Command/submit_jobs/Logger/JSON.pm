@@ -22,23 +22,12 @@ Create the data for the json submission
 sub create_json_submission {
     my $self = shift;
 
+    make_path($self->data_dir);
     $self->logger('app_log');
     my $hpc_meta = $self->gen_hpc_meta;
 
-    my $json_text = encode_json $hpc_meta;
-
-    # We are rolling back this functionality for a future release
-    # my $basename = $self->data_tar->basename('.tar.gz');
-    # my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
-    #
-    # $self->check_lock;
-    # $self->write_lock;
-    #
-    # $self->archive->add_data( $submission_file, $json_text );
-    # capture {
-    #     $self->archive->write( $self->data_tar, 1 );
-    # };
-    # $self->lock_file->remove;
+    # my $json_text = encode_json $hpc_meta;
+    # write_file(File::Spec->catdir($self->data_dir, 'submission.json'), $json_text);
 
     return $hpc_meta;
 }
@@ -54,30 +43,17 @@ We only rerun this here to get the submission status
 sub update_json_submission {
     my $self = shift;
 
+    make_path($self->data_dir);
     my $hpc_meta = $self->gen_hpc_meta;
     my $json_text = encode_json $hpc_meta;
 
-    # We are rolling back this functionality for a future release
-    #
-    # my $basename = $self->data_tar->basename('.tar.gz');
-    # my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
-    #
-    # ##TODO Change this to around?
-    # $self->check_lock;
-    # $self->write_lock;
-    #
-    # $self->archive->add_data( $submission_file, $json_text );
-    # capture {
-    #     $self->archive->write( $self->data_tar, 1 );
-    # };
-    #
-    # $self->lock_file->remove;
     my $file_name = File::Spec->catdir( $self->logdir, 'submission.json' );
     $self->_make_the_dirs( $self->logdir );
+
     write_file($file_name, $json_text);
+    write_file(File::Spec->catdir($self->data_dir, 'submission.json'), $json_text);
 
     return $hpc_meta;
-
 }
 
 =head3 gen_hpc_meta

@@ -12,6 +12,13 @@ use WebService::Slack::WebApi::Generator (
         code          => 'Str',
         redirect_uri  => { isa => 'Str', optional => 1 },
     },
+    token => {
+        client_id       => 'Str',
+        client_secret   => 'Str',
+        code            => 'Str',
+        redirect_uri    => { isa => 'Str',  optional => 1 },
+        single_channel  => { isa => 'Bool', optional => 1 },
+    },
 );
 
 1;

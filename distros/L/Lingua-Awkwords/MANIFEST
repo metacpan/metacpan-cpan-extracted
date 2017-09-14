@@ -3,6 +3,8 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+eg/athshean
+eg/tokiponaish
 lib/Lingua/Awkwords.pm
 lib/Lingua/Awkwords/ListOf.pm
 lib/Lingua/Awkwords/OneOf.pm

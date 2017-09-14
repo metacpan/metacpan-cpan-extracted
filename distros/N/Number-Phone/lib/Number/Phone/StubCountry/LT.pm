@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
+                  'pattern' => '([34]\\d)(\\d{6})',
                   'leading_digits' => '
             37|
             4(?:
@@ -33,8 +34,7 @@ my $formatters = [
               5[45]|
               6[2-4]
             )
-          ',
-                  'pattern' => '([34]\\d)(\\d{6})'
+          '
                 },
                 {
                   'pattern' => '([3-6]\\d{2})(\\d{5})',
@@ -59,19 +59,7 @@ my $formatters = [
               ];
 
 my $validators = {
-                'pager' => '',
-                'toll_free' => '800\\d{5}',
-                'voip' => '',
-                'mobile' => '6\\d{7}',
                 'fixed_line' => '
-          (?:
-            3[1478]|
-            4[124-6]|
-            52
-          )\\d{6}
-        ',
-                'personal_number' => '700\\d{5}',
-                'geographic' => '
           (?:
             3[1478]|
             4[124-6]|
@@ -83,7 +71,19 @@ my $validators = {
             0[0239]|
             10
           )\\d{5}
-        )|(70[67]\\d{5})'
+        )|(70[67]\\d{5})',
+                'toll_free' => '800\\d{5}',
+                'mobile' => '6\\d{7}',
+                'voip' => '',
+                'personal_number' => '700\\d{5}',
+                'geographic' => '
+          (?:
+            3[1478]|
+            4[124-6]|
+            52
+          )\\d{6}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   370310 => "Varėna",

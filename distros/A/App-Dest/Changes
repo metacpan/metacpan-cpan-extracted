@@ -1,5 +1,9 @@
 Revision history for App::Dest
 
+1.17      2017-09-08 11:23:52-07:00 America/Los_Angeles
+        - Minor status display fix for actions with file suffixes
+        - Tiny test warning cleanup
+
 1.16      2017-03-04 09:19:28-08:00 America/Los_Angeles
         - POD improvements and extentions
         - Add test coverage for writewatch

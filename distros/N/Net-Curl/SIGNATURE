@@ -14,7 +14,7 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 d19c53570e8f126f441d5a449cce8fe3bdbf8bd0 Changes
+SHA1 0530a41a78671c8bb668ce7c0faea42fcccb0be3 Changes
 SHA1 39881f72c1bbdc29c2f3ff49c276a568dc2cd788 Curl.xs
 SHA1 8aee52860821705f3df845c1aab87a02de3ea56f Curl_Easy.xsh
 SHA1 9fc4e5d53a8d79b161ae230c8f9bf35524ee4357 Curl_Easy_callbacks.c
@@ -25,16 +25,16 @@ SHA1 c9f922e44042a44951bd00ec6f65ddf3da085189 Curl_Share.xsh
 SHA1 94cbea5b3fb940e25cd4535d1c81bfd7d51dac3c LICENSE
 SHA1 b129e50a730f8f3e9e4e547aa2350dcbbe201770 MANIFEST
 SHA1 fe9829c2f37402c8e201d3a0ae881c71ef8fa198 MANIFEST.SKIP
-SHA1 4ecc8334e4b6d74472e1ab5b13b04e3a558c477c META.json
-SHA1 9abeae7bef1ea9b348caac7b54966764dac3c9c9 META.yml
-SHA1 4618ff50b1759cde83fc5bb26f9a880d62b34ecc Makefile.PL
-SHA1 1d3edad0566388d7716d7c7e3e3e2f1cf96b9163 README
+SHA1 bb427f31b2a10dec158d9f13761b9b41acb141cb META.json
+SHA1 ac811cfa6b42ff401d2bc038be659371181cd238 META.yml
+SHA1 84978bcd90f3d1f505146b2424f849d88c6840d3 Makefile.PL
+SHA1 53fdce217e90c64a607abe7f3b5d4d94993c43fd README
 SHA1 e400ec90c587f215f739142efaea4e898fee2860 examples/01-curl-transport.pl
 SHA1 8a186c6f71f6e3a727e110bea0558bca6d7ce886 examples/02-multi-simple.pl
 SHA1 b29db3349dca4b2f7ab5669ceab505643516ef48 examples/03-multi-event.pl
 SHA1 8a62bb893894876fd334c7dbd47ee9c895ed6c57 examples/04-share-threads.pl
 SHA1 513e95c81d810b39c13278be22c9f45ffb92e980 examples/05-irssi-downloader.pl
-SHA1 3f23c044a5e005eb8482ed7babb42ab18b994cd3 inc/Compat.pm
+SHA1 4a2e8d2fa06cb68f6425edca0714d368964a005e inc/Compat.pm
 SHA1 a35a0062fb86bb30bbbbd1b7db35d830e3fa11b5 inc/Compat/WWW/Curl.pm
 SHA1 e3b60977a4d7721b0ce96bee1b3cebf1bb5594e7 inc/Compat/WWW/Curl/Easy.pm
 SHA1 34949d7d32cfbae05110b0d23ce60a01475a3447 inc/Compat/WWW/Curl/Form.pm
@@ -42,17 +42,17 @@ SHA1 5c17a56bf0c59a248e12b4e43b45a4ba85812637 inc/Compat/WWW/Curl/Multi.pm
 SHA1 b683b9c3c979c2ebb5ce26d00141b7e6f712ee67 inc/Compat/WWW/Curl/Share.pm
 SHA1 c3089d52614a6eb54bc533d6c544fddd43b5cec3 inc/Test/HTTP/Server.pm
 SHA1 a6f7f0e3d86e2f3afdfbde417822fb379c064402 inc/Test/UnConstant.pm
-SHA1 b8bd327bbc38f4d08996a1606c50ba45b2631edb inc/symbols-in-versions
-SHA1 e0c8e11bee56447fb735160d75f783266cf4bc3b lib/Net/Curl.pm
-SHA1 151a3ba3b1c745fa523d044a8b5a99f873a6ad0f lib/Net/Curl/Compat.pm
-SHA1 affa95e687de63c96e5b3bde7c539752de4eceea lib/Net/Curl/Easy.pm
-SHA1 f212e632b89e0f24131535615f798822597f9482 lib/Net/Curl/Form.pm
-SHA1 1be3e803f14221e44b9a6c579481d084495ea17b lib/Net/Curl/Multi.pm
-SHA1 6c3a7f4deb6c2ea293e9f026f2692d2d39e8b3f0 lib/Net/Curl/Share.pm
+SHA1 852258ca1e592baa5cef9537249a94d825e69222 inc/symbols-in-versions
+SHA1 742ca5d184c16cfa73c4c4d150eae1fb92ca06ba lib/Net/Curl.pm
+SHA1 bcc70735e6ee285d47e46c75dd09c07ba752107b lib/Net/Curl/Compat.pm
+SHA1 a50508e32a3d91235f262782b12f8858368f3078 lib/Net/Curl/Easy.pm
+SHA1 94db24518895df9ac99c9be4e5052d5ec670fd4f lib/Net/Curl/Form.pm
+SHA1 7b0970ca1b1ca51dff541c72ffda34ea11937b31 lib/Net/Curl/Multi.pm
+SHA1 70d82f0c7ed505f0ce084337308f9bcdf90adba5 lib/Net/Curl/Share.pm
 SHA1 1aba3b48885111b18ff04a61fbd935d433b0fe76 lib/Net/Curl/examples.pod
 SHA1 10ee021520d7eeacc4f5d150169e848965e14484 t/00-info.t
-SHA1 4da7f41ef39a9fa073601ed4eff1d12feb7f76fd t/01-constants.t
-SHA1 283cdb21915eec7eb5db4d4c847a62634cb3ee1e t/02-methods.t
+SHA1 c4498eabfb9d32bb61c24b484f5d5e4cc1b15ab6 t/01-constants.t
+SHA1 a32730989bb8b90ba73278ff913fa29db7166f23 t/02-methods.t
 SHA1 455acd3e338758d55aa8568fd55d5de51949aeb9 t/03-cookies.t
 SHA1 0d8c720e1cbfd5435728cc4debd4b18be36a0140 t/40-callback-opensocket.t
 SHA1 fdb9bdec7a5246f728ae9c71a32329f2b5235a77 t/50-crash-lastref.t
@@ -119,12 +119,12 @@ SHA1 17514255b5ff5f46ac8ce9e9e3c887c9a205c8ba t/release-unused-vars.t
 SHA1 7b0e013f379f67f219c78779f68dba82bf7e91c9 typemap
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEK428BioOyOagl43QOXFTtlVSmaIFAll4TVIACgkQOXFTtlVS
-maJJywgAlSTTlCYdF92GpkH4udF6ohM7dQP13rLMY5nj6g17hR94mFpp9Q/AH96U
-2WaftQdlr5U0/OxPFA9Qz395MlLvIqLbwCPd9F6OTN8HavM9xw241eWDmQDtGw1I
-mDAAEK3csfa0L3otVHNfhD8xdtb3kMWRbDs/sorHBO9LMxlzWlSUsJydNh5uU5J8
-x5Qw9b3Oww+IJtQM3vcY+sjoO9BoDqYLEQPCPHlYXsPcy5Ug4Uz2pmhp7p0GoQMw
-TtuznZeHnK7iVQXdEQ0NGEpskhyvdlNfVZ9btCF/edxAHIFNrFkEex7f5FU6jpMg
-ZSCC5wOIqQoB5wFHUlUysGGPUvl+Zg==
-=fWA2
+iQEzBAEBCAAdFiEEK428BioOyOagl43QOXFTtlVSmaIFAlm0PmcACgkQOXFTtlVS
+maIUbQf9G1z7MmySiw6VK8BpdlDbSx7wXHrGhjxzeCtYs78+XPKw1F83chPcLD3Q
+Go1Q/AB8YTIYAgIoVKhwtmkw0zhif/Vyml7/9o0CnUVsDNzoUp/s+Gd1l/afCdmy
+1ttlDbZGpRe0seGIVvWZI4Z4DQMWhO4/b3rpp5cLzN3auKU3yshQWp2rBdc25wkw
+XBJRe0CqqnTEd7tqKZsQ0zU1dik8hKS5fSyGV4rPxl32a/q/xyYzmCux+GPc6POz
+/HitFmZ9oFtCPj6+lSczjzf98ooIwN4SnLiqK6V7WxatOV29r5EUOsfaLRhveHUe
+hkiEc0lnRQMN6oFsGJ+AWEItog2mAg==
+=LyFc
 -----END PGP SIGNATURE-----

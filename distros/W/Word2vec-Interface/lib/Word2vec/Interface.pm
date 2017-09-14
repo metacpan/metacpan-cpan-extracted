@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 04/08/2017                                                             #
+#    Revised: 09/05/2017                                                             #
 #    UMLS Similarity Word2Vec Package Interface Module                               #
 #                                                                                    #
 ######################################################################################
@@ -27,6 +27,7 @@ use File::Type;
 use Sys::CpuAffinity;
 
 # Word2Vec Utility Package(s)
+use Word2vec::Spearmans;
 use Word2vec::Word2vec;
 use Word2vec::Word2phrase;
 use Word2vec::Xmltow2v;
@@ -36,7 +37,7 @@ use Word2vec::Util;
 
 use vars qw($VERSION);
 
-$VERSION = '0.03';
+$VERSION = '0.036';
 
 
 ######################################################################################
@@ -75,6 +76,7 @@ sub new
         _ignoreFileChecks       => shift,               # Boolean (Binary): 0 = False, 1 = True
         _exitFlag               => shift,               # Boolean (Binary): 0 = False, 1 = True
         _workingDir             => shift,               # String (current working directory)
+        _spearmans              => shift,               # "Word2vec::Spearmans" module object
         _word2vec               => shift,               # "Word2vec::Word2vec" module object
         _word2phrase            => shift,               # "Word2vec::Word2phrase" module object
         _xmltow2v               => shift,               # "Word2vec::Xmltow2v" module object
@@ -127,11 +129,10 @@ sub new
 
         for my $dir ( @INC )
         {
-            $self->{ _word2vecDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                                    # Test Directory
-            $self->{ _word2vecDir } = "$dir/lib/Word2Vec/External/Word2vec" if ( -e "$dir/lib/Word2Vec/External/Word2vec" );          # Distribution Package Test Directory
-            $self->{ _word2vecDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                              # Dev Directory
-            $self->{ _word2vecDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );                        # Dev Directory
-            $self->{ _word2vecDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );                  # Release Directory
+            $self->{ _word2vecDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                       # Test Directory
+            $self->{ _word2vecDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                 # Dev Directory
+            $self->{ _word2vecDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );           # Dev Directory
+            $self->{ _word2vecDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );     # Release Directory
         }
 
         $self->WriteLog( "New - Word2Vec Executable Directory Found" ) if defined( $self->{ _word2vecDir } );
@@ -139,12 +140,13 @@ sub new
     }
 
     # Initialize "Word2vec::Word2vec", "Word2vec::Word2phrase", "Word2vec::Xmltow2v" and "Word2vec::Util" modules
-    my $debugLog = $self->{ _debugLog };
-    my $writeLog = $self->{ _writeLog };
-    $self->{ _word2vec } = Word2vec::Word2vec->new( $debugLog, $writeLog ) if !defined ( $self->{ _word2vec } );
-    $self->{ _word2phrase } = Word2vec::Word2phrase->new( $debugLog, $writeLog ) if !defined ( $self->{ _word2phrase } );
-    $self->{ _xmltow2v } = Word2vec::Xmltow2v->new( $debugLog, $writeLog, 1, 1, 1, 1, 2 ) if !defined ( $self->{ _xmltow2v } );
-    $self->{ _util } = Word2vec::Util->new( $debugLog, $writeLog ) if !defined ( $self->{ _util } );
+    my $debugLog            = $self->{ _debugLog };
+    my $writeLog            = $self->{ _writeLog };
+    $self->{ _spearmans }   = Word2vec::Spearmans->new( $debugLog, $writeLog )                   if !defined ( $self->{ _spearmans } );
+    $self->{ _word2vec }    = Word2vec::Word2vec->new( $debugLog, $writeLog )                 if !defined ( $self->{ _word2vec } );
+    $self->{ _word2phrase } = Word2vec::Word2phrase->new( $debugLog, $writeLog )              if !defined ( $self->{ _word2phrase } );
+    $self->{ _xmltow2v }    = Word2vec::Xmltow2v->new( $debugLog, $writeLog, 1, 1, 1, 1, 2 )  if !defined ( $self->{ _xmltow2v } );
+    $self->{ _util }        = Word2vec::Util->new( $debugLog, $writeLog )                     if !defined ( $self->{ _util } );
 
     # Set word2vec Directory In Respective Objects
     $self->{ _word2vec }->SetWord2VecExeDir( $self->{ _word2vecDir } );
@@ -212,12 +214,12 @@ sub RunFileChecks
     for my $fileName ( @fileNameVtr )
     {
         # Run file checks
-        if( $self->CheckIfExecutableFileExists( $dir, $fileName ) == 0 )
+        if( $self->_CheckIfExecutableFileExists( $dir, $fileName ) == 0 )
         {
-            $result = $self->CheckIfSourceFileExists( $dir, $fileName );
+            $result = $self->_CheckIfSourceFileExists( $dir, $fileName );
             $result = $self->_ModifyWord2VecSourceForWindows() if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
-            $result = $self->CompileSourceFile( $dir, $fileName ) if( $result == 1 );
-            $result = $self->CheckIfExecutableFileExists( $dir, $fileName ) if( $result == 1 || $self->GetIgnoreCompileErrors() == 1 );
+            $result = $self->_CompileSourceFile( $dir, $fileName ) if( $result == 1 );
+            $result = $self->_CheckIfExecutableFileExists( $dir, $fileName ) if( $result == 1 || $self->GetIgnoreCompileErrors() == 1 );
             $self->_RemoveWord2VecSourceModification() if ( $result == 1 && $self->GetOSType() eq "MSWin32" );
         }
         else
@@ -233,7 +235,7 @@ sub RunFileChecks
     return $result;
 }
 
-sub CheckIfExecutableFileExists
+sub _CheckIfExecutableFileExists
 {
     my ( $self, $dir, $fileName ) = @_;
 
@@ -243,7 +245,7 @@ sub CheckIfExecutableFileExists
     my $filePath = $dir . "/" . $fileName;
     my $result = 0;
 
-    $self->WriteLog( "CheckIfExecutableFileExists - Checking For \"$fileName\" Executable File" );
+    $self->WriteLog( "_CheckIfExecutableFileExists - Checking For \"$fileName\" Executable File" );
 
     # Check if the directory exists
     $result = 1 if ( -e "$dir" );
@@ -260,29 +262,29 @@ sub CheckIfExecutableFileExists
         $fileType = $self->GetFileType( $filePath ) if $result == 1;
 
         $result = 1 if $fileType eq "application/x-executable-file";
-        $self->WriteLog( "CheckIfExecutableFileExists - Executable File Found" ) if $result == 1;
-        $self->WriteLog( "CheckIfExecutableFileExists - Warning: Executable File Not Found" ) if $result == 0;
+        $self->WriteLog( "_CheckIfExecutableFileExists - Executable File Found" ) if $result == 1;
+        $self->WriteLog( "_CheckIfExecutableFileExists - Warning: Executable File Not Found" ) if $result == 0;
         return $result;
     }
     else
     {
-        $self->WriteLog( "CheckIfExecutableFileExists - Specified Directory Does Not Exist" );
+        $self->WriteLog( "_CheckIfExecutableFileExists - Specified Directory Does Not Exist" );
     }
 
     return 0;
 }
 
-sub CheckIfSourceFileExists
+sub _CheckIfSourceFileExists
 {
     my ( $self, $dir, $fileName ) = @_;
     my $filePath = $dir . "/" . $fileName . ".c";
     my $result = 0;
 
-    $self->WriteLog( "CheckIfSourceFileExists - Checking For \"$fileName.c\" Source File" );
+    $self->WriteLog( "_CheckIfSourceFileExists - Checking For \"$fileName.c\" Source File" );
 
     # Check if the file/directory exists
     $result = 1 if ( -e "$filePath" );
-    $self->WriteLog( "CheckIfSourceFileExists - Warning: File Does Not Exist" ) if $result == 0;
+    $self->WriteLog( "_CheckIfSourceFileExists - Warning: File Does Not Exist" ) if $result == 0;
     return 0 if $result == 0;
 
     # Check file type
@@ -290,12 +292,12 @@ sub CheckIfSourceFileExists
 
     $result = 1 if $fileType eq "text/cpp";
 
-    $self->WriteLog( "CheckIfSourceFileExists - File Exists" ) if $result == 1;
+    $self->WriteLog( "_CheckIfSourceFileExists - File Exists" ) if $result == 1;
 
     return $result;
 }
 
-sub CompileSourceFile
+sub _CompileSourceFile
 {
     my ( $self, $dir, $fileName ) = @_;
     my $executablePath = $dir . "/" . $fileName;
@@ -303,7 +305,7 @@ sub CompileSourceFile
     # Check if OS is Windows and adjust accordingly
     $executablePath .= ".exe" if ( $self->GetOSType eq "MSWin32" );
 
-    $self->WriteLog( "CompileSourceFile - Compiling Source File \"$fileName.c\"" );
+    $self->WriteLog( "_CompileSourceFile - Compiling Source File \"$fileName.c\"" );
 
     my $sourceName = "/" . $fileName . ".c";
     $dir .= $sourceName;
@@ -317,8 +319,8 @@ sub CompileSourceFile
     $result = 1 if ( $self->GetOSType() ne "MSWin32" && -e "$executablePath" && $self->GetFileType( $executablePath ) eq "application/x-executable-file" );
     $result = 1 if ( $self->GetOSType() eq "MSWin32" && -e "$executablePath" && $self->GetFileType( $executablePath ) eq "application/x-ms-dos-executable" );
 
-    $self->WriteLog( "CompileSourceFile - Compile Failed" ) if $result == 0;
-    $self->WriteLog( "CompileSourceFile - Compiled Successfully") if $result == 1;
+    $self->WriteLog( "_CompileSourceFile - Compile Failed" ) if $result == 0;
+    $self->WriteLog( "_CompileSourceFile - Compiled Successfully") if $result == 1;
 
     return $result;
 }
@@ -1244,7 +1246,7 @@ sub CLSimilarityAvg
         if( @searchWords == 3 )
         {
             my $start = @searchWords - 2;
-            my $end = @searchWords - 1;
+            my $end   = @searchWords - 1;
             @searchWords = @searchWords[$start..$end];
             $dataAry[$i] = join( '<>', @searchWords );
         }
@@ -1253,8 +1255,11 @@ sub CLSimilarityAvg
     $self->WriteLog( "CLSimilarityAvg - Finished Computing Results" );
     $self->WriteLog( "CLSimilarityAvg - Saving Results In Similarity Format" );
 
-    $similarityFilePath .= ".avg_results";
     $similarityFilePath =~ s/\.sim//g;
+    my @tempAry = split( '/', $similarityFilePath );
+    $similarityFilePath = Cwd::getcwd() . "/" . $tempAry[-1] . ".avg_results";
+    undef( @tempAry );
+
     open( $fileHandle, ">:encoding(utf8)", $similarityFilePath ) or $self->( "CLSimilarityAvg - Error: Creating/Saving Results File" );
 
     for( my $i = 0; $i < @dataAry; $i++ )
@@ -1333,7 +1338,7 @@ sub CLSimilarityComp
         if( @searchWords == 3 )
         {
             my $start = @searchWords - 2;
-            my $end = @searchWords - 1;
+            my $end   = @searchWords - 1;
             @searchWords = @searchWords[$start..$end];
             $dataAry[$i] = join( '<>', @searchWords );
         }
@@ -1342,8 +1347,11 @@ sub CLSimilarityComp
     $self->WriteLog( "CLSimilarityComp - Finished Computing Results" );
     $self->WriteLog( "CLSimilarityComp - Saving Results In Similarity Format" );
 
-    $similarityFilePath .= ".comp_results";
     $similarityFilePath =~ s/\.sim//g;
+    my @tempAry = split( '/', $similarityFilePath );
+    $similarityFilePath = Cwd::getcwd() . "/" . $tempAry[-1] . ".comp_results";
+    undef( @tempAry );
+
     open( $fileHandle, ">:encoding(utf8)", $similarityFilePath ) or $self->( "CLSimilarityComp - Error: Creating/Saving Results File" );
 
     for( my $i = 0; $i < @dataAry; $i++ )
@@ -1410,7 +1418,7 @@ sub CLSimilaritySum
         $searchWord2 = undef if defined( $searchWord2 ) && length( $searchWord2 ) == 0;
         my $result = -1 if !defined( $searchWord1 ) or !defined( $searchWord2 );
 
-        $result = $self->W2VComputeMultiWordCosineSimilarity( lc( $searchWord1 ), lc( $searchWord2 ) ) if !defined( $result );
+        $result = $self->W2VComputeMultiWordCosineSimilarity( lc( $searchWord1 ), lc( $searchWord2 ), 1 ) if !defined( $result );
         $result = -1 if !defined( $result );
         push( @resultAry, $result );
 
@@ -1419,7 +1427,7 @@ sub CLSimilaritySum
         if( @searchWords == 3 )
         {
             my $start = @searchWords - 2;
-            my $end = @searchWords - 1;
+            my $end   = @searchWords - 1;
             @searchWords = @searchWords[$start..$end];
             $dataAry[$i] = join( '<>', @searchWords );
         }
@@ -1428,8 +1436,11 @@ sub CLSimilaritySum
     $self->WriteLog( "CLSimilaritySum - Finished Computing Results" );
     $self->WriteLog( "CLSimilaritySum - Saving Results In Similarity Format" );
 
-    $similarityFilePath .= ".sum_results";
     $similarityFilePath =~ s/\.sim//g;
+    my @tempAry = split( '/', $similarityFilePath );
+    $similarityFilePath = Cwd::getcwd() . "/" . $tempAry[-1] . ".sum_results";
+    undef( @tempAry );
+
     open( $fileHandle, ">:encoding(utf8)", $similarityFilePath ) or $self->( "CLSimilaritySum - Error: Creating/Saving Results File" );
 
     for( my $i = 0; $i < @dataAry; $i++ )
@@ -1467,7 +1478,7 @@ sub CLWordSenseDisambiguation
         # Parse Directory Of Files
         if( defined( $instancesFilePath ) && $self->XTWIsFileOrDirectory( $instancesFilePath ) eq "dir" )
         {
-            my $hashRef = $self->WSDParseDirectory( $instancesFilePath );
+            my $hashRef = $self->_WSDParseDirectory( $instancesFilePath );
             %listOfFiles = %{ $hashRef } if defined( $hashRef );
 
             # Enable List Parsing
@@ -1476,14 +1487,14 @@ sub CLWordSenseDisambiguation
         # Parse Pair Of Files
         else
         {
-            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"Instances\" File Not Specified" ) if !defined( $instancesFilePath ) || length( $instancesFilePath ) == 0;
-            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"Senses\" File Not Specified" ) if !defined( $sensesFilePath ) || length( $sensesFilePath ) == 0;
-            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"vector binary\" File Not Specified" ) if !defined ( $vectorBinFilePath ) || length( $vectorBinFilePath ) == 0;
-            $self->WriteLog( "CLWordSenseDisambiguation - Attn: \"stoplist\" File Not Specified" ) if !defined ( $stopListFilePath ) || length( $stopListFilePath ) == 0;
-            $self->WriteLog( "CLWordSenseDisambiguation - \"$instancesFilePath\" Does Not Exist" ) if length( $instancesFilePath ) != 0 && !( -e $instancesFilePath );
-            $self->WriteLog( "CLWordSenseDisambiguation - \"$sensesFilePath\" Does Not Exist" ) if length( $sensesFilePath ) != 0 && !( -e $sensesFilePath );
-            $self->WriteLog( "CLWordSenseDisambiguation - \"$vectorBinFilePath\" Does Not Exist" ) if length( $vectorBinFilePath ) != 0 && !( -e $vectorBinFilePath );
-            $self->WriteLog( "CLWordSenseDisambiguation - \"$stopListFilePath\" Does Not Exist" ) if length( $stopListFilePath ) != 0 && !( -e $stopListFilePath );
+            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"Instances\" File Not Specified" )     if !defined( $instancesFilePath )    || length( $instancesFilePath ) == 0;
+            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"Senses\" File Not Specified" )        if !defined( $sensesFilePath )       || length( $sensesFilePath )    == 0;
+            $self->WriteLog( "CLWordSenseDisambiguation - Error: \"vector binary\" File Not Specified" ) if !defined ( $vectorBinFilePath )   || length( $vectorBinFilePath ) == 0;
+            $self->WriteLog( "CLWordSenseDisambiguation - Attn: \"stoplist\" File Not Specified" )       if !defined ( $stopListFilePath )    || length( $stopListFilePath )  == 0;
+            $self->WriteLog( "CLWordSenseDisambiguation - \"$instancesFilePath\" Does Not Exist" )       if length( $instancesFilePath ) != 0 && !( -e $instancesFilePath );
+            $self->WriteLog( "CLWordSenseDisambiguation - \"$sensesFilePath\" Does Not Exist" )          if length( $sensesFilePath )    != 0 && !( -e $sensesFilePath );
+            $self->WriteLog( "CLWordSenseDisambiguation - \"$vectorBinFilePath\" Does Not Exist" )       if length( $vectorBinFilePath ) != 0 && !( -e $vectorBinFilePath );
+            $self->WriteLog( "CLWordSenseDisambiguation - \"$stopListFilePath\" Does Not Exist" )        if length( $stopListFilePath )  != 0 && !( -e $stopListFilePath );
 
             print( "CLWordSenseDisambiguation - Error: No Specified Files To Parse\n" ) if ( $self->GetDebugLog() == 0 )
                   && ( !defined( $instancesFilePath ) || !defined( $sensesFilePath ) || !defined( $vectorBinFilePath ) );
@@ -1499,7 +1510,7 @@ sub CLWordSenseDisambiguation
     {
         $self->WriteLog( "CLWordSenseDisambiguation - Parsing List Of Files Option Enabled" );
 
-        my $hashRef = $self->WSDReadList( $listOfFilesPath );
+        my $hashRef = $self->_WSDReadList( $listOfFilesPath );
         %listOfFiles = %{ $hashRef } if defined( $hashRef );
     }
 
@@ -1507,7 +1518,7 @@ sub CLWordSenseDisambiguation
     if( $listOfFilesPath eq "" )
     {
         $listOfFiles{ $instancesFilePath } = $sensesFilePath;
-        $result = $self->WSDParseList( \%listOfFiles, $vectorBinFilePath, $stopListFilePath );
+        $result = $self->_WSDParseList( \%listOfFiles, $vectorBinFilePath, $stopListFilePath );
     }
     elsif( $listOfFilesPath ne "" )
     {
@@ -1517,8 +1528,8 @@ sub CLWordSenseDisambiguation
         chomp( $stopListFilePath ) if defined( $stopListFilePath );
         delete( $listOfFiles{ "-vectors" } );
         delete( $listOfFiles{ "-stoplist" } );
-        $result = $self->WSDParseList( \%listOfFiles, $vectorBinFilePath, $stopListFilePath );
-        $self->WSDGenerateAccuracyReport( $self->GetWorkingDirectory() ) if $result != -1 && ( keys %listOfFiles ) > 1;
+        $result = $self->_WSDParseList( \%listOfFiles, $vectorBinFilePath, $stopListFilePath );
+        $self->_WSDGenerateAccuracyReport( $self->GetWorkingDirectory() ) if $result != -1 && ( keys %listOfFiles ) > 1;
     }
 
     $self->WriteLog( "CLWordSenseDisambiguation - Finished" ) if ( $result == 0 );
@@ -1531,16 +1542,16 @@ sub CLWordSenseDisambiguation
     return $result;
 }
 
-sub WSDAnalyzeSenseData
+sub _WSDAnalyzeSenseData
 {
     my ( $self ) = @_;
 
     my $senseStrLength = 0;
-    my @instanceAry = $self->GetInstanceAry();
-    my @senseAry = $self->GetSenseAry();
+    my @instanceAry    = $self->GetInstanceAry();
+    my @senseAry       = $self->GetSenseAry();
 
     # Check(s)
-    $self->WriteLog( "WSDAnalyzeSenseData - Senses Array Empty / Has WSD Sense File Been Loaded Into Memory?" ) if @senseAry == 0;
+    $self->WriteLog( "_WSDAnalyzeSenseData - Senses Array Empty / Has WSD Sense File Been Loaded Into Memory?" ) if @senseAry == 0;
     return -1 if @senseAry == 0;
 
     # Find Length Of SenseID For Instances
@@ -1562,7 +1573,7 @@ sub WSDAnalyzeSenseData
         # Adjust SenseID If InstanceID Not Equal To SenseID
         if( length( $senseID ) != $senseStrLength && $instanceID ne $senseID )
         {
-            $self->WriteLog( "WSDAnalyzeSenseData - Warning: SenseID Mis-Match - InstanceID: $instanceID Not Equal SenseID: $senseID" );
+            $self->WriteLog( "_WSDAnalyzeSenseData - Warning: SenseID Mis-Match - InstanceID: $instanceID Not Equal SenseID: $senseID" );
 
             $sense->senseID( $instanceID );
             $senseAry[$i] = $sense;
@@ -1572,12 +1583,12 @@ sub WSDAnalyzeSenseData
     }
 }
 
-sub WSDReadList
+sub _WSDReadList
 {
     my ( $self, $listOfFilesPath ) = @_;
 
     # Check(s)
-    $self->WriteLog( "WSDReadList - \"$listOfFilesPath\" Does Not Exist" ) if !( -e "$listOfFilesPath" );
+    $self->WriteLog( "_WSDReadList - \"$listOfFilesPath\" Does Not Exist" ) if !( -e "$listOfFilesPath" );
     return undef if !( -e "$listOfFilesPath" );
 
     my %listOfFiles;
@@ -1610,15 +1621,15 @@ sub WSDReadList
     return \%listOfFiles;
 }
 
-sub WSDParseDirectory
+sub _WSDParseDirectory
 {
     my ( $self, $directory ) = @_;
 
     # Check(s)
-    $self->WriteLog( "WSDParseDirectory - Directory Not Defined" ) if !defined( $directory );
+    $self->WriteLog( "_WSDParseDirectory - Directory Not Defined" ) if !defined( $directory );
     return undef if !defined( $directory );
 
-    $self->WriteLog( "WSDParseDirectory - Specified Directory Does Not Exist" ) if !( -e $directory );
+    $self->WriteLog( "_WSDParseDirectory - Specified Directory Does Not Exist" ) if !( -e $directory );
     return undef if !( -e $directory );
 
     # Set Working Directory
@@ -1628,7 +1639,7 @@ sub WSDParseDirectory
     my $result = 0;
     my %listOfFiles;
     opendir( my $dirHandle, "$directory" ) or $result = -1;
-    $self->WriteLog( "WSDParseDirectory - Error: Can't open $directory: $!" ) if $result == -1;
+    $self->WriteLog( "_WSDParseDirectory - Error: Can't open $directory: $!" ) if $result == -1;
     return -1 if $result == -1;
 
     for my $file ( readdir( $dirHandle ) )
@@ -1654,32 +1665,32 @@ sub WSDParseDirectory
     return \%listOfFiles;
 }
 
-sub WSDParseList
+sub _WSDParseList
 {
     my ( $self, $hashRef, $vectorBinFilePath, $stopListFilePath ) = @_;
 
     # Check(s)
-    $self->WriteLog( "WSDParseList - List Of Files Not Defined" ) if !defined( $hashRef );
+    $self->WriteLog( "_WSDParseList - List Of Files Not Defined" ) if !defined( $hashRef );
     return undef  if !defined( $hashRef );
 
     my %listOfFiles = %{ $hashRef };
 
-    $self->WriteLog( "WSDParseList - Error: No Files To Compare Listed" ) if ( keys %listOfFiles ) == 0;
+    $self->WriteLog( "_WSDParseList - Error: No Files To Compare Listed" ) if ( keys %listOfFiles ) == 0;
     return -1 if ( keys %listOfFiles ) == 0;
 
     print( "Generating Stop List Regex\n" ) if ( $self->GetDebugLog() == 0 && defined( $stopListFilePath ) && length( $stopListFilePath ) == 0 );
 
     print( "Attn: Stop List Not Utilized\n" ) if !defined( $stopListFilePath ) || length( $stopListFilePath ) == 0;
-    $self->WriteLog( "WSDParseList - Attn: \"Stop List\" File Not Specified" ) if !defined( $stopListFilePath ) || length( $stopListFilePath ) == 0;
+    $self->WriteLog( "_WSDParseList - Attn: \"Stop List\" File Not Specified" ) if !defined( $stopListFilePath ) || length( $stopListFilePath ) == 0;
     print( "Warning: Stop List File Does Not Exist\n" ) if defined( $stopListFilePath ) && !( -e $stopListFilePath );
     $self->WriteLog( "Warning: Stop List File Does Not Exist" ) if defined( $stopListFilePath ) && !( -e $stopListFilePath );
-    
+
     print( "Generating Stop List Regex\n" ) if defined( $stopListFilePath ) && ( -e $stopListFilePath );
-    $self->WriteLog( "WSDParseList - Generating Stop List Regex" ) if defined( $stopListFilePath ) && ( -e $stopListFilePath );
+    $self->WriteLog( "_WSDParseList - Generating Stop List Regex" ) if defined( $stopListFilePath ) && ( -e $stopListFilePath );
     my $stopListRegex = $self->_WSDStop( $stopListFilePath ) if defined( $stopListFilePath ) && ( -e $stopListFilePath );
 
-    $self->WriteLog( "WSDParseList - Generated Stop List Regex: $stopListRegex" ) if defined( $stopListRegex );
-    $self->WriteLog( "WSDParseList - Warning: Stop List Regex Generation Failed - Continuing Without Stop List Regex" ) if !defined( $stopListRegex );
+    $self->WriteLog( "_WSDParseList - Generated Stop List Regex: $stopListRegex" ) if defined( $stopListRegex );
+    $self->WriteLog( "_WSDParseList - Warning: Stop List Regex Generation Failed - Continuing Without Stop List Regex" ) if !defined( $stopListRegex );
 
     my $word2vec = $self->GetWord2VecHandler();
     my $readFile = 0;
@@ -1687,11 +1698,11 @@ sub WSDParseList
     if( $word2vec->IsVectorDataInMemory() == 0 )
     {
         print( "Reading Vector File: $vectorBinFilePath\n" ) if ( $self->GetDebugLog() == 0 );
-        $self->WriteLog( "WSDParseList - Reading \"Vector Binary\" File: \"$vectorBinFilePath\"" );
+        $self->WriteLog( "_WSDParseList - Reading \"Vector Binary\" File: \"$vectorBinFilePath\"" );
         $readFile = $word2vec->ReadTrainedVectorDataFromFile( $vectorBinFilePath );
 
         print( "Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"\n" ) if ( $self->GetDebugLog() == 0 && $readFile == -1 );
-        $self->WriteLog( "WSDParseList - Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"" ) if $readFile == -1;
+        $self->WriteLog( "_WSDParseList - Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"" ) if $readFile == -1;
         return -1 if $readFile == -1;
     }
     elsif( $word2vec->IsVectorDataInMemory() == 1 && defined( $vectorBinFilePath ) )
@@ -1701,11 +1712,11 @@ sub WSDParseList
         $word2vec->ClearVocabularyHash();
 
         print( "Reading Vector File: $vectorBinFilePath\n" ) if ( $self->GetDebugLog() == 0 );
-        $self->WriteLog( "WSDParseList - Reading \"Vector Binary\" File: \"$vectorBinFilePath\"" );
+        $self->WriteLog( "_WSDParseList - Reading \"Vector Binary\" File: \"$vectorBinFilePath\"" );
         $readFile = $word2vec->ReadTrainedVectorDataFromFile( $vectorBinFilePath );
 
         print( "Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"\n" ) if ( $self->GetDebugLog() == 0 && $readFile == -1 );
-        $self->WriteLog( "WSDParseList - Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"" ) if $readFile == -1;
+        $self->WriteLog( "_WSDParseList - Unable To Read Specified Vector Binary File: \"$vectorBinFilePath\"" ) if $readFile == -1;
         return -1 if $readFile == -1;
     }
     else
@@ -1715,7 +1726,7 @@ sub WSDParseList
     }
 
     print( "Parsing File(s)\n" ) if ( $self->GetDebugLog() == 0 );
-    $self->WriteLog( "WSDParseList - Parsing List Of Files" );
+    $self->WriteLog( "_WSDParseList - Parsing List Of Files" );
 
     for my $file ( keys %listOfFiles )
     {
@@ -1725,36 +1736,36 @@ sub WSDParseList
         # Check(s)
         print( "\"$instancesFilePath\" Cannot Be Found\n" ) if !( -e $instancesFilePath ) && $self->GetDebugLog() == 0;
         print( "\"$sensesFilePath\" Cannot Be Found\n" ) if !( -e $sensesFilePath ) && $self->GetDebugLog() == 0;
-        $self->WriteLog( "WSDParseList - Error: \"$instancesFilePath\" Cannot Be Found" ) if !( -e $instancesFilePath );
-        $self->WriteLog( "WSDParseList - Error: \"$sensesFilePath\" Cannot Be Found" ) if !( -e $sensesFilePath );
-        $self->WriteLog( "WSDParseList - Error: \"$instancesFilePath\" Contains No Data" ) if ( -z $instancesFilePath );
-        $self->WriteLog( "WSDParseList - Error: \"$sensesFilePath\" Contains No Data" ) if ( -z $sensesFilePath );
+        $self->WriteLog( "_WSDParseList - Error: \"$instancesFilePath\" Cannot Be Found" ) if !( -e $instancesFilePath );
+        $self->WriteLog( "_WSDParseList - Error: \"$sensesFilePath\" Cannot Be Found" ) if !( -e $sensesFilePath );
+        $self->WriteLog( "_WSDParseList - Error: \"$instancesFilePath\" Contains No Data" ) if ( -z $instancesFilePath );
+        $self->WriteLog( "_WSDParseList - Error: \"$sensesFilePath\" Contains No Data" ) if ( -z $sensesFilePath );
         next if !( -e $instancesFilePath ) || !( -e $sensesFilePath ) || ( -z $instancesFilePath ) || ( -z $sensesFilePath );
 
         # Parse "Instances" From File
         my $aryRef = $self->WSDParseFile( $instancesFilePath, $stopListRegex );
         $self->SetInstanceAry( $aryRef ) if defined( $aryRef );
         $self->SetInstanceCount( @{ $aryRef } );
-        $self->WriteLog( "WSDParseList - Parsed And Stored ". @{ $aryRef } . " Instances From File." );
+        $self->WriteLog( "_WSDParseList - Parsed And Stored ". @{ $aryRef } . " Instances From File." );
 
         # Parse "Senses" From File
         $aryRef = $self->WSDParseFile( $sensesFilePath, $stopListRegex );
         $self->SetSenseAry( $aryRef ) if defined( $aryRef );
         $self->SetSenseCount( @{ $aryRef } );
-        $self->WriteLog( "WSDParseList - Parsed And Stored " . @{ $aryRef } . " Senses From File." );
+        $self->WriteLog( "_WSDParseList - Parsed And Stored " . @{ $aryRef } . " Senses From File." );
 
         # Analyze Sense Array For SenseID Mis-Match
-        $self->WSDAnalyzeSenseData();
+        $self->_WSDAnalyzeSenseData();
 
         # Calculate Cosine Similarity For All Data Entries
         my $success = $self->WSDCalculateCosineAvgSimilarity();
 
-        $self->WriteLog( "WSDParseList - Error Calculating Cosine Average Similarity / Skipping File" ) if ( $success == -1 );
+        $self->WriteLog( "_WSDParseList - Error Calculating Cosine Average Similarity / Skipping File" ) if ( $success == -1 );
         next if ( $success == -1 );
 
         # Save Results
         $self->WSDSaveResults( $instancesFilePath ) if ( $success == 0 );
-        $self->WriteLog( "WSDParseList - Results Saved To File \"$instancesFilePath.results\"" ) if ( $success == 0 );
+        $self->WriteLog( "_WSDParseList - Results Saved To File \"$instancesFilePath.results\"" ) if ( $success == 0 );
 
         # Clear Old Data
         $instancesFilePath = "";
@@ -1856,9 +1867,11 @@ sub WSDParseFile
                     $line =~ tr/a-z/ /cs;                                           # Remove all characters except a to z
                     $line =~ s/$stopListRegex//g if defined( $stopListRegex );      # Remove "stop" words
                     $line =~ s/ +/ /g;                                              # Remove duplicate white spaces between words
+                    $line = "" if( $line eq " " );                                  # Change line to empty string if line only contains space.
 
                     my $context = $dataEntry->contextStr;
-                    $context .= "$line ";
+                    $context .= "$line " if length( $line ) >  0;
+                    $context .= ""       if length( $line ) == 0;
                     $dataEntry->contextStr( $context );
                     #print "Normalized Context: $line\n";  # REMOVE ME
 
@@ -1985,7 +1998,7 @@ sub WSDCalculateCosineAvgSimilarity
     return 0;
 }
 
-sub WSDCalculateAccuracy
+sub _WSDCalculateAccuracy
 {
     my ( $self ) = @_;
 
@@ -2031,7 +2044,7 @@ sub WSDSaveResults
 
     open( my $fileHandle, ">:encoding(utf8)", "$instancesFilePath.results.txt" ) or die "Error: Unable to create save file\n";
 
-    my $percentCorrect = $self->WSDCalculateAccuracy();
+    my $percentCorrect = $self->_WSDCalculateAccuracy();
 
     print $fileHandle "Accuracy: $percentCorrect\n";
 
@@ -2050,16 +2063,16 @@ sub WSDSaveResults
     close( $fileHandle );
 }
 
-sub WSDGenerateAccuracyReport
+sub _WSDGenerateAccuracyReport
 {
     my ( $self, $workingDir ) = @_;
 
     # Check(s)
-    $self->WriteLog( "WSDGenerateAccuracyReport - Working Directory Does Not Exist" ) if !( -e $workingDir );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Working Directory Does Not Exist" ) if !( -e $workingDir );
     return -1 if !( -e $workingDir );
 
     # Read File Name(s) From Specified Directory
-    $self->WriteLog( "WSDGenerateAccuracyReport - Working Directory: $workingDir" );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Working Directory: $workingDir" );
 
     my @filesToParse = ();
 
@@ -2075,10 +2088,10 @@ sub WSDGenerateAccuracyReport
 
 
     # Check(s)
-    $self->WriteLog( "WSDGenerateAccuracyReport - Warning: No Results Files Found") if ( @filesToParse == 0 );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Warning: No Results Files Found") if ( @filesToParse == 0 );
     return if ( @filesToParse == 0 );
 
-    $self->WriteLog( "WSDGenerateAccuracyReport - Fetching Results From Files" ) if ( @filesToParse != 0 );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Fetching Results From Files" ) if ( @filesToParse != 0 );
 
     my @resultAry = ();
 
@@ -2104,8 +2117,8 @@ sub WSDGenerateAccuracyReport
         undef( $tempHandle );
     }
 
-    $self->WriteLog( "WSDGenerateAccuracyReport - Done fetching results" ) if ( @filesToParse != 0 );
-    $self->WriteLog( "WSDGenerateAccuracyReport - Saving data to file: \"AccuracyReport.txt\"" ) if ( @filesToParse != 0 );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Done fetching results" ) if ( @filesToParse != 0 );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Saving data to file: \"AccuracyReport.txt\"" ) if ( @filesToParse != 0 );
 
     # Save all results in file "AccuracyResults.txt"
     open( my $fileHandle, ">:encoding(utf8)", "$workingDir/AccuracyReport.txt" ) or die "Error creating file: \"AccuracyReport.txt\"\n";
@@ -2120,7 +2133,7 @@ sub WSDGenerateAccuracyReport
     close( $fileHandle );
     undef( $fileHandle );
 
-    $self->WriteLog( "WSDGenerateAccuracyReport - Data saved" ) if ( @filesToParse != 0 );
+    $self->WriteLog( "_WSDGenerateAccuracyReport - Data saved" ) if ( @filesToParse != 0 );
 }
 
 # Not my own code
@@ -2290,12 +2303,21 @@ sub GetWorkingDirectory
     return $self->{ _workingDir };
 }
 
+sub GetSpearmansHandler
+{
+    my ( $self ) = @_;
+    my $debugLog = $self->GetDebugLog();
+    my $writeLog = $self->GetWriteLog();
+    $self->{ _spearmans } = Word2vec::Spearmans->new( $debugLog, $writeLog ) if !defined( $self->{ _spearmans } );
+    return $self->{ _spearmans };
+}
+
 sub GetWord2VecHandler
 {
     my ( $self ) = @_;
     my $debugLog = $self->GetDebugLog();
     my $writeLog = $self->GetWriteLog();
-    $self->{ _word2vec } = new Word2vec::Word2vec( $debugLog, $writeLog ) if !defined ( $self->{ _word2vec } );
+    $self->{ _word2vec } = Word2vec::Word2vec->new( $debugLog, $writeLog ) if !defined ( $self->{ _word2vec } );
     return $self->{ _word2vec };
 }
 
@@ -2304,7 +2326,7 @@ sub GetWord2PhraseHandler
     my ( $self ) = @_;
     my $debugLog = $self->GetDebugLog();
     my $writeLog = $self->GetWriteLog();
-    $self->{ _word2phrase } = new Word2vec::Word2phrase( $debugLog, $writeLog ) if !defined ( $self->{ _word2phrase } );
+    $self->{ _word2phrase } = Word2vec::Word2phrase->( $debugLog, $writeLog ) if !defined ( $self->{ _word2phrase } );
     return $self->{ _word2phrase };
 }
 
@@ -2313,7 +2335,7 @@ sub GetXMLToW2VHandler
     my ( $self ) = @_;
     my $debugLog = $self->GetDebugLog();
     my $writeLog = $self->GetWriteLog();
-    $self->{ _xmltow2v } = new Word2vec::Xmltow2v( $debugLog, $writeLog, 1, 1, 1, 1, 2 ) if !defined ( $self->{ _xmltow2v } );
+    $self->{ _xmltow2v } = Word2vec::Xmltow2v->( $debugLog, $writeLog, 1, 1, 1, 1, 2 ) if !defined ( $self->{ _xmltow2v } );
     return $self->{ _xmltow2v };
 }
 
@@ -2322,7 +2344,7 @@ sub GetUtilHandler
     my ( $self ) = @_;
     my $debugLog = $self->GetDebugLog();
     my $writeLog = $self->GetWriteLog();
-    $self->{ _util } = new Word2vec::Util( $debugLog, $writeLog ) if !defined ( $self->{ _util } );
+    $self->{ _util } = Word2vec::Util->new( $debugLog, $writeLog ) if !defined ( $self->{ _util } );
     return $self->{ _util };
 }
 
@@ -2544,6 +2566,76 @@ sub GetFilesInDirectory
 
 
 ######################################################################################
+#    Spearmans Module Functions
+######################################################################################
+
+sub SpCalculateSpearmans
+{
+    my ( $self, $fileA, $fileB, $includeCountsInResults ) = @_;
+    return $self->GetSpearmansHandler()->CalculateSpearmans( $fileA, $fileB, $includeCountsInResults );
+}
+
+sub SpIsFileWordOrCUIFile
+{
+    my ( $self, $filePath ) = @_;
+    return $self->GetSpearmansHandler()->IsFileWordOrCUIFile( $filePath );
+}
+
+sub SpGetPrecision
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetPrecision();
+}
+
+sub SpGetIsFileOfWords
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetIsFileOfWords();
+}
+
+sub SpGetPrintN
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetPrintN();
+}
+
+sub SpGetACount
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetACount();
+}
+
+sub SpGetBCount
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetBCount();
+}
+
+sub SpGetNValue
+{
+    my ( $self ) = @_;
+    return $self->GetSpearmansHandler()->GetNValue();
+}
+
+sub SpSetPrecision
+{
+    my ( $self, $value ) = @_;
+    return $self->GetSpearmansHandler()->SetPrecision( $value );
+}
+
+sub SpSetIsFileOfWords
+{
+    my ( $self, $value ) = @_;
+    return $self->GetSpearmansHandler()->SetIsFileOfWords( $value );
+}
+
+sub SpSetPrintN
+{
+    my ( $self, $value ) = @_;
+    return $self->GetSpearmansHandler()->SetPrintN( $value );
+}
+
+######################################################################################
 #    Word2Vec Module Functions
 ######################################################################################
 
@@ -2585,8 +2677,8 @@ sub W2VComputeAvgOfWordsCosineSimilarity
 
 sub W2VComputeMultiWordCosineSimilarity
 {
-    my ( $self, $wordA, $wordB ) = @_;
-    return $self->GetWord2VecHandler()->ComputeMultiWordCosineSimilarity( $wordA, $wordB );
+    my ( $self, $wordA, $wordB, $allWordsMustExist ) = @_;
+    return $self->GetWord2VecHandler()->ComputeMultiWordCosineSimilarity( $wordA, $wordB, $allWordsMustExist );
 }
 
 sub W2VComputeCosineSimilarityOfWordVectors
@@ -2655,6 +2747,12 @@ sub W2VIsVectorDataInMemory
     return $self->GetWord2VecHandler()->IsVectorDataInMemory();
 }
 
+sub W2VIsWordOrCUIVectorData
+{
+    my ( $self ) = @_;
+    return $self->GetWord2VecHandler()->IsWordOrCUIVectorData();
+}
+
 sub W2VIsVectorDataSorted
 {
     my ( $self, $aryRef ) = @_;
@@ -2669,8 +2767,8 @@ sub W2VCheckWord2VecDataFileType
 
 sub W2VReadTrainedVectorDataFromFile
 {
-    my ( $self, $fileDir ) = @_;
-    return $self->GetWord2VecHandler()->ReadTrainedVectorDataFromFile( $fileDir );
+    my ( $self, $fileDir, $searchWord ) = @_;
+    return $self->GetWord2VecHandler()->ReadTrainedVectorDataFromFile( $fileDir, $searchWord );
 }
 
 sub W2VSaveTrainedVectorDataToFile
@@ -2683,6 +2781,12 @@ sub W2VStringsAreEqual
 {
     my ( $self, $strA, $strB ) = @_;
     return $self->GetWord2VecHandler()->StringsAreEqual( $strA, $strB );
+}
+
+sub W2VRemoveWordFromWordVectorString
+{
+    my ( $self, $vectorDataStr ) = @_;
+    return $self->GetWord2VecHandler()->RemoveWordFromWordVectorString( $vectorDataStr );
 }
 
 sub W2VConvertRawSparseTextToVectorDataAry
@@ -3792,7 +3896,7 @@ Example:
 
  undef( $interface );
 
-=head3 CheckIfExecutableFileExists
+=head3 _CheckIfExecutableFileExists
 
 Description:
 
@@ -3812,14 +3916,14 @@ Example:
  use Word2vec::Interface;
 
  my $interface = Word2vec::Interface->new();
- my $result = $interface->CheckIfExecutableFileExists( "../../External/word2vec", "word2vec" );
+ my $result = $interface->_CheckIfExecutableFileExists( "../../External/word2vec", "word2vec" );
 
  print( "Executable File Exists!\n" ) if $result == 1;
  print( "Executable File Does Not Exist!\n" ) if $result == 0;
 
  undef( $interface );
 
-=head3 CheckIfSourceFileExists
+=head3 _CheckIfSourceFileExists
 
 Description:
 
@@ -3840,14 +3944,14 @@ Example:
  use Word2vec::Interface;
 
  my $interface = Word2vec::Interface->new();
- my $result = $interface->CheckIfSourceFileExists( "../../External/word2vec", "word2vec" );
+ my $result = $interface->_CheckIfSourceFileExists( "../../External/word2vec", "word2vec" );
 
  print( "Source File Exists!\n" ) if $result == 1;
  print( "Source File Does Not Exist!\n" ) if $result == 0;
 
  undef( $interface );
 
-=head3 CompileSourceFile
+=head3 _CompileSourceFile
 
 Description:
 
@@ -3867,7 +3971,7 @@ Example:
  use Word2vec::Interface;
 
  my $interface = Word2vec::Interface;
- my $result = $interface->CompileSourceFile( "../../External/word2vec", "word2vec" );
+ my $result = $interface->_CompileSourceFile( "../../External/word2vec", "word2vec" );
 
  print( "Compiled Source Successfully!\n" ) if $result == 1;
  print( "Source Compilation Attempt Unsuccessful!\n" ) if $result == 0;
@@ -4505,7 +4609,7 @@ Example:
 
  undef( $interface );
 
-=head3 WSDAnalyzeSenseData
+=head3 _WSDAnalyzeSenseData
 
 Description:
 
@@ -4523,7 +4627,7 @@ Example:
 
  This is a private function and should not be utilized.
 
-=head3 WSDReadList
+=head3 _WSDReadList
 
 Description:
 
@@ -4541,7 +4645,7 @@ Example:
 
  This is a private function and should not be utilized.
 
-=head3 WSDParseList
+=head3 _WSDParseList
 
 Description:
 
@@ -4603,7 +4707,7 @@ Example:
 
  This is a private function and should not be utilized.
 
-=head3 WSDCalculateAccuracy
+=head3 _WSDCalculateAccuracy
 
 Description:
 
@@ -4683,7 +4787,7 @@ Example:
 
  This is a private function and should not be utilized.
 
-=head3 WSDGenerateAccuracyReport
+=head3 _WSDGenerateAccuracyReport
 
 Description:
 
@@ -5545,6 +5649,261 @@ Example:
 
  undef( $interface );
 
+=head2 Spearmans Main Functions
+
+=head3 SpCalculateSpearmans
+
+ Calculates Spearman's Rank Correlation Score between two data-sets.
+
+Input:
+
+ $fileA                  -> Data set to compare
+ $fileB                  -> Data set to compare
+ $includeCountsInResults -> Specifies whether to return file counts in score. (undef = False / defined = True)
+
+Output:
+
+ $value -> "undef" or Spearman's Rank Correlation Score
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $score     = $interface->SpCalculateSpearmans( "samples/MiniMayoSRS.term.comp_results", "Similarity/MiniMayoSRS.terms.coders", undef );
+ print "Spearman's Rank Correlation Score: $score\n" if defined( $score );
+ print "Spearman's Rank Correlation Score: undef\n" if !defined( $score );
+
+ undef( $interface );
+
+=head3 SpIsFileWordOrCUIFile
+
+Description:
+
+ Determines if a file is composed of CUI or word terms by checking the first line.
+
+Input:
+
+ $string -> File Path
+
+Output:
+
+ $string -> "undef" = Unable to determine, "cui" = CUI Term File, "word" = Word Term File
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface       = Word2vec::Interface->new();
+ my $isWordOrCuiFile = $interface->SpIsFileWordOrCUIFile( "samples/MiniMayoSRS.terms" );
+
+ print( "MiniMayoSRS.terms File Is A \"$isWordOrCuiFile\" File\n" ) if defined( $isWordOrCuiFile );
+ print( "Unable To Determine Type Of File\n" )                      if !defined( $isWordOrCuiFile );
+
+ undef( $interface );
+
+=head3 SpGetPrecision
+
+ Returns the number of decimal places after the decimal point of the Spearman's Rank Correlation Score to represent.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> Integer
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ print "Spearman's Precision: " . $interface->SpGetPrecision() . "\n";
+
+ undef( $interface );
+
+=head3 SpGetIsFileOfWords
+
+ Returns the variable indicating whether the files to be parsed are files consisting of words or CUI terms.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> "undef" = Auto-Detect, 0 = CUI Terms, 1 = Word Terms
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface     = Word2vec::Interface->new();
+ my $isFileOfWords = $interface->SpGetIsFileOfWords();
+ print "Is File Of Words?: $isFileOfWords\n" if defined( $isFileOfWords );
+ print "Is File Of Words?: undef\n" if !defined( $isFileOfWords );
+
+ undef( $interface );
+
+=head3 SpGetPrintN
+
+ Returns the variable indicating whether the to print NValue.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> "undef" = Do not print NValue, "defined" = Print NValue
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $printN    = $interface->SpGetPrintN();
+ print "Print N\n"        if defined( $printN );
+ print "Do Not Print N\n" if !defined( $printN );
+
+ undef( $interface );
+
+=head3 SpGetACount
+
+ Returns the non-negative count for file A.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> Integer
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ print "A Count: " . $interface->SpGetACount() . "\n";
+
+ undef( $interface );
+
+=head3 SpGetBCount
+
+ Returns the non-negative count for file B.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> Integer
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ print "B Count: " . $interface->SpGetBCount() . "\n";
+
+ undef( $interface );
+
+=head3 SpGetNValue
+
+ Returns the N value.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> Integer
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ print "N Value: " . $interface->SpGetNValue() . "\n";
+
+ undef( $interface );
+
+=head3 SpSetPrecision
+
+ Sets number of decimal places after the decimal point of the Spearman's Rank Correlation Score to represent.
+
+Input:
+
+ $value -> Integer
+
+Output:
+
+ None
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ $interface->SpSetPrecision( 8 );
+ my $score = $interface->SpCalculateSpearmans( "samples/MiniMayoSRS.term.comp_results", "Similarity/MiniMayoSRS.terms.coders", undef );
+ print "Spearman's Rank Correlation Score: $score\n" if defined( $score );
+ print "Spearman's Rank Correlation Score: undef\n" if !defined( $score );
+
+ undef( $interface );
+
+=head3 SpSetIsFileOfWords
+
+ Specifies the main method to auto-detect if file consists of CUI or Word terms, or manual override with user setting.
+
+Input:
+
+ $value -> "undef" = Auto-Detect, 0 = CUI Terms, 1 = Word Terms
+
+Output:
+
+ None
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ $interface->SpSetIsFileOfWords( undef );
+ my $score = $interface->SpCalculateSpearmans( "samples/MiniMayoSRS.term.comp_results", "Similarity/MiniMayoSRS.terms.coders", undef );
+ print "Spearman's Rank Correlation Score: $score\n" if defined( $score );
+ print "Spearman's Rank Correlation Score: undef\n" if !defined( $score );
+
+ undef( $interface );
+
+=head3 SpSetPrintN
+
+ Specifies the main method print _NValue post Spearmans::CalculateSpearmans() function completion.
+
+Input:
+
+ $value -> "undef" = Do Not Print _NValue, "defined" = Print _NValue
+
+Output:
+
+ None
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ $interface->SpSetPrintN( 1 );
+ my $score = $interface->SpCalculateSpearmans( "samples/MiniMayoSRS.term.comp_results", "Similarity/MiniMayoSRS.terms.coders", undef );
+ print "Spearman's Rank Correlation Score: $score\n" if defined( $score );
+ print "Spearman's Rank Correlation Score: undef\n" if !defined( $score );
+
+ undef( $interface );
+
 =head2 Word2Vec Main Functions
 
 =head3 W2VExecuteTraining
@@ -5740,19 +6099,19 @@ Example:
 Description:
 
  Computes cosine similarity between two words or compound words using trained word2vec vector data.
- Returns float value or undefined if one or more words are not in the dictionary.
 
- Note: Supports multiple words concatenated by ' ' and requires vector data to be in memory prior to method execution.
- This function will error out when a specified word is not found and return undefined.
+ Note: Supports multiple words concatenated by ' ' (space) and requires vector data to be in memory prior to method execution.
+ If $allWordsMustExist is set to true, this function will error out when a specified word is not found and return undefined.
 
 Input:
 
- $string -> string of single or multiple words separated by ' ' (space).
- $string -> string of single or multiple words separated by ' ' (space).
+ $string            -> string of single or multiple words separated by ' ' (space).
+ $string            -> string of single or multiple words separated by ' ' (space).
+ $allWordsMustExist -> 1 = True, 0 or undef = False
 
 Output:
 
- $value  -> Float or Undefined
+ $value             -> Float or Undefined
 
 Example:
 
@@ -5793,8 +6152,8 @@ Example:
  my $vectorBData = $interface->W2VGetWordVector( "attack" );
 
  # Remove Words From Data
- $vectorAData = RemoveWordFromWordVectorString( $vectorAData );
- $vectorBData = RemoveWordFromWordVectorString( $vectorBData );
+ $vectorAData = W2VRemoveWordFromWordVectorString( $vectorAData );
+ $vectorBData = W2VRemoveWordFromWordVectorString( $vectorBData );
 
  undef( @tempAry );
 
@@ -5825,7 +6184,7 @@ Example:
 
  use Word2vec::Interface;
 
- my $interface = Word2vec::Word2vec->new();
+ my $interface = Word2vec::Interface->new();
  $interface->W2VReadTrainedVectorDataFromFile( "samples/samplevectors.bin" );
  $interface->W2VCosSimWIthUserInputTest();
 
@@ -5976,8 +6335,8 @@ Example:
  my $wordBData = $interface->W2VGetWordVector( "the" );
 
  # Removing Words From Vector Data
- $wordAData = RemoveWordFromWordVectorString( $wordAData );
- $wordBData = RemoveWordFromWordVectorString( $wordBData );
+ $wordAData = W2VRemoveWordFromWordVectorString( $wordAData );
+ $wordBData = W2VRemoveWordFromWordVectorString( $wordBData );
 
  my $data = $interface->W2VAddTwoWordVectors( $wordAData, $wordBData );
  print( "Computed Sum Of Words: $data" ) if defined( $data );
@@ -6012,8 +6371,8 @@ Example:
  my $wordBData = $interface->W2VGetWordVector( "the" );
 
  # Removing Words From Vector Data
- $wordAData = RemoveWordFromWordVectorString( $wordAData );
- $wordBData = RemoveWordFromWordVectorString( $wordBData );
+ $wordAData = W2VRemoveWordFromWordVectorString( $wordAData );
+ $wordBData = W2VRemoveWordFromWordVectorString( $wordBData );
 
  my $data = $interface->W2VSubtractTwoWordVectors( $wordAData, $wordBData );
  print( "Computed Difference Of Words: $data" ) if defined( $data );
@@ -6048,8 +6407,8 @@ Example:
  my $wordBData = $interface->W2VGetWordVector( "the" );
 
  # Removing Words From Vector Data
- $wordAData = RemoveWordFromWordVectorString( $wordAData );
- $wordBData = RemoveWordFromWordVectorString( $wordBData );
+ $wordAData = W2VRemoveWordFromWordVectorString( $wordAData );
+ $wordBData = W2VRemoveWordFromWordVectorString( $wordBData );
 
  my $data = $interface->W2VAverageOfTwoWordVectors( $wordAData, $wordBData );
  print( "Computed Average Of Words: $data" ) if defined( $data );
@@ -6115,6 +6474,33 @@ Example:
 
  undef( $interface );
 
+=head3 W2VIsWordOrCUIVectorData
+
+Description:
+
+ Checks to see if vector data consists of word or CUI terms.
+
+Input:
+
+ None
+
+Output:
+
+ $string -> 'cui', 'word' or undef
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ $interface->W2VReadTrainedVectorDataFromFile( "samples/samplevectors.bin" );
+ my $isWordOrCUIData = $interface->W2VIsWordOrCUIVectorData();
+
+ print( "Vector Data Consists Of \"$isWordOrCUIData\" Terms\n" ) if defined( $isWordOrCUIData );
+ print( "Cannot Determine Type Of Terms\n" ) if !defined( $isWordOrCUIData );
+
+ undef( $interface );
+
 =head3 W2VIsVectorDataSorted
 
 Description:
@@ -6173,12 +6559,15 @@ Example:
 
 Description:
 
- Reads trained vector data from file path in memory. This function supports and
+ Reads trained vector data from file path in memory or searches for vector data from file. This function supports and
  automatically detects word2vec binary, plain text and sparse vector data formats.
+
+ Note: If search word is undefined, the entire vector file is loaded in memory. If a search word is defined only the vector data is returned or undef.
 
 Input:
 
  $string     -> Word2vec trained vector data file path
+ $searchWord -> Searches trained vector data file for specific word vector
 
 Output:
 
@@ -6186,7 +6575,7 @@ Output:
 
 Example:
 
- # Loading data in a Binary Search Tree
+ # Loading data in memory
  use Word2vec::Interface;
 
  my $interface = Word2vec::Interface->new();
@@ -6194,6 +6583,19 @@ Example:
 
  print( "Success Loading Data\n" ) if $result == 0;
  print( "Un-successful, Data Not Loaded\n" ) if $result == -1;
+
+ undef( $interface );
+
+ # or
+
+ # Searching vector data file for a specific word vector
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $result = $interface->W2VReadTrainedVectorDataFromFile( "samples/samplevectors.bin", "medical" );
+
+ print( "Found Vector Data In File\n" ) if $result != -1;
+ print( "Vector Data Not Found\n" )     if $result == -1;
 
  undef( $interface );
 
@@ -6258,6 +6660,33 @@ Example:
 
  undef( $interface );
 
+=head3 W2VRemoveWordFromWordVectorString
+
+Description:
+
+ Given a vector data string as input, it removed the vector word from its data returning only data.
+
+Input:
+
+ $string          -> Vector word & data string.
+
+Output:
+
+ $string          -> Vector data string.
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $str = "cookie 1 0.234 9 0.0002 13 0.234 17 -0.0023 19 1.0000";
+
+ my $vectorData = $interface->W2VRemoveWordFromWordVectorString( $str );
+
+ print( "Success!\n" ) if length( vectorData ) < length( $str );
+
+ undef( $interface );
+
 =head3 W2VConvertRawSparseTextToVectorDataAry
 
 Description:
@@ -6284,7 +6713,7 @@ Example:
  print( "Data conversion successful!\n" ) if @vectorData > 0;
  print( "Data conversion un-successful!\n" ) if @vectorData == 0;
 
- undef( $w2v );
+ undef( $interface );
 
 =head3 W2VConvertRawSparseTextToVectorDataHash
 
@@ -6302,7 +6731,7 @@ Output:
 
 Example:
 
- use Word2vec::Word2vec;
+ use Word2vec::Interface;
 
  my $interface = Word2vec::Interface->new();
  my $str = "cookie 1 0.234 9 0.0002 13 0.234 17 -0.0023 19 1.0000";
@@ -6312,7 +6741,7 @@ Example:
  print( "Data conversion successful!\n" ) if ( keys %vectorData ) > 0;
  print( "Data conversion un-successful!\n" ) if ( keys %vectorData ) == 0;
 
- undef( $w2v );
+ undef( $interface );
 
 =head2 Word2Vec Accessor Functions
 

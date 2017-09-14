@@ -2,13 +2,14 @@ package Test2::Harness::Job::Dir;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use File::Spec();
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
 use Test2::Harness::Util::JSON qw/decode_json/;
+use Test2::Harness::Util qw/read_file/;
 
 use Test2::Harness::Event;
 
@@ -284,25 +285,28 @@ sub _poll_stderr {
     my $self = shift;
     my ($max) = @_;
 
-    return if $self->{+_STDERR_INDEX} > $self->{+_EVENTS_INDEX};
-
-    my $buffer = $self->{+_STDERR_BUFFER};
-    return unless @$buffer;
-
     my @out;
-    while (my $line = shift @$buffer) {
-        chomp($line);
 
-        if ($line =~ m/^T2-HARNESS-ESYNC: (\d+)$/) {
-            $self->{+_STDERR_INDEX} = $1;
-            last;
+    until ($self->{+_STDERR_INDEX} > $self->{+_EVENTS_INDEX} || @out >= $max) {
+        my $buffer = $self->{+_STDERR_BUFFER} or last;
+
+        my @lines;
+        while (my $line = shift @$buffer) {
+            chomp($line);
+
+            if ($line =~ m/^T2-HARNESS-ESYNC: (\d+)$/) {
+                $self->{+_STDERR_INDEX} = $1;
+                last;
+            }
+
+            push @lines => $line;
         }
+
+        last unless @lines;
 
         my $id = $self->{+_STDERR_ID}++;
         my $event_id = "stderr-$id";
-        push @out => $self->_process_stderr_line($event_id, $line);
-
-        last if $max && @out >= $max;
+        push @out => $self->_process_stderr_line($event_id, join "\n" => @lines);
     }
 
     return @out;
@@ -399,6 +403,9 @@ sub _process_exit_line {
 
     chomp($value);
 
+    my $stdout = read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stdout"));
+    my $stderr = read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stderr"));
+
     return {
         event_id => $event_id,
         job_id   => $self->{+JOB_ID},
@@ -410,6 +417,8 @@ sub _process_exit_line {
                 exit    => $value,
                 job_id  => $self->{+JOB_ID},
                 file    => $self->file,
+                stdout  => $stdout,
+                stderr  => $stderr,
             },
         }
     };

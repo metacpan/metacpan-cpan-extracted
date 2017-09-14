@@ -9,6 +9,7 @@ lib/Apache/Session/Browseable/File.pm
 lib/Apache/Session/Browseable/Informix.pm
 lib/Apache/Session/Browseable/LDAP.pm
 lib/Apache/Session/Browseable/MySQL.pm
+lib/Apache/Session/Browseable/MySQLJSON.pm
 lib/Apache/Session/Browseable/Oracle.pm
 lib/Apache/Session/Browseable/PgHstore.pm
 lib/Apache/Session/Browseable/PgJSON.pm

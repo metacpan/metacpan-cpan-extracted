@@ -1,0 +1,13 @@
+[% USE gtx = Gettext %]
+[% gtx.gettext("Hello, world!\n") %]
+
+[% # TRANSLATORS: A translator comment.
+   gtx.gettext("Translator comment above.\n") %]
+
+[% gtx.pxgettext("method", "Hello, {name}!", name => "N. N.") %]
+
+[% FILTER xgettextp("filter", who => 'world') %]
+Hello, {who}!
+[% END %]
+
+[% "Hello, {arg}!" | xgettextp("pipe", arg => 'world') %]

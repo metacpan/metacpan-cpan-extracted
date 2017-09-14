@@ -53,6 +53,8 @@ LICENSE
 maint/min-perl.pl
 maint/releaseprep
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00_diag.t
 t/alien_base_modulebuild.t
@@ -67,5 +69,3 @@ t/alien_base_modulebuild_utils.t
 t/inline.t
 t/inline_cpp.t
 t/lib/Test2/Plugin/AlienEnv.pm
-META.yml
-META.json

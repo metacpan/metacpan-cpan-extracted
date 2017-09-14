@@ -2,7 +2,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 #
 #  This is free software, licensed under:
 #
@@ -40,7 +40,7 @@ use Pod::Usage;
 
 #  Version info
 #
-$VERSION='1.246';
+$VERSION='1.248';
 
 
 #  Get command line options, add them to environment so picked up
@@ -233,7 +233,7 @@ Written by Andrew Speer, andrew@webdyne.org
 
 This file is part of WebDyne.
 
-This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 
 This is free software, licensed under:
 

@@ -40,12 +40,12 @@ is done with the same syntax as with the local reference:
 # host 1
 use Patro;
 my $hash1 = { abc => 123, def => [ 456, { ghi => "jkl" }, "mno" ] };
-my $config = patronize($hash1);
+patronize($hash1)->to_file('/network/accessible/file');
 ...
 
 # host 2
 use Patro;
-my $hash2 = getProxies($config);
+my $hash2 = getProxies('/network/accessible/file');
 print $hash2->{abc};                # "123"
 $hash2->{def}[2] = "pqr";           # updates $hash1 on host 1
 print delete $hash2->{def}[1]{ghi}; # "jkl", updates $hash1 on host1
@@ -61,12 +61,12 @@ affecting the remote object and returning the result of the call.
 use Patro;
 sub Foofie::new { bless \$_[1],'Foofie' }
 sub Foofie::blerp { my $self=shift; wantarray ? (5,6,7,$$self) : ++$$self }
-$config = patronize(Foofie->new(17));
+patronize(Foofie->new(17))->to_file('/file/accessible/to-host2');
 ...
 
 # host 2
 use Patro;
-my $foo = getProxies($config);
+my $foo = getProxies('/file/accessible/to-host2');
 my @x = $foo->blerp;           # (5,6,7,17)
 my $x = $foo->blerp;           # 18
 ```
@@ -80,7 +80,7 @@ remote object.
 # host 1
 use Patro;
 my $obj = Barfie->new(2,5);
-$config = patronize($obj);
+patronize($obj)->to_file('/network/file');
 package Barfie;
 use overload '+=' => sub { $_ += $_[1] for @{$_[0]->{vals}};$_[0] },
      fallback => 1;
@@ -91,8 +91,8 @@ sub new {
 sub prod { my $self = shift; my $z=1; $z*=$_ for @{$_[0]->{vals}}; $z }
 
 # host 2
-use Patro;'
-my $proxy = getProxies($config);
+use Patro;
+my $proxy = getProxies('/network/file');
 print $proxy->prod;      # calls Barfie::prod($obj) on host1, 2 * 5 => 10
 $proxy += 4;             # calls Barfie '+=' sub on host1
 print $proxy->prod;      # 6 * 9 => 54

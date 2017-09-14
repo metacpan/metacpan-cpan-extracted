@@ -188,7 +188,6 @@ DEPRECATED - use --dry_run instead
 # q{Bool value whether or not to submit to slurm. If you are looking to debug your files, or this script you will want to set this to zero.},
 # );
 
-
 =head3 serial
 
 Option to run all jobs serially, one after the other, no parallelism
@@ -334,7 +333,12 @@ has 'template' => (
     is       => 'rw',
     required => 0,
     default  => sub {
-        return Template->new( ABSOLUTE => 1, PRE_CHOMP => 1, TRIM => 1, EVAL_PERL => 1, );
+        return Template->new(
+            ABSOLUTE  => 1,
+            PRE_CHOMP => 1,
+            TRIM      => 1,
+            EVAL_PERL => 1,
+        );
     },
 );
 
@@ -567,6 +571,7 @@ sub check_add_to_jobs {
             cpus_per_task    => $self->cpus_per_task,
             nodes_count      => $self->nodes_count,
             ntasks_per_nodes => $self->ntasks_per_node,
+            template_file    => $self->template_file,
           );
         $self->jobs->{ $self->jobname }->partition( $self->partition )
           if $self->has_partition;
@@ -767,6 +772,7 @@ sub process_batch {
     my $self = shift;
 
     my $ok;
+
     #TODO Rework this so we only get the arrayids we need the first time around
     $ok = $self->join_scheduler_ids(':') if $self->has_scheduler_ids;
 

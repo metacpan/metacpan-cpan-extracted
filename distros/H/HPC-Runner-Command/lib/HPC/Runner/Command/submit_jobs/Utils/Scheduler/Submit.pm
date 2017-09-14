@@ -23,8 +23,8 @@ sub process_submit_command {
 
     my $command = "";
 
+    ##TODO Discuss changing the log name to just the jobname
     my $logname = $self->create_log_name($counter);
-
     $self->jobs->{ $self->current_job }->add_lognames($logname);
 
     $command = "sleep 20\n";
@@ -48,8 +48,8 @@ sub process_submit_command {
     $command .=
         "\t--infile "
       . $self->cmdfile . " \\\n"
-      . "\t--outdir "
-      . $self->outdir . " \\\n"
+      . "\t--basedir "
+      . $self->basedir . " \\\n"
       . "\t--commands "
       . $self->jobs->{ $self->current_job }->commands_per_node . " \\\n"
       . "\t--batch_index_start "
@@ -59,8 +59,8 @@ sub process_submit_command {
       . "\t--logname "
       . $logname . " \\\n"
       . $log
-      . "\t--data_tar "
-      . $self->data_tar . " \\\n"
+      . "\t--data_dir "
+      . $self->data_dir . " \\\n"
       . "\t--process_table "
       . $self->process_table;
 
@@ -134,7 +134,7 @@ sub process_template {
     my $jobname = $self->resolve_project($counter);
 
     $self->template->process(
-        $self->template_file,
+        $self->jobs->{$self->current_job}->template_file,
         {
             JOBNAME   => $jobname,
             USER      => $self->user,
@@ -157,7 +157,6 @@ sub process_template {
         $scheduler_id = $self->submit_jobs;
     };
 
-    $DB::single = 2;
     if ( defined $scheduler_id ) {
         $self->jobs->{ $self->current_job }->add_scheduler_ids($scheduler_id);
     }

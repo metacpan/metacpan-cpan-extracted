@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'leading_digits' => '
-            [289]|
-            09
+            09|
+            [289]
           '
                 },
                 {
@@ -39,27 +39,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'geographic' => '
-          2(?:
-            0(?:
-              20|
-              3[1-7]|
-              4[134]|
-              5[14]|
-              6[14578]|
-              7[1-578]
-            )|
-            1(?:
-              4[145]|
-              5[14]|
-              6[14-68]|
-              7[169]|
-              88
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '(09\\d{6})',
                 'fixed_line' => '
           2(?:
             0(?:
@@ -79,6 +58,7 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'specialrate' => '(09\\d{6})',
                 'mobile' => '
           (?:
             8[089]|
@@ -86,8 +66,28 @@ my $validators = {
           )\\d{6}
         ',
                 'toll_free' => '08\\d{6}',
-                'pager' => '',
-                'voip' => ''
+                'voip' => '',
+                'geographic' => '
+          2(?:
+            0(?:
+              20|
+              3[1-7]|
+              4[134]|
+              5[14]|
+              6[14578]|
+              7[1-578]
+            )|
+            1(?:
+              4[145]|
+              5[14]|
+              6[14-68]|
+              7[169]|
+              88
+            )
+          )\\d{4}
+        ',
+                'personal_number' => '',
+                'pager' => ''
               };
 my %areanames = (
   2272020 => "Niamey",

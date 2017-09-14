@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 #
 #  This is free software, licensed under:
 #
@@ -55,7 +55,7 @@ use overload;
 
 #  Version information
 #
-$VERSION='1.246';
+$VERSION='1.248';
 
 
 #  Debug load
@@ -860,7 +860,7 @@ sub init_class {
     # CGI::->method is needed because perl 5.6.0 will use WebDyne::CGI->method instead of
     # CGI->method. CGI::->method makes it happy
     CGI::->import('-no_xhtml', '-no_sticky');
-    my @cgi_compile=qw(:all area map unescapeHTML form col colgroup spacer nobr);
+    my @cgi_compile=qw(:all area map unescapeHTML form col colgroup spacer nobr Header);
     CGI::->compile(@cgi_compile);
 
     #  Broken under CGI 4.28. Use different method
@@ -3540,7 +3540,7 @@ source /doc directory.
 
 This file is part of WebDyne.
 
-This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 
 This is free software, licensed under:
 

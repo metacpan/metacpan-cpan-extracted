@@ -1,0 +1,700 @@
+=head1 NAME
+
+Locale::XGettext - Extract Strings To PO Files
+
+=head1 SYNOPSIS
+
+    use base 'Locale::XGettext';
+    
+=head1 DESCRIPTION
+
+B<Locale::XGettext> is the base class for various string extractors.  These
+string extractors can be used as standalone programs on the command-line or
+as a module as a part of other software.
+
+See L<https://github.com/gflohr/Locale-XGettext> for an overall picture of
+the software.
+
+=head1 USAGE
+
+This section describes the usage of extractors based on this library.
+See L</SUBCLASSING> and the sections following it for the API 
+documentation!
+
+    xgettext-LANG [OPTIONS] [INPUTFILE]...
+
+B<LANG> will be replaced by an identifier for the language that a specific
+extractor was written for, for example "xgettext-txt" for plain text files
+or "xgettext-tt2" for templates for the Template Toolkit version 2 (see
+L<Template>).
+
+By default, string extractors based on this module extract strings from
+one or more B<INPUTFILES> and write the output to a file "messages.po" if
+any strings had been found.  
+
+=head1 OPTIONS
+
+The command line options are mostly compatible to
+F<xgettext> from L<GNU
+Gettext|https://www.gnu.org/software/gettext/manual/html_node/xgettext-Invocation.html>.
+
+=head2 INPUT FILE LOCATION
+
+=over 4
+
+=item B<INPUTFILE...>
+
+All non-option arguments are interpreted as input files containing strings to
+be extracted.  If the input file is "-", standard input is read.
+
+=item B<-f FILE>
+
+=item B<--files-from=FILE>
+
+Read the names of the input files from B<FILE> instead of getting them from the
+command line.
+
+B<Note!> Unlike xgettext from GNU Gettext, extractors based on 
+B<Locale::XGettext> accept this option multiple times, so that you can read 
+the list of input files from multiple files.
+
+=item B<-D DIRECTORY>
+
+=item B<--directory=DIRECTORY>
+
+Add B<DIRECTORY> to the list of directories. Source files are searched 
+relative to this list of directories. The resulting .po file will be written 
+relative to the current directory, though. 
+
+=back
+
+=head2 OUTPUT FILE LOCATION
+
+=over 4
+
+=item B<-d NAME>
+
+=item B<--default-domain=NAME>
+
+Use B<NAME>.po for output (instead of F<messages.po>).
+
+=item B<-o FILE>
+
+=item B<--output=FILE>
+
+Write output to specified F<B<FILE>> (instead of F<B<NAME>.po> or 
+F<messages.po>).
+
+=item B<-p DIR>
+
+=item B<--output-dir=DIR>
+
+Output files will be placed in directory B<DIR>.
+
+If the output file is B<-> or F</dev/stdout>, the output is written to standard 
+output. 
+
+=back
+
+=head2 INPUT FILE INTERPRETATION
+
+=over 4
+
+=item B<--from-code=NAME>
+
+Specifies the encoding of the input files. This option is needed only if some 
+untranslated message strings or their corresponding comments contain non-ASCII 
+characters.
+
+By default the input files are assumed to be in ASCII.
+
+B<Note!> Some extractors have a fixed input set, UTF-8 most of the times.
+
+=back
+
+=head2 OPERATION MODE
+
+=over 4
+
+=item B<-j>
+
+=item B<--join-existing>
+
+Join messages with existing files.  This is a shortcut for adding the
+output file to the list of input files.  The output file is read, and
+then all messages from other input files are added.
+
+For obvious reasons, you cannot use this option if output is written
+to standard output.
+
+=item B<-x FILE.po>
+
+=item B<--exclude-file=FILE.po>
+
+PO entries that are present in F<FILE.po> are not extracted.
+
+=item B<-c TAG>
+
+=item B<--add-comments=TAG>
+
+Place comment blocks starting with B<TAG> in the output
+if they precede a keyword line.
+
+=item B<-c>
+
+=item B<--add-comments>
+
+Place all comment blocks that precede a keyword line in the output.
+
+=back
+
+=head2 LANGUAGE-SPECIFIC-OPTIONS
+
+=over 4
+
+=item B<-a>
+
+=item B<--extract-all>
+
+Extract B<all> strings, not just the ones marked with keywords.
+
+B<Not all extractors support this option!>
+
+=item B<-k WORD>
+
+=item B<--keyword=WORD>
+
+Use B<WORD> as an additional keyword.
+
+B<Not all extractors support this option!>
+
+=item B<-k>
+
+=item B<--keyword>
+
+Do not use default keywords!  If you define your own keywords, you
+use usually give the option '--keyword' first without an argument to
+reset the keyword list to empty, and then you give a '--keyword'
+option for everyt keyword wanted.
+
+B<Not all extractors support this option!>
+
+=item B<--flag=WORD:ARG:FLAG>
+
+Original explanation from GNU gettext:
+
+=over 4
+
+=encoding UTF-8
+
+Specifies additional flags for strings occurring as part of the I<arg>th
+argument of the function I<word>. The possible flags are the possible
+format string indicators, such as ‘c-format’, and their negations,
+such as ‘no-c-format’, possibly prefixed with ‘pass-’.
+
+The meaning of --flag=I<function:arg:lang-format> is that in language
+I<lang>, the specified I<function> expects as I<arg>th argument a format string.
+(For those of you familiar with GCC function attributes, 
+--flag=I<function:arg>:c-format is roughly equivalent to the declaration
+‘__attribute__ ((__format__ (__printf__, I<arg>, ...)))’ attached to I<function>
+in a C source file.) For example, if you use the ‘error’ function from
+GNU libc, you can specify its behaviour through --flag=error:3:c-format.
+The effect of this specification is that xgettext will mark as format
+strings all gettext invocations that occur as I<arg>th argument of I<function>.
+This is useful when such strings contain no format string directives:
+together with the checks done by ‘msgfmt -c’ it will ensure that translators
+cannot accidentally use format string directives that would lead to a
+crash at runtime.
+
+The meaning of --flag=I<function:arg>:pass-I<lang>-format is that in language
+I<lang>, if the I<function> call occurs in a position that must yield a format
+string, then its I<arg>th argument must yield a format string of the same
+type as well. (If you know GCC function attributes, the 
+--flag=I<function:arg>:pass-c-format option is roughly equivalent to the
+declaration ‘__attribute__ ((__format_arg__ (I<arg>)))’ attached to function
+in a C source file.) For example, if you use the ‘_’ shortcut for the
+gettext function, you should use --flag=_:1:pass-c-format. The effect of
+this specification is that xgettext will propagate a format string
+requirement for a _("string") call to its first argument, the literal
+"string", and thus mark it as a format string. This is useful when such
+strings contain no format string directives: together with the checks
+done by ‘msgfmt -c’ it will ensure that translators cannot accidentally
+use format string directives that would lead to a crash at runtime.
+
+=back
+
+Note that B<Locale::XGettext> ignores the prefix I<pass-> and therefore
+most extractors based on B<Locale::XGettext> will also ignore it.
+
+=back
+
+Individual extractors may define more language-specific options.
+
+=head2 Output Details
+
+=over 4
+
+=item B<--force-po>
+
+Write PO file even if empty.  Normally, empty PO files are not written,
+and existing output files are not overwritten if they would be empty.
+
+=item B<--no-location>
+
+Do not write '#: filename:line' lines into the output PO files.
+
+=item B<-n>
+
+=item B<--add-location>
+
+Generate '#: filename:line' lines in the output PO files.  This is the
+default.
+
+=item B<-s>
+
+=item B<--sort-output>
+
+Sort output entries alphanumerically.
+
+=item B<-F>
+
+=item B<--sort-by-file>
+
+Sort output entries by source file location.
+
+=item B<--omit-header>
+
+Do not write header with meta information.  The meta information is
+normally included as the "translation" for the empty string.
+
+If you want to hava a translation for an empty string you should also
+consider using message contexts.
+
+=item B<--copyright-holder=STRING>
+
+Set the copyright holder to B<STRING> in the output PO file.
+
+=item B<--foreign-user>
+
+Omit FSF copyright in output for foreign user.
+
+=item B<--package-name=PACKAGE>
+
+Set package name in output
+
+=item B<--package-version=VERSION>
+
+Set package version in output.
+
+=item B<--msgid-bugs-address=EMAIL@ADDRESS>
+
+Set report address for msgid bugs.
+
+=item B<-m[STRING]>
+
+=item B<--msgstr-prefix[=STRING]>
+
+Use STRING or "" as prefix for msgstr values.
+
+=item B<-M[STRING]>
+
+=item B<--msgstr-suffix[=STRING]>
+
+Use STRING or "" as suffix for msgstr values.
+
+=back
+
+=head2 INFORMATIVE OUTPUT
+
+=over 4
+
+=item B<-h>
+
+=item B<--help>
+
+Display short help and exit.
+
+=item B<-V>
+
+=item B<--version>
+
+Output version information and exit.
+
+=back
+
+=head1 SUBCLASSING
+
+Writing a complete extractor script in Perl with B<Locale::XGettext>
+is as simple as:
+
+    #! /usr/bin/env perl
+
+    use Locale::Messages qw(setlocale LC_MESSAGES);
+    use Locale::TextDomain qw(YOURTEXTDOMAIN);
+
+    use Locale::XGettext::YOURSUBCLASS;
+
+    Locale::Messages::setlocale(LC_MESSAGES, "");
+    Locale::XGettext::YOURSUBCLASS->newFromArgv(\@ARGV)->run->output;
+
+Writing the extractor class is also trivial:
+
+    package Locale::XGettext::YOURSUBCLASS;
+
+    use base 'Locale::XGettext';
+
+    sub readFile {
+        my ($self, $filename) = @_;
+
+        foreach my $found (search_for_strings_in $filename) {
+            $self->addEntry({
+                msgid => $found->{string},
+                # More possible fields following, see 
+                # addEntry() below!
+            }, $found->{possible_comment});
+        }
+
+        # The return value is actually ignored.
+        return $self;
+    }
+
+All the heavy lifting happens in the method B<readFile()> that you have
+to implement yourself.  All other methods are optional.
+
+See the section L</METHODS> below for information on how to
+additionally modify the behavior your extractor.
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item B<new $OPTIONS, @FILES>
+
+B<OPTIONS> is a hash reference containing the above command-line
+options but with every hyphen replaced by an underscore.  You
+should normally not use this constructor!
+
+=item B<newFromArgv $ARGV>
+
+B<ARGV> is a reference to a an array of command-line arguments
+that is passed verbatim to B<Getopt::Long::GetOptionsFromArray>.
+After processing all options and arguments, the constructor
+B<new()> above is then invoked with the cooked command-line
+arguments.
+
+This is the constructor that you should normally use in 
+custom extractors that you write.
+
+=back
+
+=head1 METHODS
+
+B<Locale::XGettext> is an abstract base class.  All public methods
+may be overridden by subclassed extractors.
+
+=over 4
+
+=item B<readFile FILENAME>
+
+You have to implement this method yourself.  In it, read B<FILENAME>,
+extract all relevant entries, and call B<addEntry()> for each entry
+found.
+
+The method is not invoked for filenames ending in ".po" or ".pot"!
+For those files, B<readPO()> is invoked instead.
+
+This method is the only one that you have to implement!
+
+=item B<addEntry ENTRY[, COMMENT]>
+
+You should invoke this  method for every entry found.  
+
+B<COMMENT> is an optional comment that you may have extracted along 
+with the message.  Note that B<addEntry()> checks whether this
+comment should make it into the output.  Therefore, just pass any
+comment that you have found preceding the keyword.
+
+B<ENTRY> should be a reference to a hash with these possible
+keys:
+
+=over 8
+
+=item B<msgid>
+
+The entry's message id.
+
+=item B<msgid_plural>
+
+A possible plural form.
+
+=item B<msgctxt>
+
+A possible message context.
+
+=item B<reference>
+
+A source reference in the form "FILENAME: LINENO".
+
+=item B<flags>
+
+Set a flag for this entry, for example "perl-brace-format" or
+"no-perl-brace-format".  You can comma-separate multiple
+flags.
+
+=item B<keyword>
+
+The keyword that triggered the entry.  If you set this
+property and the keyword definition contained an automatic
+comment, the comment will be added.  You can try this out
+like this:
+
+    xgettext-my.pl --keyword=greet:1,'"Hello, world!"'
+
+If you set B<keyword> to "greet", the comment "Hello, world"
+will be added.  Note that the "double quotes" are part of the
+command-line argument!
+
+Likewise, if "--flag" was specified on the command-line or
+the extractor ships with default flags, entries matching
+the flag definition will automatically have this flag.
+
+You can try this out with:
+
+    xgettext-my.pl --keyword="greet:1" --flag=greet:1:hello-format
+
+Now all PO entries for the keyword "greet" will have the
+flag "hello-format"
+
+=item B<fuzzy>
+
+True if the entry is fuzzy.  There is no reason to use this
+in string extractors because they typically product .pot
+files without translations.
+
+=item B<automatic>
+
+Sets an automatic comment, not recommended.  Rather set
+the keyword (see above) and let B<Locale::XGettext> set the
+comment as appropriate.
+
+=back 
+
+Instead of a hash you can currently also pass a 
+B<Locale::PO> object.  This may no longer be supported in
+the future.  Do not use!
+
+=item B<keywords>
+
+Return a hash reference with all keyword definitions as
+L<Locale::XGettext::Util::Keyword> objects.
+
+=item B<keywordOptionStrings>
+
+Return a reference to an array with all keyword definitions
+as option strings suitable for the command-line option
+"--keyword".
+
+=item B<flags>
+
+Return an array reference with all flag definitions as
+L<Locale::XGettext::Util::Flag> objects.
+
+=item B<flagOptionStrings>
+
+Return a reference to an array with all flag definitions
+as option strings suitable for the command-line option
+"--flag".
+
+=item B<options>
+
+Get all command-line options as a hash reference.
+
+=item B<option OPTION>
+
+Get the value for command line option B<OPTION>.
+
+=item B<languageSpecificOptions>
+
+The default representation returns nothing.
+
+Your own implementation can return an reference to an array of
+arrays, each of them containing one option specification
+consisting of four items:
+
+=over 8
+
+=item *
+
+The option specification for Getopt::Long(3pm), for example
+"f|filename=s" for an option expexting a mandatory
+string argument.
+
+=item *
+
+The name of the option.  This is what gets passed to option()
+above.  It should generally be the long option name with hyphens
+converted to underscores.
+
+=item *
+
+The option description for the usage information, for example
+"-f, --files=STRING" for options taking arguments or 
+something like "    --verbose" for long-only options.  This
+is printed in the left column, when you invoke your extractor
+with "--help".
+
+=item *
+
+The description of this option.  This is printed in the right
+column, when you invoke your extractor with "--help".
+
+=back
+
+=item B<printLanguageSpecificOptions>
+
+Prints all language-specific options to standard output, calls
+languageSpecificOptions() internally.  This is used for the
+output for the option "--help".
+
+=item B<fileInformation>
+
+Returns nothing by default.  You can return a string describing
+the expected input format, when invoked with "--help".
+
+=item B<versionInformation>
+
+Returns nothing by default.  You can return a string that is
+printed, when invoked with "--version".
+
+=item B<bugTrackingAddress>
+
+Returns nothing by default.  You can return a string describing
+the bug tracking address, when invoked with "--help".
+
+=item B<canExtractAll>
+
+Returns false by default.  Return a truthy value if your extractor
+supports the option "--extract-all".
+
+=item B<canKeywords>
+
+Returns true by default.  Return a false value if your extractor
+does not support the option "--keyword".
+
+=item B<canFlags>
+
+Returns true by default.  Return a false value if your extractor
+does not support the option "--flag".
+
+=item B<needInputFiles>
+
+Returns true by default.  Return a false value if your extractor
+does not support input from files.  In this case you should
+implement readFromNonFiles().
+
+=item B<run>
+
+Runs the extractor once.  The default implementation scans all
+input sources for translatable strings and collects them.
+
+=item B<output>
+
+Print the output as a PO file to the specified output location.
+
+=item B<extractFromNonFiles>
+
+This method is invoked after all input files have been processed.
+The default implementation does nothing.  You may use the method
+for extracting strings from additional sources like a database.
+
+=item B<resolveFilename FILENAME>
+
+Given an input filename B<FILENAME> the method returns the absolute
+location of the file.  The default implementation honors the
+option "-D, --directory".
+
+=item B<defaultKeywords>
+
+Returns a reference to an emtpy array.
+
+Subclasses may return a reference to an array with default keyword
+definitions for the specific language.  The default keywords 
+(actually just a subset for it) for the language C would look like 
+this (expressed in JSON):
+
+    [
+        "gettext:1",
+        "ngettext:1,2",
+        "pgettext:1c,2",
+        "npgettext:1c,2,3"
+    ]
+
+See above the description of the command-line option "--keyword"
+for more information about the meaning of these strings.
+
+=item B<defaultFlags>
+
+Returns a reference to an emtpy array.
+
+Subclasses may return a reference to an array with default flag
+specifications for the specific language.  An example may look
+like this (expressed in JSON):
+
+    [
+        "gettextx:1:perl-brace-format",
+        "ngettextx:1:perl-brace-format",
+        "ngettextx:2:perl-brace-format",
+    ]
+
+We assume that "gettextx()" and "gettextx() are keywords for
+the language in question.  The above default flag definition
+would mean that in all invocations of the function "gettextx()",
+the 1st argument would get the flag "perl-brace-format".  In
+all invocations of "ngettextx()", the 1st and 2nd argument would
+get the flag "perl-brace-format".
+
+You can prefix the format with "no-" which tells the GNU gettext
+tools that the particular never uses that format.
+
+You can additionally prefix the format with "pass-" but this
+is ignored by Locale::XGettext.  If you want to implemnt the
+GNU xgettext behavior for the "pass-" prefix, you have to implement
+it yourself in your extractor.
+
+=item B<recodeEntry ENTRY>
+
+Gets invoked for every PO entry but I<after> it has been
+promoted to a B<Locale::PO(3pm)> object.  The implementation
+of this method is likely to be changed in the future.
+
+Do not use!
+
+=item B<readPO FILENAME>
+
+Reads B<FILENAME> as .po or .pot file.  There is no reason why
+you should override or invoke this method.
+
+=item B<po>
+
+Returns a list of PO entries represented by hash references.
+Do not use or override this method!
+
+=item B<printLanguageSpecificUsage>
+
+Prints the help for language-specific options.  Override it, 
+if you are not happy with the formatting.
+
+=back
+
+=head1 BUGS
+
+Flags are not yet supported.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+Getopt::Long(3pm), xgettext(1), perl(1)

@@ -1,6 +1,6 @@
 # MLC data downloading.
 
-# Copyright 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -33,6 +33,9 @@ use App::Chart::DownloadHandler::IndivChunks;
 use App::Chart::Latest;
 use App::Chart::Sympred;
 use App::Chart::TZ;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 my $pred = App::Chart::Sympred::Suffix->new ('.MLC');
 
@@ -117,6 +120,7 @@ sub parse {
             data     => \@data };
 
   while ($content =~ /^historicalProduct1funds.*=\"(.*)\"/mg) {
+    ### $&
     my ($fund, $product, $date, $price) = split /,/, $1;
 
     # skip historicalProduct1funds[0]="All Funds" bit

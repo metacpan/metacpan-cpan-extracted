@@ -19,11 +19,11 @@ no_index:
     - inc
   package:
     - threads::shared
-recommends:
-  Sys::HostAddr: '0'
 requires:
   Devel::GlobalDestruction: '0'
   MIME::Base64: '0'
   Storable: '0'
-version: '0.11'
+resources:
+  repository: https://github.com/mjob/p5-patro.git
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

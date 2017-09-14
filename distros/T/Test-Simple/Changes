@@ -1,3 +1,55 @@
+1.302096  2017-09-10 21:16:18-07:00 America/Los_Angeles
+
+    -Fix to work with subref-in-stash optimisation (Father C.)
+
+1.302095  2017-08-31 20:35:22-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make several tests work with preload
+
+1.302094  2017-08-30 21:27:23-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix Test::Builder in a preload scenario
+
+1.302093  2017-08-29 21:05:20-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make sure Test::Builder does not initialize Test2 too soon.
+
+1.302092  2017-08-28 21:30:06-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix bug in Facets for TodoDiag
+    - Add API command to reset after a fork
+    - Add 'important' flag to info event facet
+
+1.302091  2017-08-08 19:50:55-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add 'new_root' constructor for formatters
+    - Add intercept_deep() to the API
+    - Fix bug in Version event
+    - Add 'number' attribute to assertion facet
+
+1.302090  2017-07-09 21:10:08-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix test that unintentionally required Test2::Suite
+
+1.302089  2017-07-09 20:51:19-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix plan in buffered subtest so that the facts say it is buffered
+
+1.302088  2017-06-28 21:55:21-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix tests on perl 5.25+ with newer Data::Dumper
+
+1.302087  2017-06-26 20:32:21-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Introduce 'Facets' for events
+    - Performance enhancements
+    - Upgrade inline HashBase
+    - Move Test2::Util::Trace to Test2::EventFacet::Trace
+    - Track hub id in Trace
+    - Remove Info event
+    - Add Pass and Fail events
+    - Remove Event JSON interface
+
 1.302086  2017-06-20 10:43:13-07:00 America/Los_Angeles
 
     - Make it possible to turn off result logging in Test::Builder

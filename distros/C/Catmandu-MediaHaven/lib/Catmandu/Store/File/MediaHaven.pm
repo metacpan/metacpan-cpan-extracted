@@ -1,6 +1,6 @@
 package Catmandu::Store::File::MediaHaven;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Catmandu::Sane;
 use Moo;
@@ -16,7 +16,7 @@ with 'Catmandu::FileStore';
 has 'url'           => (is => 'ro' , required => 1);
 has 'username'      => (is => 'ro' , required => 1);
 has 'password'      => (is => 'ro' , required => 1);
-has 'record_query'  => (is => 'ro' , default => sub { "q=%%2B(MediaObjectExternalId:%s)"; });
+has 'record_query'  => (is => 'ro' , default => sub { "q=%%2B(MediaObjectFragmentId:%s)"; });
 
 has id_fixer        => (is => 'ro' , init_arg => 'record_id_fix', coerce => sub {Catmandu->fixer($_[0])},);
 has 'mh'            => (is => 'lazy');
@@ -47,7 +47,7 @@ Catmandu::Store::File::MediaHaven - A Catmandu::FileStore to access files in the
 
     $ cat catmandu.yml
     ---
-    importer:
+    store:
          mh:
              package: MediaHaven
              options:
@@ -123,7 +123,7 @@ Required. Password used to connect to MediaHaven.
 =item record_query
 
 Optional. MediaHaven query to extract a given identifier from the database.
-Default: "q=%%2B(MediaObjectExternalId:%s)"
+Default: "q=%%2B(MediaObjectFragmentId:%s)"
 
 =item record_id_fix
 

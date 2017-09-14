@@ -1,7 +1,11 @@
 Revision history for Plack-Middleware-Debug-LWP
 
+0.3 Mon Sep 11 2017
+	Sort the request in order of their sample start time.
+	Contributor: Matthew Somerville <matthew-github@dracos.co.uk>
+
 0.2 Mon Feb 23 2015
 	Fix formatting to be more readable.
-	
+
 0.1 Fri Feb 20 2015
 	Initial release.

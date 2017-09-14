@@ -115,8 +115,8 @@ sub _build_exit_code ($self) {
 }
 
 sub _build_longmess ($self) {
-    if ( $self->{call_stack}->@* ) {
-        return $self->{msg} . $LF . $self->{call_stack}->$*;
+    if ( $self->{call_stack} ) {
+        return $self->{msg} . $LF . ( $self->{call_stack}->$* =~ s/^/    /smgr );
     }
     else {
         return $self->{msg};

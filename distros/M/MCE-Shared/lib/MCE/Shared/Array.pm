@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -396,7 +396,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.826
+This document describes MCE::Shared::Array version 1.828
 
 =head1 DESCRIPTION
 
@@ -404,106 +404,106 @@ An array helper class for use as a standalone or managed by L<MCE::Shared>.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Array;
+ use MCE::Shared::Array;
 
-   my $ar = MCE::Shared::Array->new( @list );
+ my $ar = MCE::Shared::Array->new( @list );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $ar = MCE::Shared->array( @list );
+ my $ar = MCE::Shared->array( @list );
 
-   # array-like dereferencing
+ # array-like dereferencing
 
-   my $val = $ar->[$index];
-   $ar->[$index] = $val;
+ my $val = $ar->[$index];
+ $ar->[$index] = $val;
 
-   @{$ar} = ();
+ @{$ar} = ();
 
-   # OO interface
+ # OO interface
 
-   $val   = $ar->set( $index, $val );
-   $val   = $ar->get( $index);
-   $val   = $ar->delete( $index );            # del is an alias for delete
-   $bool  = $ar->exists( $index );
-   void   = $ar->clear();
-   $len   = $ar->len();                       # scalar @{ $ar }
-   $len   = $ar->len( $index );               # length $ar->[ $index ]
-   $val   = $ar->pop();
-   $len   = $ar->push( @list );
-   $val   = $ar->shift();
-   $len   = $ar->unshift( @list );
-   @list  = $ar->splice( $offset, $length, @list );
+ $val   = $ar->set( $index, $val );
+ $val   = $ar->get( $index);
+ $val   = $ar->delete( $index );            # del is an alias for delete
+ $bool  = $ar->exists( $index );
+ void   = $ar->clear();
+ $len   = $ar->len();                       # scalar @{ $ar }
+ $len   = $ar->len( $index );               # length $ar->[ $index ]
+ $val   = $ar->pop();
+ $len   = $ar->push( @list );
+ $val   = $ar->shift();
+ $len   = $ar->unshift( @list );
+ @list  = $ar->splice( $offset, $length, @list );
 
-   $ar2   = $ar->clone( @indices );           # @indices is optional
-   $ar3   = $ar->flush( @indices );
-   $iter  = $ar->iterator( @indices );        # ($idx, $val) = $iter->()
-   @keys  = $ar->keys( @indices );
-   %pairs = $ar->pairs( @indices );
-   @vals  = $ar->values( @indices );          # vals is an alias for values
+ $ar2   = $ar->clone( @indices );           # @indices is optional
+ $ar3   = $ar->flush( @indices );
+ $iter  = $ar->iterator( @indices );        # ($idx, $val) = $iter->()
+ @keys  = $ar->keys( @indices );
+ %pairs = $ar->pairs( @indices );
+ @vals  = $ar->values( @indices );          # vals is an alias for values
 
-   $len   = $ar->assign( $idx/$val pairs );   # equivalent to ->clear, ->push
-   $cnt   = $ar->mdel( @indices );
-   @vals  = $ar->mget( @indices );
-   $bool  = $ar->mexists( @indices );         # true if all indices exists
-   $len   = $ar->mset( $idx/$val pairs );     # merge is an alias for mset
+ $len   = $ar->assign( $idx/$val pairs );   # equivalent to ->clear, ->push
+ $cnt   = $ar->mdel( @indices );
+ @vals  = $ar->mget( @indices );
+ $bool  = $ar->mexists( @indices );         # true if all indices exists
+ $len   = $ar->mset( $idx/$val pairs );     # merge is an alias for mset
 
-   @vals  = $ar->range( $start, $stop );
+ @vals  = $ar->range( $start, $stop );
 
-   @vals  = $ar->sort();                      # $a <=> $b default
-   @vals  = $ar->sort( "desc" );              # $b <=> $a
-   @vals  = $ar->sort( "alpha" );             # $a cmp $b
-   @vals  = $ar->sort( "alpha desc" );        # $b cmp $a
+ @vals  = $ar->sort();                      # $a <=> $b default
+ @vals  = $ar->sort( "desc" );              # $b <=> $a
+ @vals  = $ar->sort( "alpha" );             # $a cmp $b
+ @vals  = $ar->sort( "alpha desc" );        # $b cmp $a
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $len   = $ar->append( $index, $string );   #   $val .= $string
-   $val   = $ar->decr( $index );              # --$val
-   $val   = $ar->decrby( $index, $number );   #   $val -= $number
-   $val   = $ar->getdecr( $index );           #   $val--
-   $val   = $ar->getincr( $index );           #   $val++
-   $val   = $ar->incr( $index );              # ++$val
-   $val   = $ar->incrby( $index, $number );   #   $val += $number
-   $old   = $ar->getset( $index, $new );      #   $o = $v, $v = $n, $o
+ $len   = $ar->append( $index, $string );   #   $val .= $string
+ $val   = $ar->decr( $index );              # --$val
+ $val   = $ar->decrby( $index, $number );   #   $val -= $number
+ $val   = $ar->getdecr( $index );           #   $val--
+ $val   = $ar->getincr( $index );           #   $val++
+ $val   = $ar->incr( $index );              # ++$val
+ $val   = $ar->incrby( $index, $number );   #   $val += $number
+ $old   = $ar->getset( $index, $new );      #   $o = $v, $v = $n, $o
 
-   # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
+ # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
 
-   @vals  = $ar->pipeline(                    # ( "a_a", "b_b", "c_c" )
-      [ "set", 0 => "a_a" ],
-      [ "set", 1 => "b_b" ],
-      [ "set", 2 => "c_c" ],
-      [ "mget", qw/ 0 1 2 / ]
-   );
+ @vals  = $ar->pipeline(                    # ( "a_a", "b_b", "c_c" )
+    [ "set", 0 => "a_a" ],
+    [ "set", 1 => "b_b" ],
+    [ "set", 2 => "c_c" ],
+    [ "mget", qw/ 0 1 2 / ]
+ );
 
 For normal array behavior, the TIE interface is supported.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Array;
+ use MCE::Shared::Array;
 
-   tie my @ar, "MCE::Shared::Array";
+ tie my @ar, "MCE::Shared::Array";
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   tie my @ar, "MCE::Shared";
+ tie my @ar, "MCE::Shared";
 
-   # usage
+ # usage
 
-   my $val;
+ my $val;
 
-   if ( !defined ( $val = $ar[some_index] ) ) {
-      $val = $ar[some_index] = "some_value";
-   }
+ if ( !defined ( $val = $ar[some_index] ) ) {
+    $val = $ar[some_index] = "some_value";
+ }
 
-   $ar[some_index] = 0;
+ $ar[some_index] = 0;
 
-   tied(@ar)->incrby("some_index", 20);
-   tied(@ar)->incrby(some_index => 20);
+ tied(@ar)->incrby("some_index", 20);
+ tied(@ar)->incrby(some_index => 20);
 
 =head1 SYNTAX for QUERY STRING
 
@@ -512,52 +512,52 @@ is described below. In the context of sharing, the query mechanism is beneficial
 for the shared-manager process. It is able to perform the query where the data
 resides versus the client-process grep locally involving lots of IPC.
 
-   o Basic demonstration
+ o Basic demonstration
 
-     @keys = $ar->keys( "query string given here" );
-     @keys = $ar->keys( "val =~ /pattern/" );
+   @keys = $ar->keys( "query string given here" );
+   @keys = $ar->keys( "val =~ /pattern/" );
 
-   o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
-   o Multiple expressions delimited by :AND or :OR, mixed case allowed
+ o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
+ o Multiple expressions delimited by :AND or :OR, mixed case allowed
 
-     "key == 3 :or (val > 5 :and val < 9)"
-     "key =~ /pattern/i :And val =~ /pattern/i"
-     "val eq foo baz :OR key !~ /pattern/i"
+   "key == 3 :or (val > 5 :and val < 9)"
+   "key =~ /pattern/i :And val =~ /pattern/i"
+   "val eq foo baz :OR key !~ /pattern/i"
 
-     * key matches on indices in the array
-     * likewise, val matches on values
+   * key matches on indices in the array
+   * likewise, val matches on values
 
-   o Quoting is optional inside the string
+ o Quoting is optional inside the string
 
-     "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
-     "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
 
 Examples.
 
-   # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
-   # key/val means to match against actual key/val respectively
+ # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
+ # key/val means to match against actual key/val respectively
 
-   @keys  = $ar->keys( "key == 3 :or (val > 5 :and val < 9)" );
+ @keys  = $ar->keys( "key == 3 :or (val > 5 :and val < 9)" );
 
-   @keys  = $ar->keys( "key =~ /$pattern/i" );
-   @keys  = $ar->keys( "key !~ /$pattern/i" );
-   @keys  = $ar->keys( "val =~ /$pattern/i" );
-   @keys  = $ar->keys( "val !~ /$pattern/i" );
+ @keys  = $ar->keys( "key =~ /$pattern/i" );
+ @keys  = $ar->keys( "key !~ /$pattern/i" );
+ @keys  = $ar->keys( "val =~ /$pattern/i" );
+ @keys  = $ar->keys( "val !~ /$pattern/i" );
 
-   %pairs = $ar->pairs( "key == $number" );
-   %pairs = $ar->pairs( "key != $number :and val > 100" );
-   %pairs = $ar->pairs( "key <  $number :or key > $number" );
-   %pairs = $ar->pairs( "val <= $number" );
-   %pairs = $ar->pairs( "val >  $number" );
-   %pairs = $ar->pairs( "val >= $number" );
+ %pairs = $ar->pairs( "key == $number" );
+ %pairs = $ar->pairs( "key != $number :and val > 100" );
+ %pairs = $ar->pairs( "key <  $number :or key > $number" );
+ %pairs = $ar->pairs( "val <= $number" );
+ %pairs = $ar->pairs( "val >  $number" );
+ %pairs = $ar->pairs( "val >= $number" );
 
-   @vals  = $ar->vals( "key eq $string" );
-   @vals  = $ar->vals( "key ne $string with space" );
-   @vals  = $ar->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
-   @vals  = $ar->vals( "val le $string :and val eq 'foo bar'" );
-   @vals  = $ar->vals( "val le $string :and val eq foo bar" );
-   @vals  = $ar->vals( "val gt $string" );
-   @vals  = $ar->vals( "val ge $string" );
+ @vals  = $ar->vals( "key eq $string" );
+ @vals  = $ar->vals( "key ne $string with space" );
+ @vals  = $ar->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
+ @vals  = $ar->vals( "val le $string :and val eq 'foo bar'" );
+ @vals  = $ar->vals( "val le $string :and val eq foo bar" );
+ @vals  = $ar->vals( "val gt $string" );
+ @vals  = $ar->vals( "val ge $string" );
 
 =head1 API DOCUMENTATION
 
@@ -571,27 +571,27 @@ many use cases, the OO interface is recommended for best performance.
 
 Constructs a new object, with an optional list of values.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Array;
+ use MCE::Shared::Array;
 
-   $ar = MCE::Shared::Array->new( @list );
-   $ar = MCE::Shared::Array->new( );
+ $ar = MCE::Shared::Array->new( @list );
+ $ar = MCE::Shared::Array->new( );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $ar = MCE::Shared->array( @list );
-   $ar = MCE::Shared->array( );
+ $ar = MCE::Shared->array( @list );
+ $ar = MCE::Shared->array( );
 
 =item assign ( value [, value, ... ] )
 
 Clears the list, then appends one or multiple values and returns the new length.
 This is equivalent to C<clear>, C<push>.
 
-   $len = $ar->assign( "val1", "val2" );
-   $len = @{$ar} = ( "val1", "val2" );
+ $len = $ar->assign( "val1", "val2" );
+ $len = @{$ar} = ( "val1", "val2" );
 
 API available since 1.007.
 
@@ -599,8 +599,8 @@ API available since 1.007.
 
 Removes all elements from the array.
 
-   $ar->clear;
-   @{$ar} = ();
+ $ar->clear;
+ @{$ar} = ();
 
 =item clone ( index [, index, ... ] )
 
@@ -609,16 +609,16 @@ copy if no arguments are given. Otherwise, the object includes only the given
 indices in the same order. Indices that do not exist in the array will have
 the C<undef> value.
 
-   $ar2 = $ar->clone( 0, 1 );
-   $ar2 = $ar->clone;
+ $ar2 = $ar->clone( 0, 1 );
+ $ar2 = $ar->clone;
 
 =item delete ( index )
 
 Deletes and returns the value associated by index or C<undef> if index exceeds
 the size of the list.
 
-   $val = $ar->delete( 20 );
-   $val = delete $ar->[ 20 ];
+ $val = $ar->delete( 20 );
+ $val = delete $ar->[ 20 ];
 
 =item del
 
@@ -629,14 +629,14 @@ C<del> is an alias for C<delete>.
 Determines if an element by its index exists in the array. The behavior is
 strongly tied to the use of delete on lists.
 
-   $ar->push(qw/ value0 value1 value2 value3 /);
+ $ar->push(qw/ value0 value1 value2 value3 /);
 
-   $ar->exists( 2 );   # True
-   $ar->delete( 2 );   # value2
-   $ar->exists( 2 );   # False
+ $ar->exists( 2 );   # True
+ $ar->delete( 2 );   # value2
+ $ar->exists( 2 );   # False
 
-   $ar->exists( 3 );   # True
-   exists $ar->[ 3 ];  # True
+ $ar->exists( 3 );   # True
+ exists $ar->[ 3 ];  # True
 
 =item flush ( index [, index, ... ] )
 
@@ -647,8 +647,8 @@ Same as C<clone>. Though, clears all existing items before returning.
 Gets the value of an element by its index or C<undef> if the index does not
 exists.
 
-   $val = $ar->get( 2 );
-   $val = $ar->[ 2 ];
+ $val = $ar->get( 2 );
+ $val = $ar->[ 2 ];
 
 =item iterator ( index [, index, ... ] )
 
@@ -661,12 +661,12 @@ The list of indices to return is set when the closure is constructed. New
 indices added later are not included. Subsequently, the C<undef> value is
 returned for deleted indices.
 
-   $iter = $ar->iterator;
-   $iter = $ar->iterator( 0, 1 );
+ $iter = $ar->iterator;
+ $iter = $ar->iterator( 0, 1 );
 
-   while ( my ( $index, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $index, $val ) = $iter->() ) {
+    ...
+ }
 
 =item iterator ( "query string" )
 
@@ -674,14 +674,14 @@ Returns a code reference for iterating a list of index-value pairs that match
 the given criteria. It returns an empty list if the search found nothing.
 The syntax for the C<query string> is described above.
 
-   $iter = $ar->iterator( "val eq some_value" );
-   $iter = $ar->iterator( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
-   $iter = $ar->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
-   $iter = $ar->iterator( "key =~ /$pattern/" );
+ $iter = $ar->iterator( "val eq some_value" );
+ $iter = $ar->iterator( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
+ $iter = $ar->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
+ $iter = $ar->iterator( "key =~ /$pattern/" );
 
-   while ( my ( $index, $val ) = $iter->() ) {
-      ...
-   }
+ while ( my ( $index, $val ) = $iter->() ) {
+    ...
+ }
 
 =item keys ( index [, index, ... ] )
 
@@ -689,13 +689,13 @@ Returns all indices in the array when no arguments are given. Otherwise,
 returns the given indices in the same order. Indices that do not exist will
 have the C<undef> value. In scalar context, returns the size of the array.
 
-   @keys = $ar->keys( 0, 1 );
+ @keys = $ar->keys( 0, 1 );
 
-   @keys = $ar->keys;     # faster
-   @keys = keys @{$ar};   # involves TIE overhead
+ @keys = $ar->keys;     # faster
+ @keys = keys @{$ar};   # involves TIE overhead
 
-   $len  = $ar->keys;     # ditto
-   $len  = keys @{$ar};
+ $len  = $ar->keys;     # ditto
+ $len  = keys @{$ar};
 
 =item keys ( "query string" )
 
@@ -703,10 +703,10 @@ Returns only indices that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @keys = $ar->keys( "val eq some_value" );
-   @keys = $ar->keys( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
-   @keys = $ar->keys( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ar->keys( "key =~ /$pattern/" );
+ @keys = $ar->keys( "val eq some_value" );
+ @keys = $ar->keys( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
+ @keys = $ar->keys( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ar->keys( "key =~ /$pattern/" );
 
 =item len ( index )
 
@@ -714,36 +714,36 @@ Returns the size of the array when no arguments are given. For the given
 index, returns the length of the value stored at index or the C<undef> value
 if the index does not exists.
 
-   $len = $ar->len;
-   $len = $ar->len( 0 );
-   $len = length $ar->[ 0 ];
+ $len = $ar->len;
+ $len = $ar->len( 0 );
+ $len = length $ar->[ 0 ];
 
 =item mdel ( index [, index, ... ] )
 
 Deletes one or more elements by its index and returns the number of indices
 deleted. A given index which does not exist in the list is not counted.
 
-   $cnt = $ar->mdel( 0, 1 );
+ $cnt = $ar->mdel( 0, 1 );
 
 =item mexists ( index [, index, ... ] )
 
 Returns a true value if all given indices exists in the list. A false value is
 returned otherwise.
 
-   if ( $ar->mexists( 0, 1 ) ) { ... }
+ if ( $ar->mexists( 0, 1 ) ) { ... }
 
 =item mget ( index [, index, ... ] )
 
 Gets multiple values from the list by its index. It returns C<undef> for indices
 which do not exists in the list.
 
-   ( $val1, $val2 ) = $ar->mget( 0, 1 );
+ ( $val1, $val2 ) = $ar->mget( 0, 1 );
 
 =item mset ( index, value [, index, value, ... ] )
 
 Sets multiple index-value pairs in the list and returns the length of the list.
 
-   $len = $ar->mset( 0 => "val1", 1 => "val2" );
+ $len = $ar->mset( 0 => "val1", 1 => "val2" );
 
 =item merge
 
@@ -756,10 +756,10 @@ returns index-value pairs for the given indices in the same order. Indices that
 do not exist will have the C<undef> value. In scalar context, returns the size
 of the array.
 
-   @pairs = $ar->pairs( 0, 1 );
+ @pairs = $ar->pairs( 0, 1 );
 
-   @pairs = $ar->pairs;
-   $len   = $ar->pairs;
+ @pairs = $ar->pairs;
+ $len   = $ar->pairs;
 
 =item pairs ( "query string" )
 
@@ -767,10 +767,10 @@ Returns only index-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
 described above. In scalar context, returns the size of the resulting list.
 
-   @pairs = $ar->pairs( "val eq some_value" );
-   @pairs = $ar->pairs( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
-   @pairs = $ar->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len   = $ar->pairs( "key =~ /$pattern/" );
+ @pairs = $ar->pairs( "val eq some_value" );
+ @pairs = $ar->pairs( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
+ @pairs = $ar->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len   = $ar->pairs( "key =~ /$pattern/" );
 
 =item pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
@@ -780,25 +780,25 @@ process. The C<pipeline> method is fully C<wantarray>-aware and receives a list
 of commands and their arguments. In scalar or list context, it returns data
 from the last command in the pipeline.
 
-   @vals = $ar->pipeline(                     # ( "a_a", "b_b", "c_c" )
-      [ "set", 0 => "a_a" ],
-      [ "set", 1 => "b_b" ],
-      [ "set", 2 => "c_c" ],
-      [ "mget", qw/ 0 1 2 / ]
-   );
+ @vals = $ar->pipeline(                     # ( "a_a", "b_b", "c_c" )
+    [ "set", 0 => "a_a" ],
+    [ "set", 1 => "b_b" ],
+    [ "set", 2 => "c_c" ],
+    [ "mget", qw/ 0 1 2 / ]
+ );
 
-   $len = $ar->pipeline(                      # 3, same as $ar->len
-      [ "set", 0 => "i_i" ],
-      [ "set", 1 => "j_j" ],
-      [ "set", 2 => "k_k" ],
-      [ "len" ]
-   );
+ $len = $ar->pipeline(                      # 3, same as $ar->len
+    [ "set", 0 => "i_i" ],
+    [ "set", 1 => "j_j" ],
+    [ "set", 2 => "k_k" ],
+    [ "len" ]
+ );
 
-   $ar->pipeline(
-      [ "set", 0 => "m_m" ],
-      [ "set", 1 => "n_n" ],
-      [ "set", 2 => "o_o" ]
-   );
+ $ar->pipeline(
+    [ "set", 0 => "m_m" ],
+    [ "set", 1 => "n_n" ],
+    [ "set", 2 => "o_o" ]
+ );
 
 Current API available since 1.809.
 
@@ -806,11 +806,11 @@ Current API available since 1.809.
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
-   @vals = $ar->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
-      [ "set", 0 => "a_a" ],
-      [ "set", 1 => "b_b" ],
-      [ "set", 2 => "c_c" ]
-   );
+ @vals = $ar->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
+    [ "set", 0 => "a_a" ],
+    [ "set", 1 => "b_b" ],
+    [ "set", 2 => "c_c" ]
+ );
 
 Current API available since 1.809.
 
@@ -819,31 +819,31 @@ Current API available since 1.809.
 Removes and returns the last value of the list. If there are no elements in the
 list, returns the undefined value.
 
-   $val = $ar->pop;
-   $val = pop @{$ar};
+ $val = $ar->pop;
+ $val = pop @{$ar};
 
 =item push ( value [, value, ... ] )
 
 Appends one or multiple values to the tail of the list and returns the new
 length.
 
-   $len = $ar->push( "val1", "val2" );
-   $len = push @{$ar}, "val1", "val2";
+ $len = $ar->push( "val1", "val2" );
+ $len = push @{$ar}, "val1", "val2";
 
 =item set ( index, value )
 
 Sets the value of the given array index and returns its new value.
 
-   $val = $ar->set( 2, "value" );
-   $val = $ar->[ 2 ] = "value";
+ $val = $ar->set( 2, "value" );
+ $val = $ar->[ 2 ] = "value";
 
 =item shift
 
 Removes and returns the first value of the list. If there are no elements in the
 list, returns the undefined value.
 
-   $val = $ar->shift;
-   $val = shift @{$ar};
+ $val = $ar->shift;
+ $val = shift @{$ar};
 
 =item range ( start, stop )
 
@@ -855,8 +855,8 @@ An empty list is returned if C<start> is larger than the end of the list.
 C<stop> is set to the last index of the list if larger than the actual end
 of the list.
 
-   @list = $ar->range( 20, 29 );
-   @list = $ar->range( -4, -1 );
+ @list = $ar->range( 20, 29 );
+ @list = $ar->range( -4, -1 );
 
 =item sort ( "BY val [ ASC | DESC ] [ ALPHA ]" )
 
@@ -864,23 +864,23 @@ Returns sorted values in list context, leaving the elements intact. In void
 context, sorts the list in-place. By default, sorting is numeric when no
 arguments are given. The C<BY val> modifier is optional and may be omitted.
 
-   @vals = $ar->sort( "BY val" );
+ @vals = $ar->sort( "BY val" );
 
-   $ar->sort();
+ $ar->sort();
 
 If the list contains string values and you want to sort them lexicographically,
 specify the C<ALPHA> modifier.
 
-   @vals = $ar->sort( "BY val ALPHA" );
+ @vals = $ar->sort( "BY val ALPHA" );
 
-   $ar->sort( "ALPHA" );
+ $ar->sort( "ALPHA" );
 
 The default is C<ASC> for sorting the list from small to large. In order to
 sort the list from large to small, specify the C<DESC> modifier.
 
-   @vals = $ar->sort( "DESC ALPHA" );
+ @vals = $ar->sort( "DESC ALPHA" );
 
-   $ar->sort( "DESC ALPHA" );
+ $ar->sort( "DESC ALPHA" );
 
 =item splice ( offset [, length [, list ] ] )
 
@@ -888,17 +888,17 @@ Removes the elements designated by C<offset> and C<length> from the array, and
 replaces them with the elements of C<list>, if any. The behavior is similar to
 the Perl C<splice> function.
 
-   @items = $ar->splice( 20, 2, @list );
-   @items = $ar->splice( 20, 2 );
-   @items = $ar->splice( 20 );
+ @items = $ar->splice( 20, 2, @list );
+ @items = $ar->splice( 20, 2 );
+ @items = $ar->splice( 20 );
 
 =item unshift ( value [, value, ... ] )
 
 Prepends one or multiple values to the head of the list and returns the new
 length.
 
-   $len = $ar->unshift( "val1", "val2" );
-   $len = unshift @{$ar}, "val1", "val2";
+ $len = $ar->unshift( "val1", "val2" );
+ $len = unshift @{$ar}, "val1", "val2";
 
 =item values ( index [, index, ... ] )
 
@@ -906,13 +906,13 @@ Returns all values in the array when no arguments are given. Otherwise, returns
 values for the given indices in the same order. Indices that do not exist will
 have the C<undef> value. In scalar context, returns the size of the array.
 
-   @vals = $ar->values( 0, 1 );
+ @vals = $ar->values( 0, 1 );
 
-   @vals = $ar->values;     # faster
-   @vals = values @{$ar};   # involves TIE overhead
+ @vals = $ar->values;     # faster
+ @vals = values @{$ar};   # involves TIE overhead
 
-   $len  = $ar->values;     # ditto
-   $len  = values @{$ar};
+ $len  = $ar->values;     # ditto
+ $len  = values @{$ar};
 
 =item values ( "query string" )
 
@@ -920,10 +920,10 @@ Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @keys = $ar->values( "val eq some_value" );
-   @keys = $ar->values( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
-   @keys = $ar->values( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ar->values( "key =~ /$pattern/" );
+ @keys = $ar->values( "val eq some_value" );
+ @keys = $ar->values( "key >= 50 :AND val =~ /sun|moon|air|wind/" );
+ @keys = $ar->values( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ar->values( "key =~ /$pattern/" );
 
 =item vals
 
@@ -946,49 +946,49 @@ L<http://redis.io/commands#strings> with key representing the array index.
 
 Appends a value to a key and returns its new length.
 
-   $len = $ar->append( 0, "foo" );
+ $len = $ar->append( 0, "foo" );
 
 =item decr ( key )
 
 Decrements the value of a key by one and returns its new value.
 
-   $num = $ar->decr( 0 );
+ $num = $ar->decr( 0 );
 
 =item decrby ( key, number )
 
 Decrements the value of a key by the given number and returns its new value.
 
-   $num = $ar->decrby( 0, 2 );
+ $num = $ar->decrby( 0, 2 );
 
 =item getdecr ( key )
 
 Decrements the value of a key by one and returns its old value.
 
-   $old = $ar->getdecr( 0 );
+ $old = $ar->getdecr( 0 );
 
 =item getincr ( key )
 
 Increments the value of a key by one and returns its old value.
 
-   $old = $ar->getincr( 0 );
+ $old = $ar->getincr( 0 );
 
 =item getset ( key, value )
 
 Sets the value of a key and returns its old value.
 
-   $old = $ar->getset( 0, "baz" );
+ $old = $ar->getset( 0, "baz" );
 
 =item incr ( key )
 
 Increments the value of a key by one and returns its new value.
 
-   $num = $ar->incr( 0 );
+ $num = $ar->incr( 0 );
 
 =item incrby ( key, number )
 
 Increments the value of a key by the given number and returns its new value.
 
-   $num = $ar->incrby( 0, 2 );
+ $num = $ar->incrby( 0, 2 );
 
 =back
 

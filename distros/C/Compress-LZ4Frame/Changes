@@ -1,3 +1,10 @@
+0.012001  2017-09-13 23:37:49+02:00 Europe/Berlin
+
+- Bug fix for github issue #4 (Could not read frame info: ERROR_frameHeader_incomplete)
+  https://github.com/autinitysystems/Compress-LZ4Frame/issues/4
+  Under certain circumstances frames of unknown size would not be completely uncompressed.
+  In that case decompress tries to interpret the remaining data as another frame, which leads to the error.
+
 0.012     2017-02-24 14:09:45+01:00 Europe/Berlin
 
 - Bug fix for rare infinite loop + crash in decompression function

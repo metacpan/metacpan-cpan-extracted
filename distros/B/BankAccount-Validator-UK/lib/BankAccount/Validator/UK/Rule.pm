@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK::Rule;
 
-$BankAccount::Validator::UK::Rule::VERSION   = '0.32';
+$BankAccount::Validator::UK::Rule::VERSION   = '0.33';
 $BankAccount::Validator::UK::Rule::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK::Rule - Rules for validating UK bank account.
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
@@ -58,7 +58,7 @@ sub get_sort_codes {
 =head2 get_rules()
 
 It is used by the module L<BankAccount::Validator::UK> internally.It returns every
-possible rules cover by the document, as provided by VOCALINK dated 21st August 2017
+possible rules cover by the document, as provided by VOCALINK dated 9th October 2017
 and is called valacdos.txt.
 
 =cut

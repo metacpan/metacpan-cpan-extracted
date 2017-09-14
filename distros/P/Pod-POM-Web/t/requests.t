@@ -9,8 +9,8 @@ BEGIN {
 	use_ok( 'Pod::POM::Web' );
 }
 
-diag( "Testing Pod::POM::Web $Pod::POM::Web::VERSION, Perl $], $^X" );
 
+diag( "Testing Pod::POM::Web $Pod::POM::Web::VERSION, Perl $], $^X" );
 
 response_like("", qr/frameset/, "index 1");
 response_like("/", qr/frameset/, "index 2");

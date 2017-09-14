@@ -17,24 +17,24 @@ my $test = $fw->tester();
 # No IKE Configured
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ipsec_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ipsec_peers(), 'ARRAY', "No IPSEC configured returns ARRAYREF" );
+isa_ok( $fw->ipsec_peers(), 'ARRAY' );
 is_deeply( $fw->ipsec_peers(), [] , "No IPSEC configured returns an empty ARRAYREF" );
 
 # No IKE or IPSEC UP
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ike_no_ipsec_up() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ipsec_peers(), 'ARRAY', "No IKE or IPSEC up returns ARRAYREF" );
+isa_ok( $fw->ipsec_peers(), 'ARRAY' );
 is_deeply( $fw->ipsec_peers(), [] , "No IKE or IPSEC up returns an empty ARRAYREF" );
 
 # IKE up, IPSEC not up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ike_up_no_ipsec() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ipsec_peers(), 'ARRAY', "IKE up, IPSEC not up returns ARRAYREF" );
+isa_ok( $fw->ipsec_peers(), 'ARRAY' );
 is_deeply( $fw->ipsec_peers(), [] , "IKE up, IPSEC not up returns an empty ARRAYREF" );
 
 # IPSEC peer up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( all_up() )->simplify(forcearray => ['entry'] )->{result} } );
-isa_ok( $fw->ipsec_peers(), 'ARRAY', "IPSEC up returns ARRAYREF" );
+isa_ok( $fw->ipsec_peers(), 'ARRAY' );
 
 sub no_ipsec_configured {
    return <<'END'

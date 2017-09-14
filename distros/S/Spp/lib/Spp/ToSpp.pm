@@ -1,12 +1,13 @@
 package Spp::ToSpp;
 
-use Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(ast_to_spp to_spp);
-
 use 5.012;
 no warnings "experimental";
-use Spp::Builtin;
+
+use Exporter;
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(ast_to_spp);
+
+use Spp::Builtin qw(to_json);
 
 sub ast_to_spp {
    my $ast  = shift;
@@ -19,7 +20,6 @@ sub ast_to_spp {
    return join(";", @strs);
 }
 
-# to str use for trace rule or repl of spp
 sub to_spp {
    my $rule = shift;
    my ($name, $value) = @{$rule};

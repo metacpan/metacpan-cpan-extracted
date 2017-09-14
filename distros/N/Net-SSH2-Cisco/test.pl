@@ -64,17 +64,14 @@ SKIP: {
 
     #my $LOG;
     open my $LOG, '<', $input_log or die "Can't open log: $!";
-    #my $log = join "", <$LOG>;
-    my @log = <$LOG>;
+    my $log = join "", <$LOG>;
     close $LOG;
 
     # Remove last prompt, which isn't present in @out
-    #$log =~ s/\cJ\cJ.*\Z//m;
-    pop @log;
-    my $log = join "", @log;
+    $log =~ s/\cJ\cJ.*\Z//m;
 
     # get rid of "show ver" line
-    shift @out;
+    #shift @out;
 
     # Strip ^Hs from log
     $log = Net::SSH2::Cisco::_normalize($log);
@@ -84,8 +81,7 @@ SKIP: {
 
     my $i = index $log, $out;
     ok( $i + length $out == length $log, "autopage() 1.09 bugfix" );
-#my $fh; open $fh, '>', "log.txt"; print $fh $log; open $fh, '>', "out.txt"; print $fh $out; 
-#printf "%i = %i\n", $i+length $out, length $log; exit;
+
     # Turn off autopaging. We should timeout with a More prompt
     # on the last line.
     ok( $S->autopage(0) == 0, "autopage() off");
@@ -105,16 +101,19 @@ SKIP: {
     ok( $S->waitfor($S->prompt), "waitfor() prompt");
     ok( $S->cmd('show clock'), "cmd() short");
     ok( $S->cmd('show ver'), "cmd() medium");
-    ok( @confg = $S->cmd('show ver'), "cmd() long");
+    ok( @confg = $S->cmd('show run'), "cmd() long");
 
     # breaks
+SKIP: {
+    skip("ios_break test unreliable", 1);
     sleep 2;
     my $old_timeout = $S->timeout;
     $S->timeout(2);
     $S->errmode(sub { $S->ios_break });
-    my @break_confg = $S->cmd('ping 127.0.0.1');
+    my @break_confg = $S->cmd('show run');
     $S->timeout($old_timeout);
     ok( @break_confg < @confg, "ios_break()");
+}
 
     sleep 5;
     # Error handling
@@ -193,8 +192,8 @@ EOB
     my $ans = prompt("Delete logs", "y");
     if ($ans eq "y") {
         print "Deleting logs in $dir...\n";
-        unlink "input.log" or warn "Can't delete input.log! $!\n";
-        unlink "dump.log"  or warn "Can't delete dump.log! $!\n";
+        unlink $input_log or warn "Can't delete $input_log! $!\n";
+        unlink $dump_log  or warn "Can't delete $dump_log! $!\n";
         print "done.\n";
     } else {
         warn "Not deleting logs in $dir.\n";

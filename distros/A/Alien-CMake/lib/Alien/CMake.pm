@@ -13,11 +13,11 @@ Alien::CMake - Build and make available CMake library - L<http://cmake.org/>
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 =head1 SYNOPSIS
@@ -63,7 +63,7 @@ technology and is more reliable.  In particular, this module will download
 very old binaries for some platforms (some from the 2.x series).  In
 addition L<Alien::cmake3> will build from source if binaries are not
 available for your platform.  Also L<Alien::cmake3> integrates more
-naturally with L<alienfile> and L<ALien::Build>.
+naturally with L<alienfile> and L<Alien::Build>.
 
 In short C<Alien::CMake> can be used to detect and get configuration
 settings from an already installed CMake. It offers also an option to

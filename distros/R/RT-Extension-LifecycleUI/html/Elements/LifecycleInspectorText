@@ -1,0 +1,9 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="text">
+    <div class="text">
+        Text: <textarea name="text" rows=5 data-default="New label">{{text.text}}</textarea><br><br>
+        Bold: <input type="checkbox" name="bold" {{#if text.bold}}checked=checked{{/if}}><br>
+        Italic: <input type="checkbox" name="italic" {{#if text.italic}}checked=checked{{/if}}><br>
+        <button class="clone"><&|/l&>Clone Label</&></button><br>
+        <button class="delete"><&|/l&>Delete Label</&></button>
+    </div>
+</script>

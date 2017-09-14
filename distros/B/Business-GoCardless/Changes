@@ -1,5 +1,11 @@
 Revision history for Business-GoCardless
 
+0.27     2017-09-12
+        - Update some perldoc relating to Webhooks and Events
+
+0.26     2017-09-12
+        - Automatically handle legacy webhooks in the ::Pro ->webhook code
+
 0.25     2017-09-05
         - Add missing attributes to Payout class for Pro API (GH #11)
 

@@ -1,5 +1,17 @@
 Revision history for POSIX::2008.
 
+0.15  2017-09-10
+  - Fixed a POD error.
+  - Really fake green lights on cygwin.
+0.14  2017-09-09
+  - Added posix_fadvise() and posix_fallocate().
+  - Added missing constants from fcntl.h.
+  - POD update.
+  - Fake some green lights on cygwin.
+0.13  2017-09-08
+  - pread/pwrite argument order is now (count, offset) instead of (offset, count).
+  - Added readv(), preadv().
+  - Added strptime() to the list of exportable functions.
 0.12  2017-09-03
   - Fixed missing semicolon in #if branch of nearbyint().
   - Added some CLOCK_ constants.

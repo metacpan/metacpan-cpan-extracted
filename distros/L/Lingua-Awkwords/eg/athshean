@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+#
+#   "the Athsheans' names for their own lands and places, sonorous two-
+#   syllabled words: Sornol, Tuntar, Eshreth, ... and above all Athshe,
+#   which meant the Forest, and the World."
+#     -- Ursula K. Le Guin. "The Word for World is Forest". p.105.
+
+use 5.14.0;
+use warnings;
+
+use Lingua::Awkwords::Subpattern;
+use Lingua::Awkwords;
+
+my $words_to_generate = int( shift // 20 );
+
+# these are from a low-level breakdown of Names present in the text, so
+# may miss higher-level markov relationships present there
+my $c = Lingua::Awkwords->parse_string(
+    q{ k*2/v*2/p*4/s*12/g*4/c*2/h*13/n*14/t*18/b*9/m*4/l*11/d*7/r*21/w*2 });
+
+# i, u rare (only 'il', 'ku', 'tu', 'tun'); only one instance of
+# diphthong 'ie' (in "riesh"). ignore such things as "dlobshig" or add
+# filters or post-generation regex checks as necessary
+my $v = Lingua::Awkwords->parse_string(q{ o*10/i/ie/e*32/a*22/u*3 });
+
+# only these appear as leading vowels
+my $vl = Lingua::Awkwords->parse_string(q{ a/e });
+
+# consonant clusters include st, th, sh,
+# br, dl, gr, sw, tr only at beginning
+# nd only at end
+my $cc  = Lingua::Awkwords->parse_string(q{ st*2/th*5/sh*6 });
+my $ccl = Lingua::Awkwords->parse_string(q{ br*2/dl/gr/sw/tr });
+my $cct = Lingua::Awkwords->parse_string(q{ nd });
+
+Lingua::Awkwords::Subpattern->set_patterns(
+    C => $c,
+    V => $v,
+    X => $vl,
+    D => $cc,
+    L => $ccl,
+    T => $cct,
+);
+
+# these probably need weights so that various consonant clusters are
+# less likely, though too specific rules from the get-go may exclude
+# interesting possibilities
+my $syl =
+  Lingua::Awkwords->parse_string(q{ V/CV/CVC/DV/DVC/LV/LVC/XC/XT/CVT/DVT/LVT });
+
+Lingua::Awkwords::Subpattern->set_patterns( S => $syl );
+
+# , is borrowed from lojban to show the logical break between syllables,
+# though in reality words such as "and,o" would likely become "an'do"
+# instead of "and'o" (where here the ' is a glottal stop)
+my $tree = Lingua::Awkwords->new( pattern => q{ S,S } );
+
+while (1) {
+    say $tree->render;
+    last if --$words_to_generate < 1;
+}
+
+# pronunciación -- "yumens" for "humans" (no leading "hu" allowed?
+# "ha..." "hol..." allowed starts in other words) "sha'ab" possibly a
+# glottal stop as the vowels touch. yumen name "Gosse" transcribed as
+# "Goss-a" (another glottal stop?)

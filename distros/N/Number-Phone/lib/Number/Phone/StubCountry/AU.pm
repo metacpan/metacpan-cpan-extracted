@@ -22,44 +22,44 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[2378]',
-                  'pattern' => '([2378])(\\d{4})(\\d{4})'
+                  'pattern' => '([2378])(\\d{4})(\\d{4})',
+                  'leading_digits' => '[2378]'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'leading_digits' => '
-            [45]|
-            14
-          ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+            14|
+            [45]
+          '
                 },
                 {
-                  'pattern' => '(16)(\\d{3,4})',
-                  'leading_digits' => '16'
+                  'leading_digits' => '16',
+                  'pattern' => '(16)(\\d{3,4})'
                 },
                 {
                   'pattern' => '(16)(\\d{3})(\\d{2,4})',
                   'leading_digits' => '16'
                 },
                 {
-                  'pattern' => '(1[389]\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             1(?:
-              [38]00|
-              90
-            )
-          '
+              [38]0|
+              9
+            )0
+          ',
+                  'pattern' => '(1[389]\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '1802',
-                  'pattern' => '(180)(2\\d{3})'
+                  'pattern' => '(180)(2\\d{3})',
+                  'leading_digits' => '1802'
                 },
                 {
-                  'pattern' => '(19\\d)(\\d{3})',
-                  'leading_digits' => '19[13]'
+                  'leading_digits' => '19[13]',
+                  'pattern' => '(19\\d)(\\d{3})'
                 },
                 {
                   'pattern' => '(19\\d{2})(\\d{4})',
@@ -72,14 +72,22 @@ my $formatters = [
               ];
 
 my $validators = {
-                'voip' => '550\\d{6}',
-                'toll_free' => '
-          180(?:
-            0\\d{3}|
-            2
-          )\\d{3}
-        ',
                 'pager' => '16\\d{3,7}',
+                'geographic' => '
+          [237]\\d{8}|
+          8(?:
+            [6-8]\\d{3}|
+            9(?:
+              [02-9]\\d{2}|
+              1(?:
+                [0-57-9]\\d|
+                6[0135-9]
+              )
+            )
+          )\\d{4}
+        ',
+                'personal_number' => '500\\d{6}',
+                'voip' => '550\\d{6}',
                 'mobile' => '
           14(?:
             5\\d|
@@ -94,6 +102,12 @@ my $validators = {
             8[147-9]|
             9[017-9]
           )\\d{6}
+        ',
+                'toll_free' => '
+          180(?:
+            0\\d{3}|
+            2
+          )\\d{3}
         ',
                 'fixed_line' => '
           [237]\\d{8}|
@@ -119,21 +133,7 @@ my $validators = {
             0[0126]\\d|
             [679]
           )\\d{5}
-        )',
-                'geographic' => '
-          [237]\\d{8}|
-          8(?:
-            [6-8]\\d{3}|
-            9(?:
-              [02-9]\\d{2}|
-              1(?:
-                [0-57-9]\\d|
-                6[0135-9]
-              )
-            )
-          )\\d{4}
-        ',
-                'personal_number' => '500\\d{6}'
+        )'
               };
 
     sub new {

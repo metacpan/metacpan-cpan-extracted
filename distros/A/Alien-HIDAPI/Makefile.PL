@@ -32,10 +32,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.52",
     "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::Alien" => "0.05",
-    "Test::More" => 0
+    "Test::More" => 0,
+    "blib" => "1.01"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,8 +51,11 @@ my %FallbackPrereqs = (
   "Alien::Build::MM" => "0.32",
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Test::Alien" => "0.05",
   "Test::More" => 0,
+  "blib" => "1.01",
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

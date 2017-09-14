@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Scalar::Util qw/reftype/;
 use Carp qw/croak/;
@@ -14,6 +14,7 @@ sub new {
 	my ($pkg, $args) = (shift, $_[0] && reftype $_[0] eq 'HASH' ? $_[0] : {@_});
 	my $self = bless $args, $pkg;
 	$self->{same} = 1 unless exists $self->{same};
+	exists $self->{$_} or do { $self->{$_} = 0 } foreach(qw/unique_array unique_hash/);
 	return $self;
 }
 
@@ -32,23 +33,54 @@ sub _merge {
 	my ($self, $new, $merger) = @_;
 	return $new unless defined $merger;
 
-	my $new_ref = reftype($new);
+	my $new_ref = reftype($new) || '';
 	my $merger_ref = reftype($merger) // reftype(\$merger);
 	if ( $merger_ref eq 'SCALAR' ) {
 		return $merger;
 	}
 	elsif ( $merger_ref eq 'HASH' ) {
 		$new = {} if ( $new_ref ne 'HASH' );
-		return { map +( $_ => $self->_merge( $new->{$_}, $merger->{$_} ) ), combine_keys($new, $merger) };
+		return { $self->{unique_hash} 
+			? $self->_unique_merge($merger_ref, $new, $merger) 
+			: map +( $_ => $self->_merge( $new->{$_}, $merger->{$_} ) ), combine_keys($new, $merger) 
+		};
 	}
 	elsif ( $merger_ref eq 'ARRAY') {
 		if ( $new_ref eq 'ARRAY' ) {
 			my $length = sub {$_[0] < $_[1] ? $_[1] : $_[0]}->(scalar @{$new}, scalar @{$merger});
-			return [ map { $self->_merge($new->[$_], $merger->[$_]) } 0 .. $length - 1 ];
+			return [ $self->{unique_array} 
+				? $self->_unique_merge($merger_ref, $new, $merger, $length)
+				: map { $self->_merge($new->[$_], $merger->[$_]) } 0 .. $length - 1 
+			];
 		}
 		return [ map { $self->_merge('', $_ ) } @{ $merger } ]; # destroy da references
 	}
 	return $merger;
+}
+
+sub _unique_merge {
+	my ($s, $r, $n, $m, $l) = @_;
+
+	if ($r eq 'ARRAY') {
+		my (@z, %u, $x1, $x2);
+		for (my $i = 0; $i < $l; $i++) {
+			my $c = grep {
+				my ($x) = reftype(\$_);
+				$x eq 'SCALAR' ? !$_ || exists $u{$_} ? 1 : do { $u{$_} = 1 } && push @z, $_ : 0; 
+			} ($n->[$i], $m->[$i]);
+			do { ($x1, $x2) = (reftype($n->[$i]), reftype($m->[$i])) } && $c == 0 ? $x1 eq $x2 ? push @z, $s->_merge($n->[$i], $m->[$i]) 
+				: push @z, $n->[$i], $m->[$i] : $x1 ? push @z, $n->[$i] : push @z, $m->[$i] if $c != 2;
+		}
+		return @z;
+	}
+		
+	my %z = %{ $n };
+	map {
+		my $x = reftype($m->{$_}) // reftype(\$m->{$_});
+		exists $z{$_} ? $x ne 'SCALAR' && $x eq reftype($z{$_}) 
+			? do { $z{$_} = $s->_merge($z{$_}, $m->{$_}) } : '*\o/*' : do { $z{$_} = $m->{$_} }
+	} keys %{ $m };
+	return %z;
 }
 
 =head1 NAME
@@ -57,7 +89,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -65,7 +97,7 @@ Version 0.02
 
 	use Blessed::Merge;
 
-	my $blessed = Blessed::Merge->new();
+	my $blessed = Blessed::Merge->new({ same => 0, unique_hash => 1, unique_array => 1 });
 
 	my $world = $blessed->merge($obj1, $obj2, $obj3, $obj4, $obj5);
 

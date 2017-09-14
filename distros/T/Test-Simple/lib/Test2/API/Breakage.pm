@@ -2,7 +2,7 @@ package Test2::API::Breakage;
 use strict;
 use warnings;
 
-our $VERSION = '1.302086';
+our $VERSION = '1.302096';
 
 
 use Test2::Util qw/pkg_to_file/;
@@ -32,6 +32,9 @@ sub upgrade_required {
         'Test::Alien'             => '0.04',
         'Test::UseAllModules'     => '0.14',
         'Test::More::Prefix'      => '0.005',
+
+        'Test2::Tools::EventDumper' => 0.000007,
+        'Test2::Harness'            => 0.000013,
 
         'Test::DBIx::Class::Schema'    => '1.0.9',
         'Test::Clustericious::Cluster' => '0.30',

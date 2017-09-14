@@ -1,5 +1,46 @@
 Revision history for Perl module Math::Prime::Util
 
+0.66 2017-09-12
+
+    [ADDED]
+
+    - random_semiprime                random n-bit semiprime (even split)
+    - random_unrestricted_semiprime   random n-bit semiprime
+    - forderange { ... } n            derangements iterator
+    - numtoperm(n,k)                  returns kth permutation of n elems
+    - permtonum([...])                returns rank of permutation array ref
+    - randperm(n[,k])                 random permutation of n elements
+    - shuffle(...)                    random permutation of an array
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Rewrite sieve marking based on Kim Walisch's new simple mod-30 sieve.
+      Similar in many ways to my old code, but this is simpler and faster.
+
+    - is_pseudoprime, is_euler_pseudoprime, is_strong_pseudoprime changed to
+      better handle the unusual case of base >= n.
+
+    - Speedup for is_carmichael.
+
+    - is_frobenius_underwood_pseudoprime checks for jacobi == 0.  Faster.
+
+    - Updated Montgomery inverse from Robert Gerbicz.
+
+    - Tighter nth prime bounds for large inputs from Axler 2017-06.
+      Redo Ramanujan bounds since they're based on nth prime bounds.
+
+    - chinese objectifies result (i.e. big results are bigints).
+
+    - Internal support for Baillie-Wagstaff (pg 1402) extra Lucas tests.
+
+    - More standardized Lucas parameter selection.  Like other tests and the
+      1980 paper, checks jacobi(D) in the loop, not gcd(D).
+
+    - entropy_bytes, srand, and csrand moved to XS.
+
+    - Add -secure import to disallow all manual seeding.
+
+
 0.65 2017-05-03
 
     [API Changes]
@@ -203,10 +244,11 @@ Revision history for Perl module Math::Prime::Util
 
     [ADDED]
 
-    - is_prime_power         Returns k if n=p^k for p a prime.
-    - logint(n,b)            Integer logarithm.  Largest e s.t. b^e <= n.
-    - rootint(n,k)           Integer k-th root.
-    - ramanujan_sum(k,n)     Ramanujan's sum
+    - is_euler_plumb_pseudoprime  Plumb's Euler Criterion test.
+    - is_prime_power              Returns k if n=p^k for p a prime.
+    - logint(n,b)                 Integer logarithm.  Largest e s.t. b^e <= n.
+    - rootint(n,k)                Integer k-th root.
+    - ramanujan_sum(k,n)          Ramanujan's sum
 
     [FUNCTIONALITY AND PERFORMANCE]
 

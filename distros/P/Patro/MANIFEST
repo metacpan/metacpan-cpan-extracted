@@ -1,12 +1,15 @@
 # MANIFEST for p5-patro
 Changes
 lib/Patro.pm
-lib/Patro/CODE/Shareable.pm
 lib/Patro/LeumJelly.pm
 lib/Patro/N1.pm
 lib/Patro/N2.pm
 lib/Patro/N3.pm
+lib/Patro/N4.pm
+lib/Patro/N5.pm
+lib/Patro/N6.pm
 lib/Patro/Server.pm
+lib/threadsx/shared.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -18,10 +21,19 @@ t/02b-splice.t
 t/03-hash.t
 t/04a-code.t
 t/04b-code.t
+t/05a-filehandles.t
+t/05b-filehandles.t
+t/05c-filehandles.t
+t/05d-filehandles.t
+t/05e-filehandles.t
+t/05f-dirhandles.t
+t/06-ref.t
+t/09-config.t
 t/11-ScalarObj.t
 t/12-ArrayObj.t
 t/13-HashObj.t
 t/20-overload.t
-t/60-shareable-code.t
+t/20b-overload.t
+t/21-sideeffects.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,29 @@
+0.083		2017-09-13	T. R. Wyant
+
+    Add -decayed to eg/visual.
+    
+    This eliminates decayed bodies. I decided not to remove these from
+    the magnitude table because of historical interest.
+
+    Kelso removes 38253 from visual.txt. Decayed 2017-08-18.
+
+    Kelso marks 25471 Iridium 77 failed
+
+    Kelso marks 24949 Iridium 30 failed
+
+    Kelso adds 33411 to visual.txt.
+
+    Kelso adds 11251 METEOR 1-29 to visual.txt
+
+    Use qsmag instead of mcnames to suppliment magnitudes in the canned
+    magnitude table.  As of July 24 2017 mcnames appeared to be
+    double-compressed and corrupt besides. Both are maintained by Mike
+    McCants, but the former is input to his QuickSat program and so
+    likely to be less fragile. I hope. The mcnames file was eventually
+    corrected, but I am sticking with qsmag for now.
+
+    Kelso reports decay of Iridium 74.
+
 0.082		2017-06-14	T. R. Wyant
     Kelso reports Iridium 79 out of service.
 

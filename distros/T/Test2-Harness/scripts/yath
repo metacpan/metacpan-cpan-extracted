@@ -1,38 +1,8 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
-
-our $VERSION = '0.001004';
-
-use App::Yath::Util qw/load_command/;
-use List::Util qw/sum/;
-use Time::HiRes qw/time/;
-
-use Test2::Util::Times qw/render_bench/;
-
-my $cmd_name;
-if (@ARGV && -f $ARGV[0] && $ARGV[0] =~ m/\.jsonl(\.bz2|\.gz)$/) {
-    $cmd_name = 'replay';
-}
-elsif(!@ARGV || -d $ARGV[0] || -f $ARGV[0] || substr($ARGV[0],0,1) eq '-') {
-    $cmd_name = 'test';
-}
-else {
-    $cmd_name = shift @ARGV;
-}
-
-my $cmd_class = load_command($cmd_name);
-
-my $cmd = $cmd_class->new(args => \@ARGV);
-
-my $start = time;
-my $exit = $cmd->run;
-
-my $end = time;
-my $bench = render_bench($start, $end, times);
-print $bench, "\n\n";
-
-exit $exit;
+# Do not use warnings/strict, we want to avoid contamination of the
+# file/namespace/scope
+use App::Yath(\@ARGV, \$App::Yath::RUN);
+exit($App::Yath::RUN->());
 
 __END__
 

@@ -11,20 +11,26 @@ POSIX::2008 - Perl interface to POSIX.1-2008
 
   sysopen my $dh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW or die 'Dafuq?';
   my $fh = openat($dh, 'foobar', O_RDWR|O_CREAT);
-  pwrite($fh, 'fuckyounsa', 50);
+  pwrite($fh, 'fuckyounsa', 10, 0);
 
 =head1 DESCRIPTION
 
-POSIX::2008 contains many of the interfaces specified by POSIX.1-2008 that
-the core POSIX module withholds, implements in Perl or fucked up.
+POSIX::2008 contains many of the interfaces specified by
+L<POSIX.1-2008|http://pubs.opengroup.org/onlinepubs/9699919799/> that the core
+POSIX module withholds, implements in Perl or fucked up.
 
 This module is provided "as is" unless someone volunteers to maintain it.
+
+=head1 INCOMPATIBLE PARAMETER CHANGE
+
+Since version 0.13, the parameter order of pread/pwrite is (count, offset) as
+with the actual system calls instead of (offset, count). Good luck.
 
 =head1 FILE DESCRIPTORS AND HANDLES
 
 Since version 0.05, all I/O functions that take numeric file descriptors also
-accept Perl file or directory handles. C<openat()> even returns a handle if
-you passed it one.
+accept Perl file or directory handles. L<C<openat()>|"openat"> even returns a
+handle if you passed it one.
 
 =head1 SYSTEM CALL RETURN VALUES
 
@@ -33,9 +39,9 @@ A system call return value of -1 meaning "error" is mapped to undef.
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
 For system calls where 0 does not just mean "success", 0 is returned
-unchanged. These are C<read()>, C<write()>, C<writev()>, C<pread()>,
-C<pwrite()>, C<pwritev()>. C<openat()> gets a special treatment in this
-module, see below.
+unchanged. These are C<read()>, C<write()>, C<readv()>, C<writev()>,
+C<pread()>, C<pwrite()>, C<preadv()>, C<pwritev()>. C<openat()> gets a special
+treatment in this module, see below.
 
 =head1 FUNCTIONS
 
@@ -361,23 +367,31 @@ ret = fdatasync(fd);
 
 ret = fdopen(fd, mode)
 
-Returns a file handle associated with the file descriptor I<fd>. I<mode> is
-one of the values C<"r">, C<"w">, C<"a"> with an optional C<"+"> and/or
-C<"b">.
+Returns a file handle associated with the file descriptor I<fd> or undef on
+error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with an optional
+C<"+"> and/or C<"b">.
 
-It's similar to C<IO::Handle::new_from_fd()> but it I<really> calls
-C<fdopen(3)>, expects letter mode strings (e.g. C<"r">, not C<"<">) and fails
-if the I<mode> is not compatible with the flags of I<fd> (none of which
-C<new_from_fd()> does).
+It's similar to C<IO::Handle::new_from_fd()> with the following improvements:
 
-Returns undef on failure.
+=over
+
+=item *
+It I<really> calls C<fdopen(3)>.
+
+=item *
+It expects POSIX  mode strings (e.g. C<"r">, not C<"<">).
+
+=item *
+It fails I<mode> is not compatible with the flags of I<fd>.
+
+=back
 
 =item fdopendir
 
 ret = fdopendir(fd)
 
-Returns a directory handle associated with the file descriptor I<fd>. Usage
-example:
+Returns a directory handle associated with the file descriptor I<fd> or undef
+on error. Usage example:
 
   my $dh = do {
     sysopen my $fh, '/tmp', O_RDONLY|O_DIRECTORY|O_NOFOLLOW;
@@ -386,8 +400,6 @@ example:
                     # not work before Perl 5.22
   };
   my @files = readdir $dh;  # this would fail with $fh from sysopen
-
-Returns undef on failure.
 
 =item fdim
 
@@ -771,28 +783,49 @@ descriptor. If I<fd> is a file or directory handle the return value is also a
 handle whose type depends on the file type of I<path>: If path is a directory,
 the return value is a directory handle, otherwise it's a file handle.
 
-Returns undef on failure.
+Returns undef on error.
+
+=item posix_fadvise
+
+ret = posix_fadvise(fd, offset, len, advice);
+
+I<advice> is one of the C<POSIX_FADV_> constants.
+
+Returns undef on error
+
+=item posix_fallocate
+
+ret = posix_fallocate(fd, offset, len);
 
 =item pread
 
-bytes_read = pread(fd, buf, offset, count[, buf_offset]);
+bytes_read = pread(fd, buf, count, [offset, buf_offset]);
 
 C<pread()> reads I<count> bytes (not characters) of data from the file
 descriptor I<fd> at file offset I<offset> into the scalar I<buf> without
 changing the file offset. I<buf> will be enlarged automatically if necessary.
 
+I<offset> and I<buf_offset> are set to 0 if omitted or undef.
+
 C<pread()> treats I<buf> just like C<sysread()> does: I<buf_offset> may be
-specified to place the read data at that position in I<buf>. Defaults to 0. If
-I<buf_offset> is past the end of I<buf>, I<buf> will be padded with zeros
-before appending the data. If I<buf_offset> is negative, it is counted from
-the end of the string. If I<buf_offset> plus I<bytes_read> does not exceed the
-current string length of I<buf>, I<buf> will be truncated accordingly. This
-latter detail is missing from the sysread() documentation.
+specified to place the read data at that position in I<buf>. If I<buf_offset>
+is past the end of I<buf>, I<buf> will be padded with zeros before appending
+the data. If I<buf_offset> is negative, it is counted from the end of the
+string. I<buf> will be grown or shrunk so that the last byte actually read is
+the last byte of I<buf> after the read.
 
 Returns the number of bytes read, 0 at EOF, undef on error.
 
-Note that the order of I<offset> and I<count> is inverted compared to
-pread(2). This is to be consistent with pwrite() (see below).
+=item preadv
+
+bytes_read = preadv(fd, buffers, sizes, [offset])
+
+C<preadv()> behaves like L<C<readv()>|"readv"> but adds an optional I<offset>
+argument, which specifies the file position at which the data is to be
+read. I<offset> is set to 0 if omitted or undef.
+
+The file offset is not changed by this system call. The file referred to by
+I<fd> must be capable of seeking.
 
 =item ptsname
 
@@ -800,35 +833,36 @@ name = ptsname(fd);
 
 =item pwrite
 
-bytes_written = pwrite(fd, buf, offset[, count, buf_offset]);
+bytes_written = pwrite(fd, buf, [count, offset, buf_offset]);
 
-pwrite() writes data from the scalar I<buf> to the file descriptor I<fd> at
-file offset I<offset> without changing the file offset. The file referenced by
-I<fd> must be capable of seeking.
+pwrite() writes I<count> bytes of data from the scalar I<buf> to the file
+descriptor I<fd> at file offset I<offset> without changing the file
+offset. The file referenced by I<fd> must be capable of seeking.
 
-I<count> may be specified to write only that much bytes (not characters). If
-not specified or undef, everything from I<buf_offset> up to the end of I<buf>
-is written.
+If I<count> is omitted or undef, everything from I<buf_offset> up to the end
+of I<buf> is written.
 
 I<buf_offset> may be specified to write data from that position in
-I<buf>. Defaults to 0. If I<buf_offset> is negative it is counted from the end
+I<buf>. If I<buf_offset> is negative it is counted from the end
 of the string.
 
-Returns the number of bytes written, undef on error.
+I<offset> and I<buf_offset> are set to 0 if omitted or undef.
 
-Note that the order of I<offset> and I<count> is inverted compared to
-pwrite(2). This is to allow omitting I<count> and I<buf_offset> if you just
-want to write the whole buffer.
+Returns the number of bytes written, undef on error.
 
 On Linux, if a file is opened with O_APPEND, pwrite() appends data to the end
 of the file, regardless of the value of offset (in violation of POSIX).
 
 =item pwritev
 
-bytes_written = pwritev(fd, arrayref, offset)
+bytes_written = pwritev(fd, buffers, [offset])
 
-C<pwritev()> behaves like C<writev()> but adds an I<offset> argument, which
-specifies the file position at which the data is to be written.
+C<pwritev()> behaves like L<C<writev()>|"writev"> but adds an optional
+I<offset> argument, which specifies the file position at which the data is to
+be written. I<offset> is set to 0 if omitted or undef.
+
+The file offset is not changed by this system call. The file referred to by
+I<fd> must be capable of seeking.
 
 =item random
 
@@ -836,9 +870,40 @@ r = random();
 
 =item read
 
-ret = read(fd, buf, count);
+bytes_read = read(fd, buf, count);
 
 Like POSIX::read() but returns 0 at EOF instead of "0 but true".
+
+=item readv
+
+bytes_read = readv(fd, buffers, sizes);
+
+Example:
+
+  sysopen my $fh, '/tmp/foobar', O_RDWR|O_CREAT|O_TRUNC;
+  pwrite($fh, 'foobar', 6, 0);
+  readv($fh, my @buf, [4, 0, 4, 4]);
+  # -> @buf is ('foob', '', 'ar')
+
+C<readv()> reads from the file descriptor I<fd> into I<buffers> as many
+strings as there are elements in I<sizes>. I<buffers> must be a variable
+holding an array or an array reference. I<sizes> must be an array reference.
+
+I<sizes> is expected to hold unsigned integers that specify how many bytes are
+to be read into each buffer. A byte count of 0 or undef creates an empty
+string. I<sizes> is processed in array order.
+
+I<buffers> will be extended if necessary, but it will never be shrunk. If
+I<buffers> is not empty, any existing elements are replaced as long as
+sufficient data was read from I<fd>.
+
+If the total byte count of I<sizes> exceeds the number of bytes actually read
+from I<fd>, there may be one partly filled buffer and the rest of I<sizes> is
+skipped, so you may end up with less strings in I<buffers> than there are
+elements in I<sizes>.
+
+C<readv()> returns the number of bytes read (which may be less than the total
+bytes in I<sizes>) or undef on error.
 
 =item readlink
 
@@ -860,7 +925,12 @@ r = remainder(x, y);
 
 ret = remove(path);
 
-Like POSIX::remove() but calls the C function instead of doing it in Perl.
+Calls the actual C library function C<remove()>.
+
+Note that POSIX::remove() fails if I<path> is a symlink to a directory because
+someone "couldn't read the plans right and did a piss-poor job of putting it
+together" as C<(-d $_[0]) ? CORE::rmdir($_[0]) : CORE::unlink($_[0])>. Quote
+from Armageddon.
 
 =item rename
 
@@ -1043,15 +1113,15 @@ bytes_written = write(fd, buf[, count]);
 Like POSIX::write() but returns 0 instead of "0 but true" if 0 bytes were
 written, and it does not write more bytes than I<buf> contains.
 
-If I<count> is omitted, it defaults to the length of I<buf>
+If I<count> is omitted or undef, it defaults to the length of I<buf>.
 
 =item writev
 
-bytes_written = writev(fd, arrayref);
+bytes_written = writev(fd, buffers);
 
-writev() writes multiple buffers from I<arrayref> to the file associated with
-the file descriptor I<fd>. The buffers are processed in array order. Undefined
-or empty buffers are skipped.
+writev() writes multiple buffers from I<buffers> to the file associated with
+the file descriptor I<fd>. I<buffers> must be an array reference. The buffers
+are processed in array order. Undefined or empty elements are skipped.
 
 Returns the number of bytes written or undef on error.
 
@@ -1083,25 +1153,60 @@ available:
  :at     All *at() functions like openat() etc. plus all AT_ constants
  :id     All get/set*id() functions like getuid() etc.
  :is     All is* functions like isdigit() etc.
- :rw     read(), write(), writev()
- :prw    pread(), pwrite(), pwritev()
+ :rw     read(), readv(), write(), writev()
+ :prw    pread(), preadv(), pwrite(), pwritev()
  :clock  All clock* functions and all CLOCK* constants
+ :fcntl  All F_, FD_, O_, POSIX_FADV_ and SEEK_ constants (for AT_ use :at)
+ :fnm    C<fnmatch()> and all FNM_ constants
 
 =head1 CONSTANTS
 
-AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
-AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW BOOT_TIME CLOCK_BOOTTIME CLOCK_HIGHRES
-CLOCK_MONOTONIC CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC_FAST
-CLOCK_MONOTONIC_PRECISE CLOCK_MONOTONIC_RAW CLOCK_PROCESS_CPUTIME_ID
-CLOCK_REALTIME CLOCK_REALTIME_COARSE CLOCK_REALTIME_FAST
-CLOCK_REALTIME_PRECISE CLOCK_SOFTTIME CLOCK_THREAD_CPUTIME_ID CLOCK_UPTIME
-CLOCK_UPTIME_FAST CLOCK_UPTIME_PRECISE _CS_GNU_LIBC_VERSION
-_CS_GNU_LIBPTHREAD_VERSION _CS_PATH DEAD_PROCESS FNM_CASEFOLD FNM_FILE_NAME
-FNM_LEADING_DIR FNM_NOESCAPE FNM_NOMATCH FNM_PATHNAME FNM_PERIOD FP_INFINITE
-FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO INIT_PROCESS ITIMER_PROF ITIMER_REAL
-ITIMER_VIRTUAL LOGIN_PROCESS NEW_TIME O_CLOEXEC O_DIRECTORY O_EXEC OLD_TIME
-O_NOFOLLOW O_RSYNC O_SEARCH O_SYNC O_TMPFILE O_TTY_INIT RTLD_GLOBAL RTLD_LAZY
-RTLD_LOCAL RTLD_NOW RUN_LVL TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
+C<AT_EACCESS> C<AT_EMPTY_PATH> C<AT_FDCWD> C<AT_NO_AUTOMOUNT> C<AT_REMOVEDIR>
+C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW>
+
+C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS> C<INIT_PROCESS>
+C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
+
+C<CLOCK_BOOTTIME> C<CLOCK_HIGHRES> C<CLOCK_MONOTONIC>
+C<CLOCK_MONOTONIC_COARSE> C<CLOCK_MONOTONIC_FAST> C<CLOCK_MONOTONIC_PRECISE>
+C<CLOCK_MONOTONIC_RAW> C<CLOCK_PROCESS_CPUTIME_ID> C<CLOCK_REALTIME>
+C<CLOCK_REALTIME_COARSE> C<CLOCK_REALTIME_FAST> C<CLOCK_REALTIME_PRECISE>
+C<CLOCK_SOFTTIME> C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME>
+C<CLOCK_UPTIME_FAST> C<CLOCK_UPTIME_PRECISE>
+
+C<_CS_GNU_LIBC_VERSION> C<_CS_GNU_LIBPTHREAD_VERSION> C<_CS_PATH>
+
+C<F_DUPFD> C<F_DUPFD_CLOEXEC> C<F_GETFD> C<F_SETFD> C<F_GETFL>
+C<F_SETFL> C<F_GETLK> C<F_SETLK> C<F_SETLKW> C<F_GETOWN> C<F_SETOWN>
+C<F_RDLCK> C<F_UNLCK> C<F_WRLCK>
+
+C<FD_CLOEXEC>
+
+C<FNM_CASEFOLD> C<FNM_FILE_NAME> C<FNM_LEADING_DIR> C<FNM_NOESCAPE>
+C<FNM_NOMATCH> C<FNM_PATHNAME> C<FNM_PERIOD>
+
+C<FP_INFINITE> C<FP_NAN> C<FP_NORMAL> C<FP_SUBNORMAL> C<FP_ZERO>
+
+C<TIMER_ABSTIME> C<ITIMER_PROF> C<ITIMER_REAL> C<ITIMER_VIRTUAL>
+
+C<O_ACCMODE> C<O_APPEND> C<O_CLOEXEC> C<O_CREAT> C<O_DIRECTORY> C<O_DSYNC>
+C<O_EXEC> C<O_NOCTTY> C<O_NOFOLLOW> C<O_NONBLOCK> C<O_RDONLY> C<O_RDWR>
+C<O_RSYNC> C<O_SEARCH> C<O_SYNC> C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT>
+C<O_WRONLY>
+
+C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
+C<POSIX_FADV_NOREUSE> C<POSIX_FADV_WILLNEED> C<POSIX_FADV_DONTNEED>
+
+C<RTLD_GLOBAL> C<RTLD_LAZY> C<RTLD_LOCAL> C<RTLD_NOW>
+
+C<SEEK_SET> C<SEEK_CUR> C<SEEK_END>
+
+C<UTIME_NOW> C<UTIME_OMIT>
+
+=head1 NOTES
+
+For whatever reason, C<preadv()> and C<pwritev()> are not part of POSIX. They
+are included anyway.
 
 =head1 AUTHOR
 

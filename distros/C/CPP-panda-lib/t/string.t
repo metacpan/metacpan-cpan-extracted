@@ -1571,17 +1571,43 @@ sub test_string {
     };
     
     subtest 'append' => sub {
-        my $s = $class->new_ptr(string("abcd"));
-        $s->append($class->new_ptr(string("1234")));
-        cmp_deeply([$s->length, $s->data], [8, string("abcd1234")], "str ok");
-        $s->append($class->new_ptr(string("qwerty")), 3);
-        cmp_deeply([$s->length, $s->data], [11, string("abcd1234rty")], "str ok");
-        $s->append($class->new_ptr(string("hello world")), 5, 4);
-        cmp_deeply([$s->length, $s->data], [15, string("abcd1234rty wor")], "str ok");
-        $s->append_chars(5, "x");
-        cmp_deeply([$s->length, $s->data], [20, string("abcd1234rty worxxxxx")], "str ok");
-        $s->append($s);
-        cmp_deeply([$s->length, $s->data], [40, string("abcd1234rty worxxxxxabcd1234rty worxxxxx")], "append self ok");
+        subtest 'std' => sub {
+            my $s = $class->new_ptr(string("abcd"));
+            $s->append($class->new_ptr(string("1234")));
+            cmp_deeply([$s->length, $s->data], [8, string("abcd1234")], "str ok");
+            $s->append($class->new_ptr(string("qwerty")), 3);
+            cmp_deeply([$s->length, $s->data], [11, string("abcd1234rty")], "str ok");
+            $s->append($class->new_ptr(string("hello world")), 5, 4);
+            cmp_deeply([$s->length, $s->data], [15, string("abcd1234rty wor")], "str ok");
+            $s->append_chars(5, "x");
+            cmp_deeply([$s->length, $s->data], [20, string("abcd1234rty worxxxxx")], "str ok");
+            $s->append($s);
+            cmp_deeply([$s->length, $s->data], [40, string("abcd1234rty worxxxxxabcd1234rty worxxxxx")], "append self ok");
+        };
+        subtest 'preserve_allocated_when_empty_but_reserved' => sub {
+            my $s = $class->new_empty;
+            my $s2 = $class->new_ptr(string("a" x 50));
+            my $s3 = $class->new_ptr(string("b" x 10));
+            get_allocs();
+            $s->reserve(100);
+            check_allocs([1, $buf_size+100], "allocs ok");
+            $s->append($s2);
+            check_allocs(0, "no allocs ok");
+            $s->append($s3);
+            check_allocs(0, "no allocs ok");
+            cmp_deeply([$s->length, $s->data, $s->capacity], [60, string("a"x50).string("b"x10), 100], "str ok");
+        };
+        subtest 'use_cow_when_empty_without_reserve' => sub {
+            my $s = $class->new_empty;
+            my $s2 = $class->new_ptr(string("a" x 50));
+            my $s3 = $class->new_ptr(string("b" x 10));
+            get_allocs();
+            $s->append($s2);
+            check_allocs(0, "no allocs ok");
+            $s->append($s3);
+            check_allocs([1, $buf_size+60], "allocs ok");
+            cmp_deeply([$s->length, $s->data, $s->capacity], [60, string("a"x50).string("b"x10), 60], "str ok");
+        };
     };
     
     subtest 'op_plus' => sub {

@@ -1,12 +1,11 @@
 package Pcore::WebSocket::Protocol::pcore;
 
 use Pcore -class, -result, -const;
-use Cpanel::JSON::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
-use CBOR::XS qw[];
+use Pcore::Util::Data;
 use Pcore::Util::UUID qw[uuid_str];
-use Pcore::WebSocket::Protocol::pcore::Request;
 use Pcore::Util::Text qw[trim];
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref weaken is_plain_coderef];
+use Pcore::WebSocket::Protocol::pcore::Request;
 
 has protocol => ( is => 'ro', isa => Str, default => 'pcore', init_arg => undef );
 
@@ -24,57 +23,8 @@ const our $TX_TYPE_EVENT     => 'event';
 const our $TX_TYPE_RPC       => 'rpc';
 const our $TX_TYPE_EXCEPTION => 'exception';
 
-my $CBOR = do {
-    my $cbor = CBOR::XS->new;
-
-    $cbor->max_depth(512);
-    $cbor->max_size(0);    # max. string size is unlimited
-    $cbor->allow_unknown(0);
-    $cbor->allow_sharing(0);    # maust be disable for compatibility with JS CBOR
-    $cbor->allow_cycles(1);
-    $cbor->forbid_objects(0);
-    $cbor->pack_strings(0);     # set to 1 decrease speed, but makes size smaller
-    $cbor->text_keys(0);
-    $cbor->text_strings(0);
-    $cbor->validate_utf8(0);
-    $cbor->filter(undef);
-
-    $cbor;
-};
-
-my $JSON = do {
-    my $json = Cpanel::JSON::XS->new;
-
-    $json->utf8(1);
-    $json->allow_nonref(1);    # allow scalars
-    $json->allow_tags(0);      # use FREEZE / THAW, we don't use this, because non-standard JSON will be generated, use CBOR instead to serialize objects
-
-    # shrink                        => 0,
-    # max_depth                     => 512,
-
-    # DECODE
-    $json->relaxed(1);    # allows commas and # - style comments
-
-    # filter_json_object            => undef,
-    # filter_json_single_key_object => undef,
-    # max_size                      => 0,
-
-    # ENCODE
-    $json->ascii(1);
-    $json->latin1(0);
-
-    # pretty       => 0,    # set indent, space_before, space_after
-    $json->canonical(0);       # sort hash keys, slow
-    $json->indent(0);
-    $json->space_before(0);    # put a space before the ":" separating key from values
-    $json->space_after(0);     # put a space after the ":" separating key from values, and after "," separating key-value pairs
-
-    $json->allow_unknown(0);   # throw exception if can't encode item
-    $json->allow_blessed(1);   # allow blessed objects
-    $json->convert_blessed(1); # use TO_JSON method of blessed objects
-
-    $json;
-};
+my $CBOR = Pcore::Util::Data::get_cbor();
+my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
 
 sub rpc_call ( $self, $method, @ ) {
     my $msg = {
@@ -389,9 +339,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 266                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 216                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 314, 336, 351        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 264, 286, 301        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

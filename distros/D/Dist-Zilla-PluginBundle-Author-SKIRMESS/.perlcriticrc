@@ -1,5 +1,5 @@
 # Automatically generated file
-# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic 0.008
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.010
 
 severity = 1
 only = 1

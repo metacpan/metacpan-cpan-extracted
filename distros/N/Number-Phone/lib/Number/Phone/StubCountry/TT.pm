@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164949;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
@@ -34,6 +34,34 @@ my $formatters = [
               ];
 
 my $validators = {
+                'personal_number' => '
+          5(?:
+            00|
+            22|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'geographic' => '
+          868(?:
+            2(?:
+              01|
+              [23]\\d
+            )|
+            6(?:
+              0[79]|
+              1[02-8]|
+              2[1-9]|
+              [3-69]\\d|
+              7[0-79]
+            )|
+            82[124]
+          )\\d{4}
+        ',
+                'pager' => '',
                 'fixed_line' => '
           868(?:
             2(?:
@@ -50,6 +78,7 @@ my $validators = {
             82[124]
           )\\d{4}
         ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'mobile' => '
           868(?:
             2(?:
@@ -74,7 +103,6 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'voip' => '',
                 'toll_free' => '
           8(?:
             00|
@@ -86,35 +114,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'pager' => '',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'geographic' => '
-          868(?:
-            2(?:
-              01|
-              [23]\\d
-            )|
-            6(?:
-              0[79]|
-              1[02-8]|
-              2[1-9]|
-              [3-69]\\d|
-              7[0-79]
-            )|
-            82[124]
-          )\\d{4}
-        ',
-                'personal_number' => '
-          5(?:
-            00|
-            22|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        '
+                'voip' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {

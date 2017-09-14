@@ -1,6 +1,6 @@
 package Compress::LZ4Frame;
 # ABSTRACT: Compression package using the lz4frame library
-$Compress::LZ4Frame::VERSION = '0.012';
+$Compress::LZ4Frame::VERSION = '0.012001';
 use 5.010_001;
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ Compress::LZ4Frame - Compression package using the lz4frame library
 
 =head1 VERSION
 
-version 0.012
+version 0.012001
 
 =head1 SYNOPSIS
 
@@ -106,11 +106,11 @@ L<Interoperable LZ4 implementations|http://cyan4973.github.io/lz4/#interoperable
 
 =head1 AUTHOR
 
-Felix Bytow <felix.bytow@autinity.de>
+Felix Bytow <felix.bytow@googlemail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by afr-consulting GmbH.
+This software is copyright (c) 2017 by afr-consulting GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

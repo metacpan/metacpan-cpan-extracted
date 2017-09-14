@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use v5.20;
 use strict;
 use Getopt::Long;
@@ -15,6 +15,7 @@ use Image::Randim::Source;
 my $req_timeout   = 20;
 my $output_dir    = $ENV{'HOME'}.'/Pictures/Desktop-Randim/';
 my $no_delete     = 0;
+my $delete_after  = 0;
 my $save_to_dir   = $ENV{'HOME'}.'/Pictures/Desktop-Saved/';
 my $show_url      = 0;
 my $help          = 0;
@@ -33,6 +34,7 @@ GetOptions('show-url'       => \$show_url,
 	   'output-dir=s'   => \$output_dir,
 	   'save-to-dir=s'  => \$save_to_dir,
 	   'no-delete'      => \$no_delete,
+	   'delete-after'   => \$delete_after,
 	   'timeout:i'      => \$req_timeout,
 	   'no-prompt'      => \$no_prompt,
 	   'gnome3'         => \$gnome3,
@@ -65,13 +67,15 @@ while (!$quit) {
     my $image = $source->get_image;
 
     my $img_url = $image->url;
+    my $info_text;
+    $info_text .= "Size:    ".$image->width.'x'.$image->height."\n";
+    $info_text .= "URL:     ".$image->link."\n";
+    $info_text .= "Owner:   ".($image->owner || 'UNDEFINED');
+    $info_text .= ' ('.$image->owner_name.')' if $image->owner_name;
+    $info_text .= ' @ '.$source->name."\n";
+    $info_text .= "Img URL: ".$img_url."\n" if $show_url;
     say   '=' x 40;
-    say   "Size:    ".$image->width.'x'.$image->height;
-    say   "URL:     ".$image->link;
-    print "Owner:   ".($image->owner || 'UNDEFINED');
-    print ' ('.$image->owner_name.')' if $image->owner_name;
-    say   ' @ '.$source->name;
-    say   "Img URL: ".$img_url if $show_url;
+    print $info_text;
     say   '=' x 40;
     print "Getting image...";
 
@@ -80,29 +84,39 @@ while (!$quit) {
     $ua->timeout($req_timeout);
     my $response = $ua->get($img_url, ':content_file' => $temp->filename);
     unless ($response->is_success) {
-	warn "Error retrieving image at $img_url: ".$response->status_line." - skipping\n\n";
-	next;
+        warn "Error retrieving image at $img_url: ".$response->status_line." - skipping\n\n";
+        next;
     }
     print "\n";
     
     my $filename = $response->filename;
     unless ($filename =~ /\.[a-zA-Z]{3,4}$/) {
-	warn "Bad or no filename extension provided for $filename - adding .jpg\n";
-	$filename .= '.jpg';
+        warn "Bad or no filename extension provided for $filename - adding .jpg\n";
+        $filename .= '.jpg';
     }
     if (!$filename || $filename =~ /^[\.\/]/) {
-	die "Bad or no filename $filename\n";
+        die "Bad or no filename $filename\n";
     }
     $image->filename($filename);
 
-    remove_tree($output_dir, {keep_root => 1}) unless $no_delete;
+    # Copy temp file over and clean
+    unless ($no_delete || $delete_after) {
+        remove_tree($output_dir, {keep_root => 1});
+    }
     copy($temp->filename, $output_dir.$filename);
+    open INFOFILE, ">$output_dir$filename.txt";
+    print INFOFILE $info_text;
+    close INFOFILE;
+    if ($delete_after && !$no_delete) {
+        remove_files($output_dir, $filename);
+    }
+    
     if ($gnome3) {
-	`gsettings set org.gnome.desktop.background picture-uri "file:///$output_dir$filename"`;
+        `gsettings set org.gnome.desktop.background picture-uri "file:///$output_dir$filename"`;
     }
     if (defined $viewer) {
-	$viewer = $viewer ? $viewer : $viewer_default;
-	system("$viewer $output_dir$filename &");
+        $viewer = $viewer ? $viewer : $viewer_default;
+        system("$viewer $output_dir$filename &");
     }
 
     unless ($no_prompt) {
@@ -122,6 +136,19 @@ while (!$quit) {
 	$quit = prompt("Quit?", -yesno, -single);
     }
     print "\n";
+}
+
+sub remove_files {
+    my ($dir, $keep_file) = @_;
+    return unless -d $dir;
+    opendir(my $dirh, $dir) or die "Can't open output directory $dir";
+    while (readdir $dirh) {
+	next if /^\.+/;
+	next if /^$keep_file(\.txt|)$/;
+	next if -d $_;
+	unlink "$dir/$_";
+    }
+    closedir $dirh;
 }
 
 sub list_sources {
@@ -291,6 +318,23 @@ frequently.
 
   --version
       Print the version.
+
+=head1 EXAMPLES
+
+I use an icon on a Debian Stretch Cinnamon Desktop to click and walk
+through random desktops until I find one I like. You just put a file
+called randim.desktop in your home directory's Desktop folder - and it
+contains this:
+
+  [Desktop Entry]
+  Name=Randim
+  Exec=randim --gnome3
+  Type=Application
+  Categories=AudioVideo
+  Comment=Change desktop to a random image
+  Encoding=UTF-8
+  Icon=image
+  Terminal=true
 
 =head1 AUTHOR
 

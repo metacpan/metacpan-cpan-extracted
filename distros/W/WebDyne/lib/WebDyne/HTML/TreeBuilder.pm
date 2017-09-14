@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 #
 #  This is free software, licensed under:
 #
@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='1.246';
+$VERSION='1.248';
 
 
 #  Debug load

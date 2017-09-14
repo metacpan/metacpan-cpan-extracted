@@ -1,5 +1,8 @@
 package Regexp::Parser;
 
+use strict;
+use warnings;
+
 my $ENUM;
 BEGIN { $ENUM = 0 }
 

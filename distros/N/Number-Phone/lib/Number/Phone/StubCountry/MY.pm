@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
@@ -30,15 +30,15 @@ my $formatters = [
                   'leading_digits' => '[4-79]'
                 },
                 {
-                  'pattern' => '(3)(\\d{4})(\\d{4})',
-                  'leading_digits' => '3'
+                  'leading_digits' => '3',
+                  'pattern' => '(3)(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '([18]\\d)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             1[02-46-9][1-9]|
             8
-          '
+          ',
+                  'pattern' => '([18]\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
                   'leading_digits' => '1[36-8]0',
@@ -55,23 +55,10 @@ my $formatters = [
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            3[2-9]\\d|
-            [4-9][2-9]
-          )\\d{6}
-        ',
-                'specialrate' => '(1600\\d{6})',
-                'personal_number' => '',
-                'fixed_line' => '
-          (?:
-            3[2-9]\\d|
-            [4-9][2-9]
-          )\\d{6}
-        ',
+                'toll_free' => '1[378]00\\d{6}',
                 'mobile' => '
           1(?:
-            1[1-5]\\d{2}|
+            1[1-6]\\d{2}|
             [02-4679][2-9]\\d|
             59\\d{2}|
             8(?:
@@ -80,8 +67,21 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'specialrate' => '(1600\\d{6})',
+                'fixed_line' => '
+          (?:
+            3[2-9]\\d|
+            [4-9][2-9]
+          )\\d{6}
+        ',
                 'voip' => '154\\d{7}',
-                'toll_free' => '1[378]00\\d{6}',
+                'geographic' => '
+          (?:
+            3[2-9]\\d|
+            [4-9][2-9]
+          )\\d{6}
+        ',
+                'personal_number' => '',
                 'pager' => ''
               };
 

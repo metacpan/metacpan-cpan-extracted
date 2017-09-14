@@ -22,35 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [2356]|
             87
-          '
+          ',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '(7)(\\d{4})(\\d{4})',
                   'leading_digits' => '7[457-9]'
                 },
                 {
-                  'leading_digits' => '70',
-                  'pattern' => '(\\d{2})(\\d{7})'
+                  'pattern' => '(\\d{2})(\\d{7})',
+                  'leading_digits' => '70'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{5,6})',
                   'leading_digits' => '
             8[0158]|
             9
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{5,6})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '70\\d{7}',
+                'pager' => '
+          74(?:
+            66|
+            77
+          )\\d{5}
+        ',
                 'geographic' => '
           (?:
             2(?:
@@ -94,8 +99,8 @@ my $validators = {
             6(?:
               2[50]0|
               3(?:
-                 00|
-                 33
+                00|
+                33
               )|
               4(?:
                 0[0125]|
@@ -126,6 +131,8 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'personal_number' => '70\\d{7}',
+                'voip' => '',
                 'specialrate' => '(85\\d{6})|(900\\d{5})|(
           8(?:
             10|
@@ -175,8 +182,8 @@ my $validators = {
             6(?:
               2[50]0|
               3(?:
-                 00|
-                 33
+                00|
+                33
               )|
               4(?:
                 0[0125]|
@@ -215,14 +222,7 @@ my $validators = {
             9[0-25-9]
           )\\d{6}
         ',
-                'pager' => '
-          74(?:
-            66|
-            77
-          )\\d{5}
-        ',
-                'toll_free' => '80\\d{6}',
-                'voip' => ''
+                'toll_free' => '80\\d{6}'
               };
 my %areanames = (
   962266 => "Mafraq",

@@ -20,11 +20,11 @@ no_index:
 provides:
   Inline::Ruby:
     file: Ruby.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Inline: '0.42'
   perl: '5.008'
 resources:
   repository: git://github.com/shlomif/Inline-Ruby.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

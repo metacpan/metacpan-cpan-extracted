@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -75,7 +75,7 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.022",
+   "version" : "1.023",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

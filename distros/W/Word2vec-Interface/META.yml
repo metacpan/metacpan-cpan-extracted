@@ -1,28 +1,29 @@
 ---
-abstract: "Interface module for word2vec.pm, word2phrase.pm, interface.pm modules and associated utilities."
+abstract: 'Interface module for word2vec.pm, word2phrase.pm, interface.pm modules and associated utilities.'
 author:
   - 'Clint Cuffy <cuffyca@vcu.edu, Bridget McInnes <btmcinnes@vcu.edu>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Word2vec-Interface
 no_index:
   directory:
     - t
     - inc
 requires:
-  Class::Struct: 0.64
-  Encode: 2.86
-  File::Type: 0.22
-  IO::Uncompress::Gunzip: 2.069
-  Sys::CpuAffinity: 1.10
-  Text::Unidecode: 1.27
-  XML::Twig: 3.49
-version: 0.03
+  Class::Struct: '0.64'
+  Encode: '2.86'
+  File::Type: '0.22'
+  IO::Uncompress::Gunzip: '2.069'
+  Sys::CpuAffinity: '1.10'
+  Text::Unidecode: '1.27'
+  XML::Twig: '3.49'
+version: '0.036'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

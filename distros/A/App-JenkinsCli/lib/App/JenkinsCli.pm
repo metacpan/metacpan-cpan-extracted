@@ -17,7 +17,7 @@ use File::ShareDir qw/dist_dir/;
 use Path::Tiny;
 use DateTime;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 has [qw/base_url api_key api_pass test/] => (
     is => 'rw',
@@ -193,6 +193,10 @@ sub create {
     my ($self, $job, $config, @extra) = @_;
     my $jenkins = $self->jenkins();
 
+    if ( -f $config ) {
+        $config = path($config)->slurp;
+    }
+
     my $success = $jenkins->create_job($job, $config);
 
     print $success ? "Created $job\n" : "Error creating $job\n";
@@ -260,6 +264,21 @@ sub change {
     my ($self, $query, $xsl) = @_;
 
     $self->_xslt_actions($query, $xsl);
+
+    return;
+}
+
+sub copy {
+    my ($self, $old, $new) = @_;
+    my $jenkins = $self->jenkins();
+
+    _error("Must provide job name to get it's configuration!\n") if !$old;
+
+    my $config = -f $old ? path($old)->slurp : $jenkins->project_config($old);
+
+    my $success = $jenkins->create_job($new, $config);
+
+    print $success ? "Copied $new from $old\n" : "Error copying $new from $old\n";
 
     return;
 }
@@ -409,7 +428,9 @@ sub _ls_job {
             $space -= 2 if $space > 2;
         }
 
-        my $out = colored($color, sprintf "% -${max}s", "$name $extra_pre") . " $extra_post\n";
+        my $out = $self->opt->{color}
+            ? colored($color, sprintf "% -${max}s", "$name $extra_pre") . " $extra_post\n"
+            : sprintf("% -${max}s", "$name $extra_pre") . " $extra_post\n";
 
         if ( $self->opt->{long} ) {
             $out = "$_->{color} $out";
@@ -422,6 +443,13 @@ sub _ls_job {
     };
 }
 
+sub _error {
+    my ($msg) = @_;
+
+    warn $msg;
+    exit 1;
+}
+
 1;
 
 __END__
@@ -432,7 +460,7 @@ App::JenkinsCli - Command line tool for interacting with Jenkins
 
 =head1 VERSION
 
-This documentation refers to App::JenkinsCli version 0.010
+This documentation refers to App::JenkinsCli version 0.011
 
 =head1 SYNOPSIS
 
@@ -495,6 +523,10 @@ Show the load stats for the server
 
 Run the XSLT file (C<$xsl>) over each job matching C<$query> to generate a
 new config which is then sent back to Jenkins.
+
+=head2 C<copy ( $old, $new )>
+
+Copy C<$old> to C<$new>
 
 =head2 C<watch ($job)>
 

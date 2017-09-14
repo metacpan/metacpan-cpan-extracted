@@ -1,3 +1,10 @@
+0.05 Tue Sep 12 04:40:22 BST 2017
+ - test, fix working with non-thunk value
+
+0.04 Tue Sep 12 03:12:48 BST 2017
+ - use 'rwp' setter
+ - add test of validation
+
 0.03 Wed Sep  6 07:39:03 BST 2017
  - switch back to "before" technique so works with roles
  - add test of roles behaviour

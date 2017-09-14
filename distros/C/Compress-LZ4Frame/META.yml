@@ -1,14 +1,14 @@
 ---
-abstract: "Compression package using the lz4frame library\r"
+abstract: 'Compression package using the lz4frame library'
 author:
-  - 'Felix Bytow <felix.bytow@autinity.de>'
+  - 'Felix Bytow <felix.bytow@googlemail.com>'
 build_requires:
   perl: 5.010_001
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: 5.010_001
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,11 @@ name: Compress-LZ4Frame
 provides:
   Compress::LZ4Frame:
     file: lib/Compress/LZ4Frame.pm
-    version: '0.012'
+    version: '0.012001'
 requires:
   perl: 5.010_001
 resources:
   bugtracker: https://github.com/autinitysystems/Compress-LZ4Frame/issues
   repository: https://github.com/autinitysystems/Compress-LZ4Frame.git
-version: '0.012'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.012001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

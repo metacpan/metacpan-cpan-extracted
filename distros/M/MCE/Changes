@@ -1,6 +1,37 @@
 
 Revision history for Perl module MCE.
 
+1.830 Tue Sep 12 17:00:00 EST 2017
+
+  [BUG FIXES]
+
+  * Fixed MCE and MCE::Relay stalling when setting the input record separator.
+    See http://www.perlmonks.org/?node_id=1196701. Thank you, JediWombat.
+
+  * Fixed bug with dequeue_nb in MCE::Queue (#8). Thank you, @bokutin.
+  * Fixed signal handler (#9). Thank you, @chrisdenley.
+
+  [ENHANCEMENTS]
+
+  * Added Coro and Win32::GUI to list for enabling posix_exit.
+  * Added support for Haiku to get_ncpu in MCE::Util.
+  * Allow gathering to a shared array in MCE::Candy.
+
+  * Improved CPU count on the AIX platform in MCE::Util.
+  * Improved signal handling, including nested parallel-sessions.
+  * Improved running MCE::Hobo inside MCE workers.
+  * Improved running MCE with PDL.
+
+  * Refactored logic for MCE->do, bi-directional callback feature.
+  * Preserve lexical type for numbers during IPC: MCE->do and MCE::Queue.
+
+  * No longer loads threads on the Windows platform in MCE::Signal.
+    This enables MCE::Hobo 1.827 to spin faster, including lesser
+    memory consumption. Threads isn't required to run MCE::Hobo.
+
+  * Removed extra white-space from POD documentation.
+  * Validated MCE on SmartOS.
+
 1.829 Wed May 03 03:00:00 EST 2017
 
   * Reduced memory consumption.

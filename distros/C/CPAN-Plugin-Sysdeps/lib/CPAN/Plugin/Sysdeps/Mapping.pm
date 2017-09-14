@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 # shortcuts
 #  os and distros
@@ -720,7 +720,7 @@ sub mapping {
 
      [cpanmod => 'DBD::Pg',
       [os_freebsd,
-       [package => 'postgresql93-server']],
+       [package => 'postgresql95-server | postgresql93-server']],
       [like_debian,
        [package => 'libpq-dev']],
       [like_fedora,
@@ -2092,14 +2092,6 @@ sub mapping {
        [package => ['libftgl-dev', 'libfreetype6-dev']]]],
 
      [cpanmod => 'OpenGL::GLFW',
-      [os_freebsd,
-       [package => 'glfw']],
-      [like_debian,
-       [package => 'libglfw3-dev']],
-     ],
-
-     # XXX may be removed if OpenGL::GLFW got its first stable release
-     [cpandist => qr{^OpenGL-GLFW-\d},
       [os_freebsd,
        [package => 'glfw']],
       [like_debian,

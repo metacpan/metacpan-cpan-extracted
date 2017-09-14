@@ -1,3 +1,11 @@
+1.023 2017-09-10
+
+  Bug fixes:
+    * add missing backup option to read/write commands (like cme edit,
+      fix, modify ...)
+    * die if both require_config_file and require_backend_argument are set
+      in app file (in Config/Model/[system|user|application].d)
+
 1.022 2017-06-21
 
   Bug fixes for smoke test failures:

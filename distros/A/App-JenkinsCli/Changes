@@ -1,5 +1,13 @@
 Revision history for App-jenkins-cli
 
+0.011   2017-09-10
+        Updating for release of version 0.011
+        Added documentation for copy (Ivan Wills)
+        Added the ability to turn off colour in listing activities (Ivan Wills)
+        Added using a file to get a config from (rather than just the text) (Ivan Wills)
+        Making copy available and adding verbose to ls (Ivan Wills)
+        Adding new copy build command (Ivan Wills)
+
 0.010   2017-07-30
         Updating for release of version 0.010
         Fixing paramaters passed to _xslt_actions (Ivan Wills)

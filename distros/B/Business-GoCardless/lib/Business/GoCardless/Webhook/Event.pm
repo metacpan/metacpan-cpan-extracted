@@ -2,7 +2,7 @@ package Business::GoCardless::Webhook::Event;
 
 =head1 NAME
 
-Business::GoCardless::Webhook
+Business::GoCardless::Webhook::Event
 
 =head1 DESCRIPTION
 
@@ -58,12 +58,15 @@ has [ qw/
 Returns an array of resource objects (Payment, Subscription, etc) that are present
 in the event allowing you to do things with them or update your own data:
 
-	if ( $Webhook->is_payment ) {
-		foreach my $Payment ( $Webhook->resources ) {
-			...
-		}
-	} elsif ( $Webhook->is_subscription ) {
-		...
+    if ( $Event->is_payment ) {
+
+        foreach my $Payment ( $Event->resources ) {
+
+            if ( $Event->action eq 'paid_out' ) {
+                ...
+            }
+        }
+    }
 
 =cut
 

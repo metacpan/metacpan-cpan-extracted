@@ -1,0 +1,36 @@
+---
+abstract: 'Extract Strings To PO Files'
+author:
+  - 'Guido Flohr <guido.flohr@cantanea.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Locale-XGettext
+requires:
+  Carp: '0'
+  File::Spec: '0'
+  Getopt::Long: '2.36'
+  Locale::Messages: '0'
+  Locale::PO: '0.27'
+  Locale::Recode: '0'
+  Locale::TextDomain: '1.20'
+  Scalar::Util: '0'
+  base: '0'
+  strict: '0'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/gflohr/Locale-XGettext/issues
+  homepage: http://www.guido-flohr.net/en/projects#locale-xgettext
+  repository: git://github.com/gflohr/Locale-XGettext.git
+version: '0.2'
+x_serialization_backend: 'YAML::Tiny version 1.70'

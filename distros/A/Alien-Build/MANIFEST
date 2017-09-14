@@ -68,8 +68,6 @@ corpus/lib/pkgconfig/xor.pc
 corpus/pkgconfig/libbar1.pc
 corpus/pkgconfig/libfoo1.pc
 corpus/rc/basic.pl
-corpus/system_installed/MANIFEST
-corpus/system_installed/lib/MyTest.pm
 corpus/win32/openvpn.reg
 dist.ini
 example/README

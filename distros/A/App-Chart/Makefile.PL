@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -158,7 +158,7 @@ my %PREREQ_PM
     'Locale::Messages' => '1.19',
 
     'LWP' => '5.814',  # version 5.814 for new HTTP::Message::decodable()
-    # parts of lwp used explicitly
+    # parts of lwp used explicitly, some of which are separate now
     'LWP::UserAgent' => 0,
     'HTTP::Cookies' => 0,
     'HTTP::Message' => '5.814',
@@ -526,7 +526,8 @@ doc/chart-ema-weights.txt doc/chart-ema-weights.png: $(WEIGHTS_SOURCES)
 
 doc/chart-ema-weights.eps: $(WEIGHTS_SOURCES)
 	cd doc && $(PERL) -I ../lib weights.pl --eps
-# "epstopdf" is from tetex or texlive (debian package texlive-extra-utils).
+# "epstopdf" is from tetex or texlive
+#   (debian package texlive-font-utils or previously texlive-extra-utils).
 # "ps2pdf" is from ghostscript.
 EPSTOPDF = epstopdf
 PS2PDF = ps2pdf

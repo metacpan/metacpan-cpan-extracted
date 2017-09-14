@@ -9,8 +9,8 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Compression package using the lz4frame library\r",
-  "AUTHOR" => "Felix Bytow <felix.bytow\@autinity.de>",
+  "ABSTRACT" => "Compression package using the lz4frame library",
+  "AUTHOR" => "Felix Bytow <felix.bytow\@googlemail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Compress::LZ4Frame",
   "PREREQ_PM" => {},
-  "VERSION" => "0.012",
+  "VERSION" => "0.012001",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DiaColloDB::WWW
 
+v0.02.003 Mon, 11 Sep 2017 13:28:31 +0200 moocow
+	* wrapper directory template updates to dstar-web v0.34 (svn r27212)
+	* fixes DiaColloDB::WWW::CGI methods serverPort(), uri(), uriDir()
+
 v0.02.002 Thu, 22 Jun 2017 11:18:01 +0200 moocow
 	* wrapper directory template updates to dstar-web v0.33 (svn r26927)
 	  - bug fixes for generic DiaColloDB::Client URLs

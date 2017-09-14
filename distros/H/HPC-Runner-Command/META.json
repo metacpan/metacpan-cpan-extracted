@@ -4,7 +4,7 @@
       "Jillian Rowe <jillian.e.rowe@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -105,9 +105,7 @@
             "YAML::XS" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "utf8" : "0"
          }
       },
       "test" : {
@@ -120,7 +118,9 @@
             "Test::Class::Moose::Load" : "0",
             "Test::Class::Moose::Runner" : "0",
             "Test::More" : "0",
-            "Text::Diff" : "0"
+            "Text::Diff" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -136,7 +136,7 @@
          "web" : "https://github.com/biosails/HPC-Runner-Command"
       }
    },
-   "version" : "3.2.10",
+   "version" : "3.2.11",
    "x_contributors" : [
       "Travis CI <nobody@nobody.org>"
    ],

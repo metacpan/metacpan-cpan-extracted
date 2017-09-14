@@ -38,12 +38,12 @@ Have a max retry count to avoid infinite loops
 sub check_lock {
     my $self = shift;
 
-    my $max_retries = 200;
+    my $max_retries = 500;
     my $x           = 0;
 
     my $ret = 1;
     while ( $self->lock_file->exists ) {
-        Time::HiRes::sleep(0.5);
+        Time::HiRes::sleep(0.2);
         $x++;
         if($x >= $max_retries){
           $ret = 0;

@@ -79,11 +79,11 @@ sub execute {
     $self->app_log->info('Your jobs have been submitted.');
 
     ##Rolling this back until a future release
-    # $self->app_log->info('Experimental! For status updates please run:');
-    # $self->app_log->info('hpcrunner.pl stats');
-    # $self->app_log->info(
-    #     'To get status updates for only this submission please run:');
-    # $self->app_log->info( 'hpcrunner.pl stats --data_tar ' . $self->data_tar );
+    $self->app_log->info('Experimental! For status updates please run:');
+    $self->app_log->info('hpcrunner.pl stats');
+    $self->app_log->info(
+        'To get status updates for only this submission please run:');
+    $self->app_log->info( 'hpcrunner.pl stats --data_dir ' . $self->data_dir );
 }
 
 ##TODO Combine this with the BioX cache file functions

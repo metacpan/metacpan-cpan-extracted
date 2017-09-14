@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.010;
  
-use Test::Simple tests => 98;
+use Test::Simple tests => 109;
 use Word2vec::Word2vec;
 
 my $word2vec = Word2vec::Word2vec->new();
@@ -93,7 +93,6 @@ $word2vec->SetClasses( 0 );
 
 $word2vec->SetDebugTraining( 0 );
 ok( $word2vec->GetDebugTraining() == 0 );
-$word2vec->SetDebugTraining( 2 );
 
 $word2vec->SetBinaryOutput( 0 );
 ok( $word2vec->GetBinaryOutput() == 0 );
@@ -147,7 +146,6 @@ $word2vec->SetMinimizeMemoryUsage( 1 );
 
 
 # Advanced Method Testing (Word2Vec Training From File)
-$word2vec->SetDebugTraining( 2 );
 ok( $word2vec->ExecuteTraining( "samples/precompoundexample.txt", "vectors.bin" ) == 0 );
 ok( -e "vectors.bin" && -s "vectors.bin" );
 unlink( "vectors.bin" ) if ( -e "vectors.bin" );
@@ -169,27 +167,38 @@ ok( -e "vectors.bin" && -s "vectors.bin" );
 
 # Advanced Method Testing (Dense To Sparse Vector Conversion)
 ok( $word2vec->ReadTrainedVectorDataFromFile( "vectors.bin" ) == 0 );
+ok( $word2vec->IsVectorDataInMemory() == 1 );
+ok( $word2vec->IsWordOrCUIVectorData() eq "word" );
 ok( $word2vec->SaveTrainedVectorDataToFile( "sparsevectors.bin", 2 ) == 0 );
 ok( -e "sparsevectors.bin" && -s "sparsevectors.bin" );
 ok( $word2vec->CheckWord2VecDataFileType( "sparsevectors.bin" ) eq "sparsetext" );
 
 # Advanced Method Testing (Sparse To Binary Vector Conversion)
 $word2vec->ClearVocabularyHash();
+ok( $word2vec->IsVectorDataInMemory() == 0 );
 ok( $word2vec->ReadTrainedVectorDataFromFile( "sparsevectors.bin" ) == 0 );
+ok( $word2vec->IsVectorDataInMemory() == 1 );
+ok( $word2vec->IsWordOrCUIVectorData() eq "word" );
 ok( $word2vec->SaveTrainedVectorDataToFile( "binaryvectors.bin", 1 ) == 0 );
 ok( -e "binaryvectors.bin" && -s "binaryvectors.bin" );
 ok( $word2vec->CheckWord2VecDataFileType( "binaryvectors.bin" ) eq "binary" );
 
 # Advanced Method Testing (Binary To Dense Vector Conversion)
 $word2vec->ClearVocabularyHash();
+ok( $word2vec->IsVectorDataInMemory() == 0 );
 ok( $word2vec->ReadTrainedVectorDataFromFile( "binaryvectors.bin" ) == 0 );
+ok( $word2vec->IsVectorDataInMemory() == 1 );
+ok( $word2vec->IsWordOrCUIVectorData() eq "word" );
 ok( $word2vec->SaveTrainedVectorDataToFile( "densevectors.bin", 0 ) == 0 );
 ok( -e "densevectors.bin" && -s "densevectors.bin" );
 ok( $word2vec->CheckWord2VecDataFileType( "densevectors.bin" ) eq "text" );
 
 # Computing Cosine Similarity
 $word2vec->ClearVocabularyHash();
+ok( $word2vec->IsVectorDataInMemory() == 0 );
 ok( $word2vec->ReadTrainedVectorDataFromFile( "vectors.bin" ) == 0 );
+ok( $word2vec->IsVectorDataInMemory() == 1 );
+ok( $word2vec->IsWordOrCUIVectorData() eq "word" );
 ok( defined( $word2vec->GetWordVector( "of" ) ) );
 ok( defined( $word2vec->ComputeCosineSimilarity( "of", "the" ) ) );
 ok( defined( $word2vec->ComputeAvgOfWordsCosineSimilarity( "of the", "was and" ) ) );

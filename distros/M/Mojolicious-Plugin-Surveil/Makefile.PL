@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Mojolicious/Plugin/Surveil.pm',
   VERSION_FROM => 'lib/Mojolicious/Plugin/Surveil.pm',
-  EXE_FILES => [qw(  )],
+  EXE_FILES => [qw()],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/mojolicious-plugin-surveil/issues',
@@ -22,5 +22,5 @@ WriteMakefile(
   'Mojolicious' => '5.10'
 }
 ,
-  test => { TESTS => 't/*.t' },
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );

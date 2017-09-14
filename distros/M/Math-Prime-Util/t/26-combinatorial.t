@@ -3,7 +3,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/binomial factorial forcomb forperm formultiperm/;
+use Math::Prime::Util qw/binomial factorial
+                         forcomb forperm forderange formultiperm
+                         numtoperm permtonum randperm shuffle/;
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 
 use Math::BigInt try => "GMP,Pari";
@@ -22,6 +24,10 @@ plan tests => 1                        # Factorial
             + 6 + 4                    # Combinations
             + scalar(keys(%perms)) + 1 # Permutations
             + 4                        # Multiset Permutations
+            + 5                        # Derangements
+            + 5 + 5 + 1                # numtoperm, permtonum
+            + 5                        # randperm
+            + 5                        # shuffle
             ;
 
 sub fact { my $n = Math::BigInt->new("$_[0]"); $n->bfac; }
@@ -81,3 +87,56 @@ while (my($n, $expect) = each (%perms)) {
 
 { my @p; formultiperm { push @p, join("",@_) } [qw/a a b b/];
   is_deeply(\@p, [qw/aabb abab abba baab baba bbaa/], "formultiperm aabb"); }
+
+###### forderange
+
+{ my @p; forderange { push @p, [@_] } 0;
+  is_deeply(\@p, [[]], "forderange 0"); }
+{ my @p; forderange { push @p, [@_] } 1;
+  is_deeply(\@p, [], "forderange 1"); }
+{ my @p; forderange { push @p, [@_] } 2;
+  is_deeply(\@p, [[1,0]], "forderange 2"); }
+{ my @p; forderange { push @p, [@_] } 3;
+  is_deeply(\@p, [[1,2,0],[2,0,1]], "forderange 3"); }
+{ my $n=0; forderange { $n++ } 7; is($n, 1854, "forderange 7 count"); }
+
+###### numtoperm / permtonum
+
+is_deeply([numtoperm(0,0)],[],"numtoperm(0,0)");
+is_deeply([numtoperm(1,0)],[0],"numtoperm(1,0)");
+is_deeply([numtoperm(1,1)],[0],"numtoperm(1,1)");
+is_deeply([numtoperm(5,15)],[0,3,2,4,1],"numtoperm(5,15)");
+is_deeply([numtoperm(24,987654321)],[0,1,2,3,4,5,6,7,8,9,10,13,11,21,14,20,17,15,12,22,18,19,23,16],"numtoperm(24,987654321)");
+
+is(permtonum([]),0,"permtonum([])");
+is(permtonum([0]),0,"permtonum([0])");
+is(permtonum([6,3,4,2,5,0,1]),4768,"permtonum([6,3,4,2,5,0,1])");
+is(permtonum([reverse(0..14),15..19]),"1790774578500738480","permtonum( 20 )");
+is(permtonum([reverse(0..12),reverse(13..25)]),"193228515634198442606207999","permtonum( 26 )");
+
+is(permtonum([numtoperm(14,8467582)]),8467582,"permtonum(numtoperm)");
+
+###### randperm
+# TODO: better randperm tests
+
+is(@{[randperm(0)]},0,"randperm(0)");
+is(@{[randperm(1)]},1,"randperm(1)");
+is(@{[randperm(100,4)]},4,"randperm(100,4)");
+{ my @p = 1..100;
+  my @s = @p[randperm(0+@p)];
+  isnt("@s", "@p", "randperm shuffle has shuffled input");
+  my @ss = sort { $a<=>$b } @s;
+  is("@ss", "@p", "randperm shuffle contains original data");
+}
+
+###### shuffle
+
+is_deeply([shuffle()],[],"shuffle with no args");
+is_deeply([shuffle("a")],["a"],"shuffle with one arg");
+{ my @p = 1..100;
+  my @s = shuffle(@p);
+  is(0+@s,0+@p,"argument count is the same for 100 elem shuffle");
+  isnt("@s", "@p", "shuffle has shuffled input");
+  my @ss = sort { $a<=>$b } @s;
+  is("@ss", "@p", "shuffle contains original data");
+}

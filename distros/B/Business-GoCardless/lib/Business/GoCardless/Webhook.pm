@@ -149,6 +149,18 @@ sub is_bill              { return shift->resource_type eq 'bill' }
 sub is_pre_authorization { return shift->resource_type eq 'pre_authorization' }
 sub is_subscription      { return shift->resource_type eq 'subscription' }
 
+=head2 is_legacy
+
+See if the webhook is a legacy (Basic API) webhook
+
+	if ( $Webhook->is_legacy ) {
+        ...
+    }
+
+=cut
+
+sub is_legacy { 1 }
+
 =head1 CONFIRMING WEBHOOKS
 
 According to the gocardless API docs you should respond once the signature of the

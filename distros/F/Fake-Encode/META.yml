@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Fake-Encode
 abstract: Fake Encode module for compatible scripting
-version: 0.05
+version: 0.07
 author:
   - INABA Hitoshi <ina@cpan.org> in a CPAN
 license: perl

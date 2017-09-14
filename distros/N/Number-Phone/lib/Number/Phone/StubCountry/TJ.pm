@@ -22,15 +22,15 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164949;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
+                  'pattern' => '([349]\\d{2})(\\d{2})(\\d{4})',
                   'leading_digits' => '
             [34]7|
             91[78]
-          ',
-                  'pattern' => '([349]\\d{2})(\\d{2})(\\d{4})'
+          '
                 },
                 {
                   'pattern' => '([457-9]\\d)(\\d{3})(\\d{4})',
@@ -38,14 +38,14 @@ my $formatters = [
             4[148]|
             [578]|
             9(?:
-              1[59]|
-              [0235-9]
+              [0235-9]|
+              1[59]
             )
           '
                 },
                 {
-                  'pattern' => '(331700)(\\d)(\\d{2})',
-                  'leading_digits' => '331700'
+                  'leading_digits' => '331700',
+                  'pattern' => '(331700)(\\d)(\\d{2})'
                 },
                 {
                   'leading_digits' => '
@@ -62,6 +62,8 @@ my $formatters = [
               ];
 
 my $validators = {
+                'voip' => '',
+                'toll_free' => '',
                 'mobile' => '
           (?:
             41[18]|
@@ -73,6 +75,7 @@ my $validators = {
             )\\d
           )\\d{6}
         ',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -90,8 +93,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'voip' => '',
-                'toll_free' => '',
                 'pager' => '',
                 'geographic' => '
           (?:
@@ -110,7 +111,6 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'specialrate' => '',
                 'personal_number' => ''
               };
 my %areanames = (

@@ -54,11 +54,11 @@ Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,7 @@ sub _ELEM {
     $elem;
 }
 
-=head2 _XML $SPEC [, $PARENT, $DOC, $ARGS | @ARGS ] | %PARAMS
+=head2 _XML $SPEC [, $PARENT, $DOC, \@ARGS | @ARGS ] | %PARAMS
 
 Generate an XML tree according to the L<specification
 format|/Specification Format>. Returns the I<last node generated> by
@@ -246,7 +246,26 @@ to fish it out later.
 =item parent
 
 The L<XML::LibXML::Element> (or, redundantly, Document) object which
-is intended to be the parent node of the spec. Optional.
+is intended to be the I<parent node> of the spec. Optional; defaults
+to the document.
+
+=item replace
+
+Suppose we're doing surgery to an existing XML document. Instead of
+supplying a L</parent>, we can supply a node in said document which we
+want to I<replace>. Note that this parameter is incompatible with
+L</parent>, is meaningless for some node types (e.g. C<-doctype>), and
+may fail in some contexts (e.g. when the node to be replaced is the
+document).
+
+=item before, after
+
+Why stop at replacing nodes? Sometimes we need to snuggle a new set of
+nodes up to one side or the other of a sibling at the same level.
+B<Will fail if the sibling node has no parent.> Will also fail if you
+do things like try to add a second root element. Optional of course.
+Once again, all these parameters, L</parent>, L</replace>, C<before>
+and C<after>, are I<mutually conflicting>.
 
 =item args
 
@@ -446,6 +465,75 @@ sub _attach {
     $node;
 }
 
+sub _replace {
+    my ($node, $target) = @_;
+
+    if ($node && $target) {
+        $target->replaceNode($node);
+    }
+
+    $node;
+}
+
+my %ADJ = (
+    parent => sub {
+        my ($node, $parent) = @_;
+        if ($parent->nodeType == 9 and $node->nodeType == 1) {
+            $parent->setDocumentElement($node);
+        }
+        else {
+            $parent->appendChild($node);
+        }
+
+        $node;
+    },
+    before => sub {
+        my ($node, $next) = @_;
+        my $parent = $next->parentNode;
+        $parent->insertBefore($node, $next);
+
+        $node;
+    },
+    after => sub {
+        my ($node, $prev) = @_;
+        my $parent = $prev->parentNode;
+        $parent->insertAfter($node, $prev);
+
+        $node;
+    },
+    replace => sub {
+        my ($node, $target) = @_;
+        my $od = $target->ownerDocument;
+        if ($target->isSameNode($od->documentElement)) {
+            if ($node->nodeType == 1) {
+                $od->removeChild($target);
+                $od->setDocumentElement($node);
+            }
+            else {
+                # this may not be an element
+                $od->insertAfter($node, $target);
+                $od->removeChild($target);
+            }
+        }
+        else {
+            $target->replaceNode($node);
+        }
+
+        $node;
+    },
+);
+
+sub _ancestor_is {
+    my ($node, $local, $ns) = @_;
+    return unless $node->nodeType == 1;
+
+    return 1 if $node->localName eq $local
+        and (!defined($ns) or $node->namespaceURI eq $ns);
+
+    my $parent = $node->parentNode;
+    _ancestor_is($parent, $local, $ns) if $parent and $parent->nodeType == 1;
+}
+
 sub _XML {
     my $self = shift;
     my %p;
@@ -464,27 +552,61 @@ sub _XML {
     }
 
     $p{args} ||= [];
-    $p{doc} ||= $p{parent} && $p{parent}->ownerDocument
-        ? $p{parent}->ownerDocument : $self->_DOC;
-    $p{parent} ||= $p{doc}; # this might be problematic
+
+    my $adj;
+    for my $k (keys %ADJ) {
+        if ($p{$k}) {
+            Carp::croak('Conflicting adjacent nodes ' .
+                            join ', ', sort grep { $p{$_} } keys %ADJ) if $adj;
+            Carp::croak("$k must be an XML node")
+                  unless _isa_really($p{$k}, 'XML::LibXML::Node');
+
+            $adj = $k;
+        }
+    }
+
+    if ($adj) {
+        Carp::croak('Adjacent node must be attached to a document')
+              unless $p{$adj}->ownerDocument;
+        unless ($adj eq 'parent') {
+            Carp::croak('Replace/prev/next node must have a parent node')
+                  unless $p{parent} = $p{$adj}->parentNode;
+        }
+
+        $p{doc} ||= $p{$adj}->ownerDocument;
+    }
+    else {
+        $p{$adj = 'parent'} = $p{doc} ||= $self->_DOC;
+    }
+
+    # $p{doc} ||= $p{parent} && $p{parent}->ownerDocument
+    #     ? $p{parent}->ownerDocument : $self->_DOC;
+    # $p{parent} ||= $p{doc}; # this might be problematic
 
     my $node;
 
     my $ref = ref($p{spec}) || '';
     if ($ref eq 'ARRAY') {
+        my $par = $adj ne 'parent' ?
+            $p{doc}->createDocumentFragment : $p{parent};
+
+        # we add a _pseudo parent because it's the only way to
+        # propagate things like the namespace
         my @out = map {
-            $self->_XML(spec => $_,      parent => $p{parent},
+            $self->_XML(spec => $_, parent => $par, _pseudo => $p{parent},
                         doc  => $p{doc}, args => $p{args}) } @{$p{spec}};
         if (@out) {
+            $ADJ{$adj}->($par, $p{$adj}) unless $adj eq 'parent';
+
             return wantarray ? @out : $out[-1];
         }
-        return $p{parent};
+        return $p{$adj};
     }
     elsif ($ref eq 'CODE') {
         return $self->_XML(spec   => $p{spec}->($self, @{$p{args}}),
-                              parent => $p{parent},
-                              doc    => $p{doc},
-                              args   => $p{args});
+                           $adj   => $p{$adj},
+                           doc    => $p{doc},
+                           args   => $p{args});
     }
     elsif ($ref eq 'HASH') {
         # copy the spec so we don't screw it up
@@ -492,8 +614,8 @@ sub _XML {
 
         if (my $c = $spec{'-comment'}) {
             $node = $p{doc}->createComment($self->_flatten($c, @{$p{args}}));
-            _attach($node, $p{parent});
-            return $node;
+
+            return $ADJ{$adj}->($node, $p{$adj});
         }
         if (my $target = delete $spec{'-pi'}) {
             # take -content over content
@@ -507,10 +629,10 @@ sub _XML {
                 $self->_flatten($content, @{$p{args}}) if defined $content;
 
             $node = $p{doc}->createProcessingInstruction($target, $data);
-            _attach($node, $p{parent});
-            return $node;
+
+            return $ADJ{$adj}->($node, $p{$adj});
         }
-        elsif (my $dtd = $spec{'-doctype'}) {
+        elsif (my $dtd = $spec{'-doctype'} || $spec{'-dtd'}) {
             # in XML::LibXML::LazyBuilder i wrote that there is some
             # XS issue and these values have to be explicitly passed
             # in as undef.
@@ -534,12 +656,11 @@ sub _XML {
             $prefix ||= '';
 
             # detect appropriate table tag
-            unless ($tag ||= _table_tag($p{parent})) {
-                my $is_head = $p{parent}->nodeType == 1 &&
-                    $p{parent}->localname eq 'head';
+            unless ($tag ||= _table_tag($p{_pseudo} || $p{parent})) {
+                my $is_head = _ancestor_is($p{_pseudo} || $p{parent}, 'head');
                 # detect tag
                 if (defined $spec{src}) {
-                    $tag = 'img';
+                    $tag = $is_head ? 'script' : 'img';
                 }
                 elsif (defined $spec{href}) {
                     $tag = $is_head ? 'link' : 'a';
@@ -552,7 +673,8 @@ sub _XML {
             # okay generate the node
             my %ns;
 
-            if (my $nsuri = $p{parent}->lookupNamespaceURI($prefix)) {
+            if (my $nsuri =
+                    ($p{_pseudo} || $p{parent})->lookupNamespaceURI($prefix)) {
                 $ns{$prefix} = $nsuri;
             }
 
@@ -565,7 +687,7 @@ sub _XML {
                 $ns{$prefix} = $v;
             }
             $node = $self->_ELEM($tag, $p{doc}, \%ns);
-            _attach($node, $p{parent});
+            $ADJ{$adj}->($node, $p{$adj});
 
             # now do the attributes
             for my $k (sort grep { $_ =~ QNAME_RE } keys %spec) {
@@ -587,13 +709,13 @@ sub _XML {
     elsif (Scalar::Util::blessed($p{spec})
           and $p{spec}->isa('XML::LibXML::Node')) {
         $node = $p{spec}->cloneNode(1);
-        _attach($node, $p{parent});
+        $ADJ{$adj}->($node, $p{$adj});
     }
     else {
         # spec is a text node, if defined
         if (defined $p{spec}) {
             $node = $p{doc}->createTextNode("$p{spec}");
-            _attach($node, $p{parent});
+            $ADJ{$adj}->($node, $p{$adj});
         }
     }
 
@@ -619,7 +741,7 @@ calls to L</_XML>).
 
 =item uri
 
-The C<href> attribute of the C<<baseE<gt>> element.
+The C<href> attribute of the C<E<lt>baseE<gt>> element.
 
 =item ns
 
@@ -633,10 +755,15 @@ then the XML namespaces will I<not> be set. Conversely, if this
 parameter is defined but false, then I<only> the contents of C<ns>
 will appear in the conventional C<xmlns:foo> way.
 
+=item vocab
+
+This will specify a default C<vocab> attribute in the
+C<E<lt>htmlE<gt>> element, like L<http://www.w3.org/1999/xhtml/vocab/>.
+
 =item title
 
 This can either be a literal title string, or C<CODE> reference, or
-C<HASH> reference assumed to encompass the whole C<<titleE<gt>>
+C<HASH> reference assumed to encompass the whole C<E<lt>titleE<gt>>
 element, or an C<ARRAY> reference where the first element is the title
 and subsequent elements are predicates.
 
@@ -655,7 +782,7 @@ Predicates are grouped by C<href>, folded, and sorted alphabetically.
 
 =item
 
-C<<linkE<gt>> elements are sorted first lexically by the sorted
+C<E<lt>linkE<gt>> elements are sorted first lexically by the sorted
 C<rel>, then by sorted C<rev>, then by C<href>.
 
 =item
@@ -1028,14 +1155,27 @@ sub _isa_really {
         and Scalar::Util::blessed($obj) and $obj->isa($class);
 }
 
+sub _strip_ns {
+    my $ns = shift;
+    if (_isa_really($ns, 'URI::NamespaceMap')) {
+        return { map +($_ => $ns->namespace_uri($_)->as_string),
+                 $ns->list_prefixes };
+    }
+    elsif (_isa_really($ns, 'RDF::Trine::NamespaceMap')) {
+        return { map +($_, $ns->namespace_uri($_)->uri_value->uri_value),
+                 $ns->list_prefixes };
+    }
+    else {
+        return $ns;
+    }
+}
+
 sub _XHTML {
     my $self = shift;
     my %p = @_;
 
     # ns is empty if prefix has stuff in it
-    my $nstemp = _isa_really($p{ns}, 'URI::NamespaceMap')
-        ? { map +($_ => $p{ns}->namespace_uri($_)->as_string),
-            $p{ns}->list_prefixes } : $p{ns};
+    my $nstemp = _strip_ns($p{ns} || {});
     my %ns = map +("xmlns:$_" => $nstemp->{$_}), keys %{$nstemp || {}}
         unless $p{prefix};
 
@@ -1062,10 +1202,11 @@ sub _XHTML {
     );
 
     # prefix is empty if it is defined but false, otherwise overrides ns
-    my $pfxtemp = _isa_really($p{prefix}, 'URI::NamespaceMap')
-        ? { map +($_ => $p{prefix}->namespace_uri($_)->as_string),
-            $p{prefix}->list_prefixes } : $p{prefix};
+    my $pfxtemp = _strip_ns($p{prefix}) if $p{prefix};
     $spec[1]{prefix} = $pfxtemp ? $pfxtemp : defined $pfxtemp ? {} : $nstemp;
+
+    # add a default vocab too
+    $spec[1]{vocab} = $p{vocab} if $p{vocab};
 
     # add transform if present
     unshift @spec, { -pi => 'xml-stylesheet', type => 'text/xsl',

@@ -1,5 +1,7 @@
 package TeX::Encode::BibTeX;
 
+our $VERSION = '2.003'; # VERSION
+
 use 5.008;
 use strict;
 

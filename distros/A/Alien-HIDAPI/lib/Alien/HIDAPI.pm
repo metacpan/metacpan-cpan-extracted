@@ -3,7 +3,7 @@ use warnings;
 package Alien::HIDAPI;
 
 # ABSTRACT: Perl distribution for HIDAPI
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 use parent 'Alien::Base';
 

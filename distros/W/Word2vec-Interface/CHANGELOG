@@ -1,6 +1,91 @@
 NAME
     word2vec CHANGES
 
+	version 0.036
+	  (09/04/2017)
+		 - Word2vec-Interface - Similarity() - Bug Fix: Error out gracefully when reading vector data results in an error.
+		                      - ShowHelp() - Typo                      
+		 - Word2vec.pm - ReadTrainedVectorDataFile() - Sparse vector reader updated to skip empty lines.
+		                                             - Sparse vector reader updated to convert all read data to lowercase.
+		                                             - Text vector reader updated to skip empty lines.
+		                                             - Binary vector reader updated to skip empty lines. (Beta - Needs testing)
+		                                             - Updated debug logs to support the above changes.
+		                                             - Added load progress indicator in percent when loading files.
+		                                             - Added save progress indicator in percent when saving files. (Beta - Needs testing)
+		               - GetWordVector() - Sparse-to-Dense format conversion: Included check for vector length. Must be >= 1. Returns undef if vector length = 0.
+		                                 - Updated debug log to support the above change.
+		 - Interface.pm - WSDParseFile() - Updated to check for string containing space. Convert to empty string.
+
+		(08/31/2017)
+		 - Spearmans.pm - CalculateSpearmans() - Debug Log Typo
+
+		(08/28/2017)
+		 - Word2vec.pm - ComputeMultiWordCosineSimilarity() - Added parameter "$allWordsMustExist", bool value that specifies if all words must exists prior to computing cosine similarity. (1 = True / 0 = False - Default)
+		                                                      (Returns undef when word not found in dictionary)
+		 - Interface.pm - W2VComputeMultiWordCosineSimilarity() - Updated to support the above change.
+
+		(08/23/2017)
+		 - Word2vec.pm - ComputeMultiWordCosineSimilarity()  - Bug Fix: Check argument length before continuing. Prevents empty string error.
+		               - ComputeAvgOfWordsCosineSimilarity() - Updated log statement to print error after checking argument length before continuing. (Prevents empty string error)
+
+		(08/16/2017)
+		 - Word2vec-Interface.pl - ShowHelp() - Fixed comment spacing
+		                         - CosineSimilarityBetweenTwoFiles() - Added function
+		                         - Updated other functions to support the above changes.
+		 - Word2vec.pm - ReadTrainedVectorDataFromFile() - Updated to support searching for a word while reading file from disk.
+		                                                   (Note: Only when search word parameter is defined. Method also does not store vector data in memory when search word is defined.)
+		                                                 - Updated Dense, Sparse and Binary read code to support the above changes.
+		                                                 - Added error checking and commenting to sparse code.
+		 - Interface.pm - W2VRemoveWordFromWordVectorString() - Added Function.
+		                - W2VReadTrainedVectorDataFromFile()  - Updated to support latest changes.
+
+	version 0.035
+		(05/27/2017)
+		 - Word2vec-Interface.pl - Similarity() - Updated Spearman's Correlation Rank Score Code
+		                                        - Now prints file "SpearmansScore.txt" when conditions are met.
+		                                        - Added warning statements when unable generate Spearman's score.
+		
+		(05/25/2017)
+		 - Word2vec-Interface.pl - Added Spearmans() function and updated script to include "--spearmans" command-line call.
+		 - Updated POD documentation to support the latest changes.
+		
+		(05/24/2017)
+		 - Word2vec-Interface.pl - Similarity() - Updated to support performing all standardized Spearman's Rank Correlation file comparisons.
+		 - Word2vec.pm - Added IsWordOrCUIVectorData() function.
+		 - Util.pm - Added IsWordOrCUITerm() function.
+		 - Interface.pm - Added W2VIsWordOrCUIVectorData() function.
+		 - Spearmans.pm - IsFileWordOrCUIFile() - Updated to support SVAL file format without Spearman's Rank Correlation Scores.
+		
+		(05/11/2017)
+		 - Word2vec-Interface.pl - Similarity() - Bug Fix: Function call typo. "IsFileOrDirectory()" versus "IsFileOfDirectory()"
+		                                        - Added automatic Spearman's Rank Correlation Score generation.
+		 - Spearmans.pm - Added IsFileWordOrCUIFile() function.
+		                - CalculateSpearmans() - Added $aCount and $bCount check / Fixes possible illegal division by zero error.
+		                                       - Added parameter to include $aCount and $bCount with Spearman's score.
+		                                       - Typo
+		 - Interface.pm - Added SpIsFileWordOrCUIFile() function.
+		                - Updated CLSimilarityAvg() - Now saves result file in current working directory.
+		                - Updated CLSimilarityComp() - Now saves result file in current working directory.
+		                - Updated CLSimilaritySum() - Now saves result file in current working directory.
+		 - Updated POD documentation to support the above changes.
+		
+		(05/10/2017)
+		 - Interface.pm - Spearmans.pm module integration.
+		                - Function refactoring (changed some functions to hidden functions). -> Needs further evaluation.
+		                - Updated POD documentation to support the latest changes.
+		 - Spearmans.pm - Updated POD documentation.
+		
+		(05/09/2017)
+		 - Created and added Word2vec::Spearmans Module.  (Not yet integrated into Word2vec::Interface or other modules/scripts).
+		 - Created and added 1Spearmans.t script.
+		 - Updated Word2phrase.t and Word2vec.t scripts.
+		 - Interface.pm - Added _spearmans handler object variable, GetSpearmansHandler(), CalculateSpearmans() functions.
+		                - GetWord2vecHandler() - Bug Fix: Instantiation of new object error.
+		                - GetWord2PhraseHandler() - Bug Fix: Instantiation of new object error.
+		                - GetXMLToW2VHandler() - Bug Fix: Instantiation of new object error.
+		                - GetUtilHandler() - Bug Fix: Instantiation of new object error.
+		                - Renamed private function with "_" prefix.
+
   version 0.03
     (04/05/2017)
      - word2vec-interface.pl - Similarity() - Removed "Finished File" log statement and added parsing error log statements.

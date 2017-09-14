@@ -1,4 +1,4 @@
-CREATE SEQUENCE RTxDatabaseSettings_seq;s
+CREATE SEQUENCE RTxDatabaseSettings_seq;
 CREATE TABLE RTxDatabaseSettings (
     id              NUMBER(11,0)    CONSTRAINT RTxDatabaseSettings_key PRIMARY KEY,
     Name            VARCHAR2(255) CONSTRAINT RTxDatabaseSettings_Name_Unique unique  NOT NULL,

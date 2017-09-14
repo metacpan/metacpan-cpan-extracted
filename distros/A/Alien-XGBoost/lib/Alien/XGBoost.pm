@@ -4,7 +4,7 @@ use warnings;
 
 use base qw( Alien::Base );
 
-our $VERSION = '0.04';    # VERSION
+our $VERSION = '0.05';    # VERSION
 
 # ABSTRACT: Alien package to find, and build if necessary XGBoost dynamic library
 
@@ -22,7 +22,7 @@ Alien::XGBoost - Alien package to find, and build if necessary XGBoost dynamic l
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,9 @@ version 0.04
 =head1 DESCRIPTION
 
 Alien package to find, and build if necessary XGBoost dynamic library.
+
+=for markdown [![Build Status](https://travis-ci.org/pablrod/p5-Alien-XGBoost.png?branch=master)](https://travis-ci.org/pablrod/p5-Alien-XGBoost)
+[![Build status](https://ci.appveyor.com/api/projects/status/nl46f64tjiyaveql/branch/master?svg=true)](https://ci.appveyor.com/project/pablrod/p5-alien-xgboost/branch/master)
 
 This module is to be used by other modules that need the XGBoost
 dynamic library available, indeed I've made this for L<AI::XGBoost>.

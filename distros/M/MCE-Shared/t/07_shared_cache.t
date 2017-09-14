@@ -25,7 +25,7 @@ tie my $e2,   'MCE::Shared';
 tie my $d1,   'MCE::Shared';
 tie my $s1,   'MCE::Shared';
 
-tied(%h1)->mset( k1 => 10, k2 => '', k3 => '' );
+tied(%h1)->assign( k1 => 10, k2 => '', k3 => '' );
 
 my $h5 = MCE::Shared->cache( max_keys => 100 );
 
@@ -134,9 +134,7 @@ is( $h1{ret}->[1], 'air', 'shared cache, check auto freeze/thaw' );
 ##          '2' => '3',
 ## }
 
-$h5->clear();
-
-$h5->mset( qw(
+$h5->assign( qw(
    Make me a channel of Your peace...
    Where there's despair in life let me bring hope...
    Where there is darkness only light...
@@ -376,9 +374,7 @@ is( $h5->vals('val >= 18'), 1, 'shared cache, check find vals >= match (vals)' )
 
 ## find undef
 
-$h5->clear();
-
-$h5->mset( qw/ spring summer fall winter / );
+$h5->assign( qw/ spring summer fall winter / );
 $h5->set( key => undef );
 
 cmp_array(
@@ -450,9 +446,70 @@ is( $h5->get(3), '77ba', 'shared cache, check value after append' );
 is( $h5->getset('3', '77bc'), '77ba', 'shared cache, check getset' );
 is( $h5->get(3), '77bc', 'shared cache, check value after getset' );
 
+$h5->assign( 0, 'over', 1, 'the', 2, 'rainbow', 3, 77 );
+
+my $iter  = $h5->iterator();
+my $count = 0;
+my @check;
+
+while ( my ($key, $val) = $iter->() ) {
+   push @check, $key, $val;
+   $count++;
+}
+
+$iter = $h5->iterator();
+
+while ( my $val = $iter->() ) {
+   push @check, $val;
+   $count++;
+}
+
+is( $count, 8, 'shared cache, check iterator count' );
+
+cmp_array(
+   [ @check ], [ qw/ 3 77 2 rainbow 1 the 0 over 77 rainbow the over / ],
+   'shared cache, check iterator results'
+);
+
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-$h5->clear(); $h5->mset( 0, 'over', 1, 'the', 2, 'rainbow', 3, 77 );
+my @list;
+
+$h5->assign( 0, 'over', 1, 'the', 2, 'rainbow', 3, 77 );
+
+while ( my $val = $h5->next ) { push @list, $val; }
+
+cmp_array(
+   [ @list ], [ qw/ 77 rainbow the over / ],
+   'shared cache, check next'
+);
+
+@list = (); $h5->rewind('val =~ /[a-z]/');
+
+while ( my ($key, $val) = $h5->next ) { push @list, $key, $val; }
+
+cmp_array(
+   [ @list ], [ qw/ 2 rainbow 1 the 0 over / ],
+   'shared cache, check rewind 1'
+);
+
+@list = (); $h5->rewind('key =~ /\d/');
+
+while ( my $val = $h5->next ) { push @list, $val; }
+
+cmp_array(
+   [ @list ], [ qw/ 77 rainbow the over / ],
+   'shared cache, check rewind 2'
+);
+
+@list = (); $h5->rewind(qw/ 1 2 /);
+
+while ( my $val = $h5->next ) { push @list, $val; }
+
+cmp_array(
+   [ sort @list ], [ sort qw/ rainbow the / ],
+   'shared cache, check rewind 3'
+);
 
 is( $h5->mexists(qw/ 0 2 3 /),  1, 'shared cache, check mexists 1' );
 is( $h5->mexists(qw/ 0 8 3 /), '', 'shared cache, check mexists 2' );

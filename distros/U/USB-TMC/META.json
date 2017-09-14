@@ -4,7 +4,7 @@
       "Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
       "x_IRC" : "'irc://chat.freenode.net/#labmeasurement'",
       "x_MailingList" : "'https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users'"
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

@@ -1,6 +1,6 @@
 # Minneapolis Grain Exchange (MGEX) setups.
 
-# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -135,10 +135,11 @@ sub barchart_customer_resp_to_url {
   my ($resp, $symbol) = @_;
   my $content = $resp->decoded_content (raise_error => 1);
 
-  # This doesn't use java_document_write() and HTML::LinkExtor because the
-  # width/height in the document.write() in the <img> bit is computed, which
-  # java_document_write() can't handle.  The src="" part of it is constant
-  # though.  There's only a single <img> to pick out.
+  # This doesn't use java_document_write() (in Finance::Quote::MGEX) and
+  # HTML::LinkExtor because the width/height in the document.write() in the
+  # <img> bit is computed, which java_document_write() can't handle.  The
+  # src="" part of it is constant though.  There's only a single <img> to
+  # pick out.
   if ($content =~ /<img src="([^"]+)"/i) {
     return $1;  # url
   }

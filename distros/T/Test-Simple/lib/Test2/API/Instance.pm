@@ -2,7 +2,7 @@ package Test2::API::Instance;
 use strict;
 use warnings;
 
-our $VERSION = '1.302086';
+our $VERSION = '1.302096';
 
 
 our @CARP_NOT = qw/Test2::API Test2::API::Instance Test2::IPC::Driver Test2::Formatter/;
@@ -11,7 +11,7 @@ use Scalar::Util qw/reftype/;
 
 use Test2::Util qw/get_tid USE_THREADS CAN_FORK pkg_to_file try CAN_SIGSYS/;
 
-use Test2::Util::Trace();
+use Test2::EventFacet::Trace();
 use Test2::API::Stack();
 
 use Test2::Util::HashBase qw{
@@ -20,6 +20,8 @@ use Test2::Util::HashBase qw{
     finalized loaded
     ipc stack formatter
     contexts
+
+    -preload
 
     ipc_shm_size
     ipc_shm_last
@@ -38,8 +40,8 @@ use Test2::Util::HashBase qw{
 
 sub DEFAULT_IPC_TIMEOUT() { 30 }
 
-sub pid { $_[0]->{+_PID} ||= $$ }
-sub tid { $_[0]->{+_TID} ||= get_tid() }
+sub pid { $_[0]->{+_PID} }
+sub tid { $_[0]->{+_TID} }
 
 # Wrap around the getters that should call _finalize.
 BEGIN {
@@ -65,6 +67,46 @@ sub import {
 }
 
 sub init { $_[0]->reset }
+
+sub start_preload {
+    my $self = shift;
+
+    confess "preload cannot be started, Test2::API has already been initialized"
+        if $self->{+FINALIZED} || $self->{+LOADED};
+
+    return $self->{+PRELOAD} = 1;
+}
+
+sub stop_preload {
+    my $self = shift;
+
+    return 0 unless $self->{+PRELOAD};
+    $self->{+PRELOAD} = 0;
+
+    $self->post_preload_reset();
+
+    return 1;
+}
+
+sub post_preload_reset {
+    my $self = shift;
+
+    delete $self->{+_PID};
+    delete $self->{+_TID};
+
+    $self->{+CONTEXTS} = {};
+
+    $self->{+FORMATTERS} = [];
+
+    $self->{+FINALIZED} = undef;
+    $self->{+IPC}       = undef;
+
+    $self->{+IPC_TIMEOUT} = DEFAULT_IPC_TIMEOUT() unless defined $self->{+IPC_TIMEOUT};
+
+    $self->{+LOADED} = 0;
+
+    $self->{+STACK} ||= Test2::API::Stack->new;
+}
 
 sub reset {
     my $self = shift;
@@ -101,6 +143,9 @@ sub _finalize {
     my $self = shift;
     my ($caller) = @_;
     $caller ||= [caller(1)];
+
+    confess "Attempt to initialize Test2::API during preload"
+        if $self->{+PRELOAD};
 
     $self->{+FINALIZED} = $caller;
 
@@ -232,6 +277,9 @@ sub add_post_load_callback {
 sub load {
     my $self = shift;
     unless ($self->{+LOADED}) {
+        confess "Attempt to initialize Test2::API during preload"
+            if $self->{+PRELOAD};
+
         $self->{+_PID} = $$        unless defined $self->{+_PID};
         $self->{+_TID} = get_tid() unless defined $self->{+_TID};
 
@@ -430,6 +478,8 @@ sub _ipc_wait {
 sub DESTROY {
     my $self = shift;
 
+    return if $self->{+PRELOAD};
+
     return unless defined($self->{+_PID}) && $self->{+_PID} == $$;
     return unless defined($self->{+_TID}) && $self->{+_TID} == get_tid();
 
@@ -439,6 +489,8 @@ sub DESTROY {
 
 sub set_exit {
     my $self = shift;
+
+    return if $self->{+PRELOAD};
 
     my $exit     = $?;
     my $new_exit = $exit;
@@ -504,7 +556,7 @@ This is not a supported configuration, you will have problems.
 
     # None of this is necessary if we never got a root hub
     if(my $root = shift @hubs) {
-        my $trace = Test2::Util::Trace->new(
+        my $trace = Test2::EventFacet::Trace->new(
             frame  => [__PACKAGE__, __FILE__, 0, __PACKAGE__ . '::END'],
             detail => __PACKAGE__ . ' END Block finalization',
         );

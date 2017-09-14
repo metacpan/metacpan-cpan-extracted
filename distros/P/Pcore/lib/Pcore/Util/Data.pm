@@ -15,10 +15,10 @@ use Pcore -const, -export,
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_ENC_B85 $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
     TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
   };
-use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar];
+use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
-use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_blessed_ref is_plain_scalarref is_plain_arrayref];
 use URI::Escape::XS qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 const our $DATA_TYPE_PERL => 1;
@@ -57,6 +57,7 @@ sub encode_data ( $type, $data, @ ) {
         compress_threshold => 100,                 # min data length in bytes to perform compression, only if compress = 1
         cipher             => $DATA_CIPHER_DES,    # cipher to use
         json               => undef,               # HashRef with additional params for Cpanel::JSON::XS
+        xml                => undef,               # HashRef with additional params for XML::Hash::XS
         splice @_, 2,
     );
 
@@ -71,114 +72,22 @@ sub encode_data ( $type, $data, @ ) {
 
     # encode
     if ( $type == $DATA_TYPE_PERL ) {
-        state $init = !!require Data::Dumper;
-
-        state $sort_keys = sub {
-            return [ nsort keys $_[0]->%* ];
-        };
-
-        local $Data::Dumper::Indent     = 0;
-        local $Data::Dumper::Purity     = 1;
-        local $Data::Dumper::Pad        = q[];
-        local $Data::Dumper::Terse      = 1;
-        local $Data::Dumper::Deepcopy   = 0;
-        local $Data::Dumper::Quotekeys  = 0;
-        local $Data::Dumper::Pair       = '=>';
-        local $Data::Dumper::Maxdepth   = 0;
-        local $Data::Dumper::Deparse    = 0;
-        local $Data::Dumper::Sparseseen = 1;
-        local $Data::Dumper::Useperl    = 1;
-        local $Data::Dumper::Useqq      = 1;
-        local $Data::Dumper::Sortkeys   = $args{readable} ? $sort_keys : 0;
-
-        if ( !defined $data ) {
-            $res = \'undef';
-        }
-        else {
-            no warnings qw[redefine];
-
-            local *Data::Dumper::qquote = sub {
-                return q["] . encode_utf8( escape_scalar $_[0] ) . q["];
-            };
-
-            $res = \Data::Dumper->Dump( [$data] );
-        }
-
-        if ( $args{readable} ) {
-            state $init1 = !!require Pcore::Src::File;
-
-            $res = Pcore::Src::File->new(
-                {   action      => $Pcore::Src::SRC_DECOMPRESS,
-                    path        => 'config.perl',                 # mark file as perl config
-                    is_realpath => 0,
-                    in_buffer   => $res,
-                    filter_args => {
-                        perl_tidy   => '--comma-arrow-breakpoints=0',
-                        perl_critic => 0,
-                    },
-                }
-            )->run->out_buffer;
-        }
+        $res = to_perl( $data, readable => $args{readable} );
     }
     elsif ( $type == $DATA_TYPE_JSON ) {
-        if ( $args{json} ) {
-            my $json = _get_json_obj( $args{json}->%* );
-
-            $res = \$json->encode($data);
-        }
-        elsif ( $args{readable} ) {
-            state $json = _get_json_obj( ascii => 0, latin1 => 0, utf8 => 1, canonical => 1, indent => 1, space_before => 0, space_after => 1 );
-
-            $res = \$json->encode($data);
-        }
-        else {
-            state $json = _get_json_obj( ascii => 1, latin1 => 0, utf8 => 1, pretty => 0 );
-
-            $res = \$json->encode($data);
-        }
+        $res = to_json( $data, $args{json}->%*, readable => $args{readable} );
     }
     elsif ( $type == $DATA_TYPE_CBOR ) {
-        state $cbor = _get_cbor_obj();
-
-        $res = \$cbor->encode($data);
+        $res = to_cbor($data);
     }
     elsif ( $type == $DATA_TYPE_YAML ) {
-        state $init = !!require YAML::XS;
-
-        local $YAML::XS::UseCode  = 0;
-        local $YAML::XS::DumpCode = 0;
-        local $YAML::XS::LoadCode = 0;
-
-        $res = \YAML::XS::Dump($data);
+        $res = to_yaml($data);
     }
     elsif ( $type == $DATA_TYPE_XML ) {
-        state $init = !!require XML::Hash::XS;
-
-        state $xml_args = {
-            root      => 'root',
-            version   => '1.0',
-            encode    => 'UTF-8',
-            output    => undef,
-            canonical => 0,            # sort hash keys
-            use_attr  => 1,
-            content   => 'content',    # if defined that the key name for the text content(used only if use_attr=1)
-            xml_decl  => 1,
-            trim      => 1,
-            utf8      => 0,
-            buf_size  => 4096,
-            method    => 'NATIVE',
-        };
-
-        state $xml_obj = XML::Hash::XS->new( $xml_args->%* );
-
-        my $root = [ keys $data->%* ]->[0];
-
-        $res = \$xml_obj->hash2xml( $data->{$root}, root => $root, indent => $args{readable} ? 4 : 0 );
+        $res = to_xml( $data, $args{xml}->%*, readable => $args{readable} );
     }
     elsif ( $type == $DATA_TYPE_INI ) {
-        state $init = !!require Pcore::Util::Config::INI;
-
-        $res = Pcore::Util::Config::INI::to_ini($data);
+        $res = to_ini($data);
     }
     else {
         die qq[Unknown serializer "$type"];
@@ -250,7 +159,7 @@ sub encode_data ( $type, $data, @ ) {
 }
 
 # JSON data should be without UTF8 flag
-# objects isn't deserialized automatically from JSON
+# objects aren't deserialized automatically from JSON
 sub decode_data ( $type, @ ) {
     my $data_ref = ref $_[1] ? $_[1] : \$_[1];
 
@@ -262,6 +171,7 @@ sub decode_data ( $type, @ ) {
         encode       => undef,              # 0, 1 = 'hex', 'hex', 'b64'
         perl_ns      => undef,              # for PERL only, namespace for data evaluation
         json         => undef,              # HashRef with additional params for Cpanel::JSON::XS
+        xml          => undef,              # HashRef with additional params for XML::Hash::XS
         return_token => 0,                  # return token
         splice( @_, 2 ),
         type => $type,
@@ -338,72 +248,22 @@ sub decode_data ( $type, @ ) {
     my $res;
 
     if ( $type == $DATA_TYPE_PERL ) {
-        my $ns = $args{perl_ns} || '_Pcore::CONFIG::SANDBOX';
-
-        decode_utf8 $data_ref->$*;
-
-        ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
-        $res = eval <<"CODE";
-package $ns;
-
-use Pcore -config;
-
-$data_ref->$*
-CODE
-        die $@ if $@;
-
-        die q[Config must return value] unless $res;
+        $res = from_perl( $data_ref, perl_ns => $args{perl_ns} );
     }
     elsif ( $type == $DATA_TYPE_JSON ) {
-        if ( $args{json} ) {
-            my $json = _get_json_obj( $args{json}->%* );
-
-            $res = $json->decode( $data_ref->$* );
-        }
-        else {
-            state $json = _get_json_obj( utf8 => 1 );
-
-            # $res = $json->decode_prefix( $data_ref->$* );
-
-            $res = $json->decode( $data_ref->$* );
-        }
+        $res = from_json( $data_ref, $args{json}->%* );
     }
     elsif ( $type == $DATA_TYPE_CBOR ) {
-        state $cbor = _get_cbor_obj();
-
-        $res = $cbor->decode( $data_ref->$* );
+        $res = from_cbor($data_ref);
     }
     elsif ( $type == $DATA_TYPE_YAML ) {
-        state $init = !!require YAML::XS;
-
-        local $YAML::XS::UseCode  = 0;
-        local $YAML::XS::DumpCode = 0;
-        local $YAML::XS::LoadCode = 0;
-
-        $res = YAML::XS::Load( $data_ref->$* );
+        $res = from_yaml($data_ref);
     }
     elsif ( $type == $DATA_TYPE_XML ) {
-        state $init = !!require XML::Hash::XS;
-
-        state $xml_args = {
-            encoding      => 'UTF-8',
-            utf8          => 1,
-            max_depth     => 1024,
-            buf_size      => 4096,
-            force_array   => 1,
-            force_content => 1,
-            merge_text    => 1,
-            keep_root     => 1,
-        };
-
-        state $xml_obj = XML::Hash::XS->new( $xml_args->%* );
-
-        $res = $xml_obj->xml2hash($data_ref);
+        $res = from_xml( $data_ref, $args{xml}->%* );
     }
     elsif ( $type == $DATA_TYPE_INI ) {
-        state $init = !!require Pcore::Util::Config::INI;
-
-        $res = Pcore::Util::Config::INI::from_ini( $data_ref->$* );
+        $res = from_ini($data_ref);
     }
     else {
         die qq[Unknown serializer "$type"];
@@ -418,120 +278,320 @@ CODE
 }
 
 # PERL
-sub to_perl {
-    return encode_data( $DATA_TYPE_PERL, @_ );
+sub to_perl ( $data, %args ) {
+    state $init = !!require Data::Dumper;
+
+    state $sort_keys = sub {
+        return [ nsort keys $_[0]->%* ];
+    };
+
+    local $Data::Dumper::Indent     = 0;
+    local $Data::Dumper::Purity     = 1;
+    local $Data::Dumper::Pad        = q[];
+    local $Data::Dumper::Terse      = 1;
+    local $Data::Dumper::Deepcopy   = 0;
+    local $Data::Dumper::Quotekeys  = 0;
+    local $Data::Dumper::Pair       = '=>';
+    local $Data::Dumper::Maxdepth   = 0;
+    local $Data::Dumper::Deparse    = 0;
+    local $Data::Dumper::Sparseseen = 1;
+    local $Data::Dumper::Useperl    = 1;
+    local $Data::Dumper::Useqq      = 1;
+    local $Data::Dumper::Sortkeys   = $args{readable} ? $sort_keys : 0;
+
+    my $res;
+
+    if ( !defined $data ) {
+        $res = \'undef';
+    }
+    else {
+        no warnings qw[redefine];
+
+        local *Data::Dumper::qquote = sub {
+            return q["] . encode_utf8( escape_scalar $_[0] ) . q["];
+        };
+
+        $res = \Data::Dumper->Dump( [$data] );
+    }
+
+    if ( $args{readable} ) {
+        state $init1 = !!require Pcore::Src::File;
+
+        $res = Pcore::Src::File->new(
+            {   action      => $Pcore::Src::SRC_DECOMPRESS,
+                path        => 'config.perl',                 # mark file as perl config
+                is_realpath => 0,
+                in_buffer   => $res,
+                filter_args => {
+                    perl_tidy   => '--comma-arrow-breakpoints=0',
+                    perl_critic => 0,
+                },
+            }
+        )->run->out_buffer;
+    }
+
+    return $res;
 }
 
-sub from_perl {
-    return decode_data( $DATA_TYPE_PERL, @_ );
+sub from_perl ( $data, %args ) {
+    my $ns = $args{perl_ns} || '_Pcore::CONFIG::SANDBOX';
+
+    $data = decode_utf8 is_plain_scalarref $data ? $data->$* : $data;
+
+    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+    my $res = eval <<"CODE";
+package $ns;
+
+use Pcore -config;
+
+$data
+CODE
+    die $@ if $@;
+
+    die q[Config must return value] unless $res;
+
+    return $res;
 }
 
 # JSON
-sub _get_json_obj {
-    my %args = (
-
-        # COMMON
-        utf8         => 1,
-        allow_nonref => 1,    # allow scalars
-        allow_tags   => 0,    # use FREEZE / THAW, we don't use this, because non-standard JSON will be generated, use CBOR instead to serialize objects
-
-        # shrink                        => 0,
-        # max_depth                     => 512,
-
-        # DECODE
-        relaxed => 1,    # allows commas and # - style comments
-
-        # filter_json_object            => undef,
-        # filter_json_single_key_object => undef,
-        # max_size                      => 0,
-
-        # ENCODE
-        ascii  => 1,
-        latin1 => 0,
-
-        # pretty       => 0,    # set indent, space_before, space_after
-        canonical    => 0,    # sort hash keys, slow
-        indent       => 0,
-        space_before => 0,    # put a space before the ":" separating key from values
-        space_after  => 0,    # put a space after the ":" separating key from values, and after "," separating key-value pairs
-
-        allow_unknown   => 0, # throw exception if can't encode item
-        allow_blessed   => 1, # allow blessed objects
-        convert_blessed => 1, # use TO_JSON method of blessed objects
-
-        @_,
-    );
-
+sub get_json ( @args ) {
     state $init = !!require Cpanel::JSON::XS;
+
+    my %args = (
+        allow_nonref    => 1,    # allow scalars
+        allow_blessed   => 1,    # allow blessed objects
+        convert_blessed => 1,    # use TO_JSON method of blessed objects
+        allow_bignum    => 1,
+        escape_slash    => 1,
+        relaxed         => 1,
+        @args,
+    );
 
     my $json = Cpanel::JSON::XS->new;
 
-    for ( keys %args ) {
-        $json->$_( $args{$_} );
-    }
+    $json->$_( $args{$_} ) for keys %args;
 
     return $json;
 }
 
-sub to_json ( $data, @ ) {
-    return encode_data( $DATA_TYPE_JSON, @_ );
+sub to_json ( $data, %args ) {
+    my $readable = delete $args{readable};
+
+    if (%args) {
+        return \get_json(%args)->encode($data);
+    }
+    elsif ($readable) {
+        state $json = get_json( utf8 => 1, canonical => 1, indent => 1, space_after => 1 );
+
+        return \$json->encode($data);
+    }
+    else {
+        state $json = get_json( ascii => 1, utf8 => 1 );
+
+        return \$json->encode($data);
+    }
 }
 
-sub from_json ( $data, @ ) {
-    return decode_data( $DATA_TYPE_JSON, @_ );
+sub from_json ( $data, %args ) {
+    if (%args) {
+        return get_json(%args)->decode( is_plain_scalarref $data ? $data->$* : $data );
+    }
+    else {
+        state $json = get_json( utf8 => 1 );
+
+        return $json->decode( is_plain_scalarref $data ? $data->$* : $data );
+    }
 }
 
 # CBOR
-sub _get_cbor_obj {
+sub get_cbor ( @args ) {
     state $init = !!require CBOR::XS;
+
+    my %args = (
+        max_depth      => 512,
+        max_size       => 1024 * 1024 * 100,         # max. string size is unlimited
+        allow_unknown  => 0,
+        allow_sharing  => 0,                         # must be disable for compatibility with JS CBOR
+        allow_cycles   => 1,
+        pack_strings   => 0,                         # set to 1 affect speed, but makes size smaller
+        validate_utf8  => 0,
+        forbid_objects => 0,
+        filter         => \&CBOR::XS::safe_filter,
+        @args,
+    );
 
     my $cbor = CBOR::XS->new;
 
-    $cbor->max_depth(512);
-    $cbor->max_size(0);    # max. string size is unlimited
-    $cbor->allow_unknown(0);
-    $cbor->allow_sharing(1);
-    $cbor->allow_cycles(1);
-    $cbor->pack_strings(0);    # set to 1 affect speed, but makes size smaller
-    $cbor->validate_utf8(0);
-    $cbor->filter(undef);
+    $cbor->$_( $args{$_} ) for keys %args;
 
     return $cbor;
 }
 
-sub to_cbor {
-    return encode_data( $DATA_TYPE_CBOR, @_ );
+sub to_cbor ( $data, @ ) {
+    state $cbor = get_cbor();
+
+    return \$cbor->encode($data);
 }
 
-sub from_cbor {
-    return decode_data( $DATA_TYPE_CBOR, @_ );
+sub from_cbor ( $data, @ ) {
+    state $cbor = get_cbor();
+
+    return $cbor->decode( is_plain_scalarref $data ? $data->$* : $data );
 }
 
 # YAML
-sub to_yaml {
-    return encode_data( $DATA_TYPE_YAML, @_ );
+sub to_yaml ( $data, @ ) {
+    state $init = !!require YAML::XS;
+
+    local $YAML::XS::UseCode  = 0;
+    local $YAML::XS::DumpCode = 0;
+    local $YAML::XS::LoadCode = 0;
+
+    return \YAML::XS::Dump($data);
 }
 
-sub from_yaml {
-    return decode_data( $DATA_TYPE_YAML, @_ );
+sub from_yaml ( $data, @ ) {
+    state $init = !!require YAML::XS;
+
+    local $YAML::XS::UseCode  = 0;
+    local $YAML::XS::DumpCode = 0;
+    local $YAML::XS::LoadCode = 0;
+
+    return YAML::XS::Load( is_plain_scalarref $data ? $data->$* : $data );
 }
 
 # XML
-sub to_xml {
-    return encode_data( $DATA_TYPE_XML, @_ );
+sub get_xml (@args) {
+    state $init = !!require XML::Hash::XS;
+
+    my %args = (
+        buf_size => 4096,         # buffer size for reading end encoding data
+        content  => 'content',    # if defined that the key name for the text content(used only if use_attr=1)
+        encoding => 'UTF-8',
+        trim     => 1,            # trim leading and trailing whitespace from text nodes
+
+        # to_xml
+        canonical => 0,           # sort hash keys
+        indent    => 0,
+        method    => 'NATIVE',
+        output    => undef,
+        root      => 'root',
+        use_attr  => 1,
+        version   => '1.0',
+        xml_decl  => 1,
+
+        # from_xml
+        force_array   => 1,
+        force_content => 1,
+        keep_root     => 1,
+        max_depth     => 1_024,    # maximum recursion depth
+        merge_text    => 1,
+
+        @args,
+    );
+
+    return XML::Hash::XS->new(%args);
 }
 
-sub from_xml {
-    return decode_data( $DATA_TYPE_XML, @_ );
+sub to_xml ( $data, %args ) {
+    state $xml = get_xml();
+
+    my $readable = delete $args{readable};
+
+    if (%args) {
+        return \$xml->hash2xml( $data, %args );
+    }
+    else {
+        my $root = ( keys $data->%* )[0];
+
+        return \$xml->hash2xml( $data->{$root}, root => $root, utf8 => 0, $readable ? ( canonical => 1, indent => 4 ) : () );
+    }
+}
+
+sub from_xml ( $data, %args ) {
+    state $xml = get_xml();
+
+    if (%args) {
+        return $xml->xml2hash( $data, %args );
+    }
+    else {
+        return $xml->xml2hash( $data, utf8 => 1 );
+    }
 }
 
 # INI
-sub to_ini {
-    return encode_data( $DATA_TYPE_INI, @_ );
+sub to_ini ( $data, @ ) {
+    my $str = q[];
+
+    state $write_section = sub ( $str_ref, $section, $data ) {
+        if ($section) {
+            $str_ref->$* .= "\n" x 2 if $str_ref->$*;
+
+            $str_ref->$* .= "[$section]";
+        }
+
+        for my $key ( sort keys $data->%* ) {
+            $str_ref->$* .= "\n" if $str_ref->$*;
+
+            $str_ref->$* .= "$key = " . ( defined $data->{$key} ? "$data->{$key}" : q[] );
+        }
+
+        return;
+    };
+
+    if ( exists $data->{_} ) {
+        $write_section->( \$str, q[], $data->{_} );
+    }
+
+    for my $section ( sort grep { $_ ne '_' } keys $data->%* ) {
+        $write_section->( \$str, $section, $data->{$section} );
+    }
+
+    encode_utf8 $str;
+
+    return \$str;
 }
 
-sub from_ini {
-    return decode_data( $DATA_TYPE_INI, @_ );
+sub from_ini ( $data, @ ) {
+    my $cfg;
+
+    my $section = '_';
+
+    my @lines = grep { $_ ne q[] } map { trim $_} split /\n/sm, decode_utf8 is_plain_scalarref $data ? $data->$* : $data;
+
+    for my $line (@lines) {
+
+        # section
+        if ( $line =~ /\A\[(.+)\]\z/sm ) {
+            $section = $1;
+
+            $cfg->{$section} = {} if !exists $cfg->{$section};
+        }
+
+        # not a section
+        else {
+
+            # comment
+            if ( $line =~ /\A;/sm ) {
+                next;
+            }
+
+            # variable
+            else {
+                my ( $key, $val ) = split /=/sm, $line, 2;
+
+                if ( defined $val ) {
+                    trim $val;
+
+                    $val = undef if $val eq q[];
+                }
+
+                $cfg->{$section}->{ trim $key} = $val;
+            }
+        }
+    }
+
+    return $cfg;
 }
 
 # BASE64
@@ -735,12 +795,14 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 49                   | * Subroutine "encode_data" with high complexity score (35)                                                     |
-## |      | 254                  | * Subroutine "decode_data" with high complexity score (33)                                                     |
+## |      | 49                   | * Subroutine "encode_data" with high complexity score (27)                                                     |
+## |      | 163                  | * Subroutine "decode_data" with high complexity score (28)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 585                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
+## |      | 372, 425             | * Postfix control "for" used                                                                                   |
+## |      | 781                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 721                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 645                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

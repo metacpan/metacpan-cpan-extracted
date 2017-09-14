@@ -1,5 +1,8 @@
 Revision history for Term::Screen::Lite
 
+0.04  Mon Sep 11 12:00:00 2017
+      - Updated copyright year information.
+
 0.03  Mon Nov 23 09:50:00 2015
       - Added key 'provides' to the Makefile.PL script.
 

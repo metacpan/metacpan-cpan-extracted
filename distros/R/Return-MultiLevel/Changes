@@ -1,5 +1,10 @@
 Revision history for Return-MultiLevel
 
+0.05    2017-09-10
+        - formally recommend Scope::Upper be installed in the distribution
+          metadata
+        - mention / link to bug tracker in module documentation
+
 0.04    2014-09-07
         - switch to Data::Munge::eval_string
         - make with_return a named sub to improve stack traces

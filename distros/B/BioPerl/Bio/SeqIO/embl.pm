@@ -926,7 +926,7 @@ sub write_seq {
  Title   : _print_EMBL_FTHelper
  Usage   :
  Function: Internal function
- Returns : 1 if writing suceeded, otherwise undef
+ Returns : 1 if writing succeeded, otherwise undef
  Args    :
 
 
@@ -953,7 +953,7 @@ sub _print_EMBL_FTHelper {
     $self->_write_line_EMBL_regex(sprintf("FT   %-15s ",$fth->key),
                                   "FT                   ",$fth->loc,
                                   '\,|$',80) || return; #'
-    foreach my $tag ( keys %{$fth->field} ) {
+    foreach my $tag (sort keys %{$fth->field} ) {
         if ( ! defined $fth->field->{$tag} ) {
             next;
         }
@@ -1433,7 +1433,7 @@ sub _read_FTHelper_EMBL {
  Usage   :
  Function: internal function
  Example :
- Returns : 1 if writing suceeded, else undef
+ Returns : 1 if writing succeeded, else undef
  Args    :
 
 

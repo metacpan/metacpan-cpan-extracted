@@ -2,13 +2,15 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle/;
 use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 use Test2::Util qw/IS_WIN32/;
+
+use File::Spec();
 
 BEGIN { require Test2::Formatter; our @ISA = qw(Test2::Formatter) }
 
@@ -30,6 +32,7 @@ use Test2::Util::HashBase qw{
     -job_length
     -ecount
     -job_colors
+    -active_files
 };
 
 sub TAG_WIDTH() { 8 }
@@ -124,6 +127,7 @@ sub DEFAULT_COLOR() {
 sub init {
     my $self = shift;
 
+
     $self->{+VERBOSE} = 1 unless defined $self->{+VERBOSE};
 
     $self->{+JOB_LENGTH} ||= 2;
@@ -138,16 +142,22 @@ sub init {
 
     $self->{+TTY} = -t $io unless defined $self->{+TTY};
 
+    my $use_color = ref($self->{+COLOR}) ? 1 : delete($self->{+COLOR});
+    $use_color = $self->{+TTY} unless defined $use_color;
+
     if ($self->{+TTY} && USE_ANSI_COLOR) {
         $self->{+SHOW_BUFFER} = 1 unless defined $self->{+SHOW_BUFFER};
-        $self->{+COLOR} = {
-            DEFAULT_COLOR(),
-            TAGS   => {DEFAULT_TAG_COLOR()},
-            FACETS => {DEFAULT_FACET_COLOR()},
-            JOBS   => [DEFAULT_JOB_COLOR()],
-        } unless defined $self->{+COLOR};
 
-        $self->{+JOB_COLORS} = {free => [@{$self->{+COLOR}->{JOBS}}]};
+        if ($use_color) {
+            $self->{+COLOR} = {
+                DEFAULT_COLOR(),
+                TAGS   => {DEFAULT_TAG_COLOR()},
+                FACETS => {DEFAULT_FACET_COLOR()},
+                JOBS   => [DEFAULT_JOB_COLOR()],
+            } unless defined $self->{+COLOR};
+
+            $self->{+JOB_COLORS} = {free => [@{$self->{+COLOR}->{JOBS}}]};
+        }
     }
     else {
         $self->{+SHOW_BUFFER} = 0 unless defined $self->{+SHOW_BUFFER};
@@ -182,6 +192,16 @@ if ($^C) {
 sub write {
     my ($self, $e, $num, $f) = @_;
     $f ||= $e->facet_data;
+
+    if ($f->{harness_job_launch}) {
+        my $job = $f->{harness_job};
+        $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($job->{file})} = $job->{job_id};
+    }
+
+    if ($f->{harness_job_end}) {
+        my $file = $f->{harness_job_end}->{file};
+        delete $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($file)};
+    }
 
     $self->{+ECOUNT}++;
 
@@ -241,7 +261,22 @@ sub write {
 
 sub render_ecount {
     my $self = shift;
-    return "Events seen: " . $self->{+ECOUNT};
+
+    my $active = $self->{+ACTIVE_FILES};
+
+    my $str = "Events seen: " . $self->{+ECOUNT};
+
+    if ($active && keys %$active) {
+        $str .= " (";
+        $str .= join(', ' => sort { ($active->{$a} || 0) <=> ($active->{$b} || 0) or $a cmp $b } keys %$active);
+        $str .= ")";
+
+        my $max = term_size() || 80;
+        $str = substr($str, 0, $max - 8) . " ...)" if length($str) > $max;
+    }
+
+
+    return $str;
 }
 
 sub render_buffered_event {
@@ -305,7 +340,6 @@ sub render_quiet {
         push @out => $self->render_info($if, $tree) if @{$if->{info}};
     }
 
-    push @out => $self->render_times($f, $tree) if $f->{times};
     push @out => $self->render_errors($f, $tree) if $f->{errors};
     push @out => $self->render_parent($f, $tree, quiet => 1) if $f->{parent} && !$f->{amnesty};
 
@@ -335,7 +369,7 @@ sub render_tree {
             $len = $self->{+JOB_LENGTH};
         }
 
-        $job = sprintf("%sjob %0${len}u%s ", $color, $id, $reset || '');
+        $job = sprintf("%sjob %${len}s%s ", $color, $id, $reset || '');
     }
 
     my $depth = $f->{trace}->{nested} || 0;

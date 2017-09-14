@@ -91,3 +91,16 @@ Revision history for Spp
         LintParser.pm => LintAst.pm
         Lint should do Ast.
 
+1.17    Spp.pm export func add: lint_spp_ast() spp_ast_to_table()
+        delete get_matcher() match_matcher().
+
+1.18    Use Perlcritic check all code, fix some small bug.
+
+1.19    puts IsChar.pm to Builtin.pm
+        split some function could implement with Builtin
+        to Core.pm
+
+1.20    combin all Builtin.pm function of Mylisp to Spp
+        add core to it, is_atoms
+
+1.21    die() => error, Match all error could report pos.

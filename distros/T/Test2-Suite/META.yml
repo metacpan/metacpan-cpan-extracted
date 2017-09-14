@@ -19,12 +19,12 @@ requires:
   Scalar::Util: '0'
   Sub::Info: '0.001'
   Term::Table: '0.002'
-  Test2: '1.302073'
+  Test2: '1.302096'
   overload: '0'
   perl: '5.008001'
   utf8: '0'
 resources:
   bugtracker: http://github.com/Test-More/Test2-Suite/issues
   repository: http://github.com/Test-More/Test2-Suite/
-version: '0.000072'
+version: '0.000077'
 x_serialization_backend: 'YAML::Tiny version 1.70'

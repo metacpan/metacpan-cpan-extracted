@@ -1,89 +1,112 @@
 package Spp::Cursor;
 
-use Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT =
-  qw(cursor go get_char pre_char cache recover max_report);
-
 use 5.012;
 no warnings "experimental";
-use Spp::Builtin qw(to_end);
 
-sub cursor {
-   my ($str, $ns) = @_;
-   $str = $str . chr(0);
-   return {
-      str     => $str,
+use Spp::Core qw(to_end);
+
+sub new {
+   my ($class, $str, $ns) = @_;
+   my $trace_str = $str . chr(0);
+   my $len_str = length($trace_str);
+   return bless({
+      str     => $trace_str,
       ns      => $ns,
-      len     => length($str),
+      len     => $len_str,
       off     => 0,
       line    => 1,
       pos     => 0,
-      mode    => 0,
       depth   => 0,
       maxoff  => 0,
       maxline => 1,
       maxpos  => 0,
-   };
+   }, $class);
+}
+
+sub off {
+   my $self = shift;
+   return $self->{'off'};
+}
+
+sub str {
+   my $self = shift;
+   return $self->{'str'};
+}
+
+sub len {
+   my $self = shift;
+   return $self->{'len'};
 }
 
 sub go {
-   my $cursor = shift;
-   if (get_char($cursor) eq "\n") {
-      $cursor->{line}++;
-      $cursor->{pos} = 0;
+   my $self = shift;
+   if (get_char($self) eq "\n") {
+      $self->{line}++;
+      $self->{pos} = 0;
    }
    else {
-      $cursor->{pos}++;
+      $self->{pos}++;
    }
-   $cursor->{off}++;
-   if ($cursor->{off} > $cursor->{maxoff}) {
-      $cursor->{maxoff}  = $cursor->{off};
-      $cursor->{maxline} = $cursor->{line};
-      $cursor->{maxpos}  = $cursor->{pos};
+   $self->{off}++;
+   if ($self->{off} > $self->{maxoff}) {
+      $self->{maxoff}  = $self->{off};
+      $self->{maxline} = $self->{line};
+      $self->{maxpos}  = $self->{pos};
    }
 }
 
 sub cache {
-   my $cursor = shift;
-   my $off    = $cursor->{off};
-   my $line   = $cursor->{line};
-   my $pos    = $cursor->{pos};
+   my $self = shift;
+   my $off    = $self->{off};
+   my $line   = $self->{line};
+   my $pos    = $self->{pos};
    return [$off, $line, $pos];
 }
 
 sub recover {
-   my ($cursor, $cache) = @_;
+   my ($self, $cache) = @_;
    my ($off, $line, $pos) = @{$cache};
-   $cursor->{off}  = $off;
-   $cursor->{line} = $line;
-   $cursor->{pos}  = $pos;
+   $self->{off}  = $off;
+   $self->{line} = $line;
+   $self->{pos}  = $pos;
    return 1;
 }
 
 sub get_char {
-   my $cursor = shift;
-   substr($cursor->{str}, $cursor->{off}, 1);
+   my $self = shift;
+   my $str = $self->{str};
+   my $off = $self->{off};
+   return substr($str, $off, 1);
 }
 
 sub pre_char {
-   my $cursor = shift;
-   substr($cursor->{str}, $cursor->{off} - 1, 1);
+   my $self = shift;
+   my $str = $self->{str};
+   my $off = $self->{off};
+   return substr($str, $off-1, 1);
 }
 
 sub max_report {
-   my $cursor   = shift;
-   my $str      = $cursor->{str};
-   my $off      = $cursor->{maxoff};
-   my $line     = $cursor->{maxline};
-   my $pos      = $cursor->{maxpos};
-   my $line_str = to_end(substr($str, $off - $pos));
-   my $tip_str  = (' ' x $pos) . '^';
+   my $self   = shift;
+   my $str      = $self->{str};
+   my $off      = $self->{maxoff};
+   my $line     = $self->{maxline};
+   my $pos      = $self->{maxpos};
+   my $tip_str  = to_end(substr($str, $off - $pos));
+   my $tip_char = (' ' x $pos) . '^';
    return <<EOF;
 Warning! Stop match at line: $line
-   $line_str
    $tip_str
+   $tip_char
 EOF
+}
+
+sub error {
+   my ($self, $message) = @_;
+   my $max_report = $self->max_report();
+   say $max_report; 
+   say $message;
+   exit();
 }
 
 1;

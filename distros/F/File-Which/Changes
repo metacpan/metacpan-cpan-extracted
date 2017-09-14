@@ -1,5 +1,8 @@
 Revision history for File-Which
 
+1.22      2017-09-08 14:08:59 -0400
+  - Support for MSYS2 ($^O eq 'msys')
+
 1.21      2016-03-02 14:20:43 -0500
   - Workaround for nutty cygwin filesystem rules
 

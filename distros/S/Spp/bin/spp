@@ -25,15 +25,21 @@ given ($action) {
    }
    default {
       say "
+      :: show help of spp.pl usage.
+      > spp
+
       :: test Spp rule is valid, or test rule match string.
-      spp --repl
+      > spp --repl
+
       :: update Spp Lanugage Grammar Ast with Grammar define.
-      spp --update
+      > spp --update
+
       # lint grammar defined with <grammarr.spp>.
-      spp --lint grammar.spp
+      > spp --lint grammar.spp
+
       :: parse <file.text> with grammar defined with <grammar.spp>.
-      > spp --parse grammar.spp file.text";
-      Spp::repl();
+      > spp --parse grammar.spp file.text
+      ";
    }
 }
 

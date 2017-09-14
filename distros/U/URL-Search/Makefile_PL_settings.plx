@@ -21,5 +21,5 @@ return {
         'Test::Pod' => 1.22,
     },
 
-    bonus => { github => 'mauke' },
+    REPOSITORY => [ github => 'mauke' ],
 };

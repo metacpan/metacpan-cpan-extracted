@@ -7,7 +7,12 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   NAME         => 'Mashtree',
-  VERSION_FROM => 'lib/perl5/Mashtree.pm',
+  VERSION_FROM => 'lib/Mashtree.pm',
+  EXE_FILES    => [
+    "bin/mashtree.pl",
+    "bin/mashtree_wrapper.pl",
+    "bin/min_abundance_finder.pl",
+  ],
   PREREQ_PM    => {
     # Core modules
     'File::Basename' => 0,
@@ -20,6 +25,7 @@ WriteMakefile
     'Thread::Queue'  => 0,
     # Not core (I think?)
     'DBI'            => 0,
+    'DBD::SQLite'    => 0,
     'Bio::Matrix::IO'=> 0,
     'Bio::Tree::DistanceFactory'=> 0,
     'Bio::Tree::Statistics'=> 0,

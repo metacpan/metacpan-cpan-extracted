@@ -6,7 +6,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,9 +23,6 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "FindBin" : "0",
             "Test::EOL" : "0",
@@ -57,13 +54,14 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/File-Which/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/File-Which",
+      "homepage" : "https://metacpan.org/pod/File::Which",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/File-Which.git",
          "web" : "https://github.com/plicease/File-Which"
       }
    },
-   "version" : "1.21"
+   "version" : "1.22",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

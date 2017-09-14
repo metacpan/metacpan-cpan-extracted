@@ -1,0 +1,349 @@
+=for Pod::Coverage ngettextp new
+
+=head1 NAME
+
+Template::Plugin::Gettext - Gettext Support For the Template Toolkit Version 2
+
+=head1 SYNOPSIS
+
+Load the plug-in in templates:
+
+    [% USE Gettext('com.textdomain.my', 'fr', 'utf-8', 'DIRECTORIES'...) %]
+    [% Gettext.gettext('Hello, world!) %]
+
+    [% 'Hello, world!' | gettext %]
+
+Or alias "Gettext":
+
+    [% USE gtx = Gettext('com.textdomain.my', 'fr', 'utf-8', 'DIRECTORIES'...) %]
+    [% gtx.gettext('Hello, world!) %]
+
+Use method invocations:
+
+    [% Gettext.gettext("Hello, world!") %]
+    [% Gettext.xgettext("Hello, {name}!", name => 'John Doe') %]
+
+Or filters (without the prefix):
+
+    [% FILTER gettext %]
+    Hello, world!
+    [% END %]
+
+    [% 'Hello, world!' | gettext %]
+
+    [% FILTER xgettext(name => 'John Doe') %]
+    Hello, {name}!
+    [% END %]
+
+You have a multitude of methods available:
+
+    [% gtx.gettext("Hello, user!") %]
+    [% gtx.xgettext("Hello, {user}!", user => 'John Doe') %]
+    [% gtx.ngettext("One document deleted.",
+                    "Multiple documents deleted."),
+                    42) %]
+    [% gtx.nxgettext("One document deleted.",
+                     "{num} documents deleted."),
+                     42,
+                     num => 42) %]
+    [% gtx.npgettext("context..."
+                     "One document deleted.",
+                     "Multiple documents deleted."),
+                     42) %]
+    [% gtx.npxgettext("context...",
+                      "One document deleted.",
+                      "{num} documents deleted."),
+                      42,
+                      num => 42) %]
+
+=head1 DESCRIPTION
+
+The B<Template::Plugin::Gettext> plug-in makes the
+L<GNU gettext API|https://www.gnu.org/software/gettext/> available for
+documents using the
+L<Template Toolkit version 2|http://template-toolkit.org/>.  See
+L<https://github.com/gflohr/Template-Plugin-Gettext> for an overall
+picture and the recommended tool-chain.
+
+=head1 FUNCTIONS
+
+The following methods produce translatable content:
+
+=over 4
+
+=item B<[% gtx.gettext(STRING) %]>
+
+Retrieves the translation for B<STRING>.
+
+=item B<[% gtx.xgettext(STRING, PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2, ...) %]>
+
+Gets the translation for a string with placeholders and interpolates values
+into it.  Placeholders have the format <{PLACEHOLDER}>.  For a literal
+left curly brace you can use this hack:
+
+    [% gtx.xgettext("String with {LBRACE}PLACEHOLDERS{RBRACE}",
+                    LBRACE => "{", RBRACE => "}") %]
+
+=item B<[% gtx.pgettext(CONTEXT, STRING) %]>
+
+Retrieves the translation for B<STRING> in context B<CONTEXT>.  You
+should use message context to disambiguate identical strings that
+require different translations depending on the context.  See this
+example for an explanation:
+
+    [% gtx.gettext("State: ") %]
+        [% gtx.gettext("Open")] | [% gtx.gettext("Close") %]
+    
+    [% gtx.gettext("Menu:") %]
+        [% gtx.pgettext("menu", "Open")]
+        [% gtx.gettext("Save")]
+        [% gtx.gettext("Save As")]
+        [% gtx.pgettext("menu", "Close")]
+
+The strings "Open" and "Close" in line 2 are adjectives. As 
+ menu entries they are verb forms and will have a different
+ translation in many languages.
+
+ In doubt: Only use contexts if one of your translators complains
+ about a message having multiple meanings.
+
+=item B<[% gtx.pxgettext(CONTEXT, STRING,
+                        PLACEHOLDER1 =E<gt> VALUE1,
+                        PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+Get the translation for B<STRING> with placeholders in context
+B<CONTEXT>.  This is a mixture of C<xgettext()> and C<pgettext()>
+above.
+
+=item B<[% gtx.nxgettext(SINGULAR, PLURAL, COUNT,
+                         PLACEHOLDER1 =E<gt> VALUE1,
+                         PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+Retrieves the translation for the string with the singular form
+B<SINGULAR> and the plural from B<PLURAL>, both possibly
+containing placeholders.  The correct form is picked based
+upon the third argument B<COUNT>.
+
+Example:
+
+    [% gtx.nxgettext("One document deleted",
+                     "{num} documents deleted"),
+                     count,
+                     num => count) %]
+
+In English this will produce "42 documents deleted" if the variable
+count has the value 42.  It will produce "One document deleted" if
+the variable count has the value 1.
+
+In other languages, the rules for plural forms may be a lot
+simpler (for example Chinese, which has no plural) or a lot more 
+complicated (for example Russian with two or Slovenian with even
+3 plural forms).  Using ngettext() gives your translators the
+chance to provide syntactically correct translations for these
+cases.
+
+=item B<[% gtx.npxgettext(CONTEXT, SINGULAR, PLURAL, COUNT,
+                          PLACEHOLDER1 =E<gt> VALUE1,
+                          PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+Putting it all together:  For message context B<CONTEXT>
+the translation for a message in B<SINGULAR> and B<PLURAL>
+is retrieved based on the argument B<COUNT>.  Possible placeholders
+are expanded.
+
+The function is a mixture of xgettext(), ngettext(), and
+pgettext(), see above!
+
+=item B<[% gtx.ngettext(SINGULAR, PLURAL, COUNT) %]>
+
+Useless function, provided for completeness.  Use nxgettext()
+instead, so that you can interpolate the value of B<COUNT>!
+
+=item B<[% gtx.npgettext(CONTEXT, SINGULAR, PLURAL, COUNT) %]>
+
+Useless function, provided for completeness.  Use npxgettext()
+instead, so that you can interpolate the value of B<COUNT>!
+
+=back
+
+In fact, you have also all the keywords used for L</FILTERS>
+available but those not listed here have such an odd ordering
+of arguments that they are not listed here.
+
+=head2 FILTERS
+
+The entire gettext API is also exposed as a filter.  There are
+two things to note here:
+
+=over 4
+
+=item *
+
+When used as filters, you don't prefix the method names.  It'
+s "gettext" not "Gettext.gettext" or "gtx.gettext()".
+
+=item *
+
+The filters with message contexts have rather strange names, for example:
+
+    [% FILTER gettextp("greeting") %]
+    Hello, world!
+    [% END %]
+
+    or 100 % equivalent:
+
+    [% 'Hello, world!' | gettextp("greeting") %]
+
+Why? The text between B<FILTER> and B<END> resp. the text
+in front of the pipe symbol B<|> is always the first argument.
+This plug-in therefore tries to make the first argument the
+most significant one.  Nobody stops you from writing the
+following:
+
+    [% FILTER pgettext("Hello, world!") %]
+    greeting
+    [% END %]
+
+    or again 100 % equivalent:
+
+    [% 'greeting' | pgettext("Hello, world!") %]
+
+It produces exactly the same results as above but it looks 
+a little bit odd, doesn't it?
+
+It would have been arguably better understandable to silently
+reorder the arguments, when using the plug-in as a filter.
+But it would break extraction of your strings with
+L<xgettext-tt2> (L<Locale::XGettext::TT2>) because the string
+extractor would then confuse the arguments.
+
+But stay relaxed! Message contexts are rarely needed, and when
+you need them, you have to live with this little weirdness.
+
+In order to avoid confusion, those filters that would not have
+the translatable string (in the singular form) where one would
+expect it, are not documented here.
+
+=back
+
+You can use the following filters:
+
+=over 4
+
+=item B<[% STRING | gettext %]>
+
+=item B<[% FILTER gettext %]STRING[% FILTER %]>
+
+Retrieves the translation for B<STRING>.
+
+=item B<[% STRING | xgettext(PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2, ...) %]>
+
+=item B<[% FILTER xgettext(PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2, ...) %]STRING[% END %]>
+
+Gets the translation for a string with placeholders and interpolates values
+into it.  Placeholders have the format <{PLACEHOLDER}>.  For a literal
+left curly brace you can use this hack:
+
+    [% "String with {LBRACE}PLACEHOLDERS{RBRACE}" | xgettext(LBRACE => "{", RBRACE => "}") %]
+
+=item B<[% STRING | gettextp(CONTEXT) %]>
+
+=item B<[% FILTER gettextp(CONTEXT) %]STRING[% END %]>
+
+Retrieves the translation for B<STRING> in context B<CONTEXT>.  You
+should use message context to disambiguate identical strings that
+require different translations depending on the context. See the 
+docuemntation for pgettext() in L</FUNCTIONS> above for more details!
+
+=item B<[% STRING | xgettextp(CONTEXT, STRING, PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+=item B<[% FILTER xgettextp(CONTEXT, STRING, PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2) %]STRING[% END %]>
+
+Get the translation for B<STRING> with placeholders in context
+B<CONTEXT>.  This is a mixture of C<xgettext()> and C<pgettext()>
+above.
+
+=item B<[% SINGULAR | nxgettext(PLURAL, COUNT, PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+=item B<[% FILTER nxgettext(PLURAL, COUNT, PLACEHOLDER1 =E<gt> VALUE1, PLACEHOLDER2 =E<gt> VALUE2) %]SINGULAR[% END %]>
+
+Retrieves the translation for the string with the singular form
+B<SINGULAR> and the plural from B<PLURAL>, both possibly
+containing placeholders.  The correct form is picked based
+upon the third argument B<COUNT>.
+
+Example:
+
+    [% "One document deleted" | nxgettext("{num} documents deleted"),
+                                          count,
+                                          num => count) %]
+
+In English this will produce "42 documents deleted" if the variable
+count has the value 42.  It will produce "One document deleted" if
+the variable count has the value 1.
+
+In other languages, the rules for plural forms may be a lot
+simpler (for example Chinese, which has no plural) or a lot more 
+complicated (for example Russian with two or Slovenian with even
+3 plural forms).  Using ngettext() gives your translators the
+chance to provide syntactically correct translations for these
+cases.
+
+=item B<[% SINGULAR | nxgettextp(PLURAL, COUNT, CONTEXT,
+                                 PLACEHOLDER1 =E<gt> VALUE1,
+                                 PLACEHOLDER2 =E<gt> VALUE2) %]>
+
+=item B<[% FILTER nxgettextp(PLURAL, COUNT, CONTEXT,
+                                 PLACEHOLDER1 =E<gt> VALUE1,
+                                 PLACEHOLDER2 =E<gt> VALUE2) %]SINGULAR[% END %]>
+
+Putting it all together:  For message context B<CONTEXT>
+the translation for a message in B<SINGULAR> and B<PLURAL>
+is retrieved based on the argument B<COUNT>.  Possible placeholders
+are expanded.
+
+The filter is a mixture of xgettext(), ngettext(), and
+pgettext(), see above!
+
+=item B<[% SINGULAR | ngettext(PLURAL, COUNT) %]>
+
+=item B<[% FILTER ngettext(PLURAL, COUNT) %]SINGULAR[% END %]>
+
+Useless filter, provided for completeness.  Use nxgettext()
+instead, so that you can interpolate the value of B<COUNT>!
+
+=item B<[% SINGULAR | ngettextp[(PLURAL, COUNT, CONTEXT) %]>
+
+=item B<[% FILTER | ngettextp[(PLURAL, COUNT, CONTEXT) %]SINGULAR[% END %]>
+
+Useless filter, provided for completeness.  Use nxgettextp()
+instead, so that you can interpolate the value of B<COUNT>!
+
+=item B<[% debug_locale %]>
+
+The plug-in implicitely calls B<web_set_locale()> (see
+L<Locale::Util>) if a language was specified in the B<USE> 
+statement.  The function B<debug_locale()> gives you the return
+value of the call for debugging purposes.  Example:
+
+    [% USE gtx = Gettext('com.mydomain.www', de') %]
+    
+    Using locale [% debug_locale() %].
+
+This way, you can determine whether setting the specified locale
+actually worked.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr (http://www.guido-flohr.net/).
+License LGPLv3+: L<GNU General Public License version 3 or later|http://gnu.org/licenses/lgpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Template>, L<Template::Manual::Filters>, L<xgettext-tt2>, L<perl>

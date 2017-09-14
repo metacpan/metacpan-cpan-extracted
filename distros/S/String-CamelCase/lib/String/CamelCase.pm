@@ -12,7 +12,7 @@ package String::CamelCase;
 use warnings;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(camelize decamelize wordsplit);
@@ -52,7 +52,7 @@ String::CamelCase - camelcase, de-camelcase
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 

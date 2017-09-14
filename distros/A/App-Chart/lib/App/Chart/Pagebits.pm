@@ -1,6 +1,6 @@
 # Web page download and cache.
 
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -49,11 +49,16 @@ sub get {
        method        => $method,
        data          => $data,
        etag          => $h->{'ETag'},
-       last_modified => $h->{'Last-Modified'});
+       last_modified => $h->{'Last-Modified'},
+       allow_404     => $options{'allow_404'},
+      );
 
+    if ($options{'allow_404'} && $resp->code == 404) {
+      return undef;
+    }
     if ($resp->is_success) {
       my $content = $resp->decoded_content (raise_error=>1);
-      $h = $parse->($content);
+      $h = $parse->($content, $resp);
       $h->{'ETag'} = scalar $resp->header('ETag');
       $h->{'Last-Modified'} = $resp->last_modified;
     }

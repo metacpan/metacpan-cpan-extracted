@@ -2,7 +2,7 @@ package Test2::Tools::AsyncSubtest;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000020';
 
 use Test2::IPC;
 use Test2::AsyncSubtest;
@@ -81,7 +81,7 @@ Test2::Tools::AsyncSubtest - Tools for writing async subtests.
 =head1 DESCRIPTION
 
 These are tools for writing async subtests. Async subtests are subtests which
-can be started and stashed so that they can continue to recieve events while
+can be started and stashed so that they can continue to receive events while
 other events are also being generated.
 
 =head1 SYNOPSYS

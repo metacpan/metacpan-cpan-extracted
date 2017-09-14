@@ -20,6 +20,7 @@ lib/WebService/Slack/WebApi/Generator.pm
 lib/WebService/Slack/WebApi/Groups.pm
 lib/WebService/Slack/WebApi/Im.pm
 lib/WebService/Slack/WebApi/Oauth.pm
+lib/WebService/Slack/WebApi/Pins.pm
 lib/WebService/Slack/WebApi/Reactions.pm
 lib/WebService/Slack/WebApi/Rtm.pm
 lib/WebService/Slack/WebApi/Search.pm

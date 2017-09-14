@@ -1,0 +1,6 @@
+Revision history for Perl extension Win32::EnumPrinters.
+
+0.01  Fri Sep  8 11:29:27 2017
+	- original version; created by h2xs 1.23 with options
+		-An Win32::EnumPrinters
+

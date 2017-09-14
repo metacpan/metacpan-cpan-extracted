@@ -1,0 +1,26 @@
+Changes
+lib/Geo/OSM/DBI.pm
+lib/Geo/OSM/DBI/CH.pm
+lib/Geo/OSM/DBI/Primitive.pm
+lib/Geo/OSM/DBI/Primitive/Node.pm
+lib/Geo/OSM/DBI/Primitive/Relation.pm
+lib/Geo/OSM/DBI/Primitive/Way.pm
+Makefile
+Makefile.PL
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README
+README.md
+t/001-load.t
+t/002-create-base-schema.t
+t/002-data.svg
+t/002-fill-base-schema.sql
+t/003-create-area-tables.t
+t/003-fill-expected-area-data.sql
+t/004-rel-members.t
+t/005-way-nodes.t
+t/helper.pm
+t/new.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

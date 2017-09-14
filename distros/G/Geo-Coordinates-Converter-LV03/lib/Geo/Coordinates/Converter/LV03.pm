@@ -1,5 +1,5 @@
 
- #_{ Encoding and name
+#_{ Encoding and name
 =encoding utf8
 =head1 NAME
 
@@ -13,16 +13,16 @@ use strict;
 use warnings;
 use utf8;
  #_}
- #_{ Version
+#_{ Version
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 #_}
- #_{ Synopsis
+#_{ Synopsis
 =head1 SYNOPSIS
 
     use Geo::Coordinates::Converter::LV03;
@@ -32,7 +32,7 @@ our $VERSION = '0.02';
    
 =cut
  #_}
- #_{ Export
+#_{ Export
 =head1 EXPORT
 
 On request, C<lat_lng_2_y_x> and C<y_x_2_lat_lng> are exported:
@@ -42,6 +42,7 @@ On request, C<lat_lng_2_y_x> and C<y_x_2_lat_lng> are exported:
     my ($x, $y) = lat_lng_2_y_x($φ, $λ);
     my ($φ, $λ) = y_x_2_lat_lng($x, $y);
 
+
 =head1 SUBROUTINES/METHODS
 =cut
 
@@ -50,9 +51,10 @@ use vars qw(@ISA @EXPORT_OK);
 @ISA = 'Exporter';
 @EXPORT_OK = qw(lat_lng_2_y_x y_x_2_lat_lng);
 
- #_}
-
+#_}
+#_{ Methods
 sub lat_lng_2_y_x { #_{
+#_{ POD
 
 =head2 lat_lng_2_y_x($lat, $lng)
 
@@ -62,6 +64,7 @@ Note: the Swiss seem to name the east-west axis by B<Y> and the
 the north-south axis by B<X>. Hence the strangly order of C<y> and C<x> in the sub's name.
 
 =cut
+#_}
 
 #  https://www.swisstopo.admin.ch/content/swisstopo-internet/de/online/calculation-services/_jcr_content/contentPar/tabs/items/dokumente_und_publik/tabPar/downloadlist/downloadItems/7_1467103072612.download/ch1903wgs84de.pdf
 #
@@ -101,7 +104,6 @@ the north-south axis by B<X>. Hence the strangly order of C<y> and C<x> in the s
    
   return ($y, $x);
 } #_}
-
 sub y_x_2_lat_lng { #_{
 
 =head2 y_x_2_lat_lng($y, $x)
@@ -149,8 +151,8 @@ the north-south axis by B<X>. Hence, the first argument is named C<y>, the secon
   return ($φ, $λ);
 
 } #_}
-
- #_{ Warning, Why etc
+#_}
+#_{ Warning
 
 =head1 WARNING
 
@@ -159,29 +161,57 @@ this friendly warning; »I<Diese Formeln haben eine reduzierte Genauigkeit und s
 vor allem für Navigationszwecke vorgesehen. Sie dürfen nicht für die amtliche Vermessung oder für geodätische Anwendungen verwendet werden!>« (that is: only to be used for navigational purposes,
 not of exact (or even official) measurements or geodatic applications).
 
+=cut
+#_}
+#_{ Why
 =head1 WHY
 
 Why was I not using the already existing L<Geo::Coordinates::Converter|https://metacpan.org/pod/Geo::Coordinates::Converter>?
 
 I tried, but that module's code seemed too hard and esoteric to extend. So I made this module a seperate one.
 
+=cut
+#_}
+#_{ Author
 =head1 AUTHOR
 
 René Nyffenegger, C<< <rene.nyffenegger at adp-gmbh.ch> >>
 
-=head1 BUGS
+=cut
+#_}
+#_{ See also
+=head1 SEE ALSO
+
+L<https://www.swisstopo.admin.ch/content/swisstopo-internet/de/online/calculation-services/_jcr_content/contentPar/tabs/items/dokumente_und_publik/tabPar/downloadlist/downloadItems/7_1467103072612.download/ch1903wgs84de.pdf>
+
+L<< https://asciich.ch/wordpress/koordinatenumrechner-schweiz-international/ >>: A converter in javascript.
+
+Fabien Fivaz's L<< wgs84_to_lv03.pl|https://github.com/ffivaz/wgs84_to_lv03 >>. Apparently, his script uses the online service at
+L<< http://geodesy.geo.admin.ch/reframe/ >> to convert the coordinates.
+
+=cut
+#_}
+#_{ Bugs and caveats
+=head1 BUGS AND CAVEATS
+
+The common order of using lattitude and longitude is first: lattitude, the longitude. lattitude goes in y-direction, longitude in x-direction. So,
+they're in a different order than the usually known C<X> then C<y>. More gravely is the fact, that the C<x> in L</lat_lng_2_y_x> and in
+L</y_x_2_lat_lng> is what usually is the C<y>, and vice versa. I should and might change that once. Then again, I might not find the time.
 
 Please report any bugs or feature requests to C<bug-geo-coordinates-converter-lv03 at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coordinates-Converter-LV03>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-=head1 LINKS
+=cut
+#_}
+#_{ Source code
+=head1 SOURCE CODE
 
-L<https://www.swisstopo.admin.ch/content/swisstopo-internet/de/online/calculation-services/_jcr_content/contentPar/tabs/items/dokumente_und_publik/tabPar/downloadlist/downloadItems/7_1467103072612.download/ch1903wgs84de.pdf>
+The source code is in a L<github repository|https://github.com/ReneNyffenegger/Geo-Coordinates-Converter-LV03>. Meaningful pull requests are welcome.
 
-L<github repository|https://github.com/ReneNyffenegger/Geo-Coordinates-Converter-LV03>
-
-
+=cut
+#_}
+#_{ License and Copyright
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2017 René Nyffenegger.
@@ -224,6 +254,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 =cut
- #_}
+#_}
 
 'tq84';

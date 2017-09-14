@@ -24,9 +24,20 @@ static int
 constant_6 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FP_NAN O_EXEC O_SYNC */
+     FP_NAN O_EXEC O_RDWR O_SYNC */
   /* Offset 3 gives the best switch position.  */
   switch (name[3]) {
+  case 'D':
+    if (memEQ(name, "O_RDWR", 6)) {
+    /*                  ^        */
+#ifdef O_RDWR
+      *iv_return = O_RDWR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'N':
     if (memEQ(name, "FP_NAN", 6)) {
     /*                  ^        */
@@ -68,12 +79,93 @@ static int
 constant_7 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FP_ZERO O_RSYNC RUN_LVL */
-  /* Offset 5 gives the best switch position.  */
-  switch (name[5]) {
+     FP_ZERO F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD F_SETFL F_SETLK
+     F_UNLCK F_WRLCK O_CREAT O_DSYNC O_RSYNC O_TRUNC RUN_LVL */
+  /* Offset 2 gives the best switch position.  */
+  switch (name[2]) {
+  case 'C':
+    if (memEQ(name, "O_CREAT", 7)) {
+    /*                 ^          */
+#ifdef O_CREAT
+      *iv_return = O_CREAT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "F_DUPFD", 7)) {
+    /*                 ^          */
+#ifdef F_DUPFD
+      *iv_return = F_DUPFD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "O_DSYNC", 7)) {
+    /*                 ^          */
+#ifdef O_DSYNC
+      *iv_return = O_DSYNC;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'G':
+    if (memEQ(name, "F_GETFD", 7)) {
+    /*                 ^          */
+#ifdef F_GETFD
+      *iv_return = F_GETFD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "F_GETFL", 7)) {
+    /*                 ^          */
+#ifdef F_GETFL
+      *iv_return = F_GETFL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "F_GETLK", 7)) {
+    /*                 ^          */
+#ifdef F_GETLK
+      *iv_return = F_GETLK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'N':
+    if (memEQ(name, "RUN_LVL", 7)) {
+    /*                 ^          */
+#ifdef RUN_LVL
+      *iv_return = RUN_LVL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "F_RDLCK", 7)) {
+    /*                 ^          */
+#ifdef F_RDLCK
+      *iv_return = F_RDLCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "O_RSYNC", 7)) {
-    /*                    ^       */
+    /*                 ^          */
 #ifdef O_RSYNC
       *iv_return = O_RSYNC;
       return PERL_constant_ISIV;
@@ -82,22 +174,73 @@ constant_7 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'R':
-    if (memEQ(name, "FP_ZERO", 7)) {
-    /*                    ^       */
-#ifdef FP_ZERO
-      *iv_return = FP_ZERO;
+  case 'S':
+    if (memEQ(name, "F_SETFD", 7)) {
+    /*                 ^          */
+#ifdef F_SETFD
+      *iv_return = F_SETFD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "F_SETFL", 7)) {
+    /*                 ^          */
+#ifdef F_SETFL
+      *iv_return = F_SETFL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "F_SETLK", 7)) {
+    /*                 ^          */
+#ifdef F_SETLK
+      *iv_return = F_SETLK;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
 #endif
     }
     break;
-  case 'V':
-    if (memEQ(name, "RUN_LVL", 7)) {
-    /*                    ^       */
-#ifdef RUN_LVL
-      *iv_return = RUN_LVL;
+  case 'T':
+    if (memEQ(name, "O_TRUNC", 7)) {
+    /*                 ^          */
+#ifdef O_TRUNC
+      *iv_return = O_TRUNC;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'U':
+    if (memEQ(name, "F_UNLCK", 7)) {
+    /*                 ^          */
+#ifdef F_UNLCK
+      *iv_return = F_UNLCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "F_WRLCK", 7)) {
+    /*                 ^          */
+#ifdef F_WRLCK
+      *iv_return = F_WRLCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case '_':
+    if (memEQ(name, "FP_ZERO", 7)) {
+    /*                 ^          */
+#ifdef FP_ZERO
+      *iv_return = FP_ZERO;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -112,7 +255,8 @@ static int
 constant_8 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     AT_FDCWD NEW_TIME OLD_TIME O_SEARCH RTLD_NOW _CS_PATH */
+     AT_FDCWD F_GETOWN F_SETLKW F_SETOWN NEW_TIME OLD_TIME O_APPEND O_NOCTTY
+     O_RDONLY O_SEARCH O_WRONLY RTLD_NOW SEEK_CUR SEEK_END SEEK_SET _CS_PATH */
   /* Offset 5 gives the best switch position.  */
   switch (name[5]) {
   case 'A':
@@ -131,6 +275,35 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     /*                    ^        */
 #ifdef AT_FDCWD
       *iv_return = AT_FDCWD;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "SEEK_CUR", 8)) {
+    /*                    ^        */
+#ifdef SEEK_CUR
+      *iv_return = SEEK_CUR;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'E':
+    if (memEQ(name, "O_APPEND", 8)) {
+    /*                    ^        */
+#ifdef O_APPEND
+      *iv_return = O_APPEND;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "SEEK_END", 8)) {
+    /*                    ^        */
+#ifdef SEEK_END
+      *iv_return = SEEK_END;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -157,11 +330,60 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'L':
+    if (memEQ(name, "F_SETLKW", 8)) {
+    /*                    ^        */
+#ifdef F_SETLKW
+      *iv_return = F_SETLKW;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   case 'N':
+    if (memEQ(name, "O_RDONLY", 8)) {
+    /*                    ^        */
+#ifdef O_RDONLY
+      *iv_return = O_RDONLY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "O_WRONLY", 8)) {
+    /*                    ^        */
+#ifdef O_WRONLY
+      *iv_return = O_WRONLY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
     if (memEQ(name, "RTLD_NOW", 8)) {
     /*                    ^        */
 #ifdef RTLD_NOW
       *iv_return = RTLD_NOW;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "F_GETOWN", 8)) {
+    /*                    ^        */
+#ifdef F_GETOWN
+      *iv_return = F_GETOWN;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    if (memEQ(name, "F_SETOWN", 8)) {
+    /*                    ^        */
+#ifdef F_SETOWN
+      *iv_return = F_SETOWN;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -179,6 +401,28 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'S':
+    if (memEQ(name, "SEEK_SET", 8)) {
+    /*                    ^        */
+#ifdef SEEK_SET
+      *iv_return = SEEK_SET;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "O_NOCTTY", 8)) {
+    /*                    ^        */
+#ifdef O_NOCTTY
+      *iv_return = O_NOCTTY;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   }
   return PERL_constant_NOTFOUND;
 }
@@ -187,7 +431,7 @@ static int
 constant_9 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     BOOT_TIME FP_NORMAL O_CLOEXEC O_TMPFILE RTLD_LAZY UTIME_NOW */
+     BOOT_TIME FP_NORMAL O_ACCMODE O_CLOEXEC O_TMPFILE RTLD_LAZY UTIME_NOW */
   /* Offset 7 gives the best switch position.  */
   switch (name[7]) {
   case 'A':
@@ -195,6 +439,17 @@ constant_9 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^       */
 #ifdef FP_NORMAL
       *iv_return = FP_NORMAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "O_ACCMODE", 9)) {
+    /*                      ^       */
+#ifdef O_ACCMODE
+      *iv_return = O_ACCMODE;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -264,7 +519,8 @@ static int
 constant_10 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     AT_EACCESS FNM_PERIOD O_NOFOLLOW O_TTY_INIT RTLD_LOCAL UTIME_OMIT */
+     AT_EACCESS FD_CLOEXEC FNM_PERIOD O_NOFOLLOW O_NONBLOCK O_TTY_INIT
+     RTLD_LOCAL UTIME_OMIT */
   /* Offset 7 gives the best switch position.  */
   switch (name[7]) {
   case 'C':
@@ -327,6 +583,28 @@ constant_10 (pTHX_ const char *name, IV *iv_return) {
     /*                      ^         */
 #ifdef O_TTY_INIT
       *iv_return = O_TTY_INIT;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'O':
+    if (memEQ(name, "O_NONBLOCK", 10)) {
+    /*                      ^         */
+#ifdef O_NONBLOCK
+      *iv_return = O_NONBLOCK;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'X':
+    if (memEQ(name, "FD_CLOEXEC", 10)) {
+    /*                      ^         */
+#ifdef FD_CLOEXEC
+      *iv_return = FD_CLOEXEC;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -646,7 +924,7 @@ static int
 constant_15 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     AT_NO_AUTOMOUNT CLOCK_MONOTONIC FNM_LEADING_DIR */
+     AT_NO_AUTOMOUNT CLOCK_MONOTONIC FNM_LEADING_DIR F_DUPFD_CLOEXEC */
   /* Offset 4 gives the best switch position.  */
   switch (name[4]) {
   case 'K':
@@ -682,6 +960,72 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
+  case 'P':
+    if (memEQ(name, "F_DUPFD_CLOEXEC", 15)) {
+    /*                   ^                 */
+#ifdef F_DUPFD_CLOEXEC
+      *iv_return = F_DUPFD_CLOEXEC;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  }
+  return PERL_constant_NOTFOUND;
+}
+
+static int
+constant_17 (pTHX_ const char *name, IV *iv_return) {
+  /* When generated this function returned values for the list of names given
+     here.  However, subsequent manual editing may have added or removed some.
+     AT_SYMLINK_FOLLOW CLOCK_UPTIME_FAST POSIX_FADV_NORMAL POSIX_FADV_RANDOM */
+  /* Offset 16 gives the best switch position.  */
+  switch (name[16]) {
+  case 'L':
+    if (memEQ(name, "POSIX_FADV_NORMA", 16)) {
+    /*                               L      */
+#ifdef POSIX_FADV_NORMAL
+      *iv_return = POSIX_FADV_NORMAL;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'M':
+    if (memEQ(name, "POSIX_FADV_RANDO", 16)) {
+    /*                               M      */
+#ifdef POSIX_FADV_RANDOM
+      *iv_return = POSIX_FADV_RANDOM;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'T':
+    if (memEQ(name, "CLOCK_UPTIME_FAS", 16)) {
+    /*                               T      */
+#ifdef CLOCK_UPTIME_FAST
+      *iv_return = CLOCK_UPTIME_FAST;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'W':
+    if (memEQ(name, "AT_SYMLINK_FOLLO", 16)) {
+    /*                               W      */
+#ifdef AT_SYMLINK_FOLLOW
+      *iv_return = AT_SYMLINK_FOLLOW;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
   }
   return PERL_constant_NOTFOUND;
 }
@@ -690,12 +1034,13 @@ static int
 constant_19 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     AT_SYMLINK_NOFOLLOW CLOCK_MONOTONIC_RAW CLOCK_REALTIME_FAST */
-  /* Offset 12 gives the best switch position.  */
-  switch (name[12]) {
-  case 'M':
+     AT_SYMLINK_NOFOLLOW CLOCK_MONOTONIC_RAW CLOCK_REALTIME_FAST
+     POSIX_FADV_DONTNEED POSIX_FADV_WILLNEED */
+  /* Offset 13 gives the best switch position.  */
+  switch (name[13]) {
+  case 'E':
     if (memEQ(name, "CLOCK_REALTIME_FAST", 19)) {
-    /*                           ^             */
+    /*                            ^            */
 #ifdef CLOCK_REALTIME_FAST
       *iv_return = CLOCK_REALTIME_FAST;
       return PERL_constant_ISIV;
@@ -704,9 +1049,20 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'N':
+  case 'F':
+    if (memEQ(name, "AT_SYMLINK_NOFOLLOW", 19)) {
+    /*                            ^            */
+#ifdef AT_SYMLINK_NOFOLLOW
+      *iv_return = AT_SYMLINK_NOFOLLOW;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'I':
     if (memEQ(name, "CLOCK_MONOTONIC_RAW", 19)) {
-    /*                           ^             */
+    /*                            ^            */
 #ifdef CLOCK_MONOTONIC_RAW
       *iv_return = CLOCK_MONOTONIC_RAW;
       return PERL_constant_ISIV;
@@ -715,11 +1071,22 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
 #endif
     }
     break;
-  case 'O':
-    if (memEQ(name, "AT_SYMLINK_NOFOLLOW", 19)) {
-    /*                           ^             */
-#ifdef AT_SYMLINK_NOFOLLOW
-      *iv_return = AT_SYMLINK_NOFOLLOW;
+  case 'L':
+    if (memEQ(name, "POSIX_FADV_WILLNEED", 19)) {
+    /*                            ^            */
+#ifdef POSIX_FADV_WILLNEED
+      *iv_return = POSIX_FADV_WILLNEED;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "POSIX_FADV_DONTNEED", 19)) {
+    /*                            ^            */
+#ifdef POSIX_FADV_DONTNEED
+      *iv_return = POSIX_FADV_DONTNEED;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -798,15 +1165,21 @@ my @names = (qw(AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
 	       CLOCK_PROCESS_CPUTIME_ID CLOCK_REALTIME CLOCK_REALTIME_COARSE
 	       CLOCK_REALTIME_FAST CLOCK_REALTIME_PRECISE CLOCK_SOFTTIME
 	       CLOCK_THREAD_CPUTIME_ID CLOCK_UPTIME CLOCK_UPTIME_FAST
-	       CLOCK_UPTIME_PRECISE DEAD_PROCESS FNM_CASEFOLD FNM_FILE_NAME
-	       FNM_LEADING_DIR FNM_NOESCAPE FNM_NOMATCH FNM_PATHNAME FNM_PERIOD
-	       FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO INIT_PROCESS
-	       ITIMER_PROF ITIMER_REAL ITIMER_VIRTUAL LOGIN_PROCESS NEW_TIME
-	       OLD_TIME O_CLOEXEC O_DIRECTORY O_EXEC O_NOFOLLOW O_RSYNC
-	       O_SEARCH O_SYNC O_TMPFILE O_TTY_INIT RTLD_GLOBAL RTLD_LAZY
-	       RTLD_LOCAL RTLD_NOW RUN_LVL TIMER_ABSTIME USER_PROCESS UTIME_NOW
-	       UTIME_OMIT _CS_GNU_LIBC_VERSION _CS_GNU_LIBPTHREAD_VERSION
-	       _CS_PATH));
+	       CLOCK_UPTIME_PRECISE DEAD_PROCESS FD_CLOEXEC FNM_CASEFOLD
+	       FNM_FILE_NAME FNM_LEADING_DIR FNM_NOESCAPE FNM_NOMATCH
+	       FNM_PATHNAME FNM_PERIOD FP_INFINITE FP_NAN FP_NORMAL
+	       FP_SUBNORMAL FP_ZERO F_DUPFD F_DUPFD_CLOEXEC F_GETFD F_GETFL
+	       F_GETLK F_GETOWN F_RDLCK F_SETFD F_SETFL F_SETLK F_SETLKW
+	       F_SETOWN F_UNLCK F_WRLCK INIT_PROCESS ITIMER_PROF ITIMER_REAL
+	       ITIMER_VIRTUAL LOGIN_PROCESS NEW_TIME OLD_TIME O_ACCMODE
+	       O_APPEND O_CLOEXEC O_CREAT O_DIRECTORY O_DSYNC O_EXEC O_NOCTTY
+	       O_NOFOLLOW O_NONBLOCK O_RDONLY O_RDWR O_RSYNC O_SEARCH O_SYNC
+	       O_TMPFILE O_TRUNC O_TTY_INIT O_WRONLY POSIX_FADV_DONTNEED
+	       POSIX_FADV_NOREUSE POSIX_FADV_NORMAL POSIX_FADV_RANDOM
+	       POSIX_FADV_SEQUENTIAL POSIX_FADV_WILLNEED RTLD_GLOBAL RTLD_LAZY
+	       RTLD_LOCAL RTLD_NOW RUN_LVL SEEK_CUR SEEK_END SEEK_SET
+	       TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
+	       _CS_GNU_LIBC_VERSION _CS_GNU_LIBPTHREAD_VERSION _CS_PATH));
 
 print constant_types(), "\n"; # macro defs
 foreach (C_constant ("POSIX::2008", 'constant', 'IV', $types, undef, 3, @names) ) {
@@ -849,32 +1222,16 @@ __END__
     return constant_15 (aTHX_ name, iv_return);
     break;
   case 17:
-    /* Names all of length 17.  */
-    /* AT_SYMLINK_FOLLOW CLOCK_UPTIME_FAST */
-    /* Offset 11 gives the best switch position.  */
-    switch (name[11]) {
-    case 'E':
-      if (memEQ(name, "CLOCK_UPTIME_FAST", 17)) {
-      /*                          ^            */
-#ifdef CLOCK_UPTIME_FAST
-        *iv_return = CLOCK_UPTIME_FAST;
-        return PERL_constant_ISIV;
+    return constant_17 (aTHX_ name, iv_return);
+    break;
+  case 18:
+    if (memEQ(name, "POSIX_FADV_NOREUSE", 18)) {
+#ifdef POSIX_FADV_NOREUSE
+      *iv_return = POSIX_FADV_NOREUSE;
+      return PERL_constant_ISIV;
 #else
-        return PERL_constant_NOTDEF;
+      return PERL_constant_NOTDEF;
 #endif
-      }
-      break;
-    case 'F':
-      if (memEQ(name, "AT_SYMLINK_FOLLOW", 17)) {
-      /*                          ^            */
-#ifdef AT_SYMLINK_FOLLOW
-        *iv_return = AT_SYMLINK_FOLLOW;
-        return PERL_constant_ISIV;
-#else
-        return PERL_constant_NOTDEF;
-#endif
-      }
-      break;
     }
     break;
   case 19:
@@ -884,13 +1241,32 @@ __END__
     return constant_20 (aTHX_ name, iv_return);
     break;
   case 21:
-    if (memEQ(name, "CLOCK_REALTIME_COARSE", 21)) {
-#ifdef CLOCK_REALTIME_COARSE
-      *iv_return = CLOCK_REALTIME_COARSE;
-      return PERL_constant_ISIV;
+    /* Names all of length 21.  */
+    /* CLOCK_REALTIME_COARSE POSIX_FADV_SEQUENTIAL */
+    /* Offset 16 gives the best switch position.  */
+    switch (name[16]) {
+    case 'N':
+      if (memEQ(name, "POSIX_FADV_SEQUENTIAL", 21)) {
+      /*                               ^           */
+#ifdef POSIX_FADV_SEQUENTIAL
+        *iv_return = POSIX_FADV_SEQUENTIAL;
+        return PERL_constant_ISIV;
 #else
-      return PERL_constant_NOTDEF;
+        return PERL_constant_NOTDEF;
 #endif
+      }
+      break;
+    case 'O':
+      if (memEQ(name, "CLOCK_REALTIME_COARSE", 21)) {
+      /*                               ^           */
+#ifdef CLOCK_REALTIME_COARSE
+        *iv_return = CLOCK_REALTIME_COARSE;
+        return PERL_constant_ISIV;
+#else
+        return PERL_constant_NOTDEF;
+#endif
+      }
+      break;
     }
     break;
   case 22:

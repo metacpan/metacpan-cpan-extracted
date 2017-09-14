@@ -52,6 +52,8 @@ TODO
 todo
 todos
 untestable
+EventFacet
+renderers
 
 ## computerese
 blackbox
@@ -94,6 +96,7 @@ YESNO
 ansi
 html
 HASHBASE
+renderer
 
 ## other jargon, slang
 17th
@@ -104,3 +107,12 @@ Hmmm
 cid
 tid
 pid
+SIGINT
+SIGALRM
+SIGHUP
+SIGTERM
+SIGUSR1
+SIGUSR2
+
+## Spelled correctly according to google:
+recognises

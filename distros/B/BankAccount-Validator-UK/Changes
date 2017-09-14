@@ -1,5 +1,15 @@
 Revision history for BankAccount::Validator::UK
 
+0.33  2017-09-14T11:25:00:+01:00
+      - Updated the valacdos.txt (v4.60)
+      - Added sort code range 040072-040073
+      - Changed sort code range 040406-040406 to 040400-041399.
+      - Amended sort code range 040010-040059 to 040020-040059.
+      - Amended sort code range 040010-040059 to 040010-040014 for both Mod11 and DblAl.
+      - Deleted 040015-040019.
+      - Added sort code range 236972-236972.
+      - Added sort codes - 231228, 231618 and 233135 for both Mod11 and DblAl.
+
 0.32  2017-09-03T12:00:00:+01:00
       - Updated copyright year information.
 

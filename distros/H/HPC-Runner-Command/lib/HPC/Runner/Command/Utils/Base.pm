@@ -56,6 +56,18 @@ option 'outdir' => (
     predicate     => 'has_outdir',
 );
 
+option 'basedir' => (
+    is            => 'rw',
+    isa           => AbsPath,
+    lazy          => 1,
+    coerce        => 1,
+    required      => 1,
+    default       => \&set_basedir,
+    documentation => q{Base directory to write out files.},
+    trigger       => \&_make_the_dirs,
+    predicate     => 'has_basedir',
+);
+
 #These two should both be in execute_jobs
 
 =head3 procs
@@ -109,6 +121,47 @@ has 'cmd' => (
     clearer   => 'clear_cmd',
 );
 
+=head3 set_basedir
+
+=cut
+
+sub set_basedir {
+    my $self = shift;
+
+    if ( $self->has_basedir ) {
+        make_path( $self->basedir );
+        return;
+    }
+
+    my $dt = $self->dt;
+    $dt = "$dt";
+    $dt =~ s/:/-/g;
+
+    my $outdir;
+    if ( $self->has_version && $self->has_git ) {
+        if ( $self->has_project ) {
+            $outdir =
+              File::Spec->catdir( 'hpc-runner', $self->project, $dt,
+                $self->version, );
+        }
+        else {
+            $outdir = File::Spec->catdir( 'hpc-runner', $dt, $self->version, );
+        }
+    }
+    else {
+        if ( $self->has_project ) {
+            $outdir = File::Spec->catdir( 'hpc-runner', $dt, $self->project, );
+        }
+        else {
+            $outdir = File::Spec->catdir( 'hpc-runner', $dt );
+        }
+    }
+
+    make_path($outdir);
+
+    return $outdir;
+}
+
 =head3 set_outdir
 
 Internal variable
@@ -125,30 +178,9 @@ sub set_outdir {
         return;
     }
 
-    my $outdir;
+    my $outdir = File::Spec->catdir($self->basedir, 'scratch');
 
-    if ( $self->has_version && $self->has_git ) {
-        if ( $self->has_project ) {
-            $outdir =
-              File::Spec->catdir( 'hpc-runner', $self->project, $self->version,
-                'scratch' );
-        }
-        else {
-            $outdir =
-              File::Spec->catdir( 'hpc-runner', $self->version, 'scratch' );
-        }
-    }
-    else {
-        if ( $self->has_project ) {
-            $outdir =
-              File::Spec->catdir( 'hpc-runner', $self->project, 'scratch' );
-        }
-        else {
-            $outdir = File::Spec->catdir( 'hpc-runner', 'scratch' );
-        }
-    }
-
-    $self->_make_the_dirs($outdir);
+    make_path($outdir);
 
     return $outdir;
 }

@@ -89,7 +89,7 @@ associated Bio::AnnotationCollectionI object which is associated with
 Bio::Seq objects.  If it is explicitly requested that no annotations
 should be stored when parsing a record of course they will not be
 available when you try and get them.  If you are having this problem
-look at the type of SeqBuilder that is being used to contruct your
+look at the type of SeqBuilder that is being used to construct your
 sequence object.
 
  Comments             Annotation 'comment'
@@ -117,7 +117,7 @@ sequence object.
 
 There is more information in the Feature-Annotation HOWTO about each
 field and how it is mapped to the Sequence object
-L<http://bioperl.open-bio.org/wiki/HOWTO:Feature-Annotation>.
+L<http://bioperl.org/howtos/Features_and_Annotations_HOWTO.html>.
 
 =head1 FEEDBACK
 
@@ -500,7 +500,7 @@ sub next_seq {
             }
 
             # Comments may be plain text or Structured Comments.
-            # Structured Comments are made up of tag/value pairs and have beginning 
+            # Structured Comments are made up of tag/value pairs and have beginning
             # and end delimiters like ##*-Data-START## and ##*-Data-END##
             elsif ($line =~ /^COMMENT\s+(\S.*)/) {
                 if ($annotation) {
@@ -965,7 +965,7 @@ sub write_seq {
 
         my $circular = ($seq->is_circular) ? 'circular' : 'linear  ';
 
-        local($^W) = 0; # supressing warnings about uninitialized fields.
+        local($^W) = 0; # suppressing warnings about uninitialized fields.
 
         my $temp_line;
         if ( $self->_id_generation_func ) {
@@ -1273,7 +1273,7 @@ sub _print_GenBank_FTHelper {
         sprintf( "     %-16s%s", $fth->key, $spacer ),
                  " " x 21, $fth->loc, "\,\|\$", 80 );
 
-    foreach my $tag ( keys %{ $fth->field } ) {
+    foreach my $tag ( sort keys %{ $fth->field } ) {
         # Account for hash structure in Annotation::DBLink, not the expected array
         if ( $tag eq 'db_xref' and grep /HASH/, @{ $fth->field->{$tag} }) {
             for my $ref ( @{ $fth->field->{$tag} } ) {
@@ -1330,7 +1330,7 @@ sub _read_GenBank_References {
     my (@refs);
     my $ref;
 
-    # assumme things are starting with RN
+    # assume things are starting with RN
     if ( $$buffer !~ /^REFERENCE/ ) {
         warn("Not parsing line '$$buffer' which maybe important");
     }

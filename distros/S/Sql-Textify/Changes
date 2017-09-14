@@ -1,0 +1,14 @@
+Revision history for Sql-Textify
+
+0.02, 0.03, 0.04, 0.05
+		14 September 2017
+		- little fixes to make CPAN tests happy
+		- new test suites, I'm not using test::most anymore
+		- test sqlite only if DBD::Sqlite is installed
+		- better regexp for removing C-style comments
+		- also there's no need for sqltextify.pl to split the string (the textify script will do everything already) so I removed the split code.
+		- little internal changes, updated Makefile.PL with better requires
+
+0.01    10 September 2017
+        First version, released on an unsuspecting world.
+        It contains the module Sql-Textify and the script sqltextify.pl.

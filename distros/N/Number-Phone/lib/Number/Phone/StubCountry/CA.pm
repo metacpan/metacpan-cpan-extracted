@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [
                 {
@@ -35,6 +35,7 @@ my $formatters = [
 
 my $validators = {
                 'voip' => '',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'toll_free' => '
           8(?:
             00|
@@ -48,6 +49,17 @@ my $validators = {
           310\\d{4}
         ',
                 'pager' => '',
+                'personal_number' => '
+          5(?:
+            00|
+            22|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
                 'geographic' => '(
           (?:
             2(?:
@@ -141,19 +153,7 @@ my $validators = {
             )|
             90[25]
           )[2-9]\\d{6}
-        )',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'personal_number' => '
-          5(?:
-            00|
-            22|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        '
+        )'
               };
 use Number::Phone::NANP::Data;
 sub areaname {

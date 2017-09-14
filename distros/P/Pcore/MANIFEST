@@ -145,7 +145,6 @@ lib/Pcore/Util/Bit.pm
 lib/Pcore/Util/CA.pm
 lib/Pcore/Util/Class.pm
 lib/Pcore/Util/Config.pm
-lib/Pcore/Util/Config/INI.pm
 lib/Pcore/Util/Data.pm
 lib/Pcore/Util/Date.pm
 lib/Pcore/Util/Date/Strptime.pm
@@ -162,7 +161,6 @@ lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm
 lib/Pcore/Util/Hash/RandKey.pm
 lib/Pcore/Util/IDN.pm
-lib/Pcore/Util/IDN/PP.pm
 lib/Pcore/Util/List.pm
 lib/Pcore/Util/Mail.pm
 lib/Pcore/Util/PM.pm
@@ -174,6 +172,7 @@ lib/Pcore/Util/Perl/Moo.pm
 lib/Pcore/Util/Promise.pm
 lib/Pcore/Util/Promise/Request.pm
 lib/Pcore/Util/Random.pm
+lib/Pcore/Util/Regexp.pm
 lib/Pcore/Util/Result.pm
 lib/Pcore/Util/Result/Status.pm
 lib/Pcore/Util/Scalar.pm

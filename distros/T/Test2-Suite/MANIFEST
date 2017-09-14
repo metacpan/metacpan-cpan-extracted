@@ -38,12 +38,14 @@ lib/Test2/Compare/Set.pm
 lib/Test2/Compare/String.pm
 lib/Test2/Compare/Undef.pm
 lib/Test2/Compare/Wildcard.pm
+lib/Test2/Event/Times.pm
 lib/Test2/Mock.pm
 lib/Test2/Plugin.pm
 lib/Test2/Plugin/BailOnFail.pm
 lib/Test2/Plugin/DieOnFail.pm
 lib/Test2/Plugin/ExitSummary.pm
 lib/Test2/Plugin/SRand.pm
+lib/Test2/Plugin/Times.pm
 lib/Test2/Plugin/UTF8.pm
 lib/Test2/Require.pm
 lib/Test2/Require/AuthorTesting.pm
@@ -65,6 +67,7 @@ lib/Test2/Tools/Encoding.pm
 lib/Test2/Tools/Event.pm
 lib/Test2/Tools/Exception.pm
 lib/Test2/Tools/Exports.pm
+lib/Test2/Tools/GenTemp.pm
 lib/Test2/Tools/Grab.pm
 lib/Test2/Tools/Mock.pm
 lib/Test2/Tools/Ref.pm
@@ -79,6 +82,7 @@ lib/Test2/Util/Table.pm
 lib/Test2/Util/Table/Cell.pm
 lib/Test2/Util/Table/LineBreak.pm
 lib/Test2/Util/Term.pm
+lib/Test2/Util/Times.pm
 lib/Test2/V0.pm
 perltidyrc
 t/00-report.t
@@ -114,6 +118,7 @@ t/modules/Plugin/BailOnFail.t
 t/modules/Plugin/DieOnFail.t
 t/modules/Plugin/ExitSummary.t
 t/modules/Plugin/SRand.t
+t/modules/Plugin/Times.t
 t/modules/Plugin/UTF8.t
 t/modules/Require.t
 t/modules/Require/AuthorTesting.t
@@ -136,6 +141,7 @@ t/modules/Tools/Encoding.t
 t/modules/Tools/Event.t
 t/modules/Tools/Exception.t
 t/modules/Tools/Exports.t
+t/modules/Tools/GenTemp.t
 t/modules/Tools/Grab.t
 t/modules/Tools/Mock.t
 t/modules/Tools/Ref.t
@@ -149,6 +155,7 @@ t/modules/Util/Sub.t
 t/modules/Util/Table.t
 t/modules/Util/Table/Cell.t
 t/modules/Util/Table/LineBreak.t
+t/modules/Util/Times.t
 t/modules/V0.t
 t/regression/10-set_and_dne.t
 t/regression/27-1-Test2-Bundle-More.t

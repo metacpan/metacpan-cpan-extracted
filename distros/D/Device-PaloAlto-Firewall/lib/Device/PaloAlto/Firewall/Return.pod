@@ -15,7 +15,7 @@ Device::PaloAlto:Firewall::Return - Return values for Device::PaloAlto::Firewall
 
 =head1 VERSION
 
-version 0.081
+version 0.091
  
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ Both the hash keys and example values are documented for each method to provide 
 =head2 PLATFORM
 
 =head3 system_info
+
+Note the newline at the end of the 'time' member value.
 
     {
       'wildfire-release-date' => 'unknown',
@@ -146,15 +148,370 @@ If the device is a VM, there are no environmentals an an empty HASHREF is return
 
 =head3 high_availability
 
+	{
+	  'group' => {
+	               'mode' => 'Active-Passive',
+	               'peer-info' => {
+	                                'mode' => 'Active-Passive',
+	                                'mgmt-ip' => '10.175.32.17/24',
+	                                'platform-model' => 'PA-VM',
+	                                'conn-ha1' => {
+	                                                'conn-desc' => 'heartbeat status',
+	                                                'conn-primary' => 'yes',
+	                                                'conn-status' => 'up'
+	                                              },
+	                                'url-version' => '0000.00.00.000',
+	                                'conn-status' => 'up',
+	                                'state-duration' => '5270418',
+	                                'build-rel' => '8.0.3',
+	                                'vpnclient-version' => 'Not Installed',
+	                                'last-error-state' => 'suspended',
+	                                'priority' => '128',
+	                                'gpclient-version' => 'Not Installed',
+	                                'last-error-reason' => 'User requested',
+	                                'state' => 'passive',
+	                                'app-version' => '712-4114',
+	                                'mgmt-ipv6' => {},
+	                                'ha1-macaddr' => '00:50:56:9b:c5:de',
+	                                'av-version' => '0',
+	                                'vm-license' => 'VM-300',
+	                                'version' => '1',
+	                                'preemptive' => 'yes',
+	                                'threat-version' => '712-4114',
+	                                'ha1-ipaddr' => '169.254.0.2'
+	                              },
+	               'path-monitoring' => {
+	                                      'vrouter' => {},
+	                                      'enabled' => 'yes',
+	                                      'fail-cond' => 'any',
+	                                      'vlan' => {},
+	                                      'vwire' => {}
+	                                    },
+	               'link-monitoring' => {
+	                                      'enabled' => 'yes',
+	                                      'fail-cond' => 'any',
+	                                      'groups' => {}
+	                                    },
+	               'running-sync' => 'synchronized',
+	               'local-info' => {
+	                                 'max-flaps' => '3',
+	                                 'app-version' => '712-4114',
+	                                 'ha1-link-mon-intv' => '3000',
+	                                 'state' => 'active',
+	                                 'state-sync' => 'User-disabled',
+	                                 'version' => '1',
+	                                 'preemptive' => 'yes',
+	                                 'ha1-ipaddr' => '169.254.0.1/30',
+	                                 'threat-version' => '712-4114',
+	                                 'ha1-macaddr' => '00:50:56:9b:48:4f',
+	                                 'monitor-fail-holdup' => '0',
+	                                 'build-compat' => 'Match',
+	                                 'mgmt-ipv6' => {},
+	                                 'url-compat' => 'Match',
+	                                 'promotion-hold' => '2000',
+	                                 'av-version' => '0',
+	                                 'vpnclient-compat' => 'Match',
+	                                 'addon-master-holdup' => '500',
+	                                 'mode' => 'Active-Passive',
+	                                 'mgmt-ip' => '10.175.32.16/24',
+	                                 'ha1-encrypt-enable' => 'no',
+	                                 'platform-model' => 'PA-VM',
+	                                 'vpnclient-version' => 'Not Installed',
+	                                 'av-compat' => 'Match',
+	                                 'hello-interval' => '8000',
+	                                 'build-rel' => '8.0.3',
+	                                 'app-compat' => 'Match',
+	                                 'gpclient-compat' => 'Match',
+	                                 'vm-license' => 'VM-300',
+	                                 'url-version' => '0000.00.00.000',
+	                                 'preempt-hold' => '1',
+	                                 'nonfunc-flap-cnt' => '0',
+	                                 'last-error-reason' => 'User requested',
+	                                 'heartbeat-interval' => '2000',
+	                                 'preempt-flap-cnt' => '0',
+	                                 'gpclient-version' => 'Not Installed',
+	                                 'priority' => '64',
+	                                 'last-error-state' => 'suspended',
+	                                 'active-passive' => {
+	                                                       'passive-link-state' => 'shutdown',
+	                                                       'monitor-fail-holddown' => '1'
+	                                                     },
+	                                 'ha1-encrypt-imported' => 'no',
+	                                 'threat-compat' => 'Match',
+	                                 'ha1-port' => 'ethernet1/7',
+	                                 'state-duration' => '5270423'
+	                               },
+	               'running-sync-enabled' => 'yes'
+	             },
+	  'enabled' => 'yes'
+	};
+
+
+=head3 software_check
+
+	[
+	  {
+	    'current' => 'no',
+	    'downloaded' => 'no',
+	    'filename' => 'PanOS_vm-8.0.4',
+	    'latest' => 'yes',
+	    'version' => '8.0.4',
+	    'size' => '378',
+	    'release-notes' => 'https://downloads.paloaltonetworks.com/software/PAN-OS-8.0.4-RN.pdf?__gda__=1505263707_ef8a89c4a93427db012ce6614bc44d03',
+	    'uploaded' => 'no',
+	    'released-on' => '2017/07/26  14:29:20',
+	    'size-kb' => '387602'
+	  }
+	];
+
+=head3 content_check
+
+	[
+	  {
+	    'release-notes' => 'https://downloads.paloaltonetworks.com/content/content-730-4195.html?__gda__=1505264450_4bf3585276733c1dd4fd8902286b222a',
+	    'current' => 'no',
+	    'previous' => 'no',
+	    'released-on' => '2017/08/30 16:54:52 PDT',
+	    'update-type' => 'Full',
+	    'downloaded' => 'no',
+	    'version' => '730-4195',
+	    'feature-desc' => 'Unknown',
+	    'app-version' => '730-4195',
+	    'features' => 'Apps, Threats',
+	    'size-kb' => '32940',
+	    'filename' => 'panupv2-all-contents-730-4195',
+	    'size' => '32',
+	    'installing' => 'no'
+	  },
+	];
+
+=head3 antivirus_check
+
+	[
+	  {
+	    'filename' => 'panup-all-antivirus-2358-2850',
+	    'release-notes' => 'https://downloads.paloaltonetworks.com/virus/AntiVirusExternal-2358.html?__gda__=1505264830_d290e01664cb68c51d3e1f24202e0cfa',
+	    'downloaded' => 'no',
+	    'features' => 'Virus',
+	    'version' => '2358-2850',
+	    'current' => 'no',
+	    'size-kb' => '79446',
+	    'update-type' => 'Full',
+	    'size' => '77',
+	    'released-on' => '2017/09/05 04:00:27 PDT',
+	    'previous' => 'no',
+	    'app-version' => '2358-2850',
+	    'feature-desc' => 'Unknown',
+	    'installing' => 'no'
+	  }
+	];
+
+=head3 gp_client_check
+
+    [
+      {
+        'latest' => 'no',
+        'release-notes' => 'https://downloads.paloaltonetworks.com/software/GlobalProtect-Agent-4.0.3-RNs.pdf?__gda__=1505265092_f74a714ded048dbf4031a9cf2308279b',
+        'released-on' => '2017/09/01  15:47:38',
+        'filename' => 'PanGP-4.0.3',
+        'uploaded' => 'no',
+        'downloaded' => 'no',
+        'size' => '39',
+        'size-kb' => '40823',
+        'version' => '4.0.3',
+        'current' => 'no'
+      }
+    ];
+
+=head3 licenses
+
+	[
+	  {
+	    'authcode' => {},
+	    'serial' => '1234567890',
+	    'expires' => 'June 30, 2020',
+	    'expired' => 'no',
+	    'description' => 'WildFire signature feed, integrated WildFire logs, WildFire API',
+	    'issued' => 'July 06, 2017',
+	    'feature' => 'WildFire License',
+	    'base-license-name' => 'PA-VM'
+	  }
+	];
+
 =head2 NETWORK
 
 =head3 interfaces
 
+	{
+	  'ifnet' => {
+	               'entry' => [
+	                            {
+	                              'vsys' => '1',
+	                              'dyn-addr' => {},
+	                              'name' => 'ethernet1/1',
+	                              'zone' => 'Untrust',
+	                              'id' => '16',
+	                              'addr' => {},
+	                              'fwd' => 'vr:default',
+	                              'ip' => '203.44.17.6/29',
+	                              'addr6' => {},
+	                              'tag' => '0'
+	                            },
+	                          ]
+	             },
+	  'hw' => {
+	            'entry' => [
+	                         {
+	                           'speed' => '10000',
+	                           'st' => '10000/full/up',
+	                           'type' => '0',
+	                           'state' => 'up',
+	                           'mac' => '00:50:56:9b:5a:25',
+	                           'name' => 'ethernet1/1',
+	                           'mode' => '(autoneg)',
+	                           'duplex' => 'full',
+	                           'id' => '16'
+	                         },
+	                       ]
+	          }
+	};
+
+
 =head3 interface_counters_logical
+
+	[
+	  {
+	    'teardrop' => '0',
+	    'l2_decap' => '0',
+	    'noneigh' => '0',
+	    'neighpend' => '0',
+	    'ipspoof' => '0',
+	    'other_conn' => '0',
+	    'zonechange' => '0',
+	    'noroute' => '0',
+	    'ifwderrors' => '0',
+	    'pod' => '0',
+	    'noarp' => '1',
+	    'l2_encap' => '0',
+	    'idrops' => '172',
+	    'opackets' => '493642',
+	    'name' => 'ethernet1/1',
+	    'obytes' => '158503950',
+	    'udp_conn' => '0',
+	    'land' => '0',
+	    'nomac' => '0',
+	    'icmp_frag' => '0',
+	    'ibytes' => '547451868',
+	    'macspoof' => '0',
+	    'tcp_conn' => '0',
+	    'ipackets' => '1789916',
+	    'ierrors' => '0',
+	    'flowstate' => '10928'
+	  },
+	];
 
 =head3 routing_table
 
-=head3 bgp_peers 
+	[
+	  {
+	    'destination' => '0.0.0.0/0',
+	    'nexthop' => '203.44.17.1',
+	    'flags' => 'A S   ',
+	    'virtual-router' => 'default',
+	    'interface' => 'ethernet1/1',
+	    'metric' => '10',
+	    'age' => {},
+	    'route-table' => 'unicast'
+	  },
+	  {
+	    'age' => {},
+	    'route-table' => 'unicast',
+	    'destination' => '10.175.34.0/24',
+	    'nexthop' => '10.175.34.1',
+	    'flags' => 'A C   ',
+	    'interface' => 'ethernet1/5',
+	    'virtual-router' => 'default',
+	    'metric' => '0'
+	  },
+	];
+
+=head3 bgp_peers
+
+	[
+	  {
+	    'ORF-entry-received' => '0',
+	    'msg-total-in' => '45',
+	    'local-address' => '192.168.122.19:179',
+	    'passive' => 'no',
+	    'msg-total-out' => '47',
+	    'status-duration' => '1021',
+	    'connect-retry-interval' => '120',
+	    'holdtime' => '90',
+	    'peer-router-id' => '1.1.1.20',
+	    'peer-group' => 'Cisco',
+	    'prefix-limit' => '5000',
+	    'last-error' => {},
+	    'keepalive' => '30',
+	    'status-flap-counts' => '2',
+	    'prefix-counter' => {
+	                          'entry' => [
+	                                       {
+	                                         'incoming-accepted' => '2',
+	                                         'outgoing-total' => '1',
+	                                         'incoming-total' => '2',
+	                                         'afi-safi' => 'bgpAfiIpv4-unicast',
+	                                         'outgoing-advertised' => '1',
+	                                         'incoming-rejected' => '0'
+	                                       }
+	                                     ]
+	                        },
+	    'peer-address' => '192.168.122.30:52236',
+	    'multi-hop-ttl' => '2',
+	    'idle-hold' => '15',
+	    'msg-update-out' => '5',
+	    'remote-as' => '65001',
+	    'config' => {
+	                  'remove-private-as' => 'yes'
+	                },
+	    'open-delay' => '0',
+	    'last-update-age' => '16',
+	    'password-set' => 'no',
+	    'nexthop-thirdparty' => 'yes',
+	    'peer' => 'c1000v.local',
+	    'aggregate-confed-as' => 'yes',
+	    'msg-update-in' => '7',
+	    'peering-type' => 'Unspecified',
+	    'vr' => 'default',
+	    'nexthop-peer' => 'no',
+	    'same-confederation' => 'no',
+	    'established-counts' => '1',
+	    'holdtime-config' => '90',
+	    'reflector-client' => 'not-client',
+	    'keepalive-config' => '30',
+	    'peer-capability' => {
+	                           'list' => [
+	                                       {
+	                                         'capability' => 'Multiprotocol Extensions(1)'
+	                                       },
+	                                       {
+	                                         'capability' => 'Route Refresh(2)'
+	                                       },
+	                                       {
+	                                         'capability' => '32-Bit AS Number(65)'
+	                                       },
+	                                       {
+	                                         'capability' => 'unknown(70)'
+	                                       },
+	                                       {
+	                                         'capability' => 'Route Refresh (Cisco)(128)'
+	                                       }
+	                                     ]
+	                         },
+	    'nexthop-self' => 'no',
+	    'status' => 'Established'
+	  },
+	]
+
 
 =head3 bgp_rib
 
@@ -220,9 +577,46 @@ If the device is a VM, there are no environmentals an an empty HASHREF is return
 
 =head3 bfd_peers
 
+	[
+	  {
+	    'neighbor-ip-address' => '192.168.198.30',
+	    'local-ip-address' => '192.168.198.29',
+	    'protocol' => 'BGP ',
+	    'session-id' => '2',
+	    'discriminator-remote' => '0x4bb50013',
+	    'state-local' => 'up',
+	    'up-time' => '-1244382476d 16h 53m 38s 940ms ',
+	    'discriminator-local' => '0x48e0002',
+	    'errors' => '0',
+	    'interface' => 'ethernet1/23 '
+	  },
+	]
+
 =head2 MANAGEMENT
 
 =head3 ntp
+
+	{
+	  'synched' => 'LOCAL'
+	};
+
+
+	{
+	  'ntp-server-2' => {
+	                      'reachable' => 'yes',
+	                      'status' => 'synched',
+	                      'name' => '203.122.222.149',
+	                      'authentication-type' => 'none'
+	                    },
+	  'ntp-server-1' => {
+	                      'authentication-type' => 'none',
+	                      'name' => '202.122.222.150',
+	                      'status' => 'rejected',
+	                      'reachable' => 'no'
+	                    },
+	  'synched' => '203.122.222.149'
+	};
+
 
 =head3 panorama_status
 
@@ -245,7 +639,43 @@ If the device is a VM, there are no environmentals an an empty HASHREF is return
 
 =head3 ip_user_mapping
 
+	[
+	  {
+	    'timeout' => '413',
+	    'domain' => 'domain',
+	    'ip' => '192.9.202.79',
+	    'vsys' => 'vsys1',
+	    'type' => 'AD',
+	    'user' => 'user1',
+	    'idle_timeout' => '413'
+	  },
+	  {
+	    'user' => 'user2',
+	    'idle_timeout' => '2644',
+	    'type' => 'AD',
+	    'ip' => '192.9.200.64',
+	    'vsys' => 'vsys1',
+	    'domain' => 'domain',
+	    'timeout' => '2644'
+	  },
+	]
+
+
 =head3 userid_server_monitor
+
+	[
+	  {
+	    'connected' => 'Connected',
+	    'vsys' => 'vsys1',
+	    'name' => 'ad03.domain.int'
+	  },
+	  {
+	    'name' => 'ad06.domain.int',
+	    'connected' => 'Connection timeout',
+	    'vsys' => 'vsys1'
+	  },
+	]
+
 
 =head3 ike_peers
 
@@ -263,21 +693,21 @@ If the device is a VM, there are no environmentals an an empty HASHREF is return
 
 =head3 ipsec_peers
 
-[
-  {
-    'i_spi' => '-6187583',
-    'o_spi' => '-623460235',
-    'life' => '2847',
-    'proto' => 'ESP',
-    'tid' => '1',
-    'remote' => '192.168.122.30        ',
-    'hash' => 'MD5',
-    'enc' => '3DES',
-    'kb' => '4608000',
-    'name' => 'c1000v(c1000v)',
-    'gwid' => '1'
-  }
-];
+    [
+      {
+        'i_spi' => '-6187583',
+        'o_spi' => '-623460235',
+        'life' => '2847',
+        'proto' => 'ESP',
+        'tid' => '1',
+        'remote' => '192.168.122.30        ',
+        'hash' => 'MD5',
+        'enc' => '3DES',
+        'kb' => '4608000',
+        'name' => 'c1000v(c1000v)',
+        'gwid' => '1'
+      }
+    ];
 
 =head3 vpn_tunnels
 

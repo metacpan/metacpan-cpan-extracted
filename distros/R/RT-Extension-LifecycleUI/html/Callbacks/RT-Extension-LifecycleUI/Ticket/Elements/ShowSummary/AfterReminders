@@ -1,0 +1,16 @@
+<%ARGS>
+$Ticket
+</%ARGS>
+<%INIT>
+my $config = $Ticket->LifecycleObj->{data}{ticket_display} || 'hidden';
+return unless $config eq 'readonly' || $config eq 'interactive';
+</%INIT>
+<&| /Widgets/TitleBox,
+    title => loc("Lifecycle"),
+    class => 'ticket-info-lifecycle',
+&>
+    <& /Elements/LifecycleGraph,
+           Ticket => $Ticket,
+           Interactive => ($config eq 'interactive'),
+    &>
+</&>

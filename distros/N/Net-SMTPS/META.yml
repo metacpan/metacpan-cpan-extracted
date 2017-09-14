@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
 license: perl
 meta-spec:
@@ -21,4 +21,4 @@ requires:
   Authen::SASL: 2
   IO::Socket::SSL: 1
   Net::SMTP: 2
-version: 0.06
+version: 0.08

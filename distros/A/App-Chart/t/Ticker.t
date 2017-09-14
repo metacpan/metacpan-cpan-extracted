@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -29,12 +29,9 @@ BEGIN { MyTestHelpers::nowarnings() }
 use AppChartTestHelpers;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 require App::Chart::Gtk2::Ticker;
-
-
-#------------------------------------------------------------------------------
 
 require Glib;
 Glib->VERSION (1.220); # for TreeModelFilter callback not leaking
@@ -42,6 +39,35 @@ Glib->VERSION (1.220); # for TreeModelFilter callback not leaking
 require Gtk2;
 Gtk2->disable_setlocale;  # leave LC_NUMERIC alone for version nums
 my $have_display = Gtk2->init_check;
+
+#------------------------------------------------------------------------------
+
+# The size calculation in App::Chart::Gtk2::Ticker INIT_INSTANCE uses some
+# pango measures (from Gtk2::Ex::Units) which throw warnings and stuff if no
+# display, so restrict the following tests.  (In the past it was ok for some
+# reason.)
+#
+# But ... these isa() tests are not right.  If an empty database (any fresh
+# setup) then App::Chart::Gtk2::Ticker goes to an empty ListStore instead of
+# a symlist.
+# 
+# SKIP: {
+#   $have_display or skip 'due to no DISPLAY available', 4;
+#   my $ticker = App::Chart::Gtk2::Ticker->new;
+#   my $tickermodel = $ticker->get('model');
+# 
+#   isa_ok($tickermodel, 'App::Chart::Gtk2::TickerModel');
+#   isa_ok($tickermodel, 'Gtk2::TreeModelFilter');
+# 
+#   # default symlist Favourites is the underlying symlist filtered
+#   my $childmodel = $tickermodel->get_model;   # TreeModelFilter method
+#   isa_ok($childmodel, 'App::Chart::Gtk2::Symlist::Favourites');
+#   isa_ok($childmodel, 'App::Chart::Gtk2::Symlist');
+# }
+
+
+#------------------------------------------------------------------------------
+# Ticker - gc after weakening
 
 SKIP: {
   $have_display or skip 'due to no DISPLAY available', 2;
@@ -61,6 +87,7 @@ SKIP: {
 }
 
 #------------------------------------------------------------------------------
+# Ticker - Test::Weaken::leaks
 
 # Test::Weaken 2.002 for "ignore"
 my $have_test_weaken = eval "use Test::Weaken 2.002; 1";
@@ -118,9 +145,13 @@ SKIP: {
          my $ticker = App::Chart::Gtk2::Ticker->new;
 
          my $tickermodel = $ticker->get('model');
-         my $childmodel = $tickermodel->get_model;
-         # ### $tickermodel
-         # ### $childmodel
+         ### tickermodel: ref $tickermodel
+
+         # no child model when empty ticker shows an empty ListStore
+         my $childmodel =
+           $tickermodel->isa('Gtk2::TreeModelFilter')
+           && $tickermodel->get_model;
+         ### childmodel: ref $childmodel
          ### childmodel dbh: "$childmodel->{'dbh'}"
          ### childmodel sth: "$childmodel->{'sth'}->{'read'}"
          ### childmodel sth: $childmodel->{'sth'}->{'read'}
@@ -141,7 +172,7 @@ SKIP: {
        destructor => \&Test::Weaken::Gtk2::destructor_destroy,
        contents => sub {
          my ($ref) = @_;
-           ### ref: "$ref"
+         ### ref: "$ref"
          if (Scalar::Util::blessed($ref)
              && ($ref->isa('DBI::db')
                  || $ref->isa('DBI::st'))) {

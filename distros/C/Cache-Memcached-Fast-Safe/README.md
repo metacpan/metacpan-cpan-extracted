@@ -41,9 +41,11 @@ for fork-safe.
 This module allow to change sanitizing behavior through $Cache::Memcached::Fast::Safe::SANITIZE\_METHOD.
 Default sanitizer is
 
+    use bytes;
+    my %escapes = map { chr($_) => sprintf('%%%02X', $_) } (0x00..0x20, 0x7f..0xff);
     local $Cache::Memcached::Fast::Safe::SANITIZE_METHOD = sub {
         my $key = shift;
-        $key = uri_escape($key,"\x00-\x20\x7f-\xff");
+        $key =~ s/([\x00-\x20\x7f-\xff])/$escapes{$1}/ge;
         if ( length $key > 200 ) {
             $key = sha1_hex($key);
         }
@@ -52,7 +54,7 @@ Default sanitizer is
 
 # AUTHOR
 
-Masahiro Nagano <kazeburo {at} gmail.com>
+Masahiro Nagano &lt;kazeburo {at} gmail.com>
 
 # SEE ALSO
 

@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    10/01/2016                                                             #
-#    Revised: 04/04/2017                                                             #
+#    Revised: 09/04/2017                                                             #
 #    UMLS Similarity Word2Vec Package Interface Driver                               #
 #                                                                                    #
 ######################################################################################
@@ -32,7 +32,7 @@ use Word2vec::Interface;
 
 use vars qw($VERSION);
 
-$VERSION = '0.03';
+$VERSION = '0.036';
 
 # Check For No Command-Line Arguments
 AskHelp() if @ARGV == 0;
@@ -96,24 +96,26 @@ if( $packageInterface->GetExitFlag() == 1 )
         }
 
         # Main Commands
-        print "Finished Word2Vec File Checks\n"             if( $arg eq "--test" );
-        CosSim()                                            if( $arg eq "--cos" );
-        CosMulti()                                          if( $arg eq "--cosmulti" );
-        CosAvg()                                            if( $arg eq "--cosavg" );
-        MultiCosUser()                                      if( $arg eq "--multiwordcosuserinput" );
-        AddVectors()                                        if( $arg eq "--addvectors" );
-        SubVectors()                                        if( $arg eq "--subtractvectors" );
-        W2VTrain()                                          if( $arg eq "--w2vtrain" );
-        W2PTrain()                                          if( $arg eq "--w2ptrain" );
-        CompileTextCorpus()                                 if( $arg eq "--compiletextcorpus" );
-        ConvertBinToText()                                  if( $arg eq "--converttotextvectors" );
+        print "Finished Word2Vec File Checks\n"             if( $arg eq "--test"                   );
+        CosSim()                                            if( $arg eq "--cos"                    );
+        CosMulti()                                          if( $arg eq "--cosmulti"               );
+        CosAvg()                                            if( $arg eq "--cosavg"                 );
+        CosineSimilarityBetweenTwoFiles()                   if( $arg eq "--cos2v"                  );
+        MultiCosUser()                                      if( $arg eq "--multiwordcosuserinput"  );
+        AddVectors()                                        if( $arg eq "--addvectors"             );
+        SubVectors()                                        if( $arg eq "--subtractvectors"        );
+        W2VTrain()                                          if( $arg eq "--w2vtrain"               );
+        W2PTrain()                                          if( $arg eq "--w2ptrain"               );
+        CompileTextCorpus()                                 if( $arg eq "--compiletextcorpus"      );
+        ConvertBinToText()                                  if( $arg eq "--converttotextvectors"   );
         ConvertTextToBin()                                  if( $arg eq "--converttobinaryvectors" );
         ConvertTextToSparse()                               if( $arg eq "--converttosparsevectors" );
-        CompoundifyFile()                                   if( $arg eq "--compoundifyfile" );
-        Similarity()                                        if( $arg eq "--similarity" );
-        SortVectorFile()                                    if( $arg eq "--sortvectorfile" );
-        WSD()                                               if( $arg eq "--wsd" );
-        $packageInterface->CleanWord2VecDirectory()         if( $arg eq "--clean" );
+        CompoundifyFile()                                   if( $arg eq "--compoundifyfile"        );
+        Similarity()                                        if( $arg eq "--similarity"             );
+        Spearmans()                                         if( $arg eq "--spearmans"              );
+        SortVectorFile()                                    if( $arg eq "--sortvectorfile"         );
+        WSD()                                               if( $arg eq "--wsd"                    );
+        $packageInterface->CleanWord2VecDirectory()         if( $arg eq "--clean"                  );
     }
 
     PrintElapsedTime();
@@ -164,9 +166,11 @@ sub FindNextCommandIndex
 
     for( my $i = $startindex; $i < @ARGV; $i++ )
     {
+        return $i if $ARGV[$i] eq "--test";
         return $i if $ARGV[$i] eq "--cos";
         return $i if $ARGV[$i] eq "--cosmulti";
         return $i if $ARGV[$i] eq "--cosavg";
+        return $i if $ARGV[$i] eq "--cos2v";
         return $i if $ARGV[$i] eq "--multiwordcosuserinput";
         return $i if $ARGV[$i] eq "--addvectors";
         return $i if $ARGV[$i] eq "--subtractvectors";
@@ -178,8 +182,10 @@ sub FindNextCommandIndex
         return $i if $ARGV[$i] eq "--converttosparsevectors";
         return $i if $ARGV[$i] eq "--compoundifyfile";
         return $i if $ARGV[$i] eq "--similarity";
+        return $i if $ARGV[$i] eq "--spearmans";
         return $i if $ARGV[$i] eq "--sortvectorfile";
         return $i if $ARGV[$i] eq "--wsd";
+        return $i if $ARGV[$i] eq "--clean";
     }
 
     return -1;
@@ -195,8 +201,16 @@ sub ParseOptions
 
     while( $i < @optionsAry )
     {
-        $options{$optionsAry[$i]} = $optionsAry[$i+1] if $i + 1 <= @optionsAry;
-        $i += 2;
+        if( $i + 1 < @optionsAry && index( $optionsAry[$i+1], "-" ) != 0 )
+        {
+            $options{ $optionsAry[$i] } = $optionsAry[$i+1];
+            $i += 2;
+        }
+        else
+        {
+            $options{ $optionsAry[$i] } = undef;
+            $i++;
+        }
     }
 
     # Print Options Hash
@@ -267,6 +281,31 @@ sub CosAvg
     my $value           = $packageInterface->CLComputeAvgOfWordsCosineSimilarity( $vectorDataFile, $wordA, $wordB );
     print "Average Cosine Similarity Between: \"$wordA\" and \"$wordB\": $value\n" if defined( $value );
     print "Error: Average Cosine Similarity Between: \"$wordA\" and \"$wordB\" - Cannot Be Computed\n" if !defined( $value );
+    print "See log files for details\n" if !defined( $value ) && $packageInterface->GetWriteLog() == 1;
+}
+
+sub CosineSimilarityBetweenTwoFiles
+{
+    my $vectorDataFileA = $ARGV[$argIndex+1];
+    my $wordA           = $ARGV[$argIndex+2];
+    my $vectorDataFileB = $ARGV[$argIndex+3];
+    my $wordB           = $ARGV[$argIndex+4];
+
+    # Checks to see if required options have been specified
+    if( !defined( $vectorDataFileA ) || !defined( $vectorDataFileB ) || !defined( $wordA ) || !defined( $wordB ) )
+    {
+        print "Warning: Improper format\n";
+        print "Format: --cos vector_data_fileA_path wordA vector_data_fileB_path wordB\n";
+        return;
+    }
+
+    my $wordAVector     = $packageInterface->W2VReadTrainedVectorDataFromFile( $vectorDataFileA, $wordA );
+    my $wordBVector     = $packageInterface->W2VReadTrainedVectorDataFromFile( $vectorDataFileB, $wordB );
+    $wordAVector        = $packageInterface->W2VRemoveWordFromWordVectorString( $wordAVector );
+    $wordBVector        = $packageInterface->W2VRemoveWordFromWordVectorString( $wordBVector );
+    my $value           = $packageInterface->W2VComputeCosineSimilarityOfWordVectors( $wordAVector, $wordBVector );
+    print "Cosine Similarity Between: \"$wordA\" and \"$wordB\": $value\n" if defined( $value );
+    print "Error: Cosine Similarity Between: \"$wordA\" and \"$wordB\" - Cannot Be Computed\n" if !defined( $value );
     print "See log files for details\n" if !defined( $value ) && $packageInterface->GetWriteLog() == 1;
 }
 
@@ -486,10 +525,10 @@ sub SortVectorFile
 {
     my $optionsHash = GetCommandOptions( $argIndex );
     my %options = %{ $optionsHash };
-    
+
     # Check(s)
     print( "Error: No Options Specified\n" ) if keys( %options ) == 0;
-    
+
     if( !defined( $options{ "-filepath" } ) )
     {
         print "\nWarning: Improper Format\n";
@@ -498,9 +537,9 @@ sub SortVectorFile
         print "Note: -overwrite option is optional. Replaced old file when enabled.\n";
         return;
     }
-    
+
     return if keys( %options ) == 0;
-    
+
     my $result = $packageInterface->CLSortVectorFile( $optionsHash );
     print "Finished Sort And Save\n" if $result == 0;
     print "Finished - File Skipped\n" if $result == 1;
@@ -508,44 +547,84 @@ sub SortVectorFile
     print "See \"Word2vecLog.txt\" log file for details\n" if $result == -1 && $packageInterface->GetWriteLog() == 1;
 }
 
-sub Similarity
-{    
-    my $similarityFilePath    = $ARGV[$argIndex+1];
-    my $vectorBinFilePath     = $ARGV[$argIndex+2];
-    
-    # Checks to see if required options have been specified
-    if( !defined( $similarityFilePath ) || !defined( $vectorBinFilePath ) || $similarityFilePath eq "" || $vectorBinFilePath eq "" )
+sub Spearmans
+{
+    my $svalFileA     = $ARGV[ $argIndex + 1 ];
+    my $svalFileB     = $ARGV[ $argIndex + 2 ];
+
+    # Check(s)
+    if( !defined( $svalFileA ) || !defined( $svalFileB ) || $svalFileA eq "" || $svalFileB eq "" )
     {
         print "Warning: Improper format\n";
-        print "Format: --similarity similarity_file_or_directory vector_data_file_path\n";
-        print "Note: Using directory option, files must have \".sim\" extension.\n";
+        print "Format: --spearmans file_path_a file_path_b\n";
+        print "Note: Specifying \"-n\" will include N counts.\n";
+        return;
+    }
+
+    my $optionsHash = GetCommandOptions( $argIndex );
+    my %options = %{ $optionsHash };
+
+    my $includeCounts = 1 if exists $options{ "-n" };
+
+    # Check(s)
+    print "Error: SVAL File Not Defined\n" if !defined( $svalFileA );
+    print "Error: SVAL FIle Not Defined\n" if !defined( $svalFileB );
+    return if !defined( $svalFileA ) || !defined( $svalFileB );
+
+    print "Error: \"$svalFileA\" Cannot Be Found\n" if defined( $svalFileA ) && !( -e $svalFileA );
+    print "Error: \"$svalFileB\" Cannot Be Found\n" if defined( $svalFileB ) && !( -e $svalFileB );
+    return if ( defined( $svalFileA ) && !( -e $svalFileA ) ) || ( defined( $svalFileB ) && !( -e $svalFileB ) );
+
+    # Calculate Spearman's Rank Correlation Score
+    my $score = $packageInterface->SpCalculateSpearmans( $svalFileA, $svalFileB, $includeCounts );
+
+    print "Spearman's Rank Correlation Score: $score\n"            if defined( $score );
+    print "Spearman's Rank Correlation Score Cannot Be Computed\n" if !defined( $score );
+}
+
+sub Similarity
+{
+    my $optionsHash = GetCommandOptions( $argIndex );
+    my %options = %{ $optionsHash };
+
+    # Check(s)
+    if( !defined( $options{ "-vectors" } ) || $options{ "-vectors" } eq "" )
+    {
+        print "Warning: Improper format\n";
+        print "Format: --similarity -sim similarity_file_or_directory -vectors vector_data_file_path\n";
+        print "Note: Not specifying \"-sim\" implies performing comparisons all standardized files.\n";
+        print "    : Using directory option, files must have \".sim\" extension.\n";
         print "    : \"-a\", \"-s\", \"-c\" or \"-all\" options can be added to determine which calculations are computed.\n";
         print "      No specified options implies \"-all\".\n";
         return;
     }
-    
+
+    return if keys( %options ) == 0;
+
+    my $similarityFilePath    = $options{ "-sim" };
+    my $vectorBinFilePath     = $options{ "-vectors" };
+
+    print "Warning: Similarity File Or Directory Not Specified - Using Default Setting\n" if !defined( $similarityFilePath );
+    $similarityFilePath = "./../Similarity/" if !defined( $similarityFilePath );
+
     # Check To See If Similarity And Vector Binary Files Exists
     print "Error: Similarity File Cannot Be Found\n" if !( -e $similarityFilePath );
     print "Error: Vector Binary File Cannot Be Found\n" if !( -e $vectorBinFilePath );
     return if !( -e $similarityFilePath ) || !( -e $vectorBinFilePath );
-    
+
     my $averageOptionEnabled  = 0;
     my $compoundOptionEnabled = 0;
     my $summedOptionedEnabled = 0;
-    
+
     # Check For Similarity Options
     my $endCmdOptionIndex = FindNextCommandIndex( $argIndex+1 );
-    
+
     $endCmdOptionIndex = @ARGV if $endCmdOptionIndex == -1;
-    
-    for( my $i = $argIndex + 2; $i < $endCmdOptionIndex; $i++ )
-    {
-        $averageOptionEnabled  = 1 if( $ARGV[$i] eq "-a" ) || ( $ARGV[$i] eq "-all" );
-        $compoundOptionEnabled = 1 if( $ARGV[$i] eq "-c" ) || ( $ARGV[$i] eq "-all" );
-        $summedOptionedEnabled = 1 if( $ARGV[$i] eq "-s" ) || ( $ARGV[$i] eq "-all" );
-        last if ( $ARGV[$i] eq "-all" );
-    }
-    
+
+    $averageOptionEnabled  = 1 if( exists $options{ "-a" } ) || ( exists $options{ "-all" } );
+    $compoundOptionEnabled = 1 if( exists $options{ "-c" } ) || ( exists $options{ "-all" } );
+    $summedOptionedEnabled = 1 if( exists $options{ "-s" } ) || ( exists $options{ "-all" } );
+
     # Check For No Specified Options And Set "-all" If None Found
     if( $averageOptionEnabled == 0 && $compoundOptionEnabled == 0 && $summedOptionedEnabled == 0 )
     {
@@ -553,52 +632,158 @@ sub Similarity
         $compoundOptionEnabled = 1;
         $summedOptionedEnabled = 1;
     }
-    
+
     # Load Vector Data
     print "Reading Vector Data File\n";
     my $success = $packageInterface->W2VReadTrainedVectorDataFromFile( $vectorBinFilePath );
-    
+
     print "Finished Reading Vector Data File\n" if ( $success == 0 );
     print "Error Reading Vector Data File\n"    if ( $success != 0 );
-    
+    return                                      if ( $success != 0 );
+
+    my $isWordOrCUIVectorData = $packageInterface->W2VIsWordOrCUIVectorData();
+    print "CUI Term Vector Data Detected\n"     if ( $isWordOrCUIVectorData eq "cui" );
+    print "Word Term Vector Data Detected\n"    if ( $isWordOrCUIVectorData eq "word" );
+
     print "Starting Similarity Computations\n";
-    
+
     # Compute Cosine Similarity Based On Options
-    if( $packageInterface->IsFileOrDirectory( $similarityFilePath ) eq "dir" && $success == 0 )
+    my $isFileOrDir = $packageInterface->IsFileOrDirectory( $similarityFilePath );
+
+    if( $isFileOrDir eq "dir" && $success == 0 )
     {
         my $listOfSimilarityFilesStr = $packageInterface->GetFilesInDirectory( $similarityFilePath, ".sim" );
         my @filesToParse = split( ' ', $listOfSimilarityFilesStr );
-        
+
         for my $file ( @filesToParse )
         {
             print "Processing File: $file\n";
-            
-            my $result = 0;
-            $result = $packageInterface->CLSimilarityAvg( "$similarityFilePath/$file" ) if ( $averageOptionEnabled == 1 );
-            print "Error Processing File\n" if $result == -1;
-            
-            $result = $packageInterface->CLSimilarityComp( "$similarityFilePath/$file" ) if ( $compoundOptionEnabled == 1 );
-            print "Error Processing File\n" if $result == -1;
-            
-            $result = $packageInterface->CLSimilaritySum( "$similarityFilePath/$file" ) if ( $summedOptionedEnabled == 1 );
-            print "Error Processing File\n" if $result == -1;
+
+            my $isFileWordOrCUIFile = $packageInterface->SpIsFileWordOrCUIFile( "$similarityFilePath/$file" );
+
+            if( $isFileWordOrCUIFile eq $isWordOrCUIVectorData )
+            {
+                my $result = 0;
+                $result = $packageInterface->CLSimilarityAvg( "$similarityFilePath/$file" ) if ( $averageOptionEnabled == 1 );
+                print "Error Processing File\n" if $result == -1;
+
+                $result = $packageInterface->CLSimilarityComp( "$similarityFilePath/$file" ) if ( $compoundOptionEnabled == 1 );
+                print "Error Processing File\n" if $result == -1;
+
+                $result = $packageInterface->CLSimilaritySum( "$similarityFilePath/$file" ) if ( $summedOptionedEnabled == 1 );
+                print "Error Processing File\n" if $result == -1;
+            }
+            else
+            {
+                print "Warning: Vector Vocabulary Data Detected As \"$isWordOrCUIVectorData\" Terms and Similarity File Detected As \"$isFileWordOrCUIFile\" Terms - Cannot Compare Files\n";
+            }
         }
     }
-    elsif( $packageInterface->IsFileOfDirectory( $similarityFilePath ) eq "file" && $success == 0 )
+    elsif( $isFileOrDir eq "file" && $success == 0 )
     {
-        $success = $packageInterface->CLSimilarityAvg( $similarityFilePath ) if ( $averageOptionEnabled == 1 );
-        print "Error Processing File\n" if $success == -1;
-        
-        $success = $packageInterface->CLSimilarityComp( $similarityFilePath ) if ( $compoundOptionEnabled == 1 );
-        print "Error Processing File\n" if $success == -1;
-        
-        $success = $packageInterface->CLSimilaritySum( $similarityFilePath ) if ( $summedOptionedEnabled == 1 );
-        print "Error Processing File\n" if $success == -1;
+        my $isFileWordOrCUIFile = $packageInterface->SpIsFileWordOrCUIFile( $similarityFilePath );
+
+        if( $isFileWordOrCUIFile eq $isWordOrCUIVectorData )
+        {
+            $success = $packageInterface->CLSimilarityAvg( $similarityFilePath ) if ( $averageOptionEnabled == 1 );
+            print "Error Processing File\n" if $success == -1;
+
+            $success = $packageInterface->CLSimilarityComp( $similarityFilePath ) if ( $compoundOptionEnabled == 1 );
+            print "Error Processing File\n" if $success == -1;
+
+            $success = $packageInterface->CLSimilaritySum( $similarityFilePath ) if ( $summedOptionedEnabled == 1 );
+            print "Error Processing File\n" if $success == -1;
+        }
+        else
+        {
+            print "Warning: Vector Vocabulary Data Detected As \"$isWordOrCUIVectorData\" Terms and Similarity File Detected As \"$isFileWordOrCUIFile\" Terms - Cannot Compare Files\n";
+            $success = -1;
+        }
     }
-    
+
     # Clean Up
     $packageInterface->W2VClearVocabularyHash();
-    
+
+
+    # Perform Spearman's Rank Correlation Score Calculations
+    if( defined( $isWordOrCUIVectorData ) && $isFileOrDir eq "dir" )
+    {
+        my %results = ();
+        $similarityFilePath = Cwd::getcwd();
+
+        print "Starting Spearman's Rank Correlation Score Calculations\n";
+
+        # CUI Term Files
+        if( $isWordOrCUIVectorData eq "cui" )
+        {
+            $results{ "MayoSRS.cuis.avg_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.avg_results"            , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.avg_results"             && $averageOptionEnabled  == 1 );
+            $results{ "MayoSRS.cuis.comp_results"                }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.comp_results"           , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.comp_results"            && $compoundOptionEnabled == 1 );
+            $results{ "MayoSRS.cuis.sum_results"                 }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.cuis.sum_results"            , "./../Similarity/MayoSRS.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.cuis.sum_results"             && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.coders.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.avg_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.avg_results"        , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.comp_results" }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.comp_results"       , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.cuis.physicians.sum_results"  }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.cuis.sum_results"        , "./../Similarity/MiniMayoSRS.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.cuis.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results", "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_rel.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.cuis.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.avg_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results" , "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.comp_results"     }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results", "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.cuis.sum_results"      }   = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results" , "./../Similarity/UMNSRS_reduced_sim.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.cuis.sum_results"  && $summedOptionedEnabled == 1 );
+        }
+        # Word Term Files
+        elsif( $isWordOrCUIVectorData eq "word" )
+        {
+            $results{ "MayoSRS.terms.avg_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.avg_results"            , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.avg_results"             && $averageOptionEnabled  == 1 );
+            $results{ "MayoSRS.terms.comp_results"                }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.comp_results"           , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.comp_results"            && $compoundOptionEnabled == 1 );
+            $results{ "MayoSRS.terms.sum_results"                 }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MayoSRS.terms.sum_results"            , "./../Similarity/MayoSRS.terms.gold"           , 1 ) if ( -e "$similarityFilePath/MayoSRS.terms.sum_results"             && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.coders.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.terms.coders.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.coders.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.coders"     , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.avg_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.avg_results"        , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.avg_results"         && $averageOptionEnabled  == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.comp_results" }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.comp_results"       , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.comp_results"        && $compoundOptionEnabled == 1 );
+            $results{ "MiniMayoSRS.terms.physicians.sum_results"  }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/MiniMayoSRS.terms.sum_results"        , "./../Similarity/MiniMayoSRS.terms.physicians" , 1 ) if ( -e "$similarityFilePath/MiniMayoSRS.terms.sum_results"         && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results", "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_rel.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results" , "./../Similarity/UMNSRS_reduced_rel.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_rel.terms.sum_results"  && $summedOptionedEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.avg_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.avg_results"  && $averageOptionEnabled  == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.comp_results"     }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results", "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.comp_results" && $compoundOptionEnabled == 1 );
+            $results{ "UMNSRS_reduced_sim.terms.sum_results"      }  = $packageInterface->SpCalculateSpearmans( "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results" , "./../Similarity/UMNSRS_reduced_sim.terms.gold", 1 ) if ( -e "$similarityFilePath/UMNSRS_reduced_sim.terms.sum_results"  && $summedOptionedEnabled == 1 );
+        }
+
+        my @scores = sort keys( %results );
+
+        if( scalar @scores > 0 )
+        {
+            print "Finished Spearman's Rank Correlation Score Calculations\n";
+            print "Printing Spearman's Rank Correlation Scores\n";
+            print "\n--------------------------------------------\n\n";
+
+            for my $score ( @scores )
+            {
+                print( "$score -> Score: " . $results{ $score } . "\n" ) if defined( $results{ $score } );
+            }
+
+            print "\n--------------------------------------------\n\n";
+
+            # Print Spearman's Correlation Rank Score Results To File
+            open( FILE, ">:", Cwd::getcwd . "/SpearmanScores.txt" ) or print "Error: Unable To Save Results\n" if scalar @scores > 0;
+
+            for my $score ( @scores )
+            {
+                print( FILE "$score -> Score: " . $results{ $score } . "\n" ) if defined( $results{ $score } );
+            }
+
+            close( FILE );
+            undef( @scores );
+        }
+        else
+        {
+            print "Warning: Cannot Compute Spearman's Correlation Rank Score(s)\n";
+        }
+    }
+
     print "Finished Similarity Computations\n" if ( $success == 0 );
     print "Finished Similarity With Error(s)\n" if ( $success != 0 );
     print "See \"InterfaceLog.txt\" and \"Word2vecLog.txt\" log files for details\n" if ( $success != 0 && $packageInterface->GetWriteLog() == 1 );
@@ -648,7 +833,7 @@ sub WSD
             print( "Error: Erroneous Input\n" );
             return;
         }
-        
+
         print "Enter \"vector binary\" file path: ";
         $vectorBinFilePath = <STDIN>;
         chomp( $vectorBinFilePath );
@@ -660,7 +845,7 @@ sub WSD
         chomp( $stopListFilePath );
 
         return if $stopListFilePath eq "EXIT";
-        
+
         print "Use \"minimize memory usage\"? (Y/N): ";
         $lowMemoryOption = <STDIN>;
         chomp( $lowMemoryOption );
@@ -683,7 +868,7 @@ sub WSD
             $listOfFilesPath    = $options{$option} if ( $option eq "-list" );
             $lowMemoryOption    = $options{$option} if ( $option eq "-lowmemusage" );
         }
-        
+
         # Check(s)
         if( !defined( $instancesFilePath ) || !defined( $vectorBinFilePath ) || $instancesFilePath eq "" || $vectorBinFilePath eq "" )
         {
@@ -693,7 +878,7 @@ sub WSD
             print "Error: Vector File Path = Empty String\n" if ( defined( $vectorBinFilePath ) && $vectorBinFilePath eq "" );
             return;
         }
-        
+
         # Set Low Memory Option
         $packageInterface->W2VSetMinimizeMemoryUsage( $lowMemoryOption );
 
@@ -706,7 +891,7 @@ sub WSD
         {
             # Process Specified Instance/Sense Files
             $result = $packageInterface->CLWordSenseDisambiguation( $instancesFilePath, $sensesFilePath, $vectorBinFilePath, $stopListFilePath, undef ) if( $listOfFilesPath eq "" );
-    
+
             # Process Instance/Sense Files In List
             $result = $packageInterface->CLWordSenseDisambiguation( undef, undef, $vectorBinFilePath, $stopListFilePath, $listOfFilesPath ) if ( $listOfFilesPath ne "" );
         }
@@ -754,6 +939,8 @@ sub ShowHelp
                              given a trained vector file \n\n";
     print "--cosavg                     Computes cosine similarity average between multiple\n
                              words given a trained vector file \n\n";
+    print "--cos2v                      Computes cosine similarity between two words, each in\n
+                             a differing trained vector data file\n\n";
     print "--multiwordcosuserinput      Computes cosine similarity based on user input on a\n
                              trained vector file \n\n";
     print "--addvectors                 Adds two word vectors and outputs the value \n\n";
@@ -763,16 +950,18 @@ sub ShowHelp
     print "--w2ptrain                   Executes word2phrase conversion based on\n
                              user-specified options and text corpus \n\n";
     print "--compiletextcorpus          Executes Medline XML-To-W2V text corpus \n
-                             generation basedon user-specified options \n\n";
-    print "--converttotextvectors           Converts user-specified word2vec binary \n
+                             generation based on user-specified options \n\n";
+    print "--converttotextvectors       Converts user-specified word2vec binary \n
                              formatted file to human-readable text \n\n";
-    print "--converttobinaryvectors           Converts user-specified vector text data \n
+    print "--converttobinaryvectors     Converts user-specified vector text data \n
                              to word2vec binary formatted file \n\n";
-    print "--converttosparsevectors        Converts user-specified vector text data \n
+    print "--converttosparsevectors     Converts user-specified vector text data \n
                              to sparse word vector formatted file \n\n";
     print "--compoundifyfile            Compoundifies file based on user-specified\n
                              compound word file \n\n";
     print "--similarity                 Computes Similarity For SVL Formatted Files \n\n";
+    print "--spearmans                  Computes Spearman's Rank Correlation Score
+                             between two files \n\n";
     print "--sortvectorfile             Sorts vector data file and saves to specified\n
                              directory.\n\n";
     print "--wsd                        Word Sense Disambiguation: Assigns a sense\n
@@ -785,7 +974,7 @@ sub ShowHelp
     print "--writelog                   Writes debugging statements to log module files \n\n";
     print "--clean                      Deletes word2vec executable and C object files \n
                              in word2vec directory \n\n";
-    print "Note: Debugging commands can be added before or after you main commands \n\n";
+    print "Note: Debugging commands can be added before or after your main commands \n\n";
     print "  Ex: --debuglog --cos vectors.bin heart attack \n\n";
     print "      --w2vtrain -trainfile \"textcorpus.txt\" -outputfile \"vectors.bin\" --writelog \n";
 }
@@ -798,7 +987,7 @@ sub ShowHelp
 
 sub ShowVersion
 {
-    print 'Word2vec-Interface.pl, v 0.2 2017/01/05 13:04 cuffyca';
+    print 'Word2vec-Interface.pl, v 0.36 2017/09/09 13:04 cuffyca';
     print "\nCopyright (c) 2016- Bridgett McInnes, Clint Cuffy\n";
 }
 
@@ -917,6 +1106,27 @@ Output:
 Example:
 
  Word2vec-Interface.pl --cosavg "samples/samplevectors.bin" heart:attack myocardial:infarction
+
+=head3 --cos2v
+
+Description:
+
+ Computes cosine similarity between two words, each in differing trained vector data files.
+
+Parameters:
+
+ vector_data_fileA_path (String)
+ wordA                  (String)
+ vector_data_fileB_path (String)
+ wordB                  (String)
+
+Output:
+
+ Cosine Similarity Value
+
+Example:
+
+ Word2vec-Interface.pl --cos2v "samples/medline_vectors.bin" heart "samples/pubmed_vectors.bin" infarction
 
 =head3 --multiwordcosuserinput
 
@@ -1172,6 +1382,36 @@ Example:
 
  Word2vec-Interface.pl --sortvectorfile "vectors.bin" -overwrite 0
 
+=head3 --spearmans
+
+Description:
+
+ Computes Spearman's Rank Correlation Score between two files of a specific format.
+
+ File Format:
+ "score(float)<>term1<>term2"
+ "score(float)<>term3<>term4"
+
+ Note: Optional Parameters: -n -> Prints N value with Spearman's Rank Correlation Score
+
+Parameters:
+
+ input_file_a     (String)
+ input_file_b     (String)
+ (Optional Parameters)
+
+Output:
+
+ Spearman's Rank Correlation Score.
+
+Example:
+
+ Word2vec-Interface.pl --spearmans "samples/MiniMayoSRS.terms.comp_results" "Similarity/MiniMayoSRS.terms.coders"
+
+ Or
+
+ Word2vec-Interface.pl --spearmans "samples/MiniMayoSRS.terms.comp_results" "Similarity/MiniMayoSRS.terms.coders" -n
+
 =head3 --similarity
 
 Description:
@@ -1188,8 +1428,8 @@ Description:
 
 Parameters:
 
- input_file             (String)
- vector_binary_file     (String)
+ -sim     input_file             (String)
+ -vectors vector_binary_file     (String)
  (Optional Parameters)
 
 Output:
@@ -1198,19 +1438,19 @@ Output:
 
 Example:
 
- Word2vec-Interface.pl --similarity "samples/MiniMayoSRS.terms" "vectors.bin"
+ Word2vec-Interface.pl --similarity -sim "samples/MiniMayoSRS.terms" -vectors "vectors.bin"
 
  Or
 
- Word2vec-Interface.pl --similarity "samples/MiniMayoSRS.terms" "vectors.bin" -all
+ Word2vec-Interface.pl --similarity -sim "samples/MiniMayoSRS.terms" -vectors "vectors.bin" -all
 
  Or
 
- Word2vec-Interface.pl --similarity "samples/MiniMayoSRS.terms" "vectors.bin" -a -s
+ Word2vec-Interface.pl --similarity -sim "samples/MiniMayoSRS.terms" -vectors "vectors.bin" -a -s
 
  Or
 
- Word2vec-Interface.pl --similarity "samples/MiniMayoSRS.terms" "vectors.bin" -c
+ Word2vec-Interface.pl --similarity -sim "samples/MiniMayoSRS.terms" -vectors "vectors.bin" -c
 
 =head3 --wsd
 
@@ -1237,7 +1477,7 @@ Parameters:
 
  -dir        directory_of_files     (String)
  -vectors    vector_binary_file     (String)
- -stoplist   file_path              (String)
+ -stoplist   file_path              (String) <- (Not required)
 
  Or
 

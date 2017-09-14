@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.826';
+our $VERSION = '1.828';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -44,6 +44,7 @@ use overload (
    q("")    => \&MCE::Shared::Base::_stringify,
    q(0+)    => \&MCE::Shared::Base::_numify,
    q(%{})   => sub {
+      no overloading;
       $_[0]->[_HREF] || do {
          # no circular reference to original, therefore no memory leaks
          tie my %h, __PACKAGE__.'::_href', bless([ @{ $_[0] } ], __PACKAGE__);
@@ -52,6 +53,8 @@ use overload (
    },
    fallback => 1
 );
+
+no overloading;
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
@@ -87,8 +90,8 @@ sub TIEHASH {
    # data resides, when constructed with MCE::Shared->cache( ... ).
 
    $obj->_prealloc() unless $opts->{_shared};
-
    $obj->mset(@_) if @_;
+
    $obj;
 }
 
@@ -282,7 +285,7 @@ sub CLEAR {
 # SCALAR ( )
 
 sub SCALAR {
-   defined ${ $_[0]->[_EXPI] } && $_[0]->_prune_head;
+   $_[0]->_prune_head() if defined ${ $_[0]->[_EXPI] };
 
    scalar keys %{ $_[0]->[_DATA] };
 }
@@ -479,6 +482,8 @@ sub _prealloc {
 # prune start of list
 
 sub _prune_head {
+   return unless defined ${ $_[0]->[_EXPI] };
+
    my ( $data, $keys, $indx, $begi, $gcnt ) = @{ $_[0] };
    my ( $i, $time ) = ( 0, time );
 
@@ -539,7 +544,7 @@ sub _size {
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## _find, keys, pairs, values
+## _find, iterator, keys, pairs, values
 ##
 ###############################################################################
 
@@ -555,6 +560,31 @@ sub _find {
    MCE::Shared::Base::_find_hash( $self->[_DATA], $params, $query, $self );
 }
 
+# iterator ( key [, key, ... ] )
+# iterator ( "query string" )
+# iterator ( )
+
+sub iterator {
+   my ( $self, @keys ) = @_;
+   my $data = $self->[_DATA];
+
+   if ( ! @keys ) {
+      @keys = $self->keys;
+   }
+   elsif ( @keys == 1 && $keys[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
+      @keys = $self->keys($keys[0]);
+   }
+   elsif ( defined ${ $self->[_EXPI] } ) {
+      $self->_prune_head();
+   }
+
+   return sub {
+      return unless @keys;
+      my $key = shift @keys;
+      return ( $key => $data->{ $key } );
+   };
+}
+
 # keys ( key [, key, ... ] )
 # keys ( "query string" )
 # keys ( )
@@ -562,7 +592,7 @@ sub _find {
 sub keys {
    my $self = shift;
 
-   defined ${ $self->[_EXPI] } && $self->_prune_head;
+   $self->_prune_head() if defined ${ $self->[_EXPI] };
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getkeys => 1 }, @_ );
@@ -603,7 +633,7 @@ sub _keys {
 sub pairs {
    my $self = shift;
 
-   defined ${ $self->[_EXPI] } && $self->_prune_head;
+   $self->_prune_head() if defined ${ $self->[_EXPI] };
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( @_ );
@@ -627,7 +657,7 @@ sub pairs {
 sub values {
    my $self = shift;
 
-   defined ${ $self->[_EXPI] } && $self->_prune_head;
+   $self->_prune_head() if defined ${ $self->[_EXPI] };
 
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getvals => 1 }, @_ );
@@ -773,13 +803,6 @@ sub mset {
 # peek ( key )
 
 sub peek {
-   return undef if !defined ( my $off = $_[0]->[_INDX]{ $_[1] } );
-
-   $_[0]->del( $_[1] ), return undef if (
-      defined ${ $_[0]->[_EXPI] } &&
-      $_[0]->[_KEYS]->[ $off -= ${ $_[0]->[_BEGI] } ] < time
-   );
-
    $_[0]->[_DATA]{ $_[1] };
 }
 
@@ -883,7 +906,7 @@ sub getset {
 # len ( )
 
 sub len {
-   defined ${ $_[0]->[_EXPI] } && $_[0]->_prune_head;
+   $_[0]->_prune_head() if defined ${ $_[0]->[_EXPI] };
 
    ( defined $_[1] )
       ? length $_[0]->get( $_[1] )
@@ -906,7 +929,8 @@ sub len {
 
 # For on-demand hash-like dereferencing.
 
-package MCE::Shared::Cache::_href;
+package # hide from rpm
+   MCE::Shared::Cache::_href;
 
 sub TIEHASH { $_[1] }
 
@@ -926,7 +950,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.826
+This document describes MCE::Shared::Cache version 1.828
 
 =head1 DESCRIPTION
 
@@ -946,136 +970,137 @@ fetches only.
 
 =head1 SYNOPSIS
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Cache;
+ use MCE::Shared::Cache;
 
-   my $ca;
+ my $ca;
 
-   $ca = MCE::Shared::Cache->new(); # max_keys => undef, max_age => undef
-   $ca = MCE::Shared::Cache->new( { max_keys => 500 }, @pairs );
+ $ca = MCE::Shared::Cache->new(); # max_keys => undef, max_age => undef
+ $ca = MCE::Shared::Cache->new( { max_keys => 500 }, @pairs );
 
-   $ca = MCE::Shared::Cache->new( max_keys => "unlimited", max_age => "never" );
-   $ca = MCE::Shared::Cache->new( max_keys => undef, max_age => undef ); # ditto
-   $ca = MCE::Shared::Cache->new( max_keys => 500, max_age => "1 hour" );
-   $ca = MCE::Shared::Cache->new( max_keys => "4 KiB" ); # 4*1024
-   $ca = MCE::Shared::Cache->new( max_keys => "1 MiB" ); # 1*1024*1024
+ $ca = MCE::Shared::Cache->new( max_keys => "unlimited", max_age => "never" );
+ $ca = MCE::Shared::Cache->new( max_keys => undef, max_age => undef ); # ditto
+ $ca = MCE::Shared::Cache->new( max_keys => 500, max_age => "1 hour" );
+ $ca = MCE::Shared::Cache->new( max_keys => "4 KiB" ); # 4*1024
+ $ca = MCE::Shared::Cache->new( max_keys => "1 MiB" ); # 1*1024*1024
 
-   $ca = MCE::Shared::Cache->new( max_age  => "43200 seconds" );
-   $ca = MCE::Shared::Cache->new( max_age  => 43200 );   # ditto
-   $ca = MCE::Shared::Cache->new( max_age  => "720 minutes" );
-   $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
-   $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
-   $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
-   $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
-   $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
+ $ca = MCE::Shared::Cache->new( max_age  => "43200 seconds" );
+ $ca = MCE::Shared::Cache->new( max_age  => 43200 );   # ditto
+ $ca = MCE::Shared::Cache->new( max_age  => "720 minutes" );
+ $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
+ $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
+ $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
+ $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
+ $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   my $ca;
+ my $ca;
 
-   $ca = MCE::Shared->cache(); # max_keys => undef, max_age => undef
-   $ca = MCE::Shared->cache( { max_keys => 500 }, @pairs );
+ $ca = MCE::Shared->cache(); # max_keys => undef, max_age => undef
+ $ca = MCE::Shared->cache( { max_keys => 500 }, @pairs );
 
-   $ca = MCE::Shared->cache( max_keys => "unlimited", max_age => "never" );
-   $ca = MCE::Shared->cache( max_keys => undef, max_age => undef ); # ditto
-   $ca = MCE::Shared->cache( max_keys => 500, max_age => "1 hour" );
-   $ca = MCE::Shared->cache( max_keys => "4 KiB" ); # 4*1024
-   $ca = MCE::Shared->cache( max_keys => "1 MiB" ); # 1*1024*1024
+ $ca = MCE::Shared->cache( max_keys => "unlimited", max_age => "never" );
+ $ca = MCE::Shared->cache( max_keys => undef, max_age => undef ); # ditto
+ $ca = MCE::Shared->cache( max_keys => 500, max_age => "1 hour" );
+ $ca = MCE::Shared->cache( max_keys => "4 KiB" ); # 4*1024
+ $ca = MCE::Shared->cache( max_keys => "1 MiB" ); # 1*1024*1024
 
-   $ca = MCE::Shared->cache( max_age  => "43200 seconds" );
-   $ca = MCE::Shared->cache( max_age  => 43200 );   # ditto
-   $ca = MCE::Shared->cache( max_age  => "720 minutes" );
-   $ca = MCE::Shared->cache( max_age  => "12 hours" );
-   $ca = MCE::Shared->cache( max_age  => "0.5 days" );
-   $ca = MCE::Shared->cache( max_age  => "1 week" );
-   $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
-   $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
+ $ca = MCE::Shared->cache( max_age  => "43200 seconds" );
+ $ca = MCE::Shared->cache( max_age  => 43200 );   # ditto
+ $ca = MCE::Shared->cache( max_age  => "720 minutes" );
+ $ca = MCE::Shared->cache( max_age  => "12 hours" );
+ $ca = MCE::Shared->cache( max_age  => "0.5 days" );
+ $ca = MCE::Shared->cache( max_age  => "1 week" );
+ $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
+ $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
 
-   # hash-like dereferencing
+ # hash-like dereferencing
 
-   my $val = $ca->{$key};
-   $ca->{$key} = $val;
+ my $val = $ca->{$key};
+ $ca->{$key} = $val;
 
-   %{$ca} = ();
+ %{$ca} = ();
 
-   # OO interface
+ # OO interface
 
-   if ( !defined ( $val = $ca->get("some_key") ) ) {
-      $val = $ca->set( some_key => "some_value" );
-   }
+ if ( !defined ( $val = $ca->get("some_key") ) ) {
+    $val = $ca->set( some_key => "some_value" );
+ }
 
-   $val   = $ca->set( $key, $val );
-   $val   = $ca->get( $key );
-   $val   = $ca->delete( $key );              # del is an alias for delete
-   $bool  = $ca->exists( $key );
-   void   = $ca->clear();
-   $len   = $ca->len();                       # scalar keys %{ $ca }
-   $len   = $ca->len( $key );                 # length $ca->{ $key }
+ $val   = $ca->set( $key, $val );
+ $val   = $ca->get( $key );
+ $val   = $ca->delete( $key );              # del is an alias for delete
+ $bool  = $ca->exists( $key );
+ void   = $ca->clear();
+ $len   = $ca->len();                       # scalar keys %{ $ca }
+ $len   = $ca->len( $key );                 # length $ca->{ $key }
 
-   @keys  = $ca->keys( @keys );               # @keys is optional
-   %pairs = $ca->pairs( @keys );
-   @vals  = $ca->values( @keys );             # vals is an alias for values
+ $iter  = $ca->iterator( @keys );           # ($key, $val) = $iter->()
+ @keys  = $ca->keys( @keys );               # @keys is optional
+ %pairs = $ca->pairs( @keys );
+ @vals  = $ca->values( @keys );             # vals is an alias for values
 
-   $len   = $ca->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
-   $cnt   = $ca->mdel( @keys );
-   @vals  = $ca->mget( @keys );
-   $bool  = $ca->mexists( @keys );            # true if all keys exists
-   $len   = $ca->mset( $key/$val pairs );     # merge is an alias for mset
+ $len   = $ca->assign( $key/$val pairs );   # equivalent to ->clear, ->mset
+ $cnt   = $ca->mdel( @keys );
+ @vals  = $ca->mget( @keys );
+ $bool  = $ca->mexists( @keys );            # true if all keys exists
+ $len   = $ca->mset( $key/$val pairs );     # merge is an alias for mset
 
-   # included, sugar methods without having to call set/get explicitly
+ # included, sugar methods without having to call set/get explicitly
 
-   $len   = $ca->append( $key, $string );     #   $val .= $string
-   $val   = $ca->decr( $key );                # --$val
-   $val   = $ca->decrby( $key, $number );     #   $val -= $number
-   $val   = $ca->getdecr( $key );             #   $val--
-   $val   = $ca->getincr( $key );             #   $val++
-   $val   = $ca->incr( $key );                # ++$val
-   $val   = $ca->incrby( $key, $number );     #   $val += $number
-   $old   = $ca->getset( $key, $new );        #   $o = $v, $v = $n, $o
+ $len   = $ca->append( $key, $string );     #   $val .= $string
+ $val   = $ca->decr( $key );                # --$val
+ $val   = $ca->decrby( $key, $number );     #   $val -= $number
+ $val   = $ca->getdecr( $key );             #   $val--
+ $val   = $ca->getincr( $key );             #   $val++
+ $val   = $ca->incr( $key );                # ++$val
+ $val   = $ca->incrby( $key, $number );     #   $val += $number
+ $old   = $ca->getset( $key, $new );        #   $o = $v, $v = $n, $o
 
-   # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
+ # pipeline, provides atomicity for shared objects, MCE::Shared v1.09+
 
-   @vals  = $ca->pipeline(                    # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals  = $ca->pipeline(                    # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
 For normal hash behavior, the TIE interface is supported.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Cache;
+ use MCE::Shared::Cache;
 
-   tie my %ca, "MCE::Shared::Cache", max_keys => undef, max_age => undef;
-   tie my %ca, "MCE::Shared::Cache", max_keys => 500, max_age => "1 hour";
-   tie my %ca, "MCE::Shared::Cache", { max_keys => 500 }, @pairs;
+ tie my %ca, "MCE::Shared::Cache", max_keys => undef, max_age => undef;
+ tie my %ca, "MCE::Shared::Cache", max_keys => 500, max_age => "1 hour";
+ tie my %ca, "MCE::Shared::Cache", { max_keys => 500 }, @pairs;
 
-   # construction for sharing with other threads and processes
-   # one option is needed minimally to know to use MCE::Shared::Cache
+ # construction for sharing with other threads and processes
+ # one option is needed minimally to know to use MCE::Shared::Cache
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   tie my %ca, "MCE::Shared", max_keys => undef, max_age => undef;
-   tie my %ca, "MCE::Shared", max_keys => 500, max_age => "1 hour";
-   tie my %ca, "MCE::Shared", { max_keys => 500 }, @pairs;
+ tie my %ca, "MCE::Shared", max_keys => undef, max_age => undef;
+ tie my %ca, "MCE::Shared", max_keys => 500, max_age => "1 hour";
+ tie my %ca, "MCE::Shared", { max_keys => 500 }, @pairs;
 
-   # usage
+ # usage
 
-   my $val;
+ my $val;
 
-   if ( !defined ( $val = $ca{some_key} ) ) {
-      $val = $ca{some_key} = "some_value";
-   }
+ if ( !defined ( $val = $ca{some_key} ) ) {
+    $val = $ca{some_key} = "some_value";
+ }
 
-   $ca{some_key} = 0;
+ $ca{some_key} = 0;
 
-   tied(%ca)->incrby("some_key", 20);
-   tied(%ca)->incrby(some_key => 20);
+ tied(%ca)->incrby("some_key", 20);
+ tied(%ca)->incrby(some_key => 20);
 
 =head1 SYNTAX for QUERY STRING
 
@@ -1084,54 +1109,54 @@ is described below. In the context of sharing, the query mechanism is beneficial
 for the shared-manager process. It is able to perform the query where the data
 resides versus the client-process grep locally involving lots of IPC.
 
-   o Basic demonstration
+ o Basic demonstration
 
-     @keys = $ca->keys( "query string given here" );
-     @keys = $ca->keys( "val =~ /pattern/" );
+   @keys = $ca->keys( "query string given here" );
+   @keys = $ca->keys( "val =~ /pattern/" );
 
-   o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
-   o Multiple expressions delimited by :AND or :OR, mixed case allowed
+ o Supported operators: =~ !~ eq ne lt le gt ge == != < <= > >=
+ o Multiple expressions delimited by :AND or :OR, mixed case allowed
 
-     "key eq 'some key' :or (val > 5 :and val < 9)"
-     "key eq some key :or (val > 5 :and val < 9)"
-     "key =~ /pattern/i :And val =~ /pattern/i"
-     "val eq foo baz :OR key !~ /pattern/i"
+   "key eq 'some key' :or (val > 5 :and val < 9)"
+   "key eq some key :or (val > 5 :and val < 9)"
+   "key =~ /pattern/i :And val =~ /pattern/i"
+   "val eq foo baz :OR key !~ /pattern/i"
 
-     * key matches on keys in the cache
-     * likewise, val matches on values
+   * key matches on keys in the cache
+   * likewise, val matches on values
 
-   o Quoting is optional inside the string
+ o Quoting is optional inside the string
 
-     "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
-     "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq 'foo bar'"   # val eq "foo bar"
+   "key =~ /pattern/i :AND val eq foo bar"     # val eq "foo bar"
 
 Examples.
 
-   # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
-   # key/val means to match against actual key/val respectively
+ # search capability key/val: =~ !~ eq ne lt le gt ge == != < <= > >=
+ # key/val means to match against actual key/val respectively
 
-   @keys  = $ca->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
-   @keys  = $ca->keys( "key eq some key :or (val > 5 :and val < 9)" );
+ @keys  = $ca->keys( "key eq 'some key' :or (val > 5 :and val < 9)" );
+ @keys  = $ca->keys( "key eq some key :or (val > 5 :and val < 9)" );
 
-   @keys  = $ca->keys( "key =~ /$pattern/i" );
-   @keys  = $ca->keys( "key !~ /$pattern/i" );
-   @keys  = $ca->keys( "val =~ /$pattern/i" );
-   @keys  = $ca->keys( "val !~ /$pattern/i" );
+ @keys  = $ca->keys( "key =~ /$pattern/i" );
+ @keys  = $ca->keys( "key !~ /$pattern/i" );
+ @keys  = $ca->keys( "val =~ /$pattern/i" );
+ @keys  = $ca->keys( "val !~ /$pattern/i" );
 
-   %pairs = $ca->pairs( "key == $number" );
-   %pairs = $ca->pairs( "key != $number :and val > 100" );
-   %pairs = $ca->pairs( "key <  $number :or key > $number" );
-   %pairs = $ca->pairs( "val <= $number" );
-   %pairs = $ca->pairs( "val >  $number" );
-   %pairs = $ca->pairs( "val >= $number" );
+ %pairs = $ca->pairs( "key == $number" );
+ %pairs = $ca->pairs( "key != $number :and val > 100" );
+ %pairs = $ca->pairs( "key <  $number :or key > $number" );
+ %pairs = $ca->pairs( "val <= $number" );
+ %pairs = $ca->pairs( "val >  $number" );
+ %pairs = $ca->pairs( "val >= $number" );
 
-   @vals  = $ca->vals( "key eq $string" );
-   @vals  = $ca->vals( "key ne $string with space" );
-   @vals  = $ca->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
-   @vals  = $ca->vals( "val le $string :and val eq 'foo bar'" );
-   @vals  = $ca->vals( "val le $string :and val eq foo bar" );
-   @vals  = $ca->vals( "val gt $string" );
-   @vals  = $ca->vals( "val ge $string" );
+ @vals  = $ca->vals( "key eq $string" );
+ @vals  = $ca->vals( "key ne $string with space" );
+ @vals  = $ca->vals( "key lt $string :or val =~ /$pat1|$pat2/" );
+ @vals  = $ca->vals( "val le $string :and val eq 'foo bar'" );
+ @vals  = $ca->vals( "val le $string :and val eq foo bar" );
+ @vals  = $ca->vals( "val gt $string" );
+ @vals  = $ca->vals( "val ge $string" );
 
 =head1 API DOCUMENTATION
 
@@ -1159,53 +1184,53 @@ similarly to a non-existing item.
 
 Constructs a new object.
 
-   # non-shared or local construction for use by a single process
+ # non-shared or local construction for use by a single process
 
-   use MCE::Shared::Cache;
+ use MCE::Shared::Cache;
 
-   $ca = MCE::Shared::Cache->new(); # max_keys => undef, max_age => undef
-   $ca = MCE::Shared::Cache->new( { max_keys => 500 }, @pairs );
+ $ca = MCE::Shared::Cache->new(); # max_keys => undef, max_age => undef
+ $ca = MCE::Shared::Cache->new( { max_keys => 500 }, @pairs );
 
-   $ca = MCE::Shared::Cache->new( max_keys => "unlimited", max_age => "never" );
-   $ca = MCE::Shared::Cache->new( max_keys => undef, max_age => undef ); # ditto
-   $ca = MCE::Shared::Cache->new( max_keys => 500, max_age => "1 hour" );
-   $ca = MCE::Shared::Cache->new( max_keys => "4 KiB" ); # 4*1024
-   $ca = MCE::Shared::Cache->new( max_keys => "1 MiB" ); # 1*1024*1024
+ $ca = MCE::Shared::Cache->new( max_keys => "unlimited", max_age => "never" );
+ $ca = MCE::Shared::Cache->new( max_keys => undef, max_age => undef ); # ditto
+ $ca = MCE::Shared::Cache->new( max_keys => 500, max_age => "1 hour" );
+ $ca = MCE::Shared::Cache->new( max_keys => "4 KiB" ); # 4*1024
+ $ca = MCE::Shared::Cache->new( max_keys => "1 MiB" ); # 1*1024*1024
 
-   $ca = MCE::Shared::Cache->new( max_age  => "43200 seconds" );
-   $ca = MCE::Shared::Cache->new( max_age  => 43200 );   # ditto
-   $ca = MCE::Shared::Cache->new( max_age  => "720 minutes" );
-   $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
-   $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
-   $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
-   $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
-   $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
+ $ca = MCE::Shared::Cache->new( max_age  => "43200 seconds" );
+ $ca = MCE::Shared::Cache->new( max_age  => 43200 );   # ditto
+ $ca = MCE::Shared::Cache->new( max_age  => "720 minutes" );
+ $ca = MCE::Shared::Cache->new( max_age  => "12 hours" );
+ $ca = MCE::Shared::Cache->new( max_age  => "0.5 days" );
+ $ca = MCE::Shared::Cache->new( max_age  => "1 week" );
+ $ca = MCE::Shared::Cache->new( max_age  => "never" ); # or undef
+ $ca = MCE::Shared::Cache->new( max_age  => "now" );   # or 0
 
-   $ca->assign( @pairs );
+ $ca->assign( @pairs );
 
-   # construction for sharing with other threads and processes
+ # construction for sharing with other threads and processes
 
-   use MCE::Shared;
+ use MCE::Shared;
 
-   $ca = MCE::Shared->cache(); # max_keys => undef, max_age => undef
-   $ca = MCE::Shared->cache( { max_keys => 500 }, @pairs );
+ $ca = MCE::Shared->cache(); # max_keys => undef, max_age => undef
+ $ca = MCE::Shared->cache( { max_keys => 500 }, @pairs );
 
-   $ca = MCE::Shared->cache( max_keys => "unlimited", max_age => "never" );
-   $ca = MCE::Shared->cache( max_keys => undef, max_age => undef ); # ditto
-   $ca = MCE::Shared->cache( max_keys => 500, max_age => "1 hour" );
-   $ca = MCE::Shared->cache( max_keys => "4 KiB" ); # 4*1024
-   $ca = MCE::Shared->cache( max_keys => "1 MiB" ); # 1*1024*1024
+ $ca = MCE::Shared->cache( max_keys => "unlimited", max_age => "never" );
+ $ca = MCE::Shared->cache( max_keys => undef, max_age => undef ); # ditto
+ $ca = MCE::Shared->cache( max_keys => 500, max_age => "1 hour" );
+ $ca = MCE::Shared->cache( max_keys => "4 KiB" ); # 4*1024
+ $ca = MCE::Shared->cache( max_keys => "1 MiB" ); # 1*1024*1024
 
-   $ca = MCE::Shared->cache( max_age  => "43200 seconds" );
-   $ca = MCE::Shared->cache( max_age  => 43200 );   # ditto
-   $ca = MCE::Shared->cache( max_age  => "720 minutes" );
-   $ca = MCE::Shared->cache( max_age  => "12 hours" );
-   $ca = MCE::Shared->cache( max_age  => "0.5 days" );
-   $ca = MCE::Shared->cache( max_age  => "1 week" );
-   $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
-   $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
+ $ca = MCE::Shared->cache( max_age  => "43200 seconds" );
+ $ca = MCE::Shared->cache( max_age  => 43200 );   # ditto
+ $ca = MCE::Shared->cache( max_age  => "720 minutes" );
+ $ca = MCE::Shared->cache( max_age  => "12 hours" );
+ $ca = MCE::Shared->cache( max_age  => "0.5 days" );
+ $ca = MCE::Shared->cache( max_age  => "1 week" );
+ $ca = MCE::Shared->cache( max_age  => "never" ); # or undef
+ $ca = MCE::Shared->cache( max_age  => "now" );   # or 0
 
-   $ca->assign( @pairs );
+ $ca->assign( @pairs );
 
 Reorder: Yes, when given key-value pairs contain duplicate keys
 
@@ -1214,7 +1239,7 @@ Reorder: Yes, when given key-value pairs contain duplicate keys
 Clears the cache, then sets multiple key-value pairs and returns the number of
 keys stored in the cache. This is equivalent to C<clear>, C<mset>.
 
-   $len = $ca->assign( "key1" => "val1", "key2" => "val2" );
+ $len = $ca->assign( "key1" => "val1", "key2" => "val2" );
 
 Reorder: Yes, when given key-value pairs contain duplicate keys
 
@@ -1222,16 +1247,16 @@ Reorder: Yes, when given key-value pairs contain duplicate keys
 
 Removes all key-value pairs from the cache.
 
-   $ca->clear;
-   %{$ca} = ();
+ $ca->clear;
+ %{$ca} = ();
 
 =item delete ( key )
 
 Deletes and returns the value by given key or C<undef> if the key does not
 exists in the cache.
 
-   $val = $ca->delete( "some_key" );
-   $val = delete $ca->{ "some_key" };
+ $val = $ca->delete( "some_key" );
+ $val = delete $ca->{ "some_key" };
 
 =item del
 
@@ -1241,8 +1266,8 @@ C<del> is an alias for C<delete>.
 
 Determines if a key exists in the cache.
 
-   if ( $ca->exists( "some_key" ) ) { ... }
-   if ( exists $ca->{ "some_key" } ) { ... }
+ if ( $ca->exists( "some_key" ) ) { ... }
+ if ( exists $ca->{ "some_key" } ) { ... }
 
 Reorder: No
 
@@ -1252,10 +1277,51 @@ Gets the value of a cache key or C<undef> if the key does not exists.
 LRU reordering occurs only if the key is found in the lower section of the
 cache. See C<peek> to not promote the key internally to the top of the list.
 
-   $val = $ca->get( "some_key" );
-   $val = $ca->{ "some_key" };
+ $val = $ca->get( "some_key" );
+ $val = $ca->{ "some_key" };
 
 Reorder: Yes
+
+=item iterator ( key [, key, ... ] )
+
+When C<max_age> is set, prunes any expired keys at the head of the list.
+
+Returns a code reference for iterating a list of key-value pairs stored in
+the cache when no arguments are given. Otherwise, returns a code reference for
+iterating the given keys in the same order. Keys that do not exist will have
+the C<undef> value.
+
+The list of keys to return is set when the closure is constructed. Later keys
+added to the hash are not included. Subsequently, the C<undef> value is
+returned for deleted keys.
+
+ $iter = $ca->iterator;
+ $iter = $ca->iterator( "key1", "key2" );
+
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
+
+Reorder: No
+
+=item iterator ( "query string" )
+
+When C<max_age> is set, prunes any expired keys at the head of the list.
+
+Returns a code reference for iterating a list of key-value pairs that match
+the given criteria. It returns an empty list if the search found nothing.
+The syntax for the C<query string> is described above.
+
+ $iter = $ca->iterator( "val eq some_value" );
+ $iter = $ca->iterator( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ $iter = $ca->iterator( "val eq sun :OR val eq moon :OR val eq foo" );
+ $iter = $ca->iterator( "key =~ /$pattern/" );
+
+ while ( my ( $key, $val ) = $iter->() ) {
+    ...
+ }
+
+Reorder: No
 
 =item keys ( key [, key, ... ] )
 
@@ -1266,9 +1332,9 @@ are given. Otherwise, returns the given keys in the same order. Keys that do
 not exist will have the C<undef> value. In scalar context, returns the size
 of the cache.
 
-   @keys = $ca->keys;
-   @keys = $ca->keys( "key1", "key2" );
-   $len  = $ca->keys;
+ @keys = $ca->keys;
+ @keys = $ca->keys( "key1", "key2" );
+ $len  = $ca->keys;
 
 Reorder: No
 
@@ -1280,10 +1346,10 @@ Returns only keys that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @keys = $ca->keys( "val eq some_value" );
-   @keys = $ca->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @keys = $ca->keys( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ca->keys( "key =~ /$pattern/" );
+ @keys = $ca->keys( "val eq some_value" );
+ @keys = $ca->keys( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @keys = $ca->keys( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ca->keys( "key =~ /$pattern/" );
 
 Reorder: No
 
@@ -1295,9 +1361,9 @@ Returns the size of the cache when no arguments are given. For the given key,
 returns the length of the value stored at key or the C<undef> value if the
 key does not exists.
 
-   $size = $ca->len;
-   $len  = $ca->len( "key1" );
-   $len  = length $ca->{ "key1" };
+ $size = $ca->len;
+ $len  = $ca->len( "key1" );
+ $len  = length $ca->{ "key1" };
 
 Reorder: Yes, only when key is given
 
@@ -1307,16 +1373,16 @@ Returns the maximum age set on the cache or "never" if not defined internally.
 When seconds is given, it adjusts any keys by subtracting or adding the time
 difference accordingly.
 
-   $age = $ca->max_age;
+ $age = $ca->max_age;
 
-   $ca->max_age( "43200 seconds" );
-   $ca->max_age( 43200 );     # ditto
-   $ca->max_age( "720 minutes" );
-   $ca->max_age( "12 hours" );
-   $ca->max_age( "0.5 days" );
-   $ca->max_age( "1 week" );
-   $ca->max_age( "never" );   # or undef
-   $ca->max_age( "now" );     # or 0
+ $ca->max_age( "43200 seconds" );
+ $ca->max_age( 43200 );     # ditto
+ $ca->max_age( "720 minutes" );
+ $ca->max_age( "12 hours" );
+ $ca->max_age( "0.5 days" );
+ $ca->max_age( "1 week" );
+ $ca->max_age( "never" );   # or undef
+ $ca->max_age( "now" );     # or 0
 
 =item max_keys ( [ size ] )
 
@@ -1324,27 +1390,27 @@ Returns the size limit set on the cache or "unlimited" if not defined
 internally. When size is given, it adjusts the cache accordingly to the
 new size by pruning the head of the list if necessary.
 
-   $size = $ca->max_size;
+ $size = $ca->max_size;
 
-   $ca->max_keys( "unlimited" );
-   $ca->max_keys( undef );    # ditto
-   $ca->max_keys( "4 KiB" );  # 4*1024
-   $ca->max_keys( "1 MiB" );  # 1*1024*1024
-   $ca->max_keys( 500 );
+ $ca->max_keys( "unlimited" );
+ $ca->max_keys( undef );    # ditto
+ $ca->max_keys( "4 KiB" );  # 4*1024
+ $ca->max_keys( "1 MiB" );  # 1*1024*1024
+ $ca->max_keys( 500 );
 
 =item mdel ( key [, key, ... ] )
 
 Deletes one or more keys in the cache and returns the number of keys deleted.
 A given key which does not exist in the cache is not counted.
 
-   $cnt = $ca->mdel( "key1", "key2" );
+ $cnt = $ca->mdel( "key1", "key2" );
 
 =item mexists ( key [, key, ... ] )
 
 Returns a true value if all given keys exists in the cache. A false value is
 returned otherwise.
 
-   if ( $ca->mexists( "key1", "key2" ) ) { ... }
+ if ( $ca->mexists( "key1", "key2" ) ) { ... }
 
 Reorder: No
 
@@ -1353,7 +1419,7 @@ Reorder: No
 Gets the values of all given keys. It returns C<undef> for keys which do not
 exists in the cache.
 
-   ( $val1, $val2 ) = $ca->mget( "key1", "key2" );
+ ( $val1, $val2 ) = $ca->mget( "key1", "key2" );
 
 Reorder: Yes
 
@@ -1362,7 +1428,7 @@ Reorder: Yes
 Sets multiple key-value pairs in a cache and returns the number of keys stored
 in the cache.
 
-   $len = $ca->mset( "key1" => "val1", "key2" => "val2" );
+ $len = $ca->mset( "key1" => "val1", "key2" => "val2" );
 
 Reorder: Yes
 
@@ -1379,9 +1445,9 @@ arguments are given. Otherwise, returns key-value pairs for the given keys
 in the same order. Keys that do not exist will have the C<undef> value.
 In scalar context, returns the size of the cache.
 
-   @pairs = $ca->pairs;
-   @pairs = $ca->pairs( "key1", "key2" );
-   $len   = $ca->pairs;
+ @pairs = $ca->pairs;
+ @pairs = $ca->pairs( "key1", "key2" );
+ $len   = $ca->pairs;
 
 Reorder: No
 
@@ -1393,10 +1459,10 @@ Returns only key-value pairs that match the given criteria. It returns an
 empty list if the search found nothing. The syntax for the C<query string> is
 described above. In scalar context, returns the size of the resulting list.
 
-   @pairs = $ca->pairs( "val eq some_value" );
-   @pairs = $ca->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @pairs = $ca->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len   = $ca->pairs( "key =~ /$pattern/" );
+ @pairs = $ca->pairs( "val eq some_value" );
+ @pairs = $ca->pairs( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @pairs = $ca->pairs( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len   = $ca->pairs( "key =~ /$pattern/" );
 
 Reorder: No
 
@@ -1405,8 +1471,8 @@ Reorder: No
 Same as C<get> without changing the order of the keys. Gets the value of a
 cache key or C<undef> if the key does not exists.
 
-   $val = $ca->get( "some_key" );
-   $val = $ca->{ "some_key" };
+ $val = $ca->get( "some_key" );
+ $val = $ca->{ "some_key" };
 
 Reorder: No
 
@@ -1418,25 +1484,25 @@ process. The C<pipeline> method is fully C<wantarray>-aware and receives a list
 of commands and their arguments. In scalar or list context, it returns data
 from the last command in the pipeline.
 
-   @vals = $ca->pipeline(                     # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ],
-      [ "mget", qw/ foo bar baz / ]
-   );
+ @vals = $ca->pipeline(                     # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ],
+    [ "mget", qw/ foo bar baz / ]
+ );
 
-   $len = $ca->pipeline(                      # 3, same as $ca->len
-      [ "set", foo => "i_i" ],
-      [ "set", bar => "j_j" ],
-      [ "set", baz => "k_k" ],
-      [ "len" ]
-   );
+ $len = $ca->pipeline(                      # 3, same as $ca->len
+    [ "set", foo => "i_i" ],
+    [ "set", bar => "j_j" ],
+    [ "set", baz => "k_k" ],
+    [ "len" ]
+ );
 
-   $ca->pipeline(
-      [ "set", foo => "m_m" ],
-      [ "set", bar => "n_n" ],
-      [ "set", baz => "o_o" ]
-   );
+ $ca->pipeline(
+    [ "set", foo => "m_m" ],
+    [ "set", bar => "n_n" ],
+    [ "set", baz => "o_o" ]
+ );
 
 Reorder: Very likely, see API on given method
 
@@ -1444,11 +1510,11 @@ Reorder: Very likely, see API on given method
 
 Same as C<pipeline>, but returns data for every command in the pipeline.
 
-   @vals = $ca->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
-      [ "set", foo => "a_a" ],
-      [ "set", bar => "b_b" ],
-      [ "set", baz => "c_c" ]
-   );
+ @vals = $ca->pipeline_ex(                  # ( "a_a", "b_b", "c_c" )
+    [ "set", foo => "a_a" ],
+    [ "set", bar => "b_b" ],
+    [ "set", baz => "c_c" ]
+ );
 
 Reorder: Very likely, see API on given command
 
@@ -1458,14 +1524,14 @@ A utility method for purging any *tombstones* in the keys array. It also
 resets a couple counters internally. Expired items are also purged when
 max_age is defined.
 
-   $ca->purge;
+ $ca->purge;
 
 =item set ( key, value )
 
 Sets the value of the given cache key and returns its new value.
 
-   $val = $ca->set( "key", "value" );
-   $val = $ca->{ "key" } = "value";
+ $val = $ca->set( "key", "value" );
+ $val = $ca->{ "key" } = "value";
 
 Reorder: Yes
 
@@ -1478,9 +1544,9 @@ are given. Otherwise, returns values for the given keys in the same order.
 Keys that do not exist will have the C<undef> value. In scalar context,
 returns the size of the cache.
 
-   @vals = $ca->values;
-   @vals = $ca->values( "key1", "key2" );
-   $len  = $ca->values;
+ @vals = $ca->values;
+ @vals = $ca->values( "key1", "key2" );
+ $len  = $ca->values;
 
 Reorder: No
 
@@ -1492,10 +1558,10 @@ Returns only values that match the given criteria. It returns an empty list
 if the search found nothing. The syntax for the C<query string> is described
 above. In scalar context, returns the size of the resulting list.
 
-   @vals = $ca->values( "val eq some_value" );
-   @vals = $ca->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
-   @vals = $ca->values( "val eq sun :OR val eq moon :OR val eq foo" );
-   $len  = $ca->values( "key =~ /$pattern/" );
+ @vals = $ca->values( "val eq some_value" );
+ @vals = $ca->values( "key eq some_key :AND val =~ /sun|moon|air|wind/" );
+ @vals = $ca->values( "val eq sun :OR val eq moon :OR val eq foo" );
+ $len  = $ca->values( "key =~ /$pattern/" );
 
 Reorder: No
 
@@ -1520,7 +1586,7 @@ L<http://redis.io/commands#strings> with key representing the cache key.
 
 Appends a value to a key and returns its new length.
 
-   $len = $ca->append( $key, "foo" );
+ $len = $ca->append( $key, "foo" );
 
 Reorder: Yes
 
@@ -1528,7 +1594,7 @@ Reorder: Yes
 
 Decrements the value of a key by one and returns its new value.
 
-   $num = $ca->decr( $key );
+ $num = $ca->decr( $key );
 
 Reorder: Yes
 
@@ -1536,7 +1602,7 @@ Reorder: Yes
 
 Decrements the value of a key by the given number and returns its new value.
 
-   $num = $ca->decrby( $key, 2 );
+ $num = $ca->decrby( $key, 2 );
 
 Reorder: Yes
 
@@ -1544,7 +1610,7 @@ Reorder: Yes
 
 Decrements the value of a key by one and returns its old value.
 
-   $old = $ca->getdecr( $key );
+ $old = $ca->getdecr( $key );
 
 Reorder: Yes
 
@@ -1552,7 +1618,7 @@ Reorder: Yes
 
 Increments the value of a key by one and returns its old value.
 
-   $old = $ca->getincr( $key );
+ $old = $ca->getincr( $key );
 
 Reorder: Yes
 
@@ -1560,7 +1626,7 @@ Reorder: Yes
 
 Sets the value of a key and returns its old value.
 
-   $old = $ca->getset( $key, "baz" );
+ $old = $ca->getset( $key, "baz" );
 
 Reorder: Yes
 
@@ -1568,7 +1634,7 @@ Reorder: Yes
 
 Increments the value of a key by one and returns its new value.
 
-   $num = $ca->incr( $key );
+ $num = $ca->incr( $key );
 
 Reorder: Yes
 
@@ -1576,7 +1642,7 @@ Reorder: Yes
 
 Increments the value of a key by the given number and returns its new value.
 
-   $num = $ca->incrby( $key, 2 );
+ $num = $ca->incrby( $key, 2 );
 
 Reorder: Yes
 
@@ -1587,9 +1653,9 @@ Reorder: Yes
 One might want to benchmark this module. If yes, remember to use the non-shared
 construction for running on a single core.
 
-   use MCE::Shared::Cache;
+ use MCE::Shared::Cache;
 
-   my $cache = MCE::Shared::Cache->new( max_keys => 500_000 );
+ my $cache = MCE::Shared::Cache->new( max_keys => 500_000 );
 
 Otherwise, the following is a parallel version for a L<benchmark script|https://blog.celogeek.com/201401/426/perl-benchmark-cache-with-expires-and-max-size> found on the web. The serial version was created by Celogeek for benchmarking various caching modules.
 
@@ -1598,85 +1664,85 @@ among many workers. Being a parallel script means that it involves IPC to and
 from the shared-manager process, where the data resides. In regards to IPC,
 fetches may take longer on Linux versus running on Darwin or FreeBSD.
 
-   #!/usr/bin/perl
+ #!/usr/bin/perl
 
-   use strict;
-   use warnings;
-   use feature 'say', 'state';
+ use strict;
+ use warnings;
+ use feature 'say', 'state';
 
-   use Digest::MD5 qw/md5_base64/;
-   use Time::HiRes qw/time/;
-   use Proc::ProcessTable;
+ use Digest::MD5 qw/md5_base64/;
+ use Time::HiRes qw/time/;
+ use Proc::ProcessTable;
 
-   use MCE 1.814;   # requires 1.814 minimally
-   use MCE::Shared;
+ use MCE 1.814;   # requires 1.814 minimally
+ use MCE::Shared;
 
-   sub get_current_process_memory {
-       state $pt = Proc::ProcessTable->new;
-       my %info = map { $_->pid => $_ } @{$pt->table};
-       return $info{$$}->rss;
-   }
+ sub get_current_process_memory {
+     state $pt = Proc::ProcessTable->new;
+     my %info = map { $_->pid => $_ } @{$pt->table};
+     return $info{$$}->rss;
+ }
 
-   $| = 1; srand(0);
+ $| = 1; srand(0);
 
-   # construct shared variables
-   # MCE::Shared handles serialization automatically, when needed
+ # construct shared variables
+ # MCE::Shared handles serialization automatically, when needed
 
-   my $c     = MCE::Shared->cache( max_keys => 500_000 );
-   my $found = MCE::Shared->scalar( 0 );
+ my $c     = MCE::Shared->cache( max_keys => 500_000 );
+ my $found = MCE::Shared->scalar( 0 );
 
-   # construct and spawn MCE workers
-   # workers increment a local variable $f
+ # construct and spawn MCE workers
+ # workers increment a local variable $f
 
-   my $mce = MCE->new(
-       chunk_size  => 4000,
-       max_workers => 4,
-       user_func   => sub {
-           my ($mce, $chunk_ref, $chunk_id) = @_;
-           if ( $mce->user_args()->[0] eq 'setter' ) {
-               for ( @{ $chunk_ref } ) { $c->set($_, {md5 => $_})  }
-           }
-           else {
-               my $f = 0;
-               for ( @{ $chunk_ref } ) { $f++ if ref $c->get($_) eq 'HASH' }
-               $found->incrby($f);
-           }
-       }
-   )->spawn();
+ my $mce = MCE->new(
+     chunk_size  => 4000,
+     max_workers => 4,
+     user_func   => sub {
+         my ($mce, $chunk_ref, $chunk_id) = @_;
+         if ( $mce->user_args()->[0] eq 'setter' ) {
+             for ( @{ $chunk_ref } ) { $c->set($_, {md5 => $_})  }
+         }
+         else {
+             my $f = 0;
+             for ( @{ $chunk_ref } ) { $f++ if ref $c->get($_) eq 'HASH' }
+             $found->incrby($f);
+         }
+     }
+ )->spawn();
 
-   say "Mapping";
-   my @todo = map { md5_base64($_) } (1..600_000);
-   say "Starting";
+ say "Mapping";
+ my @todo = map { md5_base64($_) } (1..600_000);
+ say "Starting";
 
-   my $mem = get_current_process_memory();
-   my ($read, $write);
+ my $mem = get_current_process_memory();
+ my ($read, $write);
 
-   {
-       my $s = time;
-       $mce->process({
-           progress  => sub { print "Write: $_[0]\r" },
-           user_args => [ 'setter' ],
-       }, \@todo);
-       $write = time - $s;
-   }
+ {
+     my $s = time;
+     $mce->process({
+         progress  => sub { print "Write: $_[0]\r" },
+         user_args => [ 'setter' ],
+     }, \@todo);
+     $write = time - $s;
+ }
 
-   say "Write: ", sprintf("%0.3f", scalar(@todo) / $write);
+ say "Write: ", sprintf("%0.3f", scalar(@todo) / $write);
 
-   {
-       my $s = time;
-       $found->set(0);
-       $mce->process({
-           progress  => sub { print "Read $_[0]\r" },
-           user_args => [ 'getter' ],
-       }, \@todo);
-       $read = time - $s;
-   }
+ {
+     my $s = time;
+     $found->set(0);
+     $mce->process({
+         progress  => sub { print "Read $_[0]\r" },
+         user_args => [ 'getter' ],
+     }, \@todo);
+     $read = time - $s;
+ }
 
-   $mce->shutdown();
+ $mce->shutdown();
 
-   say "Read : ", sprintf("%0.3f", scalar(@todo) / $read);
-   say "Found: ", $found->get();
-   say "Mem  : ", get_current_process_memory() - $mem;
+ say "Read : ", sprintf("%0.3f", scalar(@todo) / $read);
+ say "Found: ", $found->get();
+ say "Mem  : ", get_current_process_memory() - $mem;
 
 The C<progress> option is further described on Metacpan. Several examples
 are provided, accommodating all input data-types in MCE.

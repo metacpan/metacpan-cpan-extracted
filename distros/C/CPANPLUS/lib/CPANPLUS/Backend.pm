@@ -23,7 +23,7 @@ $Params::Check::VERBOSE = 1;
 use vars qw[@ISA $VERSION];
 
 @ISA     = qw[CPANPLUS::Internals];
-$VERSION = "0.9168";
+$VERSION = "0.9170";
 
 ### mark that we're running under CPANPLUS to spawned processes
 $ENV{'PERL5_CPANPLUS_IS_RUNNING'} = $$;
@@ -625,6 +625,15 @@ sub parse_module {
         $author = shift @parts || '';
     }
 
+    {
+      my $guess = $dist;
+      $guess =~ s!-!::!g if $guess;
+      my $maybe = $self->module_tree( $guess );
+      if ( IS_MODOBJ->( module => $maybe ) ) {
+         $dist = $maybe->package;
+      }
+    }
+
     my($pkg, $version, $ext, $full) =
         $self->_split_package_string( package => $dist );
 
@@ -1112,7 +1121,7 @@ sub autobundle {
     print $fh <<EOF;
 package $name;
 
-\$VERSION = "0.9168";
+\$VERSION = "0.9170";
 
 1;
 

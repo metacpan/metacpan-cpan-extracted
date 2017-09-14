@@ -91,6 +91,7 @@ Udo
 Util
 Velti
 Vroom
+Williams
 arisdottle
 autarch
 catchgithub
@@ -106,6 +107,7 @@ hardcode
 hashrefs
 invocant
 jns
+kwakwaversal
 la
 lib
 madcityzen

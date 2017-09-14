@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dbug="http://ontologi.es/doap-bugs#" xmlns:dc="http://purl.org/dc/terms/" xmlns:dcs="http://ontologi.es/doap-changeset#" xmlns:doap="http://usefulinc.com/ns/doap#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-<rdf:Description rdf:nodeID="r1483632625r0">
-	<doap:created>2017-01-05</doap:created>
-	<doap:revision>0.08</doap:revision>
+<rdf:Description rdf:nodeID="r1505339231r0">
+	<doap:created>2017-09-13</doap:created>
+	<doap:revision>0.09</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r1">
-	<ns1:addition>Replaced use of Config::JFDI with Config::ZOMG (github issue #142).</ns1:addition>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r1">
+	<ns1:update>Switch from HTML::HTML5::Parser to XML::LibXML parser for RDFa SD generation (#153 from Kjetil Kjernsmo).</ns1:update>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r10">
+<rdf:Description rdf:nodeID="r1505339231r10">
+	<doap:created>2011-07-19</doap:created>
+	<doap:revision>0.04</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r11">
+	<ns1:addition>Added RDFa serialization tests (from KjetilK).</ns1:addition>
+	<ns1:update>Allow the service description default graph to be a URI or a blank node (based on config value).</ns1:update>
+	<ns1:update>Fixed bug introduced by commit 3fb5e48 causing query results to disappear from HTML results page.</ns1:update>
+	<ns1:update>Require RDF::RDFa::Generator 0.102 (fixes RDFa service description serialization bug).</ns1:update>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1505339231r12">
 	<doap:created>2011-06-07</doap:created>
 	<doap:revision>0.03</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r11">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r13">
 	<ns1:update>Actually dereference correctly endpoint_path, and make the test use root (from kjetilk).</ns1:update>
 	<ns1:update>Add merging of namespace hashes (from kjetilk).</ns1:update>
 	<ns1:update>Make endpoint path configurable (from kjetilk).</ns1:update>
@@ -20,11 +30,11 @@
 	<ns1:update>Updated service description RDF to use sd:endpoint instead of sd:url (tracking updates in the SD spec).</ns1:update>
 	<ns1:update>style element must go in head (from kjetilk).</ns1:update>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r12">
+<rdf:Description rdf:nodeID="r1505339231r14">
 	<doap:created>2011-04-16</doap:created>
 	<doap:revision>0.02</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r13">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r15">
 	<ns1:addition>Added CodeMirror files for syntax highlighting SPARQL query form markup.</ns1:addition>
 	<ns1:addition>Added ETag support for query results, varying based on Accept and Accept-Encoding headers, and query string.</ns1:addition>
 	<ns1:addition>Added support for POSTing queries and updates directly using the appropriate media types.</ns1:addition>
@@ -37,28 +47,35 @@
 	<ns1:update>Updated endpoint.psgi to move config parsing and endpoint object construction outside of the request handler.</ns1:update>
 	<ns1:update>Updated tests to test functionality directly via PSGI.</ns1:update>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r14">
+<rdf:Description rdf:nodeID="r1505339231r16">
 	<doap:created>2010-07-14</doap:created>
 	<doap:revision>0.01</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r15">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r17">
 	<ns1:addition>First release.</ns1:addition>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r2">
+<rdf:Description rdf:nodeID="r1505339231r2">
+	<doap:created>2017-01-05</doap:created>
+	<doap:revision>0.08</doap:revision>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r3">
+	<ns1:addition>Replaced use of Config::JFDI with Config::ZOMG (github issue #142).</ns1:addition>
+</rdf:Description>
+<rdf:Description rdf:nodeID="r1505339231r4">
 	<doap:created>2014-08-04</doap:created>
 	<doap:revision>0.07</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r3">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r5">
 	<ns1:addition>Added Plack::App::RDF::Endpoint.</ns1:addition>
 	<ns1:update>Updated RDF::Endpoint to quote raw-value ETag values (github issue #106).</ns1:update>
 	<ns1:update>Updated endpoint.psgi to look for PERLRDF_STORE environment variable.</ns1:update>
 	<ns1:update>Use base64 encoding of tags to get shorter strings (patch from Kjetil Kjernsmo).</ns1:update>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r4">
+<rdf:Description rdf:nodeID="r1505339231r6">
 	<doap:created>2014-07-01</doap:created>
 	<doap:revision>0.06</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r5">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r7">
 	<ns1:addition>Add Server header (from Kjetil Kjernsmo via github pull request #93).</ns1:addition>
 	<ns1:addition>Added initial support for application/json-problem errors.</ns1:addition>
 	<ns1:update>Added Allow header to HTTP 405 responses.</ns1:update>
@@ -68,11 +85,11 @@
 	<ns1:update>The load_data and update configuration flags cannot both be true at the same time.</ns1:update>
 	<ns1:update>Updated RDF::Endpoint to return a 400 error when datasets are specified both in protocol and query.</ns1:update>
 </rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r6">
+<rdf:Description rdf:nodeID="r1505339231r8">
 	<doap:created>2012-05-28</doap:created>
 	<doap:revision>0.05</doap:revision>
 </rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r7">
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1505339231r9">
 	<ns1:addition>Let RDF_ENDPOINT_FILE env variable override the Config::JFDI default.</ns1:addition>
 	<ns1:addition>Use a default in-memory store if no config file is available.</ns1:addition>
 	<ns1:update>Added Service Description resultFormat triples for SPARQL XML and JSON Results.</ns1:update>
@@ -85,16 +102,6 @@
 	<ns1:update>Renamed Service Description sd:defaultDatasetDescription property to sd:defaultDataset.</ns1:update>
 	<ns1:update>Require a recent version (0.99) of Plack::Request with support for logging.</ns1:update>
 	<ns1:update>Updated see also link to SPARQL Protocol (1.1).</ns1:update>
-</rdf:Description>
-<rdf:Description rdf:nodeID="r1483632625r8">
-	<doap:created>2011-07-19</doap:created>
-	<doap:revision>0.04</doap:revision>
-</rdf:Description>
-<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:nodeID="r1483632625r9">
-	<ns1:addition>Added RDFa serialization tests (from KjetilK).</ns1:addition>
-	<ns1:update>Allow the service description default graph to be a URI or a blank node (based on config value).</ns1:update>
-	<ns1:update>Fixed bug introduced by commit 3fb5e48 causing query results to disappear from HTML results page.</ns1:update>
-	<ns1:update>Require RDF::RDFa::Generator 0.102 (fixes RDFa service description serialization bug).</ns1:update>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://purl.org/dc/elements/1.1/" rdf:about="file:///Users/greg/data/prog/git/perlrdf/RDF-Endpoint/Changes.ttl">
 	<ns1:description>Changes for RDF::Endpoint</ns1:description>
@@ -110,44 +117,49 @@
 	<foaf:page rdf:resource="http://search.cpan.org/~gwilliams/"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.01.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r15"/>
+	<ns1:changes rdf:nodeID="r1505339231r17"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r14"/>
+	<doap:Version rdf:nodeID="r1505339231r16"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.02.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r13"/>
+	<ns1:changes rdf:nodeID="r1505339231r15"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r12"/>
+	<doap:Version rdf:nodeID="r1505339231r14"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.03.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r11"/>
+	<ns1:changes rdf:nodeID="r1505339231r13"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r10"/>
+	<doap:Version rdf:nodeID="r1505339231r12"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.04.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r9"/>
+	<ns1:changes rdf:nodeID="r1505339231r11"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r8"/>
+	<doap:Version rdf:nodeID="r1505339231r10"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.05.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r7"/>
+	<ns1:changes rdf:nodeID="r1505339231r9"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r6"/>
+	<doap:Version rdf:nodeID="r1505339231r8"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.06.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r5"/>
+	<ns1:changes rdf:nodeID="r1505339231r7"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r4"/>
+	<doap:Version rdf:nodeID="r1505339231r6"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.07.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r3"/>
+	<ns1:changes rdf:nodeID="r1505339231r5"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r2"/>
+	<doap:Version rdf:nodeID="r1505339231r4"/>
 </rdf:Description>
 <rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.08.tar.gz">
-	<ns1:changes rdf:nodeID="r1483632625r1"/>
+	<ns1:changes rdf:nodeID="r1505339231r3"/>
 	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
-	<doap:Version rdf:nodeID="r1483632625r0"/>
+	<doap:Version rdf:nodeID="r1505339231r2"/>
+</rdf:Description>
+<rdf:Description xmlns:ns1="http://aaronland.info/ns/changefile/" rdf:about="http://kasei.us/code/files/RDF-Endpoint-0.09.tar.gz">
+	<ns1:changes rdf:nodeID="r1505339231r1"/>
+	<dc:isVersionOf rdf:resource="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project"/>
+	<doap:Version rdf:nodeID="r1505339231r0"/>
 </rdf:Description>
 <rdf:Description rdf:about="http://purl.org/NET/cpan-uri/dist/RDF-Endpoint/project">
 	<doap:bug-database rdf:resource="http://rt.cpan.org/Dist/Display.html?Queue=RDF-Endpoint"/>

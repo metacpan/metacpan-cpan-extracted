@@ -8,9 +8,9 @@
    IF dc_link_export == "" ; dc_link_export = 1; END;
 %]
 [% IF dc_link_home %]<a class="navLink" href="[% dc_home_url || root_url %]" title="[% root_title %] home">Home</a>[% END +%]
-[% IF dc_link_dchome %]<a class="navLink" href="[% dc_root %]/" title="[% root_title %] DiaColloDB home">DiaCollo</a>[% END +%]
-[% IF dc_link_info %]<a class="navLink" href="[% dc_root %]/info.perl" title="[% root_title %] DiaColloDB information (JSON)">Info</a>[% END +%]
-[% IF dc_link_help %]<a class="navLink" href="[% dc_root %]/help.perl" title="[% root_title %] DiaColloDB help &amp; examples">Help</a>[% END +%]
+[% IF dc_link_dchome %]<a class="navLink" href="./" title="[% root_title %] DiaColloDB home">DiaCollo</a>[% END +%]
+[% IF dc_link_info %]<a class="navLink" href="info.perl" title="[% root_title %] DiaColloDB information (JSON)">Info</a>[% END +%]
+[% IF dc_link_help %]<a class="navLink" href="help.perl" title="[% root_title %] DiaColloDB help &amp; examples">Help</a>[% END +%]
 [% IF dc_link_tutorial %]<a class="navLink" href="//kaskade.dwds.de/diacollo-tutorial/" title="DiaCollo Ttutorial (in German)">Tutorial</a>[% END +%]
 [% IF 0 && dc_link_export %]<a class="navLink" id="export" title="[% root_title %] export">Export</a>[% END +%]
 [%#

@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-WoS/issues
   homepage: https://github.com/LibreCat/Catmandu-WoS
   repository: https://github.com/LibreCat/Catmandu-WoS.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.69'

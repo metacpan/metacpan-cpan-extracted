@@ -1,0 +1,37 @@
+---
+abstract: 'Import functions with lexical scope'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Importer-Zim-Lexical
+provides:
+  Importer::Zim::Lexical:
+    file: lib/Importer/Zim/Lexical.pm
+    version: v0.4.0
+requires:
+  Importer::Zim::Base: v0.3.0
+  Sub::Inject: '0'
+  constant: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Importer-Zim-Lexical/issues
+  homepage: https://github.com/aferreira/cpan-Importer-Zim-Lexical
+  repository: https://github.com/aferreira/cpan-Importer-Zim-Lexical.git
+version: 0.4.0
+x_contributors:
+  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

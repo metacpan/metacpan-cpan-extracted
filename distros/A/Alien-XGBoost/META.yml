@@ -5,7 +5,6 @@ author:
 build_requires:
   Alien::Build: '1.04'
   Alien::Build::MM: '0.32'
-  Alien::git: '0'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0'
   FFI::Platypus: '0'
@@ -35,6 +34,8 @@ name: Alien-XGBoost
 requires:
   Alien::Base: '0'
   Alien::Build: '1.04'
+  Alien::cmake3: '0'
+  Alien::git: '0'
   base: '0'
   perl: '5.008'
   strict: '0'
@@ -43,5 +44,5 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Alien-XGBoost/issues
   homepage: https://github.com/pablrod/p5-Alien-XGBoost
   repository: https://github.com/pablrod/p5-Alien-XGBoost.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.69'

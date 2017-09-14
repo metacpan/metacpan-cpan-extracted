@@ -1,6 +1,5 @@
 package Net::WHMCS::Order;
-$Net::WHMCS::Order::VERSION = '0.08';
-
+$Net::WHMCS::Order::VERSION = '0.09';
 # ABSTRACT: WHMCS API Order
 
 use Moo;
@@ -9,8 +8,8 @@ with 'Net::WHMCS::Base';
 use Carp 'croak';
 
 sub addorder {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'addorder';
+    my ($self, $params) = @_;
+    $params->{action} = 'AddOrder';
     foreach my $r (qw/clientid pid/) {
         croak "$r is required." unless exists $params->{$r};
     }
@@ -18,8 +17,8 @@ sub addorder {
 }
 
 sub acceptorder {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'acceptorder';
+    my ($self, $params) = @_;
+    $params->{action} = 'AcceptOrder';
     foreach my $r (qw/orderid/) {
         croak "$r is required." unless exists $params->{$r};
     }
@@ -27,15 +26,15 @@ sub acceptorder {
 }
 
 sub deleteorder {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'deleteorder';
+    my ($self, $params) = @_;
+    $params->{action} = 'DeleteOrder';
     croak "orderid is required." unless exists $params->{orderid};
     return $self->build_request($params);
 }
 
 sub getproducts {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'getproducts';
+    my ($self, $params) = @_;
+    $params->{action} = 'GetProducts';
     return $self->build_request($params);
 }
 
@@ -53,7 +52,7 @@ Net::WHMCS::Order - WHMCS API Order
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head2 addorder
 
@@ -65,7 +64,7 @@ version 0.08
 		...
 	});
 
-L<http://docs.whmcs.com/API:Add_Order>
+L<https://developers.whmcs.com/api-reference/addorder/>
 
 =head2 acceptorder
 
@@ -73,7 +72,7 @@ L<http://docs.whmcs.com/API:Add_Order>
 		orderid => 1
 	});
 
-L<http://docs.whmcs.com/API:Accept_Order>
+L<https://developers.whmcs.com/api-reference/acceptorder/>
 
 =head2 deleteorder
 
@@ -81,13 +80,13 @@ L<http://docs.whmcs.com/API:Accept_Order>
 		orderid => 1
 	});
 
-L<http://docs.whmcs.com/API:Delete_Order>
+L<https://developers.whmcs.com/api-reference/deleteorder/>
 
 =head2 getproducts
 
 	$client->getproducts();
 
-L<http://docs.whmcs.com/API:Get_Products>
+L<https://developers.whmcs.com/api-reference/getproducts/>
 
 =head1 AUTHOR
 
@@ -95,7 +94,7 @@ Fayland Lam <fayland@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Fayland Lam.
+This software is copyright (c) 2017 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

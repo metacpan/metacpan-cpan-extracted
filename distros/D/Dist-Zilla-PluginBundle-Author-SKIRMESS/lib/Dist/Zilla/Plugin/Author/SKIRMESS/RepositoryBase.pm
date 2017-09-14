@@ -1,0 +1,626 @@
+package Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase;
+
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.010';
+
+use Moose;
+
+with qw(
+  Dist::Zilla::Role::BeforeBuild
+  Dist::Zilla::Role::FileMunger
+  Dist::Zilla::Role::TextTemplate
+);
+
+sub mvp_multivalue_args { return (qw( stopwords travis_ci_ignore_perl )) }
+
+has stopwords => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    default => sub { [] },
+);
+
+has travis_ci_ignore_perl => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    default => sub { [] },
+);
+
+has _travis_available_perl => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [qw(5.26 5.24 5.22 5.20 5.18 5.16 5.14 5.12 5.10 5.8)] },
+    traits  => ['Array'],
+);
+
+use Carp;
+use Config::Std { def_sep => q{=} };
+use List::MoreUtils qw(uniq);
+use Path::Tiny;
+
+use namespace::autoclean;
+
+sub before_build {
+    my ($self) = @_;
+
+    # Files must exist during the "gather files" phase and therefore we're
+    # forced to create them in the "before build" phase.
+    $self->_write_files();
+
+    return;
+}
+
+sub munge_files {
+    my ($self) = @_;
+
+    # Files are already generated in the before build phase.
+    #
+    # But for a release build, the $VERSION of this module changes during the
+    # "munge files" phase. We have to recreate the files during the "munge
+    # files" phase to add the correct version to the generated files.
+    return if !exists $ENV{DZIL_RELEASING};
+
+    # This module is part of the Author::SKIRMESS plugin bundle. The bundle
+    # is either used to release itself, but also to release other
+    # distributions. We must know which kind of build the current build is
+    # because if we build another distribution we are done, the files were
+    # already correctly generated during the "before build" phase.
+    #
+    # But if we are using the bundle to release itself we have to recreate
+    # the generated files because the new version of this plugin was not
+    # known during the "before build" phase.
+    #
+    # If __FILE__ is inside lib of the cwd we are run with Bootstrap::lib
+    # which means we are building the bundle. Otherwise we use the bundle to
+    # build another distribution.
+    return if !path('lib')->realpath->subsumes( path(__FILE__)->realpath() );
+
+    # Ok, we are releasing the bundle itself. That means that $VERSION of
+    # this module is not set correctly as the module was require'd before
+    # the $VERSION was adjusted in the file (during the "munge files" phase).
+    # We have to fix this now to write the correct version to the generated
+    # files.
+
+    # NOTE: Just a reminder if someone wants to refactor this module.
+    # $self->zilla->version() must not be called in the "before build" phase
+    # because it calls _build_version which is going to fail the build.
+    # Besides that, VersionFromMainModule is run during the "munge files"
+    # phase and before that we can't even know the new version of the bundle.
+    #
+    ## no critic (ValuesAndExpressions::RequireConstantVersion)
+    $VERSION = $self->zilla->version;
+
+    # re-write all generated files
+    $self->_write_files();
+
+    return;
+}
+
+sub _write_files {
+    my ($self) = @_;
+
+  FILE:
+    for my $file ( map { path($_) } sort $self->files() ) {
+        if ( -e $file ) {
+            $file->remove();
+        }
+        else {
+            # If the file does not yet exist, the basedir might also not
+            # exist. Create it if required.
+            my $parent = $file->parent();
+            if ( !-e $parent ) {
+                $self->log("Creating directory $parent");
+                $parent->mkpath();
+            }
+        }
+
+        $self->log("Generate file $file");
+
+        # write the file to disk
+        $file->spew( $self->file($file) );
+    }
+
+    return;
+}
+
+# Files to generate
+
+{
+    my %file;
+
+    sub files {
+        my ($self) = @_;
+
+        return keys %file;
+    }
+
+    sub file {
+        my ( $self, $filename ) = @_;
+
+        if ( !exists $file{$filename} ) {
+            $self->log_fatal("File '$filename' is not defined");
+
+            # log_fatal should die
+            croak 'internal error';
+        }
+
+        my $file_content = $file{$filename};
+        if ( ref $file_content eq ref sub { } ) {
+            $file_content = $file_content->($self);
+        }
+
+        # process the file template
+        return $self->fill_in_string(
+            $file_content,
+            {
+                plugin => \$self,
+            }
+        );
+    }
+
+    #.perlcriticrc
+    $file{q{.perlcriticrc}} = sub {
+        my ($self) = @_;
+
+        my $perlcriticrc_template = <<'PERLCRITICRC_TEMPLATE';
+# Automatically generated file
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+severity = 1
+only = 1
+
+[BuiltinFunctions::ProhibitBooleanGrep]
+[BuiltinFunctions::ProhibitComplexMappings]
+[BuiltinFunctions::ProhibitLvalueSubstr]
+[BuiltinFunctions::ProhibitReverseSortBlock]
+[BuiltinFunctions::ProhibitSleepViaSelect]
+[BuiltinFunctions::ProhibitStringyEval]
+[BuiltinFunctions::ProhibitStringySplit]
+[BuiltinFunctions::ProhibitUniversalCan]
+[BuiltinFunctions::ProhibitUniversalIsa]
+[BuiltinFunctions::ProhibitUselessTopic]
+[BuiltinFunctions::ProhibitVoidGrep]
+[BuiltinFunctions::ProhibitVoidMap]
+[BuiltinFunctions::RequireBlockGrep]
+[BuiltinFunctions::RequireBlockMap]
+[BuiltinFunctions::RequireGlobFunction]
+[BuiltinFunctions::RequireSimpleSortBlock]
+[ClassHierarchies::ProhibitAutoloading]
+[ClassHierarchies::ProhibitExplicitISA]
+[ClassHierarchies::ProhibitOneArgBless]
+[CodeLayout::ProhibitHardTabs]
+[CodeLayout::ProhibitParensWithBuiltins]
+[CodeLayout::ProhibitQuotedWordLists]
+[CodeLayout::ProhibitTrailingWhitespace]
+[CodeLayout::RequireConsistentNewlines]
+[CodeLayout::RequireTidyCode]
+[CodeLayout::RequireTrailingCommas]
+[ControlStructures::ProhibitCStyleForLoops]
+[ControlStructures::ProhibitCascadingIfElse]
+[ControlStructures::ProhibitDeepNests]
+[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+[ControlStructures::ProhibitMutatingListFunctions]
+[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+[ControlStructures::ProhibitPostfixControls]
+[ControlStructures::ProhibitUnlessBlocks]
+[ControlStructures::ProhibitUnreachableCode]
+[ControlStructures::ProhibitUntilBlocks]
+[ControlStructures::ProhibitYadaOperator]
+[Documentation::PodSpelling]
+[Documentation::RequirePackageMatchesPodName]
+[Documentation::RequirePodAtEnd]
+[Documentation::RequirePodLinksIncludeText]
+[ErrorHandling::RequireCarping]
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+[InputOutput::ProhibitBacktickOperators]
+[InputOutput::ProhibitBarewordFileHandles]
+[InputOutput::ProhibitExplicitStdin]
+[InputOutput::ProhibitInteractiveTest]
+[InputOutput::ProhibitJoinedReadline]
+[InputOutput::ProhibitOneArgSelect]
+[InputOutput::ProhibitReadlineInForLoop]
+[InputOutput::ProhibitTwoArgOpen]
+[InputOutput::RequireBracedFileHandleWithPrint]
+[InputOutput::RequireCheckedClose]
+[InputOutput::RequireCheckedOpen]
+[InputOutput::RequireCheckedSyscalls]
+[InputOutput::RequireEncodingWithUTF8Layer]
+[Miscellanea::ProhibitFormats]
+[Miscellanea::ProhibitTies]
+[Miscellanea::ProhibitUnrestrictedNoCritic]
+[Miscellanea::ProhibitUselessNoCritic]
+[Modules::ProhibitAutomaticExportation]
+[Modules::ProhibitConditionalUseStatements]
+[Modules::ProhibitEvilModules]
+[Modules::ProhibitExcessMainComplexity]
+[Modules::ProhibitMultiplePackages]
+[Modules::RequireBarewordIncludes]
+[Modules::RequireEndWithOne]
+[Modules::RequireExplicitPackage]
+[Modules::RequireFilenameMatchesPackage]
+[Modules::RequireNoMatchVarsWithUseEnglish]
+[NamingConventions::Capitalization]
+[NamingConventions::ProhibitAmbiguousNames]
+[Objects::ProhibitIndirectSyntax]
+[References::ProhibitDoubleSigils]
+[RegularExpressions::ProhibitCaptureWithoutTest]
+[RegularExpressions::ProhibitComplexRegexes]
+[RegularExpressions::ProhibitEnumeratedClasses]
+[RegularExpressions::ProhibitEscapedMetacharacters]
+[RegularExpressions::ProhibitFixedStringMatches]
+[RegularExpressions::ProhibitSingleCharAlternation]
+[RegularExpressions::ProhibitUnusedCapture]
+[RegularExpressions::ProhibitUnusualDelimiters]
+[RegularExpressions::ProhibitUselessTopic]
+[RegularExpressions::RequireBracesForMultiline]
+[RegularExpressions::RequireDotMatchAnything]
+[RegularExpressions::RequireExtendedFormatting]
+[RegularExpressions::RequireLineBoundaryMatching]
+[Subroutines::ProhibitAmpersandSigils]
+[Subroutines::ProhibitBuiltinHomonyms]
+[Subroutines::ProhibitExcessComplexity]
+[Subroutines::ProhibitExplicitReturnUndef]
+[Subroutines::ProhibitManyArgs]
+[Subroutines::ProhibitNestedSubs]
+[Subroutines::ProhibitReturnSort]
+[Subroutines::ProhibitSubroutinePrototypes]
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+[Subroutines::ProtectPrivateSubs]
+[Subroutines::RequireArgUnpacking]
+[Subroutines::RequireFinalReturn]
+[TestingAndDebugging::ProhibitNoStrict]
+[TestingAndDebugging::ProhibitNoWarnings]
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+[TestingAndDebugging::RequireTestLabels]
+[TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[ValuesAndExpressions::ProhibitComplexVersion]
+[ValuesAndExpressions::ProhibitConstantPragma]
+[ValuesAndExpressions::ProhibitEmptyQuotes]
+[ValuesAndExpressions::ProhibitEscapedCharacters]
+[ValuesAndExpressions::ProhibitImplicitNewlines]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[ValuesAndExpressions::ProhibitLeadingZeros]
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+[ValuesAndExpressions::ProhibitMagicNumbers]
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[ValuesAndExpressions::ProhibitNoisyQuotes]
+[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+[ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+[ValuesAndExpressions::ProhibitVersionStrings]
+[ValuesAndExpressions::RequireConstantVersion]
+[ValuesAndExpressions::RequireInterpolationOfMetachars]
+[ValuesAndExpressions::RequireNumberSeparators]
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+[Variables::ProhibitAugmentedAssignmentInDeclaration]
+[Variables::ProhibitConditionalDeclarations]
+[Variables::ProhibitEvilVariables]
+[Variables::ProhibitLocalVars]
+[Variables::ProhibitMatchVars]
+[Variables::ProhibitPackageVars]
+[Variables::ProhibitPerl4PackageNames]
+[Variables::ProhibitPunctuationVars]
+allow = $! $/
+[Variables::ProhibitReusedNames]
+[Variables::ProhibitUnusedVariables]
+[Variables::ProtectPrivateVars]
+[Variables::RequireInitializationForLocalVars]
+[Variables::RequireLexicalLoopIterators]
+[Variables::RequireLocalizedPunctuationVars]
+[Variables::RequireNegativeIndices]
+
+[Moose::ProhibitDESTROYMethod]
+[Moose::ProhibitLazyBuild]
+[Moose::ProhibitMultipleWiths]
+[Moose::ProhibitNewMethod]
+[Moose::RequireCleanNamespace]
+[Moose::RequireMakeImmutable]
+PERLCRITICRC_TEMPLATE
+
+        # Conig::Std will not preserve a comment on the last line, therefore
+        # we append at least one empty line at the end
+        $perlcriticrc_template .= "\n\n";
+
+        read_config \$perlcriticrc_template, my %perlcriticrc;
+
+        my $perlcriticrc_local = 'perlcriticrc.local';
+
+        if ( -f $perlcriticrc_local ) {
+            $self->log("Adjusting Perl::Critic config from '$perlcriticrc_local'");
+
+            read_config $perlcriticrc_local, my %perlcriticrc_local;
+
+            my %local_seen = ();
+
+          POLICY:
+            for my $policy ( keys %perlcriticrc_local ) {
+
+                if ( $policy eq q{-} ) {
+                    $self->log_fatal('We cannot disable the global settings');
+
+                    # log_fatal should die
+                    croak 'internal error';
+                }
+
+                my $policy_name = $policy =~ m{ ^ - (.+) }xsm ? $1 : $policy;
+                my $disable     = $policy =~ m{ ^ - . }xsm    ? 1  : 0;
+
+                if ( exists $local_seen{$policy_name} ) {
+                    $self->log_fatal("There are multiple entries for policy '$policy_name' in '$perlcriticrc_local'.");
+
+                    # log_fatal should die
+                    croak 'internal error';
+                }
+
+                $local_seen{$policy_name} = 1;
+
+                delete $perlcriticrc{$policy_name};
+
+                if ( $policy =~ m{ ^ - }xsm ) {
+                    $self->log("Disabling policy '$policy_name'");
+                    next POLICY;
+                }
+
+                if ( $policy eq q{} ) {
+                    $self->log('Custom global settings');
+                }
+                else {
+                    $self->log("Custom configuration for policy '$policy_name'");
+                }
+
+                $perlcriticrc{$policy_name} = $perlcriticrc_local{$policy_name};
+            }
+        }
+
+        if ( ( !exists $perlcriticrc{q{}}{only} ) or ( $perlcriticrc{q{}}{only} ne '1' ) ) {
+            $self->log(q{Setting global option 'only' back to '1'});
+            $perlcriticrc{q{}}{only} = '1';
+        }
+
+        my $content;
+        write_config %perlcriticrc, \$content;
+
+        return $content;
+    };
+
+    # .perltidyrc
+    $file{q{.perltidyrc}} = <<'PERLTIDYRC';
+# Automatically generated file
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+--maximum-line-length=0
+--break-at-old-comma-breakpoints
+--backup-and-modify-in-place
+--output-line-ending=unix
+PERLTIDYRC
+
+    # .travis.yml
+    $file{q{.travis.yml}} = sub {
+        my ($self) = @_;
+
+        my $travis_yml = <<'TRAVIS_YML_1';
+# Automatically generated file
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+language: perl
+perl:
+TRAVIS_YML_1
+
+        my %perl;
+        @perl{ @{ $self->_travis_available_perl } } = ();
+        delete @perl{ @{ $self->travis_ci_ignore_perl } };
+        my @perl = reverse sort keys %perl;
+
+        croak "No perl versions selected for TravisCI\n" if !@perl;
+
+        for my $perl (@perl) {
+            $travis_yml .= "  - '$perl'\n";
+        }
+
+        $travis_yml .= <<'TRAVIS_YML';
+before_install:
+  - export AUTOMATED_TESTING=1
+install:
+  - cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .
+script:
+  - perl Makefile.PL && make test
+  - test -d xt/author && prove -lr xt/author
+  - make manifest
+  - test -d xt/release && prove -lr xt/release
+TRAVIS_YML
+
+        return $travis_yml;
+    };
+
+    # test header
+    my $test_header = <<'_TEST_HEADER';
+#!perl
+
+use 5.006;
+use strict;
+use warnings;
+
+# this test was generated with
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+_TEST_HEADER
+
+    # xt/author/clean-namespaces.t
+    $file{q{xt/author/clean-namespaces.t}} = $test_header . <<'XT_AUTHOR_CLEAN_NAMESPACES_T';
+use Test::CleanNamespaces;
+
+all_namespaces_clean();
+XT_AUTHOR_CLEAN_NAMESPACES_T
+
+    # xt/author/critic.t
+    $file{q{xt/author/critic.t}} = $test_header . <<'XT_AUTHOR_CRITIC_T';
+use File::Spec;
+
+use Perl::Critic::Utils qw(all_perl_files);
+use Test::More;
+use Test::Perl::Critic;
+
+my @dirs = qw(bin lib t xt);
+
+my @ignores = ();
+my %file;
+@file{ all_perl_files(@dirs) } = ();
+delete @file{@ignores};
+my @files = keys %file;
+
+if ( @files == 0 ) {
+    BAIL_OUT('no files to criticize found');
+}
+
+all_critic_ok(@files);
+XT_AUTHOR_CRITIC_T
+
+    # xt/author/minimum_version.t
+    $file{q{xt/author/minimum_version.t}} = $test_header . <<'XT_AUTHOR_MINIMUM_VERSION_T';
+use Test::MinimumVersion 0.008;
+
+all_minimum_version_from_metayml_ok();
+XT_AUTHOR_MINIMUM_VERSION_T
+
+    # xt/author/mojibake.t
+    $file{q{xt/author/mojibake.t}} = $test_header . <<'XT_AUTHOR_MOJIBAKE_T';
+use Test::Mojibake;
+
+all_files_encoding_ok( grep { -d } qw( bin lib t xt ) );
+XT_AUTHOR_MOJIBAKE_T
+
+    # xt/author/no-tabs.t
+    $file{q{xt/author/no-tabs.t}} = $test_header . <<'XT_AUTHOR_NO_TABS_T';
+use Test::NoTabs;
+
+all_perl_files_ok( grep { -d } qw( bin lib t xt ) );
+XT_AUTHOR_NO_TABS_T
+
+    # xt/author/pod-no404s.t
+    $file{q{xt/author/pod-no404s.t}} = $test_header . <<'XT_AUTHOR_POD_NO404S_T';
+if ( exists $ENV{AUTOMATED_TESTING} ) {
+    print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
+    exit 0;
+}
+
+use Test::Pod::No404s;
+
+all_pod_files_ok();
+XT_AUTHOR_POD_NO404S_T
+
+    # xt/author/pod-spell.t
+    $file{q{xt/author/pod-spell.t}} = sub {
+        my ($self) = @_;
+
+        my $content = $test_header . <<'XT_AUTHOR_POD_SPELL_T';
+use Test::Spelling 0.12;
+use Pod::Wordlist;
+
+add_stopwords(<DATA>);
+
+all_pod_files_spelling_ok( grep { -d } qw( bin lib t xt ) );
+__DATA__
+XT_AUTHOR_POD_SPELL_T
+
+        my @stopwords = grep { defined && !m{ ^ \s* $ }xsm } @{ $self->stopwords };
+        push @stopwords, split /\s/xms, join q{ }, @{ $self->zilla->authors };
+
+        $content .= join "\n", uniq( sort @stopwords ), q{};
+
+        return $content;
+    };
+
+    # xt/author/pod-syntax.t
+    $file{q{xt/author/pod-syntax.t}} = $test_header . <<'XT_AUTHOR_POD_SYNTAX_T';
+use Test::Pod 1.26;
+
+all_pod_files_ok( grep { -d } qw( bin lib t xt) );
+XT_AUTHOR_POD_SYNTAX_T
+
+    # xt/author/portability.t
+    $file{q{xt/author/portability.t}} = $test_header . <<'XT_AUTHOR_PORTABILITY_T';
+BEGIN {
+    if ( !-f 'MANIFEST' ) {
+        print "1..0 # SKIP No MANIFEST file\n";
+        exit 0;
+    }
+}
+
+use Test::Portability::Files;
+
+options( test_one_dot => 0 );
+run_tests();
+XT_AUTHOR_PORTABILITY_T
+
+    # xt/author/test-version.t
+    $file{q{xt/author/test-version.t}} = $test_header . <<'XT_AUTHOR_TEST_VERSION_T';
+use Test::More 0.88;
+use Test::Version 0.04 qw( version_all_ok ), {
+    consistent  => 1,
+    has_version => 1,
+    is_strict   => 0,
+    multiple    => 0,
+};
+
+version_all_ok;
+done_testing();
+XT_AUTHOR_TEST_VERSION_T
+
+    # xt/release/changes.t
+    $file{q{xt/release/changes.t}} = $test_header . <<'XT_RELEASE_CHANGES_T';
+use Test::CPAN::Changes;
+
+changes_ok();
+XT_RELEASE_CHANGES_T
+
+    # xt/release/eol.t
+    $file{q{xt/release/eol.t}} = $test_header . <<'XT_RELEASE_EOL_T';
+use Test::EOL;
+
+all_perl_files_ok( { trailing_whitespace => 1 }, grep { -d } qw( bin lib t xt) );
+XT_RELEASE_EOL_T
+
+    # xt/release/kwalitee.t
+    $file{q{xt/release/kwalitee.t}} = $test_header . <<'XT_RELEASE_KWALITEE_T';
+use Test::More 0.88;
+use Test::Kwalitee 'kwalitee_ok';
+
+# Module::CPANTS::Analyse does not find the LICENSE in scripts that don't end in .pl
+kwalitee_ok(qw{-has_license_in_source_file -has_abstract_in_pod});
+
+done_testing();
+XT_RELEASE_KWALITEE_T
+
+    # xt/release/manifest.t
+    $file{q{xt/release/manifest.t}} = $test_header . <<'XT_RELEASE_MANIFEST_T';
+use Test::DistManifest 1.003;
+
+manifest_ok();
+XT_RELEASE_MANIFEST_T
+
+    # xt/release/meta-json.t
+    $file{q{xt/release/meta-json.t}} = $test_header . <<'XT_RELEASE_META_JSON_T';
+use Test::CPAN::Meta::JSON;
+
+meta_json_ok();
+XT_RELEASE_META_JSON_T
+
+    # xt/release/meta-yaml.t
+    $file{q{xt/release/meta-yaml.t}} = $test_header . <<'XT_RELEASE_META_YAML_T';
+use Test::CPAN::Meta 0.12;
+
+meta_yaml_ok();
+XT_RELEASE_META_YAML_T
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+# vim: ts=4 sts=4 sw=4 et: syntax=perl

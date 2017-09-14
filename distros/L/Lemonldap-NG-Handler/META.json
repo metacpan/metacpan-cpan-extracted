@@ -49,13 +49,13 @@
             "Apache::Session::Generate::MD5" : "0",
             "CGI" : "3.08",
             "LWP" : "0",
-            "Lemonldap::NG::Common" : "v1.9.11",
+            "Lemonldap::NG::Common" : "v1.9.12",
             "Mouse" : "0",
             "URI" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.9.11",
+   "version" : "v1.9.12",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

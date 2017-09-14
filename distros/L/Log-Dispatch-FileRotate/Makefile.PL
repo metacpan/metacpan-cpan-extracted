@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,27 +14,29 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Log-Dispatch-FileRotate",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Log::Dispatch::FileRotate",
   "PREREQ_PM" => {
     "Date::Manip" => 0,
+    "Exporter" => 0,
     "Fcntl" => 0,
     "File::Spec" => 0,
     "Log::Dispatch::File" => 0,
     "Log::Dispatch::Output" => 0,
-    "Params::Validate" => 0,
     "base" => 0,
     "strict" => 0,
-    "version" => 0
+    "version" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Encode" => 0,
     "POSIX" => 0,
     "Path::Tiny" => "0.018",
     "Test::More" => "0.88",
     "Test::Warn" => 0,
-    "warnings" => 0
+    "utf8" => 0
   },
-  "VERSION" => "1.30",
+  "VERSION" => "1.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,17 +45,19 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Date::Manip" => 0,
+  "Encode" => 0,
+  "Exporter" => 0,
   "Fcntl" => 0,
   "File::Spec" => 0,
   "Log::Dispatch::File" => 0,
   "Log::Dispatch::Output" => 0,
   "POSIX" => 0,
-  "Params::Validate" => 0,
   "Path::Tiny" => "0.018",
   "Test::More" => "0.88",
   "Test::Warn" => 0,
   "base" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "version" => 0,
   "warnings" => 0
 );

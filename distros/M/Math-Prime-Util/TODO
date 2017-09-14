@@ -110,22 +110,21 @@
 
 - More Montgomery: znlog, catalan
 
-- verify chinese to GMP is ok
-
-- numtoperm and permtonum.
-  Perhaps Bonet: https://github.com/soniakeys/perm/blob/master/lex.go
-  Also consider randperm(n)
-
 - polymul, polyadd, polydiv, polyneg, polyeval, polyorder, polygcd, polylcm, polyroots, ...
   A lot of our ops do these mod n, we could make ..mod versions of each.
 
----- \/ ------  Next release
-
-- put entropy_bytes call in XS.
 - have the RNG return a context and store it in our package context space.
   Should help threaded performance by removing lock.
   Careful to not leak state.
-- further processing on Ramanujan prime limits up to 4e14
-- consider random_nbit_semiprime(n, f = 0.5) f between 0 and 0.5
 
-- 5.8.5 gcdext complains about 3 vs. '3'.  ancient Test::More issue?
+- 5.8.5 gcdext complains about 3 vs. '3'.  Another Math::BigInt::Lite issue.
+
+- use word-based for-sieve for non-segment.
+
+- remove start/end partial word tests from inner loop in for-sieve.
+
+- sieve.h and util.h should get along better.
+
+- compare wheel_t with primes separated and possibly cached.
+
+- Ensure 'secure' is secure.

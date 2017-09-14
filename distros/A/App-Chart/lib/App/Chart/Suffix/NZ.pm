@@ -1,6 +1,6 @@
 # New Zealand Stock Exchange setups.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -35,7 +35,7 @@ use App::Chart::Weblink;
 use App::Chart::Yahoo;
 
 # uncomment this to run the ### lines
-#use Devel::Comments;
+# use Smart::Comments;
 
 
 our $timezone_newzealand = App::Chart::TZ->new
@@ -75,7 +75,10 @@ $App::Chart::Google::google_web_pred->add ($pred_shares);
 #------------------------------------------------------------------------------
 # weblink - NZX company info
 #
-# Eg. http://www.nzx.com/markets/NZSX/TEL
+# Eg. https://www.nzx.com/markets/NZSX/securities/FBU
+# 
+# cf top by value traded,
+# https://www.nzx.com/markets/NZSX/securities/values
 
 App::Chart::Weblink->new
   (pred => $pred_shares,
@@ -83,7 +86,7 @@ App::Chart::Weblink->new
    desc => __('Open web browser at the New Zealand Stock Exchange page for this stock'),
    proc => sub {
      my ($symbol) = @_;
-     return 'http://www.nzx.com/markets/NZSX/'
+     return 'https://www.nzx.com/markets/NZSX/securities/'
        . URI::Escape::uri_escape (App::Chart::symbol_sans_suffix ($symbol));
    });
 
@@ -94,7 +97,7 @@ App::Chart::Weblink->new
 # This uses the dividend page at
 #
 use constant DIVIDENDS_URL =>
-  'https://www.nzx.com/markets/NZSX/';
+  'https://www.nzx.com/markets/NZSX';
 
 App::Chart::DownloadHandler::DividendsPage->new
   (name     => __('NZX dividends'),
@@ -116,7 +119,9 @@ sub dividends_parse {
             resp          => $resp,
             dividends     => \@dividends,
             copyright_key => 'NZ-dividends-copyright',
-            copyright     => 'http://www.nzx.com/terms' };
+            copyright     => 'http://www.nzx.com/terms',
+            date_format  => 'dmy', # dates like "16/08/2017"
+          };
 
   # Column "Dividend Period" for "interim" or "final" not very interesting.
   # FIXME: what's the "Supp." column?
@@ -134,6 +139,7 @@ sub dividends_parse {
     die "NZX dividend table not matched";
   }
 
+  my $count = 0;
   foreach my $ts ($te->tables) {
     foreach my $row ($ts->rows) {
       my ($symbol, $ex_date, $pay_date, $amount, $currency, $imput)
@@ -146,6 +152,7 @@ sub dividends_parse {
         dividend_parse ($symbol, $ex_date,$pay_date,$amount, $currency,$imput);
     }
   }
+  App::Chart::Download::verbose_message ("NZX dividends total $count found");
   return $h;
 }
 
@@ -156,10 +163,6 @@ sub dividend_parse {
   $amount = App::Chart::collapse_whitespace ($amount);
   $imput  = App::Chart::collapse_whitespace ($imput);
   $currency = App::Chart::collapse_whitespace ($currency);
-
-  # dates like "16 Aug"
-  $ex_date  = dm_str_to_nearest_iso ($ex_date);
-  $pay_date = dm_str_to_nearest_iso ($pay_date);
 
   foreach ($amount, $imput) {
     # eg. "3.900c" with c for cents
@@ -188,18 +191,6 @@ sub dividend_parse {
            amount     => $amount,
            imputation => $imput,
            note       => $note };
-}
-
-sub dm_str_to_nearest_iso {
-  my ($str) = @_;
-  require Date::Parse;
-  my ($sec, $min, $hour, $mday, $mon, $year) = Date::Parse::strptime($str);
-  if ($year) {
-    $year += 1900;
-  } else {
-    $year = App::Chart::Download::month_to_nearest_year ($mon+1);
-  }
-  return App::Chart::ymd_to_iso ($year, $mon+1, $mday);
 }
 
 1;

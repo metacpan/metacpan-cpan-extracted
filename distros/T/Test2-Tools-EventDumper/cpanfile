@@ -1,5 +1,5 @@
-requires "Test2" => "1.302015";
-requires "Test2::Suite" => "0.000030";
+requires "Test2" => "1.302096";
+requires "Test2::Suite" => "0.000075";
 requires "perl" => "5.008001";
 
 on 'configure' => sub {

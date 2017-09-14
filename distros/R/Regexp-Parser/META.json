@@ -1,0 +1,55 @@
+{
+   "abstract" : "base class for parsing regexes",
+   "author" : [
+      "Jeff japhy Pinyan <japhy@perlmonk.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Regexp-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/toddr/Regexp-Parser/issues"
+      },
+      "homepage" : "http://wiki.github.com/toddr/Regexp-Parser",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/toddr/Regexp-Parser/tree/master"
+      }
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

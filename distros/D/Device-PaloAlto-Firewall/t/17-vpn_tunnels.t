@@ -17,7 +17,7 @@ my $test = $fw->tester();
 # No configuration
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_tunnels_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->vpn_tunnels(), 'ARRAY', "No IPSEC configured returns ARRAYREF" );
+isa_ok( $fw->vpn_tunnels(), 'ARRAY' );
 is_deeply( $fw->vpn_tunnels(), [] , "No IPSEC configured returns an empty ARRAYREF" );
 
 ok( !$test->vpn_tunnels_up(peer_ips => ['192.168.122.30']), "No IPSEC config returns 0" );
@@ -25,21 +25,21 @@ ok( !$test->vpn_tunnels_up(peer_ips => ['192.168.122.30']), "No IPSEC config ret
 # No IKE or IPSEC up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ike_no_ipsec_up() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->vpn_tunnels(), 'ARRAY', "No IKE or IPSEC up returns ARRAYREF" );
+isa_ok( $fw->vpn_tunnels(), 'ARRAY' );
 
 ok( !$test->vpn_tunnels_up(peer_ips => ['192.168.122.30']), "No IKE or IPSEC up returns 0" );
 
 # IKE up, IPSEC down
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ike_up_ipsec_down() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->vpn_tunnels(), 'ARRAY', "IKE up IPSEC down returns ARRAYREF" );
+isa_ok( $fw->vpn_tunnels(), 'ARRAY' );
 
 ok( !$test->vpn_tunnels_up(peer_ips => ['192.168.122.30']), "IKE up, IPSEC down returns 0" );
 
 # All up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( all_up() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->vpn_tunnels(), 'ARRAY', "IKE up and IPSEC up returns ARRAYREF" );
+isa_ok( $fw->vpn_tunnels(), 'ARRAY' );
 
 ok( $test->vpn_tunnels_up(peer_ips => ['192.168.122.30']), "IKE and IPSEC up returns 1" );
 ok( !$test->vpn_tunnels_up(peer_ips => ['192.168.122.30', '192.168.1.29']), "One peer up, one peer down returns 0" );

@@ -22,25 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113148;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[24-6]',
-                  'pattern' => '(\\d{2})(\\d{5,7})'
+                  'pattern' => '(\\d{2})(\\d{5,7})',
+                  'leading_digits' => '[24-6]'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{6})',
                   'leading_digits' => '7'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '[89]'
+                  'leading_digits' => '[89]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(900[02-9]\\d{5})',
+                'personal_number' => '',
                 'geographic' => '
           20\\d{6,7}|
           4(?:
@@ -58,18 +58,16 @@ my $validators = {
             6\\d{6,7}
           )
         ',
-                'personal_number' => '',
-                'voip' => '',
                 'pager' => '',
-                'toll_free' => '800[24-8]\\d{5,6}',
                 'mobile' => '
           7(?:
             [0-3679]\\d|
-            4[0-479]|
+            4[0-46-9]|
             5[0-6]|
             8[0-25-9]
           )\\d{6}
         ',
+                'toll_free' => '800[24-8]\\d{5,6}',
                 'fixed_line' => '
           20\\d{6,7}|
           4(?:
@@ -86,7 +84,9 @@ my $validators = {
             2\\d{7}|
             6\\d{6,7}
           )
-        '
+        ',
+                'specialrate' => '(900[02-9]\\d{5})',
+                'voip' => ''
               };
 my %areanames = (
   25420 => "Nairobi",

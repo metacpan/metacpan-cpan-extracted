@@ -1,5 +1,32 @@
 Revision history for Perl extension JSONP.
 
+1.76
+
+	- always serialize as ASCII with "\uxyzw" escaping for non-ascii chars to prevent any corruption for data traversing non-utf8 compatibile media streams 
+	- graft will keep to assume encoded UTF-8 JSON strings according to Postel's principle
+
+1.75
+
+	- fix bug on serialize when "pretty" is not defined
+
+1.74
+
+	- fix bug on serialize defaulting to "pretty" to true - thanks Robert Acock for reporting it
+
+1.73
+
+	- corrections on this "Changes" file and some typos in POD
+
+1.70
+
+	- make JSONP compatible with perlcritic
+	- fixed bug where JSONP returning 'true' and 'false' strings instead of true and false JSON values - thanks Robert Acock
+	- fixed bug preventing serialization of array nodes - thanks Robert Acock
+	- addition of "file" method call, more flexible than "sendfile" one, courtesy of Robert Acock
+	- addition of "pretty" call
+	- slight performance improvement in _bless_tree - thanks Robert Acock
+	- slight performance improvement in TO_JSON when serializing arrays - thanks Robert Acock
+
 1.61
 
 	- fixed a bug preventing replacement of a leaf with a new node

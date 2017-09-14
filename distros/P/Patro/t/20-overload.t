@@ -3,8 +3,7 @@ use Patro ':test';
 use strict;
 use warnings;
 
-if (!eval "use Math::BigInt; Math::BigInt->VERSION >= 1.997" &&
-    $threads::threads) {
+if (!eval "use Math::BigInt; Math::BigInt->VERSION >= 1.997") {
 
     # Math::BigInt prior to 1.997 has bug for shared objects
     ok(1,"SKIP - Math::BigInt not available");

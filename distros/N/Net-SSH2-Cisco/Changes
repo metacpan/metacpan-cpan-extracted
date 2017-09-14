@@ -1,5 +1,23 @@
 Revision history for Perl extension Net::SSH2::Cisco.
 
+0.04  Mon Sep 11 08:00:00 2017
+    - Thanks to Eric Smid for reporting, tracking down the cause of, 
+      proposing a fix for and testing the pesky newline issue in RT 122919.
+    - Fix RT 122919: _normalize() always running.  Moves to waitfor()
+    - _normalize() changed to address Net::Telnet::Cisco RT 118170.
+      Also changed in Net::Telnet::Cisco 1.11.
+    - Change -binmode to emulate Net::Telnet:
+      Replace \015\012 with \012 in waitfor() via _interpret_cr().
+      NOTE:  Dump and input logs were already and still are the same 
+      between us and Net::Telnet::Cisco.
+    - Added _interpret_cr() from Net::Telnet to address above.
+    - Fix undiscovered bug in enable() removing $error.
+    - Change put() to print() in enable() to better align with 
+      Net::Telnet::Cisco.
+    - Check for '' instead of not defined for $en_level to catch enable() 
+      success or failure (also changed in Net::Telnet::Cisco 1.11).
+    - Added more_prompt named arg to new() (bug, was missing).
+
 0.03  Mon Oct 10 15:33:04 2016
     - Fix ignore_warnings parameter and added warnings() sub.  Seems this 
       was missing in Net::Telnet::Cisco so wasn't ported.  Thanks to 

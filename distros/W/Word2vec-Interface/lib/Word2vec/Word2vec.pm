@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 04/08/2017                                                             #
+#    Revised: 09/04/2017                                                             #
 #    UMLS Similarity Word2Vec Executable Interface Module                            #
 #                                                                                    #
 ######################################################################################
@@ -37,7 +37,7 @@ use Encode qw( decode encode );
 
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 
 ######################################################################################
@@ -135,11 +135,10 @@ sub new
     # Try To Locate Word2Vec Executable Files Path
     for my $dir ( @INC )
     {
-        $self->{ _word2VecExeDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                                    # Test Directory
-        $self->{ _word2VecExeDir } = "$dir/lib/Word2Vec/External/Word2vec" if ( -e "$dir/lib/Word2Vec/External/Word2vec" );          # Distribution Package Test Directory
-        $self->{ _word2VecExeDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                              # Dev Directory
-        $self->{ _word2VecExeDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );                        # Dev Directory
-        $self->{ _word2VecExeDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );                  # Release Directory
+        $self->{ _word2VecExeDir } = "$dir/External/Word2vec" if ( -e "$dir/External/Word2vec" );                       # Test Directory
+        $self->{ _word2VecExeDir } = "$dir/../External/Word2vec" if ( -e "$dir/../External/Word2vec" );                 # Dev Directory
+        $self->{ _word2VecExeDir } = "$dir/../../External/Word2vec" if ( -e "$dir/../../External/Word2vec" );           # Dev Directory
+        $self->{ _word2VecExeDir } = "$dir/Word2vec/External/Word2vec" if ( -e "$dir/Word2vec/External/Word2vec" );     # Release Directory
     }
 
     # Open File Handler if checked variable is true
@@ -351,7 +350,7 @@ sub ComputeCosineSimilarity
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "ComputeCosineSimilarity - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "ComputeCosineSimilarity - Error: Function Requires Two Arguments (Words)" ) if !defined ( $wordA ) || !defined ( $wordB );
     return undef if !defined ( $wordA ) || !defined ( $wordB );
 
@@ -433,7 +432,7 @@ sub ComputeAvgOfWordsCosineSimilarity
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "ComputeAvgOfWordsCosineSimilarity - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "ComputeAvgOfWordsCosineSimilarity - Error: Function Requires Two Arguments (Words)" ) if !defined ( $wordA ) || !defined ( $wordB );
     return undef if !defined ( $wordA ) || !defined ( $wordB );
 
@@ -443,6 +442,10 @@ sub ComputeAvgOfWordsCosineSimilarity
 
     my @wordAAry = split( ' ', $wordA );
     my @wordBAry = split( ' ', $wordB );
+
+    # Check(s)
+    $self->WriteLog( "ComputeAvgOfWordsCosineSimilarity - Error: One Or More Arguments Contains No Data" ) if ( @wordAAry == 0 || @wordBAry == 0 );
+    return undef if ( @wordAAry == 0 || @wordBAry == 0 );
 
     $wordA = $self->ComputeAverageOfWords( \@wordAAry );
     $wordB = $self->ComputeAverageOfWords( \@wordBAry );
@@ -509,15 +512,18 @@ sub ComputeAvgOfWordsCosineSimilarity
 
 sub ComputeMultiWordCosineSimilarity
 {
-    my ( $self, $wordA, $wordB ) = @_;
+    my ( $self, $wordA, $wordB, $allWordsMustExist ) = @_;
 
     # Check(s)
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: Function Requires Two Arguments (Words)" ) if !defined ( $wordA ) || !defined ( $wordB );
     return undef if !defined ( $wordA ) || !defined ( $wordB );
+
+    $self->WriteLog( "ComputeMultiWordCosineSimilarity - Warning: \"All Words Must Exist\" Parameter Not Specified / Default = False" ) if !defined( $allWordsMustExist );
+    $allWordsMustExist = 0 if !defined( $allWordsMustExist );
 
     $self->WriteLog( "ComputeMultiWordCosineSimilarity - Computing Cosine Similarity Of Words: \"$wordA\" and \"$wordB\"" );
 
@@ -530,6 +536,10 @@ sub ComputeMultiWordCosineSimilarity
     my @wordBAry = split( ' ', $wordB );
     my $wordsFoundA = "";
     my $wordsFoundB = "";
+
+    # Check(s)
+    $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: One Or More Arguments Contains No Data" ) if ( @wordAAry == 0 || @wordBAry == 0 );
+    return undef if ( @wordAAry == 0 || @wordBAry == 0 );
 
     # Search Dictionary For Specified Words
     for my $word ( @wordAAry )
@@ -562,14 +572,17 @@ sub ComputeMultiWordCosineSimilarity
     for( my $i = 0; $i < @wordAAry; $i++ )
     {
         $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: \"" . $wordAAry[$i] . "\" Not In Dictionary" ) if index( $wordsFoundA, $wordAAry[$i] ) == -1;
-        $error = 1 if index( $wordsFoundA, $wordAAry[$i] ) == -1;
+        $error = 1 if index( $wordsFoundA, $wordAAry[$i] ) == -1 && $allWordsMustExist == 1;
     }
 
     for( my $i = 0; $i < @wordBAry; $i++ )
     {
         $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: \"" . $wordBAry[$i] . "\" Not In Dictionary" ) if index( $wordsFoundB, $wordBAry[$i] ) == -1;
-        $error = 1 if index( $wordsFoundB, $wordBAry[$i] ) == -1;
+        $error = 1 if index( $wordsFoundB, $wordBAry[$i] ) == -1 && $allWordsMustExist == 1;
     }
+
+    $self->WriteLog( "ComputeMultiWordCosineSimilarity - Error: Comparing Empty String / No Found Words" ) if ( $wordsFoundA eq "" || $wordsFoundB eq "" );
+    $error = 1 if ( $wordsFoundA eq "" || $wordsFoundB eq "" );
 
     return undef if $error != 0;
 
@@ -737,7 +750,7 @@ sub ComputeCosineSimilarityOfWordVectors
 sub CosSimWithUserInput
 {
     my ( $self ) = @_;
-    
+
     # Check
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "CosSimWithUserInput - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
@@ -776,7 +789,7 @@ sub CosSimWithUserInput
 sub MultiWordCosSimWithUserInput
 {
     my ( $self ) = @_;
-    
+
     # Check
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "CosSimWithUserInput - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
@@ -824,7 +837,7 @@ sub ComputeAverageOfWords
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "ComputeAverageOfWords - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "Error: Method Requires Array Reference Argument / Argument Not Defined" ) if !defined( $wordAryRef );
     return undef if !defined( $wordAryRef );
 
@@ -1054,7 +1067,7 @@ sub AddTwoWords
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "AddTwoWords - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "AddTwoWords - Error: Function Requires Two Arguments (Word Vectors)" ) if !defined ( $wordA ) || !defined ( $wordB );
     return undef if !defined ( $wordA ) || !defined ( $wordB );
 
@@ -1101,7 +1114,7 @@ sub SubtractTwoWords
     print( "Error: Dictionary Is Empty / No Vector Data In Memory\n" ) if ( $self->GetDebugLog() == 0 && $self->IsVectorDataInMemory() == 0 );
     $self->WriteLog( "AddTwoWords - Error: Dictionary Is Empty / No Vector Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
     return undef if ( $self->IsVectorDataInMemory() == 0 );
-    
+
     $self->WriteLog( "SubtractTwoWords - Error: Function Requires Two Arguments (Word Vectors)" ) if !defined ( $wordA ) || !defined ( $wordB );
     return undef if !defined ( $wordA ) || !defined ( $wordB );
 
@@ -1265,6 +1278,11 @@ sub GetWordVector
         }
 
         my $vectorSize = $self->GetVectorLength();
+
+        # Check
+        $self->WriteLog( "GetWordVector - Error: Cannot Convert Sparse Data To Dense Format / Vector Length = 0 - Expects Vector Length >= 1" ) if ( $vectorSize == 0 );
+        return undef if ( $vectorSize == 0 );
+
         my @data = split( ' ', $wordVectorData );
 
         # Make Array Of Vector Size With All Zeros
@@ -1307,6 +1325,42 @@ sub IsVectorDataInMemory
     return 1 if $numberOfWordsInMemory > 0;
 
     return 0;
+}
+
+sub IsWordOrCUIVectorData
+{
+    my ( $self ) = @_;
+
+    # Check(s)
+    $self->WriteLog( "isWordOrCUIVectorData - Error: No Vector Vocabulary Data In Memory" ) if $self->IsVectorDataInMemory() == 0;
+    return undef if $self->IsVectorDataInMemory() == 0;
+
+    my @vocabularyWords = keys %{ $self->GetVocabularyHash() };
+    @vocabularyWords = sort( @vocabularyWords );
+
+    # Choose Random Word, Avoiding First Three Vector Elements
+    my $term = $vocabularyWords[ rand( @vocabularyWords - 2 ) + 2 ];
+
+    # Clean Up
+    undef( @vocabularyWords );
+
+    # Perform Check
+    $term = lc( $term );
+    my @terms = split( 'c', $term );
+
+    # Return Word Term If There Are Not Two Elements After Splitting
+    return "word" if( @terms != 2 );
+
+    # If $term Is CUI, Then First Element Should Be Empty String
+    return "word" if ( $terms[0] ne "" );
+
+    # Remove Numbers From Second Element
+    $terms[1] =~ s/[0-9]//g;
+
+    # If $term Is CUI, Then After Removing All Number From Second Element An Empty String Is All That Is Left
+    return "word" if ( $terms[1] ne "" );
+
+    return "cui";
 }
 
 sub IsVectorDataSorted
@@ -1401,7 +1455,7 @@ sub CheckWord2VecDataFileType
 
 sub ReadTrainedVectorDataFromFile
 {
-    my ( $self, $fileDir ) = @_;
+    my ( $self, $fileDir, $searchWord ) = @_;
 
     $self->WriteLog( "ReadTrainedVectorDataFromFile - Reading File \"$fileDir\"" );
 
@@ -1419,6 +1473,8 @@ sub ReadTrainedVectorDataFromFile
     $self->WriteLog( "ReadTrainedVectorDataFromFile - Error: Module Already Contains Vector Training Data In Memory" ) if $numberOfWordsInMemory > 0;
     return -1 if $numberOfWordsInMemory > 0;
 
+    $self->WriteLog( "ReadTrainedVectorDataFromFile - Searching For Word \"$searchWord\" In Vector Data File \"$fileDir\"" )       if defined( $searchWord );
+    $self->WriteLog( "ReadTrainedVectorDataFromFile - Warning: Vector Data Will Be Cleared From Memory After Search Is Complete" ) if defined ( $searchWord );
 
     # Check To See If File Data Is Binary Or Text
     my $fileType = $self->CheckWord2VecDataFileType( $fileDir );
@@ -1452,19 +1508,50 @@ sub ReadTrainedVectorDataFromFile
             chomp $row;
             $row = lc( $row );
 
+            # Progress Percent Indicator - Print Percentage Of File Loaded
+            print( int( ( $lineCount / $self->GetNumberOfWords() ) * 100 ) . "%" ) if ( $self->GetNumberOfWords() > 0 );
+
+            # Skip If Line Is Empty
+            next if( length( $row ) == 0 );
+
             if( $lineCount == 0 )
             {
                 my @data = split( ' ', $row );
 
-                $self->WriteLog( "ReadTrainedVectorDataFromFile - Error: File Does Not Contain Header Information / NumOfWords & VectorLength" ) if ( @data < 2 );
-                close( $fileHandle ) if ( @data < 2 );
-                return -1 if ( @data < 2 );
+                # Check(s)
+                if( @data < 2 )
+                {
+                    $self->WriteLog( "ReadTrainedVectorDataFromFile - Error: File Does Not Contain Header Information / NumOfWords & VectorLength" );
+                    close( $fileHandle );
+                    return -1;
+                }
 
                 $self->SetNumberOfWords( $data[0] );
                 $self->SetVectorLength( $data[1] );
             }
 
-            $self->AddWordVectorToVocabHash( $row );
+            # Search For Search Word And Return If Found
+            if ( defined( $searchWord ) )
+            {
+                my @data = split( ' ', $row );
+
+                if ( $data[0] eq $searchWord )
+                {
+                    $self->WriteLog( "ReadTrainedVectorDataFromFile - Search Word Found / Clearing Variables" );
+                    $self->ClearVocabularyHash();
+                    close( $fileHandle );
+                    return join( ' ', @data );
+                }
+            }
+            # Store Vector Data In Memory
+            else
+            {
+                $self->AddWordVectorToVocabHash( $row );
+            }
+
+            # Progress Percent Indicator - Return To Beginning Of Line
+            print( "\r" ) if ( $self->GetNumberOfWords() > 0 );
+
             $lineCount++;
         }
 
@@ -1482,20 +1569,32 @@ sub ReadTrainedVectorDataFromFile
         while( my $row = <$fileHandle> )
         {
             chomp $row;
+            $row = lc( $row );
+
+            # Progress Percent Indicator - Print Percentage Of File Loaded
+            print( int( ( $lineCount / $self->GetNumberOfWords() ) * 100 ) . "%" ) if ( $self->GetNumberOfWords() > 0 );
+
+            # Skip If Line Is Empty
+            next if( length( $row ) == 0 );
 
             # Skip First Line ( First Line Holds Number Of Word Vectors And Vector Size / Is Always Even )
             if( $lineCount == 0 )
             {
                 my @data = split( ' ', $row );
 
-                if( @data >= 2 )
+                # Check(s)
+                if( @data < 2 )
                 {
-                    $numOfWordVectors = $data[0];
-                    $vectorSize = $data[1] - 1;
-
-                    $self->SetNumberOfWords( $numOfWordVectors );
-                    $self->SetVectorLength( $vectorSize + 1 );
+                    $self->WriteLog( "ReadTrainedVectorDataFromFile - Error: File Does Not Contain Header Information / NumOfWords" );
+                    close( $fileHandle );
+                    return -1;
                 }
+
+                $numOfWordVectors = $data[0];
+                $vectorSize = $data[1] - 1;
+
+                $self->SetNumberOfWords( $numOfWordVectors );
+                $self->SetVectorLength( $vectorSize + 1 );
 
             }
             elsif( $lineCount > 0 )
@@ -1527,7 +1626,27 @@ sub ReadTrainedVectorDataFromFile
                 @data = ();
             }
 
-            $self->AddWordVectorToVocabHash( $row );
+            # Search For Search Word And Return If Found
+            if ( defined( $searchWord ) )
+            {
+                my @data = split( ' ', $row );
+
+                if ( $data[0] eq $searchWord )
+                {
+                    $self->WriteLog( "ReadTrainedVectorDataFromFile - Search Word Found / Clearing Variables" );
+                    $self->ClearVocabularyHash();
+                    close( $fileHandle );
+                    return join( ' ', @data );
+                }
+            }
+            # Store Vector Data In Memory
+            else
+            {
+                $self->AddWordVectorToVocabHash( $row );
+            }
+
+            # Progress Percent Indicator - Return To Beginning Of Line
+            print( "\r" ) if ( $self->GetNumberOfWords() > 0 );
 
             $lineCount++;
         }
@@ -1547,6 +1666,10 @@ sub ReadTrainedVectorDataFromFile
         # Fetch "Number Of Words" and "Word Vector Size" From First Line
         my $row = <$fileHandle>;
         chomp( $row );
+
+        # Skip If Line Is Empty
+        next if( length( $row ) == 0 );
+
         my @strAry = split( ' ', $row );
 
         # Check(s)
@@ -1568,6 +1691,9 @@ sub ReadTrainedVectorDataFromFile
         while( $count < $wordCount + 1 )
         {
             my $cont = 1;
+
+            # Progress Percent Indicator - Print Percentage Of File Loaded
+            print( int( ( $count / $self->GetNumberOfWords() ) * 100 ) . "%" ) if ( $self->GetNumberOfWords() > 0 );
 
             # Fetch Word
             while( $cont == 1 )
@@ -1610,8 +1736,25 @@ sub ReadTrainedVectorDataFromFile
             # Word Vector = Word + WordVectorData
             $word .= $wordVectorData;
 
-            # Add Word Vector To Memory
-            $self->AddWordVectorToVocabHash( $word ) if $word ne "";
+            # Search For Search Word And Return If Found
+            if ( defined( $searchWord ) )
+            {
+                my @data = split( ' ', $word );
+
+                if ( $data[0] eq $searchWord )
+                {
+                    $self->WriteLog( "ReadTrainedVectorDataFromFile - Search Word Found / Clearing Variables" );
+                    $self->ClearVocabularyHash();
+                    close( $fileHandle );
+                    return join( ' ', @data );
+                }
+            }
+            # Store Vector Data In Memory
+            else
+            {
+                # Add Word Vector To Memory
+                $self->AddWordVectorToVocabHash( $word ) if $word ne "";
+            }
 
             # Clear Variables
             $word = "";
@@ -1619,6 +1762,9 @@ sub ReadTrainedVectorDataFromFile
             $buffer = "";
 
             $count++;
+
+            # Progress Percent Indicator - Return To Beginning Of Line
+            print( "\r" ) if ( $self->GetNumberOfWords() > 0 );
         }
 
         close( $fileHandle );
@@ -1628,6 +1774,12 @@ sub ReadTrainedVectorDataFromFile
     $numberOfWords = 0 if !defined( $numberOfWords );
     $self->WriteLog( "ReadTrainedVectorDataFromFile - Reading Data Complete" );
     $self->WriteLog( "ReadTrainedVectorDataFromFile - $numberOfWords Word Vectors Stored In Memory" );
+
+    # Used To Print New Line For Progress Percent Indicator
+    print( "\n" );
+
+    # Cannot Find Search Word In File
+    return -1 if ( defined( $searchWord ) );
 
     return 0;
 }
@@ -1661,6 +1813,9 @@ sub SaveTrainedVectorDataToFile
 
             for( my $i = 0; $i < @dataAry; $i++ )
             {
+                # Progress Percent Indicator - Print Percentage Of File Loaded
+                print( int( ( $i / $numOfWords ) * 100 ) . "%" ) if ( $numOfWords > 0 );
+
                 my $wordVectorData = $dataAry[$i] . " " . $vocabHashRef->{ $dataAry[$i] };
 
                 # Check(s)
@@ -1703,6 +1858,9 @@ sub SaveTrainedVectorDataToFile
                     @data = ();
                     @wordVector = ();
                 }
+
+                # Progress Percent Indicator - Return To Beginning Of Line
+                print( "\r" ) if ( $numOfWords > 0 );
             }
         }
         else
@@ -1714,9 +1872,15 @@ sub SaveTrainedVectorDataToFile
             # Print Dictionary/Vocabulary Vector Data To File
             for( my $i = 0; $i < @dataAry; $i++ )
             {
+                # Progress Percent Indicator - Print Percentage Of File Loaded
+                print( int( ( $i / $numOfWords ) * 100 ) . "%" ) if ( $numOfWords > 0 );
+
                 my $data = $dataAry[$i] . " " . $vocabHashRef->{ $dataAry[$i] };
                 print( $fileHandle "$data\n" ) if ( $i == 0 );
                 print( $fileHandle "$data \n" ) if ( $i > 0 );
+
+                # Progress Percent Indicator - Return To Beginning Of Line
+                print( "\r" ) if ( $numOfWords > 0 );
             }
         }
 
@@ -1756,6 +1920,9 @@ sub SaveTrainedVectorDataToFile
         # Print Word2Vec Vocabulary and Vector Data To File With Line Feed(s)
         for( my $i = 0; $i < @dataAry; $i++ )
         {
+            # Progress Percent Indicator - Print Percentage Of File Loaded
+            print( int( ( $i / $numOfWords ) * 100 ) . "%" ) if ( $numOfWords > 0 );
+
             my $data = $dataAry[$i] . " " . $vocabHashRef->{ $dataAry[$i] };
 
             # Check(s)
@@ -1790,6 +1957,9 @@ sub SaveTrainedVectorDataToFile
 
             # Add Line Feed To End Of Word + Vector Data
             print( $fileHandle "\n" );
+
+            # Progress Percent Indicator - Return To Beginning Of Line
+            print( "\r" ) if ( $numOfWords > 0 );
         }
 
         close( $fileHandle );
@@ -1822,6 +1992,9 @@ sub SaveTrainedVectorDataToFile
             # Print Dictionary/Vocabulary Vector Data To File
             for( my $i = 0; $i < @dataAry; $i++ )
             {
+                # Progress Percent Indicator - Print Percentage Of File Loaded
+                print( int( ( $i / $numOfWords ) * 100 ) . "%" ) if ( $numOfWords > 0 );
+
                 my $data = $dataAry[$i] . " " . $vocabHashRef->{ $dataAry[$i] };
                 print( $fileHandle "$data\n" ) if ( $i == 0 );
 
@@ -1844,6 +2017,9 @@ sub SaveTrainedVectorDataToFile
 
                     print( $fileHandle " \n" );
                 }
+
+                # Progress Percent Indicator - Return To Beginning Of Line
+                print( "\r" ) if ( $numOfWords > 0 );
             }
         }
 
@@ -1852,6 +2028,9 @@ sub SaveTrainedVectorDataToFile
 
         $self->WriteLog( "SaveTrainedVectorDataToFile - File Saved" );
     }
+
+    # Used To Print New Line For Progress Percent Indicator
+    print( "\n" );
 
     return 0;
 }
@@ -2779,19 +2958,19 @@ Example:
 Description:
 
  Computes cosine similarity between two words or compound words using trained word2vec vector data.
- Returns float value or undefined if one or more words are not in the dictionary.
 
- Note: Supports multiple words concatenated by ' ' and requires vector data to be in memory prior to method execution.
- This function will error out when a specified word is not found and return undefined.
+ Note: Supports multiple words concatenated by ' ' (space) and requires vector data to be in memory prior to method execution.
+ If $allWordsMustExist is set to true, this function will error out when a specified word is not found and return undefined.
 
 Input:
 
- $string -> string of single or multiple words separated by ' ' (space).
- $string -> string of single or multiple words separated by ' ' (space).
+ $string            -> string of single or multiple words separated by ' ' (space).
+ $string            -> string of single or multiple words separated by ' ' (space).
+ $allWordsMustExist -> 1 = True, 0 or undef = False
 
 Output:
 
- $value  -> Float or Undefined
+ $value             -> Float or Undefined
 
 Example:
 
@@ -3150,6 +3329,33 @@ Example:
 
  undef( $w2v );
 
+=head3 IsWordOrCUIVectorData
+
+Description:
+
+ Checks to see if vector data consists of word or CUI terms.
+
+Input:
+
+ None
+
+Output:
+
+ $string -> 'cui', 'word' or undef
+
+Example:
+
+ use Word2vec::Word2vec;
+
+ my $w2v = Word2vec::Word2vec->new();
+ $w2v->ReadTrainedVectorDataFromFile( "samples/samplevectors.bin" );
+ my $isWordOrCUIData = $w2v->IsWordOrCUIVectorData();
+
+ print( "Vector Data Consists Of \"$isWordOrCUIData\" Terms\n" ) if defined( $isWordOrCUIData );
+ print( "Cannot Determine Type Of Terms\n" ) if !defined( $isWordOrCUIData );
+
+ undef( $w2v );
+
 =head3 IsVectorDataSorted
 
 Description:
@@ -3208,11 +3414,15 @@ Example:
 
 Description:
 
- Reads trained vector data from file path in memory.
+ Reads trained vector data from file path in memory or searches for vector data from file. This function supports and
+ automatically detects word2vec binary, plain text and sparse vector data formats.
+
+ Note: If search word is undefined, the entire vector file is loaded in memory. If a search word is defined only the vector data is returned or undef.
 
 Input:
 
  $string     -> Word2vec trained vector data file path
+ $searchWord -> Searches trained vector data file for specific word vector
 
 Output:
 
@@ -3220,7 +3430,7 @@ Output:
 
 Example:
 
- # Loading data in a Binary Search Tree
+ # Loading data in memory
  use Word2vec::Word2vec;
 
  my $w2v = Word2vec::Word2vec->new();
@@ -3233,14 +3443,14 @@ Example:
 
  # or
 
- # Loading data in an array
+ # Searching vector data file for a specific word vector
  use Word2vec::Word2vec;
 
  my $w2v = Word2vec::Word2vec->new();
- my $result = $w2v->ReadTrainedVectorDataFromFile( "samples/samplevectors.bin" );
+ my $result = $w2v->ReadTrainedVectorDataFromFile( "samples/samplevectors.bin", "medical" );
 
- print( "Success Loading Data\n" ) if $result == 0;
- print( "Un-successful, Data Not Loaded\n" ) if $result == -1;
+ print( "Found Vector Data In File\n" ) if $result != -1;
+ print( "Vector Data Not Found\n" )     if $result == -1;
 
  undef( $w2v );
 
@@ -3269,7 +3479,8 @@ Example:
  use Word2vec::Word2vec;
 
  my $w2v = Word2vec::Word2vec->new();
- 
+
+ # Instruct the module to store the method as an array, not a BST.
  $w2v->ReadTrainedVectorDataFromFile( "samples/samplevectors.bin" );
  $w2v->SaveTrainedVectorDataToFile( "samples/newvectors.bin" );
 
@@ -3301,6 +3512,33 @@ Example:
 
  print( "Strings are equal!\n" )if $result == 1;
  print( "Strings are not equal!\n" ) if $result == 0;
+
+ undef( $w2v );
+
+=head3 RemoveWordFromWordVectorString
+
+Description:
+
+ Given a vector data string as input, it removed the vector word from its data returning only data.
+
+Input:
+
+ $string          -> Vector word & data string.
+
+Output:
+
+ $string          -> Vector data string.
+
+Example:
+
+ use Word2vec::Word2vec;
+
+ my $w2v = Word2vec::Word2vec->new();
+ my $str = "cookie 1 0.234 9 0.0002 13 0.234 17 -0.0023 19 1.0000";
+
+ my $vectorData = $w2v->RemoveWordFromWordVectorString( $str );
+
+ print( "Success!\n" ) if length( vectorData ) < length( $str );
 
  undef( $w2v );
 

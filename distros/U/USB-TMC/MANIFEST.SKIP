@@ -3,4 +3,6 @@
 ^TODO
 ^.travis.yml
 ^.build
+^nytprof
+^perltidy
 ^USB-TMC

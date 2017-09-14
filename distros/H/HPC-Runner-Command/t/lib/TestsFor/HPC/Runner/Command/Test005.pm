@@ -184,14 +184,9 @@ sub test_004 : Tags(submit_jobs) {
 
     $test->execute;
 
-    ok( $test->has_data_tar );
-    my $basename = $test->data_tar->basename('.tar.gz');
-    my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
-    ok( $test->archive->contains_file($submission_file),
-        'We have a submission.json' );
-
-    my $content = $test->archive->get_content($submission_file);
-
+    my $submission_file = File::Spec->catdir($test->data_dir, 'submission.json');
+    ok(-e $submission_file);
+    my $content = read_file($submission_file);
     my $json_obj = decode_json($content);
 
     ok( exists $json_obj->{submission_time} );

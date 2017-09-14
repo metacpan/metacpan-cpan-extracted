@@ -4,3 +4,16 @@
         Initial Version with y_x_2_lat_lng() and
         lat_lng_2_y_x()
 
+0.02    2017-02-22
+
+        Make the Module an Exporter so that
+        y_x_2_lat_lng and lat_lng_2_y_x can
+        be exported.
+
+0.03    2017-09-02 - 2017-09-12
+
+        POD: See also
+
+        Makefile.PL: chmod 775 / shebag
+
+        Use MANIFEST.SKIP rather than ignore.txt

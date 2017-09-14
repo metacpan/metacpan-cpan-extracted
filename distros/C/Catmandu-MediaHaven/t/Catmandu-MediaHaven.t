@@ -39,7 +39,7 @@ SKIP: {
     is int(@$result_list) , $num_of_result , 'got enough results';
 
     if ($num_of_result) {
-        my $id = $result_list->[0]->{externalId};
+        my $id = $result_list->[0]->{fragmentId};
 
         ok $id , 'got an record identifier';
 
@@ -49,7 +49,7 @@ SKIP: {
 
         is ref($res) , 'HASH' , 'record result is a hash';
 
-        is $res->{externalId} , $id , 'got the correct record';
+        is $res->{fragmentId} , $id , 'got the correct record';
     }
 }
 

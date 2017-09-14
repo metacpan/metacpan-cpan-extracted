@@ -1,10 +1,12 @@
-.cvsignore
 Changes
-Cisco.pm
+Makefile.PL
 INSTALL
 MANIFEST
-MANIFEST.SKIP
-Makefile.PL
 README
 TODO
+t/00-Net-Telnet-Cisco.t
+t/02-pod-coverage.t
 test.pl
+lib/Net/Telnet/Cisco.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

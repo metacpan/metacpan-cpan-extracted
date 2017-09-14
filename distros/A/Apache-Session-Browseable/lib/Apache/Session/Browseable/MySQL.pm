@@ -48,10 +48,10 @@ Create table with columns for indexed fields. Example for Lemonldap::NG:
 
 Add indexes:
 
-  CREATE INDEX uid1 ON sessions (_whatToTrace);
+  CREATE INDEX uid1 ON sessions (_whatToTrace) USING BTREE;
   CREATE INDEX s1   ON sessions (_session_kind);
   CREATE INDEX u1   ON sessions (_utime);
-  CREATE INDEX ip1  ON sessions (ipAddr);
+  CREATE INDEX ip1  ON sessions (ipAddr) USING BTREE;
 
 Use it with Perl:
 

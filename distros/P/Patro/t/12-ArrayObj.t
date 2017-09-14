@@ -17,7 +17,7 @@ ok($cfg, 'got config for patronize array ref');
 my ($r1) = Patro->new($cfg->to_string)->getProxies;
 
 ok($r1, 'client as boolean');
-is(CORE::ref($r1), 'Patro::N1', 'client ref');
+is(CORE::ref($r1), 'Patro::N4', 'client ref');
 is(Patro::ref($r1), 'ArrayThing', 'remote ref');
 is(Patro::reftype($r1), 'ARRAY', 'remote reftype');
 
@@ -46,7 +46,7 @@ is($r1->[7], 2, 'unshift to remote array');
 is(pop @$r1, 18, 'pop from remote array');
 
 my $r6 = $r1->[10];
-is(CORE::ref($r6), 'Patro::N1', 'proxy handle for nested remote obj');
+is(CORE::ref($r6), 'Patro::N4', 'proxy handle for nested remote obj');
 is(Patro::ref($r6), 'ARRAY', 'got remote ref type');
 
 ok(18 == $r1->reverse, 'called method on remote obj');
@@ -56,8 +56,13 @@ if ($THREADED) {
     is(xjoin($r0),xjoin($r1),"local and remote object match after function call");
 }
 is($r1->[4],$r1->get(4), 'remote function call ok');
-ok_threaded($r0->get(-2) == $r1->get(-2),
-	    'local function call same as remote function call');
+ SKIP: {
+     if ($c->{config}{style} ne 'threaded') {
+	 skip("update to proxy won't affect remote on non-threaded server",1);
+     }
+     ok($r0->get(-2) == $r1->get(-2),
+	'local function call same as remote function call');
+}
 
 my @x = $r1->context_dependent;
 my $x = $r1->context_dependent;
@@ -66,6 +71,7 @@ is(xjoin(\@x),xjoin([5,6,7]), 'context respected in list context');
 
 ok($r1->can('increment'), '$proxy->can ok on valid method name');
 ok(!$r1->can('um, no'), '$proxy->can ok on invalid method name');
+ok(eval { Patro::N4->can('increment'); 1 }, 'Patro::N4->can ok');
 
 my $z = push(@$r1, { abc => 123, foo => 456 });
 ok($z, 'push reference onto proxy ok');

@@ -16,7 +16,7 @@ use Crypt::OpenSSL::Bignum;
 use utf8;
 use base qw(Lemonldap::NG::Portal::_Browser);
 
-our $VERSION = '1.9.7';
+our $VERSION = '1.9.12';
 our $oidcCache;
 
 BEGIN {
@@ -1222,7 +1222,7 @@ sub buildUserInfoResponse {
               $self->{oidcRPMetaDataExportedVars}->{$rp}->{$attribute};
             if ($session_key) {
                 my $session_value = $apacheSession->data->{$session_key};
-                utf8::decode($session_value);
+                utf8::decode($session_value) unless ref($session_value);
 
                 # Address is a JSON object
                 if ( $claim eq "address" ) {

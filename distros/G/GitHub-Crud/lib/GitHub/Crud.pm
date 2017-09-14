@@ -7,7 +7,7 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20170902';
+our $VERSION = '20170903';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -756,12 +756,7 @@ sub test
 test unless caller;
 
 1;
-# 𝗣𝗲𝗿𝗹
 #podDocumentation
-# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/
-# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents
-# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents/images
-# curl -si -H "Authorization: token 0e8eb824527064941a528089ca7674695f5f1c15"  https://api.github.com/repos/philiprbrenan/horses/contents/images/aaa.png
 __DATA__
 use Test::More tests => 1;
 

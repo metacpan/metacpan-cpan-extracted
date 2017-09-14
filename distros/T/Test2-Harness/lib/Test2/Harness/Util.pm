@@ -2,7 +2,7 @@ package Test2::Harness::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use Carp qw/confess/;
 use Importer Importer => 'import';
@@ -10,15 +10,22 @@ use Importer Importer => 'import';
 use Test2::Util qw/try_sig_mask do_rename/;
 
 our @EXPORT_OK = qw{
+    close_file
+    fqmod
+    local_env
+    maybe_open_file
+    maybe_read_file
+    open_file
     read_file
     write_file
     write_file_atomic
-    open_file
-    close_file
-    maybe_read_file
-    maybe_open_file
-    file_stamp
 };
+
+sub fqmod {
+    my ($prefix, $input) = @_;
+    return $1 if $input =~ m/^\+(.*)$/;
+    return "$prefix\::$input";
+}
 
 sub maybe_read_file {
     my ($file) = @_;
@@ -84,10 +91,31 @@ sub write_file_atomic {
     return @content;
 }
 
-sub file_stamp {
-    my $file = shift;
-    my @stat = stat($file);
-    return $stat[9];
+sub local_env {
+    my ($env, $sub) = @_;
+
+    my $old;
+    for my $key (keys %$env) {
+        no warnings 'uninitialized';
+        $old->{$key} = $ENV{$key} if exists $ENV{$key};
+        $ENV{$key} = $env->{$key};
+    }
+
+    my $ok = eval { $sub->(); 1 };
+    my $err = $@;
+
+    for my $key (keys %$env) {
+        # If something set an env var inside than we do not want to squash it.
+        next if !defined($ENV{$key}) xor !defined($env->{$key});
+        next if defined($ENV{$key}) && defined($env->{$key}) && $ENV{$key} ne $env->{$key};
+
+        no warnings 'uninitialized';
+        exists $old->{$key} ? $ENV{$key} = $old->{$key} : delete $ENV{$key};
+    }
+
+    die $err unless $ok;
+
+    return $ok;
 }
 
 1;

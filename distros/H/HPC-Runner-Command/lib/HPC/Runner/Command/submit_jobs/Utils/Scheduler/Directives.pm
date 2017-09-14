@@ -1,8 +1,13 @@
 package HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives;
 
 use MooseX::App::Role;
-use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 use namespace::autoclean;
+
+use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
+
+use File::Temp qw/ tempfile /;
+use File::Slurp;
+use File::Spec;
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives
 
@@ -171,7 +176,7 @@ q{Number of nodes requested. You should only use this if submitting parallel job
 
 =head3 partition
 
-Specify the partition. Defaults to the partition that has the most nodes.
+Specify the partition.
 
 In PBS this is called 'queue'
 
@@ -181,7 +186,6 @@ option 'partition' => (
     is            => 'rw',
     isa           => 'Str',
     required      => 0,
-    default       => 'serial',
     documentation => q{Slurm partition to submit jobs to.},
     predicate     => 'has_partition',
     clearer       => 'clear_partition'
@@ -251,5 +255,84 @@ option 'procs' => (
         $self->ntasks_per_node( $self->procs );
     }
 );
+
+=head3 template_file
+
+actual template file
+
+One is generated here for you, but you can always supply your own with
+--template_file /path/to/template
+
+Default is for SLURM
+
+=cut
+
+has 'template_file' => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => sub {
+        my $self = shift;
+
+        my ( $fh, $filename ) = tempfile();
+
+        my $tt = <<EOF;
+#!/usr/bin/env bash
+#
+#SBATCH --share
+#SBATCH --job-name=[% JOBNAME %]
+#SBATCH --output=[% OUT %]
+[% IF job.has_account %]
+#SBATCH --account=[% job.account %]
+[% END %]
+[% IF job.has_partition %]
+#SBATCH --partition=[% job.partition %]
+[% END %]
+[% IF job.has_nodes_count %]
+#SBATCH --nodes=[% job.nodes_count %]
+[% END %]
+[% IF job.has_ntasks %]
+#SBATCH --ntasks=[% job.ntasks %]
+[% END %]
+[% IF job.has_cpus_per_task %]
+#SBATCH --cpus-per-task=[% job.cpus_per_task %]
+[% END %]
+[% IF job.has_ntasks_per_node %]
+#SBATCH --ntasks-per-node=[% job.ntasks_per_node %]
+[% END %]
+[% IF job.has_mem %]
+#SBATCH --mem=[% job.mem %]
+[% END %]
+[% IF job.has_walltime %]
+#SBATCH --time=[% job.walltime %]
+[% END %]
+[% IF ARRAY_STR %]
+#SBATCH --array=[% ARRAY_STR %]
+[% END %]
+[% IF AFTEROK %]
+#SBATCH --dependency=afterok:[% AFTEROK %]
+[% END %]
+
+[% IF MODULES %]
+module load [% MODULES %]
+[% END %]
+
+[% IF job.has_conda_env %]
+source activate [% job.conda_env %]
+[% END %]
+
+[% COMMAND %]
+
+EOF
+
+        print $fh $tt;
+        return $filename;
+    },
+    predicate => 'has_template_file',
+    clearer   => 'clear_template_file',
+    documentation =>
+      q{Path to Scheduler template file if you do not wish to use the default.}
+);
+
+
 
 1;

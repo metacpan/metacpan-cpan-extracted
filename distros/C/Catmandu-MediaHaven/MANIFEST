@@ -8,12 +8,15 @@ META.yml
 README
 cpanfile
 dist.ini
+lib/Catmandu/Exporter/MediaHaven.pm
 lib/Catmandu/Importer/MediaHaven.pm
 lib/Catmandu/MediaHaven.pm
 lib/Catmandu/Store/File/MediaHaven.pm
 lib/Catmandu/Store/File/MediaHaven/Bag.pm
 lib/Catmandu/Store/File/MediaHaven/Index.pm
 lib/Catmandu/Store/File/MediaHaven/Searcher.pm
+script/mediahaven
+t/Catmandu-Exporter-MediaHaven.t
 t/Catmandu-Importer-MediaHaven.t
 t/Catmandu-MediaHaven.t
 t/Catmandu-Store-File-MediaHaven-Bag.t

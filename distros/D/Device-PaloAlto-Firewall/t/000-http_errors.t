@@ -43,7 +43,7 @@ use Device::PaloAlto::Firewall;
      )
  ];
 
-plan tests => 41 * @{ $http_error_responses } ; 
+plan tests => 47 * @{ $http_error_responses } ; 
 
 my $fw = Device::PaloAlto::Firewall->new(uri => 'http://localhost.localdomain', username => 'test', password => 'test');
 my $test = $fw->tester();
@@ -61,6 +61,12 @@ for my $response (@{ $http_error_responses }) {
     ok( !$fw->system_info(), "system_info() returns undef on ".$response->message );
     ok( !$fw->environmentals(), "environmentals() returns undef on ".$response->message );
     ok( !$fw->high_availability(), "high_availability() returns undef on ".$response->message );
+    ok( !$fw->software_check(), "software_check() returns undef on ".$response->message );
+    ok( !$fw->content_check(), "content_check() returns undef on ".$response->message );
+    ok( !$fw->antivirus_check(), "antivirus_check() returns undef on ".$response->message );
+    ok( !$fw->gp_client_check(), "gp_client_check() returns undef on ".$response->message );
+    ok( !$fw->licenses(), "licenses() returns undef on ".$response->message );
+
     ok( !$fw->interfaces(), "interfaces() returns undef on ".$response->message );
     ok( !$fw->interface_counters_logical(), "interface_counters_logical() returns undef on ".$response->message );
     ok( !$fw->routing_table(), "routing_table() returns undef on ".$response->message );
@@ -80,6 +86,7 @@ for my $response (@{ $http_error_responses }) {
 
     ok( !$test->version(version => '6.0.0'), "version() returns undef on ".$response->message );
     ok( !$test->environmentals(), "environmentals() returns undef on ".$response->message );
+    ok( !$test->licenses_active(), "licenses_active() returns undef on ".$response->message );
     ok( !$test->interfaces_up(interfaces => ['ethernet1/1']), "interfaces_up() returns undef on ".$response->message );
     ok( !$test->interfaces_duplex(interfaces => ['ethernet1/1']), "interfaces_duplex() returns undef on ".$response->message );
     ok( !$test->interface_errors_logical(), "interface_errors_logical() returns undef on ".$response->message );

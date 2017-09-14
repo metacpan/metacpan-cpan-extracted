@@ -9,9 +9,9 @@ build_requires:
   Test::Skip::UnlessExistsExecutable: '0'
   Test::TCP: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,18 +30,19 @@ no_index:
 provides:
   Cache::Memcached::Fast::Safe:
     file: lib/Cache/Memcached/Fast/Safe.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Cache::Memcached::Fast: '0.23'
   Digest::SHA: '0'
   POSIX::AtFork: '0.02'
-  URI::Escape::XS: '0.09'
   parent: '0'
 resources:
   bugtracker: https://github.com/kazeburo/Cache-Memcached-Fast-Safe/issues
   homepage: https://github.com/kazeburo/Cache-Memcached-Fast-Safe
   repository: git://github.com/kazeburo/Cache-Memcached-Fast-Safe.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Jiro Nishiguchi <jiro@cpan.org>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'mono <mono@mono0x.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,7 @@ build_requires:
   Digest::SHA: '0'
   File::Copy: '0'
   File::Copy::Recursive: '0'
-  File::Fetch: '0'
+  File::Fetch: '0.50'
   File::Find: '0'
   File::Path: '2.07'
   File::ShareDir: '0'
@@ -19,7 +19,7 @@ configure_requires:
   Archive::Extract: '0'
   Digest::SHA: '0'
   File::Copy::Recursive: '0'
-  File::Fetch: '0'
+  File::Fetch: '0.50'
   File::Find: '0'
   File::Path: '2.07'
   File::Spec: '0'
@@ -35,7 +35,7 @@ name: Alien-CMake
 provides:
   Alien::CMake:
     file: lib/Alien/CMake.pm
-    version: '0.09'
+    version: '0.11'
 requires:
   File::ShareDir: '1.00'
   File::Spec: '0'
@@ -46,5 +46,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-CMake
   license: http://dev.perl.org/licenses/
   repository: http://github.com/PerlGameDev/Alien-CMake
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

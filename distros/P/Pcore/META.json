@@ -110,7 +110,6 @@
             "Moo" : "0",
             "MooX::TypeTiny" : "0",
             "Net::DNS::Resolver" : "0",
-            "Net::LibIDN" : "0",
             "Net::SSLeay" : "0",
             "Package::Stash" : "0",
             "Package::Stash::XS" : "0",
@@ -119,6 +118,7 @@
             "Pod::Markdown" : "0",
             "Ref::Util" : "0",
             "Ref::Util::XS" : "0",
+            "Regexp::Util" : "0",
             "Software::License" : "0",
             "Sort::Naturally" : "0",
             "String::CRC32" : "0",
@@ -158,6 +158,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.50.0",
+   "version" : "v0.52.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

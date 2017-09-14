@@ -34,9 +34,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Sys::HostAddr" : "0"
-         },
          "requires" : {
             "Devel::GlobalDestruction" : "0",
             "MIME::Base64" : "0",
@@ -45,6 +42,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjob/p5-patro.git",
+         "web" : "https://github.com/mjob/p5-patro"
+      }
+   },
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

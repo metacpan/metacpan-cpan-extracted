@@ -2,37 +2,102 @@ package App::Yath::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
+
+use File::Spec;
 
 use Carp qw/confess/;
+use Cwd qw/realpath/;
+
+use Test2::Harness::Util qw/open_file/;
 
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/load_command fully_qualify/;
+our @EXPORT_OK = qw{
+    find_yath
+    find_pfile
+    PFILE_NAME
+    find_in_updir
+    read_config
+    is_generated_test_pl
+};
 
-sub load_command {
-    my ($cmd_name) = @_;
-    my $cmd_class  = "App::Yath::Command::$cmd_name";
-    my $cmd_file   = "App/Yath/Command/$cmd_name.pm";
+sub find_yath { File::Spec->rel2abs(_find_yath()) }
 
-    if (!eval { require $cmd_file; 1 }) {
-        my $load_error = $@ || 'unknown error';
+sub _find_yath {
+    return $App::Yath::SCRIPT if $App::Yath::SCRIPT;
+    return $ENV{YATH_SCRIPT} if $ENV{YATH_SCRIPT};
+    return $0 if $0 && $0 =~ m{yath$} && -f $0;
 
-        confess "yath command '$cmd_name' not found. (did you forget to install $cmd_class?)"
-            if $load_error =~ m{Can't locate \Q$cmd_file in \@INC\E};
-
-        die $load_error;
+    require IPC::Cmd;
+    if(my $out = IPC::Cmd::can_run('yath')) {
+        return $out;
     }
 
-    return $cmd_class;
+    die "Could not find 'yath' in execution path";
 }
 
-sub fully_qualify {
-    my ($base, $in) = @_;
+sub find_in_updir {
+    my $path = shift;
+    return File::Spec->rel2abs($path) if -f $path;
 
-    $in =~ m/^(\+)?(.*)$/;
-    return $2 if $1;
-    return "$base\::$in";
+    my %seen;
+    while(1) {
+        $path = File::Spec->catdir('..', $path);
+        my $check = realpath(File::Spec->rel2abs($path));
+        last if $seen{$check}++;
+        return $check if -f $check;
+    }
+
+    return;
+}
+
+sub PFILE_NAME() { '.yath-persist.json' }
+
+sub find_pfile {
+    return find_in_updir(PFILE_NAME());
+}
+
+sub read_config {
+    my ($cmd, $rcfile) = @_;
+
+    $rcfile ||= find_in_updir('.yath.rc') or return;
+
+    my $fh = open_file($rcfile, '<');
+
+    my @out;
+
+    my $in_cmd = 0;
+    while (my $line = <$fh>) {
+        chomp($line);
+        if ($line =~ m/^\[(.*)\]$/) {
+            $in_cmd = $1 eq $cmd;
+            next;
+        }
+        next unless $in_cmd;
+
+        $line =~ s/;.*$//g;
+        $line =~ s/^\s*//g;
+        $line =~ s/\s*$//g;
+        push @out => split /\s+/, $line, 2;
+    }
+
+    return @out;
+}
+
+sub is_generated_test_pl {
+    my ($file) = @_;
+
+    my $fh = open_file($file, '<');
+
+    my $count = 0;
+    while (my $line = <$fh>) {
+        last if $count++ > 5;
+        next unless $line =~ m/^# THIS IS A GENERATED YATH RUNNER TEST$/;
+        return 1;
+    }
+
+    return 0;
 }
 
 1;

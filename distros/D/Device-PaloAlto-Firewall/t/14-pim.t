@@ -17,7 +17,7 @@ my $test = $fw->tester();
 # No PIM Configured.
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_pim_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->pim_neighbours(), 'ARRAY', "No PIM returns ARRAYREF" );
+isa_ok( $fw->pim_neighbours(), 'ARRAY' );
 is_deeply( $fw->pim_neighbours(), [] , "No PIM returns an empty ARRAYREF" );
 
 ok( !$test->pim_neighbours_up(neighbours => ['192.168.122.30']), "No PIM configured returns 0");
@@ -25,7 +25,7 @@ ok( !$test->pim_neighbours_up(neighbours => ['192.168.122.30']), "No PIM configu
 # PIM configured, but no peers.
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_pim_neighbour() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->pim_neighbours(), 'ARRAY', "No PIM peers ARRAYREF" );
+isa_ok( $fw->pim_neighbours(), 'ARRAY' );
 is_deeply( $fw->pim_neighbours(), [] , "No PIM peers returns empty ARRAYREF" );
 
 ok( !$test->pim_neighbours_up(neighbours => ['192.168.122.30']), "PIM configured with no neighbour returns 0");
@@ -34,7 +34,7 @@ ok( !$test->pim_neighbours_up(neighbours => ['192.168.122.30']), "PIM configured
 # PIM configured and a peer is up.
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( pim_neighbour_up() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->pim_neighbours(), 'ARRAY', "PIM peer up returns ARRAYREF" );
+isa_ok( $fw->pim_neighbours(), 'ARRAY' );
 ok( $test->pim_neighbours_up(neighbours => ['192.168.122.30']), "PIM configured with a neighbour returns 1");
 ok( !$test->pim_neighbours_up(neighbours => ['192.168.122.29']), "PIM configured with a neighbour but not specified returns 0");
 

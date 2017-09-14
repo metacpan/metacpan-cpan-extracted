@@ -2,10 +2,11 @@
    "abstract" : "Perl-only `which`",
    "author" : [
       "Graham Ollis <plicease@cpan.org>",
-      "Per Einar Ellefsen <pereinar@cpan.org>"
+      "Per Einar Ellefsen <pereinar@cpan.org>",
+      "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +22,23 @@
             "perl" : "5.008001"
          }
       },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "File::Which" : "0",
@@ -29,7 +47,9 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Capture::Tiny" : "0",
+            "Test2::Mock" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Script" : "0",
             "perl" : "5.008001"
          }
@@ -40,13 +60,19 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/App-pwhich/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/App-pwhich",
+      "homepage" : "https://metacpan.org/pod/App::pwhich",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/App-pwhich.git",
          "web" : "https://github.com/plicease/App-pwhich"
       }
    },
-   "version" : "1.14"
+   "version" : "1.15",
+   "x_contributors" : [
+      "Per Einar Ellefsen <pereinar@cpan.org>",
+      "Graham Ollis <plicease@cpan.org>",
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

@@ -8,7 +8,7 @@ package Net::POP3S;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use strict;
 use base qw ( Net::POP3 );
@@ -40,7 +40,13 @@ sub new {
       $host = delete $arg{Host};
   }
   my $ssl = delete $arg{doSSL};
-  $ssl = 'ssl' if delete $arg{SSL};
+  if ($ssl =~ /ssl/i) {
+      $arg{SSL} = 1;
+  }
+  if (defined($arg{SSL}) && $arg{SSL} > 0) {
+      $ssl = 'ssl';
+      $arg{Port} ||= 995;
+  }
 
   my $hosts = defined $host ? $host : $NetConfig{pop3_hosts};
   my $obj;
@@ -77,7 +83,7 @@ sub new {
 
 # common in SSL
   my %ssl_args;
-  if ($ssl) {
+  if ($ssl || defined($arg{SSL}) ) {
     eval {
       require IO::Socket::SSL;
     } or do {
@@ -105,19 +111,13 @@ sub new {
   }
 
   ${*$obj}{'net_pop3_banner'} = $obj->message;
+  ${*$obj}{'net_pop3_arg'} = \%arg;
 
 # STARTTLS
   if (defined($ssl) && $ssl =~ /starttls|stls/i ) {
-     my $capa;
-    ($capa = $obj->capa
-     and exists $capa->{STLS}
-     and ($obj->command('STLS')->response() == CMD_OK)
-     and $obj->ssl_start(\%ssl_args))
-       or do {
-	 $obj->set_status(500, ["Cannot start SSL session"]);
-	 $obj->close();
-	 return undef;
-       };
+      unless ($obj->starttls()) {
+	  return undef;
+      }
   }
 
   $obj;
@@ -134,6 +134,21 @@ sub ssl_start {
     ) or return undef;
 }
 
+sub starttls {
+    my $self = shift;
+    my %arg = %{ ${*$self}{'net_pop3_arg'} };
+    my %ssl_args = map { +"$_" => $arg{$_} } grep {/^SSL/} keys %arg;
+    my $capa;
+    ($capa = $obj->capa
+     and exists $capa->{STLS}
+     and $self->_STLS()
+     and $self->ssl_start(\%ssl_args, @_)
+    ) or do {
+	$self->set_status(500, ["Cannot start SSL session"]);
+	$self->close();
+	return undef;
+    };
+}
 
 sub capa {
     my $this = shift;
@@ -168,6 +183,8 @@ sub auth {
   }
   $self->SUPER::auth($username, $password);
 }
+
+sub _STLS { shift->command("STLS")->response() == CMD_OK }
 
 # Fix #121006 no timeout issue.
 sub getline {
@@ -204,6 +221,26 @@ document of IO::Socket::SSL about these options detail.
 Just one method difference from the Net::POP3, you may select POP AUTH mechanism
 as the third option of auth() method.
 
+As of Version 3.10 of Net::POP3(libnet) includes SSL/STARTTLS capabilities, so
+this wrapper module's significance disappareing.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( [ HOST ] [, OPTIONS ] )
+
+A few options added to Net::POP3(2.X).
+
+B<doSSL> { C<ssl> | C<starttls> | undef } - to specify SSL connection type.
+C<ssl> makes connection wrapped with SSL, C<starttls> uses POP3 command C<STLS>.
+
+B<SSL> { 0 | 1 } - C<1> means the same as B<doSSL> to C<ssl>, C<0> is just initialize
+SSL libraries internally for using C<starttls> later.
+
+=back
+
+
 =head1 METHODS
 
 Most of all methods of Net::POP3 are inherited as is, except auth().
@@ -215,6 +252,14 @@ Most of all methods of Net::POP3 are inherited as is, except auth().
 
 Attempt SASL authentication through Authen::SASL module. AUTHMETHOD is your required
 method of authentication, like 'CRAM-MD5', 'LOGIN', ... etc. the default is 'CRAM-MD5'.
+
+
+=item starttls ( SSLARGS )
+
+Upgrade existing plain connection to SSL. If you use this, you must create instance like,
+
+    $smtp = Net::POP3S->new($host, SSL => 0, ...);
+
 
 =back
 

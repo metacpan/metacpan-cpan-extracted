@@ -14,7 +14,7 @@ package MCE::Core::Input::Request;
 use strict;
 use warnings;
 
-our $VERSION = '1.829';
+our $VERSION = '1.830';
 
 ## Items below are folded into MCE.
 
@@ -49,8 +49,6 @@ sub _worker_request_chunk {
    my $_chunk_size  = $self->{chunk_size};
    my $_use_slurpio = $self->{use_slurpio};
    my $_RS          = $self->{RS} || $/;
-   my $_RS_FLG      = (!$_RS || $_RS ne $LF);
-   my $_I_FLG       = (!$/ || $/ ne $LF);
    my $_wuf         = $self->{_wuf};
 
    my ($_dat_ex, $_dat_un, $_pid);
@@ -107,7 +105,8 @@ sub _worker_request_chunk {
 
       ## Obtain the next chunk of data.
       {
-         local $\ = undef if (defined $\); local $/ = $LF if ($_I_FLG);
+         local $\ = undef if (defined $\);
+         local $/ = $LF   if ($/ ne $LF );
 
          $_dat_ex->() if $_lock_chn;
          print {$_DAT_W_SOCK} $_output_tag . $LF . $_chn . $LF;
@@ -165,7 +164,7 @@ sub _worker_request_chunk {
             else {
                my @_recs;
                {
-                  local $/ = $_RS if ($_RS_FLG);
+                  local $/ = $_RS if ($/ ne $_RS);
                   _sync_buffer_to_array(\$_, \@_recs, $_chop_str);
                   undef $_;
                }

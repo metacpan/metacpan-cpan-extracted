@@ -1,7 +1,7 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2016 by Andrew Speer <andrew@webdyne.org>.
+#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
 #
 #  This is free software, licensed under:
 #
@@ -50,7 +50,7 @@ use WebDyne::Base;
 
 #  Version information
 #
-$VERSION='1.246';
+$VERSION='1.248';
 
 
 #  Debug load
@@ -62,7 +62,7 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #
 our %CGI_Tag_Ucase=map {$_ => ucfirst($_)} (
 
-    qw(select tr link delete accept sub)
+    qw(select tr link delete accept sub header)
 
 );
 

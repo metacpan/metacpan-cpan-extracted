@@ -23,10 +23,12 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/test-more/issues
   repository: http://github.com/Test-More/test-more/
-version: '1.302086'
+version: '1.302096'
 x_breaks:
   Log::Dispatch::Config::TestLog: '<= 0.02'
   Net::BitTorrent: '<= 0.052'
+  Test2::Harness: '<= 0.000013'
+  Test2::Tools::EventDumper: '<= 0.000007'
   Test::Able: '<= 0.11'
   Test::Aggregate: '<= 0.373'
   Test::Alien: '<= 0.04'

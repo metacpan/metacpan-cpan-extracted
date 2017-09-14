@@ -1,6 +1,6 @@
 package Term::Screen::Lite;
 
-$Term::Screen::Lite::VERSION = '0.03';
+$Term::Screen::Lite::VERSION = '0.04';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Term::Screen::Lite - Platform independent interface to terminal screen.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -56,7 +56,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/Term-Screen-Lite>
+L<https://github.com/manwar/Term-Screen-Lite>
 
 =head1 SEE ALSO
 
@@ -99,7 +99,7 @@ L<http://search.cpan.org/dist/Term-Screen-Lite/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Mohammad S Anwar.
+Copyright (C) 2015 - 2017 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

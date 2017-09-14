@@ -1,11 +1,14 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/Return/MultiLevel.pm
+Makefile.PL
+Makefile_PL_settings.plx
+MANIFEST
+MANIFEST.SKIP
 t/00-load.t
 t/basic.t
 t/debug.t
 t/nested.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Return::MultiLevel POD (added by maint/eumm-fixup.pl)

@@ -22,43 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164946;
+our $VERSION = 1.20170908113147;
 
 my $formatters = [];
 
 my $validators = {
-                'mobile' => '
-          4(?:
-            [0-8]\\d{6,8}|
-            9\\d{9}
-          )|
-          50\\d{6,8}
-        ',
-                'fixed_line' => '18[1-8]\\d{4,6}',
-                'pager' => '',
-                'toll_free' => '800\\d{5,6}',
                 'voip' => '',
-                'personal_number' => '',
-                'geographic' => '18[1-8]\\d{4,6}',
                 'specialrate' => '([67]00\\d{5,6})|(
           10(?:
             0\\d{4,6}|
-            [1-9]\\d{5,7}
+            [1-46-9]\\d{5,7}|
+            5\\d{4,7}
           )|
           2(?:
             0(?:
               0\\d{4,6}|
-              [13-8]\\d{5,7}|
+              [1346-8]\\d{5,7}|
               2(?:
                 [023]\\d{4,5}|
                 [14-9]\\d{4,6}
+              )|
+              5(?:
+                \\d{3}|
+                \\d{5,7}
               )|
               9(?:
                 [0-7]\\d{4,6}|
                 [89]\\d{1,6}
               )
             )|
-            9\\d{6,8}
+            9\\d{5,8}
           )|
           3(?:
             0(?:
@@ -69,6 +62,7 @@ my $validators = {
                 \\d{5,7}
               )
             )|
+            44\\d{3}|
             93\\d{5,7}
           )|
           60(?:
@@ -80,7 +74,19 @@ my $validators = {
             3\\d{8}|
             5[03-9]\\d{5,6}
           )
-        )'
+        )',
+                'fixed_line' => '18[1-8]\\d{4,6}',
+                'mobile' => '
+          4(?:
+            [0-8]\\d{6,8}|
+            9\\d{9}
+          )|
+          50\\d{6,8}
+        ',
+                'toll_free' => '800\\d{5,6}',
+                'pager' => '',
+                'personal_number' => '',
+                'geographic' => '18[1-8]\\d{4,6}'
               };
 my %areanames = (
   35813 => "North\ Karelia",
@@ -88,8 +94,7 @@ my %areanames = (
   35815 => "Mikkeli",
   35816 => "Lapland",
   35817 => "Kuopio",
-  35818 => "Åland\ Islands",
-  35819 => "Nylandia",
+  35819 => "Uusimaa",
   35821 => "Turku\/Pori",
   35822 => "Turku\/Pori",
   35823 => "Turku\/Pori",
@@ -98,14 +103,14 @@ my %areanames = (
   35826 => "Turku\/Pori",
   35827 => "Turku\/Pori",
   35828 => "Turku\/Pori",
-  35831 => "Tavastia",
-  35832 => "Tavastia",
-  35833 => "Tavastia",
-  35834 => "Tavastia",
-  35835 => "Tavastia",
-  35836 => "Tavastia",
-  35837 => "Tavastia",
-  35838 => "Tavastia",
+  35831 => "Häme",
+  35832 => "Häme",
+  35833 => "Häme",
+  35834 => "Häme",
+  35835 => "Häme",
+  35836 => "Häme",
+  35837 => "Häme",
+  35838 => "Häme",
   35851 => "Kymi",
   35852 => "Kymi",
   35853 => "Kymi",

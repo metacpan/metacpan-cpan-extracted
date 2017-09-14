@@ -78,12 +78,12 @@ sub deleteIfLowerThan {
     my $query;
     if ( $rule->{or} ) {
         $query = join ' OR ',
-          map { "cast(a_session -> '$_' as integer) < $rule->{or}->{$_}" }
+          map { "cast(a_session -> '$_' as bigint) < $rule->{or}->{$_}" }
           keys %{ $rule->{or} };
     }
     elsif ( $rule->{and} ) {
         $query = join ' AND ',
-          map { "cast(a_session -> '$_' as integer) < $rule->{or}->{$_}" }
+          map { "cast(a_session -> '$_' as bigint) < $rule->{or}->{$_}" }
           keys %{ $rule->{or} };
     }
     if ( $rule->{not} ) {

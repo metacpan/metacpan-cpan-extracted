@@ -29,7 +29,7 @@ package Net::SSH2::Cisco;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @ISA;
 
 use version;
@@ -66,6 +66,7 @@ sub new {
         autopage              => 1,
         bin_mode              => 0,
         blocking              => 0,
+        buf                   => "",
         cmd_prompt            => '/(?m:^(?:[\w.\/]+\:)?[\w.-]+\s?(?:\(config[^\)]*\))?\s?[\$#>]\s?(?:\(enable\))?\s*$)/',
         cmd_rm_mode           => "auto",
         dumplog               => '',
@@ -140,6 +141,8 @@ sub new {
                 $self->input_record_separator($args{$_})
             } elsif (/^-?max_buffer_length$/i) {
                 $self->max_buffer_length($args{$_})
+            } elsif (/^-?more_prompt$/i) {
+                $self->more_prompt($args{$_})
             } elsif (/^-?normalize_cmd$/i) {
                 $self->normalize_cmd($args{$_})
             } elsif (/^-?output_field_separator$/i or /^-?ofs$/i) {
@@ -309,10 +312,14 @@ sub cmd {
         select(undef,undef,undef,$pause); # sleep
 
         #read
-        ($lines, $last_prompt) = $self->waitfor($prompt);
+        ($lines, $last_prompt) = $self->waitfor(
+                                     match => $prompt,
+                                     normalize_cmd => $normal
+                                 );
     }
 
     return $self->error("command timed-out") if $self->timed_out;
+    return $self->error("no output") if not defined $lines;
     return $self->error($self->errmsg) if $self->errmsg ne "";
 
     ## Split lines into an array, keeping record separator at end of line.
@@ -370,10 +377,6 @@ sub cmd {
             $ok = 0;
             last;
         }
-    }
-
-    if ($normal) {
-        @$output = _normalize (@$output);
     }
 
     ## Return command output via named arg, if requested.
@@ -501,7 +504,7 @@ sub enable {
     # access to run the 'enable' command, the device
     # won't even query for a password, it will just
     # ignore the command and display another [boring] prompt.
-    $self->put("enable " . $en_level . $ors);
+    $self->print("enable " . $en_level);
 
     select(undef,undef,undef,$self->{waitfor_pause}); # sleep
 
@@ -513,15 +516,15 @@ sub enable {
             -match => '/(?i:Passcode)[:\s]*$/',
             -match => "/$old_prompt/",
         ) or do {
-            return &$error("read eof waiting for enable login or password prompt")
+            return $self->error("read eof waiting for enable login or password prompt")
                 if $self->eof;
-            return &$error("timed-out waiting for enable login or password prompt");
+            return $self->error("timed-out waiting for enable login or password prompt");
         };
 
         if (not defined $match) {
             return $self->error("enable failed: access denied or bad name, passwd, etc")
         } elsif ($match =~ /sername|ogin/) {
-            if (!defined $self->put($en_username . $ors)) {
+            if (!defined $self->print($en_username)) {
                 return $self->error("enable failed")
             }
             $self->{last_prompt} = $match;
@@ -530,7 +533,7 @@ sub enable {
             }
             redo
         } elsif ($match =~ /[Pp]assw/ ) {
-            if (!defined $self->put($en_password . $ors)) {
+            if (!defined $self->print($en_password)) {
                 return $self->error("enable failed")
             }
             $self->{last_prompt} = $match;
@@ -539,7 +542,7 @@ sub enable {
             }
             redo
         } elsif ($match =~ /(?i:Passcode)/ ) {
-            if (!defined $self->put($en_passcode . $ors)) {
+            if (!defined $self->print($en_passcode)) {
                 return $self->error("enable failed")
             }
             $self->{last_prompt} = $match;
@@ -556,7 +559,7 @@ sub enable {
         }
     }
 
-    if (not defined $en_level or $en_level =~ /^[1-9]/) {
+    if (($en_level eq '') or ($en_level =~ /^[1-9]/)) {
         # Prompts and levels over 1 give a #/(enable) prompt.
         if ($self->is_enabled) {
             return 1
@@ -731,7 +734,6 @@ sub login {
         "for " . ref($self) . "::login()");
     }
 
-    my $bin     = $self->{bin_mode};
     my $block   = $self->{blocking};
     my $prompt  = $self->{cmd_prompt};
     my $timeout = $self->{time_out};
@@ -791,9 +793,6 @@ sub login {
         my $chan = $ssh->channel();
         $chan->blocking($block); # 0 Needed on Windows
         $chan->shell();
-        if ($bin) {
-            CORE::binmode ($chan)
-        }
         $self->{_SSH_CHAN_} = $chan;
 
         # flush buffer, read off first prompt
@@ -944,6 +943,7 @@ sub open {
         return $self->error("Net::SSH2 error - $errcode:$errname = $errstr\nunable to connect to host - `$host:$port'")
     }
 
+    $self->{buf} = "";
     $self->{eofile} = '';
     $self->{errormsg} = "";
     $self->{opened} = 1;
@@ -1018,6 +1018,11 @@ sub print {
         &_log_print($self->{outputlog}, $buf);
     }
 
+    ## Convert native newlines to CR LF.
+#    if (!$self->{bin_mode}) {
+#        $buf =~ s(\n)(\015\012)g;
+#    }
+
     &_put($self, \$buf, "print");
 }
 
@@ -1075,6 +1080,11 @@ sub put {
         &_log_print($self->{outputlog}, $buf);
     }
 
+    ## Convert native newlines to CR LF.
+#    if (!$self->{bin_mode}) {
+#        $buf =~ s(\n)(\015\012)g;
+#    }
+
     &_put($self, \$buf, "put");
 }
 
@@ -1126,6 +1136,7 @@ sub waitfor {
     my $chan    = $self->{_SSH_CHAN_};
     my $clear   = $self->{waitfor_clear};
     my $cmd     = $self->{last_cmd};
+    my $normal  = $self->{normalize_cmd};
     my $rm      = $self->{cmd_rm_mode};
     my $timeout = $self->{time_out};
 
@@ -1160,6 +1171,8 @@ sub waitfor {
                 $errmode = &_parse_errmode($self, $arg);
             } elsif (/^-?match$/i) {
                 push @matches, _prep_regex($arg)
+            } elsif (/^-?normalize_cmd$/i) {
+                $normal = $arg
             } elsif (/^-?string$/i) {
                 $arg =~ s/'/\\'/g;  # quote ticks
                 push @matches, $arg
@@ -1191,35 +1204,43 @@ sub waitfor {
         while (1) {
             last if $DONE;
             last if $self->eof;
-            my $buf;
             # Read chunk
-            while (defined (my $len = $chan->read($buf,$self->{maxbufsize}))) {
+            while (defined (
+                my $len = $chan->read($self->{buf},$self->{maxbufsize}))) {
 
                 ## Display network traffic if requested.
-                if ($self->{dumplog} and ($buf ne '')) {
-                    &_log_dump('<', $self->{dumplog}, \$buf, 0, $len);
+                if ($self->{dumplog} and ($self->{buf} ne '')) {
+                    &_log_dump('<', $self->{dumplog}, \$self->{buf}, 0, $len);
                 }
+
+                # behave like Net::Telnet(::Cisco) CRLF
+                _interpret_cr($self, 0);
 
                 # input logging
                 if ($self->{inputlog}) {
-                    &_log_print($self->{inputlog}, $buf);
+                    &_log_print($self->{inputlog}, $self->{buf});
                 }
 
                 # Found match then $DONE
                 for my $m (@matches) {
-                    if ($buf =~ /($m)/) {
+                    if ($self->{buf} =~ /($m)/) {
                         $match = $1;
-                        $buf =~ s/$m//;
+                        $self->{buf} =~ s/$m//;
                         $DONE++
                     }
                 }
+
                 # autopage
-                if ($ap and ($buf =~ /($MORE)/)) {
-                    #$buf =~ s/$MORE//g;
+                if ($ap and ($self->{buf} =~ /($MORE)/)) {
                     $self->put(" ");
                 }
-                $buffer .= $buf
+
+                $buffer .= $self->{buf}
             }
+        }
+
+        if ($ap and $normal and defined $buffer) {
+            $buffer = _normalize($buffer);
         }
     };
     alarm 0;
@@ -1241,6 +1262,10 @@ sub waitfor {
         if ($self->{waitfor_clear}) {
             $self->ios_break("Z")
         }
+    }
+
+    if ($self->{waitfor_clear}) {
+        $chan->flush;
     }
 
     if (defined $match and ($match =~ /$PROMPT/)) {
@@ -1334,6 +1359,38 @@ sub _fname_to_handle {
 
     $fh;
 }
+
+sub _interpret_cr {
+    my ($s, $pos) = @_;
+    my (
+    $nextchar,
+    );
+
+    while (($pos = index($s->{buf}, "\015", $pos)) > -1) {
+        $nextchar = substr($s->{buf}, $pos + 1, 1);
+        if ($nextchar eq "\0") {
+            ## Convert CR NULL to CR when in telnet mode.
+            if ($s->{telnet_mode}) {
+                substr($s->{buf}, $pos + 1, 1) = "";
+            }
+        }
+        elsif ($nextchar eq "\012") {
+            ## Convert CR LF to newline when not in binary mode.
+            if (!$s->{bin_mode}) {
+                substr($s->{buf}, $pos, 2) = "\n";
+            }
+        }
+        elsif (!length($nextchar) and ($s->{telnet_mode} or !$s->{bin_mode})) {
+            ## Save CR in alt buffer for possible CR LF or CR NULL conversion.
+            $s->{pushback_buf} .= "\015";
+            chop $s->{buf};
+        }
+
+        $pos++;
+    }
+
+    1;
+} # end sub _interpret_cr
 
 sub _is_open_fh {
     my ($fh) = @_;
@@ -1444,7 +1501,7 @@ sub _normalize {
     1 while s/[^\cH\c?][\cH\c?]//mg; # ^H ^?
     s/^.*\cU//mg;            # ^U
 
-    return wantarray ? split /$/m, $_ : $_; # ORS instead?
+    return wantarray ? split /^/, $_ : $_; # ORS instead?
 }
 
 sub _parse_cmd_remove_mode {
@@ -1899,6 +1956,7 @@ their documentation first, and then come back here.
         [Input_record_separator  => $char,]       # "\n"
         [Max_buffer_length       => $len,]        # 1,048,576 bytes (i.e., 1MB)
         [More_prompt             => $matchop,]    # '/(?m:^\s*--More--)/',
+        [Normalize_cmd           => $boolean,]    # 1
         [Output_field_separator  => $chars,]      # ""
         [Output_log              => $file,]       # ''
         [Output_record_separator => $char,]       # "\n"
@@ -1955,10 +2013,18 @@ handle paging.  Consider sending "terminal length 0" as the first C<cmd()>.
 
     $mode = $obj->binmode($mode);
 
-This method controls whether or not to enable C<binmode> on the
-underlying Net::SSH2::Channel object created in C<connect()>.
+This method controls whether or not sequences of carriage returns and
+line feeds (CR LF or more specifically C<"\015\012">) are translated.
+By default they are translated (i.e. binmode is C<0>).
 
 If no argument is given, the current mode is returned.
+
+If I<$mode> is C<1> then binmode is I<on> and newline translation is
+not done.
+
+If I<$mode> is C<0> then binmode is I<off> and newline translation is
+done.  In the input stream, each sequence of CR LF is converted to
+C<"\n">.
 
 =item B<blocking> - toggle channel blocking
 
@@ -2310,7 +2376,13 @@ With no argument this method returns the current input record
 separator set in the object.  With an argument it sets the input
 record separator to I<$char>.  Note that I<$char> must have length.
 
-Alias:  C<rs>.
+Alias:
+
+=over 4
+
+=item B<rs>
+
+=back
 
 =item B<ios_break> - send a break (control-^)
 
@@ -2440,7 +2512,13 @@ With no argument this method returns the current output field
 separator set in the object.  With an argument it sets the output
 field separator to I<$chars>.
 
-Alias:  C<ofs()>
+Alias:
+
+=over 4
+
+=item B<ofs>
+
+=back
 
 =item B<output_log> - log all output
 
@@ -2488,7 +2566,13 @@ With no argument this method returns the current output record
 separator set in the object.  With an argument it sets the output
 record separator to I<$char>.
 
-Alias:  C<ors()>.
+Alias:
+
+=over 4
+
+=item B<ors>
+
+=back
 
 =item B<port> - remote port
 

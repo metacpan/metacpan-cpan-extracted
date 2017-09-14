@@ -23,7 +23,7 @@ __DATA__
 #include <vas.h>
 
 void* xs_vas_open(const char *s, int pid) {
-    return vas_open(pid, 0);
+    return vas_open(pid, VAS_O_REPORT_ERROR);
 }
 
 void xs_vas_close(const char *s, void *handle) {

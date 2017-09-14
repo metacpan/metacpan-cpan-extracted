@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -24,29 +24,28 @@ use File::Slurp 'slurp';
 use App::Chart::Suffix::NZ;
 
 # uncomment this to run the ### lines
-use Devel::Comments;
+use Smart::Comments;
 
 {
   # old
   # my $content = slurp ("$ENV{'HOME'}/chart/samples/nzx/upcoming_dividends.html");
   # old jul 09
   # my $content = slurp ("$ENV{'HOME'}/chart/samples/nzx/Dividends.html");
-
-  # new jul 11
+  # new sep 17
   my $content = slurp ("$ENV{HOME}/chart/samples/nzx/NZSX.html");
 
   my $resp = HTTP::Response->new (200, 'OK',
                                   ['Content-Type' => 'text/html; charset=utf-8'],
                                   $content);
-  my $req = HTTP::Request->new();
-  $req->uri(App::Chart::Suffix::NZ::DIVIDENDS_URL);
-  $resp->request ($req);
+  # my $req = HTTP::Request->new();
+  # $req->uri(App::Chart::Suffix::NZ::DIVIDENDS_URL);
+  # $resp->request ($req);
 
   ### charset: $resp->content_charset
   # ### resp: $resp->as_string
 
   my $h = App::Chart::Suffix::NZ::dividends_parse ($resp);
-  print Dumper ($h);
+  # print Dumper ($h);
   #  App::Chart::Download::write_daily_group ($h);
   exit 0;
 }

@@ -1,0 +1,4 @@
+---
+clickhouse_proxy:
+  host: 'clickhouse-proxy.example.com'
+  port: 9001

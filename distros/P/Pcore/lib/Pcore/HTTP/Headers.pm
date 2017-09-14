@@ -9,7 +9,14 @@ sub to_string ($self) {
     my $headers = q[];
 
     for ( keys $hash->%* ) {
-        my $header = ( ucfirst lc ) =~ s/_([[:alpha:]])/q[-] . uc $1/smger;
+        my $header;
+
+        if (/[^[:upper:]_]/sm) {
+            $header = $_;
+        }
+        else {
+            $header = ( ucfirst lc ) =~ s/_([[:alpha:]])/q[-] . uc $1/smger;
+        }
 
         for ( grep {defined} $hash->{$_}->@* ) {
             $headers .= $header . q[:] . $_ . $CRLF;

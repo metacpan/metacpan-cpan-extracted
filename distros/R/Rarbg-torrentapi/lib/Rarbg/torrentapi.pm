@@ -2,7 +2,7 @@ package Rarbg::torrentapi;
 
 use strict;
 use 5.008_005;
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 use LWP::UserAgent;
 use JSON;
 use Carp;
@@ -105,6 +105,7 @@ sub _make_request {
         }
     }
     $url .= "format=" . $self->_format . "&";
+    $url .= "ranked=" . $self->ranked . "&";
     $url .= "token=" . $self->_token;
     my $res_json = $self->_ua->get($url);
     if ( $res_json->is_success ) {

@@ -187,42 +187,9 @@ Set the log directory
 sub set_logdir {
     my $self = shift;
 
-    my $logdir;
-
-    if ( $self->has_version ) {
-        if ( $self->has_project ) {
-            $logdir =
-              File::Spec->catdir( 'hpc-runner', $self->version, $self->project,
-                'logs', $self->set_logfile . '-' . $self->logname );
-        }
-        else {
-            $logdir =
-              File::Spec->catdir( 'hpc-runner', $self->version,
-                'logs', $self->set_logfile . '-' . $self->logname );
-        }
-    }
-    else {
-        if ( $self->has_project ) {
-            $logdir =
-              File::Spec->catdir( 'hpc-runner', $self->project,
-                'logs', $self->set_logfile . '-' . $self->logname );
-        }
-        else {
-            $logdir =
-              File::Spec->catdir( 'hpc-runner',
-                'logs', $self->set_logfile . '-' . $self->logname );
-        }
-    }
-
+    my $logdir = File::Spec->catdir($self->basedir, 'logs',  $self->logname );
     $logdir =~ s/\.log$//;
-
-    # my $dt = DateTime->now( time_zone => 'local' );
-    # $dt = "$dt";
-    # $dt =~ s/:/-/g;
-    #
-    # $logdir = File::Spec->catdir( $logdir, $dt );
-
-    $self->_make_the_dirs($logdir);
+    make_path($logdir);
 
     return $logdir;
 }

@@ -6,6 +6,9 @@ use utf8;
 use parent 'WebService::Slack::WebApi::Base';
 
 use WebService::Slack::WebApi::Generator (
+    revoke => {
+        test => { isa => 'Bool', optional => 1 },
+    },
     test => +{},
 );
 

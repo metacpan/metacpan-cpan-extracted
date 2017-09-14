@@ -2,9 +2,11 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001009';
 
 use Carp qw/croak/;
+
+use File::Spec;
 
 use Test2::Harness::Util::JSON qw/encode_pretty_json/;
 
@@ -15,6 +17,7 @@ use Test2::Harness::Util::HashBase qw{
     -show_job_info
     -show_job_launch
     -show_job_end
+    -times
 };
 
 sub init {
@@ -30,7 +33,13 @@ sub render_event {
     my $self = shift;
     my ($event) = @_;
 
-    my $f = $event->{facet_data};
+    my $f = $event->facet_data;
+
+    my $times = $self->{+TIMES} ||= {};
+    if($f->{times}) {
+        my $job_id = $event->job_id;
+        $times->{$job_id} = $f->{about}->{details};
+    }
 
     $f->{harness} = {%$event};
     delete $f->{harness}->{facet_data};
@@ -54,7 +63,7 @@ sub render_event {
                 tag       => 'LAUNCH',
                 debug     => 0,
                 important => 1,
-                details   => $job->file,
+                details   => File::Spec->abs2rel($job->file),
             };
         }
 
@@ -72,14 +81,14 @@ sub render_event {
         my $fail = $f->{harness_job_end}->{fail};
         my $file = $f->{harness_job_end}->{file};
 
-        $f->{harness}->{job_id} ||= $job->{job_id};
+        my $job_id = $f->{harness}->{job_id} ||= $job->{job_id};
 
         if ($self->{+SHOW_JOB_END}) {
             unshift @{$f->{info}} => {
                 tag => $skip ? 'SKIPPED' : $fail ? 'FAILED' : 'PASSED',
                 debug     => $fail,
                 important => 1,
-                details   => $file,
+                details   => File::Spec->abs2rel($file),
             };
             push @{$f->{info}} => {
                 tag       => 'SKIPPED',
@@ -87,6 +96,17 @@ sub render_event {
                 important => 1,
                 details   => $skip,
             } if $skip;
+
+            # In verbose mode the timer will be printed anyway. Otherwise we
+            # will attach it to the end event.
+            if (my $time = $times->{$job_id}) {
+                push @{$f->{info}} => {
+                    tag       => 'TIME',
+                    debug     => 0,
+                    important => 1,
+                    details   => $time,
+                } unless $self->{+SHOW_JOB_LAUNCH};
+            }
         }
     }
 

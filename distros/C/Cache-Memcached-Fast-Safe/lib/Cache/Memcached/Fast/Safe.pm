@@ -3,21 +3,26 @@ package Cache::Memcached::Fast::Safe;
 use strict;
 use warnings;
 use Cache::Memcached::Fast 0.19;
-use URI::Escape::XS qw/uri_escape/;
 use Digest::SHA qw/sha1_hex/;
 use parent qw/Cache::Memcached::Fast/;
 use POSIX::AtFork;
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '0.05';
-our $SANITIZE_METHOD = sub {
-    my $key = shift;
-    $key = uri_escape($key,"\x00-\x20\x7f-\xff");
-    if ( length $key > 200 ) {
-        $key = sha1_hex($key);
+our $VERSION = '0.06';
+our $SANITIZE_METHOD = \&_sanitize_method;
+
+{
+    use bytes;
+    my %escapes = map { chr($_) => sprintf('%%%02X', $_) } (0x00..0x20, 0x7f..0xff);
+    sub _sanitize_method {
+        my $key = shift;
+        $key =~ s/([\x00-\x20\x7f-\xff])/$escapes{$1}/ge;
+        if ( length $key > 200 ) {
+            $key = sha1_hex($key);
+        }
+        $key;
     }
-    $key;
-};
+}
 
 sub new {
     my $class = shift;
@@ -179,9 +184,11 @@ callback can also return expires sec.
 This module allow to change sanitizing behavior through $Cache::Memcached::Fast::Safe::SANITIZE_METHOD.
 Default sanitizer is
 
+  use bytes;
+  my %escapes = map { chr($_) => sprintf('%%%02X', $_) } (0x00..0x20, 0x7f..0xff);
   local $Cache::Memcached::Fast::Safe::SANITIZE_METHOD = sub {
       my $key = shift;
-      $key = uri_escape($key,"\x00-\x20\x7f-\xff");
+      $key =~ s/([\x00-\x20\x7f-\xff])/$escapes{$1}/ge;
       if ( length $key > 200 ) {
           $key = sha1_hex($key);
       }

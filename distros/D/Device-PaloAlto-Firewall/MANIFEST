@@ -13,6 +13,7 @@ lib/Device/PaloAlto/Firewall/Test.pm
 t/00-load.t
 t/000-http_errors.t
 t/001-pa_errors.t
+t/002-invalid_xml.t
 t/01-tester.t
 t/02-interfaces.t
 t/03-routes.t
@@ -32,6 +33,8 @@ t/16-ipsec_peers.t
 t/17-vpn_tunnels.t
 t/18-version.t
 t/19-ospf_neighbours.t
+t/20-licenses.t
+t/21-update_checks.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

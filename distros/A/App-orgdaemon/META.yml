@@ -22,4 +22,4 @@ requires:
   Tk: 0
 resources:
   repository: git://github.com/eserte/org-daemon.git
-version: 1.04
+version: 1.05

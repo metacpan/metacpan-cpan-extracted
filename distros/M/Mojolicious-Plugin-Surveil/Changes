@@ -1,5 +1,7 @@
-Changelog for Mojolicious::Plugin::Surveil
+Revision history for perl distribution Mojolicious-Plugin-Surveil
 
-0.01     Wed Jul 30 08:08:30 2014
-       * First EXPERIMENTAL release
+0.02 2017-09-11T11:07:55+0200
+ - Add support for console.surveil() on in JavaScript
 
+0.01 2014-07-30T08:08:30Z
+ - First EXPERIMENTAL release

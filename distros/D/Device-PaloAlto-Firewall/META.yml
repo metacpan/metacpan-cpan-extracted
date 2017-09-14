@@ -22,19 +22,21 @@ name: Device-PaloAlto-Firewall
 provides:
   Device::PaloAlto::Firewall:
     file: lib/Device/PaloAlto/Firewall.pm
-    version: '0.081'
+    version: '0.091'
   Device::PaloAlto::Firewall::Test:
     file: lib/Device/PaloAlto/Firewall/Test.pm
-    version: '0.081'
+    version: '0.091'
 requires:
   Carp: '0'
   Data::Dumper: '0'
+  Devel::StackTrace: '0'
   HTTP::Request: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
   Memoize: '0'
   Modern::Perl: '0'
   Moose: '0'
+  POSIX: '0'
   Params::Validate: '0'
   URI: '1.61'
   XML::Twig: '0'
@@ -45,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/gregfoletta/Device-PaloAlto/issues
   repository: git://github.com/gregfoletta/Device-PaloAlto.git
-version: '0.081'
+version: '0.091'
 x_serialization_backend: 'YAML::Tiny version 1.70'

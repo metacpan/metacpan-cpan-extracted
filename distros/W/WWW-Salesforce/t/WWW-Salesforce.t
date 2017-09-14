@@ -3,28 +3,35 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
-use Data::Dumper;
+use Test::More tests => 37;
+# use Data::Dumper;
 use SOAP::Lite;
 use POSIX qw(strftime);
 
-BEGIN {
-    use_ok('WWW::Salesforce::Simple');
-    can_ok(
-        'WWW::Salesforce::Simple',
-        (
-            qw( new login bye do_query do_queryAll _retrieve_queryMore get_field_list get_tables )
-        )
-    );
+use WWW::Salesforce ();
+use WWW::Salesforce::Simple ();
 
-    use_ok('WWW::Salesforce');
-    can_ok(
-        'WWW::Salesforce',
-        (
-            qw( getErrorDetails checkRetrieveStatus checkAsyncStatus retrieveMetadata describeMetadata get_session_headerM get_clientM update upsert search setPassword retrieve resetPassword query queryAll queryMore getUserInfo getDeleted getUpdated getServerTimestamp get_client get_session_header logout describeLayout describeSObjects describeTabs describeSObject create delete describeGlobal convertLead new bye do_query do_queryAll _retrieve_queryMore get_field_list get_tables )
-        )
-    );
-}
+can_ok(
+    'WWW::Salesforce::Simple',
+    (
+        qw(new login bye do_query do_queryAll _retrieve_queryMore),
+        qw(get_field_list get_tables),
+    )
+);
+
+can_ok(
+    'WWW::Salesforce',
+    (
+        qw(getErrorDetails checkRetrieveStatus checkAsyncStatus),
+        qw(retrieveMetadata describeMetadata get_session_headerM get_clientM),
+        qw(update upsert search setPassword retrieve resetPassword query),
+        qw(queryAll queryMore getUserInfo getDeleted getUpdated),
+        qw(getServerTimestamp get_client get_session_header logout),
+        qw(describeLayout describeSObjects describeTabs describeSObject create),
+        qw(delete describeGlobal convertLead new bye do_query do_queryAll),
+        qw(_retrieve_queryMore get_field_list get_tables),
+    )
+);
 
 # skip tests under automated testing or without user and pass
 my $automated  = $ENV{AUTOMATED_TESTING};
@@ -496,4 +503,3 @@ sub reportFailureDetails {
     diag "ERROR: $failureDetails->{message}";
     diag "CODE: $failureDetails->{statusCode}";
 }
-

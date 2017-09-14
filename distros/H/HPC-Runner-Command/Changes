@@ -1,5 +1,8 @@
 Revision history for HPC-Runner-Command
 
+3.2.11  2017-09-11 13:50:17 GST
+	- Milestones - https://github.com/biosails/HPC-Runner-Command/milestone/3
+
 3.2.10  2017-08-28 09:33:43 GST
 	- Rolling back JSON::Logger features for now - problematic on some filesystems
 	- Rolling back memory profiling - requires JSON::Logger

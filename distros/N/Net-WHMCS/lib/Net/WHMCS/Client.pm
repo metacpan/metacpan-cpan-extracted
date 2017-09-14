@@ -1,6 +1,5 @@
 package Net::WHMCS::Client;
-$Net::WHMCS::Client::VERSION = '0.08';
-
+$Net::WHMCS::Client::VERSION = '0.09';
 # ABSTRACT: WHMCS API Clients
 
 use Moo;
@@ -9,89 +8,92 @@ with 'Net::WHMCS::Base';
 use Carp 'croak';
 
 sub getclientsdetails {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'getclientsdetails';
+    my ($self, $params) = @_;
+    $params->{action} = 'GetClientsDetails';
     return $self->build_request($params);
 }
 
 sub addclient {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'addclient';
+    my ($self, $params) = @_;
+    $params->{action} = 'AddClient';
     return $self->build_request($params);
 }
 
 sub updateclient {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'updateclient';
+    my ($self, $params) = @_;
+    $params->{action} = 'UpdateClient';
     return $self->build_request($params);
 }
 
 sub deleteclient {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'deleteclient';
+    my ($self, $params) = @_;
+    $params->{action} = 'DeleteClient';
     return $self->build_request($params);
 }
 
 sub closeclient {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'closeclient';
+    my ($self, $params) = @_;
+    $params->{action} = 'CloseClient';
+    return $self->build_request($params);
+}
+
+sub addclientnote {
+    my ($self, $params) = @_;
+    $params->{action} = 'AddClientNote';
     return $self->build_request($params);
 }
 
 sub getclients {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'getclients';
+    $params->{action} = 'GetClients';
     return $self->build_request($params);
 }
 
 sub getclientpassword {
-    my ( $self, $params ) = @_;
-    $params->{action} = 'getclientpassword';
+    my ($self, $params) = @_;
+    $params->{action} = 'GetClientPassword';
     return $self->build_request($params);
 }
 
 sub getclientsproducts {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'getclientsproducts';
+    $params->{action} = 'GetClientsProducts';
     return $self->build_request($params);
 }
 
 sub updateclientproduct {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'updateclientproduct';
+    $params->{action} = 'UpdateClientProduct';
     croak 'serviceid is required.' unless $params->{serviceid};
     return $self->build_request($params);
 }
 
 sub upgradeproduct {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'upgradeproduct';
-    foreach my $r (
-        qw/clientid serviceid type newproductid newproductbillingcycle paymentmethod/
-      )
-    {
+    $params->{action} = 'UpgradeProduct';
+    foreach my $r (qw/clientid serviceid type newproductid newproductbillingcycle paymentmethod/) {
         croak "$r is required." unless $params->{$r};
     }
     return $self->build_request($params);
 }
 
 sub validatelogin {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'validatelogin';
+    $params->{action} = 'ValidateLogin';
     croak 'email is required.'    unless $params->{email};
     croak 'password2 is required' unless $params->{password2};
     return $self->build_request($params);
 }
 
 sub sendemail {
-    my ( $self, $params ) = @_;
+    my ($self, $params) = @_;
     $params ||= {};
-    $params->{action} = 'sendemail';
+    $params->{action} = 'SendEmail';
     return $self->build_request($params);
 }
 
@@ -109,7 +111,7 @@ Net::WHMCS::Client - WHMCS API Clients
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head2 getclientsdetails
 
@@ -118,7 +120,7 @@ version 0.08
 		stats => 'true',
 	})
 
-L<http://docs.whmcs.com/API:Get_Clients_Details>
+L<https://developers.whmcs.com/api-reference/getclientsdetails/>
 
 =head2 addclient
 
@@ -129,7 +131,7 @@ L<http://docs.whmcs.com/API:Get_Clients_Details>
 		...
 	})
 
-L<http://docs.whmcs.com/API:Add_Client>
+L<https://developers.whmcs.com/api-reference/addclient/>
 
 =head2 updateclient
 
@@ -141,7 +143,7 @@ L<http://docs.whmcs.com/API:Add_Client>
 		...
 	})
 
-L<http://docs.whmcs.com/API:Update_Client>
+L<https://developers.whmcs.com/api-reference/updateclient/>
 
 =head2 deleteclient
 
@@ -149,21 +151,30 @@ L<http://docs.whmcs.com/API:Update_Client>
 		clientid => 1
 	})
 
-L<http://docs.whmcs.com/API:Delete_Client>
+L<https://developers.whmcs.com/api-reference/deleteclient/>
 
 =head2 closeclient
 
 	$client->closeclient({
 		clientid => 1
-	})
+	});
 
-L<http://docs.whmcs.com/API:Close_Client>
+L<https://developers.whmcs.com/api-reference/closeclient/>
+
+=head2 addclientnote
+
+	$client->addclientnote({
+		userid => 1,
+		notes => 'Test Message'
+	});
+
+L<https://developers.whmcs.com/api-reference/addclientnote/>
 
 =head2 getclients
 
 	$client->getclients()
 
-L<http://docs.whmcs.com/API:Get_Clients>
+L<https://developers.whmcs.com/api-reference/getclients/>
 
 =head2 getclientpassword
 
@@ -171,7 +182,7 @@ L<http://docs.whmcs.com/API:Get_Clients>
 		userid => 1
 	})
 
-L<http://docs.whmcs.com/API:Get_Clients_Password>
+L<https://developers.whmcs.com/api-reference/getclientpassword/>
 
 =head2 getclientsproducts
 
@@ -179,7 +190,7 @@ L<http://docs.whmcs.com/API:Get_Clients_Password>
 		clientid => 1
 	})
 
-L<http://docs.whmcs.com/API:Get_Clients_Products>
+L<https://developers.whmcs.com/api-reference/getclientsproducts/>
 
 =head2 updateclientproduct
 
@@ -188,7 +199,7 @@ L<http://docs.whmcs.com/API:Get_Clients_Products>
 		...
 	});
 
-L<http://docs.whmcs.com/API:Update_Client_Product>
+L<https://developers.whmcs.com/api-reference/updateclientproduct/>
 
 =head2 upgradeproduct
 
@@ -201,7 +212,7 @@ L<http://docs.whmcs.com/API:Update_Client_Product>
 		paymentmethod => 'paypal'
 	});
 
-L<http://docs.whmcs.com/API:Upgrade_Product>
+L<https://developers.whmcs.com/api-reference/upgradeproduct/>
 
 =head2 validatelogin
 
@@ -210,7 +221,7 @@ L<http://docs.whmcs.com/API:Upgrade_Product>
 		password2 => 'abc123'
 	});
 
-L<http://docs.whmcs.com/API:Validate_Login>
+L<https://developers.whmcs.com/api-reference/validatelogin/>
 
 =head2 sendemail
 
@@ -219,7 +230,7 @@ L<http://docs.whmcs.com/API:Validate_Login>
 		messagename => 'blabla'
 	})
 
-L<http://docs.whmcs.com/API:Send_Email>
+L<https://developers.whmcs.com/api-reference/sendemail/>
 
 =head1 AUTHOR
 
@@ -227,7 +238,7 @@ Fayland Lam <fayland@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Fayland Lam.
+This software is copyright (c) 2017 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

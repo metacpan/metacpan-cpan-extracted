@@ -4,7 +4,7 @@
       "Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.4",
    "license" : [
       "mit"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -109,6 +109,9 @@
       "WebService::Slack::WebApi::Oauth" : {
          "file" : "lib/WebService/Slack/WebApi/Oauth.pm"
       },
+      "WebService::Slack::WebApi::Pins" : {
+         "file" : "lib/WebService/Slack/WebApi/Pins.pm"
+      },
       "WebService::Slack::WebApi::Reactions" : {
          "file" : "lib/WebService/Slack/WebApi/Reactions.pm"
       },
@@ -139,11 +142,12 @@
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "likkradyus <git@li.que.jp>",
       "Yanick Champoux <yanick@babyl.dyndns.org>",
       "Sterling Hanenkamp <sterling@hanenkamp.com>",
-      "Steven Arnott <steven.arnott@grantstreet.com>"
+      "Steven Arnott <steven.arnott@grantstreet.com>",
+      "Askar Timirgazin <anotheroneackap@gmail.com>"
    ]
 }

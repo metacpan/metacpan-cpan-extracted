@@ -2,7 +2,7 @@ NAME
     Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 VERSION
-    Version 0.04
+    Version 0.06
 
 SYNOPSIS
         package My::MarkupEnabled;
@@ -110,7 +110,7 @@ METHODS
     Generate a single XML element. Generates a new document unless $DOC is
     specified. Defaults to XHTML if no namespace map is provided.
 
-  _XML $SPEC [, $PARENT, $DOC, $ARGS | @ARGS ] | %PARAMS
+  _XML $SPEC [, $PARENT, $DOC, \@ARGS | @ARGS ] | %PARAMS
     Generate an XML tree according to the specification format. Returns the
     *last node generated* by the process. Parameters are as follows:
 
@@ -126,7 +126,24 @@ METHODS
 
     parent
         The XML::LibXML::Element (or, redundantly, Document) object which is
-        intended to be the parent node of the spec. Optional.
+        intended to be the *parent node* of the spec. Optional; defaults to
+        the document.
+
+    replace
+        Suppose we're doing surgery to an existing XML document. Instead of
+        supplying a "parent", we can supply a node in said document which we
+        want to *replace*. Note that this parameter is incompatible with
+        "parent", is meaningless for some node types (e.g. "-doctype"), and
+        may fail in some contexts (e.g. when the node to be replaced is the
+        document).
+
+    before, after
+        Why stop at replacing nodes? Sometimes we need to snuggle a new set
+        of nodes up to one side or the other of a sibling at the same level.
+        Will fail if the sibling node has no parent. Will also fail if you
+        do things like try to add a second root element. Optional of course.
+        Once again, all these parameters, "parent", "replace", "before" and
+        "after", are *mutually conflicting*.
 
     args
         An "ARRAY" reference of arguments to be passed into "CODE"
@@ -269,6 +286,10 @@ METHODS
         then the XML namespaces will *not* be set. Conversely, if this
         parameter is defined but false, then *only* the contents of "ns"
         will appear in the conventional "xmlns:foo" way.
+
+    vocab
+        This will specify a default "vocab" attribute in the "<html>"
+        element, like <http://www.w3.org/1999/xhtml/vocab/>.
 
     title
         This can either be a literal title string, or "CODE" reference, or

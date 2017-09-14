@@ -1,0 +1,38 @@
+---
+abstract: 'Import functions à la Invader Zim'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+  strict: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Importer-Zim
+provides:
+  Importer::Zim:
+    file: lib/Importer/Zim.pm
+    version: v0.2.0
+  zim:
+    file: lib/zim.pm
+    version: v0.2.0
+requires:
+  Module::Runtime: '0'
+  perl: '5.018'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Importer-Zim/issues
+  homepage: https://github.com/aferreira/cpan-Importer-Zim
+  repository: https://github.com/aferreira/cpan-Importer-Zim.git
+version: 0.2.0
+x_contributors:
+  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

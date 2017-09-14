@@ -370,10 +370,14 @@ const our $STRPTIME_TOKEN => {
     ],
     B => [    # the full  month  name ('January')
         '((?i:' . join( q[|], sort $MONTH->@* ) . '))',
-        '\$args{month} = \$1',
+        '\$args{month} = \$MONTH_NUM->{lc $1}',
     ],
     d => [    # day of the month (01..31)
         '(\d\d)',
+        '\$args{day} = \$1',
+    ],
+    e => [    # day of the month without leading zeroes (1..31)
+        '(\d\d?)',
         '\$args{day} = \$1',
     ],
     H => [    # hour of the day, 24-hour clock (00..23)
@@ -381,7 +385,7 @@ const our $STRPTIME_TOKEN => {
         '\$args{hour} = \$1',
     ],
     m => [    # month of the year (01..12)
-        '(\d\d)',
+        '(\d\d?)',
         '\$args{month} = \$1',
     ],
     M => [    # minute of the hour (00..59)
@@ -507,9 +511,9 @@ PERL
 ## |======+======================+================================================================================================================|
 ## |    1 | 369, 373, 377, 381,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |      | 385, 389, 393, 397,  |                                                                                                                |
-## |      | 401, 405, 409        |                                                                                                                |
+## |      | 401, 405, 409, 413   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 404                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 408                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

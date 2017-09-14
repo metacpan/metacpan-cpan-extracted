@@ -1,4 +1,7 @@
 Revision history for App-pwhich
 
+1.15      2017-09-12 22:20:43 -0400
+  - Add -s option
+
 1.14      2015-03-29 06:04:24 -0400
   - App::which was spun off from File-Which

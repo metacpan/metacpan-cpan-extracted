@@ -1,6 +1,6 @@
 package Catmandu::Store::File::MediaHaven::Searcher;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Catmandu::Sane;
 use Moo;
@@ -69,7 +69,7 @@ sub hit2rec {
         return $self->bag->store->id_fixer->fix($hit);
     }
     else {
-        my $id = $hit->{externalId};
+        my $id = $hit->{fragmentId};
         return +{_id => $id};
     }
 }

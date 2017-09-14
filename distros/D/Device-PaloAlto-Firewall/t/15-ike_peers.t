@@ -17,22 +17,22 @@ my $test = $fw->tester();
 # No IKE Configured
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ike_configured() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ike_peers(), 'ARRAY', "No IKE configured returns ARRAYREF" );
+isa_ok( $fw->ike_peers(), 'ARRAY' );
 is_deeply( $fw->ike_peers(), [] , "No IKE configured returns an empty ARRAYREF" );
 
 # No IKE Up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( no_ike_up() )->simplify(forcearray => ['entry'] )->{result} } );
 
-isa_ok( $fw->ike_peers(), 'ARRAY', "No IKE up returns ARRAYREF" );
+isa_ok( $fw->ike_peers(), 'ARRAY' );
 is_deeply( $fw->ike_peers(), [] , "No IKE up returns an empty ARRAYREF" );
 
 # IKE up no IPSEC
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( ike_up_no_ipsec() )->simplify(forcearray => ['entry'] )->{result} } );
-isa_ok( $fw->ike_peers(), 'ARRAY', "IKE up, no IPSEC returns ARRAYREF" );
+isa_ok( $fw->ike_peers(), 'ARRAY' );
 
 # All up
 $fw->meta->add_method('_send_request', sub { return XML::Twig->new()->safe_parse( all_up() )->simplify(forcearray => ['entry'] )->{result} } );
-isa_ok( $fw->ike_peers(), 'ARRAY', "IKE and IPSEC up returns ARRAYREF" );
+isa_ok( $fw->ike_peers(), 'ARRAY' );
 
 
 

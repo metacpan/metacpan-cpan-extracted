@@ -1,0 +1,34 @@
+<defs>
+  <marker id="transition_arrowhead" markerHeight=5 markerWidth=5 markerUnits="strokeWidth" orient="auto" refX=40 refY=0 viewBox="-5 -5 10 10">
+    <path d="M 0,0 m -5,-5 L 5,0 L -5,5 Z" fill="black" />
+  </marker>
+  <marker id="line_marker_arrowhead" markerHeight=5 markerWidth=5 markerUnits="strokeWidth" orient="auto" refX=0 refY=0 viewBox="-5 -5 10 10">
+    <path d="M 0,0 m -5,-5 L 5,0 L -5,5 Z" fill="black" />
+  </marker>
+  <marker id="line_marker_diamond" markerHeight=8 markerWidth=8 markerUnits="strokeWidth" orient="auto" refX=0 refY=0 viewBox="-8 -8 16 16">
+    <path d="M 0,0 m -5,0 L 0,5 L 5,0 L 0,-5 Z"  fill="white" stroke="black" stroke-width=2 stroke-dasharray="0" stroke-linecap="square" />
+  </marker>
+</defs>
+
+<filter id="focus" x="-100%" y="-100%" height="300%" width="300%">
+  <feFlood result="flood" flood-color="#FFD700" flood-opacity="1"></feFlood>
+  <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+  <feMorphology in="mask" result="dilated" operator="dilate" radius="5"></feMorphology>
+  <feGaussianBlur in="dilated" result="blurred" stdDeviation="3"></feGaussianBlur>
+  <feMerge>
+    <feMergeNode in="blurred"></feMergeNode>
+    <feMergeNode in="SourceGraphic"></feMergeNode>
+  </feMerge>
+</filter>
+
+<filter id="hover" x="-100%" y="-100%" height="300%" width="300%">
+  <feFlood result="flood" flood-color="#80A8FF" flood-opacity="1"></feFlood>
+  <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+  <feMorphology in="mask" result="dilated" operator="dilate" radius="5"></feMorphology>
+  <feGaussianBlur in="dilated" result="blurred" stdDeviation="3"></feGaussianBlur>
+  <feMerge>
+    <feMergeNode in="blurred"></feMergeNode>
+    <feMergeNode in="SourceGraphic"></feMergeNode>
+  </feMerge>
+</filter>
+

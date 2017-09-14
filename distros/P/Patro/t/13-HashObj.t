@@ -55,10 +55,16 @@ is(eval{$r1->uckeys}, 72, 'called remote method');
 is($@,'', 'remote method did not cause an error');
 ok(!exists($r1->{ghi}) && exists($r1->{GHI}),
    'remote object call affects remote object');
-ok_threaded(exists $r0->{GHI}, 'remote object call affects local object');
+ SKIP: {
+     if ($c->{config}{style} ne 'threaded') {
+	 skip("update to proxy won't affect remote on non-threaded server",1);
+     }
+     ok(exists $r0->{GHI}, 'remote object call affects local object');
+}
 
 ok($r1->can('uckeys'), '$proxy->can ok on existing method name');
 ok(!$r1->can('blech'), '$proxy->can ok on bogus method name');
+ok(eval { Patro::N1->can('blech'); 1 }, 'Patro::N1->can ok');
 
 done_testing;
 

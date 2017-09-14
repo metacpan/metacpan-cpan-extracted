@@ -1,4 +1,14 @@
 HISTORY
+
+  0.22 -- Todd Rinaldo Sept 12, 2017
+   - Adjust broken issue tracker URL
+   - Release to public.
+
+  0.21_01 -- Todd Rinaldo Sept 11, 2017
+   - Address strict warnings in module.
+   - Fix POD error - thanks Michael LaGrasta
+   - Move tracker to github - https://github.com/toddr/Regexp-Parser/issues
+
   0.21    -- Todd Rinaldo May 28, 2011
    - CPAN Testers looks good. Releasing to stable. No changes other than version.
 

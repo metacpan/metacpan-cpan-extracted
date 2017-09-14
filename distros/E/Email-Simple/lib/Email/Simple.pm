@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Email::Simple;
 # ABSTRACT: simple parsing of RFC2822 message format and headers
-$Email::Simple::VERSION = '2.213';
+$Email::Simple::VERSION = '2.214';
 use Carp ();
 
 use Email::Simple::Creator;
@@ -237,6 +237,13 @@ sub header_obj_set {
 #pod
 #pod This is another name (and the preferred one) for C<header_set>.
 #pod
+#pod =method header_raw_prepend
+#pod
+#pod   $email->header_raw_prepend($field => $value);
+#pod
+#pod This method adds a new instance of the name field as the first field in the
+#pod header.
+#pod
 #pod =method header_names
 #pod
 #pod     my @header_names = $email->header_names;
@@ -267,6 +274,7 @@ BEGIN {
   for my $method (qw(
     header_raw header
     header_raw_set header_set
+    header_raw_prepend
     header_raw_pairs header_pairs
     header_names
   )) {
@@ -340,7 +348,7 @@ Email::Simple - simple parsing of RFC2822 message format and headers
 
 =head1 VERSION
 
-version 2.213
+version 2.214
 
 =head1 SYNOPSIS
 
@@ -453,6 +461,13 @@ This is another name (and the preferred one) for C<header>.
 =head2 header_raw_set
 
 This is another name (and the preferred one) for C<header_set>.
+
+=head2 header_raw_prepend
+
+  $email->header_raw_prepend($field => $value);
+
+This method adds a new instance of the name field as the first field in the
+header.
 
 =head2 header_names
 

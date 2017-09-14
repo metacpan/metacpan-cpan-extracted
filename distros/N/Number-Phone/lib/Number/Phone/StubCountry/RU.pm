@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170702164948;
+our $VERSION = 1.20170908113149;
 
 my $formatters = [
                 {
@@ -34,12 +34,14 @@ my $formatters = [
                   'pattern' => '([3489]\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(7\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '7'
+                  'leading_digits' => '7',
+                  'pattern' => '(7\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
+                'personal_number' => '808\\d{7}',
                 'geographic' => '
           (?:
             3(?:
@@ -69,9 +71,8 @@ my $validators = {
             )
           )\\d{7}
         ',
+                'voip' => '',
                 'specialrate' => '(80[39]\\d{7})',
-                'personal_number' => '',
-                'mobile' => '9\\d{9}',
                 'fixed_line' => '
           (?:
             3(?:
@@ -101,9 +102,8 @@ my $validators = {
             )
           )\\d{7}
         ',
-                'voip' => '',
-                'toll_free' => '80[04]\\d{7}',
-                'pager' => ''
+                'mobile' => '9\\d{9}',
+                'toll_free' => '80[04]\\d{7}'
               };
 my %areanames = (
   7301 => "Republic\ of\ Buryatia",

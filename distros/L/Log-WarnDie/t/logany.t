@@ -14,7 +14,7 @@ LOGANY: {
 	if($@) {
 		plan skip_all => "Log::Any::Adapter required for checking Log::Any";
 	} else {
-		plan tests => 4;
+		plan tests => 5;
 
 		use_ok('Log::WarnDie');
 		can_ok('Log::WarnDie', qw(dispatcher import unimport));
@@ -23,14 +23,21 @@ LOGANY: {
 		Log::Any::Adapter->set('File', $filename);
 		Log::WarnDie->dispatcher(Log::Any->get_logger());
 
-		my $warn = "This warning will be displayed\n";
+		my $warn = "This warning will be displayed and saved\n";
 
 		warn $warn;
 
 		my $die = "This die will not be displayed\n";
 		eval {die $die};
 
+		Log::WarnDie->dispatcher(undef);
+
+		my $warn2 = "This warning will not be saved\n";
+
+		warn $warn2;
+
 		file_contents_like($filename, $warn, 'Verify warn message is logged');
 		file_contents_like($filename, $die, 'Verify die message is logged');
+		file_contents_unlike($filename, $warn2, 'Verify warn message is no longer logged');
 	}
 }

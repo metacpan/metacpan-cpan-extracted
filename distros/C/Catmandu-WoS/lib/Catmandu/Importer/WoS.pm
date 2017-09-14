@@ -2,7 +2,7 @@ package Catmandu::Importer::WoS;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use MIME::Base64 qw(encode_base64);
 use XML::Compile::WSDL11;
@@ -18,11 +18,16 @@ with 'Catmandu::Importer';
 
 has username => (is => 'ro', required => 1);
 has password => (is => 'ro', required => 1);
-has query    => (is => 'ro', required => 1);
-has session_id => (is => 'lazy');
-has _init      => (is => 'lazy');
-has _search    => (is => 'rwp');
-has _retrieve  => (is => 'rwp');
+has query    => (is => 'ro');
+has cited_references => (is => 'ro');
+has session_id       => (is => 'lazy');
+has _init            => (is => 'lazy');
+
+# clients
+has _search                  => (is => 'rwp');
+has _retrieve                => (is => 'rwp');
+has _citedReferences         => (is => 'rwp');
+has _citedReferencesRetrieve => (is => 'rwp');
 
 sub _build_session_id {
     my ($self) = @_;
@@ -66,10 +71,28 @@ sub _build__init {
         $ua->request($req);
     };
 
-    $self->_set__search(
-        $wsdl->compileClient('search', transport_hook => $transport_hook));
-    $self->_set__retrieve(
-        $wsdl->compileClient('retrieve', transport_hook => $transport_hook));
+    if ($self->query) {
+        $self->_set__search(
+            $wsdl->compileClient('search', transport_hook => $transport_hook)
+        );
+        $self->_set__retrieve(
+            $wsdl->compileClient(
+                'retrieve', transport_hook => $transport_hook
+            )
+        );
+    }
+    elsif ($self->cited_references) {
+        $self->_set__citedReferences(
+            $wsdl->compileClient(
+                'citedReferences', transport_hook => $transport_hook
+            )
+        );
+        $self->_set__citedReferencesRetrieve(
+            $wsdl->compileClient(
+                'citedReferencesRetrieve', transport_hook => $transport_hook
+            )
+        );
+    }
 
     undef $wsdl;
 
@@ -94,24 +117,45 @@ sub generator {
             my $res;
 
             if (defined $query_id) {
-                $res = $self->_retrieve->(
+                my $args = {
                     queryId => $query_id,
                     retrieveParameters =>
                         {firstRecord => $start, count => $limit,}
-                );
+                };
+                if ($self->query) {
+                    $res = $self->_retrieve->(%$args);
+                }
+                elsif ($self->cited_references) {
+                    $res = $self->_citedReferencesRetrieve->(%$args);
+                }
+
                 $query_id = $res->{parameters}{return}{queryId}
                     if !$res->{Fault};
             }
             else {
-                $res = $self->_search->(
-                    queryParameters => {
-                        databaseId    => 'WOS',
-                        queryLanguage => 'en',
-                        userQuery     => $self->query,
-                    },
+                my $args = {
                     retrieveParameters =>
                         {firstRecord => $start, count => $limit,},
-                );
+
+                };
+                if ($self->query) {
+                    $res = $self->_search->(
+                        %$args,
+                        queryParameters => {
+                            databaseId    => 'WOS',
+                            queryLanguage => 'en',
+                            userQuery     => $self->query,
+                        },
+                    );
+                }
+                elsif ($self->cited_references) {
+                    $res = $self->_citedReferences->(
+                        %$args,
+                        databaseId    => 'WOS',
+                        queryLanguage => 'en',
+                        uid           => $self->cited_references,
+                    );
+                }
             }
 
             if ($res->{Fault}) {
@@ -120,11 +164,19 @@ sub generator {
             }
 
             $total //= $res->{parameters}{return}{recordsFound};
+
+            return unless $total;
+
             $start += $limit;
 
-            my $xml
-                = XMLin($res->{parameters}{return}{records}, ForceArray => 1);
-            $recs = $xml->{REC};
+            if ($self->query) {
+                my $xml = XMLin($res->{parameters}{return}{records},
+                    ForceArray => 1);
+                $recs = $xml->{REC};
+            }
+            elsif ($self->cited_references) {
+                $recs = $res->{parameters}{return}{references};
+            }
         }
 
         shift @$recs;
@@ -154,6 +206,12 @@ Catmandu::Importer::WoS - Import Web of Science records
     my $wos = Catmandu::Importer::WoS->new(username => 'XXX', password => 'XXX', query => 'TS=(lead OR cadmium)');
     $wos->each(sub {
         my $record = shift;
+        # ...
+    });
+    
+    my $wos = Catmandu::Importer::WoS->new(username => 'XXX', password => 'XXX', cited_references => '000393351200025');
+    $wos->each(sub {
+        my $cite = shift;
         # ...
     });
 

@@ -17,7 +17,7 @@ use threads;
 use threads::shared;
 
 use FindBin;
-use lib "$FindBin::RealBin/../lib/perl5";
+use lib "$FindBin::RealBin/../lib";
 use Mashtree qw/logmsg @fastqExt @fastaExt @richseqExt _truncateFilename createTreeFromPhylip $MASHTREE_VERSION/;
 use Mashtree::Db;
 use Bio::Tree::DistanceFactory;
@@ -53,7 +53,7 @@ sub main{
 
   die usage() if($$settings{help});
   if($$settings{version}){
-    print "Mashtree version $MASHTREE_VERSION\n";
+    print "Mashtree $MASHTREE_VERSION\n";
     return 0;
   }
 
