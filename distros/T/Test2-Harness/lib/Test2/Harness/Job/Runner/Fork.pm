@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use Scalar::Util qw/openhandle/;
 use Test2::Util qw/clone_io CAN_REALLY_FORK pkg_to_file/;
@@ -17,6 +17,8 @@ sub viable {
     return 0 if $ENV{HARNESS_PERL_SWITCHES};
 
     my $job = $test->job;
+
+    return 0 if !$job->use_fork;
 
     # -w switch is ok, otherwise it is a no-go
     return 0 if grep { !m/\s*-w\s*/ } @{$job->switches};
@@ -84,7 +86,7 @@ sub { shift->import(@_) }
 
     my ($in_file, $out_file, $err_file, $event_file) = $test->output_filenames;
 
-    $0 = $file;
+    $0 = File::Spec->abs2rel($file);
     $class->_reset_DATA($file);
     @ARGV = ();
 

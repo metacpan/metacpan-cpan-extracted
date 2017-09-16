@@ -1,7 +1,7 @@
 #  JCM::Net::Patricia - Patricia Trie perl module for fast IP address lookups
 #  Copyright (C) 2000-2005  Dave Plonka
 #  Copyright (C) 2009       Dave Plonka & Philip Prindeville
-#  Parts Copyright(C) 2016  Joel Maslak
+#  Parts Copyright(C) 2016  J. Maslak
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA  02110-1301, USA.
 
-# Joel Maslak <jmaslak@antelope.net>
+# J. Maslak <jmaslak@antelope.net>
 # Dave Plonka <plonka@doit.wisc.edu>
 # Philip Prindeville <philipp@redfish-solutions.com>
 # Anton Berezin <tobez@tobez.org>
@@ -42,7 +42,7 @@ BEGIN {
   @EXPORT = qw(AF_INET AF_INET6);
 }
 
-'$Revision: 1.02 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
+'$Revision: 1.03 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
 
 bootstrap JCM::Net::Patricia $VERSION;
 
@@ -645,7 +645,7 @@ use that module instead.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 Forked from code written by:
 

@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Open3;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use IPC::Open3 qw/open3/;
 use Test2::Harness::Util qw/open_file write_file local_env/;
@@ -24,7 +24,7 @@ sub find_inc {
 sub command_file {
     my $class = shift;
     my ($test) = @_;
-    return $test->job->file;
+    return File::Spec->abs2rel($test->job->file);
 }
 
 sub command {

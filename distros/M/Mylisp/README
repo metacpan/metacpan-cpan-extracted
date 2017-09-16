@@ -1,0 +1,179 @@
+## Mylisp 
+
+Mylisp is like lisp which could transfer to Ast.
+
+To install this tool, please install Perl5 in your computer at first.
+
+    > cpan
+    > install Mylisp
+    > toperl --repl
+
+    This is mylisp REPL, type enter to exit.
+    >> (say 'hello world!')
+    .. say "hello world!"
+
+    >> (say $hash[:key])
+    .. say($hash->{'key'})
+
+    >> (say $hash[$key])
+    .. say($hash->{$key});
+
+    >> (say $hash[:key][$key])
+    .. say($hash->['key'][$key])
+
+    >> (say $array[1])
+    .. say($array->[1])
+
+DESCRIPTION
+
+see Mylisp.pod.
+
+SYNTAX
+
+    # Module declare
+    (package Spp::Tools)
+
+    # do not load module, builtin
+    (module Spp::Builtin)
+    
+    # load Package without import function
+    (use Class::Name)
+
+    # load Package with import function
+    (import Package::Name [name list])
+
+    # def function is exported
+    (def (exported-func $args)
+       (say :hello))
+
+    # func function is not exported
+    (func (private-func $args)
+       (say :hello))
+
+    # manyline string
+    (my $long_str """
+    a
+    b
+    c
+    """)
+
+    # define scalar
+    (my $scalar \b)
+    (my $scalar::Str \b)
+
+    # define array
+    (my @array [])
+    (my $array::Array [])
+
+    # define hash
+    (my %hash Hash)
+    (def %hash {})
+    (def %hash {Str => Str})
+
+
+    (func (func-name @args) 
+      (exprs @args))
+
+    (my @func (fn (@args) (exprs @args)))
+
+    (for $n in @array
+      (say $n))
+
+    (while (@n > 1)
+      (inc @n)
+      (say @n))
+
+    (case
+      (if (is-int @x) (say "@x is int"))
+      (if (is-str @x) (say "@x is str"))
+      (else (say "@x in not int")))
+
+    (given @x
+      (when :a (say "x is a"))
+      (when :b (say "x is b"))
+      (else (say "x is c")))
+
+    (def @constant [1 2 3])
+
+    (if (@x == 'key')
+      (say '@x is key')
+     else
+      (say '@x is str')
+      (say '@x len is 3))
+
+    (case
+      (when (@x == :key) (say '@x is key'))
+      (else (say '@x not key')))
+
+    (my $char (first $str))
+
+    (my $element (first $array))
+
+    (my $hash::Hash)
+    ($hash[:key] = 1)
+    ($hash[$key] = 2)
+
+    (my $array::Array)
+    (push $array 1)
+
+    (my [$x $y] [1, 2])
+
+    ($array[0] = 2)
+    ($array[0:2] = [1, 2])
+
+    (class Name)
+
+    (func (new:Name $class:Class)
+      (return { :name => Str, :type => Str }))
+
+    (func (name $self)
+      (return 'name'))
+
+    (func $obj (new Name))
+    ($obj.name args)
+
+    (func (match-char $char $cursor)
+
+    (func (get-array @array)
+       (for @atom in @array
+          (say "it is array")))
+
+     # multi-line string
+     (def $multi-line '''
+      a
+      b
+      c
+      ''')
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mylisp
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mylisp
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mylisp
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mylisp
+
+    Search CPAN
+        http://search.cpan.org/dist/Mylisp/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Micheal Song
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

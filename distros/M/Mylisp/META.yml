@@ -1,5 +1,5 @@
 ---
-abstract: 'My lovely Lisp'
+abstract: 'my love Lisp'
 author:
   - 'Micheal.Song <perlvim@gmail.com>'
 build_requires:
@@ -16,24 +16,28 @@ name: Mylisp
 provides:
   Mylisp:
     file: lib/Mylisp.pm
-    version: '1.05'
+    version: '1.08'
   Mylisp::Ast:
     file: lib/Mylisp/Ast.pm
-  Mylisp::Builtin:
-    file: lib/Mylisp/Builtin.pm
+  Mylisp::Core:
+    file: lib/Mylisp/Core.pm
   Mylisp::Grammar:
     file: lib/Mylisp/Grammar.pm
-  Mylisp::IsAtom:
-    file: lib/Mylisp/IsAtom.pm
-  Mylisp::OptAst:
-    file: lib/Mylisp/OptAst.pm
+  Mylisp::OptAstAtom:
+    file: lib/Mylisp/OptAstAtom.pm
+  Mylisp::OptAstMacro:
+    file: lib/Mylisp/OptAstMacro.pm
+  Mylisp::Stable:
+    file: lib/Mylisp/Stable.pm
+  Mylisp::ToPerl:
+    file: lib/Mylisp/ToPerl.pm
 requires:
-  File::Spec: '0'
-  List::MoreUtils: '0'
-  Scalar::Util: '0'
+  File::Basename: '0'
+  File::Find::Wanted: '0'
+  Perl::Tidy: '0'
   Spp: '0'
   perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.05'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

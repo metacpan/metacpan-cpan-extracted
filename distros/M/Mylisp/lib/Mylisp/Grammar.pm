@@ -1,5 +1,8 @@
 package Mylisp::Grammar;
 
+use 5.012;
+no warnings "experimental";
+
 use Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(get_mylisp_grammar);
@@ -7,60 +10,54 @@ our @EXPORT_OK = qw(get_mylisp_grammar);
 sub get_mylisp_grammar {
    return << 'EOF'
    
-   mylisp  = ^ |_ Expr|+ $ ;
+   mylisp = ^ |_ _pod Expr|+ $ ;
 
-   _       = |\s+ _comm|+ ;
-   _comm   = '#' ~ $$ ;
+   _      = |\s+ _comm|+ ;
+   _pod   = '=pod' ~ '=end' ;
+   _comm  = '#' ~ $$ ;
 
-   Expr    = '(' |_ atom|+ ')' ;
+   Expr   = '(' |_ atom|+ ')' ;
 
-   atom    = | 
-               Expr Slist Array Hash
-               Int Keyword Mstr Str String Char
-               Aindex Arange Hkey Ocall
-               Macro Oper Sub Var
-             | ;
+   atom   = | 
+              Expr Array Hash
+              Int Kstr Str String Char
+              Aindex Arange Hkey Ocall Lcall Onew
+              Oper Sub Var
+            | ;
 
-   Int     = number ;
-   number  = |{'-'\d+} \d+| ;
+   Int    = number ;
+   number = |{'-'\d+} \d+| ;
 
-   Keyword = \: [$^+*?\w]+ ;
+   Kstr   = \: [$^+*?\w:.]+ ;
    
-   Mstr    = "'''" ~ "'''" ;
-    
-   Str     = \' |Schars Char Scalar|* \' ;
-   Schars  = [^\\'$]+ ;
+   Str    = \' |schars char|* \' ;
+   schars = [^\\']+ ;
+   char   = \\ . ;
  
-   String  = \" |Chars Char Scalar|* \" ;
-   Chars   = [^\\"$]+ ;
-   Char    = \\ . ;
-   Scalar  = '$' [\a\-]+ ;
+   String = \" |Chars Char Scalar|* \" ;
+   Chars  = [^\\"$]+ ;
+   Char   = \\ . ;
+   Scalar = '$' [\a\-]+ ;
 
-   Macro   = |
-               :package :class :const
-               :use :import :func :fn :def
-               :given :else :case :if
-               :while :for :my :set :end :return
-             | ;
-   Oper    = [\-+=><!~|&]+ ;
-   Sub     = \a [\-\w:]* [!?]? ;
-   Var     = [$@%] [\-\w:]+ ;
+   Oper   = [\-+=><!~|&]+ ;
+   Sub    = \a [\-\w:]* ;
+   Var    = [$@%] [\-\w]+ ;
 
-   Slist   = ':[' |\s+ Sub|+ ']' ;
-   Array   = '['  |_ \, atom|* ']' ;
-   Hash    = '{'  |_ \, Pair|* '}' ;
-   Pair    = Keyword \s* '=>' \s* atom ;
+   Array  = '[' |_ \, atom|* ']' ;
+   Hash   = '{' |_ \, Pair|* '}' ;
+   Pair   = |Kstr Str| \s* '=>' \s* atom ;
 
-   Aindex  = Var '[' Int ']' ;
+   Aindex = Var {'[' Int ']'}+ ;
 
-   Arange  = Var Range ;
-   Range   = '[' From? ':' To? ']' ;
-   From    = |number {[$][\a\-]+}| ;
-   To      = |number {[$][\a\-]+}|;
+   Arange = Var Range ;
+   Range  = '[' From? ':' To? ']' ;
+   From   = |number {[$][\a\-]+}| ;
+   To     = |number {[$][\a\-]+}|;
    
-   Hkey    = Var '[' |Keyword Scalar| ']' ;
-
-   Ocall   = Var \. Sub ;
+   Hkey   = Var {'[' |Kstr Scalar| ']'}+ ;
+   Ocall  = Var \. Sub ;
+   Lcall  = Var \: Sub ;
+   Onew   = Sub \. Sub ;
 
 EOF
 }

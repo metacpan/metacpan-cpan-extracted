@@ -161,7 +161,7 @@ subtest 'system' => sub {
     is($INC{'Baz.pm'}, F(), 'Baz.pm is not loaded' );
 
     is(
-    $abmb->configure_requires,
+      $abmb->configure_requires,
       hash {
         field 'Module::Build' => T();
         field 'Alien::Build::MB' => T();
@@ -193,6 +193,76 @@ subtest 'system' => sub {
     my $build = $abmb->alien_build(1);
     is($build->install_prop->{did_the_gather}, T());
   };
+};
+
+subtest 'test' => sub {
+
+  skip_all 'test requires Alien::Build 1.14 or better'
+    unless eval { require Alien::Build; Alien::Build->VERSION('1.14') };
+  
+  subtest 'good' => sub {
+
+    local $CWD = tempdir( CLEANUP => 1 );
+    
+    alienfile q{
+      use alienfile;
+      probe sub { 'system' };
+      sys {
+        test sub { log("the test") };
+      };
+    };
+
+    my $abmb = Alien::Build::MB->new(
+      module_name  => 'Alien::Foo',
+      dist_version => '1.00',
+    );
+
+    # AB should take care of this for us
+    ok( $abmb->configure_requires->{'Alien::Build'} >= '1.14', 'need at least 1.14 of Alien::Build' );
+    
+    note scalar capture_merged { $abmb->ACTION_alien_build };
+    
+    my($out, $err) = capture_merged {
+      eval { $abmb->ACTION_alien_test };
+      $@;
+    };
+    
+    is $err, '';
+    
+  };
+
+  subtest 'bad' => sub {
+
+    local $CWD = tempdir( CLEANUP => 1 );
+    
+    alienfile q{
+      use alienfile;
+      probe sub { 'system' };
+      sys {
+        test sub { log("the test"); die 'bogus92' };
+      };
+    };
+
+    my $abmb = Alien::Build::MB->new(
+      module_name  => 'Alien::Foo',
+      dist_version => '1.00',
+    );
+
+    # AB should take care of this for us
+    ok( $abmb->configure_requires->{'Alien::Build'} >= '1.14', 'need at least 1.14 of Alien::Build' );
+    ok( $abmb->configure_requires->{'Alien::Build::MB'} >= 0.05, 'need at least 0.05 of Alien::Build::MB' );
+    
+    note scalar capture_merged { $abmb->ACTION_alien_build };
+    
+    my($out, $err) = capture_merged {
+      eval { $abmb->ACTION_alien_test };
+      $@;
+    };
+    
+    like $err, qr/bogus92/;
+    
+  };
+
 };
 
 done_testing;

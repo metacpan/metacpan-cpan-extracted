@@ -34,7 +34,7 @@ use Encode qw//;
         qr/\Q\x{5bcc}\x{58eb}\x{306f}\x{65e5}\x{672c}\x{4e00}\x{306e}\x{5c71}/,
         'Dumper CP932'
     );
-    $Data::Dumper::AutoEncode::ENCODING = 'CP932';
+    local $Data::Dumper::AutoEncode::ENCODING = 'CP932';
     like eDumper($decoded_str), qr/\$VAR1.+/, 'eDumper CP932';
 }
 
@@ -44,6 +44,12 @@ use Encode qw//;
         qr/'foo' => 123/,
         'numeric value'
     );
+}
+
+{
+    my $ret = eDumper({ Encode::decode_utf8('富士は日本一の山') => 'エベレストは世界一の山' });
+    like $ret, qr/富士は日本一の山/, 'ex decoded';
+    like $ret, qr/エベレストは世界一の山/, 'ex encoded';
 }
 
 done_testing;

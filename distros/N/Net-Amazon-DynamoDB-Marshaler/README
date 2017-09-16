@@ -129,10 +129,10 @@ EXPORTS
       #   ...
       # };
 
-    The module only supports 'S' and 'N' types for force_type. If you
-    specify 'S', dynamodb_marshal will stringify the value, so make sure
-    not to send arrays, etc. as values. If you specify 'N',
-    dynamodb_marshal will set the value to undef if it's not a number.
+    You can only specify 'S' or 'N' for force_type values. If the attribute
+    you specify is a list or map, the forced type will be applied
+    recursively through the data structure. Sets are not currently
+    available for force_type.
 
     Undefs or empty string values for force_type attributes will be removed
     from the marshalled hashref. While this behavior might not seem
@@ -142,6 +142,9 @@ EXPORTS
     that attribute (using NULL would be rejected by DynamoDB, and you can't
     send empty strings). If you have an undef value for a primary key
     string attribute, you have a bug in your application somewhere.
+
+    If you specify 'N', and a non-number value is encountered, it will also
+    be removed.
 
  dynamodb_unmarshal
 

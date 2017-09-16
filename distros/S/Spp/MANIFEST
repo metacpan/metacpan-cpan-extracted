@@ -9,7 +9,7 @@ lib/Spp/Ast.pm
 lib/Spp/Cursor.pm
 lib/Spp/Grammar.pm
 lib/Spp/LintAst.pm
-lib/Spp/Match.pm
+lib/Spp/MatchRule.pm
 lib/Spp/OptAst.pm
 lib/Spp/ToSpp.pm
 MANIFEST			This list of files

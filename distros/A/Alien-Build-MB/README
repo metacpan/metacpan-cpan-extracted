@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -71,6 +71,12 @@ ACTIONS
      ./Build alien_build
 
     Build the package from source.
+
+ ACTION_alien_test
+
+     ./Build alien_test
+
+    Run the package tests, if there are any.
 
 SEE ALSO
 

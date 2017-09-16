@@ -3,19 +3,19 @@ require 5.012;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PREREQ_PM' => {
+                   'File::Basename' => 0,
+                   'Test::More' => 0,
+                   'Perl::Tidy' => 0,
+                   'Spp' => 0,
+                   'File::Find::Wanted' => 0
+                 },
   'PL_FILES' => {},
   'EXE_FILES' => [
                    'bin/mylisp'
                  ],
-  'PREREQ_PM' => {
-                   'Scalar::Util' => 0,
-                   'Test::More' => 0,
-                   'List::MoreUtils' => 0,
-                   'Spp' => 0,
-                   'File::Spec' => 0
-                 },
-  'VERSION_FROM' => 'lib/Mylisp.pm',
+  'INSTALLDIRS' => 'site',
   'NAME' => 'Mylisp',
-  'INSTALLDIRS' => 'site'
+  'VERSION_FROM' => 'lib/Mylisp.pm'
 )
 ;

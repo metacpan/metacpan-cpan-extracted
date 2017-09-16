@@ -16,6 +16,7 @@ my $UNIFY  = $ENV{UNIFY};
 exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db" or
     plan skip_all => "\$DBPATH not set";
 my $dbname = "DBI:Unify:$ENV{DBPATH}";
+my $txx    = "xx_$$";
 
 my @sqlv = `SQL -version`;
 my ($rev) = ("@sqlv" =~ m/Revision:\s+(\d[.\d]*)/);
@@ -38,7 +39,7 @@ unless ($dbh) {
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
-    "create table xx (",
+    "create table $txx (",
     "    xs  numeric (4) not null,",
     "    xdt datetime",
     ")"), "create");
@@ -49,14 +50,14 @@ if ($dbh->err) {
 ok ($dbh->commit, "commit");
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0, '2012-02-05')"));
+ok ($dbh->do ("insert into $txx values (0, '2012-02-05')"));
 foreach my $v ( 1 .. 5 ) {
     my $dt = "2012-02-05 12:20:30.00$v";
-    ok ($dbh->do ("insert into xx values ($v, '$dt')"), "INS $v");
+    ok ($dbh->do ("insert into $txx values ($v, '$dt')"), "INS $v");
     }
 ok (1, "-- FILL THE TABLE, POSITIONAL");
 my $sth;
-ok ($sth = $dbh->prepare ("insert into xx values (?,?)"), "ins prepare");
+ok ($sth = $dbh->prepare ("insert into $txx values (?,?)"), "ins prepare");
 foreach my $v ( 6 .. 10 ) {
     my $dt = sprintf("2012-02-%02d 12:20:30.000", $v);
     ok ($sth->execute ($v, $dt), "ins $v");
@@ -79,7 +80,7 @@ my %result_ok = (
      9 =>  "9, '2012-02-09 12:20:30.000'",
     10 => "10, '2012-02-10 12:20:30.000'",
     );
-ok ($sth = $dbh->prepare ("select * from xx where xs between 0 and 5"), "sel prepare");
+ok ($sth = $dbh->prepare ("select * from $txx where xs between 0 and 5"), "sel prepare");
 ok (1, "-- Check the internals");
 {   local $" = ":";
     my %attr = (
@@ -102,7 +103,7 @@ while (my ($xs, $xdt) = $sth->fetchrow_array ()) {
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("select xdt from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xdt from $txx where xs = ?"), "sel prepare");
 foreach my $xs (1 .. 10) {
     ok ($sth->execute ($xs), "execute $xs");
     my ($xdt) = $sth->fetchrow_array;
@@ -118,11 +119,11 @@ ok (1, "-- Check the bind_columns");
     }
 ok ($sth->finish, "finish");
 
-ok ($dbh->do ("delete xx"), "do delete");
+ok ($dbh->do ("delete $txx"), "do delete");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- DROP THE TABLE");
-ok ($dbh->do ("drop table xx"), "do drop");
+ok ($dbh->do ("drop table $txx"), "do drop");
 ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");

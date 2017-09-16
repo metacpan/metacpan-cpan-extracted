@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'          => 'JCM::Net::Patricia',
     'ABSTRACT_FROM' => 'lib/JCM/Net/Patricia.pm',
-    'AUTHOR'        => 'Joel Maslak <jmaslak@antelope.net>',
+    'AUTHOR'        => 'J. Maslak <jmaslak@antelope.net>',
     'LICENSE'       => 'gpl_2',
     'VERSION_FROM'  => 'lib/JCM/Net/Patricia.pm',
     'LIBS'          => [],

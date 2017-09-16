@@ -7,9 +7,10 @@ use Encode qw//;
 my $encoding = shift @ARGV;
 
 unless ( IO::Interactive::Tiny::is_interactive(*STDIN) ) {
-    my $dump_str = join '', <STDIN>;
-    $dump_str =~ s/\\x\{([0-9a-f]+)\}/_unescape($1)/ge;
-    print $dump_str;
+    while (my $dump_str = <STDIN>) {
+        $dump_str =~ s/\\x\{([0-9a-f]+)\}/_unescape($1)/ge;
+        print $dump_str;
+    }
 }
 
 sub _unescape {

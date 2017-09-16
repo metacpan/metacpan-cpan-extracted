@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -86,11 +86,15 @@ sub iteration {
         for my $job_id (sort keys %{$self->{+ACTIVE}}) {
             my $watcher = $self->{+ACTIVE}->{$job_id};
 
-            if ($watcher->complete) {
+            # Give it up to 5 seconds
+            my $killed = $watcher->killed;
+            my $done = $watcher->complete || ($killed ? (time - $killed) > 5 : 0);
+
+            if ($done) {
                 $self->{+FEEDER}->job_completed($job_id);
                 delete $self->{+ACTIVE}->{$job_id};
             }
-            elsif($self->{+LIVE}) {
+            elsif($self->{+LIVE} && !$killed) {
                 push @events => $self->check_timeout($watcher);
             }
         }
@@ -155,6 +159,7 @@ sub check_timeout {
     my $stamp = time;
 
     return unless $watcher->job->use_timeout;
+    return if $watcher->killed;
 
     my $delta = $stamp - $watcher->last_event;
 

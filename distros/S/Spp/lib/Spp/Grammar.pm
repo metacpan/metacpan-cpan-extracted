@@ -14,7 +14,8 @@ spp       = ^ |_ Spec|+ $ ;
 _         = |\s+ _comm|+ ;
 _comm     = '//' ~ $$ ;
 
-Spec      = Token \s* '=' |_ Lbranch Branch rule|+ |';' $| ;
+Spec      = Token \s* '=' |_ Branch rule|+ |';' $| ;
+
 rule      = |
                Group
                Token Str String Kstr Point
@@ -23,12 +24,11 @@ rule      = |
                Look Not Till
             | ;
 
-Lbranch   = '||' |_ Branch rule|+ '||' ;
-Branch    = '|'  |_ Lbranch rule|+ '|' ;
-Group     = '{'  |_ Lbranch Branch rule|+ '}' ;
+Branch    = '|'  |_ rule|+ '|' ;
+Group     = '{'  |_ Branch rule|+ '}' ;
 
 Token     = [\a\-]+ ;
-Kstr      = ':' \S+ ;
+Kstr      = ':' [\a\-]+ ;
 Point     = '0x' \x+ ;
 
 Str       = \' |Chars Char|+ \' ;
@@ -54,7 +54,7 @@ Flag      = '?' ;
 Not       = '!' ;
 Till      = '~' ;
 
-Sym       = [$@%] [\a\-?!>]+ ;
+Sym       = '@' [\a\-]+ ;
 Expr      = '(' |_ atom|+ ')' ;
 Array     = '[' |_ atom|* ']' ;
 atom      = | Int Expr Array Str String Sym Kstr | ;

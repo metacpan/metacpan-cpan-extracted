@@ -1,4 +1,4 @@
-Revision history for Spp
+Revision history for Mylisp
 
 1.00    2017-8-31
         init project.
@@ -26,4 +26,14 @@ Revision history for Spp
         load-module() could load from package name return text
         reject export keyword, function use def is exported.
         add def keyword
+
+1.06    aindex permit more than one index $array[1][2]
+        hkey also could add more than one key $a[:key][$key]
+        (my $name::Int $key[1][2])
+        no Slist and List, only array is enough.
+        no Mstr, 
         
+1.07    combin ToPerl.pm to Mylisp, For Optimizer ast.
+
+1.08    Lint Type is complexiable, Only Lint Symbol if defined!
+

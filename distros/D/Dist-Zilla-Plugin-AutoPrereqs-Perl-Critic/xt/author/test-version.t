@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version 0.006
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.012
 
 use Test::More 0.88;
 use Test::Version 0.04 qw( version_all_ok ), {

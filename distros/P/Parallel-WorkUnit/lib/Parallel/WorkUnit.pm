@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2015 Joel Maslak
+# Copyright (C) 2015 J. Maslak
 # All Rights Reserved - See License
 #
 
 use v5.8;
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '1.009';
+$Parallel::WorkUnit::VERSION = '1.010';
 # ABSTRACT: Provide easy-to-use forking with ability to pass back data
 
 use strict;
@@ -311,7 +311,7 @@ Parallel::WorkUnit - Provide easy-to-use forking with ability to pass back data
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -414,11 +414,11 @@ threaded Perl.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016 by Joel Maslak.
+This software is copyright (c) 2016 by J. Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

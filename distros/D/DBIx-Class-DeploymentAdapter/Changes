@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx-Class-DeploymentAdapter
 
+0.09 2017-09-15T09:07:51Z
+
+    - more verbose upgrading 
+
 0.08 2016-09-01T11:33:54Z
 
     - incremental upgrade counter fix

@@ -1,5 +1,27 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.014  2017-09-14 22:02:18 UTC
+
+  - Removed Test::CPAN::Changes release test because it fails before the
+    first release
+
+0.013  2017-09-14 21:30:58 UTC
+
+  - Test::CleanNamespaces failes if there are no files to check
+
+0.012  2017-09-14 19:16:33 UTC
+
+  - The VERSION in the pod must be the version of the project, not of the
+    Author::SKIRMESS::InsertVersion plugin
+
+0.011  2017-09-14 18:51:34 UTC
+
+  - Added MetaData::BuiltWith plugin
+  - Added SetScriptShebang plugin
+  - Added documentation to the Author::SKIRMESS::RepositoryBase plugin
+  - Update the VERSION section in all files that contain a POD VERSION
+    section
+
 0.010  2017-09-10 16:43:32 UTC
 
   - Added Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase

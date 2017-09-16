@@ -55,6 +55,12 @@ sub to_w3cdtf ($self) {
     return $self->strftime('%Y-%m-%dT%H:%M:%S%Z');
 }
 
+sub duration ( $self, $start, $end ) {
+    state $init = !!require Pcore::Util::Date::Duration;
+
+    return Pcore::Util::Date::Duration->new( { start => $start, end => $end } );
+}
+
 1;
 __END__
 =pod

@@ -19,7 +19,14 @@ sub get_program_pid_mapping {
 
     my @program_pid_mapping;
     for my $pid_file ($pid_dir->children) {
-        chomp(my $pid = $pid_file->slurp);
+        # Skip processing if there are no more files after directory scanning
+        next unless -e $pid_file;
+
+        my $pid = $pid_file->slurp;
+        # Skip processing if it could not read anything from the file
+        next if length($pid) == 0;
+
+        chomp($pid);
         unless (_is_valid_pid($pid)) {
             next;
         }

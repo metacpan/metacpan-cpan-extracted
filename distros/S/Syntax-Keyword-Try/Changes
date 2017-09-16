@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Try
 
+0.08    2017-09-14 17:26:20
+        [BUGFIXES]
+         * Handle the OpSIBLING of an OP_{NEXT,LAST,REDO} correctly (RT123040)
+
 0.07    2017-08-13 23:11:39
         [CHANGES]
          * Capture 80await+try.t unit test from Future-AsyncAwait

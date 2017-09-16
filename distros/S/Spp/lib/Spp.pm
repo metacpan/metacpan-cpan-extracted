@@ -6,17 +6,17 @@ no warnings "experimental";
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT =
-  qw(ast_to_parser grammar_to_ast get_parser match
+  qw(ast_to_parser grammar_to_ast grammar_to_parser match
      spp_to_spp parse lint spp parse lint_spp_ast);
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 use Spp::Builtin;
 use Spp::Core;
 use Spp::Ast;
 use Spp::Grammar;
 use Spp::Cursor;
 use Spp::LintAst qw(lint_spp_ast);
-use Spp::Match  qw(match_rule);
+use Spp::MatchRule qw(match_rule);
 use Spp::OptAst qw(opt_spp_ast);
 use Spp::ToSpp  qw(ast_to_spp);
 
@@ -41,10 +41,11 @@ sub grammar_to_ast {
    return opt_spp_ast($match);
 }
 
-sub get_parser {
+sub grammar_to_parser {
    my $text = shift;
    my $ast  = grammar_to_ast($text);
    lint_spp_ast($ast);
+   $ast = clean_ast($ast);
    return ast_to_parser($ast);
 }
 
@@ -116,9 +117,9 @@ sub update {
 }
 
 sub lint {
-   my $grammar_file = shift;
-   my $grammar_text = read_file($grammar_file);
-   my $ast          = grammar_to_ast($grammar_text);
+   my $file = shift;
+   my $grammar = read_file($file);
+   my $ast     = grammar_to_ast($grammar);
    lint_spp_ast($ast);
 }
 
@@ -136,7 +137,7 @@ sub spp_to_spp {
 
 sub parse {
    my ($grammar, $code) = @_;
-   my $parser = get_parser($grammar);
+   my $parser = grammar_to_parser($grammar);
    my $match = match($parser, $code);
    if (is_false($match)) { error($match->[1]) }
    return $match if is_true($match);

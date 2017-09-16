@@ -279,10 +279,7 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
     case OP_LAST:
     case OP_REDO:
       {
-        OP *stateop;
-
-        if(OpSIBLING(op))
-          croak("ARGH: Unsure how to handle OP_(NEXT|LAST|REDO) with a sibling");
+        OP *stateop, *afterop = OpSIBLING(op);
 
         *op_ptr = newLISTOP(OP_SCOPE, 0,
           stateop = newSTATEOP_nowarnings(),
@@ -290,6 +287,10 @@ static void MY_walk_optree_try_in_eval(pTHX_ OP **op_ptr, OP *root)
 
         (*op_ptr)->op_next = stateop;
         stateop->op_next = op;
+        if(afterop) {
+          OpMORESIB_set(op, NULL);
+          OpMORESIB_set(*op_ptr, afterop);
+        }
       }
       break;
 

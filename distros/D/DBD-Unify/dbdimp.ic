@@ -47,6 +47,8 @@ DBISTATE_DECLARE;
 #include <sqle_usr.h>
 #include <sqlerr.h>
 #include <dbtypes.h>
+#include <rhli.h>
+#include <rhlierr.h>
 #ifndef SQLCURRENCY
 #  define SQLCURRENCY	-18
 #  endif
@@ -83,6 +85,9 @@ extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
 
 extern char    *basename (const char *path);
 
+extern int	uallcgp (UTXID, UTID, int, int*, UCID **, USTATUS *);
+extern int	uinfcgp (UTXID, int, UCID *, UOPTS, UCGPINF *, USTATUS *, USTATUS *);
+
 #define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
@@ -90,6 +95,9 @@ static	char		*pgm = NULL;
 static	byte		*sth_id_on;
 static	short		n_sth_id = 4;	/* Start with max 32 $sth's */
 static	int		dbd_verbose = 0;
+
+/* The data dictionary */
+HV	*h_dd = NULL;
 
 /* forward references */
 int	dbd_st_finish	(SV *, imp_sth_t *);
@@ -359,6 +367,393 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     return (1);
     } /* dbd_db_login */
 
+static char *u_err (USTATUS s) {
+    USTATUS      status;
+    static char  e[2048];
+    char        *msg = ufchmsg (s, &status);
+    sprintf (e, "%04d: %s", s, msg ? msg : "Unknown error");
+    return (e);
+    } /* u_err */
+
+/* Fetch DB info and store in hash
+
+   %db{AUTH}[4] = {	= $db{s}{"SYS"}
+	AID		=> 4,
+	NAME		=> "SYS,
+
+	TABLES		=> [ 77, ...],
+	],
+
+    $db{TABLE}[77] = {	= $db{t}{"SYS.HASH_INDEXES"}
+	TID		=> 77,
+	NAME		=> "HASH_INDEXES",
+	OPTIONS		=> 0x12,
+	DIRECTKEY	=> 0,
+	SCATTERED	=> 0,
+	FIXEDSIZE	=> 0,
+	PKEYED		=> 0,
+
+	COLUMNS		=> [ 323, ...],
+	},
+
+    $db{COLUMN}[323] = {
+	TID		=> 77,
+	TNAME		=> "
+	CID		=> 323,
+	NAME		=> "OWNR",
+	TYPE		=> 5,		# CHAR
+	LENGTH		=> 18,
+	SCALE		=> 0,
+	NULLABLE	=> 0,
+	DSP_LEN		=> 18,
+	DSP_SCL		=> 0,
+	DSP_PICT	=> "",
+	OPTIONS		=> 0x10,
+	PKEY		=> 0,
+	RDONLY		=> 0,
+	UNIQUE		=> 0,
+	LINK		=> -1,		# CID
+	REFS		= [],
+	},
+
+    $db{TYPE}[5] = [ 5, "CHAR", "CHAR" ],
+
+ */
+
+static void _db_dict (int refresh) {
+    int     n, err;
+    pid_t   pid;
+    UDBID   dbid;
+    UAID   *aidl;
+    UCID   *cidl;
+    ULID   *lidl;
+    UTID   *tidl;
+    UTXID   txid;
+    USTATUS status = -123;
+    UCID   *a_lnk;
+    AV     *a_typ;
+    AV     *a_sch;
+    SV    **A_anm = NULL;
+    AV    **A_tbl;
+    char   *A_typ[128];
+
+    if (h_dd) {
+	unless (refresh)
+	    return;
+	dbg (9, "REFRESH DD DICT CACHE (%d)\n", refresh);
+	sv_free ((SV *)h_dd);
+	}
+
+    pid  = getpid ();
+
+    unless (uopndb ((char *)0, DB_NOLOCK, &dbid, &status)) {
+	unless (status == -151) /* Database already opened. (-151) */
+	    warn ("Cannot connect to database: %s\n", u_err (status));
+	return;
+	}
+    unless (sqlebtx (&txid, &status)) {
+	warn ("Cannot start a transaction: %s\n", u_err (status));
+	return;
+	}
+
+    h_dd  = newHV ();
+    a_typ = newAV ();
+    a_sch = newAV ();
+
+    A_typ[U_INT]	= "INTEGER";
+    A_typ[U_HINT]	= "HUGE INTEGER";
+    A_typ[U_FLT]	= "FLOAT";
+    A_typ[U_DBL]	= "DOUBLE";
+    A_typ[U_REAL]	= "REAL";
+    A_typ[U_AMT]	= "AMOUNT";
+    A_typ[U_HAMT]	= "HUGE AMOUNT";
+    A_typ[U_DATE]	= "DATE";
+    A_typ[U_HDATE]	= "HUGE DATE";
+    A_typ[U_TIME]	= "TIME";
+    A_typ[U_STR]	= "CHAR";
+    A_typ[U_VTXT]	= "TEXT";
+    A_typ[U_VBIN]	= "BINARY";
+    A_typ[U_BYT]	= "BYTE";
+
+    (void)av_store (a_typ, U_INT,	newSVpv (A_typ[U_INT],		0));
+    (void)av_store (a_typ, U_HINT,	newSVpv (A_typ[U_HINT],		0));
+    (void)av_store (a_typ, U_FLT,	newSVpv (A_typ[U_FLT],		0));
+    (void)av_store (a_typ, U_DBL,	newSVpv (A_typ[U_DBL],		0));
+    (void)av_store (a_typ, U_REAL,	newSVpv (A_typ[U_REAL],		0));
+    (void)av_store (a_typ, U_AMT,	newSVpv (A_typ[U_AMT],		0));
+    (void)av_store (a_typ, U_HAMT,	newSVpv (A_typ[U_HAMT],		0));
+    (void)av_store (a_typ, U_DATE,	newSVpv (A_typ[U_DATE],		0));
+    (void)av_store (a_typ, U_HDATE,	newSVpv (A_typ[U_HDATE],	0));
+    (void)av_store (a_typ, U_TIME,	newSVpv (A_typ[U_TIME],		0));
+    (void)av_store (a_typ, U_STR,	newSVpv (A_typ[U_STR],		0));
+    (void)av_store (a_typ, U_VTXT,	newSVpv (A_typ[U_VTXT],		0));
+    (void)av_store (a_typ, U_VBIN,	newSVpv (A_typ[U_VBIN],		0));
+    (void)av_store (a_typ, U_BYT,	newSVpv (A_typ[U_BYT],		0));
+#ifdef H_BOOL
+    A_typ[U_BOOL]	= "BOOL";
+    (void)av_store (a_typ, U_BOOL,	newSVpv (A_typ[U_BOOL],		0));
+#endif
+#ifdef H_DEC
+    A_typ[U_DEC]	= "DECIMAL";
+    (void)av_store (a_typ, U_DEC,	newSVpv (A_typ[U_DEC],		0));
+#endif
+#ifdef H_GINT
+    A_typ[U_GINT]	= "GIANT NUMERIC";
+    (void)av_store (a_typ, U_GINT,	newSVpv (A_typ[U_GINT],		0));
+#endif
+#ifdef H_GAMT
+    A_typ[U_GAMT]	= "GIANT AMOUNT";
+    (void)av_store (a_typ, U_GAMT,	newSVpv (A_typ[U_GAMT],		0));
+#endif
+#ifdef H_DATETIME
+    A_typ[U_DATETIME]	= "DATETIME";
+    (void)av_store (a_typ, U_DATETIME,	newSVpv (A_typ[U_DATETIME],	0));
+#endif
+
+    (void)hv_store (h_dd, "TYPE", 4, newRV_noinc ((SV *)a_typ), 0);
+
+    /* Fetch SCHEMA's (AUTH) */
+    if (uallath (txid, USLCK, &n, &aidl, &status)) {
+	UATHINF *al  = (UATHINF *)calloc (n, sizeof (UATHINF));
+	USTATUS *asl = (USTATUS *)calloc (n, sizeof (USTATUS));
+	if (al && asl && uinfath (txid, n, aidl, UALLINFO, al, asl, &status)) {
+	    int i, x = 0;
+	    for (i = 0; i < n; i++) {
+		if (al[i].aid > x) x = al[i].aid;
+		}
+	    A_anm = (SV **)calloc (x + 1, sizeof (SV *));
+	    A_tbl = (AV **)calloc (x + 1, sizeof (AV *));
+
+	    (void)hv_store (h_dd, "AUTH", 4, newRV_noinc ((SV *)a_sch), 0);
+	    for (i = 0; i < n; i++) {
+		UAID aid = al[i].aid;
+		HV  *h_dba = newHV ();
+		AV  *a_tbl = newAV ();
+
+		A_anm[aid] = newSVpv (al[i].authnm, 0);
+
+		(void)hv_store (h_dba, "AID",    3, newSViv (aid),             0);
+		(void)hv_store (h_dba, "NAME",   4, A_anm[aid],                0);
+		(void)hv_store (h_dba, "TABLES", 6, newRV_noinc ((SV *)a_tbl), 0);
+
+		(void)av_store (a_sch, aid, newRV_noinc ((SV *)h_dba));
+		A_tbl[aid] = a_tbl;
+		}
+	    }
+	if (al)  free (al);
+	if (asl) free (asl);
+	if (n)   free (aidl);
+	}
+
+    /* Fetch links: only one-to-one links are supported */
+    if (ualllnk (txid, UNULLTID, USLCK, &n, &lidl, &status)) {
+	ULNKINF *ll  = (ULNKINF *)calloc (n, sizeof (ULNKINF));
+	USTATUS *lsl = (USTATUS *)calloc (n, sizeof (USTATUS));
+	if (ll && lsl && uinflnk (txid, n, lidl, UALLINFO, ll, lsl, &status)) {
+	    int i, j, x = 0;
+	    for (i = 0; i < n; i++) {
+		for (j = 0; j < ll[i].count; j++) {
+		    if (ll[i].cloc[j] > x) x = ll[i].cloc[j];
+		    }
+		}
+	    a_lnk = (UCID *)calloc (x + 1, sizeof (UCID));
+	    a_lnk[0] = x;
+	    for (i = 0; i < n; i++) {
+		if (ll[i].count == 1)
+		    a_lnk[ll[i].cloc[0]] = ll[i].ploc[0];
+		}
+	    }
+	if (ll)  free (ll);
+	if (lsl) free (lsl);
+	if (n)   free (lidl);
+	}
+    else {
+	warn ("Call to fetch all links failed with code %d: %s\n", err, u_err (status));
+	}
+
+    err = ualltbl (txid, UNULLAID, USLCK, &n, &tidl, &status);
+    if (err != USUCCESS || n <= 0) {
+	warn ("Call to fetch all tables failed with code %d: %s\n", err, u_err (status));
+	}
+    else {
+	UTBLINF *tinfl = NULL;
+	USTATUS *tsl   = NULL;
+
+	if ((tinfl = (UTBLINF *)calloc (n, sizeof (UTBLINF))) != NULL &&
+	    (tsl   = (USTATUS *)calloc (n, sizeof (USTATUS))) != NULL &&
+	     uinftbl (txid, n, tidl, UALLINFO, tinfl, tsl, &status)) {
+	    int i, c, g;
+	    AV *a_tbl = newAV ();
+	    AV *a_fld = newAV ();
+
+	    (void)hv_store (h_dd, "TABLE",	5, newRV_noinc ((SV *)a_tbl), 0);
+	    (void)hv_store (h_dd, "COLUMN",	6, newRV_noinc ((SV *)a_fld), 0);
+
+	    for (i = 0; i < n; i++) {
+		UTID     tid    =  tidl[i];
+		UTBLINF *ti     = &tinfl[i];
+		UAID     aid    =  ti->aid;
+		UCID    *cl     =  ti->ucidlst;
+		USTATUS *csl    = NULL;
+		UCOLINF *cinfl  = NULL;
+		HV      *h_dbt  = newHV ();
+		AV      *a_dbc  = newAV ();
+		AV      *a_dbk  = newAV ();
+		AV	*a_grp  = newAV ();
+		SV	*t_nm;
+
+		char    *tname  = "?";
+		char   **tnames = NULL;
+		int      nn;
+		UOPTS    tops   = ti->tblopts;
+
+		if (ufchtnm (txid, tid, &nn, &tnames, &status))
+		    tname = tnames[0];
+
+		t_nm = newSVpv (tname, 0);
+
+		(void)hv_store (h_dbt, "AID",       3, newSViv (aid),                       0);
+		(void)hv_store (h_dbt, "ANAME",     5, SvREFCNT_inc (A_anm[aid]),           0);
+		(void)hv_store (h_dbt, "TID",       3, newSViv (tid),                       0);
+		(void)hv_store (h_dbt, "NAME",      4, t_nm,                                0);
+		(void)hv_store (h_dbt, "OPTIONS",   7, newSViv (tops),                      0);
+		(void)hv_store (h_dbt, "DIRECTKEY", 9, newSViv (tops & DB_DIRECT  ? 1 : 0), 0);
+		(void)hv_store (h_dbt, "SCATTERED", 9, newSViv (tops & DB_SCATTR  ? 1 : 0), 0);
+		(void)hv_store (h_dbt, "FIXEDSIZE", 9, newSViv (tops & DB_FIXSIZE ? 1 : 0), 0);
+		(void)hv_store (h_dbt, "EXPNUM",    6, newSViv (ti->expnum),                0);
+		(void)hv_store (h_dbt, "PKEYED",    6, newSViv (tops & DB_KEYED   ? 1 : 0), 0);
+		(void)hv_store (h_dbt, "COLUMNS",   7, newRV_noinc ((SV *)a_dbc),           0);
+		(void)hv_store (h_dbt, "KEY",       3, newRV_noinc ((SV *)a_dbk),           0);
+		(void)hv_store (h_dbt, "CGRP",      4, newRV_noinc ((SV *)a_grp),           0);
+		/* do I want to keep the ti->tbldesc as DESCRIPTION ? */
+		/* No need here to store nvol, nbtree, nhsh, and nlnk yet */
+
+		(void)av_store (a_tbl, tid, newRV_noinc ((SV *)h_dbt));
+
+		if (A_tbl[aid]) av_push (A_tbl[aid], newSViv (tid));
+
+		for (c = 0; c < ti->nkey; c++)
+		    av_push (a_dbk, newSViv (ti->keycidl[c]));
+
+		if ((cinfl = (UCOLINF *)calloc (ti->ncol, sizeof (UCOLINF))) != NULL &&
+		    (csl   = (USTATUS *)calloc (ti->ncol, sizeof (USTATUS))) != NULL &&
+		     uinfcol (txid, ti->ncol, cl, UALLINFO, cinfl, csl, &status)) {
+		    for (c = 0; c < ti->ncol; c++) {
+			UCID     cid    =  cl[c];
+			UCOLINF *ci     = &cinfl[c];
+			HV      *h_dbc  = newHV ();
+
+			char    *cname  = "?";
+			char   **cnames = NULL;
+
+			UOPTS    cops   = ci->colopts;
+			int      ctyp   = ci->coltyp;
+			int	 pkey   = cops & DB_COLKEY ? 1 : 0;
+
+			AV      *a_plnk = newAV ();
+
+			if (ufchcnm (txid, cid, &nn, &cnames, &status))
+			    cname = cnames[0];
+
+
+			if (ti->nkey > 1) { /* Combined keys */
+			    int kc;
+			    for (kc = 0; kc < ti->nkey; kc++) {
+				if (ti->keycidl[kc] == cid) pkey++;
+				}
+			    }
+
+			av_push (a_dbc, newSViv (cid));
+
+			(void)hv_store (h_dbc, "TID",      3, newSViv (tid),                      0);
+			(void)hv_store (h_dbc, "TNAME",    5, SvREFCNT_inc (t_nm),                0);
+			(void)hv_store (h_dbc, "CID",      3, newSViv (cid),                      0);
+			(void)hv_store (h_dbc, "NAME",     4, newSVpv (cname, 0),                 0);
+			(void)hv_store (h_dbc, "TYPE",     4, newSViv (ctyp),                     0);
+			(void)hv_store (h_dbc, "LENGTH",   6, newSViv (ci->collen),               0);
+			(void)hv_store (h_dbc, "SCALE",    5, newSViv (ci->colscl),               0);
+			(void)hv_store (h_dbc, "NULLABLE", 8, newSViv (cops &
+								(DB_NONULL | DB_COLKEY) ? 0 : 1), 0);
+			(void)hv_store (h_dbc, "DSP_LEN",  7, newSViv (ci->dsplen),               0);
+			(void)hv_store (h_dbc, "DSP_SCL",  7, newSViv (ci->dspscl),               0);
+			(void)hv_store (h_dbc, "DSP_PICT", 8, newSVpv (ci->dsppict, 0),           0);
+			(void)hv_store (h_dbc, "OPTIONS",  7, newSViv (cops),                     0);
+			(void)hv_store (h_dbc, "PKEY",     4, newSViv (pkey),                     0);
+			(void)hv_store (h_dbc, "RDONLY",   6, newSViv (cops & DB_RDONLY ? 1 : 0), 0);
+			(void)hv_store (h_dbc, "UNIQUE",   6, newSViv (cops & DB_UNIQUE ? 1 : 0), 0);
+			(void)hv_store (h_dbc, "LINK",     4, newSViv (a_lnk && cid <= a_lnk[0]
+			                                    && a_lnk[cid] > 0 ? a_lnk[cid] : -1), 0);
+			(void)hv_store (h_dbc, "REFS",     4, newRV_noinc ((SV *)a_plnk),         0);
+
+			(void)hv_store (h_dbc, "NBTREE",   6, newSViv (ci->nbt),                  0);
+			(void)hv_store (h_dbc, "NHASH",    5, newSViv (ci->nhsh),                 0);
+			(void)hv_store (h_dbc, "NPLINK",   6, newSViv (ci->nplnk),                0);
+			(void)hv_store (h_dbc, "NCLINK",   6, newSViv (ci->nclnk),                0);
+
+			(void)av_store (a_fld, cid, newRV_noinc ((SV *)h_dbc));
+
+			if (ci->nplnk && a_lnk && a_lnk[0]) {
+			    int lc;
+			    for (lc = 1; lc < a_lnk[0]; lc++) {
+				if (a_lnk[lc] == cid)
+				    av_push (a_plnk, newSViv (lc));
+				}
+			    }
+
+			if (cnames) free (cnames);
+			}
+		    free (cinfl);
+		    }
+
+		/* Fetch col-groups */
+		if (uallcgp (txid, tid, USLCK, &g, &cidl, &status)) {
+		    UCGPINF *lcg = (UCGPINF *)calloc (g, sizeof (UCGPINF));
+		    USTATUS *lsl = (USTATUS *)calloc (g, sizeof (USTATUS));
+		    if (g && lcg && lsl && uinfcgp (txid, g, cidl, UNOCLASS, lcg, lsl, &status)) {
+			int i, j, x = 0;
+			for (i = 0; i < g; i++) {
+			    if (lcg[i].ncol > 0) {
+				HV *h_grp = newHV ();
+				AV *a_cid = newAV ();
+
+				for (j = 0; j < lcg[i].ncol; j++)
+				    (void)av_store (a_cid, j, newSViv (lcg[i].grpcidl[j]));
+
+				(void)hv_store (h_grp, "CID",     3, newSViv (lcg[i].cid),      0);
+				(void)hv_store (h_grp, "TYPE",    4, newSViv (lcg[i].coltyp),   0);
+				(void)hv_store (h_grp, "COLUMNS", 7, newRV_noinc ((SV *)a_cid), 0);
+				(void)av_store (a_grp, x++, newRV_noinc ((SV *)h_grp));
+				}
+			    }
+			}
+		    if (lcg) free (lcg);
+		    if (lsl) free (lsl);
+		    if (g)   free (cidl);
+		    }
+
+		if (csl)    free (csl);
+		if (tnames) free (tnames);
+		}
+	    free (tinfl);
+	    }
+	if (tsl) free (tsl);
+	free (tidl);
+	}
+    free (A_tbl);
+    if (a_lnk) free (a_lnk);
+    if (A_anm) free (A_anm);
+
+    /* Committing and disconnecting disables all subsequent actions
+    unless (ucmttx (txid, &status))
+	warn ("Cannot commit transaction: %s\n", u_err (status));
+
+    unless (uclsdb (dbid, DB_NOLOCK, &status)) {
+	warn ("Cannot close database connection: %s\n", u_err (status));
+	return;
+	}
+    */
+    } /* _db_dict */
+
 void dbd_st_destroy (SV *, imp_sth_t *);	/* Forward ref */
 
 /* Until those babys are able to change their own dirty nappies ... */
@@ -455,6 +850,16 @@ int dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh) {
 	ROLLBACK WORK;
     return (sqlError (dbh));
     } /* dbd_db_rollback */
+
+int dbd_db_dict (SV *dbh, int reload) {
+    dTHX;
+    D_imp_dbh (dbh);
+
+    dbg (3, "DBD::Unify::db_dict (%d)\n", reload);
+    _db_dict (reload);
+    sv_setsv (DEFSV, newRV_noinc ((SV *)h_dd)); /* $_ = \%db */
+    return (1);
+    } /* dbd_db_dict */
 
 int dbd_db_do (SV *dbh, char *statement) {
     dTHX;

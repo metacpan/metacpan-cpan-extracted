@@ -14,6 +14,7 @@ unless (exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db") {
     exit 0;
     }
 my $dbname = "DBI:Unify:$ENV{DBPATH}";
+my $txx    = "xx_$$";
 
 my $dbh;
 ok ($dbh = DBI->connect ($dbname, undef, "", {
@@ -32,7 +33,7 @@ unless ($dbh) {
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
-    "create table xx (",
+    "create table $txx (",
     "    xs numeric       (4) not null,",
     "    xt text",
     ")"), "create");
@@ -43,14 +44,14 @@ if ($dbh->err) {
 ok ($dbh->commit, "commit");
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0, 'Some text')"));
+ok ($dbh->do ("insert into $txx values (0, 'Some text')"));
 foreach my $v ( 1 .. 5 ) {
     my $t = "x" x (1 << $v);
-    ok ($dbh->do ("insert into xx values ($v, '$t')"), "INS $v");
+    ok ($dbh->do ("insert into $txx values ($v, '$t')"), "INS $v");
     }
 ok (1, "-- FILL THE TABLE, POSITIONAL");
 my $sth;
-ok ($sth = $dbh->prepare ("insert into xx values (?,?)"), "ins prepare");
+ok ($sth = $dbh->prepare ("insert into $txx values (?,?)"), "ins prepare");
 foreach my $v ( 6 .. 10 ) {
     my $t = "x" x (1 << $v);
     ok ($sth->execute ($v, $t), "ins $v");
@@ -69,7 +70,7 @@ my %result_ok = (
     4 => "4, 'xxxxxxxxxxxxxxxx'",
     5 => "5, 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
     );
-ok ($sth = $dbh->prepare ("select * from xx where xs between 0 and 5"), "sel prepare");
+ok ($sth = $dbh->prepare ("select * from $txx where xs between 0 and 5"), "sel prepare");
 ok (1, "-- Check the internals");
 {   local $" = ":";
     my %attr = (
@@ -92,7 +93,7 @@ while (my ($xs, $xt) = $sth->fetchrow_array ()) {
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("select xt from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xt from $txx where xs = ?"), "sel prepare");
 foreach my $xs (1 .. 10) {
     ok ($sth->execute ($xs), "execute $xs");
     my ($xt) = $sth->fetchrow_array;
@@ -111,10 +112,10 @@ ok ($sth->finish, "finish");
 {   my ($r, $xt);
     $r .= chr int rand 256 for 0 .. 132_000;
     ok ($r, "128k+ random data");
-    ok ($sth = $dbh->prepare ("update xx set xt = ? where xs = 3"), "prepare update");
+    ok ($sth = $dbh->prepare ("update $txx set xt = ? where xs = 3"), "prepare update");
     ok ($sth->execute ($r), "execute update");
     ok ($sth->finish, "finish update");
-    ok ($sth = $dbh->prepare ("select xt from xx where xs = ?"), "prepare select");
+    ok ($sth = $dbh->prepare ("select xt from $txx where xs = ?"), "prepare select");
     ok ($sth->execute (3), "execute select");
     ok (($xt) = $sth->fetchrow_array (), "fetch random data");
     is (length ($xt), length ($r), "length");
@@ -129,11 +130,11 @@ ok ($sth->finish, "finish");
     ok ($sth->finish, "finish select");
     }
 
-ok ($dbh->do ("delete xx"), "do delete");
+ok ($dbh->do ("delete $txx"), "do delete");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- DROP THE TABLE");
-ok ($dbh->do ("drop table xx"), "do drop");
+ok ($dbh->do ("drop table $txx"), "do drop");
 ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");

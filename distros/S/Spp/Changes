@@ -104,3 +104,6 @@ Revision history for Spp
         add core to it, is_atoms
 
 1.21    die() => error, Match all error could report pos.
+
+1.22    all branch is longest match branch, if two branch
+        match same length, then first is return.

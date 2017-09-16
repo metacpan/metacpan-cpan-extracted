@@ -4,7 +4,7 @@ package DBD::Unify::TypeInfo;
 # DBI::DBD::Metadata::write_typeinfo_pm v2.008696.
 # And manually reformatted into readable style
 
-our $VERSION = "0.88";
+our $VERSION = "0.89";
 
 use strict;
 use warnings;
@@ -91,6 +91,7 @@ my %odbc_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
     ;
 $odbc_types{DOUBLE}  = $odbc_types{"DOUBLE PRECISION"};
 
+# see include/sqle_usr.h
 my %uni_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
     [ -19  => "DATETIME"	], # SQLDATETIME
     [ -18  => "CURRENCY"	], # SQLAMT64
@@ -116,6 +117,32 @@ my %uni_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
 $uni_types{CHARACTER} = $uni_types{CHAR};
 $uni_types{DOUBLE}    = $uni_types{"DOUBLE PRECISION"};
 
+# see include/rhli.h
+my %hli_types = map { ( $_->[0] => $_->[1], $_->[1] => $_->[0] ) }
+    [   1  => "INTEGER"		], # U_INT	"small" numerics
+    [   2  => "NUMERIC"		], # U_HINT	"huge" numerics
+    [   3  => "DATE"		], # U_DATE	"small" dates
+    [   4  => "AMOUNT"		], # U_AMT	"small" amounts
+    [   5  => "CHAR"		], # U_STR	strings (terminated)
+    [   6  => "HUGE AMOUNT"	], # U_HAMT	"huge" amounts
+    [   7  => "TIME"		], # U_TIME	times
+    [   8  => "FLOAT"		], # U_FLT	floating numerics
+    [   9  => "TEXT"		], # U_VTXT	variable length text
+    [  10  => "BINARY"		], # U_VBIN	variable length binary
+    [  11  => "HUGE DATE"	], # U_HDATE	"huge" (long) dates
+    [  12  => "BYTE"		], # U_BYT	byte strings (non-terminated)
+    [  13  => "BOOL"		], # U_BOOL	boolean type
+    [  14  => "REAL"		], # U_REAL	real type
+    [  15  => "DOUBLE"		], # U_DBL	double type
+    [  16  => "DECIMAL"		], # U_DEC	packed decimal type
+    [  17  => "GIANT NUMERIC"	], # U_GINT	"giant" numerics
+    [  18  => "GIANT AMOUNT"	], # U_GAMT	"giant" amounts
+    [  19  => "DATETIME"	], # U_DATETIME	date and time
+#   [ 100  => "COL_GROUP"	], # U_CGP	column group type
+    ;
+$hli_types{CHARACTER}          = $hli_types{CHAR};
+$hli_types{"DOUBLE PRECISION"} = $hli_types{DOUBLE};
+
 sub odbc_type {
     my $t = shift;
     defined $t or return 0;
@@ -129,6 +156,13 @@ sub uni_type {
     $t = $uni_types{uc $t} || $t;
     return $t;
     } # uni_type
+
+sub hli_type {
+    my $t = shift;
+    defined $t or return 0;
+    $t = $hli_types{uc $t} || $t;
+    return $t;
+    } # hli_type
 
 1;
 

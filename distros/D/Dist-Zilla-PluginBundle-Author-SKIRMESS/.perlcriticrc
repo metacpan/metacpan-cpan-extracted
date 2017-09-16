@@ -1,5 +1,5 @@
 # Automatically generated file
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.010
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.014
 
 severity = 1
 only = 1
@@ -43,7 +43,6 @@ only = 1
 [ControlStructures::ProhibitYadaOperator]
 [Documentation::PodSpelling]
 [Documentation::RequirePackageMatchesPodName]
-[Documentation::RequirePodAtEnd]
 [Documentation::RequirePodLinksIncludeText]
 [ErrorHandling::RequireCarping]
 [ErrorHandling::RequireCheckingReturnValueOfEval]

@@ -3,6 +3,7 @@ abstract: 'Alien::Build installer class for Module::Build'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
+  Alien::Build: '1.14'
   Capture::Tiny: '0'
   File::chdir: '0'
   Test2::V0: '0.000060'
@@ -23,7 +24,7 @@ no_index:
     - example
     - maint
 requires:
-  Alien::Build: '0.05'
+  Alien::Build: '1.14'
   Module::Build: '0'
   Path::Tiny: '0'
   perl: '5.006'
@@ -32,5 +33,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build-MB/issues
   homepage: https://metacpan.org/pod/Alien::Build::MB
   repository: git://github.com/plicease/Alien-Build-MB.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

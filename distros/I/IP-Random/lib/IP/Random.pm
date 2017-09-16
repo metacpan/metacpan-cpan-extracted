@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 Joel C. Maslak
+# Copyright (C) 2016 J. C. Maslak
 # All Rights Reserved - See License
 #
 
 package IP::Random;
-$IP::Random::VERSION = '1.002';
+$IP::Random::VERSION = '1.003';
 # ABSTRACT: Generate IP Addresses Randomly
 
 
@@ -149,7 +149,7 @@ IP::Random - Generate IP Addresses Randomly
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -436,11 +436,11 @@ I have plans to port this to Perl 6.
 
 =head1 AUTHOR
 
-Joel Maslak <jmaslak@antelope.net>
+J. Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Joel Maslak.
+This software is Copyright (c) 2016 by J. Maslak.
 
 This is free software, licensed under:
 

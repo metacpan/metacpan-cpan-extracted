@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use Carp qw/croak/;
 use POSIX ":sys_wait_h";
@@ -354,7 +354,8 @@ sub wait_jobs {
                 push @keep => $set;
             }
             elsif ($got == $pid) {
-                write_file_atomic($exit_file, $ret);
+                next if eval { write_file_atomic($exit_file, $ret); 1 };
+                warn "Error writing exit file '$exit_file': $@";
             }
             else {
                 warn "Could not reap pid $pid, waitpid returned $got";
@@ -374,7 +375,7 @@ sub kill_jobs {
     my $running = $self->{+STATE}->{running};
     for my $cat (values %$running) {
         for my $set (@$cat) {
-            my ($pid) = @_;
+            my ($pid) = @$set;
             kill($sig, $pid) or warn "Could not kill pid $pid";
         }
     }
@@ -414,7 +415,7 @@ sub run_job {
     write_file_atomic($start_file, time());
 
     my @libs = $run->all_libs;
-    unshift @libs => @{$task->{libs}} if $task->{libs};
+    push @libs => @{$task->{libs}} if $task->{libs};
     my $env = {
         %{$run->env_vars},
         TMPDIR => $tmp,

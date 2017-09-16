@@ -13,17 +13,20 @@ Catalyst::Plugin::File::RotateLogs - Catalyst Plugin for File::RotateLogs
 
     $c->log->info("hello catalyst"); 
 
-    # Catalyst configuration by default (e. g. in YAML format):
+# DESCRIPTION
+
+This module allows you to initialize File::RotateLogs within the application's configuration. File::RotateLogs is utility for file logger and very simple logfile rotation. I wanted easier catalyst log rotation.
+
+# Configuration
+
+    # Catalyst configuration file (e. g. in YAML format):
     File::RotateLogs:
         logfile: '/[absolute path]/root/error.log.%Y%m%d%H' 
         linkname: '/[absolute path]/root/error.log'
         rotationtime: 86400
         maxage: 86400 * 3
         autodump: 0
-
-# DESCRIPTION
-
-This module allows you to initialize File::RotateLogs within the application's configuration. File::RotateLogs is utility for file logger and very simple logfile rotation. I wanted easier catalyst log rotation.
+        color: 0
 
 # SEE ALSO
 

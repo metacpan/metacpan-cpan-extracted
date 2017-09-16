@@ -2,7 +2,7 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use Test2::Util qw/pkg_to_file/;
 use File::Spec;
@@ -23,12 +23,14 @@ sub manage_runner   { 0 }
 sub summary         { "For internal use only" }
 sub name            { 'spawn' }
 
+my $TEST;
+
 sub init { confess(ref($_[0]) . " is not intended to be instanciated") }
 sub run  { confess(ref($_[0]) . " does not implement run()") }
 
 sub import {
     my $class = shift;
-    my ($argv) = @_;
+    my ($argv, $runref) = @_;
     my ($runner_class, $dir, %args) = @$argv;
 
     if ($args{setsid}) {
@@ -38,10 +40,10 @@ sub import {
 
     my $pid = $$;
 
-    eval <<'    EOT' or die $@;
+    eval <<'    EOT' or die $@ if $args{pfile};
         END {
             local ($?, $!, $@);
-            if ($args{pfile} && -f $args{pfile} && $pid == $$) {
+            if (-f $args{pfile} && $pid == $$) {
                 print "Deleting $args{pfile}\n";
                 unlink($args{pfile}) or warn "Could not delete $args{pfile}: $!\n";
             }
@@ -69,8 +71,15 @@ sub import {
     $SIG{INT}  = 'DEFAULT';
     $SIG{TERM} = 'DEFAULT';
 
-    require App::Yath::Filter;
-    App::Yath::Filter->import($test);
+    require goto::file;
+
+    if (ref($test) eq 'CODE') {
+        goto::file->import(['exit($App::Yath::RUN->());']);
+        return $$runref = $test;
+    }
+    else {
+        goto::file->import(File::Spec->abs2rel($test));
+    }
 }
 
 1;

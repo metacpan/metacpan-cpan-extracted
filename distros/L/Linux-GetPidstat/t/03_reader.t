@@ -120,4 +120,15 @@ subtest 'a search child command is failed' => sub {
         or diag $stderr;
 };
 
+# Fixed: https://github.com/yoheimuta/Linux-GetPidstat/issues/8
+$opt{pid_dir} = 't/assets/empty_pid';
+subtest 'empty pid' => sub {
+    my $instance = Linux::GetPidstat::Reader->new(%opt);
+    my ($stdout, $stderr, $mapping) = capture {
+        $instance->get_program_pid_mapping;
+    };
+    is scalar @$mapping, 0 or diag explain $mapping;
+    ok !$stderr or diag $stderr;
+};
+
 done_testing;

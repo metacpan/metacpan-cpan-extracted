@@ -226,27 +226,17 @@ sub status ( $self ) {
                 format => sub ( $val, $id, $row ) {
                     return q[-] if !$val;
 
-                    my $now = P->date->now_utc;
+                    my $duration = P->date->duration( P->date->from_string($val), P->date->now_utc );
 
-                    my $date = P->date->from_string($val);
-
-                    my $delta_minutes = $date->delta_minutes($now);
-
-                    my $minutes = $delta_minutes % 60;
-
-                    my $delta_hours = int( $delta_minutes / 60 );
-
-                    my $hours = $delta_hours % 24;
-
-                    my $days = int( $delta_hours / 24 );
-
-                    my $res = q[];
-
-                    $res .= "$days days " if $days;
-
-                    $res .= "$hours hours " if $hours;
-
-                    return "${res}$minutes minutes ago";
+                    if ( $duration->days ) {
+                        return sprintf '%d days %d hours %d minutes ago', $duration->dhm->@*;
+                    }
+                    elsif ( $duration->hours ) {
+                        return sprintf '%d hours %d minutes ago', $duration->hm->@*;
+                    }
+                    else {
+                        return sprintf '%d minutes ago', $duration->minutes;
+                    }
                 }
             },
         ],
@@ -545,12 +535,12 @@ sub trigger_build ( $self, $tag ) {
 ## |    3 | 23                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 118                  | * Subroutine "status" with high complexity score (25)                                                          |
-## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 118                  | * Subroutine "status" with high complexity score (26)                                                          |
+## |      | 292                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 487                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 477                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 271, 350, 480        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 261, 340, 470        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

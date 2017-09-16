@@ -16,6 +16,7 @@ corpus/dist/DZ4/lib/Perl/Critic/Policy/SKIRMESS.pm
 corpus/dist/DZ4/perl_critic_config.txt
 cpanfile
 lib/Dist/Zilla/Plugin/AutoPrereqs/Perl/Critic.pm
+perlcriticrc.local
 t/00-load.t
 t/basic.t
 t/basic2.t

@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.63   2017-09-15
+       - small tweak to support IN postcode, with testcase
+       - newest address-formatting templates
+
 1.62   2017-07-24
        - small tweak to support postformat replace on CA postcodes
        - newest address-formatting templates, more abbreviations

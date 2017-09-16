@@ -8,9 +8,9 @@ use Test::More;
 BEGIN {
    plan skip_all => "Future is not available"
       unless eval { require Future };
-   plan skip_all => "Future::AsyncAwait >= 0.09 is not available"
+   plan skip_all => "Future::AsyncAwait >= 0.10 is not available"
       unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.09' ) };
+                    Future::AsyncAwait->VERSION( '0.10' ) };
    plan skip_all => "Syntax::Keyword::Try >= 0.07 is not available"
       unless eval { require Syntax::Keyword::Try;
                     Syntax::Keyword::Try->VERSION( '0.07' ) };
@@ -70,21 +70,14 @@ BEGIN {
    my $f1 = Future->new;
    my $fdone = with_trycatch_return( $f1 );
 
-   my $ret;
+   $f1->done;
 
-   eval { $f1->done; $ret = $fdone->get; 1 } or do {
-      my $e = $@; chomp $e;
-      diag( "  Failed: $e" );
-   };
-
-   is( $ret, "result", '$fdone for successful await in try/catch with return' );
+   is( scalar $fdone->get, "result", '$fdone for successful await in try/catch with return' );
    ok( !$fellthrough, 'fallthrough after try{return} did not happen' );
 }
 
 # await in try/finally
-TODO: {
-   local $TODO = "RT122796";
-
+{
    async sub with_tryfinally
    {
       my $f = shift;
@@ -105,14 +98,9 @@ TODO: {
    my $f1 = Future->new;
    my $fret = with_tryfinally( $f1 );
 
-   my $ret;
+   $f1->done;
 
-   eval { $f1->done; $ret = $fret->get; 1 } or do {
-      my $e = $@; chomp $e;
-      diag( "  Failed: $e" );
-   };
-
-   is( $ret, "TF", '$fret for await in try/finally' );
+   is( scalar $fret->get, "TF", '$fret for await in try/finally' );
 }
 
 done_testing;

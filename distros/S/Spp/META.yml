@@ -16,7 +16,7 @@ name: Spp
 provides:
   Spp:
     file: lib/Spp.pm
-    version: '1.20'
+    version: '1.22'
   Spp::Ast:
     file: lib/Spp/Ast.pm
   Spp::Builtin:
@@ -29,8 +29,8 @@ provides:
     file: lib/Spp/Grammar.pm
   Spp::LintAst:
     file: lib/Spp/LintAst.pm
-  Spp::Match:
-    file: lib/Spp/Match.pm
+  Spp::MatchRule:
+    file: lib/Spp/MatchRule.pm
   Spp::OptAst:
     file: lib/Spp/OptAst.pm
   Spp::ToSpp:
@@ -42,5 +42,5 @@ requires:
   perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.20'
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

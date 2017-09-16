@@ -8,8 +8,7 @@ our @ISA    = qw(Exporter);
 our @EXPORT = qw(ast_to_table concat start_with end_with
   to_end append is_atom_name is_false
   is_match is_true is_bool is_atom_sym is_atom_token
-  is_atom_rept is_atom_look is_atom_tillnot is_atom_str
-  is_atom_expr clean_ast);
+  is_atom_tillnot is_atom_str is_atom_expr clean_ast);
 
 use Spp::Builtin;
 
@@ -81,16 +80,6 @@ sub is_atom_sym {
 sub is_atom_token {
    my $atom = shift;
    return is_atom_name($atom, 'Token');
-}
-
-sub is_atom_rept {
-   my $atom = shift;
-   return is_atom_name($atom, '_rept');
-}
-
-sub is_atom_look {
-   my $atom = shift;
-   return is_atom_name($atom, '_look');
 }
 
 sub is_atom_tillnot {

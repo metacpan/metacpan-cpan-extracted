@@ -8,7 +8,7 @@ package Net::POP3S;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use strict;
 use base qw ( Net::POP3 );
@@ -139,7 +139,7 @@ sub starttls {
     my %arg = %{ ${*$self}{'net_pop3_arg'} };
     my %ssl_args = map { +"$_" => $arg{$_} } grep {/^SSL/} keys %arg;
     my $capa;
-    ($capa = $obj->capa
+    ($capa = $self->capa
      and exists $capa->{STLS}
      and $self->_STLS()
      and $self->ssl_start(\%ssl_args, @_)

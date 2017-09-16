@@ -2,7 +2,7 @@ package App::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use App::Yath::Util qw/find_pfile/;
 
@@ -19,9 +19,9 @@ sub import {
 
     my $cmd_name  = $class->parse_argv($argv);
     my $cmd_class = $class->load_command($cmd_name);
-    $cmd_class->import($argv);
+    $cmd_class->import($argv, $runref);
 
-    $$runref = sub { $class->run_command($cmd_class, $cmd_name, $argv) };
+    $$runref ||= sub { $class->run_command($cmd_class, $cmd_name, $argv) };
 }
 
 sub info {
@@ -201,7 +201,7 @@ Or you can use gzip:
     ...
     Wrote log file: test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl.gz
 
-C<-B> and <C-G> both imply C<-L>.
+C<-B> and C<-G> both imply C<-L>.
 
 =head3 REPLAYING FROM A LOG
 

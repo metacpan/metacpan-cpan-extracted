@@ -2,7 +2,7 @@ package Net::Amazon::DynamoDB::Marshaler;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use parent qw(Exporter);
 our @EXPORT = qw(dynamodb_marshal dynamodb_unmarshal);
@@ -24,6 +24,13 @@ sub dynamodb_marshal {
             ref $force_type
             && ref $force_type eq 'HASH'
         );
+
+    die __PACKAGE__.qq|::dynamodb_marshal(): invalid force_type value for "$_"|
+        for grep {
+            $force_type->{$_} !~ /^[SN]$/;
+        }
+        keys %$force_type;
+
     return _marshal_hashref($attrs, $force_type);
 }
 
@@ -38,17 +45,13 @@ sub dynamodb_unmarshal {
 }
 
 sub _marshal_hashref {
-    my ($attrs, $force_type) = @_;
-    $force_type ||= {};
+    my ($attrs, $force_types) = @_;
+    $force_types ||= {};
     my %marshalled;
     for my $key (keys %$attrs) {
         my $val = $attrs->{$key};
-        my $new_val;
-        if (my $type = $force_type->{$key}) {
-            $new_val = _marshal_val_force_type($val, $type);
-        } else {
-            $new_val = _marshal_val($val);
-        }
+        my $force_type = $force_types->{$key};
+        my $new_val = _marshal_val($val, $force_type);
         if ($new_val) {
             $marshalled{$key} = $new_val;
         }
@@ -62,33 +65,85 @@ sub _unmarshal_hashref {
 }
 
 sub _marshal_val {
-    my ($val) = @_;
+    my ($val, $force_type) = @_;
+    $force_type ||= '';
+
+    # Calculate the type according to our rules.
     my $type = _val_type($val);
 
-    return { $type => $val } if $type =~ /^(N|S)$/;
-    return { $type => 1 } if $type eq 'NULL';
-    return { $type => $val ? 1 : 0 } if $type eq 'BOOL';
-    return { $type => [ $val->members ] } if $type =~ /^(NS|SS)$/;
-    return { $type => [ map { _marshal_val($_) } @$val ] } if ($type eq 'L');
-    return { $type => _marshal_hashref($val) } if ($type eq 'M');
+    # Subref to build string value result
+    my $marshalled_string = sub {{ S => "$_[0]" }};
+
+    # Subref to build number value result
+    my $marshalled_num = sub {{ N => $_[0] }};
+
+    # Handle strings
+    if ($type eq 'S') {
+        # Strip these out if we're force-typing to number
+        if ($force_type eq 'N') {
+            return undef;
+        }
+        return $marshalled_string->($val);
+    }
+
+    # Handle numbers
+    if ($type eq 'N') {
+        # Force-stringify if asked
+        if ($force_type eq 'S') {
+            return $marshalled_string->($val);
+        }
+        return $marshalled_num->($val);
+    }
+
+    # Handle nulls
+    if ($type eq 'NULL') {
+        # Strip these out if we're force-typing
+        if ($force_type) {
+            return undef;
+        }
+        return { NULL => 1 };
+    }
+
+    # Handle booleans
+    if ($type eq 'BOOL') {
+        # Force-stringify if asked
+        if ($force_type eq 'S') {
+            return $marshalled_string->($val ? 1 : 0);
+        }
+        # Force-numerify if asked
+        if ($force_type eq 'N') {
+            return $marshalled_num->($val ? 1 : 0);
+        }
+        return { BOOL => $val ? 1 : 0 };
+    }
+
+    # Handle sets
+    if ($type =~ /^(NS|SS)$/) {
+        # Blow up trying to force-type a set
+        die __PACKAGE__.'force_type not supported for sets yet'
+            if $force_type;
+        return { $type => [ $val->members ] };
+    }
+
+    # Handle lists
+    if ($type eq 'L') {
+        my @items = map { _marshal_val($_, $force_type) } @$val;
+        # Strip out any values that failed force-typing
+        @items = grep { defined } @items;
+        return { L => \@items };
+    }
+
+    # Handle maps
+    if ($type eq 'M') {
+        my $force_types = {};
+        if ($force_type) {
+            # Recursively apply our force type to all values.
+            $force_types = { map { $_ => $force_type } keys %$val };
+        }
+        return { M => _marshal_hashref($val, $force_types) };
+    }
 
     die "don't know how to marshal type of $type";
-}
-
-sub _marshal_val_force_type {
-    my ($val, $type) = @_;
-
-    if ($type eq 'N') {
-        return undef unless StrictNum->check($val);
-        return { N => $val };
-    }
-
-    if ($type eq 'S') {
-        return undef unless (defined $val && length($val));
-        return { S => "$val" };
-    }
-
-    die __PACKAGE__.'::dynamodb_marshal(): force_type only supports "S" and "N" types';
 }
 
 sub _unmarshal_attr_val {
@@ -111,7 +166,7 @@ sub _val_type {
 
     return 'NULL' if ! defined $val;
     return 'NULL' if $val eq '';
-    return 'N' if _is_number($val);
+    return 'N' if _is_valid_number($val);
     return 'S' if !ref $val;
 
     return 'BOOL' if isBoolean($val);
@@ -134,24 +189,24 @@ sub _val_type {
     die __PACKAGE__.": unable to marshal value: $val";
 }
 
-sub _is_number {
+sub _is_valid_number {
     my ($val) = @_;
-    return (
-        (!ref $val)
-        && StrictNum->check($val)
-        && (
-            $val == 0
-            || (
-                $val < '1E+126'
-                && $val > '1E-130'
-            )
-            || (
-                $val < '-1E-130'
-                && $val > '-1E+126'
-            )
-        )
-        && length($val) <= 38
-    );
+    return 0 if ref $val;
+    return 0 unless StrictNum->check($val);
+
+    # Some very high numbers are equal to 0, keep those as strings
+    return 1 if ("$val" eq '0');
+    return 0 if ($val == 0);
+
+    return 0 if ($val > 0 && $val <= 1e-130);
+    return 0 if ($val < 0 && $val >= -1e-130);
+
+    return 0 if ($val >= 1e126);
+    return 0 if ($val <= -1e126);
+
+    return 0 if length($val) > 38;
+
+    return 1;
 }
 
 
@@ -282,9 +337,11 @@ Use force_type in that situation:
   #   ...
   # };
 
-The module only supports 'S' and 'N' types for force_type. If you specify 'S', dynamodb_marshal will stringify the value, so make sure not to send arrays, etc. as values. If you specify 'N', dynamodb_marshal will set the value to undef if it's not a number.
+You can only specify 'S' or 'N' for force_type values. If the attribute you specify is a list or map, the forced type will be applied recursively through the data structure. Sets are not currently available for force_type.
 
 Undefs or empty string values for force_type attributes will be removed from the marshalled hashref. While this behavior might not seem intuitive at first, it's almost certainly what you want. For instance, if you have a global secondary index on a string attribute, and your item has an undef value for that attribute, you want to avoid sending that attribute (using NULL would be rejected by DynamoDB, and you can't send empty strings). If you have an undef value for a primary key string attribute, you have a bug in your application somewhere.
+
+If you specify 'N', and a non-number value is encountered, it will also be removed.
 
 =head2 dynamodb_unmarshal
 

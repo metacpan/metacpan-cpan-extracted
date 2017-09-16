@@ -1,5 +1,9 @@
 Revision history for Net-Amazon-DynamoDB-Marshaler
 
+0.06  2017-09-14 22:07:27 UTC
+        - support force_type for lists and maps
+        - fix edge case with super high numbers
+
 0.05  2017-07-21 15:50:33 UTC
         - Fix force_type so that it converts vals, and drops undefs.
 

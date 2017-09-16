@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Geo-Address-Formatter
 provides:
   Geo::Address::Formatter:
     file: lib/Geo/Address/Formatter.pm
-    version: '1.62'
+    version: '1.63'
 requires:
   Clone: '0'
   Data::Dumper: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Address-Formatter
   repository: https://github.com/OpenCageData/perl-Geo-Address-Formatter.git
-version: '1.62'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.63'
+x_serialization_backend: 'YAML::Tiny version 1.69'

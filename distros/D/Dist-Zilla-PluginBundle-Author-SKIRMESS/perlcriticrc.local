@@ -1,2 +1,4 @@
 [InputOutput::RequireCheckedSyscalls]
 exclude_functions = print
+
+[-Documentation::RequirePodAtEnd]

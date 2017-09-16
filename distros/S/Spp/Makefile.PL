@@ -3,18 +3,18 @@ require 5.012;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'PREREQ_PM' => {
-                   'JSON::XS' => 0,
-                   'List::MoreUtils' => 0,
-                   'File::Spec' => 0,
-                   'Test::More' => 0
-                 },
   'EXE_FILES' => [
                    'bin/spp'
                  ],
-  'VERSION_FROM' => 'lib/Spp.pm',
+  'PREREQ_PM' => {
+                   'List::MoreUtils' => 0,
+                   'File::Spec' => 0,
+                   'Test::More' => 0,
+                   'JSON::XS' => 0
+                 },
   'NAME' => 'Spp',
-  'INSTALLDIRS' => 'site'
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Spp.pm'
 )
 ;

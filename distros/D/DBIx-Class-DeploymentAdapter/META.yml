@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +25,18 @@ no_index:
 provides:
   DBIx::Class::DeploymentAdapter:
     file: lib/DBIx/Class/DeploymentAdapter.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   DBIx::Class::DeploymentHandler: '0'
   perl: '5.008001'
-version: '0.08'
+resources:
+  bugtracker: https://github.com/itnode/DBIx-Class-DeploymentAdapter/issues
+  homepage: https://github.com/itnode/DBIx-Class-DeploymentAdapter
+  repository: git://github.com/itnode/DBIx-Class-DeploymentAdapter.git
+version: '0.09'
 x_authority: cpan:MOVEAX
 x_contributors:
   - 'Patrick Kilter <pas.freelance@gmail.com>'
   - 'Patrick Kilter <pas.freelance@googlemail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Jens Gassmann <jens.gassmann@atomix.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

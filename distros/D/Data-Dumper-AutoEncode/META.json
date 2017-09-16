@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Encode" : "0",
             "Test::More" : "0.88"
          }
       },
@@ -30,9 +29,12 @@
             "IO::Interactive::Tiny" : "0"
          },
          "requires" : {
+            "B" : "0",
+            "Carp" : "0",
             "Data::Dumper" : "0",
-            "Data::Recursive::Encode" : "0.05",
+            "Encode" : "0",
             "Exporter" : "0",
+            "Scalar::Util" : "0",
             "parent" : "0",
             "perl" : "v5.8.1"
          }
@@ -41,7 +43,7 @@
    "provides" : {
       "Data::Dumper::AutoEncode" : {
          "file" : "lib/Data/Dumper/AutoEncode.pm",
-         "version" : "0.107"
+         "version" : "0.108"
       }
    },
    "release_status" : "stable",
@@ -53,6 +55,6 @@
          "url" : "http://github.com/bayashi/Data-Dumper-AutoEncode"
       }
    },
-   "version" : "0.107",
+   "version" : "0.108",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

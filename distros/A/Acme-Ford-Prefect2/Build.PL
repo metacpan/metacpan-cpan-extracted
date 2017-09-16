@@ -15,11 +15,11 @@ use lib qw{inc}; use My::ModuleBuild;
 
 my %module_build_args = (
   "build_requires" => {
-    "Acme::Alien::DontPanic2" => "0.7500",
+    "Acme::Alien::DontPanic2" => "1.1400",
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
-    "Acme::Alien::DontPanic2" => "0.7500",
+    "Acme::Alien::DontPanic2" => "1.1400",
     "Module::Build" => "0.28",
     "perl" => "5.006"
   },
@@ -29,7 +29,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Ford-Prefect2",
-  "dist_version" => "0.7500",
+  "dist_version" => "1.1400",
   "license" => "perl",
   "module_name" => "Acme::Ford::Prefect2",
   "recursive_test_files" => 1,
@@ -45,7 +45,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Acme::Alien::DontPanic2" => "0.7500",
+  "Acme::Alien::DontPanic2" => "1.1400",
   "Module::Build" => "0.28",
   "Test2::V0" => "0.000060",
   "perl" => "5.006"

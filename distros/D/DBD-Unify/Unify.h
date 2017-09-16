@@ -50,5 +50,6 @@ int  dbd_bind_ph          _((SV *sth, imp_sth_t *imp_sth,
 
 #endif
 
+int dbd_db_dict		_((SV *, int));
 int dbd_db_do		_((SV *, char *));
 int uni2sql_type	_((SQLCOLTYPE));

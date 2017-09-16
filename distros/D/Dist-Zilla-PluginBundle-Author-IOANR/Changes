@@ -1,5 +1,10 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.172580 2017-09-15T05:18:24Z
+ - Control AutoVersion with a major_version option, or {V} override (Ioan
+   Rogers)
+ - Update travis config using App::CISetup (Ioan Rogers)
+
 1.172320 2017-08-20T19:58:15Z
  - Switch to using ReadmeAnyFromPod, ReadmeFromPod seems to be broken (Ioan
    Rogers)

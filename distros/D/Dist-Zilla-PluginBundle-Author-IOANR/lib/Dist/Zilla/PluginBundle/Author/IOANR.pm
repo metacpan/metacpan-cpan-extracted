@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::IOANR 1.172320;
+package Dist::Zilla::PluginBundle::Author::IOANR 1.172580;
 
 # ABSTRACT: Build dists the way IOANR likes
 use v5.12;
@@ -93,9 +93,15 @@ sub configure {
         $change_opts->{tag_regexp} = 'semantic';
     }
 
+    if ($ENV{V}) {
+        $self->add_plugins([AutoVersion => {format => q<{{ $ENV{V} }}>}]);
+    } else {
+        my $major = $arg->{major_version} || 0;
+        $self->add_plugins([AutoVersion => {major => $major}]);
+    }
+
     my @plugins = (
         'AutoPrereqs',
-        'AutoVersion',
         ['ChangelogFromGit::CPAN::Changes' => $change_opts],
         'ContributorsFile',
         ['Git::Contributors' => {order_by => 'commits'}],
@@ -188,7 +194,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.172320
+version 1.172580
 
 =head1 OPTIONS
 

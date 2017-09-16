@@ -26,7 +26,6 @@ lib/App/Yath/Command/tcm.pm
 lib/App/Yath/Command/test.pm
 lib/App/Yath/Command/watch.pm
 lib/App/Yath/Command/which.pm
-lib/App/Yath/Filter.pm
 lib/App/Yath/Plugin.pm
 lib/App/Yath/Plugin/TCM.pm
 lib/App/Yath/Util.pm
@@ -84,7 +83,6 @@ t/App/Yath/Command/tcm.t
 t/App/Yath/Command/test.t
 t/App/Yath/Command/watch.t
 t/App/Yath/Command/which.t
-t/App/Yath/Filter.t
 t/App/Yath/Plugin.t
 t/App/Yath/Plugin/TCM.t
 t/App/Yath/Util.t
@@ -133,10 +131,12 @@ t/capture_test.pl
 t/data.t
 t/lib/App/Yath/Command/broken.pm
 t/lib/TestsFor/Simple.pm
+t/lib/TestsFor/Simple2.pm
 t/lib/bar.pm
 t/lib/baz.pm
 t/lib/foo.pm
 t/lib/tpree.pm
+t/relative_paths.t
 t/simple.t
 t/tcm.t
 test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl

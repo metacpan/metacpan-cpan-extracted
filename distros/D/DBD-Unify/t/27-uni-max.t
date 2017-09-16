@@ -7,7 +7,7 @@ use Test::More;
 
 # Test if all of the documented DBI API is implemented and working OK
 
-my ($max_sth, $tests);
+my ($max_sth, $tests, $txx);
 
 BEGIN {
     $max_sth = 473;	# Arbitrary limit test count
@@ -15,6 +15,8 @@ BEGIN {
 
     $ENV{MAXSCAN}       = $max_sth + 1;
     $ENV{MXOPENCURSORS} = 2 * $max_sth;
+
+    $txx = "xx_$$";
 
     if (exists $ENV{DBD_UNIFY_SKIP_27}) {
 	plan skip_all => "Skip max tests on user request";
@@ -40,8 +42,8 @@ my $sts;
 
 # =========================================================================
 
-ok ($sts = $dbh->do (join " " => q;
-    create table xx (
+ok ($sts = $dbh->do (join " " => qq;
+    create table $txx (
 	xs numeric       (4) not null,
 	xl numeric       (9)
 	);), "do");
@@ -54,12 +56,12 @@ ok ($dbh->commit, "commit");
 # Now check hitting realloc sth_id with an arbitrary number
 my @sti = map {
     my $sth;
-    ok ($sth = $dbh->prepare ("insert into xx (xs, xl) values ($_, ?)"), "ins prepare $_");
+    ok ($sth = $dbh->prepare ("insert into $txx (xs, xl) values ($_, ?)"), "ins prepare $_");
     $sth } (0 .. $max_sth);
 ok ($sti[$_]->execute (1234), "ins execute $_") for 0 .. $#sti;
 my @sts = map {
     my $sth;
-    ok ($sth = $dbh->prepare ("select xs, xl from xx where xs = ?"), "sel prepare $_");
+    ok ($sth = $dbh->prepare ("select xs, xl from $txx where xs = ?"), "sel prepare $_");
     $sth } (0 .. $max_sth);
 foreach my $i (0 .. $max_sth) {
     ok ($sts[$i]->execute ($i), "execute $i");
@@ -70,7 +72,7 @@ map { $_->finish () } @sts, @sti;
 ok ($dbh->commit, "commit");
 
 # =============================================================================
-ok ($dbh->do ("drop table xx"), "drop");
+ok ($dbh->do ("drop table $txx"), "drop");
 ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");

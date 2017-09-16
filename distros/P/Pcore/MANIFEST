@@ -147,6 +147,7 @@ lib/Pcore/Util/Class.pm
 lib/Pcore/Util/Config.pm
 lib/Pcore/Util/Data.pm
 lib/Pcore/Util/Date.pm
+lib/Pcore/Util/Date/Duration.pm
 lib/Pcore/Util/Date/Strptime.pm
 lib/Pcore/Util/Digest.pm
 lib/Pcore/Util/File.pm

@@ -10,9 +10,9 @@ sub command_file {
     my $self = shift;
     my ($test) = @_;
     return (
-        'find_yath',
+        find_yath(),
         'tcm',
-        $test->job->file,
+        File::Spec->abs2rel($test->job->file),
     );
 }
 

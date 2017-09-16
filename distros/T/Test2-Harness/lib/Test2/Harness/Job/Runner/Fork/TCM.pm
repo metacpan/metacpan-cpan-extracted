@@ -9,15 +9,18 @@ sub run {
 
     my ($pid, $file) = $class->SUPER::run(@_);
 
-    return ($pid, $file) if $pid;
+    return ($pid, undef) if $pid;
 
     my $sub = sub {
         require Test2::Require::Module;
         Test2::Require::Module->import('Test::Class::Moose::Runner');
+        $file =~ s{.*lib/}{}g;
         require $file;
         require Test::Class::Moose::Runner;
         Test::Class::Moose::Runner->import();
         Test::Class::Moose::Runner->new->runtests();
+
+        return 0;
     };
 
     return (undef, $sub);

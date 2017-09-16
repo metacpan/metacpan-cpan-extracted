@@ -7,12 +7,11 @@ MANIFEST
 META.json
 META.yml
 README
-cpanfile
 dist.ini
 inc/My/ModuleBuild.pm
 lib/Acme/Ford/Prefect2.pm
 lib/Acme/Ford/Prefect2.xs
-maint/travis-install-alienbuild
+maint/travis-install-mods
 t/00_diag.t
 t/acme_ford_prefect2.t
 xt/author/eol.t

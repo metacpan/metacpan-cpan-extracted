@@ -13,8 +13,8 @@ REQUIREMENTS
     and 9.1B, but this does not mean it might not work on U2000 databases or
     other DataServer releases.
 
-    I use DBI 1.633 and perl-5.8.7 through perl5.22.0, but might get it to
-    work with DBI 0.93 or higher and perl 5.6.1 (the modern toolchain will
+    I use DBI 1.637 and perl-5.8.7 through perl5.26.0, but might get it to
+    work with DBI 0.93 or higher and perl 5.6.2 (the modern toolchain will
     require 5.8.1 as of Apr 2013). But then again, in that case you should
     consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
     As of DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
@@ -31,25 +31,27 @@ REQUIREMENTS
     (http://www.unicode.org/versions/enumeratedversions.html) and
     http://www.unicode.org/history/publicationdates.html for their age.
 
-      Perl    Unicode
-      ------  -------
-                9.0.0  UCD 9.0.0 released 21 Jun 2016
-      5.24.0    8.0.0  UCD 8.0.0 released 17 Jun 2015
-      5.22.0    7.0.0  UCD 7.0.0 released 16 Jun 2014
-      5.20.0    6.3.0  UCD 6.3.0 released 30 Sep 2013
-      5.18.0    6.2.0  UCD 6.2.0 released 26 Sep 2012
-      5.16.0    6.1.0  UCD 6.1.0 released 31 Jan 2012
-      5.14.0    6.0.0  UCD 6.0.0 released 11 Oct 2010
-      5.12.0    5.2.0  UCD 5.2.0 released 01 Oct 2009
-      5.10.1    5.1.0  UCD 5.1.0 released 04 Apr 2008
-      5.10.0    5.0.0  UCD 5.0.0 released 14 Jul 2006
-      5.8.7     4.1.0  UCD 4.1.0 released 31 Mar 2005
-      5.8.5     4.0.1  UCD 4.0.1 released    Mar 2004
-      5.8.1     4.0.0  UCD 4.0.0 released 24 Apr 2003
-      5.8.0     3.2.0  UCD 3.2.0 released 02 Apr 2002
-      5.7.x     3.1.1  UCD 3.1.1 released    Aug 2001
-                3.0.x  UCD 3.0.0 released    Sep 1999
-                       UCD 1.0.0 draft was planned spring 1991 :)
+      Perl version
+      Stable  Devel   Unicode
+      ------  ------  -------
+              5.27.2   10.0.0  UCD 10.0.0 released 20 Jun 2017
+      5.26.0  5.25.3    9.0.0  UCD  9.0.0 released 21 Jun 2016
+      5.24.0  5.23.0    8.0.0  UCD  8.0.0 released 17 Jun 2015
+      5.22.0  5.21.1    7.0.0  UCD  7.0.0 released 16 Jun 2014
+      5.20.0  5.19.5    6.3.0  UCD  6.3.0 released 30 Sep 2013
+      5.18.0  5.17.1    6.2.0  UCD  6.2.0 released 26 Sep 2012
+      5.16.0  5.15.8    6.1.0  UCD  6.1.0 released 31 Jan 2012
+      5.14.0  5.13.7    6.0.0  UCD  6.0.0 released 11 Oct 2010
+      5.12.0  5.11.3    5.2.0  UCD  5.2.0 released 01 Oct 2009
+      5.10.1  5.10.1    5.1.0  UCD  5.1.0 released 04 Apr 2008
+      5.10.0  5.9.5     5.0.0  UCD  5.0.0 released 14 Jul 2006
+      5.8.7   5.8.7     4.1.0  UCD  4.1.0 released 31 Mar 2005
+      5.8.5   5.8.5     4.0.1  UCD  4.0.1 released    Mar 2004
+      5.8.1   5.8.1     4.0.0  UCD  4.0.0 released 24 Apr 2003
+      5.8.0   5.8.0     3.2.0  UCD  3.2.0 released 02 Apr 2002
+      5.7.x   5.7.x     3.1.1  UCD  3.1.1 released    Aug 2001
+                        3.0.x  UCD  3.0.0 released    Sep 1999
+                               UCD  1.0.0 draft was planned spring 1991 :)
 
     Use 'corelist -a Unicode' to see the complete list of what version of
     Unicode is shipped with what version of perl.

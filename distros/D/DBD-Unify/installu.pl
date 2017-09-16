@@ -25,6 +25,10 @@ foreach my $loc (qw( arch lib man3 )) {
 
 -d "$ENV{UNIFY}/perl"                or
     mkdir "$ENV{UNIFY}/perl", 0775;
+-d "$ENV{UNIFY}/perl/man"            or
+    mkdir "$ENV{UNIFY}/perl/man", 0775;
+-d "$ENV{UNIFY}/perl/man/man3"       or
+    mkdir "$ENV{UNIFY}/perl/man/man3", 0775;
 -d "$ENV{UNIFY}/perl/$version"       or
     mkdir "$ENV{UNIFY}/perl/$version", 0775;
 -d "$ENV{UNIFY}/perl/$version/$arch" or
@@ -53,4 +57,17 @@ foreach my $f (sort @{$tar{arch}}) {
     print STDERR "arch  cp arch/$f\n";
     copy ("$src/blib/arch/$f", "$dst/$f");
     $f =~ m/\.(sl|so|al|pm|bs)$/ and chmod 0755, "$dst/$f";
+    }
+$dst = "$ENV{UNIFY}/perl/man/man3";
+foreach my $f (sort @{$tar{man3}}) {
+    $f =~ m{(?:^|/)\.exists$} and next;
+    my $s = "$src/blib/man3/$f";
+    if (-d $s) {
+	print STDERR "mkdir $dst/$f ...\n";
+	mkdir "$dst/$f", 0775;
+	next;
+	}
+    print STDERR "man3  cp man3/$f\n";
+    copy ("$src/blib/man3/$f", "$dst/$f");
+    chmod 0644, "$dst/$f";
     }

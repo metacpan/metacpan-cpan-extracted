@@ -4,7 +4,7 @@
       "Patrick Kilter <pk@gassmann.it>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.0.10",
    "license" : [
       "perl_5"
    ],
@@ -50,15 +50,26 @@
    "provides" : {
       "DBIx::Class::DeploymentAdapter" : {
          "file" : "lib/DBIx/Class/DeploymentAdapter.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/itnode/DBIx-Class-DeploymentAdapter/issues"
+      },
+      "homepage" : "https://github.com/itnode/DBIx-Class-DeploymentAdapter",
+      "repository" : {
+         "url" : "git://github.com/itnode/DBIx-Class-DeploymentAdapter.git",
+         "web" : "https://github.com/itnode/DBIx-Class-DeploymentAdapter"
+      }
+   },
+   "version" : "0.09",
    "x_authority" : "cpan:MOVEAX",
    "x_contributors" : [
       "Patrick Kilter <pas.freelance@gmail.com>",
-      "Patrick Kilter <pas.freelance@googlemail.com>"
+      "Patrick Kilter <pas.freelance@googlemail.com>",
+      "Jens Gassmann <jens.gassmann@atomix.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

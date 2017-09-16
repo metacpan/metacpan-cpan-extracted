@@ -15,6 +15,8 @@ unless ($dbh) {
     exit 0;
     }
 
+my $foox = "foox$$";
+
 ok (1, "-- table ()");
 my @tbl;
 ok (@tbl = $dbh->tables (), "tables ()");
@@ -98,8 +100,9 @@ ok ($sth = $dbh->link_info (undef, undef, "DIRS", "R"), "\$dbh->link_info (..., 
 ok ($sth->finish,	"finish");
 ok ($sth = $dbh->link_info (undef, undef, "DIRS", ""), "\$dbh->link_info (..., '')");
 ok ($sth->finish,	"finish");
+
 ok ($sth = $dbh->link_info ({
-    TABLE_CAT => "foo" }), "\$dbh->link_info ({ TABLE_CAT => \"foo\" })");
+    TABLE_CAT => $foox }), "\$dbh->link_info ({ TABLE_CAT => \"$foox\" })");
 ok ($sth->finish,	"finish");
 
 ok (1, "-- foreign_key_info ()");
@@ -114,28 +117,31 @@ ok ($sth = $dbh->foreign_key_info (undef, $ENV{USCHEMA}||"PUBLIC", undef,
 				   undef, $ENV{USCHEMA}||"PUBLIC", undef),
 			"foreign_key_info (SCHEMA, SCHEMA, ...)");
 ok ($sth->finish,	"finish");
-ok ($sth = $dbh->foreign_key_info (undef, $ENV{USCHEMA}||"PUBLIC", "foo",
-				   undef, $ENV{USCHEMA}||"PUBLIC", "foo"),
-			"foreign_key_info (SCHEMA.foo, SCHEMA.foo)");
+ok ($sth = $dbh->foreign_key_info (undef, $ENV{USCHEMA}||"PUBLIC", $foox,
+				   undef, $ENV{USCHEMA}||"PUBLIC", $foox),
+			"foreign_key_info (SCHEMA.$foox, SCHEMA.$foox)");
 
 ok ($sth->finish,	"finish");
 
 ok (1, "-- primary_key");
 is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "DIRS") ],
 			    [ "DIRID" ], "keys - single primary key");
-is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "ADEVLOCKS") ],
-			    [ "OBJID", "OBJTYPE" ], "keys - composite key");
+# I cannot prove this to be a valid test for all databases
+# 255:OBJID & 256:OBJTYPE are in COLGRP 260
+#is_deeply ([ $dbh->primary_key (undef, "DBUTIL", "ADEVLOCKS") ],
+#			    [ "OBJID", "OBJTYPE" ], "keys - composite key");
 
 ok (1, "-- column_info");
-ok ($sth = $dbh->column_info (undef, "DBUTIL", "DIRS", "DIRID"), "column_info (foo)");
-is_deeply ($sth->fetchrow_arrayref, [
-	undef, "DBUTIL", "DIRS",
-	"DIRID", 2, "NUMERIC", 9, undef,
-	0, undef, 0, undef, undef,
-	undef, undef, undef, undef, undef, undef, undef, undef, undef,
-	undef, undef, undef, undef, undef, undef, undef, undef, undef,
-	undef, undef, undef, undef, undef,
-	2, "NUMERIC", 10, 0, "N", "Y", "Y", "Y", "N" ], "fetch + content");
+ok ($sth = $dbh->column_info (undef, "DBUTIL", "DIRS", "DIRID"), "column_info ($foox)");
+#is_deeply ($sth->fetchrow_arrayref, [
+my $exp = [
+    undef, "DBUTIL", "DIRS", "DIRID", 2, "NUMERIC", 9, undef,
+    0, undef, 0, undef, undef,
+    undef, undef, undef, undef, undef, undef, undef, undef, undef,
+    undef, undef, undef, undef, undef, undef, undef, undef, undef,
+    undef, undef, undef, undef, undef,
+    2, "NUMERIC", 10, 0, "N", "Y", "Y", "Y", "N" ];
+is_deeply ($sth->fetchrow_arrayref, $exp, "fetch + content");
 ok ($sth->finish,	"finish");
 
 ok ($dbh->rollback,	"rollback");
@@ -160,8 +166,8 @@ is ($DBI::errstr, undef, "link_info ([]) has no DBI error message");
 like ($@, qr{^usage: link_info \(}, "link_info ([]) error message");
 
 # UNIFY does not support CAT
-eval { $sth = $dbh->table_info ("foo", undef, undef, undef) };
-is ($sth, undef, "table_info (\"foo\", undef, undef, undef)");
+eval { $sth = $dbh->table_info ($foox, undef, undef, undef) };
+is ($sth, undef, "table_info (\"$foox\", undef, undef, undef)");
 is ($DBI::errstr, undef, "table_info ([]) has no DBI error message");
 
 ok   (1, "Test GetInfo functionality");

@@ -33,6 +33,7 @@ __
            != grep { $ok{$_} = eval "require $_; 1" } @configure_req;
 }
 
+BEGIN { unshift @INC, '.'; }
 use inc::Module::Install;
 
 name 'X11-XCB';
@@ -81,7 +82,7 @@ WriteMakefile(
 
 postamble <<'END_OF_MAKEFILE';
 XCB_xs.inc:
-	$(PERL) -M_GenerateMyXS -E '_GenerateMyXS::generate()'
+	$(PERL) -I. -M_GenerateMyXS -E '_GenerateMyXS::generate()'
 
 XCB.c: XCB_xs.inc XCB_util.inc XCB.inc
 

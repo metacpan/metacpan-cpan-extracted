@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 # VERSION
 
-version 1.172320
+version 1.172580
 
 # OPTIONS
 

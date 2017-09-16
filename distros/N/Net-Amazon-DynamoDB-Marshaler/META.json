@@ -65,7 +65,7 @@
          "web" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Stephen Caldwell <steve@campusexplorer.com>"
    ],

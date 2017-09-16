@@ -31,6 +31,7 @@ t/27-uni-max.t
 t/28-datetime.t
 t/30-reconnect.t
 t/40-info.t
+t/41-info.t
 t/50-trace.t
 t/99-done.t
 examples/row_counts

@@ -81,6 +81,7 @@ sub test_out_of_range_number() {
         too_large_negative  => '-1E+126',
         too_precise         => 1x39,
         too_precise2        => '1.'.(1x38),
+        super_large         => '6e3341866116', # this evaluates to 0
     };
     cmp_deeply(
         dynamodb_marshal($item),
@@ -118,6 +119,9 @@ sub test_out_of_range_number() {
             too_precise2 => {
                 S => '1.'.(1x38),
             },
+            super_large => {
+                S => '6e3341866116',
+            }
         },
         'out-of-bounds numbers marshalled to S',
     );
@@ -447,7 +451,8 @@ sub test_force_type_string() {
         age => 24,
         family => undef,
         nickname => '',
-        category => ['main'],
+        active => true,
+        disabled => false,
     };
     cmp_deeply(
         dynamodb_marshal($item),
@@ -457,15 +462,17 @@ sub test_force_type_string() {
             age           => { N => 24 },
             family        => { NULL => 1 },
             nickname      => { NULL => 1 },
-            category      => { L => [ { S => 'main' } ] },
+            active        => { BOOL => 1 },
+            disabled      => { BOOL => 0 },
         },
         'attribute marshalled to derived types with no force_type',
     );
     my $force_type = {
         username => 'S',
         family   => 'S',
-        category => 'S',
         nickname => 'S',
+        active   => 'S',
+        disabled => 'S',
     };
     cmp_deeply(
         dynamodb_marshal($item, force_type => $force_type),
@@ -473,7 +480,8 @@ sub test_force_type_string() {
             username      => { S => '1234' },
             email_address => { S => 'john@example.com' },
             age           => { N => 24 },
-            category      => { S => re('^ARRAY') },
+            active        => { S => '1' },
+            disabled      => { S => '0' },
         },
         'attributes marshalled to S via force_type, undefs dropped',
     );
@@ -484,7 +492,8 @@ sub test_force_type_number() {
         user_id  => '1234',
         rank     => undef,
         age      => 'twenty-five',
-        category => ['main'],
+        active   => true,
+        disabled => false,
     };
     cmp_deeply(
         dynamodb_marshal($item),
@@ -492,7 +501,8 @@ sub test_force_type_number() {
             user_id  => { N => '1234' },
             rank     => { NULL => 1 },
             age      => { S => 'twenty-five' },
-            category => { L => [ { S => 'main' } ] },
+            active   => { BOOL => 1 },
+            disabled => { BOOL => 0 },
         },
         'attribute marshalled to derived types with no force_type',
     );
@@ -500,31 +510,236 @@ sub test_force_type_number() {
         user_id  => 'N',
         rank     => 'N',
         age      => 'N',
-        category => 'N',
+        active   => 'N',
+        disabled => 'N',
     };
     cmp_deeply(
         dynamodb_marshal($item, force_type => $force_type),
         {
             user_id  => { N => '1234' },
+            active   => { N => '1' },
+            disabled => { N => '0' },
         },
         'attributes marshalled to N via force_type, undefs dropped',
     );
 }
 
-sub test_force_type_other() {
+sub test_force_type_errors() {
+    my $item = {
+        zip_code => '01453',
+        colors   => Set::Object->new(qw(red yellow green)),
+        ages     => Set::Object->new(qw(23 54 42)),
+    };
+
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => {}),
+        {
+            zip_code => { N => '01453' },
+            colors   => { SS => set(qw(red yellow green)) },
+            ages     => { NS => set(qw(23 54 42)) },
+        },
+        'attributes look OK without force_type',
+    );
+
     like(
         exception {
-            dynamodb_marshal(
-                {
-                    colors => [qw(red yellow green)],
-                },
-                force_type => {
-                    colors => 'L',
-                },
-            );
+            dynamodb_marshal($item, force_type => { colors => 'S' });
         },
-        qr/force_type only supports "S" and "N" types/,
-        'Error thrown on bad force_type value',
+        qr/force_type not supported for sets yet/,
+        'Error thrown trying to apply force_type to string set',
+    );
+
+    like(
+        exception {
+            dynamodb_marshal($item, force_type => { ages => 'S' });
+        },
+        qr/force_type not supported for sets yet/,
+        'Error thrown trying to apply force_type to number set',
+    );
+
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => { zip_code => 'S' }),
+        {
+            zip_code => { S => '01453' },
+            colors   => { SS => set(qw(red yellow green)) },
+            ages     => { NS => set(qw(23 54 42)) },
+        },
+        'applying force_type to non-set values in item with sets works',
+    );
+
+    like(
+        exception {
+            dynamodb_marshal($item, force_type => { ages => 'L' });
+        },
+        qr/invalid force_type value for "ages"/,
+        'Error thrown trying to force_type to an L',
+    );
+}
+
+sub test_force_type_list() {
+    my $zip_vals = [
+        '11510',
+        undef,
+        '60185',
+        '01902',
+        'one-three-six-five-two',
+    ];
+    my $item = {
+        zip_codes => $zip_vals,
+        zip_code_strings => $zip_vals,
+        zip_code_numbers => $zip_vals,
+    };
+    my $force_type = {
+        zip_code_strings => 'S',
+        zip_code_numbers => 'N',
+    };
+
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => $force_type),
+        {
+            zip_codes => {
+                L => [
+                    { N => '11510' },
+                    { NULL => 1 },
+                    { N => '60185' },
+                    { N => '01902' },
+                    { S => 'one-three-six-five-two' },
+                ],
+            },
+            zip_code_strings => {
+                L => [
+                    { S => '11510' },
+                    { S => '60185' },
+                    { S => '01902' },
+                    { S => 'one-three-six-five-two' },
+                ],
+            },
+            zip_code_numbers => {
+                L => [
+                    { N => '11510' },
+                    { N => '60185' },
+                    { N => '01902' },
+                ],
+            },
+        },
+        'force_type applied correctly to list',
+    );
+}
+
+sub test_force_type_map() {
+    my $item = {
+        address => {
+            street => '1234 Main',
+            apt => '',
+            zip => '01234',
+        },
+        external_ids => {
+            database1 => '5246',
+            database2 => {
+                person_id => 165034,
+                person_code => 'a23cds5',
+            }
+        },
+    };
+    my $force_type = {
+        address => 'S',
+        external_ids => 'N',
+    };
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => $force_type),
+        {
+            address => {
+                M => {
+                    street => { S => '1234 Main' },
+                    zip => { S => '01234' },
+                },
+            },
+            external_ids => {
+                M => {
+                    database1 => { N => '5246' },
+                    database2 => {
+                        M => {
+                            person_id => { N => 165034 },
+                        },
+                    },
+                },
+            },
+        },
+        'force_type applied correctly to map',
+    );
+}
+
+sub test_force_type_complex() {
+    my $item = {
+        username => 'jsmith',
+        details => {
+            first_name => 'John',
+            age => 34,
+            suffix => undef,
+            roles => [qw(author editor)],
+            address => {
+                number => 1234,
+                street => 'Main St.',
+                city => 'Los Angeles',
+                state => 'CA',
+            },
+            favorites => [
+                {
+                    name => '1984',
+                    author => 'George Orwell',
+                },
+                {
+                    name => 'Our Mutual Friend',
+                    author => 'Charles Dickens',
+                },
+            ],
+        },
+    };
+    my $force_type = {
+        details => 'S',
+    };
+    cmp_deeply(
+        dynamodb_marshal($item, force_type => $force_type),
+        {
+            username => { S => 'jsmith' },
+            details => {
+                M => {
+                    first_name => { S => 'John' },
+                    age => { S => '34' },
+                    roles => {
+                        L => [
+                            { S => 'author' },
+                            { S => 'editor' },
+                        ],
+                    },
+                    address => {
+                        M => {
+                            number => { S => '1234' },
+                            street => { S => 'Main St.' },
+                            city => { S => => 'Los Angeles' },
+                            state => { S => 'CA' },
+                        },
+                    },
+                    favorites => {
+                        L => [
+                            {
+                                M => {
+                                    name => { S => '1984' },
+                                    author => { S => 'George Orwell' },
+                                },
+                            },
+                            {
+                                M => {
+                                    name => { S => 'Our Mutual Friend' },
+                                    author => { S => 'Charles Dickens' },
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+        'force_type applied correctly to map',
     );
 }
 
@@ -543,6 +758,9 @@ test_other();
 test_complex();
 test_force_type_string();
 test_force_type_number();
-test_force_type_other();
+test_force_type_errors();
+test_force_type_list();
+test_force_type_map();
+test_force_type_complex();
 
 done_testing;

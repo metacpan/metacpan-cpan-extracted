@@ -1,0 +1,403 @@
+---
+abstract: 'Object for the calculation of a multiple sequence alignment from a set of unaligned sequences or alignments using the TCoffee program'
+author:
+  - 'Jason Stajich <jason@bioperl.org>'
+  - 'Peter Schattner <schattner@alum.mit.edu>'
+build_requires:
+  Env::Path: '0.18'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-Tools-Run-Alignment-TCoffee
+requires:
+  Bio::AlignIO: '0'
+  Bio::Factory::ApplicationFactoryI: '0'
+  Bio::Installer::Generic: '0'
+  Bio::Root::IO: '0'
+  Bio::Root::Root: '0'
+  Bio::Seq: '0'
+  Bio::SeqIO: '0'
+  Bio::SimpleAlign: '0'
+  Bio::Tools::Run::WrapperBase: '0'
+  Cwd: '0'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bioperl/bio-tools-run-alignment-tcoffee/issues
+  homepage: https://metacpan.org/release/Bio-Tools-Run-Alignment-TCoffee
+  repository: git://github.com/bioperl/bio-tools-run-alignment-tcoffee.git
+version: 1.7.2
+x_Dist_Zilla:
+  perl:
+    version: '5.024001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@BioPerl/@Filter/GatherDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@BioPerl/@Filter/PruneCruft'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@BioPerl/@Filter/ManifestSkip'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@BioPerl/@Filter/MetaYAML'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@BioPerl/@Filter/License'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@BioPerl/@Filter/ExtraTests'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@BioPerl/@Filter/ExecDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@BioPerl/@Filter/ShareDir'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@BioPerl/@Filter/MakeMaker'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@BioPerl/@Filter/Manifest'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@BioPerl/@Filter/TestRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@BioPerl/@Filter/ConfirmRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@BioPerl/@Filter/UploadToCPAN'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@BioPerl/MetaConfig'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@BioPerl/MetaJSON'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@BioPerl/PkgVersion'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@BioPerl/PodSyntaxTests'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@BioPerl/Test::NoTabs'
+      version: '0.15'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: '@BioPerl/Test::Compile'
+      version: '2.056'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@BioPerl/PodCoverageTests'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@BioPerl/MojibakeTests'
+      version: '0.8'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@BioPerl/AutoPrereqs'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@BioPerl/AutoMetaResources'
+      version: '1.21'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@BioPerl/MetaResources'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@BioPerl/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Encoding
+      name: '@BioPerl/Encoding'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@BioPerl'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@BioPerl/Name'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@BioPerl/Version'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@BioPerl/prelude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: 'INTERNAL METHODS'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@BioPerl/Leftovers'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@BioPerl/postlude'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: FEEDBACK
+              version: '1.06'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: 'Mailing lists'
+              version: '1.06'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: Support
+              version: '1.06'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: 'Reporting bugs'
+              version: '1.06'
+            -
+              class: Pod::Weaver::Section::Legal::Complicated
+              name: '@BioPerl/Legal'
+              version: '1.22'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@BioPerl/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: SingleEncoding
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@BioPerl/List'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::EnsureUniqueSections
+              name: EnsureUniqueSections
+              version: '0.163250'
+      name: '@BioPerl/PodWeaver'
+      version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@BioPerl/NextRelease'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.11.0
+          repo_root: .
+      name: '@BioPerl/Git::Check'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.11.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@BioPerl/Git::Commit'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: Bio-Tools-Run-Alignment-TCoffee-v1.7.2
+          tag_format: '%N-v%v'
+          tag_message: '%N-v%v'
+        Dist::Zilla::Role::Git::Repo:
+          'git --version': 2.11.0
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@BioPerl/Git::Tag'
+      version: '2.041'
+    -
+      class: Dist::Zilla::Plugin::RequiresExternal
+      name: RequiresExternal
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.008'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.008'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.008'
+x_serialization_backend: 'YAML::Tiny version 1.70'

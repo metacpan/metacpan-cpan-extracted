@@ -1,9 +1,13 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.829 Thu Sep 14 23:00:00 EST 2017
+
+  * Disabled Condvar tests on Windows machine without IO::FDPass.
+
 1.828 Wed Sep 12 23:00:00 EST 2017
 
-  * Removed extra "=over" command in documentation.
+  * Removed an extra "=over" command in the documentation.
 
 1.827 Tue Sep 12 17:00:00 EST 2017
 

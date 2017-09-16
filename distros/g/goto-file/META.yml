@@ -1,0 +1,24 @@
+---
+abstract: 'Stop parsing the current file and move on to a different one.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2: '1.302095'
+  Test2::V0: '0.000074'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: goto-file
+requires:
+  Filter::Util::Call: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/exodist/goto-file/issues
+  repository: https://github.com/exodist/goto-file.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

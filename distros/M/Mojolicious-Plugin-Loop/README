@@ -1,0 +1,126 @@
+NAME
+    Mojolicious::Plugin::Loop - Loop plugin for Mojolicious
+
+SYNOPSIS
+  Application
+      use Mojolicious::Lite;
+      plugin 'loop';
+
+  Template
+      %= loop [1,2,3,4], begin
+      ---
+      key/val: <%= loop->key %>/<%= loop->val %>
+      count: <%= loop->index %> + 1 = <%= loop->count %> (index + 1)
+      size: <%= loop->max %> + 1 = <%= loop->size %> (max + 1)
+      prev: <%= loop->peek(-1) // 'undef' %> (peek -1)
+      next: <%= loop->peek(1) // 'undef' %> (peek +1)
+      parity: <%= loop->parity %>
+      odd/even: <%= loop->odd ? 'odd' : loop->even ? 'even' : 'unknown' %>
+      first: <%= loop->first ? 'yes' : 'no' %>
+      last: <%= loop->last ? 'yes' : 'no' %>
+      % end
+
+      %= loop {a => 1, b => 2, c => 3}, begin
+      ---
+      key/val: <%= loop->key %>/<%= loop->val %>
+      count: <%= loop->index %> + 1 = <%= loop->count %> (index + 1)
+      size: <%= loop->max %> + 1 = <%= loop->size %> (max + 1)
+      prev: <%= loop->peek(-1) // 'undef' %> (peek -1)
+      next: <%= loop->peek(1) // 'undef' %> (peek +1)
+      parity: <%= loop->parity %>
+      odd/even: <%= loop->odd ? 'odd' : loop->even ? 'even' : 'unknown' %>
+      first: <%= loop->first ? 'yes' : 'no' %>
+      last: <%= loop->last ? 'yes' : 'no' %>
+      % end
+
+DESCRIPTION
+    Mojolicious::Plugin::Loop is a plugin with helpers for iterating over
+    either array, hashes or array/hash-like structures.
+
+TEMPLATE METHODS
+  count
+      $int = $loop->count;
+
+    Returns "index" + 1.
+
+  even
+      $bool = $loop->even;
+
+    Returns true if "count" is 2, 4, 6, ...
+
+  first
+      $bool = $loop->first;
+
+    Returns true if "index" is zero.
+
+  index
+      $int = $loop->index;
+
+    Returns the index number, starting on 0.
+
+  key
+      $str = $self->key; # hash
+      $int = $self->key; # array
+
+    Returns "index" if iterating over an array or the current key if
+    iterating over a hash.
+
+  last
+      $bool = $loop->last;
+
+    Returns true if "index" is "max".
+
+  max
+      $int = $loop->max;
+
+    Returns "size" - 1.
+
+  odd
+      $bool = $loop->odd;
+
+    Returns true if "count" is 1, 3, 5, ...
+
+  parity
+      $str = $loop->parity;
+
+    Returns either the string "odd" or "even".
+
+  peek
+      $any = $loop->peek($index);
+      $any = $loop->peek(-3);
+
+    Returns either the value in the array, or the key in the hash, relative
+    to the current item. Examples:
+
+      # [24, 25, 26]
+      $loop->index == 2
+      $loop->peek(-1) == 25
+
+      # {a => 24, b => 25, c => 26}
+      $loop->index == 1
+      $loop->peek(1) == "c"
+
+  size
+      $int = $loop->size;
+
+    Returns the number of items in the array, or number of keys in the hash.
+
+  val
+      $any = $loop->val;
+
+    Returns the value of the current item in the array or hash.
+
+METHODS
+  register
+    Used to register the plugin in the Mojolicious application.
+
+AUTHOR
+    Jan Henning Thorsen
+
+COPYRIGHT AND LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+    Template::Iterator.
+

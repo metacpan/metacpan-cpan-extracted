@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.828';
+our $VERSION = '1.829';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -131,15 +131,14 @@ END {
 }
 
 sub _new {
-   return _share(@_) if (!$_svr_pid && $_[0]->{delay_start});
-
    my ($_class, $_deeply, %_hndls) = ($_[0]->{class}, $_[0]->{_DEEPLY_});
    my $_has_fh = ($_class =~ /^MCE::Shared::(?:Condvar|Queue)$/);
 
    if (!$_svr_pid) {
       # Minimum support on platforms without IO::FDPass (not installed).
       # Condvar and Queue must be shared first before others.
-      return _share(@_) if $_has_fh && !$INC{'IO/FDPass.pm'};
+      $_export_nul{ $_class } = undef, return _share(@_)
+         if $_has_fh && !$INC{'IO/FDPass.pm'};
 
       _start();
    }
@@ -378,7 +377,7 @@ sub _stop {
    return unless ($_is_client && $_init_pid && $_init_pid eq "$$.$_tid");
    MCE::Hobo->finish('MCE') if $INC{'MCE/Hobo.pm'};
 
-   local ($!, $?, $@); %_all = (), %_obj = ();
+   local ($!, $?, $@);
 
    if (defined $_svr_pid) {
       my $_DAT_W_SOCK = $_SVR->{_dat_w_sock}[0];
@@ -391,15 +390,21 @@ sub _stop {
             local $\ = undef if (defined $\);
             print {$_DAT_W_SOCK} SHR_M_STP.$LF.'0'.$LF;
          };
-         local ($SIG{'INT'}, $SIG{'ALRM'});
+         local $SIG{'ALRM'};
+         local $SIG{'INT'};
+
          $SIG{'INT'} = $SIG{'ALRM'} = sub {
             alarm 0; sleep 0.015;
             CORE::kill 'KILL', $_svr_pid;
          };
          alarm 2 unless $_is_MSWin32;
          waitpid $_svr_pid, 0;
+
          alarm 0;
       }
+
+      $_init_pid = $_svr_pid = undef;
+      %_all = (), %_obj = ();
 
       MCE::Util::_destroy_socks($_SVR, qw( _dat_w_sock _dat_r_sock ));
 
@@ -408,7 +413,6 @@ sub _stop {
       }
 
       MCE::Shared::Object::_stop();
-      $_init_pid = $_svr_pid = undef;
    }
 
    return;
@@ -1816,7 +1820,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.828
+This document describes MCE::Shared::Server version 1.829
 
 =head1 DESCRIPTION
 

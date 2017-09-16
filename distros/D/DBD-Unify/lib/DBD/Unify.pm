@@ -10,7 +10,7 @@ use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.88";
+our $VERSION = "0.89";
 
 =head1 NAME
 
@@ -96,7 +96,7 @@ our $drh    = undef;	# holds driver handle once initialized
 
 sub driver {
     return $drh if $drh;
-    my ($class, $attr) = @_;
+    my $class = shift; # second argument ($attr) not used: ignored
 
     $class .= "::dr";
 
@@ -179,7 +179,7 @@ sub parse_trace_flag {
     } # parse_trace_flag
 
 sub type_info_all {
-    my ($dbh) = @_;
+    #my ($dbh) = @_;
     require DBD::Unify::TypeInfo;
     return [ @$DBD::Unify::TypeInfo::type_info_all ];
     } # type_info_all
@@ -258,11 +258,11 @@ sub table_info {
     $type   and $type = uc substr $type, 0, 1;
     $type   and push @where, _is_or_like ("TABLE_TYPE", $type);
     local $" = " and ";
-    my $where = @where ? " where @where" : "";
-    my $sth = $dbh->prepare (
-	"select '', OWNR, TABLE_NAME, TABLE_TYPE, RDWRITE ".
-	"from   SYS.ACCESSIBLE_TABLES ".
-	$where);
+    my $sql = join " " =>
+	q{select '', OWNR, TABLE_NAME, TABLE_TYPE, RDWRITE},
+	q{from   SYS.ACCESSIBLE_TABLES},
+	(@where ? " where @where" : "");
+    my $sth = $dbh->prepare ($sql);
     $sth or return;
     $sth->{ChopBlanks} = 1;
     $sth->execute;
@@ -282,6 +282,21 @@ sub table_info {
 	my $dbh = shift;
 
 	keys %cache and return;
+
+	if (my $dd = $dbh->func ("db_dict")) {
+	    require DBD::Unify::TypeInfo;
+	    foreach my $c (grep { defined } @{$dd->{COLUMN}}) {
+		my $t = $dd->{TABLE}[$c->{TID}];
+		my $s = $t->{ANAME} || "";
+		my @c = (@{$c}{qw(
+		    NAME TYPE LENGTH SCALE DSP_LEN DSP_SCL
+		    NULLABLE RDONLY PKEY UNIQUE )}, 1, 0,);
+		$c[$_] = $c[$_] ? "Y" : "N" for -6, -5, -4, -3, -2, -1;
+		$c[1] = DBD::Unify::TypeInfo::hli_type ($c[1]);
+		$cache{$s}{$t->{NAME}}{$c->{NAME}} = [ $s, $t->{NAME}, @c ];
+		}
+	    return;
+	    }
 
 	my $sth = $dbh->prepare (join " " =>
 	    "select OWNR, TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH,",
@@ -304,6 +319,27 @@ sub table_info {
 	my $dbh = shift;
 
 	@links and return;
+
+	if (my $dd = $dbh->func ("db_dict")) {
+	    foreach my $c (grep { defined && $_->{LINK} >= 0 } @{$dd->{COLUMN}}) {
+		my $t = $dd->{TABLE}[$c->{TID}];
+		my $s = $t->{ANAME} || "";
+		my $p = $dd->{COLUMN}[$c->{LINK}];
+		my $T = $dd->{TABLE}[$p->{TID}];
+		my $S = $T->{ANAME} || "";
+		push @links, {
+		    index_name			=> "",		# ?
+		    referenced_owner		=> $S,
+		    referenced_table		=> $T->{NAME},
+		    referenced_column		=> $p->{NAME},
+		    referencing_owner		=> $s,
+		    referencing_table		=> $t->{NAME},
+		    referencing_column		=> $c->{NAME},
+		    referencing_column_ord	=> 0,		# ?
+		    };
+		}
+	    return;
+	    }
 
 	my $sth = $dbh->prepare (join " " =>
 	    "select INDEX_NAME,",
@@ -345,6 +381,11 @@ sub table_info {
 	my $dbh = shift;
 	my ($Pcatalog, $Pschema, $Ptable,
 	    $Fcatalog, $Fschema, $Ftable, $attr) = (@_, {});
+
+	$Pcatalog and warn "Catalogs are not supported in Unify\n";
+	$Fcatalog and warn "Catalogs are not supported in Unify\n";
+
+	$attr && ref $attr && keys %$attr and warn "Attributes are ignored in link_info\n";
 
 	_set_link_cache ($dbh);
 
@@ -490,6 +531,19 @@ sub primary_key {
 	$dbh->{Warn} and
 	    Carp::carp "Unify does not support catalogs in table_info\n";
 	return;
+	}
+
+    if (my $dd = $dbh->func ("db_dict")) {
+	my @key;
+	foreach my $c (grep { defined && $_->{PKEY} } @{$dd->{COLUMN}}) {
+	    my $t   = $dd->{TABLE}[$c->{TID}];
+	    my $sch = $t->{ANAME} || "";
+	    my $tbl = $t->{NAME};
+	    defined $schema && lc $sch ne lc $schema and next;
+	    defined $table  && lc $tbl ne lc $table  and next;
+	    push @key, $c->{NAME};
+	    }
+	return @key;
 	}
 
     # Fetching table information from SYS is *extremely* slow
@@ -1012,6 +1066,414 @@ No messages (yet) set to level 8 and up.
 =item int  dbd_st_rows (SV *sth, imp_sth_t *imp_sth)
 
 =back
+
+=head2 DBD specific functions
+
+=head3 db_dict
+
+Query the data dictionary through HLI calls:
+
+ my $dd = $dbh->func (   "db_dict");
+ my $dd = $dbh->func (0, "db_dict"); # same
+ my $dd = $dbh->func (1, "db_dict"); # force reload
+
+This function returns the data dictionary of the database in a hashref. The
+dictionary contains all information accessible to the current user and will
+likely contain all accessible schema's, tables, columns, and simple links
+(referential integrity).
+
+The force_reload argument is useful if the data dictionary might have changed:
+adding/removing tables/links/primary keys, altering tables etc.
+
+The dictionary will have 4 entries
+
+=over 2
+
+=item TYPE
+X<TYPE>
+
+ my $types = $dd->{TYPE};
+
+This holds a list with the native type descriptions of the C<TYPE> entries
+in the C<COLUMN> hashes.
+
+ say $dd->{TYPE}[3]; # DATE
+
+=item AUTH
+X<AUTH>
+
+ my $schemas = $dd->{AUTH};
+
+This will return a reference to a list of accessible schema's. The schema's
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each auth entry is C<undef> or a hashref with these entries:
+
+=over 2
+
+=item AID
+X<AID>
+
+Holds the AUTH ID of the schema (INTEGER). In the current implementation,
+the C<AID> entry is identical to the index in the list
+
+ say $schemas->[3]{AID};
+ # 3
+
+=item NAME
+X<NAME>
+
+Holds the name of the schema (STRING)
+
+ say $schemas->[3]{NAME};
+ # DBUTIL
+
+=item TABLES
+X<TABLES>
+
+Holds the list of accessible table ID's in this schema (ARRAY of INTEGER's)
+
+ say join ", " => $schemas->[3]{TABLES};
+ # 43, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 61
+
+=back
+
+=item TABLE
+X<TABLE>
+
+ my $tables = $dd->{TABLE};
+
+This will return a reference to a list of accessible tables. The tables
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each table entry is C<undef> or a hashref with these entries:
+
+=over 2
+
+=item AID
+X<AID>
+
+Holds the AUTH ID (INTEGER) of the schema this table belongs to.
+
+ say $tables->[43]{AID};
+ # 3
+
+=item ANAME
+X<ANAME>
+
+Holds the name of the schema this table belongs too.
+
+ say $tables->[43]{NAME};
+ # UTLATH
+
+=item TID
+X<TID>
+
+Holds the TABLE ID of the table (INTEGER). In the current implementation,
+the C<TID> entry is identical to the index in the list
+
+ say $tables->[43]{TID};
+ # 43
+
+=item NAME
+X<NAME>
+
+Holds the name of the table
+
+ say $tables->[43]{NAME};
+ # UTLATH
+
+=item KEY
+X<KEY>
+
+Holds a list of column indices (C<CID>'s) of the columns that are the
+primary key of this table. The list can be empty if the table has no
+primary key.
+
+ say for @{$tables->[43]{KEY}};
+ # 186
+
+=item CGRP
+X<CGRP>
+
+Holds a list of column groups for this table (if any).
+
+ my $cgrp = $dd->{TABLE}[59];
+
+Each entry in the list holds a has with the following entries
+
+=over 2
+
+=item CID
+X<CID>
+
+Holds the column ID of this column group
+
+ say $cgrp->[0]{CID}
+ # 260
+
+=item TYPE
+X<TYPE>
+
+Holds the type of this group. This will always be C<100>.
+
+ say $cgrp->[0]{TYPE}
+ # 100
+
+=item COLUMNS
+X<COLUMNS>
+
+Holds the list of C<CID>s this group consists of
+
+ say for @{$cgrp->[0]{COLUMNS}}
+ # 255
+ # 256
+
+=back
+
+=item DIRECTKEY
+X<DIRECTKEY>
+
+Holds a true/false indication of the table being C<DIRECT-KEYED>.
+
+ say $tables->[43]{DIRECTKEY}
+ # 1
+
+=item FIXEDSIZE
+X<FIXEDSIZE>
+
+Holds a true/false indication of the table being of fixed size.
+See also L<EXPNUM>
+
+=item EXPNUM
+X<EXPNUM>
+
+If L<FIXEDNUM> is true, this entry holds the number of records of the table
+
+=item OPTIONS
+X<OPTIONS>
+
+=item PKEYED
+X<PKEYED>
+
+Holds a true/false indication of the table being primary keyed
+
+=item SCATTERED
+X<SCATTERED>
+
+Holds a true/false indication if the table has data scattered across volumes
+
+=item COLUMNS
+X<COLUMNS>
+
+Holds a list of column indices (C<CID>'s) of the columns of this table.
+
+ say for @{$tables->[43]{COLUMNS}};
+ # 186
+ # 187
+ # 188
+
+=back
+
+=item COLUMN
+X<COLUMN>
+
+ my $columns = $dd->{COLUMN};
+
+This will return a reference to a list of accessible columns. The columns
+that are not accessible or do not exist (anymore) have an C<undef> entry.
+
+Each columns entry is C<undef> or a hashref with these entries:
+
+=over 2
+
+=item CID
+X<CID>
+
+Holds the COLUMN ID of the column (INTEGER). In the current implementation,
+the C<CID> entry is identical to the index in the list
+
+ say $columns->[186]{CID};
+ # 186
+
+=item NAME
+X<NAME>
+
+Holds the name of the column
+
+ say $columns->[186]{NAME};
+ # ATHID
+
+=item TID
+X<TID>
+
+Holds the TABLE ID (INTEGER) of the table this column belongs to.
+
+ say $columns->[186]{TID};
+ # 43
+
+=item TNAME
+X<TNAME>
+
+Holds the name of the table this column belongs to.
+
+ say $columns->[186]{TNAME};
+ # DBUTIL
+
+=item TYPE
+X<TYPE>
+
+Holds the type (INTEGER) of the column
+
+ say $columns->[186]{TYPE};
+ # 2
+
+The description of the type can be found in the C<TYPE> entry in C<$dd->{TYPE}>.
+
+=item LENGTH
+X<LENGTH>
+
+Holds the length of the column or C<0> if not appropriate.
+
+ say $columns->[186]{LENGTH};
+ # 9
+
+=item SCALE
+X<SCALE>
+
+Holds the scale of the column or C<0> if not appropriate.
+
+ say $columns->[186]{SCALE};
+ # 0
+
+=item NULLABLE
+X<NULLABLE>
+
+Holds the true/false indication of this column allowing C<NULL> as value
+
+ say $columns->[186]{NULLABLE};
+ # 0
+
+Primary keys implicitly do not allow C<NULL> values
+
+=item DSP_LEN
+X<DSP_LEN>
+
+Holds, if appropriate, the display length of the column
+
+ say $columns->[186]{DSP_LEN};
+ # 10
+
+=item DSP_SCL
+X<DSP_SCL>
+
+Holds, if appropriate, the display scale of the column
+
+ say $columns->[186]{DSP_SCL};
+ # 0
+
+=item DSP_PICT
+X<DSP_PICT>
+
+Holds, if appropriate, the display format of the column
+
+ say $columns->[186]{DSP_PICT};
+ #
+
+=item OPTIONS
+X<OPTIONS>
+
+Holds the internal (bitmap) representation of the options for this column.
+Most, if not all, of these options have been translated to the other entries
+in this hash.
+
+ say $columns->[186]{OPTIONS};
+ # 16412
+
+=item PKEY
+X<PKEY>
+
+Holds a true/false indication of the column is a (single) primary key.
+
+ say $columns->[186]{PKEY};
+ # 1
+
+=item RDONLY
+X<RDONLY>
+
+Holds a true/false indication of the column is read-only.
+
+ say $columns->[186]{RDONLY};
+ # 0
+
+=item UNIQUE
+X<UNIQUE>
+
+Holds a true/false indication of the column is unique.
+
+ say $columns->[186]{UNIQUE};
+ # 1
+
+=item LINK
+X<LINK>
+
+Holds the C<CID> of the column this column links to through referential
+integrity. This value is C<-1> if there is no link.
+
+ say $columns->[186]{LINK};
+ # -1
+
+=item REFS
+X<REFS>
+
+Holds a list of column indices (C<CID>'s) of the columns referencing
+this column in a link.
+
+ say for @{$columns->[186]{REFS}};
+ # 191
+ # 202
+
+=item NBTREE
+X<NBTREE>
+
+Holds the number of B-tree indices the column participates in
+
+ say $columns->[186]{NBTREE};
+ # 0
+
+=item NHASH
+X<NHASH>
+
+Holds the number of hash-tables the column belongs to
+
+ say $columns->[186]{NHASH};
+ # 0
+
+=item NPLINK
+X<NPLINK>
+
+Holds the number of links the column is parent of
+
+ say $columns->[186]{NPLINK};
+ # 2
+
+=item NCLINK
+X<NCLINK>
+
+Holds the number of links the column is child of (<C0> or C<1>)
+
+ say $columns->[186]{NCLINK};
+ # 0
+
+If this entry holds C<1>, the C<LINK> entry holds the C<CID> of the
+parent column.
+
+=back
+
+=back
+
+Combining all of these into describing a table, might look like done in
+F<examples/describe.pl>
 
 =head1 TODO
 

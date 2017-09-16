@@ -15,5 +15,19 @@ share {
   );
   plugin Extract => 'tar.gz';
   plugin 'Build::Autoconf' => ();
+  
+  test [ '%{make} check' ];
+
+  ffi {
+  
+    build [
+      '%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic',
+      '%{make}',
+      '%{make} install',
+    ];
+    
+    test [ '%{make} check' ];
+  
+  };
 
 };

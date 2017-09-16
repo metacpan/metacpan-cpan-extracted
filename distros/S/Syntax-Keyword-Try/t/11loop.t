@@ -21,10 +21,12 @@ use Syntax::Keyword::Try;
    is( $count, 2, 'try{redo} works' );
 
    $count = 0;
+   my $after = 0;
 
    LOOP2: {
       try {
          last LOOP2;
+         $after++; # just to put a statement after 'last'
       }
       catch { }
       $count++;

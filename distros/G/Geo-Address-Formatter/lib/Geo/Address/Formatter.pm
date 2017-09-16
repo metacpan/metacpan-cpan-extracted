@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.62';
+$Geo::Address::Formatter::VERSION = '1.63';
 use strict;
 use warnings;
 use feature qw(say);
@@ -506,6 +506,8 @@ sub _clean {
     $out =~ s/[\},\s]+$//;
     $out =~ s/^[,\s]+//;
 
+    $out =~ s/^- //;  # line starting with dash due to a parameter missing
+
     $out =~ s/,\s*,/, /g; # multiple commas to one   
     $out =~ s/\h+,\h+/, /g; # one horiz whitespace behind comma
     $out =~ s/\h\h+/ /g;  # multiple horiz whitespace to one
@@ -605,7 +607,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.62
+version 1.63
 
 =head1 SYNOPSIS
 

@@ -12,13 +12,15 @@ my $builder = Module::Build->new(
     },
     build_requires      => {
         'Test::More' => 0.88,
-        'Encode' => 0,
     },
     requires => {
         'perl' => '5.8.1',
         'parent' => 0,
+        'B' => 0,
+        'Carp' => 0,
+        'Encode' => 0,
+        'Scalar::Util' => 0,
         'Data::Dumper' => 0,
-        'Data::Recursive::Encode' => 0.05,
         'Exporter' => 0,
     },
     recommends => {

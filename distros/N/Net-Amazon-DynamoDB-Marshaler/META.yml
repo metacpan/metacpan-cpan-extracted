@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler/issues
   homepage: https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler
   repository: https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Stephen Caldwell <steve@campusexplorer.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

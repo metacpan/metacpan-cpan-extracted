@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.010
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.014
 
 use Test::Spelling 0.12;
 use Pod::Wordlist;
@@ -18,4 +18,9 @@ __DATA__
 Kirmess
 SKIRMESS
 Sven
+TravisCI
 dist
+perlcriticrc
+perltidy
+perltidyrc
+travis

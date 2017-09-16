@@ -23,6 +23,7 @@ t/05_collector.t
 t/06_writer_mackerel.t
 t/07_writer_file.t
 t/08_collector_parser.t
+t/assets/empty_pid/empty
 t/assets/invalid_pid/dummy
 t/assets/invalid_pid/one
 t/assets/pid/target_script

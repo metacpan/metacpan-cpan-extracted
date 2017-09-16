@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.828';
+our $VERSION = '1.829';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -414,7 +414,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.828
+This document describes MCE::Shared version 1.829
 
 =head1 SYNOPSIS
 
@@ -1080,8 +1080,8 @@ C<CDB_File> is given in the prior section.
 
 =head1 DBM SHARING (CONT)
 
-Duplicate keys and DBM filters are not supported, just plain array and hash
-functionality. The OO interface provides better performance when needed.
+DB cursors, filters, and duplicate keys are not supported, just plain array and
+hash functionality. The OO interface provides better performance when needed.
 Use C<iterator> or C<next> for iterating over the elements.
 
  use MCE::Hobo;
@@ -1796,7 +1796,7 @@ command in the pipeline.
 
  # ( "a_a", "b_b", "c_c" )
 
-=head1 INLINE::PYTHON DEMONSTRATION
+=head1 PYTHON DEMONSTRATION
 
 Sharing a Python class is possible, starting with the 1.827 release.
 The construction is simply calling share with the module option.

@@ -10,6 +10,7 @@ META.yml
 Makefile.PL
 README
 cpanfile
+lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm
 lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm
 lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
 perlcriticrc.local
@@ -24,7 +25,6 @@ xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/author/test-version.t
-xt/release/changes.t
 xt/release/eol.t
 xt/release/kwalitee.t
 xt/release/manifest.t

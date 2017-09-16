@@ -119,7 +119,7 @@
          "web" : "https://github.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR"
       }
    },
-   "version" : "1.172320",
+   "version" : "1.172580",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.150010",

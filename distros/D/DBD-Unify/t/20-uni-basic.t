@@ -3,18 +3,19 @@
 use strict;
 use warnings;
 
-my ($pid, $p_in, $p_out);
+my ($pid, $p_in, $p_out, $txx);
 BEGIN {
     delete @ENV{qw( BOOLFMT DATEFMT )};
     #delete @ENV{qw( LC_ALL LANG )};
     $ENV{DATEFMT} = "MM/DD/YY";
 
+    $txx = "xx_$$";
     pipe ($p_in, $p_out);
     unless ($pid = fork ()) {
 	close $p_out;
 	scalar <$p_in>;
 	close $p_in;
-	qx{echo "xlock xx; !sleep 5;" | env UNIFY=$ENV{UNIFY} DBPATH=$ENV{DBPATH} SQL -q >/dev/null 2>&1};
+	qx{echo "xlock $txx; !sleep 5;" | env UNIFY=$ENV{UNIFY} DBPATH=$ENV{DBPATH} SQL -q >/dev/null 2>&1};
 	exit;
 	}
     }
@@ -22,11 +23,10 @@ BEGIN {
 use Test::More;
 use DBI qw(:sql_types);
 
-my $UNIFY  = $ENV{UNIFY};
-
 exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db" or
     BAIL_OUT ("\$DBPATH not set\n");
 my $dbname = "DBI:Unify:$ENV{DBPATH}";
+my $UNIFY  = $ENV{UNIFY};
 
 my $dbh;
 ok ($dbh = DBI->connect ($dbname, undef, "", {
@@ -50,7 +50,7 @@ like (qx{env DBPATH=$ENV{DBPATH} lmshow -Oprocess=$$},
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
-    qq{create table xx (},
+    qq{create table $txx (},
     qq{    xs  numeric       (4) not null,},
     qq{    xl  numeric       (9),},
     qq{    xc  char          (5),},
@@ -71,16 +71,16 @@ ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0,1000,'   ',0.125,0.25,0.50,1000.4,12:40,11/11/89,7/21/00)"), "insert 0");
+ok ($dbh->do ("insert into $txx values (0,1000,'   ',0.125,0.25,0.50,1000.4,12:40,11/11/89,7/21/00)"), "insert 0");
 is ($dbh->state, "", "state method");
 foreach my $v ( 1 .. 9 ) {
-    ok ($dbh->do ("insert into xx values ($v,100$v,'$v',$v.125,$v.25,$v.50,100$v.4,"
+    ok ($dbh->do ("insert into $txx values ($v,100$v,'$v',$v.125,$v.25,$v.50,100$v.4,"
 	."12:40,5/20/06,7/21/00)"), "insert $v");
     is ($dbh->state, "", "state method");
     }
 ok (1, "-- FILL THE TABLE, POSITIONAL");
 my $sth;
-ok ($sth = $dbh->prepare ("insert into xx values (?,?,?,?,?,?,?,?,05/29/07,02/06/07)"), "ins prepare");
+ok ($sth = $dbh->prepare ("insert into $txx values (?,?,?,?,?,?,?,?,05/29/07,02/06/07)"), "ins prepare");
 is ($sth->state, "", "state method");
 foreach my $v ( 10 .. 18 ) {
     ok ($sth->execute ($v, 1000 + $v, "$v", $v + .125, $v + .25, $v + .50,
@@ -101,7 +101,7 @@ my %result_ok = (
     6 => [ 6, 1006, "6", 6.125, 6.25, 6.5, 1006.4, "12:40", "05/20/06", "07/21/00" ],
     7 => [ 7, 1007, "7", 7.125, 7.25, 7.5, 1007.4, "12:40", "05/20/06", "07/21/00" ],
     );
-ok ($sth = $dbh->prepare ("select * from xx where xs between ? and ? or xc = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select * from $txx where xs between ? and ? or xc = ?"), "sel prepare");
 is ($sth->state, "", "state method");
 ok ($sth->execute (4, 7, "0"), "execute");
 is ($sth->state, "", "state method");
@@ -142,7 +142,7 @@ while (my ($xs, $xl, $xc, $xf, $xr, $xa, $xh, $xt, $xd, $xe) = $sth->fetchrow_ar
     }
 ok ($sth->finish, "finish");
 
-ok ($sth = $dbh->prepare ("select xl, xc from xx where xs = 8"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xl, xc from $txx where xs = 8"), "sel prepare");
 is ($sth->state, "", "state method");
 ok ($sth->execute, "execute");
 is ($sth->state, "", "state method");
@@ -159,7 +159,7 @@ is ($sth->state, "", "state method");
 is ("@$ref", "1008, 8", "fr_ar values 2nd");
 ok ($sth->finish, "finish");
 
-ok ($sth = $dbh->prepare ("select xl from xx where xs = 9"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xl from $txx where xs = 9"), "sel prepare");
 is ($sth->state, "", "state method");
 ok ($sth->execute, "execute");
 is ($sth->state, "", "state method");
@@ -169,7 +169,7 @@ ok (keys %$ref == 1 && exists $ref->{xl} && $ref->{xl} == 1009, "fr_hr values");
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, NESTED");
-ok ($sth = $dbh->prepare ("select xs from xx where xs in (3, 5)"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xs from $txx where xs in (3, 5)"), "sel prepare");
 is ($sth->state, "", "state method");
 is ($dbh->state, "", "state method");
 is ($DBI::state, "", "state method");
@@ -179,7 +179,7 @@ is ($dbh->state, "", "state method");
 is ($DBI::state, "", "state method");
 while (my ($xs) = $sth->fetchrow_array ()) {
     my $sth2;
-    ok ($sth2 = $dbh->prepare ("select xl from xx where xs = @{[$xs - 1]}"), "sel prepare sth2");
+    ok ($sth2 = $dbh->prepare ("select xl from $txx where xs = @{[$xs - 1]}"), "sel prepare sth2");
     if ($sth2) {
 	is ($sth2->state, "", "state method");
 	is ($dbh->state, "", "state method");
@@ -200,7 +200,7 @@ while (my ($xs) = $sth->fetchrow_array ()) {
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("select xs from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xs from $txx where xs = ?"), "sel prepare");
 is ($sth->state, "", "state method");
 foreach my $xs (3 .. 5) {
     ok ($sth->execute ($xs), "execute $xs");
@@ -222,13 +222,13 @@ ok (1, "-- Check the bind_columns");
 ok ($sth->finish, "finish");
 
 ok (1, "-- UPDATE THE TABLE");
-is ($dbh->do ("update xx set xf = xf + .0625 where xs = 5"), 1, "do update");
+is ($dbh->do ("update $txx set xf = xf + .0625 where xs = 5"), 1, "do update");
 is ($dbh->state, "", "state method");
 ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("update xx set xa = xa + .25 where xs = ?"), "do update positional");
+ok ($sth = $dbh->prepare ("update $txx set xa = xa + .25 where xs = ?"), "do update positional");
 is ($sth->state, "", "state method");
 is ($sth->execute (4), 1, "execute");
 is ($sth->state, "", "state method");
@@ -237,7 +237,7 @@ ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, MULTIPLE RECORDS, and COUNT");
-ok ($sth = $dbh->prepare ("update xx set xa = xa + .0625 where xs = 5 or xs = 6"), "upd prepare");
+ok ($sth = $dbh->prepare ("update $txx set xa = xa + .0625 where xs = 5 or xs = 6"), "upd prepare");
 is ($sth->state, "", "state method");
 is ($dbh->state, "", "state method");
 is ($sth->execute, 2, "execute");
@@ -249,7 +249,7 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, NO RECORDS, and COUNT");
-ok ($sth = $dbh->prepare ("update xx set xa = xa + .125 where xs = 95 or xs = 96"), "upd prepare");
+ok ($sth = $dbh->prepare ("update $txx set xa = xa + .125 where xs = 95 or xs = 96"), "upd prepare");
 is ($sth->state, "", "state method");
 is ($dbh->state, "", "state method");
 is ($sth->execute, "0E0", "execute");
@@ -261,7 +261,7 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL TWICE");
-ok ($sth = $dbh->prepare ("update xx set xc = ? where xs = ?"), "upd prepare");
+ok ($sth = $dbh->prepare ("update $txx set xc = ? where xs = ?"), "upd prepare");
 is ($sth->state, "", "state method");
 is ($sth->execute ("33", 3), 1, "execute");
 is ($sth->state, "", "state method");
@@ -270,7 +270,7 @@ ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, POSITIONAL TWICE, NON-KEY");
-ok ($sth = $dbh->prepare ("update xx set xc = ? where xf = 10.125 and xl = ?"), "upd prepare");
+ok ($sth = $dbh->prepare ("update $txx set xc = ? where xf = 10.125 and xl = ?"), "upd prepare");
 is ($sth->state, "", "state method");
 is ($sth->execute ("12345", 1010), 1, "execute");
 is ($sth->state, "", "state method");
@@ -279,7 +279,7 @@ ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, ERROR RETURN");
-ok ($sth = $dbh->prepare ("update xx set xs = null"), "upd prepare");
+ok ($sth = $dbh->prepare ("update $txx set xs = null"), "upd prepare");
 is ($sth->state, "", "state method");
 is ($dbh->state, "", "state method");
 is ($DBI::state, "", "state method");
@@ -295,19 +295,19 @@ is ($DBI::state, "", "state method");
 
 ok (1, "-- UPDATE THE TABLE, ERROR RETURN");
 { local ( $dbh->{RaiseError}, $dbh->{PrintError} );
-  is ($dbh->do ("update xx set xs = null" ), undef, "do update");
+  is ($dbh->do ("update $txx set xs = null" ), undef, "do update");
   is ($dbh->state, "35000", "state method"); }
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 my $f = 2.048+292;
 ok (1, "-- UPDATE THE TABLE, DIFFICULT VALUE");
-ok ($sth = $dbh->prepare ("update xx set xf = ? where xs = ?"), "do update positional");
+ok ($sth = $dbh->prepare ("update $txx set xf = ? where xs = ?"), "do update positional");
 is ($sth->state, "", "state method");
 is ($sth->execute ($f, 4), 1, "execute");
 is ($sth->state, "", "state method");
 ok ($sth->finish, "finish");
-ok ($sth = $dbh->prepare ("select xf from xx where xs = ?"), "do update positional");
+ok ($sth = $dbh->prepare ("select xf from $txx where xs = ?"), "do update positional");
 is ($sth->state, "", "state method");
 is ($sth->execute (4), 1, "execute");
 is ($sth->state, "", "state method");
@@ -319,7 +319,7 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DELETE FROM TABLE, ONE RECORD");
-ok ($sth = $dbh->prepare ("delete xx where xs = 2"), "del prepare");
+ok ($sth = $dbh->prepare ("delete $txx where xs = 2"), "del prepare");
 is ($sth->state, "", "state method");
 is ($sth->execute, 1, "execute");
 is ($sth->state, "", "state method");
@@ -329,7 +329,7 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DELETE FROM TABLE, NO RECORDS");
-ok ($sth = $dbh->prepare ("delete xx where xs = 98"), "del prepare");
+ok ($sth = $dbh->prepare ("delete $txx where xs = 98"), "del prepare");
 is ($sth->state, "", "state method");
 is ($sth->execute, "0E0", "execute");
 is ($sth->state, "", "state method");
@@ -339,7 +339,7 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DELETE FROM TABLE");
-ok ($sth = $dbh->prepare ("delete xx"), "del prepare");
+ok ($sth = $dbh->prepare ("delete $txx"), "del prepare");
 is ($sth->state, "", "state method");
 is ($sth->execute, 19, "execute");
 is ($sth->state, "", "state method");
@@ -349,30 +349,30 @@ ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DO DELETE FROM TABLE, NO ROWS");
-is ($dbh->do ("delete xx where xs = -1"), "0E0", "do delete");
+is ($dbh->do ("delete $txx where xs = -1"), "0E0", "do delete");
 is ($dbh->state, "", "state method");
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DO DELETE FROM TABLE, ONE ROW");
-is ($dbh->do ("delete xx where xs = 1"), 1, "do delete");
+is ($dbh->do ("delete $txx where xs = 1"), 1, "do delete");
 is ($dbh->state, "", "state method");
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DO DELETE FROM TABLE, TWO ROWS");
-is ($dbh->do ("delete xx where xs = 1 or xs = 0"), 2, "do delete");
+is ($dbh->do ("delete $txx where xs = 1 or xs = 0"), 2, "do delete");
 is ($dbh->state, "", "state method");
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DO DELETE FROM TABLE, ALL ROWS");
-is ($dbh->do ("delete xx"), 19, "do delete");
+is ($dbh->do ("delete $txx"), 19, "do delete");
 is ($dbh->state, "", "state method");
 ok ($dbh->rollback, "rollback");
 is ($dbh->state, "", "state method");
 
-ok ($sth = $dbh->prepare ("select * from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select * from $txx where xs = ?"), "sel prepare");
 is ($sth->state, "", "state method");
 ok ($sth->execute (1), "execute 1");
 is ($sth->state, "", "state method");
@@ -411,7 +411,7 @@ my @rec = (
     [ 17, 1017,    17, 17.125, 17.25, 17.5,  1017.4, "11:31", "05/29/07", "02/06/07" ],
     [ 18, 1018,    18, 18.125, 18.25, 18.5,  1018.4, "11:31", "05/29/07", "02/06/07" ],
     );
-ok ($sth = $dbh->prepare ("select * from xx order by xs"), "sel prepare final state");
+ok ($sth = $dbh->prepare ("select * from $txx order by xs"), "sel prepare final state");
 is ($sth->state, "", "state method");
 ok ($sth->execute, "execute");
 is ($sth->state, "", "state method");
@@ -437,7 +437,7 @@ ok ($dbh = DBI->connect ($dbname, undef, "", {
 	uni_verbose   => 0,
 	uni_scanlevel => 6,
 	}), "connect with attributes");
-ok ($sth = $dbh->prepare ("select xl, xc from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xl, xc from $txx where xs = ?"), "sel prepare");
 ok ($sth->execute (1), "execute 1");
 is ($sth->state, "", "state method");
 ok ($ref = $sth->fetchrow_arrayref, "fetchrow_arrayref");
@@ -446,13 +446,13 @@ is ("@$ref", "1001, 1", "fr_ar values");
 ok ($sth->finish, "finish");
 waitpid $pid, 0;
 
-is ($dbh->do ("delete xx"), 19, "do delete");
+is ($dbh->do ("delete $txx"), 19, "do delete");
 is ($dbh->state, "", "state method");
 ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");
 
 ok (1, "-- DROP THE TABLE");
-ok ($dbh->do ("drop table xx"), "do drop");
+ok ($dbh->do ("drop table $txx"), "do drop");
 is ($dbh->state, "", "state method");
 ok ($dbh->commit, "commit");
 is ($dbh->state, "", "state method");

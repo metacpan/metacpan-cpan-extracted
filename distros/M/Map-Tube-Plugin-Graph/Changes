@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.27  2017-09-15T11:35:00+01:00
+      - Updated copyright year information.
+
 0.26  2017-07-18T11:50:00+01:00
       - Fixed line map generation code.
 

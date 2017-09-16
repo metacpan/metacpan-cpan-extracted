@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moose;
 with qw(
@@ -111,6 +111,10 @@ __END__
 =head1 NAME
 
 Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic - automatically extract Perl::Critic policy prereqs
+
+=head1 VERSION
+
+Version 0.003
 
 =head1 SYNOPSIS
 

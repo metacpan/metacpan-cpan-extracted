@@ -46,7 +46,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "0.05",
+            "Alien::Build" : "1.14",
             "Module::Build" : "0",
             "Path::Tiny" : "0",
             "perl" : "5.006"
@@ -54,6 +54,7 @@
       },
       "test" : {
          "requires" : {
+            "Alien::Build" : "1.14",
             "Capture::Tiny" : "0",
             "File::chdir" : "0",
             "Test2::V0" : "0.000060",
@@ -74,7 +75,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

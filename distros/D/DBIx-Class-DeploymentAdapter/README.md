@@ -51,7 +51,7 @@ You can give a target version to the method to make it stop there
 
 # LICENSE
 
-Copyright (C) Patrick Kilter.
+Copyright (C) Jens Gassmann Software-Entwicklung.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -59,3 +59,4 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Patrick Kilter <pk@gassmann.it>
+Jens Gassmann <jg@gassmann.it>

@@ -1,0 +1,6 @@
+name = "Net-APNs-HTTP2"
+badges = ["travis"]
+authority="cpan:XAICRON"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,10 +1,10 @@
 {
    "abstract" : "Create tmux layout strings programmatically",
    "author" : [
-      "Joel Maslak <jmaslak@antelope.net>"
+      "J. Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,6 +49,7 @@
          "web" : "https://github.com/jmaslak/Term-Tmux-Layout"
       }
    },
-   "version" : "1.004"
+   "version" : "1.005",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

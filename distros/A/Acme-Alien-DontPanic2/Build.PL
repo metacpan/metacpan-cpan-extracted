@@ -15,12 +15,12 @@ use lib qw{inc}; use Alien::Build::MB;
 
 my %module_build_args = (
   "build_requires" => {
-    "Alien::Build" => "0.75",
-    "Alien::Build::MB" => "0.03",
+    "Alien::Build" => "1.14",
+    "Alien::Build::MB" => "0.05",
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
-    "Alien::Build" => "0.32",
+    "Alien::Build" => "1.14",
     "Alien::Build::MB" => "0.02",
     "Module::Build" => "0.28",
     "perl" => "5.006"
@@ -31,7 +31,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic2",
-  "dist_version" => "0.7500",
+  "dist_version" => "1.1400",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic2",
   "recursive_test_files" => 1,
@@ -40,8 +40,6 @@ my %module_build_args = (
     "perl" => "5.006"
   },
   "test_requires" => {
-    "Capture::Tiny" => 0,
-    "ExtUtils::CBuilder" => 0,
     "Test2::V0" => "0.000060",
     "Test::Alien" => "0.05",
     "perl" => "5.006"
@@ -50,10 +48,8 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Alien::Build" => "0.75",
-  "Alien::Build::MB" => "0.03",
-  "Capture::Tiny" => 0,
-  "ExtUtils::CBuilder" => 0,
+  "Alien::Build" => "1.14",
+  "Alien::Build::MB" => "0.05",
   "Module::Build" => "0.28",
   "Test2::V0" => "0.000060",
   "Test::Alien" => "0.05",

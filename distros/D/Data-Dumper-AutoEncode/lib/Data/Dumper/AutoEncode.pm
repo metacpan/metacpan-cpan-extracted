@@ -1,14 +1,19 @@
 package Data::Dumper::AutoEncode;
 use strict;
 use warnings;
+use Carp ();
+use Encode ();
+use Scalar::Util qw(blessed refaddr);
+use B;
 use Data::Dumper; # Dumper
-use Data::Recursive::Encode;
 use parent qw/Exporter/;
 our @EXPORT = qw/eDumper Dumper/;
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 our $ENCODING = '';
+our $CHECK_ALREADY_ENCODED = 1;
+our $DO_NOT_PROCESS_NUMERIC_VALUE = 1;
 
 sub _dump {
     my $d = Data::Dumper->new(\@_);
@@ -16,12 +21,78 @@ sub _dump {
 }
 
 sub eDumper {
-    local $Data::Recursive::Encode::DO_NOT_PROCESS_NUMERIC_VALUE = 1;
     my @args;
     for my $arg (@_) {
-        push @args, Data::Recursive::Encode->encode($ENCODING || 'utf8', $arg);
+        push @args, encode($ENCODING || 'utf8', $arg);
     }
     _dump(@args);
+}
+
+sub encode {
+    my ($encoding, $stuff, $check) = @_;
+    $encoding = Encode::find_encoding($encoding)
+        || Carp::croak("unknown encoding '$encoding'");
+    $check ||= 0;
+    _apply(sub { $encoding->encode($_[0], $check) }, {}, $stuff);
+}
+
+# copied from Data::Recursive::Encode
+sub _apply {
+    my $code = shift;
+    my $seen = shift;
+
+    my @retval;
+    for my $arg (@_) {
+        if(my $ref = ref $arg){
+            my $refaddr = refaddr($arg);
+            my $proto;
+
+            if(defined($proto = $seen->{$refaddr})){
+                 # noop
+            }
+            elsif($ref eq 'ARRAY'){
+                $proto = $seen->{$refaddr} = [];
+                @{$proto} = _apply($code, $seen, @{$arg});
+            }
+            elsif($ref eq 'HASH'){
+                $proto = $seen->{$refaddr} = {};
+                %{$proto} = _apply($code, $seen, %{$arg});
+            }
+            elsif($ref eq 'REF' or $ref eq 'SCALAR'){
+                $proto = $seen->{$refaddr} = \do{ my $scalar };
+                ${$proto} = _apply($code, $seen, ${$arg});
+            }
+            else{ # CODE, GLOB, IO, LVALUE etc.
+                $proto = $seen->{$refaddr} = $arg;
+            }
+
+            push @retval, $proto;
+        }
+        else{
+            push @retval, _can_exec($arg) ? $code->($arg) : $arg;
+        }
+    }
+
+    return wantarray ? @retval : $retval[0];
+}
+
+# copied from Data::Recursive::Encode
+sub _is_number {
+    my $value = shift;
+    return 0 unless defined $value;
+
+    my $b_obj = B::svref_2object(\$value);
+    my $flags = $b_obj->FLAGS;
+    return $flags & ( B::SVp_IOK | B::SVp_NOK ) && !( $flags & B::SVp_POK ) ? 1 : 0;
+}
+
+sub _can_exec {
+    my ($arg) = @_;
+
+    return unless defined($arg);
+    return 1 if ( !$DO_NOT_PROCESS_NUMERIC_VALUE || !_is_number($arg) )
+                    && ( $CHECK_ALREADY_ENCODED && Encode::is_utf8($arg) );
+    return;
 }
 
 1;

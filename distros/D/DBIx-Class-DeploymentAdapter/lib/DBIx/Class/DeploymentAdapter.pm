@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 =encoding utf-8
 
@@ -55,7 +55,7 @@ sub dh {
         $args->{sql_translator_args} ||= { mysql_enable_utf8 => 1 };
 
         my $dh = DBIx::Class::DeploymentHandler->new($args);
-        $self->dh_store( $dh );
+        $self->dh_store($dh);
 
     }
 
@@ -80,7 +80,7 @@ Installs the schema files to the given Database
 
 sub install {
 
-    my $self = shift;
+    my $self   = shift;
     my @params = @_;
 
     return unless $self->dh;
@@ -132,7 +132,7 @@ Returns the Status of database and schema versions as string
 
 sub status {
 
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     return unless ref $self->dh;
 
@@ -158,20 +158,27 @@ sub upgrade_incremental {
 
     my ( $self, $to_version ) = @_;
 
-    return unless $self->dh;
+    unless ( $self->dh ) {
 
-    my $start_version  = $self->dh->database_version + 1;
+        warn "Missing dh-handler";
+        return;
+    }
+
+    my $start_version  = $self->dh->database_version;
     my $target_version = $self->dh->schema->schema_version;
 
-    for my $upgrade_version ( $start_version .. $target_version ) {
+    warn "Try to upgrade from $start_version to $target_version";
+
+    for my $upgrade_version ( ( $start_version + 1 ) .. $target_version ) {
 
         my $version = $self->dh->database_version;
 
-        if( $to_version && $upgrade_version > $to_version ) {
+        if ( $to_version && $upgrade_version > $to_version ) {
+            warn "skip version $upgrade_version";
             next;
         }
 
-        warn "upgrading to version $upgrade_version\n";
+        warn "upgrading to version $upgrade_version";
 
         eval {
             my ( $ddl, $sql ) = @{ $self->dh->upgrade_single_step( { version_set => [ $version, $upgrade_version ] } ) || [] };    # from last version to desired version
@@ -187,18 +194,16 @@ sub upgrade_incremental {
         if ($@) {
             my $error_version = $self->dh->database_version;
             warn "Database remains on version $error_version";
-            die "UPGRADE ERROR - Version $error_version upgrading to $version: " . $@;
+            die "UPGRADE ERROR - Version $error_version upgrading to $upgrade_version: " . $@;
         }
     }
 }
 
 1;
 
-
-
 =head1 LICENSE
 
-Copyright (C) Patrick Kilter.
+Copyright (C) Jens Gassmann Software-Entwicklung.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -206,5 +211,6 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 Patrick Kilter E<lt>pk@gassmann.itE<gt>
+Jens Gassmann E<lt>jg@gassmann.itE<gt>
 
 =cut

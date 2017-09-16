@@ -14,6 +14,7 @@ unless (exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db") {
     exit 0;
     }
 my $dbname = "DBI:Unify:$ENV{DBPATH}";
+my $txx    = "xx_$$";
 
 my $dbh;
 ok ($dbh = DBI->connect ($dbname, undef, "", {
@@ -33,7 +34,7 @@ unless ($dbh) {
 
 ok (1, "-- CREATE THE TABLE");
 ok ($dbh->do (join " " =>
-    "create table xx (",
+    "create table $txx (",
     "    xs numeric       (4) not null,",
     "    xc char (20),",
     "    xt text",
@@ -47,14 +48,14 @@ ok ($dbh->commit, "commit");
 my $t8 = "\x{0218}\x{0151}m\x{0119} \x{0165}\x{00e8}\x{1e8b}\x{1e71}";
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0, 'Some text', 'Some text')"));
+ok ($dbh->do ("insert into $txx values (0, 'Some text', 'Some text')"));
 foreach my $v ( 1 .. 5 ) {
     my $t = "x" x (1 << $v);
-    ok ($dbh->do ("insert into xx values ($v, 'xxxx', '$t')"), "INS $v");
+    ok ($dbh->do ("insert into $txx values ($v, 'xxxx', '$t')"), "INS $v");
     }
 ok (1, "-- FILL THE TABLE, POSITIONAL");
 my $sth;
-ok ($sth = $dbh->prepare ("insert into xx values (?,?,?)"), "ins prepare");
+ok ($sth = $dbh->prepare ("insert into $txx values (?,?,?)"), "ins prepare");
 foreach my $v ( 6 .. 10 ) {
     ok ($sth->execute ($v, $t8, $t8 x ($v - 5)), "ins $v");
     }
@@ -72,7 +73,7 @@ my %result_ok = (
     4 => "4, 'xxxx', 'xxxxxxxxxxxxxxxx'",
     5 => "5, 'xxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
     );
-ok ($sth = $dbh->prepare ("select * from xx where xs between 0 and 5"), "sel prepare");
+ok ($sth = $dbh->prepare ("select * from $txx where xs between 0 and 5"), "sel prepare");
 ok ($sth->execute, "execute");
 while (my ($xs, $xc, $xt) = $sth->fetchrow_array ()) {
     is ($result_ok{$xs}, "$xs, '$xc', '$xt'", "fetchrow_array $xs");
@@ -80,7 +81,7 @@ while (my ($xs, $xc, $xt) = $sth->fetchrow_array ()) {
 ok ($sth->finish, "finish");
 
 ok (1, "-- SELECT FROM THE TABLE, POSITIONAL");
-ok ($sth = $dbh->prepare ("select xc, xt from xx where xs = ?"), "sel prepare");
+ok ($sth = $dbh->prepare ("select xc, xt from $txx where xs = ?"), "sel prepare");
 foreach my $xs (1 .. 5) {
     ok ($sth->execute ($xs), "execute $xs");
     my ($xc, $xt) = $sth->fetchrow_array;
@@ -101,11 +102,11 @@ ok (1, "-- Check the bind_columns");
     }
 ok ($sth->finish, "finish");
 
-ok ($dbh->do ("delete from xx"), "do delete");
+ok ($dbh->do ("delete from $txx"), "do delete");
 ok ($dbh->commit, "commit");
 
 ok (1, "-- DROP THE TABLE");
-ok ($dbh->do ("drop table xx"), "do drop");
+ok ($dbh->do ("drop table $txx"), "do drop");
 ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");

@@ -4,7 +4,7 @@
       "edf <edf@opencagedata.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "Geo::Address::Formatter" : {
          "file" : "lib/Geo/Address/Formatter.pm",
-         "version" : "1.62"
+         "version" : "1.63"
       }
    },
    "release_status" : "stable",
@@ -56,7 +56,7 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter"
       }
    },
-   "version" : "1.62",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.63",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

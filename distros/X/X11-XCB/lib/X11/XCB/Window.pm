@@ -83,7 +83,7 @@ X11::XCB::Window - represents an X11 window
 =head2 rect
 
 As long as the window is not mapped, this returns the planned geometry. As soon
-as the window is mapped, this retuns its geometry B<including> the window
+as the window is mapped, this returns its geometry B<including> the window
 decorations.
 
 Thus, after the window is mapped, every time you access C<rect>, the geometry

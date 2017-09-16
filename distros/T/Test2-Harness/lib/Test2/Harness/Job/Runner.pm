@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001014';
 
 use Carp qw/croak confess/;
 use List::Util qw/first/;
@@ -49,7 +49,6 @@ sub run {
     my $via;
 
     for my $item (@{$self->{+VIA}}) {
-        next if $item eq 'Fork' && !$job->use_fork;
         my $class = $RUN_MAP{$item};
 
         unless ($class) {
@@ -67,6 +66,7 @@ sub run {
 
         next unless $class->viable($self);
         my @out;
+
 
         my $chdir = $self->job->chdir;
         my $orig = File::Spec->curdir();

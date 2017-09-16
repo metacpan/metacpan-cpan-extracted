@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.014';
 
 use Moose 0.99;
 
@@ -96,6 +96,8 @@ sub configure {
             }
         ],
 
+        'Author::SKIRMESS::InsertVersion',
+
         # Update the next release number in your changelog
         [
             'NextRelease',
@@ -142,6 +144,9 @@ sub configure {
 
         # automatically extract Perl::Critic policy prereqs
         'AutoPrereqs::Perl::Critic',
+
+        # Set script shebang to #!perl
+        'SetScriptShebang',
 
         # Add the $AUTHORITY variable and metadata to your distribution
         [
@@ -197,6 +202,15 @@ sub configure {
 
         # Summarize Dist::Zilla configuration into distmeta
         'MetaConfig',
+
+        # Report what versions of things your distribution was built against
+        [
+            'MetaData::BuiltWith',
+            {
+                show_config => 1,
+                show_uname  => 1,
+            }
+        ],
 
         # Produce a META.yml
         'MetaYAML',
@@ -335,6 +349,10 @@ __END__
 =head1 NAME
 
 Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way SKIRMESS does it
+
+=head1 VERSION
+
+Version 0.014
 
 =head1 SYNOPSIS
 

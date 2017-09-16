@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Dumper::AutoEncode
 
+0.108   Fri Sep 15 08:16:32 JST 2017
+        do not double encode
+        refactor script: edumper
+
 0.107   Mon Dec 28 18:54:12 JST 2015
         add POD for edumper script
 

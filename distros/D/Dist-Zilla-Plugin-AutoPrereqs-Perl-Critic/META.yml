@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
-dynamic_config: 0
+dynamic_config: '0'
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: open_source
 meta-spec:
@@ -27,7 +27,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic:
     file: lib/Dist/Zilla/Plugin/AutoPrereqs/Perl/Critic.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   CPAN::Meta::YAML: '0'
   Dist::Zilla::Role::PrereqSource: '0'
@@ -43,105 +43,98 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic/issues
   homepage: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
   repository: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic.git
-version: '0.002'
+version: '0.003'
+x_BuiltWith:
+  modules:
+    CPAN::Meta::YAML: '0.018'
+    Dist::Zilla::Role::PrereqSource: '6.010'
+    ExtUtils::MakeMaker: '7.30'
+    File::Spec: '3.63'
+    HTTP::Tiny: '0.070'
+    Moose: '2.2006'
+    Moose::Util::TypeConstraints: '2.2006'
+    Perl::Critic: '1.130'
+    Perl::Critic::Policy::Moose::ProhibitDESTROYMethod: '1.05'
+    Perl::Critic::Policy::Moose::ProhibitLazyBuild: '1.05'
+    Perl::Critic::Policy::Moose::ProhibitMultipleWiths: '1.05'
+    Perl::Critic::Policy::Moose::ProhibitNewMethod: '1.05'
+    Perl::Critic::Policy::Moose::RequireCleanNamespace: '1.05'
+    Perl::Critic::Policy::Moose::RequireMakeImmutable: '1.05'
+    Perl::Critic::Utils: '1.130'
+    Pod::Wordlist: '1.20'
+    Test::CPAN::Changes: '0.400002'
+    Test::CPAN::Meta: '0.25'
+    Test::CPAN::Meta::JSON: '0.16'
+    Test::CleanNamespaces: '0.22'
+    Test::DZil: '6.010'
+    Test::DistManifest: '1.014'
+    Test::EOL: '2.00'
+    Test::Fatal: '0.014'
+    Test::Kwalitee: '1.26'
+    Test::MinimumVersion: '0.101082'
+    Test::Mojibake: '1.3'
+    Test::More: '1.302096'
+    Test::NoTabs: '2.00'
+    Test::Perl::Critic: '1.03'
+    Test::Pod: '1.51'
+    Test::Pod::No404s: '0.02'
+    Test::Portability::Files: '0.07'
+    Test::Spelling: '0.20'
+    Test::Version: '2.05'
+    lib: '0.63'
+    namespace::autoclean: '0.28'
+    strict: '1.11'
+    warnings: '1.36'
+  perl:
+    original: v5.24.0
+    qv: 1
+    version:
+      - 5
+      - 24
+      - 0
+  perl-config:
+    gccversion: 4.9.4
+    myarchname: i86pc-solaris
+    osname: solaris
+  platform: solaris
+  uname: 'SunOS pernaia 5.11 joyent_20170330T015208Z i86pc i386 i86pc Solaris'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
   plugins:
     -
+      class: Dist::Zilla::Plugin::Bootstrap::lib
+      config:
+        Dist::Zilla::Role::Bootstrap:
+          $Dist::Zilla::Role::Bootstrap::VERSION: '1.001004'
+          distname: Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
+          fallback: '1'
+          try_built: ~
+          try_built_method: mtime
+      name: Bootstrap::lib
+      version: '1.001002'
+    -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
         Dist::Zilla::Plugin::PromptIfStale:
-          check_all_plugins: 0
-          check_all_prereqs: 0
+          check_all_plugins: '0'
+          check_all_prereqs: '0'
           modules:
             - Dist::Zilla::PluginBundle::Author::SKIRMESS
           phase: build
-          run_under_travis: 0
+          run_under_travis: '0'
           skip: []
       name: '@Author::SKIRMESS/stale modules, build'
       version: '0.054'
     -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Changes
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Changes'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CleanNamespaces
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CleanNamespaces'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CPAN::Meta'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::CPAN::Meta::JSON'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::DistManifest
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::DistManifest'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::EOL
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::EOL'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Kwalitee
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Kwalitee'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::MinimumVersion
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::MinimumVersion'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Mojibake
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Mojibake'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::NoTabs
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::NoTabs'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Perl::Critic
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Perl::Critic'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Pod'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Pod::No404s
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Pod::No404s'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Portability::Files
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Portability::Files'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Spelling
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Spelling'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Test::XT::Test::Version
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Test::XT::Test::Version'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::TravisCI
-      name: '@Author::SKIRMESS/Author::SKIRMESS::TravisCI'
-      version: '0.006'
-    -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::Perl::Tidy::RC
-      name: '@Author::SKIRMESS/Author::SKIRMESS::Perl::Tidy::RC'
-      version: '0.006'
-    -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
         Dist::Zilla::Plugin::PromptIfStale:
-          check_all_plugins: 1
-          check_all_prereqs: 1
+          check_all_plugins: '1'
+          check_all_prereqs: '1'
           modules: []
           phase: release
-          run_under_travis: 0
+          run_under_travis: '0'
           skip: []
       name: '@Author::SKIRMESS/stale modules, release'
       version: '0.054'
@@ -150,8 +143,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Contributors:
           git_version: 2.11.0
-          include_authors: 0
-          include_releaser: 1
+          include_authors: '0'
+          include_releaser: '1'
           order_by: name
           paths: []
       name: '@Author::SKIRMESS/Git::Contributors'
@@ -170,13 +163,13 @@ x_Dist_Zilla:
             - cpanfile
             - dist.ini
           exclude_match: []
-          follow_symlinks: 0
-          include_dotfiles: 1
+          follow_symlinks: '0'
+          include_dotfiles: '1'
           prefix: ''
           prune_directory: []
           root: .
         Dist::Zilla::Plugin::Git::GatherDir:
-          include_untracked: 0
+          include_untracked: '0'
       name: '@Author::SKIRMESS/Git::GatherDir'
       version: '2.042'
     -
@@ -188,6 +181,14 @@ x_Dist_Zilla:
       name: '@Author::SKIRMESS/ReversionOnRelease'
       version: '0.06'
     -
+      class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
+      name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
+      name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
+      version: '0.012'
+    -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
       version: '6.010'
@@ -198,6 +199,9 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - .perlcriticrc
+            - .perltidyrc
+            - .travis.yml
             - Changes
             - META.json
             - META.yml
@@ -205,6 +209,22 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - xt/author/clean-namespaces.t
+            - xt/author/critic.t
+            - xt/author/minimum_version.t
+            - xt/author/mojibake.t
+            - xt/author/no-tabs.t
+            - xt/author/pod-no404s.t
+            - xt/author/pod-spell.t
+            - xt/author/pod-syntax.t
+            - xt/author/portability.t
+            - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/eol.t
+            - xt/release/kwalitee.t
+            - xt/release/manifest.t
+            - xt/release/meta-json.t
+            - xt/release/meta-yaml.t
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
@@ -228,6 +248,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::SKIRMESS/AutoPrereqs'
       version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
+      name: '@Author::SKIRMESS/AutoPrereqs::Perl::Critic'
+      version: '0.002'
+    -
+      class: Dist::Zilla::Plugin::SetScriptShebang
+      name: '@Author::SKIRMESS/SetScriptShebang'
+      version: '0.01'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Author::SKIRMESS/Authority'
@@ -260,7 +288,7 @@ x_Dist_Zilla:
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::SKIRMESS/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
               version: '6.010'
-          include_underscores: 0
+          include_underscores: '0'
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
@@ -275,6 +303,22 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::SKIRMESS/MetaConfig'
       version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::MetaData::BuiltWith
+      config:
+        Dist::Zilla::Plugin::MetaData::BuiltWith:
+          $Module::Metadata::VERSION: '1.000031'
+          _stash_key: x_BuiltWith
+          external_file_name: misc/built_with.json
+          show_config: '1'
+          show_uname: '1'
+          uname:
+            uname_args:
+              - -a
+            uname_call: uname
+          use_external_file: ~
+      name: '@Author::SKIRMESS/MetaData::BuiltWith'
+      version: '1.004005'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::SKIRMESS/MetaYAML'
@@ -318,7 +362,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '1'
       name: '@Author::SKIRMESS/MakeMaker'
       version: '6.010'
     -
@@ -376,7 +420,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '1'
       name: '@Author::SKIRMESS/RunExtraTests'
       version: '0.029'
     -
@@ -412,6 +456,9 @@ x_Dist_Zilla:
           commit_msg: '%v'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - .perlcriticrc
+            - .perltidyrc
+            - .travis.yml
             - Changes
             - INSTALL
             - LICENSE
@@ -421,6 +468,22 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - xt/author/clean-namespaces.t
+            - xt/author/critic.t
+            - xt/author/minimum_version.t
+            - xt/author/mojibake.t
+            - xt/author/no-tabs.t
+            - xt/author/pod-no404s.t
+            - xt/author/pod-spell.t
+            - xt/author/pod-syntax.t
+            - xt/author/portability.t
+            - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/eol.t
+            - xt/release/kwalitee.t
+            - xt/release/manifest.t
+            - xt/release/meta-json.t
+            - xt/release/meta-yaml.t
           allow_dirty_match:
             - (?^:\.pm$)
           changelog: Changes
@@ -437,8 +500,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           changelog: Changes
-          signed: 0
-          tag: '0.002'
+          signed: '0'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
@@ -454,27 +517,12 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Push:
           push_to:
             - origin
-          remotes_must_exist: 1
+          remotes_must_exist: '1'
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
       name: '@Author::SKIRMESS/Git::Push'
       version: '2.042'
-    -
-      class: Dist::Zilla::Plugin::Bootstrap::lib
-      config:
-        Dist::Zilla::Role::Bootstrap:
-          $Dist::Zilla::Role::Bootstrap::VERSION: '1.001004'
-          distname: Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
-          fallback: '1'
-          try_built: ~
-          try_built_method: mtime
-      name: Bootstrap::lib
-      version: '1.001002'
-    -
-      class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
-      name: AutoPrereqs::Perl::Critic
-      version: '0.001'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

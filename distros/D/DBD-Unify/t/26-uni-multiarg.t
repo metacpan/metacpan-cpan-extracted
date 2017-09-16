@@ -13,6 +13,7 @@ unless (exists $ENV{DBPATH} && -d $ENV{DBPATH} && -r "$ENV{DBPATH}/file.db") {
     exit 0;
     }
 my $dbname = "DBI:Unify:$ENV{DBPATH}";
+my $txx    = "xx_$$";
 
 use DBI;
 
@@ -33,7 +34,7 @@ unless ($dbh) {
 
 ok (1, "-- CREATE A TABLE");
 ok ($dbh->do (join " " =>
-    "create table xx (",
+    "create table $txx (",
     "    xs numeric (4) not null,",
     "    xl numeric (9),",
     "    xc char    (5),",
@@ -46,9 +47,9 @@ if ($dbh->err) {
 ok ($dbh->commit, "commit");
 
 ok (1, "-- FILL THE TABLE");
-ok ($dbh->do ("insert into xx values (0, 123456789, 'abcde', 1.23)"), "insert 1234");
+ok ($dbh->do ("insert into $txx values (0, 123456789, 'abcde', 1.23)"), "insert 1234");
 foreach my $v ( 1 .. 9 ) {
-    ok ($dbh->do ("insert into xx values (?, ?, ?, ?)", undef,
+    ok ($dbh->do ("insert into $txx values (?, ?, ?, ?)", undef,
 	$v, $v * 100000, "$v", .99/$v), "insert $v with 3-arg do ()");
     }
 
@@ -56,13 +57,13 @@ my $error;
 open my $eh, ">", \$error;
 select ((select ($eh), $| = 1)[0]);
 DBI->trace (0, $eh);
-{   my $do_st = "update xx set xl = -1 where xs = ?";
+{   my $do_st = "update $txx set xl = -1 where xs = ?";
     my $do_at = { dbd_verbose => 3 };
     my @do_bv = (99);
 
     my $sth;
     ok ($sth = $dbh->prepare ($do_st, $do_at), "prepare (..., attr)");
-    like ($error, qr{update xx}, "dbd_verbose - prepare");
+    like ($error, qr{update $txx}, "dbd_verbose - prepare");
     SKIP: {
 	$sth or skip "Prepare with attributes failed", 3;
 	ok ($sth->execute (@do_bv), "execute");
@@ -79,7 +80,7 @@ DBI->trace (0, $eh);
 
 ok ($dbh->commit, "commit");
 
-ok ($dbh->do ("drop table xx"), "Drop table");
+ok ($dbh->do ("drop table $txx"), "Drop table");
 ok ($dbh->commit, "commit");
 
 ok ($dbh->disconnect, "disconnect");

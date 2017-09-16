@@ -1,0 +1,77 @@
+{
+   "abstract" : "APNs Provider API for Perl",
+   "author" : [
+      "xaicron <xaicron@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-APNs-HTTP2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "Cache::Memory::Simple" : "0",
+            "Crypt::JWT" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Protocol::HTTP2::Client" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Net::APNs::HTTP2" : {
+         "file" : "lib/Net/APNs/HTTP2.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-Net-APNs-HTTP2/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-Net-APNs-HTTP2",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-Net-APNs-HTTP2.git",
+         "web" : "https://github.com/xaicron/p5-Net-APNs-HTTP2"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:XAICRON",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

@@ -42,7 +42,7 @@ my $build = Alien::Base::ModuleBuild->new(
         'Test2::Bundle::More' => 0,
     },
     requires => {
-        'perl' => '5.010',
+        'perl' => '5.008',
         'Alien::Base' => '0.030',
     },
     alien_inline_auto_include => [ 'vas.h' ],

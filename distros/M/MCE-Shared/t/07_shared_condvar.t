@@ -11,6 +11,15 @@ BEGIN {
    use_ok 'MCE::Shared::Condvar';
 }
 
+## MCE::Shared loads IO::FDPass automatically when available.
+## On the Windows platform, the script may exit with a non-zero
+## value (5) without it.
+
+if ( $^O eq 'MSWin32' && !exists $INC{'IO/FDPass.pm'} ) {
+   done_testing;
+   exit 0;
+}
+
 my $cv = MCE::Shared->condvar();
 
 ## signal - --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
