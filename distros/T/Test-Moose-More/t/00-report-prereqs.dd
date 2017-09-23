@@ -59,7 +59,6 @@ do { my $x = {
                                    'Test::Builder::Tester' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::More' => '0.94',
-                                   'blib' => '1.01',
                                    'namespace::autoclean' => '0',
                                    'perl' => '5.006'
                                  }

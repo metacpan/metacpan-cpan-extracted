@@ -41,7 +41,7 @@
    "provides" : {
       "Dancer2::Plugin::Paginator" : {
          "file" : "lib/Dancer2/Plugin/Paginator.pm",
-         "version" : "2.05"
+         "version" : "2.06"
       }
    },
    "release_status" : "stable",
@@ -55,7 +55,7 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Paginator"
       }
    },
-   "version" : "2.05",
+   "version" : "2.06",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

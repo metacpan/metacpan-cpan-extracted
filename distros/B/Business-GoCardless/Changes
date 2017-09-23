@@ -1,5 +1,13 @@
 Revision history for Business-GoCardless
 
+0.29     2017-09-22
+        - Add mandate method to ::Pro and ::RedirectFlow
+
+0.28     2017-09-22
+        - Add confirmation_url to RedirectFlow
+        - Improve setting of attributes on objects to not b0rk on
+          newly addded and not yet supported ones
+
 0.27     2017-09-12
         - Update some perldoc relating to Webhooks and Events
 

@@ -9,7 +9,7 @@ use File::Spec;
 our @EXPORT_OK = qw( dist_share );
 
 # ABSTRACT: Locate per-dist shared files
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 # TODO: Works with PAR
@@ -51,7 +51,8 @@ sub dist_share ($)
           # put humpty dumpty back together again
           my $share = File::Spec->catdir(
             File::Spec->catpath($v,
-              File::Spec->catdir(@dirs)
+              File::Spec->catdir(@dirs),
+              '',
             ),
             'share',
           );
@@ -107,7 +108,7 @@ File::ShareDir::Dist - Locate per-dist shared files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -142,7 +143,7 @@ It doesn't blindly go finding the first share directory in @INC that matches the
 checks to see that it matches the .pm file that goes along with it.
 
 That does mean that you need to have a .pm that corresponds to your dist name.  This is not
-always the case for some older historical distributions, but it has been the recommended convetion
+always the case for some older historical distributions, but it has been the recommended convention
 for quite some time.
 
 =item No non-core dependencies.
@@ -156,7 +157,7 @@ dependencies on modules that are not part of the Perl core on older Perls.
 
 =item Works in your development tree.
 
-Uses the huristic, for determining if you are in a development tree, and if so, uses the common
+Uses the heuristic, for determining if you are in a development tree, and if so, uses the common
 convention to find the directory named C<share>.  If you are using a relative path in C<@INC>,
 if the directory C<share> is a sibling of that relative entry in C<@INC> and if the last element
 in that relative path is C<lib>.
@@ -178,7 +179,7 @@ C<dist_share> will return the (absolute) path to ./share/data.  If you invoked i
 it would not.  For me this covers most of my needs when developing a Perl module with a share
 directory.
 
-L<prove> foils this huristic by making C<@INC> absolute paths.  To get around that you can use
+L<prove> foils this heuristic by making C<@INC> absolute paths.  To get around that you can use
 L<App::Prove::Plugin::ShareDirDist>.
 
 =item Built in override.
@@ -211,8 +212,8 @@ Functions must be explicitly exported.  They are not exported by default.
 
 Returns the absolute path to the share directory of the given distribution.
 
-As a convenience you can also use the "main" module name assoicated with the
-distribution.  That means if you want the share directory for thet dist
+As a convenience you can also use the "main" module name associated with the
+distribution.  That means if you want the share directory for the dist
 C<Foo-Bar-Baz> you may use either C<Foo-Bar-Baz> or C<Foo::Bar::Baz> to find
 it.
 
@@ -243,7 +244,11 @@ caveats or features depending on your perspective I suppose.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Yanick Champoux (yanick)
 
 =head1 COPYRIGHT AND LICENSE
 

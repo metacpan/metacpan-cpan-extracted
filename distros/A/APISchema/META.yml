@@ -32,7 +32,7 @@ no_index:
 provides:
   APISchema:
     file: lib/APISchema.pm
-    version: '1.26'
+    version: '1.27'
   APISchema::DSL:
     file: lib/APISchema/DSL.pm
   APISchema::Generator::Markdown:
@@ -45,6 +45,8 @@ provides:
     file: lib/APISchema/Generator/Markdown/ResourceResolver.pm
   APISchema::Generator::Router::Simple:
     file: lib/APISchema/Generator/Router/Simple.pm
+  APISchema::JSON:
+    file: lib/APISchema/JSON.pm
   APISchema::Resource:
     file: lib/APISchema/Resource.pm
   APISchema::Route:
@@ -90,7 +92,7 @@ resources:
   bugtracker: https://github.com/hitode909/APISchema/issues
   homepage: https://github.com/hitode909/APISchema
   repository: git://github.com/hitode909/APISchema.git
-version: '1.26'
+version: '1.27'
 x_authority: cpan:HITODE
 x_contributors:
   - 'Tomohiro Nishimura <tomohiro68@gmail.com>'

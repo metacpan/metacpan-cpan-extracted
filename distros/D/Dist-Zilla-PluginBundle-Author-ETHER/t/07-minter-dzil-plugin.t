@@ -59,6 +59,13 @@ unlike($dist_ini, qr/[^\S\n]\n/, 'no trailing whitespace in dist.ini');
 unlike($dist_ini, qr/\n\n\n/, 'no double blank links in dist.ini');
 unlike($dist_ini, qr/\n\n\z/, 'file does not end with a blank line');
 
+my $travis = path($mint_dir, '.travis.yml')->slurp_utf8;
+like(
+    $travis,
+    qr{^install:\n  - perl -M5\.014 -e1 2>/dev/null || cpan-install Dist::Zilla\@5.047$}m,
+    'extra line for older Dist::Zilla inserted into .travis.yml',
+);
+
 my $module = path($mint_dir, 'lib/Dist/Zilla/Plugin/Foo/Bar.pm')->slurp_utf8;
 
 like(

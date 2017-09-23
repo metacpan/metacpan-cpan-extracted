@@ -3,7 +3,11 @@ abstract: 'generates CPAN like project documents from pod.'
 author:
   - 'Martin Gruner <martin.gruner@cpan.org>'
   - 'Lyo Kato <lyo.kato@gmail.com>'
-build_requires: {}
+build_requires:
+  File::Path: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -13,9 +17,39 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Pod-ProjectDocs
+provides:
+  Pod::ProjectDocs:
+    file: lib/Pod/ProjectDocs.pm
+    version: '0.49'
+  Pod::ProjectDocs::CSS:
+    file: lib/Pod/ProjectDocs/CSS.pm
+    version: '0.49'
+  Pod::ProjectDocs::Config:
+    file: lib/Pod/ProjectDocs/Config.pm
+    version: '0.49'
+  Pod::ProjectDocs::Doc:
+    file: lib/Pod/ProjectDocs/Doc.pm
+    version: '0.49'
+  Pod::ProjectDocs::DocManager:
+    file: lib/Pod/ProjectDocs/DocManager.pm
+    version: '0.49'
+  Pod::ProjectDocs::File:
+    file: lib/Pod/ProjectDocs/File.pm
+    version: '0.49'
+  Pod::ProjectDocs::IndexPage:
+    file: lib/Pod/ProjectDocs/IndexPage.pm
+    version: '0.49'
+  Pod::ProjectDocs::Parser:
+    file: lib/Pod/ProjectDocs/Parser.pm
+    version: '0.49'
+  Pod::ProjectDocs::Parser::XHTML:
+    file: lib/Pod/ProjectDocs/Parser/XHTML.pm
+    version: '0.49'
+  Pod::ProjectDocs::Template:
+    file: lib/Pod/ProjectDocs/Template.pm
+    version: '0.49'
 requires:
-  Class::Accessor::Fast: '0'
-  Class::Data::Inheritable: '0'
+  Carp: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Find: '0'
@@ -24,11 +58,13 @@ requires:
   IO::File: '0'
   JSON: '2.04'
   MIME::Base64: '0'
+  Moose: '0'
   Pod::Simple::XHTML: '3.31'
   Readonly: '0'
   Template: '0'
+  perl: v5.8.0
 resources:
   bugtracker: https://github.com/mgruner/p5-pod-projectdocs/issues
   repository: git://github.com/mgruner/p5-pod-projectdocs.git
-version: '0.48'
+version: '0.49'
 x_serialization_backend: 'YAML::Tiny version 1.69'

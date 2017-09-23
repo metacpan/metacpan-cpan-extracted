@@ -36,6 +36,7 @@ lib/Catmandu/Cmd/import.pm
 lib/Catmandu/Cmd/info.pm
 lib/Catmandu/Cmd/run.pm
 lib/Catmandu/Cmd/stream.pm
+lib/Catmandu/Cmd/touch.pm
 lib/Catmandu/Counter.pm
 lib/Catmandu/Droppable.pm
 lib/Catmandu/Env.pm
@@ -92,6 +93,7 @@ lib/Catmandu/Fix/Has.pm
 lib/Catmandu/Fix/Inlineable.pm
 lib/Catmandu/Fix/Parser.pm
 lib/Catmandu/Fix/SimpleGetValue.pm
+lib/Catmandu/Fix/add.pm
 lib/Catmandu/Fix/add_field.pm
 lib/Catmandu/Fix/add_to_exporter.pm
 lib/Catmandu/Fix/add_to_store.pm
@@ -103,6 +105,7 @@ lib/Catmandu/Fix/clone.pm
 lib/Catmandu/Fix/code.pm
 lib/Catmandu/Fix/collapse.pm
 lib/Catmandu/Fix/compact.pm
+lib/Catmandu/Fix/copy.pm
 lib/Catmandu/Fix/copy_field.pm
 lib/Catmandu/Fix/count.pm
 lib/Catmandu/Fix/downcase.pm
@@ -120,10 +123,12 @@ lib/Catmandu/Fix/import_from_string.pm
 lib/Catmandu/Fix/include.pm
 lib/Catmandu/Fix/index.pm
 lib/Catmandu/Fix/int.pm
+lib/Catmandu/Fix/join.pm
 lib/Catmandu/Fix/join_field.pm
 lib/Catmandu/Fix/log.pm
 lib/Catmandu/Fix/lookup.pm
 lib/Catmandu/Fix/lookup_in_store.pm
+lib/Catmandu/Fix/move.pm
 lib/Catmandu/Fix/move_field.pm
 lib/Catmandu/Fix/nothing.pm
 lib/Catmandu/Fix/parse_text.pm
@@ -132,6 +137,7 @@ lib/Catmandu/Fix/perlcode.pm
 lib/Catmandu/Fix/prepend.pm
 lib/Catmandu/Fix/random.pm
 lib/Catmandu/Fix/reject.pm
+lib/Catmandu/Fix/remove.pm
 lib/Catmandu/Fix/remove_field.pm
 lib/Catmandu/Fix/rename.pm
 lib/Catmandu/Fix/replace_all.pm
@@ -139,11 +145,14 @@ lib/Catmandu/Fix/retain.pm
 lib/Catmandu/Fix/retain_field.pm
 lib/Catmandu/Fix/reverse.pm
 lib/Catmandu/Fix/search_in_store.pm
+lib/Catmandu/Fix/set.pm
 lib/Catmandu/Fix/set_array.pm
 lib/Catmandu/Fix/set_field.pm
 lib/Catmandu/Fix/set_hash.pm
 lib/Catmandu/Fix/sleep.pm
+lib/Catmandu/Fix/sort.pm
 lib/Catmandu/Fix/sort_field.pm
+lib/Catmandu/Fix/split.pm
 lib/Catmandu/Fix/split_field.pm
 lib/Catmandu/Fix/string.pm
 lib/Catmandu/Fix/substring.pm
@@ -204,6 +213,7 @@ lib/Catmandu/Transactional.pm
 lib/Catmandu/Util.pm
 lib/Catmandu/Validator.pm
 lib/Catmandu/Validator/Simple.pm
+misc/vim/syntax/catmandu-fix.vim
 t/Catmandu-Addable.t
 t/Catmandu-ArrayIterator.t
 t/Catmandu-Bag.t
@@ -222,6 +232,7 @@ t/Catmandu-Cmd-import.t
 t/Catmandu-Cmd-info.t
 t/Catmandu-Cmd-run.t
 t/Catmandu-Cmd-stream.t
+t/Catmandu-Cmd-touch.t
 t/Catmandu-Cmd.t
 t/Catmandu-Counter.t
 t/Catmandu-Env.t

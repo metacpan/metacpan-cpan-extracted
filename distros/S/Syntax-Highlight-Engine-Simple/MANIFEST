@@ -1,0 +1,24 @@
+Changes
+lib/Syntax/Highlight/Engine/Simple.pm
+Makefile.PL
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README
+README.pod
+t/00.load.t
+t/highlight.t
+t/highlight2.t
+t/subclass.t
+t/testfile/2original.txt
+t/testfile/3original.txt
+t/testfile/4original.txt
+t/testfile/expected.txt
+t/testfile/original.txt
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+xt/podspell.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

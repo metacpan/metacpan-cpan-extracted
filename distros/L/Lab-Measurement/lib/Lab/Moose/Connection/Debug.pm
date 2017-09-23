@@ -1,6 +1,6 @@
 package Lab::Moose::Connection::Debug;
 #ABSTRACT: Debug connection
-$Lab::Moose::Connection::Debug::VERSION = '3.554';
+$Lab::Moose::Connection::Debug::VERSION = '3.600';
 use Moose;
 use 5.010;
 use namespace::autoclean;
@@ -57,7 +57,7 @@ Lab::Moose::Connection::Debug - Debug connection
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

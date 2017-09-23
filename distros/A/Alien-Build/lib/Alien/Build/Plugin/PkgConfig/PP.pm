@@ -7,7 +7,7 @@ use Carp ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -19,6 +19,9 @@ has minimum_version => undef;
 
 
 use constant _min_version => '0.14026';
+
+# private for now, used by negotiator
+has register_prereqs => 1;
 
 sub available
 {
@@ -36,9 +39,7 @@ sub init
 {
   my($self, $meta) = @_;
   
-  my $caller = caller;
-  
-  if($caller ne 'Alien::Build::Plugin::PkgConfig::Negotiate')
+  if($self->register_prereqs)
   {
     $meta->add_requires('configure' => 'PkgConfig' => _min_version);
   }
@@ -135,7 +136,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

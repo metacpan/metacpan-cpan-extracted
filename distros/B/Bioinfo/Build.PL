@@ -18,11 +18,12 @@ my %module_build_args = (
     "Yan Xueqing <yanxueqing621\@163.com>"
   ],
   "dist_name" => "Bioinfo",
-  "dist_version" => "0.1.8",
+  "dist_version" => "0.1.11",
   "license" => "perl",
   "module_name" => "Bioinfo",
   "recursive_test_files" => 1,
   "requires" => {
+    "Data::Dumper" => 0,
     "Exporter" => 0,
     "FindBin" => 0,
     "IO::All" => 0,

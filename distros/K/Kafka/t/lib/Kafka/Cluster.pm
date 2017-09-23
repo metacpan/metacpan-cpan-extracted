@@ -6,7 +6,7 @@ Kafka::Cluster - object interface to manage a test kafka cluster.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Cluster> version 1.06 .
+This documentation refers to C<Kafka::Cluster> version 1.07 .
 
 =cut
 
@@ -14,7 +14,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Exporter qw(
     import
@@ -1047,20 +1047,44 @@ sub _start_server {
                 confess "Not running: $cmd_str";
             }
 
+
             # Find real pid using process table, because kafka uses sequence of bash
             # scripts calling each other which do not end with 'exec' and do not trap
             # signals. Proc::Daemon returns pid of the top-level script and killing it
             # won't work (no signals are trapped there) - actual java process keeps
             # running.
-            my $script_pid = _clear_tainted( $proc_daemon->get_pid( qr/.*java.+$server_name.+\Q$property_file\E.*/ ) );
-            if ( !( my $real_pid = $proc_daemon->Status( $script_pid ) ) ) {
-                confess 'Could not find server pid' unless $attempts;
-            } else {
-                my $fh = IO::File->new( $pid_file, 'w' )
-                    or confess "Cannot write $pid_file: $!";
-                say $fh $real_pid;
-                $fh->close;
-                last;
+
+            my $java_pid = $proc_daemon->get_pid( qr/.*java.+$server_name.+\Q$property_file\E.*/ );
+
+            if( not $java_pid ) {
+                # sometimes it's not possible to find pid of java process by looking
+                # for particular argument in the commandline of the process table.
+                # it happens when classpaths inside command line of java-process
+                # are too long, and commandline in processtable gets truncated
+                # after 4096 chars (and actual agruments gets truncated).
+                # As a fallback - we also try to use native 'java' way of listing processes -
+                # with jps executable
+                # See: https://stackoverflow.com/questions/199130/how-do-i-increase-the-proc-pid-cmdline-4096-byte-limit
+
+                my @java_processes = `jps -lm`; # check: man jps for description
+                foreach my $process ( @java_processes ){
+                    if ( $process =~ /$server_name.+\Q$property_file\E.*/ ) {
+                        ( $java_pid ) = ( $process =~ /^(\d+)\s/);
+                        last;
+                    }
+                }
+            }
+            if( defined $java_pid && $java_pid ne '' ) {
+                my $script_pid = _clear_tainted( $java_pid );
+                if ( !( my $real_pid = $proc_daemon->Status( $script_pid ) ) ) {
+                    confess 'Could not find server pid' unless $attempts;
+                } else {
+                    my $fh = IO::File->new( $pid_file, 'w' )
+                        or confess "Cannot write $pid_file: $!";
+                    say $fh $real_pid;
+                    $fh->close;
+                    last;
+                }
             }
         }
 

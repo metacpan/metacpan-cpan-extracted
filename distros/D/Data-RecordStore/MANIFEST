@@ -1,3 +1,5 @@
+bin/converter.pl
+bin/recordstore_explorer
 Build.PL
 CHANGELOG
 lib/Data/RecordStore.pm
@@ -7,5 +9,13 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+t/oldVersion/1_OBJSTORE
+t/oldVersion/1_OBJSTORE.recycle
+t/oldVersion/2_OBJSTORE
+t/oldVersion/2_OBJSTORE.recycle
+t/oldVersion/OBJ_INDEX
+t/oldVersion/OBJ_INDEX.recycle
+t/oldVersion/STORE_INDEX
 t/recordstore.t
+TODO.txt
 VERSIONS

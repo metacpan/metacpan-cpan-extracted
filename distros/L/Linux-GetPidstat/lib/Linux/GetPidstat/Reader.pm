@@ -24,7 +24,7 @@ sub get_program_pid_mapping {
 
         my $pid = $pid_file->slurp;
         # Skip processing if it could not read anything from the file
-        next if length($pid) == 0;
+        next unless length($pid);
 
         chomp($pid);
         unless (_is_valid_pid($pid)) {

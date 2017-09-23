@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Json;
-$Config::Model::Backend::Json::VERSION = '2.108';
+$Config::Model::Backend::Json::VERSION = '2.110';
 use Carp;
 use strict;
 use warnings;
@@ -93,7 +93,7 @@ Config::Model::Backend::Json - Read and write config as a JSON data structure
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -118,13 +118,12 @@ version 2.108
             },
         },
     ],
-  read_config  => [
-                    { backend => 'Json' ,
-                      config_dir => '/tmp',
-                      file  => 'foo.json',
-                      auto_create => 1,
-                    }
-                  ],
+  rw_config  => {
+    backend => 'Json' ,
+    config_dir => '/tmp',
+    file  => 'foo.json',
+    auto_create => 1,
+  }
  ) ;
 
  my $inst = $model->instance(root_class_name => 'MyClass' );

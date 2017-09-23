@@ -1,9 +1,9 @@
-# ABSTRACT: YAML Parser and Loader
+# ABSTRACT: YAML Framework
 use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-YAML::PP - YAML Parser and Loader
+YAML::PP - YAML Framework
 
 =head1 SYNOPSIS
 
@@ -39,28 +39,78 @@ WARNING: This is highly experimental.
 
 Here are a few examples of what you can do right now:
 
-    # Load YAML into a very simple data structure
-    yaml-pp-p5-load < file.yaml
+    my $yppl = YAML::PP::Loader->new;
+    my @documents = $yppl->load($yaml);
 
     # The loader offers JSON::PP, boolean.pm or pureperl 1/0 (default)
     # for booleans
     my $yppl = YAML::PP::Loader->new(boolean => 'JSON::PP');
     my ($data1, $data2) = $yppl->load($yaml);
 
+    my $yppd = YAML::PP::Dumper->new();
+    my $yaml = $yppd->dump($data1, $data2);
+
+Some utility scripts:
+
+    # Load YAML into a very simple data structure
+    yamlpp5-load < file.yaml
+
+    # Load and dump
+    yamlpp5-load-dump < file.yaml
+
     # Print the events from the parser in yaml-test-suite format
-    yaml-pp-p5-events < file.yaml
+    yamlpp5-events < file.yaml
+
+    # Create ANSI colored YAML
+    yamlpp5-highlight < file.yaml
+
 
 =head1 DESCRIPTION
 
-This is Yet Another YAML Parser. For why this project was started, see
+This is Yet Another YAML Framework. For why this project was started, see
 L<"WHY">.
 
-This project contains a Parser L<YAML::PP::Parser> and a Loader
-L<YAML::PP::Loader>.
+The parser aims to parse C<YAML 1.2>. See L<http://yaml.org/>.
+
+You can check out all current parse and load results from the
+yaml-test-suite here:
+L<https://perlpunk.github.io/YAML-PP-p5/test-suite.html>
+
+=over
+
+=item L<YAML::PP::Lexer>
+
+The Lexer is reading the YAML stream into tokens. This makes it possible
+to generate syntax highlighted YAML output.
+
+Note that the API to retrieve the tokens will change.
+
+=item L<YAML::PP::Parser>
+
+The Parser retrieves the tokens from the Lexer. The main YAML content is then
+parsed with the Grammar.
+
+=item L<YAML::PP::Grammar>
+
+=item L<YAML::PP::Constructor>
+
+The Constructor creates a data structure from the Parser events.
+
+=item L<YAML::PP::Loader>
+
+The Loader combines the constructor and parser.
+
+=item L<YAML::PP::Dumper>
+
+The Dumper will create Emitter events from the given data structure.
+
+=item L<YAML::PP::Emitter>
+
+The Emitter creates a YAML stream.
+
+=back
 
 =head2 YAML::PP::Parser
-
-The parser aims to parse C<YAML 1.2>.
 
 Still TODO:
 
@@ -77,24 +127,22 @@ valid, and it will accept characters that should be invalid.
 
 =item Line Numbers
 
-The parser currently doesn't keep track of the line numbers, so the error
-messages might not be very useful yet
+You will see line numbers in the error message. They might still be wrong
+in some cases.
 
 =item Error Messages
 
-The error messages in general aren't often very informative
+The error messages need to be improved. Column information is still missing.
 
-=item Lexer
-
-I would like to support a lexer that can be used for highlighting.
+=item Unicode
 
 =item Possibly more
 
 =back
 
-=head2 YAML::PP::Loader
+=head2 YAML::PP::Constructor
 
-The loader is very simple so far.
+The Constructor is very simple so far.
 
 It supports:
 
@@ -102,7 +150,7 @@ It supports:
 
 =item Simple handling of Anchors/Aliases
 
-Like in modules like L<YAML>, the Loader will use references for mappings and
+Like in modules like L<YAML>, the Constructor will use references for mappings and
 sequences, but obviously not for scalars.
 
 =item Boolean Handling
@@ -118,7 +166,7 @@ own boolean handling.
 =item Numbers
 
 Numbers are created as real numbers instead of strings, so that they are
-dumped correctly by modules like L<JSON::XS>, for example.
+dumped correctly by modules like L<JSON::PP> or L<JSON::XS>, for example.
 
 See L<"NUMBERS"> for an example.
 
@@ -131,16 +179,16 @@ TODO:
 =item Complex Keys
 
 Mapping Keys in YAML can be more than just scalars. Of course, you can't load
-that into a native perl structure. The Loader will stringify those keys
+that into a native perl structure. The Constructor will stringify those keys
 with L<Data::Dumper>.
 I would like to add a possibility to specify a method for stringification.
 
 Example:
 
     use YAML::PP::Loader;
-    use JSON::XS;
+    use JSON::PP;
     my $yppl = YAML::PP::Loader->new;
-    my $coder = JSON::XS->new->ascii->pretty->allow_nonref->canonical;
+    my $coder = JSON::PP->new->ascii->pretty->allow_nonref->canonical;
     my $yaml = <<'EOM';
     complex:
         ?
@@ -172,11 +220,36 @@ wish to be able to keep the comments.
 
 =back
 
+=head2 YAML::PP::Dumper, YAML::PP::Emitter
+
+This is also pretty simple so far. Any string containing something
+other than C<0-9a-zA-Z.-> will be dumped with double quotes.
+
+It will recognize JSON::PP::Boolean and boolean.pm objects and dump them
+correctly.
+
+The layout is like libyaml output:
+
+    key:
+    - a
+    - b
+    - c
+    ---
+    - key1: 1
+      key2: 2
+      key3: 3
+    ---
+    - - a1
+      - a2
+    - - b1
+      - b2
+
+
 =head1 NUMBERS
 
-Compare the output of the following YAML Loaders and JSON::XS dump:
+Compare the output of the following YAML Loaders and JSON::PP dump:
 
-    use JSON::XS;
+    use JSON::PP;
     use Devel::Peek;
 
     use YAML::XS ();
@@ -288,7 +361,7 @@ overview of which frameworks support which YAML features:
 
 L<https://github.com/yaml/yaml-test-suite>
 
-It contains about 160 test cases and expected parsing events and more.
+It contains about 230 test cases and expected parsing events and more.
 There will be more tests coming. This test suite allows to write parsers
 without turning the examples from the Specification into tests yourself.
 Also the examples aren't completely covering all cases - the test suite
@@ -300,9 +373,6 @@ use TestML.
 
 Thanks also to Felix Krause, who is writing a YAML parser in Nim.
 He turned all the spec examples into test cases.
-
-As of this writing, the test suite only contains valid examples.
-Invalid ones are currently added.
 
 =head2 YAML EDITOR
 
@@ -332,6 +402,10 @@ and created a matrix view.
 L<https://github.com/perlpunk/yaml-test-matrix>
 
 You can find the latest build at L<http://matrix.yaml.io>
+
+As of this writing, the test matrix only contains valid test cases.
+Invalid ones will be added.
+
 
 =head1 COPYRIGHT AND LICENSE
 

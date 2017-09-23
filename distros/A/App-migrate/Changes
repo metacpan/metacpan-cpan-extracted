@@ -1,5 +1,8 @@
 Revision history for App-migrate
 
+v0.2.6  2017-09-20 15:25:23 EEST
+	- Fixed migrate script's default arg "-f migrate".
+
 v0.2.5  2016-03-05 19:04:08 EET
 	- Fixed hang in tests.
 

@@ -16,6 +16,7 @@ my @files = (
     't/attribute_options_ok/basic.t',
     't/attribute_options_ok/subtest-wrapper.t',
     't/check_sugar.t',
+    't/definition_context.t',
     't/does_metaroles_ok.t',
     't/does_not_metaroles_ok.t',
     't/does_not_ok.t',

@@ -125,7 +125,7 @@ subtest 'post report' => sub {
             'language arch is correct';
 
         ok $mock_enqueue->called, 'report enqueued';
-        is_deeply $mock_enqueue->method_arguments, [qw( report queue ), $row->id],
+        is_deeply $mock_enqueue->method_arguments, [qw( report queue ), [$row->id], {attempts => 10}],
             'enqueue arguments are correct';
     };
 

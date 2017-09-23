@@ -1,0 +1,16 @@
+Revision history for Syntax-Highlight-Engine-Simple-HTML
+
+v0.04  2017/09/21
+    - Metadata updates
+
+v0.03  2011/07/07
+    - Internal optimization
+
+v0.02  2008/07/13
+    -Change syntax format. allowed_container(array) abolished and
+     container(string) adopted.
+    -Fix POD
+
+v0.01  2008/07/12
+    Initial release.
+

@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.06  2017-09-16 MANWAR
+      - Added test script t/manifest.t and t/pod.t.
+
 2.05  2017-08-25 MANWAR
       - Generated 'provides' as recommended by CPANTS.
 

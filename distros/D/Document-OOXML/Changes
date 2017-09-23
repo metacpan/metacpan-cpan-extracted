@@ -1,0 +1,23 @@
+Revision history for perl distribution Document-OOXML
+
+0.172650  2017-09-22 10:29:31+02:00 Europe/Amsterdam
+
+ - Add ->extract_words() method to wordprocessor documents
+ - Small API change: you need to call ->merge_runs() yourself now, before
+   calling other methods on a wordprocessor document.
+ - When finding/replacing things, referenced parts like headers, footers,
+   footnotes, etc. will also be processed.
+
+0.172610  2017-09-18 09:29:48+02:00 Europe/Amsterdam
+ 
+ - Fix the synopsis of Document::OOXML
+ - Remove unused 'use List::Utils;' that was causing test failures on old
+   versions of Perl/List::Utils
+
+0.172601  2017-09-17 13:37:45+02:00 Europe/Amsterdam
+
+ - Add $VERSION to Document::OOXML
+
+0.172600  2017-09-17 12:18:08+02:00 Europe/Amsterdam
+
+ - Initial release

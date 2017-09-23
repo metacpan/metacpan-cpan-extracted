@@ -85,17 +85,16 @@ sub CMD_src ( $self, $h, $id, $args ) {
         }
     )->run;
 
-    my $json = to_json(
-        [   $id,
-            {   was_changed => $res->was_changed                  ? 1 : 0,
-                is_error    => $res->severity_range_is('ERROR')   ? 1 : 0,
-                is_warn     => $res->severity_range_is('WARNING') ? 1 : 0,
-                content     => decode_utf8 $res->out_buffer->$*
-            }
-        ]
-    )->$*;
+    my $json = to_json [
+        $id,
+        {   was_changed => $res->was_changed                  ? 1 : 0,
+            is_error    => $res->severity_range_is('ERROR')   ? 1 : 0,
+            is_warn     => $res->severity_range_is('WARNING') ? 1 : 0,
+            content     => decode_utf8 $res->out_buffer->$*
+        }
+    ];
 
-    $h->push_write($json);
+    $h->push_write( $json->$* );
 
     return;
 }

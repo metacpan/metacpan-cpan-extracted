@@ -43,6 +43,7 @@ my @expected_files = qw(
     .ackrc
     .gitignore
     .mailmap
+    .travis.yml
     Changes
     dist.ini
     CONTRIBUTING

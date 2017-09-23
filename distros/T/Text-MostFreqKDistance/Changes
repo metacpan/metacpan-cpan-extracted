@@ -1,5 +1,8 @@
 Revision history for Text::MostFreqKDistance
 
+0.08  Sun Sep 17 11:30:00 2017
+      - Improved method exporting.
+
 0.07  Fri Apr 07 11:40:00 2017
       - Tidied up test scripts and removed "-T" switch.
 

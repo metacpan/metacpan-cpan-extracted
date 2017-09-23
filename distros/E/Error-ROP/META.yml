@@ -15,8 +15,9 @@ meta-spec:
 name: Error-ROP
 requires:
   Moose: '0'
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/paudirac/Error-ROP/issues
   repository: https://github.com/paudirac/Error-ROP
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

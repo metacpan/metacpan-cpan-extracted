@@ -48,6 +48,10 @@ sub new {
 package Your::X;
 use base qw(Base::X);
 
+sub does    { return 1 }
+sub payload { return { fake => 'payload' } }
+sub ident   {'fake-exception'}
+
 # The fake we use for testing
 package main;
 use HTTP::Throwable::Factory qw(http_throw);
@@ -216,6 +220,13 @@ test_psgi
                 $res->content,
                 qr{<p>error not found in body</p>},
                 'error message'
+            );
+            like( $res->content, qr{fake-exception},
+                'fake ident found in body' );
+            like(
+                $res->content,
+                qr{fake: payload},
+                'fake payload found in body'
             );
         };
 

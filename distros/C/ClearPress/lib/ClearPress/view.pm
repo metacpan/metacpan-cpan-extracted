@@ -24,12 +24,13 @@ use MIME::Base64 qw(encode_base64);
 use JSON;
 use Readonly;
 
-our $VERSION = q[476.1.1];
+our $VERSION = q[476.4.2];
 
-our $DEBUG_OUTPUT   = 0;
-our $DEBUG_L10N     = 0;
-our $TEMPLATE_CACHE = {};
-our $LEXICON_CACHE  = {};
+our $DEBUG_OUTPUT        = 0;
+our $DEBUG_L10N          = 0;
+our $TEMPLATE_CACHE      = {};
+our $LEXICON_CACHE       = {};
+our $TRAP_REDIR_OVERFLOW = 0;
 
 __PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape charset decorator headers));
 
@@ -381,11 +382,11 @@ sub process_template { ## no critic (Complexity)
   $entity       ||= q[];
   my $script_name = $ENV{SCRIPT_NAME} || q[];
   my ($xfh, $xfp) = ($ENV{HTTP_X_FORWARDED_HOST}, $ENV{HTTP_X_FORWARDED_PORT});
-  my $http_host   = ($xfh ? $xfh : $ENV{HTTP_HOST})   || q[localhost];
-  my $http_port   = ($xfh ? $xfp : $ENV{HTTP_PORT})   || q[];
-  my $https       = $ENV{HTTPS}?q[https]:q[http];
+  my $http_host   = ($xfh ? $xfh : $ENV{HTTP_HOST}) || q[localhost];
+  my $http_port   = ($xfh ? $xfp : $ENV{HTTP_PORT}) || q[];
+  my $http_proto  = $ENV{HTTP_X_FORWARDED_PROTO}    || $ENV{HTTPS}?q[https]:q[http];
   my $href        = sprintf q[%s://%s%s%s%s],
-			    $https,
+			    $http_proto,
 			    $http_host,
 			    $http_port?":$http_port":q[],
 			    $script_name,
@@ -405,7 +406,7 @@ sub process_template { ## no critic (Complexity)
 		  SCRIPT_NAME => $script_name,
 		  HTTP_HOST   => $http_host,
 		  HTTP_PORT   => $http_port,
-		  HTTPS       => $https,
+		  HTTPS       => $http_proto,
 		  SCRIPT_HREF => $href,
 		  ENTITY_HREF => "$href$entity",
 		  now         => (strftime '%Y-%m-%dT%H:%M:%S', localtime),
@@ -765,11 +766,13 @@ sub redirect {
   #
   $self->output_reset();
 
-  Readonly::Scalar my $OVERFLOW => 1024;
-  if(length $self->headers->as_string > $OVERFLOW) { # fudge for apparent buffer overflow with apache+mod_perl (ParseHeaders related?)
-    carp q[warning: header block looks long];
-    $self->headers->remove_header('Location');
-    $self->headers->header('Status', HTTP_OK);
+  if($TRAP_REDIR_OVERFLOW) {
+    Readonly::Scalar my $OVERFLOW => 1024;
+    if(length $self->headers->as_string > $OVERFLOW) { # fudge for apparent buffer overflow with apache+mod_perl (ParseHeaders related?)
+      carp q[warning: header block looks long];
+      $self->headers->remove_header('Location');
+      $self->headers->header('Status', HTTP_OK);
+    }
   }
 
   $self->output_buffer($self->headers->as_string, "\n");
@@ -781,6 +784,9 @@ sub redirect {
   $self->output_flush();
   $self->headers->clear();
 
+  ########
+  # Note: This ought to correspond to content-type, but doesn't!
+  #
   return <<"EOT"
    <p>This document has moved <a href="$url">here</a>.</p>
    <script>document.location.href="$url";</script>
@@ -1118,6 +1124,8 @@ e.g.
  Set $ClearPress::view::DEBUG_L10N = 1 to report missing locali[zs]ation strings.
 
  Set $ClearPress::view::DEBUG_OUTPUT = 1 to report output buffer operations.
+
+ Set $ClearPress::view::TRAP_REDIR_OVERFLOW = 1 to enable experimental redirect header overflow handling
 
 =head1 DEPENDENCIES
 

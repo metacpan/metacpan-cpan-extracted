@@ -31,3 +31,6 @@ Revision history for MooX-LazierAttributes
 0.15   26/03/2017
         - Fix for 00-load.t failing test reports.
 
+1.02   18/09/2017
+		- Fix the I do not have Moose installed test
+

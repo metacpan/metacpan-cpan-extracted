@@ -1,5 +1,13 @@
 Revision history for JPList
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.04
+		DBI Test case dependency fixed	
+0.04
+		Makefile and Meta changes to fix Failed tests on netbsd
+0.03
+		Makefile and Meta changes to fix Failed tests
+0.02	
+		Makefile and Meta changes to fix Failed tests
+0.01    
+        JPList First version, released
 

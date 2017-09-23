@@ -7,14 +7,14 @@
 # or service marks of their respective holders.
 
 package WWW::Dict::Leo::Org;
-$WWW::Dict::Leo::Org::VERSION = "2.00";
+$WWW::Dict::Leo::Org::VERSION = "2.02";
 
 use strict;
 use warnings;
 use English '-no_match_vars';
 use Carp::Heavy;
 use Carp;
-use IO::Socket;
+use IO::Socket::SSL;
 use MIME::Base64;
 use XML::Simple;
 use Encode;
@@ -27,7 +27,7 @@ sub new {
 
   my %settings        = (
                          "-Host"           => "dict.leo.org",
-                         "-Port"           => 80,
+                         "-Port"           => 443,
                          "-UserAgent"      => "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0",
                          "-Proxy"          => "",
                          "-ProxyUser"      => "",
@@ -148,10 +148,11 @@ sub translate {
     $url = "/dictQuery/m-vocab/$lang{speak}/query.xml";
   }
 
-  my $conn = new IO::Socket::INET(
-                                  Proto    => "tcp",
+  my $conn = new IO::Socket::SSL(
+                                 #Proto    => "tcp",
                                   PeerAddr => $ip,
-                                  PeerPort => $port,
+                                 PeerPort => $port,
+                                 SSL_verify_mode => SSL_VERIFY_NONE
                                  ) or die "Unable to connect to $ip:$port: $!\n";
   $conn->autoflush(1);
 
@@ -293,9 +294,9 @@ sub form {
 }
 
 sub debug {
-  my($this, $msg) = @_;
+  my($this, @msg) = @_;
   if ($this->{"-Debug"}) {
-    print STDERR "%DEBUG: $msg\n";
+    print STDERR "%DEBUG: " . join(" ", @msg) . "\n";
   }
 }
 
@@ -393,6 +394,7 @@ Valid country codes:
 
  en    english
  es    spanish
+ fr    french
  ru    russian
  pt    portuguese
  pl    polish
@@ -493,6 +495,6 @@ Please don't forget to add debugging output!
 
 =head1 VERSION
 
-  2.00
+  2.01
 
 =cut

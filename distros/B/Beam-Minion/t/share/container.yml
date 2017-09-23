@@ -6,3 +6,9 @@ failure:
     $class: Local::Service
     exit_code: 1
 
+exception:
+    $class: Local::Failing
+    exception: Foo
+
+consfail:
+    $class: Local::Required

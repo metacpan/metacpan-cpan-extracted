@@ -67,7 +67,7 @@ my %attr_list = $attr->hash( three => 'ahhhh' );
 is_deeply(\%attr_list, { one => 'Hello World', two => 'Goodbye World', three=>  'ahhhh' }, "list returns 3 key/value pairs");
 
 eval { $attr->hash };
-my $errors = $@;
+$errors = $@;
 like( $errors, qr/Missing required parameter/, "a list fails");
 
 done_testing();

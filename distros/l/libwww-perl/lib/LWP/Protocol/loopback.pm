@@ -1,5 +1,5 @@
 package LWP::Protocol::loopback;
-$LWP::Protocol::loopback::VERSION = '6.26';
+$LWP::Protocol::loopback::VERSION = '6.27';
 use strict;
 require HTTP::Response;
 

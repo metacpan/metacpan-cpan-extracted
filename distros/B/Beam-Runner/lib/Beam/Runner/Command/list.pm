@@ -1,5 +1,5 @@
 package Beam::Runner::Command::list;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: List the available containers and services
 
 #pod =head1 SYNOPSIS
@@ -29,15 +29,13 @@ use List::Util qw( any max );
 use Path::Tiny qw( path );
 use Module::Runtime qw( use_module );
 use Beam::Wire;
-use Beam::Runner::Util qw( find_container_path );
+use Beam::Runner::Util qw( find_container_path find_containers );
 use Pod::Find qw( pod_where );
 use Pod::Simple::SimpleTree;
 use Term::ANSIColor qw( color );
 
 # The extensions to remove to show the container's name
 my @EXTS = grep { $_ } @Beam::Runner::Util::EXTS;
-# A regex to use to remove the container's name
-my $EXT_RE = qr/(?:@{[ join '|', @EXTS ]})$/;
 
 #pod =method run
 #pod
@@ -78,19 +76,7 @@ sub _list_containers {
     die "Cannot list containers: BEAM_PATH environment variable not set\n"
         unless $ENV{BEAM_PATH};
 
-    my %containers;
-    for my $dir ( split /:/, $ENV{BEAM_PATH} ) {
-        my $p = path( $dir );
-        my $i = $p->iterator( { recurse => 1, follow_symlinks => 1 } );
-        while ( my $file = $i->() ) {
-            next unless $file->is_file;
-            next unless $file =~ $EXT_RE;
-            my $name = $file->relative( $p );
-            $name =~ s/$EXT_RE//;
-            $containers{ $name } ||= $file;
-        }
-    }
-
+    my %containers = find_containers();
     my @container_names = sort keys %containers;
     my $printed = 0;
     for my $i ( 0..$#container_names ) {
@@ -231,7 +217,7 @@ Beam::Runner::Command::list - List the available containers and services
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

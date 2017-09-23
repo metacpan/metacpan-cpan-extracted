@@ -1,5 +1,14 @@
 Revision history for Perl extension ObjectDB
 
+3.23 2017-09-16T10:13:49Z
+
+    - use the same connection for insert and auto_increment
+    - do not set not nullable columns on undef
+    - correctly discover that a column is nullable
+    - travis no sudo
+    - do not reuse merged var name
+    - remove unused method in test
+
 3.22 2017-09-06T19:00:47Z
 
     [META]

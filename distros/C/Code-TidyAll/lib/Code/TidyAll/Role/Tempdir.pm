@@ -4,13 +4,25 @@ use strict;
 use warnings;
 
 use Path::Tiny qw(tempdir);
+use Specio::Library::Builtins;
+use Specio::Library::Path::Tiny;
 
 use Moo::Role;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-has '_tempdir'   => ( is => 'ro', lazy => 1, builder => 1 );
-has 'no_cleanup' => ( is => 'ro', default => 0 );
+has _tempdir => (
+    is      => 'ro',
+    isa     => t('Dir'),
+    lazy    => 1,
+    builder => 1,
+);
+
+has no_cleanup => (
+    is      => 'ro',
+    isa     => t('Bool'),
+    default => 0,
+);
 
 sub _build__tempdir {
     my ($self) = @_;
@@ -37,7 +49,7 @@ classes
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 

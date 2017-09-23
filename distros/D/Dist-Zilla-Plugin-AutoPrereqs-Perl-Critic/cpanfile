@@ -12,6 +12,7 @@ requires "warnings" => "0";
 on 'test' => sub {
   requires "Test::DZil" => "0";
   requires "Test::Fatal" => "0";
+  requires "Test::MockModule" => "0";
   requires "Test::More" => "0";
   requires "lib" => "0";
   requires "perl" => "5.006";

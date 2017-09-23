@@ -7,15 +7,14 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 our (%HELP, @MAYBE, $caller, $destruct);
-
 BEGIN {
 	%HELP = (
 		arrayref => sub { return map { $_[0]->($_, $_[2]) } @{ $_[1] } },
-		hashref => sub { grep { $caller->can('filter_keys') && $caller->filter_keys($_[1]->{$_}, $_) ? 0 
-			: $destruct ? ($_[0]->($_) => $_[0]->($_[1]->{$_}, $_[2])) : do { $_[1]->{$_} = $_[0]->($_[1]->{$_}, $_[2]) } } keys %{ $_[1] }; },
-		scalarref => sub { $$_[1] =~ m/1|0/ ? $_[1] : $_[0]->($$_[1]) },
+		hashref => sub { $caller->can('filter_keys') && $caller->filter_keys($_[1]->{$_}, $_) and next or 
+			$destruct && do { $_[3]{$_[0]->($_)} = $_[0]->($_[1]->{$_}, $_[2]) } || do { $_[1]->{$_} = $_[0]->($_[1]->{$_}, $_[2]) } for keys %{ $_[1] }; $_[3]; },
+		scalarref => sub { ${$_[1]} =~ m/^[0-9.]+$/g ? $_[1] : do { ${$_[1]} =~ s/^(.*)$/$_[0]->(${$_[1]})/e; $_[1]; } && $destruct ? ${$_[1]} : $_[1]; }, 
 		scalar => sub { eval { $_[1] = $_[0]->($_, $_[1], Encode::FB_CROAK); 1; } and last foreach @MAYBE; $_[1]; }
 	);
 }
@@ -24,7 +23,7 @@ sub import {
 	my ($pkg) = shift;
 	return unless my @export = @_;
 	my $opts = ref $export[scalar @export - 1] ? pop @export : ['UTF-8'];
-	@MAYBE = ref $opts eq 'HASH' ? do { $destruct = $opts->{destuct}; @{ $opts->{type} } } : @{ $opts };
+	@MAYBE = ref $opts eq 'HASH' ? do { $destruct = $opts->{destruct}; @{ $opts->{type} } } : @{ $opts };
 	@export = qw/maybe_decode maybe_encode/ if scalar @export == 1 && $export[0] eq 'all';
 	$caller = scalar caller();
 	{
@@ -49,18 +48,12 @@ sub _maybe {
 
 sub _recurse {
 	my $addr = refaddr $_[0];
-	return $_[0] if $_[3]->{$addr};
-	$_[3]->{$addr} = 1;
-	$_[1] eq 'SCALAR' ? $HELP{scalarref}->($_[2], $_[0]) : $_[1] eq 'ARRAY' 
-		? $HELP{arrayref}->($_[2], $_[0], $_[3]) : $_[1] eq 'HASH' ? $HELP{hashref}->($_[2], $_[0], $_[3]) : '*\o/*';
-	return $_[0];
+	return defined $_[3]->{$addr} ? $_[0] : do { $_[3]->{$addr} = 1 } && $_[1] eq 'SCALAR' ? $HELP{scalarref}->($_[2], $_[0]) : $_[1] eq 'ARRAY'
+		? $HELP{arrayref}->($_[2], $_[0], $_[3]) && $_[0] : $_[1] eq 'HASH' ? $HELP{hashref}->($_[2], $_[0], $_[3], 1) && $_[0] : $_[0];
 }
 
 sub _d_recurse {
-	return $HELP{scalarref}->($_[2], $_[0]) if ( $_[1] eq 'SCALAR' );
-	return [ $HELP{arrayref}->($_[2], $_[0]) ] if ($_[1] eq 'ARRAY');
-	return { $HELP{hashref}->($_[2], $_[0]) } if ($_[1] eq 'HASH');
-	return $_[0];
+	return $_[1] eq 'SCALAR' ?  $HELP{scalarref}->($_[2], $_[0]) : $_[1] eq 'ARRAY' ? [ $HELP{arrayref}->($_[2], $_[0]) ] : $_[1] eq 'HASH' ? $HELP{hashref}->($_[2], $_[0], {}) : $_[0];
 }
 
 1;
@@ -73,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =cut
 

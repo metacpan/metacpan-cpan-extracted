@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.108';
+$Config::Model::BackendMgr::VERSION = '2.110';
 use Mouse;
 use strict;
 use warnings;
@@ -218,7 +218,7 @@ sub load_backend_class {
     $f =~ s/_(\w)/uc($1)/ge;
     $c{$k} = $f;
 
-    foreach my $c ( keys %c ) {
+    foreach my $c ( sort keys %c ) {
         if ( $c->can($function) ) {
 
             # no need to load class
@@ -229,7 +229,7 @@ sub load_backend_class {
 
     # look for file to load
     my $class_to_load;
-    foreach my $c ( keys %c ) {
+    foreach my $c ( sort keys %c ) {
         $logger->trace("load_backend_class: looking to load class $c");
         foreach my $prefix (@INC) {
             my $realfilename = "$prefix/$c{$c}";
@@ -254,18 +254,12 @@ sub read_config_data {
 
     $logger->trace( "called for node ", $self->node->location );
 
-    my $readlist_orig        = delete $args{read_config};
+    my $readlist_orig        = delete $args{rw_config};
     my $check                = delete $args{check};
-    my $r_dir                = delete $args{read_config_dir};
     my $config_file_override = delete $args{config_file};
     my $auto_create_override = delete $args{auto_create};
 
     croak "unexpected args " . join( ' ', keys %args ) . "\n" if %args;
-
-    # r_dir is obsolete
-    if ( defined $r_dir ) {
-        die $self->node->config_class_name, " : read_config_dir is obsolete\n";
-    }
 
     my $readlist = dclone $readlist_orig ;
 
@@ -274,19 +268,25 @@ sub read_config_data {
     # root override is passed by the instance
     my $root_dir = $instance->read_root_dir || '';
 
-    croak "readlist must be array or hash ref\n"
-        unless ref $readlist;
+    my @list;
+    if (ref  $readlist eq 'ARRAY') {
+        say "Multiple backends are deprecated (read_config)" if @$readlist > 1;
+        @list = @$readlist ;
+    }
+    elsif (ref  $readlist eq 'HASH') {
+        @list = ($readlist);
+    }
+    else {
+        croak "readlist must be a hash ref\n" unless ref $readlist;
+    }
 
-    my @list = ref $readlist eq 'ARRAY' ? @$readlist : ($readlist);
     my $pref_backend = $instance->backend || '';
     my $read_done    = 0;
     my $auto_create  = 0;
     my @tried;
 
     foreach my $read (@list) {
-        warn $self->config_class_name, " deprecated 'syntax' parameter in backend\n"
-            if defined $read->{syntax};
-        my $backend = delete $read->{backend} || delete $read->{syntax} || 'custom';
+        my $backend = delete $read->{backend} || die "undefined read backend\n";
         if ( $backend =~ /^(perl|ini|cds)$/ ) {
             warn $self->config_class_name,
                 " deprecated  backend $backend. Should be '$ {backend}_file'\n";
@@ -338,7 +338,7 @@ sub read_config_sub_layer {
 
     Config::Model::Exception::Model->throw(
         error => "backend error: unexpected default_layer parameters: "
-            . join( ' ', keys %$layered_config ),
+            . join( ' ', sort keys %$layered_config ),
         object => $self->node,
     ) if %$layered_config;
 
@@ -409,29 +409,9 @@ sub try_read_backend {
         };
         $error = $@;
     }
-    elsif ( $backend eq 'perl_file' ) {
-        my ($file_ok, $fh);
-        ( $file_ok, $file_path ) = $self->get_cfg_file_path(@read_args, suffix => '.pl' );
-        return ( 0, $file_path ) if not $file_ok or not -r $file_path;
-        $fh = $self->open_read_file($backend, $file_path);
-        eval { $res = $self->read_perl( @read_args, file_path => $file_path, io_handle => $fh ); };
-        $error = $@;
-    }
-    elsif ( $backend eq 'cds_file' ) {
-        my ($file_ok, $fh);
-        ( $file_ok, $file_path ) = $self->get_cfg_file_path(@read_args, suffix => '.cds' );
-        return ( 0, $file_path ) if not $file_ok or not -r $file_path;
-        $fh = $self->open_read_file($backend, $file_path);
-        eval {
-            $res = $self->read_cds_file(
-                @read_args,
-                file_path => $file_path,
-                io_handle => $fh,
-            );
-        };
-        $error = $@;
-    }
     else {
+        warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
+            if $read->{function};
         # try to load a specific Backend class
         my $f = delete $read->{function} || 'read';
         my $c = load_backend_class( $backend, $f );
@@ -493,16 +473,10 @@ sub try_read_backend {
 
 sub auto_write_init {
     my ( $self, %args ) = @_;
-    my $wrlist_orig = delete $args{write_config};
-    my $w_dir       = delete $args{write_config_dir};
+    my $wrlist_orig = delete $args{rw_config};
 
-    croak "auto_write_init: unexpected args " . join( ' ', keys %args ) . "\n"
+    croak "auto_write_init: unexpected args " . join( ' ', sort keys %args ) . "\n"
         if %args;
-
-    # w_dir is obsolete
-    if ( defined $w_dir ) {
-        die $self->config_class_name, " : write_config_dir is obsolete\n";
-    }
 
     my $wrlist = dclone $wrlist_orig ;
 
@@ -511,7 +485,17 @@ sub auto_write_init {
     # root override is passed by the instance
     my $root_dir = $instance->write_root_dir || '';
 
-    my @array = ref $wrlist eq 'ARRAY' ? @$wrlist : ($wrlist);
+    my @array;
+    if (ref  $wrlist eq 'ARRAY') {
+        say "Multiple backends are deprecated (write_config)\n" if @$wrlist > 1;
+        @array = @$wrlist ;
+    }
+    elsif (ref  $wrlist eq 'HASH') {
+        @array = ($wrlist);
+    }
+    else {
+        croak "wrlist must be a hash ref\n" unless ref $wrlist;
+    }
 
     # ensure that one auto_create specified applies to all wr backends
     my $auto_create = 0;
@@ -522,9 +506,8 @@ sub auto_write_init {
 
     # provide a proper write back function
     foreach my $write (@array) {
-        warn $self->config_class_name, " deprecated 'syntax' parameter in auto_write\n"
-            if defined $write->{syntax};
-        my $backend = delete $write->{backend} || delete $write->{syntax} || 'custom';
+        my $backend = delete $write->{backend} || die "undefined write backend\n";;
+
         if ( $backend =~ /^(perl|ini|cds)$/ ) {
             warn $self->config_class_name,
                 " deprecated backend $backend. Should be '$ {backend}_file'\n";
@@ -543,6 +526,10 @@ sub auto_write_init {
             write       => 1,              # for get_cfg_file_path
             root        => $root_dir,      # override from instance
         );
+
+        # used bby C::M::Dumper and C::M::DumpAsData
+        # TODO: is this needed once multi backend are removed
+        $self->{auto_write}{$backend} = 1;
 
         my $wb;
         if ( $backend eq 'custom' ) {
@@ -575,44 +562,6 @@ sub auto_write_init {
                 $self->close_file_to_write( $error, $fh, $file_path, $write->{file_mode} );
                 return defined $res ? $res : $error ? 0 : 1;
             };
-            $self->{auto_write}{custom} = 1;
-        }
-        elsif ( $backend eq 'perl_file' ) {
-            $wb = sub {
-                $logger->debug( "write cb ($backend) called for ", $self->node->name );
-                my ( $file_ok, $file_path, $fh ) =
-                    $self->open_file_to_write( $backend, suffix => '.pl', @wr_args, @_ );
-                my $res;
-                $res = eval {
-                    $self->write_perl( @wr_args, io_handle => $fh, file_path => $file_path, @_ );
-                };
-                my $error = $@;
-                $logger->warn("write backend $backend failed: $error") if $error;
-                $self->close_file_to_write( $error, $fh, $file_path, $write->{file_mode} );
-                return defined $res ? $res : $error ? 0 : 1;
-            };
-            $self->{auto_write}{perl_file} = 1;
-        }
-        elsif ( $backend eq 'cds_file' ) {
-            $wb = sub {
-                $logger->debug( "write cb ($backend) called for ", $self->node->name );
-                my ( $file_ok, $file_path, $fh ) =
-                    $self->open_file_to_write( $backend, suffix => '.cds', @wr_args, @_ );
-                my $res;
-                $res = eval {
-                    $self->write_cds_file(
-                        @wr_args,
-                        io_handle => $fh,
-                        file_path => $file_path,
-                        @_
-                    );
-                };
-                my $error = $@;
-                $logger->warn("write backend $backend failed: $error") if $error;
-                $self->close_file_to_write( $error, $fh, $file_path, $write->{file_mode} );
-                return defined $res ? $res : $error ? 0 : 1;
-            };
-            $self->{auto_write}{cds_file} = 1;
         }
         else {
             my $f = $write->{function} || 'write';
@@ -749,57 +698,6 @@ sub is_auto_write_for_type {
     return $self->{auto_write}{$type} || 0;
 }
 
-sub read_cds_file {
-    my $self = shift;
-    my %args = @_;
-
-    my $file_path = $args{file_path};
-    $logger->info("Read cds data from $file_path");
-
-    $self->node->load( step => [ $args{io_handle}->getlines ] );
-    return 1;
-}
-
-# TODO: replace with class based on Config::Model::Backend::Any
-sub write_cds_file {
-    my $self      = shift;
-    my %args      = @_;
-    my $file_path = $args{file_path};
-    $logger->info("Write cds data to $file_path");
-
-    my $dump = $self->node->dump_tree( skip_auto_write => 'cds_file', check => $args{check} );
-    $args{io_handle}->print($dump);
-    return 1;
-}
-
-# TODO: replace with class based on Config::Model::Backend::Any
-sub read_perl {
-    my $self = shift;
-    my %args = @_;
-
-    my $file_path = $args{file_path};
-    $file_path = "./$file_path" unless $file_path =~ m!^\.?/!;
-    $logger->info("Read Perl data from $file_path");
-
-    my $pdata = do $file_path || die "Cannot open $file_path:$!";
-    $self->node->load_data($pdata);
-    return 1;
-}
-
-sub write_perl {
-    my $self      = shift;
-    my %args      = @_;
-    my $file_path = $args{file_path};
-    $logger->info("Write perl data to $file_path");
-
-    my $p_data = $self->node->dump_as_data( skip_auto_write => 'perl_file', check => $args{check} );
-    my $dumper = Data::Dumper->new( [$p_data] );
-    $dumper->Terse(1);
-
-    $args{io_handle}->print( $dumper->Dump, ";\n" );
-    return 1;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -818,7 +716,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -840,8 +738,8 @@ version 2.108
  $model->create_config_class(
     name => "MyClass",
 
-    # read_config spec is used by Config::Model::BackendMgr
-    read_config => [
+    # rw_config spec is used by Config::Model::BackendMgr
+    rw_config => [
         {
             backend     => 'yaml',
             config_dir  => '/tmp/',
@@ -919,7 +817,7 @@ L<Config::Model::Loader/"load string syntax">.
 =item *
 
 C<perl_file>: Perl data structure (perl) in a file. See L<Config::Model::DumpAsData>
-for details on the data structure.
+for details on the data structure. Now handled by L<Config::Model::Backend::PerlFile>
 
 =item * 
 
@@ -937,12 +835,12 @@ L<Config::Model::Instance>) to store back all configuration information.
 
 The backend specification is provided as an attribute of a
 L<Config::Model::Node> specification. These attributes are optional:
-A node without C<read_config> attribute must rely on another node for
-its data to be read and saved.
+A node without C<rw_config> attribute must rely on another node to
+read or save its data.
 
 When needed (usually for the root node), the configuration class is
-declared with a C<read_config> parameter. This parameter is a list
-of possible backend. Usually, only one read backend is needed.
+declared with a C<rw_config> parameter which specifies the read/write
+backend configuration.
 
 =head2 Parameters available for all backends
 
@@ -1024,18 +922,15 @@ By default, an exception is thrown if no read was
 successful. This behavior can be overridden by specifying
 C<< auto_create => 1 >> in one of the backend specification. For instance:
 
-    read_config  => [ {
+    rw_config  => {
         backend => 'IniFile',
         config_dir => '/tmp',
         file  => 'foo.conf',
         auto_create => 1
-    } ],
+    },
 
 Setting C<auto_create> to 1 is necessary to create a configuration
 from scratch
-
-When C<auto_create> is set in write backend, missing directory and
-files are created with current umask. Default is false.
 
 =item auto_delete
 
@@ -1050,11 +945,11 @@ in their documentation.
 
 For instance:
 
-   read_config => [{
+   rw_config => {
        backend     => 'yaml',
        config_dir  => '/tmp/',
        file        => 'my_class.yml',
-   }],
+   },
 
 See L<Config::Model::Backend::Yaml> for more details for this backend.
 
@@ -1064,129 +959,9 @@ You can also write a dedicated backend. See
 L<How to write your own backend|Config::Model::Backend::Any/"How to write your own backend">
 for details.
 
-=head2 Built-in backend
-
-C<cds_file> and C<perl_file> backend must be specified with
-mandatory C<config_dir> parameter. For instance:
-
-   read_config  => { 
-       backend    => 'cds_file' , 
-       config_dir => '/etc/cfg_dir',
-       file       => 'cfg_file.cds', #optional
-   },
-
-When C<file> is not specified, a file name is constructed with
-C<< <instance_name>.<suffix> >> where suffix is C<pl> or C<cds>.
-
 =head2 Custom backend
 
-Custom backend is provided to be backward compatible but should not be used
-for new project.
-L<Writing your own backend|Config::Model::Backend::Any/"How to write your own backend">
-is preferred.
-
-Custom backend must be specified with a class name that features the
-methods used to write and read the configuration files:
-
-  read_config  => [ {
-      backend    => 'custom' ,
-      class      => 'MyRead',
-      function   => 'read_it",  # optional, defaults to 'read'
-      config_dir => '/etc/foo', # optional
-      file       => 'foo.conf', # optional
-  } ]
-
-C<custom> backend parameters are:
-
-=over
-
-=item class
-
-Specify the class that contains the read methods
-
-=item function
-
-Function name that is called back to read the file.
-See L</"read callback"> for details. (default is C<read>)
-
-=item file
-
-optional. Configuration file. This parameter may not apply if the
-configuration is stored in several files. By default, the instance name
-is used as configuration file name.
-
-=back
-
-Most of the times, there's no need to create a write specification:
-the read specification is enough for this module to write back the
-configuration file. 
-
-The write method must be specified if the writer class is not the same as the
-reader class or if the writer method is not C<write>:
-
-  write_config  => [ {
-      backend    => 'custom' ,
-      class      => 'MyWrite',
-      function   => 'write_it", # optional, defaults to 'read'
-      config_dir => '/etc/foo', # optional
-      file       => 'foo.conf', # optional
-  } ]
-
-Read callback function is called with these parameters:
-
-  object     => $obj,         # Config::Model::Node object 
-  root       => './my_test',  # fake root directory, used for tests
-  config_dir => /etc/foo',    # absolute path 
-  file       => 'foo.conf',   # file name
-  file_path  => './my_test/etc/foo/foo.conf' 
-  io_handle  => $io           # IO::File object with binmode :utf8
-  check      => [yes|no|skip]
-
-The L<IO::File> object is undef if the file cannot be read.
-
-The callback must return 0 on failure and 1 on successful read.
-
-Write callback function is called with these parameters:
-
-  object      => $obj,         # Config::Model::Node object 
-  root        => './my_test',  # fake root directory, used for tests
-  config_dir  => /etc/foo',    # absolute path
-  file        => 'foo.conf',   # file name
-  file_path  => './my_test/etc/foo/foo.conf' 
-  io_handle   => $io           # IO::File object opened in write mode 
-                               # with binmode :utf8
-  auto_create => 1             # create dir as needed
-  check      => [yes|no|skip]
-
-The L<IO::File> object is undef if the file cannot be written to.
-
-The callback must return 0 on failure and 1 on successful write.
-
-=head1 Using backend to change configuration file syntax
-
-C<read_config> tries all the specified backends. This feature 
-can be used to migrate from one syntax to another.
-
-In this example, backend manager first tries to read an INI file
-and then to read a YAML file:
-
-  read_config  => [ 
-    { backend => 'IniFile', ... },
-    { backend => 'yaml',    ... },
-  ],
-
-When a read operation is successful, the remaining read methods are
-skipped.
-
-Likewise, the C<write_config> specification accepts several backends.
-By default, the specifications are tried in order, until the first succeeds.
-
-In the example above, the migration from INI to YAML can be achieved
-by specifying only the YAML backend:
-
-  write_config => [
-    { backend => 'yaml',    ... },
-  ],
+Custom backend is now deprecated and will soon be removed.
 
 =head1 Test setup
 
@@ -1204,7 +979,7 @@ configuration file.
 
 If this behavior causes problem (e.g. with augeas backend), the
 solution is either to set C<file> to undef or an empty string in the
-C<write_config> specification.
+C<rw_config> specification.
 
 =head1 Methods
 

@@ -1,0 +1,10 @@
+Revision history for Perl extension Teamcity-Executor
+
+0.1.1 2017-09-20T12:42:01Z
+    - make work with perl 5.20+
+    - minor fix in SYNOPSIS
+
+0.1.0 2017-09-19T12:20:24Z
+
+    - original version
+

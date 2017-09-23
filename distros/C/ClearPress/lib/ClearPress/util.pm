@@ -16,7 +16,7 @@ use CGI;
 use IO::Capture::Stderr;
 use Data::UUID;
 
-our $VERSION = q[476.1.1];
+our $VERSION = q[476.4.2];
 our $DEBUG_UTIL           = 0;
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
@@ -173,7 +173,7 @@ sub driver {
     my $drivername = $config->val($dbsection, 'driver') || $DEFAULT_DRIVER;
     my $ref        = {};
 
-    for my $field (qw(dbname dbhost dbport dbuser dbpass)) {
+    for my $field (qw(dbname dbhost dbport dbuser dbpass dsn_opts)) {
       $ref->{$field} = $self->$field()
     }
 
@@ -215,7 +215,7 @@ sub db_credentials {
   my $dbsection = $self->dbsection();
   my $ref       = {};
 
-  for my $field (qw(dbuser dbpass dbhost dbport dbname)) {
+  for my $field (qw(dbuser dbpass dbhost dbport dbname dsn_opts)) {
     $ref->{$field} = $cfg->val($dbsection, $field);
   }
 
@@ -245,6 +245,11 @@ sub dbhost {
 sub dbport {
   my $self = shift;
   return $self->db_credentials->{dbport};
+}
+
+sub dsn_opts {
+  my $self = shift;
+  return $self->db_credentials->{dsn_opts};
 }
 
 END {
@@ -388,6 +393,10 @@ $Revision: 470 $
 =head2 dbport - database port from db_credentials
 
   my $sDBPort = $oUtil->dbport();
+
+=head2 dsn_opts - database dsn settings from db_credentials
+
+  my $sDBDSNOptions = $oUtil->dsn_opts();
 
 =head1 DIAGNOSTICS
 

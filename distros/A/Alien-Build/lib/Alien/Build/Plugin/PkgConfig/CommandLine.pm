@@ -6,12 +6,15 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 has '+pkg_name' => sub {
   Carp::croak "pkg_name is a required property";
 };
+
+# NOT used, for compat with other PkgConfig plugins
+has register_prereqs => 1;
 
 sub _bin_name {
 
@@ -149,7 +152,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

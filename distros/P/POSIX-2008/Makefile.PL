@@ -38,6 +38,7 @@ mode_t    T_UV
 id_t      T_UV
 int *     T_OPAQUEPTR
 nl_catd   T_PTR
+timer_t   T_PTR
 SysRet0   T_SYSRET0
 FILE *    T_STDIO
 psx_fd_t  T_PSX_FD
@@ -51,7 +52,7 @@ T_PSX_FD
 
 OUTPUT
 T_SYSRET0
-    if (\$var != -1)
+    if (\$var >= 0)
       sv_setiv(\$arg, (IV)\$var);
 
 EOTM

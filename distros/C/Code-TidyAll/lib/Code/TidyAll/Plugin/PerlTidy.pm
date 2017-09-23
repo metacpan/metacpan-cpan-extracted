@@ -10,7 +10,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
 sub transform_source {
     my ( $self, $source ) = @_;
@@ -61,7 +61,7 @@ Code::TidyAll::Plugin::PerlTidy - Use perltidy with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -91,13 +91,11 @@ Install perltidy from CPAN.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to perltidy
-
-=back
+Arguments to pass to C<perltidy>.
 
 =head1 SUPPORT
 

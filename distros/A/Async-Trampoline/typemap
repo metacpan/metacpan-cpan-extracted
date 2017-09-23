@@ -1,0 +1,34 @@
+TYPEMAP
+Async_Trampoline_Scheduler* T_ASYNC_TRAMPOLINE_SCHEDULER
+Async*                      T_ASYNC_TRAMPOLINE
+
+INPUT
+
+T_ASYNC_TRAMPOLINE_SCHEDULER
+    if (sv_isa($arg, \"Async::Trampoline::Scheduler\"))
+    {
+        $var = (Async_Trampoline_Scheduler*) SvIV(SvRV($arg));
+    }
+    else
+    {
+        croak(\"$arg must be Async::Trampoline::Scheduler instance\");
+    }
+
+T_ASYNC_TRAMPOLINE
+    if (sv_isa($arg, \"Async::Trampoline\"))
+    {
+        $var = (Async*) SvIV(SvRV($arg));
+    }
+    else
+    {
+        croak(\"$arg must be Async::Trampoline instance\");
+    }
+
+
+OUTPUT
+
+T_ASYNC_TRAMPOLINE_SCHEDULER
+    sv_setref_pv($arg, \"Async::Trampoline::Scheduler\", (void*) $var);
+
+T_ASYNC_TRAMPOLINE
+    sv_setref_pv($arg, \"Async::Trampoline\", (void*) $var);

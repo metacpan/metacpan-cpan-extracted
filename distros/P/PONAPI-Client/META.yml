@@ -29,11 +29,12 @@ requires:
   JSON::MaybeXS: '0'
   Moose: '0'
   URI: '0'
+  YAHC: '0'
   parent: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/mickeyn/PONAPI/tree/master/Client
-version: '0.002008'
+version: '0.002009'
 x_serialization_backend: 'YAML::Tiny version 1.69'

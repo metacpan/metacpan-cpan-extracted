@@ -2,7 +2,7 @@ package HTML::SocialMeta::Base;
 use Moo;
 use Carp;
 
-our $VERSION = '0.71';
+our $VERSION = '0.73';
 
 use MooX::LazierAttributes qw/rw ro lzy/;
 use MooX::ValidateSubs;
@@ -11,7 +11,8 @@ use Types::Standard qw/Str HashRef/;
 attributes(
     [qw(card_type card type name url)] => [ rw, Str, {lzy} ],
     [qw(site fb_app_id site_name title description image creator operatingSystem app_country
-    app_name app_id app_url player player_height player_width)] => [ Str, {lzy} ],
+    app_name app_id app_url player player_height player_width)] => [Str],
+    [qw(image_alt)] => [ Str, {lzy} ],
     [qw(card_options build_fields)] => [HashRef,{default => sub { {} }}],
     [qw(meta_attribute meta_namespace)] => [ro],
 );
@@ -63,8 +64,8 @@ sub _validate_field_value {
 
 sub _generate_meta_tag {
 
-    # fields that don't start with app or player generate a single tag
-    $_[1] !~ m{^app|player|fb}xms
+    # fields that don't start with app, player, or image generate a single tag
+    $_[1] !~ m{^app|player|fb|image}xms
       and return $_[0]->_build_field( { field => $_[1] } );
     return
       map { $_[0]->_build_field( { field => $_[1], %{$_} } ) }
@@ -72,14 +73,14 @@ sub _generate_meta_tag {
 }
 
 sub _build_field {
-    return sprintf q{<meta %s="%s:%s" content="%s"/>}, $_[0]->meta_attribute,
+	return sprintf q{<meta %s="%s:%s" content="%s"/>}, $_[0]->meta_attribute,
       ( $_[1]->{ignore_meta_namespace} // $_[0]->meta_namespace ),
       ( defined $_[1]->{field_type} ? $_[1]->{field_type} : $_[1]->{field} ),
-      $_[0]->{ $_[1]->{field} };
+      $_[0]->{$_[1]->{field}};
 }
 
 sub _convert_field {
-    $_[1] =~ tr/_/:/;
+    $_[1] =~ s/_/:/g;
     return $_[0]->provider_convert( $_[1] );
 }
 
@@ -112,26 +113,27 @@ builds and returns the Meta Tags
 
 =head1 VERSION
 
-Version 0.71
+Version 0.73
 
 =cut
 
 =head1 SYNOPSIS
 
     use HTML::SocialMeta;
-    # summary or featured image 
+    # summary or featured image
     my $social = HTML::SocialMeta->new(
         site => '',
         site_name => '',
         title => '',
         description => '',
         image   => '',
+        image_alt => '',
         url  => '',  # optional
         ... => '',
         ... => '',
     );
 
-    # returns meta tags for all providers   
+    # returns meta tags for all providers
     # 'summary', 'featured_image', 'app', 'player'
     my $meta_tags = $social->create('summary');
 

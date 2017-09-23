@@ -39,6 +39,8 @@ subtest 'discover schema' => sub {
               bool_no_default
               bool_default_false
               bool_default_true
+              not_nullable
+              nullable
               /
         ]
     );
@@ -55,6 +57,9 @@ subtest 'discover schema' => sub {
     is(MyTable->new->get_column('bool_no_default'), undef);
     ok(!MyTable->new->get_column('bool_default_false'));
     ok(MyTable->new->get_column('bool_default_true'));
+
+    ok !( MyTable->meta->is_nullable('not_nullable') );
+    ok( MyTable->meta->is_nullable('nullable') );
 };
 
 done_testing;

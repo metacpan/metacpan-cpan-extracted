@@ -4,7 +4,7 @@
       "Andrew Speer <andrew@webdyne.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "1.248",
+   "version" : "1.250",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

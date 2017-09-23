@@ -1,6 +1,6 @@
 package Catmandu::FileBag;
 
-our $VERSION = '1.0603';
+our $VERSION = '1.0605';
 
 use Catmandu::Sane;
 use IO::String;
@@ -74,13 +74,14 @@ Catmandu::FileBag - A Catmandu::FileStore compartment to persist binary data
     $files->upload(IO::File->new('<foobar.txt'), 'foobar.txt');
 
     # Stream the contents of a file
-    $files->stream(IO::File->new('>foobar.txt'), 'foobar.txt');
+    my $file = $files->get('foobar.txt');
+    $files->stream(IO::File->new('>foobar.txt'), $file);
 
     # Delete a file
     $files->delete('foobar.txt');
 
     # Delete a folder
-    $store->bag->delete('1234');
+    $store->index->delete('1234');
 
 
 =head1 DESCRIPTION
@@ -91,12 +92,13 @@ Each L<Catmandu::FileBag> is a L<Catmandu::Bag> and inherits all its methods.
 
 =head2 upload($io, $file_name)
 
-An helper application to add an IO::Handle $io to the L<Catmandu::FileBag>
+An helper application to add an IO::Handle $io to the L<Catmandu::FileBag>. Returns
+the number of bytes written.
 
 =head2 stream($io, $file)
 
 A helper application to stream the contents of a L<Catmandu::FileBag> item
-to an IO::Handle.
+to an IO::Handle. Returns the nuber of bytes written.
 
 =head2 as_string($file)
 

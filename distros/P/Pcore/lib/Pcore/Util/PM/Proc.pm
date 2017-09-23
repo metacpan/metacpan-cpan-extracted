@@ -28,8 +28,7 @@ has stderr => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg =>
 
 has _on_finish => ( is => 'ro', isa => Maybe [CodeRef], init_arg => undef );                 # on_finish callback
 has _win32_proc => ( is => 'ro', isa => InstanceOf ['Win32::Process'], init_arg => undef );  # MSWIN process descriptor
-has _sigchild    => ( is => 'ro', isa => Object, init_arg => undef );
-has _blocking_cv => ( is => 'ro', isa => Object, init_arg => undef );
+has _sigchild => ( is => 'ro', isa => Object, init_arg => undef );
 
 our $CACHE = {};
 
@@ -68,7 +67,7 @@ sub DEMOLISH ( $self, $global ) {
 around new => sub ( $orig, $self, $cmd, @ ) {
     $cmd = [$cmd] if !ref $cmd;
 
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
+    my $blocking = defined wantarray;
 
     my %args = (
         stdin                  => 0,
@@ -102,7 +101,7 @@ around new => sub ( $orig, $self, $cmd, @ ) {
 
         $args{on_finish}->($proc) if $args{on_finish};
 
-        if ($blocking_cv) {
+        if ($blocking) {
             return $proc;
         }
         else {
@@ -111,21 +110,39 @@ around new => sub ( $orig, $self, $cmd, @ ) {
     }
 
     # store proc attributes
-    $proc->{_on_finish}   = $args{on_finish};
-    $proc->{_blocking_cv} = $blocking_cv;
+    $proc->{_on_finish} = $args{on_finish};
 
     # create and store AE handles
     $proc->_create_handles($hdl);
 
     # create and start SIGCHILD listener
-    $proc->_create_sigchild( $args{win32_alive_timeout} );
+    $proc->_create_sigchild( $args{win32_alive_timeout} ) if !$blocking;
 
     # call on_ready callback if present
     $args{on_ready}->($proc) if $args{on_ready};
 
-    $CACHE->{ $proc->{pid} } = $proc if !$blocking_cv && refcount($proc) == 1;
+    $CACHE->{ $proc->{pid} } = $proc if !$blocking && refcount($proc) == 1;
 
-    return $blocking_cv ? $blocking_cv->recv : ();
+    if ($blocking) {
+        if ($MSWIN) {
+
+            # blocking wait
+            $proc->{_win32_proc}->Wait( Win32::Process::INFINITE() );
+
+            $proc->{_win32_proc}->GetExitCode( my $status );
+
+            $proc->_on_exit($status);
+        }
+        else {
+
+            # blocking wait
+            waitpid $proc->{pid}, 0 or die;
+
+            $proc->_on_exit( $? >> 8 );
+        }
+    }
+
+    return $blocking ? $proc : ();
 };
 
 sub _redirect_std ( $self, $args ) {
@@ -328,10 +345,6 @@ sub _on_exit ( $self, $status ) {
         $on_finish->($self);
     }
 
-    if ( my $blocking_cv = delete $self->{_blocking_cv} ) {
-        $blocking_cv->send($self);
-    }
-
     return;
 }
 
@@ -342,7 +355,7 @@ sub _on_exit ( $self, $status ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (21)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (25)                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

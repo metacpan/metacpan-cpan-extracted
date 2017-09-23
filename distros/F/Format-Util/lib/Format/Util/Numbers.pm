@@ -20,7 +20,7 @@ Format::Util::Numbers - Miscellaneous routines to do with manipulating number fo
 
 =cut
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 =head1 SYNOPSIS
 

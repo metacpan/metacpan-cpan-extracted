@@ -1,3 +1,21 @@
+commit 333c07b7ba7315f8810bfac297ac785129fffca9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 15 23:41:42 2017 +0930
+
+    VERSION increment: 1.250
+
+commit 284ba9a9c0a89fdfd11115c20a8f90900704b7fd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 15 23:39:59 2017 +0930
+
+    VERSION increment: 1.249
+
+commit ded39a243292156bb8f896d6f1f521132b4a9fa8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 15 23:38:27 2017 +0930
+
+    Added support for HTML5 button element
+
 commit 0d052f784d4b67b545ae00bd505033aa14bb65d8
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Wed Sep 13 23:33:14 2017 +0930
@@ -113,18 +131,6 @@ Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Thu Dec 10 09:49:00 2015 +1030
 
     Mute LIST_CONTEXT_WARN warnings from CGI
-
-commit 32eed49b801e198ed65bd417710748900e00c87c
-Author: Andrew Speer <andrew.speer@isolutions.com.au>
-Date:   Tue Apr 28 23:25:12 2015 +0930
-
-    VERSION increment: 1.241
-
-commit 2e80b8c399faf78cd597d825991f9c917e2913a4
-Author: Andrew Speer <andrew.speer@isolutions.com.au>
-Date:   Tue Apr 28 23:24:46 2015 +0930
-
-    Fix failure with CGI 4.14 and above, fix CGI warning about param in list context, minor fix to way empty eval result checked
 
 commit 0ca01b925b1212f46c389d19fc21d6f92d781ea5
 Author: Andrew Speer <andrew.speer@isolutions.com.au>

@@ -23,7 +23,7 @@ sub decompress ( $self, % ) {
 
     syswrite $temp, $self->buffer->$* or die;
 
-    P->pm->run_proc( [ 'js-beautify', $js_beautify_args, '--replace', qq["$temp"] ], win32_create_no_window => 1 ) or die;
+    my $proc = P->pm->run_proc( qq[js-beautify $js_beautify_args --replace "$temp"], win32_create_no_window => 1 );
 
     $self->buffer->$* = P->file->read_bin( $temp->path )->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
@@ -110,7 +110,7 @@ sub run_js_hint ($self) {
 
     my $out_temp = $ENV->{TEMP_DIR} . 'tmp-jshint-' . int rand 99_999;
 
-    P->pm->run_proc( [ 'jshint', $js_hint_args, qq["$in_temp">], qq["$out_temp"] ], win32_create_no_window => 1 ) or 1;
+    my $proc = P->pm->run_proc( qq[jshint  $js_hint_args "$in_temp" > "$out_temp"], win32_create_no_window => 1 );
 
     $jshint_output = P->file->read_lines($out_temp);
 

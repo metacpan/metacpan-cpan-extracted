@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Formatter::Utils;
 
-$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.13';
+$Map::Tube::Plugin::Formatter::Utils::VERSION   = '0.14';
 $Map::Tube::Plugin::Formatter::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,9 @@ Map::Tube::Plugin::Formatter::Utils - Helper package for Map::Tube::Plugin::Form
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
-
-use vars qw(@ISA @EXPORT_OK);
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(xml get_data validate_object);
 
 use 5.006;
 use strict; use warnings;
@@ -25,6 +20,9 @@ use XML::Twig;
 use Map::Tube::Exception::MissingSupportedObject;
 use Map::Tube::Exception::InvalidSupportedObject;
 use Map::Tube::Exception::FoundUnsupportedObject;
+use parent 'Exporter';
+
+our @EXPORT_OK = qw(xml get_data validate_object);
 
 =head1 DESCRIPTION
 

@@ -215,13 +215,14 @@ my %allowed_methods = (
     OPTIONS => "",
 );
 
+my %options;
 
 # We make our own specialization of LWP::UserAgent that asks for
 # user/password if document is protected.
 {
 
     package RequestAgent;
-$RequestAgent::VERSION = '6.26';
+$RequestAgent::VERSION = '6.27';
 use strict;
     use warnings;
     use base qw(LWP::UserAgent);
@@ -234,8 +235,8 @@ use strict;
 
     sub get_basic_credentials {
         my ($self, $realm, $uri) = @_;
-        if ($main::options{'C'}) {
-            return split(':', $main::options{'C'}, 2);
+        if ($options{'C'}) {
+            return split(':', $options{'C'}, 2);
         }
         elsif (-t) {
             my $netloc = $uri->host_port;
@@ -261,7 +262,6 @@ my $method = uc(lc($progname) eq "lwp-request" ? "GET" : $progname);
 
 # Parse command line
 use Getopt::Long;
-my %options;
 my @getopt_args = (
     'a',       # content i/o in text(ascii) mode
     'm=s',     # set method
@@ -296,7 +296,7 @@ unless (GetOptions(\%options, @getopt_args)) {
 }
 if ($options{'v'}) {
     require LWP;
-    my $DISTNAME = 'libwww-perl-' . LWP::Version();
+    my $DISTNAME = 'libwww-perl-' . $LWP::VERSION;
     die <<"EOT";
 This is lwp-request version $LWP::VERSION ($DISTNAME)
 

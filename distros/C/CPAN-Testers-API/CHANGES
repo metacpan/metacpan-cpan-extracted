@@ -1,5 +1,12 @@
 Changelog for CPAN-Testers-API
 
+0.018     2017-09-17 18:13:46-05:00 America/Chicago
+
+    [Fixed]
+
+    - Processing jobs will now automatically be retried in case of
+      temporary errors.
+
 0.017     2017-08-22 20:50:30-05:00 America/Chicago
 
     [Fixed]

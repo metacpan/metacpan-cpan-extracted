@@ -1,18 +1,18 @@
 package Beam::Minion;
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 # ABSTRACT: A distributed task runner for Beam::Wire containers
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     # Command-line interface
 #pod     export BEAM_MINION=sqlite://test.db
-#pod     beam minion worker <container>...
+#pod     beam minion worker
 #pod     beam minion run <container> <service> [<args>...]
 #pod     beam minion help
 #pod
 #pod     # Perl interface
 #pod     local $ENV{BEAM_MINION} = 'sqlite://test.db';
-#pod     Beam::Minion->enqueue( $container, $service, @args );
+#pod     Beam::Minion->enqueue( $container, $service, \@args, \%opt );
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -65,9 +65,9 @@ our $VERSION = '0.006';
 #pod =head2 Start a Worker
 #pod
 #pod Once the C<BEAM_MINION> environment variable is set, you can start
-#pod a worker with C<< beam minion worker <container> >>. Each worker can run
-#pod jobs from one container, specified as the argument to the C<beam minion
-#pod worker> command. Each worker will run up to 4 jobs concurrently.
+#pod a worker with C<< beam minion worker >>. Each worker can run jobs from
+#pod all the containers it can find from the C<BEAM_PATH> environment
+#pod variable. Each worker will run up to 4 jobs concurrently.
 #pod
 #pod =head2 Spawn a Job
 #pod
@@ -93,17 +93,38 @@ use Beam::Minion::Util qw( minion );
 
 #pod =sub enqueue
 #pod
-#pod     Beam::Minion->enqueue( $container_name, $task_name, @args );
+#pod     Beam::Minion->enqueue( $container_name, $task_name, \@args, \%opt );
 #pod
 #pod Enqueue the task named C<$task_name> from the container named C<$container_name>.
 #pod The C<BEAM_MINION> environment variable must be set.
 #pod
+#pod C<\%opt> is a hash reference with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item attempts
+#pod
+#pod Number of times to retry this job if it fails. Defaults to C<1>.
+#pod
+#pod =item delay
+#pod
+#pod Time (in seconds) to delay this job (from now). Defaults to C<0>.
+#pod
+#pod =item priority
+#pod
+#pod The job priority. Higher priority jobs get performed first. Defaults to C<0>.
+#pod
+#pod =back
+#pod
+#pod (These are the same options allowed in L<the Minion "enqueue"
+#pod method|http://mojolicious.org/perldoc/Minion#enqueue1>)
+#pod
 #pod =cut
 
 sub enqueue {
-    my ( $class, $container, $task, @args ) = @_;
+    my ( $class, $container, $task, $args, $opt ) = @_;
     my $minion = minion();
-    $minion->enqueue( $task, \@args, { queue => $container } );
+    $minion->enqueue( "$container:$task", $args, $opt );
 }
 
 1;
@@ -118,19 +139,19 @@ Beam::Minion - A distributed task runner for Beam::Wire containers
 
 =head1 VERSION
 
-version 0.006
+version 0.011
 
 =head1 SYNOPSIS
 
     # Command-line interface
     export BEAM_MINION=sqlite://test.db
-    beam minion worker <container>...
+    beam minion worker
     beam minion run <container> <service> [<args>...]
     beam minion help
 
     # Perl interface
     local $ENV{BEAM_MINION} = 'sqlite://test.db';
-    Beam::Minion->enqueue( $container, $service, @args );
+    Beam::Minion->enqueue( $container, $service, \@args, \%opt );
 
 =head1 DESCRIPTION
 
@@ -143,10 +164,31 @@ container files.
 
 =head2 enqueue
 
-    Beam::Minion->enqueue( $container_name, $task_name, @args );
+    Beam::Minion->enqueue( $container_name, $task_name, \@args, \%opt );
 
 Enqueue the task named C<$task_name> from the container named C<$container_name>.
 The C<BEAM_MINION> environment variable must be set.
+
+C<\%opt> is a hash reference with the following keys:
+
+=over
+
+=item attempts
+
+Number of times to retry this job if it fails. Defaults to C<1>.
+
+=item delay
+
+Time (in seconds) to delay this job (from now). Defaults to C<0>.
+
+=item priority
+
+The job priority. Higher priority jobs get performed first. Defaults to C<0>.
+
+=back
+
+(These are the same options allowed in L<the Minion "enqueue"
+method|http://mojolicious.org/perldoc/Minion#enqueue1>)
 
 =head1 GETTING STARTED
 
@@ -192,9 +234,9 @@ SQLite).
 =head2 Start a Worker
 
 Once the C<BEAM_MINION> environment variable is set, you can start
-a worker with C<< beam minion worker <container> >>. Each worker can run
-jobs from one container, specified as the argument to the C<beam minion
-worker> command. Each worker will run up to 4 jobs concurrently.
+a worker with C<< beam minion worker >>. Each worker can run jobs from
+all the containers it can find from the C<BEAM_PATH> environment
+variable. Each worker will run up to 4 jobs concurrently.
 
 =head2 Spawn a Job
 
@@ -215,6 +257,12 @@ L<Beam::Wire>, L<Beam::Runner>, L<Minion>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

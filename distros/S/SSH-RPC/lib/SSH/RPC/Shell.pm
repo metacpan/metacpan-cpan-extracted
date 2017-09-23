@@ -1,13 +1,15 @@
 package SSH::RPC::Shell;
-
-our $VERSION = 1.201;
-
+$SSH::RPC::Shell::VERSION = '1.203';
 use strict;
 use JSON;
 
 =head1 NAME
 
 SSH::RPC::Shell - The shell, or server side, of an RPC call over SSH.
+
+=head1 VERSION
+
+version 1.203
 
 =head1 SYNOPSIS
 
@@ -89,7 +91,7 @@ sub run {
         last if defined $request;
     }
     my $result = $class->processRequest($request);
-    $result->{version} = $VERSION;
+    $result->{version} = $SSH::RPC::Shell::VERSION;
     my $encodedResult = eval{JSON->new->pretty->utf8->encode($result)};
     if ($@) {
         print { "error" => "Malformed response.", "status" => "511" };
@@ -124,5 +126,3 @@ sub run_noop {
 =cut
 
 1;
-
-

@@ -1,7 +1,19 @@
 
 Release history for Importer-Zim-Base
 
-0.3.0     2017-09-13 12:49:00-07:00 America/Los_Angeles
+0.5.0     2017-09-20 21:03:47-07:00 America/Los_Angeles
+
+    - Now -map subroutines expect the argument at $_
+
+v0.4     2017-09-15 18:48:52-07:00 America/Los_Angeles
+
+    - Implement "use IMPORTER MODULE => \@SYMBOLS"
+    - Implement "... EXPORT => {-map => $sub}..."
+    - Implement "... EXPORT => {-prefix => $prefix}..."
+    - Implement "use IMPORTER MODULE => {-map => $sub}..."
+    - Implement "use IMPORTER MODULE => {-prefix => $prefix}..."
+
+v0.3     2017-09-13 12:49:00-07:00 America/Los_Angeles
 
     - If no explicit symbols are given, default to @EXPORT
     - Implement "use IMPORTER MODULE => {-strict => 0}..."

@@ -163,6 +163,31 @@ sub _connect ( $self, $cb ) {
     return;
 }
 
+sub get_cookies ( $self, $cb ) {
+    $self->(
+        'Network.getCookies',
+        sub ( $tab, $data ) {
+            $cb->( $tab, $tab->convert_cookies( $data->{cookies} ) );
+
+            return;
+        }
+    );
+
+    return;
+}
+
+sub convert_cookies ( $self, $chrome_cookies ) {
+    my $cookies;
+
+    for my $cookie ( $chrome_cookies->@* ) {
+        $cookies->{ $cookie->{domain} }->{ $cookie->{path} }->{ $cookie->{name} } = $cookie;
+
+        $cookie->{val} = delete $cookie->{value};
+    }
+
+    return $cookies;
+}
+
 1;
 __END__
 =pod

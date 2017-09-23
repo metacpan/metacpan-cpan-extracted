@@ -18,7 +18,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = (qw[decode_xmlrpc encode_xmlrpc from_xmlrpc to_xmlrpc]);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;
 
 my $message = Mojo::Template->new(
@@ -254,7 +254,7 @@ Mojo::XMLRPC - An XMLRPC message parser/encoder using the Mojo stack
 
   my $ua = Mojo::UserAgent->new;
   my $url = ...;
-  my $tx = $ua->post($url, encode_xmlrpc(request => 'mymethod', 'myarg'));
+  my $tx = $ua->post($url, encode_xmlrpc(call => 'mymethod', 'myarg'));
   my $res = decode_xmlrpc($tx->res->body)
 
 =head1 DESCRIPTION
@@ -336,7 +336,7 @@ If the item has C<NOK> (it has been used as a floating point number) it is encod
 
 =item *
 
-If the item has C<IOK> (it has been used as an integer (and not a float)) it is encoded as a C<double>.
+If the item has C<IOK> (it has been used as an integer (and not a float)) it is encoded as an C<int>.
 
 =item *
 

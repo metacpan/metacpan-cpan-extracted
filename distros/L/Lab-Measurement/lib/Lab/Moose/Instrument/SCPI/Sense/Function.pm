@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Function;
 #ABSTRACT: Role for the SCPI SENSe:FUNCtion subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.554';
+$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.600';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::SCPI::Sense::Function - Role for the SCPI SENSe:FUNCtion
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 METHODS
 

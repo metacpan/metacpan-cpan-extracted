@@ -61,6 +61,7 @@ use_ok('ClearPress::decorator');
 
 {
   $ClearPress::decorator::DEFAULTS->{meta_version} = 123;
+  $ClearPress::decorator::DEFAULTS->{lang} = 'en-gb';
   my $dec = ClearPress::decorator->new();
   is($dec->header(), from_file(q(header-1.frag)), 'default combined header');
 }

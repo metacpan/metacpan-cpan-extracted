@@ -3,159 +3,145 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-#
-## GMPq
-#
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPq Math::GMPq) => sub {
+sub __mul__ {
     my ($x, $y) = @_;
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_mul($r, $x, $y);
-    $r;
-};
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPq Math::GMPz) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_mul_z($r, $x, $y);
-    $r;
-};
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $y);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPq Math::MPFR) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_mul_q($r, $y, $x, $ROUND);
-    $r;
-};
+  Math_GMPq__Math_GMPz: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $x, $y);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPq Math::MPC) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_set_q($r, $x, $ROUND);
-    Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
-    $r;
-};
+  Math_GMPq__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_q($r, $y, $x, $ROUND);
+        return $r;
+    }
 
-#
-## GMPz
-#
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPz Math::GMPz) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mul($r, $x, $y);
-    $r;
-};
+  Math_GMPq__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPz $) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::GMPz::Rmpz_init();
-    $y < 0
-      ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
-      : Math::GMPz::Rmpz_mul_ui($r, $x, $y);
-    $r;
-};
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $y);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPz Math::GMPq) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_mul_z($r, $y, $x);
-    $r;
-};
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        $y < 0
+          ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
+          : Math::GMPz::Rmpz_mul_ui($r, $x, $y);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPz Math::MPFR) => sub {
-    my ($x, $y) = @_;
-    my $f = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_mul_z($f, $y, $x, $ROUND);
-    $f;
-};
+  Math_GMPz__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $y, $x);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::GMPz Math::MPC) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_set_z($r, $x, $ROUND);
-    Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
-    $r;
-};
+  Math_GMPz__Math_MPFR: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_z($f, $y, $x, $ROUND);
+        return $f;
+    }
 
-#
-## MPFR
-#
-Class::Multimethods::multimethod __mul__ => qw(Math::MPFR Math::MPFR) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_mul($r, $x, $y, $ROUND);
-    $r;
-};
+  Math_GMPz__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPFR $) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    $y < 0
-      ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
-      : Math::MPFR::Rmpfr_mul_ui($r, $x, $y, $ROUND);
-    $r;
-};
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPFR Math::GMPq) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_mul_q($r, $x, $y, $ROUND);
-    $r;
-};
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $y < 0
+          ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_mul_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPFR Math::GMPz) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_mul_z($r, $x, $y, $ROUND);
-    $r;
-};
+  Math_MPFR__Math_GMPq: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_q($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPFR Math::MPC) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_mul_fr($r, $y, $x, $ROUND);
-    $r;
-};
+  Math_MPFR__Math_GMPz: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_mul_z($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-#
-## MPC
-#
-Class::Multimethods::multimethod __mul__ => qw(Math::MPC Math::MPC) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_mul($r, $x, $y, $ROUND);
-    $r;
-};
+  Math_MPFR__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul_fr($r, $y, $x, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPC $) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    $y < 0
-      ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
-      : Math::MPC::Rmpc_mul_ui($r, $x, $y, $ROUND);
-    $r;
-};
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPC Math::MPFR) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_mul_fr($r, $x, $y, $ROUND);
-    $r;
-};
+  Math_MPC__Scalar: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $y < 0
+          ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
+          : Math::MPC::Rmpc_mul_ui($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPC Math::GMPz) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_set_z($r, $y, $ROUND);
-    Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
-    $r;
-};
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_mul_fr($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mul__ => qw(Math::MPC Math::GMPq) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_set_q($r, $y, $ROUND);
-    Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
-    $r;
-};
+  Math_MPC__Math_GMPz: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC__Math_GMPq: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
+    }
+}
 
 1;

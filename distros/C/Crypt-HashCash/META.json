@@ -35,9 +35,11 @@
             "Authen::TuringImage" : "0",
             "Business::Bitcoin" : "0",
             "Crypt::Diceware" : "0",
+            "File::HomeDir" : "0",
             "GD::Barcode::QRcode" : "0",
             "IO::Socket::INET" : "0",
             "IPC::Queue::Duplex" : "1.005",
+            "Net::Server::PreFork" : "0",
             "Wx" : "0"
          },
          "requires" : {
@@ -58,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.126",
+   "version" : "1.127",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

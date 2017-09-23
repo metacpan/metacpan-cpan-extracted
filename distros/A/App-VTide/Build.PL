@@ -13,6 +13,7 @@ my $builder = Module::Build->new(
         'File::chdir'         => '0.1008',
         'Getopt::Alt'         => '0.3.9',
         'Hash::Merge::Simple' => '0.051',
+        'IO::Prompt'          => 0,
         'List::MoreUtils'     => '0.413',
         'List::Util'          => '1.41',
         'Module::Pluggable'   => 0,

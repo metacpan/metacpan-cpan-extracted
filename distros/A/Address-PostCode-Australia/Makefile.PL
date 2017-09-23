@@ -11,7 +11,6 @@ WriteMakefile(
     VERSION_FROM       => 'lib/Address/PostCode/Australia.pm',
     ABSTRACT_FROM      => 'lib/Address/PostCode/Australia.pm',
     LICENSE            => 'artistic_2',
-    PL_FILES           => {},
     MIN_PERL_VERSION   => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
@@ -30,9 +29,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Address::PostCode::Australia'         => { file => 'lib/Address/PostCode/Australia.pm',        version => '0.08' },
-            'Address::PostCode::Australia::Place'  => { file => 'lib/Address/PostCode/Australia/Place.pm',  version => '0.08' },
-            'Address::PostCode::Australia::Params' => { file => 'lib/Address/PostCode/Australia/Params.pm', version => '0.08' },
+            'Address::PostCode::Australia'         => { file => 'lib/Address/PostCode/Australia.pm',        version => '0.09' },
+            'Address::PostCode::Australia::Place'  => { file => 'lib/Address/PostCode/Australia/Place.pm',  version => '0.09' },
+            'Address::PostCode::Australia::Params' => { file => 'lib/Address/PostCode/Australia/Params.pm', version => '0.09' },
         },
         resources => {
             repository => {

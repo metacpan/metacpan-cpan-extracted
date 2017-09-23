@@ -1,5 +1,10 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.03    2017-09-20 01:52:22
+        [CHANGES]
+         * Added AD5691R driver
+         * Noted that ADS1115 can also drive ADS101x family chips
+
 0.02    2017-08-24 19:06:59
         [CHANGES]
          * Declare dependence on Data::Bitfield (RT122887)

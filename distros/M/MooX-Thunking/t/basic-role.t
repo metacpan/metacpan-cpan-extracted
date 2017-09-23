@@ -9,7 +9,7 @@ use Types::Standard -all;
 use Types::TypeTiny -all;
 has children => (
   is => 'thunked',
-  isa => CodeLike | ArrayRef[InstanceOf['Thunking']],
+  isa => ArrayRef[InstanceOf['Thunking']],
   required => 1,
 );
 }

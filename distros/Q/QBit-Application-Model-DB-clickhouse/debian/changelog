@@ -1,3 +1,23 @@
+libqbit-application-model-db-clickhouse-perl (0.004) raring; urgency=low
+
+  * get_dbh -> dbh
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 19 Sep 2017 10:03:31 +0300
+
+libqbit-application-model-db-clickhouse-perl (0.003) raring; urgency=low
+
+  * use query in add
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 17 Sep 2017 19:45:30 +0300
+
+libqbit-application-model-db-clickhouse-perl (0.002) raring; urgency=low
+
+  * added TestTimeLog
+
+  * fix depends and delete accessors
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 16 Sep 2017 13:10:09 +0300
+
 libqbit-application-model-db-clickhouse-perl (0.001) raring; urgency=low
 
   * fix .gitignore

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/show-log-colors
+lib/Log/Any/Plugin/ANSIColor.pm
+minil.toml
+t/00_compile.t
+t/bad-methods.t
+t/colors-only.t
+t/lib/PluginTest.pm
+t/no-args.t
+t/with-defaults.t
+META.yml
+MANIFEST

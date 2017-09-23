@@ -1,5 +1,14 @@
 Revision history for DBIx-Class-Fixtures
 
+1.001038  2017-09-20 21:13:13+00:00 UTC
+
+- stop sorting source names before dumping, this allows for some hackery when you need certain sources to dump first (see https://github.com/dbsrgits/DBIx-Class-Fixtures/pull/12 for details) (cngarrison++)
+- doc patch for exclude attr (simbabque++)
+
+1.001037  2017-09-20 20:42:03+00:00 UTC
+
+- ignore virtual columns in dump_object (mmims++)
+
 1.001036  2016-03-21 14:59:55+00:00 UTC
 
 - releasing as stable
@@ -100,7 +109,7 @@ Revision history for DBIx-Class-Fixtures
 
 1.001013
 - fixed functionality in last release by more deeply cloning parameters, which
-  prevents bad things when parameters get deleted in the wrong places.  Also 
+  prevents bad things when parameters get deleted in the wrong places.  Also
   be sure we clear state properly after a dump.
 
 1.001012
@@ -109,8 +118,8 @@ Revision history for DBIx-Class-Fixtures
   to make it easier when you need to dump all the fixtures programatically.
 - Added method 'dump_config_sets' to let you dump more than one set at a time
   more easily
-- Added method 'dump_all_config_sets' which helps automate dumping all your 
-  current config sets to a directory.  
+- Added method 'dump_all_config_sets' which helps automate dumping all your
+  current config sets to a directory.
 
 1.001011
 - Added an excludes resultsource option to the ->dump({all=>1,...}) feature

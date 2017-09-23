@@ -4,42 +4,47 @@ use strict;
 use warnings;
 
 use IPC::Run3 qw(run3);
+use Specio::Library::String;
 use Text::ParseWords qw(shellwords);
 
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-has 'options' => ( is => 'ro', predicate => '_has_options' );
+has options => (
+    is        => 'ro',
+    isa       => t('NonEmptyStr'),
+    predicate => '_has_options',
+);
 
-with 'Code::TidyAll::Role::Tempdir';
+with qw( Code::TidyAll::Role::RunsCommand Code::TidyAll::Role::Tempdir );
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
 sub _build_cmd {'jshint'}
 
 sub validate_file {
     my ( $self, $file ) = @_;
 
-    my @cmd = ( $self->cmd, shellwords( $self->argv ) );
-    push @cmd, $self->_config_file_argv if $self->_has_options;
-    push @cmd, $file;
-
-    my $output;
-    run3( \@cmd, \undef, \$output, \$output );
+    my $output = $self->_run_or_die( $self->_config_file_argv, $file );
     if ( $output =~ /\S/ ) {
         $output =~ s/^$file:\s*//gm;
         die "$output\n";
     }
+
+    return;
 }
 
 sub _config_file_argv {
     my $self = shift;
 
+    return unless $self->_has_options;
+
     my $conf_file = $self->_tempdir->child('jshint.json');
     $conf_file->spew(
         '{ ' . join( ",\n", map {qq["$_": true]} split /\s+/, $self->options ) . ' }' );
-    return '--config', $conf_file;
+
+    return ( '--config', $conf_file );
 }
 
 1;
@@ -58,7 +63,7 @@ Code::TidyAll::Plugin::JSHint - Use jshint with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -103,23 +108,22 @@ easy method is to install L<npm|https://npmjs.org/>, then run
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to jshint
+Arguments to pass to C<jshint>.
 
-=item cmd
+=head2 cmd
 
-Full path to jshint
+The path for the C<jshint> command. By default this is just C<jshint>, meaning
+that the user's C<PATH> will be searched for the command.
 
-=item options
+=head2 options
 
-A whitespace separated string of options, as documented
-L<here|http://www.jshint.com/docs/>. These will be written to a temporary
-config file and passed as --config to argv.
-
-=back
+A whitespace separated string of options, as L<documented by
+jshint|http://www.jshint.com/docs/>. These will be written to a temporary
+config file and passed as C<--config> argument.
 
 =head1 SUPPORT
 

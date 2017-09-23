@@ -1,6 +1,22 @@
 ==================================================
-Changes from 2016-08-21 00:00:00 +0000 to present.
+Changes from 2016-09-15 00:00:00 +0000 to present.
 ==================================================
+
+------------------------------------------
+version 0.3.3 at 2017-09-15 16:49:22 +0000
+------------------------------------------
+
+  Change: 59c8b122b909b431acd277dc283e08e839bd0878
+  Author: LoÃ¯c Prieto <loic.prieto@capside.com>
+  Date : 2017-09-15 18:47:11 +0000
+
+    Finish documentation of the yaml config format 
+
+  Change: e8082d1225811398e9f9d4b508f513792730452f
+  Author: LoÃ¯c Prieto <loic.sephiroth@gmail.com>
+  Date : 2017-09-15 18:47:11 +0000
+
+    Start documentation of configuration by yaml 
 
 ------------------------------------------
 version 0.3.2 at 2017-08-21 21:04:48 +0000

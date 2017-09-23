@@ -23,9 +23,10 @@ my %config = (
     PREREQ_PM           => {            # more to the list $Module::CoreList::version{5.010}
         'Carp'                      => '1.08',
         'Compress::Snappy'          => '0.23',
+        'Compress::LZ4Frame'        => '0.012001',
         'Const::Fast'               => '0.014',
         'Data::Compare'             => '1.24',
-        'Data::HexDump::Range'      => '0.13',
+        'Data::HexDump::Range'      => 0,
         'Data::Validate::Domain'    => '0.11',
         'Data::Validate::IP'        => '0.24',
         'Exception::Class'          => '1.37',
@@ -88,43 +89,43 @@ my %config = (
         provides                => {
             'Kafka'                 => {
                 file                    => 'lib/Kafka.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Connection'     => {
                 file                    => 'lib/Kafka/Connection.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Consumer'       => {
                 file                    => 'lib/Kafka/Consumer.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Exceptions'     => {
                 file                    => 'lib/Kafka/Exceptions.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::IO'             => {
                 file                    => 'lib/Kafka/IO.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Int64'          => {
                 file                    => 'lib/Kafka/Int64.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Internals'      => {
                 file                    => 'lib/Kafka/Internals.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Message'        => {
                 file                    => 'lib/Kafka/Message.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Producer'       => {
                 file                    => 'lib/Kafka/Producer.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
             'Kafka::Protocol'       => {
                 file                    => 'lib/Kafka/Protocol.pm',
-                version                 => '1.06'
+                version                 => '1.07'
             },
         },
         'meta-spec'             => { version => 2 },

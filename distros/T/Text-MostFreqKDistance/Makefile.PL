@@ -23,7 +23,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Text::MostFreqKDistance' => { file => 'lib/Text/MostFreqKDistance.pm', version => '0.07' },
+            'Text::MostFreqKDistance' => { file => 'lib/Text/MostFreqKDistance.pm', version => '0.08' },
         },
         resources => {
             repository => {

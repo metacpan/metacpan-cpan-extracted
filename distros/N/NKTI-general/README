@@ -1,9 +1,16 @@
-NKTI-general version 0.14
+NKTI-general version 0.15
 =========================
+
+The Part of Prototype CellBIS Weh Framework.
+
+DESCRIPTION :
+
+This module only contains several subroutine to give problem solving
+about Perl for web.
 
 INSTALLATION
 
-To install this module type the following:
+Install module from source :
 
     perl Makefile.PL
     make
@@ -21,18 +28,13 @@ or using cpanm:
 
 DEPENDENCIES
 
-If install this module using cpan, depencencies is automatically install in your system.
+If install this module using `cpan` or `cpanm`, dependencies is automatically install in your system.
+However, if you install this module from source you must install following dependencies below :
 
-    Test::More              -   Use the latest version modules.
-    JSON                    -   Use the latest version modules.
-    DBI                     -   Use the latest version modules.
-    Data::Dumper            -   Use the latest version modules.
-    LWP::UserAgent          -   Use the latest version modules.
-    HTTP::Request::Common   -   Use the latest version modules.
-    CGI                     -   Use the latest version modules.
-    DateTime                -   Use the latest version modules.
-    HTTP::BrowserDetect     -   Use the latest version modules.
-
+    cpan -i Test::More JSON DBI \
+        Data::Dumper LWP::UserAgent \
+        HTTP::Request::Common CGI \
+        DateTime HTTP::BrowserDetect
 
 COPYRIGHT AND LICENCE
 

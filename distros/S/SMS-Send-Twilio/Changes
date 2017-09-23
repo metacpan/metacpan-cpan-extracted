@@ -1,5 +1,12 @@
 Revision history for SMS-Send-Twilio
 
+0.20 2017-08-17
+  - Use `/Messages` resource URI instead of deprecated `SMS/Messages.json`
+    so you can send messages up to 1600 characters in length.
+    Ref: https://support.twilio.com/hc/en-us/articles/223181028
+    Thanks to Julián Esteves (jesteves @ github) for the tip.
+  - Minimum Perl version to 5.10.1, following WWW::Twilio::API.
+
 0.18  2015-08-06
   - Die if sending the SMS message is unsuccesful, as stated in
     SMS::Send docs. Try to include a helpful error message.

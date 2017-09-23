@@ -56,7 +56,7 @@ You can also find it online at these locations:
     https://metacpan.org/release/WWW-Kickstarter
 
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
 No rights reserved.
 

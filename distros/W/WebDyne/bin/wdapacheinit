@@ -40,7 +40,7 @@ use Pod::Usage;
 
 #  Version info
 #
-$VERSION='1.248';
+$VERSION='1.250';
 
 
 #  Get command line options, add them to environment so picked up

@@ -1,4 +1,3 @@
-package A::Test::Package;
 use Test2::V0 -target => 'goto::file';
 use Test2::IPC;
 use Test2::Require::RealFork;

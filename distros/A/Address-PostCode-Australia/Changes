@@ -1,5 +1,10 @@
 Revision history for Address::PostCode::Australia
 
+0.09  Mon Sep 18 10:10:00 2017
+      - Improved method exporting.
+      - Tidied up test scripts.
+      - Tidied up Makefile.PL script.
+
 0.08  Wed Mar 29 15:45:00 2017
       - Tidied up test scripts and removed "-T" switch.
 

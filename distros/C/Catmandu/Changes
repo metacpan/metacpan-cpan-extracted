@@ -1,5 +1,15 @@
 Revision history for Catmandu
 
+1.0605  2017-09-21 10:58:21 CEST
+  - fix touch command pod
+
+1.0604  2017-09-21 10:35:26 CEST
+  - new touch command and bag touch method
+  - new Util::now function
+  - remove dependency on LWP::UserAgent::Determined
+  - add a basic vim syntax definiton for fix files
+  - add, copy, join, move, remove, set, sort and split fix shortcuts
+
 1.0603  2017-09-04 10:16:55 CEST
   - bags can have default plugins applied
   - add hard dependency on List::MoreUtils::XS

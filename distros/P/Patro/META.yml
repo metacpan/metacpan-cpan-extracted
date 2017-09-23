@@ -25,5 +25,5 @@ requires:
   Storable: '0'
 resources:
   repository: https://github.com/mjob/p5-patro.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,37 @@
+sudo: false
+addons:
+  apt:
+    packages:
+      - aspell
+language: perl
+perl:
+  - "blead"
+{{
+    use Module::CoreList;
+    use List::Util 'first';
+    my @all_perl_releases = reverse sort keys %Module::CoreList::released;
+    my $latest_stable_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 0 } @all_perl_releases;
+    my ($minor_ver) = $latest_stable_perl =~ /^5\.(\d+)000/;
+    join "\n", map { '  - "5.' . $_ . '"' } reverse grep { $_ % 2 == 0 } (8 .. $minor_ver);
+}}
+env:
+  global:
+    - TEST_PARTITIONS=1
+    - AUTHOR_TESTING=1
+    - AUTOMATED_TESTING=1
+    - RELEASE_TESTING=0
+before_install:
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
+  - build-dist
+  - cd $BUILD_DIR
+install:{{
+    ($dist->name =~ /^Dist-Zilla-/ ? "\n  - perl -M5.014 -e1 2>/dev/null || cpan-install Dist::Zilla\@5.047" : '' )
+}}
+  - cpan-install --deps
+script:
+  - perl Makefile.PL
+  - make
+  - prove -b -r -s -j1 $(test-files)

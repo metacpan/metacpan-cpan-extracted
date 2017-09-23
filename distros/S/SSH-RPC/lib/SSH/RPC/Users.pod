@@ -1,0 +1,14 @@
+=head1 Users of SSH::RPC
+
+These are some of the implementations of SSH::RPC.
+
+=head2 Plain Black's Automat
+
+Plain Black (plainblack.com) has a hosting automation system called Automat that is designed to provision sites and services to servers in it's hosting network over SSH::RPC. This was the implementation that SSH::RPC was built for.
+
+=head2 SysFink
+
+The SysFink (http://code.google.com/p/sysfink/) monitoring extension system is built using SSH::RPC protocols.
+
+=cut
+

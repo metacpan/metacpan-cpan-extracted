@@ -1,0 +1,14 @@
+!!!
+/ [if IE 8] <html lang="en" class="ie8 no-js">
+/ [if IE 9] <html lang="en" class="ie9 no-js">
+%html{:lang => "en"}
+  %head
+    %meta{content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}
+    %link{href: asset_path('favicon.ico'), rel: 'icon'}
+    = render partial: 'layouts/stylesheets'
+    = csrf_meta_tags
+  %body
+    =yield
+    = render partial: 'layouts/javascripts'
+    - if content_for?(:page_javascript)
+      = yield :page_javascript

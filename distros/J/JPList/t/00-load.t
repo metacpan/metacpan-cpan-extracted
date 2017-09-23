@@ -4,10 +4,8 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
-
 BEGIN {
     use_ok( 'JPList' ) || print "Bail out!\n";
 }
 
-diag( "Testing JPList $JPList::VERSION, Perl $], $^X" );
+done_testing();

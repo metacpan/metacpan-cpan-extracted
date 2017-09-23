@@ -1,5 +1,8 @@
 Revision history for File-ShareDir-Dist
 
+0.05      2017-09-15 14:11:08 -0400
+  - Add App::Yath::Plugin::ShareDirDist
+
 0.04      2017-07-27 13:01:18 -0400
   - Fix bug where File::Spec wasn't use'd
 

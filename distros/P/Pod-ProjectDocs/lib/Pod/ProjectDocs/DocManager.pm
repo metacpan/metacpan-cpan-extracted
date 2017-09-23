@@ -3,37 +3,30 @@ package Pod::ProjectDocs::DocManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49';    # VERSION
 
-use base qw/Class::Accessor::Fast/;
+use Moose;
+use Carp();
 use File::Find;
 use IO::File;
 use Pod::ProjectDocs::Doc;
 
-__PACKAGE__->mk_accessors(qw/
-    config
-    desc
-    suffix
-    parser
-    docs
-/);
+has 'config' => ( is => 'ro', );
+has 'desc' => (
+    is  => 'rw',
+    isa => 'Str',
+);
+has 'suffix' => ( is => 'rw', );
+has 'parser' => ( is => 'ro', );
+has 'docs'   => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+);
 
-sub new {
-    my ($class, @args) = @_;
-    my $self = bless {}, $class;
-    $self->_init(@args);
-    return $self;
-}
-
-sub _init {
-    my ( $self, %args ) = @_;
-    $args{suffix} = [ $args{suffix} ] unless ref $args{suffix};
-    $self->config( $args{config} );
-    $self->desc( $args{desc} );
-    $self->suffix( $args{suffix} );
-    $self->parser( $args{parser} );
-    $self->docs( [] );
-    $self->_find_files;
+sub BUILD {
+    my $self = shift;
+    $self->_find_files();
     return;
 }
 
@@ -41,10 +34,11 @@ sub _find_files {
     my $self = shift;
     foreach my $dir ( @{ $self->config->libroot } ) {
         unless ( -e $dir && -d _ ) {
-            $self->_croak(qq/$dir isn't detected or it's not a directory./);
+            Carp::croak(qq/$dir isn't detected or it's not a directory./);
         }
     }
     my $suffixs = $self->suffix;
+    $suffixs = [$suffixs] if !ref $suffixs;
     foreach my $dir ( @{ $self->config->libroot } ) {
         foreach my $suffix (@$suffixs) {
             my $wanted = sub {
@@ -68,7 +62,8 @@ sub _find_files {
                 }
 
                 # check if there is actually any POD inside, skip otherwise
-                my $content = join('', IO::File->new( $File::Find::name, 'r' )->getlines());
+                my $content = join( '',
+                    IO::File->new( $File::Find::name, 'r' )->getlines() );
                 $matched = 1 if $content !~ m{^=(head1|head2|item|cut)}ismxg;
 
                 unless ($matched) {
@@ -86,17 +81,6 @@ sub _find_files {
     }
     $self->docs( [ sort { $a->name cmp $b->name } @{ $self->docs } ] );
     return;
-}
-
-sub get_docs {
-    my $self = shift;
-    return @{ $self->docs };
-}
-
-sub _croak {
-    my ( $self, $msg ) = @_;
-    require Carp;
-    Carp::croak($msg);
 }
 
 1;

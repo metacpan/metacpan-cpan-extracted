@@ -68,5 +68,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.108'
+version: '2.110'
 x_serialization_backend: 'YAML::Tiny version 1.70'

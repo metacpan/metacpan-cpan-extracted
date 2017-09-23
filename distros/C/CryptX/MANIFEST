@@ -944,4 +944,11 @@ t/prng_rc4.t
 t/prng_sober128.t
 t/prng_yarrow.t
 t/sshkey.t
+t/wycheproof.t
+t/wycheproof/aes_gcm_test.json
+t/wycheproof/dsa_test.json
+t/wycheproof/ecdh_webcrypto_test.json
+t/wycheproof/ecdsa_test.json
+t/wycheproof/ecdsa_webcrypto_test.json
+t/wycheproof/rsa_signature_test.json
 typemap

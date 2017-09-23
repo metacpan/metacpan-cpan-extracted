@@ -1,6 +1,6 @@
 package Text::MostFreqKDistance;
 
-$Text::MostFreqKDistance::VERSION   = '0.07';
+$Text::MostFreqKDistance::VERSION   = '0.08';
 $Text::MostFreqKDistance::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,18 +9,16 @@ Text::MostFreqKDistance - Estimate strings similarity.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
-
-use vars qw(@ISA @EXPORT);
-require Exporter;
-@ISA    = qw(Exporter);
-@EXPORT = qw(MostFreqKHashing MostFreqKSDF);
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
+
+our @EXPORT = qw(MostFreqKHashing MostFreqKSDF);
 
 =head1 DESCRIPTION
 

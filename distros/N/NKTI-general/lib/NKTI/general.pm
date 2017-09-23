@@ -22,7 +22,7 @@ our @EXPORT = qw(cetak cetak_r cetak_pre);
 
 # Define Version :
 # ---------------------------------------------------------------- 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 # Create Subroutine for Get OS Server Information :
 # ------------------------------------------------------------------------
@@ -329,9 +329,9 @@ sub time_event_mysql {
     # --------------------------------------------------------------------
     elsif ($time_event =~ m/m/) {
         $get_num = $time_event =~ s/\D//g;
-        $data{'event'} = '(CURRENT_TIMESTAMP + INTERVAL '.$get_num.' MINUTES)';
+        $data{'event'} = '(CURRENT_TIMESTAMP + INTERVAL '.$get_num.' MINUTE)';
         $data{'time'} = $time_event;
-        $data{'unit'} = 'MINUTES';
+        $data{'unit'} = 'MINUTE';
     }
     # End of For $time_event =~ /m/.
     # ====================================================================

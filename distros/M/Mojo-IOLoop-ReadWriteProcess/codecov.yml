@@ -1,0 +1,23 @@
+codecov:
+  branch: master
+comment:
+  behavior: default
+  require_changes: true
+coverage:
+  precision: 2
+  range:
+  - 60.0
+  - 95.0
+  round: down
+  status:
+    changes:
+      default:
+        branches: null
+    project:
+      default:
+        target: 80
+        threshold: 0.1
+        branches: null
+    patch:
+      default:
+        branches: null

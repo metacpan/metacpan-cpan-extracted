@@ -142,6 +142,7 @@ formally.
     use Pegex::Grammar;
     use Pegex::Tree;
     use Pegex::Input;
+    use YAML;
 
     $grammar_text = "
     expr: num PLUS num
@@ -156,7 +157,7 @@ formally.
     );
     $input = Pegex::Input->new(string => '2+2');
 
-    print Dump parser->parse($input);
+    print Dump $parser->parse($input);
 
 This code does the same thing as the first example, but this time we've made
 all the objects ourselves.
@@ -206,6 +207,8 @@ L<Data::Dumper> to output it back into your module's C<make_tree> method.
 This is what a compiled Pegex grammar looks like. As soon as this module is
 loaded, the grammar is ready to be used by Pegex.
 
+=head3 Automatically rebuilding during development with environment variable
+
 If you find yourself needing to compile your grammar module a lot during
 development, just set this environment variable like so:
 
@@ -216,6 +219,21 @@ to be recompiled, and do it on the fly.
 
 If you have more than one grammar to recompile, just list all the names
 separated by commas.
+
+=head3 Automatically rebuilding during development using C<make>
+
+Alternatively, if your module uses C<ExtUtils::MakeMaker>, you can have
+C<make> automatically rebuild your C<Grammar> class if your C<.pgx> file
+is updated.
+
+Simply add this at the bottom of your C<Makefile.PL>:
+
+    sub MY::postamble {
+      <<EOF;
+    lib/MyThing/Grammar.pm : share/expr.pgx
+    \t\$(PERL) -Ilib -MMyThing::Grammar=compile
+    EOF
+    }
 
 =head1 See Also
 

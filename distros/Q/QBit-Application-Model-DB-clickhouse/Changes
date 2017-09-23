@@ -1,10 +1,71 @@
 ==================================================
-Changes from 2016-09-03 00:00:00 +0000 to present.
+Changes from 2016-09-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2017-09-03 19:06:08 +0000
+version 0.004 at 2017-09-19 07:03:30 +0000
 ------------------------------------------
+
+  Change: 3bf583664293174ec84c43618482940a6073e4d2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-19 10:01:57 +0000
+
+    get_dbh -> dbh 
+
+------------------------------------------
+version 0.003 at 2017-09-17 16:45:53 +0000
+------------------------------------------
+
+  Change: d2291ccf9a555d2636ca6eda03ec40da134e7fd4
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-17 19:45:53 +0000
+
+    Version 0.003 
+
+  Change: c3701fec1d1b4ae1fa78777405c4ed703074eed2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-17 19:44:21 +0000
+
+    Merge branch 'master' of
+    https://github.com/QBitFramework/QBit-Application-Model-DB-clickhouse 
+
+  Change: 9b07d43bb2467fed660f0ee9a9d04d5b4f2c8b56
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-17 19:43:37 +0000
+
+    use query in add 
+
+------------------------------------------
+version 0.002 at 2017-09-16 10:10:27 +0000
+------------------------------------------
+
+  Change: 7aa4ed28968eb93c0924896f46e1cc089963de53
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-16 13:10:27 +0000
+
+    Version 0.002 
+
+  Change: 63a8b112e4dbb8dc5ae612c946471f12373fd032
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-16 13:09:07 +0000
+
+    added TestTimeLog 
+
+  Change: 9d2d7f884e02475fdf16acff5fded3c639f03bb1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-16 12:53:37 +0000
+
+    fix depends and delete accessors 
+
+------------------------------------------
+version 0.001 at 2017-09-03 19:06:23 +0000
+------------------------------------------
+
+  Change: 961e4feca6491f3aba7ef66c816b4736173af358
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-03 22:06:23 +0000
+
+    Version 0.001 
 
   Change: 5572b50ac4929e8c414da1a17b0073cd8f152f4c
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>

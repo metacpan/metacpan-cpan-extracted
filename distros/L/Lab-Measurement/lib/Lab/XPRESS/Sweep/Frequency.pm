@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Frequency;
 #ABSTRACT: Frequency sweep
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.554';
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.600';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -96,7 +96,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

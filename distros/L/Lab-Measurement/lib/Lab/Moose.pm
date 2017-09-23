@@ -1,6 +1,6 @@
 package Lab::Moose;
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
-$Lab::Moose::VERSION = '3.554';
+$Lab::Moose::VERSION = '3.600';
 use warnings;
 use strict;
 use 5.010;
@@ -99,7 +99,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

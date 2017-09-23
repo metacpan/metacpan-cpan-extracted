@@ -18,7 +18,8 @@ open(my $fh, '<', io->catfile(qw't 18-extra.t')->name) ||
 ok my $row = $schema
   ->resultset('Photo')
   ->create({
-    photographer=>'john',
+    album=> {name=>'masterpiece'},
+    photographer=> {name=>'john'},
     file=>$fh,
   });
 
@@ -42,6 +43,8 @@ ok my $key = $schema->resultset('Photo')->first->file;
 ok -e $key, 'File Created';
 
 ok $schema->resultset('Photo')->delete;
+ok $schema->resultset('Photographer')->delete;
+ok $schema->resultset('Album')->delete;
 
 ok ! -e $key, 'File Deleted';
 

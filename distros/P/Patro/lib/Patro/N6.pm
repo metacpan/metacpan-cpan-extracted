@@ -25,9 +25,9 @@ foreach my $umethod (keys %UNIVERSAL::) {
 	    return $umethod->($proxy,@_);
 	}
 	my $context = defined(wantarray) ? 1 + wantarray : 0;
-	my $id = Patro::_fetch($proxy,"id");
+	no overloading;
 	return Patro::LeumJelly::proxy_request( $proxy,
-	    { id => $id, topic => 'METHOD', command => $umethod,
+	    { id => $proxy->{id}, topic => 'METHOD', command => $umethod,
 	      has_args => @_ > 0, args => [ @_ ], context => $context }, @_ );
     };
 }
@@ -41,10 +41,10 @@ sub AUTOLOAD {
     my $args = [ @_ ];
 
     my $context = defined(wantarray) ? 1 + wantarray : 0;
-    my $id = Patro::_fetch($self,"id");
+    no overloading;
 
     return Patro::LeumJelly::proxy_request( $self, 
-	{ id => $id,
+	{ id => $self->{id},
 	  topic => 'METHOD',
 	  command => $method,
 	  has_args => $has_args,
@@ -55,10 +55,10 @@ sub AUTOLOAD {
 
 sub Patro::N6x::deref {
     my $proxy = shift;
-    my $id = Patro::_fetch($proxy,"id");
+    no overloading;
     my $resp = Patro::LeumJelly::proxy_request(
 	$proxy,
-	{ id => $id,
+	{ id => $proxy->{id},
 	  topic => 'REF',
 	  command => 'deref',
 	  has_args => 0, args => [],
@@ -68,12 +68,10 @@ sub Patro::N6x::deref {
 
 sub DESTROY {
     my $self = shift;
-    bless $self, '###';
-    my $z = $self->{_DESTROY}++;
+    no overloading;
+    return if $self->{_DESTROY}++;
     my $socket = $self->{socket};
     my $id = $self->{id};
-    bless $self, __PACKAGE__;
-    return if $z;
     
     if ($socket) {
 

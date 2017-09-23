@@ -1,5 +1,5 @@
 package Beam::Runnable::Single;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: Only allow one instance of this command at a time
 
 #pod =head1 SYNOPSIS
@@ -88,7 +88,7 @@ Beam::Runnable::Single - Only allow one instance of this command at a time
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

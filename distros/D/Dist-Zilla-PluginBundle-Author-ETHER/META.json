@@ -37,14 +37,34 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.130"
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.131"
          },
          "requires" : {
+            "Dist::Zilla::Plugin::BlockRelease" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Wordlist" : "1.09",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.19",
+            "Test::Warnings" : "0",
+            "perl" : "5.013002"
+         },
+         "suggests" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Authority" : "1.009",
             "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "5.038",
-            "Dist::Zilla::Plugin::BlockRelease" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.004",
             "Dist::Zilla::Plugin::CheckBin" : "0",
             "Dist::Zilla::Plugin::CheckIssues" : "0",
@@ -116,25 +136,7 @@
             "Dist::Zilla::Plugin::UseUnsafeInc" : "0",
             "Dist::Zilla::PluginBundle::Author::ETHER" : "0.103",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0",
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
-            "Pod::Wordlist" : "1.09",
-            "Software::License::Perl_5" : "0",
-            "Test::CPAN::Changes" : "0.19",
-            "Test::CPAN::Meta" : "0",
-            "Test::CleanNamespaces" : "0.15",
-            "Test::EOL" : "0",
-            "Test::Kwalitee" : "1.21",
-            "Test::MinimumVersion" : "0",
-            "Test::Mojibake" : "0",
-            "Test::More" : "0.96",
-            "Test::NoTabs" : "0",
-            "Test::Pod" : "1.41",
-            "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.19",
-            "Test::Warnings" : "0",
-            "perl" : "5.013002"
+            "Software::License::Perl_5" : "0"
          }
       },
       "runtime" : {
@@ -315,15 +317,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.130"
+         "version" : "0.131"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.130"
+         "version" : "0.131"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.130"
+         "version" : "0.131"
       }
    },
    "release_status" : "stable",
@@ -341,7 +343,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.130",
+   "version" : "0.131",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027003"
@@ -1264,7 +1266,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Update",
             "name" : "@Author::ETHER/@Git::VersionManager/MetaProvides::Update",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
@@ -1317,7 +1319,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.130",
+                  "tag" : "v0.131",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1385,7 +1387,7 @@
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "develop",
-                  "type" : "requires"
+                  "type" : "suggests"
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager",
@@ -1458,7 +1460,7 @@
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "develop",
-                  "type" : "requires"
+                  "type" : "suggests"
                }
             },
             "name" : "@Author::ETHER/prereqs for @Author::ETHER",
@@ -1565,8 +1567,9 @@
    },
    "x_authority" : "cpan:ETHER",
    "x_contributors" : [
-      "Dave Rolsky <autarch@urth.org>",
+      "Edward Betts <edward@4angle.com>",
       "Graham Knop <haarg@haarg.org>",
+      "Dave Rolsky <autarch@urth.org>",
       "Randy Stauner <rwstauner@cpan.org>",
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"

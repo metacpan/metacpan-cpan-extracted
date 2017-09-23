@@ -49,23 +49,26 @@ subtest 'invalid alienfile' => sub {
 
 subtest 'load requires' => sub {
 
-  my $build = alienfile filename => 'corpus/blank/alienfile';
-  my $meta = $build->meta;
-  
-  note(_dump $meta);
-  
-  is( $build->load_requires, 1, 'empty loads okay' );
+  subtest 'basic' => sub {
 
-  $meta->add_requires( 'any' => 'Foo::Bar::Baz' => '1.00');
-  is( $build->load_requires, 1, 'have it okay' );
-  ok $INC{'Foo/Bar/Baz.pm'};
-  note "inc=$INC{'Foo/Bar/Baz.pm'}";
+    my $build = alienfile q{ use alienfile };
+    my $meta = $build->meta;
+  
+    note(_dump $meta);
+  
+    is( $build->load_requires, 1, 'empty loads okay' );
 
-  $meta->add_requires( 'any' => 'Foo::Bar::Baz1' => '2.00');
-  eval { $build->load_requires };
-  my $error = $@;
-  isnt $error, '';
-  note "error=$error";
+    $meta->add_requires( 'any' => 'Foo::Bar::Baz' => '1.00');
+    is( $build->load_requires, 1, 'have it okay' );
+    ok $INC{'Foo/Bar/Baz.pm'};
+    note "inc=$INC{'Foo/Bar/Baz.pm'}";
+
+    $meta->add_requires( 'any' => 'Foo::Bar::Baz1' => '2.00');
+    eval { $build->load_requires };
+    my $error = $@;
+    isnt $error, '';
+    note "error=$error";
+  };
 };
 
 subtest 'hook' => sub {
@@ -566,7 +569,7 @@ subtest 'download' => sub {
   
 };
 
-subtest 'extract' => sub {
+alien_subtest 'extract' => sub {
 
   my $tar_cmd = do {
     require Alien::Build::Plugin::Extract::CommandLine;
@@ -971,7 +974,7 @@ subtest 'first probe returns share' => sub {
 
 };
 
-subtest 'system' => sub {
+alien_subtest 'system' => sub {
 
   my @args;
 
@@ -1026,7 +1029,7 @@ subtest 'requires pulls helpers' => sub {
 
 };
 
-subtest 'around bug?' => sub {
+alien_subtest 'around bug?' => sub {
 
   my $build = alienfile_ok q{
   
@@ -1065,7 +1068,7 @@ subtest 'around bug?' => sub {
 
 subtest 'requires of Alien::Build or Alien::Base' => sub {
 
-  subtest 'Alien::Build' => sub {
+  alien_subtest 'Alien::Build' => sub {
   
     my $build = alienfile_ok q{
       use alienfile;
@@ -1081,7 +1084,7 @@ subtest 'requires of Alien::Build or Alien::Base' => sub {
     
   };
 
-  subtest 'Alien::Base' => sub {
+  alien_subtest 'Alien::Base' => sub {
   
     my $build = alienfile_ok q{
       use alienfile;
@@ -1103,7 +1106,7 @@ subtest 'out-of-source build' => sub {
 
   local $Alien::Build::VERSION = '1.08';
 
-  subtest 'basic' => sub {
+  alien_subtest 'basic' => sub {
   
     alienfile_ok q{
       use alienfile;
@@ -1131,7 +1134,7 @@ subtest 'out-of-source build' => sub {
   
   };
   
-  subtest 'from bundled source' => sub {
+  alien_subtest 'from bundled source' => sub {
 
     local $Alien::Build::Plugin::Fetch::LocalDir::VERSION = '1.07';
   
@@ -1163,6 +1166,255 @@ subtest 'out-of-source build' => sub {
     my $extract = $build->install_prop->{extract};
     note "extract = $extract";
   
+  };
+
+};
+
+subtest 'test' => sub {
+
+  local $Alien::Build::VERSION = $Alien::Build::VERSION;
+  $Alien::Build::VERSION ||= '1.14';
+  
+
+  alien_subtest 'good' => sub {
+  
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      
+      probe sub { 'share' };
+      
+      share {
+        download sub { path('file1')->touch };
+        extract sub { path($_)->touch for qw( file2 file3 ) };
+        build sub {
+          log("the build");
+          path('file4')->spew('content of file4')
+        };
+        test sub {
+          log("the test");
+          my $x = path('file4')->slurp;
+          die "hrm" unless $x eq 'content of file4';
+        };
+      };
+    
+    };
+    
+    alien_install_type_is 'share';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+    
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    is $error, '';
+  };
+  
+  alien_subtest 'bad' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      
+      probe sub { 'share' };
+      
+      share {
+        download sub { path('file1')->touch };
+        extract sub { path($_)->touch for qw( file2 file3 ) };
+        build sub { };
+        test sub {
+          log("the test");
+          die "bogus!";
+        };
+      };
+    
+    };
+    
+    alien_install_type_is 'share';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    like $error, qr/bogus!/;
+  };
+  
+  alien_subtest 'ffi' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      
+      probe sub { 'share' };
+      
+      share {
+        download sub { path('file1')->touch };
+        extract sub { path($_)->touch for qw( file2 file3 ) };
+        build sub {
+          log("the build");
+          path('file4')->spew('content of file4')
+        };
+        ffi {
+        
+          build sub {
+            path('file5')->spew('content of file5');
+          };
+          
+          test sub {
+            die "bogus1" unless -f "file2";
+            die "bogus2" unless -f "file3";
+            my $x = path("file5")->slurp;
+            die "bogus3" unless $x eq 'content of file5';
+          };
+        
+        };
+      };
+    
+    };
+    
+    alien_install_type_is 'share';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    is $error, '';
+  };
+
+  alien_subtest 'bad ffi' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      use Path::Tiny qw( path );
+      
+      probe sub { 'share' };
+      
+      share {
+        download sub { path('file1')->touch };
+        extract sub { path($_)->touch for qw( file2 file3 ) };
+        build sub {
+          log("the build");
+          path('file4')->spew('content of file4')
+        };
+        ffi {
+        
+          build sub {
+            path('file5')->spew('content of file5');
+          };
+          
+          test sub {
+            die "bogus4";
+          };
+        
+        };
+      };
+    
+    };
+    
+    alien_install_type_is 'share';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    like $error, qr/bogus4/;
+  };
+  
+  alien_subtest 'system good' => sub {
+  
+    alienfile_ok q{
+      use alienfile;
+      probe sub { 'system' };
+      sys {
+        test sub {
+          my($build) = @_;
+          log('in test!');
+          $build->install_prop->{foobar} = 'baz';
+        };
+      };
+    };
+    
+    alien_install_type_is 'system';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    is $error, '';
+    
+    is($build->install_prop->{foobar}, 'baz');
+    
+  };
+  
+  alien_subtest 'system bad' => sub {
+
+    alienfile_ok q{
+      use alienfile;
+      probe sub { 'system' };
+      sys {
+        test sub {
+          my($build) = @_;
+          log('in test!');
+          $build->install_prop->{foobar} = 'baz2';
+          die "bogus16";
+        };
+      };
+    };
+    
+    alien_install_type_is 'system';
+    alien_checkpoint_ok;
+    alien_resume_ok;
+    alien_build_ok;
+    alien_checkpoint_ok;
+
+    my $build = alien_resume_ok;
+    my($out, $error) = capture_merged {
+      eval { $build->test };
+      $@;
+    };
+    note $out;
+    
+    like $error, qr/bogus16/;
+    
+    is($build->install_prop->{foobar}, 'baz2');
   };
 
 };

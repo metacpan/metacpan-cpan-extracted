@@ -10,19 +10,19 @@ package Devel::Cover::Branch;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
 sub pad         { my $self = shift; $self->[0] = [0, 0]
-                  unless $self->[0] && @{$self->[0]}; }
+                  unless $self->[0] && @{$self->[0]};                    }
 sub uncoverable { @_ > 1 ? $_[0][2][$_[1]] : scalar grep $_, @{$_[0][2]} }
 sub covered     { @_ > 1 ? $_[0][0][$_[1]] : scalar grep $_, @{$_[0][0]} }
-sub total       { scalar @{$_[0][0]} }
-sub value       { $_[0][0][$_[1]] }
-sub values      { @{$_[0][0]} }
-sub text        { $_[0][1]{text} }
-sub criterion   { 'branch' }
+sub total       { scalar @{$_[0][0]}                                     }
+sub value       { $_[0][0][$_[1]]                                        }
+sub values      { @{$_[0][0]}                                            }
+sub text        { $_[0][1]{text}                                         }
+sub criterion   { "branch"                                               }
 
 
 sub percentage {
@@ -66,7 +66,7 @@ Devel::Cover::Branch - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

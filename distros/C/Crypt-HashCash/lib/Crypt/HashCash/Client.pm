@@ -3,7 +3,7 @@
 # Crypt::HashCash::Client - Client for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Client.pm v1.126 Sat Jun 24 02:15:17 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Client.pm v1.127 Sat Sep 16 18:48:09 PDT 2017 $
 
 package Crypt::HashCash::Client;
 
@@ -23,7 +23,7 @@ use Crypt::HashCash qw (_dec _hex);
 use Compress::Zlib;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -113,6 +113,7 @@ sub initbuy {           # Initializa a buy
   my ($self, %arg) = @_;
   my $res = $self->msgvault("id $arg{Address} $arg{Amt} $arg{Numcoins}");
   return undef if !$res or $res =~ /^-ERR/;
+  return $res if $res =~ /^-E/;
   my $inits = [ split / /, $res ]
 }
 
@@ -121,6 +122,7 @@ sub buy {               # Buy HashCash
   my @reqstrs = map { $_->as_string } @{$arg{Requests}};
   my $res = $self->msgvault("d $arg{Address} @reqstrs");
   return undef if !$res or $res =~ /^-ERR/;
+  return $res if $res =~ /^-E/;
   my $coins = [ map { Crypt::HashCash::Coin::Blinded->from_string($_) } split / /, $res ];
 }
 
@@ -257,8 +259,8 @@ Crypt::HashCash::Client - Client for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.126 $
- $Date: Sat Jun 24 02:15:17 PDT 2017 $
+ $Revision: 1.127 $
+ $Date: Sat Sep 16 18:48:09 PDT 2017 $
 
 =head1 SYNOPSIS
 

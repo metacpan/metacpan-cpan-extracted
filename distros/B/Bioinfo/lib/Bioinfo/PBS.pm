@@ -4,7 +4,7 @@ use Modern::Perl;
 use IO::All;
 use namespace::autoclean;
 
-our $VERSION = '0.1.8'; # VERSION: 
+our $VERSION = '0.1.11'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -150,7 +150,7 @@ Bioinfo::PBS - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.11
 
 =head1 SYNOPSIS
 

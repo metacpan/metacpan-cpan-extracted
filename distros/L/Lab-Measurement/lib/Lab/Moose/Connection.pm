@@ -1,14 +1,14 @@
 package Lab::Moose::Connection;
+$Lab::Moose::Connection::VERSION = '3.600';
 #ABSTRACT: Role for connections
-$Lab::Moose::Connection::VERSION = '3.554';
+
 use 5.010;
 use warnings;
 use strict;
 
-
 use Moose::Role;
 use MooseX::Params::Validate qw/validated_hash/;
-use Lab::Moose::Instrument qw/timeout_param/;
+use Lab::Moose::Instrument qw/timeout_param read_length_param/;
 use namespace::autoclean;
 
 requires qw/Read Write Clear/;
@@ -21,13 +21,21 @@ has timeout => (
 );
 
 sub _timeout_arg {
-    my $self    = shift;
-    my %arg     = @_;
-    my $timeout = $arg{timeout};
-    if ( not defined $timeout ) {
-        $timeout = $self->timeout();
-    }
-    return $timeout;
+    my $self = shift;
+    my %arg  = @_;
+    return $arg{timeout} // $self->timeout();
+}
+
+has read_length => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 32768
+);
+
+sub _read_length_arg {
+    my $self = shift;
+    my %arg  = @_;
+    return $arg{read_length} // $self->read_length();
 }
 
 
@@ -35,12 +43,14 @@ sub Query {
     my ( $self, %arg ) = validated_hash(
         \@_,
         timeout_param,
+        read_length_param,
         command => { isa => 'Str' },
     );
 
     my %write_arg = %arg;
+    delete $write_arg{read_length};
     $self->Write(%write_arg);
-    
+
     delete $arg{command};
     return $self->Read(%arg);
 }
@@ -59,7 +69,7 @@ Lab::Moose::Connection - Role for connections
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 DESCRIPTION
 

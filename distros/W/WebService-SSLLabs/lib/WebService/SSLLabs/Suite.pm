@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use WebService::SSLLabs::Suite();
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub new {
     my ( $class, $json ) = @_;
@@ -58,6 +58,11 @@ sub id {
     return $self->{id};
 }
 
+sub q {
+    my ($self) = @_;
+    return $self->{q};
+}
+
 1;
 __END__
 
@@ -67,7 +72,7 @@ WebService::SSLLabs::Suite - Suite object
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SUBROUTINES/METHODS
 

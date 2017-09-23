@@ -42,7 +42,7 @@ else {
 my $ccflags = 
 
 WriteMakefile(
-    ABSTRACT => "Perl bindings to the LabOne API of Zurich Instruments ",
+    ABSTRACT_FROM => 'lib/Lab/Zhinst.pm',
     AUTHOR => "Simon Reinhardt <simon.reinhardt\@stud.uni-regensburg.de>",
     CONFIGURE_REQUIRES => {
         "ExtUtils::MakeMaker" => 0
@@ -62,7 +62,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         "Test::More" => 0
     },
-    VERSION => "0.07",
+    VERSION_FROM => 'lib/Lab/Zhinst.pm',
     LIBS => [$libs],
     INC => $inc,
     CCFLAGS => '-Wall -Wno-deprecated-declarations',

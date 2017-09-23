@@ -3,16 +3,21 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __cos__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_cos($r, $_[0], $ROUND);
-    $r;
-};
+sub __cos__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __cos__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_cos($r, $_[0], $ROUND);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_cos($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cos($r, $x, $ROUND);
+        return $r;
+    }
+}
 
 1;

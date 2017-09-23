@@ -3,6 +3,8 @@ lib/MooX/Thunking.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/basic-multi-attr.t
+t/basic-noisa.t
 t/basic-role.t
 t/basic.t
 xt/manifest.t

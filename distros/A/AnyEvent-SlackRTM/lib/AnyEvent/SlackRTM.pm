@@ -1,5 +1,5 @@
 package AnyEvent::SlackRTM;
-$AnyEvent::SlackRTM::VERSION = '0.161950';
+$AnyEvent::SlackRTM::VERSION = '1.0';
 use v5.14;
 
 # ABSTRACT: AnyEvent module for interacting with the Slack RTM API
@@ -156,16 +156,22 @@ sub _handle_incoming {
         croak "unable to decode incoming message: $message";
     };
 
-    # Handle the initial hello
-    if ($msg->{type} eq 'hello') {
-        $self->_handle_hello($conn, $msg);
-    }
-    elsif ($msg->{type} eq 'error') {
+    # Handle errors when they occur
+    if ($msg->{error}) {
         $self->_handle_error($conn, $msg);
     }
+
+    # Handle the initial hello
+    elsif ($msg->{type} eq 'hello') {
+        $self->_handle_hello($conn, $msg);
+    }
+
+    # Periodic response to our pings
     elsif ($msg->{type} eq 'pong') {
         $self->_handle_pong($conn, $msg);
     }
+
+    # And anything else...
     else {
         $self->_handle_other($conn, $msg);
     }
@@ -187,6 +193,9 @@ sub _handle_error {
     my ($self, $conn, $msg) = @_;
 
     carp "Error #$msg->{error}{code}: $msg->{error}{msg}"
+        unless $self->{quiet};
+
+    $self->_do(error => $msg);
 }
 
 sub _handle_pong {
@@ -215,8 +224,6 @@ sub _handle_finish {
 
 sub close { shift->{conn}->close }
 
-1;
-
 __END__
 
 =pod
@@ -229,7 +236,7 @@ AnyEvent::SlackRTM - AnyEvent module for interacting with the Slack RTM API
 
 =head1 VERSION
 
-version 0.161950
+version 1.0
 
 =head1 SYNOPSIS
 
@@ -279,8 +286,6 @@ version 0.161950
 This provides an L<AnyEvent>-based interface to the L<Slack Real-Time Messaging API|https://api.slack.com/rtm>. This allows a program to interactively send and receive messages of a WebSocket connection and takes care of a few of the tedious details of encoding and decoding messages.
 
 As of this writing, the library is still a fairly low-level experience, but more pieces may be automated or simplified in the future.
-
-B<Somewhat Experimental:> The API here is not set in stone yet, so watch for surprises if you upgrade.
 
 B<Disclaimer:> Note also that this API is subject to rate limits and any service limitations and fees associated with your Slack service. Please make sure you understand those limitations before using this library.
 
@@ -372,13 +377,23 @@ Returns true after the "finish" message has been received from the server (meani
 
 This closes the WebSocket connection to the Slack RTM API.
 
+=head1 CAVEATS
+
+This is a low-level API. Therefore, this only aims to handle the basic message
+handling. You must make sure that any messages you send to Slack are formatted
+correctly. You must make sure any you receive are handled appropriately. Be sure
+to read the Slack documentation basic message formatting, attachment formatting,
+rate limits, etc.
+
+1;
+
 =head1 AUTHOR
 
 Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Qubling Software LLC.
+This software is copyright (c) 2017 by Qubling Software LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

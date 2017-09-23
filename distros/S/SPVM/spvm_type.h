@@ -6,11 +6,11 @@
 #include "spvm_base.h"
 
 enum {
-  SPVM_TYPE_C_CORE_LENGTH = 15
+  SPVM_TYPE_C_CORE_LENGTH = 13
 };
 
 enum {
-  SPVM_TYPE_C_ARRAY_SHIFT = 7
+  SPVM_TYPE_C_ARRAY_SHIFT = 6
 };
 
 enum {
@@ -25,14 +25,12 @@ enum {
   SPVM_TYPE_C_CODE_LONG,
   SPVM_TYPE_C_CODE_FLOAT,
   SPVM_TYPE_C_CODE_DOUBLE,
-  SPVM_TYPE_C_CODE_STRING,
   SPVM_TYPE_C_CODE_BYTE_ARRAY,
   SPVM_TYPE_C_CODE_SHORT_ARRAY,
   SPVM_TYPE_C_CODE_INT_ARRAY,
   SPVM_TYPE_C_CODE_LONG_ARRAY,
   SPVM_TYPE_C_CODE_FLOAT_ARRAY,
   SPVM_TYPE_C_CODE_DOUBLE_ARRAY,
-  SPVM_TYPE_C_CODE_STRING_ARRAY,
 };
 
 extern const char* const SPVM_TYPE_C_CODE_NAMES[];
@@ -51,6 +49,9 @@ char* SPVM_TYPE_create_array_name(SPVM_COMPILER* compiler, const char* base_name
 char* SPVM_TYPE_get_element_name(SPVM_COMPILER* compiler, const char* type_name);
 char* SPVM_TYPE_get_parent_name(SPVM_COMPILER* compiler, const char* type_name);
 
+_Bool SPVM_TYPE_is_string(SPVM_COMPILER* compiler, SPVM_TYPE* type);
+_Bool SPVM_TYPE_is_byte_array(SPVM_COMPILER* compiler, SPVM_TYPE* type);
+
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler);
 
 _Bool SPVM_TYPE_is_integral(SPVM_COMPILER* compiler, SPVM_TYPE* type);
@@ -65,6 +66,6 @@ SPVM_TYPE* SPVM_TYPE_get_int_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_get_long_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_get_float_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_get_double_type(SPVM_COMPILER* compiler);
-SPVM_TYPE* SPVM_TYPE_get_string_type(SPVM_COMPILER* compiler);
+SPVM_TYPE* SPVM_TYPE_get_byte_array_type(SPVM_COMPILER* compiler);
 
 #endif

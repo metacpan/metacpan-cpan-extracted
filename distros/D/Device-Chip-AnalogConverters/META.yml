@@ -15,22 +15,25 @@ meta-spec:
   version: '1.4'
 name: Device-Chip-AnalogConverters
 provides:
+  Device::Chip::AD5691R:
+    file: lib/Device/Chip/AD5691R.pm
+    version: '0.03'
   Device::Chip::ADS1115:
     file: lib/Device/Chip/ADS1115.pm
-    version: '0.02'
+    version: '0.03'
   Device::Chip::AnalogConverters:
     file: lib/Device/Chip/AnalogConverters.pm
-    version: '0.02'
+    version: '0.03'
   Device::Chip::LTC2400:
     file: lib/Device/Chip/LTC2400.pm
-    version: '0.02'
+    version: '0.03'
   Device::Chip::MCP4725:
     file: lib/Device/Chip/MCP4725.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0.10'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

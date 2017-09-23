@@ -1,6 +1,6 @@
 package Lab::Moose::DataFile::Gnuplot::2D;
 #ABSTRACT: 2D data file with live plotting support
-$Lab::Moose::DataFile::Gnuplot::2D::VERSION = '3.554';
+$Lab::Moose::DataFile::Gnuplot::2D::VERSION = '3.600';
 use 5.010;
 use warnings;
 use strict;
@@ -185,7 +185,7 @@ Lab::Moose::DataFile::Gnuplot::2D - 2D data file with live plotting support
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

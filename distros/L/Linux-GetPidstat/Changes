@@ -1,5 +1,9 @@
 Revision history for Perl extension Linux-GetPidstat
 
+0.09 2017-09-19T02:20:13Z
+
+    - Fixed: Use of uninitialized value  in numeric eq (==) at /path/to/Linux/GetPidstat/Reader.pm line 27 (https://github.com/yoheimuta/Linux-GetPidstat/pull/10)
+
 0.08 2017-09-15T03:04:34Z
 
     - Use of uninitialized value $pid in scalar chomp at /path/to/local/lib/perl5/Linux/GetPidstat/Reader.pm line 22 (https://github.com/yoheimuta/Linux-GetPidstat/pull/9)

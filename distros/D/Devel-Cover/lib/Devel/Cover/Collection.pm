@@ -7,10 +7,10 @@
 
 package Devel::Cover::Collection;
 
-use 5.16.0;
+use 5.26.0;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use Devel::Cover::DB;
 use Devel::Cover::DB::IO::JSON;
@@ -160,23 +160,24 @@ sub add_build_dirs {
     # say && system "ls -al $_" for "/remote_staging",
                                   # map "$_/build", @{$self->cpan_dir};
     my $exists = sub {
-        my $dir = "/remote_staging/" . (s|.*/||r =~ s/-\w{6}$/*/r);
-        # say "checking [$dir]";
+        # say "exists [$_]";
+        my $dir = "/remote_staging/" . (s|.*/||r =~ s/-\d+$/*/r);
         my @files = glob $dir;
+        # say "checking [$dir] -> [@files]";
         @files
     };
     push @{$self->build_dirs},
          grep { !$exists->() }
          grep -d,
          map glob("$_/build/*"), @{$self->cpan_dir};
-    # say "add_build_dirs"; say for @{$self->build_dirs};
+    # say "add_build_dirs:"; say for @{$self->build_dirs};
 }
 
 sub run {
     my $self = shift;
     my ($build_dir) = @_;
 
-    my ($module)    = $build_dir =~ m|.*/([^/]+?)(?:-\w{6})$| or return;
+    my ($module)    = $build_dir =~ m|.*/([^/]+?)(?:-\d+)$| or return;
     my $db          = "$build_dir/cover_db";
     my $line        = "=" x 80;
     my $output      = "**** Checking coverage of $module ****\n";
@@ -448,10 +449,13 @@ sub cover_modules {
     my $self = shift;
 
     $self->process_module_file;
-
     # say "modules: ", Dumper $self->modules;
 
-    my @command = qw( utils/dc cpancover-docker-module );
+    my $dir = "";
+    $dir = "/dc/" if $self->local && -d "/dc";
+    my @opts;
+    push @opts, "--local" if $self->local;
+    my @command = ("${dir}utils/dc", @opts, "cpancover-docker-module");
     $self->_set_local_timeout(0);
     my @res = iterate_as_array(
         { workers => $self->workers },
@@ -463,10 +467,10 @@ sub cover_modules {
             if ($self->is_covered($dir)) {
                 $self->set_covered($dir);
                 say "$module already covered" if $self->verbose;
-                return;
-            } elsif ($self->is_failed($dir) && !$self->force) {
+                return unless $self->force;
+            } elsif ($self->is_failed($dir)) {
                 say "$module already failed" if $self->verbose;
-                return;
+                return unless $self->force;
             }
 
             my $timeout = $self->local_timeout || $self->timeout || 30 * 60;
@@ -477,6 +481,7 @@ sub cover_modules {
             eval {
                 local $SIG{ALRM} = sub { die "alarm\n" };
                 alarm $timeout;
+                say "running: @command" if $self->verbose;
                 system @command, $module, $name;
                 alarm 0;
             };
@@ -619,7 +624,7 @@ package Devel::Cover::Collection::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use base "Template::Provider";
 
@@ -800,7 +805,7 @@ Devel::Cover::Collection - Code coverage for a collection of modules
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

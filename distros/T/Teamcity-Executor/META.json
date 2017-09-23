@@ -1,0 +1,89 @@
+{
+   "abstract" : "Executor of TeamCity build configurations",
+   "author" : [
+      "Miroslav Tynovsky <tynovsky@avast.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Teamcity-Executor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Module::Build::Tiny" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "Future" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Async::Loop" : "0",
+            "IO::Async::Timer::Periodic" : "0",
+            "IO::Socket::SSL" : "0",
+            "Moose" : "0",
+            "autobox::Core" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Teamcity::Executor" : {
+         "file" : "lib/Teamcity/Executor.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avast/Teamcity-Executor/issues"
+      },
+      "homepage" : "https://github.com/avast/Teamcity-Executor",
+      "repository" : {
+         "url" : "git://github.com/avast/Teamcity-Executor.git",
+         "web" : "https://github.com/avast/Teamcity-Executor"
+      }
+   },
+   "version" : "0.1.1",
+   "x_authority" : "cpan:TYNOVSKY",
+   "x_contributors" : [
+      "tynovsky <tynovsky@seznam.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

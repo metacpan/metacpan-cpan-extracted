@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Trace::Data::Response;
 #ABSTRACT: ???
-$Lab::Moose::Instrument::SCPI::Trace::Data::Response::VERSION = '3.554';
+$Lab::Moose::Instrument::SCPI::Trace::Data::Response::VERSION = '3.600';
 use Moose::Role;
 use Lab::Moose::Instrument qw/getter_params/;
 use Lab::Moose::Instrument::Cache;
@@ -35,7 +35,7 @@ Lab::Moose::Instrument::SCPI::Trace::Data::Response - ???
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

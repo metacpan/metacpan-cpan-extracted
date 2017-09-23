@@ -1,3 +1,12 @@
+1.203 2017-09-20
+- Add option to provide extended attributes to the new Net::OpenSSH object
+- Add option to provide existing Net::OpenSSH object
+- Now using Dist::Zilla for CPAN packaging
+
+1.202
+
+- SysFink (http://code.google.com/p/sysfink/) protocols are now based upon SSH::RPC.
+
 1.201 2009-11-02
 
 - Finally got around to fixing the broken version from the previous release.

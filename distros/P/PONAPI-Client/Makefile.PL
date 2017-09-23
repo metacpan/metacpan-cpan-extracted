@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "Moose" => 0,
     "URI" => 0,
+    "YAHC" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Simple" => "0.98"
   },
-  "VERSION" => "0.002008",
+  "VERSION" => "0.002009",
   "test" => {
     "TESTS" => "t/010-Client-Request/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Simple" => "0.98",
   "URI" => 0,
+  "YAHC" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

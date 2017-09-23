@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 sub new
@@ -184,6 +184,10 @@ sub mm_postamble
   # append to all
   $postamble .= "pure_all :: _alien/mm/build\n\n";
   
+  $postamble .= "subdirs-test_dynamic :: alien_test\n\n";
+  $postamble .= "alien_test :\n" .
+                "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e test\n\n";
+  
   # prop
   $postamble .= "alien_prop :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop\n\n";
@@ -302,6 +306,13 @@ sub import
         _touch('build');
       };
       
+      *test = sub
+      {
+        my($build) = _args();
+        $build->test;
+        $build->checkpoint;
+      };
+      
       *dumpprop = sub
       {
         my($build, $type) = _args();
@@ -333,7 +344,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

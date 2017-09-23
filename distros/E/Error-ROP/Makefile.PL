@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Error-ROP",
   "LICENSE" => "apache",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Error::ROP",
   "PREREQ_PM" => {
     "Moose" => 0
@@ -21,7 +22,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Spec" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

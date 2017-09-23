@@ -1,0 +1,40 @@
+---
+abstract: 'Auto-colorize Log::Any logs with Term::ANSIColor'
+author:
+  - 'Stephen Thirlwall <sdt@cpan.org>'
+build_requires:
+  Log::Any::Test: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Plugin-ANSIColor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Log::Any::Plugin::ANSIColor:
+    file: lib/Log/Any/Plugin/ANSIColor.pm
+    version: '0.01'
+requires:
+  Log::Any::Plugin: '0.004'
+  Term::ANSIColor: '2.02'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sdt/Log-Any-Plugin-ANSIColor/issues
+  homepage: https://github.com/sdt/Log-Any-Plugin-ANSIColor
+  repository: git://github.com/sdt/Log-Any-Plugin-ANSIColor.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

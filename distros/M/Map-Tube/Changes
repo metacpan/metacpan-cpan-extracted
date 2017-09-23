@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.35  2017-09-21T11:30:00+00:00
+      - Hide unnecessary noise during the test.
+
 3.34  2017-08-11T11:25:00+00:00
       - Added dependency on Map::Tube::Exceptions v3.13.
 

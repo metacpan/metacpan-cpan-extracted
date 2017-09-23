@@ -6,6 +6,7 @@ MANIFEST			This list of files
 README
 t/00-load.t
 t/01-utf8.t
+t/02-utf-8-n.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

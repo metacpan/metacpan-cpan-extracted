@@ -19,7 +19,7 @@ use String::Glob::Permute 'string_glob_permute';
 
 use constant TICK_SECOND => 0.1;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 my $SCRIPT = File::Basename::basename($0);
 my $SUDO_PROMPT = sprintf "sudo password (asking with %s): ", $SCRIPT;
@@ -41,6 +41,7 @@ sub run {
     $self->parse_options(@argv);
     $self->register;
 
+    local $| = 1;
     my $INT; local $SIG{INT} = sub { $INT++ };
     my $TERM; local $SIG{TERM} = sub { $TERM++ };
     while (1) {
@@ -233,9 +234,11 @@ sub register {
         };
         @command = (@prefix, $name, @{$self->{script_arg}});
     } else {
-        @command = @{$self->{command}};
-        unshift @command, "bash", "-c" if @command == 1;
-        unshift @command, @prefix;
+        @command = (
+            @prefix,
+            (@{$self->{command}} == 1 && $self->{command}[0] =~ /\s/ ? ("bash", "-c") : ()),
+            @{$self->{command}},
+        );
     }
     DEBUG and logger "execute %s", join(" ", map { qq('$_') } @command);
     push @ssh_cmd, sub {

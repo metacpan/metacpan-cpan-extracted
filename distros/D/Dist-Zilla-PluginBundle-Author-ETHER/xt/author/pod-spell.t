@@ -11,9 +11,11 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
 Author
+Betts
 Dave
 Dist
 ETHER
+Edward
 Etheridge
 Graham
 III
@@ -30,6 +32,7 @@ Stauner
 Weaver
 Zilla
 autarch
+edward
 ether
 haarg
 irc

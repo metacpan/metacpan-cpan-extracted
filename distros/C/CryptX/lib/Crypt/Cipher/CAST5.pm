@@ -4,7 +4,7 @@ package Crypt::Cipher::CAST5;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::CAST5 - Symetric cipher CAST5 (aka CAST-128), key size: 40-128 bi
   my $cbc = Crypt::Mode::CBC->new('CAST5');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::CAST5;
 

@@ -11,7 +11,7 @@ use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = q[476.1.1];
+our $VERSION = q[476.4.2];
 
 __PACKAGE__->mk_accessors(qw(dbh));
 

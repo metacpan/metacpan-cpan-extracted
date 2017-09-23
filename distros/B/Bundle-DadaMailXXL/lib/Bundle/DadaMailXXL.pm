@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.2';
+$VERSION = '0.0.3';
 
 1;
 
@@ -36,6 +36,8 @@ Try::Tiny
 
 CGI
 
+CGI::Application
+
 CGI::Session
 
 CGI::Session::ExpireSessions
@@ -65,8 +67,6 @@ Email::Valid
 Exporter::Lite
 
 File::Spec
-
-GD::SecurityImage;
 
 Data::Google::Visualization::DataTable
 
@@ -170,7 +170,7 @@ Time::Piece
 
 Try::Tiny
 
-URI::Escape
+URI
 
 Crypt::CipherSaber
 

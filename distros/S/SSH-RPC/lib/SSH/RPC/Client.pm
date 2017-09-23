@@ -1,7 +1,5 @@
 package SSH::RPC::Client;
-
-our $VERSION = 1.201;
-
+$SSH::RPC::Client::VERSION = '1.203';
 use strict;
 use Class::InsideOut qw(readonly private id register);
 use JSON;
@@ -11,6 +9,10 @@ use SSH::RPC::Result;
 =head1 NAME
 
 SSH::RPC::Client - The requestor, or client side, of an RPC call over SSH.
+
+=head1 VERSION
+
+version 1.203
 
 =head1 SYNOPSIS
 
@@ -64,12 +66,37 @@ The username you want to connect as.
 
 The password to connect to this account. Can be omitted if you've set up an ssh key to automatically authenticate. See man ssh-keygen for details.
 
+=head2 new ( \%opts )
+
+Extended constructor with Net::OpenSSH as parameter.
+
+=head3 \%opts
+
+The hash needs a key with name "host", that is the hostname or ip address you want to connect to.
+The remaining options in the hash will be used as optinal parameters for a new Net::OpenSSH object.
+
+=head2 new ( \$ssh )
+
+=head3 \$ssh
+
+Blessed reference holding an object that isa Net::OpenSSH, that will be reused for connection.
+
 =cut
 
 sub new {
-    my ($class, $host, $user, $pass) = @_;
+    my $class = shift;
     my $self = register($class);
-    $ssh{id $self} = Net::OpenSSH->new($host,user=>$user, password=>$pass, timeout=>30, master_opts => [ '-T']);
+    if (blessed($_[0]) and $_[0]->isa('Net::OpenSSH')) {
+        $ssh{id $self} = shift;
+    } elsif (ref($_[0]) eq 'HASH') {
+        my $opts = shift;
+        my $host = $opts->{host} or die "No host option specified";
+        delete $opts->{host};
+        $ssh{id $self} = Net::OpenSSH->new($host, %$opts);
+    } else {
+        my ($host, $user, $pass) = @_;
+        $ssh{id $self} = Net::OpenSSH->new($host,user=>$user, password=>$pass, timeout=>30, master_opts => [ '-T']);
+    }
     return $self;
 }
 
@@ -166,4 +193,3 @@ JT Smith <jt_at_plainblack_com>
 
 
 1;
-

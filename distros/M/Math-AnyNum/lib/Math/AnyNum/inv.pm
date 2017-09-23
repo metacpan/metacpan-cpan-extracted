@@ -3,35 +3,39 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __inv__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_ui_div($r, 1, $_[0], $ROUND);
-    $r;
-};
-
-Class::Multimethods::multimethod __inv__ => qw(Math::GMPq) => sub {
+sub __inv__ {
     my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-    # Check for division by zero
-    Math::GMPq::Rmpq_sgn($x) || do {
-        (@_) = _mpq2mpfr($x);
-        goto &__inv__;
-    };
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        return $r;
+    }
 
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_inv($r, $x);
-    $r;
-};
+  Math_GMPq: {
 
-Class::Multimethods::multimethod __inv__ => qw(Math::GMPz) => sub {
-    (@_) = _mpz2mpq($_[0]);
-    goto &__inv__;
-};
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($x) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR;
+        };
 
-Class::Multimethods::multimethod __inv__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_ui_div($r, 1, $_[0], $ROUND);
-    $r;
-};
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_inv($r, $x);
+        return $r;
+    }
+
+  Math_GMPz: {
+        $x = _mpz2mpq($x);
+        goto Math_GMPq;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        return $r;
+    }
+}
 
 1;

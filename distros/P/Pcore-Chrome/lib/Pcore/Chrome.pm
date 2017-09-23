@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.1.5;
+package Pcore::Chrome v0.2.0;
 
 use Pcore -dist, -const, -class;
 use Pcore::Chrome::Tab;
@@ -39,7 +39,7 @@ sub run ( $self, @args ) {
 
     my $useragent = !exists $args{useragent} ? $DEFAULT_USERAGENT : $args{useragent};
 
-    $self->{user_data_dir} = P->file->tempdir;
+    $self->{user_data_dir} = $args{user_data_dir} // P->file->tempdir;
 
     my $cmd = [
         qq["$args{bin}"],

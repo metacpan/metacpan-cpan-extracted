@@ -1,0 +1,13 @@
+prefix=/foo
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: foo
+Description: fooble
+Version: 1.0.2
+URL: http://www.foo.com/
+Requires.private: bar
+Requires: baz
+Libs: -L${libdir} -lfoo
+Cflags: -DFOO=1 -I${includedir}

@@ -37,6 +37,9 @@ lib/PONAPI/Client/Request/Role/IsPATCH.pm
 lib/PONAPI/Client/Request/Role/IsPOST.pm
 lib/PONAPI/Client/Request/Update.pm
 lib/PONAPI/Client/Request/UpdateRelationships.pm
+lib/PONAPI/Client/Role/UA.pm
+lib/PONAPI/Client/UA/Hijk.pm
+lib/PONAPI/Client/UA/YAHC.pm
 lib/PONAPI/Utils/URI.pm
 t/010-Client-Request/000-request-retrieve.t
 t/010-Client-Request/001-request-retrieve-all.t

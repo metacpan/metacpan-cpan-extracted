@@ -26,6 +26,7 @@ no_smart_comments_in("t/00-report-prereqs.t");
 no_smart_comments_in("t/attribute_options_ok/basic.t");
 no_smart_comments_in("t/attribute_options_ok/subtest-wrapper.t");
 no_smart_comments_in("t/check_sugar.t");
+no_smart_comments_in("t/definition_context.t");
 no_smart_comments_in("t/does_metaroles_ok.t");
 no_smart_comments_in("t/does_not_metaroles_ok.t");
 no_smart_comments_in("t/does_not_ok.t");

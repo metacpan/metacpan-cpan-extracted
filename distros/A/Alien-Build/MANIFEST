@@ -41,6 +41,7 @@ corpus/lib/Alien/Build/Plugin/Fetch/Foo.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Controller.pm
 corpus/lib/Alien/Build/Plugin/NesAdvantage/Negotiate.pm
 corpus/lib/Alien/Build/Plugin/RogerRamjet.pm
+corpus/lib/Alien/Foo.pm
 corpus/lib/Alien/Foo1.pm
 corpus/lib/Alien/Foo1/ConfigData.pm
 corpus/lib/Alien/Foo2.pm
@@ -68,7 +69,6 @@ corpus/lib/pkgconfig/xor.pc
 corpus/pkgconfig/libbar1.pc
 corpus/pkgconfig/libfoo1.pc
 corpus/rc/basic.pl
-corpus/win32/openvpn.reg
 dist.ini
 example/README
 example/bzip2.alienfile
@@ -156,7 +156,6 @@ lib/Alien/Build/Plugin/Probe.pod
 lib/Alien/Build/Plugin/Probe/CBuilder.pm
 lib/Alien/Build/Plugin/Probe/CommandLine.pm
 lib/Alien/Build/Util.pm
-lib/Alien/Build/Util/Win32/RegistryDump.pm
 lib/Alien/Role.pm
 lib/Test/Alien.pm
 lib/Test/Alien/Build.pm
@@ -173,7 +172,6 @@ maint/travis-install-deps
 maint/travis-run-test
 maint/update-cmake-libpalindrome
 t/00_diag.t
-t/00_diag2.t
 t/01_use.t
 t/alien_base.t
 t/alien_base__system_installed.t
@@ -228,7 +226,6 @@ t/alien_build_plugin_probe_commandline.t
 t/alien_build_rc.t
 t/alien_build_tempdir.t
 t/alien_build_util.t
-t/alien_build_util_win32_registrydump.t
 t/alien_role.t
 t/alienfile.t
 t/bin/ftpd
@@ -239,15 +236,6 @@ t/lib/MyTest/HTTP.pm
 t/lib/MyTest/System.pm
 t/lib/Test2/Require/Dev.pm
 t/test_alien.t
-t/test_alien__alien_ok.t
-t/test_alien__ffi_ok.t
-t/test_alien__ffi_ok__acme.t
-t/test_alien__helper_ok.t
-t/test_alien__interpolate_template_ok.t
-t/test_alien__xs_ok.t
-t/test_alien__xs_ok__acme.t
-t/test_alien__xs_ok__no_compiler.t
-t/test_alien__xs_ok__with_xs_load.t
 t/test_alien_build.t
 t/test_alien_cancompile.t
 t/test_alien_canplatypus.t

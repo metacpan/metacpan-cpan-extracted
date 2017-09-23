@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,8 +28,9 @@ resources:
   bugtracker: https://github.com/PerlChina/Acme-CPANAuthors-Chinese/issues
   homepage: https://github.com/PerlChina/Acme-CPANAuthors-Chinese
   repository: https://github.com/PerlChina/Acme-CPANAuthors-Chinese.git
-version: '0.39'
+version: '0.40'
 x_contributors:
   - 'Fayland Lam <fayland@gmail.com>'
   - 'unknown <Administrator@.(none)>'
   - 'unknown <LinDao@.(none)>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

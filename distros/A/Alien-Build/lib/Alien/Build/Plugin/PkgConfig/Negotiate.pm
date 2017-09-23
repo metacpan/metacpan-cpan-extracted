@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -46,7 +46,12 @@ sub pick
   }
   else
   {
-    Carp::carp("Could not find an appropriate pkg-config implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
+    # this is a fata error.  because we check for a pkg-config implementation
+    # at configure time, we expect at least one of these to work.  (and we
+    # fallback on installing PkgConfig.pm as a prereq if nothing else is avail).
+    # we therefore expect at least one of these to work, if not, then the configuration
+    # of the system has shifted from underneath us.
+    Carp::croak("Could not find an appropriate pkg-config implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
   }
 }
 
@@ -62,10 +67,12 @@ sub init
     $meta->add_requires('configure', 'Alien::Build::Plugin::PkgConfig::Negotiate' => '0.79');
   }
   
-  $self->subplugin($plugin,
-    pkg_name        => $self->pkg_name,
-    minimum_version => $self->minimum_version,
-  )->init($meta);
+  my @args;
+  push @args, pkg_name         => $self->pkg_name;
+  push @args, register_prereqs => 0;
+  push @args, minimum_version  => $self->minimum_version if defined $self->minimum_version;
+  
+  $meta->apply_plugin($plugin, @args);
 
   $self;
 }
@@ -84,7 +91,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

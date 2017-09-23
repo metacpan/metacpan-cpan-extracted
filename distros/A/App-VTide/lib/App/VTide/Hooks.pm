@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use Path::Tiny;
 
-our $VERSION = version->new('0.1.3');
+our $VERSION = version->new('0.1.4');
 
 has hook_cmds => (
     is      => 'rw',
@@ -48,7 +48,7 @@ sub _hook_cmds {
     }
     if ( -f $local ) {
         my $done = do $local;
-        $hooks = { %{ $hooks}, %{ $done } };
+        $hooks = { %{ $hooks || {} }, %{ $done || {} } };
     }
 
     return $hooks;
@@ -64,7 +64,7 @@ App::VTide::Hooks - Manage code hooks for APP::VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Hooks version 0.1.3
+This documentation refers to App::VTide::Hooks version 0.1.4
 
 =head1 SYNOPSIS
 

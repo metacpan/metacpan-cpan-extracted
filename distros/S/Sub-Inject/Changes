@@ -1,7 +1,11 @@
 
 Release history for Sub-Inject
 
-0.2.0     2017-09-13 12:35:51-07:00 America/Los_Angeles
+0.3.0     2017-09-21 18:52:31-07:00 America/Los_Angeles
+
+      - Accept a hash ref as input to sub_inject()
+
+v0.2     2017-09-13 12:35:51-07:00 America/Los_Angeles
 
       - Inject.xs: intro_my() for perl [ 5.18, 5.22 )
       - t/02-op-lexsub.t

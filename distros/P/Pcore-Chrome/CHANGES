@@ -1,3 +1,6 @@
+v0.2.0 2017-09-16T18:34:14Z
+ - cookies methods were added
+
 v0.1.5 2017-08-25T05:10:34Z
  - logo updated
  - call pending callbacks on websocket disconnect

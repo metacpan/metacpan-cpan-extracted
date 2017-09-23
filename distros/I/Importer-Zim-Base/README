@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Importer-Zim-Base,
-version 0.3.0:
+version 0.5.0:
 
-  Base module for Importer::Zim
+  Base module for Importer::Zim backends
 
 This software is copyright (c) 2017 by Adriano Ferreira.
 

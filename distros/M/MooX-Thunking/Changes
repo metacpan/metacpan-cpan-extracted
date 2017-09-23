@@ -1,3 +1,9 @@
+0.07 Fri Sep 15 16:02:26 BST 2017
+ - no more need for `isa` to pass `CodeLike`
+
+0.06 Fri Sep 15 14:55:20 BST 2017
+ - support multiple attributes per `has`
+
 0.05 Tue Sep 12 04:40:22 BST 2017
  - test, fix working with non-thunk value
 

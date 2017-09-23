@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Magnet;
 #ABSTRACT: Magnetic field sweep
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.554';
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.600';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -160,7 +160,7 @@ Lab::XPRESS::Sweep::Magnet - Magnetic field sweep
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

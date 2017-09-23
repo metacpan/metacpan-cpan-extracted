@@ -7,7 +7,7 @@ use Error::ROP::Imp;
 use Exporter qw/import/;
 
 our @EXPORT_OK = qw/success failure rop bind/;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub success {
     return Error::ROP::Imp->new(value => shift);

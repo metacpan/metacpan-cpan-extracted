@@ -10,7 +10,7 @@ Base class for DB fields.
 =cut
 
 package QBit::Application::Model::DB::Field;
-$QBit::Application::Model::DB::Field::VERSION = '0.019';
+$QBit::Application::Model::DB::Field::VERSION = '0.020';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);

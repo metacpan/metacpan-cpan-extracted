@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.28  2017-09-20T10:40:00+01:00
+      - Improved method exporting.
+
 0.27  2017-09-15T11:35:00+01:00
       - Updated copyright year information.
 

@@ -10,7 +10,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-README
+README.md
 bin/cover
 bin/cpancover
 bin/gcov2perl
@@ -37,6 +37,7 @@ lib/Devel/Cover/DB.pm
 lib/Devel/Cover/DB/Digests.pm
 lib/Devel/Cover/DB/File.pm
 lib/Devel/Cover/DB/IO.pm
+lib/Devel/Cover/DB/IO/Base.pm
 lib/Devel/Cover/DB/IO/JSON.pm
 lib/Devel/Cover/DB/IO/Sereal.pm
 lib/Devel/Cover/DB/IO/Storable.pm
@@ -75,7 +76,6 @@ test_output/cover/alias.5.010000
 test_output/cover/alias1.5.010000
 test_output/cover/and.5.010000
 test_output/cover/and.5.012000
-test_output/cover/and.5.016000
 test_output/cover/bigint.5.010000
 test_output/cover/branch_return_sub.5.010000
 test_output/cover/change.5.010000
@@ -109,6 +109,7 @@ test_output/cover/eval_merge_0.5.010000
 test_output/cover/eval_merge_1.5.010000
 test_output/cover/eval_merge_sep.t.5.010000
 test_output/cover/eval_nested.5.010000
+test_output/cover/eval_string.5.010000
 test_output/cover/eval_sub.t.5.010000
 test_output/cover/eval_use.t.5.010000
 test_output/cover/exec.5.010000
@@ -133,6 +134,9 @@ test_output/cover/overload_bool2.5.010000
 test_output/cover/overload_bool2.5.022000
 test_output/cover/overloaded.5.010000
 test_output/cover/padrange.5.010000
+test_output/cover/padrange2.5.010000
+test_output/cover/padrange2.5.018000
+test_output/cover/padrange2.5.022000
 test_output/cover/pod.5.010000
 test_output/cover/pod_nocp.5.010000
 test_output/cover/readonly.5.010000
@@ -198,6 +202,7 @@ tests/eval_merge_0
 tests/eval_merge_1
 tests/eval_merge_sep.t
 tests/eval_nested
+tests/eval_string
 tests/eval_sub.t
 tests/eval_use.t
 tests/exec
@@ -221,6 +226,7 @@ tests/overload_bool
 tests/overload_bool2
 tests/overloaded
 tests/padrange
+tests/padrange2
 tests/pod
 tests/pod_nocp
 tests/random/dir/file
@@ -243,19 +249,13 @@ tests/xor_constant_fold
 utils/Devel/Cover/BuildUtils.pm
 utils/all_versions
 utils/bisect.sh
-utils/build_cpancover_perl
 utils/cpancover.nginx
-utils/cpancover_modules
-utils/cpanmcover
 utils/create_all_gold
 utils/create_gold
 utils/dc
-utils/install/System.pm
-utils/install/buildperl
 utils/install_dev_modules
 utils/mail_contributors
 utils/makeh
-utils/run_cpancover
 utils/scanuncov
 utils/setup
 utils/typemap

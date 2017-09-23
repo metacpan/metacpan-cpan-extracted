@@ -58,11 +58,11 @@
     </a>
 
      <a 
-       href="[% c.mount_url %]/" target="_blank"
+       href="#!/adm/main/db/db_category" 
        class="thumbnail tile tile-200 tile-orange fa-links"
      >
-       <h1>Home page</h1>
-       <i class="fa fa-5x fa-home"></i>
+       <h1>Categories</h1>
+       <i class="fa fa-5x fa-clone"></i>
     </a>
     
     <a 

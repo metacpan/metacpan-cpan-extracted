@@ -33,7 +33,7 @@ sub _validate_sub {
 	if ( ref $spec eq 'ARRAY' ) {
 		push @count, scalar @{$spec};
 
-		if ( $count[0] == 1 and ref $params[0] eq 'ARRAY' ) {
+		if ( $count[0] == 1 && $count[1] != 1 and ref $params[0] eq 'ARRAY' ) {
 			@params   = @{ $params[0] };
 			$count[0] = scalar @params;
 			$count[3] = 'ref';
@@ -49,8 +49,7 @@ sub _validate_sub {
 			  and ( $spec->[$_]->[1] =~ m/^1$/ and next or $params[$_] = $self->_default( $spec->[$_]->[1] ) );
 		}
 
-		$compiled_check->(@params);
-
+		@params = $compiled_check->(@params);
 		return defined $count[3] ? \@params : @params;
 	}
 
@@ -61,9 +60,9 @@ sub _validate_sub {
 			and ( $spec->{$_}->[1] =~ m/^1$/ and next or $para{$_} = $self->_default( $spec->{$_}->[1] ) );
 	}
 
-	$compiled_check->(\%para);
+	my $paraRef = $compiled_check->(\%para);
 
-	return $count[0] == 1 ? \%para : %para;
+	return $count[0] == 1 ? $paraRef : %{$paraRef};
 }
 
 sub _default {

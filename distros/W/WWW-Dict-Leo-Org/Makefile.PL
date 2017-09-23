@@ -1,5 +1,5 @@
 #
-# made for WWW::Dict::Leo::Org 1.33 and up
+# made for WWW::Dict::Leo::Org 2.01 and up
 
 use ExtUtils::MakeMaker;
 
@@ -10,7 +10,7 @@ WriteMakefile(
   'clean'        => { FILES => '*~' },
   'EXCLUDE_EXT'  => [ qw(README) ],
   'PREREQ_PM'    => { 'Carp::Heavy'       => 0,
-                      'IO::Socket'        => 0,
+                      'IO::Socket::SSL'   => 0,
                       'MIME::Base64'      => 0,
                       'XML::Simple'       => 0
                     }

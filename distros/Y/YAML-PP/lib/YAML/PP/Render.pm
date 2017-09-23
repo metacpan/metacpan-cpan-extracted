@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Render;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 my $WS = '[\t ]';
@@ -24,6 +24,9 @@ sub render_tag {
             $tag = "<" . $map->{ $alias }. $name . ">";
         }
         else {
+            if ($alias ne '!' and $alias ne '!!') {
+                die "Found undefined tag handle '$alias'";
+            }
             $tag = "<!$name>";
         }
     }
@@ -33,6 +36,10 @@ sub render_tag {
     return $tag;
 }
 
+my %control = (
+    '\\' => '\\', n => "\n", t => "\t", r => "\r", b => "\b",
+    'x0a' => "\n", 'x0d' => "\r",
+);
 sub render_quoted {
     my (%args) = @_;
     my $double = $args{double};
@@ -41,15 +48,27 @@ sub render_quoted {
     my $addspace = 0;
     for my $i (0 .. $#$lines) {
         my $line = $lines->[ $i ];
+        if ($#$lines == 0) {
+            if ($double) {
+                $line =~ s/\\"/"/g;
+                $line =~ s/\\(x0d|x0a|[\\ntrb])/$control{ $1 }/g;
+                $line =~ s/\\u([A-Fa-f0-9]+)/chr(oct("x$1"))/eg;
+            }
+            else {
+                $line =~ s/''/'/g;
+            }
+            $quoted .= $line;
+            last;
+        }
         my $last = $i == $#$lines;
         my $first = $i == 0;
-        if ($line =~ s/^$WS*$/\\n/) {
+        if ($line =~ s/^$WS*$/\n/) {
             $addspace = 0;
             if ($first or $last) {
                 $quoted .= " ";
             }
             else {
-                $quoted .= "\\n";
+                $quoted .= "\n";
             }
         }
         else {
@@ -70,16 +89,15 @@ sub render_quoted {
             }
             else {
                 $line =~ s/''/'/g;
-                $line =~ s/\\/\\\\/g;
             }
-            if ($line =~ s/\\$//) {
+            if (not $last and $line =~ s/\\$//) {
                 $addspace = 0;
             }
             $line =~ s/^\\ / /;
-            $line =~ s/\t/\\t/g;
-            $line =~ s/\\x0d/\\r/g;
-            $line =~ s/\\x0a/\\n/g;
-            $line =~ s/\\u([A-Fa-f0-9]+)/chr(oct("x$1"))/eg;
+            if ($double) {
+                $line =~ s/\\(x0d|x0a|[\\ntrb])/$control{ $1 }/g;
+                $line =~ s/\\u([A-Fa-f0-9]+)/chr(oct("x$1"))/eg;
+            }
             $quoted .= $line;
         }
     }
@@ -153,9 +171,6 @@ sub render_block_scalar {
     if ($trim) {
         $string =~ s/\n$//;
     }
-    $string =~ s/\\/\\\\/g;
-    $string =~ s/\n/\\n/g;
-    $string =~ s/\t/\\t/g;
     return $string;
 }
 
@@ -171,9 +186,10 @@ sub render_multi_val {
     my $string = '';
     my $start = 1;
     for my $line (@$multi) {
+        #$line =~ s/\\/\\\\/g;
         if (not $start) {
             if ($line eq '') {
-                $string .= "\\n";
+                $string .= "\n";
                 $start = 1;
             }
             else {

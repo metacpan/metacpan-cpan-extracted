@@ -1,0 +1,103 @@
+{
+   "abstract" : "Manipulation of Office Open XML files",
+   "author" : [
+      "Martijn van de Streek <martijn@vandestreek.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Document-OOXML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Tiny" : "0",
+            "XML::LibXML" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Document::OOXML" : {
+         "file" : "lib/Document/OOXML.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::ContentTypes" : {
+         "file" : "lib/Document/OOXML/ContentTypes.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::Document" : {
+         "file" : "lib/Document/OOXML/Document.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::Document::Wordprocessor" : {
+         "file" : "lib/Document/OOXML/Document/Wordprocessor.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::Part" : {
+         "file" : "lib/Document/OOXML/Part.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::Part::WordprocessingML" : {
+         "file" : "lib/Document/OOXML/Part/WordprocessingML.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::PartParser" : {
+         "file" : "lib/Document/OOXML/PartParser.pm",
+         "version" : "0.172650"
+      },
+      "Document::OOXML::Rels" : {
+         "file" : "lib/Document/OOXML/Rels.pm",
+         "version" : "0.172650"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/martijnvds/Document-OOML/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/martijnvds/Document-OOML.git",
+         "web" : "https://gitlab.com/martijnvds/Document-OOML"
+      }
+   },
+   "version" : "0.172650",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

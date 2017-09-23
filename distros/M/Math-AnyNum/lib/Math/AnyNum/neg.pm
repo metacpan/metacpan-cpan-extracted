@@ -3,28 +3,33 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __neg__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_neg($r, $_[0], $ROUND);
-    $r;
-};
+sub __neg__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __neg__ => qw(Math::GMPq) => sub {
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_neg($r, $_[0]);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_neg($r, $x, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __neg__ => qw(Math::GMPz) => sub {
-    my $r = Math::GMPz::Rmpz_init_set($_[0]);
-    Math::GMPz::Rmpz_neg($r, $r);
-    $r;
-};
+  Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_neg($r, $x);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __neg__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_neg($r, $_[0], $ROUND);
-    $r;
-};
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_neg($r, $r);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_neg($r, $x, $ROUND);
+        return $r;
+    }
+}
 
 1;

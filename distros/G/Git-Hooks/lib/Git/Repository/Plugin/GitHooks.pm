@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.1.3';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.1.5';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -224,6 +224,13 @@ sub _gerrit_patchset_post_hook {
 
     if (my $errors = $git->get_errors()) {
         $review_input{labels}  = $cfg{'votes-to-reject'} || 'Code-Review-1';
+
+        # We have to truncate $errors down to a little less than 64kB because up
+        # to at least Gerrit 2.14.4 messages are saved in a MySQL column of type
+        # 'text', which has this limit.
+        if (length $errors > 65000) {
+            $errors = substr($errors, 0, 65000) . "...\n<truncated>\n";
+        }
         $review_input{message} = $errors;
     } else {
         $review_input{labels}  = $cfg{'votes-to-approve'} || 'Code-Review+1';
@@ -932,25 +939,25 @@ sub authenticated_user {
 
 sub get_current_branch {
     my ($git) = @_;
-    my $cmd = $git->command(qw/symbolic-ref HEAD/);
+    my $branch = $git->run({fatal => [-129, -128]}, qw/symbolic-ref HEAD/);
 
     # Return undef if we're in detached head state
-    return eval { $cmd->final_output } || undef;
+    return $? == 0 ? $branch : undef;
 }
 
 sub get_sha1 {
     my ($git, $rev) = @_;
 
-    return $git->run(qw/rev-parse --verify/, $rev)->final_output;
+    return $git->run(qw/rev-parse --verify/, $rev);
 }
 
 sub get_head_or_empty_tree {
     my ($git) = @_;
 
-    my $cmd = $git->command(qw/rev-parse --verify HEAD/);
+    my $head = $git->run({fatal => [-129, -128]}, qw/rev-parse --verify HEAD/);
 
     # Return the empty tree object if in the initial commit
-    return eval { $cmd->final_output } || $git->empty_tree;
+    return $? == 0 ? $head : $git->empty_tree;
 }
 
 sub blob {
@@ -1133,7 +1140,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.1.3
+version 2.1.5
 
 =head1 SYNOPSIS
 

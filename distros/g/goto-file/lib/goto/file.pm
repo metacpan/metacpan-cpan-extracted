@@ -2,9 +2,9 @@ package goto::file;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
-use Filter::Util::Call qw/filter_add/;
+use Filter::Util::Call qw/filter_add filter_read/;
 
 our %HANDLES;
 
@@ -15,21 +15,22 @@ sub import {
 
     return unless $in;
 
+    my ($pkg, $file, $line) = caller(0);
     my ($fh, @lines);
 
     if (ref($in) eq 'ARRAY') {
-        my ($pkg, $file, $line) = caller(0);
         my $safe = $file;
         $safe =~ s/"/\\"/;
 
-        @lines = (
-            "package $pkg;",
+        push @lines => "#line " . (__LINE__ + 1) . ' "' . __FILE__ . '"';
+        push @lines => (
+            "package main;",
             "#line 1 \"lines from $safe line $line\"",
             @$in,
         );
     }
     else {
-        push @lines => "#line " . __LINE__ . ' "' . __FILE__ . '"';
+        push @lines => "#line " . (__LINE__ + 1) . ' "' . __FILE__ . '"';
         push @lines => "package main;";
         push @lines => "\$@ = '';";
 
@@ -48,7 +49,7 @@ sub import {
     }
 
     Filter::Util::Call::filter_add(
-        bless { fh => $fh, lines => \@lines },
+        bless {fh => $fh, lines => \@lines, file => $in, caller => [$pkg, $file, $line]},
         $class
     );
 }
@@ -56,24 +57,26 @@ sub import {
 sub filter {
     my $self = shift;
 
+    unless ($self->{init}) {
+        $self->{init} = 1;
+        while (1) { filter_read() or last }
+        $_ = '';
+    }
+
     my $lines = $self->{lines};
     my $fh    = $self->{fh};
 
     my $line;
     if (@$lines) {
-        $line = shift @$lines;
+        chomp($line = shift @$lines);
+        $line .= "\n";
     }
     elsif ($fh) {
         $line = <$fh>;
     }
 
     if (defined $line) {
-        # Normalize to make sure each line ends with a newline.
-        # Without this things choke on files with no terminal newline.
-        chomp($line);
         $_ .= $line;
-        $_ .= "\n";
-
         return 1;
     }
 

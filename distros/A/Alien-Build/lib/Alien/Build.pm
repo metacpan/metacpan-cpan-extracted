@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -150,19 +150,24 @@ sub load
   
   require alienfile;
 
+  foreach my $preload (@preload)
+  {
+    ref $preload eq 'CODE' ? $preload->($self->meta) : $self->meta->apply_plugin($preload);
+  }
+
+  # TODO: do this without a string eval ?
   eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
     package ${class}::Alienfile;
-    foreach my \$preload (\@preload) {
-      ref \$preload eq 'CODE' ? \$preload->(meta()) : alienfile::plugin(\$preload);
-    }
     do '@{[ $file->absolute->stringify ]}';
     die \$\@ if \$\@;
-    foreach my \$postload (\@postload) {
-      ref \$postload eq 'CODE' ? \$postload->(meta()) : alienfile::plugin(\$postload);
-    }
   };
   die $@ if $@;
-  
+
+  foreach my $postload (@postload)
+  {
+    ref $postload eq 'CODE' ? $postload->($self->meta) : $self->meta->apply_plugin($postload);
+  }
+
   $self->{args} = \@args;
   unless(defined $self->meta->prop->{arch})
   {
@@ -270,8 +275,12 @@ sub load_requires
   foreach my $mod (keys %$reqs)
   {
     my $ver = $reqs->{$mod};
-    eval qq{ use $mod @{[ $ver ? $ver : '' ]} () };
-    die if $@;
+    require do {
+      my $pm = "$mod.pm";
+      $pm =~ s{::}{/}g;
+      $pm;
+    };
+    die "Required $mod $ver, have @{[ $mod->VERSION || 0 ]}" if $ver && ! $mod->VERSION($ver);
     
     # allow for requires on Alien::Build or Alien::Base
     next if $mod eq 'Alien::Build';
@@ -632,6 +641,8 @@ sub build
         },
       }, "build${suffix}");
 
+      $self->install_prop->{"_ab_build@{[ $suffix || '_share' ]}"} = "$CWD";
+
       $self->_call_hook("gather@{[ $suffix || '_share' ]}");
     }
   }
@@ -659,6 +670,36 @@ sub build
   }
   
   $self;
+}
+
+
+sub test
+{
+  my($self) = @_;
+
+  if($self->install_type eq 'share')
+  {
+    foreach my $suffix ('_share', '_ffi')
+    {
+      if($self->meta->has_hook("test$suffix"))
+      {
+        my $dir = $self->install_prop->{"_ab_build$suffix"};
+        Carp::croak("no build directory to run tests") unless $dir && -d $dir;
+        local $CWD = $dir;
+        $self->_call_hook("test$suffix");
+      }
+    }
+  }
+  else
+  {
+    if($self->meta->has_hook("test_system"))
+    {
+      my $dir = Alien::Build::TempDir->new($self, "test");
+      local $CWD = "$dir";
+      $self->_call_hook("test_system");
+    }
+  }
+
 }
 
 
@@ -802,10 +843,16 @@ sub _instr
       prefer        => 'share',
       extract       => 'share',
       patch         => 'share',
+      patch_ffi     => 'share',
       build         => 'share',
+      build_ffi     => 'share',
       stage         => 'share',
+      gather_ffi    => 'share',
       gather_share  => 'share',
       gather_system => 'system',
+      test_ffi      => 'share',
+      test_share    => 'share',
+      test_system   => 'system',
     );
     require Alien::Build::CommandSequence;
     my $seq = Alien::Build::CommandSequence->new(@$instr);
@@ -944,6 +991,53 @@ sub call_hook
   $value;
 }
 
+
+sub apply_plugin
+{
+  my($self, $name, @args) = @_;
+
+  my $class;
+  my $pm;
+  my $found;
+  
+  if($name =~ /^=(.*)$/)
+  {
+    $class = $1;
+    $pm    = "$class.pm";
+    $pm    =~ s!::!/!g;
+    $found = 1;
+  }
+  
+  if($name !~ /::/ && !$found)
+  {
+    foreach my $inc (@INC)
+    {
+      # TODO: allow negotiators to work with @INC hooks
+      next if ref $inc;
+      my $file = Path::Tiny->new("$inc/Alien/Build/Plugin/$name/Negotiate.pm");
+      if(-r $file)
+      {
+        $class = "Alien::Build::Plugin::${name}::Negotiate";
+        $pm    = "Alien/Build/Plugin/$name/Negotiate.pm";
+        $found = 1;
+        last;
+      }
+    }
+  }
+  
+  unless($found)
+  {
+    $class = "Alien::Build::Plugin::$name";
+    $pm    = "Alien/Build/Plugin/$name.pm";
+    $pm    =~ s{::}{/}g;
+  }
+  
+  require $pm unless $class->can('new');
+  my $plugin = $class->new(@args);
+  $plugin->init($self);
+  $self;
+}
+
 package Alien::Build::TempDir;
 
 use Path::Tiny qw( path );
@@ -988,7 +1082,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -1559,6 +1653,12 @@ The C<gather_system> hook will be executed.
 
 =back
 
+=head2 test
+
+ $build->test;
+
+Run the test phase
+
 =head2 system
 
  $build->system($command);
@@ -1665,6 +1765,13 @@ a method.  For example, this will add a probe system requirement:
      }
    },
  );
+
+=head2 apply_plugin
+
+ Alien::Build->meta->apply_plugin($name);
+ Alien::Build->meta->apply_plugin($name, @args);
+
+Apply the given plugin with the given arguments.
 
 =head1 ENVIRONMENT
 

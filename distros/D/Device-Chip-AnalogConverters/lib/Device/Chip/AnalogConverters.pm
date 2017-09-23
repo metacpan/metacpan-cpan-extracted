@@ -1,5 +1,5 @@
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -27,6 +27,10 @@ L<Device::Chip::LTC2400>
 =head1 DACs
 
 =over 2
+
+=item *
+
+L<Device::Chip::AD5691R>
 
 =item *
 

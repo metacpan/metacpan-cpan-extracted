@@ -15,7 +15,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.26';
+our $VERSION = '6.27';
 
 sub new
 {
@@ -660,13 +660,11 @@ sub redirect_ok
     return 1;
 }
 
-
-sub credentials
-{
-    my $self = shift;
-    my $netloc = lc(shift);
-    my $realm = shift || "";
-    my $old = $self->{basic_authentication}{$netloc}{$realm};
+sub credentials {
+    my $self   = shift;
+    my $netloc = lc(shift || '');
+    my $realm  = shift || "";
+    my $old    = $self->{basic_authentication}{$netloc}{$realm};
     if (@_) {
         $self->{basic_authentication}{$netloc}{$realm} = [@_];
     }
@@ -674,7 +672,6 @@ sub credentials
     return @$old if wantarray;
     return join(":", @$old);
 }
-
 
 sub get_basic_credentials
 {

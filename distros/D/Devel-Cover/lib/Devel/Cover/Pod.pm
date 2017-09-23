@@ -10,18 +10,18 @@ package Devel::Cover::Pod;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
 BEGIN { eval "use Pod::Coverage 0.06" }     # We'll use this if it is available.
 
-sub uncoverable { $_[0][2] }
-sub covered     { $_[0][0] ? 1 : 0 }
-sub total       { 1 }
-sub percentage  { $_[0][0] ? 100 : 0 }
+sub uncoverable { $_[0][2]               }
+sub covered     { $_[0][0] ? 1 : 0       }
+sub total       { 1                      }
+sub percentage  { $_[0][0] ? 100 : 0     }
 sub error       { $_[0][0] xor !$_[0][2] }
-sub criterion   { 'pod' }
+sub criterion   { "pod"                  }
 
 sub calculate_summary {
     my $self = shift;
@@ -47,7 +47,7 @@ Devel::Cover::Pod - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

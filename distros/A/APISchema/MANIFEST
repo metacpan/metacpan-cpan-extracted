@@ -12,6 +12,7 @@ lib/APISchema/Generator/Markdown/ExampleFormatter.pm
 lib/APISchema/Generator/Markdown/Formatter.pm
 lib/APISchema/Generator/Markdown/ResourceResolver.pm
 lib/APISchema/Generator/Router/Simple.pm
+lib/APISchema/JSON.pm
 lib/APISchema/Resource.pm
 lib/APISchema/Route.pm
 lib/APISchema/Schema.pm
@@ -27,6 +28,7 @@ script/generate_markdown_document.pl
 t/APISchema-DSL.t
 t/APISchema-Generator-Markdown.t
 t/APISchema-Generator-Router-Simple.t
+t/APISchema-JSON.t
 t/APISchema-Resource.t
 t/APISchema-Route.t
 t/APISchema-Schema.t

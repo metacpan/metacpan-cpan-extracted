@@ -1,6 +1,6 @@
 package Lab::XPRESS::hub;
 #ABSTRACT: The XPRESS main hub
-$Lab::XPRESS::hub::VERSION = '3.554';
+$Lab::XPRESS::hub::VERSION = '3.600';
 use Lab::Exception;
 use strict;
 use Exporter 'import';
@@ -159,7 +159,7 @@ Lab::XPRESS::hub - The XPRESS main hub
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -15,7 +15,7 @@ use ObjectDB::Table;
 use ObjectDB::With;
 use ObjectDB::Util qw(execute filter_columns);
 
-our $VERSION = '3.22';
+our $VERSION = '3.23';
 
 $Carp::Internal{ (__PACKAGE__) }++;
 $Carp::Internal{"ObjectDB::$_"}++ for qw/
@@ -255,9 +255,9 @@ sub set_column {
 
     if ($self->meta->is_column($name)) {
         if (   !defined $value
-            && !$self->meta->get_column($name)->{is_null})
+            && !$self->meta->is_nullable($name) )
         {
-            $value = q{};
+            return $self;
         }
 
         if (   !exists $self->{columns}->{$name}
@@ -335,18 +335,20 @@ sub create {
     Carp::croak(q{Calling 'create' on already created object})
       if $self->is_in_db;
 
+    my $dbh = $self->init_db;
+
     my $sql = SQL::Composer->build(
         'insert',
-        driver => $self->init_db->{Driver}->{Name},
+        driver => $dbh->{Driver}->{Name},
         into   => $self->meta->table,
         values => [ map { $_ => $self->{columns}->{$_} } $self->columns ]
     );
 
-    my $rv = execute($self->init_db, $sql, context => $self);
+    my $rv = execute($dbh, $sql, context => $self);
 
     if (my $auto_increment = $self->meta->auto_increment) {
         $self->set_column(
-            $auto_increment => $self->init_db->last_insert_id(undef, undef, $self->meta->table, $auto_increment));
+            $auto_increment => $dbh->last_insert_id(undef, undef, $self->meta->table, $auto_increment));
     }
 
     $self->{is_in_db}    = 1;

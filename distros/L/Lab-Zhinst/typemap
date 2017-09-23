@@ -1,6 +1,12 @@
 Lab::Zhinst          T_PTROBJ
+Lab::Zhinst::ZIEvent T_PTROBJ
 HV *                 T_HVREF_REFCOUNT_FIXED
+uint16_t             T_UV
+uint32_t             T_UV
 
+ZIResult_enum        T_IV
+ZIDoubleData         T_DOUBLE
+ZIIntegerData        T_IV
 ##########################
 INPUT
 T_HVREF_REFCOUNT_FIXED

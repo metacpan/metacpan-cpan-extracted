@@ -1,6 +1,6 @@
 package Lab::Instrument::MagnetSupply;
 #ABSTRACT: Base class for superconducting magnet power supply instruments
-$Lab::Instrument::MagnetSupply::VERSION = '3.554';
+$Lab::Instrument::MagnetSupply::VERSION = '3.600';
 use Lab::Measurement::KeyboardHandling qw(labkey_soft_check);
 use strict;
 
@@ -308,7 +308,7 @@ Lab::Instrument::MagnetSupply - Base class for superconducting magnet power supp
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 Coding and calling conventions
 

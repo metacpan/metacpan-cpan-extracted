@@ -2,9 +2,9 @@ package Catmandu::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0603';
+our $VERSION = '1.0605';
 
-use Catmandu::Util qw(:check is_string require_package);
+use Catmandu::Util qw(:check is_string require_package now);
 use Catmandu::Bag::IdGenerator::UUID;
 use Moo::Role;
 use MooX::Aliases;
@@ -92,6 +92,12 @@ sub to_hash {
             $hash;
         }
     );
+}
+
+sub touch {
+    my ($self, $key, $format) = @_;
+    $self->add_many($self->tap(sub {$_[0]->{$key} = now($format)}));
+    $self->commit;
 }
 
 1;
@@ -208,6 +214,14 @@ Deletes the item with C<$id> from the bag.
 =head2 delete_all
 
 Clear the bag.
+
+=head2 touch($key, $format)
+
+Add the current datetime to each record.
+
+    $bag->touch('date_updated', 'iso_date_time');
+
+See L<Catmandu::Util::now> for possible format values.
 
 =head2 commit
 

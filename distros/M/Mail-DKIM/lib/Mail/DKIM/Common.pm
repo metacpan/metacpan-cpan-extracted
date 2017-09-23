@@ -15,7 +15,7 @@ use Mail::Address;
 package Mail::DKIM::Common;
 use base "Mail::DKIM::MessageParser";
 use Carp;
-our $VERSION = 0.42;
+our $VERSION = 0.43;
 
 sub new
 {

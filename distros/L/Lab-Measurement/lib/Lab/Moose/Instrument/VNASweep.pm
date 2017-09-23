@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::VNASweep;
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.600';
 #ABSTRACT: Role for network analyzer sweeps
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.554';
+
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;
@@ -12,7 +13,6 @@ use Carp;
 use PDL::Lite;
 use PDL::Core qw/pdl cat/;
 use namespace::autoclean;
-
 
 with qw(
     Lab::Moose::Instrument::Common
@@ -114,7 +114,10 @@ sub sparam_sweep {
     # Query measured traces.
 
     # Get data.
-    my $num_cols = @{$catalog};
+    $args{read_length} = $self->block_length(
+        num_points => @{$catalog} * @{$freq_array},
+        precision  => $precision
+    );
 
     my $binary = $self->sparam_sweep_data(%args);
 
@@ -141,7 +144,7 @@ Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 METHODS
 

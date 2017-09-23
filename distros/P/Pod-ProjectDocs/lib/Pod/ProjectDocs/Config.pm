@@ -3,48 +3,57 @@ package Pod::ProjectDocs::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49';    # VERSION
 
-use base qw/Class::Accessor::Fast/;
+use Moose;
 
-use Readonly;
+has 'title' => (
+    is      => 'ro',
+    default => "MyProject's Libraries",
+    isa     => 'Str',
+);
 
-__PACKAGE__->mk_accessors(qw/
-    title
-    desc
-    verbose
-    index
-    outroot
-    libroot
-    forcegen
-    lang
-    except
-/);
+has 'desc' => (
+    is      => 'ro',
+    default => "manuals and libraries",
+    isa     => 'Str',
+);
 
-Readonly my $DEFAULT_TITLE   => qq/MyProject's Libraries/;
-Readonly my $DEFAULT_DESC    => qq/manuals and libraries/;
-Readonly my $DEFAULT_LANG    => qq/en/;
+has 'verbose' => (
+    is  => 'ro',
+    isa => 'Bool',
+);
 
-sub new {
-    my ($class, @args) = @_;
-    my $self  = bless { }, $class;
-    $self->_init(@args);
-    return $self;
-}
+has 'index' => (
+    is  => 'ro',
+    isa => 'Bool',
+);
 
-sub _init {
-    my($self, %args) = @_;
-    $self->title   ( $args{title}   || $DEFAULT_TITLE   );
-    $self->desc    ( $args{desc}    || $DEFAULT_DESC    );
-    $self->lang    ( $args{lang}    || $DEFAULT_LANG    );
-    $self->verbose ( $args{verbose}                     );
-    $self->index   ( $args{index}                       );
-    $self->outroot ( $args{outroot}                     );
-    $self->libroot ( $args{libroot}                     );
-    $self->forcegen( $args{forcegen}                    );
-    $self->except  ( $args{except}                      );
-    return;
-}
+has 'forcegen' => (
+    is  => 'ro',
+    isa => 'Bool',
+);
+
+has 'outroot' => (
+    is  => 'ro',
+    isa => 'Str',
+);
+
+has 'libroot' => (
+    is  => 'ro',
+    isa => 'ArrayRef[Str]'
+);
+
+has 'lang' => (
+    is      => 'ro',
+    default => 'en',
+    isa     => 'Str',
+);
+
+has 'except' => (
+    is  => 'ro',
+    isa => 'ArrayRef[Str]'
+);
 
 1;
 __END__

@@ -4,7 +4,7 @@ package Crypt::Cipher::Twofish;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::Twofish - Symetric cipher Twofish, key size: 128/192/256 bits (Cr
   my $cbc = Crypt::Mode::CBC->new('Twofish');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Twofish;
 

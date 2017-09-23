@@ -54,7 +54,7 @@
    "provides" : {
       "Sub::Inject" : {
          "file" : "lib/Sub/Inject.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -69,10 +69,7 @@
          "web" : "https://github.com/aferreira/cpan-Sub-Inject"
       }
    },
-   "version" : "0.2.0",
-   "x_contributors" : [
-      "Adriano Ferreira <a.r.ferreira@gmail.com>"
-   ],
+   "version" : "0.3.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

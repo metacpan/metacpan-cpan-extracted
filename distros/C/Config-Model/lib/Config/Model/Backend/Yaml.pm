@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.108';
+$Config::Model::Backend::Yaml::VERSION = '2.110';
 use 5.10.1;
 use Carp;
 use strict;
@@ -123,7 +123,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -148,13 +148,12 @@ version 2.108
             },
         },
     ],
-  read_config  => [
-                    { backend => 'yaml' , 
-                      config_dir => '/tmp',
-                      file  => 'foo.yml',
-                      auto_create => 1,
-                    }
-                  ],
+  rw_config  => {
+    backend => 'yaml',
+    config_dir => '/tmp',
+    file  => 'foo.yml',
+    auto_create => 1,
+  }
  ) ;
 
  my $inst = $model->instance(root_class_name => 'MyClass' );

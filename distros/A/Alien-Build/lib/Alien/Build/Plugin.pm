@@ -5,10 +5,10 @@ use warnings;
 use Module::Load ();
 use Carp ();
 
-our @CARP_NOT = qw( alienfile );
+our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 sub new
@@ -64,6 +64,7 @@ sub import
 sub subplugin
 {
   my(undef, $name, %args) = @_;
+  Carp::carp("subplugin method is deprecated");
   my $class = "Alien::Build::Plugin::$name";
   Module::Load::load($class) unless eval { $class->can('new') };
   delete $args{$_} for grep { ! defined $args{$_} } keys %args;
@@ -136,7 +137,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -231,6 +232,8 @@ You provide the implementation for this.  The intent is to register
 hooks and set meta properties on the L<Alien::Build> class.
 
 =head2 subplugin
+
+B<DEPRECATED>: Maybe removed, but not before 1 October 2018.
 
  my $plugin2 = $plugin1->subplugin($plugin_name, %args);
 

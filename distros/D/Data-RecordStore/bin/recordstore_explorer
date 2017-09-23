@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+no warnings 'numeric';
+
+use Data::RecordStore;
+use Data::Dumper;
+
+my $db_dir = shift @ARGV;
+
+die "Usage: $0 <recordstore directory>" unless $db_dir;
+
+die "No recordstore found at $db_dir;" unless -d $db_dir;
+
+my $store = Data::RecordStore->open( $db_dir );
+
+print "Enter an id to see the data at\n";
+print ">";
+
+while( my $in = <STDIN> ) {
+    chomp $in;
+
+    if( $in =~ /^(FULL\s+)?(\d+)$/ ) {
+        my $val = $store->fetch( $2 );
+        if( length($val) < 1001 || $1 ) {
+            print $val."\n";
+        } else {
+            print substr( $val, 0, 1000 )."\n...(use FULL $2 to show all)";
+        }
+    } elsif( $in =~ /^SET (\d+) (.*)$/ ) {
+        $store->stow( $1, $2 );
+    } else {
+        print "Don't know how to show '$in'.\n";
+    }
+    
+    print "\n>";
+}
+
+exit;
+
+
+__END__
+
+a command line explorer for a Data::RecordStore
+

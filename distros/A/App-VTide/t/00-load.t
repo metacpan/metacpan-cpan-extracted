@@ -13,6 +13,7 @@ BEGIN {
     use_ok('App::VTide::Command::Grep');
     use_ok('App::VTide::Command::Help');
     use_ok('App::VTide::Command::Init');
+    use_ok('App::VTide::Command::Who');
     use_ok('App::VTide::Command::Recent');
     use_ok('App::VTide::Command::Refresh');
     use_ok('App::VTide::Command::Run');

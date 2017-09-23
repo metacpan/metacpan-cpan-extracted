@@ -20,3 +20,6 @@ Revision history for Perl module Symbol::Get
 
 0.07 Thu 09 Feb 2017
     - Disown get() for constants. It’s just not reliable.
+
+0.08 Thu 21 Sep 2017
+    - Fix SYNOPSIS to show correct usage.

@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: File-Slurper
 provides:
   File::Slurper:
     file: lib/File/Slurper.pm
-    version: '0.009'
+    version: '0.010'
 recommends:
   PerlIO::utf8_strict: '0'
 requires:
@@ -37,9 +37,10 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper
   repository: git://github.com/Leont/file-slurp-sane.git
-version: '0.009'
+version: '0.010'
 x_contributors:
   - 'Jim Davis <revhippie@gmail.com>'
   - 'Leon Timmermans <fawaka@gmail.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Philipp Gortan <philipp.gortan@apa.at>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,10 +1,11 @@
 package Beam::Minion::Command::run;
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 # ABSTRACT: Command to enqueue a job on Beam::Minion job queue
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     beam minion run <container> <service> [<args>...]
+#pod     beam minion run [-d <delay>] [-a <attempts>] [-p <priority]
+#pod         <container> <service> [<args>...]
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -27,6 +28,23 @@ our $VERSION = '0.006';
 #pod
 #pod The service that defines the task to run. Must be an object that consumes
 #pod the L<Beam::Runner> role.
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod =head2 delay
+#pod
+#pod The amount of time, in seconds, to delay the start of the job (from now).
+#pod Defaults to C<0>.
+#pod
+#pod =head2 attempts
+#pod
+#pod The number of times to automatically retry the job if it fails.
+#pod Subsequent attempts will be delayed by an increasing amount of time
+#pod (calculated by C<(retries ** 4) + 15>).
+#pod
+#pod =head2 priority
+#pod
+#pod The job's priority. Higher priority jobs will be run first. Defaults to C<0>.
 #pod
 #pod =head1 ENVIRONMENT
 #pod
@@ -52,10 +70,16 @@ our $VERSION = '0.006';
 use strict;
 use warnings;
 use Beam::Minion;
+use Getopt::Long qw( GetOptionsFromArray );
 
 sub run {
     my ( $class, $container, $service_name, @args ) = @_;
-    Beam::Minion->enqueue( $container, $service_name, @args );
+    GetOptionsFromArray( \@args, \my %opt,
+        'delay|d=i',
+        'attempts|a=i',
+        'priority|p=i',
+    );
+    Beam::Minion->enqueue( $container, $service_name, \@args, \%opt );
 }
 
 1;
@@ -70,11 +94,12 @@ Beam::Minion::Command::run - Command to enqueue a job on Beam::Minion job queue
 
 =head1 VERSION
 
-version 0.006
+version 0.011
 
 =head1 SYNOPSIS
 
-    beam minion run <container> <service> [<args>...]
+    beam minion run [-d <delay>] [-a <attempts>] [-p <priority]
+        <container> <service> [<args>...]
 
 =head1 DESCRIPTION
 
@@ -97,6 +122,23 @@ variable (separated by C<:>).
 
 The service that defines the task to run. Must be an object that consumes
 the L<Beam::Runner> role.
+
+=head1 OPTIONS
+
+=head2 delay
+
+The amount of time, in seconds, to delay the start of the job (from now).
+Defaults to C<0>.
+
+=head2 attempts
+
+The number of times to automatically retry the job if it fails.
+Subsequent attempts will be delayed by an increasing amount of time
+(calculated by C<(retries ** 4) + 15>).
+
+=head2 priority
+
+The job's priority. Higher priority jobs will be run first. Defaults to C<0>.
 
 =head1 ENVIRONMENT
 

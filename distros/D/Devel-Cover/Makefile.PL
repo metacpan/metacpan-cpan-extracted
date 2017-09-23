@@ -18,13 +18,12 @@ use File::Copy;
 
 $| = 1;
 
-my $Version  = "1.26";
-my $Latest_t = "5.027002";
+my $Version  = "1.27";
+my $Latest_t = "5.027003";
 my $Author   = 'paul@pjcj.net';
 my @perlbug  = ("perlbug", "-a", $Author,
                            "-s", "Installation of Devel::Cover $Version");
 my $Perlbug  = join " ", map { / / ? "'$_'" : $_ } @perlbug;
-my $base     = getcwd;
 my %inc      = map { -d $_ ? (($_ eq "." ? $_ : Cwd::abs_path($_)) => 1) : () }
                    @INC;
 my @inc      = sort keys %inc;
@@ -48,7 +47,6 @@ use warnings;
 
 our \$VERSION      = "$Version";
 our \$Perl_version = '$]';
-our \$Base         = '$base';
 our \@Inc          = qw( @inc );
 chomp (our \$Perl  = <<'EOV');  # Careful with \\\\ in the path
 $^X
@@ -113,10 +111,10 @@ for my $t (readdir D) {
 use strict;
 use warnings;
 
-use lib "$base/lib";
-use lib "$base/blib/lib";
-use lib "$base/blib/arch";
-use lib "$base/t";
+use lib "./lib";
+use lib "./blib/lib";
+use lib "./blib/arch";
+use lib "./t";
 
 use Devel::Cover::Test;
 
@@ -325,8 +323,9 @@ my $opts = {
     EXE_FILES        => [ map "bin/$_", qw( cover gcov2perl cpancover ) ],
     PERL_MALLOC_OK   => 1,
     PREREQ_PM        => {
-                            Storable      => 0,
-                            "Digest::MD5" => 0,
+                            "Storable"       => 0,
+                            "Digest::MD5"    => 0,
+                            "B::Debug"       => 0,
                             "HTML::Entities" => 3.69,
                             $ENV{DEVEL_COVER_NO_TESTS}
                                 ? ()
@@ -417,6 +416,9 @@ html : _run
 
 basic : _run
 \t \$(PERL) -Mblib bin/cover `\$(COVER_PARAMETERS)` -report html_basic
+
+subtle : _run
+\t \$(PERL) -Mblib bin/cover `\$(COVER_PARAMETERS)` -report html_subtle
 
 out : _run
 \t \$(PERL) -Mblib bin/cover `\$(COVER_PARAMETERS)` -report text > \$(TEST).out

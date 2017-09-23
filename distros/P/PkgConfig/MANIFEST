@@ -32,6 +32,7 @@ t/02-iterfiles-FLISTal.t
 t/data/dep_no_inherit_vars/lib/pkgconfig/foo.pc
 t/data/dep_no_inherit_vars/lib/pkgconfig/nspr.pc
 t/data/dep_no_inherit_vars/lib/pkgconfig/nss.pc
+t/data/gh36/foo.pc
 t/data/iterfiles_template
 t/data/quote/backslash.pc
 t/data/quote/doublequote.pc
@@ -628,6 +629,10 @@ t/data/usr/share/pkgconfig/xtrans.pc
 t/dep_no_inherit_vars.t
 t/env.t
 t/file_path.t
+t/gh36.t
+t/lib/PkgConfig/.Path.pm.swp
+t/lib/PkgConfig/Capture.pm
+t/lib/PkgConfig/Path.pm
 t/pcfiledir.t
 t/perl_version.t
 t/PkgConfigTest.pm

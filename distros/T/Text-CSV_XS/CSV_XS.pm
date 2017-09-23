@@ -26,7 +26,7 @@ use DynaLoader ();
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.31";
+$VERSION   = "1.32";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT_OK = qw( csv );
 bootstrap Text::CSV_XS $VERSION;
@@ -101,10 +101,8 @@ my $last_new_err = Text::CSV_XS->SetDiag (0);
 
 # NOT a method: is also used before bless
 sub _unhealthy_whitespace {
-    my ($self, $aw, $sep) = @_;
+    my ($self, $aw) = @_;
     $aw or return 0; # no checks needed without allow_whitespace
-
-#   $sep =~ m/^[ \t]/ || $sep =~ m/[ \t]$/ and return 1002;
 
     my $quo = $self->{quote};
     defined $quo && length ($quo) or $quo = $self->{quote_char};
@@ -148,7 +146,7 @@ sub _check_sanity {
 	length ($eol) > 16	and return 1005;
 	}
 
-    return _unhealthy_whitespace ($self, $self->{allow_whitespace}, $sep);
+    return _unhealthy_whitespace ($self, $self->{allow_whitespace});
     } # _check_sanity
 
 sub known_attributes {
@@ -254,6 +252,7 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     quote_binary		=> 32,
     escape_null			=> 31,
     decode_utf8			=> 35,
+    _has_ahead			=> 30,
     _has_hooks			=> 36,
     _is_bound			=> 26,	# 26 .. 29
     strict			=> 58,
@@ -454,7 +453,7 @@ sub allow_whitespace {
     my $self = shift;
     if (@_) {
 	my $aw = shift;
-	_unhealthy_whitespace ($self, $aw, $self->sep) and
+	_unhealthy_whitespace ($self, $aw) and
 	    croak ($self->SetDiag (1002));
 	$self->_set_attr_X ("allow_whitespace", $aw);
 	}
@@ -829,19 +828,31 @@ sub header {
 		$hdr .= "\0" x $l;
 		read $fh, $x, $l;
 		}
-	    $enc = ":encoding($enc)";
-	    binmode $fh, $enc;
+	    if ($enc ne "utf-8") {
+		require Encode;
+		$hdr = Encode::decode ($enc, $hdr);
+		}
+	    binmode $fh, ":encoding($enc)";
 	    }
 	}
+
+    my $ahead;
+    $hdr =~ s/^([^\r\n]+)[\r\n]+([^\r\n].+)\z/$1/s and
+	$ahead = $2;
 
     $args{munge_column_names} eq "lc" and $hdr = lc $hdr;
     $args{munge_column_names} eq "uc" and $hdr = uc $hdr;
 
     my $hr = \$hdr; # Will cause croak on perl-5.6.x
-    open my $h, "<$enc", $hr or croak ($self->SetDiag (1010));
+    open my $h, "<", $hr or croak ($self->SetDiag (1010));
 
     my $row = $self->getline ($h) or croak;
     close $h;
+
+    if ($ahead) { # Must be after getline, which creates the cache
+	$self->_cache_set ($_cache_id{_has_ahead}, 1);
+	$self->{_AHEAD} = $ahead;
+	}
 
     my @hdr = @$row;
     ref $args{munge_column_names} eq "CODE" and
@@ -1031,6 +1042,10 @@ sub _csv_attr {
 
     ref $in eq "CODE" || ref $in eq "ARRAY" and $out ||= \*STDOUT;
 
+    $in && $out && !ref $in && !ref $out and croak join "\n" =>
+	qq{Cannot use a string for both in and out. Instead use:},
+	qq{ csv (in => csv (in => "$in"), out => "$out");\n};
+
     if ($out) {
 	if ((ref $out and ref $out ne "SCALAR") or "GLOB" eq ref \$out) {
 	    $fh = $out;
@@ -1072,6 +1087,9 @@ sub _csv_attr {
     my $hdrs = delete $attr{headers};
     my $frag = delete $attr{fragment};
     my $key  = delete $attr{key};
+    my $kh   = delete $attr{keep_headers}	    ||
+	       delete $attr{keep_column_names}      ||
+	       delete $attr{kh};
 
     my $cbai = delete $attr{callbacks}{after_in}    ||
 	       delete $attr{after_in}               ||
@@ -1123,6 +1141,7 @@ sub _csv_attr {
 	enc  => $enc,
 	hdrs => $hdrs,
 	key  => $key,
+	kh   => $kh,
 	frag => $frag,
 	fltr => $fltr,
 	cbai => $cbai,
@@ -1203,11 +1222,17 @@ sub csv {
 	@hdr and $hdrs ||= \@hdr;
 	}
 
+    if ($c->{kh}) {
+	ref $c->{kh} eq "ARRAY" or croak ($csv->SetDiag (1501, "1501 - PRM"));
+	$hdrs ||= "auto";
+	}
+
     my $key = $c->{key};
     if ($key) {
 	ref $key and croak ($csv->SetDiag (1501, "1501 - PRM"));
 	$hdrs ||= "auto";
 	}
+
     $c->{fltr} && grep m/\D/ => keys %{$c->{fltr}} and $hdrs ||= "auto";
     if (defined $hdrs) {
 	if (!ref $hdrs) {
@@ -1232,6 +1257,7 @@ sub csv {
 	    my $cr = $hdrs;
 	    $hdrs  = [ map {  $cr->($hdr{$_} || $_) } @$h ];
 	    }
+	$c->{kh} and $hdrs and @{$c->{kh}} = @$hdrs;
 	}
 
     if ($c->{fltr}) {
@@ -1271,7 +1297,8 @@ sub csv {
     $ref or Text::CSV_XS->auto_diag;
     $c->{cls} and close $fh;
     if ($ref and $c->{cbai} || $c->{cboi}) {
-	foreach my $r (@{$ref}) {
+	# Default is ARRAYref, but with key =>, you'll get a hashref
+	foreach my $r (ref $ref eq "ARRAY" ? @{$ref} : values %{$ref}) {
 	    local %_;
 	    ref $r eq "HASH" and *_ = $r;
 	    $c->{cbai} and $c->{cbai}->($csv, $r);
@@ -3069,6 +3096,20 @@ date that has no header line, like
      headers => [qw( c_foo foo bar description stock )],
      key     =>     "c_foo",
      );
+
+=head3 keep_headers
+X<keep_headers>
+X<keep_column_names>
+X<kh>
+
+When using hashes,  keep the column names into the arrayref passed,  so all
+headers are available after the call in the original order.
+
+ my $aoh = csv (in => "file.csv", keep_headers => \my @hdr);
+
+This attribute can be abbreviated to C<kh> or passed as C<keep_column_names>.
+
+This attribute implies a default of C<auto> for the C<headers> attribute.
 
 =head3 fragment
 X<fragment>

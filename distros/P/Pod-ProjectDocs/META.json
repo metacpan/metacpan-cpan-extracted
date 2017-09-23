@@ -1,0 +1,115 @@
+{
+   "abstract" : "generates CPAN like project documents from pod.",
+   "author" : [
+      "Martin Gruner <martin.gruner@cpan.org>",
+      "Lyo Kato <lyo.kato@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-ProjectDocs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Path" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "HTML::Entities" : "0",
+            "IO::File" : "0",
+            "JSON" : "2.04",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Pod::Simple::XHTML" : "3.31",
+            "Readonly" : "0",
+            "Template" : "0",
+            "perl" : "v5.8.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::ProjectDocs" : {
+         "file" : "lib/Pod/ProjectDocs.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::CSS" : {
+         "file" : "lib/Pod/ProjectDocs/CSS.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::Config" : {
+         "file" : "lib/Pod/ProjectDocs/Config.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::Doc" : {
+         "file" : "lib/Pod/ProjectDocs/Doc.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::DocManager" : {
+         "file" : "lib/Pod/ProjectDocs/DocManager.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::File" : {
+         "file" : "lib/Pod/ProjectDocs/File.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::IndexPage" : {
+         "file" : "lib/Pod/ProjectDocs/IndexPage.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::Parser" : {
+         "file" : "lib/Pod/ProjectDocs/Parser.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::Parser::XHTML" : {
+         "file" : "lib/Pod/ProjectDocs/Parser/XHTML.pm",
+         "version" : "0.49"
+      },
+      "Pod::ProjectDocs::Template" : {
+         "file" : "lib/Pod/ProjectDocs/Template.pm",
+         "version" : "0.49"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mgruner/p5-pod-projectdocs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mgruner/p5-pod-projectdocs.git",
+         "web" : "https://github.com/mgruner/p5-pod-projectdocs"
+      }
+   },
+   "version" : "0.49",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

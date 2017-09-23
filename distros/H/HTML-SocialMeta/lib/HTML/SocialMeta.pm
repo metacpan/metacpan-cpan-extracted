@@ -7,28 +7,37 @@ use HTML::SocialMeta::OpenGraph;
 
 use MooX::LazierAttributes qw/lzy bld/;
 use MooX::ValidateSubs;
-use Types::Standard qw/Str Object ArrayRef/;
+use Types::Standard qw/Str Object ArrayRef Split/;
 
-our $VERSION = '0.71';
+our $VERSION = '0.73';
+
+our %encode;
+BEGIN {
+        %encode = ( q{&} => q{&amp;}, q{"} => q{&quot;}, q{'} => q{&apos;}, q{<} => q{&lt;}, q{>} => q{&gt;} );
+        $encode{regex} = join "|", keys %encode;
+}
 
 attributes(
-    [qw(card_type card site site_name title description image url creator operatingSystem 
-    app_country app_name app_id app_url player player_height player_width fb_app_id)] => [ Str, {lzy} ],
+    [qw(card_type card site site_name title description image image_alt url creator operatingSystem
+    app_country app_name app_id app_url player player_height player_width fb_app_id)] => [ Str, {lzy, coerce => sub { 
+        $_[0] =~ s/($encode{regex})/$encode{$1}/g;
+		$_[0]; 
+	}} ],
     [qw(twitter opengraph)] => [ Object, { lzy, bld } ],
     social => [ sub { [qw/twitter opengraph/] } ],
 );
 
 validate_subs(
     create => {
-        params => [ [ Str, 'card_type' ], [ ArrayRef, 'social' ] ],
+        params => [ [ Str, 'card_type' ], [ (ArrayRef[Str])->plus_coercions(Split[qr/\s/]), 'social' ] ], # I expect this to be an arrayref
     },
     required_fields => {
-        params => [ [ Str, 'card_type' ], [ ArrayRef, 'social' ] ],
+        params => [ [ Str, 'card_type' ], [ (ArrayRef[Str])->plus_coercions(Split[qr/\s/]), 'social' ] ],
     },
 );
 
 sub create {
-    return join "\n", map { $_[0]->$_->create( $_[1] ) } @{ $_[2] };
+    return join "\n", map { $_[0]->$_->create( $_[1] ) } @{ $_[2] }; # it doesn't coerce my value
 }
 
 sub required_fields {
@@ -41,7 +50,7 @@ sub _build_twitter {
     HTML::SocialMeta::Twitter->new(
         (
             map { defined $_[0]->$_ ? ( $_ => $_[0]->$_ ) : () }
-              qw/card_type site title description image url creator
+              qw/card_type site title description image image_alt url creator
               operatingSystem app_country app_name app_id app_url
               player player_width player_height/
         )
@@ -53,7 +62,7 @@ sub _build_opengraph {
         (
             map { defined $_[0]->$_ ? ( $_ => $_[0]->$_ ) : () }
               qw/card_type site_name title description image operatingSystem player
-              player_width player_height fb_app_id/
+              image_alt player_width player_height fb_app_id/
         ),
         (
             $_[0]->app_url || $_[0]->url
@@ -78,7 +87,7 @@ HTML::SocialMeta - Module to generate Social Media Meta Tags,
 
 =head1 VERSION
 
-Version 0.71
+Version 0.73
 
 =head1 SYNOPSIS
 
@@ -187,9 +196,13 @@ A description of the content in a maximum of 200 characters
 
 A URL to a unique image representing the content of the page
 
+=item image_alt
+
+OPTIONAL - A text description of the image, for use by vision-impaired users
+
 =item url
 
-OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected 
+OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected
 
 =item player
 
@@ -293,6 +306,10 @@ Fields Required:
     * image
     * url - Open Graph
 
+Optional Fields:
+
+    * image_alt
+
 =cut
 
 =head2 Player Card
@@ -314,30 +331,34 @@ The Player Card allows you to share Video clips and audio stream.
 
 Returns an instance for the player card:
 
-    $card->create('player');	
+    $card->create('player');
     # call meta provider specifically
     $card->twitter->create_player;
     $card->opengraph->create_video;
 
 Fields Required:
- 
-    * site 
-    * title 
-    * description 
-    * image 
-    * player                
-    * player_width           
-    * player_height     
+
+    * site
+    * title
+    * description
+    * image
+    * player
+    * player_width
+    * player_height
+
+Optional Fields:
+
+    * image_alt
 
 image to be displayed in place of the player on platforms that does not support iframes or inline players. You should make this image the same dimensions
-as your player. Images with fewer than 68,600 pixels (a 262 x 262 square image, or a 350 x 196 16:9 image) will cause the player card not to render. 
-Image must be less than 1MB in size 
+as your player. Images with fewer than 68,600 pixels (a 262 x 262 square image, or a 350 x 196 16:9 image) will cause the player card not to render.
+Image must be less than 1MB in size
 
 =cut
 
 =head2 App Card
 
-The App Card is a great way to represent mobile applications on Social Media Platforms and to drive installs. 
+The App Card is a great way to represent mobile applications on Social Media Platforms and to drive installs.
 
     ,-----------------------------------,
     |   APP NAME              *-------* |
@@ -409,7 +430,7 @@ List::MoreUtils - Version 0.413
 
 A. Twitter Validation Tool
 
-https://dev.twitter.com/docs/cards/validation/validator
+L<https://cards-dev.twitter.com/validator>
 
 Before your cards show on Twitter, you must first have your domain approved. Fortunately, 
 it's a super-easy process. After you implement your cards, simply enter your sample URL into 
@@ -417,7 +438,7 @@ the validation tool. After checking your markup, select the "Submit for Approval
 
 B. Facebook Debugger
 
-https://developers.facebook.com/tools/debug
+L<https://developers.facebook.com/tools/debug>
 
 You do not need prior approval for your meta information to show on Facebook, 
 but the debugging tool they offer gives you a wealth of information about all your 
@@ -425,7 +446,7 @@ tags and can also analyze your Twitter tags.
 
 C. Google Structured Data Testing Tool
 
-http://www.google.com/webmasters/tools/richsnippets
+L<https://search.google.com/structured-data/testing-tool>
 
 Webmasters traditionally use the structured data testing tool to test authorship markup and preview
 how snippets will appear in search results, but you can also use see what other types of
@@ -435,6 +456,7 @@ meta data Google is able to extract from each page.
 
 Robert Acock <ThisUsedToBeAnEmail@gmail.com>
 Robert Haliday <robh@cpan.org>
+Jason McIntosh (JMAC) <jmac@jmac.org>
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

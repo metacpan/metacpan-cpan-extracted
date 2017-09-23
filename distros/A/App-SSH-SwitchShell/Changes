@@ -1,0 +1,14 @@
+Revision history for App-SSH-SwitchShell
+
+0.003  2017-09-19 21:17:59 UTC
+
+  - Fix tests under Windows
+
+0.002  2017-09-16 16:21:02 UTC
+
+  - Added package App::SSH::SwitchShell from bin/sshss to provides section
+    of META.* files
+
+0.001  2017-09-16 14:07:50 UTC
+
+  - Initial release

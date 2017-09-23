@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use Bioinfo::PBS::Queue;
 
-our $VERSION = '0.1.8'; # VERSION: 
+our $VERSION = '0.1.11'; # VERSION: 
 # ABSTRACT: submit blast after splitting a fasta file into multiple files;
 
 
@@ -174,8 +174,8 @@ sub execute {
   }
   $pbs->execute;
   for my $dir (@fa_dirs) {
-    system("cat $dir/*xls >$dir/$dir.xls");
-    system("cat $dir/*xls.m8 >$dir/$dir.xls.m8");
+    system("cat $dir/*xls >$dir.xls");
+    system("cat $dir/*xls.m8 >$dir.xls.m8");
   }
   say "finished";
 
@@ -195,7 +195,7 @@ Bioinfo::App::Cmd::Blast::Cmd::SplitSubmitB - submit blast after splitting a fas
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.11
 
 =head1 SYNOPSIS
 

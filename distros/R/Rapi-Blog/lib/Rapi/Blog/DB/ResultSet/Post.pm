@@ -73,7 +73,7 @@ sub _all_columns_except {
 __PACKAGE__->load_components('+Rapi::Blog::DB::Component::ResultSet::ListAPI');
 
 sub _api_default_params {{ limit => 20 }}
-sub _api_param_arg_order { [qw/search tag page limit sort/] } 
+sub _api_param_arg_order { [qw/search tag page limit sort category/] } 
 
 
 # Method exposed to templates:
@@ -88,7 +88,7 @@ sub list_posts {
     ->newest_first
     ->_all_columns_except('body')
     ->search_rs(undef, { 
-      join     => 'post_tags',
+      join     => ['post_tags','post_categories'],
       group_by => 'me.id'
     })
   ;
@@ -100,6 +100,7 @@ sub list_posts {
     
     $Rs = $Rs->search_rs({ -or => [
       { 'post_tags.tag_name' => lc($as_tag) },
+      { 'post_categories.category_name' => { like => join('','%',$P->{search},'%') } },
       { 'me.name'    => { like => join('','%',$P->{search},'%') } },
       { 'me.title'   => { like => join('','%',$P->{search},'%') } },
       { 'me.summary' => { like => join('','%',$P->{search},'%') } },
@@ -108,6 +109,7 @@ sub list_posts {
   }
   
   $Rs = $Rs->search_rs({ 'post_tags.tag_name' => $P->{tag} }) if ($P->{tag});
+  $Rs = $Rs->search_rs({ 'post_categories.category_name' => $P->{category} }) if ($P->{category});
   
   $Rs = $Rs->search_rs(
     { 'author.username' => $P->{username} },

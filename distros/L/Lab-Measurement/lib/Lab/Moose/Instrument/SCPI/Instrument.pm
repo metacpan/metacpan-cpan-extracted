@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Instrument;
 #ABSTRACT: ???
-$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.554';
+$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.600';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument qw/validated_getter validated_setter/;
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::SCPI::Instrument - ???
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

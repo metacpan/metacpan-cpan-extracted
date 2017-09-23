@@ -1,0 +1,59 @@
+{
+   "abstract" : "Trampolining functions with async/await syntax",
+   "author" : [
+      "Lukas Atkinson <amon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Async-Trampoline",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.280226",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/latk/p5-Async-Trampoline/issues",
+         "x_url" : "https://github.com/latk/p5-Async-Trampoline/issues"
+      },
+      "homepage" : "https://github.com/latk/p5-Async-Trampoline",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/latk/p5-Async-Trampoline.git",
+         "web" : "https://github.com/latk/p5-Async-Trampoline"
+      }
+   },
+   "version" : "0.001000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

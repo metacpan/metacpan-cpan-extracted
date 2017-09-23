@@ -14,10 +14,6 @@ use File::Temp qw/tempfile tempdir/;
 use File::Slurper 'read_binary';
 use PDL;
 
-if ( $^O eq 'MSWin32' ) {
-    plan skip_all => "Skipping plot tests on Windows";
-};
-
 eval {
     autoload 'PDL::Graphics::Gnuplot';
     1;
@@ -61,7 +57,9 @@ $plot->plot(
     data => [ $x, $y ],
 );
 
-my $kill_trailing_spaces = qr/ *$/m;
+# The dumb terminal produces some trailing whitespace on windows.
+my $kill_trailing_spaces = qr/[ \r]*$/m;
+
 file_filter_ok(
     $file, squared_plot_expected(), $kill_trailing_spaces,
     'plot x**2 vs x'

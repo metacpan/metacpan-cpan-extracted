@@ -228,6 +228,23 @@ sub pre_authorizations {
     });
 };
 
+=head1 Mandate Methods
+
+See L<Business::GoCardless::Mandate> for more information on Mandate operations.
+
+=head2 mandate
+
+Get an individual mandate, returns a L<Business::GoCardless::Mandate> object:
+
+    my $Mandate = $GoCardless->mandate( $id );
+
+=cut
+
+sub mandate {
+    my ( $self,$id ) = @_;
+    return $self->_generic_find_obj( $id,'Mandate','mandates' );
+}
+
 =head1 Customer Methods
 
 See L<Business::GoCardless::Customer> for more information on Customer operations.

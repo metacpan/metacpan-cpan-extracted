@@ -6,7 +6,7 @@
 
 use strict;
 use lib qw(../lib);
-use Math::AnyNum qw(:overload);
+use Math::AnyNum qw(:overload idiv gcd);
 
 # Pi/4 = 4 arctan 1/5 - arctan 1/239
 # expanding it with Taylor series with what's probably the dumbest method
@@ -45,7 +45,7 @@ for (my $x = 5 ; $x < 5000 ; $x += 4) {
 
     if ($ppow > 1) {
         $ns *= $ppow;
-        my $out = $ns->idiv($ds);
+        my $out = idiv($ns, $ds);
         $ns %= $ds;
 
         $out = ("0" x (length($ppow) - length($out) - 1)) . $out;
@@ -54,7 +54,7 @@ for (my $x = 5 ; $x < 5000 ; $x += 4) {
     }
 
     if ($p2 % 20 == 1) {
-        my $g = $ds->gcd($ns);
+        my $g = gcd($ds, $ns);
         $ds /= $g;
         $ns /= $g;
     }

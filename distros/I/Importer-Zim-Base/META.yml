@@ -1,5 +1,5 @@
 ---
-abstract: 'Base module for Importer::Zim'
+abstract: 'Base module for Importer::Zim backends'
 author:
   - 'Adriano Ferreira <ferreira@cpan.org>'
 build_requires:
@@ -20,7 +20,7 @@ name: Importer-Zim-Base
 provides:
   Importer::Zim::Base:
     file: lib/Importer/Zim/Base.pm
-    version: v0.3.0
+    version: v0.5.0
 requires:
   Carp: '0'
   Module::Runtime: '0'
@@ -31,7 +31,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Importer-Zim-Base/issues
   homepage: https://github.com/aferreira/cpan-Importer-Zim-Base
   repository: https://github.com/aferreira/cpan-Importer-Zim-Base.git
-version: 0.3.0
-x_contributors:
-  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+version: 0.5.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

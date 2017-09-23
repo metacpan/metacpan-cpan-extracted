@@ -2,19 +2,19 @@ package Safe::Isa;
 
 use strict;
 use warnings FATAL => 'all';
-use Scalar::Util qw(blessed);
+use Scalar::Util ();
 use Exporter 5.57 qw(import);
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000007';
 
-our @EXPORT = qw($_call_if_object $_isa $_can $_does $_DOES);
+our @EXPORT = qw($_call_if_object $_isa $_can $_does $_DOES $_call_if_can);
 
 our $_call_if_object = sub {
   my ($obj, $method) = (shift, shift);
   # This is intentionally a truth test, not a defined test, otherwise
   # we gratuitously break modules like Scalar::Defer, which would be
   # un-perlish.
-  return unless blessed($obj);
+  return unless Scalar::Util::blessed($obj);
   return $obj->isa(@_) if lc($method) eq 'does' and not $obj->can($method);
   return $obj->$method(@_);
 };
@@ -23,6 +23,11 @@ our ($_isa, $_can, $_does, $_DOES) = map {
   my $method = $_;
   sub { my $obj = shift; $obj->$_call_if_object($method => @_) }
 } qw(isa can does DOES);
+
+our $_call_if_can = sub {
+  my ($obj, $method) = (shift, shift);
+  $obj->$_call_if_object(can => $method) && $obj->$_call_if_object($method => @_);
+};
 
 1;
 __END__
@@ -72,9 +77,10 @@ Similarly:
   $maybe_an_object->$_does('RoleName'); # true or false, no boom today
   $maybe_an_object->$_DOES('RoleName'); # true or false, no boom today
 
-And just in case we missed a method:
+And just in case we missed a method or two:
 
   $maybe_an_object->$_call_if_object(name => @args);
+  $maybe_an_object->$_call_if_can(name => @args);
 
 Or to re-use a previous example for purposes of explication:
 
@@ -153,6 +159,14 @@ returns nothing.
 
 If called on an object, calls C<method_name> on it and returns the result,
 otherwise returns nothing.
+
+=head2 $_call_if_can
+
+  $maybe_an_object->$_call_if_can(name => @args);
+
+If called on an object, calls C<can> on it; if that returns true, then
+calls C<method_name> on it and returns the result; if any condition is false
+returns nothing.
 
 =head1 SEE ALSO
 

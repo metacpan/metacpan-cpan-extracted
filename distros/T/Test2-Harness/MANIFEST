@@ -129,6 +129,7 @@ t/builder.t
 t/caller.t
 t/capture_test.pl
 t/data.t
+t/ending.t
 t/lib/App/Yath/Command/broken.pm
 t/lib/TestsFor/Simple.pm
 t/lib/TestsFor/Simple2.pm

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Voltage;
 #ABSTRACT: Voltage sweep
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.554';
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.600';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use warnings;
@@ -164,7 +164,7 @@ Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

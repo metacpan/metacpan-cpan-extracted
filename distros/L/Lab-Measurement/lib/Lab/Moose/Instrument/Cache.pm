@@ -1,42 +1,14 @@
 package Lab::Moose::Instrument::Cache;
+$Lab::Moose::Instrument::Cache::VERSION = '3.600';
 #ABSTRACT: Role for device cache functionality in Moose::Instrument drivers
-$Lab::Moose::Instrument::Cache::VERSION = '3.554';
+
 
 use Moose::Role;
 use MooseX::Params::Validate;
 
 Moose::Exporter->setup_import_methods( with_meta => ['cache'] );
 
-use namespace::autoclean -also =>
-    [qw/_add_cache_accessor _add_cache_attribute/];
-
-sub _add_cache_attribute {
-    my %args      = @_;
-    my $meta      = $args{meta};
-    my $attribute = $args{attribute};
-    my $getter    = $args{getter};
-    my $builder   = $args{builder};
-
-    # Creat builder method for the entry.
-    $meta->add_method(
-        $builder => sub {
-            my $self = shift;
-            return $self->$getter();
-        }
-    );
-
-    $args{meta}->add_attribute(
-        $args{attribute} => (
-            is        => 'rw',
-            init_arg  => undef,
-            builder   => $builder,
-            lazy      => 1,
-            predicate => $args{predicate},
-            clearer   => $args{clearer},
-            isa       => $args{isa},
-        )
-    );
-}
+use namespace::autoclean;
 
 sub cache {
     my ( $meta, $name, %options ) = @_;
@@ -44,24 +16,128 @@ sub cache {
     my @options = %options;
     validated_hash(
         \@options,
-        getter => { isa      => 'Str' },
-        isa    => { optional => 1 },
+        getter    => { isa      => 'Str' },
+        isa       => { optional => 1, default => 'Any' },
+        index_arg => { isa      => 'Str', optional => 1 },
     );
 
-    $options{meta} = $meta;
-    $options{name} = $name;
+    my $getter         = $options{getter};
+    my $isa            = $options{isa};
+    my $index_arg      = $options{index_arg};
+    my $have_index_arg = defined $index_arg;
+    my $function       = "cached_$name";
+    my $attribute      = "cached_${name}_attribute";
+    my $builder        = "cached_${name}_builder";
+    my $clearer        = "clear_cached_$name";
+    my $predicate      = "has_cached_$name";
 
-    if ( not exists $options{isa} ) {
-        $options{isa} = 'Any';
-    }
+    # Creat builder method for the entry. The user can override
+    # (method modifier)  this in an instrument driver to add additional
+    # arguments to the getter.
+    $meta->add_method(
+        $builder => sub {
+            my $self = shift;
+            if ($have_index_arg) {
+                my ($index) = validated_list(
+                    \@_,
+                    $index_arg => { isa => 'Int' }
+                );
+                return $self->$getter( $index_arg => $index );
+            }
+            return $self->$getter();
+        }
+    );
 
-    $options{attribute} = "cached_$name";
-    $options{predicate} = "has_cached_$name";
-    $options{clearer}   = "clear_cached_$name";
-    $options{builder}   = $options{attribute} . '_builder';
+    $meta->add_attribute(
+        $attribute => (
+            is       => 'rw',
+            init_arg => undef,
+            isa      => 'ArrayRef',
+            default  => sub { [] },
+        )
+    );
 
-    _add_cache_attribute(%options);
+    $meta->add_method(
+        $function => sub {
+            my $self  = shift;
+            my $array = $self->$attribute();
 
+            if ($have_index_arg) {
+                my ( $index, $value ) = validated_list(
+                    \@_,
+                    $index_arg => { isa      => 'Int' },
+                    value      => { optional => 1 },
+                );
+                if ( defined $value ) {
+
+                    # Store entry.
+                    return $array->[$index] = $value;
+                }
+
+                # Query cache.
+                if ( defined $array->[$index] ) {
+                    return $array->[$index];
+                }
+                return $array->[$index]
+                    = $self->$builder( $index_arg => $index );
+            }
+
+            # No vector index argument. Behave like usual Moose attribute.
+            if ( @_ == 0 ) {
+
+                # Query cache.
+                if ( defined $array->[0] ) {
+                    return $array->[0];
+                }
+                $array->[0] = $self->$builder();
+                return $array->[0];
+            }
+
+            # Store entry.
+            my ($value) = pos_validated_list( \@_, { isa => $isa } );
+            return $array->[0] = $value;
+        }
+    );
+
+    $meta->add_method(
+        $clearer => sub {
+            my $self = shift;
+            my $index;
+            if ($have_index_arg) {
+
+                # If no index is given, clear them all!
+                ($index) = validated_list(
+                    \@_,
+                    $index_arg => { isa => 'Int', optional => 1 },
+                );
+            }
+            if ( defined $index ) {
+                $self->$attribute->[$index] = undef;
+            }
+            else {
+                $self->$attribute( [] );
+            }
+        }
+    );
+
+    $meta->add_method(
+        $predicate => sub {
+            my $self  = shift;
+            my $index = 0;
+            if ($have_index_arg) {
+                ($index) = validated_list(
+                    \@_,
+                    $index_arg => { isa => 'Int' }
+                );
+            }
+
+            my $array = $self->$attribute();
+            if ( defined $array->[$index] ) {
+                return 1;
+            }
+            return;
+        }
+    );
 }
 
 1;
@@ -78,7 +154,7 @@ Lab::Moose::Instrument::Cache - Role for device cache functionality in Moose::In
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 
@@ -86,7 +162,7 @@ in your driver:
 
  use Lab::Moose::Instrument::Cache;
 
- cache 'foobar' => (getter => 'get_foobar');
+ cache foobar => (getter => 'get_foobar');
 
  sub get_foobar {
      my $self = shift;
@@ -105,35 +181,57 @@ in your driver:
 
 This package exports a new Moose keyword: B<cache>.
 
-Calling C<< cache key => (getter => $getter, isa => $type) >> will generate a
-L<Moose attribute|Moose::Manual::Attributes> 'cached_key' with the following
-properties: 
+Calling C<< cache key => (getter => $getter, isa => $type) >> generates the
+following functions:
 
- is => 'rw',
- isa => $type,
- predicate => 'has_cached_key',
- clearer => 'clear_cached_key',
- builder => 'cached_key_builder',
- lazy => 1,
- init_arg => undef
+=over
+
+=item C<cached_key> (accessor)
+
+Calling C<< $instr->cached_key() >> will return the last stored value from the
+cache. If the cache entry is empty, use the C<$getter> method.
+
+To update the cache entry, call C<< $instr->cached_key($value) >>.
+
+=item C<has_cached_key> (predicate)
+
+Return true if the cache entry holds a value (which is not undef).
+
+=item C<clear_cached_key> (clearer)
+
+Clear the value of the cache entry.
+
+=item C<cached_key_builder> (builder)
+
+Called by C<cached_key> if the entry is cleared. This will call the C<$getter>
+method. Can be overriden by 'around' method modifier if the C<$getter> needs
+special extra arguments.
+
+=back
 
 The C<isa> argument is optional.
 
-The builder method comes into play if a cache entry is in the cleared state. If
-the getter is called in this situation, the builder
-method will be used to generate the value.
-The default builder method just calls the configured C<$getter> method.
+=head2 Array cache
 
-If you need to call the getter with specific arguments, override the
-builder method.
-For example, the C<format_data_query> of the L<Lab::Moose::Instrument::RS_ZVM>
-needs a timeout of 3s. This is done by putting the following into the
-driver:
+Some methods take an additional parameter (e.g. channel number). For this case
+you can give the C<index_arg> argument to the cache keyword:
 
- sub cached_format_data_builder {
-     my $self = shift;
-     return $self->format_data_query( timeout => 3 );
- }
+ cache foobar => (isa => 'Num', getter => 'get_foobar', index_arg => 'channel');
+
+ # Get value from cache.
+ my $value = $instr->cached_foobar(channel => 1);
+ 
+ # Store value.
+ $instr->cached_foobar(channel => 2, value => 1.234);
+ 
+ # Clear single entry.
+ $instr->clear_cached_foobar(channel => 3);
+ 
+ # Clear them all.
+ $instr->clear_cached_foobar();
+ 
+ # Check for cache value
+ if ($instr->has_cached_foobar(channel => 1)) {...}
 
 =head1 COPYRIGHT AND LICENSE
 

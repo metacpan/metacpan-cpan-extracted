@@ -23,9 +23,11 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.73",
+            "Alien::Build" : "1.18",
             "Alien::Build::MM" : "0.73",
             "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "Alien::Build::Plugin::Prefer::BadVersion" : "1.05",
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -50,15 +52,13 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.73",
-            "base" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::Bundle::Extended" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
-            "Test::More" : "0.94",
             "perl" : "5.006"
          }
       }
@@ -76,7 +76,24 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.02",
+   "version" : "0.03",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "IO::Zlib" : "0",
+            "LWP::UserAgent" : "0",
+            "Net::FTP" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

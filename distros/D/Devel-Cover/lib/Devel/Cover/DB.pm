@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -22,7 +22,7 @@ use File::Path;
 
 use Devel::Cover::Dumper;  # For debugging
 
-my $DB = "cover.14";  # Version of the database.
+my $DB = "cover.14";  # Version of the database
 
 @Devel::Cover::DB::Criteria =
     (qw( statement branch path condition subroutine pod time ));
@@ -199,7 +199,7 @@ sub is_valid {
     opendir my $fh, $self->{db} or return 0;
     for my $file (readdir $fh) {
         next if $file eq "." || $file eq "..";
-        next if $file =~ /(?:runs|structure|debuglog|digests)$/
+        next if $file =~ /(?:runs|structure|debuglog|digests)|(?:\.lock)$/
                 && -e "$self->{db}/$file";
         warn "found $file in $self->{db}";
         return 0;
@@ -252,7 +252,7 @@ sub merge {
     return $self;  # TODO - what's going on here?
 
     # When the database gets big, it's quicker to merge into what's
-    # already there.
+    # already there
 
     _merge_hash($from->{runs},      $self->{runs});
     _merge_hash($from->{collected}, $self->{collected});
@@ -551,7 +551,7 @@ sub uncoverable {
     }
 
     # print STDERR Dumper $u;
-    # Now change the format of the uncoverable information.
+    # Now change the format of the uncoverable information
 
     for my $file (sort keys %$u) {
         # print STDERR "Reading $file\n";
@@ -577,7 +577,7 @@ sub uncoverable {
                     # print STDERR
                     # "Found uncoverable $file:$crit:$line -> $dl{$line}\n";
 
-                    # Change key from the MD5 digest to the actual line number.
+                    # Change key from the MD5 digest to the actual line number
                     $c->{$dl{$line}} = delete $c->{$line};
                 } else {
                     warn "Devel::Cover: Can't find line for uncovered data: " .
@@ -586,7 +586,7 @@ sub uncoverable {
                 }
             }
         }
-        # Change the key from the filename to the MD5 digest of the file.
+        # Change the key from the filename to the MD5 digest of the file
         $u->{$df->hexdigest} = delete $u->{$file};
     }
 
@@ -761,7 +761,7 @@ sub objectify_cover {
         *Devel::Cover::DB::File::DESTROY = sub {};
         unless (exists &Devel::Cover::DB::File::AUTOLOAD) {
             *Devel::Cover::DB::File::AUTOLOAD = sub {
-                # Work around a change in bleadperl from 12251 to 14899.
+                # Work around a change in bleadperl from 12251 to 14899
                 my $func = $Devel::Cover::DB::AUTOLOAD || $::AUTOLOAD;
 
                 # print STDERR "autoloading <$func>\n";
@@ -788,8 +788,14 @@ sub cover {
     my $cover = $self->{cover} = {};
     my $uncoverable = {};
     my $st = Devel::Cover::DB::Structure->new(base => $self->{base})->read_all;
-    my @runs = sort { $self->{runs}{$b}{start} <=> $self->{runs}{$a}{start} }
-                    keys %{$self->{runs}};
+    # Sometimes the start value is undefined.  It's not yet clear why, but it
+    # probably has something to do with the code under test forking.  We'll
+    # just try to cope with that here.
+    my @runs = sort {
+        ($self->{runs}{$b}{start} || 0) <=> ($self->{runs}{$a}{start} || 0)
+                                        ||
+                                     $b cmp $a
+    } keys %{$self->{runs}};
     # print STDERR "runs: ", Dumper \@runs
 
     my %warned;
@@ -821,7 +827,12 @@ sub cover {
                 unless $digests{$digest};
 
             # Set up data structure to hold coverage being filled in
-            my $cf = $cover->{$digests{$digest} ||= $file} ||= {};
+            my $ff = $file;
+            if ($self->{prefer_lib}) {
+                $ff =~ s|^blib/||;
+                $ff = $file unless -e $ff;
+            }
+            my $cf = $cover->{$digests{$digest} ||= $ff} ||= {};
 
             # print STDERR "st ", Dumper($st),
                          # "f  ", Dumper($f),
@@ -893,7 +904,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,19 @@ use Rapi::Blog::Util;
 sub BUILD {
   my $self = shift;
   
-  if($self->ResultSource->source_name eq 'Post') {
+  my $source_name = $self->ResultSource->source_name;
+  
+  if($source_name eq 'Category') {
+    $self->apply_extconfig(
+      use_add_form => 0,
+      persist_immediately => { 
+        create => 0, update => 0, destroy => 1 
+      },
+      autoload_added_record => 0,
+      toggle_edit_cells_init_off => 0
+    )
+  }
+  elsif($source_name eq 'Post') {
 
     $self->apply_extconfig(
       reload_on_show => \1,
@@ -48,11 +60,17 @@ around 'get_add_edit_form_items' => sub {
   my @items = $self->$orig(@args);
 
   if($self->ResultSource->source_name eq 'Post') {
-
+  
+    # Actually check to see if there are any Categories, and if 
+    # there are not, don't present the editor
+    unless($self->ResultSource->schema->resultset('Category')->count > 0) {
+      @items = grep { ($_->{name}||'') ne 'categories' } @items;
+    }
+  
     my @sets = (
     
       $self->_collect_to_fieldset(
-        \@items, [qw/name title author ts published/], {
+        \@items, [qw/name title categories author ts published/], {
           width => 410,
           title => 'Attributes',
           labelWidth => 70
@@ -97,6 +115,12 @@ around 'get_add_edit_form_items' => sub {
     };
     
     @items = ($wrap,$disp,@items);
+    
+    # For 'body' to always be the last item to maintain nearest expected functionality,
+    # even in the event of un-handled schema changes
+    my $bodyItm;
+    @items = grep { ($_->{name}||'') eq 'body' ? ($bodyItm = $_ and 0) : 1 } @items;
+    push @items, $bodyItm;
     
     my $eF = $items[$#items] || {}; # last element
     if($eF->{xtype} eq 'ra-md-editor') {

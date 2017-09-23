@@ -8,7 +8,6 @@ package Test::JPList;
 use Test::Most;
 use base 'Test::Class';
 use DBI;
-use Data::Dumper;
 
 our $SQLITEDB="$FindBin::Bin/sqlite3.test.db";
 
@@ -28,7 +27,6 @@ sub startup : Tests(startup => 6)
     my $dbh = DBI->connect("dbi:SQLite:$SQLITEDB",'','',
                        {RaiseError=>1, PrintError=>0, AutoCommit=>0});
 
-    print Dumper $dbh;
     #$sth = $dbh->prepare('SELECT * FROM "Items"') or die("$!");
     #my $data = $dbh->selectall_arrayref($sth, {Slice => {}}) or die("$!");
     $test->{dbh} = $dbh;
@@ -85,8 +83,6 @@ sub jplist : Tests
             });
         $jp_resultset = $jplist->get_resultset();
         
-        #print Dumper $jp_resultset;
-
         is(
             scalar(@{$jp_resultset->{data}}),
             $data->{items_returned},

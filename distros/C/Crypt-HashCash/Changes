@@ -5,3 +5,7 @@ Revision history for Crypt-HashCash
 
 1.126   Sat Jun 24 02:05:11 2017 -0700
         Update vault-worker.pl, vault-queuer.pl
+
+1.127   Sat Sep 16 18:43:05 2017 -0700
+        Fix error propagation bugs, dependencies, electrum args
+

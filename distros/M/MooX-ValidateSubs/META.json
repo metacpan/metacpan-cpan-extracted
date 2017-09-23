@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-ValidateSubs",
    "no_index" : {
@@ -22,7 +22,7 @@
    "provides" : {
       "MooX::ValidateSubs" : {
          "file" : "lib/MooX/ValidateSubs.pm",
-         "version" : "1.012000"
+         "version" : "1.012001"
       },
       "MooX::ValidateSubs::Role" : {
          "file" : "lib/MooX/ValidateSubs/Role.pm"
@@ -36,8 +36,9 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs"
       }
    },
-   "version" : "1.012000",
+   "version" : "1.012001",
    "x_contributors" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

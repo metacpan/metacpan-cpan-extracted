@@ -95,7 +95,7 @@ my @bundle_plugins = qw(
     MakeMaker
 );
 
-# individual member plugins of bundle should not have been added to run-requires
+# individual member plugins of bundle should not have been added to runtime-requires
 all_plugins_in_prereqs($tzil,
     exempt => [ map { Dist::Zilla::Util->expand_config_package_name($_) } @bundle_plugins ],
     additional => [ 'Dist::Zilla::PluginBundle::Filter' ],
@@ -127,7 +127,7 @@ cmp_deeply(
     superhashof({
         prereqs => superhashof({
             develop => superhashof({
-                requires => all(
+                suggests => all(
                     superhashof({ 'Dist::Zilla::PluginBundle::Filter' => '4.000' }),
                     notexists(map { Dist::Zilla::Util->expand_config_package_name($_) } @bundle_plugins),
                 ),

@@ -11,6 +11,7 @@ const-xs.inc
 lib/POSIX/2008.pm
 lib/POSIX/2008.pod
 t/01_use.t
-t/02_io.t
+t/02_at.t
+t/03_rw.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

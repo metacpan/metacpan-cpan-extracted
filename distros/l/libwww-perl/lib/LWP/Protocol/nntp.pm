@@ -1,5 +1,5 @@
 package LWP::Protocol::nntp;
-$LWP::Protocol::nntp::VERSION = '6.26';
+$LWP::Protocol::nntp::VERSION = '6.27';
 # Implementation of the Network News Transfer Protocol (RFC 977)
 
 use base qw(LWP::Protocol);

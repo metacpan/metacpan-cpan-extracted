@@ -16,13 +16,14 @@ corpus/lib3/Foo/Bar/Baz.pm
 corpus/lib3/auto/share/dist/Foo-Bar-Baz/word.txt
 corpus/plugin/Foo-Bar-Baz/share/word.txt
 corpus/share1/word.txt
-cpanfile
 dist.ini
 lib/App/Prove/Plugin/ShareDirDist.pm
+lib/App/Yath/Plugin/ShareDirDist.pm
 lib/File/ShareDir/Dist.pm
 t/00_diag.t
 t/01_use.t
 t/app_prove_plugin_sharedirdist.t
+t/app_yath_plugin_sharedirdist.t
 t/file_sharedir_dist.t
 xt/author/eol.t
 xt/author/no_tabs.t

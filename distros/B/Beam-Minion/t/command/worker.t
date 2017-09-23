@@ -34,33 +34,55 @@ my $mock = Mock::MonkeyPatch->patch(
 my $class = 'Beam::Minion::Command::worker';
 $ENV{BEAM_MINION} = 'sqlite:' . $tmp->filename;
 $ENV{BEAM_PATH} = catdir( $FindBin::Bin, '..', 'share' );
-$class->run( 'container' );
+$class->run();
 
 ok $mock->called, 'Minion::Command::minion::worker->run called';
-is_deeply $mock->method_arguments, [qw( -q container )], 'correct queue is used';
+is_deeply $mock->method_arguments, [qw()], 'arguments are correct';
 
 my $invocant = $mock->arguments->[0];
 my $minion = $invocant->app->minion;
 
 subtest 'tasks are created' => sub {
     my $tasks = $minion->tasks;
-    ok exists $tasks->{success}, 'success task exists';
-    ok exists $tasks->{failure}, 'failure task exists';
+    ok exists $tasks->{'container:success'}, 'success task exists';
+    ok exists $tasks->{'container:failure'}, 'failure task exists';
+    ok exists $tasks->{'container:exception'}, 'exception task exists';
+    ok exists $tasks->{'container:consfail'}, 'consfail task exists';
 };
 
 subtest 'success job' => sub {
-    my $id = $minion->enqueue( 'success', [], { queue => 'container' } );
-    $minion->perform_jobs( { queues => ['container'] } );
+    my $id = $minion->enqueue( 'container:success', [] );
+    $minion->perform_jobs();
     my $job = $minion->job( $id );
     is_deeply $job->info->{result}, { exit => 0 }, 'job result is correct';
     is $job->info->{state}, 'finished', 'job finished successfully';
 };
 
 subtest 'failure job' => sub {
-    my $id = $minion->enqueue( 'failure', [], { queue => 'container' } );
-    $minion->perform_jobs( { queues => ['container'] } );
+    my $id = $minion->enqueue( 'container:failure', [] );
+    $minion->perform_jobs();
     my $job = $minion->job( $id );
     is_deeply $job->info->{result}, { exit => 1 }, 'job result is correct';
+    is $job->info->{state}, 'failed', 'job failed';
+};
+
+subtest 'job exception' => sub {
+    my $id = $minion->enqueue( 'container:exception', [] );
+    $minion->perform_jobs();
+    my $job = $minion->job( $id );
+    my $result = $job->info->{result};
+    ok !exists $result->{exit}, 'exit is unset';
+    like $result->{error}, qr{^Foo}, 'exception set as error';
+    is $job->info->{state}, 'failed', 'job failed';
+};
+
+subtest 'constructor failure' => sub {
+    my $id = $minion->enqueue( 'container:consfail', [] );
+    $minion->perform_jobs();
+    my $job = $minion->job( $id );
+    my $result = $job->info->{result};
+    ok !exists $result->{exit}, 'exit is unset';
+    ok $result->{error}, 'exception set as error';
     is $job->info->{state}, 'failed', 'job failed';
 };
 
@@ -68,7 +90,7 @@ subtest 'BEAM_MINION must be set' => sub {
     local $ENV{BEAM_MINION} = '';
     like
         exception {
-            Beam::Minion::Command::worker->run( 'container' );
+            Beam::Minion::Command::worker->run();
         },
         qr{You must set the BEAM_MINION environment variable},
         'BEAM_MINION missing raises exception';

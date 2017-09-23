@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -109,7 +109,7 @@ sub handle_post {
         sprintf 'Wrote report %s from %s (%s)', $row->id, $user->fullname, $user->email,
     );
 
-    Beam::Minion->enqueue( report => 'queue', $row->id );
+    Beam::Minion->enqueue( report => 'queue', [ $row->id ], { attempts => 10 } );
 
     my $url = $c->req->url->clone;
     my $path = $url->path;
@@ -230,7 +230,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

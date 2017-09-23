@@ -7,7 +7,6 @@ package Test::JPList::Request;
 
 use Test::Most;
 use base 'Test::Class';
-use Data::Dumper;
 
 sub class { 'JPList::Request' }
 
@@ -214,8 +213,6 @@ sub requests : Tests
 
         my $jplist_req = JPList::Request->new(request_params => $data->{'request_params'});
         $jplist_req->decode_data();
-
-        #print Dumper $jplist_req;
 
         is_deeply($jplist_req->filter_data,     $data->{filter_data},     "$i - filter_data matched");
         is_deeply($jplist_req->sort_data,       $data->{sort_data},       "$i - sort_data matched");

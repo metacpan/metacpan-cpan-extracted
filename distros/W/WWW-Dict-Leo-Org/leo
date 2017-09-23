@@ -13,7 +13,7 @@
 # All other brand and product names are trademarks, registered trademarks
 # or service marks of their respective holders.
 
-#use lib qw(blib/lib);
+use lib qw(blib/lib);
 
 use utf8;
 
@@ -33,7 +33,7 @@ my $default_c = "\033[0m";    # reset default terminal color
 my $bold_c    = "\033[0;34m"; # blue color
 my $copy_c    = "\033[0;35m"; # copyright message color (green)
 
-my $version   = "2.00";
+my $version   = "2.02";
 my $config    = $ENV{HOME} . "/.leo";
 my $cache     = $ENV{HOME} . "/.leo-CACHE.db";
 
@@ -344,6 +344,7 @@ Supported <countrycode>s are:
 
 en    english
 es    spanish
+fr    french
 ru    russian
 pt    portuguese
 pl    polish
@@ -449,6 +450,7 @@ Valid country codes:
 
 en    english
 es    spanish
+fr    french
 ru    russian
 pt    portuguese
 pl    polish
@@ -643,9 +645,9 @@ to me, thanks.
 
 =head1 COPYRIGHT
 
-B<leo> copyleft 2000-2016 Thomas v.D.. All rights reserved.
+B<leo> copyleft 2000-2017 Thomas v.D.. All rights reserved.
 
-http://dict.leo.org/ copyright (c) 1995-2016 LEO Dictionary Team.
+http://dict.leo.org/ copyright (c) 1995-2017 LEO Dictionary Team.
 
 
 The search results returned by B<leo> are based on the work
@@ -668,6 +670,6 @@ browser, what is not prohibited. At least not today.
 
 =head1 VERSION
 
-This is the manpage for B<leo> version B<1.43>.
+This is the manpage for B<leo> version B<2.01>.
 
 =cut

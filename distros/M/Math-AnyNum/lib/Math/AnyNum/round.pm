@@ -3,118 +3,120 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __round__ => qw(Math::MPFR $) => sub {
+sub __round__ {
     my ($x, $prec) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-    my $nth = -CORE::int($prec);
+  Math_MPFR: {
 
-    my $p = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $ROUND);
+        my $nth = -CORE::int($prec);
 
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $ROUND);
 
-    if ($nth < 0) {
-        Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_mul($r, $x, $p, $ROUND);
-    }
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
 
-    Math::MPFR::Rmpfr_round($r, $r);
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_mul($r, $x, $p, $ROUND);
+        }
 
-    if ($nth < 0) {
-        Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_div($r, $r, $p, $ROUND);
-    }
+        Math::MPFR::Rmpfr_round($r, $r);
 
-    $r;
-};
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_div($r, $r, $p, $ROUND);
+        }
 
-Class::Multimethods::multimethod __round__ => qw(Math::MPC $) => sub {
-    my ($x, $prec) = @_;
-
-    my $real = Math::MPFR::Rmpfr_init2($PREC);
-    my $imag = Math::MPFR::Rmpfr_init2($PREC);
-
-    Math::MPC::RMPC_RE($real, $x);
-    Math::MPC::RMPC_IM($imag, $x);
-
-    $real = __round__($real, $prec);
-    $imag = __round__($imag, $prec);
-
-    if (Math::MPFR::Rmpfr_zero_p($imag)) {
-        return $real;
+        return $r;
     }
 
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
-    $r;
-};
+  Math_MPC: {
 
-Class::Multimethods::multimethod __round__ => qw(Math::GMPq $) => sub {
-    my ($x, $prec) = @_;
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
 
-    my $nth = -CORE::int($prec);
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
 
-    my $n = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_set($n, $x);
+        $real = __round__($real, $prec);
+        $imag = __round__($imag, $prec);
 
-    my $sgn = Math::GMPq::Rmpq_sgn($n);
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
+        }
 
-    if ($sgn < 0) {
-        Math::GMPq::Rmpq_neg($n, $n);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
     }
 
-    my $p = Math::GMPz::Rmpz_init_set_str('1' . ('0' x CORE::abs($nth)), 10);
+  Math_GMPq: {
 
-    if ($nth < 0) {
-        Math::GMPq::Rmpq_div_z($n, $n, $p);
-    }
-    else {
-        Math::GMPq::Rmpq_mul_z($n, $n, $p);
-    }
+        my $nth = -CORE::int($prec);
 
-    state $half = do {
-        my $q = Math::GMPq::Rmpq_init_nobless();
-        Math::GMPq::Rmpq_set_ui($q, 1, 2);
-        $q;
-    };
+        my $n = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($n, $x);
 
-    Math::GMPq::Rmpq_add($n, $n, $half);
+        my $sgn = Math::GMPq::Rmpq_sgn($n);
 
-    my $z = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_set_q($z, $n);
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($n, $n);
+        }
 
-    if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
-        Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-    }
+        my $p = Math::GMPz::Rmpz_init_set_str('1' . ('0' x CORE::abs($nth)), 10);
 
-    Math::GMPq::Rmpq_set_z($n, $z);
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_div_z($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_mul_z($n, $n, $p);
+        }
 
-    if ($nth < 0) {
-        Math::GMPq::Rmpq_mul_z($n, $n, $p);
-    }
-    else {
-        Math::GMPq::Rmpq_div_z($n, $n, $p);
-    }
+        state $half = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            $q;
+        };
 
-    if ($sgn < 0) {
-        Math::GMPq::Rmpq_neg($n, $n);
-    }
+        Math::GMPq::Rmpq_add($n, $n, $half);
 
-    if (Math::GMPq::Rmpq_integer_p($n)) {
+        my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, $n);
-        return $z;
+
+        if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+        }
+
+        Math::GMPq::Rmpq_set_z($n, $z);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_mul_z($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_div_z($n, $n, $p);
+        }
+
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($n, $n);
+        }
+
+        if (Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_set_q($z, $n);
+            return $z;
+        }
+
+        return $n;
     }
 
-    $n;
-};
-
-Class::Multimethods::multimethod __round__ => qw(Math::GMPz $) => sub {
-    (@_) = (_mpz2mpq($_[0]), $_[1]);
-    goto &__round__;
-};
+  Math_GMPz: {
+        $x = _mpz2mpq($x);
+        goto Math_GMPq;
+    }
+}
 
 1;

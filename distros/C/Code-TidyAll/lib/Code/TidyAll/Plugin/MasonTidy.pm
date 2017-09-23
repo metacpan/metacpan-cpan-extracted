@@ -11,7 +11,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
 sub _build_cmd {'masontidy'}
 
@@ -40,7 +40,7 @@ Code::TidyAll::Plugin::MasonTidy - Use masontidy with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -62,17 +62,11 @@ Install L<masontidy> from CPAN.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to masontidy
-
-=item cmd
-
-Full path to masontidy
-
-=back
+Arguments to pass to C<masontidy>.
 
 =head1 SUPPORT
 

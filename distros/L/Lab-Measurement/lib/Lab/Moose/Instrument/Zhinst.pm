@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::Zhinst;
+$Lab::Moose::Instrument::Zhinst::VERSION = '3.600';
 #ABSTRACT: Base class for Zurich Instruments device drivers
-$Lab::Moose::Instrument::Zhinst::VERSION = '3.554';
+
 use 5.010;
 use Moose;
 use MooseX::Params::Validate qw/validated_list validated_hash/;
@@ -17,7 +18,6 @@ use constant {
 };
 
 extends 'Lab::Moose::Instrument';
-
 
 has device => (
     is      => 'ro',
@@ -90,6 +90,18 @@ sub sync_set_value {
     return $self->binary_query( command => $command );
 }
 
+
+sub sync_poll {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        path    => { isa => 'Str' },
+        timeout => { isa => 'Num', optional => 1 },
+    );
+    $args{method} = 'SyncPoll';
+    my $command = Dump( \%args );
+    return $self->binary_query( command => $command );
+}
+
 __PACKAGE__->meta->make_immutable();
 
 1;
@@ -106,9 +118,7 @@ Lab::Moose::Instrument::Zhinst - Base class for Zurich Instruments device driver
 
 =head1 VERSION
 
-version 3.554
-
-=head1 SYNOPSIS
+version 3.600
 
 =head1 METHODS
 
@@ -136,6 +146,17 @@ array), Demod, DIO, AuxIn.
  );
 
 Call L<Lab::Zhinst> SyncSet* method. Supported values for C<$type>: I, D, B.
+
+=head2 sync_poll
+
+ my $sample = $instr->sync_poll(
+     path => "$device/imps/0/sample",
+     timeout => 0.1,
+ );
+
+Poll event and return the most recent value in the event. Before doing the
+poll, flush the event queque with a Sync to ensure that we get a newly recorded
+event.
 
 =head1 COPYRIGHT AND LICENSE
 

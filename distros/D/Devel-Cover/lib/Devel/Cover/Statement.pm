@@ -10,17 +10,17 @@ package Devel::Cover::Statement;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
-sub val         { $_[0][0] }
-sub uncoverable { $_[0][1] }
-sub covered     { $_[0][0] }
-sub total       { 1 }
-sub percentage  { $_[0][0] ? 100 : 0 }
+sub val         { $_[0][0]               }
+sub uncoverable { $_[0][1]               }
+sub covered     { $_[0][0]               }
+sub total       { 1                      }
+sub percentage  { $_[0][0] ? 100 : 0     }
 sub error       { $_[0][0] xor !$_[0][1] }
-sub criterion   { 'statement' }
+sub criterion   { "statement"            }
 
 
 1
@@ -33,7 +33,7 @@ Devel::Cover::Statement - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

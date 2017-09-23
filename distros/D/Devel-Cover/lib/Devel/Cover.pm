@@ -10,18 +10,19 @@ package Devel::Cover;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
-our $LVERSION;
-BEGIN { $LVERSION = do { no warnings; eval '$VERSION' || "0.001" } }  # for dev
+our $VERSION;
+BEGIN {
+our $VERSION = '1.27'; # VERSION
+}
 
 use DynaLoader ();
 our @ISA = "DynaLoader";
 
-# sub Pod::Coverage::TRACE_ALL () { 1 }
-
 use Devel::Cover::DB;
 use Devel::Cover::DB::Digests;
 use Devel::Cover::Inc;
+
+BEGIN { $VERSION //= $Devel::Cover::Inc::VERSION }
 
 use B qw( class ppname main_cv main_start main_root walksymtable OPf_KIDS );
 use B::Debug;
@@ -36,9 +37,9 @@ use Devel::Cover::Dumper;
 use Devel::Cover::Util "remove_contained_paths";
 
 BEGIN {
-    # Use Pod::Coverage if it is available.
+    # Use Pod::Coverage if it is available
     eval "use Pod::Coverage 0.06";
-    # If there is any error other than a failure to locate, report it.
+    # If there is any error other than a failure to locate, report it
     die $@ if $@ && $@ !~ m/Can't locate Pod\/Coverage.+pm in \@INC/;
 
     # We'll prefer Pod::Coverage::CountParents
@@ -47,46 +48,47 @@ BEGIN {
 }
 
 # $SIG{__DIE__} = \&Carp::confess;
+# sub Pod::Coverage::TRACE_ALL () { 1 }
 
-my $Initialised;                         # import() has been called.
+my $Initialised;                         # import() has been called
 
 my $Dir;                                 # Directory in which coverage will be
-                                         # collected.
-my $DB             = "cover_db";         # DB name.
-my $Merge          = 1;                  # Merge databases.
-my $Summary        = 1;                  # Output coverage summary.
-my $Subs_only      = 0;                  # Coverage only for sub bodies.
-my $Self_cover_run = 0;                  # Covering Devel::Cover now.
+                                         # collected
+my $DB             = "cover_db";         # DB name
+my $Merge          = 1;                  # Merge databases
+my $Summary        = 1;                  # Output coverage summary
+my $Subs_only      = 0;                  # Coverage only for sub bodies
+my $Self_cover_run = 0;                  # Covering Devel::Cover now
 my $Loose_perms    = 0;                  # Use loose permissions in the cover DB
 
-my @Ignore;                              # Packages to ignore.
-my @Inc;                                 # Original @INC to ignore.
-my @Select;                              # Packages to select.
-my @Ignore_re;                           # Packages to ignore.
-my @Inc_re;                              # Original @INC to ignore.
-my @Select_re;                           # Packages to select.
+my @Ignore;                              # Packages to ignore
+my @Inc;                                 # Original @INC to ignore
+my @Select;                              # Packages to select
+my @Ignore_re;                           # Packages to ignore
+my @Inc_re;                              # Original @INC to ignore
+my @Select_re;                           # Packages to select
 
 my $Pod = $INC{"Pod/Coverage/CountParents.pm"} ? "Pod::Coverage::CountParents"
         : $INC{"Pod/Coverage.pm"}              ? "Pod::Coverage"
-        : "";                            # Type of pod coverage available.
-my %Pod;                                 # Pod coverage data.
+        : "";                            # Type of pod coverage available
+my %Pod;                                 # Pod coverage data
 
-my @Cvs;                                 # All the Cvs we want to cover.
-my %Cvs;                                 # All the Cvs we want to cover.
-my @Subs;                                # All the subs we want to cover.
-my $Cv;                                  # Cv we are looking in.
-my $Sub_name;                            # Name of the sub we are looking in.
-my $Sub_count;                           # Count for multiple subs on same line.
+my @Cvs;                                 # All the Cvs we want to cover
+my %Cvs;                                 # All the Cvs we want to cover
+my @Subs;                                # All the subs we want to cover
+my $Cv;                                  # Cv we are looking in
+my $Sub_name;                            # Name of the sub we are looking in
+my $Sub_count;                           # Count for multiple subs on same line
 
-my $Coverage;                            # Raw coverage data.
-my $Structure;                           # Structure of the files.
-my $Digests;                             # Digests of the files.
+my $Coverage;                            # Raw coverage data
+my $Structure;                           # Structure of the files
+my $Digests;                             # Digests of the files
 
-my %Criteria;                            # Names of coverage criteria.
-my %Coverage;                            # Coverage criteria to collect.
-my %Coverage_options;                    # Options for overage criteria.
+my %Criteria;                            # Names of coverage criteria
+my %Coverage;                            # Coverage criteria to collect
+my %Coverage_options;                    # Options for overage criteria
 
-my %Run;                                 # Data collected from the run.
+my %Run;                                 # Data collected from the run
 
 my $Const_right = qr/^(?:const|s?refgen|gelem|die|undef|bless|anon(?:list|hash)|
                        scalar|return|last|next|redo|goto)$/x;
@@ -97,11 +99,11 @@ use vars '$File',                        # Last filename we saw.  (localised)
          '$Collect',                     # Whether or not we are collecting
                                          # coverage data.  We make two passes
                                          # over conditions.  (localised)
-         '%Files',                       # Whether we are interested in files.
-                                         # Used in runops function.
-         '$Replace_ops',                 # Whether we are replacing ops.
-         '$Silent',                      # Output nothing. Can be used anywhere.
-         '$Self_cover';                  # Coverage of Devel::Cover.
+         '%Files',                       # Whether we are interested in files
+                                         # Used in runops function
+         '$Replace_ops',                 # Whether we are replacing ops
+         '$Silent',                      # Output nothing. Can be used anywhere
+         '$Self_cover';                  # Coverage of Devel::Cover
 
 BEGIN {
     ($File, $Line, $Collect) = ("", 0, 1);
@@ -118,7 +120,7 @@ BEGIN {
                                    IMPORTANT
                                    ---------
 
-Devel::Cover $LVERSION is not supported on perl $].  The last version of
+Devel::Cover $VERSION is not supported on perl $].  The last version of
 Devel::Cover which was supported was version $v.  This version may not work.
 I have not tested it.  If it does work it will not be fully functional.
 
@@ -154,7 +156,7 @@ EOM
         # mod_perl < 2.0.8
         @Inc = @Devel::Cover::Inc::Inc;
     } else {
-        # Can't get @INC via eval `` in taint mode, revert to default value.
+        # Can't get @INC via eval `` in taint mode, revert to default value
         if (${^TAINT}) {
             @Inc = @Devel::Cover::Inc::Inc;
         } else {
@@ -188,7 +190,7 @@ EOM
     $^P |= 0x004 | 0x100;
 }
 
-sub version { $LVERSION }
+sub version { $VERSION }
 
 if (0 && $Config{useithreads}) {
     eval "use threads";
@@ -267,7 +269,7 @@ EOM
         @coverage = get_coverage();
         my $last = pop @coverage || "";
 
-        print OUT __PACKAGE__, " $LVERSION: Collecting coverage data for ",
+        print OUT __PACKAGE__, " $VERSION: Collecting coverage data for ",
               join(", ", @coverage),
               @coverage ? " and " : "",
               "$last.\n",
@@ -331,8 +333,8 @@ sub import {
 
     my $class = shift;
 
-    # Die tainting.
-    # Anyone using this module can do worse things than messing with tainting.
+    # Die tainting
+    # Anyone using this module can do worse things than messing with tainting
     my $options = ($ENV{DEVEL_COVER_OPTIONS} || "") =~ /(.*)/ ? $1 : "";
     my @o = (@_, split ",", $options);
     defined or $_ = "" for @o;
@@ -367,7 +369,7 @@ sub import {
 
     if ($blib) {
         eval "use blib";
-        for (@INC) { $_ = $1 if /(.*)/ }  # Die tainting.
+        for (@INC) { $_ = $1 if /(.*)/ }  # Die tainting
         push @Ignore, "^t/", '\\.t$', '^test\\.pl$';
     }
 
@@ -376,16 +378,10 @@ sub import {
     @Ignore_re = map qr/$_/,                           @Ignore;
     @Inc_re    = map $ci ? qr/^\Q$_\//i : qr/^\Q$_\//, @Inc;
 
-    if ($LVERSION > 0.002) {
-        # Usual situation in production from a full release.
-        bootstrap Devel::Cover $LVERSION;
-    } else {
-        # Usual situation in development.
-        bootstrap Devel::Cover;
-    }
+    bootstrap Devel::Cover $VERSION;
 
     if (defined $Dir) {
-        $Dir = $1 if $Dir =~ /(.*)/;  # Die tainting.
+        $Dir = $1 if $Dir =~ /(.*)/;  # Die tainting
         chdir $Dir or die __PACKAGE__ . ": Can't chdir $Dir: $!\n";
     } else {
         $Dir = $1 if Cwd::getcwd() =~ /(.*)/;
@@ -583,7 +579,7 @@ my $find_filename = qr/
 /x;
 
 sub use_file {
-    # If we're in global destruction, forget it.
+    # If we're in global destruction, forget it
     return unless $find_filename;
 
     my ($file) = @_;
@@ -1025,7 +1021,7 @@ sub deparse {
         return "" if $name eq "padrange";
 
         unless ($Seen{statement}{$$op} || $Seen{other}{$$op}) {
-            # Collect everything under here.
+            # Collect everything under here
             local ($File, $Line) = ($File, $Line);
             # print STDERR "Collecting $$op under $File:$Line\n";
             $deparse = eval { local $^W; $Original{deparse}->($self, @_) };
@@ -1035,7 +1031,7 @@ sub deparse {
             # print STDERR "Collect Deparse $op $$op => <$deparse>\n";
         }
 
-        # Get the coverage on this op.
+        # Get the coverage on this op
 
         if ($class eq "COP" && $Coverage{statement}) {
             # print STDERR "COP $$op, seen [$Seen{statement}{$$op}]\n";
@@ -1054,7 +1050,7 @@ sub deparse {
                       && ppname($op->targ) eq "pp_nextstate"
                       && $Coverage{statement}) {
             # If the current op is null, but it was nextstate, we can still
-            # get at the file and line number, but we need to get dirty.
+            # get at the file and line number, but we need to get dirty
 
             bless $op, "B::COP";
             # print STDERR "null $$op, seen [$Seen{statement}{$$op}]\n";
@@ -1062,7 +1058,7 @@ sub deparse {
             bless $op, "B::$class";
         } elsif ($Seen{other}{$$op}++) {
             # print STDERR "seen [$Seen{other}{$$op}]\n";
-            return ""  # Only report on each op once.
+            return ""  # Only report on each op once
         } elsif ($name eq "cond_expr") {
             local ($File, $Line) = ($File, $Line);
             my $cond  = $op->first;
@@ -1082,7 +1078,7 @@ sub deparse {
                     my $newtrue = $newcond->sibling;
                     if ($newcond->name eq "lineseq") {
                         # lineseq to ensure correct line numbers in elsif()
-                        # Bug #37302 fixed by change #33710.
+                        # Bug #37302 fixed by change #33710
                         $newcond = $newcond->first->sibling;
                     }
                     # last in chain is OP_AND => no else
@@ -1176,8 +1172,8 @@ sub get_cover {
     ($Sub_name, my $start) = sub_info($cv);
 
     # warn "get_cover: <$Sub_name>\n";
-    return unless defined $Sub_name;  # Only happens within Safe.pm, AFAIK.
-    # return unless length  $Sub_name;  # Only happens with Self_cover, AFAIK.
+    return unless defined $Sub_name;  # Only happens within Safe.pm, AFAIK
+    # return unless length  $Sub_name;  # Only happens with Self_cover, AFAIK
 
     get_location($start) if $start;
     # print STDERR "[[$File:$Line]]\n";
@@ -1196,8 +1192,8 @@ sub get_cover {
         no warnings "uninitialized";
         if ($File eq $Structure->get_file && $Line == $Structure->get_line &&
             $Sub_name eq "__ANON__" && $Structure->get_sub_name eq "__ANON__") {
-            # Merge instances of anonymous subs into one.
-            # TODO - multiple anonymous subs on the same line.
+            # Merge instances of anonymous subs into one
+            # TODO - multiple anonymous subs on the same line
         } else {
             my $count = $Sub_count->{$File}{$Line}{$Sub_name}++;
             $Structure->set_subroutine($Sub_name, $File, $Line, $count);
@@ -1287,7 +1283,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -1338,10 +1334,9 @@ If L<Pod::Coverage::CountParents> is available it will be used instead.
 Coverage data for other criteria are not yet collected.
 
 The F<cover> program can be used to generate coverage reports.  Devel::Cover
-ships with a number of different reports including various types of HTML
-output, textual reports, a report to display missing coverage in the same
-format as compilation errors and a report to display coverage information
-within the Vim editor.
+ships with a number of reports including various types of HTML output, textual
+reports, a report to display missing coverage in the same format as compilation
+errors and a report to display coverage information within the Vim editor.
 
 It is possible to add annotations to reports, for example you can add a column
 to an HTML report showing who last changed a line, as determined by git blame.
@@ -1457,27 +1452,27 @@ In this example, Devel::Cover will be operating in silent mode.
 =head1 OPTIONS
 
  -blib               - "use blib" and ignore files matching \bt/ (default true
-                       if blib directory exists, false otherwise).
+                       if blib directory exists, false otherwise)
  -coverage criterion - Turn on coverage for the specified criterion.  Criteria
                        include statement, branch, condition, path, subroutine,
-                       pod, time, all and none (default all available).
- -db cover_db        - Store results in coverage db (default ./cover_db).
+                       pod, time, all and none (default all available)
+ -db cover_db        - Store results in coverage db (default ./cover_db)
  -dir path           - Directory in which coverage will be collected (default
-                       cwd).
- -ignore RE          - Set REs of files to ignore (default "/Devel/Cover\b").
- +ignore RE          - Append to REs of files to ignore.
- -inc path           - Set prefixes of files to include (default @INC).
- +inc path           - Append to prefixes of files to include.
+                       cwd)
+ -ignore RE          - Set REs of files to ignore (default "/Devel/Cover\b")
+ +ignore RE          - Append to REs of files to ignore
+ -inc path           - Set prefixes of files to include (default @INC)
+ +inc path           - Append to prefixes of files to include
  -loose_perms val    - Use loose permissions on all files and directories in
                        the coverage db so that code changing EUID can still
-                       write coverage information (default off).
- -merge val          - Merge databases, for multiple test benches (default on).
- -select RE          - Set REs of files to select (default none).
- +select RE          - Append to REs of files to select.
- -silent val         - Don't print informational messages (default off).
- -subs_only val      - Only cover code in subroutine bodies (default off).
- -replace_ops val    - Use op replacing rather than runops (default on).
- -summary val        - Print summary information if val is true (default on).
+                       write coverage information (default off)
+ -merge val          - Merge databases, for multiple test benches (default on)
+ -select RE          - Set REs of files to select (default none)
+ +select RE          - Append to REs of files to select
+ -silent val         - Don't print informational messages (default off)
+ -subs_only val      - Only cover code in subroutine bodies (default off)
+ -replace_ops val    - Use op replacing rather than runops (default on)
+ -summary val        - Print summary information if val is true (default on)
 
 =head2 More on Coverage Options
 
@@ -1497,15 +1492,15 @@ decide whether a file will be included in coverage reports:
 =over
 
 =item * If the file matches a RE given as a select option, it will be
-included.
+included
 
 =item * Otherwise, if it matches a RE given as an ignore option, it won't be
-included.
+included
 
 =item * Otherwise, if it is in one of the inc directories, it won't be
-included.
+included
 
-=item * Otherwise, it will be included.
+=item * Otherwise, it will be included
 
 =back
 
@@ -1593,6 +1588,19 @@ Both branches may be uncoverable:
         handle_it_another_way();  # uncoverable statement
     }
 
+If there is an elsif in the branch then it can be addressed as the second
+branch on the line by using the "count" attribute.  Futher elsifs are the third
+and fourth "count" value, and so on:
+
+# uncoverable branch false count:2
+if ($thing == 1) {
+    handle_thing_being_one();
+} elsif ($thing == 2) {
+    handle_thing_being_tow();
+} else {
+    die "thing can only be one or two, not $thing"; # uncoverable statement
+}
+
 =head3 Conditions
 
 Because of the way in which Perl short-circuits boolean operations, there are
@@ -1616,6 +1624,9 @@ conditions may be modelled thus:
 
 C<Or> conditionals are handled in a similar fashion (TODO - provide some
 examples) but C<xor> conditionals are not properly handled yet.
+
+As for branches, the "count" value may be used for either conditions in elsif
+conditionals, or for complex conditions.
 
 =head3 Subroutines
 

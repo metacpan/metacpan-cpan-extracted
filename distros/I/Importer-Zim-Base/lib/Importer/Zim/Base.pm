@@ -1,6 +1,8 @@
 
 package Importer::Zim::Base;
-$Importer::Zim::Base::VERSION = '0.3.0';
+$Importer::Zim::Base::VERSION = '0.5.0';
+# ABSTRACT: Base module for Importer::Zim backends
+
 use 5.018;
 no strict 'refs';
 
@@ -14,27 +16,28 @@ sub _prepare_args {
     my $package = shift
       or Carp::croak qq{Usage: use $class MODULE => [\%OPTS =>] EXPORTS...\n};
 
-    my $opts = ref $_[0] ? shift : {};
+    my $opts = _module_opts( ref $_[0] eq 'HASH' ? shift : {} );
     my @version = exists $opts->{-version} ? ( $opts->{-version} ) : ();
     &Module::Runtime::use_module( $package, @version );
 
-    my $strict = 1;
-    $strict = $opts->{-strict} if exists $opts->{-strict};
     my $can_export;
-    $can_export = _can_export($package) if $strict;
+    $can_export = _can_export($package) if $opts->{-strict};
 
     my ( @exports, %seen );
     @_ = @{"${package}::EXPORT"} unless @_ || !${"${package}::"}{'EXPORT'};
     while (@_) {
         my @symbols = _expand_symbol( $package, shift );
-        my $opts = ref $_[0] ? shift : {};
+        my $opts = _import_opts( ref $_[0] eq 'HASH' ? shift : {}, $opts );
         for my $symbol (@symbols) {
             Carp::croak qq{"$symbol" is not exported by "$package"}
               if $can_export && !$can_export->{$symbol};
             Carp::croak qq{Can't handle "$symbol"}
               if $symbol =~ /^[\$\@\%\*]/;
-            my $sub = *{"${package}::${symbol}"}{CODE};
-            my $export = $opts->{-as} // $symbol;
+            my $sub    = *{"${package}::${symbol}"}{CODE};
+            my $export = do {
+                local $_ = $opts->{-as} // $symbol;
+                exists $opts->{-map} ? $opts->{-map}->() : $_;
+            };
             Carp::croak qq{Can't find "$symbol" in "$package"}
               unless $sub;
             my $seen = $seen{$export}{$sub}++;
@@ -50,8 +53,41 @@ sub _prepare_args {
     return @exports;
 }
 
+sub _module_opts {
+    state $IS_MODULE_OPTION
+      = { map { ; "-$_" => 1 } qw(how map prefix strict version) };
+
+    my %opts = ( -strict => !!1 );
+    my $o = $_[0];
+    $opts{-strict} = !!$o->{-strict} if exists $o->{-strict};
+    exists $o->{-map} and $opts{-map} = $o->{-map}
+      or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
+    if ( my @bad = grep { !$IS_MODULE_OPTION->{$_} } keys %$o ) {
+        Carp::carp qq{Ignoring unknown module options (@bad)\n};
+    }
+    return \%opts;
+}
+
+# $opts = _import_opts($opts1, $m_opts);
+sub _import_opts {
+    state $IS_IMPORT_OPTION = { map { ; "-$_" => 1 } qw(as map prefix) };
+
+    my %opts;
+    exists $_[1]{-map} and $opts{-map} = $_[1]{-map};
+    my $o = $_[0];
+    $opts{-as} = $o->{-as} if exists $o->{-as};
+    exists $o->{-map} and $opts{-map} = $o->{-map}
+      or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
+    if ( my @bad = grep { !$IS_IMPORT_OPTION->{$_} } keys %$o ) {
+        Carp::carp qq{Ignoring unknown symbol options (@bad)\n};
+    }
+    return \%opts;
+}
+
 sub _expand_symbol {
-    return $_[1] unless $_[1] =~ /^[:&]/;
+    return $_[1] unless ref $_[1] || $_[1] =~ /^[:&]/;
+
+    return map { /^&/ ? substr( $_, 1 ) : $_ } @{ $_[1] } if ref $_[1];
 
     return substr( $_[1], 1 ) if $_[1] =~ /^&/;
 
@@ -80,11 +116,10 @@ sub _can_export {
 
 #pod =encoding utf8
 #pod
-#pod =head1 NAME
-#pod
-#pod Importer::Zim::Base - Base module for Importer::Zim
-#pod
 #pod =head1 DESCRIPTION
+#pod
+#pod    "The Earth is safe once more, GIR! Now let's go destroy it!"
+#pod      – Zim
 #pod
 #pod No public interface.
 #pod
@@ -109,19 +144,18 @@ __END__
 
 =head1 NAME
 
-Importer::Zim::Base
+Importer::Zim::Base - Base module for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.3.0
+version 0.5.0
 
 =head1 DESCRIPTION
 
+   "The Earth is safe once more, GIR! Now let's go destroy it!"
+     – Zim
+
 No public interface.
-
-=head1 NAME
-
-Importer::Zim::Base - Base module for Importer::Zim
 
 =head1 DEBUGGING
 
@@ -137,12 +171,6 @@ L<Importer::Zim>
 =head1 AUTHOR
 
 Adriano Ferreira <ferreira@cpan.org>
-
-=head1 CONTRIBUTOR
-
-=for stopwords Adriano Ferreira
-
-Adriano Ferreira <a.r.ferreira@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

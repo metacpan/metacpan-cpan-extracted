@@ -4,7 +4,7 @@ use qbit;
 
 use lib::abs qw(../lib ./lib);
 
-use Test::More tests => 33;
+use Test::More tests => 36;
 use Test::Differences;
 
 use HTTP::Response;
@@ -337,6 +337,31 @@ sub check_add_multi {
             }
         ],
         fields => [qw(f_date f_string f_uint8 f_uint32 f_enum)]    #my fields and my order
+    );
+
+    _call_clickhouse(
+        {
+            set   => {code => 200, content => ''},
+            check => {
+                url     => $URL,
+                content => q{INSERT INTO `stat` (`f_enum`, `f_string`) SELECT
+    `stat`.`f_enum` AS `f_enum`,
+    `stat`.`f_string` AS `f_string`
+FROM `stat`
+WHERE (
+    `stat`.`f_date` = '2017-09-17 19:19:23'
+)}
+            }
+        }
+    );
+
+    $app->clickhouse->stat->add(
+        $app->clickhouse->query->select(
+            table  => $app->clickhouse->stat,
+            fields => [qw(f_string f_enum)],
+            filter => {f_date => '2017-09-17 19:19:23'}
+        ),
+        fields => [qw(f_enum f_string)]
     );
 }
 

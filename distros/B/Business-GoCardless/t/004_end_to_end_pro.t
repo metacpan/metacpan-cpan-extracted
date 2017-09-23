@@ -110,7 +110,7 @@ isa_ok(
 	my $Payment = $GoCardless->create_payment(
 		amount   => 100,
 		currency => 'EUR',
-		links    => { mandate => $PreAuthorization->links->{mandate} },
+		links    => { mandate => $PreAuthorization->mandate->id },
 	),
 	'Business::GoCardless::Payment',
 	'->create_payment',

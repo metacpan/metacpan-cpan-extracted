@@ -1,5 +1,8 @@
 Revision history for Perl extension AnySan-Provider-Slack
 
+0.05 2017-09-22T11:10:16Z
+    - Add link_names option #4 (thx @nukokusa)
+
 0.04 2015-11-05T13:23:51Z
     - `from_nickname` is user name now, not user id
 

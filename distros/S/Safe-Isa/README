@@ -40,9 +40,10 @@ SYNOPSIS
       $maybe_an_object->$_does('RoleName'); # true or false, no boom today
       $maybe_an_object->$_DOES('RoleName'); # true or false, no boom today
 
-    And just in case we missed a method:
+    And just in case we missed a method or two:
 
       $maybe_an_object->$_call_if_object(name => @args);
+      $maybe_an_object->$_call_if_can(name => @args);
 
     Or to re-use a previous example for purposes of explication:
 
@@ -115,6 +116,13 @@ EXPORTS
 
     If called on an object, calls "method_name" on it and returns the
     result, otherwise returns nothing.
+
+  $_call_if_can
+      $maybe_an_object->$_call_if_can(name => @args);
+
+    If called on an object, calls "can" on it; if that returns true, then
+    calls "method_name" on it and returns the result; if any condition is
+    false returns nothing.
 
 SEE ALSO
     I gave a lightning talk on this module (and curry and Import::Into) at

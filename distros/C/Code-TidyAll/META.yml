@@ -9,6 +9,7 @@ build_requires:
   File::Spec: '0'
   Test::Class::Most: '0'
   Test::Differences: '0'
+  Test::Fatal: '0'
   Test::More: '0.96'
   Test::Warnings: '0'
   autodie: '0'
@@ -28,94 +29,97 @@ no_index:
 provides:
   Code::TidyAll:
     file: lib/Code/TidyAll.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Cache:
     file: lib/Code/TidyAll/Cache.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::CacheModel:
     file: lib/Code/TidyAll/CacheModel.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::CacheModel::Shared:
     file: lib/Code/TidyAll/CacheModel/Shared.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Config::INI::Reader:
     file: lib/Code/TidyAll/Config/INI/Reader.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Git::Precommit:
     file: lib/Code/TidyAll/Git/Precommit.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Git::Prereceive:
     file: lib/Code/TidyAll/Git/Prereceive.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Git::Util:
     file: lib/Code/TidyAll/Git/Util.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin:
     file: lib/Code/TidyAll/Plugin.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::CSSUnminifier:
     file: lib/Code/TidyAll/Plugin/CSSUnminifier.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::JSBeautify:
     file: lib/Code/TidyAll/Plugin/JSBeautify.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::JSHint:
     file: lib/Code/TidyAll/Plugin/JSHint.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::JSLint:
     file: lib/Code/TidyAll/Plugin/JSLint.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::JSON:
     file: lib/Code/TidyAll/Plugin/JSON.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::MasonTidy:
     file: lib/Code/TidyAll/Plugin/MasonTidy.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PHPCodeSniffer:
     file: lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PerlCritic:
     file: lib/Code/TidyAll/Plugin/PerlCritic.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PerlTidy:
     file: lib/Code/TidyAll/Plugin/PerlTidy.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PerlTidySweet:
     file: lib/Code/TidyAll/Plugin/PerlTidySweet.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PodChecker:
     file: lib/Code/TidyAll/Plugin/PodChecker.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PodSpell:
     file: lib/Code/TidyAll/Plugin/PodSpell.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::PodTidy:
     file: lib/Code/TidyAll/Plugin/PodTidy.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Plugin::SortLines:
     file: lib/Code/TidyAll/Plugin/SortLines.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Result:
     file: lib/Code/TidyAll/Result.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Role::HasIgnore:
     file: lib/Code/TidyAll/Role/HasIgnore.pm
-    version: '0.65'
+    version: '0.67'
+  Code::TidyAll::Role::RunsCommand:
+    file: lib/Code/TidyAll/Role/RunsCommand.pm
+    version: '0.67'
   Code::TidyAll::Role::Tempdir:
     file: lib/Code/TidyAll/Role/Tempdir.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::SVN::Precommit:
     file: lib/Code/TidyAll/SVN/Precommit.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::SVN::Util:
     file: lib/Code/TidyAll/SVN/Util.pm
-    version: '0.65'
+    version: '0.67'
   Code::TidyAll::Util::Zglob:
     file: lib/Code/TidyAll/Util/Zglob.pm
-    version: '0.65'
+    version: '0.67'
   Test::Code::TidyAll:
     file: lib/Test/Code/TidyAll.pm
-    version: '0.65'
+    version: '0.67'
 recommends:
   Parallel::ForkManager: '0'
 requires:
@@ -143,7 +147,7 @@ requires:
   Path::Tiny: '0.098'
   Scalar::Util: '0'
   Scope::Guard: '0'
-  Specio: '0.30'
+  Specio: '0.40'
   Specio::Declare: '0'
   Specio::Library::Builtins: '0'
   Specio::Library::Numeric: '0'
@@ -163,7 +167,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/perl-code-tidyall/issues
   homepage: http://metacpan.org/release/Code-TidyAll
   repository: git://github.com/houseabsolute/perl-code-tidyall.git
-version: '0.65'
+version: '0.67'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -275,7 +279,7 @@ x_Dist_Zilla:
               version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -340,7 +344,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -358,7 +362,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -496,7 +500,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.7.4
+          git_version: 2.14.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -677,7 +681,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '0.85'
@@ -702,7 +706,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.042'
@@ -724,7 +728,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -737,11 +741,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.65
+          tag: v0.67
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -755,7 +759,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.042'
@@ -784,7 +788,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -798,7 +802,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.14.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.042'
@@ -897,4 +901,4 @@ x_contributors:
   - 'Sergey Romanov <sromanov-dev@yandex.ru>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'timgimyee <tim.gim.yee@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

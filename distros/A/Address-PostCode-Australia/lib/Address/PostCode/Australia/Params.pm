@@ -1,6 +1,6 @@
 package Address::PostCode::Australia::Params;
 
-$Address::PostCode::Australia::Params::VERSION   = '0.08';
+$Address::PostCode::Australia::Params::VERSION   = '0.09';
 $Address::PostCode::Australia::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::Australia::Params - Placeholder for parameters for Address::P
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 DESCRIPTION
 
@@ -20,11 +20,9 @@ B<FOR INTERNAL USE ONLY>
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT_OK);
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(validate);
+our @EXPORT_OK = qw(validate);
 
 sub check_num {
     my ($num) = @_;

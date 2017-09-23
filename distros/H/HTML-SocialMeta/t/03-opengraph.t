@@ -14,6 +14,7 @@ my $meta_tags = HTML::SocialMeta->new(
     title => 'You can have any title you wish here',
     description => 'Description goes here may have to do a little validation',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     url	 => 'www.someurl.com',
     player => 'www.somevideourl.com/url/url',
     player_width => '500',
@@ -34,6 +35,7 @@ my $test_opengraph = '<meta property="og:type" content="article"/>
 <meta property="og:description" content="Description goes here may have to do a little validation"/>
 <meta property="og:url" content="www.someurl.com"/>
 <meta property="og:image" content="www.urltoimage.com/blah.jpg"/>
+<meta property="og:image:alt" content="A picture of some stuff."/>
 <meta property="og:site_name" content="Example Site, anything"/>
 <meta property="fb:app_id" content="1232342342354"/>';
 
@@ -45,6 +47,7 @@ my $test_opengraph_thumbnail = '<meta property="og:type" content="thumbnail"/>
 <meta property="og:description" content="Description goes here may have to do a little validation"/>
 <meta property="og:url" content="www.someurl.com"/>
 <meta property="og:image" content="www.urltoimage.com/blah.jpg"/>
+<meta property="og:image:alt" content="A picture of some stuff."/>
 <meta property="og:site_name" content="Example Site, anything"/>
 <meta property="fb:app_id" content="1232342342354"/>';
 
@@ -56,6 +59,7 @@ my $test_video_card = '<meta property="og:type" content="video"/>
 <meta property="og:url" content="www.someurl.com"/>
 <meta property="og:title" content="You can have any title you wish here"/>
 <meta property="og:image" content="www.urltoimage.com/blah.jpg"/>
+<meta property="og:image:alt" content="A picture of some stuff."/>
 <meta property="og:description" content="Description goes here may have to do a little validation"/>
 <meta property="og:video:url" content="www.somevideourl.com/url/url"/>
 <meta property="og:video:secure_url" content="www.somevideourl.com/url/url"/>
@@ -72,6 +76,7 @@ my $app_meta_tags = HTML::SocialMeta->new(
     title => 'You can have any title you wish here',
     description => 'Description goes here may have to do a little validation',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     app_url	 => 'www.someurl.com',
     fb_app_id	=> '1232342342354',
 );
@@ -79,6 +84,7 @@ my $app_meta_tags = HTML::SocialMeta->new(
 my $test_app = '<meta property="og:type" content="product"/>
 <meta property="og:title" content="You can have any title you wish here"/>
 <meta property="og:image" content="www.urltoimage.com/blah.jpg"/>
+<meta property="og:image:alt" content="A picture of some stuff."/>
 <meta property="og:description" content="Description goes here may have to do a little validation"/>
 <meta property="og:url" content="www.someurl.com"/>
 <meta property="fb:app_id" content="1232342342354"/>';

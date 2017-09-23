@@ -93,6 +93,7 @@ INOUE
 Ian
 Jacob
 Jakub
+James
 Jason
 Jeremy
 Joao
@@ -116,6 +117,7 @@ Kilzer
 Klar
 Knop
 Koenig
+Konojacki
 Koster
 Kronengold
 Krüger
@@ -139,6 +141,7 @@ Mark
 Marko
 Markus
 Martijn
+Martin
 Massjouni
 Mates
 Matthew
@@ -181,6 +184,7 @@ Rabbitson
 Radoslaw
 Radu
 Rai
+Raspass
 Rezic
 Robert
 RobotUA
@@ -196,8 +200,10 @@ Simple
 Sjogren
 Skyttä
 Slaven
+Sluka
 Spafford
 Spiros
+Standish
 Steffen
 Steffen_Ullrich
 Steinbrunner
@@ -216,6 +222,7 @@ Tilly
 Tim
 Todd
 Tom
+Tomasz
 Tony
 Toru
 Tourbin
@@ -264,6 +271,7 @@ david
 davidrw
 de
 denaxas
+dnstandish
 dot
 dpettit
 dsteinbrunner
@@ -288,6 +296,7 @@ jefflee
 jfesler
 jmates
 john9art
+jraspass
 jwilk
 jwittkoski
 ka
@@ -297,6 +306,8 @@ loopback
 lwp
 mailto
 mark
+martin
+me
 michael
 michealgong
 michiel

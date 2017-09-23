@@ -4,7 +4,7 @@
       "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unrestricted"
    ],
@@ -76,5 +76,5 @@
          "web" : "https://github.com/ikegami/perl-WWW-Kickstarter"
       }
    },
-   "version" : "v1.8.0"
+   "version" : "v1.10.0"
 }

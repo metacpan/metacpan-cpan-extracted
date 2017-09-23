@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Table;
-$QBit::Application::Model::DB::mysql::Table::VERSION = '0.013';
+$QBit::Application::Model::DB::mysql::Table::VERSION = '0.014';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Table);
@@ -51,6 +51,8 @@ sub add_multi {
           if @unknown_fields;
 
         $field_names = $opts{'fields'};
+    } elsif (blessed($data->[0]) && $data->[0]->isa('QBit::Application::Model::DB::Query')) {
+        $field_names = [sort map {$fields->{$_}->name} keys %$fields];
     } else {
         my $data_fields;
         if ($opts{'identical_rows'}) {
@@ -75,13 +77,8 @@ sub add_multi {
 
     throw Exception::BadArguments gettext('Expected fields') unless $field_names;
 
-    my @locales = keys(%{$self->db->get_option('locales', {})});
+    my @locales = sort keys(%{$self->db->get_option('locales', {})});
     @locales = (undef) unless @locales;
-
-    my $add_rows = 0;
-
-    my $need_transact = @$data > $ADD_CHUNK;
-    $self->db->begin() if $need_transact;
 
     my $sql_header =
         ($opts{'replace'} ? 'REPLACE'  : 'INSERT')
@@ -96,7 +93,20 @@ sub add_multi {
             push(@real_field_names, $name);
         }
     }
-    $sql_header .= join(', ', map {$self->quote_identifier($_)} @real_field_names) . ") VALUES\n";
+    $sql_header .= join(', ', map {$self->quote_identifier($_)} @real_field_names) . ") ";
+
+    if (blessed($data->[0]) && $data->[0]->isa('QBit::Application::Model::DB::Query')) {
+        my ($sql, @params) = $data->[0]->get_sql_with_data();
+
+        return $self->db->_do($sql_header . $sql, @params);
+    }
+
+    $sql_header .= "VALUES\n";
+
+    my $add_rows = 0;
+
+    my $need_transact = @$data > $ADD_CHUNK;
+    $self->db->begin() if $need_transact;
 
     try {
         $self->db->_sub_with_connected_dbh(
@@ -313,7 +323,7 @@ B<Arguments:>
 
 =item *
 
-B<$data> - reference to hash
+B<$data> - reference to hash or object (QBit::Application::Model::DB::Query)
 
 =item *
 
@@ -355,6 +365,24 @@ B<Example:>
     fields => [qw(login name)]
   );
   # insert only login and name in this order
+
+  $app->db->users->add(
+    $app->db->query->select(
+        table => $app->db->logs,
+        fields => [qw(login name)],
+        filter => {date => '2017-09-19'}
+    ),
+    fields => [qw(login name)]
+  );
+
+  # mysql
+  INSERT INTO `users` (`login`, `name`) SELECT
+      `logs`.`login` AS `login`,
+      `logs`.`name` AS `name`
+  FROM `logs`
+  WHERE (
+      `logs`.`date` = '2017-09-19'
+  )
 
 =head2 add_multi
 

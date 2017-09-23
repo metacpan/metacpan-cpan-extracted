@@ -2,7 +2,7 @@ package t::odea::Maybe;
 
 use Moo;
 use MooX::ValidateSubs;
-use Types::Standard qw/Str ArrayRef HashRef/;
+use Types::Standard qw/Str ArrayRef HashRef Split/;
 
 validate_subs (
     [qw/hello_hash hello_hashref/] => {
@@ -15,7 +15,15 @@ validate_subs (
     [qw/a_list a_single_arrayref/] => {
         params => [ [Str], [ArrayRef], [HashRef] ],
     },
+	coe => {
+		params => [ [(ArrayRef)->plus_coercions(Split[qr/\s/])] ],
+	}
 );
+
+sub coe {
+	my ($self, $args) = @_;
+	return $_[1];
+}
 
 sub hello_hash {
     my ($self, %args) = @_;

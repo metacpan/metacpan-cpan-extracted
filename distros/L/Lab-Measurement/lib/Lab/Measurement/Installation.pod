@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 Introduction
 
@@ -40,11 +40,13 @@ My Computer => Properties => Advanced => Environment Variables
 
 =back
 
-=item * Build and install:
+=item * Build and install. Open cmd.exe and run
 
- cpanm Lab::Measurement
+ cpan -T Lab::Measurement
 
 =item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|http://search.cpan.org/dist/Lab-VISA/lib/Lab/VISA/Installation.pod>
+
+=item * For Zurich Instruments devices you need to install L<Lab::Zhinst|http://search.cpan.org/~amba/Lab-Zhinst/lib/Lab/Zhinst.pm>.
 
 =item * Have fun!
 
@@ -83,7 +85,7 @@ This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2011-2012  Andreas K. Huettel
             2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

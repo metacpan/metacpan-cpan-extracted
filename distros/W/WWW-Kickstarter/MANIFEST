@@ -8,6 +8,7 @@ lib/WWW/Kickstarter/Data/Location.pm
 lib/WWW/Kickstarter/Data/NotificationPref.pm
 lib/WWW/Kickstarter/Data/Project.pm
 lib/WWW/Kickstarter/Data/Reward.pm
+lib/WWW/Kickstarter/Data/Tags.pod
 lib/WWW/Kickstarter/Data/User.pm
 lib/WWW/Kickstarter/Data/User/Myself.pm
 lib/WWW/Kickstarter/Error.pm

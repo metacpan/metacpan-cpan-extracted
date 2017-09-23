@@ -1,0 +1,290 @@
+__END__
+
+=head1 NAME
+
+Syntax::Highlight::Engine::Simple - Simple Syntax Highlight Engine
+
+=head1 VERSION
+
+This document describes Syntax::Highlight::Engine::Simple
+
+=head1 SYNOPSIS
+
+    use Syntax::Highlight::Engine::Simple;
+    
+    # Constractor
+    $highlight = Syntax::Highlight::Engine::Simple->new(%hash);
+    
+    # Parameter configuration
+    $highlight->setParams(%hash);
+    
+    # Syntax definision and addition
+    $highlight->setSyntax(%hash);
+    $highlight->appendSyntax(%hash);
+    
+    # Perse
+    $highlight->doFile(%hash);
+    $highlight->doStr(%hash);
+    
+    # Utilities
+    $highlight->array2regexp(%hash);
+    $highlight->getClassNames(%hash);
+
+=head1 DESCRIPTION
+
+This is a Syntax highlight Engine. This generates a part of HTML string by
+marking up the input string with span tags along the given rules so that you
+can easily coloring with CSS.
+
+Advantage is the simpleness. This provides a simple way to define the
+highlighting rules by packing the complicated part of it into regular
+expression. Also, This works faster than similar highlight solutions on rough
+benchmarks.
+
+Here is a working example of This module.
+
+http://jamadam.com/dev/cpan/demo/Syntax/Highlight/Engine/Simple/
+
+=head1 INTERFACE 
+
+=head2 new
+
+I<new> constractor calls for following arguments.
+
+=over
+
+B<type>
+
+File type. This argument causes specific sub class to be loaded.
+
+B<syntax>
+
+With this argument, you can assign rules in constractor.
+
+=back
+
+=head2 setParams
+
+This method calls for following arguments.
+
+=over
+
+B<html_escape_code_ref>
+
+HTML escape code ref. Default subroutine escapes 3 characters '&', '<' and '>'.
+
+=back
+
+=head2 setSyntax
+
+Set the rules for highlight. It calls for a argument I<syntax> in array.
+
+    $highlighter->setSyntax(
+        syntax => [
+                {
+                    class => 'tag',
+                    regexp => "<.+?>",
+                },
+                {
+                    class => 'quote',
+                    regexp => "'.*?'",
+                    container => 'tag',
+                },
+                {
+                    class => 'wquote',
+                    regexp => '".*?"',
+                    container => 'tag',
+                },
+                {
+                    class => 'keyword',
+                    regexp => 'somekeyword',
+                    container => ['tag', 'quote', 'wquote'],
+                },
+        ]
+    );
+
+The array can contain rules in hash which is consists of 3 keys, I<class>,
+I<regexp> and I<container>.
+
+=over
+
+B<class>
+
+This appears to the output SPAN tag. 
+
+B<regexp>
+
+Regular expression to be highlighted.
+
+B<container>
+
+Class names of allowed container. It can be given in String or Array. This
+restricts the I<regexp> to stand only inside of the classes. This parameter
+also works to ease the regulation some time. The highlighting rules doesn't
+stand in any container in default. This parameter eliminates it.
+
+=back
+
+=head2 appendSyntax
+
+Append syntax by giving a hash.
+
+    $highlighter->setSyntax(
+        syntax => {
+            class       => 'quote',
+            regexp      => "'.*?'",
+            container   => 'tag',
+        }
+    );
+
+=head2 doStr
+
+Highlighting input string and returns the marked up string. This method calls
+for following arguments.
+
+=over
+
+B<str>
+
+String.
+
+B<tab_width>
+
+Tab width for tab-space conversion. -1 for disable it. -1 is the default.
+
+=back
+
+    $highlighter->doStr(
+        str         => $str,
+        tab_width   => 4
+    );
+
+=head2 doFile
+
+Highlighting the file and returns the marked up string. This method calls for
+following arguments.
+
+=over
+
+B<file>
+
+File name.
+
+B<tab_width>
+
+Tab width for tab-space conversion. -1 for disable it. -1 is the default.
+
+B<encode>
+
+Set the encode of file. utf8 is the default.
+
+=back
+
+    $highlighter->doStr(
+        str         => $str,
+        tab_width   => 4,
+        encode      => 'utf8'
+    );
+
+=head2 array2regexp
+
+This is a utility method for converting string array to regular expression.
+
+=over
+
+=back
+
+=head2 getClassNames
+
+Returns the class names in array.
+
+=over
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< doStr method got undefined value >>
+
+=item C<< File open failed >>
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+I<Syntax::Highlight::Engine::Simple> requires no configuration files or
+environment variables. Specific language syntax can be defined with
+sub classes and loaded in constructor if you give it the type argument.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<UNIVERSAL::require>
+
+=item L<encoding>
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-syntax-highlight-engine-Simple@rt.cpan.org>, or through the web
+interface at L<http://rt.cpan.org>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Syntax::Highlight::Engine::Simple::HTML>
+
+=item L<Syntax::Highlight::Engine::Simple::Perl>
+
+=back
+
+=head1 AUTHOR
+
+Sugama Keita  C<< <sugama@jamadam.com> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008-2011, Sugama Keita C<< <sugama@jamadam.com> >>. All rights
+reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See I<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

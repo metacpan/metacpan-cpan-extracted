@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::Log;
 #ABSTRACT: ???? something about logging?
-$Lab::Moose::Instrument::Log::VERSION = '3.554';
+$Lab::Moose::Instrument::Log::VERSION = '3.600';
 use Moose::Role;
 use Carp;
 use namespace::autoclean;
@@ -110,7 +110,7 @@ Lab::Moose::Instrument::Log - ???? something about logging?
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

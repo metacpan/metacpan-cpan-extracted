@@ -1,6 +1,8 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.2.0';
+$Importer::Zim::VERSION = '0.3.0';
+# ABSTRACT: Import functions à la Invader Zim
+
 use 5.018;
 use warnings;
 use Module::Runtime ();
@@ -10,7 +12,7 @@ sub import {
 }
 
 my %MIN_VERSION = do {
-    my %v = ( '+Lexical' => '0.4.0', );
+    my %v = ( '+Lexical' => '0.5.0', );
     /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
     %v;
 };
@@ -34,10 +36,6 @@ sub backend {
 
 #pod =encoding utf8
 #pod
-#pod =head1 NAME
-#pod
-#pod Importer::Zim - Import functions à la Invader Zim
-#pod
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Importer::Zim 'Scalar::Util' => 'blessed';
@@ -47,7 +45,13 @@ sub backend {
 #pod
 #pod     use Importer::Zim 'Foo' => { -version => '3.0' } => 'foo';
 #pod
+#pod     use Importer::Zim 'SpaceTime::Machine' => [qw(robot rubber_pig)];
+#pod
 #pod =head1 DESCRIPTION
+#pod
+#pod    "Because, when you create a giant monster of doom,
+#pod    no matter how cute, you have to... you have to... I don't know."
+#pod      – Zim
 #pod
 #pod This pragma imports subroutines from other modules in a clean way.
 #pod "Clean imports" here mean that the import symbols are available
@@ -88,11 +92,11 @@ __END__
 
 =head1 NAME
 
-Importer::Zim
+Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -103,7 +107,13 @@ version 0.2.0
 
     use Importer::Zim 'Foo' => { -version => '3.0' } => 'foo';
 
+    use Importer::Zim 'SpaceTime::Machine' => [qw(robot rubber_pig)];
+
 =head1 DESCRIPTION
+
+   "Because, when you create a giant monster of doom,
+   no matter how cute, you have to... you have to... I don't know."
+     – Zim
 
 This pragma imports subroutines from other modules in a clean way.
 "Clean imports" here mean that the import symbols are available
@@ -118,10 +128,6 @@ By default, L<Importer::Zim> looks at package variables
 C<@EXPORT>, C<@EXPORT_OK> and C<%EXPORT_TAGS> to decide
 what are exportable subroutines. It tries its best to implement
 a behavior akin to L<Exporter> without the corresponding package polution.
-
-=head1 NAME
-
-Importer::Zim - Import functions à la Invader Zim
 
 =head1 METHODS
 
@@ -141,12 +147,6 @@ L<lexically>
 =head1 AUTHOR
 
 Adriano Ferreira <ferreira@cpan.org>
-
-=head1 CONTRIBUTOR
-
-=for stopwords Adriano Ferreira
-
-Adriano Ferreira <a.r.ferreira@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

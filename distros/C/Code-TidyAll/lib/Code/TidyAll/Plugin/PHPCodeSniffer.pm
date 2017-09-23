@@ -10,20 +10,18 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+with 'Code::TidyAll::Role::RunsCommand';
+
+our $VERSION = '0.67';
 
 sub _build_cmd {'phpcs'}
 
 sub validate_file {
     my ( $self, $file ) = @_;
 
-    my @cmd = ( $self->cmd, shellwords( $self->argv ), $file );
-    my $output;
-    run3( \@cmd, \undef, \$output, \$output );
-    if ( $? > 0 ) {
-        $output ||= 'problem running ' . $self->cmd;
-        die "$output\n";
-    }
+    $self->_run_or_die($file);
+
+    return;
 }
 
 1;
@@ -42,7 +40,7 @@ Code::TidyAll::Plugin::PHPCodeSniffer - Use phpcs with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -67,17 +65,16 @@ Install L<PEAR|http://pear.php.net/>, then install C<phpcs> from PEAR:
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to C<phpcs>
+Arguments to pass to C<phpcs>.
 
-=item cmd
+=head2 cmd
 
-Full path to C<phpcs>
-
-=back
+The path for the C<phpcs> command. By default this is just C<phpcs>, meaning
+that the user's C<PATH> will be searched for the command.
 
 =head1 SUPPORT
 

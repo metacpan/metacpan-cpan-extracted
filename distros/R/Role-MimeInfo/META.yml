@@ -1,0 +1,36 @@
+---
+abstract: 'Bolt-on type checking against GNOME shared-mime-info'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Role-MimeInfo
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::MimeInfo: '0.27'
+  IO::Scalar: '2.110'
+  Moo: '2.003'
+  namespace::autoclean: '0.28'
+  perl: 5.12.0
+resources:
+  bugtracker: https://github.com/doriantaylor/p5-role-mimeinfo/issues
+  homepage: https://github.com/doriantaylor/p5-role-mimeinfo
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-role-mimeinfo.git
+version: '0.02'

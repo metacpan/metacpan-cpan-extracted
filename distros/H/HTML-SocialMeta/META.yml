@@ -2,13 +2,9 @@
 abstract: 'Module to generate Social Media Meta Tags, '
 author:
   - 'Robert Acock <ThisUsedToBeAnEmail@gmail.com>'
-build_requires:
-  Test::Exception: '0'
-  Test::More: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+build_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +14,10 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  List::MoreUtils: '0.413'
-  Moo: '1.001001'
-  MooX::LazierAttributes: '0.14'
-  MooX::ValidateSubs: '0.09'
-  Type::Tiny: '1.000006'
-  perl: '5.006'
-version: '0.71'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/HTML-SocialMeta.git
+version: '0.73'
+x_contributors:
+  - 'Robert Haliday <robh@cpan.org>'
+  - 'Jason McIntosh (JMAC) <jmac@jmac.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

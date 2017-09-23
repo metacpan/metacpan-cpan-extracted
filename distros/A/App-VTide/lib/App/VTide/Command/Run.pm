@@ -15,10 +15,11 @@ use Hash::Merge::Simple qw/ merge /;
 use Path::Tiny;
 use File::stat;
 use File::chdir;
+use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.3');
+our $VERSION = version->new('0.1.4');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -199,12 +200,25 @@ sub params {
     return merge $config->{default} || {}, $params;
 }
 
+sub command_param {
+    my ( $self, $param ) = @_;
+
+    my ($user_param) = $param =~ /^[{]:(\w+):[}]$/;
+
+    return $param if ! $user_param;
+
+    my $value = prompt "$user_param : ";
+    chomp $value;
+
+    return $value;
+}
+
 sub command {
     my ( $self, $params ) = @_;
 
     if ( ! $params->{edit} ) {
         return ref $params->{command}
-            ? @{ $params->{command} }
+            ? map {$self->command_param($_)} @{ $params->{command} }
             : ( $params->{command} );
     }
 
@@ -316,7 +330,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.3
+This documentation refers to App::VTide::Command::Run version 0.1.4
 
 =head1 SYNOPSIS
 
@@ -355,6 +369,10 @@ Gets the configuration for the command C<$cmd>
 
 Gets the command to execute, either a simple command or an "editor" command
 where the files are got from the groups
+
+=head2 C<command_param ( $params )>
+
+Processes any found user parameters
 
 =head2 C<_shell_quote ( $file )>
 

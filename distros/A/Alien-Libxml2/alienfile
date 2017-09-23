@@ -1,9 +1,73 @@
 use alienfile;
 
+my $test_program = <<'EOF';
+#include <stdio.h>
+#include <libxml/xmlversion.h>
+
+int
+main(int argc, char *argv[])
+{
+  printf("xml version = '%s'\n", LIBXML_DOTTED_VERSION);
+}
+EOF
+
+my @try_flags = (
+  { cflags => '',                             libs => '-lxml2' },
+  { cflags => '-I/usr/include/libxml2',       libs => '-lxml2' },
+  { cflags => '-I/usr/local/include/libxml2', libs => '-lxml2' },
+);
+
 plugin 'PkgConfig' => 'libxml-2.0';
+
+configure { requires 'Alien::Build' => '1.18' };
+
+probe [
+  ['xml2-config', '--version' => \'%{.install.my_version}'],
+  ['xml2-config', '--cflags'  => \'%{.install.my_cflags}'],
+  ['xml2-config', '--libs'    => \'%{.install.my_libs}'],
+];
+
+plugin 'Probe::CBuilder' => (
+  cflags  => $_->{cflags},
+  libs    => $_->{libs},
+  program => $test_program,
+  version => qr{xml version = '(.*?)'},
+) for @try_flags;
 plugin 'PkgConfig::MakeStatic' => ();
 
+# TODO: refuse these versions for system install too
+#       (missing feature from AB core)
+plugin 'Prefer::BadVersion' => [
+  '2.4.22.0',
+  '2.4.25.0', # broken XPath
+  '2.4.28.0', # unsupported, may work fine with earlier XML::LibXML versions
+  '2.4.29.0', # broken
+  '2.4.30.0', # broken
+  '2.5.0.0', # unsupported
+  '2.5.1.0', # all pre 2.5.4 version have broken attr output
+  '2.5.5.0', # tests pass, but known as broken
+  '2.5.11.0', # will partially work
+  '2.6.0.0', # unsupported
+  '2.6.4.0', # schema error
+  '2.6.5.0', # broken xincludes
+  '2.6.15.0',
+  '2.6.16.1', # first version to pass all tests
+  '2.6.18.1', # up to 2.6.18 all ok
+  '2.6.19.0', # broken c14n
+  '2.6.20.0', # broken schemas
+  '2.6.24.1', # all tests pass
+  '2.6.25.0', # broken XPath
+  '2.6.32.1', # tested, works ok
+  '2.7.1.0', # broken release, broken utf-16
+  '2.7.6.1', # tested, ok
+  '2.7.8.1', # tested, ok
+  '2.9.3.1', # schema regression
+  '2.9.4.0', # schema regression
+];
+
 share {
+
+  meta->prop->{out_of_source} = 1;
 
   plugin Download => (
     url     => 'ftp://xmlsoft.org/libxml2/',
@@ -14,11 +78,23 @@ share {
   plugin 'Build::Autoconf' => ();
 
   build [
-    '%{configure} --prefix=%{alien.install.autoconf_prefix} --without-python --disable-shared --enable-static',
+    '%{configure} --prefix=%{.install.autoconf_prefix} --without-python --disable-shared --enable-static',
     '%{make}',
     '%{make} install',
   ];
   
   plugin 'PkgConfig::MakeStatic' => ();
+
+};
+
+sys {
+
+  gather sub {
+    my($build) = @_;
+    if($build->install_prop->{my_libs})
+    {
+      $build->runtime_prop->{$_} = $build->install_prop->{"my_$_"} for qw( version cflags libs );
+    }
+  };
 
 };

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -40,7 +40,7 @@ DESCRIPTION
 
       That does mean that you need to have a .pm that corresponds to your
       dist name. This is not always the case for some older historical
-      distributions, but it has been the recommended convetion for quite
+      distributions, but it has been the recommended convention for quite
       some time.
 
     No non-core dependencies.
@@ -55,7 +55,7 @@ DESCRIPTION
 
     Works in your development tree.
 
-      Uses the huristic, for determining if you are in a development tree,
+      Uses the heuristic, for determining if you are in a development tree,
       and if so, uses the common convention to find the directory named
       share. If you are using a relative path in @INC, if the directory
       share is a sibling of that relative entry in @INC and if the last
@@ -79,7 +79,7 @@ DESCRIPTION
       it would not. For me this covers most of my needs when developing a
       Perl module with a share directory.
 
-      prove foils this huristic by making @INC absolute paths. To get
+      prove foils this heuristic by making @INC absolute paths. To get
       around that you can use App::Prove::Plugin::ShareDirDist.
 
     Built in override.
@@ -115,10 +115,10 @@ FUNCTIONS
     Returns the absolute path to the share directory of the given
     distribution.
 
-    As a convenience you can also use the "main" module name assoicated
+    As a convenience you can also use the "main" module name associated
     with the distribution. That means if you want the share directory for
-    thet dist Foo-Bar-Baz you may use either Foo-Bar-Baz or Foo::Bar::Baz
-    to find it.
+    the dist Foo-Bar-Baz you may use either Foo-Bar-Baz or Foo::Bar::Baz to
+    find it.
 
     Returns nothing if no share directory could be found.
 
@@ -140,7 +140,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Yanick Champoux (yanick)
 
 COPYRIGHT AND LICENSE
 

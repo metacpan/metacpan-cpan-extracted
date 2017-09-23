@@ -24,13 +24,13 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion:
     file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm
-    version: '0.014'
+    version: '0.022'
   Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase:
     file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm
-    version: '0.014'
+    version: '0.022'
   Dist::Zilla::PluginBundle::Author::SKIRMESS:
     file: lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
-    version: '0.014'
+    version: '0.022'
 requires:
   Carp: '0'
   Config::Std: '0'
@@ -89,6 +89,7 @@ requires:
   Dist::Zilla::Plugin::VersionFromMainModule: '0'
   Dist::Zilla::Role::BeforeBuild: '0'
   Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::TextTemplate: '0'
   List::MoreUtils: '0'
@@ -102,7 +103,7 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS/issues
   homepage: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS
   repository: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS.git
-version: '0.014'
+version: '0.022'
 x_BuiltWith:
   modules:
     Carp: '1.40'
@@ -162,6 +163,7 @@ x_BuiltWith:
     Dist::Zilla::Plugin::VersionFromMainModule: '0.03'
     Dist::Zilla::Role::BeforeBuild: '6.010'
     Dist::Zilla::Role::FileMunger: '6.010'
+    Dist::Zilla::Role::PluginBundle::Config::Slicer: '0.202'
     Dist::Zilla::Role::PluginBundle::Easy: '6.010'
     Dist::Zilla::Role::TextTemplate: '6.010'
     ExtUtils::MakeMaker: '7.30'
@@ -178,6 +180,7 @@ x_BuiltWith:
     Perl::Critic::Policy::Moose::RequireMakeImmutable: '1.05'
     Perl::Critic::Utils: '1.130'
     Pod::Wordlist: '1.20'
+    Test::CPAN::Changes: '0.400002'
     Test::CPAN::Meta: '0.25'
     Test::CPAN::Meta::JSON: '0.16'
     Test::CleanNamespaces: '0.22'
@@ -295,11 +298,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
       name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
-      version: '0.013'
+      version: '0.021'
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
       name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
-      version: '0.013'
+      version: '0.021'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
@@ -331,6 +334,8 @@ x_Dist_Zilla:
             - xt/author/pod-syntax.t
             - xt/author/portability.t
             - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/distmeta.t
             - xt/release/eol.t
             - xt/release/kwalitee.t
             - xt/release/manifest.t
@@ -409,6 +414,28 @@ x_Dist_Zilla:
           Module::Metadata: '1.000031'
           version: '0.004'
       name: '@Author::SKIRMESS/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder:
+            - ':ExecFiles'
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: ':ExecFiles'
+              version: '6.010'
+          include_underscores: '0'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000031'
+          version: '0.004'
+      name: '@Author::SKIRMESS/MetaProvides::Package/ExecFiles'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
@@ -556,7 +583,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::CopyFilesFromRelease:
           filename: []
           match:
-            - .pm$
+            - \.pm$
+            - ^bin/
       name: '@Author::SKIRMESS/CopyFilesFromRelease'
       version: '0.006'
     -
@@ -589,6 +617,8 @@ x_Dist_Zilla:
             - xt/author/pod-syntax.t
             - xt/author/portability.t
             - xt/author/test-version.t
+            - xt/release/changes.t
+            - xt/release/distmeta.t
             - xt/release/eol.t
             - xt/release/kwalitee.t
             - xt/release/manifest.t
@@ -596,6 +626,7 @@ x_Dist_Zilla:
             - xt/release/meta-yaml.t
           allow_dirty_match:
             - (?^:\.pm$)
+            - (?^:^bin/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
@@ -611,7 +642,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.014'
+          tag: '0.022'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

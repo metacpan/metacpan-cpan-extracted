@@ -192,6 +192,28 @@ they use internally to build menus, etc. The scaffold can be used as a general-p
 which is available in templates via the C<[% scaffold %]> template variable.
 
 
+=head1 Taxonomies
+
+As of the current version of L<Rapi::Blog>, besides B<Author>, there are two other general purpose, built-in 
+(i.e. defined by the default database schema) taxonomies, 
+B<Tags> and B<Categories>. Both of these operate as C<many-to-many> links, meaning Posts can have
+multiple Tags and be in multiple Categories. The difference between the two is the manner in which
+they are set in the admin interface:
+
+=head2 Tags
+
+Tags are created automatically by using social-media syle hashtags in the Post body. For example, if 
+you include the string C<#foo> the Post will have the tag "foo," if you include the string C<#CodingStuff>
+the Post will have the tag "codingstuff" (names are normalized lower-case). The first time a tag name
+is seen a new Tag row (which is a first class object) is created automatically.
+
+=head2 Categories
+
+Categories must be setup in advance and then can be selected when created or editing a Post. When no
+Category rows exist, the category selector/field is not shown on Post add/edit screens, meaning if you
+don't want to use Categories, just don't create any.
+
+
 =head1 TEMPLATE DIRECTIVES
 
 Files within the scaffold (which are not defined as C<static_paths>) are processed as L<Template::Toolkit>
@@ -219,9 +241,13 @@ C<summary>, C<body> and exact match on a C<tag>. Only Posts with at least one ma
 
 Limit posts to those containing the named C<tag>.
 
+=head3 category
+
+Limit posts to those containing the named C<category>.
+
 =head3 limit
 
-The maximum number of results to return (i.e. page size)
+The maximum number of results to return (i.e. page size).
 
 =head3 page
 
@@ -278,6 +304,40 @@ Tags in alphabetical order.
 =head4 recent
 
 Most recently used (according to Post Date/Time) tags first.
+
+=head2 list_categories
+
+Interface to retrieve and filter Categories from the database. This is exposed with the 
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI>
+interface which accepts several named params and returns a common
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI> result packet.
+
+Accepted params (all optional):
+
+=head3 search
+
+String to search/filter results. The search will match substrings of the category name.
+
+=head3 post_id
+
+Limit results to Categories linked to the supplied post_id
+
+=head3 sort
+
+Sort keyword for the order tags are returned in. Currently supports 3 possible values (defaults to
+C<popularity>)
+
+=head4 popularity
+
+Most popular categories by number of posts which use them.
+
+=head4 alphabetical
+
+Categories in alphabetical order.
+
+=head4 recent
+
+Most recently used (according to Post Date/Time) categories first.
 
 =head2 list_users
 
@@ -343,6 +403,20 @@ the entire application which can be used to perform actions based on the query s
 (e.g. C<[% c.req.params.foo %]>, direct access to the database 
 (e.g. C<[% c.model('DB::Post').search_rs(...) %]>) or anything else which can be reached via the context.
 
+
+=head1 AUTOMATIC DATABASE UPGRADES
+
+L<Rapi::Blog> was designed from the ground up to support automatic schema migrations for all publically
+released versions of the built-in Schema. This is done via scan/fingerprint of the schema of the existing 
+database to identify the known/previous schema version, and running the all DDL (i.e ALTER TABLE, etc) 
+needed to upgrade it to the current version. When the database does not match any known fingerprints 
+(including the fingerprint of the current version) the app will refuse to start.
+
+Whenever a database is upgraded, a backup of the old database file is made and saved in the directory
+C<.bkp.rapi_blog.db/> within the C<site_dir>.
+
+This means that under normal circumstances, you don't need to worry about upgrading sites from previous
+versions of C<Rapi::Blog> -- it should just work and automagically do the right thing.
 
 
 =head1 SEE ALSO

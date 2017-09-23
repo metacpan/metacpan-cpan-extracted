@@ -3,7 +3,7 @@ package ObjectDB::Meta::Relationship::OneToOne;
 use strict;
 use warnings;
 
-our $VERSION = '3.22';
+our $VERSION = '3.23';
 
 use base 'ObjectDB::Meta::Relationship::ManyToOne';
 

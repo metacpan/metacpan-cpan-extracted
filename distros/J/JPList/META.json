@@ -1,0 +1,63 @@
+{
+   "abstract" : "JPList module is a data source bundle that works with Perl and database handle where as jPlist (http://jplist.com) behaves as UI module only",
+   "author" : [
+      "Sheeju Alex <sheejuec7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JPList",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.90",
+            "Moose" : "2.1604",
+            "SQL::Abstract" : "1.81",
+            "URI::Escape" : "1.72",
+            "namespace::autoclean" : "0.28",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "1.630",
+            "FindBin" : "0",
+            "Test::Class" : "0.50",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sheeju/JPList.git",
+         "web" : "https://github.com/sheeju/JPList"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

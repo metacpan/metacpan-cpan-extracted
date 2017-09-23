@@ -1,9 +1,19 @@
 Changes
 lib/JPList.pm
+lib/JPList/Controls/Filter.pm
+lib/JPList/Controls/Sort.pm
+lib/JPList/DB/Config.pm
+lib/JPList/DB/Result.pm
+lib/JPList/Request.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+META.json
+META.yml
+README.pod
 t/00-load.t
+t/01-run.t
 t/manifest.t
-t/pod-coverage.t
-t/pod.t
+t/schema.sql
+t/sqlite3.test.db
+t/Test/JPList.pm
+t/Test/JPList/Request.pm

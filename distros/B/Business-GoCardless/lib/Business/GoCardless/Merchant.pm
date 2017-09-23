@@ -16,6 +16,8 @@ use warnings;
 use Moo;
 extends 'Business::GoCardless::Resource';
 
+use Carp qw/ carp /;
+
 use Business::GoCardless::Bill;
 use Business::GoCardless::PreAuthorization;
 use Business::GoCardless::Payout;
@@ -74,7 +76,10 @@ sub BUILD {
     my $data = $self->client->api_get( sprintf( $self->endpoint,$self->id ) );
 
     foreach my $attr ( keys( %{ $data } ) ) {
-        $self->$attr( $data->{$attr} );
+        eval { $self->$attr( $data->{$attr} ); };
+        $@ && do {
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+        };
     }
 
     return $self;

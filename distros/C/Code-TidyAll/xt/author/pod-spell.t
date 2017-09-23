@@ -77,6 +77,7 @@ Role
 Rolsky
 Rolsky's
 Romanov
+RunsCommand
 STDERR
 STDIN
 STDOUT

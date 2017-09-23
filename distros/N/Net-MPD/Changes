@@ -1,5 +1,8 @@
 Revision history for Net-MPD
 
+0.07  2017-09-17 10:53:06 PDT
+  - Add support for UNIX socket connections
+
 0.06  2016-09-05 08:44:37 PDT
   - Escape curly braces in regex
 

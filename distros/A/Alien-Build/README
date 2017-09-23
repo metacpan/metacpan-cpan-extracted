@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.12
+    version 1.18
 
 SYNOPSIS
 
@@ -536,6 +536,12 @@ METHODS
 
       The gather_system hook will be executed.
 
+ test
+
+     $build->test;
+
+    Run the test phase
+
  system
 
      $build->system($command);
@@ -640,6 +646,13 @@ META METHODS
          }
        },
      );
+
+ apply_plugin
+
+     Alien::Build->meta->apply_plugin($name);
+     Alien::Build->meta->apply_plugin($name, @args);
+
+    Apply the given plugin with the given arguments.
 
 ENVIRONMENT
 

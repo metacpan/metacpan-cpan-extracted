@@ -83,7 +83,6 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Probe/CBuilder.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CBuilder.pm",
     "lib/Alien/Build/Plugin/Probe/CommandLine.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CommandLine.pm",
     "lib/Alien/Build/Util.pm" => "\$(INST_LIB)/Alien/Build/Util.pm",
-    "lib/Alien/Build/Util/Win32/RegistryDump.pm" => "\$(INST_LIB)/Alien/Build/Util/Win32/RegistryDump.pm",
     "lib/Alien/Role.pm" => "\$(INST_LIB)/Alien/Role.pm",
     "lib/Test/Alien.pm" => "\$(INST_LIB)/Test/Alien.pm",
     "lib/Test/Alien/Build.pm" => "\$(INST_LIB)/Test/Alien/Build.pm",
@@ -112,7 +111,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.18",
   "test" => {
     "TESTS" => "t/*.t"
   }

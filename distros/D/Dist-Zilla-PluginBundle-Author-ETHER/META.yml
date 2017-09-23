@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.130'
+    version: '0.131'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.130'
+    version: '0.131'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.130'
+    version: '0.131'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -204,7 +204,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.130'
+version: '0.131'
 x_Dist_Zilla:
   perl:
     version: '5.027003'
@@ -905,7 +905,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -945,7 +945,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.130
+          tag: v0.131
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -995,7 +995,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
-          type: requires
+          type: suggests
       name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
       version: '6.010'
     -
@@ -1048,7 +1048,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
-          type: requires
+          type: suggests
       name: '@Author::ETHER/prereqs for @Author::ETHER'
       version: '6.010'
     -
@@ -1127,8 +1127,9 @@ x_Dist_Zilla:
     version: '6.010'
 x_authority: cpan:ETHER
 x_contributors:
-  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Edward Betts <edward@4angle.com>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'Dave Rolsky <autarch@urth.org>'
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'

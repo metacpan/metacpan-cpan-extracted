@@ -58,7 +58,7 @@ WWW::Kickstarter::Data::User - Kickstarter user data
    $ks->login($email, $password);
 
    my $iter = $ks->projects_ending_soon();
-   while (my ($project) = $iter->()) {
+   while (my ($project) = $iter->get()) {
       print($project->creator->name, "\n");
    }
 

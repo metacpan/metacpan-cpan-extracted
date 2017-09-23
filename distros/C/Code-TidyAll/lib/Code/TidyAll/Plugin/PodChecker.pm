@@ -4,20 +4,24 @@ use strict;
 use warnings;
 
 use Pod::Checker;
+use Specio::Library::Numeric;
 
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-has 'warnings' => ( is => 'ro' );
+has warnings => (
+    is  => 'ro',
+    isa => t('PositiveInt'),
+);
 
 sub validate_file {
     my ( $self, $file ) = @_;
 
     my $result;
-    my %options = ( defined( $self->warnings ) ? ( '-warnings' => $self->warnings ) : () );
+    my %options = ( $self->warnings ? ( '-warnings' => $self->warnings ) : () );
     my $checker = Pod::Checker->new(%options);
     my $output;
     open my $fh, '>', \$output;
@@ -43,7 +47,7 @@ Code::TidyAll::Plugin::PodChecker - Use podchecker with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -72,14 +76,12 @@ Install podchecker from CPAN.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item warnings
+=head2 warnings
 
-Level of warnings to consider as errors - 1 or 2. By default, warnings will be
-ignored.
-
-=back
+The level of warnings to consider as errors - 1 or 2. By default, warnings will
+be ignored.
 
 =head1 SUPPORT
 

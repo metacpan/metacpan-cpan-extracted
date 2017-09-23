@@ -1,6 +1,7 @@
 package Lab::Moose::Connection::Zhinst;
+$Lab::Moose::Connection::Zhinst::VERSION = '3.600';
 #ABSTRACT: Connection back end to Zurich Instrument's LabOne measurement control API
-$Lab::Moose::Connection::Zhinst::VERSION = '3.554';
+
 
 use 5.010;
 
@@ -13,7 +14,6 @@ use Lab::Zhinst;
 use YAML::XS 'Load';
 use Data::Dumper;
 use namespace::autoclean;
-
 
 has host => (
     is       => 'ro',
@@ -34,13 +34,24 @@ has connection => (
     writer   => '_connection',
 );
 
+sub _handle_error {
+    my $rv = shift;
+    if ($rv) {
+        my ( undef, $msg ) = ziAPIGetError($rv);
+        croak "Error in Zhinst backend. Value: $rv. Message: $msg.";
+    }
+
+    my $value = shift;
+    return $value;
+}
+
 sub BUILD {
     my $self = shift;
 
     # Will croak on error.
-    my $connection
-        = Lab::Zhinst->new( $self->host(), $self->port() );
+    my $connection = _handle_error( Lab::Zhinst->Init() );
     $self->_connection($connection);
+    _handle_error( $connection->Connect( $self->host(), $self->port() ) );
 }
 
 sub Query {
@@ -52,13 +63,22 @@ sub Query {
     my %args   = %{ Load $command};
     my $method = delete $args{method};
     if ( $method eq 'ListNodes' ) {
-        return $self->connection()->ListNodes( $args{path}, $args{mask} );
+
+        # result length is ~ 12000 for MFIA. Be generous.
+        my $read_length = 100000;
+        my $connection  = $self->connection();
+        return _handle_error(
+            $connection->ListNodes( $args{path}, $read_length, $args{mask} )
+        );
     }
     elsif ( $method eq 'Get' ) {
         return $self->get_value(%args);
     }
     elsif ( $method eq 'SyncSet' ) {
         return $self->sync_set_value(%args);
+    }
+    elsif ( $method eq 'SyncPoll' ) {
+        return $self->sync_poll(%args);
     }
     else {
         croak "unknown method $method";
@@ -71,18 +91,21 @@ sub sync_set_value {
         \@_,
         path  => { isa => 'Str' },
         type  => { isa => enum( [qw/I D B/] ) },
-        value => { isa => 'Str' }
+        value => { isa => 'Str' },
     );
-    my $method = "SyncSetValue$type";
-    return $self->connection()->$method( $path, $value );
+    my $method     = "SyncSetValue$type";
+    my $connection = $self->connection();
+    return _handle_error( $connection->$method( $path, $value ) );
 }
 
 sub get_value {
     my $self = shift;
-    my ( $path, $type ) = validated_list(
+    my ( $path, $type, $read_length ) = validated_list(
         \@_,
-        path => { isa => 'Str' },
-        type => { isa => enum( [qw/I D B Demod AuxIn DIO/] ) },
+        path        => { isa => 'Str' },
+        type        => { isa => enum( [qw/I D B Demod AuxIn DIO/] ) },
+        read_length => { isa => 'Int', optional => 1 },
+
     );
 
     my $method = 'Get';
@@ -93,7 +116,56 @@ sub get_value {
         : $type eq 'Demod' ? 'DemodSample'
         : $type eq 'AuxIn' ? 'AuxInSample'
         :                    'DIOSample';
-    return $self->connection()->$method($path);
+
+    my $connection = $self->connection();
+    if ( $type eq 'B' ) {
+        if ( not defined $read_length ) {
+            croak "Need read_length arg to set byte string.";
+        }
+        return _handle_error( $connection->$method( $path, $read_length ) );
+    }
+    return _handle_error( $connection->$method($path) );
+}
+
+sub _timeout_arg {
+    my $self    = shift;
+    my %arg     = @_;
+    my $timeout = $arg{timeout} // $self->timeout();
+    return sprintf( "%.0f", $timeout * 1000 );
+}
+
+sub sync_poll {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        path    => { isa => 'Str' },
+        timeout => { isa => 'Num', optional => 1 },
+    );
+    my $timeout    = $self->_timeout_arg(%args);
+    my $path       = $args{path};
+    my $connection = $self->connection();
+
+    my $event = ziAPIAllocateEventEx();
+    _handle_error( $connection->Subscribe($path) );
+
+    # Ensure that we get a recent value. See LabOne manual
+    # '1.4.4. Obtaining Data from the Instrument'
+    _handle_error( $connection->Sync() );
+
+    my $data = _handle_error( $connection->PollDataEx( $event, $timeout ) );
+    _handle_error( $connection->UnSubscribe($path) );
+
+    if ( $data->{valueType} == ZI_VALUE_TYPE_NONE ) {
+        croak
+            "Possible timeout in PollDataEx. Got event type ZI_VALUE_TYPE_NONE .";
+    }
+    if ( $data->{count} == 0 ) {
+
+        # Never reached?
+        croak "Event with zero count.";
+    }
+
+    # Return only last (most recent) event.
+    return $data->{values}[-1];
 }
 
 sub Write {
@@ -107,6 +179,9 @@ sub Read {
 sub Clear {
     croak "not implemented";
 }
+
+# Get timeout attribute.
+with qw/Lab::Moose::Connection/;
 
 __PACKAGE__->meta->make_immutable();
 
@@ -124,7 +199,7 @@ Lab::Moose::Connection::Zhinst - Connection back end to Zurich Instrument's LabO
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,6 @@ lib/Git/Hooks/GerritChangeId.pm
 lib/Git/Hooks/Test.pm
 lib/Git/Message.pm
 lib/Git/Repository/Plugin/GitHooks.pm
-lib/Git/Repository/Plugin/GitHooks.pm.orig
 t/00-load.t
 t/01-setup.t
 t/02-check-acls.t

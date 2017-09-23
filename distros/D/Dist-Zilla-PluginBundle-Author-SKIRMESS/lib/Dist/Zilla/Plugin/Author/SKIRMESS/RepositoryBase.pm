@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.022';
 
 use Moose;
 
@@ -14,7 +14,13 @@ with qw(
   Dist::Zilla::Role::TextTemplate
 );
 
-sub mvp_multivalue_args { return (qw( stopwords travis_ci_ignore_perl )) }
+sub mvp_multivalue_args { return (qw( skip stopwords travis_ci_ignore_perl )) }
+
+has skip => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    default => sub { [] },
+);
 
 has stopwords => (
     is      => 'ro',
@@ -104,8 +110,14 @@ sub munge_files {
 sub _write_files {
     my ($self) = @_;
 
+    my %file_to_skip = map { $_ => 1 } grep { defined && !m{ ^ \s* $ }xsm } @{ $self->skip };
+
   FILE:
     for my $file ( map { path($_) } sort $self->files() ) {
+        if ( exists $file_to_skip{$file} ) {
+            next FILE;
+        }
+
         if ( -e $file ) {
             $file->remove();
         }
@@ -138,7 +150,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.014
+Version 0.022
 
 =head1 SYNOPSIS
 
@@ -461,7 +473,9 @@ TRAVIS_YML_1
 
         my %perl;
         @perl{ @{ $self->_travis_available_perl } } = ();
-        delete @perl{ @{ $self->travis_ci_ignore_perl } };
+        if ( @{ $self->travis_ci_ignore_perl } ) {
+            delete @perl{ @{ $self->travis_ci_ignore_perl } };
+        }
         my @perl = reverse sort keys %perl;
 
         croak "No perl versions selected for TravisCI\n" if !@perl;
@@ -478,8 +492,6 @@ install:
 script:
   - perl Makefile.PL && make test
   - test -d xt/author && prove -lr xt/author
-  - make manifest
-  - test -d xt/release && prove -lr xt/release
 TRAVIS_YML
 
         return $travis_yml;
@@ -674,6 +686,30 @@ version_all_ok;
 done_testing();
 XT_AUTHOR_TEST_VERSION_T
 
+=head2 xt/release/changes.t
+
+L<Test::CPAN::Changes|Test::CPAN::Changes> release test.
+
+=cut
+
+    $file{q{xt/release/changes.t}} = $test_header . <<'XT_RELEASE_CHANGES_T';
+use Test::CPAN::Changes;
+
+changes_ok();
+XT_RELEASE_CHANGES_T
+
+=head2 xt/release/distmeta.t
+
+L<Test::CPAN::Meta|Test::CPAN::Meta> release test.
+
+=cut
+
+    $file{q{xt/release/distmeta.t}} = $test_header . <<'XT_RELEASE_DISTMETA_T';
+use Test::CPAN::Meta;
+
+meta_yaml_ok();
+XT_RELEASE_DISTMETA_T
+
 =head2 xt/release/eol.t
 
 L<Test::EOL|Test::EOL> release test.
@@ -749,15 +785,23 @@ __END__
 
 The following configuration options are supported:
 
-=head2 stopwords
+=over 4
 
-Defines stopwords for the spell checker.
+=item *
 
-=head2 travis_ci_ignore_perl
+C<skip> - Defines files to be skipped (not generated).
 
-By default, the generated F<.travis.yml> file runs on all Perl version known
-to exist on TravisCI. Use the B<travis_ci_ignore_perl> option to define Perl
-versions to not check.
+=item *
+
+C<stopwords> - Defines stopwords for the spell checker.
+
+=item *
+
+C<travis_ci_ignore_perl> - By default, the generated F<.travis.yml> file
+runs on all Perl version known to exist on TravisCI. Use the
+C<travis_ci_ignore_perl> option to define Perl versions to not check.
+
+=back
 
 =head1 SUPPORT
 

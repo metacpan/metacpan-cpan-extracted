@@ -20,13 +20,13 @@ no_index:
 provides:
   Address::PostCode::Australia:
     file: lib/Address/PostCode/Australia.pm
-    version: '0.08'
+    version: '0.09'
   Address::PostCode::Australia::Params:
     file: lib/Address/PostCode/Australia/Params.pm
-    version: '0.08'
+    version: '0.09'
   Address::PostCode::Australia::Place:
     file: lib/Address/PostCode/Australia/Place.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Address::PostCode::UserAgent: '0.05'
   JSON: '0'
@@ -35,5 +35,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Address-PostCode-Australia.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

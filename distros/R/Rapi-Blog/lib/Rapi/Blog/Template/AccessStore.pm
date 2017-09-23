@@ -187,10 +187,11 @@ around 'get_template_vars' => sub {
     %{ $self->$orig(@args) },
     %{ $self->templateData($template) || {} },
     
-    scaffold     => $self->scaffold_cnf,
-    list_posts   => sub { $self->Model->resultset('Post')->list_posts(@_) },
-    list_tags    => sub { $self->Model->resultset('Tag') ->list_tags(@_)  },
-    list_users   => sub { $self->Model->resultset('User')->list_users(@_) },
+    scaffold        => $self->scaffold_cnf,
+    list_posts      => sub { $self->Model->resultset('Post')     ->list_posts(@_)      },
+    list_tags       => sub { $self->Model->resultset('Tag')      ->list_tags(@_)       },
+    list_categories => sub { $self->Model->resultset('Category') ->list_categories(@_) },
+    list_users      => sub { $self->Model->resultset('User')     ->list_users(@_)      },
     
     # TODO: consider mount_url
     request_path => sub { $c ? join('','/',$c->req->path) : undef },

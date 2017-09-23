@@ -14,7 +14,7 @@ Lab::Measurement::Developer::Testing - Using mock instruments for testing
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 Using mock instruments for testing.
 

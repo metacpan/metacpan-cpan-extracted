@@ -1,3 +1,9 @@
+libqbit-application-model-db-perl (0.020) raring; urgency=low
+
+  * added drop for table
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 19 Sep 2017 10:16:40 +0300
+
 libqbit-application-model-db-perl (0.019) raring; urgency=low
 
   * added sub _get_table_alias

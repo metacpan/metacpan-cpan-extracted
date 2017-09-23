@@ -6,14 +6,15 @@ build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  Test2::Bundle::Extended: '0.000060'
+  Test2::V0: '0.000060'
   Test::Alien: '0'
-  Test::More: '0.94'
   perl: '5.006'
 configure_requires:
-  Alien::Build: '0.73'
+  Alien::Build: '1.18'
   Alien::Build::MM: '0.73'
   Alien::Build::Plugin::Build::SearchDep: '0.35'
+  Alien::Build::Plugin::Prefer::BadVersion: '1.05'
+  ExtUtils::CBuilder: '0'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
@@ -25,12 +26,25 @@ meta-spec:
 name: Alien-Libxml2
 requires:
   Alien::Base: '0.73'
-  base: '0'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Libxml2/issues
   homepage: https://metacpan.org/pod/Alien::Libxml2
   repository: git://github.com/plicease/Alien-Libxml2.git
-version: '0.02'
+version: '0.03'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      IO::Zlib: '0'
+      LWP::UserAgent: '0'
+      Net::FTP: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_serialization_backend: 'YAML::Tiny version 1.70'

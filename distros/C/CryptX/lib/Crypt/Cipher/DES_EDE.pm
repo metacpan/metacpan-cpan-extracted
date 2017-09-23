@@ -4,7 +4,7 @@ package Crypt::Cipher::DES_EDE;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::DES_EDE - Symetric cipher DES_EDE (aka Tripple-DES, 3DES), key si
   my $cbc = Crypt::Mode::CBC->new('DES_EDE');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::DES_EDE;
 

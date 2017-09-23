@@ -29,7 +29,7 @@ sub main {
         my $b_cmd       = 'echo No backup command defined, skip backup';
         my $r_cmd       = 'false';
         my $v_cmd       = 'echo Current version is $MIGRATE_NEXT_VERSION';
-        my @files       = qw( migrate );
+        my @files       = ();
         my $is_path     = 0;
         my $is_check    = 0;
         GetOptionsFromArray(\@_,
@@ -51,6 +51,9 @@ sub main {
                 usage() if 2 != @_;
         }
         my @versions = @_;
+        if (!@files) {
+            @files = qw( migrate );
+        }
 
         if ($is_check) {
                 App::migrate->new->load($_[0] // 'migrate');
@@ -104,7 +107,7 @@ migrate - upgrade / downgrade project
 
 =head1 VERSION
 
-This document describes migrate version v0.2.5
+This document describes migrate version v0.2.6
 
 
 =head1 USAGE

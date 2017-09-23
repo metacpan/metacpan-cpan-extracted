@@ -1,0 +1,33 @@
+Changes file for Dancer2::Logger::LogAny
+
+0.9907    2017-09-18 14:14:10-04:00 America/New_York
+
+  - Add missing dependencies
+
+0.9906    2017-09-18 13:10:31-04:00 America/New_York
+
+  - Add missing test dependency
+
+0.9905    2017-09-18 11:09:03-04:00 America/New_York
+
+  - Move Pod coverage test to xt/
+
+0.9904    2017-09-18 09:48:50-04:00 America/New_York
+
+  - Manually update version number
+
+0.9903    2017-09-18 09:41:29-04:00 America/New_York
+
+  - Update Abstract
+
+0.9902    2017-09-18 09:37:53-04:00 America/New_York
+
+  - Testing Changes file update
+
+0.9901 2017-09-17 09:01:00 EDT
+
+  - Use Pod::Weaver
+
+0.9900 2017-09-17 09:00:00 EDT
+
+  - Initial release

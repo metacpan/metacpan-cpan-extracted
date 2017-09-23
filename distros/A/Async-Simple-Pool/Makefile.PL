@@ -16,21 +16,22 @@ WriteMakefile(
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.14.0,
     CONFIGURE_REQUIRES => {
-        'Modern::Perl'        => 0,
-        'ExtUtils::MakeMaker' => 0,
+        'Modern::Perl'         => 0,
+        'ExtUtils::MakeMaker'  => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More'          => 0,
-        'Modern::Perl'        => 0,
-        'Test::Spec'          => 0,
-        'Pod::Coverage'       => 0,
-        'POSIX'               => 0,
-        'Test::CheckManifest' => 0,
-        'Test::Exception'     => 0,
-        'Test::Pod::Coverage' => 0,
-        'Test::Pod'           => 0,
-        'Time::HiRes'         => 0,
-        'Module::Metadata'    => 1.000009,
+        'Test::More'           => 0,
+        'Modern::Perl'         => 0,
+        'Test::Spec'           => 0,
+        'Pod::Coverage'        => 0,
+        'POSIX'                => 0,
+        'Test::CheckManifest'  => 0,
+        'Test::Exception'      => 0,
+        'Test::Pod::Coverage'  => 0,
+        'Test::Pod'            => 0,
+        'Time::HiRes'          => 0,
+        'Module::Metadata'     => 1.000009,
+        'File::Spec'           => 0,
     },
     PREREQ_PM => {
         'Class::Load'          => 0,
@@ -41,24 +42,25 @@ WriteMakefile(
         'Moose'                => 0,
         'namespace::autoclean' => 0,
         'Time::HiRes'          => 0,
+        'File::Spec'           => 0,
     },
     META_ADD => {
         provides => {
             'Async::Simple::Pool' => {
-                'version' => '0.13',
+                'version' => '0.14',
                 'file'    => 'lib/Async/Simple/Pool.pm'
             },
             'Async::Simple::Task::Fork' => {
                 'file'    => 'lib/Async/Simple/Task/Fork.pm',
-                'version' => '0.13'
+                'version' => '0.14'
             },
             'Async::Simple::Task::ForkTmpFile' => {
                 'file'    => 'lib/Async/Simple/Task/ForkTmpFile.pm',
-                'version' => '0.13'
+                'version' => '0.14'
             },
             'Async::Simple::Task' => {
                 'file'    => 'lib/Async/Simple/Task.pm',
-                'version' => '0.13'
+                'version' => '0.14'
             }
         }
     },

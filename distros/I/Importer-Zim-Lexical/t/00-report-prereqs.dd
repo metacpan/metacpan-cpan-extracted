@@ -19,7 +19,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Importer::Zim::Base' => 'v0.3.0',
+                                      'Importer::Zim::Base' => 'v0.5.0',
                                       'Sub::Inject' => '0',
                                       'constant' => '0',
                                       'perl' => '5.018'

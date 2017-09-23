@@ -1,0 +1,46 @@
+---
+abstract: 'Class for Rails Projects Assets Analysis.'
+author:
+  - 'Mauro Berlanda <kupta@cpan.org>'
+build_requires:
+  Devel::Cover: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rails-Assets
+provides:
+  Rails::Assets:
+    file: lib/Rails/Assets.pm
+    version: '0.02'
+  Rails::Assets::Base:
+    file: lib/Rails/Assets/Base.pm
+    version: '0.02'
+  Rails::Assets::Formatter:
+    file: lib/Rails/Assets/Formatter.pm
+    version: '0.02'
+  Rails::Assets::Output:
+    file: lib/Rails/Assets/Output.pm
+    version: '0.02'
+  Rails::Assets::Processor:
+    file: lib/Rails/Assets/Processor.pm
+    version: '0.02'
+requires:
+  Clone: '0'
+  YAML: '0'
+  YAML::Dumper: '0'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

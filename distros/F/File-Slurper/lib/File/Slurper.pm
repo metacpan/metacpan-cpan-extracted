@@ -1,5 +1,5 @@
 package File::Slurper;
-$File::Slurper::VERSION = '0.009';
+$File::Slurper::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ sub _text_layers {
 	my ($encoding, $crlf) = @_;
 	$crlf = CRLF_DEFAULT if $crlf && $crlf eq 'auto';
 
-	if ($encoding =~ /^(latin|iso-8859-)1$/i) {
+	if ($encoding =~ /^(latin-?|iso-8859-)1$/i) {
 		return $crlf ? ':unix:crlf' : ':raw';
 	}
 	elsif (HAS_UTF8_STRICT && $encoding =~ /^utf-?8\b/i) {
@@ -115,7 +115,7 @@ File::Slurper - A simple, sane and efficient module to slurp a file
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ version 0.009
 
 =head1 DESCRIPTION
 
-This module provides functions for fast and correct slurping and spewing. All functions are optionally exported.
+This module provides functions for fast and correct slurping and spewing. All functions are optionally exported. All functions throw exceptions on errors, write functions don't return any meaningful value.
 
 =head1 FUNCTIONS
 
@@ -174,7 +174,7 @@ An attempt to expose as many IO related features as possible via a single API.
 
 =item * L<File::Slurp|File::Slurp>
 
-This is previous generation file slurping module. It has a number of issues, as described L<here|http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html>
+This is a previous generation file slurping module. It has a number of issues, as described L<here|http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html>.
 
 =item * L<File::Slurp::Tiny|File::Slurp::Tiny>
 

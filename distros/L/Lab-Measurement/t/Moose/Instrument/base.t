@@ -2,7 +2,7 @@
 use 5.010;
 use warnings;
 use strict;
-use Test::More tests => 22;
+use Test::More tests => 31;
 use Test::Fatal;
 use Lab::Moose::Instrument;
 
@@ -189,5 +189,80 @@ use Lab::Moose::Instrument;
         exception { $instr->cached_func1( [1] ); },
         "ArrayRef throws for func1"
     );
+
+    # Vector/Array cache
+    {
+        {
+            package MyDevice::Vector;
+            use Moose;
+            use Lab::Moose::Instrument::Cache;
+            use MooseX::Params::Validate 'validated_list';
+            extends 'MyDevice';
+
+            cache func_vector => (
+                getter    => 'func_vector',
+                index_arg => 'index',
+                isa       => 'Int',
+            );
+
+            sub func_vector {
+                my $self = shift;
+                my ($index) = validated_list(
+                    \@_,
+                    index => { isa => 'Int' }
+                );
+
+                return $index + 42;
+            }
+
+        }
+
+        my $connection = TestConnection->new();
+        my $instr = MyDevice::Vector->new( connection => $connection );
+        isa_ok( $instr, 'MyDevice::Vector' );
+        is(
+            $instr->cached_func_vector( index => 1 ), 43,
+            "call func_vector(index => 1)"
+        );
+
+        # Check for element in cache. (This is not part of public API.)
+        is_deeply(
+            $instr->cached_func_vector_attribute(), [ undef, 43 ],
+            "correct cache array"
+        );
+        is(
+            $instr->cached_func_vector( index => 1 ), 43,
+            "call func_vector(index => 1)"
+        );
+        $instr->cached_func_vector( index => 1, value => 100 );
+        is(
+            $instr->cached_func_vector( index => 1 ), 100,
+            "call func_vector(index => 1) gives new value"
+        );
+
+        $instr->cached_func_vector( index => 0, value => 22 );
+        $instr->clear_cached_func_vector( index => 1 );
+        ok(
+            $instr->has_cached_func_vector( index => 0 ),
+            "have entry for index = 0"
+        );
+        ok(
+            !$instr->has_cached_func_vector( index => 1 ),
+            "have no entry for index = 1"
+        );
+
+        # Illegal operations
+
+        ok(
+            exception { $instr->cached_func_vector(); },
+            "missing index arg throws"
+        );
+
+        ok(
+            exception { $instr->cached_func_vector( index => 'abc' ); },
+            "throw if index arg not an Int"
+        );
+
+    }
 
 }

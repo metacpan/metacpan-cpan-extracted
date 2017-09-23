@@ -10,10 +10,10 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
-our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log );
+our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test );
 
 
 sub requires
@@ -31,51 +31,8 @@ sub plugin
 {
   my($name, @args) = @_;
   
-  my $class;
-  my $pm;
-  my $found;
-  
-  if($name =~ /^=(.*)$/)
-  {
-    $class = $1;
-    $pm    = $class;
-    $pm =~ s!::!/!g;
-    $pm .= ".pm";
-    $found = 1;
-  }
-  
-  if($name !~ /::/ && ! $found)
-  {
-    foreach my $inc (@INC)
-    {
-      # TODO: allow negotiators to work with
-      # @INC hooks
-      next if ref $inc;
-      my $file = _path("$inc/Alien/Build/Plugin/$name/Negotiate.pm");
-      if(-r $file)
-      {
-        $class = "Alien::Build::Plugin::${name}::Negotiate";
-        $pm    = "Alien/Build/Plugin/$name/Negotiate.pm";
-        $found = 1;
-        last;
-      }
-    }
-  }
-  
-  unless($found)
-  {
-    $class = "Alien::Build::Plugin::$name";
-    $pm    = do {
-      my $name = $name;
-      $name =~ s!::!/!g;
-      "Alien/Build/Plugin/$name.pm";
-    };
-  }
-
-  require $pm unless $class->can('new');  
   my $caller = caller;
-  my $plugin = $class->new(@args);
-  $plugin->init($caller->meta);
+  $caller->meta->apply_plugin($name, @args);
   return;
 }
 
@@ -285,6 +242,37 @@ sub log
   goto &Alien::Build::log;
 }
 
+
+sub test
+{
+  my($instr) = @_;
+  my $caller = caller;
+  my $meta = $caller->meta;
+  my $phase = $meta->{phase};
+  Carp::croak "test is not allowed in $phase block"
+    if $phase eq 'any' || $phase eq 'configure';
+  
+  $meta->add_requires('configure' => 'Alien::Build' => '1.14');
+  
+  if($phase eq 'share')
+  {
+    my $suffix = $caller->meta->{build_suffix} || '_share';
+    $meta->register_hook(
+      "test$suffix" => $instr,
+    );
+  }
+  elsif($phase eq 'system')
+  {
+    $meta->register_hook(
+      "test_system" => $instr,
+    );
+  }
+  else
+  {
+    die "unknown phase: $phase";
+  }
+}
+
 sub import
 {
   strict->import;
@@ -306,7 +294,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -635,6 +623,19 @@ Returns the meta object for your L<alienfile>.
  log($message);
 
 Prints the given log to stdout.
+
+=head2 test
+
+ share {
+   test \&code;
+   test \@commandlist;
+ };
+ sys {
+   test \&code;
+   test \@commandlist;
+ };
+
+Run the tests
 
 =head1 SEE ALSO
 

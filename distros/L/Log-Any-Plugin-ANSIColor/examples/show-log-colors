@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use Log::Any::Adapter   qw( Stderr );
+use Log::Any::Plugin;
+
+use Log::Any qw( $log );
+
+my %args = @ARGV;
+Log::Any::Plugin->add('ANSIColor', %args);
+
+if (@ARGV) {
+    if (delete $args{default}) {
+        $log->info('Using default color scheme');
+    }
+    else {
+        $log->info('Overriding default color scheme - include defaults with: default 1');
+        $log->info("eg. $0 default 1 " .
+            join(' ', map { /\s/ ? "'$_'" : $_ } @ARGV));
+    }
+
+    for my $key (sort keys %args) {
+        $log->info("Setting $key to \"$args{$key}\"");
+    }
+}
+else {
+    $log->info('Using default color scheme - specify plugin options to override');
+    $log->info("eg. $0 default 1  error 'blue on_white'  warning  'bright_yellow'");
+}
+$log->info(' ');
+
+
+for my $method (Log::Any->logging_methods) {
+    my $article = $method =~ /^[aeiou]/ ? 'an' : 'a';
+    $log->$method("This is $article $method message");
+}

@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -23,8 +23,14 @@ use strict;
 use warnings;
 use Exporter qw( import );
 use Minion;
+use Beam::Runner::Util qw( find_containers );
+use Scalar::Util qw( weaken );
+use Mojolicious;
+use Mojo::Log;
+use Beam::Wire;
 
-our @EXPORT_OK = qw( minion_init_args minion );
+
+our @EXPORT_OK = qw( minion_init_args minion build_mojo_app );
 
 our %BACKEND = (
     sqlite => 'SQLite',
@@ -93,6 +99,53 @@ sub minion {
     return Minion->new( minion_init_args );
 }
 
+#pod =sub build_mojo_app
+#pod
+#pod Build the L<Mojolicious> app that contains the L<Minion> plugin
+#pod (L<Mojolicious::Plugin::Minion>) and tasks. This can then be given to
+#pod one of the L<Minion::Command> classes to execute commands.
+#pod
+#pod =cut
+
+sub build_mojo_app {
+    my $app = Mojolicious->new(
+        log => Mojo::Log->new, # Log to STDERR
+    );
+
+    push @{$app->commands->namespaces}, 'Minion::Command';
+
+    my $minion = minion();
+    weaken $minion->app($app)->{app};
+    $app->helper(minion => sub {$minion});
+
+    my %container = find_containers();
+    for my $container_name ( keys %container ) {
+        my $path = $container{ $container_name };
+        my $wire = Beam::Wire->new( file => $path );
+        my $config = $wire->config;
+        for my $service_name ( keys %$config ) {
+            next unless $wire->is_meta( $config->{ $service_name }, 1 );
+            $minion->add_task( "$container_name:$service_name" => sub {
+                my ( $job, @args ) = @_;
+
+                my $obj = eval { $wire->get( $service_name ) };
+                if ( $@ ) {
+                    return $job->fail( { error => $@ } );
+                }
+
+                my $exit = eval { $obj->run( @args ) };
+                if ( $@ ) {
+                    return $job->fail( { error => $@ } );
+                }
+
+                my $method = $exit ? 'fail' : 'finish';
+                $job->$method( { exit => $exit } );
+            } );
+        }
+    }
+
+    return $app;
+}
 
 1;
 
@@ -106,7 +159,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.006
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -159,6 +212,12 @@ C<+>:
 
 Get a L<Minion> instance as configured by the C<BEAM_MINION> environment
 variable (parsed by L</minion_init_args>).
+
+=head2 build_mojo_app
+
+Build the L<Mojolicious> app that contains the L<Minion> plugin
+(L<Mojolicious::Plugin::Minion>) and tasks. This can then be given to
+one of the L<Minion::Command> classes to execute commands.
 
 =head1 SEE ALSO
 

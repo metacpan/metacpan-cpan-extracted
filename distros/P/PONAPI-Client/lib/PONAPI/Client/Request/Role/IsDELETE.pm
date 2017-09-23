@@ -19,7 +19,7 @@ PONAPI::Client::Request::Role::IsDELETE - request - role - is DELETE
 
 =head1 VERSION
 
-version 0.002008
+version 0.002009
 
 =head1 AUTHORS
 

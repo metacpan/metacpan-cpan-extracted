@@ -23,11 +23,11 @@ JPList module is a data source bundle that works with Perl and database handle w
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 

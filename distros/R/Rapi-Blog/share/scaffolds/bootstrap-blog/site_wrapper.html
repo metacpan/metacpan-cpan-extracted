@@ -117,10 +117,29 @@
 
           
           <div class="sidebar-module">
+            
+            [%- SET categories_result = list_categories({limit => 15}) -%]
+            [% IF categories_result.total > 0 %]
+            
+              <h4>Categories</h4>
+              <ol class="list-unstyled">
+                [% FOREACH category IN categories_result.rows %]
+                  <li>
+                    <a href="[%- mount_url -%]/list?category=[% category.name %]">[% category.name %]</a> 
+                    ([% category.posts_count %])
+                  </li>
+                 [% END %]
+                 [% IF categories_result.remaining %]
+                  <b style="padding-left:10px;"> ... <a href="[%- mount_url -%]/categories">see all [[% categories_result.total %]]</a></b>
+                 [% END %]
+              </ol>
+              <br>
+            [% END %]
+
           
             <h4>Popular Tags</h4>
             <ol class="list-unstyled">
-              [%- SET tags_result = list_tags({limit => 10}) -%]
+              [%- SET tags_result = list_tags({limit => 8}) -%]
               [% FOREACH tag IN tags_result.rows %]
                 <li>
                   <a href="[%- mount_url -%]/list?tag=[% tag.name %]">[% tag.name %]</a> 
@@ -134,12 +153,12 @@
                  <li>(no tags yet)</li> 
                [% END %]
             </ol>
-						
-						<br>
-						
+            
+            <br>
+            
             <h4>Recent Tags</h4>
             <ol class="list-unstyled">
-              [%- SET tags_result = list_tags({limit => 10,sort => 'recent'}) -%]
+              [%- SET tags_result = list_tags({limit => 6,sort => 'recent'}) -%]
               [% FOREACH tag IN tags_result.rows %]
                 <li>
                   <a href="[%- mount_url -%]/list?tag=[% tag.name %]">[% tag.name %]</a> 
@@ -148,8 +167,8 @@
                [% END %]
                [% IF tags_result.remaining %]
                 <b style="padding-left:10px;"> ... <a href="[%- mount_url -%]/tags?sort=recent">
-										see all [[% tags_result.total %]]
-								</a></b>
+                    see all [[% tags_result.total %]]
+                </a></b>
                [% END %]
                [% IF tags_result.total == 0 %]
                  <li>(no tags yet)</li> 

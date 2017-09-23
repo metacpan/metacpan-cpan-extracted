@@ -1,0 +1,164 @@
+NAME
+
+    sshss - Use your preferred shell and own home directory for shared SSH
+    accounts
+
+VERSION
+
+SYNOPSIS
+
+    sshss [shell]
+
+DESCRIPTION
+
+    sshss adds support to ease the pain of these dreadful shared accounts
+    prevalent at some organizations. All you have to do is add sshss to the
+    command string of the authorized_keys file. sshss lets you define a
+    different shell then the one defined in the passwd database for the
+    shared account and lets you define a different directory as your home
+    directory. You are most likely going to use a subdirectory of the
+    shared accounts home directory.
+
+    Both features, the personal home directory and the shell change, can be
+    used independently without using the other.
+
+    If you specify a new shell the shell is not only used as the
+    interactive shell but also if you directly run a command. This includes
+    commands that run over SSH like scp(1) and rsync(1). It's your
+    responsibility to not use an overly obscure shell that breaks these
+    commands.
+
+    The used shell must support the -c flag to run a command, which is used
+    if you run a command directly over SSH, including scp(1) and rsync(1).
+    This is the default used by SSH itself. If your shell would work with
+    plain SSH, it should also work with sshss.
+
+    sshss tries to behave as much as possible like the do_child function
+    from session.c from OpenSSH portable.
+
+    sshss uses no non-core modules.
+
+OPTIONS
+
+    shell
+
+      Specifies the shell to be used instead of the one specified in the
+      passwd database.
+
+      This can be used to overwrite the shell configured for a shared
+      account. It can also be used to change the shell for your personal
+      account if your organization does not have a supported way to change
+      your shell.
+
+      If the shell is omitted, sshss uses the default shell for the account
+      from the passwd database.
+
+      If the specified shell is not an absolute path, sshss uses the
+      default shell for the account from the passwd database.
+
+EXIT STATUS
+
+    sshss exits 1 if an error occurs until it can exec the shell. After the
+    exec the exit status depends on the executed shell or the command run
+    in this shell.
+
+EXAMPLES
+
+ Example 1 Change the shell to ksh93 and use a custom home directory
+
+    Create a directory to contain your own home directory. We create the
+    directory ~/.ryah in this example. Create a .ssh directory in your new
+    custom home directory and add the sshss script to this directory. Add
+    the following command string in front of your SSH key in the
+    ~/.ssh/authorized_keys file:
+
+      command=".ryah/.ssh/sshss /usr/bin/ksh93"
+
+    When you login over SSH with your key to the admin account,
+
+      * your shell will be /usr/bin/ksh93, started as login shell
+
+      * the SHELL environment variable will be set to /usr/bin/ksh93
+
+      * the HOME environment variable will be set to /home/admin/.ryah (The
+      shared accounts home directory is /home/admin in this example)
+
+      * the working directory will be /home/admin/.ryah (The shared
+      accounts home directory is /home/admin in this example)
+
+ Example 2 Change the shell to ksh93 without changing the home directory
+
+    Add the sshss script to e.g. the ~/.ssh directory or any other
+    directory. sshss only changes the home directory if it is run from
+    inside a .ssh directory outside of the current home directory.
+
+    Add the following command string in front of your SSH key in the
+    ~/.ssh/authorized_keys file:
+
+      command=".ssh/sshss /usr/bin/ksh93"
+
+    When you login over SSH with your key to the admin account,
+
+      * your shell will be /usr/bin/ksh93, started as login shell
+
+      * the SHELL environment variable will be set to /usr/bin/ksh93
+
+ Example 3 Use a custom home directory
+
+    Create a directory to contain your own home directory. We create the
+    directory ~/.ryah in this example. Create a .ssh directory in your new
+    custom home directory and add the sshss script to this directory. Add
+    the following command string in front of your SSH key in the
+    ~/.ssh/authorized_keys file:
+
+      command=".ryah/.ssh/sshss"
+
+    When you login over SSH with your key to the admin account,
+
+      * your shell will be the shell defined in the passwd database,
+      started as login shell. If the shell specified in the passwd database
+      is empty or invalid, /bin/sh is used instead.
+
+      * the SHELL environment variable will be set to the shell defined in
+      the passwd database. If the shell specified in the passwd database is
+      empty or invalid, the SHELL environment variable is set to /bin/sh
+      instead.
+
+      * the HOME environment variable will be set to /home/admin/.ryah (The
+      shared accounts home directory is /home/admin in this example)
+
+      * the working directory will be /home/admin/.ryah (The shared
+      accounts home directory is /home/admin in this example)
+
+ENVIRONMENT
+
+    HOME
+
+      If sshss is placed in an .ssh directory, the HOME environment
+      variable is set to the parent directory of this .ssh directory. Then,
+      the working directory is changed to this new home directory.
+
+      Otherwise the HOME environment variable is not used, nor is the
+      working directory changed.
+
+    SHELL
+
+      The environment variable SHELL is set to the shell that is either
+      used as interactive shell or that is used to execute the command.
+
+SEE ALSO
+
+    passwd(4), "AUTHORIZED_KEYS FILE FORMAT" in sshd(1)
+
+AUTHOR
+
+    Sven Kirmess <sven.kirmess@kzone.ch>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Sven Kirmess.
+
+    This is free software, licensed under:
+
+      The (two-clause) FreeBSD License
+

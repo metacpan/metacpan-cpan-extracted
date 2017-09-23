@@ -1,5 +1,8 @@
 Revision history for File-Slurper
 
+0.010     2017-09-17 22:09:05+02:00 Europe/Amsterdam
+          Recognize "latin-1" as iso-8859-1
+
 0.009     2016-08-05 18:26:58+02:00 Europe/Amsterdam
           Load PerlIO::encoding before localizing $PerlIO::encoding::fallback
 

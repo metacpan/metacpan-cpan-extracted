@@ -27,4 +27,4 @@ resources:
   IRC: irc://irc.perl.org/#graphql-perl
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/moox-thunking
-version: '0.05'
+version: '0.07'

@@ -1,5 +1,9 @@
 Revision history for Net-IPAddress-Util
 
+4.000   2017-09-21
+        Major backwards-incompatible bug fix. Was treating ::ffff:0:0/96 as SIIT
+        instead of ::ffff:0:0:0/96. Was self-compatible, but RFC-wrong.
+
 3.033   2017-08-31
         Starting to prepare for Perl 5.026
 
@@ -122,4 +126,3 @@ Revision history for Net-IPAddress-Util
 
 0.01    2010-03-21
         First version, released on an unsuspecting world.
-

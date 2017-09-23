@@ -10,7 +10,7 @@ use warnings;
 use base qw( Device::Chip::Base::RegisteredI2C );
 Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Data::Bitfield qw( bitfield boolfield enumfield );
 
@@ -22,9 +22,22 @@ C<Device::Chip::ADS1115> - chip driver for F<ADS1115>
 
 =head1 SYNOPSIS
 
+ use Device::Chip::ADS1115;
+
+ my $chip = Device::Chip::ADS1115->new;
+ $chip->mount( Device::Chip::Adapter::...->new )->get;
+
+ $chip->change_config( MUX => "0" )->get;
+ $chip->trigger->get;
+
+ printf "The voltage is %.2fV\n", $chip->read_adc_voltage->get;
+
+=head1 DESCRIPTION
+
 This L<Device::Chip> subclass provides specific communications to a chip in
 the F<Texas Instruments> F<ADS111x> family, such as the F<ADS1113>, F<ADS1114>
-or F<ADS1115>.
+or F<ADS1115>. Due to similarities in hardware, it also works for the
+F<ADS101x> family, consisting of F<ADS1013>, F<ADS1014> and F<ADS1015>.
 
 The reader is presumed to be familiar with the general operation of this chip;
 the documentation here will not attempt to explain or define chip-specific
@@ -96,7 +109,7 @@ sub read_config
 
 =head2 change_config
 
-   $chip->change_config( %config ->get
+   $chip->change_config( %changes )->get
 
 Changes the configuration. Any field names not mentioned will be preserved at
 their existing values.

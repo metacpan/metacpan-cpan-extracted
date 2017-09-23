@@ -1,5 +1,5 @@
 ---
-abstract: "Default Boilerplate for Joel's Code"
+abstract: "Default Boilerplate for J. Maslak's Code"
 author:
   - 'J. Maslak <jmaslak@antelope.net>'
 build_requires:
@@ -16,7 +16,7 @@ name: JCM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.015'
+    version: '1.016'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -108,5 +108,5 @@ requires:
   perl: v5.22.0
   strict: '0'
   warnings: '0'
-version: '1.015'
+version: '1.016'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 package LWP::Protocol::ftp;
-$LWP::Protocol::ftp::VERSION = '6.26';
+$LWP::Protocol::ftp::VERSION = '6.27';
 # Implementation of the ftp protocol (RFC 959). We let the Net::FTP
 # package do all the dirty work.
 use base qw(LWP::Protocol);
@@ -16,7 +16,7 @@ use File::Listing   ();
 {
 
     package LWP::Protocol::MyFTP;
-$LWP::Protocol::MyFTP::VERSION = '6.26';
+$LWP::Protocol::MyFTP::VERSION = '6.27';
 use strict;
     use base qw(Net::FTP);
 

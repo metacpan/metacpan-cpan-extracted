@@ -22,9 +22,11 @@ recommends:
   Authen::TuringImage: '0'
   Business::Bitcoin: '0'
   Crypt::Diceware: '0'
+  File::HomeDir: '0'
   GD::Barcode::QRcode: '0'
   IO::Socket::INET: '0'
   IPC::Queue::Duplex: '1.005'
+  Net::Server::PreFork: '0'
   Wx: '0'
 requires:
   Compress::Zlib: '0'
@@ -35,5 +37,5 @@ requires:
   DBI: '0'
   Math::BaseCnv: '1.14'
   Persistence::Object::Simple: '0'
-version: '1.126'
+version: '1.127'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

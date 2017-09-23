@@ -5,7 +5,7 @@ use warnings;
 use Scalar::Util qw/reftype blessed/;
 use MooX::ReturnModifiers qw/return_modifiers/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use constant ro       => 'ro';
 use constant is_ro    => ( is => ro );
@@ -94,7 +94,7 @@ MooX::LazierAttributes - Lazier Attributes.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig::LibPkgConf
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -15,6 +15,9 @@ has '+pkg_name' => sub {
 
 
 has minimum_version => undef;
+
+# private for now, used by negotiator
+has register_prereqs => 1;
 
 
 use constant _min_version => '0.04';
@@ -28,9 +31,7 @@ sub init
 {
   my($self, $meta) = @_;
 
-  my $caller = caller;
-  
-  if($caller ne 'Alien::Build::Plugin::PkgConfig::Negotiate')
+  if($self->register_prereqs)
   {
     # Also update in Neotiate.pm
     $meta->add_requires('configure' => 'PkgConfig::LibPkgConf::Client' => _min_version);
@@ -120,7 +121,7 @@ Alien::Build::Plugin::PkgConfig::LibPkgConf - Probe system and determine library
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

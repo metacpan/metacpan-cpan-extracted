@@ -3,18 +3,23 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __sech__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_sech($r, $_[0], $ROUND);
-    $r;
-};
+sub __sech__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-# sech(x) = 1/cosh(x)
-Class::Multimethods::multimethod __sech__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_cosh($r, $_[0], $ROUND);
-    Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sech($r, $x, $ROUND);
+        return $r;
+    }
+
+    # sech(x) = 1/cosh(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cosh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
 
 1;

@@ -3,7 +3,7 @@
 # Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.126 Sat Jun 24 02:15:18 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.127 Sat Sep 16 18:48:10 PDT 2017 $
 
 package Crypt::HashCash::Vault::Bitcoin;
 
@@ -20,7 +20,7 @@ use Business::Bitcoin;
 use Authen::TuringImage;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -333,7 +333,7 @@ sub process_request {                                 # Hande a request from a c
   }
   elsif (/^id (\S+) (\d+) (\d+)$/) {                  # Initialise Deposit - Check deposit, send init vectors
     if (my $inits = $self->initdeposit(Address => $1, Amount => $2, NumCoins => $3, Offline => $offline)) {
-      $ret = "@$inits";
+      $ret = $inits =~ /^-E/ ? $inits : "@$inits";
     }
     else {
       $ret = '';
@@ -352,8 +352,13 @@ sub process_request {                                 # Hande a request from a c
     if (my $bcoins = $self->deposit( Address             => $1,
 				     Offline             => $offline,
 				     Requests            => [ map { Crypt::HashCash::CoinRequest->from_string($_) } split / /,$2 ])) {
-      my @bcoins = map { $_->as_string } @$bcoins;
-      $ret = "@bcoins";
+      if ($bcoins =~ /^-E/) {
+	$ret = $bcoins;
+      }
+      else {
+	my @bcoins = map { $_->as_string } @$bcoins;
+	$ret = "@bcoins";
+      }
     }
     else {
       $ret = '';
@@ -376,7 +381,7 @@ sub process_request {                                 # Hande a request from a c
       }
       else {
 	$sendto = $1;
-	$sendamt = $2 / 100000000; my $feeamt = $3 / 100000000;
+	$sendamt = sprintf("%f",$2 / 100000000); my $feeamt = sprintf("%f",$3 / 100000000);
 	my $electrum = $self->electrum;
 	my $balance = `$electrum getbalance`;
 	$balance =~ /"confirmed": "(\S+)"/s; $balance = $1 * 100000000;
@@ -470,8 +475,8 @@ Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.126 $
- $Date: Sat Jun 24 02:15:18 PDT 2017 $
+ $Revision: 1.127 $
+ $Date: Sat Sep 16 18:48:10 PDT 2017 $
 
 =head1 SYNOPSIS
 

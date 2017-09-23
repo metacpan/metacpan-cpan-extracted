@@ -56,11 +56,11 @@ requires:
   Time::HiRes: '0'
   base: '0'
   constant: '0'
-  goto::file: '0.003'
+  goto::file: '0.004'
   parent: '0'
   perl: '5.008001'
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness/issues
   repository: http://github.com/Test-More/Test2-Harness/
-version: '0.001014'
+version: '0.001015'
 x_serialization_backend: 'YAML::Tiny version 1.70'

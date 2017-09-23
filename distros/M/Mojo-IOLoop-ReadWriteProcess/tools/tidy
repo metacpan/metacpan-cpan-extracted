@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+# perltidy rules can be found in ../.perltidyrc
+#
+
+check=
+if test "$1"  = '--check'; then
+    shift
+    check=1
+fi
+
+if ! which perltidy > /dev/null 2>&1; then
+    echo "No perltidy found, install it first!"
+    exit 1
+fi
+
+cd "${0%/*}/.."
+
+# just to make sure we are at the right location
+test -e tools/tidy || exit 1
+
+find -name '*.tdy' -delete
+
+find . \( -name '*.p[lm]' -o -name '*.t' \) -print0 | xargs -0 perltidy --pro=.../.perltidyrc
+
+while read file; do
+    if ! diff -u ${file%.tdy} $file; then
+        if test -n "$check"; then
+            echo "RUN tools/tidy script before checkin"
+            exit 1
+        else
+            mv -v $file ${file%.tdy}
+        fi
+    else
+        rm $file
+    fi
+done < <(find . -name "*.tdy")
+
+# vim: set sw=4 et:

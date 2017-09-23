@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -108,6 +108,7 @@ The following functions are exportable:
         as_oct as_int as_dec as_frac is_pos is_neg is_int
         is_rat is_real is_imag is_complex is_inf is_ninf
         is_nan is_zero is_one is_mone is_even is_odd is_div
+        rat_approx
 
 Each function can be exported individually, as:
 
@@ -1369,21 +1370,34 @@ Returns a true value when C<x> holds the Not-a-Number special value.
 
     int(x)                                        #=> Int | NaN
 
-Returns the integer part of C<x>. Returns C<NaN> when C<x> cannot be truncated to an integer.
+Returns the integer part of C<x>. Returns NaN when C<x> cannot be truncated to an integer.
 
 =head2 rat
 
     rat(x)                                        #=> Rat | NaN
     rat(str)                                      #=> Rat | NaN
 
-Converts C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
+Converts C<x> to a rational number. Returns NaN when this conversion is not possible.
 
-When the given argument is a decimal expansion string, it will be specially parsed as a fraction.
+When the given argument is a decimal expansion string, it will be specially parsed as an exact fraction.
 
 Example:
 
     rat('0.5')       = 1/2
     rat('1234/5678') = 617/2839
+
+=head2 rat_approx
+
+    rat_approx(n)                                 #=> Rat | NaN
+
+Given a real number C<n>, it returns a very good (sometimes exact) rational approximation to C<n>, computed with continued fractions.
+
+Example:
+
+    rat_approx(3.14)     = 22/7
+    rat_approx(zeta(-5)) = -1/252
+
+Return NaN when C<n> is not a real number.
 
 =head2 float
 
@@ -1505,7 +1519,7 @@ Example:
     numerator(x)                                  #=> Int | NaN
 
 Returns the numerator of C<x> as a signed C<Math::AnyNum> object. When C<x> is not a rational number,
-it tries to convert it to a rational. Returns C<NaN> when this conversion is not possible.
+it tries to convert it to a rational. Returns NaN when this conversion is not possible.
 
 Example:
 
@@ -1517,7 +1531,7 @@ Example:
     denominator(x)                                #=> Int | NaN
 
 Returns the denominator of C<x> as an unsigned C<Math::AnyNum> object. When C<x> is not a rational number,
-it tries to convert it to a rational. Returns C<NaN> when this conversion is not possible.
+it tries to convert it to a rational. Returns NaN when this conversion is not possible.
 
 Example:
 

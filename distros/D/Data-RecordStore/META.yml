@@ -18,12 +18,12 @@ name: Data-RecordStore
 provides:
   Data::RecordStore:
     file: lib/Data/RecordStore.pm
-    version: '2.0'
+    version: '2.01'
   Data::RecordStore::FixedStore:
     file: lib/Data/RecordStore.pm
 requires:
   perl: v5.9.4
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.0'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

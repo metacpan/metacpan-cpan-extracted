@@ -1,5 +1,8 @@
 Revision history for Perl extension APISchema
 
+1.27 2017-09-19T09:58:40Z
+   - Sort keys when encoding JSON
+
 1.26 2017-08-30T02:20:58Z
    - Expand `FETCH` method to `GET` and `HEAD`
 

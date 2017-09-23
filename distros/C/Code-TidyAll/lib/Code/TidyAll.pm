@@ -17,7 +17,7 @@ use List::SomeUtils qw(uniq);
 use Module::Runtime qw( use_module );
 use Path::Tiny qw(path);
 use Scalar::Util qw(blessed);
-use Specio 0.30;
+use Specio 0.40;
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Numeric;
@@ -28,159 +28,176 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
 # External
-has 'backup_ttl' => (
+has backup_ttl => (
     is      => 'ro',
     isa     => t('NonEmptyStr'),
     default => '1 hour',
 );
 
-has 'cache' => (
+has cache => (
     is  => 'lazy',
     isa => object_can_type( methods => [qw( get set )] ),
 );
 
-has 'cache_model_class' => (
+has cache_model_class => (
     is      => 'ro',
     isa     => t('ClassName'),
     default => 'Code::TidyAll::CacheModel',
 );
 
-has 'check_only' => (
+has check_only => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'data_dir' => (
+has data_dir => (
     is     => 'lazy',
     isa    => t('Path'),
     coerce => t('Path')->coercion_sub,
 );
 
-has 'iterations' => (
+has iterations => (
     is      => 'ro',
     isa     => t('PositiveInt'),
     default => 1,
 );
 
-has 'jobs' => (
+has jobs => (
     is      => 'ro',
     isa     => t('Int'),
     default => 1,
 );
 
-has 'list_only' => (
+has list_only => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'mode' => (
+has mode => (
     is      => 'ro',
     isa     => t('NonEmptyStr'),
     default => 'cli',
 );
 
-has 'msg_outputter' => (
+has msg_outputter => (
     is      => 'ro',
     isa     => t('CodeRef'),
     builder => '_build_msg_outputter',
 );
 
-has 'no_backups' => (
+has no_backups => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'no_cache' => (
+has no_cache => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'output_suffix' => (
+has output_suffix => (
     is      => 'ro',
     isa     => t('Str'),
     default => q{},
 );
 
-has 'plugins' => (
+has plugins => (
     is       => 'ro',
     isa      => t('HashRef'),
     required => 1,
 );
 
-has 'quiet' => (
+has selected_plugins => (
+    is   => 'ro',
+    isa  => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    lazy => 1,
+    default => sub { [] },
+);
+
+has quiet => (
     is  => 'ro',
     isa => t('Bool'),
 );
-has 'recursive' => (
+has recursive => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'refresh_cache' => (
+has refresh_cache => (
     is  => 'ro',
     isa => t('Bool'),
 );
 
-has 'root_dir' => (
+has root_dir => (
     is       => 'ro',
     isa      => t('RealDir'),
     coerce   => t('RealDir')->coercion_sub,
     required => 1
 );
 
-has 'verbose' => (
+has verbose => (
     is      => 'ro',
     isa     => t('Bool'),
     default => 0,
 );
 
-has 'inc' => (
+has inc => (
     is  => 'ro',
     isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
     default => sub { [] },
 );
 
-# Internal
-has 'backup_dir' => (
-    is       => 'lazy',
+has _backup_dir => (
+    is       => 'ro',
     isa      => t('Path'),
     init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_backup_dir',
 );
 
-has 'backup_ttl_secs' => (
-    is       => 'lazy',
+has _backup_ttl_secs => (
+    is       => 'ro',
     isa      => t('Int'),
     init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_backup_ttl_secs',
 );
 
-has 'base_sig' => (
-    is       => 'lazy',
+has _base_sig => (
+    is       => 'ro',
     isa      => t('NonEmptyStr'),
     init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_base_sig',
 );
 
-has 'plugin_objects' => (
-    is       => 'lazy',
+has _plugin_objects => (
+    is       => 'ro',
     isa      => t( 'ArrayRef', of => object_isa_type('Code::TidyAll::Plugin') ),
     init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_plugin_objects',
 );
 
-has 'plugins_for_mode' => (
-    is       => 'lazy',
+has _plugins_to_run => (
+    is       => 'ro',
     isa      => t( 'HashRef', of => t('HashRef') ),
     init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_plugins_to_run',
 );
 
-has '_plugins_for_path' => (
-    is  => 'lazy',
-    isa => t( 'HashRef', of => t('HashRef') ),
-    default  => sub { {} },
+has _plugins_for_path => (
+    is       => 'ro',
+    isa      => t( 'HashRef', of => t('HashRef') ),
     init_arg => undef,
+    lazy     => 1,
+    default => sub { {} },
 );
 
 with qw( Code::TidyAll::Role::HasIgnore Code::TidyAll::Role::Tempdir );
@@ -197,7 +214,7 @@ sub _build_backup_ttl_secs {
 
 sub _build_base_sig {
     my $self = shift;
-    my $active_plugins = join( q{|}, map { $_->name } @{ $self->plugin_objects } );
+    my $active_plugins = join( q{|}, map { $_->name } @{ $self->_plugin_objects } );
     return $self->_sig( [ $Code::TidyAll::VERSION || 0, $active_plugins ] );
 }
 
@@ -216,16 +233,25 @@ sub _build_data_dir {
     return $self->root_dir->child('/.tidyall.d');
 }
 
-sub _build_plugins_for_mode {
-    my $self    = shift;
-    my $plugins = $self->plugins;
-    if ( my $mode = $self->mode ) {
-        $plugins = {
-            map { ( $_, $plugins->{$_} ) }
-            grep { $self->_plugin_conf_matches_mode( $plugins->{$_}, $mode ) } keys(%$plugins)
-        };
+sub _build_plugins_to_run {
+    my $self = shift;
+
+    my $all_plugins = $self->plugins;
+    my %selected = map { $_ => 1 } @{ $self->selected_plugins };
+    my %plugins;
+
+    if (%selected) {
+        my @unknown = sort grep { !$all_plugins->{$_} } keys %selected;
+        die "Asked for unknown plugins: [@unknown]" if @unknown;
+        %plugins = map { $_ => $all_plugins->{$_} } keys %selected;
     }
-    return $plugins;
+    elsif ( my $mode = $self->mode ) {
+        %plugins = map { $_ => $all_plugins->{$_} }
+            grep { $self->_plugin_conf_matches_mode( $all_plugins->{$_}, $mode ) }
+            keys %{$all_plugins};
+    }
+
+    return \%plugins;
 }
 
 sub _plugin_conf_matches_mode {
@@ -242,14 +268,16 @@ sub _plugin_conf_matches_mode {
 
 sub _build_plugin_objects {
     my $self = shift;
-    my @plugin_objects = map { $self->_load_plugin( $_, $self->plugins->{$_} ) }
-        keys( %{ $self->plugins_for_mode } );
 
     # Sort tidiers by weight (by default validators have a weight of 60 and non-
     # validators a weight of 50 meaning non-validators normally go first), then
     # alphabetical
     # TODO: These should probably sort in a consistent way independent of locale
-    return [ sort { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) } @plugin_objects ];
+    return [
+        sort { ( $a->weight <=> $b->weight ) || ( $a->name cmp $b->name ) }
+            map { $self->_load_plugin( $_, $self->_plugins_to_run->{$_} ) }
+            keys %{ $self->_plugins_to_run }
+    ];
 }
 
 sub _load_plugin {
@@ -293,7 +321,7 @@ sub BUILD {
     }
 
     unless ( $self->no_backups ) {
-        $self->backup_dir->mkpath( { mode => 0775 } );
+        $self->_backup_dir->mkpath( { mode => 0775 } );
         $self->_purge_backups_periodically();
     }
 
@@ -304,7 +332,7 @@ sub _purge_backups_periodically {
     my ($self) = @_;
     my $cache = $self->cache;
     my $last_purge_backups = $cache->get('last_purge_backups') || 0;
-    if ( time > $last_purge_backups + $self->backup_ttl_secs ) {
+    if ( time > $last_purge_backups + $self->_backup_ttl_secs ) {
         $self->_purge_backups();
         $cache->set( 'last_purge_backups', time() );
     }
@@ -317,11 +345,11 @@ sub _purge_backups {
         {
             follow => 0,
             wanted => sub {
-                unlink $_ if -f && /\.bak$/ && time > ( stat($_) )[9] + $self->backup_ttl_secs;
+                unlink $_ if -f && /\.bak$/ && time > ( stat($_) )[9] + $self->_backup_ttl_secs;
             },
             no_chdir => 1
         },
-        $self->backup_dir
+        $self->_backup_dir,
     );
 }
 
@@ -337,7 +365,8 @@ sub new_from_conf_file {
     %params = (
         plugins  => $conf_params,
         root_dir => path($conf_file)->realpath->parent,
-        %$main_params, %params
+        %{$main_params},
+        %params
     );
 
     # Initialize with alternate class if given
@@ -394,11 +423,8 @@ sub _recurse_dump {
                     die 'Cannot dump ' . ref($v) . ' object';
                 }
             }
-            elsif ( ref $v eq 'HASH' ) {
+            elsif ( ref $v =~ /^(?:HASH|ARRAY)$/ ) {
                 $dump{$k} = _recurse_dump($v);
-            }
-            elsif ( ref $v eq 'ARRAY' ) {
-                $dump{$k} = [ map { _recurse_dump($_) } @{$v} ];
             }
             else {
                 $dump{$k} = $v;
@@ -417,11 +443,8 @@ sub _recurse_dump {
                     die 'Cannot dump ' . ref($v) . ' object';
                 }
             }
-            elsif ( ref $v eq 'HASH' ) {
+            elsif ( ref $v =~ /^(?:HASH|ARRAY)$/ ) {
                 push @dump, _recurse_dump($v);
-            }
-            elsif ( ref $v eq 'ARRAY' ) {
-                push @dump, [ map { _recurse_dump($_) } @{ $p->{$v} } ];
             }
             else {
                 push @dump, $v;
@@ -446,7 +469,7 @@ sub process_paths {
     @paths = map {
         try { $_->realpath }
             || $_->absolute
-    } map { path($_) } sort { $a cmp $b } @paths;
+    } map { path($_) } @paths;
 
     if ( $self->jobs > 1 && @paths > 1 ) {
         return $self->_process_parallel(@paths);
@@ -572,24 +595,24 @@ sub plugins_for_path {
     my ( $self, $path ) = @_;
 
     $self->_plugins_for_path->{$path}
-        ||= [ grep { $_->matches_path($path) } @{ $self->plugin_objects } ];
+        ||= [ grep { $_->matches_path($path) } @{ $self->_plugin_objects } ];
     return @{ $self->_plugins_for_path->{$path} };
 }
 
 sub _cache_model_for {
     my ( $self, $path, $full_path ) = @_;
     return $self->cache_model_class->new(
-        path         => $path,
-        full_path    => $full_path,
-        cache_engine => $self->no_cache ? undef : $self->cache,
-        base_sig     => $self->base_sig,
+        path      => $path,
+        full_path => $full_path,
+        ( $self->no_cache ? () : ( cache_engine => $self->cache ) ),
+        base_sig => $self->_base_sig,
     );
 }
 
 sub _backup_file {
     my ( $self, $path, $contents ) = @_;
     unless ( $self->no_backups ) {
-        my $backup_file = $self->backup_dir->child( $self->_backup_filename($path) );
+        my $backup_file = $self->_backup_dir->child( $self->_backup_filename($path) );
         $backup_file->parent->mkpath( { mode => 0775 } );
         $backup_file->spew($contents);
     }
@@ -604,8 +627,11 @@ sub _backup_filename {
 sub process_source {
     my ( $self, $contents, $path ) = @_;
 
+    $path = path($path);
+
     die 'contents and path required' unless defined($contents) && defined($path);
     my @plugins = $self->plugins_for_path($path);
+
     if ( !@plugins ) {
         $self->msg(
             '[no plugins apply%s] %s',
@@ -679,11 +705,19 @@ sub _error_result {
     my ( $self, $msg, $path, $orig_contents, $new_contents ) = @_;
     $self->msg( '%s', $msg );
     return Code::TidyAll::Result->new(
-        path          => $path,
-        state         => 'error',
-        error         => $msg,
-        orig_contents => $orig_contents,
-        new_contents  => $new_contents,
+        path  => $path,
+        state => 'error',
+        error => $msg,
+        (
+              ( defined $orig_contents && length $orig_contents )
+            ? ( orig_contents => $orig_contents )
+            : ()
+        ),
+        (
+              ( defined $new_contents && length $new_contents )
+            ? ( new_contents => $new_contents )
+            : ()
+        ),
     );
 }
 
@@ -730,7 +764,7 @@ sub find_matched_files {
     my $root_length      = length( $self->root_dir );
 
     my @all;
-    for my $plugin ( @{ $self->plugin_objects } ) {
+    for my $plugin ( @{ $self->_plugin_objects } ) {
         my @matched = $self->_matched_by_plugin($plugin);
         push @all, @matched;
 
@@ -812,7 +846,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -846,17 +880,15 @@ This is the engine used by L<tidyall> - read that first to get an overview.
 
 You can call this API from your own program instead of executing C<tidyall>.
 
-=head1 CONSTRUCTION
+=head1 METHODS
 
-=head2 Constructor methods
+This class offers the following methods:
 
-=over
-
-=item new (%params)
+=head2 Code::TidyAll->new(%params)
 
 The regular constructor. Must pass at least I<plugins> and I<root_dir>.
 
-=item new_with_conf_file ($conf_file, %params)
+=head2 $tidyall->new_with_conf_file( $conf_file, %params )
 
 Takes a conf file path, followed optionally by a set of key/value parameters.
 Reads parameters out of the conf file and combines them with the passed
@@ -865,73 +897,81 @@ parameters (the latter take precedence), and calls the regular constructor.
 If the conf file or params defines I<tidyall_class>, then that class is
 constructed instead of C<Code::TidyAll>.
 
-=back
+=head3 Constructor parameters
 
-=head2 Constructor parameters
+=over 4
 
-=over
-
-=item plugins
+=item * plugins
 
 Specify a hash of plugins, each of which is itself a hash of options. This is
 equivalent to what would be parsed out of the sections in the configuration
 file.
 
-=item cache_model_class
+=item * selected_plugins
+
+An arrayref of plugins to be used. This overrides the C<mode> parameter.
+
+This is really only useful if you're getting configuration from a config file
+and want to narrow the set of plugins to be run.
+
+Note that plugins will still only run on files which match their C<select> and
+C<ignore> configuration.
+
+=item * cache_model_class
 
 The cache model class. Defaults to C<Code::TidyAll::CacheModel>
 
-=item cache
+=item * cache
 
 The cache instance (e.g. an instance of C<Code::TidyAll::Cache> or a C<CHI>
 instance.) An instance of C<Code::TidyAll::Cache> is automatically instantiated
 by default.
 
-=item backup_ttl
+=item * backup_ttl
 
-=item check_only
+=item * check_only
 
 If this is true, then we simply check that files pass validation steps and that
 tidying them does not change the file. Any changes from tidying are not
 actually written back to the file.
 
-=item no_cleanup
+=item * no_cleanup
 
 A boolean indicating if we should skip cleaning temporary files or not.
 Defaults to false.
 
-=item inc
+=item * inc
 
 An arrayref of directories to prepend to C<@INC>. This can be set via the
 command-line as C<-I>, but you can also set it in a config file.
 
 This affects both loading and running plugins.
 
-=item data_dir
+=item * data_dir
 
-=item iterations
+=item * iterations
 
-=item mode
+=item * mode
 
-=item no_backups
+=item * no_backups
 
-=item no_cache
+=item * no_cache
 
-=item output_suffix
+=item * output_suffix
 
-=item quiet
+=item * quiet
 
-=item root_dir
+=item * root_dir
 
-=item ignore
+=item * ignore
 
-=item verbose
+=item * verbose
 
 These options are the same as the equivalent C<tidyall> command-line options,
 replacing dashes with underscore (e.g. the C<backup-ttl> option becomes
 C<backup_ttl> here).
 
-=item msg_outputter
+=item * msg_outputter
 
 This is a subroutine reference that is called whenever a message needs to be
 printed in some way. The sub receives a C<sprintf()> format string followed by
@@ -941,67 +981,62 @@ Test::Builder->diag >> method.
 
 =back
 
-=head1 METHODS
+=head2 $tidyall->process_paths( $path, ... )
 
-=over
+This method iterates through a list of paths, processing all the files it
+finds. It will descend into subdirectories if C<recursive> flag is true.
+Returns a list of L<Code::TidyAll::Result> objects, one for each file.
 
-=item process_paths (path, ...)
+=head2 $tidyall->process_file( $file )
 
-Call L</process_file> on each file; descend recursively into each directory if
-the C<recursive> flag is on. Return a list of L<Code::TidyAll::Result> objects,
-one for each file.
+Process the one I<file>, meaning:
 
-=item process_file (file)
-
-Process the I<file>, meaning
-
-=over
+=over 4
 
 =item *
 
-Check the cache and return immediately if file has not changed
+Check the cache and return immediately if file has not changed.
 
 =item *
 
-Apply appropriate matching plugins
+Apply appropriate matching plugins.
 
 =item *
 
-Print success or failure result to STDOUT, depending on quiet/verbose settings
+Print success or failure result to STDOUT, depending on quiet/verbose settings.
 
 =item *
 
-Write the cache if enabled
+Write to the cache if caching is enabled.
 
 =item *
 
-Return a L<Code::TidyAll::Result> object
+Return a L<Code::TidyAll::Result> object.
 
 =back
 
-=item process_source (I<source>, I<path>)
+=head2 $tidyall->process_source( $source, $path )
 
-Like L</process_file>, but process the I<source> string instead of a file, and
-do not read from or write to the cache. You must still pass the relative
+Like C<process_file>, but process the I<source> string instead of a file, and
+does not read from or write to the cache. You must still pass the relative
 I<path> from the root as the second argument, so that we know which plugins to
-apply. Return a L<Code::TidyAll::Result> object.
+apply. Returns a L<Code::TidyAll::Result> object.
 
-=item plugins_for_path (I<path>)
+=head2 $tidyall->plugins_for_path($path)
 
-Given a relative I<path> from the root, return a list of
+Given a relative I<path> from the root, returns a list of
 L<Code::TidyAll::Plugin> objects that apply to it, or an empty list if no
 plugins apply.
 
-=item find_conf_file (I<conf_names>, I<start_dir>)
-
-Class method. Start in the I<start_dir> and work upwards, looking for one of
-the I<conf_names>. Return the pathname if found or throw an error if not found.
-
-=item find_matched_files
+=head2 $tidyall->find_matched_files
 
 Returns a list of sorted files that match at least one plugin in configuration.
 
-=back
+=head2 Code::TidyAll->find_conf_file( $conf_names, $start_dir )
+
+Start in the I<start_dir> and work upwards, looking for a file matching one of
+the I<conf_names>. Returns the pathname if found or throw an error if not
+found.
 
 =head1 SUPPORT
 

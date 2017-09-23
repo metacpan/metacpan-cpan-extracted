@@ -74,7 +74,9 @@
 #ifdef I_UNISTD
 #include <unistd.h>
 #endif
+#ifndef __OpenBSD__
 #include <utmpx.h>
+#endif
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
@@ -89,6 +91,58 @@ typedef int psx_fd_t; /* checks for file handle or descriptor via typemap */
 /* is*() stuff borrowed from POSIX.xs */
 typedef int (*isfunc_t)(int);
 typedef void (*any_dptr_t)(void *);
+
+#ifndef __NetBSD__
+#define RETURN_STAT_BUF(buf) { \
+    EXTEND(SP, 16);                \
+    mPUSHu( buf.st_dev );          \
+    mPUSHu( buf.st_ino );          \
+    mPUSHu( buf.st_mode );         \
+    mPUSHu( buf.st_nlink );        \
+    mPUSHu( buf.st_uid );          \
+    mPUSHu( buf.st_gid );          \
+    mPUSHu( buf.st_rdev );         \
+    if (sizeof(IV) < 8)            \
+        mPUSHn( buf.st_size );     \
+    else                           \
+        mPUSHi( buf.st_size );     \
+    mPUSHi( buf.st_atim.tv_sec );  \
+    mPUSHi( buf.st_mtim.tv_sec );  \
+    mPUSHi( buf.st_ctim.tv_sec );  \
+    /* actually these come before the times but we follow core stat */ \
+    mPUSHi( buf.st_blksize );      \
+    mPUSHi( buf.st_blocks );       \
+    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
+    mPUSHi( buf.st_atim.tv_nsec ); \
+    mPUSHi( buf.st_mtim.tv_nsec ); \
+    mPUSHi( buf.st_ctim.tv_nsec ); \
+}
+#else
+#define RETURN_STAT_BUF(buf) { \
+    EXTEND(SP, 16);                \
+    mPUSHu( buf.st_dev );          \
+    mPUSHu( buf.st_ino );          \
+    mPUSHu( buf.st_mode );         \
+    mPUSHu( buf.st_nlink );        \
+    mPUSHu( buf.st_uid );          \
+    mPUSHu( buf.st_gid );          \
+    mPUSHu( buf.st_rdev );         \
+    if (sizeof(IV) < 8)            \
+        mPUSHn( buf.st_size );     \
+    else                           \
+        mPUSHi( buf.st_size );     \
+    mPUSHi( buf.st_atime );  \
+    mPUSHi( buf.st_mtime );  \
+    mPUSHi( buf.st_ctime );  \
+    /* actually these come before the times but we follow core stat */ \
+    mPUSHi( buf.st_blksize );      \
+    mPUSHi( buf.st_blocks );       \
+    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
+    mPUSHi( buf.st_atimensec ); \
+    mPUSHi( buf.st_mtimensec ); \
+    mPUSHi( buf.st_ctimensec ); \
+}
+#endif
 
 static XSPROTO(is_common);
 static XSPROTO(is_common)
@@ -139,8 +193,14 @@ _readlink50c(char *path, int *dirfd) {
   while (1) {
     if (dirfd == NULL)
       linklen = readlink(path, buf, bufsize);
-    else
+    else {
+#ifdef AT_FDCWD
       linklen = readlinkat(*dirfd, path, buf, bufsize);
+#else
+      errno = ENOSYS;
+      linklen = -1;
+#endif
+    }
 
     if (linklen >= 0) {
       if ((size_t)linklen < bufsize || linklen == SSIZE_MAX) {
@@ -369,6 +429,35 @@ psx_fileno(pTHX_ SV *sv) {
   }
 
   return fn;
+}
+
+static int
+psx_close(pTHX_ SV *sv) {
+  IO *io;
+  int rv = -1;
+
+  if (SvOK(sv)) {
+    if (psx_looks_like_number(aTHX_ sv)) {
+      int fn = SvIV(sv);
+      rv = close(fn);
+    }
+    else if ((io = sv_2io(sv))) {
+      if (IoIFP(io))
+        rv = PerlIO_close(IoIFP(io));
+      else if (IoDIRP(io)) {
+#ifdef VOID_CLOSEDIR
+        errno = 0;
+        PerlDir_close(IoDIRP(io));
+        rv = errno ? -1 : 0;
+#else
+        rv = PerlDir_close(IoDIRP(io));
+#endif
+        IoDIRP(io) = 0;
+      }
+    }
+  }
+
+  return rv;
 }
 
 #define PACKNAME "POSIX::2008"
@@ -620,7 +709,7 @@ fnmatch(char *pattern, char *string, int flags);
 int
 killpg(pid_t pgrp, int sig);
 
-#if defined(__FreeBSD__) || defined(__CYGWIN__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__CYGWIN__)
 void
 getdate(...);
     PPCODE:
@@ -781,6 +870,28 @@ getsid(pid_t pid = 0);
     }                                                       \
 }
 
+#ifdef __OpenBSD__
+void
+endutxent(...);
+    PPCODE:
+        croak("endutxent() not available");
+
+void
+getutxent(...);
+    PPCODE:
+        croak("getutxent() not available");
+
+void
+getutxid(...);
+    PPCODE:
+        croak("getutxid() not available");
+
+void
+getutxline(...);
+    PPCODE:
+        croak("getutxline() not available");
+
+#else
 void
 endutxent();
 
@@ -818,6 +929,8 @@ getutxline(char *ut_line);
 
 void
 setutxent();
+
+#endif
 
 NV
 drand48();
@@ -914,17 +1027,138 @@ int
 setuid(uid_t uid);
 
 int
+sigpause(int sig);
+
+#ifndef __OpenBSD__
+int
 sighold(int sig);
 
 int
 sigignore(int sig);
 
 int
-sigpause(int sig);
+sigrelse(int sig);
+
+#else
+void
+sighold(...);
+  PPCODE:
+    croak("sighold() not available");
+
+void
+sigignore(...);
+  PPCODE:
+    croak("sigignore() not available");
 
 int
 sigrelse(int sig);
+  PPCODE:
+    croak("sigrelse() not available");
 
+#endif
+
+#if !defined(CLOCK_REALTIME) || !defined(TIMER_ABSTIME) || !defined(SIGEV_SIGNAL)
+void
+timer_create(...);
+  PPCODE:
+    croak("timer_create() not available");
+
+void
+timer_delete(...);
+  PPCODE:
+    croak("timer_delete() not available");
+
+void
+timer_gettime(...);
+  PPCODE:
+    croak("timer_gettime() not available");
+
+void
+timer_getoverrun(...);
+  PPCODE:
+    croak("timer_getoverrun() not available");
+
+void
+timer_settime(...);
+  PPCODE:
+    croak("timer_settime() not available");
+
+#else
+
+timer_t
+timer_create(clockid_t clockid, int sig);
+  PREINIT:
+    struct sigevent sevp;
+    timer_t timerid;
+    int rv;
+  CODE:
+  {
+    sevp.sigev_notify = SIGEV_SIGNAL;
+    sevp.sigev_signo = sig;
+    sevp.sigev_value.sival_int = 0;
+
+    rv = timer_create(clockid, &sevp, &timerid);
+
+    if (rv == 0)
+      RETVAL = timerid;
+    else
+      RETVAL = (timer_t)0;
+  }
+  OUTPUT:
+    RETVAL
+
+SysRet
+timer_delete(timer_t timerid);
+
+SysRet0
+timer_getoverrun(timer_t timerid);
+
+void
+timer_gettime(timer_t timerid);
+  PREINIT:
+    struct itimerspec curr_value;
+    int rv;
+  PPCODE:
+  {
+    rv = timer_gettime(timerid, &curr_value);
+
+    if (rv == 0) {
+      EXTEND(SP, 4);
+      mPUSHi(curr_value.it_interval.tv_sec);
+      mPUSHi(curr_value.it_interval.tv_nsec);
+      mPUSHi(curr_value.it_value.tv_sec);
+      mPUSHi(curr_value.it_value.tv_nsec);
+    }
+  }
+
+void
+timer_settime(timer_t timerid, int flags, time_t interval_sec, long interval_nsec, time_t initial_sec=-1, long initial_nsec=-1);
+  PREINIT:
+    struct itimerspec new_value, old_value;
+    int rv;
+  PPCODE:
+  {
+    new_value.it_interval.tv_sec = interval_sec;
+    new_value.it_interval.tv_nsec = interval_nsec;
+    if (initial_sec < 0 || initial_nsec < 0)
+      new_value.it_value = new_value.it_interval;
+    else {
+      new_value.it_value.tv_sec = initial_sec;
+      new_value.it_value.tv_nsec = initial_nsec;
+    }
+
+    rv = timer_settime(timerid, flags, &new_value, &old_value);
+
+    if (rv == 0) {
+      EXTEND(SP, 4);
+      mPUSHi(old_value.it_interval.tv_sec);
+      mPUSHi(old_value.it_interval.tv_nsec);
+      mPUSHi(old_value.it_value.tv_sec);
+      mPUSHi(old_value.it_value.tv_nsec);
+    }
+  }
+
+#endif
 
 ## I/O-related functions
 ########################
@@ -945,19 +1179,11 @@ lchown(char *path, uid_t owner, gid_t group);
 SysRet
 access(char *path, int mode);
 
-SysRet
-faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
-
 #else
 void
 access(...);
   PPCODE:
     croak("access() not available");
-
-void
-faccessat(...);
-  PPCODE:
-    croak("faccessat() not available");
 
 #endif
 
@@ -968,13 +1194,7 @@ SysRet
 fchmod(psx_fd_t fd, mode_t mode);
 
 SysRet
-fchmodat(psx_fd_t dirfd, char *path, mode_t mode, int flags = 0);
-
-SysRet
 fchown(psx_fd_t fd, uid_t owner, gid_t group);
-
-SysRet
-fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
 
 #if !defined(HAS_FSYNC) || (defined(__FreeBSD_version) && __FreeBSD_version < 1101000)
 void
@@ -987,66 +1207,6 @@ SysRet
 fdatasync(psx_fd_t fd);
 
 #endif
-
-#ifndef __NetBSD__
-#define RETURN_STAT_BUF(buf) { \
-    EXTEND(SP, 16);                \
-    mPUSHu( buf.st_dev );          \
-    mPUSHu( buf.st_ino );          \
-    mPUSHu( buf.st_mode );         \
-    mPUSHu( buf.st_nlink );        \
-    mPUSHu( buf.st_uid );          \
-    mPUSHu( buf.st_gid );          \
-    mPUSHu( buf.st_rdev );         \
-    if (sizeof(IV) < 8)            \
-        mPUSHn( buf.st_size );     \
-    else                           \
-        mPUSHi( buf.st_size );     \
-    mPUSHi( buf.st_atim.tv_sec );  \
-    mPUSHi( buf.st_mtim.tv_sec );  \
-    mPUSHi( buf.st_ctim.tv_sec );  \
-    /* actually these come before the times but we follow core stat */ \
-    mPUSHi( buf.st_blksize );      \
-    mPUSHi( buf.st_blocks );       \
-    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
-    mPUSHi( buf.st_atim.tv_nsec ); \
-    mPUSHi( buf.st_mtim.tv_nsec ); \
-    mPUSHi( buf.st_ctim.tv_nsec ); \
-}
-#else
-#define RETURN_STAT_BUF(buf) { \
-    EXTEND(SP, 16);                \
-    mPUSHu( buf.st_dev );          \
-    mPUSHu( buf.st_ino );          \
-    mPUSHu( buf.st_mode );         \
-    mPUSHu( buf.st_nlink );        \
-    mPUSHu( buf.st_uid );          \
-    mPUSHu( buf.st_gid );          \
-    mPUSHu( buf.st_rdev );         \
-    if (sizeof(IV) < 8)            \
-        mPUSHn( buf.st_size );     \
-    else                           \
-        mPUSHi( buf.st_size );     \
-    mPUSHi( buf.st_atime );  \
-    mPUSHi( buf.st_mtime );  \
-    mPUSHi( buf.st_ctime );  \
-    /* actually these come before the times but we follow core stat */ \
-    mPUSHi( buf.st_blksize );      \
-    mPUSHi( buf.st_blocks );       \
-    /* to stay compatible with pre-2008 stat we append the nanoseconds */ \
-    mPUSHi( buf.st_atimensec ); \
-    mPUSHi( buf.st_mtimensec ); \
-    mPUSHi( buf.st_ctimensec ); \
-}
-#endif
-
-void
-fstatat(psx_fd_t dirfd, char *path, int flags = 0);
-    INIT:
-        struct stat buf;
-    PPCODE:
-        if (fstatat(dirfd, path, &buf, flags) == 0)
-            RETURN_STAT_BUF(buf);
 
 void
 lstat(char *path);
@@ -1089,13 +1249,7 @@ SysRet
 link(char *path1, char *path2);
 
 SysRet
-linkat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath, int flags = 0);
-
-SysRet
 mkdir(char *path, mode_t mode);
-
-SysRet
-mkdirat(psx_fd_t dirfd, char *path, mode_t mode);
 
 char *
 mkdtemp(char *template);
@@ -1104,13 +1258,7 @@ SysRet
 mkfifo(char *path, mode_t mode);
 
 SysRet
-mkfifoat(psx_fd_t dirfd, char *path, mode_t mode);
-
-SysRet
 mknod(char *path, mode_t mode, dev_t dev);
-
-SysRet
-mknodat(psx_fd_t dirfd, char *path, mode_t mode, dev_t dev);
 
 void
 mkstemp(char *template);
@@ -1173,11 +1321,120 @@ fdopendir(psx_fd_t fd);
 
 ##
 ## POSIX::open(), read() and write() return "0 but true" for 0, which
-## is not quite what you want. We return a real 0.
+## is not quite what you would expect. We return a real 0.
 ##
 
 SysRet0
 open(char *path, int oflag = O_RDONLY, mode_t mode = 0600);
+
+SysRet
+close(SV *fd);
+  CODE:
+    RETVAL = psx_close(aTHX_ fd);
+  OUTPUT:
+    RETVAL
+
+#if !defined(AT_FDCWD) || (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000)
+void
+faccessat(...);
+  PPCODE:
+    croak("faccessat() not available");
+
+void
+fchmodat(...);
+  PPCODE:
+    croak("fchmodat() not available");
+
+void
+fchownat(...);
+  PPCODE:
+    croak("fchownat() not available");
+
+void
+fstatat(...);
+  PPCODE:
+    croak("fstatat() not available");
+
+void
+openat(...);
+  PPCODE:
+    croak("openat() not available");
+
+void
+linkat(...);
+  PPCODE:
+    croak("linkat() not available");
+
+void
+mkdirat(...);
+  PPCODE:
+    croak("mkdirat() not available");
+
+void
+mkfifoat(...);
+  PPCODE:
+    croak("mkfifoat() not available");
+
+void
+mknodat(...);
+  PPCODE:
+    croak("mknodat() not available");
+
+void
+readlinkat(...);
+  PPCODE:
+    croak("readlinkat() not available");
+
+void
+renameat(...);
+  PPCODE:
+    croak("renameat() not available");
+
+void
+symlinkat(...);
+  PPCODE:
+    croak("symlinkat() not available");
+
+void
+unlinkat(...);
+  PPCODE:
+    croak("unlinkat() not available");
+
+void
+utimensat(...);
+  PPCODE:
+    croak("utimensat() not available");
+
+#else
+
+SysRet
+faccessat(psx_fd_t dirfd, char *path, int amode, int flags = 0);
+
+SysRet
+fchmodat(psx_fd_t dirfd, char *path, mode_t mode, int flags = 0);
+
+SysRet
+fchownat(psx_fd_t dirfd, char *path, uid_t owner, gid_t group, int flags = 0);
+
+void
+fstatat(psx_fd_t dirfd, char *path, int flags = 0);
+    INIT:
+        struct stat buf;
+    PPCODE:
+        if (fstatat(dirfd, path, &buf, flags) == 0)
+            RETURN_STAT_BUF(buf);
+
+SysRet
+linkat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath, int flags = 0);
+
+SysRet
+mkdirat(psx_fd_t dirfd, char *path, mode_t mode);
+
+SysRet
+mkfifoat(psx_fd_t dirfd, char *path, mode_t mode);
+
+SysRet
+mknodat(psx_fd_t dirfd, char *path, mode_t mode, dev_t dev);
 
 void
 openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
@@ -1244,6 +1501,46 @@ openat(SV *dirfdsv, char *path, int oflag = O_RDONLY, mode_t mode = 0600);
       /* https://rt.perl.org/Public/Bug/Display.html?id=59268 */
       (void) hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
   }
+
+char *
+readlinkat(psx_fd_t dirfd, char *path);
+    CODE:
+        RETVAL = _readlink50c(path, &dirfd);
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        if (RETVAL != NULL)
+          Safefree(RETVAL);
+
+SysRet
+renameat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath);
+
+SysRet
+symlinkat(char *old, psx_fd_t newdirfd, char *new);
+
+SysRet
+unlinkat(psx_fd_t dirfd, char *path, int flags = 0);
+
+#ifndef UTIME_NOW
+void
+utimensat(...);
+  PPCODE:
+    croak("utimensat() not available");
+
+#else
+SysRet
+utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
+    INIT:
+        struct timespec times[2] = { { atime_sec, atime_nsec },
+                                     { mtime_sec, mtime_nsec } };
+    CODE:
+        RETVAL = utimensat(dirfd, path, times, flags);
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#endif
 
 SysRet0
 read(psx_fd_t fd, SV *buf, size_t count);
@@ -1440,6 +1737,21 @@ posix_fadvise(psx_fd_t fd, off_t offset, off_t len, int advice);
   OUTPUT:
     RETVAL
 
+#else
+void
+posix_fadvise(...);
+    PPCODE:
+        croak("posix_fadvise() not available");
+
+#endif
+
+#if (defined(__NetBSD_Version__) && __NetBSD_Version__ < 700000000) || defined(__OpenBSD__)
+void
+posix_fallocate(...);
+    PPCODE:
+        croak("posix_fallocate() not available");
+
+#else
 SysRet
 posix_fallocate(psx_fd_t fd, off_t offset, off_t len);
   CODE:
@@ -1447,17 +1759,6 @@ posix_fallocate(psx_fd_t fd, off_t offset, off_t len);
     RETVAL = errno ? -1 : 0;
   OUTPUT:
     RETVAL
-
-#else
-void
-posix_fadvise(...);
-    PPCODE:
-        croak("posix_fadvise() not available");
-
-void
-posix_fallocate(...);
-    PPCODE:
-        croak("posix_fallocate() not available");
 
 #endif
 
@@ -1475,28 +1776,14 @@ readlink(char *path);
         if (RETVAL != NULL)
             Safefree(RETVAL);
 
-char *
-readlinkat(psx_fd_t dirfd, char *path);
-    CODE:
-        RETVAL = _readlink50c(path, &dirfd);
-    OUTPUT:
-        RETVAL
-    CLEANUP:
-        if (RETVAL != NULL)
-            Safefree(RETVAL);
-
 #else
 void
 readlink(...);
   PPCODE:
     croak("readlink() not available");
 
-void
-readlinkat(...);
-  PPCODE:
-    croak("readlinkat() not available");
-
 #endif
+
 
 ##
 ## POSIX::remove() is incorrectly implemented as:
@@ -1510,13 +1797,7 @@ SysRet
 rename(char *old, char *new);
 
 SysRet
-renameat(psx_fd_t olddirfd, char *oldpath, psx_fd_t newdirfd, char *newpath);
-
-SysRet
 symlink(char *old, char *new);
-
-SysRet
-symlinkat(char *old, psx_fd_t newdirfd, char *new);
 
 void
 sync();
@@ -1526,9 +1807,6 @@ truncate(char *path, off_t length);
 
 SysRet
 unlink(char *path);
-
-SysRet
-unlinkat(psx_fd_t dirfd, char *path, int flags = 0);
 
 #ifdef UTIME_NOW
 SysRet
@@ -1541,26 +1819,11 @@ futimens(psx_fd_t fd, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t 
     OUTPUT:
         RETVAL
 
-SysRet
-utimensat(psx_fd_t dirfd, char *path, int flags = 0, time_t atime_sec = 0, long atime_nsec = UTIME_NOW, time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
-    INIT:
-        struct timespec times[2] = { { atime_sec, atime_nsec },
-                                     { mtime_sec, mtime_nsec } };
-    CODE:
-        RETVAL = utimensat(dirfd, path, times, flags);
-    OUTPUT:
-        RETVAL
-
 #else
 void
 futimens(...);
     PPCODE:
         croak("futimens() not available");
-
-void
-utimensat(...);
-    PPCODE:
-        croak("futimensat() not available");
 
 #endif
 

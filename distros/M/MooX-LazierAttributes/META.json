@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooX-LazierAttributes",
    "no_index" : {
@@ -22,7 +22,7 @@
    "provides" : {
       "MooX::LazierAttributes" : {
          "file" : "lib/MooX/LazierAttributes.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -33,6 +33,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-LazierAttributes"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.108';
+$Config::Model::Backend::PlainFile::VERSION = '2.110';
 use 5.10.1;
 use Carp;
 use Mouse;
@@ -210,7 +210,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -223,12 +223,10 @@ version 2.108
     element => [ 
         [qw/source new/] => { qw/type leaf value_type uniline/ },
     ],
-    read_config  => [ 
-        { 
-            backend => 'plain_file', 
-            config_dir => '/tmp',
-        },
-    ],
+    rw_config  => {
+      backend => 'plain_file',
+      config_dir => '/tmp',
+    },
  );
  
  my $inst = $model->instance(root_class_name => 'WithPlainFile' );
@@ -285,12 +283,12 @@ For instance, with the following model:
         string_a => { type => 'leaf', value_type => 'string'}
         string_b => { type => 'leaf', value_type => 'string'}
     ],
-    read_config => [{
+    rw_config => {
         backend => 'PlainFile',
         config_dir => 'foo',
         file => '&element(-).&element',
         file_mode => 0644,  # optional
-    }]
+    }
 
 If the configuration is loaded with C<example string_a=something
 string_b=else>, this backend writes "C<something>" in file

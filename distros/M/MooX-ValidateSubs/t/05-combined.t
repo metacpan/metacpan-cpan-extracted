@@ -45,7 +45,7 @@ is_deeply(\%list, {
     two => 'Goodbye World', 
     three => 'Add a value', 
     four => 'I live in my own world', 
-    five => { one =>two } 
+    five => { one => 'two' } 
 }, "list returns 5 key/value pairs");
 
 my %over = $maybe->hash( one => 'can be set', two => 'can be set' );
@@ -54,7 +54,7 @@ is_deeply(\%over, {
     two => 'can be set', 
     three => 'Add a value', 
     four => 'I live in my own world', 
-    five => { one =>two } 
+    five => { one => 'two' } 
 }, "list returns 5 key/value pairs");
 
 eval { $maybe->hash( three => 'cannot be set' ) };

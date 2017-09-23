@@ -1,0 +1,10 @@
+Revision history for VSGDR::MergeData
+
+0.01    18/09/2017
+        First version, released on an unsuspecting world.  Broken.
+0.02    18/09/2017
+        Fixed merge statement.
+0.03    19/09/2017
+        Fixed merge statement filter.
+
+

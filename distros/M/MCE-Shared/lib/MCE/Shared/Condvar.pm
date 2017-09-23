@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.829';
+our $VERSION = '1.831';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -30,22 +30,6 @@ my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_has_threads = $INC{'threads.pm'} ? 1 : 0;
 my $_tid = $_has_threads ? threads->tid() : 0;
 my $_reset_flg = 1;
-
-sub new {
-   my ($_class, $_cv) = (shift, {});
-
-   $_cv->{_init_pid} = $_has_threads ? $$ .'.'. $_tid : $$;
-   $_cv->{_mutex}    = MCE::Mutex->new( impl => 'Channel' );
-   $_cv->{_value}    = shift || 0;
-   $_cv->{_count}    = 0;
-
-   MCE::Util::_sock_pair($_cv, qw(_cr_sock _cw_sock));
-
-   MCE::Shared::Object::_reset(), $_reset_flg = ''
-      if $_reset_flg && $INC{'MCE/Shared/Server.pm'};
-
-   bless $_cv, $_class;
-}
 
 sub CLONE {
    $_tid = threads->tid() if $_has_threads;
@@ -69,10 +53,26 @@ sub DESTROY {
 ##
 ###############################################################################
 
+sub new {
+   my ($_class, $_cv) = (shift, {});
+
+   $_cv->{_init_pid} = $_has_threads ? $$ .'.'. $_tid : $$;
+   $_cv->{_mutex}    = MCE::Mutex->new( impl => 'Channel' );
+   $_cv->{_value}    = shift || 0;
+   $_cv->{_count}    = 0;
+
+   MCE::Util::_sock_pair($_cv, qw(_cr_sock _cw_sock));
+
+   MCE::Shared::Object::_reset(), $_reset_flg = ''
+      if $_reset_flg && $INC{'MCE/Shared/Server.pm'};
+
+   bless $_cv, $_class;
+}
+
 sub get { $_[0]->{_value} }
 sub set { $_[0]->{_value} = $_[1] }
 
-# The following methods applies to sharing only and are handled by
+# The following methods applies to shared-context only and handled by
 # MCE::Shared::Object.
 
 sub lock      { }
@@ -372,7 +372,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.829
+This document describes MCE::Shared::Condvar version 1.831
 
 =head1 DESCRIPTION
 

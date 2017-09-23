@@ -1,0 +1,53 @@
+Revision history for Syntax-Highlight-Engine-Simple
+
+0.101 2017/09/21
+
+    - Metadata updates (license, homepage, repository)
+
+0.10  2017/09/20
+
+    - Fixed: Tests on Perl 5.26 (encoding pragma no longer supported)
+
+0.09  2011/07/07
+    
+    - Fixed: PBP test passed
+	
+0.08  2008/07/29
+    
+    - Fixed: Bug on priority control(test6 in highlight.t) on some invironment
+
+0.07  2008/07/28
+    
+    - Fixed: Some Perl::Critic violations
+
+0.06  2008/07/27
+    
+    - Improved: Optimized the architecture and the performance on some
+        situation has improved
+    - Improved: The document edited
+
+0.05  Sat Jul 16 00:53:00 2008
+	
+	- Fixed: Perl::Critic test now requires version 1.088 or later
+	- Fixed: Bug in complicated rule definition.
+	- Added: Posibility to define allowed container by array.
+
+0.04  Sat Jul 13 15:33:25 2008
+	
+	- Fixed: Perl::Critic test failure in certain environment
+
+0.03  Sat Jul 13 15:33:25 2008
+	
+	- Fixed: Perl::Critic test failure in certain environment
+	- Fixed: Bug in appendSyntax method
+
+0.02  Sat Jul 13 15:33:25 2008
+	
+	- Fixed: getClassNames method
+	- Fixed: POD
+	- Changed: Syntax format. allowed_container(array) abolished and
+        container(string) adopted.
+
+0.0.1  Mon Jul  7 14:13:17 2008
+    
+    - Initial release.

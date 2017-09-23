@@ -15,6 +15,7 @@ my $bad_meta_tags = HTML::SocialMeta->new(
     site_name => 'Example Site, anything',
     description => 'Description goes here may have to do a little validation',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     url	 => 'www.someurl.com',
 );
 
@@ -25,8 +26,8 @@ throws_ok{$bad_meta_tags->opengraph->create_article} qr/you have not set this fi
 my $social = HTML::SocialMeta->new();
 my @social_required_fields = $social->required_fields('summary');
 
-my @expected_fields = ( qw{name description image card site title type site_name fb_app_id} );
-my @expected_player_fields = ( qw{name description image card site title player player_width player_height type site_name fb_app_id} );
+my @expected_fields = ( qw{name description image image_alt card site title type site_name fb_app_id} );
+my @expected_player_fields = ( qw{name description image image_alt card site title player player_width player_height type site_name fb_app_id} );
 
 is(@social_required_fields, @expected_fields);
 

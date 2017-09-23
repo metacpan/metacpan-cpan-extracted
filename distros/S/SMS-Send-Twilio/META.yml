@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,9 @@ no_index:
 requires:
   SMS::Send: '1'
   WWW::Twilio::API: '0.15'
-  perl: '5.006001'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/mbeijen/SMS-Send-Twilio/issues
   repository: https://github.com/mbeijen/SMS-Send-Twilio
-version: '0.18'
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

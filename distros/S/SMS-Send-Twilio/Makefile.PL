@@ -9,7 +9,7 @@ WriteMakefile(
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30",
   },
-  "MIN_PERL_VERSION" => "5.6.1",
+  "MIN_PERL_VERSION" => "5.10.1",
   "DISTNAME" => "SMS-Send-Twilio",
   "EXE_FILES" => [],
   "LICENSE" => "perl",

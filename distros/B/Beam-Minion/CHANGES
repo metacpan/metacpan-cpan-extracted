@@ -1,5 +1,62 @@
 Changelog for Beam-Minion
 
+0.011     2017-09-19 15:18:44-05:00 America/Chicago
+
+    [Fixed]
+
+    - Added missing prereq on Module::Runtime. Thanks @manwar and
+      CPANTS!
+
+0.010     2017-09-18 14:06:38-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed job command not processing options
+
+0.009     2017-09-18 13:25:40-05:00 America/Chicago
+
+    [Added]
+
+    - Added "beam minion job" command to list jobs, retry jobs, list
+      workers, and otherwise manage the job queue. This is a proxy for
+      the Minion::Command::minion::job command.
+
+    [Fixed]
+
+    - Fixed tests that fail when BEAM_MINION environment variable is set
+    - Fixed worker only loading one container file instead of all
+      container files
+
+0.008     2017-09-17 18:00:34-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed minimum version of Getopt::Long prerequisite
+
+0.007     2017-09-17 17:54:51-05:00 America/Chicago
+
+    [Changed]
+
+    - The worker is now able to run tasks from all containers by
+      default. This opens up Minion queues to be used for other
+      purposes, such as prioritization and partitioning jobs.
+
+    - BREAKING CHANGE: The `Beam::Minion::enqueue` method now accepts an
+      arrayref of args and a hashref of options. Previously, the
+      arguments were allowed as a list, but this prevented us from
+      adding the options hashref.
+
+    [Added]
+
+    - Added options to the `beam minion run` command to set job
+      auto-retry, job delay, and job priority.
+
+    [Fixed]
+
+    - Added better exception handling to Minion jobs. Now if the service
+      dies during construction, or the `run` method throws an exception,
+      the job result will reflect this and show the exception.
+
 0.006     2017-08-22 18:48:33-05:00 America/Chicago
 
     [Fixed]

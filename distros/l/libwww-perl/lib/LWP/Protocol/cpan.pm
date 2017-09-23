@@ -1,5 +1,5 @@
 package LWP::Protocol::cpan;
-$LWP::Protocol::cpan::VERSION = '6.26';
+$LWP::Protocol::cpan::VERSION = '6.27';
 use strict;
 
 use base qw(LWP::Protocol);

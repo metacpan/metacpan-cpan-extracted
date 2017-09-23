@@ -33,6 +33,7 @@ my @files = (
     'lib/Code/TidyAll/Plugin/SortLines.pm',
     'lib/Code/TidyAll/Result.pm',
     'lib/Code/TidyAll/Role/HasIgnore.pm',
+    'lib/Code/TidyAll/Role/RunsCommand.pm',
     'lib/Code/TidyAll/Role/Tempdir.pm',
     'lib/Code/TidyAll/SVN/Precommit.pm',
     'lib/Code/TidyAll/SVN/Util.pm',

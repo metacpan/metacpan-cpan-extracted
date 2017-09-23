@@ -1,0 +1,42 @@
+[%- USE scalar -%]
+[%- WRAPPER site_wrapper.html 
+  title = 'Categories'
+-%]
+[%- SET 
+ p      = c.req.query_params
+ result = list_categories( p )
+ categories  = result.rows
+-%]
+
+  <div class="blog-post">
+    [% IF result.total > 0 %]
+  
+      <div style="padding-bottom:15px;">
+        [% IF result.params.sort == 'alphabetical' %]
+          <h3>Categories (alphabetical)</h3>
+          <a href="?[% this_qs %]&new_sort=popularity">Sort by popularity</a>
+        [% ELSIF result.params.sort == 'recent' %]
+          <h3>Categories (most recently used)</h3>
+           <a href="?[% this_qs %]&new_sort=alphabetical">Sort alphabetically</a>
+				[% ELSE %]
+          <h3>Categories (by popularity)</h3>
+          <a href="?[% this_qs %]&new_sort=recent">Sort by most recent</a>
+        [% END %]
+       </div>
+    
+      <ul>
+        [% FOREACH category IN categories %]
+          <li>
+            <a href="[%- mount_url -%]/list?category=[% category.name %]">[% category.name %]</a> 
+            ([% category.posts_count %])
+          </li>
+        [% END %]
+      </ul>
+    [% ELSE %]
+      <ul></ul>
+      <h4>No categories found.</h4>
+    [% END %]
+  
+  </div>
+
+[% END %]

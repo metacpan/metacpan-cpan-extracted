@@ -20,6 +20,7 @@ perlcriticrc.local
 t/00-load.t
 t/basic.t
 t/basic2.t
+t/lib/Local/HTTP/Tiny/Mock.pm
 xt/author/clean-namespaces.t
 xt/author/critic.t
 xt/author/minimum_version.t
@@ -31,6 +32,7 @@ xt/author/pod-syntax.t
 xt/author/portability.t
 xt/author/test-version.t
 xt/release/changes.t
+xt/release/distmeta.t
 xt/release/eol.t
 xt/release/kwalitee.t
 xt/release/manifest.t

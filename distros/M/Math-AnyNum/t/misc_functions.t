@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 257;
+plan tests => 272;
 
 use Math::AnyNum qw(:misc);
 
@@ -17,6 +17,9 @@ ok(rand(0.2) < 0.2, 'rand(0.2) < 0.2');
 
 ok(rand(0, 2) < 2,       'rand(2) < 2');
 ok(rand(0, 1000) < 1000, 'rand(0, 1000) < 1000');
+
+ok(rand(123, 130) >= 123);
+ok(rand(123, 130) < 130);
 
 is(irand(0), 0);
 ok(irand(1) <= 1, 'irand(1) <= 1');
@@ -340,6 +343,11 @@ ok(is_div(float('17'),    complex('3.4')));
 ok(is_div(rat('17'),      complex('3.4')));
 ok(is_div(complex('17'),  complex('3.4')));
 
+ok(is_rat(rat('1/2')));
+ok(!is_rat(complex('3+4i')));
+ok(is_rat('1234'));
+ok(!is_rat('3+4i'));
+
 ok(is_real(complex('4')));           # true
 ok(not is_real(complex('4i')));      # false (is imaginary)
 ok(not is_real(complex('3+4i')));    # false (is complex)
@@ -355,3 +363,15 @@ ok(is_complex(complex('3+4i')));     # true
 is(round('1234.567'), '1235');
 is(round('1234.567',     2),  '1200');
 is(round('3.123+4.567i', -2), '3.12+4.57i');
+
+is(rat_approx('-0.6180339887'),    '-260497/421493');
+is(rat_approx('1.008155930329'),   '7293/7234');
+is(rat_approx('1.0019891835756'),  '524875/523833');
+is(rat_approx('-529.12424242424'), '-174611/330');
+
+is(rat_approx($o->new_q(1,  6)->as_dec),  '1/6');
+is(rat_approx($o->new_q(13, 6)->as_dec),  '13/6');
+is(rat_approx($o->new_q(6,  13)->as_dec), '6/13');
+
+is(rat_approx($o->new_f('-5.0108932461873638344226579520697167755991285403')), '-2300/459');
+is(rat_approx($o->new_f('-5.0544662309368191721132897603485838779956427015')), '-2320/459');

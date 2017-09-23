@@ -1,7 +1,11 @@
 
 Release history for Importer-Zim
 
-0.2.0     2017-09-13 14:47:24-07:00 America/Los_Angeles
+0.3.0     2017-09-15 19:51:53-07:00 America/Los_Angeles
+
+    - Require +Lexical 0.5.0+
+
+v0.2     2017-09-13 14:47:24-07:00 America/Los_Angeles
 
     - Add SEE ALSO pod section
     - add DESCRIPTION pod section

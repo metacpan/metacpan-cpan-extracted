@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.10",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "AnySan::Provider::Slack" : {
          "file" : "lib/AnySan/Provider/Slack.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,11 @@
          "web" : "https://github.com/shogo82148/p5-AnySan-Provider-Slack"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:SHOGO",
    "x_contributors" : [
+      "nukokusa <nagashima-daisuke@kayac.com>",
       "Ichinose Shogo <shogo82148@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27202"
 }

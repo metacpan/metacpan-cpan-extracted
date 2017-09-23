@@ -18,7 +18,7 @@ sub decompress ($self) {
 
     syswrite $temp, $self->buffer->$* or die;
 
-    my $res = P->pm->run_proc( [ qw[html-beautify], $html_beautify_args, '--replace', qq["$temp"] ], win32_create_no_window => 1 );
+    my $proc = P->pm->run_proc( qq[html-beautify $html_beautify_args --replace "$temp"], win32_create_no_window => 1 );
 
     $self->buffer->$* = P->file->read_bin( $temp->path )->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 

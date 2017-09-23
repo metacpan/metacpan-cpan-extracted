@@ -35,3 +35,11 @@ Revision history for Data-Dx
 
     Added support for Term::ANSIColor under Windows
     (Thanks William!)
+
+
+0.000008  Sun Sep 17 17:27:07 2017
+
+    Noted prereq for Win32::Console::ANSI on Windows platforms
+
+    Fixed (I hope!) segfaulting on large data structures
+    (Thanks, Joel)

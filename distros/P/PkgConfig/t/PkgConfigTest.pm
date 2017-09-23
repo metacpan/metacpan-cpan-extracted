@@ -40,7 +40,7 @@ $ENV{PKG_CONFIG_PATH} = join($Config{path_sep}, @PC_PATHS);
 our $RV;
 our $S;
 
-my $SCRIPT = $FindBin::Bin . "/../script/ppkg-config";
+my $SCRIPT = "$FindBin::Bin/../script/ppkg-config";
 
 # Work around git on windows' lamentable lack of symbolic
 # link support

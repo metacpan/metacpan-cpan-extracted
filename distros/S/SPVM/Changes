@@ -1,3 +1,61 @@
+0.0270 2017-09-22
+  - fix 0 length string bug
+0.0269 2017-09-21
+  - add SPVM::Object::Array::Short::set_data()
+  - add SPVM::Object::Array::Int::set_data()
+  - add SPVM::Object::Array::Long::set_data()
+  - add SPVM::Object::Array::Float::set_data()
+  - add SPVM::Object::Array::Double::set_data()
+  - add SPVM::Object::Array::Short::to_data()
+  - add SPVM::Object::Array::Int::to_data()
+  - add SPVM::Object::Array::Long::to_data()
+  - add SPVM::Object::Array::Float::to_data()
+  - add SPVM::Object::Array::Double::to_data()
+  - add SPVM::new_short_array_data()
+  - add SPVM::new_int_array_data()
+  - add SPVM::new_long_array_data()
+  - add SPVM::new_float_array_data()
+  - add SPVM::new_double_array_data()
+  - add SPVM::Object::Array::Byte::set_elements_range()
+  - add SPVM::Object::Array::Short::set_elements_range()
+  - add SPVM::Object::Array::Int::set_elements_range()
+  - add SPVM::Object::Array::Long::set_elements_range()
+  - add SPVM::Object::Array::Float::set_elements_range()
+  - add SPVM::Object::Array::Double::set_elements_range()
+  - add SPVM::Object::Array::Byte::set_data_range()
+  - add SPVM::Object::Array::Short::set_data_range()
+  - add SPVM::Object::Array::Int::set_data_range()
+  - add SPVM::Object::Array::Long::set_data_range()
+  - add SPVM::Object::Array::Float::set_data_range()
+  - add SPVM::Object::Array::Double::set_data_range()
+  - add SPVM::Object::Array::Byte::to_array_range()
+  - add SPVM::Object::Array::Short::to_array_range()
+  - add SPVM::Object::Array::Int::to_array_range()
+  - add SPVM::Object::Array::Long::to_array_range()
+  - add SPVM::Object::Array::Float::to_array_range()
+  - add SPVM::Object::Array::Double::to_array_range()
+  - add SPVM::Object::Array::Byte::to_data_range()
+  - add SPVM::Object::Array::Short::to_data_range()
+  - add SPVM::Object::Array::Int::to_data_range()
+  - add SPVM::Object::Array::Long::to_data_range()
+  - add SPVM::Object::Array::Float::to_data_range()
+  - add SPVM::Object::Array::Double::to_data_range()
+
+0.0268 2017-09-19
+  - remove string type. SPVM string become byte[].
+  - SPVM::new_string_bytes renamed to SPVM::new_byte_array_data and return SPVM::Array::Byte object
+  - SPVM::new_string renamed to SPVM::new_byte_array_string and return SPVM::Array::Byte object
+  - rename get_elements to to_array
+  - rename get_string to to_string
+  - rename get_data to to_data
+  
+0.0267 2017-09-18
+  - add .= operator
+0.0266 2017-09-16
+  - fix bug that empty string is not used
+  - rename SPVM::new_string_raw to SPVM::new_string_bytes
+  - implement . operator to concat string
+  - renmae println to say
 0.0265 2017-09-13
   - fix clang duplicate symbol bug
 0.0264 2017-09-12

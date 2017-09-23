@@ -3,60 +3,52 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __BesselY__ => qw(Math::MPFR Math::GMPz) => sub {
+sub __BesselY__ {
     my ($x, $n) = @_;
+    goto(join('__', ref($x), ref($n) || 'Scalar') =~ tr/:/_/rs);
 
-    $n = Math::GMPz::Rmpz_get_d($n);
+  Math_MPFR__Scalar: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
 
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-
-    if (   $n < Math::AnyNum::LONG_MIN
-        or $n > Math::AnyNum::ULONG_MAX) {
-
-        if (Math::MPFR::Rmpfr_sgn($x) < 0 or !Math::MPFR::Rmpfr_number_p($x)) {
-            Math::MPFR::Rmpfr_set_nan($r);
-            return $r;
+        if ($n == 0) {
+            Math::MPFR::Rmpfr_y0($r, $x, $ROUND);
         }
-
-        if ($n < 0) {
-            Math::MPFR::Rmpfr_set_inf($r, 1);
+        elsif ($n == 1) {
+            Math::MPFR::Rmpfr_y1($r, $x, $ROUND);
         }
         else {
-            Math::MPFR::Rmpfr_set_inf($r, -1);
+            Math::MPFR::Rmpfr_yn($r, $n, $x, $ROUND);
         }
 
         return $r;
     }
 
-    if ($n == 0) {
-        Math::MPFR::Rmpfr_y0($r, $x, $ROUND);
-    }
-    elsif ($n == 1) {
-        Math::MPFR::Rmpfr_y1($r, $x, $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_yn($r, $n, $x, $ROUND);
-    }
+  Math_MPFR__Math_GMPz: {
 
-    $r;
-};
+        $n = Math::GMPz::Rmpz_get_d($n);
 
-Class::Multimethods::multimethod __BesselY__ => qw(Math::MPFR $) => sub {
-    my ($x, $n) = @_;
+        if (   $n < Math::AnyNum::LONG_MIN
+            or $n > Math::AnyNum::ULONG_MAX) {
 
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
+            my $r = Math::MPFR::Rmpfr_init2($PREC);
 
-    if ($n == 0) {
-        Math::MPFR::Rmpfr_y0($r, $x, $ROUND);
+            if (Math::MPFR::Rmpfr_sgn($x) < 0 or !Math::MPFR::Rmpfr_number_p($x)) {
+                Math::MPFR::Rmpfr_set_nan($r);
+                return $r;
+            }
+
+            if ($n < 0) {
+                Math::MPFR::Rmpfr_set_inf($r, 1);
+            }
+            else {
+                Math::MPFR::Rmpfr_set_inf($r, -1);
+            }
+
+            return $r;
+        }
+
+        goto Math_MPFR__Scalar;
     }
-    elsif ($n == 1) {
-        Math::MPFR::Rmpfr_y1($r, $x, $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_yn($r, $n, $x, $ROUND);
-    }
-
-    $r;
-};
+}
 
 1;

@@ -2,8 +2,8 @@ NAME
     ShellQuote::Any::Tiny - Escape string for the Unix/Windows shell
 
 VERSION
-    This document describes version 0.005 of ShellQuote::Any::Tiny (from
-    Perl distribution ShellQuote-Any-Tiny), released on 2017-08-16.
+    This document describes version 0.007 of ShellQuote::Any::Tiny (from
+    Perl distribution ShellQuote-Any-Tiny), released on 2017-09-20.
 
 SYNOPSIS
      use ShellQuote::Any::Tiny qw(shell_quote);

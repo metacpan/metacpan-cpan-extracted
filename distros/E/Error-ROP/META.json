@@ -31,7 +31,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Moose" : "0"
+            "Moose" : "0",
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -51,7 +52,7 @@
          "web" : "https://github.com/paudirac/Error-ROP"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

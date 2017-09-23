@@ -67,7 +67,6 @@ Puts data to task.
 
     $self->put( $data );
 
-
 =head2 C<get>
 
 Tries to read result from task.
@@ -120,12 +119,11 @@ use Moose;
 use namespace::autoclean;
 use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
-use File::Temp ();
+use File::Spec;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 extends 'Async::Simple::Task::Fork';
-
 
 =head1 Attributes
 
@@ -197,6 +195,35 @@ internal. Some tricks here:)
 
 =cut
 
+#  Writable pipe between parent and child.
+#  Each of them has pair of handlers, for duplex communication.
+has writer => (
+    is       => 'rw',
+    isa      => 'Str',
+);
+
+
+#   Readable pipe between parent and child.
+#   Each of them has pair of handlers, for duplex communication.
+has reader => (
+    is       => 'rw',
+    isa      => 'Str',
+);
+
+
+#   Path to store temporary files
+#   During taint -T mode always writes files to current directory ( path = '' )
+#   Windows outside taint -T mode writes files by default to C:\TEMP or C:\TMP
+#   Unix    outside taint -T mode writes files by default to /var/tmp/
+#   You can set this to any destination path you like
+# TODO: use it!
+#has tmp_dir => (
+#    is       => 'rw',
+#    isa      => 'Str',
+#    builder  => sub { File::Spec->tmpdir() },
+#    required => 1,
+#);
+
 
 =head2 fork_child
 
@@ -207,25 +234,24 @@ Makes child process and returns pid of child process to parent or 0 to child pro
 sub fork_child {
     my ( $self ) = @_;
 
-    # Connections via tmp files: parent -> child and child -> parent
-    my $parent_writer = File::Temp->new();
-    my $parent_reader = File::Temp->new();
+    my $tmp_dir = File::Spec->tmpdir();
 
-    my $parent_writer_fname = $parent_writer->filename;
-    my $parent_reader_fname = $parent_reader->filename;
+    my $parent_writer_fname = File::Spec->catfile( $tmp_dir, '_pw_tmp_' . int( rand 999_999_999_999 ) );
+    my $parent_reader_fname = File::Spec->catfile( $tmp_dir, '_pr_tmp_' . int( rand 999_999_999_999 ) );
 
+    # For WIN taint mode calculated path starts with '\'. Remove it and stay at current dir
+    $parent_reader_fname =~ s/^\\//;
+    $parent_writer_fname =~ s/^\\//;
 
     my $pid = fork() // die "fork() failed: $!";
 
+    # With taint mode we use current directory as temp,
+    # Otherwise - default writable temp directory from File::Spec->tmpdir();
+
     # child
     unless ( $pid ) {
-        open( my $child_reader, '<', $parent_writer_fname );
-        open( my $child_writer, '>', $parent_reader_fname );
-
-        $child_writer->autoflush(1);
-
-        $self->writer( $child_writer );
-        $self->reader( $child_reader );
+        $self->writer( $parent_reader_fname );
+        $self->reader( $parent_writer_fname );
 
         # Important!
         # Just after that we trap into BUILD
@@ -234,10 +260,8 @@ sub fork_child {
     }
 
     # parent
-    $parent_writer->autoflush(1);
-
-    $self->writer( $parent_writer );
-    $self->reader( $parent_reader );
+    $self->writer( $parent_writer_fname );
+    $self->reader( $parent_reader_fname );
 
     return $pid;
 };
@@ -258,37 +282,18 @@ Please note! If your function can return an undef value, then you shoud check
 sub get {
     my ( $self ) = @_;
 
-    my $fh = $self->reader;
-    my $data;
-
     # Try to read "marker" into data within timeout
     # Each pack starts with an empty line and serialized string of useful data.
-    eval {
-        local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-        alarm $self->timeout;
-        $data = <$fh>;
-        alarm 0;
-    } or do {
-        # Can't read data
-        return unless $data;
-        # Alarm caught but something readed, will continue
-        undef $@;
-    };
+    open( my $fh, '<', $self->reader ) or return;
+
+    my $data = <$fh>;
 
     return unless defined $data;
-    return unless $data eq "-\n";
+    return unless $data =~ /\n/;
 
-    # Read useful data without any timeouts
-    # or die, if parent/child has closed connection
-    undef $data;
+    close( $fh );
 
-    for ( 1..1000 ) {
-        $data = <$fh>;
-        last  if defined $data;
-        sleep $self->timeout;
-    }
-
-    return unless defined $data;
+    unlink $self->reader;
 
     my $answer = $data
         ? eval{ $self->serializer->deserialize( $data )->[0] }
@@ -306,6 +311,20 @@ Writes task to task.
 
 =cut
 
+sub put {
+    my ( $self, $data ) = @_;
+
+    unlink $self->writer;
+    $self->clear_answer;
+
+    open( my $fh, '>', $self->writer );
+
+    # Each pack starts with an empty line and serialized string of useful data
+    say $fh $self->serializer->serialize( [ $data ] );
+
+    close $fh;
+};
+
 
 =head2 get_serializer
 
@@ -317,6 +336,21 @@ By default returns Data::Serializer with Storable as backend.
     $result_ref = $self->serializer->deserialize();
 
 =cut
+
+
+=head2 DEMOLISH
+
+Destroys object and probably should finish the child process.
+
+=cut
+
+sub DEMOLISH {
+    my ( $self ) = @_;
+
+    unlink $self->writer;
+    unlink $self->reader;
+}
+
 
 
 __PACKAGE__->meta->make_immutable;

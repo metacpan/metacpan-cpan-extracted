@@ -13,15 +13,15 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.829';
+our $VERSION = '1.831';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-use Time::HiRes 'sleep';
 use MCE::Shared ();
+use Time::HiRes 'sleep';
 use bytes;
 
 use overload (
@@ -769,7 +769,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.829
+This document describes MCE::Hobo version 1.831
 
 =head1 SYNOPSIS
 

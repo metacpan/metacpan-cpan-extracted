@@ -1,0 +1,10 @@
+Revision history for Perl extension File::Replace.
+
+0.04	Sun, Sep 17 2017
+	- updated minimum Perl version to 5.8.1 (was 5.8.0)
+	- fixed various compatibility issues in Perls 5.8.1 thru 5.24
+	- no feature or documentation changes
+
+0.02	Sat, Sep 16 2017	commit 86f91ad496fc36d683e0464460004d9c3decf1a9
+	- first public release
+

@@ -1,6 +1,19 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.831 Tue Sep 19 23:00:00 EST 2017
+
+  * Resolved crash on the Windows platform for older Perl (< v5.18).
+    Older Perl must continue to run the shared-server as a thread.
+    Thank you CPAN testers, CHORNY and NONAME.
+
+  * Re-enabled Condvar testing on the Windows platform.
+
+1.830 Fri Sep 15 23:00:00 EST 2017
+
+  * Disabled Condvar tests on the Windows platform. I'm unable to replicate
+    the exit behavior reported by two smoke machines running Windows.
+
 1.829 Thu Sep 14 23:00:00 EST 2017
 
   * Disabled Condvar tests on Windows machine without IO::FDPass.

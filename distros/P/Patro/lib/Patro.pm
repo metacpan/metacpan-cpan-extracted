@@ -1,46 +1,19 @@
 package Patro;
 use strict;
 use warnings;
+use Patro::Mony;
 use Patro::LeumJelly;
 use Scalar::Util;
 use Data::Dumper;
 use Socket ();
 use Carp;
 use base 'Exporter';
+no overloading '%{}', '${}';
+
 our @EXPORT = qw(patronize getProxies);
+our $VERSION = '0.15';
 
-our $VERSION = '0.14';
-
-BEGIN {
-    if (defined &CORE::read) {
-	*CORE::GLOBAL::read = sub (*\$$;$) {
-	    $Patro::read_sysread_flag = 'read';
-	    goto &CORE::read if defined &CORE::read;
-	};
-	*CORE::GLOBAL::sysread = sub (*\$$;$) {
-	    $Patro::read_sysread_flag = 'sysread';
-	    goto &CORE::sysread if defined &CORE::sysread;
-	};
-    } else {
-	$Patro::read_sysread_flag = 'read?';
-    }
-    *CORE::GLOBAL::ref = \&Patro::ref;
-    *CORE::GLOBAL::truncate = \&Patro::_truncate;
-    *CORE::GLOBAL::stat = \&Patro::_stat;
-    *CORE::GLOBAL::flock = \&Patro::_flock;
-    *CORE::GLOBAL::fcntl = \&Patro::_fcntl;
-
-    *CORE::GLOBAL::sysopen = \&Patro::_sysopen;
-    *CORE::GLOBAL::lstat = \&Patro::_lstat;
-
-    *CORE::GLOBAL::opendir = \&Patro::_opendir;
-    *CORE::GLOBAL::closedir = \&Patro::_closedir;
-    *CORE::GLOBAL::readdir = \&Patro::_readdir;
-    *CORE::GLOBAL::seekdir = \&Patro::_seekdir;
-    *CORE::GLOBAL::telldir = \&Patro::_telldir;
-    *CORE::GLOBAL::rewinddir = \&Patro::_rewinddir;
-    *CORE::GLOBAL::chdir = \&Patro::_chdir;
-}
+BEGIN { *CORE::GLOBAL::ref = \&Patro::ref };
 
 sub import {
     my ($class, @args) = @_;
@@ -49,8 +22,8 @@ sub import {
     $Patro::SECURE = 1;
     foreach my $tag (@tags) {
 	if ($tag eq ':test') {
-	    require Patro::Server;
-	    Patro::Server->TEST_MODE;
+	    require Patro::Archy;
+	    Patro::Archy->TEST_MODE;
 
 	    # a poor man's Data::Dumper, but works for Patro::N objects.
 	    *xjoin = sub {
@@ -74,11 +47,11 @@ sub import {
     }		
     eval "use threads;1";
     eval "use threadsx::shared";
-    $Patro::Server::threads_avail = $threads::threads;
+    $Patro::Archy::threads_avail = $threads::threads;
     if (!defined &threads::tid) {
 	*threads::tid = sub { 0 };
     }
-    if ($ENV{PATRO_THREADS} && !$Patro::Server::threads_avail) {
+    if ($ENV{PATRO_THREADS} && !$Patro::Archy::threads_avail) {
 	warn "Threaded Patro server was requested but was not available\n";
     }
     Patro->export_to_level(1, 'Patro', @args, @EXPORT);
@@ -89,8 +62,8 @@ sub nize { goto &patronize }
 
 sub patronize {
     croak 'usage: Patro::patronize(@refs)' if @_ == 0;
-    require Patro::Server;
-    my $server = Patro::Server->new({}, @_);
+    require Patro::Archy;
+    my $server = Patro::Archy->new({}, @_);
     return $server->{config};
 }
 
@@ -101,7 +74,7 @@ sub ref (_) {
 	return $ref;
     }
     my $handle = Patro::LeumJelly::handle($obj);
-    return _fetch($handle, "ref");
+    return $handle->{ref};
 }
 
 sub reftype {
@@ -110,7 +83,7 @@ sub reftype {
 	return Scalar::Util::reftype($_[0]);
     }
     my $handle = Patro::LeumJelly::handle($_[0]);
-    return _fetch($handle, "reftype");
+    return $handle->{reftype};
 }
 
 sub _allrefs {
@@ -122,27 +95,7 @@ sub client {
     if (!Patro::LeumJelly::isProxyRef(CORE::ref($_[0]))) {
 	return;     # not a remote proxy object
     }
-    return _fetch(Patro::LeumJelly::handle($_[0]),"client");
-}
-
-sub _fetch {
-    # _fetch HASH, LIST
-    #     where HASH is an object that overloads the '%{}' 
-    #     operator, temporarily unbless it, fetch values for
-    #     one or more keys, and restore the original blessing.
-    #     Returns the retrieved values.
-    
-    my ($hash, @keys) = @_;
-    my $ref = CORE::ref($hash);
-    my @r;
-    if (!$ref) {
-	@r = @{$hash}{@keys};
-    } else {
-	bless $hash, '###';
-	@r = @{$hash}{@keys};
-	bless $hash, $ref;
-    }
-    return wantarray ? @r : @r > 0 ? $r[-1] : undef;
+    return Patro::LeumJelly::handle($_[0])->{client};
 }
 
 sub main::xdiag {
@@ -220,118 +173,6 @@ sub getProxies {
 
 ########################################
 
-sub _truncate {
-    my ($fh,$len) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-	return $fh->_tied->__('TRUNCATE',1,$len);
-    } else {
-	return CORE::truncate($fh,$len);
-    }
-}
-
-sub _fcntl {
-    my ($fh,$func,$scalar) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-	return $fh->_tied->__('FCNTL',1,$func,$scalar);
-    } else {
-	return CORE::fcntl($fh,$func,$scalar);
-    }
-}
-
-sub _stat {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-	my $context = defined(wantarray) + wantarray + 0;
-	return $fh->_tied->__('STAT',$context);
-    } else {
-	return CORE::stat $fh;
-    }
-}
-
-sub _flock {
-    my ($fh,$op) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-	return $fh->_tied->__('FLOCK',1,$op);
-    } else {
-	return CORE::flock($fh,$op);
-    }
-}
-
-sub _sysopen {
-    my ($fh,$fname,$mode,$perm) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('SYSOPEN',1,$fname,$mode,$perm);
-    } elsif (defined ($perm)) {
-        return CORE::sysopen($fh,$fname,$mode,$perm);
-    } else {
-        return CORE::sysopen($fh,$fname,$mode);
-    }
-}
-
-sub _lstat (;*) {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-	my $context = defined(wantarray) + wantarray + 0;
-	return $fh->_tied->__('LSTAT',$context);
-    }
-    return CORE::lstat $fh;
-}
-
-sub _opendir (*$) {
-    if (CORE::ref($_[0]) eq 'Patro::N5') {
-        return $_[0]->_tied->__('OPENDIR',1,$_[1]);
-    }
-    return CORE::opendir($_[0],$_[1]);
-}
-
-sub _closedir (*) {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('CLOSEDIR',1);
-    }
-    return CORE::closedir($fh);
-}
-
-sub _readdir (*) {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('READDIR',undef);
-    }
-    return CORE::readdir($fh);
-}
-
-sub _seekdir (*$) {
-    my ($fh,$pos) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('SEEKDIR',1,$pos);
-    }
-    return CORE::seekdir($fh,$pos);
-}
-
-sub _telldir (*) {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('TELLDIR',1);
-    }
-    return CORE::telldir($fh);
-}
-
-sub _rewinddir (*) {
-    my ($fh) = @_;
-    if (CORE::ref($fh) eq 'Patro::N5') {
-        return $fh->_tied->__('REWINDDIR',1);
-    }
-    return CORE::rewinddir($fh);
-}
-
-sub _chdir (;$) {
-    my ($fh) = @_;
-    if ($fh && CORE::ref($fh) eq 'Patro::N5') {
-	return $fh->_tied->__('CHDIR',1);
-    }
-    return CORE::chdir($fh);
-}
-
 1;
 
 =head1 NAME
@@ -341,7 +182,7 @@ Patro - proxy access to remote objects
 
 =head1 VERSION
 
-0.14
+0.15
 
 
 =head1 SYNOPSIS

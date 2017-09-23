@@ -55,7 +55,7 @@ use overload;
 
 #  Version information
 #
-$VERSION='1.248';
+$VERSION='1.250';
 
 
 #  Debug load
@@ -860,7 +860,7 @@ sub init_class {
     # CGI::->method is needed because perl 5.6.0 will use WebDyne::CGI->method instead of
     # CGI->method. CGI::->method makes it happy
     CGI::->import('-no_xhtml', '-no_sticky');
-    my @cgi_compile=qw(:all area map unescapeHTML form col colgroup spacer nobr Header);
+    my @cgi_compile=qw(:all area map unescapeHTML form col colgroup spacer nobr Header Button);
     CGI::->compile(@cgi_compile);
 
     #  Broken under CGI 4.28. Use different method

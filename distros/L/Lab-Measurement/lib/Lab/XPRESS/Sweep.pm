@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep;
 #ABSTRACT: Base sweep class
-$Lab::XPRESS::Sweep::VERSION = '3.554';
+$Lab::XPRESS::Sweep::VERSION = '3.600';
 use Role::Tiny::With;
 
 use Time::HiRes qw/usleep/, qw/time/;
@@ -1430,7 +1430,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

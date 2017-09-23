@@ -12,7 +12,7 @@ configure_requires:
   Devel::CheckOS: '1.63'
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   App::migrate:
     file: lib/App/migrate.pm
-    version: v0.2.5
+    version: v0.2.6
 requires:
   File::Temp: '0'
   Getopt::Long: '0'
@@ -39,6 +39,7 @@ resources:
   bugtracker: https://github.com/powerman/migrate/issues
   homepage: https://github.com/powerman/migrate
   repository: https://github.com/powerman/migrate.git
-version: v0.2.5
+version: v0.2.6
 x_contributors:
   - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: RapidApp-powered blog
 
-use RapidApp 1.3002;
+use RapidApp 1.3003;
 
 use Moose;
 extends 'RapidApp::Builder';
@@ -19,7 +19,7 @@ require Module::Locate;
 use Path::Class qw/file dir/;
 use YAML::XS 0.64 'LoadFile';
 
-our $VERSION = 1.0004;
+our $VERSION = '1.0100';
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;
@@ -30,6 +30,11 @@ has 'fallback_builtin_scaffold', is => 'ro', isa => Bool, default => sub {0};
 
 has '+base_appname', default => sub { 'Rapi::Blog::App' };
 has '+debug',        default => sub {1};
+
+sub BUILD {
+  my $self = shift;
+  print STDERR join('',' -- ',(blessed $self),' v',$self->VERSION,' -- ',"\n") if ($self->debug);
+}
 
 has 'share_dir', is => 'ro', isa => Str, lazy => 1, default => sub {
   my $self = shift;

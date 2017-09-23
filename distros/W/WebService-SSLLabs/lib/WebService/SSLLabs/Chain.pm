@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use WebService::SSLLabs::ChainCert();
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub new {
     my ( $class, $json ) = @_;
@@ -43,7 +43,7 @@ WebService::SSLLabs::Chain - Chain object
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SUBROUTINES/METHODS
 

@@ -20,8 +20,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Linux-DesktopFiles
+    GitHub issue tracker (report bugs here)
+        https://github.com/trizen/Linux-DesktopFiles/issues
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Linux-DesktopFiles
@@ -35,13 +35,13 @@ You can also look for information at:
 
 ### LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2016 Daniel "Trizen" Șuteu
+Copyright (C) 2012-2017 Daniel "Trizen" Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+https://opensource.org/licenses/artistic-license-2.0.php
 
 Any use, modification, and distribution of the Standard or Modified
 Versions is governed by this Artistic License. By using, modifying or

@@ -9,8 +9,8 @@
 #
 package Test::Moose::More;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.047-23-gb33a6e7
-$Test::Moose::More::VERSION = '0.048';
+# git description: 0.049-1-g0a65e1a
+$Test::Moose::More::VERSION = '0.050';
 
 # ABSTRACT: More tools for testing Moose packages
 
@@ -22,6 +22,7 @@ use Sub::Exporter::Progressive -setup => {
         attribute_options_ok
         check_sugar_ok
         check_sugar_removed_ok
+        definition_context_ok
         does_metaroles_ok
         does_not_metaroles_ok
         does_not_ok
@@ -108,8 +109,8 @@ sub _thing_name {
 {
     my $_yes = sub { $tb->ok(!!shift, shift . ' has a meta')           };
     my $_no  = sub { $tb->ok( !shift, shift . ' does not have a meta') };
-    sub meta_ok    ($;$) { unshift @_, $_yes, $_[0]; goto \&_method_ok_guts }
-    sub no_meta_ok ($;$) { unshift @_, $_no,  $_[0]; goto \&_method_ok_guts }
+    sub meta_ok    ($;$) { _method_ok_guts($_yes, $_[0], @_) }
+    sub no_meta_ok ($;$) { _method_ok_guts($_no,  $_[0], @_) }
 }
 
 
@@ -179,15 +180,15 @@ sub has_attribute_ok ($$;$) {
     my $_has_test = sub { $tb->ok(!!$_[0]->has_method($_), "$_[1] has method $_")           };
     my $_no_test  = sub { $tb->ok( !$_[0]->has_method($_), "$_[1] does not have method $_") };
 
-    sub has_no_method_ok ($@) { unshift @_, $_no_test;  goto \&_method_ok_guts }
-    sub has_method_ok    ($@) { unshift @_, $_has_test; goto \&_method_ok_guts }
+    sub has_no_method_ok ($@) { _method_ok_guts($_no_test,  @_) }
+    sub has_method_ok    ($@) { _method_ok_guts($_has_test, @_) }
 }
 {
     my $_has_test = sub { $tb->ok(!!$_[0]->find_method_by_name($_), "$_[1] has method $_")           };
     my $_no_test  = sub { $tb->ok( !$_[0]->find_method_by_name($_), "$_[1] does not have method $_") };
 
-    sub has_no_method_from_anywhere_ok ($@) { unshift @_, $_no_test;  goto \&_method_ok_guts }
-    sub has_method_from_anywhere_ok    ($@) { unshift @_, $_has_test; goto \&_method_ok_guts }
+    sub has_no_method_from_anywhere_ok ($@) { _method_ok_guts($_no_test,  @_) }
+    sub has_method_from_anywhere_ok    ($@) { _method_ok_guts($_has_test, @_) }
 }
 
 sub _method_ok_guts {
@@ -197,8 +198,8 @@ sub _method_ok_guts {
     my $meta = find_meta($thing);
     my $name = _thing_name($thing, $meta);
 
-    # the test below is run one stack frame up (down?), so let's handle that
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # the test below is run two stack frame up (down?), so let's handle that
+    local $Test::Builder::Level = $Test::Builder::Level + 2;
 
     # "tiny evil?" -- Eleanor Weyl
 
@@ -238,9 +239,30 @@ sub _method_from_pkg_ok {
 }
 
 
-sub role_wraps_around_method_ok ($@) { unshift @_, 'around'; goto \&_role_wraps }
-sub role_wraps_before_method_ok ($@) { unshift @_, 'before'; goto \&_role_wraps }
-sub role_wraps_after_method_ok  ($@) { unshift @_, 'after';  goto \&_role_wraps }
+sub definition_context_ok ($$) {
+    my ($meta, $dc) = @_;
+
+    my $name = _thing_name($meta, $meta);
+
+    return unless $tb->ok(
+        $meta->can('definition_context'),
+        "$name can definition_context()",
+    );
+
+    my $meta_dc = $meta->definition_context;
+
+    ### $dc
+    ### $meta_dc
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return is_deeply $meta_dc => $dc,
+        "$name definition context is strictly correct";
+}
+
+
+sub role_wraps_around_method_ok ($@) { _role_wraps(around => @_) }
+sub role_wraps_before_method_ok ($@) { _role_wraps(before => @_) }
+sub role_wraps_after_method_ok  ($@) { _role_wraps(after  => @_) }
 
 sub _role_wraps {
     my ($style, $thing, @methods) = @_;
@@ -252,6 +274,7 @@ sub _role_wraps {
     my $name = _thing_name($thing, $meta);
 
     ### @methods
+    local $Test::Builder::Level = $Test::Builder::Level + 2;
     $tb->ok(!!$meta->$meta_method($_), "$name wraps $style method $_")
         for @methods;
 
@@ -263,8 +286,8 @@ sub _role_wraps {
     my $_is_test  = sub { $tb->ok( $_[0]->requires_method($_), "$_[1] requires method $_")         };
     my $_not_test = sub { $tb->ok(!$_[0]->requires_method($_), "$_[1] does not require method $_") };
 
-    sub requires_method_ok ($@)         { unshift @_, $_is_test;  goto \&_method_ok_guts }
-    sub does_not_require_method_ok ($@) { unshift @_, $_not_test; goto \&_method_ok_guts }
+    sub requires_method_ok ($@)         { _method_ok_guts($_is_test,  @_) }
+    sub does_not_require_method_ok ($@) { _method_ok_guts($_not_test, @_) }
 }
 
 
@@ -295,8 +318,8 @@ sub is_not_immutable_ok ($;$) {
     my $_not_test = sub { $tb->ok(!$_[0]->is_pristine(), "$_[1] is not pristine") };
 
     # FIXME should probably rename _method_ok_guts()...
-    sub is_pristine_ok ($)     { @_ = ($_is_test,  @_, q{}); goto \&_method_ok_guts }
-    sub is_not_pristine_ok ($) { @_ = ($_not_test, @_, q{}); goto \&_method_ok_guts }
+    sub is_pristine_ok ($)     { _method_ok_guts($_is_test,  @_, q{}) }
+    sub is_not_pristine_ok ($) { _method_ok_guts($_not_test, @_, q{}) }
 }
 
 
@@ -583,7 +606,6 @@ sub _validate_role_guts {
     );
 }
 
-
 sub _validate_attribute       { _validate_subtest_wrapper(\&__validate_attribute_guts,                 @_) }
 sub validate_attribute ($$@)  { _validate_subtest_wrapper( \&_validate_attribute_guts, [shift, shift], @_) }
 
@@ -765,7 +787,7 @@ Test::Moose::More - More tools for testing Moose packages
 
 =head1 VERSION
 
-This document describes version 0.048 of Test::Moose::More - released June 17, 2017 as part of Test-Moose-More.
+This document describes version 0.050 of Test::Moose::More - released September 20, 2017 as part of Test-Moose-More.
 
 =head1 SYNOPSIS
 
@@ -886,6 +908,11 @@ accessor -- that is, it descends from L<Class::MOP::Method::Accessor>.
 
 Given a thing (role, class, etc) and a method, test that the method is B<not>
 an accessor -- that is, it does not descend from L<Class::MOP::Method::Accessor>.
+
+=head2 definition_context_ok $meta, \%dc
+
+Validates the definition context of a metaclass instance.  This is a strict
+comparison.
 
 =head2 role_wraps_around_method_ok $role, @methods
 
@@ -1033,6 +1060,78 @@ or "let's subclass Moose::Meta::Class/etc and implement something new").
 As with L</does_metaroles_ok>, but test that the metaroles are not consumed, a
 la L</does_not_ok>.
 
+=head2 attribute_options_ok
+
+Validates that an attribute is set up as expected; like
+C<validate_attribute()>, but only concerns itself with attribute options.
+
+Note that some of these options will skip if used against attributes defined
+in a role.
+
+=over 4
+
+=item *
+
+C<< -subtest => 'subtest name...' >>
+
+If set, all tests run (save the first, "does this thing even have this
+attribute?" test) will be wrapped in a subtest, the name of which will be
+whatever C<-subtest> is set to.
+
+=item *
+
+C<< is => ro|rw >>
+
+Tests for reader/writer options set as one would expect.
+
+=item *
+
+C<< isa => ... >>
+
+Validates that the attribute requires its value to be a given type.
+
+=item *
+
+C<< does => ... >>
+
+Validates that the attribute requires its value to do a given role.
+
+=item *
+
+C<< builder => '...' >>
+
+Validates that the attribute expects the method name given to be its builder.
+
+=item *
+
+C<< default => ... >>
+
+Validates that the attribute has the given default.
+
+=item *
+
+C<< init_arg => '...' >>
+
+Validates that the attribute has the given initial argument name.
+
+=item *
+
+C<< lazy => 0|1 >>
+
+Validates that the attribute is/isn't lazy.
+
+=item *
+
+C<< required => 0|1 >>
+
+Validates that setting the attribute's value is/isn't required.
+
+=back
+
+=for Pod::Coverage is_anon is_class is_not_anon is_role
+
+=head1 VALIDATION METHODS
+
 =head2 validate_thing
 
 Runs a bunch of tests against the given C<$thing>, as defined:
@@ -1060,38 +1159,38 @@ metaclass.
 
 =item *
 
--subtest => 'subtest name...'
+C<< -subtest => 'subtest name...' >>
 
 If set, all tests run will be wrapped in a subtest, the name of which will be
 whatever C<-subtest> is set to.
 
 =item *
 
-isa => [ ... ]
+C<< isa => [ ... ] >>
 
 A list of superclasses thing should have.
 
 =item *
 
-anonymous => 0|1
+C<< anonymous => 0|1 >>
 
 Check to see if the class is/isn't anonymous.
 
 =item *
 
-does => [ ... ]
+C<< does => [ ... ] >>
 
 A list of roles the thing should do.
 
 =item *
 
-does_not => [ ... ]
+C<< does_not => [ ... ] >>
 
 A list of roles the thing should not do.
 
 =item *
 
-attributes => [ ... ]
+C<< attributes => [ ... ] >>
 
 The attributes list specified here is in the form of a list of names, each
 optionally followed by a hashref of options to test the attribute for; this
@@ -1109,25 +1208,25 @@ hashref takes the same arguments L</validate_attribute> does.  e.g.:
 
 =item *
 
-methods => [ ... ]
+C<< methods => [ ... ] >>
 
 A list of methods the thing should have; see L</has_method_ok>.
 
 =item *
 
-no_methods => [ ... ]
+C<< no_methods => [ ... ] >>
 
 A list of methods the thing should not have; see L</has_no_method_ok>.
 
 =item *
 
-sugar => 0|1
+C<< sugar => 0|1 >>
 
 Ensure that thing can/cannot do the standard Moose sugar.
 
 =item *
 
-metaclasses => { $mop => { ... }, ... }
+C<< metaclasses => { $mop => { ... }, ... } >>
 
 Validates this thing's metaclasses: that is, given a MOP type (e.g. class,
 attribute, method, ...) and a hashref, find the associated metaclass of the
@@ -1176,7 +1275,7 @@ for additional role-specific tests.
 
 =item *
 
--compose => 0|1
+C<< -compose => 0|1 >>
 
 When true, attempt to compose the role into an anonymous class, then use it to
 run L</validate_class>.  The options we're given are passed to C<validate_class()>
@@ -1207,20 +1306,20 @@ e.g.:
 
 =item *
 
--subtest => 'subtest name...'
+C<< -subtest => 'subtest name...' >>
 
 If set, all tests run will be wrapped in a subtest, the name of which will be
 whatever C<-subtest> is set to.
 
 =item *
 
-required_methods => [ ... ]
+C<< required_methods => [ ... ] >>
 
 A list of methods the role requires a consuming class to supply.
 
 =item *
 
-before => [ ... ]
+C<< before => [ ... ] >>
 
 A list of methods the role expects to wrap before, on application to a class.
 
@@ -1228,7 +1327,7 @@ See L<Moose/before> for information on before method modifiers.
 
 =item *
 
-around => [ ... ]
+C<< around => [ ... ] >>
 
 A list of methods the role expects to wrap around, on application to a class.
 
@@ -1236,7 +1335,7 @@ See L<Moose/around> for information on around method modifiers.
 
 =item *
 
-after => [ ... ]
+C<< after => [ ... ] >>
 
 A list of methods the role expects to wrap after, on application to a class.
 
@@ -1244,21 +1343,21 @@ See L<Moose/after> for information on after method modifiers.
 
 =item *
 
-role_metaroles => { $mop => [ $role, ... ], ... }
+C<< role_metaroles => { $mop => [ $role, ... ], ... } >>
 
 Checks metaclasses to ensure the given metaroles are applied.  See
 L</does_metaroles_ok>.
 
 =item *
 
-no_role_metaroles => { $mop => [ $role, ... ], ... }
+C<< no_role_metaroles => { $mop => [ $role, ... ], ... } >>
 
 Checks metaclasses to ensure the given metaroles are applied.  See
 L</does_not_metaroles_ok>.
 
 =item *
 
-role_metaclasses => { $mop => { ... }, ... }
+C<< role_metaclasses => { $mop => { ... }, ... } >>
 
 Validates this role's metaclasses: that is, given a MOP type (e.g. role,
 attribute, method, ...) and a hashref, find the associated metaclass of the
@@ -1291,7 +1390,7 @@ C<class_metaclasses> and C<role_metaclasses>, respectively.
 
 =item *
 
-class_metaclasses => { $mop => { ... }, ... }
+C<< class_metaclasses => { $mop => { ... }, ... } >>
 
 As with role_metaclasses, above, except that this option is only used
 if C<-compose> is also specified.
@@ -1326,34 +1425,34 @@ for additional class-specific tests.
 
 =item *
 
--subtest => 'subtest name...'
+C<< -subtest => 'subtest name...' >>
 
 If set, all tests run will be wrapped in a subtest, the name of which will be
 whatever C<-subtest> is set to.
 
 =item *
 
-immutable => 0|1
+C<< immutable => 0|1 >>
 
 Checks the class to see if it is/isn't immutable.
 
 =item *
 
-class_metaroles => { $mop => [ $role, ... ], ... }
+C<< class_metaroles => { $mop => [ $role, ... ], ... } >>
 
 Checks metaclasses to ensure the given metaroles are applied.  See
 L</does_metaroles_ok>.
 
 =item *
 
-no_class_metaroles => { $mop => [ $role, ... ], ... }
+C<< no_class_metaroles => { $mop => [ $role, ... ], ... } >>
 
 Checks metaclasses to ensure the given metaroles are applied.  See
 L</does_not_metaroles_ok>.
 
 =item *
 
-class_metaclasses => { $mop => { ... }, ... }
+C<< class_metaclasses => { $mop => { ... }, ... } >>
 
 Validates this class' metaclasses: that is, given a MOP type (e.g. role,
 attribute, method, ...) and a hashref, find the associated metaclass of the
@@ -1435,82 +1534,12 @@ the following:
 
 =item *
 
--subtest => 'subtest name...'
+C<< -subtest => 'subtest name...' >>
 
 If set, all tests run will be wrapped in a subtest, the name of which will be
 whatever C<-subtest> is set to.
 
 =back
-
-=head2 attribute_options_ok
-
-Validates that an attribute is set up as expected; like
-C<validate_attribute()>, but only concerns itself with attribute options.
-
-Note that some of these options will skip if used against attributes defined
-in a role.
-
-=over 4
-
-=item *
-
--subtest => 'subtest name...'
-
-If set, all tests run (save the first, "does this thing even have this
-attribute?" test) will be wrapped in a subtest, the name of which will be
-whatever C<-subtest> is set to.
-
-=item *
-
-is => ro|rw
-
-Tests for reader/writer options set as one would expect.
-
-=item *
-
-isa => ...
-
-Validates that the attribute requires its value to be a given type.
-
-=item *
-
-does => ...
-
-Validates that the attribute requires its value to do a given role.
-
-=item *
-
-builder => '...'
-
-Validates that the attribute expects the method name given to be its builder.
-
-=item *
-
-default => ...
-
-Validates that the attribute has the given default.
-
-=item *
-
-init_arg => '...'
-
-Validates that the attribute has the given initial argument name.
-
-=item *
-
-lazy => 0|1
-
-Validates that the attribute is/isn't lazy.
-
-=item *
-
-required => 0|1
-
-Validates that setting the attribute's value is/isn't required.
-
-=back
-
-=for Pod::Coverage is_anon is_class is_not_anon is_role
 
 =head1 SEE ALSO
 

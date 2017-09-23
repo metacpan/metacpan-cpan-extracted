@@ -3,9 +3,9 @@ package Pod::ProjectDocs;
 use strict;
 use warnings;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49';    # VERSION
 
-use base qw/Class::Accessor::Fast/;
+use Moose;
 
 use File::Spec;
 use JSON;
@@ -15,30 +15,43 @@ use Pod::ProjectDocs::Parser;
 use Pod::ProjectDocs::CSS;
 use Pod::ProjectDocs::IndexPage;
 
-__PACKAGE__->mk_accessors(qw/managers components config/);
+has 'managers' => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+);
+has 'components' => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    default => sub { {} },
+);
+has 'config' => (
+    is  => 'ro',
+    isa => 'Object',
+);
 
-sub new {
-    my ($class, @args) = @_;
-    my $self  = bless { }, $class;
-    $self->_init(@args);
-    return $self;
-}
+sub BUILDARGS {
+    my ( $class, %args ) = @_;
 
-sub _init {
-    my($self, %args) = @_;
+    $args{title} ||= "MyProject's Libraries";
+    $args{desc}  ||= "manuals and libraries";
+    $args{lang}  ||= "en";
 
     # set absolute path to 'outroot'
     $args{outroot} ||= File::Spec->curdir;
-    $args{outroot} = File::Spec->rel2abs($args{outroot}, File::Spec->curdir)
-        unless File::Spec->file_name_is_absolute( $args{outroot} );
+    $args{outroot} = File::Spec->rel2abs( $args{outroot}, File::Spec->curdir )
+      unless File::Spec->file_name_is_absolute( $args{outroot} );
 
     # set absolute path to 'libroot'
     $args{libroot} ||= File::Spec->curdir;
     $args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
-    $args{libroot} = [ map {
-        File::Spec->file_name_is_absolute($_) ? $_
-        : File::Spec->rel2abs($_, File::Spec->curdir)
-    } @{ $args{libroot} } ];
+    $args{libroot} = [
+        map {
+            File::Spec->file_name_is_absolute($_)
+              ? $_
+              : File::Spec->rel2abs( $_, File::Spec->curdir )
+        } @{ $args{libroot} }
+    ];
 
     # check mtime by default, but can be overridden
     $args{forcegen} ||= 0;
@@ -46,45 +59,36 @@ sub _init {
     $args{except} ||= [];
     $args{except} = [ $args{except} ] unless ref $args{except};
 
-    $self->config( Pod::ProjectDocs::Config->new(%args) );
+    $args{config} = Pod::ProjectDocs::Config->new(%args);
 
-    $self->_setup_components();
-    $self->_setup_managers();
-    return;
+    return \%args;
 }
 
-sub _setup_components {
+sub BUILD {
     my $self = shift;
-    $self->components( {} );
-    $self->components->{css}
-        = Pod::ProjectDocs::CSS->new( config => $self->config );
-    return;
-}
 
-sub _setup_managers {
-    my $self = shift;
-    $self->reset_managers();
-    $self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser->new);
-    $self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser->new);
-    $self->add_manager('Trigger Scripts', ['cgi', 'pl'], Pod::ProjectDocs::Parser->new);
-    return;
-}
+    $self->components->{css} =
+      Pod::ProjectDocs::CSS->new( config => $self->config );
+    $self->add_manager( 'Perl Manuals', 'pod', Pod::ProjectDocs::Parser->new );
+    $self->add_manager( 'Perl Modules', 'pm',  Pod::ProjectDocs::Parser->new );
+    $self->add_manager(
+        'Trigger Scripts',
+        [ 'cgi', 'pl' ],
+        Pod::ProjectDocs::Parser->new
+    );
 
-sub reset_managers {
-    my $self = shift;
-    $self->managers( [] );
     return;
 }
 
 sub add_manager {
-    my($self, $desc, $suffix, $parser) = @_;
+    my ( $self, $desc, $suffix, $parser ) = @_;
     push @{ $self->managers },
-        Pod::ProjectDocs::DocManager->new(
-            config => $self->config,
-            desc   => $desc,
-            suffix => $suffix,
-            parser => $parser,
-        );
+      Pod::ProjectDocs::DocManager->new(
+        config => $self->config,
+        desc   => $desc,
+        suffix => $suffix,
+        parser => $parser,
+      );
     return;
 }
 
@@ -100,10 +104,10 @@ sub gen {
 
     foreach my $manager ( @{ $self->managers } ) {
         next if $manager->desc !~ /Perl Modules/;
-        for my $doc ( $manager->get_docs() ) {
+        for my $doc ( @{ $manager->docs() || [] } ) {
             my $name = $doc->name;
             my $path = $doc->get_output_path;
-            if ($manager->desc eq 'Perl Modules') {
+            if ( $manager->desc eq 'Perl Modules' ) {
                 $local_modules{$name} = $path;
             }
         }
@@ -113,7 +117,7 @@ sub gen {
 
         $manager->parser->local_modules( \%local_modules );
 
-        for my $doc ( $manager->get_docs() ) {
+        for my $doc ( @{ $manager->docs() || [] } ) {
             my $html = $manager->parser->gen_html(
                 doc        => $doc,
                 desc       => $manager->desc,
@@ -146,23 +150,25 @@ sub get_managers_json {
             records => [],
         };
         foreach my $doc ( @{ $manager->docs } ) {
-            push @{ $record->{records} }, {
+            push @{ $record->{records} },
+              {
                 path  => $doc->relpath,
                 name  => $doc->name,
                 title => $doc->title,
-            };
+              };
         }
         if ( scalar( @{ $record->{records} } ) > 0 ) {
             push @$records, $record;
         }
     }
+
     # Use "canonical" to generate stable structures that can be added
     #   to version control systems without changing all the time.
     return $js->canonical()->encode($records);
 }
 
 sub _croak {
-    my($self, $msg) = @_;
+    my ( $self, $msg ) = @_;
     require Carp;
     Carp::croak($msg);
     return;
@@ -171,15 +177,21 @@ sub _croak {
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Pod::ProjectDocs - generates CPAN like project documents from pod.
 
 =head1 SYNOPSIS
 
-    #!/usr/bin/perl -w
+    #!/usr/bin/perl
+
     use strict;
+    use warnings;
+
     use Pod::ProjectDocs;
+
     my $pd = Pod::ProjectDocs->new(
         libroot => '/your/project/lib/root',
         outroot => '/output/directory',
@@ -187,7 +199,7 @@ Pod::ProjectDocs - generates CPAN like project documents from pod.
     );
     $pd->gen();
 
-    #or use pod2projdocs on your shell
+    # or use pod2projdocs on your shell
     pod2projdocs -out /output/directory -lib /your/project/lib/root
 
 =head1 DESCRIPTION
@@ -199,11 +211,11 @@ for your projects. It also creates an optional index page.
 
 =over 4
 
-=item outroot
+=item C<outroot>
 
 output directory for the generated documentation.
 
-=item libroot
+=item C<libroot>
 
 your library's (source code) root directory.
 
@@ -221,27 +233,27 @@ or
         libroot => ['/path/to/lib1', '/path/to/lib2'],
     );
 
-=item title
+=item C<title>
 
 your project's name.
 
-=item desc
+=item C<desc>
 
 description for your project.
 
-=item index
+=item C<index>
 
 whether you want to create an index for all generated pages (0 or 1).
 
-=item lang
+=item C<lang>
 
 set this language as xml:lang (default 'en')
 
-=item forcegen
+=item C<forcegen>
 
 whether you want to generate HTML document even if source files are not updated (default is 0).
 
-=item except
+=item C<except>
 
 the files matches this regex won't be parsed.
 
@@ -266,7 +278,7 @@ without creating a custom perl script.
 
 =head1 SEE ALSO
 
-L<Pod::Parser>
+L<Pod::Simple::XHTML>
 
 =head1 AUTHORS
 
@@ -280,7 +292,13 @@ L<Pod::Parser>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright(C) 2005 by Lyo Kato
+=over 4
+
+=item © 2005 by Lyo Kato
+
+=item © 2017 by Martin Gruner
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

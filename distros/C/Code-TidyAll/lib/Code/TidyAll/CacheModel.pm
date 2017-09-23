@@ -5,21 +5,69 @@ use warnings;
 
 use Digest::SHA qw(sha1_hex);
 use Path::Tiny ();
+use Specio::Declare;
+use Specio::Library::Builtins;
+use Specio::Library::Path::Tiny;
+use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-# todo, type checking?
+has base_sig => (
+    is      => 'ro',
+    isa     => t('Str'),
+    default => q{},
+);
 
-has 'base_sig'      => ( is => 'ro', default => "" );
-has 'cache_engine'  => ( is => 'ro' );
-has 'cache_key'     => ( is => 'lazy', clearer => 1 );
-has 'cache_value'   => ( is => 'lazy', clearer => 1 );
-has 'file_contents' => ( is => 'rw', lazy => 1, builder => 1, trigger => 1, clearer => 1 );
-has 'full_path'     => ( is => 'ro', required => 1 );
-has 'is_cached'     => ( is => 'rw', lazy => 1, builder => 1, clearer => 1 );
-has 'path'          => ( is => 'ro', required => 1 );
+has cache_engine => (
+    is  => 'ro',
+    isa => object_can_type(
+        methods => [qw( get set remove )],
+    ),
+    predicate => '_has_cache_engine',
+);
+
+has cache_key => (
+    is      => 'lazy',
+    isa     => t('NonEmptyStr'),
+    clearer => 1,
+);
+
+has cache_value => (
+    is      => 'lazy',
+    isa     => t('NonEmptyStr'),
+    clearer => 1,
+);
+
+has file_contents => (
+    is      => 'rw',
+    isa     => t('Str'),
+    lazy    => 1,
+    builder => 1,
+    trigger => 1,
+    clearer => 1,
+);
+
+has full_path => (
+    is       => 'ro',
+    isa      => t('Path'),
+    required => 1,
+);
+
+has is_cached => (
+    is      => 'rw',
+    isa     => t('Bool'),
+    lazy    => 1,
+    builder => 1,
+    clearer => 1,
+);
+
+has path => (
+    is       => 'ro',
+    isa      => t('Path'),
+    required => 1,
+);
 
 sub _build_file_contents {
     my ($self) = @_;
@@ -49,23 +97,26 @@ sub _build_cache_value {
 
 sub _build_is_cached {
     my ($self) = @_;
-    my $cache_engine = $self->cache_engine or return;
-    my $cached_value = $cache_engine->get( $self->cache_key );
+
+    return unless $self->_has_cache_engine;
+    my $cached_value = $self->cache_engine->get( $self->cache_key );
     return defined $cached_value && $cached_value eq $self->cache_value;
 }
 
 sub update {
     my ($self) = @_;
-    my $cache_engine = $self->cache_engine or return;
-    $cache_engine->set( $self->cache_key, $self->cache_value );
+
+    return unless $self->_has_cache_engine;
+    $self->cache_engine->set( $self->cache_key, $self->cache_value );
     $self->is_cached(1);
     return;
 }
 
 sub remove {
     my ($self) = @_;
-    my $cache_engine = $self->cache_engine or return;
-    $cache_engine->remove( $self->cache_key );
+
+    return unless $self->_has_cache_engine;
+    $self->cache_engine->remove( $self->cache_key );
     return;
 }
 
@@ -90,7 +141,7 @@ Code::TidyAll::CacheModel - Caching model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -118,61 +169,88 @@ version 0.65
 A cache model for Code::TidyAll. Different subclasses can employ different
 caching techniques.
 
-The basic model implemented here is simple;  It stores in the cache a hash key
-of the file contents keyed by a hash key of the file's path.
+The basic model implemented here is simple; It stores a hash key of the file
+contents keyed by a hash key of the file's path.
 
-=head2 Attributes
+=head1 METHODS
 
-=over
+This class has the following methods:
 
-=item full_path (required, ro)
+=head2 Code::TidyAll::CacheModel->new(%params)
 
-The full path to the file on disk
+The constructor accepts the following attributes:
 
-=item path (required, ro)
+=over 4
+
+=item * full_path
+
+The full path to the cache file on disk. This is required.
+
+=item * path
 
 The local path to the file (i.e. what the cache system will consider the
-canonical name of the file)
+canonical name of the file).
 
-=item cache_engine (optional, default undef, ro)
+=item * cache_engine
 
-A C<Code::TidyAll::Cache> compatible instance, or, if no caching is required
-undef.
+A C<Code::TidyAll::Cache> compatible instance. This can be omitted if no
+caching is actually being done.
 
-=item base_sig (optional, default empty string, ro)
+=item * base_sig
 
-A base signature.
+A base signature. This defaults to an empty string.
 
-=item file_contents (optional, default loads file contents from disk, rw)
+=item * file_contents
 
-=item is_cached (optional, default computed, rw)
+The contents of the file being cached. This can be omitted, in which case it
+will be loaded as needed.
 
-A flag indicating if this is cached. By default checks that the cache key and
-cache value match the cache.
+=item * is_cached
 
-=back
-
-=head2 Methods
-
-=over
-
-=item cache_key
-
-The computed cache key for the file
-
-=item cache_value
-
-The computed cache value for the file
-
-=item update
-
-Updates the cache
-
-=item remove
-
-Attempts to remove the value from the cache
+A boolean indicating if this file is cached. By default this is computed by
+checking that the cache key and cache value match what is in the cache.
 
 =back
+
+=head2 $model->full_path
+
+The value passed to the constructor.
+
+=head2 $model->path
+
+The value passed to the constructor.
+
+=head2 $model->cache_engine
+
+The value passed to the constructor.
+
+=head2 $model->base_sig
+
+The value passed to the constructor or the default value, an empty string.
+
+=head2 $model->file_contents
+
+The file contents, which will be loaded from the file system if needed.
+
+=head2 $model->is_cached
+
+A boolean indicating whether the path is currently in the cache.
+
+=head2 $model->cache_key
+
+The computed cache key for the file.
+
+=head2 $model->cache_value
+
+The computed cache value for the file.
+
+=head2 $model->update
+
+Updates the cache.
+
+=head2 $model->remove
+
+Attempts to remove the value from the cache.
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package Lab::Instrument::RSSMB100A;
 #ABSTRACT: Rohde & Schwarz SMB100A signal generator
-$Lab::Instrument::RSSMB100A::VERSION = '3.554';
+$Lab::Instrument::RSSMB100A::VERSION = '3.600';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -163,7 +163,7 @@ Lab::Instrument::RSSMB100A - Rohde & Schwarz SMB100A signal generator
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

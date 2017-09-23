@@ -1,5 +1,9 @@
 Revision history for PONAPI-Client
 
+0.002009     2017-Sep-22
+             * Added support for external UAs and a wrapper
+               for YAHC (Matt Koscica, Eric Herman)
+
 0.002008     2017-Feb-7
              * JSON::XS --> JSON::MaybeXS.
 

@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Exporter" : "0",
             "FindBin" : "0",
             "IO::All" : "0",
@@ -61,7 +62,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1.8",
+   "version" : "0.1.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

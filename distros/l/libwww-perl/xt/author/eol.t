@@ -36,6 +36,7 @@ my @files = (
     'lib/LWP/UserAgent.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/10-attrs.t',
     't/base/default_content_type.t',
     't/base/protocols.t',
     't/base/protocols/nntp.t',

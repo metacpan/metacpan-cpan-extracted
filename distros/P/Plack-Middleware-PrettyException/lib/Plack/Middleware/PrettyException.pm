@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use 5.010;
 use strict;
@@ -98,8 +98,18 @@ sub call {
                     && $env->{HTTP_ACCEPT} =~ m{application/json}i )
                 ) {
                 $err_headers->set( 'content-type' => 'application/json' );
-                $err_body = encode_json(
-                    { status => 'error', message => "" . $error } );
+                my $err_payload = { status => 'error', message => "" . $error };
+                if ($exception && $exception->can('does')) {
+                    if ($exception->does('Throwable::X')) {
+                        my $payload = $exception->payload;
+                        while (my ($k, $v) = each %$payload) {
+                            $err_payload->{$k} = $v;
+                        }
+                        $err_payload->{ident} = $exception->ident;
+                    }
+                }
+
+                $err_body = encode_json( $err_payload );
             }
 
             # return HTML as default
@@ -120,12 +130,29 @@ sub render_html_error {
 
     $status ||= 'unknown HTTP status code';
     $error  ||= 'unknown error';
+
+    my $more='';
+    if ($exception && $exception->can('does')) {
+        my @more;
+        if ($exception->does('Throwable::X')) {
+            push(@more, "<li>".$exception->ident."</li>");
+            my $payload = $exception->payload;
+            while (my ($k, $v) = each %$payload) {
+                push(@more,"<li>$k: $v</li>");
+            }
+        }
+        if (@more) {
+            $more='<ul>'.join("\n",@more).'</ul>';
+        }
+    }
+
     return <<"UGLYERROR";
 <html>
   <head><title>Error $status</title></head>
   <body>
     <h1>Error $status</h1>
     <p>$error</p>
+    $more
   </body>
 </html>
 UGLYERROR
@@ -145,7 +172,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

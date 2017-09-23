@@ -13,7 +13,7 @@ package  # Private module
 use strict qw( vars subs );  # no refs
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 sub import {
     my $caller = caller;
@@ -27,7 +27,7 @@ sub import {
 
 sub Dumper {
     require Data::Dumper;
-    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Indent   = 1;
     local $Data::Dumper::Sortkeys = 1;
     Data::Dumper::Dumper(@_);
 }
@@ -44,7 +44,7 @@ Devel::Cover::Dumper - Internal module for debugging purposes
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

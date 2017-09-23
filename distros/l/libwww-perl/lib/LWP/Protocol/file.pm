@@ -1,5 +1,5 @@
 package LWP::Protocol::file;
-$LWP::Protocol::file::VERSION = '6.26';
+$LWP::Protocol::file::VERSION = '6.27';
 use base qw(LWP::Protocol);
 
 use strict;

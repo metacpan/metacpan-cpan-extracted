@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 # shortcuts
 #  os and distros
@@ -1049,6 +1049,17 @@ sub mapping {
        [package => 'glib']],
      ],
 
+     [cpanmod => 'Glib::JSON',
+      [os_freebsd,
+       [package => 'json-glib']],
+      [like_debian,
+       [package => 'libjson-glib-dev']],
+      [like_fedora,
+       [package => 'json-glib-devel']],
+      [os_darwin,
+       [package => 'json-glib']],
+     ],
+
      [cpanmod => 'Glib::Object::Introspection',
       [os_freebsd,
        [package => 'gobject-introspection']],
@@ -2045,7 +2056,7 @@ sub mapping {
       [like_debian,
        [package => ['g++', 'libcurl3']]]],
 
-     [cpanmod => 'Ogg::Vorbis::Decoder',
+     [cpanmod => ['Ogg::Vorbis', 'Ogg::Vorbis::Decoder'],
       [os_freebsd,
        [package => 'libvorbis']],
       [like_debian,
@@ -2204,7 +2215,9 @@ sub mapping {
        [package => 'ragel']]],
 
      [cpanmod => 're::engine::Hyperscan',
-      # not available on freebsd & CentOS7
+      # not available on CentOS7
+      [os_freebsd,
+       [package => 'hyperscan']],
       [like_debian,
        [linuxdistrocodename => [qw(squeeze wheezy jessie xenial)],
 	[package => []]], # not available before stretch

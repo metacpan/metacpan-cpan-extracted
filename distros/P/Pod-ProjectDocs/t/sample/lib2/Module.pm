@@ -4,11 +4,13 @@ use strict;
 use warnings;
 
 sub foo {
- 	# foo foo foo
+
+    # foo foo foo
 }
 
 sub bar {
-	# bar bar bar
+
+    # bar bar bar
 }
 
 1;

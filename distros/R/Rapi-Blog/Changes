@@ -1,5 +1,11 @@
 Revision history for Rapi::Blog
 
+1.0100 2017-09-17
+    - Added new feature/tamonomy CATEGORIES (VANSTYN)
+    - Second publically released version of the schema (VANSTYN)
+    - Automatic upgrade of existing databases created by '1.00x' (VANSTYN)
+    - Require RapidApp 1.3003 (VANSTYN)
+
 1.0004 2017-07-06
     - Require RapidApp 1.3002 (VANSTYN)
     - Grid cell/row max-height now only enabled in Posts grid (VANSTYN)

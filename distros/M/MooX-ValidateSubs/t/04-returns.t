@@ -30,7 +30,7 @@ my $arrayref = $maybe->a_single_arrayref([ 'a', ['b'], { four => 'ahh' } ]);
 is_deeply($arrayref, [ 'a', ['b'], { four => 'ahh' }, 'd' ]);
 
 eval { $maybe->a_single_arrayref };
-my $errors = $@;
+$errors = $@;
 like( $errors, qr/Error - Invalid count in returns for sub - a_single_arrayref - expected - 4 - got - 1/, "an arrayref fails");
 
 done_testing();

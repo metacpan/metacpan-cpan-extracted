@@ -119,7 +119,7 @@ use Time::HiRes qw/ alarm sleep /;
 
 
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 extends 'Async::Simple::Task';
@@ -282,9 +282,9 @@ sub fork_child {
 
     # This is here instead of BEGIN, because this package uses as "extends" in Async::Simple::Task::ForkTmpFile
     # TODO: Maybe it would be great to move this code(function) to separate package
-    if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
-        die 'Your OS does not support threads... Use Async::Simple::Task::ForkTmpFile instead.';
-    };
+    # if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
+    #     die 'Your OS does not support threads... Use Async::Simple::Task::ForkTmpFile instead.';
+    # };
 
     # Pipes: parent -> child and child -> parent
     pipe my( $parent_reader, $child_writer  )  or die 'Child  to Parent pipe open error';

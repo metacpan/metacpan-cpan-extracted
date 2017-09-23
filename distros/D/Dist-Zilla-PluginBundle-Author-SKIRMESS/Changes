@@ -1,5 +1,44 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.022  2017-09-19 21:56:17 UTC
+
+  - Also commit files copied from bin/ with CopyFilesFromRelease
+
+0.021  2017-09-18 19:32:56 UTC
+
+  - Renamed skip_file option to skip
+
+0.020  2017-09-18 19:24:11 UTC
+
+  - Add the Dist::Zilla::Role::PluginBundle::Config::Slicer role
+
+0.019  2017-09-17 19:50:55 UTC
+
+  - Added new option 'skip_file' which can be used to skip the creation of
+    files from the RepositoryBase plugin
+  - Added Test::CPAN::Meta release test
+
+0.018  2017-09-16 18:14:53 UTC
+
+  - Also copy files from bin/ with CopyFilesFromRelease
+
+0.017  2017-09-16 16:14:27 UTC
+
+  - Added another invocation of MetaProvides::Package with :ExecFiles as
+    finder to add packages defined in scripts under bin to the provides
+    section
+
+0.016  2017-09-16 13:57:29 UTC
+
+  - Added new option 'set_script_shebang' which can be used to disable the
+    SetScriptShebang plugin, defaults to enable
+  - Documented all configureation options in pod
+
+0.015  2017-09-15 18:02:52 UTC
+
+  - Added Test::CPAN::Changes release test
+  - Release tests are no longer run on TravisCI
+
 0.014  2017-09-14 22:02:18 UTC
 
   - Removed Test::CPAN::Changes release test because it fails before the

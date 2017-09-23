@@ -4,7 +4,7 @@ package Crypt::Cipher::Skipjack;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::Skipjack - Symetric cipher Skipjack, key size: 80 bits (Crypt::CB
   my $cbc = Crypt::Mode::CBC->new('Skipjack');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::Skipjack;
 

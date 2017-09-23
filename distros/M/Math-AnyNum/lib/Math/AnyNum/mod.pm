@@ -3,209 +3,222 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-#
-## GMPq
-#
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPq Math::GMPq) => sub {
+sub __mod__ {
     my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
-    Math::GMPq::Rmpq_sgn($y)
-      || goto &_nan;
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
 
-    my $quo = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_div($quo, $x, $y);
+        Math::GMPq::Rmpq_sgn($y)
+          || goto &_nan;
 
-    # Floor
-    Math::GMPq::Rmpq_integer_p($quo) || do {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, $quo);
-        Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
-        Math::GMPq::Rmpq_set_z($quo, $z);
-    };
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($quo, $x, $y);
 
-    Math::GMPq::Rmpq_mul($quo, $quo, $y);
-    Math::GMPq::Rmpq_sub($quo, $x, $quo);
+        # Floor
+        Math::GMPq::Rmpq_integer_p($quo) || do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
+        };
 
-    $quo;
-};
+        Math::GMPq::Rmpq_mul($quo, $quo, $y);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPq Math::GMPz) => sub {
-    (@_) = ($_[0], _mpz2mpq($_[1]));
-    goto &__mod__;
-};
-
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPq Math::MPFR) => sub {
-    (@_) = (_mpq2mpfr($_[0]), $_[1]);
-    goto &__mod__;
-};
-
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPq Math::MPC) => sub {
-    (@_) = (_mpq2mpc($_[0]), $_[1]);
-    goto &__mod__;
-};
-
-#
-## GMPz
-#
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPz Math::GMPz) => sub {
-    my ($x, $y) = @_;
-
-    my $sgn_y = Math::GMPz::Rmpz_sgn($y)
-      || goto &_nan;
-
-    my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mod($r, $x, $y);
-
-    if (!Math::GMPz::Rmpz_sgn($r)) {
-        ## ok
-    }
-    elsif ($sgn_y < 0) {
-        Math::GMPz::Rmpz_add($r, $r, $y);
+        return $quo;
     }
 
-    $r;
-};
+  Math_GMPq__Math_GMPz: {
 
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPz $) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mod_ui($r, $x, $y);
-    $r;
-};
+        Math::GMPz::Rmpz_sgn($y)
+          || goto &_nan;
 
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPz Math::GMPq) => sub {
-    (@_) = (_mpz2mpq($_[0]), $_[1]);
-    goto &__mod__;
-};
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div_z($quo, $x, $y);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPz Math::MPFR) => sub {
-    (@_) = (_mpz2mpfr($_[0]), $_[1]);
-    goto &__mod__;
-};
+        # Floor
+        Math::GMPq::Rmpq_integer_p($quo) || do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
+        };
 
-Class::Multimethods::multimethod __mod__ => qw(Math::GMPz Math::MPC) => sub {
-    (@_) = (_mpz2mpc($_[0]), $_[1]);
-    goto &__mod__;
-};
+        Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
 
-#
-## MPFR
-#
-Class::Multimethods::multimethod __mod__ => qw(Math::MPFR Math::MPFR) => sub {
-    my ($x, $y) = @_;
+        return $quo;
+    }
 
-    my $quo = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_div($quo, $x, $y, $ROUND);
-    Math::MPFR::Rmpfr_floor($quo, $quo);
-    Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
-    Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+  Math_GMPq__Math_MPFR: {
+        $x = _mpq2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
 
-    $quo;
-};
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPFR $) => sub {
-    my ($x, $y) = @_;
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
 
-    my $quo = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_div_ui($quo, $x, $y, $ROUND);
-    Math::MPFR::Rmpfr_floor($quo, $quo);
-    Math::MPFR::Rmpfr_mul_ui($quo, $quo, $y, $ROUND);
-    Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        my $sgn_y = Math::GMPz::Rmpz_sgn($y)
+          || goto &_nan;
 
-    $quo;
-};
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $x, $y);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPFR Math::GMPq) => sub {
-    my ($x, $y) = @_;
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            ## ok
+        }
+        elsif ($sgn_y < 0) {
+            Math::GMPz::Rmpz_add($r, $r, $y);
+        }
 
-    my $quo = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_div_q($quo, $x, $y, $ROUND);
-    Math::MPFR::Rmpfr_floor($quo, $quo);
-    Math::MPFR::Rmpfr_mul_q($quo, $quo, $y, $ROUND);
-    Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        return $r;
+    }
 
-    $quo;
-};
+  Math_GMPz__Scalar: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod_ui($r, $x, $y);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPFR Math::GMPz) => sub {
-    my ($x, $y) = @_;
+  Math_GMPz__Math_GMPq: {
+        $x = _mpz2mpq($x);
+        goto Math_GMPq__Math_GMPq;
+    }
 
-    my $quo = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_div_z($quo, $x, $y, $ROUND);
-    Math::MPFR::Rmpfr_floor($quo, $quo);
-    Math::MPFR::Rmpfr_mul_z($quo, $quo, $y, $ROUND);
-    Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+  Math_GMPz__Math_MPFR: {
+        $x = _mpz2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+    }
 
-    $quo;
-};
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPFR Math::MPC) => sub {
-    (@_) = (_mpfr2mpc($_[0]), $_[1]);
-    goto &__mod__;
-};
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
 
-#
-## MPC
-#
-Class::Multimethods::multimethod __mod__ => qw(Math::MPC Math::MPC) => sub {
-    my ($x, $y) = @_;
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
 
-    my $quo = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
+        return $quo;
+    }
 
-    my $real = Math::MPFR::Rmpfr_init2($PREC);
-    my $imag = Math::MPFR::Rmpfr_init2($PREC);
+  Math_MPFR__Scalar: {
 
-    Math::MPC::RMPC_RE($real, $quo);
-    Math::MPC::RMPC_IM($imag, $quo);
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_ui($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
 
-    Math::MPFR::Rmpfr_floor($real, $real);
-    Math::MPFR::Rmpfr_floor($imag, $imag);
+        return $quo;
+    }
 
-    Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+  Math_MPFR__Math_GMPq: {
 
-    Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
-    Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_q($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_q($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
 
-    $quo;
-};
+        return $quo;
+    }
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPC $) => sub {
-    my ($x, $y) = @_;
+  Math_MPFR__Math_GMPz: {
 
-    my $quo = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_div_z($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_z($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
 
-    my $real = Math::MPFR::Rmpfr_init2($PREC);
-    my $imag = Math::MPFR::Rmpfr_init2($PREC);
+        return $quo;
+    }
 
-    Math::MPC::RMPC_RE($real, $quo);
-    Math::MPC::RMPC_IM($imag, $quo);
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-    Math::MPFR::Rmpfr_floor($real, $real);
-    Math::MPFR::Rmpfr_floor($imag, $imag);
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
 
-    Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+        my $quo = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
 
-    Math::MPC::Rmpc_mul_ui($quo, $quo, $y, $ROUND);
-    Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
 
-    $quo;
-};
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPC Math::MPFR) => sub {
-    (@_) = ($_[0], _mpfr2mpc($_[1]));
-    goto &__mod__;
-};
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPC Math::GMPz) => sub {
-    (@_) = ($_[0], _mpz2mpc($_[1]));
-    goto &__mod__;
-};
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
 
-Class::Multimethods::multimethod __mod__ => qw(Math::MPC Math::GMPq) => sub {
-    (@_) = ($_[0], _mpq2mpc($_[1]));
-    goto &__mod__;
-};
+        Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPC__Scalar: {
+
+        my $quo = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+
+        Math::MPC::Rmpc_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+
+        return $quo;
+    }
+
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
+}
 
 1;

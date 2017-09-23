@@ -6,10 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'YAML/PP.pm',
+    'YAML/PP/Constructor.pm',
+    'YAML/PP/Dumper.pm',
+    'YAML/PP/Emitter.pm',
+    'YAML/PP/Exception.pm',
+    'YAML/PP/Grammar.pm',
+    'YAML/PP/Highlight.pm',
+    'YAML/PP/Lexer.pm',
     'YAML/PP/Loader.pm',
     'YAML/PP/Parser.pm',
     'YAML/PP/Reader.pm',
@@ -17,8 +24,10 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/yaml-pp-p5-events',
-    'bin/yaml-pp-p5-load'
+    'bin/yamlpp5-events',
+    'bin/yamlpp5-highlight',
+    'bin/yamlpp5-load',
+    'bin/yamlpp5-load-dump'
 );
 
 # no fake home requested

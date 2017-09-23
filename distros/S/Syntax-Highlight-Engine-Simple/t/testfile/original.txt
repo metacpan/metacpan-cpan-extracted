@@ -1,0 +1,510 @@
+package Syntax::Highlight::Engine::Simple;
+use warnings;
+use strict;
+use Carp;
+use version;
+our $VERSION = qv('0.0.1');
+
+#use Data::Dumper; my $dump = Dumper($res->{'_headers'}); $dump =~ s/\\x{([0-9a-z]+)}/chr(hex($1))/ge; print "<pre>$dump</pre>";use version;
+
+### ----------------------------------------------------------------------------
+### constractor
+### ----------------------------------------------------------------------------
+sub new {
+	
+	my $class = shift;
+	my $self =
+        bless {syntax  => undef, encode => 'utf8', @_}, $class;
+	
+	$self->setSyntax();
+	$self->setParams(@_);
+	
+	return $self;
+}
+
+### ----------------------------------------------------------------------------
+### set params
+### ----------------------------------------------------------------------------
+sub setParams {
+	
+	my $self = shift;
+	
+	my %args = (
+		html_escape_code_ref => \&_html_escape,
+		encode => $self->{encode},
+		@_);
+
+	$self->{encode} = $args{encode};
+	$self->{html_escape_code_ref} = $args{html_escape_code_ref};
+}
+
+### ----------------------------------------------------------------------------
+### set syntax
+### ----------------------------------------------------------------------------
+sub setSyntax {
+	
+	my $self = shift;
+	my %args = (syntax => [], @_);
+    
+	$self->{syntax} = $args{syntax};
+}
+
+### ----------------------------------------------------------------------------
+### append syntax
+### ----------------------------------------------------------------------------
+sub appendSyntax {
+	
+	my $self = shift;
+	my %args = (
+		syntax => {
+			regexp		=> '',
+			class		=> '',
+			allow_nest	=> 0,
+		}, @_);
+    
+	push(@{$self->{syntax}}, $args{syntax});
+}
+
+### ----------------------------------------------------------------------------
+### Highlight multi Line
+### ----------------------------------------------------------------------------
+sub doStr{
+	
+	my $self = shift;
+	my %args = (str => '', tab_width => -1, @_);
+	
+	if ($args{tab_width} > 0) {
+		
+		my $tabed = '';
+		
+		foreach my $line (split(/\r\n|\r|\n/, $args{str})) {
+			
+			$tabed .=
+				&_tab2space(str => $line, tab_width => $args{tab_width}). "\n";
+		}
+		
+		$args{str} = $tabed;
+	}
+	
+	return $self->doLine(str => $args{str});
+}
+
+### ----------------------------------------------------------------------------
+### Highlight file
+### ----------------------------------------------------------------------------
+sub doFile {
+	
+	my $self = shift;
+	my %args = (file => '', tab_width => -1, @_);
+	my $str = '';
+	
+	open(my $filehandle, '<'. $self->{encode},$args{file})
+		or croak 'File open failed';
+	
+	while (my $line = <$filehandle>) {
+		
+		if ($args{tab_width} > 0) {
+			
+			$line = &_tab2space(str => $line, tab_width => $args{tab_width});
+		}
+		
+		$str .= $line;
+	}
+	
+	close($filehandle);
+	
+	return $self->doLine(str => $str);
+}
+
+### ----------------------------------------------------------------------------
+### Highlight single line
+### ----------------------------------------------------------------------------
+sub doLine {
+	
+	my $self = shift;
+	my %args = (
+		str			=> '', 
+		@_);
+	
+	my $str = $args{str}; $str =~ s/\r\n|\r/\n/g;
+	
+	$self->{_markup_map} = [];
+	
+	### make markup map
+	foreach my $regexp (@{$self->{syntax}}) {
+		
+        $self->{_regexp}        = $regexp->{regexp};
+        $self->{_class}         = $regexp->{class};
+        $self->{_allow_nest}    = $regexp->{allow_nest};
+        
+		$self->_make_map(str => $str);
+	}
+	
+	$self->_vacuum_map();
+	
+	my $outstr = '';
+	
+	### Apply the markup map to string
+	{
+		my @markup_array;
+		
+		### Restructure the map array
+		foreach my $elem (@{$self->{_markup_map}}) {
+			
+			push(@markup_array, [$elem->[0], $elem->[2]], [$elem->[1]]);
+		}
+		
+		@markup_array = sort {$a->[0] <=> $b->[0]} @markup_array;
+		
+		my $last_pos = 0;
+		
+		foreach my $pos (@markup_array) {
+			
+			my $str_left = substr($str, $last_pos, $pos->[0] - $last_pos);
+			
+			no strict 'refs';
+			$str_left = &{$self->{html_escape_code_ref}}($str_left);
+			
+			if (defined $pos->[1]) {
+				
+				$outstr .= sprintf("%s<span class='%s'>", $str_left, $pos->[1]);
+			} 
+			
+			else {
+				
+				$outstr .= sprintf("%s</span>", $str_left);
+			}
+			
+			$last_pos = $pos->[0];
+		}
+		
+		$outstr .= substr($str, $last_pos);
+	}
+	
+	return $outstr;
+}
+
+### ----------------------------------------------------------------------------
+### Make markup map
+### ----------------------------------------------------------------------------
+sub _make_map {
+	
+	no warnings; ### Avoid Deep Recursion warning
+	
+	my $self = shift;
+	my %args = (
+		str			=> '', 
+		pos			=> 0, 
+		@_);
+	
+	my $alias = $self->{_markup_map};
+	
+	my @scraps = split(/($self->{_regexp})/, $args{str}, 2);
+	
+	if ((scalar @scraps) >= 3) {
+		
+		my $ins_pos0 = length($scraps[0]) + $args{pos};
+		my $ins_pos1 = length($scraps[1]) + $ins_pos0;
+		
+		### Add markup position
+        push(
+            @$alias, [
+                $ins_pos0,
+                $ins_pos1,
+                $self->{_class},
+                ($self->{_allow_nest} or 0)
+            ]
+        );
+		
+		### Recurseion for rest
+		$self->_make_map(str => pop(@scraps), pos => $ins_pos1);
+		#$self->_make_map(
+		#	str => substr($scraps[1], 1). pop(@scraps), 
+		#	pos => $ins_pos0 + 1
+        #);
+	}
+	
+	### Follow up process
+	elsif (@$alias) {
+		
+		@$alias = sort {$a->[0] <=> $b->[0]} @$alias;
+	}
+	
+	return;
+}
+
+### ----------------------------------------------------------------------------
+### Vacuum map data
+### ----------------------------------------------------------------------------
+sub _vacuum_map {
+	
+	my $self = shift;
+	my $alias = $self->{_markup_map};
+	
+	$self->{_max_close_point} = $$alias[0]->[1];
+	
+	ENTRY_LOOP: for (my $i = 1; $i < scalar @$alias; $i++) {
+		
+		### Remove illigal overlap
+		if ($$alias[$i]->[0] < $$alias[$i - 1]->[1] and 
+			$$alias[$i]->[1] >= $$alias[$i - 1]->[1]) {
+			
+			splice(@$alias, $i--, 1);
+			next ENTRY_LOOP;
+		}
+		
+		### Remove nest if not allowed
+		if (! $$alias[$i]->[3] and
+			$$alias[$i]->[1] <= $self->{_max_close_point}) {
+			
+			splice(@$alias, $i--, 1);
+			next ENTRY_LOOP;
+		}
+		
+		if ($$alias[$i]->[1] > $self->{_max_close_point}) {
+			
+			$self->{_max_close_point} = $$alias[$i]->[1];
+		}
+	}
+}
+
+### ----------------------------------------------------------------------------
+### Return map for debug
+### ----------------------------------------------------------------------------
+sub _ret_map {
+	
+	return shift->{_markup_map};
+}
+
+### ----------------------------------------------------------------------------
+### replace tabs to spaces
+### ----------------------------------------------------------------------------
+sub _tab2space {
+	
+	no warnings; ### Avoid Deep Recursion warning
+	
+	my %args = (str => '', tab_width => 4, @_);
+	my @scraps = split(/\t/, $args{str}, 2);
+	
+	if (scalar @scraps == 2) {
+		
+		my $num = $args{tab_width} - (length($scraps[0]) % $args{tab_width});
+		my $right_str = &_tab2space(%args, str => $scraps[1]);
+		
+		return ($scraps[0]. ' ' x $num. $right_str);
+	}
+	
+	return $args{str};
+}
+
+### ----------------------------------------------------------------------------
+### convert array to regexp
+### ----------------------------------------------------------------------------
+sub array2regexp {
+
+    my $self = shift;
+
+	return sprintf('\\b(?:%s)\\b', join('|', @_));
+}
+
+### ----------------------------------------------------------------------------
+### convert array to regexp
+### ----------------------------------------------------------------------------
+sub getClassNames {
+	
+	return map {$_->{class}} @{shift->{syntax}}
+}
+
+### ----------------------------------------------------------------------------
+### HTML escape
+### ----------------------------------------------------------------------------
+sub _html_escape {
+	
+	my ($str) = @_;
+	
+	$str =~ s/&/&amp;/g;
+	$str =~ s/</&lt;/g;
+	$str =~ s/>/&gt;/g;
+	
+	return $str;
+}
+
+1; # Magic true value required at end of module
+__END__
+
+=head1 NAME
+
+Syntax::Highlight::Engine::Simple - Simple, fast and flexible Syntax Highlight Engine
+
+=head1 VERSION
+
+This document describes Syntax::Highlight::Engine::Simple version 0.0.1
+
+=head1 SYNOPSIS
+
+	use Syntax::Highlight::Engine::Simple;
+	
+	# Constractor
+	$highlight = Syntax::Highlight::Engine::Simple->new(%hash);
+	
+	# Parameter configuration
+	$highlight->setParams(%hash);
+	
+	# Syntax definision and addition
+	$highlight->setSyntax(%hash);
+	$highlight->appendSyntax(%hash);
+	
+	# Perse
+	$highlight->doLine(%hash);
+	$highlight->doFile(%hash);
+	$highlight->doStr(%hash);
+	
+	# Utilities
+	$highlight->array2regexp(%hash);
+	$highlight->getClassNames(%hash);
+
+=head1 DESCRIPTION
+
+This is a Syntax highlight Engine. You can easily and minutely define the rules for highlighting by regular expressions. This is much faster than Text::VimColor or Syntax::Highlight::Engine::Kate.
+
+A working example of This module is at bellow.
+
+http://jamadam.com/cpan/demo/Syntax/Highlight/Engine/Simple/
+
+=head1 INTERFACE 
+
+=over
+
+=item new
+
+=item setParams
+
+=item setSyntax
+
+=item appendSyntax
+
+=item doStr
+
+=item doFile
+
+=item doLine
+
+=item array2regexp
+
+=item getClassNames
+
+=back
+
+=head1 DIAGNOSTICS
+
+=for author to fill in:
+    List every single error and warning message that the module can
+    generate (even the ones that will "never happen"), with a full
+    explanation of each problem, one or more likely causes, and any
+    suggested remedies.
+
+=over
+
+=item C<< Error message here, perhaps with %s placeholders >>
+
+[Description of error here]
+
+=item C<< Another error message here >>
+
+[Description of error here]
+
+[Et cetera, et cetera]
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=for author to fill in:
+    A full explanation of any configuration system(s) used by the
+    module, including the names and locations of any configuration
+    files, and the meaning of any environment variables or properties
+    that can be set. These descriptions must also include details of any
+    configuration language used.
+  
+Syntax::Highlight::Engine::Simple requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+=for author to fill in:
+    A list of all the other modules that this module relies upon,
+    including any restrictions on versions, and an indication whether
+    the module is part of the standard Perl distribution, part of the
+    module's distribution, or must be installed separately. ]
+
+None.
+
+
+=head1 INCOMPATIBILITIES
+
+=for author to fill in:
+    A list of any modules that this module cannot be used in conjunction
+    with. This may be due to name conflicts in the interface, or
+    competition for system or program resources, or due to internal
+    limitations of Perl (for example, many modules that use source code
+    filters are mutually incompatible).
+
+None reported.
+
+
+=head1 BUGS AND LIMITATIONS
+
+=for author to fill in:
+    A list of known problems with the module, together with some
+    indication Whether they are likely to be fixed in an upcoming
+    release. Also a list of restrictions on the features the module
+    does provide: data types that cannot be handled, performance issues
+    and the circumstances in which they may arise, practical
+    limitations on the size of data sets, special cases that are not
+    (yet) handled, etc.
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-syntax-highlight-engine-Simple@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+
+=head1 AUTHOR
+
+Sugama Keita  C<< <sugama@jamadam.com> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, Sugama Keita C<< <sugama@jamadam.com> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

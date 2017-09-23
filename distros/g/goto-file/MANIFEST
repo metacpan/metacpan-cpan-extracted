@@ -12,8 +12,10 @@ dist.ini
 lib/goto/file.pm
 t/caller.t
 t/data.t
+t/ending.t
 t/goto_caller.t
 t/goto_data.t
+t/goto_ending.t
 t/goto_file.t
 t/lines.t
 xt/author/pod-syntax.t

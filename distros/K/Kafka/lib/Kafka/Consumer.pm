@@ -6,7 +6,7 @@ Kafka::Consumer - Perl interface for Kafka consumer client.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Consumer> version 1.06 .
+This documentation refers to C<Kafka::Consumer> version 1.07 .
 
 =cut
 
@@ -14,7 +14,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Carp;
 use Params::Util qw(
@@ -259,6 +259,7 @@ sub new {
         MinBytes            => $MIN_BYTES_RESPOND_IMMEDIATELY,
         MaxBytes            => $DEFAULT_MAX_BYTES,
         MaxNumberOfOffsets  => $DEFAULT_MAX_NUMBER_OF_OFFSETS,
+        ApiVersion          => undef, # undef - allows consumer to choose newest supported
     }, $class;
 
     exists $p{$_} and $self->{$_} = $p{$_} foreach keys %$self;
@@ -342,7 +343,7 @@ sub fetch {
 
     my $request = {
         ApiKey                              => $APIKEY_FETCH,
-        ApiVersion                          => $api_version,
+        ApiVersion                          => $api_version // $self->{ApiVersion},
         CorrelationId                       => _get_CorrelationId(),
         ClientId                            => $self->{ClientId},
         MaxWaitTime                         => int( $self->{MaxWaitTime} * 1000 ),
@@ -439,7 +440,7 @@ Check the configuration of the brokers or topic, specifically
 C<message.timestamp.type>, and set it either to C<LogAppentTime> to have Kafka
 automatically set messages timestamps based on the broker clock, or
 C<CreateTime>, in which case the client populating your topic has to set the
-timestamps when producing messages. .
+timestamps when producing messages.
 
 C<offset_at_time()> takes the following arguments:
 

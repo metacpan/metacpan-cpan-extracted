@@ -74,6 +74,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
     "Dist::Zilla::Role::BeforeBuild" => 0,
     "Dist::Zilla::Role::FileMunger" => 0,
+    "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Dist::Zilla::Role::TextTemplate" => 0,
     "List::MoreUtils" => 0,
@@ -86,7 +87,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -151,6 +152,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
   "Dist::Zilla::Role::BeforeBuild" => 0,
   "Dist::Zilla::Role::FileMunger" => 0,
+  "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "Dist::Zilla::Role::TextTemplate" => 0,
   "List::MoreUtils" => 0,

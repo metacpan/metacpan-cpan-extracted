@@ -3,11 +3,23 @@ use strict;
 use warnings;
 use Test::More;
 use FindBin '$Bin';
+use lib "$Bin/lib";
+
 use Data::Dumper;
+use YAML::PP::Test;
 use YAML::PP::Loader;
 use Encode;
 use File::Basename qw/ dirname basename /;
-my $json_xs = eval "use JSON::XS; 1";
+my $json_xs = eval "use JSON::PP; 1";
+
+my $yts = "$Bin/../yaml-test-suite";
+my @dirs = YAML::PP::Test->get_tests(
+    valid => 1,
+    test_suite_dir => "$yts",
+    dir => "$Bin/valid",
+    json => 1,
+);
+
 
 $|++;
 
@@ -52,24 +64,12 @@ my @skip = qw/
 /;
 my %skip;
 @skip{ @skip }= ();
-my @dirs;
-my $datadir = "$Bin/../yaml-test-suite";
-if (-d "$datadir") {
-    opendir my $dh, $datadir or die $!;
-    @dirs = map {
-        "$datadir/$_"
-    } grep {
-        not exists $skip{ $_ }
-    } grep {
-        -f "$datadir/$_/in.json"
-    } grep {
-        m/^[A-Z0-9]{4}\z/
-    } readdir $dh;
-    closedir $dh;
-}
-else {
-    diag "Skipping tests, no yaml-test-suite directory";
+@dirs = grep { not exists $skip{ basename $_ } } @dirs;
+
+unless (@dirs) {
     ok(1);
+    done_testing;
+    exit;
 }
 
 @dirs = sort @dirs;
@@ -79,8 +79,8 @@ if (my $dir = $ENV{YAML_TEST_DIR}) {
 }
 
 SKIP: {
-    skip "JSON::XS not nstalled", scalar(@dirs) unless $json_xs;
-    my $coder = JSON::XS->new->ascii->pretty->allow_nonref->canonical;
+    skip "JSON::PP not installed", scalar(@dirs) unless $json_xs;
+    my $coder = JSON::PP->new->ascii->pretty->allow_nonref->canonical;
 
 for my $item (@dirs) {
     my $dir = dirname $item;
@@ -89,6 +89,7 @@ for my $item (@dirs) {
     open my $fh, "<", "$dir/$id/in.yaml" or die $!;
     my $yaml = do { local $/; <$fh> };
     close $fh;
+    $yaml = decode_utf8 $yaml;
     open $fh, "<", "$dir/$id/===" or die $!;
     chomp(my $title = <$fh>);
     close $fh;
@@ -96,6 +97,7 @@ for my $item (@dirs) {
     open $fh, "<", "$dir/$id/in.json" or die $!;
     my $exp_json = do { local $/; <$fh> };
     close $fh;
+    $exp_json = decode_utf8 $exp_json;
 
 #    diag "------------------------------ $id";
     my $ypp = YAML::PP::Loader->new(boolean => 'JSON::PP');

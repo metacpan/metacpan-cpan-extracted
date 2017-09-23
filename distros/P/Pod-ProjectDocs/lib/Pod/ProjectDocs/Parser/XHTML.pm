@@ -3,25 +3,28 @@ package Pod::ProjectDocs::Parser::XHTML;
 use strict;
 use warnings;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49';    # VERSION
 
 use base qw(Pod::Simple::XHTML);
 
 use File::Basename();
 use File::Spec();
-use HTML::Entities(); # Required for proper entity detection in Pod::Simple::XHTML.
+use HTML::Entities()
+  ;    # Required for proper entity detection in Pod::Simple::XHTML.
 
 sub new {
     my $class = shift;
-    my $self = $class->SUPER::new(@_);
+    my $self  = $class->SUPER::new(@_);
+
+    $self->perldoc_url_prefix('http://metacpan.org/module/');
 
     return $self;
 }
 
 sub doc {
-    my ($self, $doc) = @_;
+    my ( $self, $doc ) = @_;
 
-    if (defined $doc) {
+    if ( defined $doc ) {
         $self->{_doc} = $doc;
     }
 
@@ -29,9 +32,9 @@ sub doc {
 }
 
 sub local_modules {
-    my ($self, $modules) = @_;
+    my ( $self, $modules ) = @_;
 
-    if (defined $modules) {
+    if ( defined $modules ) {
         $self->{_local_modules} = $modules;
     }
 
@@ -39,9 +42,9 @@ sub local_modules {
 }
 
 sub current_files_output_path {
-    my ($self, $path) = @_;
+    my ( $self, $path ) = @_;
 
-    if (defined $path) {
+    if ( defined $path ) {
         $self->{_current_files_output_path} = $path;
     }
 
@@ -51,15 +54,18 @@ sub current_files_output_path {
 sub resolve_pod_page_link {
     my ( $self, $module, $section ) = @_;
 
-    my %module_map = %{$self->local_modules() || {}};
+    my %module_map = %{ $self->local_modules() || {} };
 
-    if ($module && $module_map{$module}) {
+    if ( $module && $module_map{$module} ) {
         $section = defined $section ? '#' . $self->idify( $section, 1 ) : '';
-        my ($filename, $directory) = File::Basename::fileparse( $self->current_files_output_path, qr/\.html/ );
-        return File::Spec->abs2rel($module_map{$module}, $directory) . $section;
+        my ( $filename, $directory ) =
+          File::Basename::fileparse( $self->current_files_output_path,
+            qr/\.html/ );
+        return File::Spec->abs2rel( $module_map{$module}, $directory )
+          . $section;
     }
 
-    return $self->SUPER::resolve_pod_page_link($module, $section);
+    return $self->SUPER::resolve_pod_page_link( $module, $section );
 
 }
 
@@ -71,39 +77,40 @@ sub resolve_pod_page_link {
 #   Package::Name - Description line.
 #
 sub start_head1 {
-   my ($self, $attrs) = @_;
+    my ( $self, $attrs ) = @_;
 
-   $self->{_in_head1} = 1;
-   return $self->SUPER::start_head1($attrs);
+    $self->{_in_head1} = 1;
+    return $self->SUPER::start_head1($attrs);
 }
 
 sub end_head1 {
-   my ($self, $attrs) = @_;
+    my ( $self, $attrs ) = @_;
 
-   delete $self->{_in_head1};
-   return $self->SUPER::end_head1($attrs);
+    delete $self->{_in_head1};
+    return $self->SUPER::end_head1($attrs);
 }
 
 sub handle_text {
-   my ($self, $text) = @_;
+    my ( $self, $text ) = @_;
 
-   if ($self->{_titleflag}) {
-       my ($name, $description) = $text =~ m{ ^ \s* ([^-]*?) \s* - \s* (.*?) \s* $}x;
+    if ( $self->{_titleflag} ) {
+        my ( $name, $description ) =
+          $text =~ m{ ^ \s* ([^-]*?) \s* - \s* (.*?) \s* $}x;
 
-       if ($description && $self->doc()) {
-           $self->doc()->title($description);
-       }
-       delete $self->{_titleflag};
+        if ( $description && $self->doc() ) {
+            $self->doc()->title($description);
+        }
+        delete $self->{_titleflag};
 
-   }
-   elsif ($self->{_in_head1} && $text eq 'NAME') {
-       $self->{_titleflag} = 1;
-   }
-   else {
-       delete $self->{_titleflag};
-   }
+    }
+    elsif ( $self->{_in_head1} && $text eq 'NAME' ) {
+        $self->{_titleflag} = 1;
+    }
+    else {
+        delete $self->{_titleflag};
+    }
 
-   return $self->SUPER::handle_text($text);
+    return $self->SUPER::handle_text($text);
 }
 
 1;

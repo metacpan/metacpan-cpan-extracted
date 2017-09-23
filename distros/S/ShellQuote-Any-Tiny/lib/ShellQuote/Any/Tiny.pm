@@ -1,22 +1,26 @@
 package ShellQuote::Any::Tiny;
 
-our $DATE = '2017-08-16'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2017-09-20'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 #use warnings;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(shell_quote);
+our $OS;
 
 sub shell_quote {
     my $arg = shift;
 
-    if ($^O eq 'MSWin32') {
+    my $os = $OS || $^O;
+
+    if ($os eq 'MSWin32') {
         if ($arg =~ /\A\w+\z/) {
             return $arg;
         }
-        $arg =~ s/([\\"])/\\$1/g;
+        $arg =~ s/\\(?=\\*(?:"|$))/\\\\/g;
+        $arg =~ s/"/\\"/g;
         return qq("$arg");
     } else {
         if ($arg =~ /\A\w+\z/) {
@@ -42,7 +46,7 @@ ShellQuote::Any::Tiny - Escape string for the Unix/Windows shell
 
 =head1 VERSION
 
-This document describes version 0.005 of ShellQuote::Any::Tiny (from Perl distribution ShellQuote-Any-Tiny), released on 2017-08-16.
+This document describes version 0.007 of ShellQuote::Any::Tiny (from Perl distribution ShellQuote-Any-Tiny), released on 2017-09-20.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,45 @@
+---
+abstract: 'Execute external programs or internal code blocks as separate process.'
+author:
+  - 'Ettore Di Giacinto <edigiacinto@suse.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-IOLoop-ReadWriteProcess
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::IOLoop::ReadWriteProcess:
+    file: lib/Mojo/IOLoop/ReadWriteProcess.pm
+    version: '0.05'
+  Mojo::IOLoop::ReadWriteProcess::Exception:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm
+  Mojo::IOLoop::ReadWriteProcess::Pool:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm
+requires:
+  Mojo::Base: '0'
+  Mojo::File: '0'
+resources:
+  bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
+  homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
+  repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
+version: '0.05'
+x_contributors:
+  - 'Ettore Di Giacinto <mudler@gentoo.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

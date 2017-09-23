@@ -9,20 +9,49 @@ use Code::TidyAll;
 use Digest::SHA qw(sha1_hex);
 use IPC::System::Simple qw(capturex run);
 use Path::Tiny qw(cwd path);
+use Specio::Library::Builtins;
+use Specio::Library::Numeric;
+use Specio::Library::String;
 use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-# Public
-has 'allow_repeated_push' => ( is => 'ro', default => 3 );
-has 'conf_name'           => ( is => 'ro' );
-has 'extra_conf_files'    => ( is => 'ro', default => sub { [] } );
-has 'git_path'            => ( is => 'ro', default => 'git' );
-has 'reject_on_error'     => ( is => 'ro' );
-has 'tidyall_class'       => ( is => 'ro', default => 'Code::TidyAll' );
-has 'tidyall_options'     => ( is => 'ro', default => sub { {} } );
+has allow_repeated_push => (
+    is      => 'ro',
+    isa     => t('PositiveInt'),
+    default => 3,
+);
+
+has conf_name => (
+    is  => 'ro',
+    isa => t('NonEmptyStr'),
+);
+
+has extra_conf_files => (
+    is  => 'ro',
+    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+    default => sub { [] },
+);
+
+has git_path => (
+    is      => 'ro',
+    isa     => t('NonEmptyStr'),
+    default => 'git',
+);
+
+has tidyall_class => (
+    is      => 'ro',
+    isa     => t('ClassName'),
+    default => 'Code::TidyAll',
+);
+
+has tidyall_options => (
+    is      => 'ro',
+    isa     => t('HashRef'),
+    default => sub { {} }
+);
 
 sub check {
     my ( $class, %params ) = @_;
@@ -168,7 +197,7 @@ tidyall'd
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -207,14 +236,14 @@ See also L<Code::TidyAll::Git::Precommit>, which operates locally.
 
 =head1 METHODS
 
-=over
+This class provides the following methods:
 
-=item check (key/value params...)
+=head2 Code::TidyAll::Git::Prerecive->check(%params)
 
-An all-in-one class method. Reads commit info from standard input, then checks
-that all files being added or modified in this push are tidied and valid
-according to L<tidyall>. If not, then the entire push is rejected and the
-reason(s) are output to the client. e.g.
+This method reads commit info from standard input, then checks that all files
+being added or modified in this push are tidied and valid according to
+L<tidyall>. If not, then the entire push is rejected and the reason(s) are
+output to the client. e.g.
 
     % git push
     Counting objects: 9, done.
@@ -256,22 +285,22 @@ Passes mode = "commit" by default; see L<modes|tidyall/MODES>.
 
 Key/value parameters:
 
-=over
+=over 4
 
-=item allow_repeated_push
+=item * allow_repeated_push
 
 Number of times a push must be repeated exactly after which it will be let
-through regardless of errors. Defaults to 3. Set to 0 or undef to disable this
-feature.
+through regardless of errors. Defaults to 3. Set to 0 or C<undef> to disable
+this feature.
 
-=item conf_name
+=item * conf_name
 
 Conf file name to search for instead of the defaults.
 
-=item extra_conf_files
+=item * extra_conf_files
 
-A listref of extra configuration files referred to from the main configuration
-file, e.g.
+An arrayref of extra configuration files referred to from the main
+configuration file, e.g.
 
     extra_conf_files => ['perlcriticrc', 'perltidyrc']
 
@@ -279,21 +308,21 @@ These files will be pulled out of the repo alongside the main configuration
 file. If you don't list them here then you'll get errors like 'cannot find
 perlcriticrc' when the hook runs.
 
-=item git_path
+=item * git_path
 
 Path to git to use in commands, e.g. '/usr/bin/git' or '/usr/local/bin/git'. By
 default, just uses 'git', which will search the user's PATH.
 
-=item reject_on_error
+=item * reject_on_error
 
-Whether C<check()> should reject the commit when an unexpected runtime error
+Whether C<check> should reject the commit when an unexpected runtime error
 occurs. By default, the error will be reported but the commit will be allowed.
 
-=item tidyall_class
+=item * tidyall_class
 
 Subclass to use instead of L<Code::TidyAll>
 
-=item tidyall_options
+=item * tidyall_options
 
 Hashref of options to pass to the L<Code::TidyAll> constructor. You can use
 this to override the default options
@@ -305,18 +334,17 @@ or pass additional options.
 
 =back
 
-=item new (key/value params...)
+=head2 Code::TidyAll::Git::Prereceive->new(%params)
 
-Constructor. Takes the same parameters documented in check(), above, and
-returns a new object which you can then call L</check_input> on.
+This takes the same parameters documented as documented in C<check> above and
+returns a new object which you can then call C<check_input> on.
 
-=item check_input (input)
+=head2 $prereceive->check_input($input)
 
-Run a check on I<input>, the text block of lines that came from standard input.
-You can call this manually before or after you do other processing on the
-input. Returns an error string if there was a problem, undef if no problems.
-
-=back
+Runs a check on I<$input>, the text block of lines that came from standard
+input. You can call this manually before or after you do other processing on
+the input. Returns an error string if there was a problem or undef if there
+were no problems.
 
 =head1 KNOWN BUGS
 

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::TreeSearcher;
-$Config::Model::TreeSearcher::VERSION = '2.108';
+$Config::Model::TreeSearcher::VERSION = '2.110';
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
@@ -147,7 +147,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 

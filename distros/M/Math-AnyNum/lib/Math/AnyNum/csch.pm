@@ -3,18 +3,23 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __csch__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_csch($r, $_[0], $ROUND);
-    $r;
-};
+sub __csch__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-# csch(x) = 1/sinh(x)
-Class::Multimethods::multimethod __csch__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_sinh($r, $_[0], $ROUND);
-    Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_csch($r, $x, $ROUND);
+        return $r;
+    }
+
+    # csch(x) = 1/sinh(x)
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sinh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
+    }
+}
 
 1;

@@ -7,7 +7,7 @@ use File::Spec;
 use File::Basename qw( basename );
 
 # ABSTRACT: A prove plugin that works with File::ShareDir::Dist
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub load
@@ -34,11 +34,11 @@ App::Prove::Plugin::ShareDirDist - A prove plugin that works with File::ShareDir
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
- % prove -PShreDirDist -lv t
+ % prove -PShareDirDist -lv t
 
 =head1 DESCRIPTION
 
@@ -47,9 +47,25 @@ the current directory name, if there is a C<share> directory.  It
 assumes that the directory name is the same as the dist name.  This
 may not be the case, but it happens to be the convention that I use.
 
+=head1 SEE ALSO
+
+=over 4
+
+=item L<prove>
+
+=item L<App::Prove>
+
+=item L<Test::Harness>
+
+=back
+
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Yanick Champoux (yanick)
 
 =head1 COPYRIGHT AND LICENSE
 

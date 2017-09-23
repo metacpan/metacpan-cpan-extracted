@@ -3,29 +3,33 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __norm__ => qw(Math::MPC) => sub {
+sub __norm__ {
     my ($x) = @_;
-    my $f = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPC::Rmpc_norm($f, $x, $ROUND);
-    $f;
-};
+    goto(ref($x) =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __norm__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_sqr($r, $_[0], $ROUND);
-    $r;
-};
+  Math_MPC: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_norm($r, $x, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __norm__ => qw(Math::GMPz) => sub {
-    my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mul($r, $_[0], $_[0]);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sqr($r, $x, $ROUND);
+        return $r;
+    }
 
-Class::Multimethods::multimethod __norm__ => qw(Math::GMPq) => sub {
-    my $r = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_mul($r, $_[0], $_[0]);
-    $r;
-};
+  Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $x);
+        return $r;
+    }
+
+  Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $x);
+        return $r;
+    }
+}
 
 1;

@@ -6,7 +6,7 @@ package Business::ES::NIF;
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use strict;
 use warnings FATAL => 'all';
@@ -56,12 +56,12 @@ Se puede activar la comprobacion sobre el VIES ( Business::Tax::VAT::Validation 
 
 my $Types = {
     NIF => {
-	re => '^[0-9]{8}[A-Za-z]',
+	re => '^[0-9]{8}[A-Z]$',
 	val => sub {
 	    my $dni = shift;
 	    my $ret = shift || 0;
 
-	    $dni =~ /^([0-9]{8})([A-Za-z])$/x;
+	    $dni =~ /^([0-9]{8})([A-Z])$/x;
 	    my ($NIF,$DC) = ($1,$2);
 	    my $L = substr( 'TRWAGMYFPDXBNJZSQVHLCKE', $NIF % 23, 1);
 

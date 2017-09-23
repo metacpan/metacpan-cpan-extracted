@@ -6,7 +6,7 @@ Kafka::Protocol - Functions to process messages in the Apache Kafka protocol.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka::Protocol> version 1.06 .
+This documentation refers to C<Kafka::Protocol> version 1.07 .
 
 =cut
 
@@ -14,7 +14,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Exporter qw(
     import
@@ -38,6 +38,7 @@ our @EXPORT_OK = qw(
     encode_offsetfetch_request
     _decode_MessageSet_template
     _decode_MessageSet_array
+    _encode_Message
     _encode_MessageSet_array
     _encode_string
     _pack64
@@ -52,7 +53,8 @@ our @EXPORT_OK = qw(
     $_int64_template
 );
 
-use Compress::Snappy;
+use Compress::Snappy ();
+use Compress::LZ4Frame ();
 use Const::Fast;
 use Gzip::Faster qw( gzip gunzip );
 use Params::Util qw(
@@ -73,6 +75,7 @@ use Kafka qw(
     $COMPRESSION_GZIP
     $COMPRESSION_NONE
     $COMPRESSION_SNAPPY
+    $COMPRESSION_LZ4
     $DEFAULT_MAX_WAIT_TIME
     %ERROR
     $ERROR_COMPRESSION
@@ -94,8 +97,8 @@ use Kafka::Internals qw(
     $APIKEY_OFFSETFETCH
     $PRODUCER_ANY_OFFSET
     format_message
+    debug_level
 );
-
 
 =head1 SYNOPSIS
 
@@ -747,7 +750,10 @@ if the compression is desirable.
 Supported codecs:
 L<$COMPRESSION_NONE|Kafka/$COMPRESSION_NONE>,
 L<$COMPRESSION_GZIP|Kafka/$COMPRESSION_GZIP>,
-L<$COMPRESSION_SNAPPY|Kafka/$COMPRESSION_SNAPPY>.
+L<$COMPRESSION_SNAPPY|Kafka/$COMPRESSION_SNAPPY>,
+L<$COMPRESSION_LZ4|Kafka/$COMPRESSION_LZ4>.
+
+NOTE: $COMPRESSION_LZ4 requires Kafka 0.10 or higher, as initial implementation of LZ4 in Kafka did not follow the standard LZ4 framing specification.
 
 =back
 
@@ -1816,6 +1822,113 @@ sub _decode_fetch_response_template {
     return;
 }
 
+# kafka uses a snappy-java compressor, with it's own headers and frame formats
+my $XERIAL_SNAPPY_MAGIC_HEADER = "\x82SNAPPY\x00";
+my $XERIAL_SNAPPY_BLOCK_SIZE   = 0x8000; # 32Kb
+my $XERIAL_SNAPPY_FILE_VERSION = 1;
+
+# https://github.com/xerial/snappy-java
+# https://github.com/kubo/snzip/blob/master/snappy-java-format.c
+sub _snappy_xerial_decompress {
+    my ( $data ) = @_;
+    my $uncompressed;
+    my $raw_format_suspected = 1;
+    if ( length($data) > 16 ) {
+        my ( $header, $x_version, $x_compatversion) = unpack( q{a[8]L>L>}, $data );
+        if ( $header eq $XERIAL_SNAPPY_MAGIC_HEADER ) {
+            $raw_format_suspected = 0;
+            _error( $ERROR_COMPRESSION, 'snappy: bad compatversion in snappy xerial header' ) unless $x_compatversion == $XERIAL_SNAPPY_FILE_VERSION;
+            _error( $ERROR_COMPRESSION, 'snappy: bad version in snappy xerial header' ) unless $x_version == $XERIAL_SNAPPY_FILE_VERSION;
+            $data = substr( $data, 16 );
+            while ( length($data) > 0 ) {
+                $uncompressed //= '';
+                _error( $ERROR_COMPRESSION, 'snappy: bad frame length header' ) if length($data) < 4;
+                my $compressed_frame_length = unpack( q{L>}, $data );
+                $data = substr( $data, 4 );
+                _error( $ERROR_COMPRESSION, 'snappy: partial frame ' ) if length($data) < $compressed_frame_length;
+                my $compressed_frame = substr( $data, 0, $compressed_frame_length,  '');
+                my $uncompressed_frame = Compress::Snappy::decompress( $compressed_frame );
+                _error( $ERROR_COMPRESSION, 'snappy: can\'t uncompress frame ' ) if not defined $uncompressed_frame;
+                $uncompressed .=  $uncompressed_frame;
+            }
+        }
+    }
+    if ( $raw_format_suspected ) {
+        $uncompressed = Compress::Snappy::decompress( $data );
+    }
+    return $uncompressed;
+}
+
+sub _snappy_xerial_compress {
+    my ( $data ) = @_;
+    my $compressed_data;
+    while ( length($data) ) {
+         my $block = substr $data, 0, $XERIAL_SNAPPY_BLOCK_SIZE, '';
+         my $compressed_block = Compress::Snappy::compress( $block );
+         _error( $ERROR_COMPRESSION, 'snappy: can\'t compress frame!' ) if not defined $compressed_block;
+         $compressed_data //= pack( q{a[8]L>L>}, $XERIAL_SNAPPY_MAGIC_HEADER, $XERIAL_SNAPPY_FILE_VERSION, $XERIAL_SNAPPY_FILE_VERSION );
+         $compressed_data .= pack( q{L>}, length($compressed_block) ) . $compressed_block;
+    }
+    return $compressed_data;
+}
+
+sub _decompress_data {
+    my ( $data, $compression_codec ) = @_;
+    say STDERR format_message( '[%s] decompress_data request, compression_codec: %s, data: %s',
+        scalar( localtime ),
+        $compression_codec,
+        unpack( 'H*', $data ),
+    ) if Kafka::Protocol->debug_level // 0 >= 3;
+
+    my $decompressed;
+    if ( $compression_codec == $COMPRESSION_GZIP ) {
+        try {
+            $decompressed = gunzip( $data );
+        } catch {
+            _error( $ERROR_COMPRESSION, format_message( 'gunzip failed: %s', $_ ) );
+        };
+    } elsif ( $compression_codec == $COMPRESSION_SNAPPY ) {
+        $decompressed = _snappy_xerial_decompress( $data )
+            // _error( $ERROR_COMPRESSION, 'Unable to decompress snappy compressed data' );
+    } elsif ( $compression_codec == $COMPRESSION_LZ4 ) {
+        # https://cwiki.apache.org/confluence/display/KAFKA/KIP-57+-+Interoperable+LZ4+Framing
+        # New 0.10 clients (proposed behavior) - produce and consume v1 messages w/ correct LZ4F checksum
+        if ( Compress::LZ4Frame::looks_like_lz4frame( $data ) ) {
+            $decompressed = Compress::LZ4Frame::decompress( $data ) // _error( $ERROR_COMPRESSION, 'Unable to decompress LZ4 compressed data' );
+        } else {
+            _error( $ERROR_COMPRESSION, 'Unable to decompress LZ4 compressed data. Frame is not valid' );
+        }
+
+    } else {
+        _error( $ERROR_COMPRESSION, "Unknown compression codec $compression_codec" );
+    }
+    _error( $ERROR_COMPRESSION, 'Decompression produced empty result' ) unless defined $decompressed;
+    return $decompressed;
+}
+
+sub _compress_data {
+    my ( $data, $compression_codec ) = @_;
+    my $compressed;
+
+    # Compression
+    if ( $compression_codec == $COMPRESSION_GZIP ) {
+        $compressed = gzip( $data )
+            // _error( $ERROR_COMPRESSION, 'Unable to compress gzip data' );
+    } elsif ( $compression_codec == $COMPRESSION_SNAPPY ) {
+        $compressed = _snappy_xerial_compress( $data )
+            // _error( $ERROR_COMPRESSION, 'Unable to compress snappy data' );
+    } elsif ( $compression_codec == $COMPRESSION_LZ4 ) {
+        # https://cwiki.apache.org/confluence/display/KAFKA/KIP-57+-+Interoperable+LZ4+Framing
+        # New 0.10 clients (proposed behavior) - produce and consume v1 messages w/ correct LZ4F checksum
+        $compressed = Compress::LZ4Frame::compress_checksum( $data )
+            // _error( $ERROR_COMPRESSION, 'Unable to compress LZ4 data' );
+    } else {
+         _error( $ERROR_COMPRESSION, "Unknown compression codec $compression_codec" );
+    }
+    return $compressed;
+}
+
+
 # Decrypts MessageSet
 sub _decode_MessageSet_array {
     my ( $response, $MessageSetSize, $i_ref, $MessageSet_array_ref, $_override_offset) = @_;
@@ -1859,33 +1972,7 @@ sub _decode_MessageSet_array {
         $Message->{Value} = $Value_length == $NULL_BYTES_LENGTH ? q{} : $data->[ $$i_ref++ ];   # Value
 
         if ( my $compression_codec = $Message->{Attributes} & $COMPRESSION_CODEC_MASK ) {
-            my $decompressed;
-            if ( $compression_codec == $COMPRESSION_GZIP ) {
-                try {
-                    $decompressed = gunzip( $Message->{Value} );
-                } catch {
-                    _error( $ERROR_COMPRESSION, format_message( 'gunzip failed: %s', $_ ) );
-                };
-            } elsif ( $compression_codec == $COMPRESSION_SNAPPY ) {
-                my ( $header, $x_version, $x_compatversion, undef ) = unpack( q{a[8]L>L>L>}, $Message->{Value} );   # undef - $x_length
-
-                # Special thanks to Colin Blower
-                if ( $header eq "\x82SNAPPY\x00" ) {
-                    # Found a xerial header.... nonstandard snappy compression header, remove the header
-                    if ( $x_compatversion == 1 && $x_version == 1 ) {
-                        $Message->{Value} = substr( $Message->{Value}, 20 );    # 20 = q{a[8]L>L>L>}
-                    } else {
-                        #warn("V $x_version and comp $x_compatversion");
-                        _error( $ERROR_COMPRESSION, format_message( 'Snappy compression with incompatible xerial header version found (x_version = %s, x_compatversion = %s)', $x_version, $x_compatversion ) );
-                    }
-                }
-
-                $decompressed = Compress::Snappy::decompress( $Message->{Value} )
-                    // _error( $ERROR_COMPRESSION, 'Unable to decompress snappy compressed data' );
-            } else {
-                _error( $ERROR_COMPRESSION, "Unknown compression codec $compression_codec" );
-            }
-            _error( $ERROR_COMPRESSION, 'Decompression produced empty result' ) unless defined $decompressed;
+            my $decompressed = _decompress_data($Message->{Value}, $compression_codec);
             my @data;
             my $Value_length = length $decompressed;
             my $resp = {
@@ -1918,121 +2005,114 @@ sub _decode_MessageSet_array {
     return;
 }
 
-# Generates a template to encrypt MessageSet
+# Generates a template to encode single message within MessageSet
+sub _encode_Message {
+    my ($request, $Key, $Value, $Attributes, $Offset, $v1_format, $Timestamp) = @_;
+
+    # v1 format - supported since 0.10.0, introduces Timestamps
+    my $MagicByte = $v1_format ? 1 : 0;
+    $Timestamp  //= -1;
+    $Attributes //= $COMPRESSION_NONE; # According to Apache Kafka documentation:
+                                       # The lowest 2 bits contain the compression codec used for the message.
+                                       # The other bits should be set to 0.
+
+
+    my $key_length   = length( $Key   );
+    my $value_length = length( $Value );
+
+    my $message_body = pack(
+            q{cc}                                           # MagicByte
+                                                            # Attributes
+            .( $v1_format    ? q{a[8]}              : q{} ) # Timestamp - v1 only (when MagicByte > 0) (#$_int64_template)
+            .q{l>}                                          # Key length
+            .( $key_length   ? qq{a[$key_length]}   : q{} ) # Key
+            .q{l>}                                          # Value length
+            .( $value_length ? qq{a[$value_length]} : q{} ) # Value
+        ,
+        $MagicByte,
+        $Attributes,
+        $v1_format    ? ( _pack64( $Timestamp )  ) : (),
+        $key_length   ? ( $key_length,    $Key   ) : ( $NULL_BYTES_LENGTH ),
+        $value_length ? ( $value_length,  $Value ) : ( $NULL_BYTES_LENGTH ),
+    );
+
+    my $MessageBodySize = length($message_body);
+    my $MessageSize     = $MessageBodySize + 4;
+
+    my $data = $request->{data};
+    $request->{template}    .= $_MessageSet_template . qq{l>a[$MessageBodySize]}; # crc + message_body
+    $request->{len}         += $_MessageSet_length + $MessageSize;
+
+    push @$data, (_pack64( $Offset ), $MessageSize, crc32( $message_body ), $message_body );
+    return;
+}
+
+# Generates a template to encode MessageSet
 sub _encode_MessageSet_array {
     my ( $request, $MessageSet_array_ref, $compression_codec ) = @_;
 
-    my ( $MessageSize, $Key, $Value, $key_length, $value_length, $message_body, $message_set );
+    # not sure if it would be good to mix different formats in different messages in the same set
+    # so detect if we should use v1 format
+    my $use_v1_format;
+    foreach my $MessageSet ( @$MessageSet_array_ref ) {
+        if ( $MessageSet->{Timestamp} ) {
+            $use_v1_format = 1;
+            last;
+        }
+    }
 
     if ( $compression_codec ) {
+        my $subrequest = {
+            data     => [],
+            template => '',
+            len      => 0
+        };
+        my ( $Key, $Value );
+
         foreach my $MessageSet ( @$MessageSet_array_ref ) {
-            $key_length   = length( $Key    = $MessageSet->{Key} );
-            $value_length = length( $Value  = $MessageSet->{Value} );
-
-            $message_body = pack(
-                    q{ccl>}                                         # MagicByte
-                                                                    # Attributes
-                                                                    # Key length
-                    .( $key_length   ? qq{a[$key_length]}   : q{} ) # Key
-                    .q{l>}                                          # Value length
-                    .( $value_length ? qq{a[$value_length]} : q{} ) # Value
-                ,
-                0,
-                $COMPRESSION_NONE,  # According to Apache Kafka documentation:
-                                    # The lowest 2 bits contain the compression codec used for the message.
-                                    # The other bits should be set to 0.
-                $key_length     ? ( $key_length,    $Key )    : ( $NULL_BYTES_LENGTH ),
-                $value_length   ? ( $value_length,  $Value )  : ( $NULL_BYTES_LENGTH ),
-            );
-
-            $message_set .= pack( qq(x[8]l>l>),     # 8 Offset ($PRODUCER_ANY_OFFSET)
-                length( $message_body ) + 4,        # [l] MessageSize ( $message_body + Crc )
-                crc32( $message_body )              # [l] Crc
-            ).$message_body;
+            _encode_Message( $subrequest,
+                             $Key = $MessageSet->{Key},
+                             $MessageSet->{Value},
+                             $COMPRESSION_NONE,
+                             $PRODUCER_ANY_OFFSET,
+                             $use_v1_format,
+                             $MessageSet->{Timestamp}
+                           );
         }
+
+        $Value = pack($subrequest->{template}, @{$subrequest->{data}});
 
         $MessageSet_array_ref = [
             {
                 Offset  => $PRODUCER_ANY_OFFSET,
                 Key     => $Key,
+                Value   => _compress_data($Value, $compression_codec),
             }
         ];
 
-        # Compression
-        if ( $compression_codec == $COMPRESSION_GZIP ) {
-            $MessageSet_array_ref->[0]->{Value} = gzip( $message_set )
-                // _error( $ERROR_COMPRESSION, 'Unable to compress gzip data' );
-        } elsif ( $compression_codec == $COMPRESSION_SNAPPY ) {
-            $MessageSet_array_ref->[0]->{Value} = Compress::Snappy::compress( $message_set )
-                // _error( $ERROR_COMPRESSION, 'Unable to compress snappy data' );
-        } else {
-             _error( $ERROR_COMPRESSION, "Unknown compression codec $compression_codec" );
-        }
+    }
+
+    my $subrequest = {
+        data     => [],
+        template => '',
+        len      => 0
+    };
+
+    foreach my $MessageSet ( @$MessageSet_array_ref ) {
+        _encode_Message( $subrequest,
+                         $MessageSet->{Key},
+                         $MessageSet->{Value},
+                         $compression_codec // $COMPRESSION_NONE,
+                         $MessageSet->{Offset},
+                         $use_v1_format,
+                         $MessageSet->{Timestamp}
+                       );
     }
 
     my $data = $request->{data};
-    my $MessageSetSize = 0;
-    my %sizes;
-    foreach my $MessageSet ( @$MessageSet_array_ref ) {
-        $MessageSetSize +=
-              12                                                            # [q] Offset
-                                                                            # [l] MessageSize
-            + ( $sizes{ $MessageSet } =                                     # MessageSize
-                  10                                                        # [l] Crc
-                                                                            # [c] MagicByte
-                                                                            # [c] Attributes
-                                                                            # [l] Key length
-                + length( $MessageSet->{Key}    //= q{} )                   # Key
-                + 4                                                         # [l] Value length
-                + length( $MessageSet->{Value}  //= q{} )                   # Value
-            )   # MessageSize
-            ;
-    }
-    push( @$data, $MessageSetSize );
-    $request->{template}    .= q{l>};                                       # MessageSetSize
-    $request->{len}         += 4;
-
-    foreach my $MessageSet ( @$MessageSet_array_ref ) {
-        push( @$data,
-            _pack64( $MessageSet->{Offset} ),                               # Offset (It may be $PRODUCER_ANY_OFFSET)
-            ( $MessageSize = $sizes{ $MessageSet } ),                       # MessageSize
-        );
-        $request->{template}    .= $_MessageSet_template;
-        $request->{len}         += $_MessageSet_length;
-
-        $key_length   = length( $Key    = $MessageSet->{Key} );
-        $value_length = length( $Value  = $MessageSet->{Value} );
-
-        $message_body = pack(
-                q{ccl>}                                         # MagicByte
-                                                                # Attributes
-                                                                # Key length
-                .( $key_length   ? qq{a[$key_length]}   : q{} ) # Key
-                .q{l>}                                          # Value length
-                .( $value_length ? qq{a[$value_length]} : q{} ) # Value
-            ,
-            0,
-            $compression_codec // $COMPRESSION_NONE,    # According to Apache Kafka documentation:
-                                # The lowest 2 bits contain the compression codec used for the message.
-                                # The other bits should be set to 0.
-            $key_length     ? ( $key_length,    $Key )    : ( $NULL_BYTES_LENGTH ),
-            $value_length   ? ( $value_length,  $Value )  : ( $NULL_BYTES_LENGTH ),
-        );
-
-        push( @$data, crc32( $message_body ), $message_body );
-        # Message
-        $request->{template} .= q{l>a[}                                         # Crc
-            .( $MessageSize - 4 )   # 4 Crc
-            .qq{]};
-        # Message body:
-                                                                                # MagicByte
-                                                                                # Attributes
-                                                                                # Key length
-                                                                                # Key
-                                                                                # Value length
-                                                                                # Value
-        $request->{len} += $MessageSize;    # Message
-    }
+    $request->{template}     .= q{l>}   . $subrequest->{template};
+    $request->{len}          +=     4   + $subrequest->{len};
+    push @$data, ( $subrequest->{len}, @{ $subrequest->{data}     } );
 
     return;
 }

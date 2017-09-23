@@ -12,7 +12,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION = q[476.1.1];
+our $VERSION = q[476.4.2];
 
 Readonly::Scalar our $TYPES => {
 				'primary key' => 'bigint unsigned not null auto_increment primary key',
@@ -26,10 +26,27 @@ sub dbh {
   }
 
   if(!$self->{dbh}) {
-    my $dsn = sprintf q(DBI:mysql:database=%s;host=%s;port=%s),
+    my $dsn_opts = q[];
+    if($self->{dsn_opts}) {
+      if(ref $self->{dsn_opts} && scalar keys %{$self->{dsn_opts}}) {
+        #########
+        # structured key:value pairs
+        #
+        $dsn_opts = join q[;], q[], map { sprintf q[%s=%s], $_, $self->{dsn_opts}->{$_} } sort keys %{$self->{dsn_opts}};
+
+      } else {
+        #########
+        # scalar line e.g. straight out of config.ini
+        #
+        $dsn_opts = sprintf q[;%s], $self->{dsn_opts};
+      }
+    }
+
+    my $dsn = sprintf q(DBI:mysql:database=%s;host=%s;port=%s%s),
 		      $self->{dbname} || q[],
 		      $self->{dbhost} || q[localhost],
-		      $self->{dbport} || q[3306];
+		      $self->{dbport} || q[3306],
+                      $dsn_opts;
 
     eval {
       $self->{dbh} = DBI->connect($dsn,

@@ -194,7 +194,7 @@ is_deeply(\%list2, {
 }, "list returns 4 key/value pairs" );
 
 my $five = One::Two::Three::Five->new();
-my %list = $five->hash( three => 'ahhhh' );
+%list = $five->hash( three => 'ahhhh' );
 is_deeply(\%list, { 
     one => 'Hello World', 
     two => 'Goodbye World', 
@@ -209,7 +209,7 @@ like( $errors, qr/Unrecognized parameter: four/, "four is currently not a valid 
 
 my $seven = One::Two::Three::Seven->new();
 eval { $seven->hash( three => 'ahhhh' ) };
-my $errors = $@;
+$errors = $@;
 like( $errors, qr/Unrecognized parameter: four/, "four is currently not a valid param");
 
 my $eight = One::Two::Three::Eight->new();

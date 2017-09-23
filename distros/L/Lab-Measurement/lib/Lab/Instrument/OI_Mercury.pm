@@ -1,6 +1,6 @@
 package Lab::Instrument::OI_Mercury;
 #ABSTRACT: Oxford Instruments Mercury Cryocontrol (level meter and magnet power supply)
-$Lab::Instrument::OI_Mercury::VERSION = '3.554';
+$Lab::Instrument::OI_Mercury::VERSION = '3.600';
 use strict;
 use Lab::Instrument;
 
@@ -323,7 +323,7 @@ Lab::Instrument::OI_Mercury - Oxford Instruments Mercury Cryocontrol (level mete
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

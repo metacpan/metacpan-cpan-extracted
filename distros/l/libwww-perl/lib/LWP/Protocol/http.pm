@@ -1,5 +1,5 @@
 package LWP::Protocol::http;
-$LWP::Protocol::http::VERSION = '6.26';
+$LWP::Protocol::http::VERSION = '6.27';
 use strict;
 
 require HTTP::Response;
@@ -497,8 +497,9 @@ sub request
 
 
 #-----------------------------------------------------------
-package LWP::Protocol::http::SocketMethods;
-$LWP::Protocol::http::SocketMethods::VERSION = '6.26';
+package # hide from PAUSE
+    LWP::Protocol::http::SocketMethods;
+
 sub ping {
     my $self = shift;
     !$self->can_read(0);
@@ -510,8 +511,9 @@ sub increment_response_count {
 }
 
 #-----------------------------------------------------------
-package LWP::Protocol::http::Socket;
-$LWP::Protocol::http::Socket::VERSION = '6.26';
+package # hide from PAUSE
+    LWP::Protocol::http::Socket;
+
 use base qw(LWP::Protocol::http::SocketMethods Net::HTTP);
 
 1;

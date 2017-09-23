@@ -1,0 +1,10 @@
+be able to open a record store read only
+
+ * conversion of old to new database ( command line maybe? )
+
+
+testing -
+ * check version
+ * check db without version ( assumes < 2 ) - so bottle up an old style version
+     and see if it can be read from and written to
+ 

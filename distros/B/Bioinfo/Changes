@@ -1,10 +1,50 @@
 ==================================================
-Changes from 2017-06-24 00:00:00 +0000 to present.
+Changes from 2017-07-17 00:00:00 +0000 to present.
 ==================================================
 
+-------------------------------------------
+version 0.1.11 at 2017-09-15 16:35:58 +0000
+-------------------------------------------
+
+  Change: 04c2b88daf4ef97439d4f893a05a27b526ca2e6d
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:35:44 +0000
+
+    nonsen 
+
 ------------------------------------------
-version 0.1.8 at 2017-08-23 06:49:26 +0000
+version 0.1.8 at 2017-09-15 16:27:40 +0000
 ------------------------------------------
+
+  Change: 9c9d63a3e60af917036c8608512aab786cf14a8a
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:27:02 +0000
+
+    nonsen 
+
+  Change: 5911b06ff37bb9fe857008330973b307f0bbe719
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:07:41 +0000
+
+    Added a app which can extract specified sequence from fasta file 
+
+  Change: 977abfe092e531d4a4adc2148eb8836f1fffab21
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:06:23 +0000
+
+    Fixed bug when seq name don't include annotation 
+
+  Change: 3093fd9cee46592d9fa4a3463854634f2c797f3d
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:05:28 +0000
+
+    Modified xls and xls.m8 file path 
+
+  Change: 0a314fd315a6e26ab856e35501c1da8fe82a12dd
+  Author: Yan Xueqing <yanxueqing621@163.com>
+  Date : 2017-09-16 00:04:43 +0000
+
+    Change default parallel 1 to tasks number 
 
   Change: 65e45217b11a591519e8630c5ec7b1a7c9193c4e
   Author: Yan Xueqing <yanxueqing621@163.com>
@@ -189,5 +229,5 @@ version 0.1.0 at 2017-07-28 09:45:39 +0000
     Initialize gitrepo with `dzil new` 
 
 ================================================
-Plus 2 releases after 2017-06-24 00:00:00 +0000.
+Plus 2 releases after 2017-07-17 00:00:00 +0000.
 ================================================

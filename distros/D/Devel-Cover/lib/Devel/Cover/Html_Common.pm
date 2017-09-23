@@ -1,14 +1,14 @@
 package Devel::Cover::Html_Common;
-BEGIN {require 5.006}
+
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use Exporter;
 
-our @ISA       = 'Exporter';
-our @EXPORT_OK = 'launch';
+our @ISA       = "Exporter";
+our @EXPORT_OK = "launch";
 
 sub launch {
     my ($package, $opt) = @_;
@@ -29,7 +29,7 @@ Devel::Cover::Report::Html_Common - Common code for HTML reporters
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 
@@ -52,4 +52,4 @@ Devel::Cover
 
 =cut
 
-1;
+1

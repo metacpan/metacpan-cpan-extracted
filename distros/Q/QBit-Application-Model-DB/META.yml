@@ -26,4 +26,4 @@ requires:
   base: 0
   qbit: 0
   strict: 0
-version: 0.019
+version: 0.020

@@ -1,0 +1,208 @@
+
+=head1 NAME
+
+WWW::Kickstarter::Data::Tags - Kickstarter tags
+
+
+=head1 DESCRIPTION
+
+Projects can be searched by tag. The list of tags available changes often. I don't know of an API endpoint that returns a list of available tags, but you can find some of them on L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>. This document lists the tags known to exist at the time of this writing. It also lists tags known to have existed at some time.
+
+
+=head1 TAGS
+
+=head2 PUBLIC TAGS
+
+The following tags are listed on L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>:
+
+=over
+
+=item * Accessible Art (id: 247, slug: accessible-art)
+
+=item * Bikes (id: 50, slug: ride-with-it) [Formerly named "Ride With It"]
+
+=item * DIY (id: 5, slug: diy)
+
+=item * Innovation (id: 128, slug: innovative) [Formerly named "Innovative"]
+
+=item * Just for Kids (id: 86, slug: kids) [Formerly named "Kids"]
+
+=item * LGBTQ (id: 16, slug: lgbtq)
+
+=item * Make Vinyl (id: 239, slug: make-vinyl)
+
+=item * Projects of Earth (id: 248, slug: projects-of-earth)
+
+=item * Public Benefit (id: 3, slug: public-benefit) [Formerly named "Civic", with slug "civic"]
+
+=item * Robots (id: 41, slug: robots)
+
+=item * RPGs (id: 33, slug: rpg) [Formerly named "RPG"]
+
+=item * Sci-Fi and Fantasy (id: 139, slug: sci-fi) [Formerly named "Sci-Fi"]
+
+=item * STEM (id: 204, slug: stem)
+
+=item * Virtual Reality (id: 154, slug: vr)
+
+=back
+
+
+=head2 SECRET TAGS
+
+The following tags are known to exist, but they aren't mentioned on L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>. It's possible they aren't actively used (yet/anymore). This list was obtained through trial and error.
+
+=over
+
+=item * All in 1 (id: 224, slug: ???)
+
+=item * Always Be Learning (id: 74, slug: education)
+
+=item * Animal Kingdom (id: 1, slug: animal-kingdom)
+
+=item * Art (id: 222, slug: art)
+
+=item * Artisanal (id: 122, slug: artisanal)
+
+=item * BAMF 2017 (id: 234, slug: ???)
+
+=item * Bookish (id: 46, slug: library) [Formerly named "Library"]
+
+=item * Burning Man (id: 34, slug: burning-man)
+
+=item * CES (id: 212, slug: ces)
+
+=item * Carpe Noctem (id: 174, slug: carpe-noctem)
+
+=item * Coloring Books (id: 203, slug: coloring-books)
+
+=item * Compelling Stories (id: 120, slug: compelling-stories)
+
+=item * Enamel Pins (id: 199, slug: enamel-pins)
+
+=item * Essence (id: 231, slug: essence)
+
+=item * Everyday Carry (id: 237, slug: everyday-carry)
+
+=item * Exquisite Objects (id: 210, slug: exquisite-objects)
+
+=item * Getting Political  (id: 197, slug: getting-political)
+
+=item * Go Green (id: 121, slug: go-green)
+
+=item * Hardware Studio (id: 250, slug: hardware-studio)
+
+=item * In the Kitchen (id: 118, slug: lets-eat) [Fornerly named "Let's Eat"]
+
+=item * Instagram (id: 192, slug: instagram)
+
+=item * Kickstarter Gold (id: 230, slug: kickstarter-gold)
+
+=item * Make 100 (id: 218, slug: make-100)
+
+=item * Maker (id: 10, slug: hacker-maker)
+
+=item * Monsters (id: 30, slug: zombies) [Formerly named "Zombies"]
+
+=item * Museums (id: 63, slug: museums)
+
+=item * Music Tech (id: 205, slug: music-tech)
+
+=item * Open Source (id: 20, slug: open-source)
+
+=item * Preserve and Restore (id: 110, slug: conservation)
+
+=item * Science (id: 19, slug: science)
+
+=item * Space (id: 28, slug: space)
+
+=item * Standout Style (id: 136, slug: standout-style)
+
+=item * Timepieces (id: 219, slug: timepieces)
+
+=item * Turn It Up (id: 132, slug: audiophiles)
+
+=item * Wellness (id: 130, slug: wellness) [Formerly named "Health Nuts", with slug "health-nuts"]
+
+=item * World Explorers (id: 126, slug: world-explorers)
+
+=back
+
+
+=head2 DEFUNCT TAGS
+
+The following tags are known to have existed at some time, but are no longer recognized:
+
+=over
+
+=item * Add To It (id: 127, slug: add-to-it)
+
+=item * Arctic (id: 39, slug: arctic)
+
+=item * At Home (id: 131, slug: at-home)
+
+=item * Avant-Garde (id: 138, slug: avant-garde)
+
+=item * Cats (id: 31, slug: cats)
+
+=item * Creative Spaces (id: 78, slug: creative-spaces)
+
+=item * Cthulhu (id: 38, slug: cthulhu)
+
+=item * Dance Films (id: 189, slug: dance-films)
+
+=item * Dapper (id: 135, slug: dapper)
+
+=item * Fantasy (id: 133, slug: fantasy)
+
+=item * Fringe (id: 99, slug: fringe)
+
+=item * Great GIFs (id: 175, slug: great-gifs)
+
+=item * Great Gifts (id: 129, slug: great-gifts)
+
+=item * Inspirational (id: 123, slug: inspirational)
+
+=item * Integrity Pick (id: 176, slug: integrity-pick)
+
+=item * It's History (id: 125, slug: its-history)
+
+=item * LOL (id: 105, slug: lol)
+
+=item * Maker Faire (id: 87, slug: maker-faire)
+
+=item * Maps (id: 48, slug: maps)
+
+=item * Movers and Shakers (id: 124, slug: movers-and-shakers)
+
+=item * Movie Theater (id: 43, slug: movie-theater)
+
+=item * Net Culture (id: 119, slug: net-culture)
+
+=item * Print It (id: 77, slug: print-it)
+
+=item * Projects We Love (id: 115, slug: projects-we-love)
+
+=item * Punk (id: 134, slug: punk)
+
+=item * Retro (id: 22, slug: retro)
+
+=item * See It Live (id: 137, slug: see-it-live)
+
+=item * Space is the Place (id: 107, slug: space-is-the-place)
+
+=item * Sundance (id: 29, slug: sundance)
+
+=item * Trailers (id: 187, slug: trailers)
+
+=item * World Maker Faire 2014 (id: 106, slug: world-maker-faire-2014)
+
+=back
+
+
+=head1 VERSION, BUGS, KNOWN ISSUES, DOCUMENTATION, SUPPORT, AUTHOR, COPYRIGHT AND LICENSE
+
+See L<WWW::Kickstarter>
+
+
+=cut

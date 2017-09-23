@@ -1,0 +1,48 @@
+---
+abstract: 'Executor of TeamCity build configurations'
+author:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Teamcity-Executor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Teamcity::Executor:
+    file: lib/Teamcity/Executor.pm
+    version: v0.1.1
+requires:
+  Cpanel::JSON::XS: '0'
+  Future: '0'
+  HTTP::Tiny: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Timer::Periodic: '0'
+  IO::Socket::SSL: '0'
+  Moose: '0'
+  autobox::Core: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/avast/Teamcity-Executor/issues
+  homepage: https://github.com/avast/Teamcity-Executor
+  repository: git://github.com/avast/Teamcity-Executor.git
+version: 0.1.1
+x_authority: cpan:TYNOVSKY
+x_contributors:
+  - 'tynovsky <tynovsky@seznam.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

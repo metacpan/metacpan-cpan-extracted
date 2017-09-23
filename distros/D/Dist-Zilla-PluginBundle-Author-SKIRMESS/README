@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.014
+    Version 0.022
 
 SYNOPSIS
 
@@ -18,7 +18,11 @@ DESCRIPTION
 
 USAGE
 
-    To use this PluginBundle, just add it to your dist.ini.
+    To use this PluginBundle, just add it to your dist.ini. You can provide
+    the following options:
+
+      * set_script_shebang - this indicates whether SetScriptShebang should
+      be used or not
 
 SUPPORT
 

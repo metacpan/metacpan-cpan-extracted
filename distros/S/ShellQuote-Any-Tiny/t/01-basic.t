@@ -10,10 +10,19 @@ test_echo(arg => '', result => '');
 test_echo(arg => ' ', result => ' ');
 test_echo(arg => 'hello', result => 'hello');
 test_echo(arg => 'hello world', result => 'hello world');
+
 test_echo(arg => 'a\\', result => 'a\\');
 test_echo(arg => 'a\\\\', result => 'a\\\\');
+test_echo(arg => 'a\\ \\', result => 'a\\ \\');
+test_echo(arg => 'a\\ \\\\', result => 'a\\ \\\\');
+
 test_echo(arg => "'", result => "'");
+
 test_echo(arg => '"', result => '"');
+test_echo(arg => '"abc" d e', result => '"abc" d e');
+test_echo(arg => 'a\\\\\\b d"e f"g h', result => 'a\\\\\\b d"e f"g h');
+test_echo(arg => 'a\\\\\\"b c d', result => 'a\\\\\\"b c d');
+test_echo(arg => 'a\\\\\\\\"b c" d e', result => 'a\\\\\\\\"b c" d e');
 
 done_testing;
 

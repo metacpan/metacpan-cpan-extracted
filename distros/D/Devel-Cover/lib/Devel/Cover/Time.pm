@@ -10,15 +10,15 @@ package Devel::Cover::Time;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
-sub uncoverable { 0 }
-sub covered     { ${$_[0]} }
-sub total       { 1 }
+sub uncoverable { 0                  }
+sub covered     { ${$_[0]}           }
+sub total       { 1                  }
 sub percentage  { ${$_[0]} ? 100 : 0 }
-sub error       { 0 }
+sub error       { 0                  }
 
 sub calculate_summary {
     my $self = shift;
@@ -45,7 +45,7 @@ Devel::Cover::Time - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

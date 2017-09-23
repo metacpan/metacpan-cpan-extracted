@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 use Keyword::Declare;
 
@@ -119,8 +119,9 @@ sub _format_data {
                         $dump .= exists $+{key}     ? _color( "$+{key}",     $COLOUR{key}   )
                                : exists $+{punct}   ? _color( "$+{punct}",   $COLOUR{punct} )
                                : exists $+{literal} ? _color( "$+{literal}", $COLOUR{value} )
-                               :                             "$+{space}"
-                     }gxmse;
+                               :                              "$+{space}";
+                        "";
+                     }gxmseo;
         }
 
         $dump =~ s{ (?! \A ) ^ }{$indent}gxms;
@@ -148,7 +149,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000007
+This document describes Data::Dx version 0.000008
 
 
 =head1 SYNOPSIS
@@ -273,7 +274,10 @@ Data::Dx requires no configuration files or environment variables.
 
 Requires the Data::Dump and Keyword::Declare modules.
 
-Only works under Perl 5.12 and later (the release in 
+If you want syntax colouring on the dumps, also requires the
+Term::ANSIColor module (plus Win32::Console::ANSI under Windows)
+
+Only works under Perl 5.12 and later (the release in
 which pluggable keywords were added to Perl).
 
 Does not work under Perl 5.20 (due to problems with regex compilation

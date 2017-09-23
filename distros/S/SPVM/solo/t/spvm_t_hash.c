@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "../../spvm_hash.h"
 #include "../../spvm_hash_entry.h"
@@ -14,6 +17,16 @@
 
 int main()
 {
+  // Hash - first same key
+  {
+    SPVM_HASH* hash = SPVM_HASH_new(0);
+    int32_t value1 = 3;
+    SPVM_HASH_insert_norehash(hash, "", 0, &value1);
+    
+    int32_t value1_ret = *(int32_t*)SPVM_HASH_search(hash, "", 0);
+    OK(value1_ret == 3);
+  }
+  
   // Hash - new
   {
     SPVM_HASH* hash = SPVM_HASH_new(10);
@@ -155,23 +168,26 @@ int main()
     int32_t i;
     int32_t max = 70000;
     
-    int32_t* values = malloc(sizeof(int32_t) * max);
-    for (i = 0; i < max; i++) {
-      values[i] = i * 10;
-    }
+    SPVM_HASH_insert(hash, "", strlen(""), (void*)(intptr_t)-1);
     
-    for (i = 0; i < max; i++) {
+    for (i = 1; i < max; i++) {
       char* key = malloc(10);
       sprintf(key, "key%d", i);
-      SPVM_HASH_insert(hash, key, strlen(key), &values[i]);
+      SPVM_HASH_insert(hash, key, strlen(key), (void*)(intptr_t)(i * 10));
     }
     
     _Bool ok = 1;
-    for (i = 0; i < max; i++) {
+    
+    int32_t value = (int32_t)(intptr_t)SPVM_HASH_search(hash, "", strlen(""));
+    if (value != -1) {
+      ok = 0;
+    }
+    
+    for (i = 1; i < max; i++) {
       char* key = malloc(10);
       sprintf(key, "key%d", i);
-      int32_t* value_ptr = SPVM_HASH_search(hash, key, strlen(key));
-      if (*value_ptr != i * 10) {
+      int32_t value = (int32_t)(intptr_t)SPVM_HASH_search(hash, key, strlen(key));
+      if (value != i * 10) {
         ok = 0;
       }
     }

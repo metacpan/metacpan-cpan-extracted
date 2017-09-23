@@ -11,7 +11,7 @@ use WWW::Twilio::API;
 
 use parent qw(SMS::Send::Driver);
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 =encoding utf-8
 
@@ -28,13 +28,13 @@ SMS::Send::Twilio - SMS::Send backend for Twilio API
     _authtoken  => 'b857f7afe254fa86c689648447e04cff',
     _from       => '+15005550006',
   );
-  
+
   # Send a message to me
   my $sent = $sender->send_sms(
-    text => 'Messages have a limit of 160 chars',
+    text => 'Messages can be up to 1600 characters',
     to   => '+31645742418',
   );
-  
+
   # Did it send?
   if ( $sent ) {
     print "Sent test message\n";
@@ -67,7 +67,7 @@ If not we'd see an error message on STDERR.
 
   # Send a message to me
   my $sent = $sender->send_sms(
-    text => 'Messages have a limit of 160 chars',
+    text => 'Messages can be up to 1600 characters',
     to   => '+31645742418',
   );
 
@@ -104,7 +104,7 @@ sub send_sms {
     my $recipient = delete $params{to};
 
     my $response = $self->{twilio}->POST(
-        'SMS/Messages.json',
+        'Messages.json',
         From => $self->{_from},
         To   => $recipient,
         Body => $message,

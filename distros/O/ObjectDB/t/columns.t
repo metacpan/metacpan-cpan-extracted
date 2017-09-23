@@ -32,7 +32,7 @@ subtest 'should set column overwrites undef value' => sub {
 subtest 'should not null columns return empty strings' => sub {
     my $row = _build(foo => undef);
 
-    is($row->get_column('foo'), '');
+    ok !defined $row->get_column('foo');
 };
 
 subtest 'should null columns return undef' => sub {

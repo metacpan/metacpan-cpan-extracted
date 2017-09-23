@@ -84,6 +84,7 @@ retval: 1
 command: TRAC:DATA:RESP:ALL? CH1DATA
 id: 16
 method: Query
+read_length: 29
 retval: 23323234aefcc53ead1075bfe15f96be66d1f43ec7ed5ebe82f48e3d
 retval_enc: hex
 timeout: 10
@@ -101,6 +102,7 @@ retval: 1
 command: TRAC:DATA:RESP:ALL? CH1DATA
 id: 19
 method: Query
+read_length: 29
 retval: 233232340575c23ec31d75bf640496bef2b9f43eee735ebe1b998d3d
 retval_enc: hex
 timeout: 10
@@ -118,6 +120,7 @@ retval: 1
 command: TRAC:DATA:RESP:ALL? CH1DATA
 id: 22
 method: Query
+read_length: 29
 retval: 23323234cc56a43e66b577bfe55d96bec45af43e6edf5fbe06968e3d
 retval_enc: hex
 timeout: 10

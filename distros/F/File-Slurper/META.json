@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "File::Slurper" : {
          "file" : "lib/File/Slurper.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -80,12 +80,13 @@
          "web" : "https://github.com/Leont/file-slurp-sane"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_contributors" : [
       "Jim Davis <revhippie@gmail.com>",
       "Leon Timmermans <fawaka@gmail.com>",
       "Olivier Mengu\u00e9 <dolmen@cpan.org>",
       "Philipp Gortan <philipp.gortan@apa.at>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

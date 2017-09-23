@@ -8,7 +8,7 @@ use Plack::Util::Accessor qw(schema validator);
 use Plack::Response;
 use APISchema::Generator::Router::Simple;
 use APISchema::Validator;
-use JSON::XS qw(encode_json);
+use APISchema::JSON;
 
 use constant DEFAULT_VALIDATOR_CLASS => 'Valiemon';
 
@@ -45,7 +45,7 @@ sub call {
             @$res = (
                 500,
                 [ 'Content-Type' => 'application/json', 'X-Error-Cause' => $error_cause ],
-                [ encode_json($errors) ],
+                [ encode_json_canonical($errors) ],
             );
             return;
         }

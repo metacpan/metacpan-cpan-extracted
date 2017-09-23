@@ -1,3 +1,28 @@
+libclearpress-perl (476.4.2) stable; urgency=low
+
+  * Permit configuration of default language in
+    decorator::lang. Defaults to 'en'.
+    Also sets Content-Language response-header.
+
+    More information from: 
+    https://www.w3.org/International/questions/qa-html-language-declarations
+
+libclearpress-perl (476.4.1) stable; urgency=low
+
+  * Disable view redirect header response overflow handling by default.
+    Re-enable by setting $ClearPress::view::TRAP_REDIR_OVERFLOW = 1
+
+libclearpress-perl (476.3.1) stable; urgency=low
+
+  * Support additional options for dsn connect (mysql only), primarily
+    for RDS/IAM support.
+    config.ini can now provide:
+    dsn_opts=mysql_ssl=1;mysql_ssl_ca_file=/path/to/certificate.pem
+
+libclearpress-perl (476.2.1) stable; urgency=low
+
+  * ENTITY_HREF template value understands X-Forwarded-Proto header.
+
 libclearpress-perl (476.1.1) stable; urgency=low
 
   * Do not overwrite the status code if it's already been set during

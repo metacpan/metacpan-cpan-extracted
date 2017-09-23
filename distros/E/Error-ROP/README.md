@@ -1,4 +1,6 @@
-Error-ROP - A simple and lightweight implementation error handling library for Perl,
+# NAME
+
+Error::ROP - A simple and lightweight implementation error handling library for Perl,
 inspired in the Rop type.
 
 # SYNOPSIS

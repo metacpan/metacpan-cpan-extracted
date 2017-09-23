@@ -63,7 +63,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
         case SPVM_TYPE_C_CODE_DOUBLE:
           printf(" %f", constant->value.double_value);
           break;
-        case SPVM_TYPE_C_CODE_STRING:
+        case SPVM_TYPE_C_CODE_BYTE_ARRAY:
           printf(" \"%s\"", constant->value.string_value);
           break;
       }
@@ -84,6 +84,13 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     }
     else if (code == SPVM_OP_C_CODE_TYPE) {
       printf(" \"%s\"", op_cur->uv.type->name);
+    }
+    else if (code == SPVM_OP_C_CODE_PACKAGE) {
+      if (strcmp(op_cur->uv.package->op_name->uv.name, "std") == 0) {
+        printf(" std(omit)\n");
+        op_cur = op_cur->sibparent;
+        continue;
+      }
     }
     printf("\n");
     
@@ -171,6 +178,7 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_p
       printf("package[%" PRId32 "]\n", i);
       SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(op_packages, i);
       SPVM_PACKAGE* package = op_package->uv.package;
+      
       printf("  name => \"%s\"\n", package->op_name->uv.name);
       
       if (package->op_type) {
@@ -493,8 +501,8 @@ void SPVM_DUMPER_dump_constant(SPVM_COMPILER* compiler, SPVM_CONSTANT* constant)
     case SPVM_TYPE_C_CODE_DOUBLE:
       printf("      double %f\n", constant->value.double_value);
       break;
-    case SPVM_TYPE_C_CODE_STRING:
-      printf("      string \"%s\"\n", constant->value.string_value);
+    case SPVM_TYPE_C_CODE_BYTE_ARRAY:
+      printf("      byte[] \"%s\"\n", constant->value.string_value);
       break;
   }
   printf("      address => %" PRId32 "\n", constant->id);

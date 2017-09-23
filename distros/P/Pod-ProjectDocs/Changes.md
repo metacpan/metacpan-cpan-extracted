@@ -1,3 +1,7 @@
+## 0.49 2017-09-20
+- Switch to metacpan for external perldoc links.
+- Ported to Moose.
+
 ## 0.48 2017-04-25
 - Rewrite of the Parser to use Pod::Simple::XHTML internally instead of legacy Pod::Parser. This fixes some issues with linking and adds proper encoding support based on the Pod command `=encoding`.
 - Therefore the `-charset` parameter was removed. Pod sources are correctly processed as described by the specification, all output files are generated as UTF-8.

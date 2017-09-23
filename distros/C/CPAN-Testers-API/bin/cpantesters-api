@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: cpantesters-api
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 #pod =head1 NAME
 #pod
@@ -42,7 +42,7 @@ cpantesters-api
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

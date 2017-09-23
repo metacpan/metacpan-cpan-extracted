@@ -3,7 +3,7 @@
 # Crypt::HashCash::Coin - HashCash Digital Cash Coin
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Coin.pm v1.126 Sat Jun 24 02:15:18 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Coin.pm v1.127 Sat Sep 16 18:48:10 PDT 2017 $
 
 package Crypt::HashCash::Coin;
 
@@ -13,7 +13,7 @@ use strict;
 use Crypt::HashCash qw (_squish _unsquish _hex _dec);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
 
 sub as_string {
   my $self = shift;
@@ -107,8 +107,8 @@ Crypt::HashCash::Coin - HashCash Digital Cash Coin
 
 =head1 VERSION
 
- $Revision: 1.126 $
- $Date: Sat Jun 24 02:15:18 PDT 2017 $
+ $Revision: 1.127 $
+ $Date: Sat Sep 16 18:48:10 PDT 2017 $
 
 =head1 SYNOPSIS
 

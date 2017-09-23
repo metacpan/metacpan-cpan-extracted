@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2016, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -27,7 +27,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 
 ###############################################################################
@@ -186,6 +186,12 @@ sub add_series {
 
     if ( $self->{_requires_category} && !exists $arg{categories} ) {
         croak "Must specify 'categories' in add_series() for this chart type";
+    }
+
+    if ( @{ $self->{_series} } == 255 ) {
+        carp "The maxiumn number of series that can be added to an "
+          . "Excel Chart is 255";
+        return
     }
 
     # Convert aref params into a formula string.
@@ -4634,25 +4640,6 @@ sub _write_marker {
 
 ##############################################################################
 #
-# _write_marker_value()
-#
-# Write the <c:marker> element without a sub-element.
-#
-sub _write_marker_value {
-
-    my $self  = shift;
-    my $style = $self->{_default_marker};
-
-    return unless $style;
-
-    my @attributes = ( 'val' => 1 );
-
-    $self->xml_empty_tag( 'c:marker', @attributes );
-}
-
-
-##############################################################################
-#
 # _write_marker_size()
 #
 # Write the <c:size> element.
@@ -8664,6 +8651,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXVI, John McNamara.
+Copyright MM-MMXVII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

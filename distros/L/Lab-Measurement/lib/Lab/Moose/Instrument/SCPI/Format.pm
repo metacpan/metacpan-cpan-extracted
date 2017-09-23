@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Format;
 #ABSTRACT: Format SCPI queries
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.554';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.600';
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_getter/;
 use Lab::Moose::Instrument::Cache;
@@ -66,7 +66,7 @@ Lab::Moose::Instrument::SCPI::Format - Format SCPI queries
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

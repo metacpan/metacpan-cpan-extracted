@@ -8,11 +8,15 @@ For compile, bison command is needed.
 
 ## Run
     
-   yacc/bison.sh && make -f solo/Makefile DEFINE=-DDEBUG && ./spvm Test
+   yacc/bison.sh && make -f solo/Makefile DEFINE=-DDEBUG && ./spvm TestCase
 
+## Cleanup
+
+  yacc/bison.sh && make -f solo/Makefile cleanup
+  
 ## Test
     
-    make -f solo/Makefile test
+   yacc/bison.sh && make -f solo/Makefile DEFINE=-DDEBUG test
 
 ## Types
 

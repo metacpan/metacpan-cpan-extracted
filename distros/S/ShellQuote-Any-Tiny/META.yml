@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ShellQuote-Any-Tiny
   homepage: https://metacpan.org/release/ShellQuote-Any-Tiny
   repository: git://github.com/perlancar/perl-ShellQuote-Any-Tiny.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

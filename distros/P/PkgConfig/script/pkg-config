@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.16026';
+our $VERSION = '0.17026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -1166,7 +1166,7 @@ if($WantFlags) {
 }
 
 my %pc_options;
-if($PrintExists || $AtLeastVersion || $ExactVersion || $MaxVersion) {
+if($PrintExists || $AtLeastVersion || $ExactVersion || $MaxVersion || $PrintVersion) {
     $pc_options{no_recurse} = 1;
 }
 
@@ -1730,6 +1730,8 @@ Other contributors include:
 =item Breno G. de Oliveira (garu)
 
 =item Gregor Herrmann
+
+=item Ilya Pavlov (ILUX, Ilya33)
 
 =back
 

@@ -28,7 +28,7 @@ PONAPI::Client::Request::Role::HasUriAll - request - role - URI format for all-r
 
 =head1 VERSION
 
-version 0.002008
+version 0.002009
 
 =head1 AUTHORS
 

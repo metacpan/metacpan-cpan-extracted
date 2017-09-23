@@ -10,7 +10,9 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+with 'Code::TidyAll::Role::RunsCommand';
+
+our $VERSION = '0.67';
 
 # On Windows only the batch file is actually executable.
 my $cmd = $^O eq 'MSWin32' ? 'perlcritic.bat' : 'perlcritic';
@@ -19,10 +21,10 @@ sub _build_cmd {$cmd}
 sub validate_file {
     my ( $self, $file ) = @_;
 
-    my @cmd = ( $self->cmd, shellwords( $self->argv ), $file );
-    my $output;
-    run3( \@cmd, \undef, \$output, \$output );
-    die "$output\n" if $output !~ /^.* source OK\n/s;
+    my $output = $self->_run_or_die($file);
+    die "$output\n" unless $output =~ /^.* source OK\n/s;
+
+    return;
 }
 
 1;
@@ -41,7 +43,7 @@ Code::TidyAll::Plugin::PerlCritic - Use perlcritic with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -71,13 +73,11 @@ Install perlcritic from CPAN.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to perlcritic
-
-=back
+Arguments to pass to C<perlcritic>.
 
 =head1 SUPPORT
 

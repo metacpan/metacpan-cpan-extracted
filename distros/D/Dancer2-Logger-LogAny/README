@@ -1,0 +1,43 @@
+NAME
+    Dancer2::Logger::LogAny - Use Log::Any to log from your Dancer2 app
+
+VERSION
+    version 0.9907
+
+DESCRIPTION
+    This module implements a Dancer2 logging engine using "Log::Any". You
+    can then use any "Log::Any::Adapter"-based output class on the backend.
+
+METHODS
+  log( @args )
+    This is the function required by "Dancer2::Core::Role::Logger"
+
+CONFIGURATION
+    In your Dancer2 config:
+
+      logger: LogAny
+ 
+      engines:
+          logger:
+              LogAny:
+                  category: Important Messages
+                  logger:
+                      - Stderr
+                      - newline
+                      - 1
+
+    If you omit the category setting, "Log::Any::Adapter" will use the name
+    of this class as the category.
+
+SEE ALSO
+    "Log::Any", "Log::Any::Adapter", "Dancer2::Core::Role::Logger"
+
+AUTHOR
+    Nick Tonkin <tonkin@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Nick Tonkin.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

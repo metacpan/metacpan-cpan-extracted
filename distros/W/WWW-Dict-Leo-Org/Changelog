@@ -1,3 +1,11 @@
+2.02:
+
+Fixed rt.cpan.org#123087: add IO::Socket::SSL as dependency.
+
+2.01:
+
+dict.leo.org now forces SSL via Cloudflare, we follow suit.
+
 2.00:
 
 Fixed rt.cpan.org#119714 rt.cpan.org#120563 and https://github.com/TLINDEN/leo/pull/1:

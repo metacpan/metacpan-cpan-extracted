@@ -1,5 +1,8 @@
 Revision history for PkgConfig
 
+0.17026 2017-09-18
+  - --modversion does not require dependencies
+
 0.16026 2017-03-23
   - Fix for Perl 5.25.11+ where '.' is not in @INC
 

@@ -21,3 +21,4 @@ lib/QBit/Application/Model/DB/clickhouse/st.pm
 t/clickhouse.t
 t/lib/TestApp.pm
 t/lib/TestApp/ClickHouse.pm
+t/lib/TestTimeLog.pm

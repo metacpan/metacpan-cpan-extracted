@@ -22,6 +22,8 @@ my $timeout = $dev_mode ? 0.03 : 0.5;
 my $full_cycle_worst_time = 3 * $timeout * 10 * 1.5;
 my $worker_delay = $timeout * 10;
 
+my $is_win = $^O =~ /^(dos|os2|MSWin32|NetWare)$/;
+
 describe 'All' => sub {
 
     describe 'init' => sub {
@@ -125,7 +127,7 @@ describe 'All' => sub {
                     break_on     => 'done', # [ 'busy', 'run', 'done' ]
                     data         => \@data, # [ any type you wish ]
                     result_type  => 'hash',
-                    task_class   => 'Async::Simple::Task::Fork',
+                    task_class   => $is_win ? 'Async::Simple::Task::ForkTmpFile' : 'Async::Simple::Task::Fork',
                     task_params  => { # Can be placed into pool params directly
                         task          => $task,
                         timeout       => $timeout,

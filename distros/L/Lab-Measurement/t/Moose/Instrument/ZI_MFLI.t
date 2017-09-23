@@ -8,8 +8,7 @@ use 5.010;
 
 use lib 't';
 
-use Lab::Test import =>
-    [qw/is_float is_absolute_error is_relative_error set_get_test/];
+use Lab::Test import => [qw/is_absolute_error/];
 use Test::More;
 use Moose::Instrument::MockTest qw/mock_instrument/;
 

@@ -6,9 +6,11 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
-                                      'Beam::Runner' => '0.006',
+                                      'Beam::Runner' => '0.014',
                                       'Beam::Wire' => '1.019',
+                                      'Getopt::Long' => '2.36',
                                       'Minion' => '0',
+                                      'Module::Runtime' => '0',
                                       'Mojolicious' => '7',
                                       'perl' => '5.010'
                                     }

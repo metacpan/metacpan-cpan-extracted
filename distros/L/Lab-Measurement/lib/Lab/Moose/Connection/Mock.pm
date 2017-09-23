@@ -1,6 +1,6 @@
 package Lab::Moose::Connection::Mock;
 #ABSTRACT: Mock connection
-$Lab::Moose::Connection::Mock::VERSION = '3.554';
+$Lab::Moose::Connection::Mock::VERSION = '3.600';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;
@@ -121,7 +121,7 @@ Lab::Moose::Connection::Mock - Mock connection
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

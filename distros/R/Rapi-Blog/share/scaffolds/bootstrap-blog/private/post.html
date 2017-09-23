@@ -33,6 +33,18 @@
 
       [% content %]
       
+      <div style="font-size:.8em;padding:10px;">
+        Category: 
+        [% IF Post.num_categories %]
+          [% FOREACH category IN Post.category_list %]
+            <a href="[%- mount_url -%]/list?category=[% category %]">[% category %]</a>
+            [% IF loop.next() %], [% END %]
+          [% END %]
+        [% ELSE %]
+          (none)
+        [% END %]
+      </div>
+      
       [% INCLUDE private/post_comments.html %]
     
   

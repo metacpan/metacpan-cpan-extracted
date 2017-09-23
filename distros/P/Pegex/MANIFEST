@@ -14,10 +14,7 @@ example/calculator/lib/Runner.pm
 example/calculator/tests
 example/calculator/tokenizer.pl
 example/self-parser.pl
-inc/Pegex.pm
 inc/Pegex/Base.pm
-inc/Pegex/Bootstrap.pm
-inc/Pegex/Compiler.pm
 inc/Pegex/Grammar.pm
 inc/Pegex/Input.pm
 inc/Pegex/Optimizer.pm
@@ -37,6 +34,7 @@ inc/TestML/Library/Standard.pm
 inc/TestML/Runtime.pm
 inc/TestML/Runtime/TAP.pm
 inc/TestML/Util.pm
+inc/Text/Diff.pm
 lib/Pegex.pm
 lib/Pegex.pod
 lib/Pegex/API.pod

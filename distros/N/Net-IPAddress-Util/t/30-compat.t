@@ -58,10 +58,10 @@ SKIP: {
   ok($old_vld   ==  $new_vld  && $old_nvd   == $new_nvd  , 'validaddr()');
   ok("$old_msk" eq "$new_msk" && "$new_msk" eq "$std_msk", 'mask()');
   ok(
-    "$old_hn"    eq "$new_hn"  
+    "$old_hn"    eq "$new_hn"
     && "$old_dn" eq "$new_dn"
     && "$old_hn" eq "$std_hn"
-    && "$old_dn" eq "$std_dn", 
+    && "$old_dn" eq "$std_dn",
     'fqdn()'
   );
 

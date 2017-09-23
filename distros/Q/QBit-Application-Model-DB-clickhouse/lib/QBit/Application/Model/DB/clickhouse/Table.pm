@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse::Table;
-$QBit::Application::Model::DB::clickhouse::Table::VERSION = '0.001';
+$QBit::Application::Model::DB::clickhouse::Table::VERSION = '0.004';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Table);
@@ -49,6 +49,8 @@ sub add_multi {
           if @unknown_fields;
 
         $field_names = $opts{'fields'};
+    } elsif (blessed($data->[0]) && $data->[0]->isa('QBit::Application::Model::DB::Query')) {
+        $field_names = [sort map {$fields->{$_}->name} keys %$fields];
     } else {
         my $data_fields;
         if ($opts{'identical_rows'}) {
@@ -73,7 +75,7 @@ sub add_multi {
 
     throw Exception::BadArguments gettext('Expected fields') unless $field_names;
 
-    my @locales = keys(%{$self->db->get_option('locales', {})});
+    my @locales = sort keys(%{$self->db->get_option('locales', {})});
     @locales = (undef) unless @locales;
 
     my $add_rows = 0;
@@ -88,9 +90,17 @@ sub add_multi {
             push(@real_field_names, $name);
         }
     }
-    $sql_header .= join(', ', map {$self->quote_identifier($_)} @real_field_names) . ") VALUES\n";
+    $sql_header .= join(', ', map {$self->quote_identifier($_)} @real_field_names) . ") ";
 
     my $db = $self->db();
+
+    if (blessed($data->[0]) && $data->[0]->isa('QBit::Application::Model::DB::Query')) {
+        my ($sql, @params) = $data->[0]->get_sql_with_data();
+
+        return $db->_do($sql_header . $sql, @params);
+    }
+
+    $sql_header .= "VALUES\n";
 
     while (my @add_data = splice(@$data, 0, $ADD_CHUNK)) {
         my ($delimiter, $values) = ('', '');
@@ -179,7 +189,7 @@ B<Arguments:>
 
 =item *
 
-B<$data> - reference to hash
+B<$data> - reference to hash or object(QBit::Application::Model::DB::Query)
 
 =item *
 
@@ -211,6 +221,24 @@ B<Example:>
 
   $count = $app->db->stat->add({date => '2017-09-03', hits => 10, not_exists => 'something'}, fields => [qw(date hits)]);
   # $count = 1, insert only date and hits in this order
+
+  $app->db->stat->add(
+      $app->db->query->select(
+          table  => $app->db->today_stat,
+          fields => [qw(date hits)],
+          filter => {date => '2017-09-17 19:19:23'}
+      ),
+      fields => [qw(date hits)]
+  );
+
+  # clickhouse
+  INSERT INTO `stat` (`date`, `hits`) SELECT
+    `today_stat`.`date` AS `date`,
+    `today_stat`.`hits` AS `hits`
+  FROM `today_stat`
+  WHERE (
+    `today_stat`.`date` = '2017-09-17 19:19:23'
+  );
 
 =head2 add_multi
 

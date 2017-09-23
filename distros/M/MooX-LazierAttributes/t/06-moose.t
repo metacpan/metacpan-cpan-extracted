@@ -3,8 +3,9 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    eval { 
-	    require Moose;
+    eval {
+		require Moose;
+		Moose->new();
 		1;
 	} or do {
         plan skip_all => "Moose is not available";

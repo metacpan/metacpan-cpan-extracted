@@ -9,7 +9,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 has '+format' => 'tar';
@@ -24,7 +24,7 @@ sub init
   $format = 'tar.xz'  if $format eq 'txz';
   
   my $plugin = $self->pick($format);
-  $self->subplugin($plugin, format => $format)->init($meta);
+  $meta->apply_plugin($plugin, format => $format);
   $self;
 }
 
@@ -94,7 +94,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

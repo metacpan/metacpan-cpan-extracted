@@ -4,7 +4,7 @@ package Crypt::Cipher::MULTI2;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use CryptX;
 use base 'Crypt::Cipher';
@@ -33,7 +33,7 @@ Crypt::Cipher::MULTI2 - Symetric cipher MULTI2, key size: 320 bits (Crypt::CBC c
   my $cbc = Crypt::Mode::CBC->new('MULTI2');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
 
-  ### example 2
+  ### example 2 (slower)
   use Crypt::CBC;
   use Crypt::Cipher::MULTI2;
 

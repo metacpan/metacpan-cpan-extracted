@@ -17,7 +17,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.3');
+our $VERSION = version->new('0.1.4');
 our $NAME    = 'init';
 our $OPTIONS = [
     'name|n=s',
@@ -63,7 +63,11 @@ sub run {
         warn "Overwritting '.vtide.yml'\n";
     }
 
-    DumpFile( $file, $config );
+    my $yaml = Dump( $config );
+    my $now = localtime;
+    $yaml =~ s/^(---\s*\n)/$1# Create by App::VTide::Command::Init $now VERSION $App::VTide::Command::Init::VERSION\n/xms;
+
+    $file->spew($yaml);
 
     $self->save_session( $name, $dir );
 
@@ -84,7 +88,7 @@ App::VTide::Command::Init - Initialize an session configuration file
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Init version 0.1.3
+This documentation refers to App::VTide::Command::Init version 0.1.4
 
 =head1 SYNOPSIS
 

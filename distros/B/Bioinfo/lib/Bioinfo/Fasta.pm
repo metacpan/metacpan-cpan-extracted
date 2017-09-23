@@ -4,7 +4,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(fa2hs);
 
-our $VERSION = '0.1.8'; # VERSION: 
+our $VERSION = '0.1.11'; # VERSION: 
 # ABSTRACT: get one or more sequences from a FASTA file quickly.
 
 
@@ -22,8 +22,11 @@ sub fa2hs {
   my (%hs, $name);
   while (my $line = <$file>) {
     chomp($line);
-    if ($line =~/^>(.+?)\s/) {
-      $name = $1;
+    #if ($line =~/^>(.+?)\s*/) {
+      #$name = $1;
+    if ($line =~/^>/) {
+      $name = $line =~/^>(.+?)\s+/ ? $1 : $line;
+      $name =~s/>//;
     } else {
       $hs{$name} .= $line;
     }
@@ -57,10 +60,12 @@ sub get_seqs_batch {
   open my $IN, "<",  $id_file or die "Can not open $id_file $!";
   my @ids = <$IN>;
   chomp @ids;
+  close($IN);
   open my $OUT, ">", $outfile or die "Can not open $outfile $!";
   for my $id (@ids) {
     print $OUT $self->get_id_seq($id);
   }
+  close($OUT);
 }
 
 # may be use later
@@ -82,14 +87,14 @@ Bioinfo::Fasta - get one or more sequences from a FASTA file quickly.
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.11
 
 =head1 SYNOPSIS
 
   # use it in object-oriented way;
   
   use Bioinfo::Fasta;
-  my $obj = Bio::SeqHash->new(file => "test.fa");
+  my $obj = Bioinfo::Fasta->new(file => "test.fa");
   my $hs = $obj->fa2hs; # get a HashRef coverted from the test.fa
   my $seq = $obj->get_seq("seq_id"); # get the sequence of "seq_id"(only the sequence)
   my $seq_fa = $obj->get_id_seq("seq_id"); # get the sequence of "seq_id"(in the FASTA format)
@@ -97,7 +102,7 @@ version 0.1.8
 
   # use it in Common mode;
 
-  use Bio::SeqHash "fa2hs";
+  use Bioinfo::Fasta "fa2hs";
   my $hs = fa2hs("in.fa");
 
 =head1 DESCRIPTION

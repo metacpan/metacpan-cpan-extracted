@@ -1,0 +1,35 @@
+---
+abstract: 'JPList module is a data source bundle that works with Perl and database handle where as jPlist (http://jplist.com) behaves as UI module only'
+author:
+  - 'Sheeju Alex <sheejuec7@gmail.com>'
+build_requires:
+  DBI: '1.630'
+  FindBin: '0'
+  Test::Class: '0.50'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JPList
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '2.90'
+  Moose: '2.1604'
+  SQL::Abstract: '1.81'
+  URI::Escape: '1.72'
+  namespace::autoclean: '0.28'
+  perl: '5.006'
+resources:
+  repository: https://github.com/sheeju/JPList.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

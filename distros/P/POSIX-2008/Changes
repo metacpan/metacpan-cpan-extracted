@@ -1,5 +1,8 @@
 Revision history for POSIX::2008.
 
+0.16  2017-09-15
+  - Added timer_create(), timer_delete(), timer_gettime(), timer_getoverrun(), timer_settime().
+  - Added close() (closes RT#123054).
 0.15  2017-09-10
   - Fixed a POD error.
   - Really fake green lights on cygwin.

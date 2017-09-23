@@ -12,15 +12,16 @@ use base qw(Class::Accessor);
 use Readonly;
 use Carp;
 
-our $VERSION = q[476.1.1];
+our $VERSION = q[476.4.2];
 our $DEFAULTS = {
-		 'meta_content_type' => 'text/html',
-		 'meta_version'      => '0.2',
-		 'meta_description'  => q[],
-		 'meta_author'       => q[],
-		 'meta_keywords'     => q[],
-		 'username'          => q[],
-		 'charset'           => q[iso8859-1],
+		 meta_content_type => 'text/html',
+		 meta_version      => '0.2',
+		 meta_description  => q[],
+		 meta_author       => q[],
+		 meta_keywords     => q[],
+		 username          => q[],
+		 charset           => q[iso8859-1],
+                 lang              => [qw(en)],
 		};
 
 Readonly::Scalar our $PROCESS_COMMA_YES => 1;
@@ -31,6 +32,7 @@ our $ARRAY_FIELDS = {
 		     'atom'       => $PROCESS_COMMA_YES,
 		     'stylesheet' => $PROCESS_COMMA_YES,
 		     'script'     => $PROCESS_COMMA_NO,
+		     'lang'       => $PROCESS_COMMA_YES,
 		    };
 __PACKAGE__->mk_accessors(__PACKAGE__->fields());
 
@@ -38,7 +40,8 @@ sub fields {
   return qw(title stylesheet style jsfile script atom rss
             meta_keywords meta_description meta_author meta_version
             meta_refresh meta_cookie meta_content_type meta_expires
-            onload onunload onresize username charset headers);
+            onload onunload onresize username charset headers
+            lang);
 }
 
 sub get {
@@ -87,16 +90,10 @@ sub cookie {
   my ($self, @cookies) = @_;
 
   if(scalar @cookies) {
-    $self->{'cookie'} = \@cookies;
+    $self->{cookie} = \@cookies;
   }
 
   return @{$self->{cookie}||[]};
-}
-
-sub http_header {
-  carp q[ClearPress::decorator::http_header is DEPRECATED];
-
-  return q[]; # don't emit anything at this point
 }
 
 sub site_header {
@@ -143,7 +140,7 @@ EOT
   return <<"EOT";
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="@{[join q[,], @{$self->lang}]}" lang="@{[join q[,], @{$self->lang}]}">
   <head>
     <meta http-equiv="Content-Type" content="@{[$self->meta_content_type() || $self->defaults('meta_content_type')]}" />
 @{[(scalar $self->meta_cookie())?(map { qq( <meta http-equiv="Set-Cookie" content="$_" />\n) } $self->meta_cookie()):q[]]}@{[$self->meta_refresh()?qq(<meta http-equiv="Refresh" content="@{[$self->meta_refresh()]}" />):q[]]}@{[$self->meta_expires()?qq(<meta http-equiv="Expires" content="@{[$self->meta_expires()]}" />):q[]]}    <meta name="author"      content="@{[$self->meta_author()      || $self->defaults('meta_author')]}" />
@@ -217,12 +214,6 @@ $LastChangeRevision$
   my @aCookies = $oDecorator->cookie();
 
 =head2 header - construction of HTTP and HTML site headers
-
-=head2 http_header - construction of HTTP response headers
-
-e.g. content-type, set-cookie etc.
-
-  my $sHTTPHeaders = $oDecorator->http_header();
 
 =head2 site_header - construction of HTML site headers
 

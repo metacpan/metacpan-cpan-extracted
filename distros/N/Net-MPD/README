@@ -34,6 +34,9 @@ METHODS
     password is given, none will be used. If no port is given, the default
     (6600) will be used. If no host is given, localhost will be used.
 
+    If the hostname contains a "/", it will be interpretted as the path to
+    a UNIX socket try to connect that way instead of using TCP.
+
     Return a Net::MPD object on success and croaks on failure.
 
  version

@@ -46,7 +46,7 @@ WWW::Kickstarter::Data::Reward - Kickstarter reward data
    $ks->login($email, $password);
 
    my $iter = $ks->projects_ending_soon();
-   while (my ($project) = $iter->()) {
+   while (my ($project) = $iter->get()) {
       my @rewards = $project->rewards;
       ...
    }

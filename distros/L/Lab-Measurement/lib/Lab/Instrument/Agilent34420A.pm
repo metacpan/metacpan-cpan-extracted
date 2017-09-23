@@ -1,6 +1,6 @@
 package Lab::Instrument::Agilent34420A;
 #ABSTRACT: HP/Agilent/Keysight 34420A or 34421A digital multimeter
-$Lab::Instrument::Agilent34420A::VERSION = '3.554';
+$Lab::Instrument::Agilent34420A::VERSION = '3.600';
 use strict;
 use Lab::Instrument;
 use Lab::MultiChannelInstrument;
@@ -978,7 +978,7 @@ Lab::Instrument::Agilent34420A - HP/Agilent/Keysight 34420A or 34421A digital mu
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

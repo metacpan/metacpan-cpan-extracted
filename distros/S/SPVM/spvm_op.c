@@ -124,52 +124,121 @@ const char* const SPVM_OP_C_CODE_NAMES[] = {
   "WEAKEN",
   "WEAKEN_FIELD",
   "SPECIAL_ASSIGN",
+  "CONCAT_STRING",
 };
 
-// Return cloned op and target op become stab
-SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
+SPVM_OP* SPVM_OP_get_parent(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
+  (void)compiler;
   
-  // Cut op
-  SPVM_OP* op_cut = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, op_target->file, op_target->line);
-  op_cut->first = op_target->first;
-  op_cut->last = op_target->last;
-  if (op_cut->last) {
-    op_cut->last->sibparent = op_cut;
+  SPVM_OP* op_parent;
+  SPVM_OP* op_cur = op_target;
+  while (1) {
+    if (op_cur->moresib) {
+      op_cur = op_cur->sibparent;
+    }
+    else {
+      op_parent = op_cur->sibparent;
+      break;
+    }
   }
-  op_cut->uv = op_target->uv;
-  op_cut->code = op_target->code;
-  op_cut->flag = op_target->flag;
   
-  op_target->first = NULL;
-  op_target->last = NULL;
-  op_target->uv.name = NULL;
-  op_target->code = SPVM_OP_C_CODE_STAB;
-  op_target->flag = 0;
+  return op_parent;
+}
+
+void SPVM_OP_get_before(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP** op_before_ptr, _Bool* next_is_child_ptr) {
+
+  // Get parent
+  SPVM_OP* op_parent = SPVM_OP_get_parent(compiler, op_target);
   
-  return op_cut;
+  SPVM_OP* op_before;
+  _Bool next_is_child = 0;
+  if (op_parent->first == op_target) {
+    op_before = op_parent;
+    next_is_child = 1;
+  }
+  else {
+    op_before = op_parent->first;
+    while (1) {
+      if (op_before->sibparent == op_target) {
+        break;
+      }
+      else {
+        op_before = op_before->sibparent;
+      }
+    }
+  }
+  
+  *op_before_ptr = op_before;
+  *next_is_child_ptr = next_is_child;
 }
 
 // Replace target op with replace op
 void SPVM_OP_replace_op(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP* op_replace) {
   (void)compiler;
+
+  // Get before op
+  _Bool next_is_child;
+  SPVM_OP* op_before;
+  SPVM_OP_get_before(compiler, op_target, &op_before, &next_is_child);
   
-  op_target->first = op_replace->first;
-  op_target->last = op_replace->last;
-  if (op_target->last) {
-    op_target->last->sibparent = op_target;
+  // Stab
+  if (next_is_child) {
+    // One child
+    if (op_before->first == op_before->last) {
+      op_before->first = op_replace;
+      op_before->last = op_replace;
+    }
+    // More
+    else {
+      op_before->first = op_replace;
+    }
   }
-  op_target->uv = op_replace->uv;
-  op_target->code = op_replace->code;
-  op_target->file = op_replace->file;
-  op_target->line = op_replace->line;
+  else {
+    op_before->sibparent = op_replace;
+  }
+  op_replace->moresib = op_target->moresib;
+  op_replace->sibparent = op_target->sibparent;
+}
+
+// Cut op and insert stab into original position and return stab
+SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
+  // Get before op
+  _Bool next_is_child;
+  SPVM_OP* op_before;
+  SPVM_OP_get_before(compiler, op_target, &op_before, &next_is_child);
+  
+  // Stab
+  SPVM_OP* op_stab = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_STAB, op_target->file, op_target->line);
+  if (next_is_child) {
+    
+    // One child
+    if (op_before->first == op_before->last) {
+      op_before->first = op_stab;
+      op_before->last = op_stab;
+    }
+    // More
+    else {
+      op_before->first = op_stab;
+    }
+  }
+  else {
+    op_before->sibparent = op_stab;
+  }
+  op_stab->moresib = op_target->moresib;
+  op_stab->sibparent = op_target->sibparent;
+
+  // Clear target
+  op_target->moresib = 0;
+  op_target->sibparent = NULL;
+  
+  return op_stab;
 }
 
 SPVM_OP* SPVM_OP_build_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant) {
   
-  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
   SPVM_CONSTANT* constant = op_constant->uv.constant;
   
-  if (constant->type->code == SPVM_TYPE_C_CODE_STRING) {
+  if (constant->type->code == SPVM_TYPE_C_CODE_BYTE_ARRAY) {
     SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEW, op_constant->file, op_constant->line);
     SPVM_OP_insert_child(compiler, op_new, op_new->last, op_constant);
     return op_new;
@@ -201,6 +270,8 @@ SPVM_OP* SPVM_OP_new_op_constant_byte(SPVM_COMPILER* compiler, int8_t value, con
   constant->type = SPVM_TYPE_get_byte_type(compiler);
   
   op_constant->uv.constant = constant;
+
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
   
   return op_constant;
 }
@@ -213,7 +284,9 @@ SPVM_OP* SPVM_OP_new_op_constant_short(SPVM_COMPILER* compiler, int16_t value, c
   constant->type = SPVM_TYPE_get_short_type(compiler);
   
   op_constant->uv.constant = constant;
-  
+
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+
   return op_constant;
 }
 
@@ -225,7 +298,9 @@ SPVM_OP* SPVM_OP_new_op_constant_int(SPVM_COMPILER* compiler, int32_t value, con
   constant->type = SPVM_TYPE_get_int_type(compiler);
   
   op_constant->uv.constant = constant;
-  
+
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+
   return op_constant;
 }
 
@@ -237,7 +312,9 @@ SPVM_OP* SPVM_OP_new_op_constant_long(SPVM_COMPILER* compiler, int64_t value, co
   constant->type = SPVM_TYPE_get_long_type(compiler);
   
   op_constant->uv.constant = constant;
-  
+
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+
   return op_constant;
 }
 
@@ -249,7 +326,9 @@ SPVM_OP* SPVM_OP_new_op_constant_float(SPVM_COMPILER* compiler, float value, con
   constant->type = SPVM_TYPE_get_float_type(compiler);
   
   op_constant->uv.constant = constant;
-  
+
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+
   return op_constant;
 }
 
@@ -261,6 +340,34 @@ SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, c
   constant->type = SPVM_TYPE_get_double_type(compiler);
   
   op_constant->uv.constant = constant;
+  
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+  
+  return op_constant;
+}
+
+SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, char* string, const char* file, int32_t line) {
+
+  SPVM_OP* op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, file, line);
+  SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
+  constant->value.string_value = string;
+  constant->type = SPVM_TYPE_get_byte_array_type(compiler);
+  op_constant->uv.constant = constant;
+  
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
+  
+  return op_constant;
+}
+
+SPVM_OP* SPVM_OP_new_op_constant_byte_array_string(SPVM_COMPILER* compiler, char* string, const char* file, int32_t line) {
+
+  SPVM_OP* op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, file, line);
+  SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
+  constant->value.string_value = string;
+  constant->type = SPVM_TYPE_get_byte_array_type(compiler);
+  op_constant->uv.constant = constant;
+  
+  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
   
   return op_constant;
 }
@@ -448,6 +555,9 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
   SPVM_TYPE*  type = NULL;
   
   switch (op->code) {
+    case SPVM_OP_C_CODE_CONCAT_STRING:
+      type = SPVM_TYPE_get_byte_array_type(compiler);
+      break;
     case SPVM_OP_C_CODE_ASSIGN_PROCESS:
       type = SPVM_OP_get_type(compiler, op->first);
       break;
@@ -525,7 +635,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       break;
     }
     case SPVM_OP_C_CODE_EXCEPTION_VAR: {
-      type = SPVM_TYPE_get_string_type(compiler);
+      type = SPVM_TYPE_get_byte_array_type(compiler);
       break;
     }
     case SPVM_OP_C_CODE_MY: {
@@ -706,7 +816,7 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
           constant->id = SPVM_CONSTANT_POOL_push_double(compiler, constant_pool, value);
           break;
         }
-        case SPVM_TYPE_C_CODE_STRING: {
+        case SPVM_TYPE_C_CODE_BYTE_ARRAY: {
           const char* value = constant->value.string_value;
           
           constant->id = SPVM_CONSTANT_POOL_push_string(compiler, constant_pool, value);
@@ -750,11 +860,7 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
           constant_pool_type->element_type_id = element_type->id;
         }
         else {
-          if (type->code == SPVM_TYPE_C_CODE_STRING) {
-            SPVM_CONSTANT_POOL_TYPE* constant_pool_type = (SPVM_CONSTANT_POOL_TYPE*)&compiler->constant_pool->values[type->id];
-            SPVM_TYPE* byte_type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_BYTE);
-            constant_pool_type->element_type_id = byte_type->id;
-          }
+          assert(0);
         }
       }
     }
@@ -1339,45 +1445,31 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
     compiler->enum_default_value++;
   }
   else {
-    SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
-    
     // TODO add type
     if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_BYTE) {
-      constant->type = SPVM_TYPE_get_byte_type(compiler);
-      constant->value.byte_value = (int8_t)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_byte(compiler, (int8_t)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_SHORT) {
-      constant->type = SPVM_TYPE_get_short_type(compiler);
-      constant->value.short_value = (int16_t)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_short(compiler, (int16_t)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_INT) {
-      constant->type = SPVM_TYPE_get_int_type(compiler);
-      constant->value.int_value = (int32_t)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_int(compiler, (int32_t)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_LONG) {
-      constant->type = SPVM_TYPE_get_long_type(compiler);
-      constant->value.long_value = (int64_t)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_long(compiler, (int64_t)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_FLOAT) {
-      constant->type = SPVM_TYPE_get_float_type(compiler);
-      constant->value.float_value = (float)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_float(compiler, (float)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else if (compiler->enum_default_type_code == SPVM_TYPE_C_CODE_DOUBLE) {
-      constant->type = SPVM_TYPE_get_double_type(compiler);
-      constant->value.double_value = (double)compiler->enum_default_value;
+      op_constant = SPVM_OP_new_op_constant_double(compiler, (double)compiler->enum_default_value, op_name->file, op_name->line);
     }
     else {
       assert(0);
     }
     
-    op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_name->file, op_name->line);
-    op_constant->uv.constant = constant;
-    
-    SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
-    
     compiler->enum_default_value++;
   }
-  SPVM_DYNAMIC_ARRAY_push(compiler->op_constants, op_constant);
   
   // Return
   SPVM_OP* op_return = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_RETURN, op_name->file, op_name->line);
@@ -1514,6 +1606,15 @@ SPVM_OP* SPVM_OP_build_binop(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* 
   SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_last);
   
   return op_bin;
+}
+
+SPVM_OP* SPVM_OP_build_concat_string(SPVM_COMPILER* compiler, SPVM_OP* op_cancat_string, SPVM_OP* op_first, SPVM_OP* op_last) {
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_cancat_string, op_cancat_string->last, op_first);
+  SPVM_OP_insert_child(compiler, op_cancat_string, op_cancat_string->last, op_last);
+  
+  return op_cancat_string;
 }
 
 SPVM_OP* SPVM_OP_build_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op_first, SPVM_OP* op_last) {
@@ -1663,6 +1764,9 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
     else if (flag == SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_AND) {
       op_operation = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BIT_AND, op_assign->file, op_assign->line);
     }
+    else if (flag == SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT_STRING) {
+      op_operation = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONCAT_STRING, op_assign->file, op_assign->line);
+    }
     else {
       assert(0);
     }
@@ -1722,11 +1826,7 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
         
         length++;
       }
-      SPVM_OP* op_constant_length = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_list->file, op_list->line);
-      SPVM_CONSTANT* constant_length = SPVM_CONSTANT_new(compiler);
-      constant_length->type = SPVM_TYPE_get_int_type(compiler);
-      constant_length->value.int_value = length;
-      op_constant_length->uv.constant = constant_length;
+      SPVM_OP* op_constant_length = SPVM_OP_new_op_constant_int(compiler, length, op_list->file, op_list->line);
       
       // New
       SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEW, op_list->file, op_list->line);
@@ -1749,9 +1849,6 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
       }
       else if (first_type->code == SPVM_TYPE_C_CODE_DOUBLE) {
         op_type_new->uv.type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_DOUBLE_ARRAY);;
-      }
-      else if (first_type->code == SPVM_TYPE_C_CODE_STRING) {
-        op_type_new->uv.type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_STRING_ARRAY);;
       }
       else {
         assert(0);
@@ -1784,11 +1881,7 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
           op_var_array_elem->uv.var = op_first->uv.var;
           SPVM_OP_insert_child(compiler, op_array_elem, op_array_elem->last, op_var_array_elem);
           
-          SPVM_OP* op_constant_index = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_list->file, op_list->line);
-          SPVM_CONSTANT* constant_index = SPVM_CONSTANT_new(compiler);
-          constant_index->type = SPVM_TYPE_get_int_type(compiler);
-          constant_index->value.int_value = i;
-          op_constant_index->uv.constant = constant_index;
+          SPVM_OP* op_constant_index = SPVM_OP_new_op_constant_int(compiler, i, op_list->file, op_list->line);
           SPVM_OP_insert_child(compiler, op_array_elem, op_array_elem->last, op_constant_index);
           
           SPVM_OP_insert_child(compiler, op_assign_array, op_assign_array->last, op_array_elem);
@@ -1827,13 +1920,7 @@ SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op
   
   if (!op_term) {
     // Default error message
-    SPVM_OP* op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_die->file, op_die->line);
-    SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
-    constant->value.string_value = "Error";
-    constant->type = SPVM_TYPE_get_string_type(compiler);
-    op_constant->uv.constant = constant;
-    
-    op_term = op_constant;
+    op_term =SPVM_OP_new_op_constant_byte_array_string(compiler, "Error", op_die->file, op_die->line);;
   }
   
   // Exception variable
@@ -1908,14 +1995,6 @@ SPVM_OP* SPVM_OP_build_type_double(SPVM_COMPILER* compiler, SPVM_OP* op_double) 
   // Type op
   SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_double->file, op_double->line);
   op_type->uv.type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_DOUBLE);
-  
-  return op_type;
-}
-
-SPVM_OP* SPVM_OP_build_type_string(SPVM_COMPILER* compiler, SPVM_OP* op_string) {
-  // Type op
-  SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_string->file, op_string->line);
-  op_type->uv.type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_STRING);
   
   return op_type;
 }

@@ -1,11 +1,13 @@
 
 package Importer::Zim::Lexical;
-$Importer::Zim::Lexical::VERSION = '0.4.0';
+$Importer::Zim::Lexical::VERSION = '0.6.0';
+# ABSTRACT: Import functions with lexical scope
+
 use 5.018;
 
 BEGIN {
     require Importer::Zim::Base;
-    Importer::Zim::Base->VERSION('0.3.0');
+    Importer::Zim::Base->VERSION('0.5.0');
     our @ISA = qw(Importer::Zim::Base);
 }
 
@@ -25,10 +27,6 @@ sub import {
 
 #pod =encoding utf8
 #pod
-#pod =head1 NAME
-#pod
-#pod Importer::Zim::Lexical - Import functions with lexical scope
-#pod
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Importer::Zim::Lexical 'Scalar::Util' => 'blessed';
@@ -38,6 +36,17 @@ sub import {
 #pod     use Importer::Zim::Lexical 'Mango::BSON' => ':bson';
 #pod
 #pod     use Importer::Zim::Lexical 'Foo' => { -version => '3.0' } => 'foo';
+#pod
+#pod     use zim 'Krazy::Taco' => qw(tacos burritos poop);
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod    "It's... INCREDIBLE! There's stuff down here I've never even
+#pod     dreamed of! I'm gonna try to blow it up."
+#pod      – Dib
+#pod
+#pod This is a backend for L<Importer::Zim> which gives lexical scope
+#pod to imported subroutines.
 #pod
 #pod =head1 DEBUGGING
 #pod
@@ -60,11 +69,11 @@ __END__
 
 =head1 NAME
 
-Importer::Zim::Lexical
+Importer::Zim::Lexical - Import functions with lexical scope
 
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -76,9 +85,16 @@ version 0.4.0
 
     use Importer::Zim::Lexical 'Foo' => { -version => '3.0' } => 'foo';
 
-=head1 NAME
+    use zim 'Krazy::Taco' => qw(tacos burritos poop);
 
-Importer::Zim::Lexical - Import functions with lexical scope
+=head1 DESCRIPTION
+
+   "It's... INCREDIBLE! There's stuff down here I've never even
+    dreamed of! I'm gonna try to blow it up."
+     – Dib
+
+This is a backend for L<Importer::Zim> which gives lexical scope
+to imported subroutines.
 
 =head1 DEBUGGING
 
@@ -94,12 +110,6 @@ L<Importer::Zim>
 =head1 AUTHOR
 
 Adriano Ferreira <ferreira@cpan.org>
-
-=head1 CONTRIBUTOR
-
-=for stopwords Adriano Ferreira
-
-Adriano Ferreira <a.r.ferreira@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

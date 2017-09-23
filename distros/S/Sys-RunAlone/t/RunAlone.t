@@ -6,7 +6,7 @@ BEGIN {				# Magic Perl CORE pragma
     }
 }
 
-use Test::More tests => 57;
+use Test::More tests => 63;
 use strict;
 use warnings;
 sub slurp ($) { open( my $handle,$_[0] ); local $/; <$handle> }
@@ -69,6 +69,18 @@ foreach ( "", '"retry" 2', '"retry" "2,1"' ) {
 foreach ( '"silent"', '"silent" 1' ) {
     $ok = 0;
     $command = "| $^X -I$INC[-1] script $_ 2>2";
+    $ok++ if ok( open( my $stdin2a, $command ), "Run script #2 again silently: $!" );
+    sleep 2;
+    chomp( my $error2a = slurp 2 );
+    $ok++ if is( $error2a,"","Error message #2aa" );
+    $ok++ if ok( !close( $stdin2a ),"Close pipe #2aa: $!" );
+    diag($command) if $ok != 3;
+}
+
+# check silent operation using environment variables
+foreach ( 1, 1 ){
+    $ok = 0;
+    $command = "| SILENT_SYS_RUNALONE=1 $^X -I$INC[-1] script 2>2";
     $ok++ if ok( open( my $stdin2a, $command ), "Run script #2 again silently: $!" );
     sleep 2;
     chomp( my $error2a = slurp 2 );

@@ -1,5 +1,8 @@
 Revision history for Safe-Isa
 
+1.000007 - 2017-09-22
+  - added new interface: $obj->$_call_if_can
+
 1.000006 - 2016-10-31
   - now falling back to $obj->isa if DOES/does is not implemented on the
     object, to avoid fatal errors on perls too old to have their own DOES

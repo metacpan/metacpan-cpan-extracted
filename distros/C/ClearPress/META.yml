@@ -31,58 +31,58 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::Localize:
     file: lib/ClearPress/Localize.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authenticator:
     file: lib/ClearPress/authenticator.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authenticator::db:
     file: lib/ClearPress/authenticator/db.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authenticator::passwd:
     file: lib/ClearPress/authenticator/passwd.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::authenticator::session:
     file: lib/ClearPress/authenticator/session.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::driver::Pg:
     file: lib/ClearPress/driver/Pg.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: v476.1.1
+    version: v476.4.2
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: v476.1.1
+    version: v476.4.2
 recommends:
   Crypt::MySQL: '0.04'
   DBD::SQLite: '1.14'
@@ -123,5 +123,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/rmp/libclearpress-perl
-version: v476.1.1
+version: v476.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

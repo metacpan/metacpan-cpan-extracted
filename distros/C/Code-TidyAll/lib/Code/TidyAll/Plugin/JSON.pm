@@ -4,14 +4,19 @@ use strict;
 use warnings;
 
 use JSON::MaybeXS ();
+use Specio::Library::Builtins;
 
 use Moo;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
 extends 'Code::TidyAll::Plugin';
 
-has 'ascii' => ( is => 'ro', default => 0 );
+has ascii => (
+    is      => 'ro',
+    isa     => t('Bool'),
+    default => 0,
+);
 
 sub transform_source {
     my $self   = shift;
@@ -46,7 +51,7 @@ documents with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -63,13 +68,11 @@ format with the keys of objects sorted.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item ascii
+=head2 ascii
 
 Escape non-ASCII characters. The output file will be valid ASCII.
-
-=back
 
 =head1 SUPPORT
 

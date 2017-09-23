@@ -16,6 +16,14 @@ use namespace::autoclean;
 
 JPList::DB::Config - JPList DB Config
 
+=head1 VERSION
+
+Version 0.04
+
+=cut
+
+our $VERSION = '0.04';
+
 =head1 SYNOPSIS
 
   with 'JPList::DB::Config';

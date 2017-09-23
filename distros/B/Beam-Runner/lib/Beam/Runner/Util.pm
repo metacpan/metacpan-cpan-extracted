@@ -1,5 +1,5 @@
 package Beam::Runner::Util;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: Utilities for Beam::Runner command classes
 
 #pod =head1 SYNOPSIS
@@ -24,15 +24,42 @@ use warnings;
 use Exporter 'import';
 use Path::Tiny qw( path );
 
-our @EXPORT_OK = qw( find_container_path );
+our @EXPORT_OK = qw( find_container_path find_containers );
 
 # File extensions to try to find, starting with no extension (which is
 # to say the extension is given by the user's input)
 our @EXTS = ( "", qw( .yml .yaml .json .xml .pl ) );
+# A regex to use to remove the container's name
+my $EXT_RE = qr/(?:@{[ join '|', @EXTS ]})$/;
 
 # The "BEAM_PATH" separator value. Windows uses ';' to separate
 # PATH-like variables, everything else uses ':'
 our $PATHS_SEP = $^O eq 'MSWin32' ? ';' : ':';
+
+#pod =sub find_containers
+#pod
+#pod     my %container = find_containers();
+#pod
+#pod Returns a list of C<name> and C<path> pairs pointing to all the containers
+#pod in the C<BEAM_PATH> paths.
+#pod
+#pod =cut
+
+sub find_containers {
+    my %containers;
+    for my $dir ( split /:/, $ENV{BEAM_PATH} ) {
+        my $p = path( $dir );
+        my $i = $p->iterator( { recurse => 1, follow_symlinks => 1 } );
+        while ( my $file = $i->() ) {
+            next unless $file->is_file;
+            next unless $file =~ $EXT_RE;
+            my $name = $file->relative( $p );
+            $name =~ s/$EXT_RE//;
+            $containers{ $name } ||= $file;
+        }
+    }
+    return %containers;
+}
 
 #pod =sub find_container_path
 #pod
@@ -90,7 +117,7 @@ Beam::Runner::Util - Utilities for Beam::Runner command classes
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -104,6 +131,13 @@ This module has some shared utility functions for creating
 L<Beam::Runner::Command> classes.
 
 =head1 SUBROUTINES
+
+=head2 find_containers
+
+    my %container = find_containers();
+
+Returns a list of C<name> and C<path> pairs pointing to all the containers
+in the C<BEAM_PATH> paths.
 
 =head2 find_container_path
 

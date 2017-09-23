@@ -5,6 +5,7 @@ author:
 build_requires:
   Test::DZil: '0'
   Test::Fatal: '0'
+  Test::MockModule: '0'
   Test::More: '0'
   lib: '0'
   perl: '5.006'
@@ -27,7 +28,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic:
     file: lib/Dist/Zilla/Plugin/AutoPrereqs/Perl/Critic.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   CPAN::Meta::YAML: '0'
   Dist::Zilla::Role::PrereqSource: '0'
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic/issues
   homepage: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
   repository: https://github.com/skirmess/Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic.git
-version: '0.003'
+version: '0.004'
 x_BuiltWith:
   modules:
     CPAN::Meta::YAML: '0.018'
@@ -72,6 +73,7 @@ x_BuiltWith:
     Test::Fatal: '0.014'
     Test::Kwalitee: '1.26'
     Test::MinimumVersion: '0.101082'
+    Test::MockModule: '0.12'
     Test::Mojibake: '1.3'
     Test::More: '1.302096'
     Test::NoTabs: '2.00'
@@ -183,11 +185,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
       name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
-      version: '0.012'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
       name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
-      version: '0.012'
+      version: '0.022'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
@@ -220,6 +222,7 @@ x_Dist_Zilla:
             - xt/author/portability.t
             - xt/author/test-version.t
             - xt/release/changes.t
+            - xt/release/distmeta.t
             - xt/release/eol.t
             - xt/release/kwalitee.t
             - xt/release/manifest.t
@@ -251,7 +254,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
       name: '@Author::SKIRMESS/AutoPrereqs::Perl::Critic'
-      version: '0.002'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::SKIRMESS/SetScriptShebang'
@@ -298,6 +301,28 @@ x_Dist_Zilla:
           Module::Metadata: '1.000031'
           version: '0.004'
       name: '@Author::SKIRMESS/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder:
+            - ':ExecFiles'
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: ':ExecFiles'
+              version: '6.010'
+          include_underscores: '0'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000031'
+          version: '0.004'
+      name: '@Author::SKIRMESS/MetaProvides::Package/ExecFiles'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
@@ -445,7 +470,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::CopyFilesFromRelease:
           filename: []
           match:
-            - .pm$
+            - \.pm$
+            - ^bin/
       name: '@Author::SKIRMESS/CopyFilesFromRelease'
       version: '0.006'
     -
@@ -479,6 +505,7 @@ x_Dist_Zilla:
             - xt/author/portability.t
             - xt/author/test-version.t
             - xt/release/changes.t
+            - xt/release/distmeta.t
             - xt/release/eol.t
             - xt/release/kwalitee.t
             - xt/release/manifest.t
@@ -486,6 +513,7 @@ x_Dist_Zilla:
             - xt/release/meta-yaml.t
           allow_dirty_match:
             - (?^:\.pm$)
+            - (?^:^bin/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
@@ -501,7 +529,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

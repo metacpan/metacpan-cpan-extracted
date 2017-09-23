@@ -1,6 +1,6 @@
 package Lab::Instrument::SpectrumSCPI;
 #ABSTRACT: Generic spectrum analyzer with SCPI command set
-$Lab::Instrument::SpectrumSCPI::VERSION = '3.554';
+$Lab::Instrument::SpectrumSCPI::VERSION = '3.600';
 use strict;
 use Lab::Instrument;
 
@@ -181,7 +181,7 @@ Lab::Instrument::SpectrumSCPI - Generic spectrum analyzer with SCPI command set
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 DESCRIPTION
 

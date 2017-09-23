@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.108';
+$Config::Model::Node::VERSION = '2.110';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -324,7 +324,8 @@ sub init {
     my $model = $self->{model};
 
     return
-        unless defined $model->{read_config}
+        unless defined $model->{rw_config}
+        or defined $model->{read_config}
         or defined $model->{write_config};
 
     my $initial_load_backup = $self->instance->initial_load;
@@ -336,20 +337,27 @@ sub init {
         node => $self,
     );
 
-    if ( defined $model->{read_config} ) {
+    if ( $model->{rw_config} or $model->{read_config} ) {
+        # TODO: change to warn
         $self->read_config_data( check => $args{check} // $self->check );
+        say "read_config parameter for backend is deprecated. ",
+            "Please use rw_config to specify both read and write parameters.\n" if $model->{read_config};
+    }
+
+    if (defined $model->{write_config}) {
+        # TODO: change to warn
+        say "write_config parameter for backend is deprecated. ",
+            "Please use only rw_config to specify both read and write parameters.\n";
     }
 
     # use read_config data if write_config is missing
     $model->{write_config} ||= dclone $model->{read_config}
         if defined $model->{read_config};
 
-    if ( $model->{write_config} ) {
-
-        # setup auto_write, write_config_dir is obsolete
+    if ( $model->{rw_config} || $model->{write_config} ) {
+        # setup auto_write
         $self->backend_mgr->auto_write_init(
-            write_config     => $model->{write_config},
-            write_config_dir => $model->{write_config_dir},
+            rw_config     => $model->{rw_config} || $model->{write_config},
         );
     }
 
@@ -366,12 +374,11 @@ sub read_config_data {
             $self->location, ")\n";
     }
 
-    # setup auto_read, read_config_dir is obsolete
+    # setup auto_read
     # may use an overridden config file
     $self->backend_mgr->read_config_data(
-        read_config     => $model->{read_config},
+        rw_config       => $model->{rw_config} || $model->{read_config},
         check           => $args{check},
-        read_config_dir => $model->{read_config_dir},
         config_file     => $args{config_file} || $self->{config_file},
         auto_create     => $args{auto_create} || $self->instance->auto_create,
     );
@@ -953,7 +960,7 @@ sub load_data {
         "Node load_data (",
         $self->location,
         ") will load elt ",
-        join( ' ', keys %$perl_data ) );
+        join( ' ', sort keys %$perl_data ) );
 
     # data must be loaded according to the element order defined by
     # the model. This will not load not yet accepted parameters
@@ -1208,7 +1215,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -1365,9 +1372,7 @@ when generating user interfaces.
 Optional C<list ref> of element descriptions. These descriptions may be
 used when generating user interfaces.
 
-=item B<read_config>
-
-=item B<write_config>
+=item B<rw_config>
 
 =item B<config_dir>
 

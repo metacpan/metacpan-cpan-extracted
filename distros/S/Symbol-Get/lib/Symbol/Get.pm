@@ -5,7 +5,7 @@ use warnings;
 
 use Call::Context ();
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 =encoding utf-8
 
@@ -23,11 +23,13 @@ Symbol::Get - Read Perl’s symbol table programmatically
 
     use constant my_const => 'haha';
 
+    use constant my_const_list => qw( a b c );
+
     sub doit { ... }
 
     my $name_sr = Symbol::Get::get('$Foo::name');    # \$name
-    my $list_ar = Symbol::Get::get('$Foo::list');    # \@list
-    my $hash_hr = Symbol::Get::get('$Foo::hash');    $ \%hash
+    my $list_ar = Symbol::Get::get('@Foo::list');    # \@list
+    my $hash_hr = Symbol::Get::get('%Foo::hash');    $ \%hash
 
     #Defaults to __PACKAGE__ if none is given:
     my $doit_cr = Symbol::Get::get('&doit');

@@ -168,7 +168,7 @@ void SPVM_HASH_insert_norehash(SPVM_HASH* hash, const char* key, int32_t length,
   
   assert(hash);
   assert(key);
-  assert(length > 0);
+  assert(length >= 0);
   
   int32_t hash_value = SPVM_HASH_FUNC_calc_hash_for_index(key, length);
   int32_t table_index = hash_value % hash->table_capacity;
@@ -179,7 +179,17 @@ void SPVM_HASH_insert_norehash(SPVM_HASH* hash, const char* key, int32_t length,
     
     int32_t entry_index = hash->table[table_index];
     while (1) {
-      if (strncmp(key, &hash->key_buffer[hash->entries[entry_index].key_index], length) == 0) {
+      _Bool match_string = 0;
+      if (length == 0) {
+        if (strlen(&hash->key_buffer[hash->entries[entry_index].key_index]) == 0) {
+          match_string = 1;
+        }
+      }
+      else if (strncmp(key, &hash->key_buffer[hash->entries[entry_index].key_index], length) == 0) {
+        match_string = 1;
+      }
+      
+      if (match_string) {
         hash->entries[entry_index].value = value;
         break;
       }
@@ -205,7 +215,7 @@ void SPVM_HASH_insert(SPVM_HASH* hash, const char* key, int32_t length, void* va
   
   assert(hash);
   assert(key);
-  assert(length > 0);
+  assert(length >= 0);
   
   // Rehash
   if (hash->entries_length > hash->table_capacity * 0.75) {
@@ -221,7 +231,7 @@ void* SPVM_HASH_search(SPVM_HASH* hash, const char* key, int32_t length) {
   
   assert(hash);
   assert(key);
-  assert(length > 0);
+  assert(length >= 0);
   
   int32_t hash_value = SPVM_HASH_FUNC_calc_hash_for_index(key, length);
   int32_t table_index = hash_value % hash->table_capacity;
@@ -233,7 +243,17 @@ void* SPVM_HASH_search(SPVM_HASH* hash, const char* key, int32_t length) {
   while (1) {
     assert(entry_index >= -1);
     if (entry_index != -1) {
-      if (strncmp(key, &hash->key_buffer[hash->entries[entry_index].key_index], length) == 0) {
+      _Bool match_string = 0;
+      if (length == 0) {
+        if (strlen(&hash->key_buffer[hash->entries[entry_index].key_index]) == 0) {
+          match_string = 1;
+        }
+      }
+      else if (strncmp(key, &hash->key_buffer[hash->entries[entry_index].key_index], length) == 0) {
+        match_string = 1;
+      }
+      
+      if (match_string) {
         return hash->entries[entry_index].value;
       }
       else {

@@ -19,6 +19,7 @@ t/meta-yml.t
 t/meta-json.t
 t/manifest.t
 t/map.t
+t/not_ok_map.t
 t/pod.t
 t/changes.t
 t/invalid-role.t

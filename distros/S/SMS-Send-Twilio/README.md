@@ -11,14 +11,12 @@ SMS::Send::Twilio - SMS::Send backend for Twilio API
       _authtoken  => 'b857f7afe254fa86c689648447e04cff',
       _from       => '+15005550006',
       );
-    
 
     # Send a message to me
     my $sent = $sender->send_sms(
-      text => 'Messages have a limit of 160 chars',
+      text => 'Messages can be up to 1600 chars',
       to   => '+31645742418',
-      );
-    
+    );
 
     # Did it send?
     if ( $sent ) {
@@ -50,7 +48,7 @@ If not we'd see an error message on STDERR.
 
     # Send a message to me
       my $sent = $sender->send_sms(
-      text => 'Messages have a limit of 160 chars',
+      text => 'Messages can be up to 1600 chars',
       to   => '+31645742418',
     );
 

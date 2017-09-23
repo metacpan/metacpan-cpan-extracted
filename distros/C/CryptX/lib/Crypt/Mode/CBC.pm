@@ -4,7 +4,7 @@ package Crypt::Mode::CBC;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 use Crypt::Cipher;
 use base 'Crypt::Mode';
@@ -69,15 +69,19 @@ This module implements CBC cipher mode. B<NOTE:> it works only with ciphers from
 
 =head2 start_encrypt
 
-See example below L</finish>.
+   $m->start_encrypt($key, $iv);
 
 =head2 start_decrypt
 
-See example below L</finish>.
+   $m->start_decrypt($key, $iv);
 
 =head2 add
 
-See example below L</finish>.
+   # in encrypt mode
+   my $plaintext = $m->add($ciphertext);
+
+   # in decrypt mode
+   my $ciphertext = $m->add($plaintext);
 
 =head2 finish
 

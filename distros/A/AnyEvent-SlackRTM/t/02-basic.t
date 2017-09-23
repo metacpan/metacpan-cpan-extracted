@@ -19,18 +19,18 @@ my $rtm = AnyEvent::SlackRTM->new($token);
 isa_ok($rtm, 'AnyEvent::SlackRTM');
 
 my $c = AnyEvent->condvar;
-$rtm->on('hello' => sub { 
+$rtm->on('hello' => sub {
     isa_ok($_[0], 'AnyEvent::SlackRTM');
     is($_[1]{type}, 'hello', 'got hello');
     ok($rtm->said_hello, 'said hello');
 
-    $rtm->ping({ echo => 'I am your father!' });
+    $rtm->ping({ echo => 'I am <your> father!' });
 });
 
 $rtm->on('pong' => sub {
     isa_ok($_[0], 'AnyEvent::SlackRTM');
     is($_[1]{type}, 'pong', 'got pong');
-    is($_[1]{echo}, 'I am your father!', 'echo message returned');
+    is($_[1]{echo}, 'I am <your> father!', 'echo message returned');
 
     $rtm->close;
 });

@@ -5,7 +5,7 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our @ISA = qw(Exporter);
 
@@ -16,9 +16,9 @@ a64l abort abs access acos acosh alarm asin asinh atan2 atan atanh atof atoi
 atol basename cabs cacos cacosh carg casinh catan catanh catclose catgets
 catopen cbrt ccos ccosh ceil cexp chdir chmod chown cimag clock
 clock_getcpuclockid clock_getres clock_gettime clock_nanosleep clock_settime
-clog confstr conj copysign cos cosh cpow cproj creal csin csinh csqrt ctan
-ctanh dirname div dlclose dlerror dlopen dlsym drand48 endutxent erand48 erf
-erfc exp2 expm1 faccessat fchdir fchmod fchmodat fchown fchownat fdatasync
+clog close confstr conj copysign cos cosh cpow cproj creal csin csinh csqrt
+ctan ctanh dirname div dlclose dlerror dlopen dlsym drand48 endutxent erand48
+erf erfc exp2 expm1 faccessat fchdir fchmod fchmodat fchown fchownat fdatasync
 fdim fdopen fdopendir fegetround fesetround ffs floor fma fmax fmin fmod
 fnmatch fpclassify fstatat fsync ftruncate futimens getdate getdate_err
 getegid geteuid getgid gethostid gethostname getitimer getpriority getsid
@@ -31,7 +31,8 @@ openat open pread preadv ptsname pwrite pwritev random read readlink
 readlinkat readv remainder remove rename renameat round scalbn seed48 setegid
 seteuid setgid setitimer setpriority setregid setreuid setuid setutxent
 sighold sigignore signbit sigpause sigrelse sinh srand48 srandom stat strptime
-symlink symlinkat sync tan tanh tgamma truncate trunc unlinkat unlink
+symlink symlinkat sync tan tanh tgamma timer_create timer_delete
+timer_getoverrun timer_gettime timer_settime truncate trunc unlinkat unlink
 utimensat write writev y0 y1 yn
 
 AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
@@ -63,7 +64,9 @@ our %EXPORT_TAGS = (
   'prw'   => [qw(pread preadv pwrite pwritev)],
   'clock' => [grep /^clock/i, @EXPORT_OK],
   'fcntl' => [grep /^(?:F|FD|O|POSIX_FADV)_/, @EXPORT_OK],
-  'fnm'   => [grep(/^FNM_/, @EXPORT_OK), 'fnmatch']
+  'fnm'   => [grep(/^FNM_/, @EXPORT_OK), 'fnmatch'],
+  'time_h'=> [grep /^(?:CLOCK|TIMER)_/, @EXPORT_OK],
+  'timer' => [grep /^timer_/i, @EXPORT_OK],
 );
 
 our $AUTOLOAD;

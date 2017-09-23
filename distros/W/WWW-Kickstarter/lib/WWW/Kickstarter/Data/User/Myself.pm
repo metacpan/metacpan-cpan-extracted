@@ -39,7 +39,7 @@ WWW::Kickstarter::Data::User::Myself - Kickstarter user data for the logged-in u
    my $myself = $ks->login($email, $password);
 
    my $iter = $myself->projects_backed();
-   while (my ($project) = $iter->()) {
+   while (my ($project) = $iter->get()) {
       print($project->name, "\n");
    }
 

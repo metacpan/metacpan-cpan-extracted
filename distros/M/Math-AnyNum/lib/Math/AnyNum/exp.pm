@@ -3,16 +3,21 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __exp__ => qw(Math::MPFR) => sub {
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_exp($r, $_[0], $ROUND);
-    $r;
-};
+sub __exp__ {
+    my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __exp__ => qw(Math::MPC) => sub {
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_exp($r, $_[0], $ROUND);
-    $r;
-};
+  Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_exp($r, $x, $ROUND);
+        return $r;
+    }
+
+  Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_exp($r, $x, $ROUND);
+        return $r;
+    }
+}
 
 1;

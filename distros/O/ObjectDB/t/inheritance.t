@@ -35,7 +35,3 @@ sub _setup {
     TestEnv->prepare_table('person');
     TestEnv->prepare_table('book');
 }
-
-sub _build_object {
-    Table->new(@_);
-}

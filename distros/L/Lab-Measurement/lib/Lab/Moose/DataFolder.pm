@@ -1,6 +1,6 @@
 package Lab::Moose::DataFolder;
 #ABSTRACT: Create a data directory with meta data
-$Lab::Moose::DataFolder::VERSION = '3.554';
+$Lab::Moose::DataFolder::VERSION = '3.600';
 use 5.010;
 use warnings;
 use strict;
@@ -179,7 +179,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 DESCRIPTION
 

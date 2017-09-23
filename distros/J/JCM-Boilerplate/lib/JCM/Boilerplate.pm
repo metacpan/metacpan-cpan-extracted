@@ -3,9 +3,9 @@
 # All Rights Reserved - See License
 #
 
-package JCM::Boilerplate v0.01.11;
-# ABSTRACT: Default Boilerplate for Joel's Code
-$JCM::Boilerplate::VERSION = '1.015';
+package JCM::Boilerplate;
+# ABSTRACT: Default Boilerplate for J. Maslak's Code
+$JCM::Boilerplate::VERSION = '1.016';
 
 use v5.22;
 use strict;
@@ -75,11 +75,11 @@ __END__
 
 =head1 NAME
 
-JCM::Boilerplate - Default Boilerplate for Joel's Code
+JCM::Boilerplate - Default Boilerplate for J. Maslak's Code
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 

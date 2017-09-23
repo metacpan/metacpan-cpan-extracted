@@ -39,6 +39,7 @@
         [% IF p.tag %] and [% END %]
     [% END %]
     [% IF p.tag %]Tagged "[% p.tag %]" [% END %]
+    [% IF p.category %]In "[% p.category %]" [% END %]
   </h3>
   
   [% IF result.params.username %]
@@ -83,6 +84,16 @@
           
           [% IF result.params.summary %]
           <div style="font-size:0.7em;padding: 5px 0px 15px 5px;">
+            [% IF Post.num_categories %]
+            <div style="opacity:0.6;margin-top:-8px;padding-bottom:5px;">
+              <i>in:
+                [% FOREACH category IN Post.category_list %]
+                  <a href="[%- mount_url -%]/list?category=[% category %]">[% category %]</a>
+                  [% IF loop.next() %],&nbsp;[% END %]
+                [% END %]
+              </i>
+            </div>
+            [% END %]
             <table><tr>
               [% IF Post.image_url %]
                 <td style="width:85px; vertical-align:top; padding-right:15px;">

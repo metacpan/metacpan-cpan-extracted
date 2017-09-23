@@ -1,5 +1,5 @@
 package Beam::Runnable::Timeout::Alarm;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: Use `alarm` to set a timeout for a command
 
 #pod =head1 SYNOPSIS
@@ -91,7 +91,7 @@ Beam::Runnable::Timeout::Alarm - Use `alarm` to set a timeout for a command
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

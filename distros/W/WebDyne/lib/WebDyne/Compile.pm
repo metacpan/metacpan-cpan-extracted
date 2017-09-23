@@ -50,7 +50,7 @@ use WebDyne::Base;
 
 #  Version information
 #
-$VERSION='1.248';
+$VERSION='1.250';
 
 
 #  Debug load
@@ -62,7 +62,7 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #
 our %CGI_Tag_Ucase=map {$_ => ucfirst($_)} (
 
-    qw(select tr link delete accept sub header)
+    qw(select tr link delete accept sub header button)
 
 );
 

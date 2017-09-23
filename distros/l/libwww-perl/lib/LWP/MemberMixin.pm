@@ -1,5 +1,5 @@
 package LWP::MemberMixin;
-$LWP::MemberMixin::VERSION = '6.26';
+$LWP::MemberMixin::VERSION = '6.27';
 sub _elem {
     my $self = shift;
     my $elem = shift;

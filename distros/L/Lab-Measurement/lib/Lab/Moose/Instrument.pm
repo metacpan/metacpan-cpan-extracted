@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument;
+$Lab::Moose::Instrument::VERSION = '3.600';
 #ABSTRACT: Base class for instrument drivers
-$Lab::Moose::Instrument::VERSION = '3.554';
+
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw(enum duck_type);
@@ -11,6 +12,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(
     timeout_param
+    read_length_param
     channel_param
     precision_param
     getter_params
@@ -28,7 +30,6 @@ use namespace::autoclean
     # Need this for Exporter.
     -except => 'import',
     -also   => [@EXPORT_OK];
-
 
 has 'connection' => (
     is       => 'ro',
@@ -70,8 +71,14 @@ sub query {
     return _trim_pmt( $self->binary_query(@_) );
 }
 
+
 sub timeout_param {
     return ( timeout => { isa => 'Num', optional => 1 } );
+}
+
+
+sub read_length_param {
+    return ( read_length => { isa => 'Int', optional => 1 } );
 }
 
 
@@ -87,7 +94,7 @@ sub precision_param {
 
 
 sub getter_params {
-    return ( timeout_param() );
+    return ( timeout_param(), read_length_param() );
 }
 
 
@@ -192,7 +199,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 
@@ -280,6 +287,10 @@ request.
 
 Return mandatory validation parameter for timeout.
 
+=head2 read_length_param
+
+Return mandatory validation parameter for read_length.
+
 =head2 channel_param
 
 Return optional validation parameter for channel. A given argument has to be an
@@ -339,7 +350,7 @@ Analog to C<validated_channel_getter>.
 This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

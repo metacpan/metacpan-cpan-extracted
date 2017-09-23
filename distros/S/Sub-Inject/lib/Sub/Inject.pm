@@ -1,6 +1,6 @@
 
 package Sub::Inject;
-$Sub::Inject::VERSION = '0.2.0';
+$Sub::Inject::VERSION = '0.3.0';
 # ABSTRACT: Inject subroutines into a lexical scope
 
 use 5.018;
@@ -8,13 +8,14 @@ use 5.018;
 require XSLoader;
 XSLoader::load(__PACKAGE__);
 
+sub sub_inject {
+    @_ = %{ $_[0] } if @_ == 1 && ref $_[0] eq 'HASH';
+    goto &_sub_inject;
+}
+
 1;
 
 #pod =encoding utf8
-#pod
-#pod =head1 NAME
-#pod
-#pod Sub::Inject - Inject subroutines into a lexical scope
 #pod
 #pod =head1 SYNOPSIS
 #pod
@@ -82,6 +83,7 @@ XSLoader::load(__PACKAGE__);
 #pod
 #pod     sub_inject($name, $code);
 #pod     sub_inject($name1, $code1, $name2, $code2);
+#pod     sub_inject(\%subs);
 #pod
 #pod Injects C<$code> as a lexical subroutine named C<$name>
 #pod into the currently compiling scope. The same applies
@@ -117,7 +119,7 @@ Sub::Inject - Inject subroutines into a lexical scope
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -149,10 +151,6 @@ is the static equivalent of
     BEGIN {
         Sub::Inject::sub_inject( 'one', sub { say "One!" } );
     }
-
-=head1 NAME
-
-Sub::Inject - Inject subroutines into a lexical scope
 
 =head1 HOW IT WORKS
 
@@ -189,6 +187,7 @@ The reference aliasing operation means no copy is done
 
     sub_inject($name, $code);
     sub_inject($name1, $code1, $name2, $code2);
+    sub_inject(\%subs);
 
 Injects C<$code> as a lexical subroutine named C<$name>
 into the currently compiling scope. The same applies
@@ -213,12 +212,6 @@ L<Exporter::Lexical> and L<lexically>
 =head1 AUTHOR
 
 Adriano Ferreira <ferreira@cpan.org>
-
-=head1 CONTRIBUTOR
-
-=for stopwords Adriano Ferreira
-
-Adriano Ferreira <a.r.ferreira@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

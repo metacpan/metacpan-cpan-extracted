@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.108';
+$Config::Model::Loader::VERSION = '2.110';
 use Carp;
 use strict;
 use warnings;
@@ -128,7 +128,7 @@ sub _split_cmd {
 	 (?:
             (:~|:-[=~]?|:=~|:\.\w+|:[=<>@]?|~)       # action
             (?:
-                  (?: \( ( $quoted_string | [^)]+ ) \) )  # capture parameters between braces
+                  (?: \( ( $quoted_string | [^)]+ ) \) )  # capture parameters between ( )
                 | (
                     /[^/]+/      # regexp
                     | (?:
@@ -137,16 +137,19 @@ sub _split_cmd {
                       )+
                   )
             )?
-         )?
+     )?
 	 (?:
-            (=~|.=|[=<>])          # apply regexp or assign or append
-	    (
-              (?:
-                $quoted_string
-                | [^#\s]                # or non whitespace
-              )+                       # many
-            )
-	 )?
+            (=~|\.=|=\.\w+|[=<>])          # apply regexp or assign or append
+            (?:
+                  (?: \( ( $quoted_string | [^)]+ ) \) )  # capture parameters between ( )
+                | (
+                    (?:
+                      $quoted_string
+                     | [^#\s]                # or non whitespace
+                    )+                       # many
+                  )
+	        )?
+     )?
 	 (?:
             \#              # optional annotation
 	    (
@@ -224,12 +227,12 @@ sub _load {
         }
 
         my @instructions = _split_cmd($cmd);
-        my ( $element_name, $action, $function_param, $id, $subaction, $value, $note ) =
+        my ( $element_name, $action, $function_param, $id, $subaction, $value_function_param, $value, $note ) =
             @instructions;
 
         if ( $logger->is_debug ) {
             my @disp = map { defined $_ ? "'$_'" : '<undef>' } @instructions;
-            $logger->debug("_load instructions: @disp (left: $cmd)");
+            $logger->debug("_load instructions: @disp (from: $cmd)");
         }
 
         if ( not defined $element_name and not defined $note ) {
@@ -372,7 +375,7 @@ sub unquote {
 
 sub _load_check_list {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
 
     my $element = $node->fetch_element( name => $element_name, check => $check );
 
@@ -516,7 +519,7 @@ sub _insort_hash_of_node {
 
 sub _load_list {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
 
     my $element = $node->fetch_element( name => $element_name, check => $check );
 
@@ -610,7 +613,7 @@ sub _load_list {
 
 sub _load_hash {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
 
     unquote( $id, $value, $note );
 
@@ -728,7 +731,7 @@ sub _load_hash {
 
 sub _load_leaf {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
 
     unquote( $id, $value );
 
@@ -830,7 +833,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 

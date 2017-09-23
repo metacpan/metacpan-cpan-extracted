@@ -1,0 +1,55 @@
+use TestCase::EnumA;
+
+package TestCase::Simple {
+  has x : int;
+  has y : int;
+  has values1 : int[];
+  has values2 : long[];
+  has message : byte[];
+  # has c : TestCase::Simple;
+  # has d : TestCase::Simple[];
+  
+  has title : int;
+  
+  sub get_x ($self : TestCase::Simple) : int {
+    return $self->{x};
+  }
+  
+  sub get2 () : int {
+    1;
+    my $var1 : int;
+    my $var2 : int;
+    
+    return 0;
+  }
+
+  sub get3 () : int { return 0; }
+  sub get4 ($foo : int) : int { return 0; }
+  sub get7 ($foo : int, $bar : int) : int { return 0; }
+
+  sub sum4 ($self : TestCase::Simple) : int {
+    
+    my $title : int;
+   
+    # $title->();
+    # $title->(1);
+    # $title->(1, 2);
+
+    $self->{x};
+    $self->sum5();
+
+    TestCase::Simple::sum5($self);
+
+    $self->{x} = 3;
+
+    my $char : byte = 'a';
+    
+    return 0;
+  }
+  
+  sub sum5($self : TestCase::Simple) : int {
+    $self->{x};
+    
+    return 0;
+  }
+}

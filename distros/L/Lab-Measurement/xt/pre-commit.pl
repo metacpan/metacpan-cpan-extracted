@@ -20,8 +20,8 @@ if ( $branch eq 'HEAD' ) {
     exit 0;
 }
 
-chdir catfile(qw/. Measurement/)
-    or die "cannot chdir to Measurement: $!";
+#chdir catfile(qw/. Measurement/)
+#    or die "cannot chdir to Measurement: $!";
 
 delete $ENV{GIT_DIR};
 
@@ -33,7 +33,7 @@ my @files = split '\n', qx/git diff --cached --name-only/;
 
 @files = grep {/\.(pm|pl|t)$/} @files;
 
-@files = map { abs2rel( $_, 'Measurement' ) } @files;
+#@files = map { abs2rel( $_, 'Measurement' ) } @files;
 
 # Run this after abs2rel.
 @files = grep {-f} @files;

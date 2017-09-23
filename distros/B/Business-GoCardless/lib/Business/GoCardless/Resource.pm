@@ -15,7 +15,7 @@ use strict;
 use warnings;
 
 use Moo;
-use Carp qw/ confess /;
+use Carp qw/ carp confess /;
 use JSON ();
 
 =head1 ATTRIBUTES
@@ -77,7 +77,16 @@ sub find_with_client {
     $data = $data->{$sub_key} if $sub_key;
 
     foreach my $attr ( keys( %{ $data } ) ) {
-        $self->$attr( $data->{$attr} );
+        # as per https://developer.gocardless.com/api-reference/#overview-backwards-compatibility
+        #
+        #     The following changes are considered backwards compatible
+        #     "Adding new properties to the responses from existing API endpoints"
+        #
+        # so we need to be able to handle attributes we don't know about yet, hence the eval
+        eval { $self->$attr( $data->{$attr} ); };
+        $@ && do {
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+        };
     }
 
     return $self;
@@ -105,7 +114,10 @@ sub _operation {
     }
 
     foreach my $attr ( keys( %{ $data } ) ) {
-        $self->$attr( $data->{$attr} );
+        eval { $self->$attr( $data->{$attr} ); };
+        $@ && do {
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+        };
     }
 
     return $self;

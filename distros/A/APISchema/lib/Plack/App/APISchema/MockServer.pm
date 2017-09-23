@@ -5,7 +5,7 @@ use parent qw(Plack::Component);
 use Plack::Util::Accessor qw(schema);
 use Plack::Request;
 
-use JSON::XS qw(encode_json);
+use APISchema::JSON;
 
 use APISchema::Generator::Router::Simple;
 use APISchema::Generator::Markdown::ResourceResolver;
@@ -32,7 +32,7 @@ sub call {
 
     my $response_body;
     if (ref $example) {
-        $response_body = encode_json($example);
+        $response_body = encode_json_canonical($example);
     } else {
         $response_body = $example;
     }

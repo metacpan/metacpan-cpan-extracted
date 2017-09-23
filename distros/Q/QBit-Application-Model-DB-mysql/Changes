@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-09-03 00:00:00 +0000 to present.
+Changes from 2016-09-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.013 at 2017-09-03 18:32:04 +0000
+version 0.014 at 2017-09-17 17:06:26 +0000
 ------------------------------------------
+
+  Change: 62c40e3a98deb4a35f3030fc7ec7d1143467fb3b
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-09-17 20:05:41 +0000
+
+    Merge pull request #13 from Madskill/use_query_in_add
+
+    use query in add 
+
+  Change: 79dd38bb658e8c7bba19fad23abe038e4d201269
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-17 20:04:24 +0000
+
+    use query in add 
+
+------------------------------------------
+version 0.013 at 2017-09-03 18:32:13 +0000
+------------------------------------------
+
+  Change: 9bb3dcd5ced226532aaa685831dfd3051fc7cc16
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-03 21:32:13 +0000
+
+    Version 0.013 
 
   Change: dc5c4b88514202d942354d64e52079ca7a11beba
   Author: Igor <igor-sverdlov@mail.ru>
@@ -138,36 +162,6 @@ version 0.009 at 2016-10-30 10:40:58 +0000
 
     deleted require 
 
-------------------------------------------
-version 0.008 at 2016-09-04 19:16:05 +0000
-------------------------------------------
-
-  Change: 5c88c2e240b6b7b5a72bc38dcec226c918d6b546
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 22:16:05 +0000
-
-    Version 0.008 
-
-  Change: d5d7e43f78b56158f5989bf3ed9045449fb6f780
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:13:38 +0000
-
-    Merge pull request #6 from Madskill/upload_to_cpan
-
-    Upload to cpan 
-
-  Change: 2ca5f251351aed940cb0e10ca09b801b9caf5f61
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-07-17 18:54:03 +0000
-
-    use __END__ 
-
-  Change: 6fe936f9283f4d90feb434d9a25ba1eb09f0f77d
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-07-17 17:26:30 +0000
-
-    added pod documentation and upload to cpan 
-
 ================================================
-Plus 7 releases after 2016-09-03 00:00:00 +0000.
+Plus 8 releases after 2016-09-17 00:00:00 +0000.
 ================================================

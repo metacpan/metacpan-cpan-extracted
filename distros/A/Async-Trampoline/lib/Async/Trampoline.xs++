@@ -1,0 +1,625 @@
+#define PERL_NO_GET_CONTEXT
+
+#include "ConvertErrorsXS.h"
+
+extern "C" {
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include "ppport.h"
+}
+
+#include "Async.h"
+
+static void* copy_sv_ref(void* sv);
+static void destroy_sv_ref(void* sv);
+static size_t get_refcount_sv(void* sv);
+static const char* get_stringification_sv(void* sv);
+
+static Destructible_Vtable sv_vtable {
+        destroy_sv_ref,
+        copy_sv_ref,
+        get_refcount_sv,
+        get_stringification_sv,
+};
+
+static void* copy_sv_ref(void* sv)
+{
+    ASYNC_LOG_DEBUG("copy_sv_ref: " DESTRUCTIBLE_FORMAT "\n",
+            DESTRUCTIBLE_FORMAT_ARGS_BORROWED(&sv_vtable, sv));
+    if (sv)
+        SvREFCNT_inc((SV*) sv);
+    return sv;
+}
+
+static void destroy_sv_ref(void* sv)
+{
+    ASYNC_LOG_DEBUG("destroy_sv_ref: " DESTRUCTIBLE_FORMAT "\n",
+            DESTRUCTIBLE_FORMAT_ARGS_BORROWED(&sv_vtable, sv));
+    if (sv)
+        SvREFCNT_dec((SV*) sv);
+}
+
+static size_t get_refcount_sv(void* sv)
+{
+    assert(sv);
+    return SvREFCNT((SV*) sv);
+}
+
+static const char* get_stringification_sv(void* sv)
+{
+    assert(sv);
+    if (!SvOK((SV*) sv))
+        return "<undef>";
+    return SvPV_nolen((SV*) sv);
+}
+
+static
+AsyncRef
+invoke_cv(CV* callback, DestructibleTuple const& args)
+{
+    assert(callback);
+
+    if (ASYNC_TRAMPOLINE_DEBUG)
+    {
+        #if PERL_VERSION >= 22
+        SV* name_sv = cv_name(callback, NULL, 0);
+        const char* name = SvPV_nolen(name_sv);
+        #else
+        char const* name = GvNAME(CvGV(callback));
+        #endif
+
+        const char* file = CvFILE(callback);
+        const COP* location = (const COP*) CvSTART(callback);
+        int line = (location) ? CopLINE(location) : 0;
+
+        ASYNC_LOG_DEBUG(
+                "running Perl callback %p: %s() at %s line %d\n",
+                callback, name, file, line);
+    }
+
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    if (args.size)
+    {
+        EXTEND(SP, args.size);
+        for (auto arg : args)
+        {
+            ASYNC_LOG_DEBUG("  - arg %p refs=%zu content=%s\n",
+                    arg,
+                    (size_t) SvREFCNT((SV*) arg),
+                    SvPV_nolen((SV*) arg));
+
+            PUSHs((SV*) arg);
+        }
+        PUTBACK;
+    }
+    else
+    {
+        ASYNC_LOG_DEBUG("  no args\n");
+    }
+
+    int count = call_sv((SV*) callback, G_SCALAR|G_EVAL);
+
+    SPAGAIN;
+
+    assert(count == 1);  // safe because scalar context
+
+    AsyncRef result{};
+
+    SV* error = ERRSV;
+    if (SvTRUE(error))
+    {
+        POPs;  // discard scalar return value
+        result = Async::alloc();
+        Destructible error_temp { newSVsv(error), &sv_vtable };
+        result->set_to_Error(std::move(error_temp));
+    }
+    else
+    {
+        SV* result_sv = POPs;
+
+        if (!sv_isa(result_sv, "Async::Trampoline"))
+            croak("Async callback must return another Async!");
+
+        result = (Async*) SvIV(SvRV(result_sv));
+    }
+
+    FREETMPS;
+    LEAVE;
+
+    return result;
+}
+
+class InvokeCV
+{
+    Destructible const context;
+public:
+    explicit InvokeCV(Destructible context) : context{std::move(context)} {}
+
+    InvokeCV(CV* callback) : InvokeCV{{callback, &sv_vtable}}
+    { SvREFCNT_inc(callback); }
+
+    auto operator() (DestructibleTuple const& args) const -> AsyncRef
+    {
+        CV* callback = (CV*) context.data;
+        return invoke_cv(callback, args);
+    }
+};
+
+static AsyncRef async_from_sv(SV* sv)
+{
+    if (sv_isa(sv, "Async::Trampoline"))
+        return (Async*) SvIV(SvRV(sv));
+    return {};
+}
+
+static DestructibleTuple destructible_tuple_tail(
+        size_t head,
+        DestructibleTuple const& data)
+{
+    assert(head <= data.size);
+
+    DestructibleTuple result { data.vtable, data.size - head };
+    for (size_t i = head; i < data.size; i++)
+        result.set(i - head, data.copy_from(i));
+    return result;
+}
+
+static AsyncRef make_async_yield(AsyncRef&& continuation, AsyncRef&& value)
+{
+    // wrap continuation as SV
+    DestructibleTuple continuation_tuple { &sv_vtable, 1 };
+    SV* continuation_sv = nullptr;
+    continuation_tuple.set(0, { continuation_sv = newSV(0), &sv_vtable });
+    sv_setref_pv(
+            continuation_sv,
+            "Async::Trampoline",
+            std::move(continuation).ptr_with_ownership());
+
+    AsyncRef continuation_tuple_async = Async::alloc();
+    continuation_tuple_async->set_to_Value(std::move(continuation_tuple));
+
+    AsyncRef yield = Async::alloc();
+    yield->set_to_Concat(
+            std::move(continuation_tuple_async),
+            std::move(value));
+
+    return yield;
+}
+
+static AsyncRef make_gen_foreach(AsyncRef&& gen, InvokeCV&& body)
+{
+    struct GenForeachThunk
+    {
+        InvokeCV body;
+
+        auto operator()(DestructibleTuple const& data) -> AsyncRef
+        {
+            AsyncRef continuation {};
+            if (data.size > 0)
+                continuation = async_from_sv((SV*) data.at(0));
+
+            if (!continuation)
+                throw std::runtime_error(
+                        "generator Async must have Async as first value");
+
+            DestructibleTuple body_args = destructible_tuple_tail(1, data);
+
+            AsyncRef ok_then = Async::alloc();
+
+            AsyncRef next_foreach = make_gen_foreach(
+                    std::move(continuation), InvokeCV { body });
+
+            AsyncRef ok = body(body_args);
+
+            ok_then->set_to_Flow({
+                    ok, next_foreach,
+                    Async_Type::IS_VALUE,
+                    Async_Flow::THEN,
+            });
+
+            return ok_then;
+        }
+    } gen_foreach_thunk { std::move(body) };
+
+    AsyncRef await = Async::alloc();
+    await->set_to_Thunk(gen_foreach_thunk, std::move(gen));
+
+    AsyncRef value = Async::alloc();
+    value->set_to_Value(DestructibleTuple { &sv_vtable, 0 });
+
+    AsyncRef finished = Async::alloc();
+    finished->set_to_Flow({
+            std::move(await), std::move(value),
+            Async_Type::CATEGORY_RESOLVED,
+            Async_Flow::OR,
+    });
+
+    return finished;
+}
+
+static AsyncRef make_gen_map(AsyncRef&& gen, InvokeCV&& body)
+{
+    struct GenMapThunk
+    {
+        InvokeCV body;
+
+        auto operator()(DestructibleTuple const& data) -> AsyncRef
+        {
+            AsyncRef continuation {};
+            if (data.size > 0)
+                continuation = async_from_sv((SV*) data.at(0));
+
+            if (!continuation)
+                throw std::runtime_error(
+                        "generator Async must have Async as first value");
+
+            AsyncRef next_map = make_gen_map(
+                    std::move(continuation), InvokeCV { body });
+
+            DestructibleTuple body_args = destructible_tuple_tail(1, data);
+
+            AsyncRef result = body(body_args);
+
+            return make_async_yield(std::move(next_map), std::move(result));
+        }
+    } gen_map_thunk { std::move(body) };
+
+    AsyncRef await = Async::alloc();
+    await->set_to_Thunk(gen_map_thunk, std::move(gen));
+    return await;
+}
+
+static AsyncRef concat_fold_right(ssize_t i, AV* array)
+{
+    if (i > av_len(array))
+        return nullptr;
+
+    AsyncRef left;
+    if (SV** left_sv = av_fetch(array, i, 0))
+        left = async_from_sv(*left_sv);
+
+    if (!left)
+        throw std::runtime_error(
+                "all dependencies must be Asyncs");
+
+    AsyncRef right = concat_fold_right(i + 1, array);
+
+    if (!right)
+        return left;
+
+    AsyncRef concat = Async::alloc();
+    concat->set_to_Concat(std::move(left), std::move(right));
+    return concat;
+};
+
+
+#define ASYNC_TYPE_GET(name) (static_cast<I32>(Async_Type::name))
+#define ASYNC_TYPE_CATEGORY_COMPLETE    ASYNC_TYPE_GET(CATEGORY_COMPLETE)
+#define ASYNC_TYPE_CATEGORY_RESOLVED    ASYNC_TYPE_GET(CATEGORY_RESOLVED)
+#define ASYNC_TYPE_IS_CANCEL            ASYNC_TYPE_GET(IS_CANCEL)
+#define ASYNC_TYPE_IS_ERROR             ASYNC_TYPE_GET(IS_ERROR)
+#define ASYNC_TYPE_IS_VALUE             ASYNC_TYPE_GET(IS_VALUE)
+
+MODULE = Async::Trampoline PACKAGE = Async::Trampoline
+
+void
+Async::run_until_completion()
+    INIT:
+        CXX_TRY
+    PPCODE:
+    {
+        Async_run_until_completion(THIS);
+
+        Async& result = THIS->ptr_follow();
+
+        if (!result.has_category(Async_Type::CATEGORY_COMPLETE))
+        {
+            croak(  "run_until_completion() did not complete " ASYNC_FORMAT,
+                    ASYNC_FORMAT_ARGS(&result));
+        }
+        else if (result.has_type(Async_Type::IS_CANCEL))
+        {
+            croak("run_until_completion(): Async was cancelled");
+        }
+        else if (result.has_type(Async_Type::IS_ERROR))
+        {
+            croak_sv((SV*) result.as_error.data);
+        }
+        else if (result.has_type(Async_Type::IS_VALUE))
+        {
+            ASYNC_LOG_DEBUG("returning to Perl: " ASYNC_FORMAT "\n",
+                    ASYNC_FORMAT_ARGS(&result));
+
+            DestructibleTuple& values = result.as_value;
+            XSprePUSH;  // to fix weird XS+PPCODE argument handling
+            EXTEND(SP, values.size);
+            for (auto value : values)
+            {
+                ASYNC_LOG_DEBUG("  - " DESTRUCTIBLE_FORMAT "\n",
+                        DESTRUCTIBLE_FORMAT_ARGS_BORROWED(values.vtable, value));
+                PUSHs(sv_mortalcopy((SV*) value));
+            }
+
+            ASYNC_LOG_DEBUG("result end\n");
+
+            XSRETURN(values.size);
+        }
+        else
+        {
+            assert(0);
+        }
+    }
+    CXX_CATCH
+
+void
+Async::DESTROY()
+    INIT:
+        CXX_TRY
+    CODE:
+        THIS->unref();
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+async(body)
+        CV* body
+    PROTOTYPE: &
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef self = Async::alloc();
+        self->set_to_Thunk(InvokeCV{body}, nullptr);
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+await(deps, body)
+        SV* deps
+        CV* body
+    PROTOTYPE: $&
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        auto get_arrayref = [](SV* sv) -> AV*
+        {
+            if (!SvROK(sv))
+                return nullptr;
+
+            sv = SvRV(sv);
+
+            if (SvTYPE(sv) != SVt_PVAV)
+                return nullptr;
+
+            return (AV*) sv;
+        };
+
+        AsyncRef dep = async_from_sv(deps);
+        if (dep)
+        {
+            // ok
+        }
+        else if (AV* deps_av = get_arrayref(deps))
+        {
+            dep = concat_fold_right(0, deps_av);
+        }
+        else
+        {
+            throw std::runtime_error(
+                    "dependency must be Async or arrayref of Asyncs");
+        }
+
+        AsyncRef self = Async::alloc();
+        self->set_to_Thunk(InvokeCV{body}, std::move(dep));
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+async_value(...)
+    PROTOTYPE: @
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        DestructibleTuple values{&sv_vtable, (size_t) items};
+        for (size_t i = 0; i < items; i++)
+            values.set(i, Destructible { newSVsv(ST(i)), &sv_vtable });
+
+        AsyncRef self = Async::alloc();
+        self->set_to_Value(std::move(values));
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+async_error(message)
+        SV* message
+    PROTOTYPE: $;
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        Destructible value{ newSVsv(message), &sv_vtable };
+        AsyncRef self = Async::alloc();
+        self->set_to_Error(std::move(value));
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+async_cancel()
+    PROTOTYPE:
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef self = Async::alloc();
+        self->set_to_Cancel();
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+async_yield(async, callback)
+        Async*  async
+        CV*     callback
+    PROTOTYPE: $&
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef continuation = Async::alloc();
+        continuation->set_to_Thunk(InvokeCV{callback}, nullptr);
+
+        AsyncRef yield = make_async_yield(std::move(continuation), async);
+        RETVAL = std::move(yield).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async::resolved_or(orelse)
+        Async*  orelse;
+    ALIAS:
+        resolved_or = ASYNC_TYPE_CATEGORY_RESOLVED
+        value_or    = ASYNC_TYPE_IS_VALUE
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef self = Async::alloc();
+        self->set_to_Flow({
+                THIS, orelse,
+                static_cast<Async_Type>(ix),
+                Async_Flow::OR,
+        });
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async::resolved_then(then)
+        Async*  then;
+    ALIAS:
+        complete_then   = ASYNC_TYPE_CATEGORY_COMPLETE
+        resolved_then   = ASYNC_TYPE_CATEGORY_RESOLVED
+        value_then      = ASYNC_TYPE_IS_VALUE
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef self = Async::alloc();
+        self->set_to_Flow({
+                THIS, then,
+                static_cast<Async_Type>(ix),
+                Async_Flow::THEN,
+        });
+        RETVAL = std::move(self).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async::concat(other)
+        Async* other
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        AsyncRef async = Async::alloc();
+        async->set_to_Concat(THIS, other);
+        RETVAL = std::move(async).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+SV*
+Async::to_string()
+    PROTOTYPE: DISABLE
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        RETVAL = newSVpvf(ASYNC_FORMAT,
+                ASYNC_FORMAT_ARGS(THIS));
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+bool
+Async::is_complete()
+    ALIAS:
+        is_complete = ASYNC_TYPE_CATEGORY_COMPLETE
+        is_resolved = ASYNC_TYPE_CATEGORY_RESOLVED
+    INIT:
+        CXX_TRY
+    CODE:
+        RETVAL = THIS->has_category(static_cast<Async_Type>(ix));
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+bool
+Async::is_cancelled()
+    ALIAS:
+        is_cancelled = ASYNC_TYPE_IS_CANCEL
+        is_error     = ASYNC_TYPE_IS_ERROR
+        is_value     = ASYNC_TYPE_IS_VALUE
+    INIT:
+        CXX_TRY
+    CODE:
+        RETVAL = THIS->has_type(static_cast<Async_Type>(ix));
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async::gen_map(body)
+        CV* body
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        RETVAL = make_gen_map(THIS, body).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async::gen_foreach(body)
+        CV* body
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        RETVAL = make_gen_foreach(THIS, body).ptr_with_ownership();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH

@@ -15,11 +15,12 @@ my $meta_tags = HTML::SocialMeta->new(
     title => 'You can have any title you wish here',
     description => 'Description goes here may have to do a little validation',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     url	 => 'www.someurl.com',
     operatingSystem => 'ANDROID',
     app_country => 'test',
     app_name => 'test',
-    app_id => 'test', 
+    app_id => 'test',
     app_url => 'test',
     player      => 'www.urltovideo.com/blah.jpg',
     player_width => '500',
@@ -32,6 +33,7 @@ my $meta_player_tags = HTML::SocialMeta->new(
     description => 'Description goes here may have to do a little validation',
     player => 'www.urltovideo.com/blah.jpg',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     player_width => '500',
     player_height => '500',
 );
@@ -43,11 +45,12 @@ my $ios_app_tags = HTML::SocialMeta->new(
     title => 'You can have any title you wish here',
     description => 'Description goes here may have to do a little validation',
     image => 'www.urltoimage.com/blah.jpg',
+    image_alt => 'A picture of some stuff.',
     url  => 'www.someurl.com',
     operatingSystem => 'IOS',
     app_country => 'US',
     app_name => 'tester twitter',
-    app_id => '1232', 
+    app_id => '1232',
     app_url => 'app.app.com/app',
 );
 
@@ -64,7 +67,8 @@ my $test_twitter = '<meta name="twitter:card" content="summary"/>
 <meta name="twitter:site" content="@example_twitter"/>
 <meta name="twitter:title" content="You can have any title you wish here"/>
 <meta name="twitter:description" content="Description goes here may have to do a little validation"/>
-<meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>';
+<meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>
+<meta name="twitter:image:alt" content="A picture of some stuff."/>';
 
 is($twitter->create('summary'), $test_twitter);
 is($twitter_summary_card, $test_twitter);
@@ -73,7 +77,8 @@ my $test_twitter_featured = '<meta name="twitter:card" content="summary_large_im
 <meta name="twitter:site" content="@example_twitter"/>
 <meta name="twitter:title" content="You can have any title you wish here"/>
 <meta name="twitter:description" content="Description goes here may have to do a little validation"/>
-<meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>';
+<meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>
+<meta name="twitter:image:alt" content="A picture of some stuff."/>';
 
 is($twitter->create('featured_image'), $test_twitter_featured);
 is($twitter_featured_image_card, $test_twitter_featured);
@@ -94,6 +99,7 @@ my $test_player_card = '<meta name="twitter:card" content="player"/>
 <meta name="twitter:title" content="You can have any title you wish here"/>
 <meta name="twitter:description" content="Description goes here may have to do a little validation"/>
 <meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>
+<meta name="twitter:image:alt" content="A picture of some stuff."/>
 <meta name="twitter:player" content="www.urltovideo.com/blah.jpg"/>
 <meta name="twitter:player:width" content="500"/>
 <meta name="twitter:player:height" content="500"/>';

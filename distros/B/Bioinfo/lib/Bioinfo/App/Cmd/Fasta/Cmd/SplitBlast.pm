@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use Bioinfo::PBS::Queue;
 
-our $VERSION = '0.1.8'; # VERSION: 
+our $VERSION = '0.1.11'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -207,7 +207,7 @@ Bioinfo::App::Cmd::Fasta::Cmd::SplitBlast - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.8
+version 0.1.11
 
 =head1 SYNOPSIS
 

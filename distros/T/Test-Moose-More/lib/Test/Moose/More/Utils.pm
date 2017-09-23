@@ -9,7 +9,7 @@
 #
 package Test::Moose::More::Utils;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Test::Moose::More::Utils::VERSION = '0.048';
+$Test::Moose::More::Utils::VERSION = '0.050';
 # ABSTRACT: Various utility functions for TMM (and maybe others!)
 
 use strict;
@@ -72,7 +72,7 @@ Test::Moose::More::Utils - Various utility functions for TMM (and maybe others!)
 
 =head1 VERSION
 
-This document describes version 0.048 of Test::Moose::More::Utils - released June 17, 2017 as part of Test-Moose-More.
+This document describes version 0.050 of Test::Moose::More::Utils - released September 20, 2017 as part of Test-Moose-More.
 
 =head1 FUNCTIONS
 

@@ -17,9 +17,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Beam::Minion",
   "PREREQ_PM" => {
-    "Beam::Runner" => "0.006",
+    "Beam::Runner" => "0.014",
     "Beam::Wire" => "1.019",
+    "Getopt::Long" => "2.36",
     "Minion" => 0,
+    "Module::Runtime" => 0,
     "Mojolicious" => 7
   },
   "TEST_REQUIRES" => {
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t t/command/*.t"
   }
@@ -42,15 +44,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Beam::Runner" => "0.006",
+  "Beam::Runner" => "0.014",
   "Beam::Wire" => "1.019",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Getopt::Long" => "2.36",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Minion" => 0,
   "Minion::Backend::SQLite" => 0,
   "Mock::MonkeyPatch" => 0,
+  "Module::Runtime" => 0,
   "Mojo::SQLite" => "2.002",
   "Mojolicious" => 7,
   "Test::Fatal" => 0,

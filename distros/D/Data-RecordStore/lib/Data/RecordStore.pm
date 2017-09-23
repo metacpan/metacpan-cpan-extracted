@@ -56,7 +56,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '2.0';
+$VERSION = '2.01';
 
 =head1 METHODS
 
@@ -399,12 +399,7 @@ sub convert {
 
     for my $id (1..$store_db->entry_count) {
         my( $size ) = @{ $store_db->get_record( $id ) };
-        #    $source_sizes[$id] = $size;
-
         $source_dbs->[$id] = Data::RecordStore::FixedStore->open( "A*", "$source_dir/${id}_OBJSTORE", $size );
-    
-        #    my( $data ) = @{ $source_dbs->[$id]->get_record( 1 ) };
-        #    print STDERR "$id:0) $data\n";
     }
 
 
@@ -418,9 +413,6 @@ sub convert {
     for my $id (1..$source_obj_db->entry_count) {
         my( $source_store_id, $id_in_old_store ) = @{ $source_obj_db->get_record( $id ) };
 
-        #    print STDERR "id ($id) in $source_store_id/$id_in_old_store\n";next;
-
-    
         next unless $id_in_old_store;
 
         # grab data
@@ -532,15 +524,17 @@ sub open {
     my $useSize = $size || do { use bytes; length( pack( $template ) ) };
     die "Cannot open a zero record sized fixed store" unless $useSize;
     unless( -e $filename ) {
-        CORE::open $FH, ">", $filename;
+        CORE::open $FH, ">", $filename or die "Unable to open $filename : $!";
         print $FH "";
         close $FH;
     }
     CORE::open $FH, "+<", $filename or die "$@ $!";
-    bless { TMPL => $template,
+    my $self = bless { TMPL => $template,
             RECORD_SIZE => $useSize,
             FILENAME => $filename,
     }, $class;
+    
+    $self;
 } #open
 
 =head2 empty
@@ -710,12 +704,12 @@ assigned to this store.
 sub put_record {
     my( $self, $idx, $data ) = @_;
 
-    my $fh = $self->_filehandle;
-
     my $to_write = pack ( $self->{TMPL}, ref $data ? @$data : $data );
     # allows the put_record to grow the data store by no more than one entry
 
     die "Index $idx out of bounds. Store has entry count of ".$self->entry_count if $idx > (1+$self->entry_count);
+
+    my $fh = $self->_filehandle;
 
     sysseek( $fh, $self->{RECORD_SIZE} * ($idx-1), SEEK_SET ) && ( my $swv = syswrite( $fh, $to_write ) );
     1;
@@ -735,7 +729,7 @@ sub unlink_store {
 
 sub _filehandle {
     my $self = shift;
-    CORE::open( my $fh, "+<", $self->{FILENAME} );
+    CORE::open( my $fh, "+<", $self->{FILENAME} ) or die "Unable to open ($self) $self->{FILENAME} : $!";
     $fh;
 }
 
@@ -756,6 +750,6 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.0  (Feb 23, 2017))
+       Version 2.01  (Sep 14, 2017))
 
 =cut

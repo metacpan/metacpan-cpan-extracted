@@ -7,7 +7,7 @@ use 5.022000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Default Boilerplate for Joel's Code",
+  "ABSTRACT" => "Default Boilerplate for J. Maslak's Code",
   "AUTHOR" => "J. Maslak <jmaslak\@antelope.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -110,7 +110,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.001014"
   },
-  "VERSION" => "1.015",
+  "VERSION" => "1.016",
   "test" => {
     "TESTS" => "t/*.t"
   }

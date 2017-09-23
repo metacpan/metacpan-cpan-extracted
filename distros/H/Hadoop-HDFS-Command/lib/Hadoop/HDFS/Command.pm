@@ -1,9 +1,8 @@
 package Hadoop::HDFS::Command;
-$Hadoop::HDFS::Command::VERSION = '0.003';
+$Hadoop::HDFS::Command::VERSION = '0.005';
 use 5.010;
 use strict;
 use warnings;
-
 use Capture::Tiny   ();
 use Carp            ();
 use Data::Dumper;
@@ -37,10 +36,10 @@ has enable_log => (
     lazy    => 1,
 );
 
-has 'runas' => (
+has runas => (
     is      => 'rw',
     isa     => Str,
-    default => getpwuid $<,
+    default => scalar getpwuid $<,
     lazy    => 1,
 );
 
@@ -400,6 +399,31 @@ sub _dfs_chown {
     return @response
 }
 
+sub _dfs_get {
+    my $self    = shift;
+    my $options = shift;
+    my @params  = @_;
+    my @flags   = qw( p ignoreCrc crc );
+    my($arg, $paths) = $self->_parse_options(
+                            \@params,
+                            \@flags,
+                            undef,
+                            {
+                                require_params => 1,
+                            },
+                        );
+    my @response = $self->_capture(
+        $options,
+        $self->cmd_hdfs,
+        qw( dfs -get ),
+        ( map { '-' . $_ } grep { $arg->{ $_ } } @flags ),
+        @{ $paths },
+    );
+
+    # just a confirmation message
+    return @response
+}
+
 sub _parse_options {
     my $self = shift;
     # TODO: collect dfs generic options
@@ -556,7 +580,7 @@ Hadoop::HDFS::Command
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -722,6 +746,12 @@ The C<@subcommand_args> can have these defined: C<-R>
 The C<@subcommand_args> can have these defined: C<-R>
 
     $hdfs->dfs( chown => @subcommand_args, $OWNERCOLONGROUP, $path );
+
+=head3 get
+
+The C<@subcommand_args> can have these defined: C<-p>, C<-ignoreCrc>, C<-crc>
+
+    $hdfs->dfs( get => @subcommand_args, $src, $localdst );
 
 =head1 SEE ALSO
 

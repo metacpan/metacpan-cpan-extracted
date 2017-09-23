@@ -5,8 +5,9 @@ use Data::Dumper;
 use Carp;
 use Storable;
 use MIME::Base64 ();
+no overloading '%{}', '${}';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my %proxyClasses = (
     'Patro::N1' => 0,    # HASH
@@ -126,13 +127,11 @@ sub getproxy {
 sub proxy_request {
     my $proxy = shift;
     my $request = shift;
-    my ($socket,$proxy_id,$_DESTROY,$proxy_client)
-	= Patro::_fetch($proxy,qw(socket id _DESTROY client));
     if (!defined $request->{context}) {
 	$request->{context} = defined(wantarray) ? 1 + wantarray : 0;
     }
     if (!defined $request->{id}) {
-	$request->{id} = $proxy_id;
+	$request->{id} = $proxy->{id};
     }
 
     if ($request->{has_args}) {
@@ -140,15 +139,20 @@ sub proxy_request {
 	# we should convert it to ... what?
 	foreach my $arg (@{$request->{args}}) {
 	    if (isProxyRef(ref($arg))) {
-		my $id = Patro::_fetch(handle($arg),"id");
+		my $id = handle($arg)->{id};
 		$arg = bless \$id, '.Patroon';
 	    }
 	}
     }
 
+#    if ($request->{command} eq '@{}') {
+#	::xdiag("in LeumJelly::proxy_request , request=",$request);
+#    }
+
     my $sreq = serialize($request);
     my $resp;
-    if ($_DESTROY) {
+    my $socket = $proxy->{socket};
+    if ($proxy->{_DESTROY}) {
 	no warnings 'closed';
 	print {$socket} $sreq . "\n";
 	$resp = readline($socket);
@@ -160,7 +164,7 @@ sub proxy_request {
 	return serialize({context => 0, response => ""});
     }
     croak if ref($resp);
-    $resp = deserialize_response($resp, $proxy_client);
+    $resp = deserialize_response($resp, $proxy->{client});
     if ($resp->{error}) {
 	croak $resp->{error};
     }
@@ -270,13 +274,13 @@ qw# + - * / % ** << >> += -= *= /= %= **= <<= >>= <=> < <= > >= == != ^ ^=
 sub overload_handler {
     my ($ref, $y, $swap, $op) = @_;
     my $handle = handle($ref);
-    my ($overloads,$handle_id) = Patro::_fetch($handle,"overloads","id");
+    my $overloads = $handle->{overloads};
 
     if ($overloads && $overloads->{$op}) {
 	# operation is overloaded in the remote object.
 	# ask the server to compute the operation result
 	return proxy_request( $handle,
-	    { id => $handle_id,
+	    { id => $handle->{id},
 	      topic => 'OVERLOAD',
 	      command => $op,
 	      has_args => 1,
@@ -325,12 +329,12 @@ sub deref_handler {
     my $op = pop;
 
     my $handle = handle($obj);
-    my ($overloads,$handle_id) = Patro::_fetch($handle,"overloads","id");
+    my $overloads = $handle->{overloads};
     if ($overloads && $overloads->{$op}) {
 	# operation is overloaded in the remote object.
 	# ask the server to compute the operation result
 	return proxy_request( $handle,
-	    { id => $handle_id,
+	    { id => $handle->{id},
 	      topic => 'OVERLOAD',
 	      command => $op,
 	      has_args => 0 } );
@@ -338,6 +342,8 @@ sub deref_handler {
     if ($op eq '@{}') { croak "Not an ARRAY reference" }
     if ($op eq '%{}') { croak "Not a HASH reference" }
     if ($op eq '&{}') { croak "Not a CODE reference" }
+    if ($op eq '${}') { croak "Not a SCALAR reference" }
+    if ($op eq '*{}') { croak "Not a GLOB reference" }
     croak "Patro: invalid dereference $op";
 }
 1;

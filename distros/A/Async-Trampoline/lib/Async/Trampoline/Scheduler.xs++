@@ -1,0 +1,77 @@
+#include "Scheduler.h"
+
+#include "ConvertErrorsXS.h"
+
+extern "C" {
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include "ppport.h"
+}
+
+
+MODULE = Async::Trampoline::Scheduler PACKAGE = Async::Trampoline::Scheduler
+
+Async_Trampoline_Scheduler*
+Async_Trampoline_Scheduler::new(initial_capacity = 32);
+        UV initial_capacity;
+    INIT:
+        CXX_TRY
+    CLEANUP:
+        CXX_CATCH
+
+void
+Async_Trampoline_Scheduler::DESTROY();
+    INIT:
+        CXX_TRY
+    CLEANUP:
+        CXX_CATCH
+
+void
+Async_Trampoline_Scheduler::enqueue(Async* async, ...);
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        THIS->enqueue(async);
+
+        for (IV i = 2; i < items; i++)
+        {
+            SV* dep_sv = ST(i);
+            if (!sv_isa(dep_sv, "Async::Trampoline"))
+                croak("Argument %d must be Async: ", i, SvPV_nolen(dep_sv));
+            Async* dep = (Async*) SvIV(SvRV(dep_sv));
+
+            THIS->block_on(*async, dep);
+        }
+    }
+    CLEANUP:
+        CXX_CATCH
+
+Async*
+Async_Trampoline_Scheduler::dequeue();
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        if (THIS->queue_size() == 0)
+            XSRETURN_EMPTY;
+
+        RETVAL = &THIS->dequeue()->ref();
+    }
+    OUTPUT: RETVAL
+    CLEANUP:
+        CXX_CATCH
+
+
+void
+Async_Trampoline_Scheduler::complete(Async* async);
+    INIT:
+        CXX_TRY
+    CODE:
+    {
+        THIS->complete(*async);
+    }
+    CLEANUP:
+        CXX_CATCH

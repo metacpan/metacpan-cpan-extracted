@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.108';
+$Config::Model::Instance::VERSION = '2.110';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -516,7 +516,7 @@ sub write_back {
             "Try with -force option or add read/write backend to $info\n";
     }
 
-    foreach my $path ( $self->nodes_to_write_back ) {
+    foreach my $path ( sort $self->nodes_to_write_back ) {
         $logger->info("write_back called on node $path");
 
         if ( $path and $self->{config_file} ) {
@@ -633,7 +633,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 

@@ -1,28 +1,19 @@
 package Beam::Minion::Command::worker;
-our $VERSION = '0.006';
+our $VERSION = '0.011';
 # ABSTRACT: Command to run a Beam::Minion worker
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     beam minion worker <container>
+#pod     beam minion worker
 #pod
 #pod =head1 DESCRIPTION
 #pod
-#pod This command takes a L<Beam::Wire> container (optionally searching
-#pod C<BEAM_PATH> a la L<Beam::Runner>) and starts a L<Minion::Worker> worker that
-#pod will run any service inside.
+#pod This command takes all the L<Beam::Wire> containers located on the
+#pod C<BEAM_PATH> environment variable and starts a L<Minion::Worker> worker
+#pod that will run any services inside.
 #pod
 #pod Service jobs are added to the queue using the L<beam minion run
 #pod command|Beam::Minion::Command::run>.
-#pod
-#pod =head1 ARGUMENTS
-#pod
-#pod =head2 container
-#pod
-#pod The container of tasks for this worker to handle. This can be an absolute
-#pod path to a container file, a relative path from the current directory, or
-#pod a relative path from one of the directories in the C<BEAM_PATH> environment
-#pod variable (separated by C<:>).
 #pod
 #pod =head1 ENVIRONMENT
 #pod
@@ -47,41 +38,14 @@ our $VERSION = '0.006';
 
 use strict;
 use warnings;
-use Beam::Wire;
-use Beam::Runner::Util qw( find_container_path );
-use Beam::Minion::Util qw( minion );
-use Scalar::Util qw( weaken );
-use Mojolicious;
-use Mojo::Log;
+use Beam::Minion::Util qw( build_mojo_app );
 use Minion::Command::minion::worker;
 
 sub run {
-    my ( $class, $container ) = @_;
-    my $app = Mojolicious->new(
-        log => Mojo::Log->new, # Log to STDERR
-    );
-
-    push @{$app->commands->namespaces}, 'Minion::Command';
-
-    my $minion = minion();
-    weaken $minion->app($app)->{app};
-    $app->helper(minion => sub {$minion});
-
-    my $path = find_container_path( $container );
-    my $wire = Beam::Wire->new( file => $path );
-    my $config = $wire->config;
-    for my $name ( keys %$config ) {
-        next unless $wire->is_meta( $config->{ $name }, 1 );
-        $minion->add_task( $name => sub {
-            my ( $job, @args ) = @_;
-            my $obj = $wire->get( $name );
-            my $exit = $obj->run( @args );
-            my $method = $exit ? 'fail' : 'finish';
-            $job->$method( { exit => $exit } );
-        } );
-    }
+    my ( $class, @args ) = @_;
+    my $app = build_mojo_app();
     my $cmd = Minion::Command::minion::worker->new( app => $app );
-    $cmd->run( '-q', $container );
+    $cmd->run( @args );
 }
 
 1;
@@ -96,29 +60,20 @@ Beam::Minion::Command::worker - Command to run a Beam::Minion worker
 
 =head1 VERSION
 
-version 0.006
+version 0.011
 
 =head1 SYNOPSIS
 
-    beam minion worker <container>
+    beam minion worker
 
 =head1 DESCRIPTION
 
-This command takes a L<Beam::Wire> container (optionally searching
-C<BEAM_PATH> a la L<Beam::Runner>) and starts a L<Minion::Worker> worker that
-will run any service inside.
+This command takes all the L<Beam::Wire> containers located on the
+C<BEAM_PATH> environment variable and starts a L<Minion::Worker> worker
+that will run any services inside.
 
 Service jobs are added to the queue using the L<beam minion run
 command|Beam::Minion::Command::run>.
-
-=head1 ARGUMENTS
-
-=head2 container
-
-The container of tasks for this worker to handle. This can be an absolute
-path to a container file, a relative path from the current directory, or
-a relative path from one of the directories in the C<BEAM_PATH> environment
-variable (separated by C<:>).
 
 =head1 ENVIRONMENT
 

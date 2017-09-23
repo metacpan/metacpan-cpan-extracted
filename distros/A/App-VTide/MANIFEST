@@ -15,6 +15,7 @@ lib/App/VTide/Command/Run.pm
 lib/App/VTide/Command/Save.pm
 lib/App/VTide/Command/Split.pm
 lib/App/VTide/Command/Start.pm
+lib/App/VTide/Command/Who.pm
 lib/App/VTide/Config.pm
 lib/App/VTide/Configuration.pod
 lib/App/VTide/Hooks.pm

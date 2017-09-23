@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.131     2017-09-16 04:29:15Z
+          - spelling fix in generated CONTRIBUTING file (thanks, Edward
+            Betts!)
+          - added .travis.yml to minting profile
+          - plugins used by the bundle are now injected into develop-suggests
+            prerequisites, rather than develop-requires, so Travis no longer
+            feels obliged to install them when testing the built distribution
+
 0.130     2017-08-28 01:13:46Z
           - fix test that is broken with older [CopyFilesFromRelease]
           - fix inverted condition in [Git::Check] configuration (wrong since
@@ -267,7 +275,7 @@ Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
 0.083     2015-01-08 04:24:23Z
           - fix regression in 0.082 that caused new generated files not to be
-            commited to git after a release
+            committed to git after a release
           - -remove = <plugin> now also accepts the unique plugin name, not
             just the class, for more targeted plugin removal
 
@@ -530,7 +538,7 @@ Revision history for Dist-Zilla-PluginBundle-Author-ETHER
           - update generated CONTRIBUTING file to filter out local plugins
             when running 'dzil authordeps --missing', and to mention the irc
             channel when available
-          - new "airplane" mode, to faciliate development while the network is
+          - new "airplane" mode, to facilitate development while the network is
             not available
 
 0.041     2013-11-29 06:02:08Z

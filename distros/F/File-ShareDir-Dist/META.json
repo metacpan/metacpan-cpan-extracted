@@ -65,7 +65,11 @@
          "web" : "https://github.com/plicease/File-ShareDir-Dist"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.05",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Yanick Champoux (yanick)"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

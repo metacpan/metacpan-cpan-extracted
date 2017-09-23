@@ -1,0 +1,12 @@
+---
+appname: TestApp
+charset: UTF-8
+
+engines:
+    logger:
+        LogAny:
+            category: Testeroo
+            logger:
+                 - Stderr
+logger: LogAny
+log: core

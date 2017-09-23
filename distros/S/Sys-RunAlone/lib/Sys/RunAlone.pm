@@ -1,7 +1,7 @@
 package Sys::RunAlone;
 
 # version info
-$VERSION= '0.12';
+$VERSION= '0.13';
 
 # make sure we're strict and verbose as possible
 use strict;
@@ -39,6 +39,7 @@ sub import {
     # obtain parameters
     my %args= @_;
     $silent= delete $args{silent};
+    $silent=  $ENV{SILENT_SYS_RUNALONE} if exists $ENV{SILENT_SYS_RUNALONE};
     $retry=  delete $args{retry};
     $retry=  $ENV{RETRY_SYS_RUNALONE} if exists $ENV{RETRY_SYS_RUNALONE};
 
@@ -142,6 +143,7 @@ exits with an error message on STDERR and an exit value of 2.
 If the DATA handle is available, and it cannot be C<flock>ed, it exits
 with an error message on STDERR and an exit value of 1.  The error message
 will be surpressed when C<silent => 1> was specified in the C<use> statement.
+This can be overridden with the environment variable C<SILENT_SYS_RUNALONE>.
 
 If there is a DATA handle, and it could be C<flock>ed, execution continues
 without any further interference.
@@ -235,7 +237,8 @@ L<Sys::RunAlways>.
 =head1 COPYRIGHT
 
 Copyright (c) 2005, 2006, 2008, 2009, 2011, 2012 Elizabeth Mattijsen
-<liz@dijkmat.nl>.  All rights reserved.  This program is free software;
-you can redistribute it and/or modify it under the same terms as Perl itself.
+<liz@dijkmat.nl>.  Copyright (c) 2017 Ben Tilly <btilly@gmail.com>.  All
+rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
 
 =cut

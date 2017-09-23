@@ -11,7 +11,7 @@ use Scalar::Util qw'looks_like_number';
 
 use 5.010;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf-8
 
@@ -51,11 +51,18 @@ sub _debug {
 sub _connect {
   my ($self) = @_;
 
-  my $socket = IO::Socket::INET->new(
-    PeerHost => $self->{hostname},
-    PeerPort => $self->{port},
-    Proto    => 'tcp',
-  ) or croak "Unable to connect to $self->{hostname}:$self->{port}";
+  my $socket;
+  if ($self->{hostname} =~ /\//) {
+    $socket = IO::Socket::UNIX->new($self->{hostname})
+      or croak "Unable to connect to $self->{hostname}";
+  } else {
+    $socket = IO::Socket::INET->new(
+      PeerHost => $self->{hostname},
+      PeerPort => $self->{port},
+      Proto    => 'tcp',
+    ) or croak "Unable to connect to $self->{hostname}:$self->{port}";
+  }
+
   binmode $socket, ':utf8';
 
   my $versionline = $socket->getline;
@@ -208,6 +215,9 @@ Connect to the MPD running at the given address.  Address takes the form of
 password@host:port.  Both the password and port are optional.  If no password is
 given, none will be used.  If no port is given, the default (6600) will be used.
 If no host is given, C<localhost> will be used.
+
+If the hostname contains a "/", it will be interpretted as the path to a UNIX
+socket try to connect that way instead of using TCP.
 
 Return a Net::MPD object on success and croaks on failure.
 

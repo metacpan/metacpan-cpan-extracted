@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,4 +36,4 @@ resources:
   homepage: http://search.cpan.org/dist/WWW-Kickstarter/
   license: http://creativecommons.org/publicdomain/zero/1.0/
   repository: https://github.com/ikegami/perl-WWW-Kickstarter.git
-version: v1.8.0
+version: v1.10.0

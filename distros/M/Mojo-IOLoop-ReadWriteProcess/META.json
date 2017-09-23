@@ -1,0 +1,84 @@
+{
+   "abstract" : "Execute external programs or internal code blocks as separate process.",
+   "author" : [
+      "Ettore Di Giacinto <edigiacinto@suse.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-IOLoop-ReadWriteProcess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojo::File" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::IOLoop::ReadWriteProcess" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
+         "version" : "0.05"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Exception" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Pool" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues"
+      },
+      "homepage" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess",
+      "repository" : {
+         "url" : "git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git",
+         "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Ettore Di Giacinto <mudler@gentoo.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

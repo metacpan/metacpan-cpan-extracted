@@ -1,0 +1,30 @@
+---
+abstract: '(EXPERIMENTAL)HTML code highlighting class'
+author:
+  - 'Sugama Keita <sugama@jamadam.com>'
+  - 'Andreas K. Huettel <mail@akhuettel.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Highlight-Engine-Simple-HTML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Syntax::Highlight::Engine::Simple: '0.02'
+  Test::More: '0'
+  version: '0'
+resources:
+  bugtracker: https://github.com/akhuettel/Syntax-Highlight-Engine-Simple-HTML/issues
+  homepage: https://github.com/akhuettel/Syntax-Highlight-Engine-Simple-HTML
+  repository: git://github.com/akhuettel/Syntax-Highlight-Engine-Simple-HTML
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

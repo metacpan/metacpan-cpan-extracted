@@ -13,12 +13,12 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Base module for Importer::Zim",
+  "dist_abstract" => "Base module for Importer::Zim backends",
   "dist_author" => [
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim-Base",
-  "dist_version" => "0.3.0",
+  "dist_version" => "0.5.0",
   "license" => "perl",
   "module_name" => "Importer::Zim::Base",
   "recursive_test_files" => 1,

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.108';
+$Config::Model::Value::VERSION = '2.110';
 use 5.10.1;
 
 use Mouse;
@@ -409,10 +409,10 @@ sub setup_match_regexp {
     return unless defined $str;
     my $vt = $self->{value_type};
 
-    if ( $vt ne 'uniline' and $vt ne 'string' ) {
+    if ( $vt ne 'uniline' and $vt ne 'string' and $vt ne 'enum') {
         Config::Model::Exception::Model->throw(
             object => $self,
-            error  => "Can't use $what regexp with $vt, " . "expected 'uniline' or 'string'"
+            error  => "Can't use $what regexp with $vt, expected 'enum', 'uniline' or 'string'"
         );
     }
 
@@ -437,10 +437,10 @@ sub check_validation_regexp {
 
     my $vt = $self->{value_type};
 
-    if ( $vt ne 'uniline' and $vt ne 'string' ) {
+    if ( $vt ne 'uniline' and $vt ne 'string' and $vt ne 'enum') {
         Config::Model::Exception::Model->throw(
             object => $self,
-            error  => "Can't use $what regexp with $vt, " . "expected 'uniline' or 'string'"
+            error  => "Can't use $what regexp with $vt, expected 'enum', 'uniline' or 'string'"
         );
     }
 
@@ -1809,7 +1809,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 

@@ -76,7 +76,7 @@
          "web" : "https://github.com/Perl-Hadoop/Hadoop-HDFS-Command"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>"
    ],

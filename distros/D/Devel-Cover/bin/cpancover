@@ -7,10 +7,10 @@
 # The latest version of this software should be available from my homepage:
 # http://www.pjcj.net
 
-use 5.16.0;
+use 5.26.0;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use Devel::Cover::Collection;
 
@@ -145,7 +145,7 @@ cpancover - report coverage statistics on CPAN modules
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

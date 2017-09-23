@@ -1,0 +1,71 @@
+NAME
+    App::MacVictimUtils - CLI utilities for when dealing with Mac
+    computers/files
+
+VERSION
+    This document describes version 0.001 of App::MacVictimUtils (from Perl
+    distribution App-MacVictimUtils), released on 2017-09-20.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   delete-ds-store
+
+FUNCTIONS
+  delete_ds_store
+    Usage:
+
+     delete_ds_store(%args) -> [status, msg, result, meta]
+
+    Recursively delete .DS_Store files.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dirs => *array[dirname]*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MacVictimUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MacVictimUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MacVictimUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

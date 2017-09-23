@@ -19,7 +19,7 @@ use Alien::Build::Util qw( _dump );
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 
 our @aliens;
@@ -461,8 +461,7 @@ sub ffi_ok
     my $min = '0.12'; # the first CPAN release
     $min = '0.15' if $opt->{ignore_not_found};
     $min = '0.18' if $opt->{lang};
-    eval qq{ use FFI::Platypus $min };
-    if($@)
+    unless(eval { require FFI::Platypus; FFI::Platypus->VERSION($min) })
     {
       $ok = 0;
       $skip = "Test requires FFI::Platypus $min";
@@ -644,7 +643,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

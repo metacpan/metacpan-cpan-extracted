@@ -27,11 +27,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Multimethods" : "1.7",
             "Math::GMPq" : "0.45",
             "Math::GMPz" : "0.39",
             "Math::MPC" : "1.07",
-            "Math::MPFR" : "3.29",
+            "Math::MPFR" : "3.36",
             "POSIX" : "0",
             "perl" : "v5.14.0"
          }
@@ -40,7 +39,7 @@
    "provides" : {
       "Math::AnyNum" : {
          "file" : "lib/Math/AnyNum.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -50,12 +49,12 @@
       },
       "homepage" : "https://github.com/trizen/Math-AnyNum",
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ],
       "repository" : {
          "url" : "https://github.com/trizen/Math-AnyNum"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

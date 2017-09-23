@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::ShellVar;
-$Config::Model::Backend::ShellVar::VERSION = '2.108';
+$Config::Model::Backend::ShellVar::VERSION = '2.110';
 use Carp;
 use Mouse;
 use Config::Model::Exception;
@@ -114,7 +114,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 
@@ -127,14 +127,12 @@ version 2.108
         [qw/foo bar/] => {qw/type leaf value_type string/}
     ],
 
-   read_config  => [
-        { 
-            backend => 'ShellVar',
-            config_dir => '/tmp',
-            file  => 'foo.conf',
-            auto_create => 1,
-        }
-    ],
+   rw_config  => {
+     backend => 'ShellVar',
+     config_dir => '/tmp',
+     file  => 'foo.conf',
+     auto_create => 1,
+   }
  );
 
  my $inst = $model->instance(root_class_name => 'MyClass' );

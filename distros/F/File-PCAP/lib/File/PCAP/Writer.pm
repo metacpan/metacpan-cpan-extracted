@@ -12,11 +12,11 @@ File::PCAP::Writer - write PCAP files with pure Perl
 
 =head1 VERSION
 
-Version v0.0.4
+Version v0.0.5
 
 =cut
 
-use version; our $VERSION = qv('v0.0.4');
+use version; our $VERSION = qv('v0.0.5');
 
 
 =head1 SYNOPSIS
@@ -25,7 +25,10 @@ This module writes PCAP files that can be read with tcpdump or wireshark.
 
     use File::PCAP::Writer;
 
-    my $fpw = File::PCAP::Writer->new( $fname );
+    my $fpw = File::PCAP::Writer->new( {
+        fname => 'file.pcap',
+        dlt => 1,
+    } );
 
     $fpw->packet( $tsec, $usec, $blen, $plen, $buf );
 
@@ -35,7 +38,8 @@ This module writes PCAP files that can be read with tcpdump or wireshark.
 
 Create a new File::PCAP::Writer object.
 
-Parameter I<< $args >> is a hash reference containing the following keys:
+Parameter I<< $args >> is a reference to a hash, that may contain the
+following keys:
 
 =over 4
 

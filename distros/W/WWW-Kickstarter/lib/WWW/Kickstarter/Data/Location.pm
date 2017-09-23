@@ -50,7 +50,7 @@ WWW::Kickstarter::Data::Location - Kickstarter location data
    $ks->login($email, $password);
 
    my $iter = $ks->projects_ending_soon();
-   while (my ($project) = $iter->()) {
+   while (my ($project) = $iter->get()) {
       printf "%s: %s\n", $project->name, $project->location->displayable_name;
    }
 

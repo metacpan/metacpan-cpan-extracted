@@ -1,0 +1,57 @@
+{
+   "abstract" : "The shell, or server side, of an RPC call over SSH.",
+   "author" : [
+      "JT Smith <jt@plainblack.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SSH-RPC",
+   "no_index" : {
+      "directory" : [
+         "author.t",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::InsideOut" : "1.06",
+            "JSON" : "2.12",
+            "Net::OpenSSH" : "0.39"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/plainblack/ssh-rpc/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plainblack/ssh-rpc.git",
+         "web" : "http://github.com/plainblack/ssh-rpc"
+      }
+   },
+   "version" : "1.203",
+   "x_contributors" : [
+      "Janos Mattyasovszky <mail@matya.hu>"
+   ]
+}
+

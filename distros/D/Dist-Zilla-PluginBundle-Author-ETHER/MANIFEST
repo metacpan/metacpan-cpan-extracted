@@ -22,10 +22,12 @@ share/profiles/default/Module.pm
 share/profiles/default/profile.ini
 share/profiles/default/skel/dist.ini
 share/profiles/default/skel/t/01-basic.t
+share/profiles/default/skel/travis.yml
 share/profiles/github/Module.pm
 share/profiles/github/profile.ini
 share/profiles/github/skel/dist.ini
 share/profiles/github/skel/t/01-basic.t
+share/profiles/github/skel/travis.yml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-pluginbundle-basic.t

@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Summary;
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 # ABSTRACT: API for test report summary data
 
 #pod =head1 DESCRIPTION
@@ -106,7 +106,7 @@ CPAN::Testers::API::Controller::Summary - API for test report summary data
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use 5.010;
-use Test::More tests => 5;
+use Test::More tests => 3;
 
 use Lab::Moose::Connection::Socket;
 use IO::Socket::INET;
@@ -22,10 +22,8 @@ if ( not defined $pid ) {
     die "could not fork";
 }
 
-my $non_binary1 = "a" x 100000;
-my $binary1     = "#6100000" . "a" x 100000;
-my $binary2     = "#6100000" . "a\n" x 50000;
-my $binary3     = "#6100000" . "\xff\x00" x 50000;
+my $non_binary = "a" x 100000;
+my $binary     = "#6100000" . "\xff\x00" x 50000;
 if ($pid) {
 
     # Parent: client
@@ -38,30 +36,39 @@ if ($pid) {
         $connection->Query( command => "*IDN?" ), "dummy instrument\n",
         "simple query"
     );
-    is( $connection->Read(), $non_binary1 . "\n", "non binary long string" );
-    is( $connection->Read(), $binary1 . "\n",     "block data ascii" );
     is(
-        $connection->Read(), $binary2 . "\n",
-        "block data ascii with newlines"
+        $connection->Query(
+            command     => "long_non_binary",
+            read_length => length($non_binary)
+        ),
+        $non_binary,
+        "non binary long string"
     );
-    is( $connection->Read(), $binary3 . "\n", "block data non-ascii" );
+    is(
+        $connection->Query(
+            command     => "long_binary",
+            read_length => length($binary)
+        ),
+        $binary,
+        "block data non-ascii"
+    );
 
 }
 else {
     # Child: device
     $client = $device->accept();
-    device_read("*IDN?");
-    device_write("dummy instrument");
-    device_write($non_binary1);
-    device_write($binary1);
-    device_write($binary2);
-    device_write($binary3);
+    device_read("*IDN?\n");
+    device_write("dummy instrument\n");
+    device_read("long_non_binary\n");
+    device_write($non_binary);
+    device_read("long_binary\n");
+    device_write($binary);
 
 }
 
 sub device_write {
     my $str = shift;
-    $client->syswrite( $str . "\n" );
+    $client->syswrite($str);
 }
 
 sub device_read {
@@ -70,7 +77,7 @@ sub device_read {
 
     # Use sysread instead of read, as it's non-blocking.
     $client->sysread( $str, 1000 );
-    if ( $str ne ( $expect . "\n" ) ) {
+    if ( $str ne $expect ) {
         die "device expected '$expect', got '$str'\n";
     }
 }

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.022';
 
 use Moose 0.99;
 
@@ -14,25 +14,15 @@ use namespace::autoclean 0.09;
 
 with qw(
   Dist::Zilla::Role::PluginBundle::Easy
+  Dist::Zilla::Role::PluginBundle::Config::Slicer
 );
 
-sub mvp_multivalue_args { return qw(stopwords travis_ci_ignore_perl) }
-
-has stopwords => (
+has set_script_shebang => (
     is      => 'ro',
-    isa     => 'Maybe[ArrayRef]',
+    isa     => 'Bool',
     lazy    => 1,
     default => sub {
-        exists $_[0]->payload->{stopwords} ? $_[0]->payload->{stopwords} : undef;
-    },
-);
-
-has travis_ci_ignore_perl => (
-    is      => 'ro',
-    isa     => 'Maybe[ArrayRef]',
-    lazy    => 1,
-    default => sub {
-        exists $_[0]->payload->{travis_ci_ignore_perl} ? $_[0]->payload->{travis_ci_ignore_perl} : undef;
+        exists $_[0]->payload->{set_script_shebang} ? $_[0]->payload->{set_script_shebang} : 1;
     },
 );
 
@@ -88,13 +78,7 @@ sub configure {
 
         # Must run after ReversionOnRelease because it adds the version of
         # the bundle to the generated files
-        [
-            'Author::SKIRMESS::RepositoryBase',
-            {
-                stopwords             => $self->stopwords,
-                travis_ci_ignore_perl => $self->travis_ci_ignore_perl,
-            }
-        ],
+        'Author::SKIRMESS::RepositoryBase',
 
         'Author::SKIRMESS::InsertVersion',
 
@@ -146,7 +130,7 @@ sub configure {
         'AutoPrereqs::Perl::Critic',
 
         # Set script shebang to #!perl
-        'SetScriptShebang',
+        ( $self->set_script_shebang ? 'SetScriptShebang' : () ),
 
         # Add the $AUTHORITY variable and metadata to your distribution
         [
@@ -197,6 +181,18 @@ sub configure {
             'MetaProvides::Package',
             {
                 meta_noindex => 1,
+            }
+        ],
+
+        # Extract namespaces/version from traditional packages for provides
+        #
+        # This adds packages found in scripts under bin which are skipped
+        # by the default finder of MetaProvides::Package above.
+        [
+            'MetaProvides::Package', 'MetaProvides::Package/ExecFiles',
+            {
+                meta_noindex => 1,
+                finder       => ':ExecFiles',
             }
         ],
 
@@ -303,7 +299,7 @@ sub configure {
         [
             'CopyFilesFromRelease',
             {
-                match => [qw( .pm$ )],
+                match => [qw( \.pm$ ^bin/ )],
             }
         ],
 
@@ -313,7 +309,7 @@ sub configure {
             {
                 commit_msg        => '%v',
                 allow_dirty       => [ qw(Changes cpanfile dist.ini INSTALL LICENSE Makefile.PL META.json META.yml README.md), @generated_files ],
-                allow_dirty_match => '\.pm$',
+                allow_dirty_match => [qw( \.pm$ ^bin/ )],
             }
         ],
 
@@ -352,7 +348,7 @@ Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way 
 
 =head1 VERSION
 
-Version 0.014
+Version 0.022
 
 =head1 SYNOPSIS
 
@@ -365,7 +361,16 @@ This is a L<Dist::Zilla|Dist::Zilla> PluginBundle.
 
 =head1 USAGE
 
-To use this PluginBundle, just add it to your dist.ini.
+To use this PluginBundle, just add it to your dist.ini. You can provide the
+following options:
+
+=over 4
+
+=item *
+
+C<set_script_shebang> - this indicates whether C<SetScriptShebang> should be used or not
+
+=back
 
 =head1 SUPPORT
 

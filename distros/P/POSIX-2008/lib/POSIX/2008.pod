@@ -39,9 +39,9 @@ A system call return value of -1 meaning "error" is mapped to undef.
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
 For system calls where 0 does not just mean "success", 0 is returned
-unchanged. These are C<read()>, C<write()>, C<readv()>, C<writev()>,
-C<pread()>, C<pwrite()>, C<preadv()>, C<pwritev()>. C<openat()> gets a special
-treatment in this module, see below.
+unchanged. These are C<open()>, C<read()>, C<write()>, C<readv()>,
+C<writev()>, C<pread()>, C<pwrite()>, C<preadv()>, C<pwritev()>. C<openat()>
+gets a special treatment in this module, see below.
 
 =head1 FUNCTIONS
 
@@ -222,6 +222,10 @@ ret = clock_settime(clock_id, sec, nsec);
 =item clog
 
 (re, im) = clog(re, im);
+
+=item close
+
+ret = close(fd);
 
 =item confstr
 
@@ -1078,6 +1082,37 @@ y = tanh(x);
 
 y = tgamma(x);
 
+=item timer_create
+
+timerid = timer_create(clockid, signal);
+
+Returns undef on error.
+
+=item timer_delete
+
+timer_delete(timerid);
+
+Returns '0 but true' on success, undef on error.
+
+=item timer_getoverrun
+
+count = timer_getoverrun(timerid);
+
+Returns undef on error.
+
+=item timer_gettime
+
+(interval_sec, interval_nsec, initial_sec, initial_nsec) = timer_gettime(timerid);
+
+Returns an empty list on error.
+
+=item timer_settime
+
+(old_int_sec, old_int_nsec, old_init_sec, old_init_nsec) = timer_settime(timerid, flags, int_sec, int_nsec, [init_sec, init_nsec]);
+
+I<flags> may be 0 or C<TIMER_ABSTIME>. If the I<init> values are omitted, they
+are set to the I<int> values.
+
 =item truncate
 
 ret = truncate(path, length);
@@ -1158,6 +1193,8 @@ available:
  :clock  All clock* functions and all CLOCK* constants
  :fcntl  All F_, FD_, O_, POSIX_FADV_ and SEEK_ constants (for AT_ use :at)
  :fnm    C<fnmatch()> and all FNM_ constants
+ :time_h All CLOCK_ and TIMER_ constants
+ :timer  All timer_ functions and TIMER_ constants
 
 =head1 CONSTANTS
 

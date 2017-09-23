@@ -4,7 +4,7 @@ HTML::SocialMeta - Module to generate Social Media Meta Tags,
 
 # VERSION
 
-Version 0.6
+Version 0.72
 
 # SYNOPSIS
 
@@ -17,7 +17,7 @@ Version 0.6
         description => '',
         image   => '',
         fb_app_id => '',
-        url  => '',  # optional
+            url  => '',  # optional
         ... => '',
         ... => '',
     );
@@ -111,9 +111,13 @@ Returns an instance of this class. Requires `$url` as an argument;
 
     A URL to a unique image representing the content of the page
 
+- image\_alt
+
+    OPTIONAL - A text description of the image, for use by vision-impaired users
+
 - url
 
-    OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected 
+    OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected
 
 - player
 
@@ -215,6 +219,10 @@ Fields Required:
     * image
     * url - Open Graph
 
+Optional Fields:
+
+    * image_alt
+
 ## Player Card
 
 The Player Card allows you to share Video clips and audio stream.
@@ -234,28 +242,32 @@ The Player Card allows you to share Video clips and audio stream.
 
 Returns an instance for the player card:
 
-    $card->create('player');    
+    $card->create('player');
     # call meta provider specifically
     $card->twitter->create_player;
     $card->opengraph->create_video;
 
 Fields Required:
 
-    * site 
-    * title 
-    * description 
-    * image 
-    * player                
-    * player_width           
-    * player_height     
+    * site
+    * title
+    * description
+    * image
+    * player
+    * player_width
+    * player_height
+
+Optional Fields:
+
+    * image_alt
 
 image to be displayed in place of the player on platforms that does not support iframes or inline players. You should make this image the same dimensions
-as your player. Images with fewer than 68,600 pixels (a 262 x 262 square image, or a 350 x 196 16:9 image) will cause the player card not to render. 
-Image must be less than 1MB in size 
+as your player. Images with fewer than 68,600 pixels (a 262 x 262 square image, or a 350 x 196 16:9 image) will cause the player card not to render.
+Image must be less than 1MB in size
 
 ## App Card
 
-The App Card is a great way to represent mobile applications on Social Media Platforms and to drive installs. 
+The App Card is a great way to represent mobile applications on Social Media Platforms and to drive installs.
 
     ,-----------------------------------,
     |   APP NAME              *-------* |
@@ -322,7 +334,7 @@ List::MoreUtils - Version 0.413
 
 A. Twitter Validation Tool
 
-https://dev.twitter.com/docs/cards/validation/validator
+[https://cards-dev.twitter.com/validator](https://cards-dev.twitter.com/validator)
 
 Before your cards show on Twitter, you must first have your domain approved. Fortunately, 
 it's a super-easy process. After you implement your cards, simply enter your sample URL into 
@@ -330,7 +342,7 @@ the validation tool. After checking your markup, select the "Submit for Approval
 
 B. Facebook Debugger
 
-https://developers.facebook.com/tools/debug
+[https://developers.facebook.com/tools/debug](https://developers.facebook.com/tools/debug)
 
 You do not need prior approval for your meta information to show on Facebook, 
 but the debugging tool they offer gives you a wealth of information about all your 
@@ -338,7 +350,7 @@ tags and can also analyze your Twitter tags.
 
 C. Google Structured Data Testing Tool
 
-http://www.google.com/webmasters/tools/richsnippets
+[https://search.google.com/structured-data/testing-tool](https://search.google.com/structured-data/testing-tool)
 
 Webmasters traditionally use the structured data testing tool to test authorship markup and preview
 how snippets will appear in search results, but you can also use see what other types of
@@ -347,7 +359,8 @@ meta data Google is able to extract from each page.
 # AUTHOR
 
 Robert Acock <ThisUsedToBeAnEmail@gmail.com>
-Robert Haliday &lt;robh@cpan.org>
+Robert Haliday <robh@cpan.org>
+Jason McIntosh (JMAC) <jmac@jmac.org>
 
 # CONFIGURATION AND ENVIRONMENT
 
@@ -355,7 +368,7 @@ Robert Haliday &lt;robh@cpan.org>
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016 Robert Acock.
+Copyright 2017 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

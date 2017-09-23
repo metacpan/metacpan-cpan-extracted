@@ -89,7 +89,9 @@ EOS
      `int_default` INTEGER DEFAULT 123,
      `bool_no_default` BOOLEAN,
      `bool_default_false` BOOLEAN DEFAULT 0,
-     `bool_default_true` BOOLEAN DEFAULT 1
+     `bool_default_true` BOOLEAN DEFAULT 1,
+     `not_nullable` INT NOT NULL DEFAULT 1,
+     `nullable` INT DEFAULT 1
     );
 EOS
 );

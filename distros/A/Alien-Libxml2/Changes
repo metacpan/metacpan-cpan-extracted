@@ -1,5 +1,12 @@
 Revision history for Alien-Libxml2
 
+0.03      2017-09-22 06:46:14 -0400
+  - Look for libxml2 in some standard places.
+    OS X, for example provides a libxml2, but (unhelpfully) does not
+    provide the .pc file to go along with it.
+  - Do not accept same bad versions refused by XML::LibXML
+    on share install
+
 0.02      2017-08-08 15:17:54 -0400
   - Require Alien::Build 0.73 for bug fixes
     related to parallel builds

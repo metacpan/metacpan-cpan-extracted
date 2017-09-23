@@ -18,6 +18,14 @@ with 'JPList::Controls::Sort';
 
 JPList::Request - JPList Request parser module
 
+=head1 VERSION
+
+Version 0.05
+
+=cut
+
+our $VERSION = '0.05';
+
 =head1 SYNOPSIS
 
   use JPList::Request;

@@ -1,10 +1,13 @@
+0.4 2015-12-01
+  - Update to work with current Mojolicous.
+
 0.3 2015-12-01
   - Fix fatpacking more better.
 
 0.2 2015-11-30
   - make sure script is being installed.
   - Fix CLI help
-  - integrate fatpacking 
+  - integrate fatpacking
 
 0.1  2015-11-30
   - First release.

@@ -1,5 +1,13 @@
 Changelog for Beam-Runner
 
+0.014     2017-09-17 16:45:25-05:00 America/Chicago
+
+    [Added]
+
+    - Added find_containers() utility function for other projects
+      (Beam::Minion) to find all the containers reachable through
+      BEAM_PATH.
+
 0.013     2017-06-20 14:26:20-04:00 America/New_York
 
     [Fixed]

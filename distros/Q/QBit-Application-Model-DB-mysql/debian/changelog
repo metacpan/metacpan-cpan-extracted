@@ -1,3 +1,9 @@
+libqbit-application-model-db-mysql-perl (0.014) raring; urgency=low
+
+  * use query in add
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 17 Sep 2017 20:06:26 +0300
+
 libqbit-application-model-db-mysql-perl (0.013) raring; urgency=low
 
   * added order for add[_multi]

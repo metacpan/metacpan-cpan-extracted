@@ -1,0 +1,10 @@
+Revision history for Rails-Assets
+
+0.01a    2017-09-01/10:32
+        Created for version Rails::Assets including some utility functions.
+
+0.01b    2017-09-04/11:17
+        Created for version Rails::Assets importing functions from submodules.
+
+0.01    2017-09-19/17:27
+        First release.

@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse;
-$QBit::Application::Model::DB::clickhouse::VERSION = '0.001';
+$QBit::Application::Model::DB::clickhouse::VERSION = '0.004';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -11,8 +11,6 @@ use QBit::Application::Model::DB::Filter;
 
 use Exception::DB;
 eval {require Exception::DB::DuplicateEntry};
-
-__PACKAGE__->model_accessors(clickhouse => 'QBit::Application::Model::API::Yandex::ClickHouse',);
 
 BEGIN {
     no strict 'refs';
@@ -39,7 +37,7 @@ sub filter {
 sub _create_sql_db {
     my ($self) = @_;
 
-    return 'CREATE DATABASE ' . $self->get_dbh()->quote_identifier($self->get_option('database'));
+    return 'CREATE DATABASE ' . $self->dbh->quote_identifier($self->get_option('database'));
 }
 
 sub _get_table_class {

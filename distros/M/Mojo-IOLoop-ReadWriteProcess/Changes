@@ -1,0 +1,25 @@
+Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
+
+0.05 2017-09-22T07:51:33Z
+    - Enhance testsuite
+    - If we fail to setup process return pipe, try to send an error message (best-effort)
+    - Check if _status is defined, it might be zero
+    - Small refactorizations
+
+0.04 2017-09-20T13:25:31Z
+    - add maximum process limit to the pool
+    - better handling of pipes in stress conditions
+    - decouple return_status and exit_status
+
+0.03 2017-09-18T09:47:28Z
+    - add more pool functions
+    - make wait() wait just the necessary time
+    - Minor fixes
+0.02 2017-09-16T14:54:07Z
+
+    - Add support for pools and different perl versions
+
+0.01 2017-09-15T15:06:17Z
+
+    - original version
+

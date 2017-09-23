@@ -31,8 +31,8 @@ our %EXPORT_TAGS = (
 
 my %EXPORT_OK;
 for my $k (keys %EXPORT_TAGS) {
-  for my $v (@{$EXPORT_TAGS{$k}}) {
-    $EXPORT_OK{$v} = 1;
+  for my $v (@{$EXPORT_TAGS{ $k }}) {
+    undef $EXPORT_OK{ $v };
   }
 }
 
@@ -43,7 +43,7 @@ $EXPORT_TAGS{ all } = [@EXPORT_OK];
 our $DIE_ON_ERROR = 0;
 our $PROMOTE_N32 = 1;
 
-our $VERSION = '3.033';
+our $VERSION = '4.000';
 
 sub IP {
   return Net::IPAddress::Util->new($_[0]);
@@ -62,16 +62,17 @@ sub new {
   }
   elsif (ref($address) eq 'ARRAY' && @$address == 4) {
     # FIXME Principal of least surprise here? Should feeding in 4 values make an IPv4?
+    # TODO At least document what it's doing, to reduce the surprise.
     $normal = [ unpack 'C16', pack 'N4', @$address ];
   }
   elsif (ref $address and eval { $address->isa(__PACKAGE__) }) {
     return bless { address => $address->{ address } } => $class;
   }
-  elsif ($address =~ /^(?:::ffff:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/o) {
+  elsif ($address =~ /^(?:::ffff:0:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/o) {
     $normal = [
       0, 0, 0, 0,
       0, 0, 0, 0,
-      0, 0, 0xff, 0xff,
+      0xff, 0xff, 0, 0,
       $1, $2, $3, $4
     ];
   }
@@ -79,7 +80,7 @@ sub new {
     $normal = [
       0, 0, 0, 0,
       0, 0, 0, 0,
-      0, 0, 0xff, 0xff,
+      0xff, 0xff, 0, 0,
       unpack('C4', pack('N', $address))
     ];
   }
@@ -143,7 +144,12 @@ sub new {
 sub is_ipv4 {
   my $self = shift;
   my @octets = unpack 'C16', $self->{ address };
-  return $octets[ 10 ] == 0xff && $octets[ 11 ] == 0xff && (!grep { $_ } @octets[ 0 .. 9 ]);
+  return
+    $octets[ 8 ] == 0xff
+    && $octets[ 9 ] == 0xff
+    && $octets[ 10 ] == 0
+    && $octets[ 11 ] == 0
+    && (!grep { $_ } @octets[ 0 .. 7 ]);
 }
 
 sub ipv4 {
@@ -195,12 +201,13 @@ sub ipv6_expanded {
 sub ipv6 {
   my $self = shift;
   if ($self->is_ipv4()) {
-    return '::ffff:'.$self->ipv4();
+    return '::ffff:0:'.$self->ipv4();
   }
   my $iv = $self->ipv6_expanded();
   my $rv = join(':', map { (my $x = $_) =~ s/^0+//; $x ||= '0'; $x } split ':', $iv);
   $rv =~ s/[^[:xdigit:]]0(:0)+/::/;
   $rv =~ s/::+/::/g;
+  $rv =~ s/^0::/::/;
   return $rv;
 }
 
@@ -331,8 +338,8 @@ sub _band {
   my @l = @$lhs;
   my @r = @$rhs;
   my @rv;
-  for my $octet (0 .. 3) {
-    $rv[$octet] = $l[$octet] & $r[$octet];
+  for my $hextet (0 .. 3) {
+    $rv[$hextet] = $l[$hextet] & $r[$hextet];
   }
   return Net::IPAddress::Util->new(\@rv);
 }
@@ -349,8 +356,8 @@ sub _bor {
   my @l = @$lhs;
   my @r = @$rhs;
   my @rv;
-  for my $octet (0 .. 3) {
-    $rv[$octet] = $l[$octet] | $r[$octet];
+  for my $hextet (0 .. 3) {
+    $rv[$hextet] = $l[$hextet] | $r[$hextet];
   }
   return Net::IPAddress::Util->new(\@rv);
 }
@@ -358,7 +365,6 @@ sub _bor {
 sub _neg {
   my $self = shift;
   my @n = unpack('C16', $self->{ address });
-  my ($pow, $mask) = $self->_pow_mask;
   my @rv = map { 255 - $_ } @n;
   return Net::IPAddress::Util->new(\@rv);
 }
@@ -369,7 +375,12 @@ sub _pow_mask {
   my $mask = pack('N4', 0, 0, 0, 0);
   if ($self->is_ipv4) {
     $pow = 32;
-    $mask = pack('N4', 0, 0, 0xffff, 0);
+    $mask = pack('C16',
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0xff, 0xff, 0, 0,
+      0, 0, 0, 0,
+    );
   }
   return ($pow, $mask);
 }
@@ -386,19 +397,19 @@ sub _mask_out {
 }
 
 sub ipv4_mask {
-  return implode_ip(('0' x 80) . ('1' x 48));
+  return implode_ip(('0' x 64) . ('1' x 16) . ('0' x 16) . ('1' x 32));
 }
 
 sub ipv4_flag {
-  return implode_ip(('0' x 80) . ('1' x 16) . ('0' x 32));
+  return implode_ip(('0' x 64) . ('1' x 16) . ('0' x 48));
 }
 
 sub common_prefix (\@\@) {
   my ($x, $y) = @_;
   return ERROR("Something isn't right there") unless @$x == @$y;
   my @rv;
-  for my $i ($[ .. $#$x) {
-    if($x->[$i] == $y->[$i]) {
+  for my $i (0 .. $#$x) {
+    if($x->[$i] eq $y->[$i]) {
       push @rv, $x->[$i];
     }
     else {
@@ -412,7 +423,7 @@ sub prefix_mask (\@\@) {
   my ($x, $y) = @_;
   return ERROR("Something isn't right there") unless @$x == @$y;
   my @rv;
-  for my $i ($[ .. $#$x) {
+  for my $i (0 .. $#$x) {
     if($x->[$i] == $y->[$i]) {
       push @rv, 1;
     }
@@ -521,7 +532,7 @@ Net::IPAddress::Util - Version-agnostic representation of an IP address
 
 =head1 VERSION
 
-Version 3.033
+Version 4.000
 
 =head1 SYNOPSIS
 
@@ -557,8 +568,8 @@ collections of addresses and/or ranges.
 
 =head2 $Net::IPAddress::Util::DIE_ON_ERROR
 
-Set to a true value to make errors confess(). Set to a false value to make
-errors cluck(). Defaults to false.
+Set to a true value to make errors C<confess()>. Set to a false value to make
+errors C<cluck()>. Defaults to false.
 
 =head2 $Net::IPAddress::Util::PROMOTE_N32
 
@@ -614,11 +625,6 @@ duplicates, so ymmv. B<There are also (rare) corner cases> in which radix_sort()
 can chew up so much RAM that it causes paging / swapping, which I<will> slow
 down the process I<dramatically>.
 
-Also note that this particular radix sort implementation is technically kinda
-C<O(48 * N)> (even though one would normally ignore a simple multiplier factor),
-so the break even point is actually nice and low (something close to 4 or more
-addresses) for it to be worth the setup and teardown costs associated.
-
 =head1 COMPATIBILITY API
 
 =head2 ip2num
@@ -632,7 +638,7 @@ addresses) for it to be worth the setup and teardown costs associated.
 =head2 fqdn
 
 These functions are exportable to provide a functionally-identical API
-to that provided by C<Net::IPAddress>. They will cause warnings to be issued
+to that provided by L<Net::IPAddress>. They will cause warnings to be issued
 if they are called, to help you in your transition to Net::IPAddress::Util,
 if indeed that's what you're doing -- and I can't readily imagine any other
 reason you'd want to export them from here (as opposed to from Net::IPAddress)
@@ -672,6 +678,63 @@ Create a new Net::IPAddress::Util object, based on a well-formed IPv4 or IPv6
 address string (e.g. '192.168.0.1' or 'fe80::1234:5678:90ab'), or based
 on what is known by this module as the "normal form", a 32-digit hex number
 (without the leading '0x').
+
+There are a number of acceptable arguments to C<new()>, though it does always
+take a single argument.
+
+=over
+
+=item 16-element ARRAYREF
+
+Creates an IPv6 object from 16 unsigned octets in network (big-endian) order.
+
+=item 4-element ARRAYREF
+
+Creates an IPv6 object from 4 unsigned 32-bit network-order integers, supplied in network order.
+
+=item An existing Net::IPAddress::Util object (equivalently, call as an object method)
+
+Creates a non-distructive clone of the object.
+
+=item A well-formed IPv4 or IPv6 string (including "IPv4 in IPv6" notation)
+
+Examples are C<1.2.3.4>, C<::ffff:1.2.3.4>, C<1:2::3:4>. Note that for IPv6
+flavor strings, the scope ID (if any) is silently discarded. Note also that this
+behavior is subject to change. If you feel strongly, go to CPAN RT and file a
+ticket.
+
+=item An unsigned 32-bit integer Perl value
+
+B<Iff> the $PROMOTE_N32 package variable is set, creates an IPv4 object.
+
+=over
+
+Actually, since I<all> objects of this class are underlyingly IPv6, creates an
+"IPv4 in IPv6" representation of the IPv4 address. This is a very minor technical
+point, but I don't want the reader going away with incorrect assumptions about
+the way this module works.
+
+=back
+
+=item An unsigned 128-bit integer Perl value (or a string holding a decimal representation of one, or a L<Math::BigInt> object containing one)
+
+Creates an IPv6 object, treating the number as network-order.
+
+=item A 32-character hex string (case insensitive)
+
+Creates an IPv6 object. B<NB> this may be especially useful when you're using
+the output of the C<normal_form> method (e.g. for round-tripping to a database).
+
+=item A non-encoded sequence of 16 bytes in Perl string form
+
+Creates an IPv6 object. B<Be especially sure> that use of this argument form is
+performed correctly. You B<MUST>, for instance, C<utf8::downgrade> and C<decode>
+your string before providing it. No effort is made to check or ensure anything
+about Unicode flagging or semantics. This is probably a bug, and is likely to be
+fixed in some future version (unless you can find a case for it being a security
+bug, in which case go directly to CPAN RT, please, and I'll fix it ASAP).
+
+=back
 
 =head2 IP
 
@@ -767,4 +830,3 @@ May be redistributed and/or modified under terms of the Artistic License v2.0.
 PWBENNETT -- paul(dot)w(dot)bennett(at)gmail.com
 
 =cut
-

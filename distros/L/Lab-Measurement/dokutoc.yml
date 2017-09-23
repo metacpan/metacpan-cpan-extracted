@@ -8,7 +8,7 @@ toc:
       - lib/Lab/Measurement/Backends.pod
       - lib/Lab/Measurement/Developer/Write-A-Source-Driver.pod
       - lib/Lab/Moose/Developer.pod
-      - lib/Lab/Measurement/Testing.pod
+      - lib/Lab/Measurement/Developer/Testing.pod
       - Example scripts:
           - examples/Simple/yoko_goto.pl
           - examples/Simple/query_id.pl
@@ -48,6 +48,7 @@ toc:
       - Instrument control classes:
           - lib/Lab/Moose/Instrument.pm
           - lib/Lab/Moose/Instrument/Cache.pm
+          - lib/Lab/Moose/Instrument/Zhinst.pm
           - lib/Lab/Instrument.pm
           - Multimeters:
               - lib/Lab/Instrument/Multimeter.pm
@@ -68,6 +69,8 @@ toc:
               - lib/Lab/Instrument/SR830/AuxIn.pm
               - lib/Lab/Instrument/SR830/AuxOut.pm	
               - lib/Lab/Moose/Instrument/ZI_MFLI.pm
+          - Impedance analyzers:
+              - lib/Lab/Moose/Instrument/ZI_MFIA.pm
           - RF generators:
               - lib/Lab/Instrument/HP33120A.pm
               - lib/Lab/Instrument/HP83732A.pm
@@ -133,12 +136,15 @@ toc:
               - lib/Lab/Connection/VISA_RS232.pm
               - lib/Lab/Bus/RS232.pm
           - USB Test&Measurement (Linux kernel driver):
+              - lib/Lab/Moose/Connection/USB.pm
               - lib/Lab/Connection/USBtmc.pm
               - lib/Lab/Bus/USBtmc.pm
           - Network socket:
               - lib/Lab/Moose/Connection/Socket.pm
               - lib/Lab/Connection/Socket.pm
               - lib/Lab/Bus/Socket.pm
+          - VXI-11:
+              - lib/Lab/Moose/Connection/VXI11.pm
           - Oxford Instruments ISOBUS:
               - lib/Lab/Connection/IsoBus.pm
               - lib/Lab/Bus/IsoBus.pm

@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Beam/Minion.pm',
+    'Beam/Minion/Command/job.pm',
     'Beam/Minion/Command/run.pm',
     'Beam/Minion/Command/worker.pm',
     'Beam/Minion/Util.pm',

@@ -3,142 +3,164 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-#
-## MPFR
-#
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPFR Math::MPFR) => sub {
+sub __cmp__ {
+    my ($x, $y) = @_;
+    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
-    if (   Math::MPFR::Rmpfr_nan_p($_[0])
-        or Math::MPFR::Rmpfr_nan_p($_[1])) {
-        return undef;
+    #
+    ## MPFR
+    #
+  Math_MPFR__Math_MPFR: {
+
+        if (   Math::MPFR::Rmpfr_nan_p($x)
+            or Math::MPFR::Rmpfr_nan_p($y)) {
+            return undef;
+        }
+
+        return Math::MPFR::Rmpfr_cmp($x, $y);
     }
 
-    Math::MPFR::Rmpfr_cmp($_[0], $_[1]);
-};
+  Math_MPFR__Math_GMPz: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($x)
+                ? undef
+                : Math::MPFR::Rmpfr_cmp_z($x, $y)
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPFR Math::GMPz) => sub {
-    Math::MPFR::Rmpfr_nan_p($_[0]) && return undef;
-    Math::MPFR::Rmpfr_cmp_z($_[0], $_[1]);
-};
+  Math_MPFR__Math_GMPq: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($x)
+                ? undef
+                : Math::MPFR::Rmpfr_cmp_q($x, $y)
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPFR Math::GMPq) => sub {
-    Math::MPFR::Rmpfr_nan_p($_[0]) && return undef;
-    Math::MPFR::Rmpfr_cmp_q($_[0], $_[1]);
-};
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPFR Math::MPC) => sub {
-    (@_) = (_mpfr2mpc($_[0]), $_[1]);
-    goto &__cmp__;
-};
+  Math_MPFR__Scalar: {
+        Math::MPFR::Rmpfr_nan_p($x) && return undef;
+        return (
+                $y < 0
+                ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPFR $) => sub {
-    my ($x, $y) = @_;
-    Math::MPFR::Rmpfr_nan_p($x) && return undef;
-    $y < 0
-      ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-      : Math::MPFR::Rmpfr_cmp_ui($x, $y);
-};
+    #
+    ## GMPq
+    #
+  Math_GMPq__Math_GMPq: {
+        return Math::GMPq::Rmpq_cmp($x, $y);
+    }
 
-#
-## GMPq
-#
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPq Math::GMPq) => sub {
-    Math::GMPq::Rmpq_cmp($_[0], $_[1]);
-};
+  Math_GMPq__Math_GMPz: {
+        return Math::GMPq::Rmpq_cmp_z($x, $y);
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPq Math::GMPz) => sub {
-    Math::GMPq::Rmpq_cmp_z($_[0], $_[1]);
-};
+  Math_GMPq__Math_MPFR: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($y)
+                ? undef
+                : (-Math::MPFR::Rmpfr_cmp_q($y, $x))
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPq Math::MPFR) => sub {
-    Math::MPFR::Rmpfr_nan_p($_[1]) && return undef;
-    -(Math::MPFR::Rmpfr_cmp_q($_[1], $_[0]));
-};
+  Math_GMPq__Math_MPC: {
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPq Math::MPC) => sub {
-    (@_) = (_mpq2mpc($_[0]), $_[1]);
-    goto &__cmp__;
-};
+  Math_GMPq__Scalar: {
+        return (
+                $y < 0
+                ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPq $) => sub {
-    my ($x, $y) = @_;
-    $y < 0
-      ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
-      : Math::GMPq::Rmpq_cmp_ui($x, $y, 1);
-};
+    #
+    ## GMPz
+    #
+  Math_GMPz__Math_GMPz: {
+        return Math::GMPz::Rmpz_cmp($x, $y);
+    }
 
-#
-## GMPz
-#
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPz Math::GMPz) => sub {
-    Math::GMPz::Rmpz_cmp($_[0], $_[1]);
-};
+  Math_GMPz__Math_GMPq: {
+        return (-Math::GMPq::Rmpq_cmp_z($y, $x));
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPz Math::GMPq) => sub {
-    -(Math::GMPq::Rmpq_cmp_z($_[1], $_[0]));
-};
+  Math_GMPz__Math_MPFR: {
+        return (
+                Math::MPFR::Rmpfr_nan_p($y)
+                ? undef
+                : -(Math::MPFR::Rmpfr_cmp_z($y, $x))
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPz Math::MPFR) => sub {
-    Math::MPFR::Rmpfr_nan_p($_[1]) && return undef;
-    -(Math::MPFR::Rmpfr_cmp_z($_[1], $_[0]));
-};
+  Math_GMPz__Math_MPC: {
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPz Math::MPC) => sub {
-    (@_) = (_mpz2mpc($_[0]), $_[1]);
-    goto &__cmp__;
-};
+  Math_GMPz__Scalar: {
+        return (
+                $y < 0
+                ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                : Math::GMPz::Rmpz_cmp_ui($x, $y)
+               );
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::GMPz $) => sub {
-    my ($x, $y) = @_;
-    $y < 0
-      ? Math::GMPz::Rmpz_cmp_si($x, $y)
-      : Math::GMPz::Rmpz_cmp_ui($x, $y);
-};
+    #
+    ## MPC
+    #
+  Math_MPC__Math_MPC: {
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
 
-#
-## MPC
-#
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPC Math::MPC) => sub {
-    my ($x, $y) = @_;
+        Math::MPC::RMPC_RE($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-    my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::RMPC_RE($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-    Math::MPC::RMPC_RE($f, $x);
-    Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-    Math::MPC::RMPC_RE($f, $y);
-    Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        Math::MPC::RMPC_IM($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-    Math::MPC::RMPC_IM($f, $x);
-    Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        my $si = Math::MPC::Rmpc_cmp($x, $y);
+        my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
 
-    Math::MPC::RMPC_IM($f, $y);
-    Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        return (
+                ($re_cmp == 0)
+                ? Math::MPC::RMPC_INEX_IM($si)
+                : $re_cmp
+               );
+    }
 
-    my $si = Math::MPC::Rmpc_cmp($x, $y);
-    my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
-    $re_cmp == 0 or return $re_cmp;
-    Math::MPC::RMPC_INEX_IM($si);
-};
+  Math_MPC__Math_GMPz: {
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPC Math::GMPz) => sub {
-    (@_) = ($_[0], _mpz2mpc($_[1]));
-    goto &__cmp__;
-};
+  Math_MPC__Math_GMPq: {
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPC Math::GMPq) => sub {
-    (@_) = ($_[0], _mpq2mpc($_[1]));
-    goto &__cmp__;
-};
+  Math_MPC__Math_MPFR: {
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
+    }
 
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPC Math::MPFR) => sub {
-    (@_) = ($_[0], _mpfr2mpc($_[1]));
-    goto &__cmp__;
-};
-
-Class::Multimethods::multimethod __cmp__ => qw(Math::MPC $) => sub {
-    (@_) = ($_[0], _any2mpc(_str2obj($_[1])));
-    goto &__cmp__;
-};
+  Math_MPC__Scalar: {
+        $y = _any2mpc(_str2obj($y));
+        goto Math_MPC__Math_MPC;
+    }
+}
 
 1;

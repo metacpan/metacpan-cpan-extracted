@@ -3,34 +3,36 @@ use warnings;
 
 our ($ROUND, $PREC);
 
-Class::Multimethods::multimethod __atan2__ => qw(Math::MPFR Math::MPFR) => sub {
+sub __atan2__ {
     my ($x, $y) = @_;
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_atan2($r, $x, $y, $ROUND);
-    $r;
-};
+    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
-Class::Multimethods::multimethod __atan2__ => qw(Math::MPFR Math::MPC) => sub {
-    (@_) = (_mpfr2mpc($_[0]), $_[1]);
-    goto &__atan2__;
-};
+  Math_MPFR__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_atan2($r, $x, $y, $ROUND);
+        return $r;
+    }
 
-# atan2(x, y) = atan(x/y)
-Class::Multimethods::multimethod __atan2__ => qw(Math::MPC Math::MPFR) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
-    Math::MPC::Rmpc_atan($r, $r, $ROUND);
-    $r;
-};
+  Math_MPFR__Math_MPC: {
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+    }
 
-# atan2(x, y) = atan(x/y)
-Class::Multimethods::multimethod __atan2__ => qw(Math::MPC Math::MPC) => sub {
-    my ($x, $y) = @_;
-    my $r = Math::MPC::Rmpc_init2($PREC);
-    Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
-    Math::MPC::Rmpc_atan($r, $r, $ROUND);
-    $r;
-};
+    # atan2(x, y) = atan(x/y)
+  Math_MPC__Math_MPFR: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
+    }
+
+    # atan2(x, y) = atan(x/y)
+  Math_MPC__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
+    }
+}
 
 1;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 no autovivification;
 
-use version; our $VERSION = qv('v1.8.0');
+use version; our $VERSION = qv('v1.10.0');
 
 
 use Time::HiRes                              qw( );
@@ -557,7 +557,7 @@ WWW::Kickstarter - Retrieve information from Kickstarter
 
 =head1 VERSION
 
-Version 1.8.0
+Version 1.10.0
 
 
 =head1 SYNOPSIS
@@ -571,7 +571,7 @@ Version 1.8.0
    my $myself = $ks->login($email, $password);
 
    my $iter = $ks->projects_ending_soon();
-   while (my ($project) = $iter->()) {
+   while (my ($project) = $iter->get()) {
       print($project->name, "\n");
    }
 
@@ -781,147 +781,8 @@ Limits the projects returned to those of the specified category (or one of its s
 
 Limits the projects returned to those with the specified tag.
 
-I don't know of an API endpoint that returns a list of available tags. The following are the tags that exist at the time of this writing:
+The list of tags available changes often. I don't know of an API endpoint that returns a list of available tags, but you can find some of them on L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>. See L<WWW::Kickstarter::Data::Tags> for the list of tags known to exist at the time of this writing.
 
-=over
-
-=item * At Home (id: 131, slug: at-home)
-
-=item * Avant-Garde (id: 138, slug: avant-garde)
-
-=item * Burning Man (id: 34, slug: burning-man)
-
-=item * Carpe Noctem (id: 174, slug: carpe-noctem)
-
-=item * Compelling Stories (id: 120, slug: compelling-stories)
-
-=item * Creative Spaces (id: 78, slug: creative-spaces)
-
-=item * DIY (id: 5, slug: diy)
-
-=item * Dapper (id: 135, slug: dapper)
-
-=item * Fantasy (id: 133, slug: fantasy)
-
-=item * Fringe (id: 99, slug: fringe)
-
-=item * Go Green (id: 121, slug: go-green)
-
-=item * Innovative (id: 128, slug: innovative)
-
-=item * Inspirational (id: 123, slug: inspirational)
-
-=item * Kids (id: 86, slug: kids)
-
-=item * LOL (id: 105, slug: lol)
-
-=item * Let's Eat (id: 118, slug: lets-eat)
-
-=item * Library (id: 46, slug: library)
-
-=item * Maker (id: 10, slug: hacker-maker)
-
-=item * Monsters (id: 30, slug: zombies) [Formerly named "Zombies"]
-
-=item * Museums (id: 63, slug: museums)
-
-=item * Open Source (id: 20, slug: open-source)
-
-=item * Preserve and Restore (id: 110, slug: conservation)
-
-=item * Print It (id: 77, slug: print-it)
-
-=item * Public Benefit (id: 3, slug: public-benefit) [Formerly named "Civic", with slug "civic"]
-
-=item * Ride With It (id: 50, slug: bikes) [Formerly named "Bikes"]
-
-=item * Robots (id: 41, slug: robots)
-
-=item * Sci-Fi (id: 139, slug: sci-fi)
-
-=item * Science (id: 19, slug: science)
-
-=item * Space (id: 28, slug: space)
-
-=item * Standout Style (id: 136, slug: standout-style)
-
-=item * Turn It Up (id: 132, slug: audiophiles)
-
-=item * World Explorers (id: 126, slug: world-explorers)
-
-=back
-
-The following are also tags that are known to exist, but these aren't shown on the website. It's possible they aren't actively used anymore.
-
-=over
-
-=item * Add To It (id: 127, slug: add-to-it)
-
-=item * Always Be Learning (id: 74, slug: education)
-
-=item * Animal Kingdom (id: 1, slug: animal-kingdom)
-
-=item * Artisanal (id: 122, slug: artisanal)
-
-=item * Dance Films (id: 189, slug: dance-films)
-
-=item * Great GIFs (id: 175, slug: great-gifs)
-
-=item * Great Gifts (id: 129, slug: great-gifts)
-
-=item * Health Nuts (id: 130, slug: health-nuts)
-
-=item * Integrity Pick (id: 176, slug: integrity-pick)
-
-=item * It's History (id: 125, slug: its-history)
-
-=item * Maps (id: 48, slug: maps)
-
-=item * Movers and Shakers (id: 124, slug: movers-and-shakers)
-
-=item * Net Culture (id: 119, slug: net-culture)
-
-=item * Projects We Love (id: 115, slug: projects-we-love)
-
-=item * Punk (id: 134, slug: punk)
-
-=item * Retro (id: 22, slug: retro)
-
-=item * RPG (id: 33, slug: rpg)
-
-=item * See It Live (id: 137, slug: see-it-live)
-
-=item * Trailers (id: 187, slug: trailers)
-
-=back
-
-=begin comment
-
-The following are known to have existed at some time, but are no longer recognized:
-
-=over
-
-=item * Arctic (id: 39, slug: arctic)
-
-=item * Cats (id: 31, slug: cats)
-
-=item * Cthulhu (id: 38, slug: cthulhu)
-
-=item * Maker Faire (id: 87, slug: maker-faire)
-
-=item * Movie Theater (id: 43, slug: movie-theater)
-
-=item * Space is the Place (id: 107, slug: space-is-the-place)
-
-=item * Sundance (id: 29, slug: sundance)
-
-=item * World Maker Faire 2014 (id: 106, slug: world-maker-faire-2014)
-
-=back
-
-=end comment
-
-The first list was obtained from L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>. The second list was obtained through trial and error.
 
 =item * C<< location => $woe_id >>
 
@@ -1143,11 +1004,7 @@ This has already happened, and may happen again. I cannot
 guarantee the continuing operation of this distribution.
 
 
-=head1 BUGS AND KNOWN ISSUES
-
-Please report any bugs or feature requests to C<bug-WWW-Kickstarter at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Kickstarter>.
-I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+=head1 KNOWN ISSUES
 
 The following issues are known:
 
@@ -1161,7 +1018,7 @@ The following issues are known:
 
 =back
 
-Feel free to bug me (C<< <ikegami@adaelis.com> >>) to work on these, or to submit a patch to the bug tracker.
+Feel free to bug me (C<< <ikegami@adaelis.com> >>) to work on these, or to submit a patch to one of the bug trackers listed below.
 
 
 =head1 DOCUMENTATION AND SUPPORT
@@ -1192,9 +1049,11 @@ If you need help, the following are great resources:
 
 =back
 
-Bugs and improvements can be reported using either of the following systems:
+Bugs and improvements can be reported using any of the following systems:
 
 =over
+
+=item Using CPAN's request tracker by emailing C<bug-WWW-Kickstarter at rt.cpan.org>
 
 =item Using CPAN's request tracker at L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Kickstarter>
 

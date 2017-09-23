@@ -28,6 +28,8 @@ WriteMakefile(
 					 runtime => {
 						     recommends => {
 								    'Wx' => 0,
+								    'Net::Server::PreFork' => 0,
+								    'File::HomeDir' => 0,
 								    'IO::Socket::INET' => 0,
 								    'GD::Barcode::QRcode' => 0,
 								    'Crypt::Diceware' => 0,

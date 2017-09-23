@@ -14,7 +14,7 @@ PROTOTYPES: DISABLE
 #define is_code(sv) (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV)
 
 void
-sub_inject(...)
+_sub_inject(...)
   CODE:
     int argi;
     PADLIST *pl;

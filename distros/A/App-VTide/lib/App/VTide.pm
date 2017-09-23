@@ -17,7 +17,7 @@ use App::VTide::Hooks;
 use Path::Tiny;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.3');
+our $VERSION = version->new('0.1.4');
 
 has config => (
     is      => 'rw',
@@ -166,21 +166,24 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.3
+This documentation refers to App::VTide version 0.1.4
 
 =head1 SYNOPSIS
 
     vtide [start] [project]
-    vtide (init|start|refresh|run|edit|save|conf|help) [options]
+    vtide (init|start|edit|run|conf|grep|recent|split|refresh|save|help) [options]
 
   COMMANDS:
     conf    Show editor config settings
     edit    Run vim for a group of files
+    grep    Run grep against configured globs
     help    Show help for vtide sub commands
     init    Initialise a new project
+    recent  List recently run vtide sessions
     refresh Refreshes the autocomplete cache
     run     Run a projects terminal command
     save    Make/Save changes to a projects config file
+    split   Simply split up a tmux widow (using the same syntax as the config)
     start   Open a project in Tmux
 
   Examples:
@@ -192,8 +195,11 @@ This documentation refers to App::VTide version 0.1.3
     vtide start
     # start the "my-project" project previously initialised
     vtide start my-project
-    # or lazy shortcut
+    # Shortcuts
+    #  When not in a tmux session starting a new session
     vtide my-project
+    #  When in a tmux session you can run edit with out specifying it
+    vtide my-glob
 
 =head1 DESCRIPTION
 

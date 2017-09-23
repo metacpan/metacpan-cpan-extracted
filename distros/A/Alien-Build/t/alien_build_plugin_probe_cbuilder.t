@@ -35,7 +35,7 @@ subtest 'basic' => sub {
     'mytest';
   });
 
-  my $build = alienfile q{
+  my $build = alienfile_ok q{
     use alienfile;
     plugin 'Probe::CBuilder' => (
       cflags => '-I/usr/local/include',
@@ -49,9 +49,8 @@ subtest 'basic' => sub {
     'mytest'   => sub { 0 },
   ;
   
-  note capture_merged { $build->probe; () };
-
-  is( $build->install_type, 'system', 'is system' );
+  alien_build_ok;
+  alien_install_type_is 'system';
 
   is( $build->runtime_prop->{cflags}, '-I/usr/local/include ', 'cflags' );
   is( $build->runtime_prop->{libs}, '-L/usr/local/lib -lfoo ', 'libs' );
@@ -142,7 +141,7 @@ subtest 'program' => sub {
     'mytest';
   });
 
-  my $build = alienfile q{
+  my $build = alienfile_ok q{
     use alienfile;
     plugin 'Probe::CBuilder' => (
       cflags  => '-I/usr/local/include',
@@ -157,10 +156,57 @@ subtest 'program' => sub {
     'mytest'   => sub { print "version = '1.2.3'\n"; 0 },
   ;
 
-  note capture_merged { $build->probe; () };
+  alien_build_ok;
+  alien_install_type_is 'system';
 
-  is( $build->install_type, 'system', 'is system' );
   is( $build->runtime_prop->{version}, '1.2.3', 'version matches' );
+};
+
+subtest 'fail' => sub {
+
+  my $mock = Test2::Mock->new(
+    class => 'ExtUtils::CBuilder',
+  );
+  
+  $mock->add('new' => sub {
+    bless {}, 'ExtUtils::CBuilder';
+  });
+
+  subtest 'compile' => sub {
+  
+    $mock->add('compile' => sub {
+      my(undef, %args) = @_;
+      die "error building mytest.o from mytest.c";
+    });
+    
+    my $build = alienfile_ok q{
+    
+      use alienfile;
+      plugin 'Probe::CBuilder' => (
+        cflags => '-DX=1',
+        libs   => '-lfoo',
+      );
+      
+      probe sub {
+        my($build) = @_;
+        # some other plugin tries system
+        # but doesn't add a gather step
+        'system';
+      };
+    
+    };
+    
+    alien_install_type_is 'system';
+    
+    my($out, $err) = capture_merged {
+      eval { $build->build };
+      $@;
+    };
+    
+    like $err, qr/cbuilder unable to gather;/;
+  
+  };
+  
 };
 
 done_testing;

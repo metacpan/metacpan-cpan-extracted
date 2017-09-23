@@ -1,5 +1,9 @@
 Revision history for WWW-Kickstarter
 
+1.10.0  2017-09-20
+        - Documentation fixes.
+        - Updated list of tags.
+
 1.8.0   2016-05-08
         - Documented the ability for $ks->projects to search by search term,
           which was previously left undocumented by accident.

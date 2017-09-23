@@ -110,6 +110,7 @@ foreach my $endpoint (@endpoints) {
 			ok($suite->name() =~ /^[A-Z0-9_]+$/, "\$suite->name() looks like a suite name");
 			ok($suite->id() =~ /^\d+$/, "\$suite->id() looks like a number");
 			ok($suite->cipher_strength() =~ /^\d+$/, "\$suite->cipher_strength() looks like a number");
+			ok((!defined $suite->q() or ((defined $suite->q()) and ($suite->q() == 0))), "\$suite->q() is 0 or undefined");
 			if (defined $suite->ecdh_strength()) {
 				ok($suite->ecdh_strength() =~ /^\d+$/, "\$suite->ecdh_strength() looks like a number");
 				ok($suite->ecdh_bits() =~ /^\d+$/, "\$suite->ecdh_bits() looks like a number");

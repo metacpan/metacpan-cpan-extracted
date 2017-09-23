@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.27';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.28';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,9 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
-
-use vars qw(@ISA @EXPORT_OK);
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(graph_line_image graph_map_image);
 
 use 5.006;
 use strict; use warnings;
@@ -27,6 +22,9 @@ use Graphics::ColorNames;
 use Map::Tube::Exception::MissingLineName;
 use Map::Tube::Exception::InvalidLineName;
 use File::Temp qw(tempfile tempdir);
+use parent 'Exporter';
+
+our @EXPORT_OK = qw(graph_line_image graph_map_image);
 
 our $STYLE      = 'dashed';
 our $NODE_COLOR = 'black';

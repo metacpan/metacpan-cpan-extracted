@@ -19,4 +19,6 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.11'
+resources:
+  repository: https://github.com/bollwarm/ZHOUYI
+version: '0.13'

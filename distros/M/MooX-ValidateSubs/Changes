@@ -11,3 +11,7 @@ Revision history for MooX-ValidateSubs
 0.09    16/03/2017
         - Fix a couple of typos in the pod.
         - Add some extra tests for around.
+
+1.012001 19/09/2017
+        - Allow for ArrayRef on ArrayRef validation 
+	    - coercion now works (ArrayRef[Str])->plus_coercions(Split[qr{\s}])

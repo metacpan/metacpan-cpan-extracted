@@ -1,3 +1,12 @@
+1.0       2017-09-21 21:56:14-05:00 America/Chicago
+
+    * Fixed a bug where errors weren't quieted when the quiet flag was set by
+      the developer.
+    * Fixed a bug where errors were always quieted because they weren't being
+      detected correctly.
+    * Removed the experimental notice from the docs.
+    * Added a CAVEATS section to the docs.
+
 0.161950  2016-07-13 12:56:03-05:00 America/Chicago
 
     * The on() method now allows multiple registrations with one call.

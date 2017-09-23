@@ -15,7 +15,7 @@ name: Mojo-XMLRPC
 provides:
   Mojo::XMLRPC:
     file: lib/Mojo/XMLRPC.pm
-    version: '0.02'
+    version: '0.03'
   Mojo::XMLRPC::Base64:
     file: lib/Mojo/XMLRPC/Base64.pm
   Mojo::XMLRPC::Message:
@@ -30,5 +30,5 @@ resources:
   bugtracker: http://github.com/jberger/Mojo-XMLRPC/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-XMLRPC
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

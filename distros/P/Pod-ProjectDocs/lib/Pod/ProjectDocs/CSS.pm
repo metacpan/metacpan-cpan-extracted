@@ -3,25 +3,22 @@ package Pod::ProjectDocs::CSS;
 use strict;
 use warnings;
 
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49';    # VERSION
 
-use base qw/Pod::ProjectDocs::File/;
+use Moose;
+with 'Pod::ProjectDocs::File';
+
 use File::Basename;
 
-__PACKAGE__->default_name('podstyle.css');
-__PACKAGE__->data( do{ local $/; <DATA> } );
+has 'default_name' => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'podstyle.css',
+);
 
-sub relative_url {
-    my($self, $doc) = @_;
-    my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
-    my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
-    $relpath =~ s:\\:/:g if $^O eq 'MSWin32';
-    return $relpath;
-}
-
-1;
-__DATA__
-
+has 'data' => (
+    is      => 'ro',
+    default => <<'DATA',
 BODY, .logo { background: white; }
 
 BODY {
@@ -374,3 +371,15 @@ table.dlsip     {
 .search_highlight {
 	color: #ff6600;
 }
+DATA
+);
+
+sub relative_url {
+    my ( $self, $doc ) = @_;
+    my ( $name, $path ) = fileparse $doc->get_output_path, qw/\.html/;
+    my $relpath = File::Spec->abs2rel( $self->get_output_path, $path );
+    $relpath =~ s:\\:/:g if $^O eq 'MSWin32';
+    return $relpath;
+}
+
+1;

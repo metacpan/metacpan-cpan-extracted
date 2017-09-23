@@ -17,9 +17,11 @@ use Moo;
 extends 'Business::GoCardless::PreAuthorization';
 
 use Business::GoCardless::Exception;
+use Business::GoCardless::Mandate;
 
 =head1 ATTRIBUTES
 
+    confirmation_url
     redirect_url
     scheme
     session_token
@@ -29,6 +31,7 @@ use Business::GoCardless::Exception;
 =cut
 
 has [ qw/
+    confirmation_url
     redirect_url
     scheme
     session_token
@@ -55,6 +58,21 @@ sub cancel {
 	Business::GoCardless::Exception->throw({
 		message => "->cancel on a RedirectFlow is not meaningful in the Pro API",
 	});
+}
+
+sub mandate {
+    my ( $self ) = @_;
+
+    if ( ! $self->links ) {
+        $self->find_with_client( 'redirect_flows' );
+    }
+
+    my $Mandate = Business::GoCardless::Mandate->new(
+        client => $self->client,
+        id => $self->links->{mandate}
+    );
+
+    return $Mandate->find_with_client( 'mandates' );
 }
 
 1;

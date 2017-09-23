@@ -1,0 +1,510 @@
+<span class='keyword'>package</span> Syntax::Highlight::Engine::Simple;
+<span class='keyword'>use</span> warnings;
+<span class='keyword'>use</span> strict;
+<span class='keyword'>use</span> Carp;
+<span class='keyword'>use</span> version;
+<span class='keyword'>our</span> <span class='variable'>$VERSION</span> = qv(<span class='quote'>'0.0.1'</span>);
+
+<span class='comment'>#use Data::Dumper; my $dump = Dumper($res-&gt;{'_headers'}); $dump =~ s/\\x{([0-9a-z]+)}/chr(hex($1))/ge; print "&lt;pre&gt;$dump&lt;/pre&gt;";use version;</span>
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### constractor</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> new {
+    
+    <span class='keyword'>my</span> <span class='variable'>$class</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>$self</span> =
+        <span class='keyword'>bless</span> {syntax  =&gt; <span class='keyword'>undef</span>, encode =&gt; <span class='quote'>'utf8'</span>, <span class='variable'>@_</span>}, <span class='variable'>$class</span>;
+    
+    <span class='variable'>$self</span>-&gt;<span class='method'>setSyntax</span>();
+    <span class='variable'>$self</span>-&gt;<span class='method'>setParams</span>(<span class='variable'>@_</span>);
+    
+    <span class='keyword'>return</span> <span class='variable'>$self</span>;
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### set params</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> setParams {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (
+        html_escape_code_ref =&gt; \<span class='function'>&amp;_html_escape</span>,
+        encode =&gt; <span class='variable'>$self</span>-&gt;{encode},
+        <span class='variable'>@_</span>);
+
+    <span class='variable'>$self</span>-&gt;{encode} = <span class='variable'>$args</span>{encode};
+    <span class='variable'>$self</span>-&gt;{html_escape_code_ref} = <span class='variable'>$args</span>{html_escape_code_ref};
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### set syntax</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> setSyntax {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (syntax =&gt; [], <span class='variable'>@_</span>);
+    
+    <span class='variable'>$self</span>-&gt;{syntax} = <span class='variable'>$args</span>{syntax};
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### append syntax</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> appendSyntax {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (
+        syntax =&gt; {
+            regexp      =&gt; <span class='quote'>''</span>,
+            class       =&gt; <span class='quote'>''</span>,
+            allow_nest  =&gt; <span class='number'>0</span>,
+        }, <span class='variable'>@_</span>);
+    
+    <span class='keyword'>push</span>(@{<span class='variable'>$self</span>-&gt;{syntax}}, <span class='variable'>$args</span>{syntax});
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Highlight multi Line</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> doStr{
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (str =&gt; <span class='quote'>''</span>, tab_width =&gt; -<span class='number'>1</span>, <span class='variable'>@_</span>);
+    
+    <span class='keyword'>if</span> (<span class='variable'>$args</span>{tab_width} &gt; <span class='number'>0</span>) {
+        
+        <span class='keyword'>my</span> <span class='variable'>$tabed</span> = <span class='quote'>''</span>;
+        
+        <span class='keyword'>foreach</span> <span class='keyword'>my</span> <span class='variable'>$line</span> (<span class='keyword'>split</span>(<span class='regexp_statement'>/\r\n|\r|\n/</span>, <span class='variable'>$args</span>{str})) {
+            
+            <span class='variable'>$tabed</span> .=
+                <span class='function'>&amp;_tab2space</span>(str =&gt; <span class='variable'>$line</span>, tab_width =&gt; <span class='variable'>$args</span>{tab_width}). <span class='wquote'>"\n"</span>;
+        }
+        
+        <span class='variable'>$args</span>{str} = <span class='variable'>$tabed</span>;
+    }
+    
+    <span class='keyword'>return</span> <span class='variable'>$self</span>-&gt;<span class='method'>doLine</span>(str =&gt; <span class='variable'>$args</span>{str});
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Highlight file</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> doFile {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (file =&gt; <span class='quote'>''</span>, tab_width =&gt; -<span class='number'>1</span>, <span class='variable'>@_</span>);
+    <span class='keyword'>my</span> <span class='variable'>$str</span> = <span class='quote'>''</span>;
+    
+    <span class='keyword'>open</span>(<span class='keyword'>my</span> <span class='variable'>$filehandle</span>, <span class='quote'>'&lt;'</span>. <span class='variable'>$self</span>-&gt;{encode},<span class='variable'>$args</span>{file})
+        or croak <span class='quote'>'File open failed'</span>;
+    
+    <span class='keyword'>while</span> (<span class='keyword'>my</span> <span class='variable'>$line</span> = &lt;<span class='variable'>$filehandle</span>&gt;) {
+        
+        <span class='keyword'>if</span> (<span class='variable'>$args</span>{tab_width} &gt; <span class='number'>0</span>) {
+            
+            <span class='variable'>$line</span> = <span class='function'>&amp;_tab2space</span>(str =&gt; <span class='variable'>$line</span>, tab_width =&gt; <span class='variable'>$args</span>{tab_width});
+        }
+        
+        <span class='variable'>$str</span> .= <span class='variable'>$line</span>;
+    }
+    
+    <span class='keyword'>close</span>(<span class='variable'>$filehandle</span>);
+    
+    <span class='keyword'>return</span> <span class='variable'>$self</span>-&gt;<span class='method'>doLine</span>(str =&gt; <span class='variable'>$str</span>);
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Highlight single line</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> doLine {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (
+        str         =&gt; <span class='quote'>''</span>, 
+        <span class='variable'>@_</span>);
+    
+    <span class='keyword'>my</span> <span class='variable'>$str</span> = <span class='variable'>$args</span>{str}; <span class='variable'>$str</span> =~ s<span class='regexp_statement'>/\r\n|\r/\n/</span>g;
+    
+    <span class='variable'>$self</span>-&gt;{_markup_map} = [];
+    
+    <span class='comment'>### make markup map</span>
+    <span class='keyword'>foreach</span> <span class='keyword'>my</span> <span class='variable'>$regexp</span> (@{<span class='variable'>$self</span>-&gt;{syntax}}) {
+        
+        <span class='variable'>$self</span>-&gt;{_regexp}        = <span class='variable'>$regexp</span>-&gt;{regexp};
+        <span class='variable'>$self</span>-&gt;{_class}         = <span class='variable'>$regexp</span>-&gt;{class};
+        <span class='variable'>$self</span>-&gt;{_allow_nest}    = <span class='variable'>$regexp</span>-&gt;{allow_nest};
+        
+        <span class='variable'>$self</span>-&gt;<span class='method'>_make_map</span>(str =&gt; <span class='variable'>$str</span>);
+    }
+    
+    <span class='variable'>$self</span>-&gt;<span class='method'>_vacuum_map</span>();
+    
+    <span class='keyword'>my</span> <span class='variable'>$outstr</span> = <span class='quote'>''</span>;
+    
+    <span class='comment'>### Apply the markup map to string</span>
+    {
+        <span class='keyword'>my</span> <span class='variable'>@markup_array</span>;
+        
+        <span class='comment'>### Restructure the map array</span>
+        <span class='keyword'>foreach</span> <span class='keyword'>my</span> <span class='variable'>$elem</span> (@{<span class='variable'>$self</span>-&gt;{_markup_map}}) {
+            
+            <span class='keyword'>push</span>(<span class='variable'>@markup_array</span>, [<span class='variable'>$elem</span>-&gt;[<span class='number'>0</span>], <span class='variable'>$elem</span>-&gt;[<span class='number'>2</span>]], [<span class='variable'>$elem</span>-&gt;[<span class='number'>1</span>]]);
+        }
+        
+        <span class='variable'>@markup_array</span> = <span class='keyword'>sort</span> {<span class='variable'>$a</span>-&gt;[<span class='number'>0</span>] &lt;=&gt; <span class='variable'>$b</span>-&gt;[<span class='number'>0</span>]} <span class='variable'>@markup_array</span>;
+        
+        <span class='keyword'>my</span> <span class='variable'>$last_pos</span> = <span class='number'>0</span>;
+        
+        <span class='keyword'>foreach</span> <span class='keyword'>my</span> <span class='variable'>$pos</span> (<span class='variable'>@markup_array</span>) {
+            
+            <span class='keyword'>my</span> <span class='variable'>$str_left</span> = <span class='keyword'>substr</span>(<span class='variable'>$str</span>, <span class='variable'>$last_pos</span>, <span class='variable'>$pos</span>-&gt;[<span class='number'>0</span>] - <span class='variable'>$last_pos</span>);
+            
+            <span class='keyword'>no</span> strict <span class='quote'>'refs'</span>;
+            <span class='variable'>$str_left</span> = &amp;{<span class='variable'>$self</span>-&gt;{html_escape_code_ref}}(<span class='variable'>$str_left</span>);
+            
+            <span class='keyword'>if</span> (<span class='keyword'>defined</span> <span class='variable'>$pos</span>-&gt;[<span class='number'>1</span>]) {
+                
+                <span class='variable'>$outstr</span> .= <span class='keyword'>sprintf</span>(<span class='wquote'>"%s&lt;span class='%s'&gt;"</span>, <span class='variable'>$str_left</span>, <span class='variable'>$pos</span>-&gt;[<span class='number'>1</span>]);
+            } 
+            
+            <span class='keyword'>else</span> {
+                
+                <span class='variable'>$outstr</span> .= <span class='keyword'>sprintf</span>(<span class='wquote'>"%s&lt;/span&gt;"</span>, <span class='variable'>$str_left</span>);
+            }
+            
+            <span class='variable'>$last_pos</span> = <span class='variable'>$pos</span>-&gt;[<span class='number'>0</span>];
+        }
+        
+        <span class='variable'>$outstr</span> .= <span class='keyword'>substr</span>(<span class='variable'>$str</span>, <span class='variable'>$last_pos</span>);
+    }
+    
+    <span class='keyword'>return</span> <span class='variable'>$outstr</span>;
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Make markup map</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> _make_map {
+    
+    <span class='keyword'>no</span> warnings; <span class='comment'>### Avoid Deep Recursion warning</span>
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (
+        str         =&gt; <span class='quote'>''</span>, 
+        <span class='keyword'>pos</span>         =&gt; <span class='number'>0</span>, 
+        <span class='variable'>@_</span>);
+    
+    <span class='keyword'>my</span> <span class='variable'>$alias</span> = <span class='variable'>$self</span>-&gt;{_markup_map};
+    
+    <span class='keyword'>my</span> <span class='variable'>@scraps</span> = <span class='keyword'>split</span>(<span class='regexp_statement'>/($self-&gt;{_regexp})/</span>, <span class='variable'>$args</span>{str}, <span class='number'>2</span>);
+    
+    <span class='keyword'>if</span> ((<span class='keyword'>scalar</span> <span class='variable'>@scraps</span>) &gt;= <span class='number'>3</span>) {
+        
+        <span class='keyword'>my</span> <span class='variable'>$ins_pos0</span> = <span class='keyword'>length</span>(<span class='variable'>$scraps</span>[<span class='number'>0</span>]) + <span class='variable'>$args</span>{<span class='keyword'>pos</span>};
+        <span class='keyword'>my</span> <span class='variable'>$ins_pos1</span> = <span class='keyword'>length</span>(<span class='variable'>$scraps</span>[<span class='number'>1</span>]) + <span class='variable'>$ins_pos0</span>;
+        
+        <span class='comment'>### Add markup position</span>
+        <span class='keyword'>push</span>(
+            @<span class='variable'>$alias</span>, [
+                <span class='variable'>$ins_pos0</span>,
+                <span class='variable'>$ins_pos1</span>,
+                <span class='variable'>$self</span>-&gt;{_class},
+                (<span class='variable'>$self</span>-&gt;{_allow_nest} or <span class='number'>0</span>)
+            ]
+        );
+        
+        <span class='comment'>### Recurseion for rest</span>
+        <span class='variable'>$self</span>-&gt;<span class='method'>_make_map</span>(str =&gt; <span class='keyword'>pop</span>(<span class='variable'>@scraps</span>), <span class='keyword'>pos</span> =&gt; <span class='variable'>$ins_pos1</span>);
+        <span class='comment'>#$self-&gt;_make_map(</span>
+        <span class='comment'>#   str =&gt; substr($scraps[1], 1). pop(@scraps), </span>
+        <span class='comment'>#   pos =&gt; $ins_pos0 + 1</span>
+        <span class='comment'>#);</span>
+    }
+    
+    <span class='comment'>### Follow up process</span>
+    <span class='keyword'>elsif</span> (@<span class='variable'>$alias</span>) {
+        
+        @<span class='variable'>$alias</span> = <span class='keyword'>sort</span> {<span class='variable'>$a</span>-&gt;[<span class='number'>0</span>] &lt;=&gt; <span class='variable'>$b</span>-&gt;[<span class='number'>0</span>]} @<span class='variable'>$alias</span>;
+    }
+    
+    <span class='keyword'>return</span>;
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Vacuum map data</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> _vacuum_map {
+    
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+    <span class='keyword'>my</span> <span class='variable'>$alias</span> = <span class='variable'>$self</span>-&gt;{_markup_map};
+    
+    <span class='variable'>$self</span>-&gt;{_max_close_point} = $<span class='variable'>$alias</span>[<span class='number'>0</span>]-&gt;[<span class='number'>1</span>];
+    
+    ENTRY_LOOP: <span class='keyword'>for</span> (<span class='keyword'>my</span> <span class='variable'>$i</span> = <span class='number'>1</span>; <span class='variable'>$i</span> &lt; <span class='keyword'>scalar</span> @<span class='variable'>$alias</span>; <span class='variable'>$i</span>++) {
+        
+        <span class='comment'>### Remove illigal overlap</span>
+        <span class='keyword'>if</span> ($<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>0</span>] &lt; $<span class='variable'>$alias</span>[<span class='variable'>$i</span> - <span class='number'>1</span>]-&gt;[<span class='number'>1</span>] and 
+            $<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>1</span>] &gt;= $<span class='variable'>$alias</span>[<span class='variable'>$i</span> - <span class='number'>1</span>]-&gt;[<span class='number'>1</span>]) {
+            
+            <span class='keyword'>splice</span>(@<span class='variable'>$alias</span>, <span class='variable'>$i</span>--, <span class='number'>1</span>);
+            <span class='keyword'>next</span> ENTRY_LOOP;
+        }
+        
+        <span class='comment'>### Remove nest if not allowed</span>
+        <span class='keyword'>if</span> (! $<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>3</span>] and
+            $<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>1</span>] &lt;= <span class='variable'>$self</span>-&gt;{_max_close_point}) {
+            
+            <span class='keyword'>splice</span>(@<span class='variable'>$alias</span>, <span class='variable'>$i</span>--, <span class='number'>1</span>);
+            <span class='keyword'>next</span> ENTRY_LOOP;
+        }
+        
+        <span class='keyword'>if</span> ($<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>1</span>] &gt; <span class='variable'>$self</span>-&gt;{_max_close_point}) {
+            
+            <span class='variable'>$self</span>-&gt;{_max_close_point} = $<span class='variable'>$alias</span>[<span class='variable'>$i</span>]-&gt;[<span class='number'>1</span>];
+        }
+    }
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### Return map for debug</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> _ret_map {
+    
+    <span class='keyword'>return</span> <span class='keyword'>shift</span>-&gt;{_markup_map};
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### replace tabs to spaces</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> _tab2space {
+    
+    <span class='keyword'>no</span> warnings; <span class='comment'>### Avoid Deep Recursion warning</span>
+    
+    <span class='keyword'>my</span> <span class='variable'>%args</span> = (str =&gt; <span class='quote'>''</span>, tab_width =&gt; <span class='number'>4</span>, <span class='variable'>@_</span>);
+    <span class='keyword'>my</span> <span class='variable'>@scraps</span> = <span class='keyword'>split</span>(<span class='regexp_statement'>/\t/</span>, <span class='variable'>$args</span>{str}, <span class='number'>2</span>);
+    
+    <span class='keyword'>if</span> (<span class='keyword'>scalar</span> <span class='variable'>@scraps</span> == <span class='number'>2</span>) {
+        
+        <span class='keyword'>my</span> <span class='variable'>$num</span> = <span class='variable'>$args</span>{tab_width} - (<span class='keyword'>length</span>(<span class='variable'>$scraps</span>[<span class='number'>0</span>]) % <span class='variable'>$args</span>{tab_width});
+        <span class='keyword'>my</span> <span class='variable'>$right_str</span> = <span class='function'>&amp;_tab2space</span>(<span class='variable'>%args</span>, str =&gt; <span class='variable'>$scraps</span>[<span class='number'>1</span>]);
+        
+        <span class='keyword'>return</span> (<span class='variable'>$scraps</span>[<span class='number'>0</span>]. <span class='quote'>' '</span> x <span class='variable'>$num</span>. <span class='variable'>$right_str</span>);
+    }
+    
+    <span class='keyword'>return</span> <span class='variable'>$args</span>{str};
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### convert array to regexp</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> array2regexp {
+
+    <span class='keyword'>my</span> <span class='variable'>$self</span> = <span class='keyword'>shift</span>;
+
+    <span class='keyword'>return</span> <span class='keyword'>sprintf</span>(<span class='quote'>'\\b(?:%s)\\b'</span>, <span class='keyword'>join</span>(<span class='quote'>'|'</span>, <span class='variable'>@_</span>));
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### convert array to regexp</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> getClassNames {
+    
+    <span class='keyword'>return</span> <span class='keyword'>map</span> {<span class='variable'>$_</span>-&gt;{class}} @{<span class='keyword'>shift</span>-&gt;{syntax}}
+}
+
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='comment'>### HTML escape</span>
+<span class='comment'>### ----------------------------------------------------------------------------</span>
+<span class='keyword'>sub</span> _html_escape {
+    
+    <span class='keyword'>my</span> (<span class='variable'>$str</span>) = <span class='variable'>@_</span>;
+    
+    <span class='variable'>$str</span> =~ s<span class='regexp_statement'>/&amp;/&amp;amp;/</span>g;
+    <span class='variable'>$str</span> =~ s<span class='regexp_statement'>/&lt;/&amp;lt;/</span>g;
+    <span class='variable'>$str</span> =~ s<span class='regexp_statement'>/&gt;/&amp;gt;/</span>g;
+    
+    <span class='keyword'>return</span> <span class='variable'>$str</span>;
+}
+
+<span class='number'>1</span>; <span class='comment'># Magic true value required at end of module</span>
+__END__
+
+<span class='perlpod'><span class='keyword2'><span class='statement'>=head1</span> NAME</span>
+
+Syntax::Highlight::Engine::Simple - Simple, fast and flexible Syntax Highlight Engine
+
+<span class='keyword2'><span class='statement'>=head1</span> VERSION</span>
+
+This document describes Syntax::Highlight::Engine::Simple version 0.0.1
+
+<span class='keyword2'><span class='statement'>=head1</span> SYNOPSIS</span>
+
+    use Syntax::Highlight::Engine::Simple;
+    
+    # Constractor
+    $highlight = Syntax::Highlight::Engine::Simple-&gt;new(%hash);
+    
+    # Parameter configuration
+    $highlight-&gt;setParams(%hash);
+    
+    # Syntax definision and addition
+    $highlight-&gt;setSyntax(%hash);
+    $highlight-&gt;appendSyntax(%hash);
+    
+    # Perse
+    $highlight-&gt;doLine(%hash);
+    $highlight-&gt;doFile(%hash);
+    $highlight-&gt;doStr(%hash);
+    
+    # Utilities
+    $highlight-&gt;array2regexp(%hash);
+    $highlight-&gt;getClassNames(%hash);
+
+<span class='keyword2'><span class='statement'>=head1</span> DESCRIPTION</span>
+
+This is a Syntax highlight Engine. You can easily and minutely define the rules for highlighting by regular expressions. This is much faster than Text::VimColor or Syntax::Highlight::Engine::Kate.
+
+A working example of This module is at bellow.
+
+http://jamadam.com/cpan/demo/Syntax/Highlight/Engine/Simple/
+
+<span class='keyword2'><span class='statement'>=head1</span> INTERFACE </span>
+
+<span class='keyword2'><span class='statement'>=over</span></span>
+
+<span class='keyword2'><span class='statement'>=item</span> new</span>
+
+<span class='keyword2'><span class='statement'>=item</span> setParams</span>
+
+<span class='keyword2'><span class='statement'>=item</span> setSyntax</span>
+
+<span class='keyword2'><span class='statement'>=item</span> appendSyntax</span>
+
+<span class='keyword2'><span class='statement'>=item</span> doStr</span>
+
+<span class='keyword2'><span class='statement'>=item</span> doFile</span>
+
+<span class='keyword2'><span class='statement'>=item</span> doLine</span>
+
+<span class='keyword2'><span class='statement'>=item</span> array2regexp</span>
+
+<span class='keyword2'><span class='statement'>=item</span> getClassNames</span>
+
+<span class='keyword2'><span class='statement'>=back</span></span>
+
+<span class='keyword2'><span class='statement'>=head1</span> DIAGNOSTICS</span>
+
+<span class='keyword2'><span class='statement'>=for</span> author to fill in:</span>
+    List every single error and warning message that the module can
+    generate (even the ones that will "never happen"), with a full
+    explanation of each problem, one or more likely causes, and any
+    suggested remedies.
+
+<span class='keyword2'><span class='statement'>=over</span></span>
+
+<span class='keyword2'><span class='statement'>=item</span> C&lt;&lt; Error message here, perhaps with %s placeholders &gt;&gt;</span>
+
+[Description of error here]
+
+<span class='keyword2'><span class='statement'>=item</span> C&lt;&lt; Another error message here &gt;&gt;</span>
+
+[Description of error here]
+
+[Et cetera, et cetera]
+
+<span class='keyword2'><span class='statement'>=back</span></span>
+
+
+<span class='keyword2'><span class='statement'>=head1</span> CONFIGURATION AND ENVIRONMENT</span>
+
+<span class='keyword2'><span class='statement'>=for</span> author to fill in:</span>
+    A full explanation of any configuration system(s) used by the
+    module, including the names and locations of any configuration
+    files, and the meaning of any environment variables or properties
+    that can be set. These descriptions must also include details of any
+    configuration language used.
+  
+Syntax::Highlight::Engine::Simple requires no configuration files or environment variables.
+
+
+<span class='keyword2'><span class='statement'>=head1</span> DEPENDENCIES</span>
+
+<span class='keyword2'><span class='statement'>=for</span> author to fill in:</span>
+    A list of all the other modules that this module relies upon,
+    including any restrictions on versions, and an indication whether
+    the module is part of the standard Perl distribution, part of the
+    module's distribution, or must be installed separately. ]
+
+None.
+
+
+<span class='keyword2'><span class='statement'>=head1</span> INCOMPATIBILITIES</span>
+
+<span class='keyword2'><span class='statement'>=for</span> author to fill in:</span>
+    A list of any modules that this module cannot be used in conjunction
+    with. This may be due to name conflicts in the interface, or
+    competition for system or program resources, or due to internal
+    limitations of Perl (for example, many modules that use source code
+    filters are mutually incompatible).
+
+None reported.
+
+
+<span class='keyword2'><span class='statement'>=head1</span> BUGS AND LIMITATIONS</span>
+
+<span class='keyword2'><span class='statement'>=for</span> author to fill in:</span>
+    A list of known problems with the module, together with some
+    indication Whether they are likely to be fixed in an upcoming
+    release. Also a list of restrictions on the features the module
+    does provide: data types that cannot be handled, performance issues
+    and the circumstances in which they may arise, practical
+    limitations on the size of data sets, special cases that are not
+    (yet) handled, etc.
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C&lt;bug-syntax-highlight-engine-Simple@rt.cpan.org&gt;, or through the web interface at
+L&lt;http://rt.cpan.org&gt;.
+
+
+<span class='keyword2'><span class='statement'>=head1</span> AUTHOR</span>
+
+Sugama Keita  C&lt;&lt; &lt;sugama@jamadam.com&gt; &gt;&gt;
+
+
+<span class='keyword2'><span class='statement'>=head1</span> LICENCE AND COPYRIGHT</span>
+
+Copyright (c) 2008, Sugama Keita C&lt;&lt; &lt;sugama@jamadam.com&gt; &gt;&gt;. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L&lt;perlartistic&gt;.
+
+
+<span class='keyword2'><span class='statement'>=head1</span> DISCLAIMER OF WARRANTY</span>
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+<span class='keyword2'><span class='statement'>=cut</span></span></span>

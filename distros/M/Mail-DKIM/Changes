@@ -1,6 +1,10 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.43
+
+ * Update tests for new DNS setup
+
 Version 0.42
 
   * Fix tests failing due to dns changes elsewhere

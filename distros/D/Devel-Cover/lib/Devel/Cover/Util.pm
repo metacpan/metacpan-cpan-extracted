@@ -10,7 +10,7 @@ package Devel::Cover::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 use Cwd "abs_path";
 use File::Spec;
@@ -23,7 +23,7 @@ sub remove_contained_paths {
 
     # File::Spec's case tolerancy detection on *nix/Mac systems does not
     # take actual file system properties into account, but is better than
-    # trying to normalize paths with per-os logic. On Windows it is
+    # trying to normalise paths with per-os logic. On Windows it is
     # properly determined per drive.
     my ($drive) = File::Spec->splitpath($container);
     my $ignore_case = "(?i)";
@@ -39,7 +39,7 @@ sub remove_contained_paths {
     ]x;
 
     @paths = grep {
-        my $path = abs_path $_;    # normalize backslashes
+        my $path = abs_path $_;    # normalise backslashes
         $path !~ $regex;           # check if path is inside the container
     } @paths;
 
@@ -56,7 +56,7 @@ Devel::Cover::Util - Utility subroutines for Devel::Cover
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

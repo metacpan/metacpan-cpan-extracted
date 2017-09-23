@@ -11,26 +11,19 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+with 'Code::TidyAll::Role::RunsCommand';
+
+our $VERSION = '0.67';
 
 sub _build_cmd {'js-beautify'}
 
 sub transform_file {
     my ( $self, $file ) = @_;
 
-    try {
-        my @cmd = ( $self->cmd, shellwords( $self->argv ), $file );
-        my $output;
-        my $exit = run3( \@cmd, \undef, \$output, \$output );
-        die "exited with $?\n" if $?;
-        $file->spew($output);
-    }
-    catch {
-        die sprintf(
-            "%s failed - possibly bad arg list '%s'\n    $_", $self->cmd,
-            $self->argv
-        );
-    };
+    my $output = $self->_run_or_die( '-f', $file );
+    $file->spew($output);
+
+    return;
 }
 
 1;
@@ -49,7 +42,7 @@ Code::TidyAll::Plugin::JSBeautify - Use js-beautify with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -69,21 +62,22 @@ Install L<npm|https://npmjs.org/>, then run
 
     npm install js-beautify -g
 
-Do not confuse this with the C<jsbeautify> package (without the dash).
+Do not confuse this with the C<jsbeautify> command, which is provided by the
+L<JavaScript::Beautifier> module.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item argv
+=head2 argv
 
-Arguments to pass to js-beautify
+Arguments to pass to C<js-beautify>.
 
-=item cmd
+=head2 cmd
 
-Full path to js-beautify
-
-=back
+The path for the C<js-beautify> command. By default this is just
+C<js-beautify>, meaning that the user's C<PATH> will be searched for the
+command.
 
 =head1 SUPPORT
 

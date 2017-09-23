@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SR830;
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
-$Lab::Moose::Instrument::SR830::VERSION = '3.554';
+$Lab::Moose::Instrument::SR830::VERSION = '3.600';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;
@@ -402,7 +402,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 

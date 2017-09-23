@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.829';
+our $VERSION = '1.831';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -25,19 +25,19 @@ no overloading;
 use Carp ();
 use Storable ();
 
-use Scalar::Util qw( blessed looks_like_number reftype weaken );
-use Socket qw( SOL_SOCKET SO_RCVBUF );
-use Time::HiRes qw( sleep time );
-
 my ($_has_threads, $_spawn_child, $_freeze2, $_freeze, $_thaw);
 
 BEGIN {
    local $@;
 
+   eval 'use threads ()'
+      if ($^O eq 'MSWin32' && $] lt '5.018000' && !$INC{'threads.pm'});
+
+   eval 'use IO::FDPass ()'
+      if (!$INC{'IO/FDPass.pm'} && $^O ne 'cygwin');
+
    $_has_threads = $INC{'threads.pm'} ? 1 : 0;
    $_spawn_child = $_has_threads  ? 0 : 1;
-
-   eval 'use IO::FDPass ()' if !$INC{'IO/FDPass.pm'} && $^O ne 'cygwin';
 
    if (!exists $INC{'PDL.pm'}) {
       eval '
@@ -64,6 +64,10 @@ BEGIN {
 
 sub _get_freeze { $_freeze; }
 sub _get_thaw   { $_thaw;   }
+
+use Time::HiRes qw( sleep time );
+use Scalar::Util qw( blessed looks_like_number reftype weaken );
+use Socket qw( SOL_SOCKET SO_RCVBUF );
 
 use MCE::Util ();
 use MCE::Signal ();
@@ -344,7 +348,7 @@ sub _start {
       eval 'PDL::no_clone_skip_warning()';
    }
 
-   $_init_pid = "$$.$_tid"; local $_;
+   local $_;  $_init_pid = "$$.$_tid";
 
    my $_data_channels = ($_oid eq $_init_pid) ? DATA_CHANNELS : 2;
    $_SVR = { _data_channels => $_data_channels };
@@ -364,11 +368,13 @@ sub _start {
    }
    else {
       $_svr_pid = threads->create(\&_loop);
-      $_svr_pid->detach(), sleep(0.005) if defined $_svr_pid;
+      $_svr_pid->detach() if defined $_svr_pid;
    }
 
    _croak("cannot start the shared-manager process: $!")
       unless (defined $_svr_pid);
+
+   sleep(0.005) if (!$_spawn_child || $_is_MSWin32);
 
    return;
 }
@@ -386,21 +392,21 @@ sub _stop {
          eval { $_svr_pid->kill('KILL') };
       }
       else {
-         eval {
-            local $\ = undef if (defined $\);
-            print {$_DAT_W_SOCK} SHR_M_STP.$LF.'0'.$LF;
-         };
-         local $SIG{'ALRM'};
-         local $SIG{'INT'};
+         local $SIG{'ALRM'}; local $SIG{'INT'};
 
          $SIG{'INT'} = $SIG{'ALRM'} = sub {
             alarm 0; sleep 0.015;
             CORE::kill 'KILL', $_svr_pid;
          };
+         eval {
+            local $\ = undef if (defined $\);
+            print {$_DAT_W_SOCK} SHR_M_STP.$LF.'0'.$LF;
+         };
+
          alarm 2 unless $_is_MSWin32;
          waitpid $_svr_pid, 0;
 
-         alarm 0;
+         alarm 0 unless $_is_MSWin32;
       }
 
       $_init_pid = $_svr_pid = undef;
@@ -1820,7 +1826,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.829
+This document describes MCE::Shared::Server version 1.831
 
 =head1 DESCRIPTION
 

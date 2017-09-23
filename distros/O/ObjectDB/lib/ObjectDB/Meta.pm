@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use mro;
 
-our $VERSION = '3.22';
+our $VERSION = '3.23';
 
 require Storable;
 require Carp;
@@ -101,6 +101,15 @@ sub is_unique_key {
     }
 
     return 0;
+}
+
+sub is_nullable {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $column = $self->get_column($name);
+
+    return $column->{is_null};
 }
 
 sub get_class {
@@ -374,7 +383,9 @@ sub discover_schema {
             }
         }
 
-        $self->add_column($column->name, { default => $default_value, is_null => $column->is_nullable });
+        my $is_null = $column->is_nullable eq 'YES' ? 1 : 0;
+
+        $self->add_column($column->name, { default => $default_value, is_null => $is_null });
     }
 
     $self->set_primary_key(map { $_->name } $table->primary_key);

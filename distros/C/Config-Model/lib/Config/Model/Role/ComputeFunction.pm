@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::ComputeFunction;
-$Config::Model::Role::ComputeFunction::VERSION = '2.108';
+$Config::Model::Role::ComputeFunction::VERSION = '2.110';
 # ABSTRACT: compute &index or &element functions
 
 use Mouse::Role;
@@ -88,7 +88,7 @@ Config::Model::Role::ComputeFunction - compute &index or &element functions
 
 =head1 VERSION
 
-version 2.108
+version 2.110
 
 =head1 SYNOPSIS
 

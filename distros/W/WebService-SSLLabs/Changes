@@ -1,5 +1,8 @@
 Revision history for WebService-SSLLabs
 
+0.29   Sat Sep 16 11:01:00 2017
+	Adding the missing $suite->q() method to fix RT#123027.  Thanks to Jeff Braine for the bug report and proposed patch
+
 0.28   Mon May 13 18:48:00 2016
 	Working around an apparent inconsistency in the ssllabs api vs the documentation covered in https://github.com/ssllabs/ssllabs-scan/issues/497.  Fixing RT#121640.
 

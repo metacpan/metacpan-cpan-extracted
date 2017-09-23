@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Calculate::Data;
 #ABSTRACT: ???
-$Lab::Moose::Instrument::SCPI::Calculate::Data::VERSION = '3.554';
+$Lab::Moose::Instrument::SCPI::Calculate::Data::VERSION = '3.600';
 use 5.010;
 use Moose::Role;
 use MooseX::Params::Validate;
@@ -62,7 +62,7 @@ Lab::Moose::Instrument::SCPI::Calculate::Data - ???
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

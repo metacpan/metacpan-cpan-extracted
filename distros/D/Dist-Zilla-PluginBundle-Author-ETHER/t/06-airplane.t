@@ -111,8 +111,11 @@ cmp_deeply(
 );
 
 cmp_deeply(
-    $tzil->distmeta->{prereqs}{develop}{requires},
-    notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')),
+    $tzil->distmeta->{prereqs}{develop},
+    {
+        map { $_ => notexists(keys %network_plugins, Dist::Zilla::Util->expand_config_package_name('BlockRelease')) }
+            qw(requires recommends suggests),
+    },
     'no network-using plugins, nor BlockRelease, were added to develop prereqs',
 );
 

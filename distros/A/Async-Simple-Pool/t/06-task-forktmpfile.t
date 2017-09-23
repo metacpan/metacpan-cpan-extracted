@@ -35,8 +35,8 @@ describe 'All' => sub {
             my $pid = $task->pid;
 
             isa_ok( $task, 'Async::Simple::Task::ForkTmpFile', 'successful init' );
-            isa_ok( $task->reader, 'GLOB', 'have a reader' );
-            isa_ok( $task->writer, 'GLOB', 'have a writer' );
+            is( ref $task->reader, '', 'have scalar reader' );
+            is( ref $task->writer, '', 'have scalar writer' );
             isa_ok( $task->task, 'CODE', 'task exists and is a CODE' );
 
             is( $task->timeout, 0.01, 'default timeout' );

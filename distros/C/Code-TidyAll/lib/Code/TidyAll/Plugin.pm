@@ -7,25 +7,88 @@ use Code::TidyAll::Util::Zglob qw(zglobs_to_regex);
 use File::Which qw(which);
 use IPC::Run3 qw(run3);
 use Scalar::Util qw(weaken);
+use Specio::Declare;
+use Specio::Library::Builtins;
+use Specio::Library::Numeric;
+use Specio::Library::String;
 use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-# External
-has 'argv'               => ( is => 'ro', default => q{} );
-has 'class'              => ( is => 'ro' );
-has 'cmd'                => ( is => 'lazy' );
-has 'diff_on_tidy_error' => ( is => 'ro', default => 0 );
-has 'ignore'             => ( is => 'ro' );
-has 'is_tidier'          => ( is => 'lazy' );
-has 'is_validator'       => ( is => 'lazy' );
-has 'name'               => ( is => 'ro', required => 1 );
-has 'select'             => ( is => 'ro' );
-has 'shebang'            => ( is => 'ro' );
-has 'tidyall'            => ( is => 'ro', required => 1, weak_ref => 1 );
-has 'weight'             => ( is => 'lazy' );
+has argv => (
+    is      => 'ro',
+    isa     => t('Str'),
+    default => q{}
+);
+
+# This really belongs in Code::TidyAll::Role::RunsCommand but moving it there
+# breaks plugins not in the core distro that expect to just inherit from this
+# module and be able to specify a cmd attribute.
+has cmd => (
+    is      => 'ro',
+    isa     => t('NonEmptyStr'),
+    lazy    => 1,
+    builder => '_build_cmd',
+);
+
+has diff_on_tidy_error => (
+    is      => 'ro',
+    isa     => t('Bool'),
+    default => 0
+);
+
+has is_tidier => (
+    is  => 'lazy',
+    isa => t('Bool'),
+);
+
+has is_validator => (
+    is  => 'lazy',
+    isa => t('Bool'),
+);
+
+has name => (
+    is       => 'ro',
+    required => 1
+);
+
+has select => (
+    is  => 'lazy',
+    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+);
+
+has select_regex => (
+    is  => 'lazy',
+    isa => t('RegexpRef'),
+);
+
+has selects => (
+    is  => 'lazy',
+    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+);
+
+has shebang => (
+    is  => 'ro',
+    isa => t( 'ArrayRef', of => t('NonEmptyStr') ),
+);
+
+has tidyall => (
+    is => 'ro',
+
+    # This should be "object_isa_type( class => 'Code::TidyAll' )" but then
+    # we'd need to load Code::TidyAll, leading to a circular require
+    # situation.
+    isa      => t('Object'),
+    required => 1,
+    weak_ref => 1
+);
+
+has weight => (
+    is  => 'lazy',
+    isa => t('PositiveOrZeroInt'),
+);
 
 with 'Code::TidyAll::Role::HasIgnore';
 
@@ -50,7 +113,6 @@ sub _build_cmd {
 
 sub _build_selects {
     my ($self) = @_;
-    die sprintf( q{select is required for '%s'}, $self->name ) unless defined( $self->select );
     return $self->_parse_zglob_list( $self->select );
 }
 
@@ -189,7 +251,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -224,8 +286,8 @@ L<Code::TidyAll::Plugin::PerlTidy> and L<Code::TidyAll::Plugin::PerlCritic>.
 
 =head1 NAMING
 
-If you are going to publicly release your plugin, call it
-'Code::TidyAll::Plugin::I<something>' so that users can find it easily and
+If you are going to publicly release your plugin, call it C<<
+Code::TidyAll::Plugin::I<something> >> so that users can find it easily and
 refer to it by its short name in configuration.
 
 If it's an internal plugin, you can call it whatever you like and refer to it
@@ -255,42 +317,31 @@ then L<Code::TidyAll::Plugin::PerlCritic> would be constructed with parameters
 The following attributes are part of this base class. Your subclass can declare
 others, of course.
 
-=over
-
-=item argv
+=head2 argv
 
 A standard attribute for passing command line arguments.
 
-=item cmd
-
-A standard attribute for specifying the name of the command to run, e.g.
-"/usr/local/bin/perlcritic".
-
-=item diff_on_tidy_error
+=head2 diff_on_tidy_error
 
 This only applies to plugins which transform source. If this is true, then when
 the plugin is run in check mode it will include a diff in the return value from
 C<process_source_or_file> when the source is not tidy.
 
-=item is_validator
+=head2 is_validator
 
 An attribute that indicates if this is a validator or not; By default this
 returns true if either C<validate_source> or C<validate_file> methods have been
 implemented.
 
-=item name
+=head2 name
 
 Name of the plugin to be used in error messages etc.
 
-=item tidyall
+=head2 tidyall
 
 A weak reference back to the L<Code::TidyAll> object.
 
-=item select, ignore
-
-Select and ignore patterns - you can ignore these.
-
-=item weight
+=head2 weight
 
 A number indicating the relative weight of the plugin, used to calculate the
 order the plugins will execute in. The lower the number the sooner the plugin
@@ -304,27 +355,23 @@ The order of plugin execution is determined first by the value of the C<weight>
 attribute, and then (if multiple plugins have the same weight>) by sorting by
 the name of module.
 
-=back
-
 =head1 METHODS
 
 Your plugin may define one or more of these methods. They are all no-ops by
 default.
 
-=over
-
-=item preprocess_source ($source)
+=head2 $plugin->preprocess_source($source)
 
 Receives source code as a string; returns the processed string, or dies with
 error. This runs on all plugins I<before> any of the other methods.
 
-=item transform_source ($source)
+=head2 $plugin->transform_source($source)
 
 Receives source code as a string; returns the transformed string, or dies with
 error. This is repeated multiple times if --iterations was passed or specified
 in the configuration file.
 
-=item transform_file ($file)
+=head2 $plugin->transform_file($file)
 
 Receives filename; transforms the file in place, or dies with error. Note that
 the file will be a temporary copy of the user's file with the same basename;
@@ -332,22 +379,20 @@ your changes will only propagate back if there was no error reported from any
 plugin. This is repeated multiple times if --iterations was passed or specified
 in the configuration file.
 
-=item validate_source ($source)
+=head2 $plugin->validate_source($source)
 
 Receives source code as a string; dies with error if invalid. Return value will
 be ignored.
 
-=item validate_file ($file)
+=head2 $plugin->validate_file($file)
 
 Receives filename; validates file and dies with error if invalid. Should not
 modify file! Return value will be ignored.
 
-=item postprocess_source ($source)
+=head2 $plugin->postprocess_source($source)
 
 Receives source code as a string; returns the processed string, or dies with
 error. This runs on all plugins I<after> any of the other methods.
-
-=back
 
 =head1 SUPPORT
 

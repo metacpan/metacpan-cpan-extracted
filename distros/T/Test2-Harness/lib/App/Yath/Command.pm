@@ -10,7 +10,7 @@ BEGIN {
     select $old;
 }
 
-our $VERSION = '0.001014';
+our $VERSION = '0.001015';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -19,6 +19,7 @@ use File::Path qw/remove_tree/;
 use List::Util qw/first max/;
 use Test2::Util qw/pkg_to_file/;
 use POSIX qw/strftime/;
+use Config qw/%Config/;
 
 use File::Spec;
 
@@ -90,7 +91,8 @@ sub init {
 
     if (my $p5lib = $ENV{PERL5LIB}) {
         my $libs = $settings->{libs} ||= [];
-        push @$libs => map { File::Spec->rel2abs($_) } split /:/, $p5lib;
+        my $sep = $Config{path_sep};
+        push @$libs => map { File::Spec->rel2abs($_) } split /\Q$sep\E/, $p5lib;
     }
 
     die "You cannot select both bzip2 and gzip for the log.\n"

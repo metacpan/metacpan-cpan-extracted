@@ -255,6 +255,22 @@ sub test_pre_authorization {
         '->pre_authorization returns a Business::GoCardless::PreAuthorization object'
     );
 
+    $mock->mock( 'content',sub { _mandate_json() } );
+    my $Mandate = $PreAuthorization->mandate;
+
+    cmp_deeply(
+        $Mandate,
+        _mandate_obj(),
+        '->mandate returns a Business::GoCardless::Mandate object'
+    );
+
+    is(
+        $Mandate->next_possible_charge_date,
+        '2017-09-27',
+        '->next_possible_charge_date'
+    );
+
+    $mock->mock( 'content',sub { _redirect_flow_json() } );
     throws_ok(
         sub { $GoCardless->pre_authorizations },
         'Business::GoCardless::Exception',
@@ -614,6 +630,39 @@ bless( {
 
 }
 
+sub _mandate_obj {
+
+    my ( $status ) = @_;
+
+    $status //= 'active';
+
+    return 
+bless( {
+  'client' => bless( {
+    'api_path' => '',
+    'api_version' => 2,
+    'base_url' => 'https://api.gocardless.com',
+    'token' => 'MvYX0i6snRh/1PXfPoc6',
+    'user_agent' => ignore(),
+  }, 'Business::GoCardless::Client' ),
+  'endpoint' => '/mandates/%s',
+    "id" => "MD000660000000",
+    "created_at" => "2017-09-12T20:37:07.787Z",
+    "reference" => "MAND-RZ000S",
+    "status" => "active",
+    "scheme" => "bacs",
+    "next_possible_charge_date" => "2017-09-27",
+    "payments_require_approval" => JSON::false,
+    "metadata" => {},
+    "links" => {
+        "customer_bank_account" => "BA00060000000W",
+        "creditor" => "CR000020000008",
+        "customer" => "CU0006J00000TV"
+    }
+}, 'Business::GoCardless::Mandate' );
+
+}
+
 sub _pre_auth_json {
 
     my ( $status ) = @_;
@@ -863,6 +912,26 @@ sub _redirect_flow_json {
             }
           }
         }!;
+}
+
+sub _mandate_json {
+    return qq!{
+        "mandates":{
+            "id":"MD000660000000",
+            "created_at":"2017-09-12T20:37:07.787Z",
+            "reference":"MAND-RZ000S",
+            "status":"active",
+            "scheme":"bacs",
+            "next_possible_charge_date":"2017-09-27",
+            "payments_require_approval":false,
+            "metadata":{},
+            "links":{
+                "customer_bank_account":"BA00060000000W",
+                "creditor":"CR000020000008",
+                "customer":"CU0006J00000TV"
+            }
+        }
+    }!;
 }
 
 # vim: ts=4:sw=4:et

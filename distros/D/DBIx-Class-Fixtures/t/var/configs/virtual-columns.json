@@ -1,0 +1,6 @@
+{
+	"sets": [{
+		"class": "Person",
+		"quantity": "all",
+	}]
+}

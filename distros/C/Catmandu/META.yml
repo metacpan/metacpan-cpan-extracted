@@ -45,7 +45,6 @@ requires:
   Hash::Merge::Simple: '0'
   IO::Handle::Util: '0.01'
   LWP::UserAgent: '0'
-  LWP::UserAgent::Determined: '0'
   List::MoreUtils: '0.33'
   List::MoreUtils::XS: '0'
   Log::Any: '0'
@@ -75,7 +74,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu/issues
   homepage: https://github.com/LibreCat/Catmandu
   repository: https://github.com/LibreCat/Catmandu.git
-version: '1.0603'
+version: '1.0605'
 x_contributors:
   - 'Christian Pietsch <chr.pietsch+github@googlemail.com>'
   - 'Dave Sherohman <dsheroh@cpan.org>'

@@ -24,5 +24,8 @@ resources:
   bugtracker: https://github.com/plicease/File-ShareDir-Dist/issues
   homepage: https://metacpan.org/pod/File::ShareDir::Dist
   repository: git://github.com/plicease/File-ShareDir-Dist.git
-version: '0.04'
+version: '0.05'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Yanick Champoux (yanick)'
 x_serialization_backend: 'YAML::Tiny version 1.70'

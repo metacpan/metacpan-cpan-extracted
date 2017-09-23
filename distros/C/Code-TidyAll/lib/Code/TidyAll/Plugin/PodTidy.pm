@@ -5,14 +5,18 @@ use warnings;
 
 use Capture::Tiny qw(capture_merged);
 use Pod::Tidy;
+use Specio::Library::Numeric;
 
 use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.65';
+our $VERSION = '0.67';
 
-has 'columns' => ( is => 'ro' );
+has columns => (
+    is  => 'ro',
+    isa => t('PositiveInt'),
+);
 
 sub transform_file {
     my ( $self, $file ) = @_;
@@ -45,7 +49,7 @@ Code::TidyAll::Plugin::PodTidy - Use podtidy with tidyall
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -67,13 +71,11 @@ Install podtidy from CPAN.
 
 =head1 CONFIGURATION
 
-=over
+This plugin accepts the following configuration options:
 
-=item columns
+=head2 columns
 
-Number of columns per line
-
-=back
+Number of columns per line.
 
 =head1 SUPPORT
 

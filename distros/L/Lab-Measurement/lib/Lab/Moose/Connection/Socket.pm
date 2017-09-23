@@ -1,6 +1,7 @@
 package Lab::Moose::Connection::Socket;
+$Lab::Moose::Connection::Socket::VERSION = '3.600';
 #ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
-$Lab::Moose::Connection::Socket::VERSION = '3.554';
+
 use 5.010;
 
 use Moose;
@@ -10,10 +11,9 @@ use IO::Socket::INET;
 use IO::Socket::Timeout;
 use Carp;
 
-use Lab::Moose::Instrument qw/timeout_param/;
+use Lab::Moose::Instrument qw/timeout_param read_length_param/;
 
 use namespace::autoclean;
-
 
 has client => (
     is       => 'ro',
@@ -32,6 +32,12 @@ has port => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
+);
+
+has write_termchar => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    default => "\n",
 );
 
 sub BUILD {
@@ -56,85 +62,67 @@ sub BUILD {
 }
 
 sub Write {
-    my ( $self, %arg ) = validated_hash(
+    my ( $self, %args ) = validated_hash(
         \@_,
         timeout_param,
         command => { isa => 'Str' },
     );
 
-    my $command = $arg{command} . "\n";
-    my $timeout = $self->_timeout_arg(%arg);
+    my $write_termchar = $self->write_termchar() // '';
+    my $command        = $args{command} . $write_termchar;
+    my $timeout        = $self->_timeout_arg(%args);
 
     my $client = $self->client();
     $client->write_timeout($timeout);
 
-    print {$client} $command
-        or croak "socket write error: $!";
+    my $length  = length($command);
+    my $written = 0;
+
+    while ($length) {
+        my $bytes_written = $client->syswrite( $command, $length, $written )
+            or croak("Write: syswrite failed: $!");
+        $written += $bytes_written;
+        $length -= $bytes_written;
+    }
 }
 
 sub Read {
-    my ( $self, %arg ) = validated_hash(
+    my ( $self, %args ) = validated_hash(
         \@_,
         timeout_param(),
+        read_length_param(),
     );
-    my $timeout = $self->_timeout_arg(%arg);
-    my $client  = $self->client();
+    my $timeout     = $self->_timeout_arg(%args);
+    my $read_length = $self->_read_length_arg(%args);
+    my $client      = $self->client();
 
     $client->read_timeout($timeout);
 
-    my $line = <$client>;
-    if ( !defined $line ) {
-        croak "socket read error: $!";
-    }
+    my $string;
+    my $length = 0;
+    if ( $args{read_length} ) {
 
-    if ( $line =~ /^#([1-9])/ ) {
-
-        # DEFINITE LENGTH ARBITRARY BLOCK RESPONSE DATA
-        # See IEEE 488.2, Sec. 8.7.9
-        my $num_digits = $1;
-        my $num_bytes = substr( $line, 2, $num_digits );
-
-        # We do require a trailing newline
-        my $needed = 2 + $num_digits + $num_bytes - length($line) + 1;
-
-        if ( $needed == 0 ) {
-            return $line;
+        # explicit read_length arg:
+        # Keep reading until we have $read_length bytes.
+        while ($read_length) {
+            my $read_bytes
+                = $client->sysread( $string, $read_length, $length )
+                or croak "socket read error: $!";
+            $read_length -= $read_bytes;
+            $length += $read_bytes;
         }
-
-        if ( $needed < 0 ) {
-            croak "negative read length";
-        }
-        my $string;
-        my $read_bytes = read( $client, $string, $needed );
-        if ( !$read_bytes ) {
-            croak "socket read error: $!";
-        }
-
-        if ( $read_bytes != $needed ) {
-            croak "tcp read returned too few bytes:\n"
-                . "expected: $needed, got: $read_bytes";
-        }
-        return $line . $string;
     }
     else {
-        return $line;
+        $client->sysread( $string, $read_length )
+            or croak "socket read error: $!";
     }
-}
 
-sub Query {
-    my ( $self, %arg ) = validated_hash(
-        \@_,
-        timeout_param,
-        command => { isa => 'Str' },
-    );
-    my %write_arg = %arg;
-    $self->Write(%write_arg);
-    delete $arg{command};
-    return $self->Read(%arg);
+    return $string;
 }
 
 sub Clear {
 
+    # Some instruments provide an additional control port.
 }
 
 with qw/
@@ -157,7 +145,7 @@ Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 SYNOPSIS
 
@@ -166,18 +154,55 @@ version 3.554
  my $instrument = instrument(
      type => 'random_instrument',
      connection_type => 'Socket',
-     connection_options => {host => '132.199.11.2', port => 5025},
+     connection_options => {
+         host => '132.199.11.2',
+         port => 5025
+     },
  );
 
 =head1 DESCRIPTION
 
 This connection uses L<IO::Socket::INET> to interface with the operating
 system's TCP stack. This works on most operating systems without installing any
-additional software (like NI-VISA).
+additional software.
 
-It supports both newline terminated messages of arbitrary length and definite
-length block data, which is needed to transfer binary data from e.g. spectrum
-analyzers, oscilloscopes and VNAs (IEEE 488.2 Sec. 8.7.9).
+Without knowing the syntax of the used command-messages there is no way for the
+connection to determine when C<Read> is finished. This is unlike GPIB, USBTMC,
+or VXI-11 which have explicit End of Message indicators. To deal with this, the
+C<read_length> parameter has the following semantics:
+
+=over
+
+=item C<Read> is given an explicit C<read_length> parameter
+
+Keep calling sysread until C<read_length> bytes are read.
+
+=item C<Read> is not given an explicit C<read_length> parameter
+
+Do a single sysread with the connections default C<read_length>.
+
+=back
+
+For SCPI definite length blocks you will have to give the exact block length
+with the C<read_length> parameter.
+
+=head2 CONNECTION OPTIONS
+
+=over
+
+=item host
+
+Host address.
+
+=item port
+
+Host port.
+
+=item write_termchar
+
+Append this to each write command. Default: C<"\n">.
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

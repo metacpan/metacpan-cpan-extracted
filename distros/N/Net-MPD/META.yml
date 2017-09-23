@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
-license: bsd
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/bentglasstube/Net-MPD/issues
   homepage: https://github.com/bentglasstube/Net-MPD
   repository: https://github.com/bentglasstube/Net-MPD.git
-version: '0.06'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.07'
+x_serialization_backend: 'YAML::Tiny version 1.70'

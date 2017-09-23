@@ -26,21 +26,21 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'LWP::RobotUA' => [
-                               qr/^host_count$/
-                             ],
              'LWP::UserAgent' => [
                                  qr/^(?:run_handlers|send_request|use_alarm|use_eval)$/
                                ],
-             'LWP::Protocol::gopher' => [
-                                        qr/^(?:gopher2url|menu2html)$/
-                                      ],
+             'LWP::Protocol' => [
+                                qr/^(?:max_size|timeout)$/
+                              ],
              'LWP::Protocol::http' => [
                                       qr/^(?:hlist_remove|socket_class|socket_type)$/
                                     ],
-             'LWP::Protocol' => [
-                                qr/^(?:max_size|timeout)$/
-                              ]
+             'LWP::RobotUA' => [
+                               qr/^host_count$/
+                             ],
+             'LWP::Protocol::gopher' => [
+                                        qr/^(?:gopher2url|menu2html)$/
+                                      ]
            );
 
 my @also_private;

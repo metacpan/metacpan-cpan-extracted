@@ -1,6 +1,6 @@
 package Lab::Exception;
 #ABSTRACT: Exception handling classes
-$Lab::Exception::VERSION = '3.554';
+$Lab::Exception::VERSION = '3.600';
 #
 # un/comment the following BEGIN clause to slap in the custom base class above
 #
@@ -172,7 +172,7 @@ Lab::Exception - Exception handling classes
 
 =head1 VERSION
 
-version 3.554
+version 3.600
 
 =head1 COPYRIGHT AND LICENSE
 

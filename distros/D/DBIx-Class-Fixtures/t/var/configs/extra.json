@@ -8,5 +8,17 @@
                 "args": {"path":"__ATTR(photo_dir)__"}
             }
         }
+	},{
+		"class": "Album",
+		"quantity": "all",
+         "fetch" : [
+            {
+               "quantity" : "all",
+               "rel" : "photos"
+            }
+         ]
+	},{
+		"class": "Photographer",
+		"quantity": "all"
 	}]
 }

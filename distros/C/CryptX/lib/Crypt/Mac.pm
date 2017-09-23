@@ -2,7 +2,7 @@ package Crypt::Mac;
 
 use strict;
 use warnings;
-our $VERSION = '0.051';
+our $VERSION = '0.053';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( mac mac_hex )] );
@@ -48,6 +48,6 @@ __END__
  
 =head1 NAME
 
-Crypt::mode - [internal only]
+Crypt::Mac - [internal only]
 
 =cut

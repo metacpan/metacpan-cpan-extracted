@@ -8,6 +8,7 @@ use warnings;
 
 use experimental qw(signatures);
 
+use lib qw(../lib);
 use Math::AnyNum qw(:overload);    # can be commented out
 use Math::AnyNum qw(gamma binomial zeta factorial);
 

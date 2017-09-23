@@ -1,0 +1,326 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.003';
+
+package App::SSH::SwitchShell;
+
+use Cwd;
+use English qw(-no_match_vars);
+use File::Spec;
+
+sub _exec (&@);
+
+if ( !caller ) {
+    main();
+    exit 1;
+}
+
+sub main {
+    configure_home();
+    my $shell = configure_shell();
+
+    # Get the last component of the shell name.
+    my $shell0 = ( File::Spec->splitpath($shell) )[2];
+
+    # If we have no command, execute the shell.  In this case, the shell
+    # name to be passed in argv[0] is preceded by '-' to indicate that
+    # this is a login shell.
+
+    if ( !exists $ENV{SSH_ORIGINAL_COMMAND} ) {
+
+        # Launch a login shell
+        _exec { $shell } "-$shell0";
+    }
+    else {
+        # Execute the command using the user's shell.  This uses the -c
+        # option to execute the command.
+        _exec { $shell } $shell0, '-c', $ENV{SSH_ORIGINAL_COMMAND};
+    }
+
+    return;
+}
+
+# We have to run exec from a small wrapper function to be able to test this
+# script
+# https://stackoverflow.com/questions/44597021/how-do-you-test-exec-used-with-indirect-object-syntax
+sub _exec (&@) {
+    my ( $file, @argv ) = @_;
+    $file = $file->();
+
+    {
+        exec {$file} @argv;
+    }
+
+    print {*STDERR} "$ERRNO: $file\n";
+    exit 1;
+}
+
+# Update the HOME env variable and change to the new home directory if we
+# are configured for a shared account. Otherwise do nothung because SSH
+# already ensures that HOME is configured correctly and we are chdir'd
+# into it.
+sub configure_home {
+    my $myhome = get_abs_script_basedir();
+
+    my @dirs = File::Spec->splitdir($myhome);
+    return if $dirs[-1] ne '.ssh';
+    pop @dirs;
+    $myhome = File::Spec->catdir(@dirs);
+
+    if ( exists $ENV{HOME} && defined $ENV{HOME} && -d $ENV{HOME} ) {
+        my $home = File::Spec->canonpath( $ENV{HOME} );
+
+        my $home_rp   = Cwd::realpath($home);
+        my $myhome_rp = Cwd::realpath($myhome);
+        return if $home_rp eq $myhome_rp;
+    }
+
+    $ENV{HOME} = $myhome;
+
+    if ( !chdir $myhome ) {
+        print {*STDERR} "Could not chdir to home '$myhome': $ERRNO";
+    }
+
+    return;
+}
+
+sub get_abs_script_basedir {
+    my $basedir = File::Spec->rel2abs(__FILE__);
+    $basedir = ( File::Spec->splitpath($basedir) )[1];
+    $basedir = File::Spec->canonpath($basedir);
+
+    return $basedir;
+}
+
+sub configure_shell {
+    my $shell = get_shell();
+
+    # Make sure SHELL points to the correct shell, either the shell
+    # specified as argument, the shell from the password file, or /bin/sh
+    $ENV{SHELL} = $shell;
+
+    return $shell;
+}
+
+sub get_shell {
+
+    # The shell can be specified as argument
+    if (@ARGV) {
+        my $shell = shift @ARGV;
+
+        if ( !File::Spec->file_name_is_absolute($shell) ) {
+            print {*STDERR} "Shell '$shell' is not an absolute path\n";
+        }
+        elsif ( !-e $shell ) {
+            print {*STDERR} "Shell '$shell' does not exist\n";
+        }
+        else {
+            return $shell if -x $shell;
+
+            print {*STDERR} "Shell '$shell' is not executable\n";
+        }
+    }
+
+    # Get the shell from the password data. An empty shell field is
+    # legal, and means /bin/sh.
+
+    my $shell = ( getpwuid $EUID )[8];
+    return $shell if defined $shell && $shell ne q{};
+    return '/bin/sh';
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+sshss - Use your preferred shell and own home directory for shared SSH accounts
+
+=head1 VERSION
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<sshss> [shell]
+
+=back
+
+=head1 DESCRIPTION
+
+B<sshss> adds support to ease the pain of these dreadful shared accounts
+prevalent at some organizations. All you have to do is add B<sshss> to
+the I<command> string of the F<authorized_keys> file. B<sshss> lets you
+define a different shell then the one defined in the passwd database for the
+shared account and lets you define a different directory as your home
+directory. You are most likely going to use a subdirectory of the shared
+accounts home directory.
+
+Both features, the personal home directory and the shell change, can be used
+independently without using the other.
+
+If you specify a new shell the shell is not only used as the interactive
+shell but also if you directly run a command. This includes commands that
+run over SSH like L<scp(1)|scp(1)> and L<rsync(1)|rsync(1)>. It's your
+responsibility to not use an overly obscure shell that breaks these commands.
+
+The used shell must support the I<-c> flag to run a command, which is used if
+you run a command directly over SSH, including L<scp(1)|scp(1)> and L<rsync(1)|rsync(1)>.
+This is the default used by SSH itself. If your shell would work with plain
+SSH, it should also work with B<sshss>.
+
+B<sshss> tries to behave as much as possible like the C<do_child> function
+from F<session.c> from OpenSSH portable.
+
+B<sshss> uses no non-core modules.
+
+=head1 OPTIONS
+
+=over
+
+=item I<shell>
+
+Specifies the shell to be used instead of the one specified in the
+passwd database.
+
+This can be used to overwrite the shell configured for a shared account. It
+can also be used to change the shell for your personal account if your
+organization does not have a supported way to change your shell.
+
+If the shell is omitted, B<sshss> uses the default shell for the account
+from the passwd database.
+
+If the specified shell is not an absolute path, B<sshss> uses the default
+shell for the account from the passwd database.
+
+=back
+
+=head1 EXIT STATUS
+
+B<sshss> exits 1 if an error occurs until it can exec the shell. After
+the exec the exit status depends on the executed shell or the command run in
+this shell.
+
+=head1 EXAMPLES
+
+=head2 B<Example 1> Change the shell to ksh93 and use a custom home directory
+
+Create a directory to contain your own home directory. We create the
+directory ~/.ryah in this example. Create a F<.ssh> directory in your new custom
+home directory and add the B<sshss> script to this directory. Add the
+following command string in front of your SSH key in the
+F<~/.ssh/authorized_keys> file:
+
+  command=".ryah/.ssh/sshss /usr/bin/ksh93"
+
+When you login over SSH with your key to the admin account,
+
+=over
+
+=item * your shell will be F</usr/bin/ksh93>, started as login shell
+
+=item * the SHELL environment variable will be set to F</usr/bin/ksh93>
+
+=item * the HOME environment variable will be set to F</home/admin/.ryah>
+(The shared accounts home directory is /home/admin in this example)
+
+=item * the working directory will be F</home/admin/.ryah>
+(The shared accounts home directory is /home/admin in this example)
+
+=back
+
+=head2 B<Example 2> Change the shell to ksh93 without changing the home directory
+
+Add the B<sshss> script to e.g. the F<~/.ssh> directory or any other
+directory. B<sshss> only changes the home directory if it is run from
+inside a F<.ssh> directory outside of the current home directory.
+
+Add the following command string in front of your SSH key in the
+F<~/.ssh/authorized_keys> file:
+
+  command=".ssh/sshss /usr/bin/ksh93"
+
+When you login over SSH with your key to the admin account,
+
+=over
+
+=item * your shell will be F</usr/bin/ksh93>, started as login shell
+
+=item * the SHELL environment variable will be set to F</usr/bin/ksh93>
+
+=back
+
+=head2 B<Example 3> Use a custom home directory
+
+Create a directory to contain your own home directory. We create the
+directory ~/.ryah in this example. Create a F<.ssh> directory in your new custom
+home directory and add the B<sshss> script to this directory. Add the
+following command string in front of your SSH key in the
+F<~/.ssh/authorized_keys> file:
+
+  command=".ryah/.ssh/sshss"
+
+When you login over SSH with your key to the admin account,
+
+=over
+
+=item * your shell will be the shell defined in the passwd database, started as
+login shell. If the shell specified in the passwd database is empty or
+invalid, F</bin/sh> is used instead.
+
+=item * the SHELL environment variable will be set to the shell defined in the
+passwd database. If the shell specified in the passwd database is empty or
+invalid, the SHELL environment variable is set to F</bin/sh> instead.
+
+=item * the HOME environment variable will be set to F</home/admin/.ryah>
+(The shared accounts home directory is /home/admin in this example)
+
+=item * the working directory will be F</home/admin/.ryah>
+(The shared accounts home directory is /home/admin in this example)
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item HOME
+
+If B<sshss> is placed in an F<.ssh> directory, the HOME environment
+variable is set to the parent directory of this F<.ssh> directory. Then, the
+working directory is changed to this new home directory.
+
+Otherwise the HOME environment variable is not used, nor is the working
+directory changed.
+
+=item SHELL
+
+The environment variable SHELL is set to the shell that is either used as
+interactive shell or that is used to execute the command.
+
+=back
+
+=head1 SEE ALSO
+
+L<passwd(4)|passwd(4)>, L<sshd(1)/AUTHORIZED_KEYS FILE FORMAT>
+
+=head1 AUTHOR
+
+Sven Kirmess <sven.kirmess@kzone.ch>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Sven Kirmess.
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+
+# vim: ts=4 sts=4 sw=4 et: syntax=perl

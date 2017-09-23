@@ -106,12 +106,13 @@ sub one_tick {
 
     my $ssh = $self->{ssh};
 
-    if ($ssh and $exit_pid and $exit_pid == $ssh->get_master_pid) {
+    if ($ssh and $exit_pid and $ssh->get_master_pid and $exit_pid == $ssh->get_master_pid) {
+        DEBUG and logger "FAIL %s, master process exited unexpectedly", $self->host;
         $ssh->master_exited;
-        undef $self->{ssh};
         $self->{exit} = $exit_code;
-        $self->{_error} = "master process exited unexpectedly";
+        $self->{_error} = $self->{ssh}->error || "master process exited unexpectedly";
         $self->{state} = STATE_DONE;
+        undef $self->{ssh};
     }
 
     if ($self->{state} == STATE_TODO) {
@@ -121,11 +122,19 @@ sub one_tick {
     }
 
     if ($self->{state} == STATE_CONNECTING) {
-        if ($ssh->wait_for_master(1)) {
+        my $master_state = $ssh->wait_for_master(1);
+        if ($master_state) {
             DEBUG and logger "CONNECTED %s", $self->host;
             $self->{state} = STATE_CONNECTED;
-        } else {
+        } elsif (!defined $master_state) {
+            # still connecting...
             return 1;
+        } else {
+            DEBUG and logger "FAIL TO CONNECT %s", $self->host;
+            $self->{exit} = -1;
+            $self->{_error} = $self->{ssh}->error || "master process exited unexpectedly";
+            $self->{state} = STATE_DONE;
+            undef $self->{ssh};
         }
     }
 
@@ -172,8 +181,8 @@ sub one_tick {
     }
 
     if ($self->{state} == STATE_DISCONNECTING) {
-        my $ret = $ssh->wait_for_master(1);
-        if (defined $ret && !$ret) {
+        my $master_state = $ssh->wait_for_master(1);
+        if (defined $master_state && !$master_state) {
             DEBUG and logger "DISCONNECTED %s", $self->host;
             $self->{state} = STATE_DONE;
             undef $self->{ssh};
@@ -183,6 +192,7 @@ sub one_tick {
     }
 
     if ($self->{state} == STATE_DONE) {
+        DEBUG and logger "DONE %s", $self->host;
         return;
     }
 
