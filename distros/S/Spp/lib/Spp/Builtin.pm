@@ -5,16 +5,42 @@ no warnings "experimental";
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(
-  all is_str is_array is_hash is_atom is_atoms
-  error read_file write_file to_json from_json concat
-  first rest trim len subarray uuid zip unique append
-  is_char_space is_char_upper is_char_lower is_char_digit
-  is_char_xdigit is_char_alpha is_char_words
-  is_char_hspace is_char_vspace clean_ast);
+our @EXPORT = qw(End In Out True False Qstr Qint
+  is_estr is_qint is_int is_str is_array is_true
+  is_false is_bool is_atom is_atoms
+  error read_file write_file to_json from_json
+  first tail rest len trim subarray uuid cutlast
+  is_space is_upper is_lower is_digit is_xdigit
+  is_alpha is_words is_hspace is_vspace
+  clean_ast clean_atom start_with end_with to_end
+  see_ast);
 
 use JSON::XS qw(encode_json decode_json);
-use List::MoreUtils qw(all mesh uniq);
+
+use constant {
+  End   => chr(0),
+  In    => chr(1),
+  Out   => chr(2),
+  True  => chr(3),
+  False => chr(4),
+  Qstr  => chr(5),
+  Qint  => chr(6),
+};
+
+sub is_estr {
+  my $estr = shift;
+  return first($estr) eq In;
+}
+
+sub is_qint {
+  my $estr = shift;
+  return first($estr) eq Qint;
+}
+
+sub is_int {
+  my $int = shift;
+  return ($int ^ $int) eq '0';
+}
 
 sub is_str {
    my $x = shift;
@@ -26,9 +52,21 @@ sub is_array {
    return (ref($x) eq ref([]));
 }
 
-sub is_hash {
-   my $x = shift;
-   return (ref($x) eq ref({}));
+sub is_true {
+  my $atom = shift;
+  return $atom eq True;
+}
+
+sub is_false {
+  my $atom = shift;
+  return $atom eq False;
+}
+
+sub is_bool {
+  my $atom = shift;
+  return 1 if is_false($atom);
+  return 1 if is_true($atom);
+  return 0;
 }
 
 sub is_atom {
@@ -59,7 +97,7 @@ sub write_file {
    my ($file, $str) = @_;
    open my ($fh), '>:encoding(UTF-8)', $file or die $!;
    print {$fh} $str;
-   say "write file: |$file| ok!";
+   say "write file: $file ok!";
    return $file;
 }
 
@@ -73,11 +111,6 @@ sub to_json {
 }
 
 sub from_json { return decode_json(shift) }
-
-sub concat {
-   my @strs = @_;
-   return join('', @strs);
-}
 
 sub first {
    my $data = shift;
@@ -97,8 +130,6 @@ sub rest {
    my $data = shift;
    return substr($data, 1) if is_str($data);
    if (is_array($data)) {
-
-      # copy $data, splice would change array
       my @array = @{$data};
       return [splice(@array, 1)];
    }
@@ -122,7 +153,6 @@ sub trim {
 
 sub subarray {
    my ($array, $from, $to) = @_;
-   # make copy of $array, splice would change it
    my @array = @{$array};
    if (is_array($array)) {
       if ($to > 0) {
@@ -140,68 +170,63 @@ sub subarray {
 
 sub uuid { return scalar(rand()) }
 
-sub zip {
-   my ($arr_one, $arr_two) = @_;
-   return [ mesh(@{$arr_one}, @{$arr_two}) ];
+sub cutlast {
+   my $str = shift;
+   if (is_str($str)) {
+      return substr($str, 0, -1);
+   }
+   if (is_array($str)) {
+      my @array = @{$str};
+      return [splice @array, 0, -1];
+   }
 }
 
-sub unique {
-   my $array = shift;
-   return [ uniq @{$array} ];
-}
-
-sub append {
-   my ($array_one, $array_two) = @_;
-   push @{$array_one}, @{$array_two};
-   return $array_one;
-}
-
-sub is_char_space {
+sub is_space {
    my $r = shift;
    return $r ~~ ["\n", "\t", "\r", ' '];
 }
 
-sub is_char_upper {
+sub is_upper {
    my $r = shift;
    return $r ~~ ['A' .. 'Z'];
 }
 
-sub is_char_lower {
+sub is_lower {
    my $r = shift;
    return $r ~~ ['a' .. 'z'];
 }
 
-sub is_char_digit {
+sub is_digit {
    my $r = shift;
    return $r ~~ ['0' .. '9'];
 }
 
-sub is_char_xdigit {
+sub is_xdigit {
    my $char = shift;
-   return 1 if is_char_digit($char);
+   return 1 if is_digit($char);
    return 1 if $char ~~ ['a' .. 'f'];
    return 1 if $char ~~ ['A' .. 'F'];
    return 0;
 }
 
-sub is_char_alpha {
+sub is_alpha {
    my $r = shift;
    return $r ~~ ['a' .. 'z', 'A' .. 'Z', '_'];
 }
 
-sub is_char_words {
+sub is_words {
    my $r = shift;
-   return 1 if is_char_digit($r);
-   return 1 if is_char_alpha($r);
+   return 1 if is_digit($r);
+   return 1 if is_alpha($r);
    return 0;
 }
 
-sub is_char_hspace {
+sub is_hspace {
    my $r = shift;
    return $r ~~ [' ', "\t"];
 }
 
-sub is_char_vspace {
+sub is_vspace {
    my $r = shift;
    return $r ~~ ["\r", "\n"];
 }
@@ -209,39 +234,47 @@ sub is_char_vspace {
 sub clean_ast {
    my $ast   = shift;
    return clean_atom($ast) if is_atom($ast);
-   if (is_array($ast)) {
-      my $clean_atoms = [];
-      for my $atom (@{$ast}) {
-         if (is_atom($atom)) {
-            push @{$clean_atoms}, clean_atom($atom);
-         } else {
-            say to_json($atom);
-            error("not atom in ast value!");
-         }
-      }
-      return $clean_atoms;
+   my $clean_atoms = [];
+   for my $atom (@{$ast}) {
+      push @{$clean_atoms}, clean_atom($atom);
    }
-   say to_json([$ast]);
-   error("ast is not array!")
+   return $clean_atoms;
 }
 
 sub clean_atom {
    my $atom = shift;
    my ($name, $value) = @{$atom};
    if (is_str($value)) { return [$name, $value] }
-   if (is_array($value)) {
-      if (len($value) == 0) {
-         return [$name, $value]
-      }
-      if (is_atom($value)) {
-         return [$name, clean_atom($value)];
-      }
-      if (is_atoms($value)) {
-        return [$name, clean_ast($value)];
-     }
+   if (len($value) == 0) {
+      return [$name, $value]
    }
-   say to_json($atom);
-   error("error ast not atom or atoms!");
+   if (is_atom($value)) {
+      return [$name, clean_atom($value)];
+   }
+   return [$name, clean_ast($value)];
+}
+
+sub start_with {
+   my ($str, $start) = @_;
+   return 1 if index($str, $start) == 0;
+   return 0;
+}
+
+sub end_with {
+   my ($str, $end) = @_;
+   my $len = length($end);
+   return substr($str, -$len) eq $end;
+}
+
+sub to_end {
+   my $str   = shift;
+   my $index = index($str, "\n");
+   return substr($str, 0, $index);
+}
+
+sub see_ast {
+   my $ast = shift;
+   return to_json(clean_ast($ast));
 }
 
 1;

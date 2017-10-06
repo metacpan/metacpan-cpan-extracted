@@ -95,10 +95,6 @@
 
 - Test for print_primes.  Not as easy with filenos.
 
-- We should have a way to exit a forprimes loop.  E.g. add a lastfor() call.
-  Nested calls are doable, but threading is a bear.  Perhaps do a first
-  version that is non-threadsafe.
-
 - sum primes better than current method.  Especially using less memory.
 
 - bernreal and bernfrac using MPFR
@@ -113,12 +109,6 @@
 - polymul, polyadd, polydiv, polyneg, polyeval, polyorder, polygcd, polylcm, polyroots, ...
   A lot of our ops do these mod n, we could make ..mod versions of each.
 
-- have the RNG return a context and store it in our package context space.
-  Should help threaded performance by removing lock.
-  Careful to not leak state.
-
-- 5.8.5 gcdext complains about 3 vs. '3'.  Another Math::BigInt::Lite issue.
-
 - use word-based for-sieve for non-segment.
 
 - remove start/end partial word tests from inner loop in for-sieve.
@@ -127,4 +117,17 @@
 
 - compare wheel_t with primes separated and possibly cached.
 
-- Ensure 'secure' is secure.
+- urandomm with bigints could be faster.
+  14.7s  my $f=factorial(144); urandomm($f) for 1..5e5;
+  10.7s  use Math::GMP qw/:constant/; my $f=factorial(144); urandomm($f) for 1..5e5;
+   1.8s  my $f=Math::Prime::Util::GMP::factorial(144); Math::Prime::Util::GMP::urandomm($f) for 1..5e5;
+
+- Move ISAAC to per-thread context model.
+
+- Destroy csprng context on thread destruction.
+
+- Pari/GP:  permorder, permsign.    istotient, ispowerful, isfundamental.
+
+- formultiperm doesn't completely cover lastfor
+
+- submit bug report for Perl error in 30b8ab3

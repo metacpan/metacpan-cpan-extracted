@@ -3,6 +3,7 @@ Build.PL
 Changes
 lib/App/Devel/MAT/Explorer/GTK.pm
 lib/App/Devel/MAT/Explorer/GTK/Resources.pm
+lib/App/Devel/MAT/Explorer/GTK/Shell.pm
 lib/App/Devel/MAT/Explorer/GTK/SVDetail.pm
 lib/App/Devel/MAT/Explorer/GTK/Utils.pm
 lib/App/Devel/MAT/Explorer/GTK/Widgets.pm

@@ -78,7 +78,7 @@ sub BUILD {
     foreach my $attr ( keys( %{ $data } ) ) {
         eval { $self->$attr( $data->{$attr} ); };
         $@ && do {
-            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $@" );
         };
     }
 

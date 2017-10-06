@@ -7,7 +7,7 @@ use File::Basename;
 use Encode qw( encode decode_utf8 );
 use Mojo::Util 'quote';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub register {
     my ( $self, $app ) = @_;
@@ -25,8 +25,10 @@ sub register {
         my $cleanup             = $args{cleanup} // 0;
 
         # Content type based on format
-		$c->app->log->error('You cannot provide both "format" and "content_type" option');
-        return if $args{format} && $args{content_type};
+        if ($args{format} && $args{content_type}) {
+            $c->app->log->error('You cannot provide both "format" and "content_type" option');
+            return;
+        }
 
         my $content_type = $args{content_type};
         $content_type ||= $c->app->types->type( $args{format} ) if $args{format};
@@ -148,7 +150,7 @@ Path on the filesystem to the file. You must always pass "filepath" or "data" op
 
 =item C<data>
 
-Binary content which will be transfered to browser. You must always pass "filepath" or "data" option
+Binary content which will be transferred to browser. You must always pass "filepath" or "data" option
 
 =item C<filename> (optional)
 

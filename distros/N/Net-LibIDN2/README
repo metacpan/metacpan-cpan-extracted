@@ -1,18 +1,11 @@
-Net/LibIDN2 version 0.03
+Net/LibIDN2 version 1.00
 ========================
 
 This module provides Perl bindings for GNU Libidn2 by Simon Josefsson
 (http://www.gnu.org/software/libidn/) and closely follows
 the original C API of that library.
 
-Please note that as of Jan 5th 2013, libidn2 doesn't appear to be fully 
-functional yet (see IDN2_ALABEL_ROUNDTRIP regression test), so please
-consider this a development release with a potentially unstable API.
-
-Developed against pre-release git tree of libidn2 (internal
-version 0.9).
-
-Devel-CheckLib-0.98 in directory inc, by Yasuhiro Matsumoto, is
+Devel-CheckLib-1.11 in directory inc, by Yasuhiro Matsumoto, is
 included as is to facilitate cpantesters.org build testing.
 
 INSTALLATION
@@ -44,4 +37,4 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  GNU Libidn2 >=0.8
+  GNU Libidn2 >=2.0.0

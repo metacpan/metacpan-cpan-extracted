@@ -51,26 +51,55 @@ for my $podfile (@PODFILES) {
 	pod_file_ok($podfile);
 }
 
-subtest 'synposes' => sub {
-	## no critic (ProhibitStringyEval)
-	my $verb_thb = getsynverb($PODFILES[1]);
-	is @$verb_thb, 2, 'Tie::Handle::Base synopsis verbatim block count'
+use Capture::Tiny qw/capture_merged/;
+subtest 'verbatim code' => sub {
+	## no critic (ProhibitStringyEval, RequireBriefOpen, RequireCarping)
+	my $verb_thb = getverbatim($PODFILES[1], qr/\b(?:synopsis|examples)\b/i);
+	is @$verb_thb, 4, 'Tie::Handle::Base verbatim block count'
 		or diag explain $verb_thb;
 	eval("use warnings; use strict; $$verb_thb[0]; 1") or fail($@);
 	{
 		my $filename = newtempfn;
-		use Capture::Tiny qw/capture_merged/;
 		is capture_merged {
 			eval("use warnings; use strict; $$verb_thb[1]; 1") or fail($@);
 		}, "Debug: Output 'Hello, World'\n", 'my tied handle works 1';
 		is slurp($filename), "Hello, World", 'my tied handle works 2';
 	}
+	{
+		eval("use warnings; use strict; $$verb_thb[2]; 1") or fail($@);
+		is capture_merged {
+			my $fh = Tie::Handle::Debug->new;
+			open $fh, '<', '/etc/passwd' or die $!;
+			my $x = <$fh>;
+			seek $fh, 0, 0;
+			close $x;
+		}, qq{"TIEHANDLE"\n("OPEN", "<", "/etc/passwd")\n"FILENO"\n}
+			.qq{"READLINE"\n("SEEK", 0, 0)\n"DESTROY"\n},
+			'Tie::Handle::Debug works';
+	}
+	{
+		eval("use warnings; use strict; $$verb_thb[3]; 1") or fail($@);
+		open my $fh0, '>', \my $main or die $!;
+		open my $fh1, '>', \my $one or die $!;
+		open my $fh2, '>', \my $two or die $!;
+		my $teefh = Tie::Handle::Tee->new($fh0,$fh1,$fh2);
+		print $teefh "Hello";
+		printf $teefh ", %s!", "World";
+		syswrite $teefh, "xy\nz", 1, 2;
+		close $teefh;
+		close $fh1;
+		close $fh2;
+		use Data::Dump;
+		is $main, "Hello, World!\n", 'Tie::Handle::Tee main';
+		is $one,  "Hello, World!\n", 'Tie::Handle::Tee one';
+		is $two,  "Hello, World!\n", 'Tie::Handle::Tee two';
+	}
 	
-	my $verb_fr = getsynverb($PODFILES[0]);
-	is @$verb_fr, 3, 'File::Replace synopsis verbatim block count'
+	my $verb_fr = getverbatim($PODFILES[0], qr/\bsynopsis\b/i);
+	is @$verb_fr, 3, 'File::Replace verbatim block count'
 		or diag explain $verb_fr;
 	{
-		my $filename = spew(newtempfn, "Foo\nBar\nQuz\n");
+		my $filename = newtempfn("Foo\nBar\nQuz\n");
 		eval("use warnings; use strict; $$verb_fr[0]; 1") or fail($@);
 		is slurp($filename), "X: Foo\nX: Bar\nX: Quz\n", 'synposis 1';
 		eval("use warnings; use strict; $$verb_fr[1]; 1") or fail($@);
@@ -90,20 +119,21 @@ subtest 'other doc bits' => sub {
 };
 
 use Pod::Simple::SimpleTree;
-sub getsynverb { # extract verbatim code blocks from the "Synopsis" section
-	my $file = shift;
+sub getverbatim {
+	my ($file,$regex) = @_;
 	my $tree = Pod::Simple::SimpleTree->new->parse_file($file)->root;
-	my $state = 'idle';
-	my @synverb;
-	TREE: for my $e (@$tree) {
+	my ($curhead,@v);
+	for my $e (@$tree) {
 		next unless ref $e eq 'ARRAY';
-		if ($state eq 'idle' && $e->[0] eq 'head1'
-			&& $e->[2]=~/\bsynopsis\b/i)
-				{ $state = 'synopsis' }
-		elsif ($state eq 'synopsis') {
-			last TREE if $e->[0]=~/^head/;
-			push @synverb, $e->[2] if $e->[0] eq 'Verbatim';
+		if (defined $curhead) {
+			if ($e->[0]=~/^\Q$curhead\E/)
+				{ $curhead = undef }
+			elsif ($e->[0] eq 'Verbatim')
+				{ push @v, $e->[2] }
 		}
+		elsif ($e->[0]=~/^head\d\b/ && $e->[2]=~$regex)
+			{ $curhead = $e->[0] }
 	}
-	return \@synverb;
+	return \@v;
 }
+

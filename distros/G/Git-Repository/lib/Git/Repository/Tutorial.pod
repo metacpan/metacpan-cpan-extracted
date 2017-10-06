@@ -111,6 +111,39 @@ Such quoting is of course not needed with L<Git::Repository>:
     $grep  = 'report ticket';
     my $cmd = $r->command( log => "--since=$since", "--grep=$grep" );
 
+=head2 Be careful with spaces in options
+
+For the same reasons as above (individual arguments to C<run> or
+C<command> are turned into individual C<argv> elements for B<git>,
+whitespace included),
+some command-line usages of B<git> need to be slightly reformatted to
+make them suitable for C<run()>.
+
+For example, these two commands have the same effect when run from the shell:
+
+	shell> git checkout -b sometopic
+	shell> git checkout -bsometopic
+
+In the first case, B<git> receives three arguments in C<argv>: C<checkout>,
+C<-b> and C<sometopic>. In the second case, it receives two arguments:
+C<checkout> and C<-bsometopic>, and then B<git> recognizes the beginning
+of the I<-b> option and splits C<sometopic> out of the second argument.
+
+So, in a call such as:
+
+    $command = $repo->run( checkout => "-b$branch_name", { quiet => 0 } );
+
+If C<$branch_name> contains an initial space character, the call will be
+equivalent the following shell command:
+
+	shell> git checkout -b\ sometopic
+
+and B<git> will receive two arguments: C<checkout> and C<-b sometopic>, from
+which it will split out C< sometopic> (note the initial space).
+
+The space after I<-b> must be removed, as otherwise the code attempts to
+create a branch called C< sometopic>, which git rejects.
+
 =head2 Silence warnings for some Git commands
 
 Some Git porcelain commands provide additional information on C<STDERR>.
@@ -456,8 +489,8 @@ and finally update the references:
         $r->run( 'update-ref', $ref => $sha1 );
     }
 
-It's also possible to clone directly from a bundle (this creates an
-C<origin> remote pointing to the bundle file):
+Since Git version 1.6.5, it's also possible to clone directly from a
+bundle (this creates an C<origin> remote pointing to the bundle file):
 
     my $r = test_repository( clone => [ $bundle_file ] );
 

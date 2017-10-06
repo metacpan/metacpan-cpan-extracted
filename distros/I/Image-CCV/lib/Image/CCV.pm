@@ -4,7 +4,7 @@ require DynaLoader;
 use Carp qw(croak);
 use vars qw($VERSION @EXPORT @ISA);
 
-$VERSION = '0.10'; 
+$VERSION = '0.11';
 
 @EXPORT = qw(sift detect_faces );
 
@@ -90,13 +90,13 @@ sub default_sift_params {
 	norm_threshold => 0,
 	peak_threshold => 0,
     );
-    
+
     for (keys %default) {
     	if(! exists $params->{ $_ }) {
             $params->{ $_ } = $default{ $_ }
     	};
     };
-    
+
     if( ref $params ne 'ccv_sift_param_tPtr') {
     	$params = myccv_pack_parameters(
     	    @{$params}{qw<
@@ -109,7 +109,7 @@ sub default_sift_params {
     	    >}
     	);
     };
-    
+
     $params
 };
 
@@ -124,9 +124,9 @@ B<Not yet implemented>
 
 sub get_sift_descriptor {
     my ($filename, $params) = @_;
-    
+
     $params = default_sift_params( $params );
-    
+
     my ($keypoints, $descriptor) = myccv_get_descriptor($filename);
     return {
     	keypoints => $keypoints,
@@ -151,9 +151,9 @@ The parameters get decoded by C<get_default_params>.
 
 sub sift {
     my ($object, $scene, $params) = @_;
-    
+
     $params = default_sift_params( $params );
-    
+
     myccv_sift( $object, $scene, $params);
 };
 
@@ -173,14 +173,14 @@ Returns a list of 5-element arrayrefs. The elements are:
 
 sub detect_faces {
     my ($filename, $training_data_path) = @_;
-    
+
     if(! $training_data_path ) {
     	($training_data_path = $INC{ "Image/CCV.pm" }) =~ s!.pm$!!;
     	$training_data_path .= '/facedetect';
     };
-    
+
     if( ! -d $training_data_path ) {
-    	croak "Training data path '$training_data_path' does not seem to be a directory!";    
+    	croak "Training data path '$training_data_path' does not seem to be a directory!";
     };
     myccv_detect_faces($filename, $training_data_path);
 }
@@ -211,15 +211,15 @@ Memory currently is only allocated. Rarely is memory deallocated.
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/image-ccv>.
+The public repository of this module is
+L<https://github.com/Corion/image-ccv>.
 
 The upstream repository of C<libccv> is at
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 The support for C<libccv> can be found at L<http://libccv.org>.
 
@@ -227,7 +227,7 @@ The support for C<libccv> can be found at L<http://libccv.org>.
 
 I've given one lightning talk about this module at Perl conferences:
 
-L<German Perl Workshop, German|http://corion.net/talks/Image-CCV-lightning-talk/image-ccv-lightning-talk.de.html>
+L<German Perl Workshop, German|https://corion.net/talks/Image-CCV-lightning-talk/image-ccv-lightning-talk.de.html>
 
 =head1 BUG TRACKER
 
@@ -246,7 +246,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2012-2013 by Max Maischein C<corion@cpan.org>.
+Copyright 2012-2017 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

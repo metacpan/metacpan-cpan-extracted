@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::WarpedNode;
-$Config::Model::WarpedNode::VERSION = '2.110';
+$Config::Model::WarpedNode::VERSION = '2.112';
 use Mouse;
 
 use Carp qw(cluck croak);
@@ -81,7 +81,7 @@ sub config_model {
 foreach my $method (
     qw/fetch_element config_class_name copy_from get_element_name
     has_element is_element_available element_type load
-    fetch_element_value get_type get_cargo_type dump_tree
+    fetch_element_value get_type get_cargo_type dump_tree needs_save
     describe get_help get_help_as_text children get set accept_regexp/
     ) {
     # to register new methods in package
@@ -313,7 +313,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,6 @@
+name = "App-Prove-Plugin-CumulativeTimer"
+# badges = ["travis"]
+authority="cpan:MASIUCHI"
+
+module_maker="ModuleBuildTiny"
+

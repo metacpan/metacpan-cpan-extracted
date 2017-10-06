@@ -1,5 +1,4 @@
-requires 'Mojo::Base';
-requires 'Mojo::File';
+requires 'Mojolicious', '7.24';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.035';

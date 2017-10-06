@@ -38,13 +38,13 @@ produces output
     1..8
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-CheckGzip-0.03/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-CheckGzip-0.05/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.03 of WWW::CheckGzip corresponding to
-L<git commit 18f7c39b6111935af7a67f0f22ef172f30a2e88e|https://github.com/benkasminbullock/www-checkgzip/commit/18f7c39b6111935af7a67f0f22ef172f30a2e88e> released on Thu Aug 17 17:43:51 2017 +0900.
+This documents version 0.05 of WWW::CheckGzip corresponding to
+L<git commit c2e1c0b7f8722fa48778c1027ae79c3019348a0b|https://github.com/benkasminbullock/www-checkgzip/commit/c2e1c0b7f8722fa48778c1027ae79c3019348a0b> released on Wed Oct 4 11:01:08 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -120,6 +120,29 @@ Check the URL given as the argument. The tests call the callback
 supplied to L</new>. There is no return value. If no URL is supplied,
 a warning is printed and the function returns.
 
+=head1 TESTING
+
+In order to not cause problems for testers, this module does not
+attempt to connect to the internet during its tests. To run the
+module's tests with a real web site, set the environment variable
+WEBSITE to a real website you know to be well-behaved with regards to
+gzip compression. For example, on a Unix-like system,
+
+    export WEBSITE=http://www.hooli.xyz
+    make test
+    # clean up if necessary as follows
+    export WEBSITE=
+    
+
+
+will cause the module to attempt to connect to the given web site and
+check its compression.
+
+The tests will fail if the web site does not
+use gzip correctly, so using your local web server may cause test
+failures which are not this module's fault.
+
+
 =head1 DEPENDENCIES
 
 =over
@@ -132,12 +155,10 @@ This is used to report user errors.
 
 This is used to test whether the page content is in the gzip format or not.
 
-=item L<LWP::UserAgent>
+=item L<HTTP::Tiny>
 
-This is used to retrieve the web page. However, this module
-deliberately does not use the built in methods of libwww-perl such as
-L<HTTP::Response/decoded_content>, but explicitly does its own testing
-of the headers and the content returned.
+This is used to retrieve the web page. Until version 0.04,
+L<LWP::UserAgent> was used.
 
 =back
 
@@ -147,7 +168,7 @@ of the headers and the content returned.
 
 =item GET only
 
-As of version 0.03, the module currently only does GET requests.
+As of version 0.05, the module currently only does GET requests.
 
 =back
 
@@ -157,6 +178,9 @@ A script F<checkgzip> in the distribution checks web pages given to it
 on the command line:
 
     checkgzip http://www.lemoda.net/
+
+"No output" indicates success, so that this can be used by, for
+example cron jobs.
 
 =head1 SEE ALSO
 
@@ -170,6 +194,32 @@ gzip-related problems from a web page.
 =item L<WWW::Mechanize::GZip>
 
 This module retrieves gzip content from web pages.
+
+=back
+
+=head2 About compression on the web
+
+=over
+
+=item L<web-gzip|https://github.com/benkasminbullock/web-gzip>
+
+Some scripts by the author of this module related to compression of
+static content (content which does not change with each request, such
+as JavaScript files).
+
+=item L<Compressing CGI output with Perl and Gzip::Faster|https://www.lemoda.net/cgi/perl-gzip-faster-cgi/index.html>
+
+A very simple demonstration of compression using CGI (the common
+gateway interface) and L<Gzip::Faster>.
+
+=item L<Gzip handler in Go|https://www.lemoda.net/go/gzip-handler/index.html>
+
+Similar to the above, but for the Go language.
+
+=item L<Compressing CGI output with Perl|https://www.lemoda.net/cgi/perl-gzip-cgi/index.html>
+
+Another Perl example, this time using the L<IO::Compress::Gzip> module
+instead of L<Gzip::Faster>.
 
 =back
 
@@ -212,8 +262,12 @@ contain some code from that module.
 
 On 16 August 2017 I completely rewrote the module to remove the
 L</WWW::Mechanize::GZip> parts and released version 0.01 to CPAN. The
-methodology the module currently uses is based on my web page:
+methodology the module used was based on my web page
 L<https://www.lemoda.net/compression/lwp-use-gzip/index.html>.
+
+On 1 October 2017, for version 0.04, I changed from L<LWP::UserAgent>
+to L<HTTP::Tiny> at the L<suggestion of a blog
+commentator|http://blogs.perl.org/users/ben_bullock/2017/08/check-compression-in-web-page.html#comment-1790471>.
 
 
 =head1 AUTHOR

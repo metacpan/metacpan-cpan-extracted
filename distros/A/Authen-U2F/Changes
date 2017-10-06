@@ -1,3 +1,7 @@
+0.003     2017-10-04 10:14:15+11:00 Australia/Melbourne
+ - Support for Perl 5.8 (thanks Michael McClimon)
+ - Use namespace::autoclean instead of namespace::sweep
+
 0.002     2016-06-27 22:42:56+10:00 Australia/Melbourne
  - Version dep on MIME::Base64 for url methods
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Cisco::SNMP.
 
+1.04  Mon Sep 25 12:30:00 2017
+      - Update new() to allow re-bless to other C::M::<CLASS>.
+      - Update new() to accept hostname:port like Net::SNMP.
+      - Move C::M::Password to deprecated and start Crypt::Cisco.
+      - Added DEFAULT_FAMILY to control resolution behavior.
+      - Fixed bug in C::M::Config CatOS operation.
+
 1.03  Mon Jul 24 12:30:00 2017
       - Updated C::M::Config to allow other protocols than just TFTP.
       - Updated bin/cisco-conf.pl for above changes.

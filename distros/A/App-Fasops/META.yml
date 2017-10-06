@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   App::Fasops:
     file: lib/App/Fasops.pm
-    version: v0.5.11
+    version: v0.5.12
   App::Fasops::Command::axt2fas:
     file: lib/App/Fasops/Command/axt2fas.pm
   App::Fasops::Command::check:
@@ -80,5 +80,5 @@ resources:
   bugtracker: https://github.com/wang-q/App-Fasops/issues
   homepage: https://github.com/wang-q/App-Fasops
   repository: git://github.com/wang-q/App-Fasops.git
-version: 0.5.11
+version: 0.5.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

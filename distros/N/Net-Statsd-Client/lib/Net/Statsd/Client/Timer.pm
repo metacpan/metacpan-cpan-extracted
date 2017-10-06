@@ -3,7 +3,7 @@ use Moo;
 use Sub::Quote;
 
 # ABSTRACT: Measure event timings and send them to StatsD
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.32'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Time::HiRes qw(gettimeofday tv_interval);
@@ -33,13 +33,14 @@ sub BUILD {
 
 sub finish {
   my ($self) = @_;
-  my $duration = tv_interval($self->{start});
+  my $duration = tv_interval($self->{start}) * 1000;
   $self->{statsd}->timing_ms(
     $self->{metric},
-    $duration * 1000,
+    $duration,
     $self->{sample_rate},
   );
   delete $self->{_pending};
+  return $duration;
 }
 
 sub cancel {
@@ -71,13 +72,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::Statsd::Client::Timer - Measure event timings and send them to StatsD
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -100,7 +103,7 @@ begins counting as soon as it's constructed.
 
 =head2 $timer->finish
 
-Stop timing, and send the elapsed time to the server.
+Stop timing, and send the elapsed time to the server.  Returns the elapsed time in milliseconds.
 
 =head2 $timer->cancel
 
@@ -130,7 +133,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Andrew Rodland.
+This software is copyright (c) 2017 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use JSON;
 use HTTP::Tiny;
 use URI;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, %args) = @_;
@@ -16,10 +16,24 @@ sub new {
     my $self = {
         api_key         => $args{api_key},
         service_name    => $args{service_name},
-        mackerel_origin => $args{mackerel_origin} || 'https://mackerel.io',
+        mackerel_origin => $args{mackerel_origin} || 'https://api.mackerelio.com',
         agent           => HTTP::Tiny->new( agent => "WebService::Mackerel agent $VERSION" ),
     };
     bless $self, $class;
+}
+
+sub get_service_metrics {
+    my ($self, $query_parameters) = @_;
+    my $uri = URI->new($self->{mackerel_origin});
+    $uri->path("/api/v0/services/".$self->{service_name}."/metrics");
+    $uri->query_form($query_parameters);
+    my $res  = $self->{agent}->request('GET', $uri->as_string, {
+            headers => {
+                'content-type' => 'application/json',
+                'X-Api-Key'    => $self->{api_key},
+            },
+        });
+    return $res->{content};
 }
 
 sub post_service_metrics {

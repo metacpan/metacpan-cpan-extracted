@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/cisco-pass.pl
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-Crypt-Cisco.t
+lib/Crypt/Cisco.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,7 +10,7 @@ use WWW::Salesforce::Constants;
 use WWW::Salesforce::Deserializer;
 use WWW::Salesforce::Serializer;
 
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 $VERSION = eval $VERSION;
 
 our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/8.0';
@@ -97,7 +97,7 @@ sub login {
       if ( $params{'serverurl'} && length( $params{'serverurl'} ) );
     bless $self, $class;
 
-    my $client = $self->get_client();
+    my $client = $self->_get_client();
     my $r      = $client->login(
         SOAP::Data->name( 'username' => $self->{'sf_user'} ),
         SOAP::Data->name( 'password' => $self->{'sf_pass'} )
@@ -167,10 +167,10 @@ sub convertLead {
     }
 
     #got the data lined up, make the call
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $r      = $client->convertLead(
         SOAP::Data->name( "leadConverts" => \SOAP::Data->value(@data) ),
-        $self->get_session_header() );
+        $self->_get_session_header() );
 
     unless ($r) {
         die "cound not convertLead";
@@ -200,7 +200,7 @@ sub create {
     if ( !keys %in ) {
         die("Expected a hash of arrays.");
     }
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("create")->prefix($SF_PREFIX)->uri($SF_URI)
       ->attr( { 'xmlns:sfons' => $SF_SOBJECT_URI } );
@@ -218,7 +218,7 @@ sub create {
     my $r = $client->call(
         $method => SOAP::Data->name( 'sObjects' => \SOAP::Data->value(@elems) )
           ->attr( { 'xsi:type' => 'sfons:' . $type } ),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -240,7 +240,7 @@ This subroutine takes as input an array of SCALAR values, where each SCALAR is a
 sub delete {
     my $self = shift;
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method = SOAP::Data->name("delete")->prefix($SF_PREFIX)->uri($SF_URI);
 
     my @elems;
@@ -254,7 +254,7 @@ sub delete {
 
     my $r = $client->call(
         $method => @elems,
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -277,11 +277,11 @@ This method calls the Salesforce L<describeGlobal method|https://developer.sales
 sub describeGlobal {
     my $self = shift;
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("describeGlobal")->prefix($SF_PREFIX)->uri($SF_URI);
 
-    my $r = $client->call( $method, $self->get_session_header() );
+    my $r = $client->call( $method, $self->_get_session_header() );
     unless ($r) {
         die "could not call method $method";
     }
@@ -312,14 +312,14 @@ sub describeLayout {
     if ( !defined $in{'type'} or !length $in{'type'} ) {
         die("Expected hash with key 'type'");
     }
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("describeLayout")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r = $client->call(
         $method =>
           SOAP::Data->prefix($SF_PREFIX)->name( 'sObjectType' => $in{'type'} )
           ->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -353,7 +353,7 @@ sub describeSObject {
         die("Expected hash with key 'type'");
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("describeSObject")->prefix($SF_PREFIX)->uri($SF_URI);
 
@@ -361,7 +361,7 @@ sub describeSObject {
         $method =>
           SOAP::Data->prefix($SF_PREFIX)->name( 'sObjectType' => $in{'type'} )
           ->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -389,14 +389,14 @@ sub describeSObjects {
         die "Expected hash with key 'type' containing array reference";
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("describeSObjects")->prefix($SF_PREFIX)->uri($SF_URI);
 
     my $r = $client->call(
         $method => SOAP::Data->prefix($SF_PREFIX)->name('sObjectType')
           ->value( @{ $in{'type'} } )->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
 
     unless ($r) {
@@ -416,11 +416,11 @@ Use the C<describeTabs> call to obtain information about the standard and custom
 
 sub describeTabs {
     my $self   = shift;
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("describeTabs")->prefix($SF_PREFIX)->uri($SF_URI);
 
-    my $r = $client->call( $method, $self->get_session_header() );
+    my $r = $client->call( $method, $self->_get_session_header() );
     unless ($r) {
         die "could not call method $method";
     }
@@ -430,43 +430,16 @@ sub describeTabs {
     return $r;
 }
 
-=head2 get_client( $readable )
-
-Get a client
-
-=cut
-
+# TODO: remove in version 0.400
 sub get_client {
-    my $self = shift;
-    my ($readable) = @_;
-    $readable = ($readable) ? 1 : 0;
-
-    my $client =
-      SOAP::Lite->readable($readable)
-      ->deserializer( WWW::Salesforce::Deserializer->new )
-      ->serializer( WWW::Salesforce::Serializer->new )
-      ->on_action( sub { return '""' } )->uri($SF_URI)->multirefinplace(1);
-
-    if($WEB_PROXY) {
-        $client->proxy( $self->{'sf_serverurl'}, proxy => ['https' => $WEB_PROXY ] );
-    } else {
-        $client->proxy( $self->{'sf_serverurl'} );
-    }
-    return $client;
+    warn "The method: get_client() has always been private. It is now deprecated and will be removed in version 0.400.";
+    return shift->_get_client(@_);
 }
 
-
-=head2 get_session_header()
-
-Gets the session header
-
-=cut
-
+# TODO: remove in version 0.400
 sub get_session_header {
-    my ($self) = @_;
-    return SOAP::Header->name( 'SessionHeader' =>
-          \SOAP::Header->name( 'sessionId' => $self->{'sf_sid'} ) )
-      ->uri($SF_URI)->prefix($SF_PREFIX);
+    warn "The method: get_session_header() has always been private. It is now deprecated and will be removed in version 0.400.";
+    return shift->_get_session_header(@_);
 }
 
 
@@ -545,7 +518,7 @@ sub getDeleted {
         die("Expected hash with key of 'end' which is a date");
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("getDeleted")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r = $client->call(
@@ -557,7 +530,7 @@ sub getDeleted {
         SOAP::Data->prefix($SF_PREFIX)
           ->name( 'endDate' => $in{'end'} )
           ->type('xsd:dateTime'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -577,8 +550,8 @@ Retrieves the current system timestamp (GMT) from the Salesforce web service.
 
 sub getServerTimestamp {
     my $self   = shift;
-    my $client = $self->get_client(1);
-    my $r      = $client->getServerTimestamp( $self->get_session_header() );
+    my $client = $self->_get_client(1);
+    my $r      = $client->getServerTimestamp( $self->_get_session_header() );
     unless ($r) {
         die "could not getServerTimestamp";
     }
@@ -624,7 +597,7 @@ sub getUpdated {
         die("Expected hash with key of 'end' which is a date");
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("getUpdated")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r = $client->call(
@@ -636,7 +609,7 @@ sub getUpdated {
         SOAP::Data->prefix($SF_PREFIX)
           ->name( 'endDate' => $in{'end'} )
           ->type('xsd:dateTime'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
     unless ($r) {
         die "could not call method $method";
@@ -664,8 +637,8 @@ A user ID
 
 sub getUserInfo {
     my $self   = shift;
-    my $client = $self->get_client(1);
-    my $r      = $client->getUserInfo( $self->get_session_header() );
+    my $client = $self->_get_client(1);
+    my $r      = $client->getUserInfo( $self->_get_session_header() );
     unless ($r) {
         die "could not getUserInfo";
     }
@@ -686,10 +659,10 @@ L<Logout API Call|http://www.salesforce.com/us/developer/docs/api/Content/sforce
 sub logout {
     my $self = shift;
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("logout")->prefix($SF_PREFIX)->uri($SF_URI);
-    my $r = $client->call( $method, $self->get_session_header() );
+    my $r = $client->call( $method, $self->_get_session_header() );
     unless ($r) {
         die "could not call method $method";
     }
@@ -735,9 +708,9 @@ sub query {
     my $limit = SOAP::Header->name(
         'QueryOptions' => \SOAP::Header->name( 'batchSize' => $in{'limit'} ) )
       ->prefix($SF_PREFIX)->uri($SF_URI);
-    my $client = $self->get_client();
+    my $client = $self->_get_client();
     my $r = $client->query( SOAP::Data->type( 'string' => $in{'query'} ),
-        $limit, $self->get_session_header() );
+        $limit, $self->_get_session_header() );
 
     unless ($r) {
         die "could not query " . $in{'query'};
@@ -784,9 +757,9 @@ sub queryAll {
     my $limit = SOAP::Header->name(
         'QueryOptions' => \SOAP::Header->name( 'batchSize' => $in{'limit'} ) )
       ->prefix($SF_PREFIX)->uri($SF_URI);
-    my $client = $self->get_client();
+    my $client = $self->_get_client();
     my $r = $client->queryAll( SOAP::Data->name( 'queryString' => $in{'query'} ),
-        $limit, $self->get_session_header() );
+        $limit, $self->_get_session_header() );
 
     unless ($r) {
         die "could not query " . $in{'query'};
@@ -831,10 +804,10 @@ sub queryMore {
     my $limit = SOAP::Header->name(
         'QueryOptions' => \SOAP::Header->name( 'batchSize' => $in{'limit'} ) )
       ->prefix($SF_PREFIX)->uri($SF_URI);
-    my $client = $self->get_client();
+    my $client = $self->_get_client();
     my $r      = $client->queryMore(
         SOAP::Data->name( 'queryLocator' => $in{'queryLocator'} ),
-        $limit, $self->get_session_header() );
+        $limit, $self->_get_session_header() );
 
     unless ($r) {
         die "could not queryMore " . $in{'queryLocator'};
@@ -868,14 +841,14 @@ sub resetPassword {
         die("A hash expected with key 'userId'");
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("resetPassword")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r = $client->call(
         $method =>
           SOAP::Data->prefix($SF_PREFIX)->name( 'userId' => $in{'userId'} )
           ->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
 
     unless ($r) {
@@ -927,7 +900,7 @@ sub retrieve {
     }
 
     my @elems;
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method = SOAP::Data->name("retrieve")->prefix($SF_PREFIX)->uri($SF_URI);
     foreach my $id ( @{ $in{'ids'} } ) {
         push( @elems,
@@ -941,7 +914,7 @@ sub retrieve {
         SOAP::Data->prefix($SF_PREFIX)->name( 'sObjectType' => $in{'type'} )
           ->type('xsd:string'),
         @elems,
-        $self->get_session_header()
+        $self->_get_session_header()
     );
 
     unless ($r) {
@@ -974,12 +947,12 @@ sub search {
     if ( !defined $in{'searchString'} || !length $in{'searchString'} ) {
         die("Expected hash with key 'searchString'");
     }
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method = SOAP::Data->name("search")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r      = $client->call(
         $method => SOAP::Data->prefix($SF_PREFIX)
           ->name( 'searchString' => $in{'searchString'} )->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
 
     unless ($r) {
@@ -1021,7 +994,7 @@ sub setPassword {
         die("Expected a hash with key 'password'");
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("setPassword")->prefix($SF_PREFIX)->uri($SF_URI);
     my $r = $client->call(
@@ -1030,7 +1003,7 @@ sub setPassword {
           ->type('xsd:string'),
         SOAP::Data->prefix($SF_PREFIX)->name( 'password' => $in{'password'} )
           ->type('xsd:string'),
-        $self->get_session_header()
+        $self->_get_session_header()
     );
 
     unless ($r) {
@@ -1116,12 +1089,12 @@ sub update {
           ->attr( { 'xsi:type' => 'sforce:' . $type } );
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("update")->prefix($SF_PREFIX)->uri($SF_URI)
       ->attr( { 'xmlns:sfons' => $SF_SOBJECT_URI } );
     my $r = $client->call(
-        $method => $self->get_session_header(),
+        $method => $self->_get_session_header(),
         @updates
     );
     unless ($r) {
@@ -1190,12 +1163,12 @@ sub upsert {
           ->attr( { 'xsi:type' => 'sforce:' . $type } );
     }
 
-    my $client = $self->get_client(1);
+    my $client = $self->_get_client(1);
     my $method =
       SOAP::Data->name("upsert")->prefix($SF_PREFIX)->uri($SF_URI)
       ->attr( { 'xmlns:sfons' => $SF_SOBJECT_URI } );
     my $r = $client->call(
-        $method => $self->get_session_header(),
+        $method => $self->_get_session_header(),
         @updates
     );
     unless ($r) {
@@ -1207,36 +1180,16 @@ sub upsert {
     return $r;
 }
 
-
-=head2 get_clientM( $readable )
-
-=cut
-
+# TODO: remove in version 0.400
 sub get_clientM {
-    my $self = shift;
-    my ($readable) = @_;
-    $readable = ($readable) ? 1 : 0;
-
-    my $client =
-      SOAP::Lite->readable($readable)
-      ->deserializer( WWW::Salesforce::Deserializer->new )
-      ->serializer( WWW::Salesforce::Serializer->new )
-      ->on_action( sub { return '""' } )->uri($SF_URI)->multirefinplace(1)
-      ->proxy( $self->{'sf_metadataServerUrl'} )
-      ->soapversion('1.1');
-    return $client;
+    warn "The method: get_clientM() has always been private. It is now deprecated and will be removed in version 0.400.";
+    return shift->_get_client_meta(@_);
 }
 
-=head2 get_session_headerM()
-
-=cut
-
+# TODO: remove in version 0.400
 sub get_session_headerM {
-    my ($self) = @_;
-    return SOAP::Header->name( 'SessionHeader' =>
-          \SOAP::Header->name( 'sessionId' => $self->{'sf_sid'} ) )
-      ->uri($SF_URIM)->prefix($SF_PREFIX);
-
+    warn "The method: get_session_headerM() has always been private. It is now deprecated and will be removed in version 0.400.";
+    return shift->_get_session_header_meta(@_);
 }
 
 =head2 describeMetadata()
@@ -1247,13 +1200,13 @@ Get some metadata info about your instance.
 
 sub describeMetadata {
     my $self = shift;
-    my $client = $self->get_clientM(1);
+    my $client = $self->_get_client_meta(1);
     my $method =
       SOAP::Data->name("describeMetadata")->prefix($SF_PREFIX)->uri($SF_URIM);
 
     my $r = $client->call(
           $method =>
-          SOAP::Data->prefix($SF_PREFIX)->name( 'asOfVersion' )->value( $SF_APIVERSION ), $self->get_session_headerM() );
+          SOAP::Data->prefix($SF_PREFIX)->name( 'asOfVersion' )->value( $SF_APIVERSION ), $self->_get_session_header_meta() );
     unless ($r) {
         die "could not call method $method";
     }
@@ -1280,12 +1233,12 @@ sub retrieveMetadata {
                         )
                     ));
     }
-    my $client = $self->get_clientM(1);
+    my $client = $self->_get_client_meta(1);
     my $method =
       SOAP::Data->name('retrieve')->prefix($SF_PREFIX)->uri($SF_URIM);
     my $r = $client->call(
             $method,
-            $self->get_session_headerM(),
+            $self->_get_session_header_meta(),
 SOAP::Data->name('retrieveRequest'=>
        \SOAP::Data->value(
        SOAP::Data->name( 'apiVersion'=>$SF_APIVERSION),
@@ -1316,7 +1269,7 @@ sub checkAsyncStatus {
     my $self = shift;
     my $pid = shift;
     #print "JOB - ID $pid\n";
-    my $client = $self->get_clientM(1);
+    my $client = $self->_get_client_meta(1);
     my $method = SOAP::Data->name('checkStatus')->prefix($SF_PREFIX)->uri($SF_URIM);
     my $r;
     my $waitTimeMilliSecs = 1;
@@ -1328,7 +1281,7 @@ sub checkAsyncStatus {
         $r = $client->call(
                 $method,
                 SOAP::Data->name('asyncProcessId'=>$pid)->type('xsd:ID'),
-                $self->get_session_headerM()
+                $self->_get_session_header_meta()
         );
         unless ($r) {
             die "could not call method $method";
@@ -1354,13 +1307,13 @@ sub checkAsyncStatus {
 sub checkRetrieveStatus {
     my $self = shift;
     my $pid = shift;
-    my $client = $self->get_clientM(1);
+    my $client = $self->_get_client_meta(1);
     my $method = SOAP::Data->name('checkRetrieveStatus')->prefix($SF_PREFIX)->uri($SF_URIM);
 
     my $r = $client->call(
             $method,
             SOAP::Data->name('asyncProcessId'=>$pid),
-            $self->get_session_headerM()
+            $self->_get_session_header_meta()
     );
     unless ($r) {
         die "could not call method $method";
@@ -1578,6 +1531,56 @@ sub get_tables {
     return \@globals;
 }
 
+# private methods
+sub _get_client {
+    my $self = shift;
+    my ($readable) = @_;
+    $readable = ($readable) ? 1 : 0;
+
+    my $client
+        = SOAP::Lite->readable($readable)
+        ->deserializer(WWW::Salesforce::Deserializer->new)
+        ->serializer(WWW::Salesforce::Serializer->new)
+        ->on_action(sub { return '""' })->uri($SF_URI)->multirefinplace(1);
+
+    if ($WEB_PROXY) {
+        $client->proxy($self->{'sf_serverurl'},
+            proxy => ['https' => $WEB_PROXY]);
+    }
+    else {
+        $client->proxy($self->{'sf_serverurl'});
+    }
+    return $client;
+}
+
+sub _get_client_meta {
+    my $self = shift;
+    my ($readable) = @_;
+    $readable = ($readable) ? 1 : 0;
+
+    my $client
+        = SOAP::Lite->readable($readable)
+        ->deserializer(WWW::Salesforce::Deserializer->new)
+        ->serializer(WWW::Salesforce::Serializer->new)
+        ->on_action(sub { return '""' })->uri($SF_URI)->multirefinplace(1)
+        ->proxy($self->{'sf_metadataServerUrl'})->soapversion('1.1');
+    return $client;
+}
+
+sub _get_session_header {
+    my ($self) = @_;
+    return SOAP::Header->name('SessionHeader' =>
+            \SOAP::Header->name('sessionId' => $self->{'sf_sid'}))
+        ->uri($SF_URI)->prefix($SF_PREFIX);
+}
+
+sub _get_session_header_meta {
+    my ($self) = @_;
+    return SOAP::Header->name( 'SessionHeader' =>
+            \SOAP::Header->name( 'sessionId' => $self->{'sf_sid'} ) )
+        ->uri($SF_URIM)->prefix($SF_PREFIX);
+}
+
 
 1;
 __END__
@@ -1627,44 +1630,29 @@ San Francisco.
 
 =head1 AUTHORS
 
+Byrne Reese - <byrne at majordojo dot com>
+
+Chase Whitener <F<capoeirab@cpan.org>>
+
 Fred Moyer <fred at redhotpenguin dot com>
 
-Thanks to:
+=head1 CONTRIBUTORS
 
-Chase Whitener <cwhitener at gmail dot com> -
-Maintaining this module and working on development version.
+Michael Blanco
 
-Michael Blanco -
-Finding and fixing some bugs.
+Garth Webb
 
-Garth Webb -
-Finding and fixing bugs. Adding some additional features and more constant types.
+Jun Shimizu
 
-Ron Hess -
-Finding and fixing bugs. Adding some additional features. Adding more tests
-to the build. Providing a lot of other help.
+Ron Hess
 
-Tony Stubblebine -
-Finding a bug and providing a fix.
+Tony Stubblebine
 
-Jun Shimizu -
-Providing more to the WWW::Salesforce::Constants module
-and submitting fixes for various other bugs.
+=head1 COPYRIGHT & LICENSE
 
-Byrne Reese - <byrne at majordojo dot com> -
-Byrne Reese wrote the original Salesforce module.
+Copyright 2003-2004 Byrne Reese, Chase Whitener, Fred Moyer. All rights reserved.
 
-=head1 COPYRIGHT
-
-Copyright 2010-2016 Fred Moyer, All rights reserved.
-
-Copyright 2005-2007 Chase Whitener.
-
-Copyright 2003-2004 Byrne Reese, Chase Whitener. All rights reserved.
-
-=head1 LICENSE
-
-This library is free software and may be distributed under the same terms
-as perl itself.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

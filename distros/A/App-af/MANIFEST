@@ -15,10 +15,10 @@ corpus/lib/Alien/foo.pm
 corpus/lib/auto/share/dist/Alien-foo/_alien/alien.json
 corpus/lib/auto/share/dist/Alien-foo/_alien/alienfile
 corpus/lib/auto/share/dist/Alien-foo/bin/foo
-cpanfile
 dist.ini
 lib/App/af.pm
 lib/App/palien.pm
+maint/travis-install-mods
 t/00_diag.t
 t/02_compile.t
 t/app_af.t

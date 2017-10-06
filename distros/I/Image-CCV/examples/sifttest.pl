@@ -9,7 +9,7 @@ use List::Util qw(max);
 use Image::CCV qw(sift);
 
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =pod
 

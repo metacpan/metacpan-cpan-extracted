@@ -1,17 +1,6 @@
 # NAME
 
-GraphQL - A reference implementation of the GraphQL spec in Perl.
-
-# SYNOPSIS
-
-Perhaps a little code snippet.
-
-    use GraphQL;
-    my $foo = GraphQL->new();
-
-# DESCRIPTION
-
-See [GraphQL::Type](https://metacpan.org/pod/GraphQL::Type) for description of how to create GraphQL types.
+GraphQL - Perl implementation of GraphQL
 
 # PROJECT STATUS
 
@@ -21,52 +10,128 @@ See [GraphQL::Type](https://metacpan.org/pod/GraphQL::Type) for description of h
 
 [![CPAN version](https://badge.fury.io/pl/GraphQL.svg)](https://metacpan.org/pod/GraphQL)
 
+# SYNOPSIS
+
+    use GraphQL::Schema;
+    use GraphQL::Type::Object;
+    use GraphQL::Type::Scalar qw($String);
+    use GraphQL::Execution;
+
+    my $schema = GraphQL::Schema->new(query => GraphQL::Type::Object->new(
+      name => 'QueryRoot',
+      fields => {
+        helloWorld => { type => $String, resolve => sub { 'Hello world!' } },
+      },
+    ));
+    post '/graphql' => sub {
+      send_as JSON => GraphQL::Execution->execute(
+        $schema,
+        body_parameters->{query},
+        undef,
+        undef,
+        body_parameters->{variables},
+        body_parameters->{operationName},
+        undef,
+      );
+    };
+
+The above is from [the sample Dancer 2 applet](https://github.com/graphql-perl/sample-dancer2).
+
+# DESCRIPTION
+
+This module is a port of the GraphQL reference implementation,
+[graphql-js](https://github.com/graphql-js/graphql-js), to Perl 5.
+
+See [GraphQL::Type](https://metacpan.org/pod/GraphQL::Type) for description of how to create GraphQL types.
+
+## Introduction to GraphQL
+
+GraphQL is a technology that lets clients talk to APIs via a single
+endpoint, which acts as a single "source of the truth". This means clients
+do not need to seek the whole picture from several APIs. Additionally,
+it makes this efficient in network traffic, time, and programming effort:
+
+- Network traffic
+
+    The request asks for exactly what it wants, which it gets, and no
+    more. No wasted traffic.
+
+- Time
+
+    It gets all the things it needs in one go, including any connected
+    resources, so it does not need to make several requests to fill its
+    information requirement.
+
+- Programming effort
+
+    With "fragments" that can be attached to user-interface components,
+    keeping track of what information a whole page needs to request can be
+    automated. See [Relay](https://facebook.github.io/relay/) or
+    [Apollo](http://dev.apollodata.com/) for more on this.
+
+## Basic concepts
+
+GraphQL implements a system featuring a [schema](https://metacpan.org/pod/GraphQL::Schema),
+which features various classes of [types](https://metacpan.org/pod/GraphQL::Type), some of which
+are [objects](https://metacpan.org/pod/GraphQL::Type::Object). Special objects provide the roots
+of queries (mandatory), and mutations and subscriptions (both optional).
+
+Objects have fields, each of which can be specified to take arguments,
+and which have a return type. These are effectively the properties and/or
+methods on the type. If they return an object, then a query can specify
+subfields of that object, and so on - as alluded to in the "time-saving"
+point above.
+
+For more, see the JavaScript tutorial in ["SEE ALSO"](#see-also).
+
+## Hooking your system up to GraphQL
+
+You will need to decide how to model your system in GraphQL terms. This
+will involve deciding on what [output object types](https://metacpan.org/pod/GraphQL::Type::Object)
+you have, what fields they have, and what arguments and return-types
+those fields have.
+
+Additionally, you will need to design mutations if you want to be able
+to update/create/delete data. This requires some thought for return types,
+to ensure you can get all the information you need to proceed to avoid
+extra round-trips.
+
+Finally, you should consider whether you need "subscriptions". These
+are designed to hook into WebSockets. Apollo has a [JavaScript
+module](https://github.com/apollographql/graphql-subscriptions) for this.
+
+Specifying types and fields is straightforward. See [the
+document](https://metacpan.org/pod/GraphQL::Type::Library#FieldMapOutput) for how to make resolvers.
+
+# DEBUGGING
+
+To debug, set environment variable `GRAPHQL_DEBUG` to a true value.
+
 # EXPORT
 
 None yet.
 
-# SUBROUTINES/METHODS
+# SEE ALSO
 
-## function1
+[http://facebook.github.io/graphql/](http://facebook.github.io/graphql/) - GraphQL specification
 
-## function2
+[http://graphql.org/graphql-js/](http://graphql.org/graphql-js/) - Tutorial on the JavaScript version,
+highly recommended.
 
 # AUTHOR
 
 Ed J, `<etj at cpan.org>`
 
-The creation of this work has been sponsored by Perl Careers:
-[https://perl.careers/](https://perl.careers/).
-
 # BUGS
 
-Please report any bugs or feature requests to `bug-graphql at rt.cpan.org`, or through
-the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on
+[https://github.com/graphql-perl/graphql-perl/issues](https://github.com/graphql-perl/graphql-perl/issues).
 
-# SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc GraphQL
-
-You can also look for information at:
-
-- RT: CPAN's request tracker (report bugs here)
-
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=GraphQL](http://rt.cpan.org/NoAuth/Bugs.html?Dist=GraphQL)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/GraphQL](http://annocpan.org/dist/GraphQL)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/GraphQL](http://cpanratings.perl.org/d/GraphQL)
-
-- Search CPAN
-
-    [https://metacpan.org/release/GraphQL](https://metacpan.org/release/GraphQL)
+Or, if you prefer email and/or RT: to `bug-graphql
+at rt.cpan.org`, or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL). I will be
+notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
 
 # ACKNOWLEDGEMENTS
 
@@ -82,33 +147,3 @@ under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 [http://www.perlfoundation.org/artistic\_license\_2\_0](http://www.perlfoundation.org/artistic_license_2_0)
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

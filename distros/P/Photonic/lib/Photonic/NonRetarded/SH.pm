@@ -4,7 +4,7 @@ Photonic::NonRetarded::SH
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -38,23 +38,133 @@ and B materials at the fundamental and the second harmonic frequency
 
 =back
 
-=begin Pod::Coverage
+=head1 ACCESORS (read only)
 
-=head2 BUILD
+=over 4
 
-=end Pod::Coverage
+=item * shp 
+
+Invariant part of SHG calculator.
+
+=item * ndims nrf densityA densityB density nr
+
+Accesors handled by shp
+
+=item * epsA1, epsB1
+
+Dielectric functions of materials A and B at the fundamental frequency
+
+=item * epsA2, epsB2
+
+Dielectric functions of materials A and B at the second harmonic frequency
+
+=item * alpha1
+
+Polarizabity field at the fundamental frequency
+
+=item * alpha2
+
+Polarizabity field at the second harmonic frequency
+
+=item * u1
+
+Spectral variable at fundamental frequency
+
+=item * u2
+
+Spectral variable at second harmonic frequency
+
+=item * field1
+
+longitudinal field at fundamental
+
+=item * field2
+
+longitudinal field at second harmonic
+
+=item * dipolar
+
+Dipolar contribution to SH polarization field
+
+=item * quadrupolar
+
+SH quadrupolar contribution to SH polarization field
+
+=item * external
+
+External contribution to SH polarization field (quadrupolar + dipolar)
+
+=item * external_G
+
+External SH polarization field in reciprocal space
+
+=item * externalL_G
+
+Longitudinal projection of external polarization field in reciprocal space
+
+=item * HP
+
+Photonic::NonRetarded::AllH structure to calculate Haydock basis for
+non linear polarization
+
+=item * externalL_n
+
+External SH polarization field represented in Haydock basis
+
+=item * selfConsistentL_n
+
+SH self consistent longitudinal polarization in Haydock representation
+
+=item * selfConsistentL_G
+
+SH self consistent longitudinal polarization components in reciprocal
+space
+
+=item * selfConsistentVecL_G
+
+SH self consistent longitudinal polarization vector field projection in
+reciprocal space
+
+=item * selfConsistentVecL
+
+SH self consistent longitudinal polarization vector projection field
+in real space
+
+=item * P2
+
+SH self consistent total polarization vector field in real space
+
+=back
+
+=head1 ACCESORS (read/write)
+
+=over 4
+
+=item * filterflag
+
+Flag to filter results in reciprocal space to smooth non linear
+polarization using the field (nrf) filter.
+
+=back
+
+#=begin Pod::Coverage
+#
+#=head2 BUILD
+#
+#=end Pod::Coverage
 
 =cut
 
 package Photonic::NonRetarded::SH;
-$Photonic::NonRetarded::SH::VERSION = '0.007';
+$Photonic::NonRetarded::SH::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::FFTW3;
 use Photonic::NonRetarded::AllH;
-use Photonic::Utils qw(RtoG GtoR HProd cgtsl linearCombine);
+use Photonic::Utils qw(RtoG GtoR HProd linearCombine);
+use Photonic::ExtraUtils qw(cgtsl);
 use Moose;
 use PDL::Constants qw(PI);
 
@@ -81,6 +191,15 @@ has 'u1'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
 has 'u2'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
          lazy=>1, builder=>'_build_u2',  
          documentation=>'Spectral variable at SH');
+has 'field1'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+         lazy=>1, builder=>'_build_field1', 
+         documentation=>'longitudinal field at fundamental');
+has 'field2'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+         lazy=>1, builder=>'_build_field2', 
+         documentation=>'longitudinal field at second harmonic');
+has 'epsL2'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+         writer=>'_epsL2', predicate=>'has_epsL2', 
+         documentation=>'longitudinal dielectric function at 2w');
 has 'dipolar'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
          lazy=>1, builder=>'_build_dipolar', 
          documentation=>'SH dipolar contribution to SH polarization');
@@ -96,7 +215,15 @@ has 'external_G'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
 has 'externalL_G'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
          lazy=>1, builder=>'_build_externalL_G', 
          documentation=>
-             'SH ext. longitudinal polarization in reciprocal space'); 
+             'SH ext. longitudinal polarization comp. in reciprocal space'); 
+has 'externalVecL_G'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+         lazy=>1, builder=>'_build_externalVecL_G', 
+         documentation=>
+             'SH ext. longitudinal polarization proj. in recip. space'); 
+has 'externalVecL'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef,
+         lazy=>1, builder=>'_build_externalVecL', 
+         documentation=>
+             'SH ext. longitudinal polarization proj. in real space'); 
 has 'HP' =>(is=>'ro', isa=>'Photonic::NonRetarded::AllH', init_arg=>undef,
          lazy=>1, builder=>'_build_HP',
          documentation=>
@@ -137,16 +264,25 @@ has 'P2'=>(is=>'ro', isa=>'PDL::Complex',
              'SH self consistent total polarization vector
               field in real space');
 
+has 'P2LMCalt'=>(is=>'ro', isa=>'PDL::Complex',
+         init_arg=>undef, lazy=>1,
+         builder=>'_build_P2LMCalt',
+         documentation=>
+             'SH self consistent total macroscopic polarization
+              in real space. Alternative');
+
 has 'filterflag'=>(is=>'rw', 
          documentation=>'Filter results in reciprocal space');
 
-sub BUILD {
-    my $self=shift;
-    $self->nrf->evaluate($self->epsA1, $self->epsB1); #solve linear field
-    #my $nh=$self->nrf->nh;
-    #$nh=$self->nrf->nr->iteration if $nh>=$self->nrf->nr->iteration;
-    #$self->_nh($nh);
-}
+#sub BUILD {
+#    my $self=shift;
+#    #solve linear longitudinal field at w and 2w
+#    $self->_field1($self->nrf->evaluate($self->epsA1, $self->epsB1));
+#    $self->_field2($self->nrf->evaluate($self->epsA2, $self->epsB2));
+#    #my $nh=$self->nrf->nh;
+#    #$nh=$self->nrf->nr->iteration if $nh>=$self->nrf->nr->iteration;
+#    #$self->_nh($nh);
+#}
 
 sub _alpha {
     my $self=shift;
@@ -172,9 +308,20 @@ sub _build_alpha2 {
 }
 
 
+sub _build_field1 {
+    my $self=shift;
+    $self->nrf->evaluate($self->epsA1, $self->epsB1);
+}
+
+sub _build_field2 {
+    my $self=shift;
+    $self->nrf->evaluate($self->epsA2, $self->epsB2);
+    $self->_epsL2($self->nrf->epsL);
+}
+
 sub _build_dipolar {
     my $self=shift;
-    my $field=$self->nrf->field;
+    my $field=$self->field1;
     my $ndims=$self->ndims;
     #E^2 Square each complex component and sum over components
     #result is RorI, nx, ny...
@@ -200,7 +347,7 @@ sub _build_dipolar {
 
 sub _build_quadrupolar {
     my $self=shift;
-    my $field=$self->nrf->field;
+    my $field=$self->field1;
     my $ndims=$self->ndims; #dims of space
     #E E tensor
     #result is RorI, cartesian, cartesian, nx, ny...
@@ -258,13 +405,27 @@ sub _build_externalL_G {
     return $result;
 }
 
+sub _build_externalVecL_G {
+    my $self=shift;
+    my $extG=$self->externalL_G;
+    my $result=$self->nrf->nr->geometry->LC2Vec_G($extG);
+    return $result;
+}
+
+sub _build_externalVecL {
+    my $self=shift;
+    my $extG=$self->externalVecL_G;
+    my $result=GtoR($extG, $self->ndims, 1);
+    return $result;
+}
+    
 sub _build_HP { #build haydock states for P2
     my $self=shift;
     my $ext=$self->externalL_G;
     my $normext=sqrt(Cabs2($ext)->sum);
     my $extnorm=$ext->complex/$normext;
-    my $hp=Photonic::NonRetarded::AllH->new(	nh=>$self->nrf->nh, 
-	geometry=>$self->nrf->nr->geometry, small=>$self->nrf->nr->small,
+    my $hp=Photonic::NonRetarded::AllH->new(nh=>$self->nrf->nh, 
+	geometry=>$self->nrf->nr->geometry, smallH=>$self->nrf->nr->smallH,
 		keepStates=>1, nextState=>$extnorm);
     $hp->run;
     return $hp;
@@ -275,7 +436,12 @@ sub _build_externalL_n {
     my $pol=$self->externalL_G;
     my $states=$self->HP->states;
     my $nh=$self->HP->iteration;
-    my @Pn=map HProd($states->[$_],$pol), 0..$nh-1;
+    # innecesario: \propto \delta_{n0}
+    #my @Pn=map HProd($states->[$_],$pol), 0..$nh-1;
+    my @Pn=map {0+0*i} 0..$nh-1;
+    #$Pn[0]=$pol->(:,(0),(0));
+    $Pn[0]=HProd($states->[0],$pol);
+    #print join " Pn ", @Pn[0..3], "\n";
     return PDL->pdl([@Pn])->complex;
 }
     
@@ -290,8 +456,9 @@ sub _build_selfConsistentL_n {
     my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C;
     # rotate complex zero from first to last element.
     my $supradiag=$subdiag->mv(0,-1)->rotate(-1)->mv(-1,0);
-    my ($result, $info)=cgtsl($subdiag, $diag, $supradiag, $external);
+    my ($result, $info)= cgtsl($subdiag, $diag, $supradiag, $external); 
     die "Error solving tridiag system" unless $info == 0;
+    $result->complex;
     $result *= $u2/$self->epsA2;
     return $result;
 }    
@@ -330,6 +497,75 @@ sub _build_P2 {
     my $Pext=$self->external;
     my $P2=-4*PI*($alpha2*$density)->(,*1)*$PL+$Pext;
     return $P2;
+}
+
+sub _build_P2LMCalt {
+    my $self=shift;
+    my $PexL_G=$self->externalL_G; #external long 2w polarization
+    my $PexM=$self->external_G->(:,:,(0),(0)); #macroscopic external.
+    my $ndims=$self->nrf->nr->geometry->ndims;
+    my $nelem=$self->nrf->nr->geometry->npoints;
+    my $k=$self->nrf->nr->geometry->Direction0;
+    my $GNorm=$self->nrf->nr->geometry->GNorm;
+    my $epsA2=$self->epsA2;
+    my $u2=$self->u2;
+    my $B=$self->nrf->nr->geometry->B;
+    my $as=$self->nrf->nr->as;
+    my $b2s=$self->nrf->nr->b2s;
+    my $bs=$self->nrf->nr->bs;
+    my $states=$self->nrf->nr->states;
+    my $nh=$self->nrf->nh; #desired number of Haydock terms
+    #don't go beyond available values.
+    $nh=$self->nrf->nr->iteration if $nh>=$self->nrf->nr->iteration;
+    # calculate using linpack for tridiag system
+    # solve \epsilon^LL \vec E^L=|0>.
+    my $diag=$self->u2->Cconj->complex - PDL->pdl([@$as])->(0:$nh-1);
+    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C;
+    # rotate complex zero from first to last element.
+    my $supradiag=$subdiag->real->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
+    my $rhs=PDL->zeroes($nh);
+    $rhs->((0)).=1;
+    $rhs=$rhs->r2C;
+    my ($phi_n, $info)= cgtsl($subdiag, $diag, $supradiag, $rhs); 
+    die "Error solving tridiag system" unless $info == 0;
+    my $phi_G=linearCombine([$phi_n->dog], $states);
+    my $Pphi=$k*(1-$epsA2)*$u2/$epsA2*HProd($phi_G, $PexL_G);
+
+    my $beta_G=RtoG($B*GtoR($states->[0],$ndims,0), $ndims,0);
+    #my $beta_G=RtoG(GtoR($states->[0],$ndims,0), $ndims,0);
+    my $betaV_G=$beta_G->(,*1)*$GNorm;
+    #my $betaV_G=$beta_G->(,*1)*$k;
+    my $betaV_n=PDL->pdl(
+	[map {HProd($betaV_G,$states->[$_]->(,*1), 1)} (0..$nh-1)]
+	)->complex;
+    #my $tmp=HProd($betaV_G->(,(1),:,:), $states->[200]);
+    #print $tmp, "==?", $betaV_n->(:,(1), (200)), "\n";
+    
+    my @Ppsi;
+    foreach(0..$ndims-1){
+	my ($psi_n, $psiinfo)= 
+	    cgtsl($subdiag, $diag, $supradiag, $betaV_n->(:,($_),:)); 
+	die "Error solving tridiag system" unless $psiinfo == 0;
+	# RorI nx ny .... cartesian
+	#print "psi_n[$_]=$psi_n\n";
+	my $psi_G=linearCombine([$psi_n->dog], $states);
+	my $Ppsi=HProd($psi_G, $PexL_G);
+	push @Ppsi, $Ppsi;
+    }
+    my $Ppsi=PDL->pdl(@Ppsi)->complex;
+    #my $P2M=$Pphi+$Ppsi;
+    my $P2M=$Pphi+$Ppsi+$PexM*$nelem; # Unnormalize Pex !!
+    #my $P2M=$Pphi;#+$Ppsi;
+    #my $P2M=$Ppsi;#+$Ppsi;
+    #my $P2M=PDL->pdl(@P2M)->complex;
+    # RorI nx ny .... cartesian
+    #my $psiV_n=PDL->pdl(@psi_ns);
+    #my $psi_G=linearCombine([$psiV_n->dog], $states);
+    #my $Pphi=(1-$epsA2)*$u2/$epsA2*HProd($phi_G, $PexL_G);
+    #my $Ppsi=HProd($psi_G, $PexL_G);
+    #my $P2M=$k*($Pphi+$Ppsi);
+    return $P2M->(,,*1,*1);
+    #return $prod->(,*1)*$self->nrf->nr->geometry->Direction0;
 }
 
 sub _build_u1 {

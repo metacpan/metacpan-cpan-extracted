@@ -18,7 +18,7 @@ use Apache::Session::Store::DBI;
 use Apache::Session::Browseable::Store::DBI;
 
 our @ISA     = qw(Apache::Session::Browseable::Store::DBI Apache::Session::Store::DBI);
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.7';
 
 $Apache::Session::Browseable::Store::SQLite::DataSource = undef;
 
@@ -45,6 +45,7 @@ sub connection {
     $self->{dbh} =
       DBI->connect( $datasource, '', '', { RaiseError => 1, AutoCommit => 0 } )
       || die $DBI::errstr;
+    $self->{dbh}->{sqlite_unicode} = 1;
 
     #If we open the connection, we close the connection
     $self->{disconnect} = 1;

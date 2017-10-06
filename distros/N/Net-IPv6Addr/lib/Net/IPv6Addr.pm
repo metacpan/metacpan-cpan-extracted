@@ -5,71 +5,85 @@ use warnings;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw();
-our @EXPORT_OK = qw();
-our $VERSION = '0.7';
+our @EXPORT_OK = qw(
+		       in_network
+		       in_network_of_size
+		       ipv6_chkip
+		       ipv6_parse
+		       is_ipv6
+	       );
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our $VERSION = '0.91';
 
 use Carp;
 use Net::IPv4Addr;
 use Math::BigInt;
 use Math::Base85;
 
+#  ____       _   _                      
+# |  _ \ __ _| |_| |_ ___ _ __ _ __  ___ 
+# | |_) / _` | __| __/ _ \ '__| '_ \/ __|
+# |  __/ (_| | |_| ||  __/ |  | | | \__ \
+# |_|   \__,_|\__|\__\___|_|  |_| |_|___/
+#                                       
 
+# Match one to four digits of hexadecimal
 
-# We get these formats from rfc1884:
-#
-#	preferred form: x:x:x:x:x:x:x:x
-# 
-#	zero-compressed form: the infamous double-colon.  
-#	Too many pattern matches to describe in this margin.
-#
-#	mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
-#
-#	mixed IPv4/IPv6 with compression: ::d.d.d.d or ::FFFF:d.d.d.d
-#
-# And we get these from rfc1924:
-#
-#	base-85-encoded: [0-9A-Za-z!#$%&()*+-;<=>?@^_`{|}~]{20}
-#
+my $h = qr/[a-f0-9]{1,4}/i;
+
+# Match one to three digits
+
+#my $d = qr/[0-9]{1,3}/;
+my $ipv4 = "((25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))";
+
+# base-85
+
+my $digits = $Math::Base85::base85_digits;
+$digits =~ s/-//;
+my $x = "[" . $digits . "-]";
+my $n = "{20}";
 
 my %ipv6_patterns = (
     'preferred' => [
-	qr/^(?:[a-f0-9]{1,4}:){7}[a-f0-9]{1,4}$/i,
+	qr/^(?:$h:){7}$h$/i,
 	\&ipv6_parse_preferred,
     ],
-    'compressed' => [		## No, this isn't pretty.
+    'compressed' => [
 	qr/^[a-f0-9]{0,4}::$/i,
-	qr/^:(?::[a-f0-9]{1,4}){1,6}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){1,6}:$/i,
-	qr/^(?:[a-f0-9]{1,4}:)(?::[a-f0-9]{1,4}){1,6}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){2}(?::[a-f0-9]{1,4}){1,5}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){3}(?::[a-f0-9]{1,4}){1,4}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){4}(?::[a-f0-9]{1,4}){1,3}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){5}(?::[a-f0-9]{1,4}){1,2}$/i,
-	qr/^(?:[a-f0-9]{1,4}:){6}(?::[a-f0-9]{1,4})$/i,
+	qr/^:(?::$h){1,7}$/i,
+	qr/^(?:$h:){1,}:$/i,
+	qr/^(?:$h:)(?::$h){1,6}$/i,
+	qr/^(?:$h:){2}(?::$h){1,5}$/i,
+	qr/^(?:$h:){3}(?::$h){1,4}$/i,
+	qr/^(?:$h:){4}(?::$h){1,3}$/i,
+	qr/^(?:$h:){5}(?::$h){1,2}$/i,
+	qr/^(?:$h:){6}(?::$h)$/i,
 	\&ipv6_parse_compressed,
     ],
     'ipv4' => [
-	qr/^(?:0:){5}ffff:(?:\d{1,3}\.){3}\d{1,3}$/i,
-	qr/^(?:0:){6}(?:\d{1,3}\.){3}\d{1,3}$/,
+	qr/^(?:0:){5}ffff:$ipv4$/i,
+	qr/^(?:0:){6}$ipv4$/,
 	\&ipv6_parse_ipv4,
     ],
     'ipv4 compressed' => [
-	qr/^::(?:ffff:)?(?:\d{1,3}\.){3}\d{1,3}$/i,
+	qr/^::(?:ffff:)?$ipv4$/i,
 	\&ipv6_parse_ipv4_compressed,
     ],
-); 
-
-# base-85
-if (defined $Math::Base85::base85_digits) {
-    my $digits;
-    ($digits = $Math::Base85::base85_digits) =~ s/-//;
-    my $x = "[" . $digits . "-]";
-    my $n = "{20}";
-    $ipv6_patterns{'base85'} = [
+    'base85' => [
 	qr/$x$n/,
 	\&ipv6_parse_base85,
-    ];
-}
+    ],
+);
+
+#  ____       _            _       
+# |  _ \ _ __(_)_   ____ _| |_ ___ 
+# | |_) | '__| \ \ / / _` | __/ _ \
+# |  __/| |  | |\ V / (_| | ||  __/
+# |_|   |_|  |_| \_/ \__,_|\__\___|
+#                                 
+
+# Errors which include the package name and the subroutine name. This
+# is for consistency with earlier versions of the module.
 
 sub mycroak
 {
@@ -78,152 +92,87 @@ sub mycroak
     croak __PACKAGE__ . '::' . $caller[3] . ' -- ' . $message;
 }
 
+# Given one argument with a slash or two arguments, return them as two
+# arguments, and check there are one or two arguments.
 
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $maybe_ip = shift;
-    my $parser = ipv6_chkip($maybe_ip);
-    if (ref $parser ne 'CODE') {
-	mycroak "invalid IPv6 address $maybe_ip";
-    }
-    my @hexadecets = $parser->($maybe_ip);
-    my $self = \@hexadecets;
-    bless $self, $class;
-    return $self;
-}
-
-
-
-sub ipv6_parse
+sub getargs
 {
     my ($ip, $pfx);
     if (@_ == 2) {
 	($ip, $pfx) = @_;
-    } else {
+    }
+    elsif (@_ == 1) {
 	($ip, $pfx) = split(m!/!, $_[0])
     }
-
-    unless (ipv6_chkip($ip)) {
-	mycroak "invalid IPv6 address $ip\n";
+    else {
+	mycroak "wrong number of arguments (need 1 or 2)";
     }
-
-    $pfx =~ s/\s+//g if defined($pfx);
-
-    if (defined $pfx) {
-	if ($pfx =~ /^\d+$/) {
-	    if (($pfx < 0)  || ($pfx > 128)) {
-		mycroak "invalid prefix length $pfx\n";
-	    }
-	} else {
-	    mycroak "non-numeric prefix length $pfx\n";
-	}
-    } else {
-	return $ip;
-    }
-    wantarray ? ($ip, $pfx) : "$ip/$pfx";
+    return ($ip, $pfx);
 }
 
+# Match $ip against the regexes of type $type, or die.
 
-
-sub is_ipv6
+sub match_or_die
 {
-    my ($ip, $pfx);
-    if (@_ == 2) {
-	($ip, $pfx) = @_;
-    } else {
-	($ip, $pfx) = split(m!/!, $_[0])
-    }
-
-    unless (ipv6_chkip($ip)) {
-	return undef;
-    }
-
-    if (defined $pfx) {
-        $pfx =~ s/s+//g;
-	if ($pfx =~ /^\d+$/) {
-	    if (($pfx < 0)  || ($pfx > 128)) {
-               return undef;
-	    }
-	} else {
-            return undef;
+    my ($ip, $type) = @_;
+    my $patterns = $ipv6_patterns{$type};
+    for my $p (@$patterns) {
+	if (ref($p) eq 'CODE') {
+	    mycroak "invalid address $ip for type $type";
 	}
-    } else {
-	return $ip;
+	if ($ip =~ $p) {
+	    return;
+	}
     }
-    wantarray ? ($ip, $pfx) : "$ip/$pfx";
 }
 
+# Make the bit mask for "in_network_of_size".
 
-
-sub ipv6_chkip
+sub bitmask
 {
-    my $ip = shift; 
-    my ($pattern, $parser);
-    my @patlist;
-
-    $parser = undef;
-
-TYPE:
-    for my $k (keys %ipv6_patterns) {
-	@patlist = @{$ipv6_patterns{$k}};
-PATTERN:
-	for my $pattern (@patlist) {
-	    last PATTERN if (ref($pattern) eq 'CODE');
-	    if ($ip =~ $pattern) {
-		$parser = $patlist[-1];
-		last TYPE;
-	    }
-	}
-    }
-    return $parser;
+    my ($j) = @_;
+    my $bitmask = '1' x $j . '0' x (16 - $j);
+    my $k = unpack("n",pack("B16", $bitmask));
+    return $k;
 }
+
+#  ____                              
+# |  _ \ __ _ _ __ ___  ___ _ __ ___ 
+# | |_) / _` | '__/ __|/ _ \ '__/ __|
+# |  __/ (_| | |  \__ \  __/ |  \__ \
+# |_|   \__,_|_|  |___/\___|_|  |___/
+#                                   
+
+# Private parser
 
 sub ipv6_parse_preferred
 {
     my $ip = shift;
-    my @patterns = @{$ipv6_patterns{'preferred'}};
-    for my $p (@patterns) {
-	if (ref($p) eq 'CODE') {
-	    mycroak "invalid address";
-	}
-	last if ($ip =~ $p);
-    }
+    match_or_die ($ip, 'preferred');
     my @pieces = split(/:/, $ip);
     splice(@pieces, 8);
     return map { hex } @pieces;
 }
 
+# Private parser
+
 sub ipv6_parse_compressed
 {
     my $ip = shift;
-    my @patterns = @{$ipv6_patterns{'compressed'}};
-    for my $p (@patterns) {
-	if (ref($p) eq 'CODE') {
-	    mycroak "invalid address";
-	}
-	last if ($ip =~ $p);
-    }
-    my $colons;
-    $colons = ($ip =~ tr/:/:/);
+    match_or_die ($ip, 'compressed');
+    my $colons = ($ip =~ tr/:/:/);
     my $expanded = ':' x (9 - $colons);
     $ip =~ s/::/$expanded/;
     my @pieces = split(/:/, $ip, 8);
     return map { hex } @pieces;
 }
 
+# Private parser
+
 sub ipv6_parse_ipv4
 {
     my $ip = shift;
-    my @patterns = @{$ipv6_patterns{'ipv4'}};
-    for my $p (@patterns) {
-	if (ref($p) eq 'CODE') {
-	    mycroak "invalid address";
-	}
-	last if ($ip =~ $p);
-    }
+    match_or_die ($ip, 'ipv4');
     my @result;
     my $v4addr;
     my @v6pcs = split(/:/, $ip);
@@ -237,16 +186,12 @@ sub ipv6_parse_ipv4
     return @result;
 }
 
+# Private parser
+
 sub ipv6_parse_ipv4_compressed
 {
     my $ip = shift;
-    my @patterns = @{$ipv6_patterns{'ipv4 compressed'}};
-    for my $p (@patterns) {
-	if (ref($p) eq 'CODE') {
-	    mycroak "invalid address";
-	}
-	last if ($ip =~ $p);
-    }
+    match_or_die ($ip, 'ipv4 compressed');
     my @result;
     my $v4addr;
     my $colons;
@@ -265,17 +210,13 @@ sub ipv6_parse_ipv4_compressed
     return @result;
 }
 
+# Private parser
+
 sub ipv6_parse_base85
 {
     my $ip = shift;
+    match_or_die ($ip, 'base85');
     my $r;
-    my @patterns = @{$ipv6_patterns{'base85'}};
-    for my $p (@patterns) {
-	if (ref($p) eq 'CODE') {
-	    mycroak "invalid address";
-	}
-	last if ($ip =~ $p);
-    }
     my $bigint = Math::Base85::from_base85($ip);
     my @result;
     while ($bigint > 0) {
@@ -289,24 +230,109 @@ sub ipv6_parse_base85
     return @result;
 }
 
+#  ____        _     _ _      
+# |  _ \ _   _| |__ | (_) ___ 
+# | |_) | | | | '_ \| | |/ __|
+# |  __/| |_| | |_) | | | (__ 
+# |_|    \__,_|_.__/|_|_|\___|
+#                            
+
+sub new
+{
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my $maybe_ip = shift;
+    my $parser = ipv6_chkip($maybe_ip);
+    if (ref $parser ne 'CODE') {
+	mycroak "invalid IPv6 address $maybe_ip";
+    }
+    my @hexadecets = $parser->($maybe_ip);
+    my $self = \@hexadecets;
+    bless $self, $class;
+    return $self;
+}
+
+
+sub ipv6_chkip
+{
+    my $ip = shift; 
+
+    my $parser = undef;
+
+    TYPE:
+    for my $k (keys %ipv6_patterns) {
+	my @patlist = @{$ipv6_patterns{$k}};
+	PATTERN:
+	for my $pattern (@patlist) {
+	    last PATTERN if (ref($pattern) eq 'CODE');
+	    if ($ip =~ $pattern) {
+		$parser = $patlist[-1];
+		last TYPE;
+	    }
+	}
+    }
+    return $parser;
+}
+
+
+sub ipv6_parse
+{
+    my ($ip, $pfx) = getargs (@_);
+
+    if (! ipv6_chkip($ip)) {
+	mycroak "invalid IPv6 address $ip";
+    }
+
+    if (! defined $pfx) {
+	return $ip;
+    }
+
+    $pfx =~ s/\s+//g;
+
+    if ($pfx =~ /^[0-9]+$/) {
+	if ($pfx > 128) {
+	    mycroak "invalid prefix length $pfx";
+	}
+    }
+    else {
+	mycroak "non-numeric prefix length $pfx";
+    }
+
+    if (wantarray ()) {
+	return ($ip, $pfx);
+    }
+    return "$ip/$pfx";
+}
+
+
+sub is_ipv6
+{
+    my $r;
+    eval {
+	$r = ipv6_parse (@_);
+    };
+    if ($@) {
+	return undef;
+    }
+    return $r;
+}
 
 
 sub to_string_preferred
 {
     my $self = shift;
-    if (ref $self eq __PACKAGE__) {
-	return join(":", map { sprintf("%x", $_) } @$self);
-    } 
-    return Net::IPv6Addr->new($self)->to_string_preferred();
+    if (ref $self ne __PACKAGE__) {
+	$self = Net::IPv6Addr->new ($self);
+    }
+    return join(":", map { sprintf("%x", $_) } @$self);
 }
-
 
 
 sub to_string_compressed
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_string_compressed();
+	$self = Net::IPv6Addr->new ($self);
     }
     my $expanded = join(":", map { sprintf("%x", $_) } @$self);
     $expanded =~ s/^0:/:/;
@@ -317,7 +343,7 @@ sub to_string_compressed
 	$expanded =~ s/::::/_/ or
 	$expanded =~ s/:::/_/ or
 	$expanded =~ s/::/_/
-        ) {
+    ) {
         $expanded =~ s/:(?=:)/:0/g;
 	$expanded =~ s/^:(?=[0-9a-f])/0:/;
 	$expanded =~ s/([0-9a-f]):$/$1:0/;
@@ -327,12 +353,11 @@ sub to_string_compressed
 }
 
 
-
 sub to_string_ipv4
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_string_ipv4();
+	$self = Net::IPv6Addr->new ($self);
     }
     if ($self->[0] | $self->[1] | $self->[2] | $self->[3] | $self->[4]) {
 	mycroak "not originally an IPv4 address";
@@ -346,12 +371,11 @@ sub to_string_ipv4
 }
 
 
-
 sub to_string_ipv4_compressed
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_string_ipv4_compressed();
+	$self = Net::IPv6Addr->new ($self);
     }
     if ($self->[0] | $self->[1] | $self->[2] | $self->[3] | $self->[4]) {
 	mycroak "not originally an IPv4 address";
@@ -362,7 +386,8 @@ sub to_string_ipv4_compressed
     my $v6part;
     if ($self->[5]) {
 	$v6part = sprintf("::%x", $self->[5]);
-    } else {
+    }
+    else {
 	$v6part = ":";
     }
     my $v4part = join('.', $self->[6] >> 8, $self->[6] & 0xff, $self->[7] >> 8,  $self->[7] & 0xff);
@@ -370,13 +395,11 @@ sub to_string_ipv4_compressed
 }
 
 
-
-
 sub to_string_base85
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_string_base85();
+	$self = Net::IPv6Addr->new ($self);
     }
     my $bigint = new Math::BigInt("0");
     for my $i (@{$self}[0..6]) {
@@ -388,12 +411,11 @@ sub to_string_base85
 }
 
 
-
 sub to_bigint
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_bigint();
+	$self = Net::IPv6Addr->new ($self);
     }
     my $bigint = new Math::BigInt("0");
     for my $i (@{$self}[0..6]) {
@@ -402,16 +424,15 @@ sub to_bigint
     }
     $bigint = $bigint + $self->[7];
     $bigint =~ s/\+//;
-    return  $bigint;
+    return $bigint;
 }
-
 
 
 sub to_array
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_array();
+	$self = Net::IPv6Addr->new ($self);
     }
     return map {sprintf "%04x", $_} @$self;
 }
@@ -421,18 +442,17 @@ sub to_intarray
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_intarray();
+	$self = Net::IPv6Addr->new ($self);
     }
     return @$self;
 }
-
 
 
 sub to_string_ip6_int
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-	return Net::IPv6Addr->new($self)->to_string_ip6_int();
+	$self = Net::IPv6Addr->new ($self);
     }
     my $hexdigits = sprintf("%04x" x 8, @$self);
     my @nibbles = ('INT', 'IP6', split(//, $hexdigits));
@@ -440,75 +460,80 @@ sub to_string_ip6_int
     return $ptr . ".";
 }
 
+# Private - validate a given netsize
 
+sub validate_netsize
+{
+    my ($netsize) = @_;
+    if ($netsize !~ /^[0-9]+$/ || $netsize > 128) {
+	mycroak "invalid network size $netsize";
+    }
+}
 
 
 sub in_network_of_size
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-      if ($self =~ m!(.+)/(.+)!) {
-	unshift @_, $2;
-	return Net::IPv6Addr->new($1)->in_network_of_size(@_)->to_string_preferred;
-      }
-      return Net::IPv6Addr->new($self)->in_network_of_size(@_)->to_string_preferred;
+	if ($self =~ m!(.+)/(.+)!) {
+	    unshift @_, $2;
+	    $self = $1;
+	}
+	$self = Net::IPv6Addr->new($self);
     }
     my $netsize = shift;
-    if (!defined $netsize) {
-      mycroak "not network size given";
+    if (! defined $netsize) {
+	mycroak "network size not given";
     }
     $netsize =~ s!/!!;
-    if ($netsize !~ /^\d+$/ or $netsize < 0 or $netsize > 128) {
-      mycroak "not valid network size $netsize";
-    }
+    validate_netsize ($netsize);
     my @parts = @$self;
-    my $i = $netsize / 16;
-    unless ($i == 8) { # netsize was 128 bits; the whole address
-      my $j = $netsize % 16;
-      $parts[$i] &= unpack("C4",pack("B16", '1' x $j . '0000000000000000'));
-      foreach $j (++$i..$#parts) {
-	$parts[$j] = 0;
-      }
+    my $i = int ($netsize / 16);
+    if ($i < 8) {
+	my $j = $netsize % 16;
+	if ($j) {
+	    # If $netsize is not a multiple of 16, truncate the lowest
+	    # 16-$j bits of the $ith element of @parts.
+	    $parts[$i] &= bitmask ($j);
+	    # Jump over this element.
+	    $i++;
+	}
+	# Set all the remaining lower parts to zero.
+	for ($i..$#parts) {
+	    $parts[$_] = 0;
+	}
     }
-    # https://rt.cpan.org/Ticket/Display.html?id=79325
-    return Net::IPv6Addr->new(sprintf("%04x" x 8, @parts));
-    #    return Net::IPv6Addr->new(join(':', @parts));
+    return bless \@parts;
 }
-
 
 
 sub in_network
 {
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
-      return Net::IPv6Addr->new($self)->in_network(@_);
+	$self = Net::IPv6Addr->new ($self);
     }
-    my ($net,$netsize) = (@_);
-    if ($net =~ m!/!) {
-      $net =~ s!(.*)/(.*)!$1!;
-      $netsize = $2;
-    }
+    my ($net, $netsize) = getargs (@_);
     unless (defined $netsize) {
-      mycroak "not enough parameters";
+	mycroak "not enough parameters, need netsize";
     }
     $netsize =~ s!/!!;
-    if ($netsize !~ /^\d+$/ or $netsize < 0 or $netsize > 128) {
-      mycroak "not valid network size $netsize";
+    validate_netsize ($netsize);
+    if (! ref $net) {
+	$net = Net::IPv6Addr->new($net);
     }
     my @s = $self->in_network_of_size($netsize)->to_intarray;
-    $net = Net::IPv6Addr->new($net) unless (ref $net);
     my @n = $net->in_network_of_size($netsize)->to_intarray;
-    my $i = int($netsize / 16);
-    $i++;
-    $i = $#s if ($i > $#s);
+    my $i = int ($netsize / 16) + 1;
+    if ($i > $#s) {
+	$i = $#s;
+    }
     for (0..$i) {
-      return 0 unless ($s[$_] == $n[$_]);
+	if ($s[$_] != $n[$_]) {
+	    return undef;
+	}
     }
     return 1;
 }
 
-
 1;
-__END__
-
-

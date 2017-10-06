@@ -10,6 +10,7 @@ README.md
 t/00_smoke.t
 t/10_replace.t
 t/11_chmod.t
+t/12_create.t
 t/20_tie_handle_base.t
 t/30_singlehandle.t
 t/40_dualhandle.t

@@ -21,7 +21,7 @@
 
 0.8.1
  * allow escape to cancle popupClosed
- 
+
 0.8.0
  * provide meta information to the formCfg initializer ... in the case of a popup this is the
    data from the parent form. See SongForm for example use.

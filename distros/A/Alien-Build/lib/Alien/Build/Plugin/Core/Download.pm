@@ -7,7 +7,7 @@ use Path::Tiny ();
 use Alien::Build::Util qw( _mirror );
 
 # ABSTRACT: Core download plugin
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 sub _hook
@@ -121,7 +121,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -9,7 +9,7 @@ use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::DBI;
 
-our $VERSION = '1.2.5';
+our $VERSION = '1.2.7';
 our @ISA     = qw(Apache::Session::Browseable::DBI Apache::Session);
 
 sub populate {
@@ -78,16 +78,19 @@ sub deleteIfLowerThan {
     my $query;
     if ( $rule->{or} ) {
         $query = join ' OR ',
-          map { qq{cast(a_session->>"\$.$_" as UNSIGNED) < $rule->{or}->{$_}} } keys %{ $rule->{or} };
+          map { qq{cast(a_session->>"\$.$_" as UNSIGNED) < $rule->{or}->{$_}} }
+          keys %{ $rule->{or} };
     }
     elsif ( $rule->{and} ) {
         $query = join ' AND ',
-          map { qq{cast(a_session->>"\$.$_" as UNSIGNED) < $rule->{or}->{$_}} } keys %{ $rule->{or} };
+          map { qq{cast(a_session->>"\$.$_" as UNSIGNED) < $rule->{or}->{$_}} }
+          keys %{ $rule->{or} };
     }
     if ( $rule->{not} ) {
         $query = "($query) AND "
           . join( ' AND ',
-            map { qq{a_session->>"\$.$_" <> '$rule->{not}->{$_}'} } keys %{ $rule->{not} } );
+            map { qq{a_session->>"\$.$_" <> '$rule->{not}->{$_}'} }
+              keys %{ $rule->{not} } );
     }
     return 0 unless ($query);
     my $dbh        = $class->_classDbh($args);
@@ -108,7 +111,8 @@ sub get_key_from_all_sessions {
     # Special case if all wanted fields are indexed
     if ( $data and ref($data) ne 'CODE' ) {
         $data = [$data] unless ( ref($data) );
-        my $fields = join ',', map { s/'//g; qq{a_session->>"\$.$_" AS $_} } @$data;
+        my $fields = join ',',
+          map { s/'//g; qq{a_session->>"\$.$_" AS $_} } @$data;
         $sth = $dbh->prepare("SELECT $fields from $table_name");
         $sth->execute;
         return $sth->fetchall_hashref('id');
@@ -146,6 +150,8 @@ sub _classDbh {
       DBI->connect_cached( $datasource, $username, $password,
         { RaiseError => 1, AutoCommit => 1 } )
       || die $DBI::errstr;
+    $dbh->{mysql_enable_utf8} = 1;
+    return $dbh;
 }
 
 1;

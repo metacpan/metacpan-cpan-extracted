@@ -18,7 +18,7 @@ use FindBin ();
 use lib $FindBin::Bin;
 use IPC_Run3_Shell_Testlib;
 
-use Test::More tests => 24;
+use Test::More tests => 21;
 use Test::Fatal 'exception';
 ## no critic (ProhibitComplexRegexes)
 
@@ -48,9 +48,9 @@ my @w1 = warns {
 		$s->perl({allow_exit=>[]},'-e','exit');
 		is $?, 0, 'allow_exit err 1';
 	};
-is @w1, 2, "warnings on empty allow_exit 1";
-like $w1[0], qr/allow_exit is empty/, "warnings on empty allow_exit 2";
-like $w1[1], qr/exit (status|value) 0\b/, "warnings on empty allow_exit 3";
+ok @w1>=2, "warnings on empty allow_exit 1";
+is grep({/allow_exit is empty/} @w1), 1, "warnings on empty allow_exit 2";
+is grep({/exit (status|value) 0\b/} @w1), 1, "warnings on empty allow_exit 3";
 my @w2 = warns {
 		# make warnings nonfatal in a way compatible with Perl v5.6, which didn't yet have "NONFATAL"
 		no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
@@ -62,9 +62,8 @@ my @w2 = warns {
 		like exception { $s->perl({allow_exit=>[0,undef,123]},'-e','exit 5'); 1 },
 			qr/\bexit (status|value) 5\b/, 'allow_exit err 4';
 	};
-is @w2, 3, "allow_exit numeric warn count";
-like $w2[$_], qr/\bisn't numeric\b.+\ballow_exit\b.+\bat (?:\Q${\__FILE__}\E|.*\bTest\/Fatal\.pm) line\b/, "allow_exit numeric warn"
-	for 0..2;
+is grep({/\bisn't numeric\b.+\ballow_exit\b.+\bat (?:\Q${\__FILE__}\E|.*\bTest\/Fatal\.pm) line\b/} @w2), 3, "allow_exit numeric warns"
+	or diag explain \@w2;
 
 $s->perl({allow_exit=>[123]},{allow_exit=>undef},'-e','exit');
 	is $?, 0, 'allow_exit unset 1';

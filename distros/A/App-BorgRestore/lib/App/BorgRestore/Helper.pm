@@ -1,10 +1,23 @@
 package App::BorgRestore::Helper;
-use v5.10;
+use v5.14;
 use strict;
 use warnings;
 
+use autodie;
 use Function::Parameters;
 use POSIX ();
+
+=encoding utf-8
+
+=head1 NAME
+
+App::BorgRestore::Helper - Helper functions
+
+=head1 DESCRIPTION
+
+App::BorgRestore::Helper provides some general helper functions used in various packages in the L<App::BorgRestore> namespace.
+
+=cut
 
 fun untaint($data, $regex) {
 	$data =~ m/^($regex)$/ or die "Failed to untaint: $data";

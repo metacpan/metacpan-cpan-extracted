@@ -1,5 +1,9 @@
 Revision history for Alien-nasm
 
+0.19      2017-10-03 06:32:05 -0400
+  - For MSWin32 download binaries of nasm to avoid MSYS
+  - Ensure both nasm and ndisasm are available
+
 0.18      2017-03-01 19:10:26 +1100
   - Remove dep on Alien::Base2.  Use Alien::Base directly.
 

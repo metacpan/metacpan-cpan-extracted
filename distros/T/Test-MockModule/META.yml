@@ -17,7 +17,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Carp: '0'
   SUPER: '0'
@@ -28,5 +28,5 @@ resources:
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

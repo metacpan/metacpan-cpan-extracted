@@ -60,7 +60,7 @@ sub check_mode {
 
 # See if we can discern the modes 600 and 640 on this system
 my $cant_chmod_modes = sub {
-	my $testfn = spew(newtempfn, "XYZ");
+	my $testfn = newtempfn("XYZ");
 	if (!chmod(oct('600'), $testfn)) { return "can't chmod b/c chmod 1 failed" }
 	my $perms1 = S_IMODE(stat($testfn)->mode);
 	if ( $perms1!=oct('600') ) { return "can't chmod b/c 1st perms are ".sprintf('%05o',$perms1) }
@@ -71,7 +71,7 @@ my $cant_chmod_modes = sub {
 subtest 'perms / chmod' => sub {
 	plan $cant_chmod_modes ? (skip_all=>$cant_chmod_modes) : (tests=>7);
 	{
-		my $fn = spew(newtempfn,"PermTest1");
+		my $fn = newtempfn("PermTest1");
 		checked_chmod('600',$fn);
 		File::Replace->new($fn, perms=>oct('640'))->finish;
 		check_mode('640',$fn);
@@ -82,7 +82,7 @@ subtest 'perms / chmod' => sub {
 		check_mode('640',$fn);
 	}
 	{
-		my $fn = spew(newtempfn,"qqq\nrrr\nsss");
+		my $fn = newtempfn("qqq\nrrr\nsss");
 		checked_chmod('640',$fn);
 		File::Replace->new($fn, chmod=>0)->finish;
 		# we know File::Temp defaults to 0600
@@ -93,7 +93,7 @@ subtest 'perms / chmod' => sub {
 # Use some heuristics to see whether "chmod" should work on this system,
 # and whether we can use chmod(0, ...) to prevent opening a file.
 my $cant_chmod_permdeny = sub {
-	my $testfn = spew(newtempfn, "XYZ");
+	my $testfn = newtempfn("XYZ");
 	if (!chmod(0, $testfn)) { return "can't chmod b/c chmod failed" }
 	my $perms = S_IMODE(stat($testfn)->mode);
 	if ( $perms!=0 )
@@ -105,7 +105,7 @@ my $cant_chmod_permdeny = sub {
 }->();
 subtest 'open/chmod/rename failure tests' => sub {
 	$cant_chmod_permdeny and plan skip_all => $cant_chmod_permdeny;
-	my $tmpdir = tempdir(CLEANUP=>1);
+	my $tmpdir = tempdir(DIR=>$TEMPDIR,CLEANUP=>1);
 	
 	# cause opening the file to fail
 	my $tfn = spew(catfile($tmpdir,'file1'), "Blah");
@@ -126,7 +126,10 @@ subtest 'open/chmod/rename failure tests' => sub {
 	my $r1 = File::Replace->new($tfn);
 	print {$r1->out_fh} "Test1";
 	checked_chmod('400',$tmpdir);
-	like exception { $r1->finish }, qr/\bchmod\b/,
+	like exception { $r1->finish },
+		# apparently the directory perms work a little differently on cygwin,
+		# this dies with "couldn't rename ...: Permission denied" there.
+		$^O eq 'cygwin' ? qr/\brenam(?:e|ing)\b/i : qr/\bchmod\b/,
 		'close permission denied (chmod fail)';
 	
 	checked_chmod('500',$tmpdir);

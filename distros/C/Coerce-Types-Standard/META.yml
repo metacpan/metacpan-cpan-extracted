@@ -1,0 +1,27 @@
+---
+abstract: Coercing
+author:
+  - 'Robert Acock <thisusedtobeanemail@gmail.com>'
+build_requires:
+  Moo: '2.003002'
+  MooX::LazierAttributes: '1.03'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Coerce-Types-Standard
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scalar::Util: '0'
+  Type::Tiny: '1.002001'
+  perl: '5.006'
+version: '0.000003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

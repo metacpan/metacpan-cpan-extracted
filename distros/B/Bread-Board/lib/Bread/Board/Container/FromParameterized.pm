@@ -1,7 +1,7 @@
 package Bread::Board::Container::FromParameterized;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: container with weak parent reference
-$Bread::Board::Container::FromParameterized::VERSION = '0.35';
+$Bread::Board::Container::FromParameterized::VERSION = '0.36';
 use Moose;
 
 extends 'Bread::Board::Container';
@@ -26,7 +26,7 @@ Bread::Board::Container::FromParameterized - container with weak parent referenc
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

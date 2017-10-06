@@ -428,3 +428,21 @@ Revision history for Regexp-Grammars
 
     * Fixed bug causing premature clearing of action handlers
       (thanks Keith!)
+
+
+
+1.047  Tue Sep 26 15:41:13 2017
+
+    * Fixed misleading (mis-)documentation of <[MATCH=item]>
+      (thanks, Felix!)
+
+    * Fixed handling of (?>...) construct
+      (thanks, Hugo!)
+
+
+
+
+1.048  Wed Sep 27 06:20:49 2017
+
+    * Hid use of Regexp package from CPAN
+      (Thanks, Neil)

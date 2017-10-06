@@ -5,23 +5,32 @@ use warnings;
 package Log::Any::Proxy;
 
 # ABSTRACT: Log::Any generator proxy object
-our $VERSION = '1.049';
+our $VERSION = '1.701';
 
 use Log::Any::Adapter::Util ();
 use overload;
 
+sub _stringify_params {
+    my @params = @_;
+
+    return map {
+        !defined($_)
+          ? '<undef>'
+          : ref($_) ? (
+            overload::OverloadedStringify($_)
+            ? "$_"
+            : Log::Any::Adapter::Util::dump_one_line($_)
+          )
+          : $_
+    } @params;
+}
+
 sub _default_formatter {
     my ( $cat, $lvl, $format, @params ) = @_;
     return $format->() if ref($format) eq 'CODE';
-    my @new_params =
-      map {
-           !defined($_) ? '<undef>'
-          : ref($_)     ? (
-            overload::OverloadedStringify($_) ? "$_"
-          : Log::Any::Adapter::Util::dump_one_line($_)
-        )
-          : $_
-      } @params;
+
+    my @new_params = _stringify_params(@params);
+
     # Perl 5.22 adds a 'redundant' warning if the number parameters exceeds
     # the number of sprintf placeholders.  If a user does this, the warning
     # is issued from here, which isn't very helpful.  Doing something
@@ -40,7 +49,11 @@ sub new {
     }
     unless ( $self->{category} ) {
         require Carp;
-        Carp::croak("$class requires an 'category' parameter")
+        Carp::croak("$class requires a 'category' parameter");
+    }
+    unless ( $self->{context} ) {
+        require Carp;
+        Carp::croak("$class requires a 'context' parameter");
     }
     bless $self, $class;
     $self->init(@_);
@@ -54,7 +67,7 @@ sub clone {
 
 sub init { }
 
-for my $attr (qw/adapter filter formatter prefix/) {
+for my $attr (qw/adapter filter formatter prefix context/) {
     no strict 'refs';
     *{$attr} = sub { return $_[0]->{$attr} };
 }
@@ -76,9 +89,27 @@ foreach my $name ( Log::Any::Adapter::Util::logging_methods(), keys(%aliases) )
     };
     *{$name} = sub {
         my ( $self, @parts ) = @_;
-        my $message = join(" ", grep { defined($_) && length($_) } @parts );
-        if ( length $message ) {
-            $message = $self->{filter}->( $self->{category}, $numeric, $message )
+
+        my $structured_logging =
+            $self->{adapter}->can('structured') && !$self->{filter};
+
+        if ($structured_logging) {
+            unshift @parts, $self->{prefix} if $self->{prefix};
+            $self->{adapter}
+              ->structured( $realname, $self->{category}, @parts, grep { scalar keys %$_ } $self->{context});
+            return unless defined wantarray;
+        }
+
+        @parts = grep { defined($_) && length($_) } @parts;
+
+        # last part might be a hashref - if so, stringify
+        push @parts, _stringify_params(pop @parts) if ( @parts && ((ref $parts[-1] || '') eq ref {}));
+
+        push @parts, _stringify_params($self->{context}) if %{$self->{context}};
+        my $message = join( " ", @parts );
+        if ( length $message && !$structured_logging ) {
+            $message =
+              $self->{filter}->( $self->{category}, $numeric, $message )
               if defined $self->{filter};
             if ( defined $message and length $message ) {
                 $message = "$self->{prefix}$message"
@@ -115,7 +146,7 @@ Log::Any::Proxy - Log::Any generator proxy object
 
 =head1 VERSION
 
-version 1.049
+version 1.701
 
 =head1 SYNOPSIS
 
@@ -168,6 +199,9 @@ logged.  Otherwise, the return value is passed to the logging adapter.
 
 Numeric levels range from 0 (emergency) to 8 (trace).  Constant functions
 for these levels are available from L<Log::Any::Adapter::Util>.
+
+Configuring a filter disables structured logging, even if the
+configured adapter supports it.
 
 =head2 formatter
 
@@ -260,6 +294,14 @@ string is then returned.
 
 Numeric levels range from 0 (emergency) to 8 (trace).  Constant functions
 for these levels are available from L<Log::Any::Adapter::Util>.
+
+=head2 Logging Structured Data
+
+If you have data in addition to the text you want to log, you can
+specify a hashref after your string. If the configured adapter
+supports structured data, it will receive the hashref as-is, otherwise
+it will be converted to a string using L<Data::Dumper> and will be
+appended to your text.
 
 =head1 TIPS
 

@@ -1,3 +1,7 @@
+0.13	2017-06-02
+	- Only expose documented SV constants.
+	- Add GV constants.
+	- Add magic related constants.
 0.12    2017-01-19
         - XSprePUSH removed.
 	- stack_init() resets SP to first argument.

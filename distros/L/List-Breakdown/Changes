@@ -1,0 +1,94 @@
+Revision history for Perl module List::Breakdown
+
+Initial revision history up to 0.11 was a little overzealous with
+releases until #perl told me to calm down. All of those versions are
+documented here anyway for comprehensiveness' sake. Entries with "No
+important changes" are likely to be trivial things like documentation
+fixes or Perl::Tidy runs.
+
+0.18 2017-10-06
+
+ - Refine and correct documentation, particularly formatting
+ - Specify dependencies
+
+0.17 2017-10-06
+
+ - Correct problem with use of comparisons to "Inf" causing failing
+   tests on at least Perl 5.8 by using direct definedness test instead
+
+0.16 2017-10-06
+
+ - Mention exporting policy in SYNOPSIS and in the documentation for the
+   `breakdown` method
+ - Other documentation fixes
+
+0.15 2017-10-06
+
+ - Added a syntax to filter numeric data within intervals
+ - Added documentation and tests for new interval syntax
+ - Altered error tests to accommodate the new interval syntax
+
+0.14 2017-10-05
+
+ - Several documentation fixes
+ - Complete test coverage for missing branch spotted by Devel::Cover
+
+0.13 2017-10-05
+
+ - Reformated Changes file.
+ - First attempt at CPAN release.
+
+0.12 2017-10-05
+
+ - Added some author tests pilfered from Module::Starter.
+ - Added two new examples to POD, and tests to reflect them.
+ - Added this Changes file.
+
+0.11 2017-10-04
+
+ - No important changes.
+
+0.10 2017-10-04
+
+ - No important changes.
+
+0.09 2017-10-04
+
+ - No important changes.
+
+0.08 2017-10-04
+
+ - No important changes.
+
+0.07 2017-10-04
+
+ - Expanded documentation a little to make the SYNOPSIS more useful.
+
+0.06 2017-10-04
+
+ - Renamed module to List::Breakdown. See notes for v0.01.
+
+0.05 2017-10-03
+
+ - Another test file t/errors.t was added which ensures that both of the
+   major errors cause an `eval` block to fail:
+    * A value in the bucket layout spec was not a handled reference type
+    * A value in the bucket layout spec was not a reference at all
+
+0.04 2017-10-03
+
+ - No important changes.
+
+0.03 2017-10-03
+
+ - Export was adjusted to `use base` to accommodate Perl 5.6.
+
+0.02 2017-10-03
+
+ - No important changes.
+
+0.01 2017-10-03
+
+ - First public release with one test in one file, t/words.t. Initially
+   named List::Filters, which was unique but very close to an existing
+   CPAN module.

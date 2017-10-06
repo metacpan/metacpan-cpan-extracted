@@ -4,7 +4,7 @@ Photonic::Retarded::EpsilonTensor
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,8 @@ functions of the components.
 
 =over 4
 
-=item * new(metric=>$m, nh=>$nh, small=>$small, keepStates=>$k)
+=item * new(metric=>$m, nh=>$nh, smallE=>$smallE, smallH=>$smallH,
+keepStates=>$k)  
 
 Initializes the structure.
 
@@ -30,7 +31,9 @@ $m Photonic::Retarded::Metric describing the structure and some parametres.
 
 $nh is the maximum number of Haydock coefficients to use.
 
-$small is the criteria of convergence (default 1e-7)
+$smallH and $smallE are the criteria of convergence (default 1e-7) for
+Haydock coefficients and for the continued fraction. From
+Photonic::Roles::EpsParams.  
 
 $k is a flag to keep states in Haydock calculations (default 0)
 
@@ -58,7 +61,7 @@ The macroscopic dielectric tensor of the last operation
 =cut
 
 package Photonic::Retarded::EpsilonTensor;
-$Photonic::Retarded::EpsilonTensor::VERSION = '0.007';
+$Photonic::Retarded::EpsilonTensor::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;

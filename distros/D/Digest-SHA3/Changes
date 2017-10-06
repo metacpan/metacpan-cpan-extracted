@@ -1,5 +1,15 @@
 Revision history for Perl extension Digest::SHA3.
 
+0.27  Wed Oct  4 00:40:04 MST 2017
+	- removed "portable" mode from sha3sum and addfile
+		-- rarely used, mostly in outdated systems
+		-- potentially confusing features (e.g. \r\r\n -> \n)
+		-- Universal Newlines mode (-U) a much cleaner approach
+			-- mimics Universal Newlines in Python
+	- sha3sum now depends explicitly on Digest::SHA3
+		-- eliminates runtime loading of modules
+		-- no future plans to write Digest::SHA3::PurePerl
+
 0.26  Wed Sep  6 02:23:08 MST 2017
 	- added 'quiet' option to sha3sum
 		-- thanks to Chris David for suggestion and initial patch

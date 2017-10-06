@@ -3,6 +3,7 @@ jQuery(function () {
 
     function Editor (container) {
         Super.call(this);
+        this.pointHandleRadius = 5;
     };
     Editor.prototype = Object.create(Super.prototype);
 
@@ -26,6 +27,10 @@ jQuery(function () {
             return lifecycle.hasTransition(fromStatus, toStatus);
         });
 
+        Handlebars.registerHelper('selectedRights', function(lifecycle) {
+            return lifecycle.selectedRights();
+        });
+
         Handlebars.registerHelper('truncate', function(text) {
             if (text.length > 15) {
                 text = text.substr(0, 15) + '…';
@@ -44,26 +49,34 @@ jQuery(function () {
         return templates;
     };
 
-    Editor.prototype.setInspectorContent = function (node) {
+    Editor.prototype._refreshInspector = function (refreshContent) {
         var self = this;
         var lifecycle = self.lifecycle;
         var inspector = self.inspector;
-        self.inspectorNode = node;
-
-        var type = node ? node._type : 'canvas';
+        var node = self.inspectorNode;
 
         var params = { lifecycle: lifecycle };
-        params[type] = node;
 
-        inspector.find('.content').html(self.templates[type](params));
+        var header = inspector.find('.header');
+        header.html(self.templates.header(params));
 
-        inspector.find(".toplevel").addClass('sf-menu sf-vertical sf-js-enabled sf-shadow').supersubs().superfish({ speed: 'fast' });
+        var refreshedNode = header;
+        if (refreshContent) {
+            var type = node ? node._type : 'canvas';
+            params[type] = node;
+            inspector.find('.content').html(self.templates[type](params));
+            refreshedNode = inspector;
+        }
 
-        inspector.find(':checkbox[data-show-hide]').each(function () {
+        refreshedNode.find(".toplevel").addClass('sf-menu sf-js-enabled sf-shadow').supersubs().superfish({ speed: 'fast' });
+
+        refreshedNode.find(':checkbox[data-show-hide]').each(function () {
             var field = jQuery(this);
             var selector = field.data('show-hide');
+            var flip = field.data('show-hide-flip') ? true : false;
+
             var toggle = function () {
-                if (field.prop('checked')) {
+                if ((field.prop('checked') ? true : false) != flip) {
                     jQuery(selector).show();
                 } else {
                     jQuery(selector).hide();
@@ -72,6 +85,32 @@ jQuery(function () {
             field.change(function (e) { toggle() });
             toggle();
         });
+
+        refreshedNode.find('option[data-show-hide]').each(function () {
+            var option = jQuery(this);
+            var field = option.closest('select');
+            var selector = option.data('show-hide');
+            var flip = option.data('show-hide-flip') ? true : false;
+
+            var toggle = function () {
+                if ((field.val() == option.val()) != flip) {
+                    jQuery(selector).show();
+                } else {
+                    jQuery(selector).hide();
+                }
+            }
+            field.change(function (e) { toggle() });
+            toggle();
+        });
+
+        refreshedNode.find(".combobox input.combo-text").each(function () {
+            ComboBox_Load(this.id);
+        });
+    };
+
+    Editor.prototype.setInspectorContent = function (node) {
+        this.inspectorNode = node;
+        this._refreshInspector(true);
     };
 
     Editor.prototype.bindInspectorEvents = function () {
@@ -80,16 +119,23 @@ jQuery(function () {
         var inspector = self.inspector;
 
         inspector.on('change', ':input', function () {
-            var field = this.name;
+            var node = jQuery(this);
             var value;
-            if (jQuery(this).is(':checkbox')) {
-                value = this.checked;
+
+            if (node.is('.combo-list')) {
+                value = node.val();
+                node = node.closest('.combobox').find('.combo-text');
+            }
+            else if (node.is(':checkbox')) {
+                value = node[0].checked;
             }
             else {
-                value = jQuery(this).val();
+                value = node.val();
             }
 
-            var action = jQuery(this).closest('li.action');
+            var field = node.attr('name');
+
+            var action = node.closest('li.action');
             if (action.length) {
                 var action = lifecycle.itemForKey(action.data('key'));
                 lifecycle.updateItem(action, field, value);
@@ -105,17 +151,18 @@ jQuery(function () {
 
         inspector.on('click', 'button.change-color', function (e) {
             e.preventDefault();
-            var container = jQuery(this).closest('.color-control');
-            var field = container.data('field');
-            var picker = jQuery('<div class="color-picker"></div>');
-            jQuery(this).replaceWith(picker);
+            var inputContainer = jQuery(this).closest('.color-control');
+            var field = inputContainer.data('field');
+            var pickerContainer = jQuery('tr.color-widget[data-field="'+field+'"]');
+            var picker = pickerContainer.find('.color-picker');
+            jQuery(this).remove();
 
             var skipUpdateCallback = 0;
             var farb = jQuery.farbtastic(picker, function (newColor) {
                 if (skipUpdateCallback) {
                     return;
                 }
-                container.find('.current-color').val(newColor);
+                inputContainer.find('.current-color').val(newColor);
                 lifecycle.updateItem(self.inspectorNode, field, newColor, true);
                 self.renderDisplay();
             });
@@ -127,7 +174,7 @@ jQuery(function () {
             });
 
             var input = jQuery('<input class="current-color" size=8 maxlength=7>');
-            container.find('.current-color').replaceWith(input);
+            inputContainer.find('.current-color').replaceWith(input);
             input.on('input', function () {
                 var newColor = input.val();
                 if (newColor.match(/^#[a-fA-F0-9]{6}$/)) {
@@ -307,13 +354,23 @@ jQuery(function () {
     Editor.prototype.addPointHandles = function (d) {
         var self = this;
         var points = [];
-        for (var i = 0; i < d.points.length; ++i) {
+
+        if (d._type == 'circle') {
             points.push({
-                _key: d._key + '-' + i,
-                i: i,
-                x: d.points[i].x,
-                y: d.points[i].y
+                _key: d._key + '-r',
+                x: this.xScaleZeroInvert(d.r + this.pointHandleRadius/2),
+                y: 0
             });
+        }
+        else {
+            for (var i = 0; i < d.points.length; ++i) {
+                points.push({
+                    _key: d._key + '-' + i,
+                    i: i,
+                    x: d.points[i].x,
+                    y: d.points[i].y
+                });
+            }
         }
         self.pointHandles = points;
     };
@@ -343,7 +400,12 @@ jQuery(function () {
         d.x = x;
         d.y = y;
 
-        this.lifecycle.movePolygonPoint(this.inspectorNode, d.i, x, y);
+        if (this.inspectorNode._type == 'circle') {
+            this.lifecycle.moveCircleRadiusPoint(this.inspectorNode, this.xScaleZero(x), this.yScaleZero(y));
+        }
+        else {
+            this.lifecycle.movePolygonPoint(this.inspectorNode, d.i, x, y);
+        }
 
         this.renderDisplay();
     };
@@ -363,18 +425,26 @@ jQuery(function () {
 
         rects.exit()
             .classed("removing", true)
-            .transition().duration(200)
+            .transition().duration(200*self.animationFactor)
               .remove();
 
-        rects.enter().insert("rect", ":first-child")
+        var newRects = rects.enter().insert("rect", ":first-child")
                      .attr("data-key", function (d) { return d._key })
                      .classed("text-background", true)
                      .on("click", function (d) {
                          d3.event.stopPropagation();
                          self.clickedDecoration(d);
                      })
-                     .call(function (rects) { self.didEnterTextDecorations(rects) })
-              .merge(rects)
+                     .call(function (rects) { self.didEnterTextDecorations(rects) });
+
+        if (!initial) {
+            newRects.style("opacity", 0.15)
+                    .transition().duration(200*self.animationFactor)
+                        .style("opacity", 1)
+                        .on("end", function () { d3.select(this).style("opacity", undefined) });
+        }
+
+        newRects.merge(rects)
                       .classed("focus", function (d) { return self.isFocused(d) })
                       .each(function (d) {
                           var rect = d3.select(this);
@@ -401,15 +471,24 @@ jQuery(function () {
         handles.exit()
               .remove();
 
-        handles.enter().append("circle")
-                     .classed("point-handle", true)
-                     .call(d3.drag()
-                         .subject(function (d) { return { x: self.xScaleZero(d.x), y : self.yScaleZero(d.y) } })
-                         .on("start", function (d) { self.didBeginDrag(d, this) })
-                         .on("drag", function (d) { self.didDragPointHandle(d) })
-                         .on("end", function (d) { self.didEndDrag(d, this) })
-                     )
-              .merge(handles)
+        var newHandles = handles.enter().append("circle")
+                           .classed("point-handle", true)
+                           .attr("r", self.pointHandleRadius)
+                           .call(d3.drag()
+                               .subject(function (d) { return { x: self.xScaleZero(d.x), y : self.yScaleZero(d.y) } })
+                               .on("start", function (d) { self.didBeginDrag(d, this) })
+                               .on("drag", function (d) { self.didDragPointHandle(d) })
+                               .on("end", function (d) { self.didEndDrag(d, this) })
+                           );
+
+        if (!initial) {
+            newHandles.style("opacity", 0.15)
+                      .transition().duration(200*self.animationFactor)
+                          .style("opacity", 1)
+                          .on("end", function () { d3.select(this).style("opacity", undefined) });
+        }
+
+        newHandles.merge(handles)
                      .attr("transform", function (d) {
                          var x = self.xScale(self.inspectorNode.x);
                          var y = self.yScale(self.inspectorNode.y);
@@ -471,10 +550,6 @@ jQuery(function () {
     };
 
     Editor.prototype.didEnterStatusNodes = function (statuses) {
-        statuses.call(this._createDrag());
-    };
-
-    Editor.prototype.didEnterStatusLabels = function (statuses) {
         statuses.call(this._createDrag());
     };
 
@@ -561,8 +636,7 @@ jQuery(function () {
         };
 
         self.lifecycle.undoStateChangedCallback = function () {
-            d3.select(node).select('button.undo').classed('invisible', !self.lifecycle.hasUndoStack());
-            d3.select(node).select('button.redo').classed('invisible', !self.lifecycle.hasRedoStack());
+            self._refreshInspector(false);
         };
         self.lifecycle.undoStateChangedCallback();
 
@@ -583,7 +657,7 @@ jQuery(function () {
         Super.prototype.focusItem.call(this, item);
         this.setInspectorContent(item);
 
-        if (item._type == 'polygon' || item._type == 'line') {
+        if (item._type == 'polygon' || item._type == 'line' || item._type == 'circle') {
             this.addPointHandles(item);
         }
 

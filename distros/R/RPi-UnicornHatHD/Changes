@@ -1,0 +1,26 @@
+Revision history for Perl extension RPi-UnicornHatHD
+
+0.05 2017-09-30T04:54:53Z
+
+	- Automatically size image for text length in reddit scroll example
+
+0.04 2017-09-29T17:20:29Z
+
+	- Minor fix on vertical alignment of reddit scroll example script
+
+0.03 2017-09-27T02:11:54Z
+
+	- Include correct LICENSE
+	- Clean up docs and examples a little
+
+0.02 2017-09-27T00:50:56Z
+
+	- Adding demo scripts
+		- ex/reddit_scroll.pl - Display titles from /r/all
+		- ex/rave.pl - Flash and fade random colors
+		- ex/tardis.pl - Draw a crude time machine on screen
+
+0.01 2017-09-26T23:25:52Z
+
+    - original version
+

@@ -74,6 +74,8 @@ sub should_return_properly_formatted_JSON {
             }
         ],
         info => {
+            rows   => $width / $unit_size,
+            cols   => $height / $unit_size,
             metric => {
                 length => $plan_length,
                 height => $plan_height,

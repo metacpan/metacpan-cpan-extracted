@@ -1,4 +1,4 @@
-#!perl -T
+#!perl -T ## no critic (TidyCode)
 
 use strict;
 use warnings;

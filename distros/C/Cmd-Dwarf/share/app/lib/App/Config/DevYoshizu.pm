@@ -11,6 +11,14 @@ sub setup {
 			base     => 'http://<APP_NAME>.seagirl.local',
 			ssl_base => 'https://<APP_NAME>.seagirl.local',
 		},
+		db => {
+			master => {
+				dsn      => 'dbi:Pg:dbname=<APP_NAME>; hostname=localhost; port=5432',
+				username => 'www',
+				password => '',
+				opts     => { pg_enable_utf8 => 1 },
+			},
+		},
 	);
 }
 

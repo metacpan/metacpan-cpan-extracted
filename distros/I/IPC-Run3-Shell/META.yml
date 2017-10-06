@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,4 +38,5 @@ resources:
   bugtracker: https://github.com/haukex/IPC-Run3-Shell/issues
   homepage: https://github.com/haukex/IPC-Run3-Shell
   repository: https://github.com/haukex/IPC-Run3-Shell.git
-version: '0.54'
+version: '0.56'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,17 @@
 Revision history for Perl extension File::Replace.
 
-0.04	Sun, Sep 17 2017
+0.06	Sat, Sep 30 2017
+	- DEPRECATED "devnull" option (merged into "create" option)
+	- DEPRECATED previous "create" option values
+	- added "in_fh" option
+	- improved Tie::Handle::Base subclassing
+	- made return values of tied methods more consistent with Perl's
+	- various other minor changes, fixes, and improvements
+	- major doc. updates, especially Tie::Handle::Base
+	- removed "alpha version" notice
+	- fixed a test failure on cygwin, made tests a bit more robust
+
+0.04	Sun, Sep 17 2017	commit 91cb26d0dba90b00d37ffafae211ed089f8d04fd
 	- updated minimum Perl version to 5.8.1 (was 5.8.0)
 	- fixed various compatibility issues in Perls 5.8.1 thru 5.24
 	- no feature or documentation changes

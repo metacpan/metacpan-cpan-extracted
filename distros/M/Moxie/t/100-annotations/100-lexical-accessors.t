@@ -19,9 +19,6 @@ BEGIN {
     has foo => sub { 'FOO' };
     has bar => sub { 'BAR' };
 
-    my sub foo : private;
-    my sub bar : private;
-
     sub change_bar {
         my $self = shift; # we are safe even with modifications to @_
         my ($value) = @_;

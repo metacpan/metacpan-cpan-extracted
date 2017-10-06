@@ -99,15 +99,19 @@ sub create_customizer_feed {
   my $feed_result =
     $client->AdCustomizerFeedService()->mutate({operations => [$operation]});
 
-  my $saved_feed = $feed_result->get_value(0);
+  my $added_feed = $feed_result->get_value(0);
 
   printf(
-    "Ad customizer feed with ID %d and name '%s'.\n",
-    $saved_feed->get_feedId(),
-    $saved_feed->get_feedName(),
-  );
+    "Created ad customizer feed with ID %d, and name '%s' and attributes:\n",
+    $added_feed->get_feedId(),
+    $added_feed->get_feedName());
+  foreach my $feed_attribute ($added_feed->get_feedAttributes()) {
+    printf "  ID: %d, name: '%s', type: '%s'\n",
+      $feed_attribute->get_id(), $feed_attribute->get_name(),
+      $feed_attribute->get_type();
+  }
 
-  return $saved_feed;
+  return $added_feed;
 }
 
 sub create_customizer_feed_items {
@@ -163,8 +167,8 @@ sub create_feed_item_add_operation {
         {TargetingAdGroupId => $ad_group_id})});
 
   my $operation = Google::Ads::AdWords::v201708::FeedItemOperation->new({
-      operand  => $feed_item,
-      operator => "ADD"
+    operand  => $feed_item,
+    operator => "ADD"
   });
 
   return $operation;
@@ -178,8 +182,7 @@ sub create_ads_with_customizations {
       headlinePart2 => sprintf("Only {=%s.Price}",            $feed_name),
       description =>
         sprintf("Offer ends in {=countdown(%s.Date)}!", $feed_name),
-      finalUrls  => ['http://www.example.com']
-  });
+      finalUrls => ['http://www.example.com']});
 
   # We add the same ad to both ad groups. When they serve, they will show
   # different values, since they match different feed items.

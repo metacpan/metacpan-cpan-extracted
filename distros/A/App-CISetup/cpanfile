@@ -26,8 +26,8 @@ on 'test' => sub {
   requires "Cwd" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "Test2::Bundle::Extended" => "0";
   requires "Test2::Plugin::NoWarnings" => "0.06";
+  requires "Test2::V0" => "0";
   requires "Test::Class::Moose" => "0";
   requires "Test::Class::Moose::CLI" => "0";
   requires "Test::More" => "1.302015";
@@ -64,5 +64,4 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
 };

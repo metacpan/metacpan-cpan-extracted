@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak confess/;
 use List::Util qw/first/;
@@ -67,18 +67,7 @@ sub run {
         next unless $class->viable($self);
         my @out;
 
-
-        my $chdir = $self->job->chdir;
-        my $orig = File::Spec->curdir();
-        chdir($chdir) if $chdir;
-
-        my $ok = eval { @out = $class->run($self); 1 };
-        my $err = $@;
-
-        chdir($orig) if $chdir;
-        die $err unless $ok;
-
-        return @out;
+        return $class->run($self);
     }
 
     croak "No viable run method found";

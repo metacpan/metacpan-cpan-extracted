@@ -17,7 +17,6 @@
       "build" : {
          "requires" : {
             "App::CELL" : "0.222",
-            "App::MFILE" : "0.181",
             "HTTP::Request" : "0",
             "Plack::Test" : "0",
             "Scalar::Util" : "0",
@@ -33,7 +32,6 @@
       "runtime" : {
          "requires" : {
             "App::CELL" : "0.222",
-            "App::MFILE" : "0.181",
             "File::ShareDir" : "1.00",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
@@ -56,7 +54,7 @@
    "provides" : {
       "App::MFILE::WWW" : {
          "file" : "lib/App/MFILE/WWW.pm",
-         "version" : "0.158"
+         "version" : "0.161"
       },
       "App::MFILE::WWW::Dispatch" : {
          "file" : "lib/App/MFILE/WWW/Dispatch.pm",
@@ -73,5 +71,5 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "0.158"
+   "version" : "0.161"
 }

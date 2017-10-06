@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use 5.010;
 use warnings;
 use strict;
 
@@ -15,18 +14,18 @@ unless ($handle && $key) {
   die "usage: $0 <handle> <key>\n";
 }
 
-say "CHALLENGE:";
+print "CHALLENGE:\n";
 
 my $challenge = Authen::U2F->challenge;
-say encode_json({
+print encode_json({
   challenge => $challenge,
   keyHandle => $handle,
   appId     => APPID,
   version   => VERSION,
-});
+}) . "\n";
 
-say "";
-say "ENTER RESPONSE:";
+print "\n";
+print "ENTER RESPONSE:\n";
 chomp (my $in = <STDIN>);
 
 my $sign_response = decode_json($in);
@@ -41,5 +40,5 @@ Authen::U2F->signature_verify(
   client_data    => $sign_response->{clientData},
 );
 
-say "";
-say "SUCCESS";
+print "\n";
+print "SUCCESS\n";

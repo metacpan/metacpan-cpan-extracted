@@ -496,6 +496,8 @@ sub on_create
          ['~Properties' => sub { $w-> fig_propdialog( $w-> {selectedRect})}],
       ],
    );
+   my $scale = $::application-> uiScaling;
+   $scale = 1 if $scale < 1;
 
    my %btn_profile = (
       glyphs      => 2,
@@ -503,13 +505,13 @@ sub on_create
       selectable  => 0,
       transparent => 1,
       flat        => 1,
-      size        => [ 36, 36],
+     size        => [ map { $_ * $scale } 36, 36],
       borderWidth => 1,
    );
 
    $w-> ToolBar-> insert(
       [ SpeedButton =>
-         origin    => [ 114, 1],
+         origin    => [ 114 * $scale, 1],
          image     => App::PLab::ButtonGlyphs::icon( bg::floppy),
          hint      => 'Save file',
          enabled   => 0,
@@ -518,7 +520,7 @@ sub on_create
          %btn_profile,
       ],
       [ SpeedButton =>
-         origin    => [ 150, 1],
+         origin    => [ 150 * $scale, 1],
          image     => App::PLab::ButtonGlyphs::icon( bg::print),
          hint      => 'Print',
          enabled   => 0,

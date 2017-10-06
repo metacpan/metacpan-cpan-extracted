@@ -1,4 +1,4 @@
-Locale::Utils::PluralForms version 0.001
+Locale::Utils::PluralForms version 0.002
 ========================================
 
 Utils to use plural forms.
@@ -26,7 +26,6 @@ This module requires these other modules and libraries:
     Moose
     MooseX::StrictConstructor
     namespace::autoclean
-    syntax
     English
     HTML::Entities
     LWP::UserAgent
@@ -34,7 +33,7 @@ This module requires these other modules and libraries:
     
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2011,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

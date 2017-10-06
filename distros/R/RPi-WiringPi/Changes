@@ -1,5 +1,26 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3621  2017-10-03
+        - removed the test/images and images/ directory from the repo
+        - renamed Util.pm to Core.pm
+        - we now use RPi::Const in replacement of RPi::WiringPi::Constant
+          (closes #52)
+        - updated diagrams with the ADS1115 ADC
+        - renamed the PWM test to show it also includes SPI
+        - re-enabled t/42 for interrupt both
+        - updated FAQ unit test section with a blurb about the HCSR04
+          ultra-sonic distance sensor (and how it requires an env var)
+        - removed assignment of pin objects where it wasn't really necessary, we
+          were just using them for registration purposes; we just make the calls
+          in void context
+        - fix issue in t/80-mode_state_all_pins.t where we were calling a setup
+          routine before checking if we're on a Pi board
+        - dac() POD now lists the mandatory parameters and some of the optional
+          ones (fixes #54)
+        - alphabeticalized the subs both in code and POD (closes #53)
+        - bumped prereq of RPi::ADC::ADS from 1.01 to 1.02
+        - fix a missing escape in FAQ POD (fixes #47)
+
 2.3620  2017-07-13
         - worked around issue where bbdispatch/brewbuild was causing havoc on
           pin cleanup due to the LCD. After trial and headache, I just disabled

@@ -2,7 +2,7 @@
 ROOT=${0%/*}/..
 PID=$ROOT/starman.pid
 PSGI=$ROOT/app.psgi
-HOST=127.0.0.1
+HOST=0.0.0.0
 PORT=11022
 MODE=debug
 LOCAL=NO

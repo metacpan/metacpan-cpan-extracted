@@ -3,8 +3,10 @@ jQuery(function () {
         this.width  = 809;
         this.height = 500;
         this.statusCircleRadius = 35;
+        this.statusCircleRadiusFudge = 4; // required to give room for the arrowhead
         this.gridSize = 10;
         this.padding = this.statusCircleRadius * 2;
+        this.animationFactor = 1; // bump this to 10 debug JS animations
     };
 
     Viewer.prototype.createScale = function (size, padding) {
@@ -27,7 +29,12 @@ jQuery(function () {
         var self = this;
         self._zoom = d3.zoom()
                        .scaleExtent([.3, 2])
-                       .on("zoom", function () { self.didZoom() });
+                       .on("zoom", function () {
+                           if (self.zoomControl) {
+                               self.didZoom();
+                           }
+                       });
+
         self.svg.call(self._zoom);
     };
 
@@ -39,7 +46,7 @@ jQuery(function () {
     Viewer.prototype.zoomScale = function (scaleBy, animated) {
         if (animated) {
             this.svg.transition()
-                    .duration(350)
+                    .duration(350*this.animationFactor)
                     .call(this._zoom.scaleBy, scaleBy);
         }
         else {
@@ -47,19 +54,38 @@ jQuery(function () {
         }
     }
 
-    Viewer.prototype.resetZoom = function (animated) {
+    Viewer.prototype._setZoom = function (zoom, animated) {
         if (animated) {
             this.svg.transition()
-                    .duration(750)
-                    .call(this._zoom.transform, this._zoomIdentity);
+                    .duration(750*this.animationFactor)
+                    .call(this._zoom.transform, zoom);
         }
         else {
-            this.svg.call(this._zoom.transform, this._zoomIdentity);
+            this.svg.call(this._zoom.transform, zoom);
         }
     };
 
+    Viewer.prototype.resetZoom = function (animated) {
+        this._setZoom(this._zoomIdentity, animated);
+    };
+
+    Viewer.prototype.zoomToFit = function (animated) {
+        var bounds = this.transformContainer.node().getBBox();
+        var parent = this.transformContainer.node().parentElement;
+        var fullWidth = parent.clientWidth || parent.parentNode.clientWidth,
+            fullHeight = parent.clientHeight || parent.parentNode.clientHeight;
+        var width = bounds.width,
+            height = bounds.height;
+        var midX = bounds.x + width / 2,
+            midY = bounds.y + height / 2;
+        var scale = .9 / Math.max(width / fullWidth, height / fullHeight);
+        var tx = fullWidth / 2 - scale * midX;
+        var ty = fullHeight / 2 - scale * midY;
+
+        this._setZoom(d3.zoomIdentity.translate(tx, ty).scale(scale), animated);
+    };
+
     Viewer.prototype.didEnterStatusNodes = function (statuses) { };
-    Viewer.prototype.didEnterStatusLabels = function (labels) { };
     Viewer.prototype.didEnterTransitions = function (paths) { };
     Viewer.prototype.didEnterTextDecorations = function (labels) { };
     Viewer.prototype.didEnterPolygonDecorations = function (polygons) { };
@@ -68,30 +94,51 @@ jQuery(function () {
 
     Viewer.prototype.renderStatusNodes = function (initial) {
         var self = this;
-        var statuses = self.statusContainer.selectAll("circle")
+        var statuses = self.statusContainer.selectAll("g")
                                            .data(self.lifecycle.statusObjects(), function (d) { return d._key });
 
-        statuses.exit()
-              .classed("removing", true)
-              .transition().duration(200)
-                .attr("r", self.statusCircleRadius * .8)
-                .remove();
+        var exitStatuses = statuses.exit()
+                                   .classed("removing", true)
+                                   .transition().duration(200*self.animationFactor)
+                                     .remove();
 
-        statuses.enter().append("circle")
-                        .attr("r", self.statusCircleRadius)
-                        .attr("data-key", function (d) { return d._key })
-                        .on("click", function (d) {
-                            d3.event.stopPropagation();
-                            self.clickedStatus(d);
-                        })
-                        .call(function (statuses) { self.didEnterStatusNodes(statuses) })
-                .merge(statuses)
-                        .attr("cx", function (d) { return self.xScale(d.x) })
-                        .attr("cy", function (d) { return self.yScale(d.y) })
-                        .attr("fill", function (d) { return d.color })
+        exitStatuses.select('circle')
+                    .attr("r", self.statusCircleRadius * .8);
+
+        var newStatuses = statuses.enter().append("g")
+                            .attr("data-key", function (d) { return d._key })
+                            .on("click", function (d) {
+                                d3.event.stopPropagation();
+                                self.clickedStatus(d);
+                            })
+                            .call(function (statuses) { self.didEnterStatusNodes(statuses) });
+
+        newStatuses.append("circle")
+                   .attr("r", initial ? self.statusCircleRadius : self.statusCircleRadius * .8)
+
+        newStatuses.append("text");
+
+        if (!initial) {
+            newStatuses.transition().duration(200*self.animationFactor)
+                         .select("circle")
+                         .attr("r", self.statusCircleRadius)
+        }
+
+        var allStatuses = newStatuses.merge(statuses)
                         .classed("focus", function (d) { return self.isFocused(d) })
                         .classed("focus-from", function (d) { return self.isFocusedTransition(d, true) })
                         .classed("focus-to", function (d) { return self.isFocusedTransition(d, false) });
+
+        allStatuses.select("circle")
+                     .attr("cx", function (d) { return self.xScale(d.x) })
+                     .attr("cy", function (d) { return self.yScale(d.y) })
+                     .attr("fill", function (d) { return d.color });
+
+        allStatuses.select("text")
+                      .attr("x", function (d) { return self.xScale(d.x) })
+                      .attr("y", function (d) { return self.yScale(d.y) })
+                      .attr("fill", function (d) { return d3.hsl(d.color).l > 0.35 ? '#000' : '#fff' })
+                      .text(function (d) { return d.name }).each(function () { self.truncateLabel(this) })
     };
 
     Viewer.prototype.clickedStatus = function (d) { };
@@ -109,40 +156,33 @@ jQuery(function () {
         }
     };
 
-    Viewer.prototype.renderStatusLabels = function (initial) {
-        var self = this;
-        var labels = self.statusContainer.selectAll("text")
-                                         .data(self.lifecycle.statusObjects(), function (d) { return d._key });
-
-        labels.exit()
-            .classed("removing", true)
-            .transition().duration(200)
-              .remove();
-
-        labels.enter().append("text")
-                      .attr("data-key", function (d) { return d._key })
-                      .on("click", function (d) {
-                          d3.event.stopPropagation();
-                          self.clickedStatus(d);
-                      })
-                     .call(function (labels) { self.didEnterStatusLabels(labels) })
-              .merge(labels)
-                      .attr("x", function (d) { return self.xScale(d.x) })
-                      .attr("y", function (d) { return self.yScale(d.y) })
-                      .attr("fill", function (d) { return d3.hsl(d.color).l > 0.35 ? '#000' : '#fff' })
-                      .text(function (d) { return d.name }).each(function () { self.truncateLabel(this) })
-                      .classed("focus", function (d) { return self.isFocused(d) })
-                      .classed("focus-from", function (d) { return self.isFocusedTransition(d, true) })
-                      .classed("focus-to", function (d) { return self.isFocusedTransition(d, false) });
-    };
-
     Viewer.prototype.transitionArc = function (d) {
-      var from = this.lifecycle.statusObjectForName(d.from);
-      var to = this.lifecycle.statusObjectForName(d.to);
-      var dx = this.xScale(to.x - from.x),
-          dy = this.yScale(to.y - from.y),
-          dr = Math.abs(dx*6) + Math.abs(dy*6);
-      return "M" + this.xScale(from.x) + "," + this.yScale(from.y) + "A" + dr + "," + dr + " 0 0,1 " + this.xScale(to.x) + "," + this.yScale(to.y);
+        // c* variables are circle centers
+        // a* variables are for the arc path which is from circle edge to circle edge
+        var from = this.lifecycle.statusObjectForName(d.from),
+              to = this.lifecycle.statusObjectForName(d.to),
+             cx0 = this.xScale(from.x),
+             cx1 = this.xScale(to.x),
+             cy0 = this.yScale(from.y),
+             cy1 = this.yScale(to.y),
+             cdx = cx1 - cx0,
+             cdy = cy1 - cy0;
+
+        // the circles on top of each other would calculate atan2(0,0) which is
+        // undefined and a little nonsensical
+        if (cdx == 0 && cdy == 0) {
+            return null;
+        }
+
+        var theta = Math.atan2(cdy, cdx),
+                r = this.statusCircleRadius,
+              ax0 = cx0 + r * Math.cos(theta),
+              ay0 = cy0 + r * Math.sin(theta),
+              ax1 = cx1 - (r + this.statusCircleRadiusFudge) * Math.cos(theta),
+              ay1 = cy1 - (r + this.statusCircleRadiusFudge) * Math.sin(theta),
+               dr = Math.abs((ax1-ax0)*4) + Math.abs((ay1-ay0)*4);
+
+        return "M" + ax0 + "," + ay0 + " A" + dr + "," + dr + " 0 0,1 " + ax1 + "," + ay1;
     };
 
     Viewer.prototype.renderTransitions = function (initial) {
@@ -150,25 +190,52 @@ jQuery(function () {
         var paths = self.transitionContainer.selectAll("path")
                         .data(self.lifecycle.transitions, function (d) { return d._key });
 
-        paths.exit()
-            .classed("removing", true)
-            .transition().duration(200)
-              .remove();
+        paths.exit().classed("removing", true)
+                    .each(function (d) {
+                        var length = this.getTotalLength();
+                        var path = d3.select(this);
+                        path.attr("stroke-dasharray", length + " " + length)
+                            .attr("stroke-dashoffset", 0)
+                            .style("marker-end", "none")
+                            .transition().duration(200*self.animationFactor).ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", length)
+                              .remove();
+                    });
 
-        paths.enter().append("path")
-                     .attr("data-key", function (d) { return d._key })
-                     .on("click", function (d) {
-                         d3.event.stopPropagation();
-                         self.clickedTransition(d);
-                     })
-                     .call(function (paths) { self.didEnterTransitions(paths) })
-              .merge(paths)
+        var newPaths = paths.enter().append("path")
+                         .attr("data-key", function (d) { return d._key })
+                         .on("click", function (d) {
+                             d3.event.stopPropagation();
+                             self.clickedTransition(d);
+                         })
+                         .call(function (paths) { self.didEnterTransitions(paths) });
+
+        newPaths.merge(paths)
                       .attr("d", function (d) { return self.transitionArc(d) })
                       .classed("dashed", function (d) { return d.style == 'dashed' })
                       .classed("dotted", function (d) { return d.style == 'dotted' })
                       .classed("focus", function (d) { return self.isFocused(d) })
                       .classed("focus-from", function (d) { return self.isFocusedTransition(d, true) })
                       .classed("focus-to", function (d) { return self.isFocusedTransition(d, false) });
+
+        if (!initial) {
+            newPaths.each(function (d) {
+                        var length = this.getTotalLength();
+                        var path = d3.select(this);
+                        path.attr("stroke-dasharray", length + " " + length)
+                            .attr("stroke-dashoffset", length)
+                            .style("marker-end", "none")
+                            .transition().duration(200*self.animationFactor).ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 0)
+                              .on("end", function () {
+                                d3.select(this)
+                                  .attr("stroke-dasharray", undefined)
+                                  .attr("stroke-offset", undefined)
+                                  .style("marker-end", undefined)
+                              })
+                    });
+        }
+
     };
 
     Viewer.prototype._wrapTextDecoration = function (node, text) {
@@ -196,17 +263,25 @@ jQuery(function () {
 
         labels.exit()
             .classed("removing", true)
-            .transition().duration(200)
+            .transition().duration(200*self.animationFactor)
               .remove();
 
-        labels.enter().append("text")
-                     .attr("data-key", function (d) { return d._key })
-                     .on("click", function (d) {
-                         d3.event.stopPropagation();
-                         self.clickedDecoration(d);
-                     })
-                     .call(function (labels) { self.didEnterTextDecorations(labels) })
-              .merge(labels)
+        var newLabels = labels.enter().append("text")
+                          .attr("data-key", function (d) { return d._key })
+                          .on("click", function (d) {
+                              d3.event.stopPropagation();
+                              self.clickedDecoration(d);
+                          })
+                          .call(function (labels) { self.didEnterTextDecorations(labels) });
+
+        if (!initial) {
+            newLabels.style("opacity", 0.15)
+                     .transition().duration(200*self.animationFactor)
+                         .style("opacity", 1)
+                         .on("end", function () { d3.select(this).style("opacity", undefined) });
+        }
+
+        newLabels.merge(labels)
                       .attr("x", function (d) { return self.xScale(d.x) })
                       .attr("y", function (d) { return self.yScale(d.y) })
                       .classed("bold", function (d) { return d.bold })
@@ -225,17 +300,25 @@ jQuery(function () {
 
         polygons.exit()
             .classed("removing", true)
-            .transition().duration(200)
+            .transition().duration(200*self.animationFactor)
               .remove();
 
-        polygons.enter().append("polygon")
-                     .attr("data-key", function (d) { return d._key })
-                     .on("click", function (d) {
-                         d3.event.stopPropagation();
-                         self.clickedDecoration(d);
-                     })
-                     .call(function (polygons) { self.didEnterPolygonDecorations(polygons) })
-              .merge(polygons)
+        var newPolygons = polygons.enter().append("polygon")
+                            .attr("data-key", function (d) { return d._key })
+                            .on("click", function (d) {
+                                d3.event.stopPropagation();
+                                self.clickedDecoration(d);
+                            })
+                            .call(function (polygons) { self.didEnterPolygonDecorations(polygons) });
+
+        if (!initial) {
+            newPolygons.style("opacity", 0.15)
+                       .transition().duration(200*self.animationFactor)
+                           .style("opacity", 1)
+                           .on("end", function () { d3.select(this).style("opacity", undefined) });
+        }
+
+        newPolygons.merge(polygons)
                      .attr("stroke", function (d) { return d.renderStroke ? d.stroke : 'none' })
                      .classed("dashed", function (d) { return d.strokeStyle == 'dashed' })
                      .classed("dotted", function (d) { return d.strokeStyle == 'dotted' })
@@ -256,18 +339,26 @@ jQuery(function () {
 
         circles.exit()
             .classed("removing", true)
-            .transition().duration(200)
+            .transition().duration(200*self.animationFactor)
               .remove();
 
-        circles.enter().append("circle")
-                     .classed("decoration", true)
-                     .attr("data-key", function (d) { return d._key })
-                     .on("click", function (d) {
-                         d3.event.stopPropagation();
-                         self.clickedDecoration(d);
-                     })
-                     .call(function (circles) { self.didEnterCircleDecorations(circles) })
-              .merge(circles)
+        var newCircles = circles.enter().append("circle")
+                           .classed("decoration", true)
+                           .attr("data-key", function (d) { return d._key })
+                           .on("click", function (d) {
+                               d3.event.stopPropagation();
+                               self.clickedDecoration(d);
+                           })
+                           .call(function (circles) { self.didEnterCircleDecorations(circles) });
+
+        if (!initial) {
+            newCircles.style("opacity", 0.15)
+                      .transition().duration(200*self.animationFactor)
+                          .style("opacity", 1)
+                          .on("end", function () { d3.select(this).style("opacity", undefined) });
+        }
+
+        newCircles.merge(circles)
                      .attr("stroke", function (d) { return d.renderStroke ? d.stroke : 'none' })
                      .classed("dashed", function (d) { return d.strokeStyle == 'dashed' })
                      .classed("dotted", function (d) { return d.strokeStyle == 'dotted' })
@@ -285,17 +376,38 @@ jQuery(function () {
 
         lines.exit()
             .classed("removing", true)
-            .transition().duration(200)
+            .transition().duration(200*self.animationFactor)
               .remove();
 
-        lines.enter().append("line")
-                     .attr("data-key", function (d) { return d._key })
-                     .on("click", function (d) {
-                         d3.event.stopPropagation();
-                         self.clickedDecoration(d);
-                     })
-                     .call(function (lines) { self.didEnterLineDecorations(lines) })
-              .merge(lines)
+        var newLines = lines.enter().append("line")
+                         .attr("data-key", function (d) { return d._key })
+                         .on("click", function (d) {
+                             d3.event.stopPropagation();
+                             self.clickedDecoration(d);
+                         })
+                         .call(function (lines) { self.didEnterLineDecorations(lines) });
+
+        if (!initial) {
+            newLines.each(function (d) {
+                        var length = Math.sqrt((d.points[1].x-d.points[0].x)**2 + (d.points[1].y-d.points[0].y)**2);
+                        var path = d3.select(this);
+                        path.attr("stroke-dasharray", length + " " + length)
+                            .attr("stroke-dashoffset", length)
+                            .style("marker-start", "none")
+                            .style("marker-end", "none")
+                            .transition().duration(200*self.animationFactor).ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 0)
+                              .on("end", function () {
+                                d3.select(this)
+                                  .attr("stroke-dasharray", undefined)
+                                  .attr("stroke-offset", undefined)
+                                  .style("marker-start", undefined)
+                                  .style("marker-end", undefined)
+                              })
+                    });
+        }
+
+        newLines.merge(lines)
                      .classed("dashed", function (d) { return d.style == 'dashed' })
                      .classed("dotted", function (d) { return d.style == 'dotted' })
                      .attr("transform", function (d) { return "translate(" + self.xScale(d.x) + ", " + self.yScale(d.y) + ")" })
@@ -318,7 +430,6 @@ jQuery(function () {
     Viewer.prototype.renderDisplay = function (initial) {
         this.renderTransitions(initial);
         this.renderStatusNodes(initial);
-        this.renderStatusLabels(initial);
         this.renderDecorations(initial);
     };
 
@@ -428,11 +539,30 @@ jQuery(function () {
         self.lifecycle = new RT.Lifecycle(name);
         self.lifecycle.initializeFromConfig(config);
 
+        // need to start with zoom control on to set the initial zoom
+        this.zoomControl = true;
+
         self.addZoomBehavior();
 
-        self.focusOnStatus(focusStatus, true, false);
+        if (self.container.hasClass('center-status')) {
+            self.focusOnStatus(focusStatus, true, false);
+            self.renderDisplay(true);
+        }
+        else {
+            self.focusOnStatus(focusStatus, false, false);
+            self.renderDisplay(true);
 
-        self.renderDisplay(true);
+            if (self.container.hasClass('center-fit')) {
+                self.zoomToFit(false);
+            }
+            else if (self.container.hasClass('center-origin')) {
+                self.resetZoom(false);
+            }
+        }
+
+        self._zoomIdentity = self._currentZoom;
+
+        self.zoomControl = self.container.hasClass('zoomable');
 
         self.container.on('click', 'button.zoom-in', function (e) {
             e.preventDefault();

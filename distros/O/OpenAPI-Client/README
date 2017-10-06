@@ -10,8 +10,8 @@ DESCRIPTION
     The generated class will perform input validation, so invalid data won't
     be sent to the server.
 
-    Not that this implementation is currently EXPERIMENTAL! Feedback is
-    appreciated.
+    Not that this implementation is currently EXPERIMENTAL, but unlikely to
+    change! Feedback is appreciated.
 
 SYNOPSIS
   Open API specification
@@ -68,6 +68,27 @@ ATTRIBUTES
     Returns a Mojo::URL object with the base URL to the API. The default
     value comes from "schemes", "basePath" and "host" in the Open API
     specification.
+
+  pre_processor
+      $code = $self->pre_processor;
+      $self = $self->pre_processor(sub { my ($headers, $req) = @_; ... });
+
+    Holds a code ref that can pre-process the request. The return values are
+    passed on to "build_tx" in Mojo::UserAgent. Example:
+
+      $self->pre_processor(sub {
+        my ($headers, $req) = @_;
+        return $headers, json => {whatever => 42};
+      });
+
+    The code above will result in this:
+
+      $self->ua->build_tx($http_method, $url, $headers, json => {whatever => 42});
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    $headers is a hash-ref containing the request headers and $req is a
+    hash-ref that can contain either the key "body" or "form". Note that
+    additional parameters might be added to $req, though it is unlikely.
 
   ua
       $ua = $self->ua;

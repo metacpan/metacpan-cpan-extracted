@@ -568,7 +568,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&sum_by;
+            goto &sum_by;
         }
 
         my $sum = $arg // Sidef::Types::Number::Number::ZERO;
@@ -596,7 +596,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&prod_by;
+            goto &prod_by;
         }
 
         my $prod = $arg // Sidef::Types::Number::Number::ONE;
@@ -609,11 +609,11 @@ package Sidef::Types::Array::Array {
     }
 
     sub _min_max_by {
-        my ($self, $code, $value) = @_;
+        my ($self, $block, $value) = @_;
 
         @$self || return undef;
 
-        my @pairs = map { [$_, scalar $code->run($_)] } @$self;
+        my @pairs = map { [$_, scalar $block->run($_)] } @$self;
         my $item = $pairs[0];
 
         foreach my $i (1 .. $#pairs) {
@@ -625,12 +625,12 @@ package Sidef::Types::Array::Array {
 
     sub max_by {
         @_ = (@_[0, 1], 1);
-        goto \&_min_max_by;
+        goto &_min_max_by;
     }
 
     sub min_by {
         @_ = (@_[0, 1], -1);
-        goto \&_min_max_by;
+        goto &_min_max_by;
     }
 
     sub swap {
@@ -651,7 +651,7 @@ package Sidef::Types::Array::Array {
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto \&first_by;
+                goto &first_by;
             }
 
             my $max = $#$self;
@@ -662,13 +662,15 @@ package Sidef::Types::Array::Array {
         @$self ? $self->[0] : ();
     }
 
+    *head = \&first;
+
     sub last {
         my ($self, $arg) = @_;
 
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto \&last_by;
+                goto &last_by;
             }
 
             my $from = @$self - CORE::int($arg);
@@ -677,6 +679,8 @@ package Sidef::Types::Array::Array {
 
         @$self ? $self->[-1] : ();
     }
+
+    *tail = \&last;
 
     sub _flatten {    # this exists for performance reasons
         my ($self, $class) = @_;
@@ -781,10 +785,10 @@ package Sidef::Types::Array::Array {
     *slice = \&ft;
 
     sub each {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $item (@$self) {
-            $code->run($item);
+            $block->run($item);
         }
 
         $self;
@@ -794,18 +798,18 @@ package Sidef::Types::Array::Array {
     *foreach = \&each;
 
     sub each_slice {
-        my ($self, $n, $code) = @_;
+        my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
         my $end = @$self;
         for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            $code->run(@$self[$i - ($n - 1) .. $i]);
+            $block->run(@$self[$i - ($n - 1) .. $i]);
         }
 
         my $mod = $end % $n;
         if ($mod != 0) {
-            $code->run(@$self[$end - $mod .. $end - 1]);
+            $block->run(@$self[$end - $mod .. $end - 1]);
         }
 
         $self;
@@ -875,22 +879,22 @@ package Sidef::Types::Array::Array {
     }
 
     sub each_cons {
-        my ($self, $n, $code) = @_;
+        my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
         foreach my $i ($n - 1 .. $#$self) {
-            $code->run(@$self[$i - $n + 1 .. $i]);
+            $block->run(@$self[$i - $n + 1 .. $i]);
         }
 
         $self;
     }
 
     sub each_index {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $i (0 .. $#$self) {
-            $code->run(Sidef::Types::Number::Number->_set_uint($i));
+            $block->run(Sidef::Types::Number::Number->_set_uint($i));
         }
 
         $self;
@@ -899,27 +903,27 @@ package Sidef::Types::Array::Array {
     *each_key = \&each_index;
 
     sub each_kv {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $i (0 .. $#$self) {
-            $code->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]);
+            $block->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]);
         }
 
         $self;
     }
 
     sub expand {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        if (not defined($code)) {
-            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        if (not defined($block)) {
+            $block = Sidef::Types::Block::Block->new(code => sub { $_[0] });
         }
 
         my @new;
         my @copy = @$self;
 
         foreach my $item (@copy) {
-            my $res = $code->run($item);
+            my $res = $block->run($item);
 
             if (ref($res) eq __PACKAGE__) {
                 CORE::push(@copy, @$res);
@@ -935,16 +939,16 @@ package Sidef::Types::Array::Array {
     *expand_by = \&expand;
 
     sub recmap {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        if (not defined($code)) {
-            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        if (not defined($block)) {
+            $block = Sidef::Types::Block::Block->new(code => sub { $_[0] });
         }
 
         my @copy = @$self;
 
         foreach my $item (@copy) {
-            my $res = $code->run($item);
+            my $res = $block->run($item);
 
             if (ref($res) eq __PACKAGE__) {
                 CORE::push(@copy, @$res);
@@ -955,33 +959,33 @@ package Sidef::Types::Array::Array {
     }
 
     sub map {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @array;
         foreach my $item (@$self) {
-            CORE::push(@array, $code->run($item));
+            CORE::push(@array, $block->run($item));
         }
 
         bless \@array, __PACKAGE__;
     }
 
     sub map_kv {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @arr;
         foreach my $i (0 .. $#$self) {
-            CORE::push(@arr, $code->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]));
+            CORE::push(@arr, $block->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]));
         }
 
         bless \@arr, __PACKAGE__;
     }
 
     sub flat_map {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @array;
         foreach my $item (@$self) {
-            CORE::push(@array, @{scalar $code->run($item)});
+            CORE::push(@array, @{scalar $block->run($item)});
         }
 
         bless \@array, __PACKAGE__;
@@ -1001,11 +1005,11 @@ package Sidef::Types::Array::Array {
     *select = \&grep;
 
     sub grep_kv {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @array;
         foreach my $i (0 .. $#$self) {
-            CORE::push(@array, $self->[$i]) if $code->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]);
+            CORE::push(@array, $self->[$i]) if $block->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]);
         }
 
         bless \@array, __PACKAGE__;
@@ -1014,11 +1018,11 @@ package Sidef::Types::Array::Array {
     *select_kv = \&grep_kv;
 
     sub group {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my %hash;
         foreach my $item (@$self) {
-            CORE::push(@{$hash{$code->run($item)}}, $item);
+            CORE::push(@{$hash{$block->run($item)}}, $item);
         }
 
         Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}, __PACKAGE__) } CORE::keys(%hash));
@@ -1070,14 +1074,14 @@ package Sidef::Types::Array::Array {
     }
 
     sub freq_by {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my %hash;
         foreach my $item (@$self) {
-            my $r = $hash{$code->run($item)} //= {
-                                                  count => 0,
-                                                  items => [],
-                                                 };
+            my $r = $hash{$block->run($item)} //= {
+                                                   count => 0,
+                                                   items => [],
+                                                  };
             CORE::push(@{$r->{items}}, $item);
             ++$r->{count};
         }
@@ -1093,10 +1097,10 @@ package Sidef::Types::Array::Array {
     }
 
     sub freq {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        if (defined($code)) {
-            goto \&freq_by;
+        if (defined($block)) {
+            goto &freq_by;
         }
 
         my %hash;
@@ -1112,9 +1116,9 @@ package Sidef::Types::Array::Array {
     }
 
     sub first_by {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
         foreach my $val (@$self) {
-            return $val if $code->run($val);
+            return $val if $block->run($val);
         }
         return undef;
     }
@@ -1122,18 +1126,18 @@ package Sidef::Types::Array::Array {
     *find = \&first_by;
 
     sub last_by {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
         for (my $i = $#$self ; $i >= 0 ; --$i) {
-            return $self->[$i] if $code->run($self->[$i]);
+            return $self->[$i] if $block->run($self->[$i]);
         }
         return undef;
     }
 
     sub any {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $val (@$self) {
-            $code->run($val)
+            $block->run($val)
               && return (Sidef::Types::Bool::Bool::TRUE);
         }
 
@@ -1141,12 +1145,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub all {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         @$self || return (Sidef::Types::Bool::Bool::FALSE);
 
         foreach my $val (@$self) {
-            $code->run($val)
+            $block->run($val)
               || return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -1287,6 +1291,35 @@ package Sidef::Types::Array::Array {
     sub shuffle {
         my ($self) = @_;
         bless [List::Util::shuffle(@$self)], __PACKAGE__;
+    }
+
+    sub weighted_shuffle_by {
+        my ($self, $block) = @_;
+
+#<<<
+        my @weights = map {
+            Sidef::Types::Number::Number::__numify__(${Sidef::Types::Number::Number->new(scalar $block->run($_))})
+        } @$self;
+#>>>
+
+        my @vals  = @$self;
+        my $total = List::Util::sum(@weights);
+
+        my @shuffled;
+        while (@vals > 1) {
+            my $select = CORE::int(CORE::rand($total));
+
+            my $idx = 0;
+            while ($select >= $weights[$idx]) {
+                $select -= $weights[$idx++];
+            }
+
+            CORE::push(@shuffled, CORE::splice(@vals, $idx, 1));
+            $total -= CORE::splice(@weights, $idx, 1);
+        }
+
+        CORE::push(@shuffled, @vals) if @vals;
+        bless \@shuffled, __PACKAGE__;
     }
 
     sub best_shuffle {
@@ -1826,18 +1859,18 @@ package Sidef::Types::Array::Array {
     }
 
     sub sort {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        if (defined $code) {
-            return bless([CORE::sort { scalar $code->run($a, $b) } @$self], __PACKAGE__);
+        if (defined $block) {
+            return bless([CORE::sort { scalar $block->run($a, $b) } @$self], __PACKAGE__);
         }
 
         bless [CORE::sort { $a cmp $b } @$self], __PACKAGE__;
     }
 
     sub sort_by {
-        my ($self, $code) = @_;
-        bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $code->run($_)] } @$self], __PACKAGE__;
+        my ($self, $block) = @_;
+        bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $block->run($_)] } @$self], __PACKAGE__;
     }
 
     sub cmp {
@@ -1987,29 +2020,29 @@ package Sidef::Types::Array::Array {
         my @perm;
         my @arr = @$self;
 
-        $n = $n->int;
+        $n = Sidef::Types::Number::Number->new($n)->int;
+        $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
 
-        my $cmp = CORE::int($n->cmp(Sidef::Types::Number::Number::ZERO));
+        my $cmp = Math::GMPz::Rmpz_cmp_ui($n, 0);
 
         if ($cmp < 0) {
-            $n   = $n->neg->dec;
+            Math::GMPz::Rmpz_neg($n, $n);
             @arr = CORE::reverse(@arr);
         }
         elsif ($cmp == 0) {
             return bless \@arr, __PACKAGE__;
         }
-        else {
-            $n = $n->dec;
-        }
 
-        while (@arr) {
-            my $end = $#arr;
-            my $f   = Sidef::Types::Number::Number->_set_uint($end)->factorial;
-            (my $q, $n) = $n->divmod($f);
-            $q = $q->imod(Sidef::Types::Number::Number->_set_uint($end + 1));
-            my $i = CORE::int($q);
-            push @perm, $arr[$i];
-            @arr = (@arr[0 .. $i - 1, $i + 1 .. $end]);
+        state $f = Math::GMPz::Rmpz_init_nobless();
+        state $q = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
+
+        while (my $len = scalar(@arr)) {
+            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
+            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
+            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
+            CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
         }
 
         bless \@perm, __PACKAGE__;
@@ -2044,12 +2077,10 @@ package Sidef::Types::Array::Array {
         my @arrays = @{$self};
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
-        my @first = @{CORE::shift(@arrays)};
-
         my @new_array;
         foreach my $i (0 .. $min - 1) {
 
-            my @tmp = ($first[$i], map { $_->[$i] } @arrays);
+            my @tmp = (map { $_->[$i] } @arrays);
 
             if (defined($block)) {
                 $block->run(@tmp);
@@ -2062,28 +2093,42 @@ package Sidef::Types::Array::Array {
         defined($block) ? $self : bless(\@new_array, __PACKAGE__);
     }
 
-    sub mzip {
+    sub zip_by {
         my ($self, $block) = @_;
 
         my @arrays = @{$self};
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
-        my @first = @{CORE::shift(@arrays)};
-
         my @new_array;
-        foreach my $i (0 .. $#first) {
+        foreach my $i (0 .. $min - 1) {
+            CORE::push(@new_array, $block->run(map { $_->[$i] } @arrays));
+        }
 
-            my @tmp = ($first[$i], map { $_->[$i % $min] } @arrays);
+        bless(\@new_array, __PACKAGE__);
+    }
 
-            if (defined($block)) {
-                $block->run(@tmp);
+    sub unzip_by {
+        my ($self, $block) = @_;
+
+        my @matrix;
+        foreach my $i (0 .. $#$self) {
+
+            my @tmp = $block->run($self->[$i]);
+
+            if (@tmp < @matrix) {
+                $#tmp = $#matrix;
             }
-            else {
-                CORE::push(@new_array, bless(\@tmp, __PACKAGE__));
+
+            foreach my $j (0 .. $#tmp) {
+                $matrix[$j][$i] = $tmp[$j];
             }
         }
 
-        defined($block) ? $self : bless(\@new_array, __PACKAGE__);
+        foreach my $row (@matrix) {
+            bless($row, __PACKAGE__);
+        }
+
+        bless(\@matrix, __PACKAGE__);
     }
 
     sub pack {
@@ -2142,7 +2187,7 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    *encode = \&join_bytes;    # somehow, I got this alias wrong...
+    *chrs   = \&join_bytes;
     *decode = \&join_bytes;
 
     sub reverse {
@@ -2216,10 +2261,10 @@ package Sidef::Types::Array::Array {
     *remove = \&delete;
 
     sub delete_if {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         for (my $i = 0 ; $i <= $#$self ; $i++) {
-            if ($code->run($self->[$i])) {
+            if ($block->run($self->[$i])) {
                 CORE::splice(@$self, $i--, 1);
             }
         }
@@ -2228,12 +2273,51 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_if = \&delete_if;
+    *remove_by = \&delete_if;
+    *delete_by = \&delete_if;
 
-    sub delete_first_if {
-        my ($self, $code) = @_;
+    sub extract_by {
+        my ($self, $block) = @_;
+
+        my @extracted;
+        for (my $i = 0 ; $i <= $#$self ; $i++) {
+            if ($block->run($self->[$i])) {
+                push @extracted, CORE::splice(@$self, $i--, 1);
+            }
+        }
+
+        bless(\@extracted, __PACKAGE__);
+    }
+
+    sub extract_first_by {
+        my ($self, $block) = @_;
 
         foreach my $i (0 .. $#$self) {
-            if ($code->run($self->[$i])) {
+            if ($block->run($self->[$i])) {
+                return CORE::splice(@$self, $i--, 1);
+            }
+        }
+
+        return undef;
+    }
+
+    sub extract_last_by {
+        my ($self, $block) = @_;
+
+        for (my $i = $#$self ; $i >= 0 ; --$i) {
+            if ($block->run($self->[$i])) {
+                return CORE::splice(@$self, $i, 1);
+            }
+        }
+
+        return undef;
+    }
+
+    sub delete_first_if {
+        my ($self, $block) = @_;
+
+        foreach my $i (0 .. $#$self) {
+            if ($block->run($self->[$i])) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
@@ -2243,13 +2327,14 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_first_if = \&delete_first_if;
+    *remove_first_by = \&delete_first_if;
+    *delete_first_by = \&delete_first_if;
 
     sub delete_last_if {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         for (my $i = $#$self ; $i >= 0 ; --$i) {
-            my $item = $self->[$i];
-            if ($code->run($item)) {
+            if ($block->run($self->[$i])) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
@@ -2259,6 +2344,8 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_last_if = \&delete_last_if;
+    *remove_last_by = \&delete_last_if;
+    *delete_last_by = \&delete_last_if;
 
     sub to_list { @{$_[0]} }
 

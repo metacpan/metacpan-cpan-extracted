@@ -11,7 +11,7 @@ use Symbol              (); # creating the occasional symbol
 use Scalar::Util        (); # I think I use blessed somewhere in here ...
 use Devel::OverloadInfo (); # Sometimes I need to know about overloading
 
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## ------------------------------------------------------------------
@@ -408,7 +408,7 @@ MOP::Internal::Util - For MOP Internal Use Only
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,15 @@
+ $class->new($str, $scheme)
+
+    Returns a instance that is a MarpaX::ESLIF::URI::$scheme representation
+    of $str, when $scheme defaults to _generic if there is no specific
+    $scheme implementation, or if the later fails.
+
+NOTES
+
+    Percent-encoded characters are decoded to ASCII characters
+    corresponding to every percent-encoded byte.
+
+SEE ALSO
+
+    MarpaX::ESLIF::URI::_generic
+

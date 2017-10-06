@@ -45,7 +45,7 @@ define ([
 ], function (
     $,
     ajax,
-    lib,
+    coreLib,
     currentUser,
     target,
     stack,
@@ -70,7 +70,7 @@ define ([
                                         "nick": nick,
                                         "phid": row.phid,
                                         "priv": row.priv,
-                                        "effective": lib.readableDate(row.effective)
+                                        "effective": coreLib.readableDate(row.effective)
                                     };
                                 }
                             );
@@ -102,7 +102,7 @@ define ([
                                 });
                             }
                         }
-                        lib.displayError(st.payload.message);
+                        coreLib.displayError(st.payload.message);
                     };
                 ajax(rest, sc, fc);
             };
@@ -130,20 +130,20 @@ define ([
                     if (st.code === 'DOCHAZKA_CUD_OK') {
                         console.log("Payload is", st.payload);
                         stack.unwindToTarget("actionPrivHistory");
-                        lib.displayError("Priv (status) history record successfully added");
+                        coreLib.displayError("Priv (status) history record successfully added");
                     }
                 },
                 fc = function (st) {
                     console.log("AJAX: " + rest["path"] + " failed with", st);
-                    lib.displayError(st.payload.message);
+                    coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
             // start.drowselectListen();
         },
         "privHistoryDeleteAction": function () {
             var phid,
-                set = lib.drowselectState.set,
-                pos = lib.drowselectState.pos,
+                set = coreLib.drowselectState.set,
+                pos = coreLib.drowselectState.pos,
                 rest = {
                     "method": 'DELETE',
                     "path": 'priv/history/phid/'
@@ -153,16 +153,16 @@ define ([
                     if (st.code === 'DOCHAZKA_CUD_OK') {
                         console.log("Payload is", st.payload);
                         stack.unwindToTarget("actionPrivHistory");
-                        lib.displayError("Priv (status) history record successfully deleted");
+                        coreLib.displayError("Priv (status) history record successfully deleted");
                     }
                 },
                 fc = function (st) {
                     console.log("AJAX: " + rest["path"] + " failed with", st);
-                    lib.displayError(st.payload.message);
+                    coreLib.displayError(st.payload.message);
                 };
 
             if (set === null || set === undefined || set.length === 0) {
-                lib.displayError("Nothing to do");
+                coreLib.displayError("Nothing to do");
                 start.drowselectListen();
             }
             phid = set[pos].phid;

@@ -1,5 +1,8 @@
 Revision history for Test-Alien-CPP
 
+0.99      2017-10-02 15:35:12 -0400
+  - Test for bug in Test::Alien::Build fixed in 1.21 (gh#1)
+
 0.98      2017-08-25 10:26:05 -0400
   - Production release identical to 0.97_01
 

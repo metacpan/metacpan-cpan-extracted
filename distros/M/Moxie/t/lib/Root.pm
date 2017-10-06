@@ -3,9 +3,9 @@ use Moxie;
 
 extends 'Moxie::Object';
 
-has 'foo';
+has '_foo';
 
-my sub _foo : private(foo);
+sub BUILDARGS : init_args( foo? => _foo );
 
 sub foo { _foo }
 

@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -7,8 +7,8 @@ use Cwd qw(getcwd);
 use File::Find;
 use Test::More;
 
-$ENV{TEST_AUTHOR}
-    or plan( skip_all => 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.' );
+$ENV{AUTHOR_TESTING}
+    or plan( skip_all => 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.' );
 
 my $UNTAINT_FILENAME_PATTERN = qr{\A (
     (?:

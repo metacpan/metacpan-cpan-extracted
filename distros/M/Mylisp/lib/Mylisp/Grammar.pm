@@ -8,7 +8,7 @@ our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(get_mylisp_grammar);
 
 sub get_mylisp_grammar {
-   return << 'EOF'
+  return << 'EOF'
    
    mylisp = ^ |_ _pod Expr|+ $ ;
 
@@ -19,16 +19,16 @@ sub get_mylisp_grammar {
    Expr   = '(' |_ atom|+ ')' ;
 
    atom   = | 
-              Expr Array Hash
+              Expr Array Hash Lstr
               Int Kstr Str String Char
-              Aindex Arange Hkey Ocall Lcall Onew
+              Aindex Arange Hkey Ocall Onew
               Oper Sub Var
             | ;
 
-   Int    = number ;
-   number = |{'-'\d+} \d+| ;
+   Int    = \-? \d+ ;
 
-   Kstr   = \: [$^+*?\w:.]+ ;
+   Kstr   = \: [\w:]+ ;
+   Lstr   = \'\'\' ~ { \'\'\' } ;
    
    Str    = \' |schars char|* \' ;
    schars = [^\\']+ ;
@@ -41,7 +41,7 @@ sub get_mylisp_grammar {
 
    Oper   = [\-+=><!~|&]+ ;
    Sub    = \a [\-\w:]* ;
-   Var    = [$@%] [\-\w]+ ;
+   Var    = [$@%] [\-\w:?+]+ ;
 
    Array  = '[' |_ \, atom|* ']' ;
    Hash   = '{' |_ \, Pair|* '}' ;
@@ -51,12 +51,11 @@ sub get_mylisp_grammar {
 
    Arange = Var Range ;
    Range  = '[' From? ':' To? ']' ;
-   From   = |number {[$][\a\-]+}| ;
-   To     = |number {[$][\a\-]+}|;
+   From   = |\d+ {[$][\a\-]+}| ;
+   To     = |{'-'? \d+} {[$][\a\-]+}|;
    
    Hkey   = Var {'[' |Kstr Scalar| ']'}+ ;
    Ocall  = Var \. Sub ;
-   Lcall  = Var \: Sub ;
    Onew   = Sub \. Sub ;
 
 EOF

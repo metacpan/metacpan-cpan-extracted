@@ -25,18 +25,14 @@
 #    along with Config-Model-Itself; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
-my @warp_in_uniline_or_string = (
+my @warp_in_string_like_parameter = (
     warp => {
         follow => {
             'type'  => '?type',
             'vtype' => '?value_type',
         },
         'rules' => [
-            '    $type eq "leaf" 
-                            and (    $vtype eq "uniline" 
-                                  or $vtype eq "string" 
-                                )
-                          '
+            '$type eq "leaf" and ($vtype eq "uniline" or $vtype eq "string" or $vtype eq "enum")'
               => { level => 'normal', }
         ]
     },
@@ -51,7 +47,7 @@ my %warn_if_match_payload = (
         type              => 'node',
         config_class_name => 'Itself::CommonElement::WarnIfMatch',
     },
-    @warp_in_uniline_or_string,
+    @warp_in_string_like_parameter,
 );
 
 my %assert_payload = (
@@ -62,7 +58,7 @@ my %assert_payload = (
         type              => 'node',
         config_class_name => 'Itself::CommonElement::Assert',
     },
-    @warp_in_uniline_or_string,
+    @warp_in_string_like_parameter,
 );
 
 [
@@ -154,7 +150,7 @@ my %assert_payload = (
                 level       => 'hidden',
                 description => 'Specify the possible values of an enum. This can also be used in a '
                     .'reference element so the possible enum value will be the combination of the '
-                    .'specified choice and the refered to values',
+                    .'specified choice and the referred to values',
                 warp        => {
                     follow => {
                         t  => '?type',
@@ -291,7 +287,7 @@ my %assert_payload = (
                     . q!use the C<(?i)> extended pattern. For instance, the regexp !
                     . q!C<^(?i)foo|bar$> also allows the values !
                     . q!C<Foo> and C<Bar>.!,
-                @warp_in_uniline_or_string,
+                @warp_in_string_like_parameter,
             },
 
             'assert' => {
@@ -342,7 +338,7 @@ my %assert_payload = (
                 level      => 'hidden',
                 description =>
 "Feed this grammar to Parse::RecDescent to perform validation",
-                @warp_in_uniline_or_string,
+                @warp_in_string_like_parameter,
             },
 
             'default_list' => {

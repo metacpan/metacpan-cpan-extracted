@@ -4,7 +4,7 @@ Photonic::Retarded::AllH
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ retarded regime and saves them for later retrieval.
 
 =over 4
 
-=item * new(metric=>$m, polarization=>$p, nh=>$nh[, keepStates=>$k, small=>$s]) 
+=item * new(metric=>$m, polarization=>$p, nh=>$nh[, keepStates=>$k, smallH=>$s]) 
 
 Initializes an Ph::NR::AllH object. $m is the retarded metric to use,
 $p is the polarization of the field, $nh is the maximum number of desired
@@ -88,14 +88,14 @@ Array of Haydock b times c coefficients
 
 Array of Haydock g coefficients 
 
-=item * All the Photonic::NonRetarded::OneH methods
+=item * All the Photonic::Retarded::OneH methods
 
 =back
 
 =cut
 
 package Photonic::Retarded::AllH;
-$Photonic::Retarded::AllH::VERSION = '0.007';
+$Photonic::Retarded::AllH::VERSION = '0.009';
 use namespace::autoclean;
 use Carp;
 use PDL::Lite;

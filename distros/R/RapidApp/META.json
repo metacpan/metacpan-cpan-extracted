@@ -75,7 +75,7 @@
             "DBIx::Class::PassphraseColumn" : "0.02",
             "DBIx::Class::ResultSet" : "0",
             "DBIx::Class::Schema" : "0",
-            "DBIx::Class::Schema::Diff" : "1.03",
+            "DBIx::Class::Schema::Diff" : "1.05",
             "DBIx::Class::Schema::Loader" : "0.07045",
             "DBIx::Class::Schema::Loader::DBI" : "0",
             "DBIx::Class::Schema::Loader::Table" : "0",
@@ -199,7 +199,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.3003",
+   "version" : "1.3004",
    "x_contributors" : [
       "Michael Conrad <mconrad@intellitree.com>",
       "Torsten Raudssus <torsten@raudss.us>",

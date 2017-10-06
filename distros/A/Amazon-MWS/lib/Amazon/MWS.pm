@@ -6,11 +6,11 @@ Amazon::MWS - Perl interface to Amazon Marketplace Web Services
 
 =head1 VERSION
 
-0.141
+0.150
 
 =cut
 
-our $VERSION = '0.141';
+our $VERSION = '0.150';
 
 =head1 DESCRIPTION
 
@@ -202,6 +202,10 @@ wrong number of characters.
 
 There is no point in using such big image files for Amazon.
 
+=head3 Error 99001: "brand_name"
+
+Brand is a required field for products.
+
 =head1 Uploader Module
 
 L<Amazon::MWS::Uploader> is an upload agent for Amazon::MWS.
@@ -235,6 +239,10 @@ L<Amazon::MWS::XML::Order>
 L<Amazon::MWS::XML::OrderlineItem>
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+James Rinser (additional API methods).
 
 =head1 AUTHORS
 

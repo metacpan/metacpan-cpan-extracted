@@ -104,7 +104,7 @@ sub execute {
                         $count_of{$name} = {};
                     }
                     if ( !exists $count_of{$name}->{$chr_name} ) {
-                        $count_of{$name}->{$chr_name} = AlignDB::IntSpan->new;
+                        $count_of{$name}->{$chr_name} = AlignDB::IntSpan->new();
                     }
 
                     my $intspan = AlignDB::IntSpan->new->add_pair( $info_of->{$key}{start},
@@ -128,7 +128,7 @@ sub execute {
     for my $name ( keys %count_of ) {
         for my $chr_name ( keys %{ $count_of{$name} } ) {
             $count_of{$name}->{$chr_name}
-                = $count_of{$name}->{$chr_name}->runlist;
+                = $count_of{$name}->{$chr_name}->runlist();
         }
     }
 

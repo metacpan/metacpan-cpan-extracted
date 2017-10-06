@@ -24,11 +24,17 @@ static inline void _async_log_debug_ignoreall(Args&&...) { }
 #endif /* ifndef ASYNC_TRAMPOLINE_DEBUG */
 
 #define ASYNC_FORMAT "<Async %p %s ref=%zu blocks=%zu>"
-#define ASYNC_FORMAT_ARGS(aptr)                                          \
+#define ASYNC_FORMAT_ARGS(aptr)                                             \
     (aptr),                                                                 \
-    ((aptr) ? Async_Type_name((aptr)->type) : "(NULL)"),                    \
-    ((aptr) ? (aptr)->refcount : 0),                                        \
-    ((aptr) ? (aptr)->blocked.size() : 0)
+    Async_maybe_type_name(aptr),                                            \
+    Async_maybe_refcount(aptr),                                             \
+    Async_maybe_blocked_size(aptr)
+
+#ifdef __cpp_ref_qualifiers
+#define MAYBE_MOVEREF &&
+#else
+#define MAYBE_MOVEREF
+#endif
 
 enum class Async_Type
 {
@@ -111,7 +117,7 @@ public:
 
     auto fold() -> AsyncRef&;
 
-    auto ptr_with_ownership() && noexcept -> Async*
+    auto ptr_with_ownership() MAYBE_MOVEREF noexcept -> Async*
     {
         Async* retval = nullptr;
         noexcept_swap(retval, ptr);
@@ -124,6 +130,10 @@ struct Async_RawThunk
     using Callback = std::function<AsyncRef(AsyncRef dependency)>;
     Callback    callback;
     AsyncRef    dependency;
+
+    Async_RawThunk(Async_RawThunk&&) = default;
+    ~Async_RawThunk() = default;
+    auto operator=(Async_RawThunk&&) -> Async_RawThunk& = default;
 };
 
 struct Async_Thunk
@@ -131,12 +141,20 @@ struct Async_Thunk
     using Callback = std::function<AsyncRef(DestructibleTuple const& data)>;
     Callback    callback;
     AsyncRef    dependency;
+
+    Async_Thunk(Async_Thunk&&) = default;
+    ~Async_Thunk() = default;
+    auto operator=(Async_Thunk&&) -> Async_Thunk& = default;
 };
 
 struct Async_Pair
 {
     AsyncRef left;
     AsyncRef right;
+
+    Async_Pair(Async_Pair&&) = default;
+    ~Async_Pair() = default;
+    auto operator=(Async_Pair&&) -> Async_Pair& = default;
 };
 
 struct Async_Flow
@@ -145,6 +163,10 @@ struct Async_Flow
     AsyncRef right;
     Async_Type flow_type;
     enum Direction { THEN, OR } direction;
+
+    Async_Flow(Async_Flow&&) = default;
+    ~Async_Flow() = default;
+    auto operator=(Async_Flow&&) -> Async_Flow& = default;
 };
 
 struct Async_Uninitialized {};
@@ -216,6 +238,17 @@ inline auto AsyncRef::clear() -> void {
         ptr->unref();
     ptr = nullptr;
 }
+
+// functions used with debugging output
+static inline auto Async_maybe_type_name(Async const* ptr) noexcept -> char const*
+{ return ptr ? Async_Type_name(ptr->type) : "(NULL)"; }
+
+static inline auto Async_maybe_refcount(Async const* ptr) noexcept -> size_t
+{ return ptr ? ptr->refcount : 0; }
+
+static inline auto Async_maybe_blocked_size(Async const* ptr) noexcept -> size_t
+{ return ptr ? ptr->blocked.size() : 0; }
+
 
 // Evaluation: Async_X_evaluate()
 // Incomplete -> Complete

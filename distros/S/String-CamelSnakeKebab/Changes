@@ -1,5 +1,8 @@
 Revision history for String::CamelSnakeKebab
 
+0.06 2017-09-29T18:30:08Z
+    - Added split_word() so that users can do custom processing.
+
 0.05 2016-06-16T01:33:58Z
     - Don't warn when coverting a string with just underscores in it.
     - Be explicit in POD: the empty string is returned if you use a

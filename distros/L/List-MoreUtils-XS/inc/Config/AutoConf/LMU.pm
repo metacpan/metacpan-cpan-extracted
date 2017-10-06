@@ -71,6 +71,7 @@ sub check_lmu_prerequisites
     my $self = shift->_get_instance();
 
     $self->check_produce_loadable_xs_build() or die "Can't produce loadable XS module";
+    $self->check_default_headers();
     $self->check_all_headers(qw(time.h sys/time.h));
     $self->check_funcs([qw(time)]);
 

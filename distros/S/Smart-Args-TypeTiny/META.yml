@@ -1,0 +1,43 @@
+---
+abstract: 'We are smart, smart for you'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  Moo: '0'
+  Test2: '0'
+  Test2::Suite: '0.000077'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Smart-Args-TypeTiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Smart::Args::TypeTiny:
+    file: lib/Smart/Args/TypeTiny.pm
+    version: '0.02'
+  Smart::Args::TypeTiny::Check:
+    file: lib/Smart/Args/TypeTiny/Check.pm
+requires:
+  PadWalker: '0'
+  Type::Tiny: '0'
+resources:
+  bugtracker: https://github.com/akiym/Smart-Args-TypeTiny/issues
+  homepage: https://github.com/akiym/Smart-Args-TypeTiny
+  repository: git://github.com/akiym/Smart-Args-TypeTiny.git
+version: '0.02'
+x_authority: cpan:AKIYM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

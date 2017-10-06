@@ -7,7 +7,7 @@ use Test::Deep::Cmp;
 use JSON;
 use Exporter::Lite;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(json);
 

@@ -21,6 +21,7 @@ sub init_plugins {
 		},
 
 		'CGI::SpeedyCGI' => {},
+		'MouseX::Types::Common' => {},
 
 		'CORS' => {
 			origin      => c->base_url,
@@ -35,7 +36,7 @@ sub init_plugins {
 		},
 
 		'XML::Simple' => {
-			RootName      => '<APP_NAME>',
+			RootName      => 'test',
 			NoAttr        => 1,
 			KeyAttr       => [],
 			SuppressEmpty => '' 
@@ -45,7 +46,7 @@ sub init_plugins {
 			session_key         => conf('/session/state/name'),
 			session_table       => conf('/session/store/table'),
 			session_expires     => 60 * 60 * 24 * 21,
-			session_clean_thres => 1,
+			session_clean_thres => 0.001,
 			param_name          => [qw/sessionId session_id/],
 			cookie_path         => '/',
 			cookie_domain       => undef,

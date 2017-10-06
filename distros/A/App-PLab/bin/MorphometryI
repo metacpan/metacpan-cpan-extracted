@@ -382,12 +382,14 @@ sub on_create
       $w-> win_objectsetsmenuaction($cs);
       $_[0]-> clear_event;
    });
+   my $scale = $::application-> uiScaling;
+   $scale = 1 if $scale < 1;
 
    my $cck = $self-> ToolBar-> insert(
        SpeedButton =>
        name        => "Contours",
-       origin      => [120, 1],
-       size        => [ 36, 36],
+       origin      => [120 * $scale, 1],
+       size        => [ 36 * $scale, 36 * $scale],
        image       => App::PLab::ImageAppGlyphs::icon( bga::drawprocesses),
        enabled     => 0,
        checkable   => 1,
@@ -406,8 +408,8 @@ sub on_create
    $self-> ToolBar-> insert(
        SpeedButton =>
        name        => "CalcStatistics",
-       origin      => [ 162, 1],
-       size        => [ 36, 36],
+       origin      => [ 162 * $scale, 1],
+       size        => [ 36 * $scale, 36 * $scale],
        image       => App::PLab::ImageAppGlyphs::icon( bga::calcstatistics),
        enabled     => 1,
        hint        => 'Calculate statistics',

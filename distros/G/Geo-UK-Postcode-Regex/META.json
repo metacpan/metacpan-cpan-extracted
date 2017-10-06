@@ -83,11 +83,11 @@
    "provides" : {
       "Geo::UK::Postcode::Regex" : {
          "file" : "lib/Geo/UK/Postcode/Regex.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Geo::UK::Postcode::Regex::Simple" : {
          "file" : "lib/Geo/UK/Postcode/Regex/Simple.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -102,9 +102,10 @@
          "web" : "https://github.com/mjemmeson/Geo-UK-Postcode-Regex"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
-      "Michael Jemmeson <michael.jemmeson@cpan.org>"
+      "Michael Jemmeson <michael.jemmeson@cpan.org>",
+      "Tom Bloor <t.bloor@shadowcat.co.uk>"
    ],
    "x_serialization_backend" : "JSON::XS version 2.34"
 }

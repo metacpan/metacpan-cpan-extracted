@@ -10,7 +10,7 @@ build_requires:
   Test::Alien: '0.92'
   perl: '5.008001'
 configure_requires:
-  Alien::Build: '0.92'
+  Alien::Build: '1.19'
   Alien::Build::MM: '0.32'
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
@@ -32,5 +32,22 @@ resources:
   bugtracker: https://github.com/plicease/Alien-cmake3/issues
   homepage: https://metacpan.org/pod/Alien::cmake3
   repository: git://github.com/plicease/Alien-cmake3.git
-version: '0.03'
+version: '0.04'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      LWP::Protocol::https: '0'
+      LWP::UserAgent: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_serialization_backend: 'YAML::Tiny version 1.70'

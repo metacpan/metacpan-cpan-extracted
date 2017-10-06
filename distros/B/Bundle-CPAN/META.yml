@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150002'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 keywords:
   - CPAN
   - module
@@ -21,8 +21,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
 resources:
   homepage: https://github.com/andk/cpanpm/tree/master/related/Bundle-CPAN
   repository: git://github.com/andk/cpanpm.git
-version: '1.862'
+version: '1.863'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

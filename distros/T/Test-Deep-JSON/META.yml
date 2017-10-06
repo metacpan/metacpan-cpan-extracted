@@ -3,18 +3,17 @@ abstract: 'Compare JSON with Test::Deep'
 author:
   - 'motemen <motemen@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+  Test::Tester: '0'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Deep-JSON
 no_index:
   directory:
@@ -29,14 +28,15 @@ no_index:
 provides:
   Test::Deep::JSON:
     file: lib/Test/Deep/JSON.pm
-    version: 0.03
+    version: '0.04'
 requires:
-  Exporter::Lite: 0
-  JSON: 0
-  Test::Deep: 0
-  perl: 5.008001
+  Exporter::Lite: '0'
+  JSON: '0'
+  Test::Deep: '0'
+  perl: '5.008001'
 resources:
-  bugtracker: https://github.com/motemen/Test-Deep-JSON/issues
-  homepage: https://github.com/motemen/Test-Deep-JSON
-  repository: git://github.com/motemen/Test-Deep-JSON
-version: 0.03
+  bugtracker: https://github.com/motemen/perl5-Test-Deep-JSON/issues
+  homepage: https://github.com/motemen/perl5-Test-Deep-JSON
+  repository: git://github.com/motemen/perl5-Test-Deep-JSON.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

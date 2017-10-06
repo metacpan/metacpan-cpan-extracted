@@ -1,0 +1,48 @@
+---
+abstract: 'Alien wrapper for LibreSSL (alternative to OpenSSL)'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::V0: '0.000060'
+  Test::Alien: '0'
+  perl: '5.008001'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Fetch::CurlCommand: '1.19'
+  Alien::Build::Plugin::Fetch::Wget: '1.19'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.008001'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-LibreSSL
+requires:
+  Alien::Base: '0.038'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Alien-LibreSSL/issues
+  homepage: https://metacpan.org/pod/Alien::LibreSSL
+  repository: git://github.com/plicease/Alien-LibreSSL.git
+version: '0.02'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      IO::Zlib: '0'
+      LWP::Protocol::https: '0'
+      LWP::UserAgent: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -35,6 +35,7 @@ t/business/gocardless/bill.t
 t/business/gocardless/client.t
 t/business/gocardless/customer.t
 t/business/gocardless/exception.t
+t/business/gocardless/mandate.t
 t/business/gocardless/merchant.t
 t/business/gocardless/paginator.t
 t/business/gocardless/payment.t

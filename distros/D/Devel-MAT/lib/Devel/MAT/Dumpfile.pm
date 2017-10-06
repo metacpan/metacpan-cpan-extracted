@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -105,6 +105,8 @@ foreach (
    no strict 'refs';
    *$name = $code;
 }
+
+*ROOTS = sub { @ROOTS };
 
 =head1 CONSTRUCTOR
 

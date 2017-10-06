@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.66';
+  $Math::Prime::Util::VERSION = '0.67';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -28,13 +28,15 @@ our @EXPORT_OK =
       is_aks_prime is_bpsw_prime
       is_ramanujan_prime
       is_mersenne_prime
-      is_power is_prime_power sqrtint rootint logint is_pillai is_semiprime
+      is_power is_prime_power is_pillai is_semiprime is_square is_polygonal
       is_square_free is_primitive_root is_carmichael is_quasi_carmichael
+      sqrtint rootint logint
       miller_rabin_random
       lucas_sequence lucasu lucasv
       primes twin_primes ramanujan_primes sieve_prime_cluster sieve_range
       forprimes forcomposites foroddcomposites fordivisors
       forpart forcomp forcomb forperm forderange formultiperm
+      lastfor
       numtoperm permtonum randperm shuffle
       prime_iterator prime_iterator_object
       next_prime  prev_prime
@@ -130,12 +132,13 @@ BEGIN {
     # Load PP front end code
     require Math::Prime::Util::PPFE;
 
+    # Init rand
+    Math::Prime::Util::csrand();
+
     *prime_count   = \&Math::Prime::Util::_generic_prime_count;
     *factor        = \&Math::Prime::Util::_generic_factor;
     *factor_exp    = \&Math::Prime::Util::_generic_factor_exp;
   };
-
-  Math::Prime::Util::csrand();
 
   $_Config{'secure'} = 0;
   $_Config{'nobigint'} = 0;
@@ -210,6 +213,12 @@ sub prime_set_config {
       _XS_set_callgmp($_HAVE_GMP) if $_Config{'xs'};
     } elsif ($param eq 'nobigint') {
       $_Config{'nobigint'} = ($value) ? 1 : 0;
+    } elsif ($param eq 'secure') {
+      croak "Cannot disable secure once set" if !$value && $_Config{'secure'};
+      if ($value) {
+        $_Config{'secure'} = 1;
+        _XS_set_secure() if $_Config{'xs'};
+      }
     } elsif ($param eq 'irand') {
       carp "ntheory irand option is deprecated";
     } elsif ($param eq 'use_primeinc') {
@@ -521,14 +530,18 @@ sub _generic_forprimes {
   _validate_positive_integer($beg);
   _validate_positive_integer($end);
   $beg = 2 if $beg < 2;
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   {
     my $pp;
     local *_ = \$pp;
     for (my $p = next_prime($beg-1);  $p <= $end;  $p = next_prime($p)) {
       $pp = $p;
       $sub->();
+      last if Math::Prime::Util::_get_forexit();
     }
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 
 sub _generic_forcomposites {
@@ -538,6 +551,8 @@ sub _generic_forcomposites {
   _validate_positive_integer($end);
   $beg = 4 if $beg < 4;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   {
     my $pp;
     local *_ = \$pp;
@@ -545,10 +560,13 @@ sub _generic_forcomposites {
       for ( ; $beg < $p && $beg <= $end ; $beg++ ) {
         $pp = $beg;
         $sub->();
+        last if Math::Prime::Util::_get_forexit();
       }
       $beg++;
+      last if Math::Prime::Util::_get_forexit();
     }
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 
 sub _generic_foroddcomposites {
@@ -559,6 +577,8 @@ sub _generic_foroddcomposites {
   $beg = 9 if $beg < 9;
   $beg++ unless $beg & 1;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   {
     my $pp;
     local *_ = \$pp;
@@ -566,24 +586,31 @@ sub _generic_foroddcomposites {
       for ( ; $beg < $p && $beg <= $end ; $beg += 2 ) {
         $pp = $beg;
         $sub->();
+        last if Math::Prime::Util::_get_forexit();
       }
       $beg += 2;
+      last if Math::Prime::Util::_get_forexit();
     }
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 
 sub _generic_fordivisors {
   my($sub, $n) = @_;
   _validate_positive_integer($n);
   my @divisors = divisors($n);
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   {
     my $pp;
     local *_ = \$pp;
     foreach my $d (@divisors) {
       $pp = $d;
       $sub->();
+      last if Math::Prime::Util::_get_forexit();
     }
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 
 sub formultiperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
@@ -939,7 +966,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 
 =head1 SYNOPSIS
@@ -1423,6 +1450,16 @@ sets.  This iterator will be much more efficient.
 
 There is no ordering requirement for the input array reference.  The results
 will be in lexicographic order.
+
+
+=head2 lastfor
+
+  forprimes { lastfor,return if $_ > 1000; $sum += $_; } 1e9;
+
+Calling lastfor requests that the current for... loop stop after this
+call.  Ideally this would act exactly like a C<last> inside a loop,
+but technical reasons mean it does not exit the block early, hence
+one typically adds a C<return> if needed.
 
 
 =head2 prime_iterator
@@ -2402,8 +2439,8 @@ not efficient for multiple calls.
   say "$n is a perfect cube" if is_power($n, 3);
   say "$n is a ", is_power($n), "-th power";
 
-Given a single non-negative integer input C<n>, returns k if C<n = p^k> for
-some integer C<p E<gt> 1, k E<gt> 1>, and 0 otherwise.  The k returned is
+Given a single non-negative integer input C<n>, returns k if C<n = r^k> for
+some integer C<r E<gt> 1, k E<gt> 1>, and 0 otherwise.  The k returned is
 the largest possible.  This can be used in a boolean statement to
 determine if C<n> is a perfect power.
 
@@ -2431,6 +2468,14 @@ If a second argument is present, it must be a scalar reference.  If the
 return value is non-zero, then it will be set to C<p>.
 
 This corresponds to Pari/GP's C<isprimepower> function.
+
+
+=head2 is_square
+
+Given a positive integer C<n>, returns 1 if C<n> is a perfect square,
+0 otherwise.  This is identical to C<is_power(n,2)>.
+
+This corresponds to Pari/GP's C<issquare> function.
 
 
 =head2 sqrtint
@@ -2871,6 +2916,16 @@ and C<n % v != 1>, then C<v> is returned.  Otherwise 0.
 
 For n prime, this is the L<OEIS series A063980|http://oeis.org/A063980>.
 
+=head is_polygonal
+
+Given integers C<x> and C<s>, return 1 if x is an s-gonal number, 0 otherwise.
+C<s> must be greater than 2.
+
+If a third argument is present, it must be a scalar reference.  It will be
+set to n if x is the nth s-gonal number.  If the function returns 0, then
+it will be unchanged.
+
+This corresponds to Pari's C<ispolygonal> function.
 
 =head2 moebius
 
@@ -3186,6 +3241,10 @@ Returns 12 times the Hurwitz-Kronecker class number of the input integer C<n>.
 This will always be an integer due to the pre-multiplication by 12.
 The result is C<0> for any input less than zero or congruent to 1 or 2 mod 4.
 
+This is related to Pari's C<qfbhclassno(n)> where C<hclassno(n)> for positive
+C<n> equals C<12 * qfbhclassno(n)> in Pari/GP.
+This is L<OEIS A259825|http://oeis.org/A259825>.
+
 
 =head2 bernfrac
 
@@ -3194,18 +3253,22 @@ rational number represented by two L<Math::BigInt> objects.  B_1 = 1/2.
 This corresponds to Pari's C<bernfrac(n)> and Mathematica's C<BernoulliB>
 functions.
 
-Having L<Math::Prime::Util::GMP> installed will make a big difference in
-speed, and version 0.41 and newer of that package use fast Zeta and Pi
-computations to run much faster.  Older versions of that package, and the
-Perl/Bignum version used without that package, use the simple Brent-Harvey
-algorithm.  This is faster than L<Math::Pari> which uses an older algorithm,
+Having a modern version of L<Math::Prime::Util::GMP> installed will make
+a big difference in speed.  That module uses a fast Pi/Zeta method.
+Our pure Perl backend uses the Seidel method as shown by Peter Luschny.
+This is faster than L<Math::Pari> which uses an older algorithm,
 but quite a bit slower than modern Pari, Mathematica, or our GMP backend.
+
+This corresponds to Pari's C<bernfrac> function
+and Mathematica's C<BernoulliB> function.
 
 =head2 bernreal
 
 Returns the Bernoulli number C<B_n> for an integer argument C<n>, as
 a L<Math::BigFloat> object using the default precision.  An optional
 second argument may be given specifying the precision to be used.
+
+This corresponds to Pari's C<bernreal> function.
 
 =head2 stirling
 
@@ -3236,6 +3299,8 @@ C<1 + 1/2 + 1/3 + ... + 1/n>.
 
 Binary splitting (Fredrik Johansson's elegant formulation) is used.
 
+This corresponds to Mathematica's C<HarmonicNumber> function.
+
 =head2 harmreal
 
 Returns the Harmonic number C<H_n> for an integer argument C<n>, as
@@ -3254,6 +3319,7 @@ Given two positive integers C<a> and C<n>, returns the multiplicative order
 of C<a> modulo C<n>.  This is the smallest positive integer C<k> such that
 C<a^k ≡ 1 mod n>.  Returns 1 if C<a = 1>.  Returns undef if C<a = 0> or if
 C<a> and C<n> are not coprime, since no value will result in 1 mod n.
+
 This corresponds to Pari's C<znorder(Mod(a,n))> function and Mathematica's
 C<MultiplicativeOrder[a,n]> function.
 
@@ -3321,8 +3387,8 @@ rank C<k> lexicographic permutation of C<n> elements.
 This will match iteration number C<k> (zero based) of L</forperm>.
 C<k> can be assumed to be mod C<n!>.
 
-This corresponds to Pari's C<numtoperm(n,k)> function, though it uses
-an implementation specific ordering rather than lexicographic.
+This corresponds to Pari's C<numtoperm(n,k)> function, though Pari
+uses an implementation specific ordering rather than lexicographic.
 
 =head2 permtonum
 
@@ -3336,14 +3402,15 @@ C<n> must be present.
 This will match iteration number C<k> (zero based) of L</forperm>.
 The result will be between C<0> and C<n!-1>.
 
-This corresponds to Pari's C<permtonum(n)> function, though it uses
-an implementation specific ordering rather than lexicographic.
+This corresponds to Pari's C<permtonum(n)> function, though Pari
+uses an implementation specific ordering rather than lexicographic.
 
 =head2 randperm
 
   @p = randperm(100);   # returns shuffled 0..99
   @p = randperm(100,4)  # returns 4 elements from shuffled 0..99
-  @s = @data[randperm(1+$#data)];  # shuffle an array
+  @s = @data[randperm(1+$#data)];    # shuffle an array
+  @p = @data[randperm(1+$#data,2)];  # pick 2 from an array
 
 With a single argument C<n>, this returns a random permutation of the
 values from C<0> to C<n-1>.
@@ -3360,8 +3427,15 @@ The randomness comes from our CSPRNG.
 Takes a list as input, and returns a random permutation of the list.
 Like randperm, the randomness comes from our CSPRNG.
 
-This function is similar to the C<shuffle> function in L<List::Util>.
-The main difference is the random source.
+This function is functionally identical to the C<shuffle> function
+in L<List::Util>.  The only difference is the random source (Chacha20
+with better randomness, a larger period, and a larger state).  This
+does make it slower.
+
+If the entire shuffled array is desired, this is faster than slicing
+with L</randperm> as shown in its example above.  If, however, a "pick"
+operation is desired, e.g. pick 2 random elements from a large array,
+then the slice technique can be hundreds of times faster.
 
 
 =head1 RANDOM NUMBERS
@@ -3388,6 +3462,14 @@ C<arc4random> and C</dev/urandom> on BSD and Linux 4.8+.
 Seeding is performed at startup using the Win32 Crypto API (on Windows),
 C</dev/urandom>, C</dev/random>, or L<Crypt::PRNG>, whichever is found first.
 
+We use the original ChaCha definition rather than RFC7539.  This means a
+64-bit counter, resulting in a period of 2^72 bytes or 2^68 calls to
+L<drand> or <irand64>.  This compares favorably to the 2^48 period of Perl's
+C<drand48>.  It has a 512-bit state which is significantly larger than the
+48-bit C<drand48> state.  When seeding, 320 bits (40 bytes) are used.
+Among other things, this means all 52! permutations of a shuffled card deck
+are possible, which is not true of L<List::Util/shuffle>.
+
 One might think that performance would suffer from using a CSPRNG, but
 benchmarking shows it is less than one might expect.
 does not seem to be the case.  The speed of irand, irand64, and drand
@@ -3399,9 +3481,10 @@ these calls.  Carefully tuning that interface is critical.
 For performance on large amounts of data, see the tables
 in L</random_bytes>.
 
-A single thread-safe stream is used.  A later implementation may switch to
-per-thread contexts, which would be slightly faster and arguably give better
-security.  If control of multiple independent streams are needed then using
+Each thread uses its own context, meaning seeding in one thread has no
+impact on other threads.  In addition to improved security, this is
+better for performance than a single context with locks.
+If explicit control of multiple independent streams are needed then using
 a more specific module is recommended.  I believe L<Crypt::PRNG>
 (part of L<CryptX>) and L<Bytes::Random::Secure> are good alternatives.
 
@@ -3816,6 +3899,7 @@ the configuration, so changing it has no effect.  The settings include:
   maxprime        the largest representable prime, without bigint
   maxprimeidx     the index of maxprime, without bigint
   assume_rh       whether to assume the Riemann hypothesis (default 0)
+  secure          disable ability to manually seed the CSPRNG
 
 =head2 prime_set_config
 
@@ -3848,6 +3932,14 @@ Allows setting of some parameters.  Currently the only parameters are:
                as primality testing.  A later version may also have a
                way to indicate whether no RH, RH, GRH, or ERH is to
                be assumed.
+
+  secure       The CSPRNG may no longer be manually seeded.  Once set,
+               this option cannot be disabled.  L</srand> will croak
+               if called, and L</csrand> will croak if called with any
+               arguments.  L</csrand> with no arguments is still allowed,
+               as that will use system entropy without giving anything
+               to the caller.  The point of this option is to ensure that
+               any called functions do not try to control the RNG.
 
 
 =head1 FACTORING FUNCTIONS

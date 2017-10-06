@@ -6,8 +6,8 @@ build_requires:
   Config::Model::Tester: '0'
   Module::Build: '0.34'
 configure_requires:
-  Config::Model: '2.076'
-  Config::Model::Itself: '2.005'
+  Config::Model: '2.111'
+  Config::Model::Itself: '2.012'
   Getopt::Long: '0'
   Module::Build: '0.34'
   Path::Tiny: '0'
@@ -19,11 +19,11 @@ meta-spec:
   version: '1.4'
 name: Config-Model-LcdProc
 requires:
-  Config::Model: '2.043'
+  Config::Model: '2.111'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/dod38fr/config-model-lcdproc/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-lcdproc.git
-version: '2.051'
+version: '2.052'
 x_serialization_backend: 'YAML::Tiny version 1.70'

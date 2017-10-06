@@ -1,5 +1,9 @@
 Revision history for App-af
 
+0.15      2017-09-28 15:58:25 -0400
+  - Add af missing --plugin option
+  - Add af missing --precompile option
+
 0.14      2017-08-15 11:27:54 -0400
   - Merged App-palien and App-af.  For the old App-palien change log
     see Changes.App-palien

@@ -8,15 +8,16 @@ docs/fritzing/adc_basic_example.fzz
 docs/fritzing/brewbuild_test_platform.fzz
 docs/fritzing/dpot_adc.fzz
 docs/fritzing/two_74595_shift_registers.fzz
+docs/pics/bb_hardware_test_platform.jpg
 docs/schematic/adc_basic_example_schem.jpg
 docs/schematic/dpot_adc_schem.jpg
+docs/sketch/arduino.ino
 FAQ-Tutorial.pod
 lib/RPi/WiringPi.pm
-lib/RPi/WiringPi/Util.pm
+lib/RPi/WiringPi/Core.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-out
 README
 t/00-load.t
 t/01-setup.t.norun
@@ -25,13 +26,13 @@ t/03-setup_phys.t.norun
 t/04-setup_uninit.t.norun
 t/05-pin.t
 t/10-register.t
-t/15-pwm_adc_ads1115.t
+t/15-pwm_spi_adc.t
 t/20-cleanup.t
 t/25-sig_die.t
 t/35-pin_map.t
 t/40-interrupt_rising_and_pud.t
 t/41-interrupt_falling_and_pud.t
-t/42-interrupt_both_and_pud.t
+t/42-interrupt_both_and_pud.t-norun
 t/45-shift_reg_adc.t
 t/55-dac.t
 t/60-lcd.t
@@ -50,8 +51,6 @@ test/api_servo.pl
 test/baseline_setup.pl
 test/bmp.pl
 test/i2c.pl
-test/images/after.jpg
-test/images/before.jpg
 test/registered_pins.pl
 test/sg90_servo.pl
 test/shift.pl

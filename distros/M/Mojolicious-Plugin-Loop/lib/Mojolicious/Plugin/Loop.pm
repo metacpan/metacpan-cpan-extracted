@@ -1,18 +1,27 @@
 package Mojolicious::Plugin::Loop;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our $ITERATOR;
 
-sub count  { $_[0]->{index} + 1 }
-sub even   { $_[0]->{index} % 2 ? 0 : 1 }
-sub first  { $_[0]->{index} == 0 }
-sub index  { $_[0]->{index} }
-sub key    { $_[0]->{key} }
-sub last   { $_[0]->{index} + 1 == @{$_[0]->{items}} }
-sub max    { $_[0]->size - 1 }
-sub odd    { $_[0]->{index} % 2 ? 1 : 0 }
+sub count { $_[0]->{index} + 1 }
+sub even  { $_[0]->{index} % 2 ? 0 : 1 }
+sub first { $_[0]->{index} == 0 }
+sub index { $_[0]->{index} }
+sub key   { $_[0]->{key} }
+sub last  { $_[0]->{index} + 1 == @{$_[0]->{items}} }
+sub max   { $_[0]->size - 1 }
+
+sub next {
+  my $self = shift;
+  return 0 if @{$self->{items}} <= ++$self->{index};
+  $self->{item} = $self->{items}[$self->{index}];
+  $self->{key} = $self->{map} ? $self->{item} : $self->{index};
+  return 1;
+}
+
+sub odd    { $_[0]->{index} % 2 ? 1     : 0 }
 sub parity { $_[0]->{index} % 2 ? 'odd' : 'even' }
 
 sub peek {
@@ -21,6 +30,7 @@ sub peek {
   return $index < 0 ? undef : $_[0]->{items}[$index];
 }
 
+sub reset { $_[0]->{index} = -1; $_[0] }
 sub size { int @{$_[0]->{items}} }
 sub val { $_[0]->{map} ? $_[0]->{map}{$_[0]->{item}} : $_[0]->{item} }
 
@@ -31,13 +41,13 @@ sub register {
     loop => sub {
       my ($c, $data, $cb) = @_;
       return $ITERATOR if @_ == 1;
-      return Mojolicious::Plugin::Loop->_iterate($c->stash, $data, $cb);
+      return Mojolicious::Plugin::Loop->_iterate($data, $cb);
     }
   );
 }
 
 sub _iterate {
-  my ($class, $stash, $data, $cb) = @_;
+  my ($class, $data, $cb) = @_;
   my $bs = Mojo::ByteStream->new;
   my $self = bless {cb => $cb}, $class;
 
@@ -51,15 +61,13 @@ sub _iterate {
     @$self{qw(items)} = $data->to_array;
   }
 
-  $self->{index} = -1;
+  $self->reset;
+  return $self unless $cb;
   local $ITERATOR = $self;
 
 LOOP:
-  for my $item (@{$self->{items}}) {
-    $self->{index}++;
-    local $self->{item} = $item;
-    local $self->{key} = $self->{map} ? $item : $self->{index};
-    $bs .= $cb->();
+  while ($self->next) {
+    $bs .= $cb->($self->{item}, $self->{index});
   }
 
   return $bs;
@@ -111,7 +119,9 @@ Mojolicious::Plugin::Loop - Loop plugin for Mojolicious
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Loop> is a plugin with helpers for iterating over either array,
-hashes or array/hash-like structures.
+hashes or array/hash-like structures. 
+
+NOTE: THIS MODULE IS EXPERIMENTAL AND THE API MAY CHANGE AT ANY TIME
 
 =head1 TEMPLATE METHODS
 
@@ -159,6 +169,17 @@ Returns true if L</index> is L</max>.
 
 Returns L</size> - 1.
 
+=head2 next
+
+  $bool = $self->next;
+
+Move the iterator forward one step. Example:
+
+  % my $i = loop [1, 2, 3];
+  % while ($i->next) {
+  %= $i->val;
+  % }
+
 =head2 odd
 
   $bool = $loop->odd;
@@ -187,6 +208,12 @@ current item. Examples:
   $loop->index == 1
   $loop->peek(1) == "c"
 
+=head2 reset
+
+  $self = $self->reset;
+
+Used to reset the iterator.
+
 =head2 size
 
   $int = $loop->size;
@@ -208,6 +235,8 @@ Used to register the plugin in the L<Mojolicious> application.
 =head1 AUTHOR
 
 Jan Henning Thorsen
+
+Marcus Ramberg
 
 =head1 COPYRIGHT AND LICENSE
 

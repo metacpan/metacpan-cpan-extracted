@@ -35,36 +35,25 @@
 "use strict";
 
 define ([
+    'QUnit',
     'cf'
 ], function (
+    QUnit,
     cf
 ) {
-
-    var prefix = 'core: ';
-
     return function () {
+
         var priv = cf('currentUserPriv');
-        test(prefix + 'cf sees parameters sent from Perl side', function (assert) {
+
+        QUnit.test('cf sees parameters sent from Perl side', function (assert) {
             assert.strictEqual(typeof cf('appName'), 'string', "appName");
             assert.strictEqual(typeof cf('appVersion'), 'string', "appVersion");
             assert.strictEqual(typeof cf('currentUser'), 'object', "currentUser");
-
-            // currentUser can either be null or a user/employee object
-            if (cf('currentUser') === null) {
-                assert.strictEqual(cf('currentUser'), null, "currentUser is null");
-                assert.strictEqual(cf('currentUserPriv'), null, "currentUserPriv is null when currentUser is null");
-            } else {
-                assert.ok(cf('currentUser').hasOwnProperty('nick'), "currentUser has nick property");
-                assert.strictEqual(cf('currentUser').hasOwnProperty('priv'), false, "currentUser does NOT have priv property");
-                assert.strictEqual(typeof priv, 'string', "currentUserPriv");
-                assert.ok( 
-                    (priv === 'passerby') ||
-                    (priv === 'inactive') ||
-                    (priv === 'active') ||
-                    (priv === 'admin')
-                    , "currentUserPriv value is valid (" + priv + ")");
-            }
-
+            //
+            // currentUser and currentUserPriv will always be null in testing
+            assert.strictEqual(cf('currentUser'), null, "currentUser is null");
+            assert.strictEqual(cf('currentUserPriv'), null, "currentUserPriv is null");
+            //
             assert.strictEqual(typeof cf('loginDialogChallengeText'), 'string', "loginDialogChallengeText (1)");
             assert.ok(cf('loginDialogChallengeText').length > 0, "loginDialogChallengeText (2)");
             assert.strictEqual(typeof cf('loginDialogMaxLengthUsername'), 'number', "loginDialogMaxLengthUsername");
@@ -72,15 +61,17 @@ define ([
             assert.strictEqual(typeof cf('dummyParam'), 'object', "dummyParam is an object");
             assert.strictEqual(cf('nonExistentdummyParam'), undefined, "nonExistentDummyParam is undefined");
         });
-        test(prefix + 'cf parameter values can be overridden', function (assert) {
+
+        QUnit.test('cf parameter values can be overridden', function (assert) {
             // override dummyParam
             cf('dummyParam', { test: 'test' });
             assert.deepEqual(cf('dummyParam'), { test: 'test' }, 'dummyParam value override');
         });
-        test(prefix + 'cf testing is set to true', function (assert) {
+
+        QUnit.test('cf testing is set to true', function (assert) {
             assert.strictEqual(cf('testing'), true, 'cf testing is set to true');
         });
-    };
 
+    };
 });
 

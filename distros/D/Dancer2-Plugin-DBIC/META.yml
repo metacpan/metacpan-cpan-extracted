@@ -30,10 +30,14 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dancer2-Plugin-DBIC
+provides:
+  Dancer2::Plugin::DBIC:
+    file: lib/Dancer2/Plugin/DBIC.pm
+    version: '0.0100'
 recommends:
   DBIx::Class::Schema::Loader: '0.07002'
 requires:
-  DBICx::Sugar: '0'
+  DBICx::Sugar: '0.0200'
   Dancer2: '0.153002'
   Dancer2::Plugin: '0'
   strict: '0'
@@ -42,4 +46,4 @@ requires:
 resources:
   bugtracker: https://github.com/ironcamel/Dancer2-Plugin-DBIC/issues
   repository: git://github.com/ironcamel/Dancer2-Plugin-DBIC.git
-version: '0.0013'
+version: '0.0100'

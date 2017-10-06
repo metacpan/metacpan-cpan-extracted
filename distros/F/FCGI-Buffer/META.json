@@ -22,16 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "CGI::Lingua" : "0",
-            "Capture::Tiny" : "0",
-            "DateTime" : "0",
-            "DateTime::Format::HTTP" : "0",
-            "HTTP::Headers" : "0",
-            "HTTP::Response" : "0",
-            "IPC::System::Simple" : "0",
-            "Test::Most" : "0",
-            "Test::TempDir::Tiny" : "0.016",
-            "autodie" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -53,12 +44,26 @@
             "HTML::Packer" : "1",
             "HTTP::Date" : "0",
             "HTTP::Status" : "0",
-            "IO::Compress::Brotli" : "0",
+            "IO::Compress::Brotli" : "0.003",
             "IO::String" : "0",
             "JavaScript::Packer" : "2",
             "Storable" : "0",
             "Time::localtime" : "0",
             "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI::Lingua" : "0",
+            "Capture::Tiny" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Response" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Most" : "0",
+            "Test::TempDir::Tiny" : "0.016",
+            "autodie" : "0"
          }
       }
    },
@@ -74,6 +79,6 @@
          "web" : "https://github.com/nigelhorne/FCGI-Buffer"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

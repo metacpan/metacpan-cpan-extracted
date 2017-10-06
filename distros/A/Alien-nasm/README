@@ -4,9 +4,11 @@ NAME
 
 VERSION
 
-    version 0.18
+    version 0.19
 
 SYNOPSIS
+
+    From your Perl script:
 
      use Alien::nasm ();
      use Env qw( @PATH );
@@ -14,19 +16,16 @@ SYNOPSIS
      unshift @ENV, Alien::nasm->bin_dir;
      system 'nasm', ...;
 
-    Or with Alien::Build::ModuleBuild:
+    From alienfile:
 
-     use Alien::Base::ModuleBuild;
-     Alien::Base::ModuleBuild->new(
-       ...
-       alien_bin_requires => {
-         'Alien::nasm' => '0.11',
-       },
-       alien_build_commands => {
-         "%{nasm} ...",
-       },
-       ...
-     )->create_build_script;
+     use alienfile;
+     
+     share {
+       requires 'Alien::nasm';
+       build [
+         '%{nasm} ...',
+       ];
+     };
 
 DESCRIPTION
 
@@ -45,6 +44,9 @@ HELPERS
     always nasm, but in the future it may have a different value.
 
 CAVEATS
+
+    On Windows for share builds, we install binaries. This avoids needing
+    to depend on Alien::MSYS.
 
     This version of Alien::nasm adds nasm to your path, if it isn't already
     there when you use it, like this:

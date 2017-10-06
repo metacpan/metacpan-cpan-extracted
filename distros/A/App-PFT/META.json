@@ -4,13 +4,13 @@
       "Giovanni Simoni (dacav at openmailbox)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-PFT",
    "no_index" : {
@@ -48,7 +48,7 @@
             "FindBin" : "0",
             "Getopt::Long" : "0",
             "LWP::Simple" : "0",
-            "PFT" : "v1.2.0",
+            "PFT" : "v1.2.1",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
             "Template::Alloy" : "0",
@@ -63,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.1",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v1.2.2",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

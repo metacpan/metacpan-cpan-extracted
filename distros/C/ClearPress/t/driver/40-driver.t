@@ -1,10 +1,15 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
+#########
+# Author: rmp
+#
 use strict;
 use warnings;
 use Test::More tests => 11;
 use English qw(-no_match_vars);
 use Test::Trap;
+
+our $VERSION = q[477.1.2];
 
 use_ok('ClearPress::driver');
 

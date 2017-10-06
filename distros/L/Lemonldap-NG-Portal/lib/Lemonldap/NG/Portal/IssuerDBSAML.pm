@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_SAML;
 our @ISA = qw(Lemonldap::NG::Portal::_SAML);
 
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.13';
 
 ## @method void issuerDBInit()
 # Load and check SAML configuration
@@ -30,6 +30,38 @@ sub issuerDBInit {
     return PE_SAML_LOAD_IDP_ERROR unless $self->loadIDPs();
 
     PE_OK;
+}
+
+## @apmethod string normalize_url()
+# Normalize url to be tolerant to SAML Path
+# Usefull if SAML Path is a regex
+# @return normalized url
+sub normalize_url {
+    my ( $self, $url, $samlPath, $metadataUrl ) = @_;
+
+    my $initialPath = "";
+    my $finalPath   = "";
+
+    # Get current (bad) path
+    if ( $url =~ m~($samlPath)~ ) {
+        $initialPath = $1;
+    }
+
+    # Get destination (good) path
+    if ( $metadataUrl =~ m~($samlPath)~ ) {
+        $finalPath = $1;
+    }
+
+    if (    $initialPath ne ""
+        and $finalPath ne ""
+        and $initialPath ne $finalPath )
+    {
+        $self->lmLog( "Normalizing url path form $initialPath to $finalPath",
+            'info' );
+        $url =~ s~$initialPath~$finalPath~;
+    }
+
+    return $url;
 }
 
 ## @apmethod int issuerForUnAuthUser()
@@ -89,6 +121,11 @@ sub issuerForUnAuthUser {
     my $idp_initiated           = $self->param('IDPInitiated');
     my $idp_initiated_sp        = $self->param('sp');
     my $idp_initiated_spConfKey = $self->param('spConfKey');
+
+    # Normalize URL to be tolerant to SAML Path
+    $url =
+      $self->normalize_url( $url, $self->{issuerDBSAMLPath},
+        $saml_sso_get_url );
 
     # 1.1. SSO
     if ( $url =~
@@ -1171,6 +1208,11 @@ sub issuerForAuthUser {
     my $idp_initiated           = $self->param('IDPInitiated');
     my $idp_initiated_sp        = $self->param('sp');
     my $idp_initiated_spConfKey = $self->param('spConfKey');
+
+    # Normalize URL to be tolerant to SAML Path
+    $url =
+      $self->normalize_url( $url, $self->{issuerDBSAMLPath},
+        $saml_sso_get_url );
 
     # 1.1. SSO (SSO URL or Proxy Mode)
     if ( $url =~

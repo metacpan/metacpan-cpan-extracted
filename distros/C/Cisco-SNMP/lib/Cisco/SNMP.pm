@@ -1,5 +1,4 @@
 package Cisco::SNMP;
-
 ##################################################
 # AUTHOR = Michael Vincent
 # www.VinsWorld.com
@@ -9,17 +8,38 @@ use strict;
 use warnings;
 
 use version;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Net::SNMP qw(:asn1 :snmp);
 
 use Sys::Hostname;
-use Socket qw(inet_ntoa AF_INET IPPROTO_TCP);
+use Socket qw(AF_INET IPPROTO_TCP inet_ntoa);
 
-my $AF_INET6 = eval { Socket::AF_INET6() };
-my $AF_UNSPEC = eval { Socket::AF_UNSPEC() };
+my $AF_INET6       = eval { Socket::AF_INET6() };
+my $AF_UNSPEC      = eval { Socket::AF_UNSPEC() };
 my $AI_NUMERICHOST = eval { Socket::AI_NUMERICHOST() };
 my $NI_NUMERICHOST = eval { Socket::NI_NUMERICHOST() };
+
+# Default to IPv4 for backward compatiblity
+# THIS MAY CHANGE IN THE FUTURE!!!
+my $DEFAULT_FAMILY = AF_INET;
+
+sub DEFAULT_FAMILY {
+    my ( $s, $v ) = @_;
+    my $prev = $DEFAULT_FAMILY;
+
+    if ( defined $s and ( $s !~ /^Cisco::SNMP/ ) ) {
+        $v = $s;
+    }
+    if ( defined $v and ( $v =~ /^4|6|${\AF_INET}|$AF_INET6$/ ) ) {
+        if ( $v == 4 or $v == AF_INET ) {
+            $DEFAULT_FAMILY = AF_INET;
+        } else {
+            $DEFAULT_FAMILY = $AF_INET6;
+        }
+    }
+    return $prev;
+}
 
 our $LASTERROR;
 
@@ -39,156 +59,163 @@ sub new {
     );
 
     my %args;
-    if (@_ == 1) {
-        ($params{hostname}) = @_
+    if ( @_ == 1 ) {
+        if ( $_[0] =~ /^Cisco::SNMP/ ) {
+            return bless $_[0], $class;
+        } else {
+            ( $params{hostname} ) = @_;
+        }
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?family$/i) {
-                 if ($args{$_} =~ /^(?:(?:(:?ip)?v?(?:4|6))|${\AF_INET}|$AF_INET6)$/) {
-                    if ($args{$_} =~ /^(?:(?:(:?ip)?v?4)|${\AF_INET})$/) {
+                if ( $args{$_}
+                    =~ /^(?:(?:(:?ip)?v?(?:4|6))|${\AF_INET}|$AF_INET6)$/ ) {
+                    if ( $args{$_} =~ /^(?:(?:(:?ip)?v?4)|${\AF_INET})$/ ) {
                         $params{domain} = 'udp';
-                        $family = AF_INET
+                        $family = AF_INET;
                     } else {
                         $params{domain} = 'udp6';
-                        $family = $AF_INET6
+                        $family = $AF_INET6;
                     }
                 } else {
                     $LASTERROR = "Invalid family `$args{$_}'";
-                    return undef
+                    return undef;
                 }
-            # pass through
+
+                # pass through
             } else {
-                $params{$_} = $args{$_}
+                $params{$_} = $args{$_};
             }
         }
     }
 
     # set default community string if not provided and SNMP version 1 or 2
-    if (($params{version} =~ /[1,2]/) && !defined $params{community}) {
-        $params{community} = 'private'
+    if ( ( $params{version} =~ /[1,2]/ ) and not defined $params{community} )
+    {
+        $params{community} = 'private';
     }
 
     # hostname must be defined
-    if (!defined $params{hostname}) {
-        $params{hostname} = hostname
+    if ( !defined $params{hostname} ) {
+        $params{hostname} = hostname;
     }
 
     # resolve hostname our way
-    if (defined(my $ret = _resolv($params{hostname}, $family))) {
+    if ( defined( my $ret = _resolv( $params{hostname}, $family ) ) ) {
         $params{hostname} = $ret->{addr};
+        if ( defined $ret->{port} ) {
+            $params{port} = $ret->{port};
+        }
         $family = $ret->{family};
-        if ($family == AF_INET) {
-            $params{domain} = 'udp'
+        if ( $family == AF_INET ) {
+            $params{domain} = 'udp';
         } else {
-            $params{domain} = 'udp6'
+            $params{domain} = 'udp6';
         }
     } else {
-        return undef
+        return undef;
     }
 
-    my ($session, $error) = Net::SNMP->session(%params);
+    my ( $session, $error ) = Net::SNMP->session(%params);
 
-    if (!defined $session) {
+    if ( not defined $session ) {
         $LASTERROR = "Error creating Net::SNMP object: $error";
-        return undef
+        return undef;
     }
 
-    return bless {
-                  %params,       # merge user parameters
-                  'family' => $family,
-                  '_SESSION_' => $session
-                 }, $class
+    return bless {'_SESSION_' => $session}, $class;
 }
 
 ### WARNINGS - use of Cisco::SNMP directly
 # our $LOADED = 0;
 # sub import {
-    # shift;
-    # if ((@_ == 0) && ($LOADED == 0) && ((caller(1))[3] eq 'main::BEGIN')) {
-        # my $warn = sprintf
-            # "\n" .
-            # "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" .
-            # "'use Cisco::SNMP;' directly is deprecated.\n" .
-            # "Instead, use the relevent sub module:\n" .
-            # "'use Cisco::SNMP::<module>;'\n" .
-            # "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
-        # warnings::warnif($warn)
-    # }
-    # $LOADED++;
-    # my @l = @_ ? @_ : qw(Config ARP Config CPU Entity Image Interface IP Line Memory Password ProxyPing Sensor System);
-    # eval join("", map { "require Cisco::SNMP::" . (/(\w+)/)[0] . ";\n" } @l) or die "Error - $@";
+# shift;
+# if ((@_ == 0) && ($LOADED == 0) && ((caller(1))[3] eq 'main::BEGIN')) {
+# my $warn = sprintf
+# "\n" .
+# "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" .
+# "'use Cisco::SNMP;' directly is deprecated.\n" .
+# "Instead, use the relevent sub module:\n" .
+# "'use Cisco::SNMP::<module>;'\n" .
+# "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+# warnings::warnif($warn)
+# }
+# $LOADED++;
+# my @l = @_ ? @_ : qw(Config ARP Config CPU Entity Image Interface IP Line Memory Password ProxyPing Sensor System);
+# eval join("", map { "require Cisco::SNMP::" . (/(\w+)/)[0] . ";\n" } @l) or die "Error - $@";
 # }
 
 sub session {
     my $self = shift;
-    return $self->{_SESSION_}
+    return $self->{_SESSION_};
 }
 
 sub close {
     my $self = shift;
-    $self->{_SESSION_}->close()
+    $self->{_SESSION_}->close();
 }
 
 sub error {
     my $self = shift;
-    
+
     my $e = $LASTERROR;
     undef $LASTERROR;
-    return $e
+    return $e;
 }
 
 no strict 'refs';
+
 sub _mk_accessors_array_1 {
-    my ($TYPE, $NAME) = @_;
+    my ( $TYPE, $NAME ) = @_;
     *{$TYPE . $NAME} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($idx) = @_;
 
-        if (!defined $idx) {
-            $idx = 0
-        } elsif ($idx !~ /^\d+$/) {
+        if ( !defined $idx ) {
+            $idx = 0;
+        } elsif ( $idx !~ /^\d+$/ ) {
             $Cisco::SNMP::LASTERROR = "Invalid $TYPE index `$idx'";
-            return undef
+            return undef;
         }
-        return $self->[$idx]->{$NAME}
-    }
+        return $self->[$idx]->{$NAME};
+      }
 }
 
 sub _mk_accessors_hash_1 {
-    my ($TYPE, $NAME) = @_;
+    my ( $TYPE, $NAME ) = @_;
     *{$TYPE . $NAME} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($idx) = @_;
 
-        if (!defined $idx) {
-            $idx = 0
-        } elsif ($idx !~ /^\d+$/) {
+        if ( !defined $idx ) {
+            $idx = 0;
+        } elsif ( $idx !~ /^\d+$/ ) {
             $Cisco::SNMP::LASTERROR = "Invalid $TYPE index `$idx'";
-            return undef
+            return undef;
         }
-        return $self->{$idx}->{$NAME}
-    }
+        return $self->{$idx}->{$NAME};
+      }
 }
 
 sub _mk_accessors_hash_2 {
-    my ($TYPE1, $TYPE2, $NAME) = @_;
+    my ( $TYPE1, $TYPE2, $NAME ) = @_;
     *{$TYPE2 . $NAME} = sub {
         my $self = shift;
-        my ($idx1, $idx2) = @_;
+        my ( $idx1, $idx2 ) = @_;
 
-        if (!defined $idx2) {
+        if ( !defined $idx2 ) {
             $idx1 = $idx1 || 0;
-            $idx2 = 0
-        } elsif ($idx1 !~ /^\d+$/) {
+            $idx2 = 0;
+        } elsif ( $idx1 !~ /^\d+$/ ) {
             $Cisco::SNMP::LASTERROR = "Invalid $TYPE1 index `$idx1'";
-            return undef
-        } elsif ($idx2 !~ /^\d+$/) {
+            return undef;
+        } elsif ( $idx2 !~ /^\d+$/ ) {
             $Cisco::SNMP::LASTERROR = "Invalid $TYPE2 index `$idx2'";
-            return undef
+            return undef;
         }
-        return $self->{$idx1}->[$idx2]->{$NAME}
-    }
+        return $self->{$idx1}->[$idx2]->{$NAME};
+      }
 }
 
 use strict 'refs';
@@ -206,190 +233,206 @@ sub _get_range {
 
     # If argument, it must be a number range in the form:
     #  1,9-11,7,3-5,15
-    if ($opt !~ /^\d+([\,\-]\d+)*$/) {
+    if ( $opt !~ /^\d+([\,\-]\d+)*$/ ) {
         $LASTERROR = "Invalid range format `$opt'";
-        return undef
+        return undef;
     }
 
-    my (@option, @temp, @ends);
+    my ( @option, @temp, @ends );
 
     # Split the string at the commas first to get:  1 9-11 7 3-5 15
-    @option = split(/,/, $opt);
+    @option = split( /,/, $opt );
 
     # Loop through remaining values for dashes which mean all numbers inclusive.
     # Thus, need to expand ranges and put values in array.
     for $opt (@option) {
 
         # If value has a dash '-', split and add 'missing' numbers.
-        if ($opt =~ /-/) {
+        if ( $opt =~ /-/ ) {
 
             # Ends are start and stop number of range.  For example, $opt = 9-11:
             # $ends[0] = 9
             # $ends[1] = 11
-            @ends = split(/-/, $opt);
+            @ends = split( /-/, $opt );
 
-            for ($ends[0]..$ends[1]) {
-                push @temp, $_
+            for ( $ends[0] .. $ends[1] ) {
+                push @temp, $_;
             }
 
-        # No dash '-', move on
+            # No dash '-', move on
         } else {
-            push @temp, $opt
+            push @temp, $opt;
         }
     }
+
     # return the sorted values of the temp array
     @temp = sort { $a <=> $b } (@temp);
-    return \@temp
+    return \@temp;
 }
 
 sub _snmpwalk {
-    my ($session, $oid) = @_;
+    my ( $session, $oid ) = @_;
 
-    my (@oids, @vals);
-    my $base = $oid;
+    my ( @oids, @vals );
+    my $base   = $oid;
     my $result = 0;
 
-    while (defined($result = $session->get_next_request(varbindlist => [$oid]))) {
-        my ($o, $v) = each(%{$result});
-        if (oid_base_match($base, $o)) {
+    while (
+        defined(
+            $result = $session->get_next_request( varbindlist => [$oid] )
+        )
+      ) {
+        my ( $o, $v ) = each( %{$result} );
+        if ( oid_base_match( $base, $o ) ) {
             push @vals, $v;
             push @oids, $o;
-            $oid = $o
+            $oid = $o;
         } else {
-            last
+            last;
         }
     }
-    if ((@oids == 0) && (@vals == 0)) {
-        if (defined($result = $session->get_request($oid))) {
+    if ( ( @oids == 0 ) and ( @vals == 0 ) ) {
+        if ( defined( $result = $session->get_request($oid) ) ) {
             push @vals, $result->{$oid};
-            push @oids, $oid
+            push @oids, $oid;
         } else {
-            return undef
+            return undef;
         }
     }
-    return (\@oids, \@vals)
+    return ( \@oids, \@vals );
 }
 
 ##################################################
 # DNS hostname resolution
 # return:
-#   $host->{name}   = host - as passed in
+#   $host->{name}   = original
 #   $host->{host}   = host - as passed in without :port
 #   $host->{port}   = OPTIONAL - if :port, then value of port
 #   $host->{addr}   = resolved numeric address
 #   $host->{family} = AF_INET/6
 ############################
 sub _resolv {
-    my ($name, $family) = @_;
+    my ( $name, $family ) = @_;
 
-    my %h;
-    $h{name} = $name;
+    my %h = ( name => $name );
 
-    # Default to IPv4 for backward compatiblity
-    # THIS MAY CHANGE IN THE FUTURE!!!
-    if (!defined $family) {
-        $family = AF_INET
+    if ( !defined $family ) {
+        $family = $DEFAULT_FAMILY;
     }
 
-# START - host:port
-    my $cnt = 0;
-
-    # Count ":"
-    $cnt++ while ($name =~ m/:/g);
+    # START - host:port
+    my $cnt = 0;    # Count ":"
+    $cnt++ while ( $name =~ m/:/g );
 
     # 0 = hostname or IPv4 address
-    if ($cnt == 0) {
+    if ( $cnt == 0 ) {
         $h{host} = $name
-    # 1 = IPv4 address with port
-    } elsif ($cnt == 1) {
-        ($h{host}, $h{port}) = split /:/, $name
-    # >=2 = IPv6 address
-    } elsif ($cnt >= 2) {
+
+          # 1 = IPv4 address with port
+    } elsif ( $cnt == 1 ) {
+        ( $h{host}, $h{port} ) = split /:/, $name
+
+          # >=2 = IPv6 address
+    } elsif ( $cnt >= 2 ) {
+
         #IPv6 with port - [2001::1]:port
-        if ($name =~ /^\[.*\]:\d{1,5}$/) {
-            ($h{host}, $h{port}) = split /:([^:]+)$/, $name # split after last :
-        # IPv6 without port
+        if ( $name =~ /^\[.*\]:\d{1,5}$/ ) {
+            ( $h{host}, $h{port} ) = split /:([^:]+)$/, $name # split after last :
+                                                              # IPv6 without port
         } else {
-            $h{host} = $name
+            $h{host} = $name;
         }
     }
 
-    # Clean up host
-    $h{host} =~ s/\[//g;
-    $h{host} =~ s/\]//g;
+    # Remove []'s from possible IPv6 string literal
+    $h{host} =~ s/[\[\]]//g;
+
     # Clean up port
-    if (defined $h{port} && (($h{port} !~ /^\d{1,5}$/) || ($h{port} < 1) || ($h{port} > 65535))) {
+    if (defined $h{port}
+        and (  ( $h{port} !~ /^\d{1,5}$/ )
+            or ( $h{port} < 1 )
+            or ( $h{port} > 65535 ) )
+      ) {
         $LASTERROR = "Invalid port `$h{port}' in `$name'";
-        return undef
+        return undef;
     }
-# END - host:port
+
+    # END - host:port
 
     # address check
     # new way
-    if (version->parse($Socket::VERSION) >= version->parse(1.94)) {
+    if ( version->parse($Socket::VERSION) >= version->parse(1.94) ) {
         my %hints = (
             family   => $AF_UNSPEC,
             protocol => IPPROTO_TCP,
-            flags => $AI_NUMERICHOST
+            flags    => $AI_NUMERICHOST
         );
 
         # numeric address, return
-        my ($err, @getaddr) = Socket::getaddrinfo($h{host}, undef, \%hints);
-        if (defined $getaddr[0]) {
+        my ( $err, @getaddr )
+          = Socket::getaddrinfo( $h{host}, undef, \%hints );
+        if ( defined $getaddr[0] ) {
             $h{addr}   = $h{host};
             $h{family} = $getaddr[0]->{family};
-            return \%h
+            return \%h;
         }
-    # old way
+
+        # old way
     } else {
+
         # numeric address, return
-        my $ret = gethostbyname($h{host});
-        if (defined $ret && (inet_ntoa($ret) eq $h{host})) {
+        my $ret = gethostbyname( $h{host} );
+        if ( defined $ret && ( inet_ntoa($ret) eq $h{host} ) ) {
             $h{addr}   = $h{host};
             $h{family} = AF_INET;
-            return \%h
+            return \%h;
         }
     }
 
     # resolve
     # new way
-    if (version->parse($Socket::VERSION) >= version->parse(1.94)) {
+    if ( version->parse($Socket::VERSION) >= version->parse(1.94) ) {
         my %hints = (
             family   => $family,
             protocol => IPPROTO_TCP
         );
 
-        my ($err, @getaddr) = Socket::getaddrinfo($h{host}, undef, \%hints);
-        if (defined $getaddr[0]) {
-            my ($err, $address) = Socket::getnameinfo($getaddr[0]->{addr}, $NI_NUMERICHOST);
-            if (defined $address) {
+        my ( $err, @getaddr )
+          = Socket::getaddrinfo( $h{host}, undef, \%hints );
+        if ( defined $getaddr[0] ) {
+            my ( $err, $address )
+              = Socket::getnameinfo( $getaddr[0]->{addr}, $NI_NUMERICHOST );
+            if ( defined $address ) {
                 $h{addr} = $address;
-                $h{addr} =~ s/\%(.)*$//; # remove %ifID if IPv6
+                $h{addr} =~ s/\%(.)*$//;    # remove %ifID if IPv6
                 $h{family} = $getaddr[0]->{family};
-                return \%h
+                return \%h;
             } else {
                 $LASTERROR = "getnameinfo($getaddr[0]->{addr}) failed - $err";
-                return undef
+                return undef;
             }
         } else {
-            $LASTERROR = sprintf "getaddrinfo($h{host},,%s) failed - $err", ($family == AF_INET) ? "AF_INET" : "AF_INET6";
-            return undef
-        }
-    # old way
-    } else {
-        if ($family == $AF_INET6) {
-            $LASTERROR = "Socket >= 1.94 required for IPv6 - found Socket $Socket::VERSION";
-            return undef
+            $LASTERROR = sprintf "getaddrinfo($h{host},,%s) failed - $err",
+              ( $family == AF_INET ) ? "AF_INET" : "AF_INET6";
+            return undef;
         }
 
-        my @gethost = gethostbyname($h{host});
-        if (defined $gethost[4]) {
-            $h{addr} = inet_ntoa($gethost[4]);
+        # old way
+    } else {
+        if ( $family == $AF_INET6 ) {
+            $LASTERROR
+              = "Socket >= 1.94 required for IPv6 - found Socket $Socket::VERSION";
+            return undef;
+        }
+
+        my @gethost = gethostbyname( $h{host} );
+        if ( defined $gethost[4] ) {
+            $h{addr}   = inet_ntoa( $gethost[4] );
             $h{family} = AF_INET;
-            return \%h
+            return \%h;
         } else {
             $LASTERROR = "gethostbyname($h{host}) failed - $^E";
-            return undef
+            return undef;
         }
     }
 }
@@ -451,7 +494,7 @@ versions of B<Socket>.
   my $cm = Cisco::SNMP::_MODULE_->new([OPTIONS]);
 
 Create a new B<Cisco::SNMP::_MODULE_> object - where B<_MODULE_> is a sub-module 
-in the B<Cisco::SNMP> suite (see B<SEE ALSO>) - with OPTIONS as optional parameters.
+in the B<Cisco::SNMP> suite (B<SEE ALSO>) - with OPTIONS as optional parameters.
 Valid options are:
 
   Option     Description                            Default
@@ -470,6 +513,11 @@ Valid options are:
 
 B<Family> provides hint for resolving names provided for B<hostname>
 to addresses.
+
+Single option is B<hostname>.
+
+Single option may also be a valid B<Cisco::SNMP::_MODULE_> object in 
+which case the object is re-blessed to the calling class.
 
 =head2 session() - return Net::SNMP session object
 
@@ -502,6 +550,17 @@ Close the session.
   printf "Error: %s\n", $cm->error();
 
 Return last error.
+
+=head2 DEFAULT_FAMILY() - change the default address family for resolution
+
+  [$previous] = Cisco::SNMP::DEFAULT_FAMILY(#);
+
+Sets the default family for name resolution if none is provided.  Default is 
+IPv4.  THIS MAY CHANGE IN FUTURE RELEASES!!!
+
+Called with no #, current value is returned.  Called with valid #, 
+setting is changed to # and previous value is returned.  Valid values 
+for # are: 4, AF_INET (constant), 6, AF_INET6 (constant).  
 
 =head1 EXPORT
 

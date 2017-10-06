@@ -4,10 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 use Moo;
+use MooX::Thunking;
 use Types::Standard -all;
 use GraphQL::Type::Library -all;
 use Return::Type;
 use Function::Parameters;
+use GraphQL::Debug qw(_debug);
 extends qw(GraphQL::Type);
 with qw(
   GraphQL::Role::Output
@@ -16,6 +18,8 @@ with qw(
   GraphQL::Role::Nullable
   GraphQL::Role::Named
 );
+
+use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 our $VERSION = '0.02';
 
@@ -41,12 +45,12 @@ Inherits C<name>, C<description> from L<GraphQL::Type>.
 
 =head2 types
 
-Array-ref of L<GraphQL::Type::Object> objects.
+Thunked array-ref of L<GraphQL::Type::Object> objects.
 
 =cut
 
 has types => (
-  is => 'ro',
+  is => 'thunked',
   isa => UniqueByProperty['name'] & ArrayRefNonEmpty[InstanceOf['GraphQL::Type::Object']],
   required => 1,
 );
@@ -73,13 +77,14 @@ performing validation.
 has _types_validated => (is => 'rw', isa => Bool);
 method get_types() :ReturnType(ArrayRefNonEmpty[InstanceOf['GraphQL::Type::Object']]) {
   my @types = @{ $self->types };
-  return @types if $self->_types_validated; # only do once
+  return \@types if $self->_types_validated; # only do once
+  $self->_types_validated(1);
   if (!$self->resolve_type) {
     my @bad = map $_->name, grep !$_->is_type_of, @types;
     die $self->name." no resolve_type and no is_type_of for @bad" if @bad;
   }
-  $self->_types_validated(1);
-  @types;
+  DEBUG and _debug('get_types', $self->name, \@types);
+  \@types;
 }
 
 __PACKAGE__->meta->make_immutable();

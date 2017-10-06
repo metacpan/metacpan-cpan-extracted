@@ -1,0 +1,244 @@
+{
+   "collapse" : true,
+   "height" : "250px",
+   "panels" : [
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 1,
+         "grid" : {},
+         "id" : 9,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "hideZero" : true,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_mail_processed_total{node=~\"$node\"}[$ratetime])) by(result)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ result }}",
+               "metric" : "authmilter_mail_",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Emails processed rate by result",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "cumulative"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 1,
+         "grid" : {},
+         "id" : 37,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_connect_total{node=~\"$node\"}[$ratetime]))",
+               "intervalFactor" : 2,
+               "legendFormat" : "Connections",
+               "metric" : "authmilter_connect_total",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Milter connections rate",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "cumulative"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 0,
+         "grid" : {},
+         "id" : 17,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "hideZero" : true,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_mail_processed_total{node=~\"$node\"}[$ratetime])) by(node)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ node }}",
+               "metric" : "authmilter_mail_",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Emails processed rate by node",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "cumulative"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      }
+   ],
+   "repeat" : null,
+   "repeatIteration" : null,
+   "repeatRowId" : null,
+   "showTitle" : true,
+   "title" : "Throughput",
+   "titleSize" : "h6"
+}

@@ -1,0 +1,421 @@
+{
+   "collapse" : true,
+   "height" : "250px",
+   "panels" : [
+      {
+         "aliasColors" : {},
+         "bars" : true,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 1,
+         "grid" : {},
+         "id" : 18,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : true,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(authmilter_processes_waiting{node=~\"$node\"})",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "Spare children",
+               "metric" : "authmilter_",
+               "refId" : "A",
+               "step" : 4
+            },
+            {
+               "expr" : "sum(authmilter_processes_processing{node=~\"$node\"})",
+               "intervalFactor" : 2,
+               "legendFormat" : "Busy children",
+               "metric" : "authmilter_",
+               "refId" : "B",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Children count",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : 0,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 0,
+         "grid" : {},
+         "id" : 7,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(authmilter_processes_waiting{node=~\"$node\"}+authmilter_processes_processing{node=~\"$node\"}) by(node)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ node }}",
+               "metric" : "authmilter_",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Total children by node",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : 0,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 0,
+         "grid" : {},
+         "id" : 19,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(authmilter_processes_waiting{node=~\"$node\"}) by(node)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ node }}",
+               "metric" : "authmilter_",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Spare children by node",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : 0,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 0,
+         "grid" : {},
+         "id" : 20,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(authmilter_processes_processing{node=~\"$node\"}) by(node)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ node }}",
+               "metric" : "authmilter_",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Processing children by node",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : 0,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 1,
+         "grid" : {},
+         "id" : 31,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_forked_children_total{node=~\"$node\"}[$ratetime]))",
+               "intervalFactor" : 2,
+               "legendFormat" : "Children forked",
+               "metric" : "authmilter_f",
+               "refId" : "A",
+               "step" : 4
+            },
+            {
+               "expr" : "-sum(rate(authmilter_reaped_children_total{node=~\"$node\"}[$ratetime]))",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "Children reaped",
+               "metric" : "authmilter_f",
+               "refId" : "B",
+               "step" : 4
+            },
+            {
+               "expr" : "sum(rate(authmilter_forked_children_total{node=~\"$node\"}[$ratetime]))-sum(rate(authmilter_reaped_children_total{node=~\"$node\"}[$ratetime]))",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "Children churn",
+               "refId" : "C",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Fork rate",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "cumulative"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      }
+   ],
+   "repeat" : null,
+   "repeatIteration" : null,
+   "repeatRowId" : null,
+   "showTitle" : true,
+   "title" : "Processes",
+   "titleSize" : "h6"
+}

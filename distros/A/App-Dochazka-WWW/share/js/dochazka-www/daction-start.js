@@ -44,24 +44,26 @@ define ([
     "jquery",
     "current-user",
     "app/emp-lib",
+    "app/ldap-lib",
     "app/priv-lib",
     "app/sched-history-lib",
     "app/sched-lib",
     "app/rest-lib",
     "html",
-    "logout",
+    "loggout",
     "target",
     "start"
 ], function (
     $,
     currentUser,
     empLib,
+    ldapLib,
     privLib,
     schedHistLib,
     schedLib,
     restLib,
     html,
-    logout,
+    loggout,
     target,
     start
 ) {
@@ -79,14 +81,16 @@ define ([
             start.dbrowserListen();
         },
 
-        // actions triggered from Employee menu
+        // Employee, non-LDAP actions
         "myProfileAction": empLib.myProfileAction,
         "empProfileEditSave": empLib.empProfileEditSave,
-        "ldapLookupSubmit": empLib.ldapLookupSubmit,
-        "ldapSync": empLib.ldapSync,
-        "ldapSyncFromBrowser": empLib.ldapSyncFromBrowser,
         "actionEmplSearch": empLib.actionEmplSearch,
         "masqEmployee": empLib.masqEmployee,
+
+        // Employee LDAP actions
+        "ldapLookupSubmit": ldapLib.ldapLookupSubmit,
+        "ldapSync": ldapLib.ldapSync,
+        "ldapSyncFromBrowser": ldapLib.ldapSyncFromBrowser,
 
         // actions triggered from Priv (status) menu
         "actionPrivHistory": privLib.actionPrivHistory,
@@ -104,6 +108,7 @@ define ([
         "browseAllSchedules": schedLib.browseAllSchedules,
         "actionSchedLookup": schedLib.actionSchedLookup,
         "createSchedule": schedLib.createSchedule,
+        "actionDisplaySchedule": schedLib.actionDisplaySchedule,
         "schedEditSave": schedLib.schedEditSave,
         "schedReallyDelete": schedLib.schedReallyDelete,
 
@@ -118,12 +123,11 @@ define ([
 
         // logout action
         "logout": function () {
-            // if masquerading, end the masquerade;
+            console.log("Reached logout action");
             if (currentUser('flag1')) {
                 empLib.endTheMasquerade();
-            } else {
-                logout();
             }
+            loggout();
         } // logout
 
     }; // var act

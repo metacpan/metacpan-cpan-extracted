@@ -22,7 +22,6 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'App::CELL'      => 0.222,
-        'App::MFILE'     => 0.181,
         'HTTP::Request'  => 0,
         'Plack::Test'    => 0,
         'Scalar::Util'   => 0,
@@ -32,7 +31,6 @@ my $builder = Module::Build->new(
     requires => {
         'perl'           => 5.012,
         'App::CELL'      => 0.222,
-        'App::MFILE'     => 0.181,
         'Getopt::Long'   => 0,
         'File::ShareDir' => 0,
         'File::Temp'     => 0,

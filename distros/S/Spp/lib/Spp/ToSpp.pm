@@ -7,47 +7,54 @@ use Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(ast_to_spp);
 
-use Spp::Builtin qw(to_json);
+use Spp::Builtin qw(to_json clean_ast);
+use Spp::Estr qw(to_estr atoms flat);
 
 sub ast_to_spp {
    my $ast  = shift;
+   my $estr = to_estr(to_json(clean_ast($ast)));
+   # say $estr;
+   # say from_estr($estr);
    my @strs = ();
-   for my $spec (@{$ast}) {
-      my ($name, $rule) = @{$spec};
-      my $rule_str = to_spp($rule);
+   for my $spec (atoms($estr)) {
+      my ($name, $rule) = flat($spec);
+      my $rule_str = atom_to_spp($rule);
       push @strs, "$name = $rule_str";
    }
-   return join(";", @strs);
+   return join(';', @strs);
 }
 
-sub to_spp {
+sub map_atoms {
+   my $atoms = shift;
+   return map { atom_to_spp($_) } atoms($atoms);
+}
+
+sub atoms_to_spp {
+   my $atoms = shift;
+   return join('', map_atoms($atoms));
+}
+
+sub atom_to_spp {
    my $rule = shift;
-   my ($name, $value) = @{$rule};
+   my ($name, $value) = flat($rule);
    given ($name) {
       when ('Rules')    { return rules_to_spp($value) }
       when ('Group')    { return group_to_spp($value) }
       when ('Branch')   { return branch_to_spp($value) }
-      when ('Lbranch')  { return lbranch_to_spp($value) }
       when ('Rept')     { return rept_to_spp($value) }
       when ('Look')     { return look_to_spp($value) }
-      when ("Chclass")  { return chclass_to_spp($value) }
-      when ("Nchclass") { return nchclass_to_spp($value) }
-      when ('Str')      { return str_to_spp($value) }
       when ('Char')     { return char_to_spp($value) }
       when ("Cclass")   { return cclass_to_spp($value) }
-      when ('Till')     { return till_to_spp($value) }
-      when ('Not')      { return not_to_spp($value) }
-      when ("Range")    { return range_to_spp($value) }
       when ("Cchar")    { return char_to_spp($value) }
+      when ("Chclass")  { return chclass_to_spp($value) }
+      when ("Nchclass") { return nchclass_to_spp($value) }
+      when ("Range")    { return range_to_spp($value) }
+      when ('Str')      { return str_to_spp($value) }
+      when ('Not')      { return not_to_spp($value) }
+      when ('Till')     { return till_to_spp($value) }
       when ("Expr")     { return expr_to_spp($value) }
       when ("Array")    { return array_to_spp($value) }
-      when ('Assert')   { return $value }
-      when ('Ntoken')   { return $value }
-      when ('Ctoken')   { return $value }
-      when ('Rtoken')   { return $value }
-      when ('Sym')      { return $value }
-      when ('Int')      { return $value }
-      default { die "unknown atom to Spp: |$name|" }
+      default { return $value }
    }
 }
 
@@ -66,21 +73,19 @@ sub branch_to_spp {
    return "|" . rules_to_spp($branch) . "|";
 }
 
-sub lbranch_to_spp {
-   my $branch = shift;
-   return "||" . rules_to_spp($branch) . "||";
-}
-
 sub rept_to_spp {
    my $rule = shift;
-   my ($rept, $atom) = @{$rule};
-   return to_spp($atom) . $rept;
+   my ($rept, $atom) = flat($rule);
+   return atom_to_spp($atom) . $rept;
 }
 
 sub look_to_spp {
    my $rule = shift;
-   my ($rept, $atom, $look) = @{$rule};
-   return to_spp($atom) . $rept . to_spp($look);
+   my ($rept, $atom_look) = flat($rule);
+   my ($atom, $look) = flat($atom_look);
+   my $atom_spp = atom_to_spp($atom);
+   my $look_spp = atom_to_spp($look);
+   return $atom_spp . $rept . $look_spp;
 }
 
 sub chclass_to_spp {
@@ -117,17 +122,17 @@ sub char_to_spp {
 
 sub till_to_spp {
    my $rule = shift;
-   return '~' . to_spp($rule);
+   return '~' . atom_to_spp($rule);
 }
 
 sub not_to_spp {
    my $rule = shift;
-   return '!' . to_spp($rule);
+   return '!' . atom_to_spp($rule);
 }
 
 sub range_to_spp {
    my $range = shift;
-   return join('-', @{$range});
+   return join('-', atoms($range));
 }
 
 sub expr_to_spp {
@@ -138,16 +143,6 @@ sub expr_to_spp {
 sub array_to_spp {
    my $expr = shift;
    return "[" . rules_to_spp($expr) . "]";
-}
-
-sub map_atoms {
-   my $atoms = shift;
-   return map { to_spp($_) } @{$atoms};
-}
-
-sub atoms_to_spp {
-   my $atoms = shift;
-   return join('', map_atoms($atoms));
 }
 
 1;

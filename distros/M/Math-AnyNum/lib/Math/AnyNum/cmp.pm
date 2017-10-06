@@ -42,11 +42,10 @@ sub __cmp__ {
     }
 
   Math_MPFR__Scalar: {
-        Math::MPFR::Rmpfr_nan_p($x) && return undef;
         return (
-                $y < 0
-                ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-                : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                  Math::MPFR::Rmpfr_nan_p($x) ? undef
+                : $y < 0 ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                :          Math::MPFR::Rmpfr_cmp_ui($x, $y)
                );
     }
 
@@ -65,7 +64,7 @@ sub __cmp__ {
         return (
                 Math::MPFR::Rmpfr_nan_p($y)
                 ? undef
-                : (-Math::MPFR::Rmpfr_cmp_q($y, $x))
+                : -Math::MPFR::Rmpfr_cmp_q($y, $x)
                );
     }
 
@@ -90,14 +89,14 @@ sub __cmp__ {
     }
 
   Math_GMPz__Math_GMPq: {
-        return (-Math::GMPq::Rmpq_cmp_z($y, $x));
+        return -Math::GMPq::Rmpq_cmp_z($y, $x);
     }
 
   Math_GMPz__Math_MPFR: {
         return (
                 Math::MPFR::Rmpfr_nan_p($y)
                 ? undef
-                : -(Math::MPFR::Rmpfr_cmp_z($y, $x))
+                : -Math::MPFR::Rmpfr_cmp_z($y, $x)
                );
     }
 

@@ -5,7 +5,7 @@ use 5.012000;
 use utf8;
 use feature qw/ unicode_strings say /;
 use charnames qw/ :full lao /;
-use version 0.77; our $VERSION = version->declare('v1.0.0');
+use version 0.77; our $VERSION = version->declare('v1.0.1');
 use Carp;
 use Lingua::LO::NLP::Analyze;
 use parent 'Lingua::LO::NLP::Romanize::PCGN';
@@ -47,13 +47,13 @@ my %CONSONANTS = (
    'ຟ'  => [qw/ f p /],
    'ມ'  => 'm',
    'ຢ'  => 'j',
-   'ລ'  => [qw/ l n /],
+   'ລ'  => 'l',
    "\N{LAO SEMIVOWEL SIGN LO}"  => 'l',
    'ວ'  => [qw/ ʋ w /],
    'ຫ'  => 'h',
    'ອ'  => 'ʔ',
    'ຮ'  => 'h',
-   'ຣ'  => [qw/ r n /],   # TODO l?
+   'ຣ'  => 'r',   # TODO l?
    'ໜ'  => 'n',
    'ໝ'  => 'm',
    'ຫຼ'  => 'l',
@@ -67,7 +67,7 @@ my %CONSONANTS = (
 
 my %VOWELS = (
     ### Monophthongs
-    'Xະ'   => 'a',
+    'Xະ'   => 'aʔ',
     'Xັ'    => 'a',
     'Xາ'   => 'aː',
     'Xາວ'  => 'aːo',
@@ -83,22 +83,22 @@ my %VOWELS = (
     'Xຸ'    => 'u',
     'Xູ'    => 'uː',
 
-    'ເXະ'  => 'e',
+    'ເXະ'  => 'eʔ',
     'ເXັ'   => 'e',
     'ເX'   => 'eː',
 
-    'ແXະ'  => 'ɛ',
+    'ແXະ'  => 'ɛʔ',
     'ແXັ'   => 'ɛ',
     'ແX'   => 'ɛː',
     'ແXວ'  => 'ɛːo',
 
-    'ໂXະ'  => 'o',
+    'ໂXະ'  => 'oʔ',
     'Xົ'    => 'o',
     'ໂX'   => 'oː',
     'ໂXຍ'  => 'oːi', # TODO correct?
     'Xອຍ'  => 'oːi',
 
-    'ເXາະ' => 'ɔ',
+    'ເXາະ' => 'ɔʔ',
     'Xັອ'   => 'ɔ',
     'Xໍ'    => 'ɔː',
     'Xອ'   => 'ɔː',
@@ -120,8 +120,7 @@ my %VOWELS = (
     'ເXືອ'  => 'ɯːə',
     'ເXືອຍ' => 'ɯːəi',
 
-    'Xົວະ'  => 'uə',
-    'Xັວ '  => 'uə',
+    'Xົວະ'  => 'uəʔ',
     'Xົວ'   => 'uːə',
     'Xວ'   => 'uːə',
     'Xວຍ'  => 'uːəi',
@@ -156,7 +155,7 @@ my %TONE_DIACRITICS = (
 
 =head2 new
 
-You don't call this constructor directly bu via L<Lingua::LO::NLP::Romanize>.
+You don't call this constructor directly but via L<Lingua::LO::NLP::Romanize>.
 It adds the following attribute:
 
 =over 4

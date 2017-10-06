@@ -6,9 +6,9 @@ build_requires:
   Data::Printer: '0'
   Test::Most: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.142060'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,17 @@ no_index:
 provides:
   String::CamelSnakeKebab:
     file: lib/String/CamelSnakeKebab.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Sub::Exporter: '0'
 resources:
   bugtracker: https://github.com/kablamo/perl-string-camelsnakekebab/issues
   homepage: https://github.com/kablamo/perl-string-camelsnakekebab
   repository: git://github.com/kablamo/perl-string-camelsnakekebab.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Eric Johnson <eric.git@iijo.org>'
-  - 'Lance Wicks <lw@judocoach.com>'
   - 'Eric Johnson <github@iijo.org>'
+  - 'Lance Wicks <lw@judocoach.com>'
+  - 'Thomas Sibley <trsibley@uw.edu>'

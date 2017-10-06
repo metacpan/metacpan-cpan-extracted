@@ -1,5 +1,6 @@
 Build.PL
 Changes
+examples/mihome.pl
 examples/pantilt.pl
 Exec.xs
 GPIO.xs
@@ -66,5 +67,6 @@ t/000-load.t
 t/001-gpio.t
 t/002-rfspi.t
 t/003-i2c.t
+t/004-sysfs.t
 typemap
 Utils.xs

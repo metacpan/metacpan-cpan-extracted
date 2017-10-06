@@ -16,7 +16,7 @@ Log::Any::Adapter::Development - Manual for developing new Log::Any adapters
 
 =head1 VERSION
 
-version 1.049
+version 1.701
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,13 @@ The adapter module:
        no strict 'refs';
        *$method = sub { ... };
    }
+
+   # or, support structured logging instead
+   sub structured {
+       my ($self, $level, $category, @args) = @_;
+       # ... process and log all @args
+   }
+
 
    # Create detection methods: is_debug, is_info, etc.
    #
@@ -135,10 +142,10 @@ through a separate C<get_logger> call, the same object will be returned.
 Therefore, you should try to avoid anything non-deterministic in your L</init>
 function.
 
-=head2 Logging methods (required)
+=head2 Logging methods
 
 The following methods have no default implementation, and MUST be defined by
-your subclass:
+your subclass, unless your adapter supports L</Structured logging>:
 
 =for :list * debug ($msg)
 * info ($msg)
@@ -177,6 +184,15 @@ To help generate these methods programmatically, you can get a list of the
 sub names with the
 L<Log::Any::Adapter::Util::detection_methods|Log::Any::Adapter::Util/detection_methods>
 function.
+
+=head2 Structured logging
+
+Your adapter can choose to receive structured data instead of a
+string. In this case, instead of implementing all the L</Logging
+methods>, you define a single method called C<structured>. The method
+receives the log level, the category, and all arguments that were
+passed to the logging function, so be prepared to not only handle
+strings, but also hashrefs, arrayrefs, coderefs, etc.
 
 =head2 Aliases
 

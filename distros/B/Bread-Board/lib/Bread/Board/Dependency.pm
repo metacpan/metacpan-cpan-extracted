@@ -1,7 +1,7 @@
 package Bread::Board::Dependency;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: dependency for a service
-$Bread::Board::Dependency::VERSION = '0.35';
+$Bread::Board::Dependency::VERSION = '0.36';
 use Moose;
 
 use Bread::Board::Service;
@@ -61,7 +61,7 @@ Bread::Board::Dependency - dependency for a service
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

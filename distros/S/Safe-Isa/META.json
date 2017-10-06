@@ -50,6 +50,6 @@
          "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Safe-Isa.git"
       }
    },
-   "version" : "1.000007",
+   "version" : "1.000008",
    "x_serialization_backend" : "JSON::MaybeXS version 1.003009"
 }

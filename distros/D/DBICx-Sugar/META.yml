@@ -25,6 +25,12 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBICx-Sugar
+provides:
+  DBICx::Sugar:
+    file: lib/DBICx/Sugar.pm
+    version: '0.0200'
+recommends:
+  DBIx::Class::Schema::Loader: '1'
 requires:
   Carp: '0'
   DBIx::Class: '0'
@@ -37,4 +43,4 @@ requires:
 resources:
   bugtracker: https://github.com/ironcamel/DBICx-Sugar/issues
   repository: git://github.com/ironcamel/DBICx-Sugar.git
-version: '0.0100'
+version: '0.0200'

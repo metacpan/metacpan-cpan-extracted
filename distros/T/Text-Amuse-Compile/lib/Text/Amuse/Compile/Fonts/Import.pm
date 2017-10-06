@@ -99,6 +99,7 @@ sub import_with_fclist {
     my %specs;
     my %all = $self->all_fonts;
     my $pipe = IO::Pipe->new;
+    my @dupes;
     $pipe->reader('fc-list');
     $pipe->autoflush;
     while (<$pipe>) {
@@ -113,10 +114,12 @@ sub import_with_fclist {
             my $file = $1;
             my $name = $2;
             my $style = lc($4);
+            next unless $file =~ m/\.(t|o)tf$/i;
             $style =~ s/\s//g;
             next unless $all{$name};
             if ($specs{$name}{files}{$style}) {
                 warn "Duplicated font! $file $name $style $specs{$name}{files}{$style}\n";
+                push @dupes, $name;
             }
             else {
                 $specs{$name}{files}{$style} = $file;
@@ -124,6 +127,12 @@ sub import_with_fclist {
         }
     }
     wait;
+    if (@dupes) {
+        warn "Deleting duplicated fonts, likely to cause problems:" . join(" ", @dupes). "!\n";
+        foreach my $dupe (@dupes) {
+            delete $specs{$dupe};
+        }
+    }
     return \%specs;
     
 }

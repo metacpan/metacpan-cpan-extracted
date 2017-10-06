@@ -1,5 +1,17 @@
 Revision history for Net-IPAddress-Util
 
+4.004   2017-10-05
+        Enhanced detection and logging of repairable <= v3.x data.
+
+4.003   2017-10-05
+        Fix ::Tie so that it actually does what the POD says it does.
+
+4.002   2017-10-04
+        Add "repair" functionality to upgrade v3.x data to v4.x format.
+
+4.001   2017-09-22
+        Doc fix so that the POD specifies ::ffff:0:0:0/96 to agree with the code.
+
 4.000   2017-09-21
         Major backwards-incompatible bug fix. Was treating ::ffff:0:0/96 as SIIT
         instead of ::ffff:0:0:0/96. Was self-compatible, but RFC-wrong.

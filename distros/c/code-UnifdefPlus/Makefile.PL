@@ -5,7 +5,7 @@ WriteMakefile
   'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
   'PREREQ_PM' => {},
-  'VERSION_FROM' => 'lib/code/UnifdefPlus.pm',
+  'VERSION_FROM' => 'lib/UnifdefPlus.pm',
   'EXE_FILES' => [],
   'NAME' => 'code::UnifdefPlus'
 )

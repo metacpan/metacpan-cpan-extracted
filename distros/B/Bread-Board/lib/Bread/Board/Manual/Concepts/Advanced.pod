@@ -13,7 +13,7 @@ Bread::Board::Manual::Concepts::Advanced - An overview of some of the more advan
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 INTRODUCTION
 

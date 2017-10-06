@@ -4,7 +4,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ The filename containing the image
 =cut
 
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.007';
+$Photonic::Geometry::FromImage2D::VERSION = '0.009';
 use namespace::autoclean;
 use Moose;
 extends 'Photonic::Geometry';
@@ -76,22 +76,22 @@ use Carp;
 has 'path' => ( is => 'ro', required => 1,
 	       documentation => 'File name of 2D monochrome image' );
 has '+B' => (is=>'ro', init_arg=>undef, lazy=>1, builder=>'_build_B' );
+has 'inverted' => (is=>'ro', default=> 0,
+               documentation=>'Flag to invert black/white');
 
 sub _build_B {
     my $self=shift;
     my $path=$self->path;
     ( $path ) = ($path =~ m|^([A-Z0-9_.-\\/]+)$|ig);
-    print $ENV{PATH};
     ($ENV{PATH})=($ENV{PATH}=~m|^([A-Z0-9_.-\\/]+)$|ig);
-print "\n".$ENV{PATH}."\n";
     croak 
 	"Only letters, numbers, underscores, dots, slashes and hyphens " . 
 	"allowed in file names"
 	unless $path;
     my $B=PDL->rpic($path);
-    croak "Please convert image $self->path to 2D monochrome first" 
+    croak "Please convert image $self->path to 2D monochrome B/W first" 
 	if $B->ndims != 2 || (($B|!$B)!=1)->any;
-    $B=!$B if $self->inverted; # too many inversions?
+    $B=!$B if $self->inverted;
     return $B;
 }
 

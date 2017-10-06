@@ -1,0 +1,11 @@
+Revision history for Perl extension App-Prove-Plugin-Count
+
+0.02 2017-10-01T01:43:00Z
+
+    - Fix failed test when ~/.proverc has --shuffle option
+    - Fix failed test on Windows
+
+0.01 2017-09-30T13:23:36Z
+
+    - original version
+

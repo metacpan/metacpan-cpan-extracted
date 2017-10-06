@@ -1,5 +1,5 @@
 ---
-abstract: 'A reference implementation of the GraphQL spec in Perl.'
+abstract: 'Perl implementation of GraphQL'
 author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
@@ -20,14 +20,18 @@ no_index:
     - t
     - inc
 requires:
-  Function::Parameters: '0'
+  Function::Parameters: '2.001001'
+  JSON::MaybeXS: '1.003009'
+  JSON::PP: '2.92'
   Moo: '0'
+  MooX::Thunking: '0.07'
   Pegex: '0'
   Return::Type: '0'
   Type::Tiny: '0'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/graphql-perl/graphql-perl/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.07'
+version: '0.10'

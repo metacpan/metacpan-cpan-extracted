@@ -1,10 +1,11 @@
 package Dancer::RPCPlugin::ErrorResponse;
 use warnings;
 use strict;
-use Params::Validate ':all';
 
 use Exporter 'import';
 our @EXPORT = qw/error_response/;
+
+use Params::ValidationCompiler 'validation_for';
 
 sub error_response {
     __PACKAGE__->new(@_);
@@ -12,17 +13,15 @@ sub error_response {
 
 sub new {
     my $class = shift;
-    my $self = validate_with(
-        params => \@_,
-        spec   => {
+    my %self = validation_for(
+        params => {
             error_code    => {optional => 0},
             error_message => {optional => 0},
             error_data    => {optional => 1},
         },
-        allow_extra => 0,
-    );
+    )->(@_);
 
-    return bless($self, $class);
+    return bless(\%self, $class);
 }
 
 sub error_code    { $_[0]->{error_code} }
@@ -102,7 +101,7 @@ Factory function that retuns an instantiated L<Dancer::RPCPlugin::ErrorResponse>
 
 =head3 Responses
 
-An instance or an exception from L<Params::Validate>.
+An instance or an exception from L<Params::ValidationCompiler>.
 
 =head2 Dancer::RPCPlugin::ErrorResponse->new(%parameters)
 
@@ -120,7 +119,7 @@ An instance or an exception from L<Params::Validate>.
 
 =head3 Responses
 
-An instance or an exception from L<Params::Validate>.
+An instance or an exception from L<Params::ValidationCompiler>.
 
 =head2 $er->error_code
 

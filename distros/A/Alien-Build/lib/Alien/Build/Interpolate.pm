@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 sub new
@@ -185,7 +185,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 CONSTRUCTOR
 
@@ -269,6 +269,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

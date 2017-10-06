@@ -3,14 +3,15 @@ abstract: 'Handle unlimited length bitmasks in an easy and flexible way'
 author:
   - 'Klaus Ita'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
   Test::Warn: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
-generated_by: 'Module::Install version 0.94'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,4 +33,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/maros/Bitmask-Data.git
-version: 2.040
+version: '2.050'

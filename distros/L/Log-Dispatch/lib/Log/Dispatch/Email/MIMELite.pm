@@ -3,7 +3,7 @@ package Log::Dispatch::Email::MIMELite;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use MIME::Lite;
 
@@ -44,7 +44,7 @@ Log::Dispatch::Email::MIMELite - Subclass of Log::Dispatch::Email that uses the 
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

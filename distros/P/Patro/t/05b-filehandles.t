@@ -17,14 +17,14 @@ of worms and an oozy smell, nor yet a dry, bare,
 sandy hole with nothing in it to sit down on or
 to eat: it was a hobbit-hold, and that means comfort.';
 
-open my $fh_tmp, '>', 't/t-05b.in';
+open my $fh_tmp, '>:raw', 't/t-05b.input';
 print $fh_tmp $r0;
 close $fh_tmp;
 
 my ($f2,$f3); # = Symbol::gensym();
 
 open $f2, '<', \$r0;
-open $f3, '<', 't/t-05b.in';
+open $f3, '<', 't/t-05b.input';
 
 ok($f2 && ref($f2) eq 'GLOB', 'created remote filehandle');
 my $cfg = patronize($f2,$f3);
@@ -67,7 +67,8 @@ ok($ch eq 'o', 'getc on input proxy fh (opened from scalar)');
 $ch = getc($p3);
 ok($ch eq 'f', 'getc on input proxy fh again (opened from scalar)');
 ok(tell($p2)  > 0 && tell($p2) == tell($p3),
-   'tell from proxy fhs consistent');   
+   'tell from proxy fhs consistent')
+    or ::xdiag([tell($p2), tell($p3)]);
 
 my @lines = <$p2>;
 ok(@lines > 1, "readline from proxy handle in list context");
@@ -105,6 +106,11 @@ ok($line eq "In a hole in the ground there lived a hobbit.\n",
 
 done_testing;
 
+close $f3;
+#eval { close $p3 };
+
+unlink 't/t-05b.input' unless $ENV{KEEP};
+
 END {
-    unlink 't/t-05b.in' unless $ENV{KEEP};
+    unlink 't/t-05b.input' unless $ENV{KEEP};
 }

@@ -20,59 +20,63 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _entityOID {
-    return '1.3.6.1.2.1.47.1.1.1.1'
+    return '1.3.6.1.2.1.47.1.1.1.1';
 }
 
 sub entityOIDs {
-    return qw(Descr VendorType ContainedIn Class ParentRelPos Name HardwareRev FirmwareRev SoftwareRev SerialNum MfgName ModelName Alias AssetID IsFRU)
+    return qw(Descr VendorType ContainedIn Class ParentRelPos Name 
+      HardwareRev FirmwareRev SoftwareRev SerialNum MfgName ModelName 
+      Alias AssetID IsFRU);
 }
 
 sub entity_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my @ENTITYKEYS = entityOIDs();
     my %ret;
-    for my $oid (0..$#ENTITYKEYS) {
-        $ret{$ENTITYKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _entityOID() . '.' . ($oid+2));
-        if (!defined $ret{$ENTITYKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get entity `$ENTITYKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#ENTITYKEYS ) {
+        $ret{$ENTITYKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _entityOID() . '.' . ( $oid + 2 ) );
+        if ( not defined $ret{$ENTITYKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get entity `$ENTITYKEYS[$oid]' info";
+            return undef;
         }
     }
 
     my @Entity;
-    for my $unit (0..$#{$ret{$ENTITYKEYS[5]}}) {
+    for my $unit ( 0 .. $#{$ret{$ENTITYKEYS[5]}} ) {
         my %EntityHash;
-        for (0..$#ENTITYKEYS) {
-            $EntityHash{$ENTITYKEYS[$_]} = $ret{$ENTITYKEYS[$_]}->[$unit]
+        for ( 0 .. $#ENTITYKEYS ) {
+            $EntityHash{$ENTITYKEYS[$_]} = $ret{$ENTITYKEYS[$_]}->[$unit];
         }
-        push @Entity, \%EntityHash
+        push @Entity, \%EntityHash;
     }
-    return bless \@Entity, $class
+    return bless \@Entity, $class;
 }
 
-for (entityOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('entity', $_)
+for ( entityOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'entity', $_ );
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = entityOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_entity" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_entityOID() . '.' . ($o+2) . '.' . $val]
-        );
-        return $r->{_entityOID() . '.' . ($o+2) . '.' . $val}
-    }
+            varbindlist => [_entityOID() . '.' . ( $o + 2 ) . '.' . $val] );
+        return $r->{_entityOID() . '.' . ( $o + 2 ) . '.' . $val};
+      }
 }
 
 ##################################################

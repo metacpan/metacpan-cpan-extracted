@@ -75,7 +75,7 @@ package Sidef::Types::Range::Range {
         my ($self, $block) = @_;
 
         if (defined($block)) {
-            goto \&min_by;
+            goto &min_by;
         }
 
         ($self->{_asc} //= !!$self->{step}->is_pos)
@@ -108,7 +108,7 @@ package Sidef::Types::Range::Range {
         my ($self, $block) = @_;
 
         if (defined($block)) {
-            goto \&max_by;
+            goto &max_by;
         }
 
         ($self->{_asc} //= !!$self->{step}->is_pos)
@@ -148,7 +148,7 @@ package Sidef::Types::Range::Range {
         my ($self, $num) = @_;
 
         if (ref($num) eq 'Sidef::Types::Block::Block') {
-            goto \&first_by;
+            goto &first_by;
         }
 
         my $iter = $self->iter->{code};
@@ -167,6 +167,8 @@ package Sidef::Types::Range::Range {
         $iter->() // undef;
     }
 
+    *head = \&first;
+
     sub last {
         my ($self, $num) = @_;
 
@@ -178,6 +180,8 @@ package Sidef::Types::Range::Range {
           ? $self->reverse->first($num)->reverse
           : $self->reverse->first;
     }
+
+    *tail = \&last;
 
     sub last_by {
         my ($self, $code) = @_;

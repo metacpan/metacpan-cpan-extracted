@@ -64,6 +64,7 @@ subtest "dispatch" => sub {
 	});
 	$c->{namespace} = 'Dwarf::Test';
 	$c->{request_handler_prefix} = $c->namespace . '::Controller';
+	$c->{route} = { controller => $c->{request_handler_prefix} . '::Api::Ping' };
 	$c->dispatch;
 	my $res = $c->finalize;
 	is $res->[0], 200, 'works fine';
@@ -114,6 +115,19 @@ subtest "handle_server_error" => sub {
 	is $res->[0], 500, 'works fine';
 };
 
+subtest "find_route" => sub {
+	my $c = Dwarf->new(env => {
+		REQUEST_METHOD => 'GET',
+		PATH_INFO      => '/api/ping',
+	});
+	my $route = $c->find_route;
+	is_deeply($route, {
+		controller => 'Dwarf::Controller::Api::Ping',
+		action     => undef,
+		splat      => ['ping']
+	}, 'works fine');
+};
+
 subtest "find_class" => sub {
 	my $c = Dwarf->new;
 	my ($class, $ext) = $c->find_class('/api/ping.json');
@@ -138,16 +152,6 @@ subtest "model" => sub {
 	$c->{namespace} = 'Dwarf::Test';
 	my $m = $c->model('Hoge');
 	is $c->models->{'Dwarf::Test::Model::Hoge'}, $m, 'works fine';
-};
-
-subtest "proctitle" => sub {
-	my $c = Dwarf->new;
-	my $title = 'dwarf test';
-	$c->proctitle($title);
-	SKIP: {
-		skip('linux is not supported', 1) if $^O eq 'linux';
-		is $0, $title, 'proctitle works fine';
-	}
 };
 
 subtest "load_plugin" => sub {

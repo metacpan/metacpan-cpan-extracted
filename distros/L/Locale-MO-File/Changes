@@ -1,5 +1,13 @@
 Revision history for Perl extension Locale::MO::File.
 
+0.08  Tue Oct  3 06:58:56 2017
+- fixed broken version 0.07, fixed split agian
+
+0.07  Sun Oct  1 20:51:37 2017
+- removed dependency Module::Build
+- fixed split to get back the right count of msgstr_plural's
+  also on empty strings
+
 0.06 Sun Apr 26 21:14:02 2015
 - corrected plural selection,
   depends on msgid_plural and not on count of msgstr

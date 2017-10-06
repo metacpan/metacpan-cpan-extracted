@@ -12,7 +12,8 @@ to see when the resulting PDFs are displayed.
 012_pages
   012_pages.pdf
    8 pages labeled 1 to 8, then page 9 inserted between 1 and 2,
-      giving 1 9 2 3 4 5 6 7 8
+   3 pages labeled i to iii, inserted before page 1
+      giving i ii iii 1 9 2 3 4 5 6 7 8
 
 020_corefonts  (020_corefonts.NAME.latin1.pdf)
  Helvetica -- latin1 
@@ -83,6 +84,10 @@ to see when the resulting PDFs are displayed.
   020_textunderline.pdf  
    1 page showing color, angle, single/multiple underline
 
+021_psfonts  glyph_file_name -M "metrics_file_name"
+  021_psfonts.NAME.latin1.pdf
+  one or more pages of up to 256 characters displayed
+
 021_synfonts  
   021_synfonts.NAME.pdf "1 font" = one page with 16x16 char grid
   4 pages of variants per "font" (slant, oblique, bold, small caps) 
@@ -121,12 +126,17 @@ to see when the resulting PDFs are displayed.
 022_truefonts  times.ttf (sample input)
  times
   022_truefonts.times.pdf
-   24 pages x 16x16 grid + one page sample text
+   1 page 16x16 grid of selected encoding (SINGLE BYTE, default latin1, omitted
+     if UTF-8 is chosen as the encoding)
+   23 pages of 15x10 grid of CIDs in order (nothing to do with encoding)
+   1 page sample text in ASCII
 
 022_truefonts_diacrits_utf8  tahoma.ttf (sample input)
  tahoma
   022_truefonts_diacrits_utf8.tahoma.pdf  
-   1 page x 16x16 grid + 1 page with sample diacritic spanning 3 letters
+   1 page 16x16 grid in selected encoding (SINGLE BYTE, default latin1, omitted
+     if UTF-8 is chosen as the encoding)
+   1 page with sample diacritic spanning 3 letters (UTF-8 input)
 
 023_cjkfonts   (requires installation of CJK font package by Adobe Reader)
  Ming  Ming-Bold Ming-Italic Ming-BoldItalic
@@ -157,9 +167,6 @@ to see when the resulting PDFs are displayed.
 026_unifont2
   026_unifont2.pdf
    9 pages of labeled UTF character grids (16x16)
-
-027_winfont 
- (fails with no output -- unable to find Windows fonts in registry)
 
 030_colorspecs
   030_colorspaces.pdf

@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::TrustedIP;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Net::IP;
 use Sys::Syslog qw{:standard :macros};
@@ -11,6 +11,13 @@ sub default_config {
     return {
         'trusted_ip_list' => [],
     };
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'TrustedIP_metrics' );
+    return \@rows;
 }
 
 sub is_trusted_ip_address {

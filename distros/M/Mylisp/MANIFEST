@@ -6,9 +6,8 @@ lib/Mylisp.pod
 lib/Mylisp/Ast.pm
 lib/Mylisp/Core.pm
 lib/Mylisp/Grammar.pm
-lib/Mylisp/OptAstAtom.pm
-lib/Mylisp/OptAstMacro.pm
-lib/Mylisp/Stable.pm
+lib/Mylisp/OptAst.pm
+lib/Mylisp/Lint.pm
 lib/Mylisp/ToPerl.pm
 MANIFEST			This list of files
 README

@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.045';
+our $VERSION = '1.048';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -86,14 +86,10 @@ sub _module_is_active {
 my $RULE_HANDLER;
 sub clear_rule_handler { undef $RULE_HANDLER; }
 
-{
-    package Regexp;
-
-    sub with_actions {
-        my ($self, $handler) = @_;
-        $RULE_HANDLER = $handler;
-        return $self;
-    }
+sub Regexp::with_actions {
+    my ($self, $handler) = @_;
+    $RULE_HANDLER = $handler;
+    return $self;
 }
 
 #=====[ COMPILE-TIME INTERIM REPRESENTATION OF GRAMMARS ]===================
@@ -1656,7 +1652,7 @@ sub _translate_subrule_calls {
 
     (?(DEFINE)
         (?<SEPLIST_OP> \*\* | [*+?][+?]?\s*% | \{ \d+(,\d*)? \} [+?]?\s*%                                          )
-        (?<PARENS>    \( (?:[?]<[=!])? (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+ \)   )
+        (?<PARENS>    \( (?:[?] (?: <[=!] | [:>] ))? (?: \\. | (?&PARENCODE) | (?&PARENS) | (?&CHARSET) | [^][()\\<>]++ )*+ \)   )
         (?<BRACES>    \{     (?: \\. | (?&BRACES)    | [^{}\\]++   )*+                              \}   )
         (?<PARENCODE> \(\?[{] (?: \\. | (?&BRACES)    | [^{}\\]++   )*+ [}]\)                            )
         (?<HASH>      \% (?&IDENT) (?: :: (?&IDENT) )*                                                   )
@@ -2112,7 +2108,7 @@ sub _open_log {
 sub _invert_delim {
     my ($delim) = @_;
     $delim = reverse $delim;
-    $delim =~ tr/<>[]{}()«»`'/><][}{)(»«'`/;
+    $delim =~ tr/<>[]{}()??`'/><][}{)(??'`/;
     return quotemeta $delim;
 }
 
@@ -2660,7 +2656,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.045
+This document describes Regexp::Grammars version 1.048
 
 
 =head1 SYNOPSIS
@@ -4273,7 +4269,7 @@ Like matchrefs, invertrefs come in the usual range of flavours:
     <[ALIAS=/ident]>    # Match inverse and push on @{$MATCH{ident}}
 
 The character pairs that are reversed during mirroring are: C<{> and C<}>,
-C<[> and C<]>, C<(> and C<)>, C<< < >> and C<< > >>, C<«> and C<»>,
+C<[> and C<]>, C<(> and C<)>, C<< < >> and C<< > >>, C<?> and C<?>,
 C<`> and C<'>.
 
 The following mnemonics may be useful in distinguishing inverserefs from
@@ -4485,7 +4481,7 @@ in the grammar, and instead of any start-rule. For example:
         <grammar: List::Generic>
 
         <rule: List>
-            <MATCH=[Item]>+ % <Separator>
+            <[MATCH=Item]>+ % <Separator>
 
         <rule: Item>
             \S++

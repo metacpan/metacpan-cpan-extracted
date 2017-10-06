@@ -11,7 +11,7 @@ use Carp qw(confess croak);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # these defaults set from what the online version does at
 # http://akana.conlang.org/tools/awkwords/

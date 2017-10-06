@@ -1,0 +1,48 @@
+11 {
+    date = 20140424
+    title = Rachel's old PowerBook laptop
+    loc = floating
+}
+
+12 {
+    date = 20140424
+    title = Paul's old MacBook laptop
+    nick = macbook
+    descrip = MacBook (13 inch, Aluminum, late 2008) 2.4GHz
+    manufacture {
+        company = Apple
+        date = 2008
+        model = MacBook5,1
+        partnum = MB467LL/A
+        ref = http://support.apple.com/kb/sp500
+    }
+    purchase { date = 200901 }
+    loc = floating
+}
+
+13 {
+    date = 20140424
+    title = Paul's HP Pavilion laptop
+    nick [ hppavilion, plaptop ]
+    manufacture {
+        company = HP
+        model = Pavilion Core i3
+        date = 2014
+        sn = xxx
+    }
+    purchase {
+        price = 550.00
+        date = 20140418
+    }
+    loc = floating
+}
+
+14 {
+    date = 20140424
+    title = Rachel's MacBook Pro
+    nick [ rlaptop, macbookpro ]
+    owner = rachel
+    manufacture { company = Apple }
+    loc = floating
+}
+

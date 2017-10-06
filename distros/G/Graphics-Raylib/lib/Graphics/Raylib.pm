@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
@@ -16,6 +16,10 @@ use Graphics::Raylib::Color;
 =head1 NAME
 
 Graphics::Raylib - Perlish wrapper for Raylib videogame library
+
+=head1 VERSION
+
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -54,7 +58,7 @@ NOTE for ADVENTURERS: raylib is a programming library to learn videogames progra
 
 This is a Perlish wrapper around L<Graphics::Raylib::XS>, but not yet feature complete.
 
-You can import L<Graphics::Raylib::XS> for any functions not yet exposed perlishly.
+You can import L<Graphics::Raylib::XS> for any functions not yet exposed perlishly. Scroll down for an example.
 
 =head1 METHODS/SUBS AND ARGUMENTS
 
@@ -67,16 +71,16 @@ Constructs the Graphics::Raylib window. C<$title> is optional and defaults to C<
 =cut
 
 sub window {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = {
         width => $_[0],
         height => $_[1],
     };
     InitWindow($self->{width}, $self->{height}, $_[2] // $0);
 
-	bless $self, $class;
-	return $self;
+    bless $self, $class;
+    return $self;
 }
 
 =item fps($fps)
@@ -141,8 +145,6 @@ sub DESTROY {
 
 1;
 
-1;
-
 =back
 
 =head1 EXAMPLES
@@ -151,10 +153,13 @@ sub DESTROY {
 
 =item Conway's Game of Life
 
-    my $HZ = 60;
-    my $SIZE = 80;
+    my $HZ = 120;
+    my $SIZE = 160;
+    my $MUTATION_CHANCE = 0.000;
 
-    my $CELL_SIZE = 6;
+    ###########
+
+    my $CELL_SIZE = 3;
 
     use Graphics::Raylib;
     use Graphics::Raylib::Shape;
@@ -180,27 +185,29 @@ sub DESTROY {
     $g->fps($HZ);
 
     my $text = Graphics::Raylib::Text->new(
-        color => Graphics::Raylib::Color::DARKGRAY,
+        color => Graphics::Raylib::Color::RED,
         size => 20,
     );
 
-    my $rainbow = Graphics::Raylib::Color::Rainbow->new(colors => 240);
+    my $bitmap = Graphics::Raylib::Shape->bitmap(
+        matrix => unpdl($gen),
+        # color => Graphics::Raylib::Color::RED; # commented-out, we are doing it fancy
+    );
 
-    my $i = 0;
-    while (!$g->exiting)
-    {
-        my $bitmap = Graphics::Raylib::Shape->bitmap(
-            matrix => unpdl($gen),
-            color  => $rainbow->cycle,
-        );
+    my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
 
+    $g->clear(Graphics::Raylib::Color::BLACK);
+
+    while (!$g->exiting) {
         Graphics::Raylib::draw {
             $g->clear(Graphics::Raylib::Color::BLACK);
 
-            $text->{text} = "Generation " . ($i++);
-            $text->draw;
-
+            $bitmap->matrix = unpdl($gen);
+            $bitmap->color = $rainbow->();
             $bitmap->draw;
+
+            $text->text = "Generation " . ($i++);
+            $text->draw;
         };
 
 
@@ -212,11 +219,18 @@ sub DESTROY {
         #  next gen are live cells with three neighbours or any with two
         my $next = $gen & ($neighbourhood == 4) | ($neighbourhood == 3);
 
+        # mutation
+        $next |= $neighbourhood == 2 if rand(1) < $MUTATION_CHANCE;
+
         # procreate
         $gen = $next;
     }
 
 =back
+
+=head2 Result
+
+=for html <iframe src="https://giphy.com/embed/3ov9jGoKzwnt4l4UQo" width="458" height="480" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/graphicsraylib-3ov9jGoKzwnt4l4UQo">via GIPHY</a></p>
 
 =head1 GIT REPOSITORY
 

@@ -285,7 +285,9 @@ version: $version
 		$helpconnect = 16;
 
 		## Use the initdb found by App::Info
-		$initdb = $ENV{DBDPG_INITDB} || $ENV{PGINITDB} || '';
+        if (! length $initdb or $initdb eq 'default') {
+            $initdb = $ENV{DBDPG_INITDB} || $ENV{PGINITDB} || '';
+        }
 		if (!$initdb or ! -e $initdb) {
 			$initdb = 'initdb';
 		}
@@ -318,7 +320,7 @@ version: $version
 		elsif ($info =~ /(\d+\.\d+)/) {
 			$version = $1;
 		}
-		elsif ($info =~ /(\d+)(?:devel|beta)/) { ## Can be 10devel
+		elsif ($info =~ /(\d+)(?:devel|beta|rc|alpha)/) { ## Can be 10devel
 			$version = $1;
 		}
 		else {
@@ -518,6 +520,21 @@ version: $version
 			print $cfh "log_filename = 'postgres%Y-%m-%d.log'\n";
 			print $cfh "log_rotation_size = 0\n";
 
+			if ($version >= 9.4) {
+				print $cfh "wal_level = logical\n";
+				print $cfh "max_replication_slots = 1\n";
+				print $cfh "max_wal_senders = 1\n";
+
+				open my $hba, '>>', "$testdir/data/pg_hba.conf"
+					or die qq{Could not open "$testdir/data/pg_hba.conf": $!\n};
+
+				print $hba "local\treplication\tall\ttrust\n";
+				print $hba "host\treplication\tall\t127.0.0.1/32\ttrust\n";
+				print $hba "host\treplication\tall\t::1/128\ttrust\n";
+
+				close $hba or die qq{Could not close "$testdir/data/pg_hba.conf": $!\n};
+			}
+
 			print $cfh "listen_addresses='127.0.0.1'\n" if $^O =~ /Win32/;
 			print $cfh "\n";
 			close $cfh or die qq{Could not close "$conf": $!\n};
@@ -660,6 +677,7 @@ version: $version
 	if (!$arg->{quickreturn} or 1 != $arg->{quickreturn}) {
 		## non-ASCII parts of the tests assume UTF8
 		$dbh->do('SET client_encoding = utf8');
+		$dbh->{pg_enable_utf8} = -1;
 	}
 
 	if ($arg->{quickreturn}) {
@@ -765,13 +783,20 @@ sub get_test_settings {
 
 	## Find the best candidate for the pg_ctl program
 	my $pg_ctl = 'pg_ctl';
-	if (exists $ENV{DBDPG_INITDB} and -e $ENV{DBDPG_INITDB}) {
+    my $initdb = 'default';
+    if (exists $ENV{POSTGRES_HOME} and -e "$ENV{POSTGRES_HOME}/bin/pg_ctl") {
+        $pg_ctl = "$ENV{POSTGRES_HOME}/bin/pg_ctl";
+        $initdb = "$ENV{POSTGRES_HOME}/bin/initdb";
+    }
+	elsif (exists $ENV{DBDPG_INITDB} and -e $ENV{DBDPG_INITDB}) {
 		($pg_ctl = $ENV{DBDPG_INITDB}) =~ s/initdb/pg_ctl/;
-	} elsif (exists $ENV{PGINITDB} and -e $ENV{PGINITDB}) {
+	}
+    elsif (exists $ENV{PGINITDB} and -e $ENV{PGINITDB}) {
 		($pg_ctl = $ENV{PGINITDB}) =~ s/initdb/pg_ctl/;
 	}
+
 	my ($testdsn, $testuser, $testdir, $error) = ('','','','?');
-	my ($helpconnect, $su, $uid, $initdb, $version) = (0,'','','default',0);
+	my ($helpconnect, $su, $uid, $version) = (0,'','',0);
 	my $inerror = 0;
 	if (-e $helpfile) {
 		open $fh, '<', $helpfile or die qq{Could not open "$helpfile": $!\n};

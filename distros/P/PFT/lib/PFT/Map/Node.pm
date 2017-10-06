@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Map::Node v1.2.0;
+package PFT::Map::Node v1.2.1;
 
 =encoding utf8
 
@@ -195,6 +195,8 @@ sub virtual { !shift->{cont}->exists }
 =item content_type
 
 Returns the type of the content. Short for C<ref($node-E<gt>content)>
+
+This has nothing to do with HTTP content-type header (nor with HTTP at all).
 
 =cut
 

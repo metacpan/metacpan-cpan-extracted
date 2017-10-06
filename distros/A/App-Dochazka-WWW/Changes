@@ -281,3 +281,45 @@ Revision history for App-Dochazka-WWW
 - tests: js: migrate unit test to QUnit 2.4.0
 - build/ops: require App::MFILE::WWW 0.158
 
+0.149 2017-09-24 00:03 CEST
+- build/ops: add ext/codepaths file to MANIFEST
+- js: tests: add simple test cases for mainMenu targets
+- Dispatch.pm: upon login success, expurgate currentUser object
+- js: tests: force root user for mainMenu test
+- js: tests: refactor and add test for mainEmpl menu
+- js: tests: use setTimeout properly
+- js: tests/main-menu.js: refactor to do login/logout
+- Dispatch.pm: use _prep_ajax_response for logout
+- daction-start.js: call loggout instead of logout
+- tests/main-menu.js: use current user object correctly
+- js: tests: refactor all three existing tests
+
+0.150 2017-09-25 17:36 CEST
+- js: emp-lib: migrate ldapLookupSubmit() to target stack
+- js: tests: add LDAP lookup test case
+- js: tests: put focus on selection field when populating it
+- canned-tests.js: use stack methods instead of examining stack itself
+- emp-lib.js: use stack to display employee in ldapEmployeeLink
+- tests: main-empl.js: return to dmenu from LDAP test before logging out
+- tests: main-empl.js: implement LDAP lookup - failure test case
+- js: emp-lib: light refactor of ldapEmployeeObject handling
+- js: tests: main-empl: change how LDAP lookup success is determined
+- js: tests: main-empl: after ncutler LDAP lookup, add him to Dochazka
+- js: tests: implement Search Dochazka employees - success test case
+- js: emp-lib: refrain from pushing duplicate ldapDisplayEmployee targets
+- js: add test case for LDAP sync from simpleEmployeeBrowser
+- js: emp-lib: update dbrowser dataset after successful empProfile edit
+
+0.151 2017-09-28 11:43 CEST
+- js: emp-lib: rely on stack in LDAPsync AJAX success callback
+- js: emp-lib: refactor, split off LDAP functions into ldap-lib.js
+- js: cleanup: remove last vestiges of (dform, dbrowser) "hook"
+- js: cleanup: refrain from calling ajaxMessage() twice
+- Dispatch.pm: migrate is_authorized to App::MFILE::HTTP
+- Eliminate dependency on App::MFILE distro
+- Dispatch.pm: improve process_post error handling
+- js: immediately display schedules upon creation
+- js: daction-init: some action targets were still pushable
+- js: dform-init: activate rememberState for some dforms
+- js: tests: add "bogus schedule lookup" test case
+

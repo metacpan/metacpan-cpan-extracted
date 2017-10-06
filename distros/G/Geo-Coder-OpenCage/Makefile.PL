@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Geocode addresses with the OpenCage Geocoder API",
+  "ABSTRACT" => "Geocode coordinates and addresses with the OpenCage Geocoder",
   "AUTHOR" => "edf <edf\@opencagedata.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,19 +16,20 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Geo::Coder::OpenCage",
   "PREREQ_PM" => {
-    "Carp" => "1.26",
-    "HTTP::Tiny" => "0.028",
-    "JSON" => "2.53",
-    "List::MoreUtils" => "0.33",
+    "Carp" => 0,
+    "HTTP::Tiny" => 0,
+    "JSON" => "2.94",
+    "JSON::XS" => "3.04",
     "Pod::Perldoc" => "3.21",
-    "URI" => "1.60"
+    "URI" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.32",
     "Test::More" => "0.92",
-    "Test::Pod" => "1.51"
+    "Test::Pod" => "1.51",
+    "Test::Warn" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,15 +37,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => "1.26",
-  "HTTP::Tiny" => "0.028",
-  "JSON" => "2.53",
-  "List::MoreUtils" => "0.33",
+  "Carp" => 0,
+  "HTTP::Tiny" => 0,
+  "JSON" => "2.94",
+  "JSON::XS" => "3.04",
   "Pod::Perldoc" => "3.21",
   "Test::Exception" => "0.32",
   "Test::More" => "0.92",
   "Test::Pod" => "1.51",
-  "URI" => "1.60"
+  "Test::Warn" => 0,
+  "URI" => 0
 );
 
 

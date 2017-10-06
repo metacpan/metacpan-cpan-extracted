@@ -17,14 +17,14 @@ $model->create_config_class
   (
    name => 'Hosts',
 
-   read_config  => [ { backend => 'augeas', 
-		       config_dir => '/etc/',
-		       file => 'hosts',
-		       set_in => 'record',
-		       save   => 'backup',
-		       #sequential_lens => ['record'],
-		     },
-		   ],
+   rw_config  =>  {
+       backend => 'augeas',
+       config_dir => '/etc/',
+       file => 'hosts',
+       set_in => 'record',
+       save   => 'backup',
+       #sequential_lens => ['record'],
+   },
 
    element => [
 	       record => { type => 'list',
@@ -39,14 +39,13 @@ $model->create_config_class
   (
    name => 'Sshd',
 
-   'read_config'
-   => [ { backend => 'augeas', 
-	  config_dir => '/etc/ssh/',
-	  file => 'sshd_config',
-	  save   => 'backup',
-	  sequential_lens => [qw/HostKey Subsystem Match/],
-	},
-      ],
+   'rw_config' => {
+       backend => 'augeas',
+       config_dir => '/etc/ssh/',
+       file => 'sshd_config',
+       save   => 'backup',
+       sequential_lens => [qw/HostKey Subsystem Match/],
+   },
 
    element => [
 	       'AcceptEnv',

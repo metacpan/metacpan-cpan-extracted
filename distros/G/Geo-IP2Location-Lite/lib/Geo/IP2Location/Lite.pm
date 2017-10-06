@@ -19,7 +19,7 @@ package Geo::IP2Location::Lite;
 use strict;
 use warnings;
 
-$Geo::IP2Location::Lite::VERSION = '0.10';
+$Geo::IP2Location::Lite::VERSION = '0.11';
 
 my $UNKNOWN            = "UNKNOWN IP ADDRESS";
 my $NO_IP              = "MISSING IP ADDRESS";
@@ -50,6 +50,8 @@ my $USAGETYPE          = 20;
 
 my $NUMBER_OF_FIELDS   = 20;
 my $ALL                = 100;
+
+my $IS_LITTLE_ENDIAN   = unpack("h*", pack("s", 1)) =~ m/^1/;
 
 my $POSITIONS = {
 	$COUNTRYSHORT       => [0,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2,  2],
@@ -292,14 +294,9 @@ sub readFloat {
 	seek($handle, $position-1, 0);
 	read($handle, $data, 4);
 
-	my $is_little_endian = unpack("h*", pack("s", 1));
-	if ($is_little_endian =~ m/^1/) {
-		# "LITTLE ENDIAN - x86\n";
-		return unpack("f", $data);
-	} else {
-		# "BIG ENDIAN - MAC\n";
-		return unpack("f", reverse($data));
-	}
+	return $IS_LITTLE_ENDIAN
+		? unpack("f", $data)           # "LITTLE ENDIAN - x86\n";
+		: unpack("f", reverse($data)); # "BIG ENDIAN - MAC\n";
 }
 
 sub validate_ip {
@@ -336,7 +333,7 @@ sub name2ip {
     $ip_address = $host;
   } else {
 	if ( my $ip = gethostbyname($host) ) {
-    	$ip_address = join('.', unpack('C4',($ip)[4]||''));
+		$ip_address = join('.', unpack('C4',($ip)[4]));
 	}
   }
   return $ip_address;
@@ -406,7 +403,7 @@ http://www.ip2location.com
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 AUTHOR
 

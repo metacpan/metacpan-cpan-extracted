@@ -1,5 +1,6 @@
 Changes
 lib/Mail/Milter/Authentication/Handler/SMIME.pm
+lib/Mail/Milter/Authentication/Handler/SMIME_metrics.json
 LICENCE
 Makefile.PL
 MANIFEST			This list of files

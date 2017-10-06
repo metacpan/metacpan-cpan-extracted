@@ -7,7 +7,7 @@ use utf8;
 use Test::More tests => 8;
 use Test::NoWarnings;
 use Test::Exception;
-use Test::Differences;
+use Test::Differences; local $Data::Dumper::Useperl = 1;
 use Path::Tiny qw(path);
 
 BEGIN {

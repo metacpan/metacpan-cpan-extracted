@@ -9,18 +9,35 @@
 #
 package MooseX::AttributeShortcuts::Trait::Role::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.034';
+$MooseX::AttributeShortcuts::Trait::Role::Attribute::VERSION = '0.035';
 # ABSTRACT: Role attribute trait to create builder method
 
 use MooseX::Role::Parameterized;
 use namespace::autoclean 0.24;
 use MooseX::Types::Common::String ':all';
 
+use MooseX::Util;
+
+use aliased 'MooseX::AttributeShortcuts::Trait::Role::Method::Builder'
+    => 'RoleBuilderTrait';
+
 with 'MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder';
 
 
 parameter builder_prefix => (isa => NonEmptySimpleStr, default => '_build_');
 
+
+
+sub builder_method_metaclass {
+    my $self = shift @_;
+
+    # this mirrors the approach taken by
+    # Moose::Meta::Role::Attribute->attribute_for_class()
+    return with_traits(
+        $self->original_role->method_metaclass,
+        RoleBuilderTrait,
+    );
+}
 
 # no POD, as this is "private".  If a role is composed into another role, the
 # role attributes are cloned into the new role using original_options.  In
@@ -40,7 +57,7 @@ after attach_to_role  => sub {
     return unless $self->has_anon_builder && !$self->anon_builder_installed;
 
     ### install our anon builder as a method: $role->name
-    $role->add_method($self->builder => $self->anon_builder);
+    $role->add_method($self->builder => $self->_builder_method_meta($role));
     $self->_set_anon_builder_installed;
 
     return;
@@ -85,18 +102,19 @@ MooseX::AttributeShortcuts::Trait::Role::Attribute - Role attribute trait to cre
 
 =head1 VERSION
 
-This document describes version 0.034 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released July 25, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.035 of MooseX::AttributeShortcuts::Trait::Role::Attribute - released September 22, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 
-Normally, attribute options processing takes place at the time an attribute is created and attached
-to a class, either by virtue of a C<has> statement in a class definition or when a role is applied to a
-class.
+Normally, attribute options processing takes place at the time an attribute is
+created and attached to a class, either by virtue of a C<has> statement in a
+class definition or when a role is applied to a class.
 
-This is not an optimal approach for anonymous builder methods.
+This is not an optimal approach for inline builder methods.
 
-This is a role attribute trait, to create builder methods when role attributes are created,
-so that they can be aliased, excluded, etc, like any other role method.
+This is a role attribute trait, to create builder methods when role attributes
+are created, so that they can be aliased, excluded, etc, like any other role
+method.
 
 =head1 ROLE PARAMETERS
 
@@ -108,16 +126,22 @@ Parameterized roles accept parameters that influence their construction.  This r
 
 =head2 new
 
-If we have an anonymous builder defined in our role options, swizzle our options
-such that C<builder> becomes the builder method name, and C<anon_builder>
-is the anonymous sub.
+If we have an inline builder defined in our role options, swizzle our options
+such that C<builder> becomes the builder method name, and C<anon_builder> is
+the anonymous sub.
 
 =head1 AFTER METHOD MODIFIERS
 
 =head2 attach_to_role
 
-If we have an anonymous builder defined in our role options, install it as a
+If we have an inline builder defined in our role options, install it as a
 method.
+
+=head1 METHODS
+
+=head2 builder_method_metaclass()
+
+Returns the metaclass we'll use to install a inline builder.
 
 =head1 SEE ALSO
 

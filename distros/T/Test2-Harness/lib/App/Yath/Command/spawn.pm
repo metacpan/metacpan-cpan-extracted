@@ -2,10 +2,12 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Test2::Util qw/pkg_to_file/;
 use File::Spec;
+
+use App::Yath::Util qw/find_yath/;
 
 use Carp qw/confess/;
 
@@ -33,28 +35,16 @@ sub import {
     my ($argv, $runref) = @_;
     my ($runner_class, $dir, %args) = @$argv;
 
-    if ($args{setsid}) {
+    if (delete $args{setsid}) {
         require POSIX;
         POSIX::setsid();
     }
 
-    my $pid = $$;
-
-    eval <<'    EOT' or die $@ if $args{pfile};
-        END {
-            local ($?, $!, $@);
-            if (-f $args{pfile} && $pid == $$) {
-                print "Deleting $args{pfile}\n";
-                unlink($args{pfile}) or warn "Could not delete $args{pfile}: $!\n";
-            }
-        }
-
-        1;
-    EOT
+    $0 = find_yath() . ' runner';
 
     my $file = pkg_to_file($runner_class);
     require $file;
-    my $spawn = $runner_class->new(dir => $dir);
+    my $spawn = $runner_class->new(dir => $dir, %args);
 
     my $test = $spawn->start;
 
@@ -95,6 +85,51 @@ __END__
 App::Yath::Command::spawn - TODO
 
 =head1 DESCRIPTION
+
+=head1 SYNOPSIS
+
+=head1 COMMAND LINE USAGE
+
+
+    $ yath spawn [options]
+
+=head2 Help
+
+=over 4
+
+=item --show-opts
+
+Exit after showing what yath thinks your options mean
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=back
+
+=head2 Plugins
+
+=over 4
+
+=item -pPlugin
+
+=item -p+My::Plugin
+
+=item --plugin Plugin
+
+Load a plugin
+
+can be specified multiple times
+
+=item --no-plugins
+
+cancel any plugins listed until now
+
+This can be used to negate plugins specified in .yath.rc or similar
+
+=back
 
 =head1 SOURCE
 

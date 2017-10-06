@@ -22,7 +22,7 @@ Does nothing, only prints what it would do.
 
 =item B<--help|h>
 
-Prints a brief message and exists.
+Prints a brief message and exits.
 
 =item B<--remoteroot=s>
 
@@ -72,11 +72,13 @@ use ExtUtils::MakeMaker qw(prompt);
 use File::Rsync::Mirror::Recent;
 use File::Spec;
 use Getopt::Long;
+use Hash::Util qw(lock_keys);
 use List::Util qw(max);
 use Pod::Usage qw(pod2usage);
 use Time::HiRes qw(time sleep);
 
 our %Opt;
+lock_keys %Opt, map { /([^=|]+)/ } @opt;
 GetOptions(\%Opt,
            @opt,
           ) or pod2usage(1);

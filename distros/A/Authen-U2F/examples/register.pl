@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use 5.010;
 use warnings;
 use strict;
 
@@ -10,17 +9,19 @@ use JSON;
 use constant APPID   => 'https://example.com';
 use constant VERSION => 'U2F_V2';
 
-say "CHALLENGE:";
+print "CHALLENGE:\n";
 
 my $challenge = Authen::U2F->challenge;
-say encode_json({
+print encode_json({
   challenge => $challenge,
   appId     => APPID,
   version   => VERSION,
-});
+}) . "\n";
 
-say "";
-say "ENTER RESPONSE:";
+exit;
+
+print "\n";
+print "ENTER RESPONSE:\n";
 chomp (my $in = <STDIN>);
 
 my $reg_response = decode_json($in);
@@ -33,6 +34,6 @@ my ($handle, $key) = Authen::U2F->registration_verify(
   client_data       => $reg_response->{clientData},
 );
 
-say "";
-say "HANDLE: $handle";
-say "KEY: $key";
+print "\n";
+print "HANDLE: $handle\n";
+print "KEY: $key\n";

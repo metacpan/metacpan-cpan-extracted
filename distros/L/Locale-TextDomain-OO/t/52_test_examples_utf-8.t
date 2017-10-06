@@ -30,6 +30,55 @@ var localeTextDomainOOLexicon = {"en-gb:cat:dom":{"":{"charset":"UTF-8","nplural
 EOT
     },
     {
+        test   => '04_merge_move_copy_delete_lexicon_utf-8',
+        path   => 'example',
+        script => '-I../lib -T 04_merge_move_copy_delete_lexicon_utf-8.pl',
+        result => <<'EOT',
+Lexicon "en-gb:cat:dom" loaded from hash.
+Lexicon "i-default::" copied to "i-default:cat:dom".
+Lexicon "i-default::", "en-gb:cat:dom" merged to "en:cat:dom".
+Lexicon "i-default::" deleted.
+Lexicon "i-default:cat:dom" moved to "i-default::dom".
+{
+  "en-gb:cat:dom" => {
+    "" => {
+      charset => "UTF-8",
+      nplurals => 1,
+      plural => "n != 1",
+      plural_code => sub { "DUMMY" }
+    },
+    "date for GBP/0dates for GBP/4appointment" => {
+      msgstr => [
+        "date for /x{a3}",
+        "dates for /x{a3}"
+      ]
+    }
+  },
+  "en:cat:dom" => {
+    "" => {
+      charset => "UTF-8",
+      nplurals => 1,
+      plural => "n != 1",
+      plural_code => sub { "DUMMY" }
+    },
+    "date for GBP/0dates for GBP/4appointment" => {
+      msgstr => [
+        "date for /x{a3}",
+        "dates for /x{a3}"
+      ]
+    }
+  },
+  "i-default::dom" => {
+    "" => {
+      nplurals => 2,
+      plural => "n != 1",
+      plural_code => sub { "DUMMY" }
+    }
+  }
+}
+EOT
+    },
+    {
         test   => '12_gettext_mo_utf-8',
         path   => 'example',
         script => '-I../lib -T 12_gettext_mo_utf-8.pl',

@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator;
-$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002220';
+$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002221';
 use Moose;
 
 # ABSTRACT: Manage your SQL and Perl migrations in nicely laid out directories
@@ -43,6 +43,11 @@ has storage => (
   isa        => 'DBIx::Class::Storage',
   is         => 'ro',
   lazy_build => 1,
+);
+
+has version_source => (
+    is      => 'ro',
+    default => '__VERSION',
 );
 
 sub _build_storage {
@@ -494,7 +499,7 @@ sub _sqldiff_from_yaml {
   return [SQL::Translator::Diff::schema_diff(
      $source_schema, $db,
      $dest_schema,   $db,
-     $sqltargs
+     { producer_args => $sqltargs }
   )];
 }
 
@@ -611,11 +616,11 @@ sub prepare_deploy {
   log_info { 'preparing deploy' };
   my $self = shift;
   $self->prepare_protoschema({
-      # Exclude __VERSION so that it gets installed separately
+      # Exclude version table so that it gets installed separately
       parser_args => {
          sources => [
             sort { $a cmp $b }
-            grep { $_ ne '__VERSION' }
+            grep { $_ ne $self->version_source }
             $self->schema->sources
          ],
       }
@@ -1069,6 +1074,11 @@ transaction.
 
 The version the schema on your harddrive is at.  Defaults to
 C<< $self->schema->schema_version >>.
+
+=head2 version_source
+
+The source name used to register the version storage with C<schema>.  Defaults
+to C<__VERSION>.
 
 =head1 AUTHOR
 

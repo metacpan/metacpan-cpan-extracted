@@ -8,7 +8,7 @@ package Devel::MAT::SV;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -122,6 +122,25 @@ sub desc_addr
    return sprintf "%s at %#x", $self->desc, $self->addr;
 }
 
+=head2 desc_class_addr
+
+   $desc = $sv->desc_class_addr
+
+Returns a string describing the SV similar to L</desc_addr> but also includes
+the class name if the SV is blessed.
+
+=cut
+
+sub desc_class_addr
+{
+   my $self = shift;
+
+   my $blessed = $self->blessed or
+      return $self->desc_addr;
+
+   return sprintf "%s=%s at %#x", $self->desc, $blessed->stashname, $self->addr;
+}
+
 =head2 addr
 
    $addr = $sv->addr
@@ -166,6 +185,27 @@ sub blessed
    my $self = shift;
    return $self->df->sv_at( $self->blessed_at );
 }
+
+=head2 name
+
+   $name = $sv->name
+
+Called on an SV which is a member of the symbol table, this method returns the
+perl representation of the full symbol name, including sigil. Otherwise,
+returns C<undef>.
+
+A leading C<main::> prefix is removed for symbols in packages other than
+C<main>.
+
+=cut
+
+my $mkname = sub {
+   my ( $sigil, $glob ) = @_;
+
+   my $stashname = $glob->stashname;
+   $stashname =~ s/^main::// if $stashname =~ m/^main::.+::/;
+   return $sigil . $stashname;
+};
 
 =head2 size
 
@@ -362,7 +402,7 @@ boolean true and false. They are
 
 package Devel::MAT::SV::Immortal;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use constant immortal => 1;
 sub new {
    my $class = shift;
@@ -375,13 +415,13 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::UNDEF;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
 package Devel::MAT::SV::YES;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 sub desc { "YES" }
 sub type { "SCALAR" }
 
@@ -396,7 +436,7 @@ sub name {}
 
 package Devel::MAT::SV::NO;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 sub desc { "NO" }
 sub type { "SCALAR" }
 
@@ -411,7 +451,7 @@ sub name {}
 
 package Devel::MAT::SV::Unknown;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 0xff );
 
 sub desc { "UNKNOWN" }
@@ -420,7 +460,7 @@ sub _outrefs {}
 
 package Devel::MAT::SV::GLOB;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 1 );
 
 =head1 Devel::MAT::SV::GLOB
@@ -573,7 +613,7 @@ sub _outrefs
 
 package Devel::MAT::SV::SCALAR;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 2 );
 
 =head1 Devel::MAT::SV::SCALAR
@@ -692,7 +732,7 @@ sub name
 {
    my $self = shift;
    return unless my $glob_at = $self->glob_at;
-   return '$' . $self->df->sv_at( $glob_at )->stashname;
+   return $mkname->( '$', $self->df->sv_at( $glob_at ) );
 }
 
 sub type
@@ -727,7 +767,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REF;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 3 );
 
 =head1 Devel::MAT::SV::REF
@@ -804,7 +844,7 @@ sub _outrefs
 
 package Devel::MAT::SV::ARRAY;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 4 );
 
 =head1 Devel::MAT::SV::ARRAY
@@ -854,7 +894,7 @@ sub name
 {
    my $self = shift;
    return unless my $glob_at = $self->glob_at;
-   return '@' . $self->df->sv_at( $glob_at )->stashname;
+   return $mkname->( '@', $self->df->sv_at( $glob_at ) );
 }
 
 =head2 elems
@@ -924,7 +964,7 @@ sub _outrefs
 package Devel::MAT::SV::PADLIST;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use constant type => "PADLIST";
 
 =head1 Devel::MAT::SV::PADLIST
@@ -960,7 +1000,7 @@ sub _outrefs
 package Devel::MAT::SV::PADNAMES;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use constant type => "PADNAMES";
 
 =head1 Devel::MAT::SV::PADNAMES
@@ -1036,7 +1076,7 @@ sub _outrefs
 package Devel::MAT::SV::PAD;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 use constant type => "PAD";
 
 use List::Util qw( pairmap );
@@ -1097,7 +1137,7 @@ sub _outrefs
 
 package Devel::MAT::SV::HASH;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 5 );
 
 =head1 Devel::MAT::SV::HASH
@@ -1143,7 +1183,7 @@ sub name
 {
    my $self = shift;
    return unless my $glob_at = $self->glob_at;
-   return '%' . $self->df->sv_at( $glob_at )->stashname;
+   return $mkname->( '%', $self->df->sv_at( $glob_at ) );
 }
 
 # HVs have a backrefs field directly, rather than using magic
@@ -1227,7 +1267,7 @@ sub _outrefs
 
 package Devel::MAT::SV::STASH;
 use base qw( Devel::MAT::SV::HASH );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 6 );
 
 =head1 Devel::MAT::SV::STASH
@@ -1347,7 +1387,7 @@ sub _outrefs
 
 package Devel::MAT::SV::CODE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 7 );
 
 use Carp;
@@ -1630,7 +1670,9 @@ sub name
 
    # CvLEXICALs or CVs with non-reified CvGVs may still have a hekname
    if( defined( my $hekname = $self->hekname ) ) {
-      return '&' . $self->stashname . "::" . $hekname;
+      my $stashname = $self->stashname;
+      $stashname =~ s/^main:://;
+      return '&' . $stashname . "::" . $hekname;
    }
    elsif( my $glob = $self->glob ) {
       return '&' . $glob->stashname;
@@ -1794,7 +1836,7 @@ sub _outrefs
 
 package Devel::MAT::SV::IO;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 8 );
 
 =head1 Devel::MAT::SV::IO
@@ -1812,7 +1854,8 @@ sub load
    @{$self}{qw( ifileno ofileno )} =
       unpack "$df->{uint_fmt}2", $header;
 
-   $_ == $df->{minus_1} and $_ = -1 for @{$self}{qw( ifileno ofileno )};
+   defined $_ and $_ == $df->{minus_1} and 
+      $_ = -1 for @{$self}{qw( ifileno ofileno )};
 
    @{$self}{qw( topgv_at formatgv_at bottomgv_at )} =
       @$ptrs;
@@ -1851,7 +1894,7 @@ sub _outrefs
 
 package Devel::MAT::SV::LVALUE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 9 );
 
 sub load
@@ -1884,7 +1927,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REGEXP;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 10 );
 
 sub load {}
@@ -1895,7 +1938,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::FORMAT;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 11 );
 
 sub load {}
@@ -1906,7 +1949,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::INVLIST;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 __PACKAGE__->register_type( 12 );
 
 sub load {}

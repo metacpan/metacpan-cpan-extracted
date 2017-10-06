@@ -2,18 +2,18 @@ package Test2::Harness::Util::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Test2::Util qw/IS_WIN32/;
 
 use Importer Importer => 'import';
-our @EXPORT_OK = qw/USE_ANSI_COLOR/;
+our @EXPORT_OK = qw/USE_ANSI_COLOR window_size_changed/;
 
 {
     my $use = 0;
     local ($@, $!);
 
-    if (eval { require Term::ANSIColor }) {
+    if (eval { require Term::ANSIColor; Term::ANSIColor->VERSION('4.03') }) {
         if (IS_WIN32) {
             if (eval { require Win32::Console::ANSI }) {
                 Win32::Console::ANSI->import();

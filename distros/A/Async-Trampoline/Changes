@@ -1,0 +1,15 @@
+0.001002  2017-09-23 17:07:57+00:00 UTC
+
+    - support Perls with threading/multiplicity
+    - support compilation under Windows
+
+0.001001  2017-09-22 14:16:56+00:00 UTC
+
+    - better compiler compatibility down to GCC 4.7
+    - don't break compilation if CXXFLAGS env var is set
+    - specify Test::Exception as test dependency
+    - other distribution quality improvements
+
+0.001000  2017-09-19
+
+    - initial release

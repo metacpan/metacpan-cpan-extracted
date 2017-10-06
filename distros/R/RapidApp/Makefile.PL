@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
     "DBIx::Class::PassphraseColumn" => "0.02",
     "DBIx::Class::ResultSet" => 0,
     "DBIx::Class::Schema" => 0,
-    "DBIx::Class::Schema::Diff" => "1.03",
+    "DBIx::Class::Schema::Diff" => "1.05",
     "DBIx::Class::Schema::Loader" => "0.07045",
     "DBIx::Class::Schema::Loader::DBI" => 0,
     "DBIx::Class::Schema::Loader::Table" => 0,
@@ -178,7 +178,7 @@ my %WriteMakefileArgs = (
     "inc::Module::Install" => "1.08",
     "utf8" => 0
   },
-  "VERSION" => "1.3003",
+  "VERSION" => "1.3004",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t t/unit/*.t"
   }
@@ -228,7 +228,7 @@ my %FallbackPrereqs = (
   "DBIx::Class::PassphraseColumn" => "0.02",
   "DBIx::Class::ResultSet" => 0,
   "DBIx::Class::Schema" => 0,
-  "DBIx::Class::Schema::Diff" => "1.03",
+  "DBIx::Class::Schema::Diff" => "1.05",
   "DBIx::Class::Schema::Loader" => "0.07045",
   "DBIx::Class::Schema::Loader::DBI" => 0,
   "DBIx::Class::Schema::Loader::Table" => 0,

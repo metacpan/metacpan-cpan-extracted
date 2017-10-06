@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeEmailCloud/Configuration.pm
   AsposeEmailCloud::EmailApi:
     file: lib/AsposeEmailCloud/EmailApi.pm
-    version: '1.01'
+    version: '1.03'
   AsposeEmailCloud::Object::BaseObject:
     file: lib/AsposeEmailCloud/Object/BaseObject.pm
   AsposeEmailCloud::Object::EmailDocument:
@@ -108,5 +108,6 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  license: http://opensource.org/licenses/mit-license.php
-version: '1.01'
+  license: http://www.opensource.org/licenses/mit-license.php
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

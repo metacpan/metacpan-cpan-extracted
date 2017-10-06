@@ -1,0 +1,10 @@
+Revision history for Perl extension Test2-Tools-JSON
+
+0.02 2017-10-01T05:04:16Z
+
+    - fix testing problem to remove unused code
+
+0.01 2017-09-30T03:55:40Z
+
+    - original version
+

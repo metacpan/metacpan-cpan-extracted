@@ -2,9 +2,9 @@ package Test2::Formatter::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
-use Carp qw/croak/;
+use Carp qw/croak confess/;
 use Time::HiRes qw/time/;
 
 use Test2::Harness::Util::JSON qw/JSON/;
@@ -12,16 +12,18 @@ use Test2::Harness::Util::JSON qw/JSON/;
 use base qw/Test2::Formatter/;
 use Test2::Util::HashBase qw/-io _encoding _no_header _no_numbers _no_diag -event_id -tb -tb_handles -file -leader/;
 
-{
+BEGIN {
     my $J = JSON->new;
     $J->indent(0);
     $J->convert_blessed(1);
     $J->allow_blessed(1);
     $J->utf8(1);
 
-    sub ENCODER() { $J }
+    require constant;
+    constant->import(ENCODER => $J);
 }
 
+my $ROOT_PID;
 my $ROOT_FILE;
 sub import {
     my $class = shift;
@@ -29,6 +31,7 @@ sub import {
 
     $class->SUPER::import();
 
+    $ROOT_PID  = $$;
     $ROOT_FILE = $params{file} if $params{file};
 }
 
@@ -40,6 +43,7 @@ sub init {
     $self->{+EVENT_ID} = 1;
 
     if (my $file = $self->{+FILE}) {
+        confess "File '$file' already exists!" if -f $file;
         open(my $fh, '>', $file) or die "Could not open file: $file";
         $fh->autoflush(1);
         unshift @{$self->{+IO}} => $fh;
@@ -70,6 +74,9 @@ sub init {
 sub new_root {
     my $class = shift;
     my %params = @_;
+
+    confess "new_root called from child process!"
+        if $ROOT_PID != $$;
 
     require Test2::API;
     my $io = $params{+IO} = [Test2::API::test2_stdout(), Test2::API::test2_stderr()];

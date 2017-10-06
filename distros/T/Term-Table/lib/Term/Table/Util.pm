@@ -2,7 +2,9 @@ package Term::Table::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+use Config qw/%Config/;
+
+our $VERSION = '0.010';
 
 use Importer Importer => 'import';
 our @EXPORT_OK = qw/term_size USE_GCS USE_TERM_READKEY USE_TERM_SIZE_ANY uni_length/;
@@ -24,13 +26,12 @@ $trk &&= Term::ReadKey->can('GetTerminalSize');
 if (!-t *STDOUT) {
     *USE_TERM_READKEY  = sub() { 0 };
     *USE_TERM_SIZE_ANY = sub() { 0 };
-    *term_size = \&DEFAULT_SIZE;
+    *term_size         = \&DEFAULT_SIZE;
 }
 elsif ($tsa) {
-    *USE_TERM_READKEY = sub() { 0 };
+    *USE_TERM_READKEY  = sub() { 0 };
     *USE_TERM_SIZE_ANY = sub() { 1 };
-    *term_size = sub {
-        return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
+    *_term_size        = sub {
         my $size = chars(\*STDOUT);
         return DEFAULT_SIZE if !$size;
         return DEFAULT_SIZE if $size < DEFAULT_SIZE;
@@ -38,10 +39,9 @@ elsif ($tsa) {
     };
 }
 elsif ($trk) {
-    *USE_TERM_READKEY = sub() { 1 };
-    *term_size = sub {
-        return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
-
+    *USE_TERM_READKEY  = sub() { 1 };
+    *USE_TERM_SIZE_ANY = sub() { 0 };
+    *_term_size        = sub {
         my $total;
         try {
             my @warnings;
@@ -58,11 +58,38 @@ elsif ($trk) {
     };
 }
 else {
-    *USE_TERM_READKEY = sub() { 0 };
-    *term_size = sub {
+    *USE_TERM_READKEY  = sub() { 0 };
+    *USE_TERM_SIZE_ANY = sub() { 0 };
+    *term_size         = sub {
         return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
         return DEFAULT_SIZE;
     };
+}
+
+if (USE_TERM_READKEY() || USE_TERM_SIZE_ANY()) {
+    if (index($Config{sig_name}, 'WINCH') >= 0) {
+        my $changed = 0;
+        my $polled = -1;
+        $SIG{WINCH} = sub { $changed++ };
+
+        my $size;
+        *term_size = sub {
+            return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
+
+            unless ($changed == $polled) {
+                $polled = $changed;
+                $size = _term_size();
+            }
+
+            return $size;
+        }
+    }
+    else {
+        *term_size = sub {
+            return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
+            _term_size();
+        };
+    }
 }
 
 my ($gcs, $err) = try { require Unicode::GCString };

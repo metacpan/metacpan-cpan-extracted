@@ -17,7 +17,7 @@ use Carp;
 use Try::Tiny;
 require Device::SerialPort if $^O =~ /^linux$/i;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw( portopen baudrate parity stopbits databits serialdriver ) );
 

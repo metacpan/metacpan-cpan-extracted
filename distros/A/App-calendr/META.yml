@@ -20,10 +20,10 @@ no_index:
 provides:
   App::calendr:
     file: lib/App/calendr.pm
-    version: '0.21'
+    version: '0.23'
   App::calendr::Option:
     file: lib/App/calendr/Option.pm
-    version: '0.21'
+    version: '0.23'
 requires:
   Module::Pluggable: '5.1'
   Moo: '2.000000'
@@ -34,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/App-calendr.git
-version: '0.21'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

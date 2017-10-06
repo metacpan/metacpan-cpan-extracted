@@ -8,7 +8,7 @@ use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has options => sub { {} };
@@ -159,7 +159,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -262,6 +262,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

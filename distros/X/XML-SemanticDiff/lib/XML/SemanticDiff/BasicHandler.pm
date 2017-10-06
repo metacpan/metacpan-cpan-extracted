@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:SHLOMIF';
 use strict;
 use warnings;
 
-our $VERSION = '1.0005';
+our $VERSION = '1.0006';
 
 sub new {
     my ($proto, %args) = @_;
@@ -165,7 +165,7 @@ XML::SemanticDiff::BasicHandler - Default handler class for XML::SemanticDiff
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ Please run perldoc XML::SemanticDiff for more information.
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 IMPLEMENTED METHODS (FOR INTERNAL USE)
 
@@ -226,8 +226,9 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff or by
-email to bug-xml-semanticdiff@rt.cpan.org.
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff> or by
+email to
+L<bug-xml-semanticdiff@rt.cpan.org|mailto:bug-xml-semanticdiff@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

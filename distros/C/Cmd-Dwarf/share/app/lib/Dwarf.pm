@@ -14,7 +14,7 @@ use Module::Find;
 use Router::Simple;
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '1.50';
+our $VERSION = '1.60';
 
 use constant {
 	BEFORE_DISPATCH    => 'before_dispatch',
@@ -27,7 +27,7 @@ use constant {
 };
 
 use Dwarf::Accessor {
-	ro => [qw/namespace base_dir env config error request response router handler handler_class ext models state/],
+	ro => [qw/namespace base_dir env config error request response router route handler handler_class ext models state/],
 	rw => [qw/stash request_handler_prefix request_handler_method/],
 };
 
@@ -150,6 +150,7 @@ sub dump {
 
 sub to_psgi {
 	my $self = shift;
+	$self->{route} = $self->find_route;
 	$self->call_before_trigger;
 	$self->dispatch(@_);
 	$self->call_after_trigger;
@@ -163,31 +164,7 @@ sub dispatch {
 
 	eval {
 		eval {
-			my $p = $self->router->match($self->env);
-			#warn Dumper $p;
-			return $self->handle_not_found unless $p;
-
-			my $controller = delete $p->{controller};
-			my $action = delete $p->{action};
-			my $splat = delete $p->{splat};
-
-			# 余ったパラメータを追加
-			for my $k (keys %{ $p }) {
-				$self->request->parameters->add($k, $p->{$k});
-			}
-
-			# prefix がなかったら補完する
-			if ($controller) {
-				($controller) = $self->find_class($controller);
-			}
-
-			# splat があったら、splat から controller を組み立てる
-			if ($splat) {
-				my @a = grep { $_ ne "/" } @{ $splat };
-				unshift @a, $controller if $controller;
-				my ($class, $ext) = $self->find_class(join "/", @a);
-				$controller = $class if $class;
-			}
+			my $controller = $self->route->{controller};
 
 			return $self->handle_not_found unless $controller;
 			Dwarf::Util::load_class($controller);
@@ -198,9 +175,6 @@ sub dispatch {
 
 			my $method = $self->find_method;
 			return $self->not_found unless $method;
-
-			# プロセス名に処理中のコントローラー名を表示する
-			$self->proctitle(sprintf "[Dwarf] %s::%s() (%s)", $controller, lc $self->method, $self->base_dir);
 
 			$self->handler->init($self);
 			
@@ -247,9 +221,6 @@ sub finalize {
 	if ($self->can('disconnect_db')) {
 		$self->disconnect_db;
 	}
-
-	# プロセス名を idle にする
-	$self->proctitle(sprintf "[Dwarf] idle (%s)", $self->base_dir);
 
 	my $res = ref $self->body eq 'CODE'
 		? $self->body # ストリーミング
@@ -369,6 +340,43 @@ sub handle_server_error {
 sub receive_error { die $_[1] }
 sub receive_server_error { die $_[1] }
 
+sub find_route {
+	my $self = shift;
+	my ($controller, $action, $splat);
+
+	my $p = $self->router->match($self->env);
+	#warn Dumper $p;
+	return ($controller, $action, $splat) unless $p;
+
+	$controller = delete $p->{controller};
+	$action = delete $p->{action};
+	$splat = delete $p->{splat};
+
+	# 余ったパラメータを追加
+	for my $k (keys %{ $p }) {
+		$self->request->parameters->add($k, $p->{$k});
+	}
+
+	# prefix がなかったら補完する
+	if ($controller) {
+		($controller) = $self->find_class($controller);
+	}
+
+	# splat があったら、splat から controller を組み立てる
+	if ($splat) {
+		my @a = grep { $_ ne "/" } @{ $splat };
+		unshift @a, $controller if $controller;
+		my ($class, $ext) = $self->find_class(join "/", @a);
+		$controller = $class if $class;
+	}
+
+	return {
+		controller => $controller,
+		action     => $action,
+		splat      => $splat,
+	};
+}
+
 sub find_class {
 	my ($self, $path, $prefix) = @_;
 	return if not defined $path or $path eq '';
@@ -430,19 +438,6 @@ sub create_module {
 	weaken $module->{context};
 	$module->init($self);
 	return $module;
-}
-
-sub proctitle {
-	my ($self, $title) = @_;
-	$title ||= $0;
-
-	if ($^O eq 'linux' and load_class("Sys::Proctitle")) {
-		Sys::Proctitle::setproctitle($title);
-		no warnings 'redefine';
-		*proctitle = sub { Sys::Proctitle::setproctitle($_[1]) };
-		return;
-	}
-	$0 = $title;
 }
 
 sub call_before_trigger {

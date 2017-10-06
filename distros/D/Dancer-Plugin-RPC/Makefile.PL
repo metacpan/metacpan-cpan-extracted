@@ -12,10 +12,11 @@ WriteMakefile(
     LICENSE       => 'perl',
 
     PREREQ_PM => {
-        'Dancer'           => '1.31',
-        'Params::Validate' => '1.0',
-        'RPC::XML'         => '0.56',
-        'JSON'             => '2.0',
+        'Dancer'                     => '1.31',
+        'JSON'                       => '2.0',
+        'Params::ValidationCompiler' => '0.24',
+        'RPC::XML'                   => '0.56',
+        'Types::Standard'            => '1.00',
     },
 
     CONFIGURE_REQUIRES => {
@@ -23,9 +24,9 @@ WriteMakefile(
     },
 
     BUILD_REQUIRES => {
+        'Test::Fatal'      => '0.010',
         'Test::More'       => '0.88',    # done_testing()
         'Test::NoWarnings' => '1.00',
-        'Test::Fatal'      => '0.010',
     },
 
     MIN_PERL_VERSION => '5.010001',

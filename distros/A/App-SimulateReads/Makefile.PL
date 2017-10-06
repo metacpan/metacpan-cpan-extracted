@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.018;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "script/simulate_reads"
   ],
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "App::SimulateReads",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -63,14 +63,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Class::Data::Inheritable" => "0.08",
-    "Statistics::Normality" => 0,
     "Test::Class" => "0.50",
     "Test::Most" => "0.35",
-    "Test::Perl::Critic" => "1.03",
     "Test::UseAllModules" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -102,11 +100,9 @@ my %FallbackPrereqs = (
   "PerlIO::gzip" => "0.19",
   "Pod::Usage" => 0,
   "Scalar::Util" => 0,
-  "Statistics::Normality" => 0,
   "Storable" => "2.51",
   "Test::Class" => "0.50",
   "Test::Most" => "0.35",
-  "Test::Perl::Critic" => "1.03",
   "Test::UseAllModules" => 0,
   "Try::Tiny" => 0,
   "autodie" => 0,

@@ -2,14 +2,14 @@ package Test2::Harness::Job::Dir;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use File::Spec();
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
 use Test2::Harness::Util::JSON qw/decode_json/;
-use Test2::Harness::Util qw/read_file/;
+use Test2::Harness::Util qw/maybe_read_file open_file/;
 
 use Test2::Harness::Event;
 
@@ -24,13 +24,15 @@ use Test2::Harness::Util::TapParser qw{
 
 use Test2::Harness::Util::HashBase qw{
     -run_id -job_id -job_root
-    -events_file -events_exists -_events_buffer -_events_index
-    -stderr_file -stderr_exists -_stderr_buffer -_stderr_index -_stderr_id
-    -stdout_file -stdout_exists -_stdout_buffer -_stdout_index -_stdout_id
-    -start_file  -start_exists  -_start_buffer
-    -exit_file   -_exit_done    -_exit_buffer
+    -events_file -_events_buffer -_events_index
+    -stderr_file -_stderr_buffer -_stderr_index -_stderr_id
+    -stdout_file -_stdout_buffer -_stdout_index -_stdout_id
+    -start_file  -start_exists   -_start_buffer
+    -exit_file   -_exit_done     -_exit_buffer
 
     -_file -file_file
+
+    runner_exited
 };
 
 sub init {
@@ -113,9 +115,9 @@ sub file {
 }
 
 my %FILE_MAP = (
-    'events.jsonl' => [EVENTS_FILE, 'Test2::Harness::Util::File::JSONL'],
-    'stdout'       => [STDOUT_FILE, 'Test2::Harness::Util::File::Stream'],
-    'stderr'       => [STDERR_FILE, 'Test2::Harness::Util::File::Stream'],
+    'events.jsonl' => [EVENTS_FILE, \&open_file],
+    'stdout'       => [STDOUT_FILE, \&open_file],
+    'stderr'       => [STDERR_FILE, \&open_file],
     'start'        => [START_FILE,  'Test2::Harness::Util::File::Value'],
     'exit'         => [EXIT_FILE,   'Test2::Harness::Util::File::Value'],
     'file'         => [FILE_FILE,   'Test2::Harness::Util::File::Value'],
@@ -128,9 +130,58 @@ sub _open_file {
     my $map = $FILE_MAP{$file} or croak "'$file' is not a known job file";
     my ($key, $type) = @$map;
 
-    my $path = File::Spec->catfile($self->{+JOB_ROOT}, $file);
+    return $self->{$key} if $self->{$key};
 
-    return $self->{$key} ||= $type->new(name => $path);
+    my $path = File::Spec->catfile($self->{+JOB_ROOT}, $file);
+    my $out;
+
+    return $self->{$key} = $type->new(name => $path)
+        unless ref $type;
+
+    return undef unless -e $path;
+    return $self->{$key} = $type->($path, '<')
+}
+
+sub _fill_stream_buffers {
+    my $self = shift;
+    my ($max) = @_;
+
+    my $events_buff = $self->{+_EVENTS_BUFFER} ||= [];
+    my $stdout_buff = $self->{+_STDOUT_BUFFER} ||= [];
+    my $stderr_buff = $self->{+_STDERR_BUFFER} ||= [];
+
+    my $events_file = $self->{+EVENTS_FILE} || $self->_open_file('events.jsonl');
+    my $stdout_file = $self->{+STDOUT_FILE} || $self->_open_file('stdout');
+    my $stderr_file = $self->{+STDERR_FILE} || $self->_open_file('stderr');
+
+    my @sets = grep { defined $_->[0] } (
+        [$events_file, $events_buff],
+        [$stdout_file, $stdout_buff],
+        [$stderr_file, $stderr_buff],
+    );
+
+    return unless @sets;
+
+    # Cache the result of the exists check on success, files can come into
+    # existence at any time though so continue to check if it fails.
+    while (!$max || @$events_buff + @$stderr_buff + @$stdout_buff < $max) {
+        my $added = 0;
+        for my $set (@sets) {
+            my ($file, $buff) = @$set;
+
+            my $pos = tell($file);
+            my $line = <$file>;
+            if (defined($line) && ($self->{+_EXIT_DONE} || substr($line, -1) eq "\n")) {
+                push @$buff => $line;
+                seek($file, 0, 1) if eof($file); # Reset EOF.
+                $added++;
+            }
+            else {
+                seek($file, $pos, 0);
+            }
+        }
+        last unless $added;
+    }
 }
 
 sub _fill_buffers {
@@ -154,22 +205,10 @@ sub _fill_buffers {
         $self->{+START_EXISTS} = 1;
     }
 
-    my $events_buff = $self->{+_EVENTS_BUFFER} ||= [];
-    my $stdout_buff = $self->{+_STDOUT_BUFFER} ||= [];
-    my $stderr_buff = $self->{+_STDERR_BUFFER} ||= [];
-
-    my $events_file = $self->{+EVENTS_FILE} || $self->_open_file('events.jsonl');
-    my $stdout_file = $self->{+STDOUT_FILE} || $self->_open_file('stdout');
-    my $stderr_file = $self->{+STDERR_FILE} || $self->_open_file('stderr');
-
-    # Cache the result of the exists check on success, files can come into
-    # existence at any time though so continue to check if it fails.
-    push @$events_buff => $events_file->poll(max => $max) if $self->{+EVENTS_EXISTS} ||= $events_file->exists;
-    push @$stderr_buff => $stderr_file->poll(max => $max) if $self->{+STDERR_EXISTS} ||= $stderr_file->exists;
-    push @$stdout_buff => $stdout_file->poll(max => $max) if $self->{+STDOUT_EXISTS} ||= $stdout_file->exists;
+    $self->_fill_stream_buffers($max);
 
     # Do not look for exit until we are done with the other streams
-    return if $self->{+_EXIT_DONE} || @$stdout_buff || @$stderr_buff || @$events_buff;
+    return if $self->{+_EXIT_DONE} || @{$self->{+_STDOUT_BUFFER}} || @{$self->{+_STDERR_BUFFER}} || @{$self->{+_EVENTS_BUFFER}};
 
     my $ended = 0;
     my $exit_file = $self->{+EXIT_FILE} || $self->_open_file('exit');
@@ -182,14 +221,17 @@ sub _fill_buffers {
             $ended++;
         }
     }
+    elsif ($self->{+RUNNER_EXITED}) {
+        $self->{+_EXIT_BUFFER} = '-1';
+        $self->{+_EXIT_DONE} = 1;
+        $ended++;
+    }
 
     return unless $ended;
 
     # If we found exit we need one last buffer fill on the other sources.
     # If we do not do this we have a race condition. Ignore the max for this.
-    push @$events_buff => $events_file->poll() if $self->{+EVENTS_EXISTS} ||= $events_file->exists;
-    push @$stderr_buff => $stderr_file->poll() if $self->{+STDERR_EXISTS} ||= $stderr_file->exists;
-    push @$stdout_buff => $stdout_file->poll() if $self->{+STDOUT_EXISTS} ||= $stdout_file->exists;
+    $self->_fill_stream_buffers();
 }
 
 sub _poll_start {
@@ -226,7 +268,7 @@ sub _poll_event {
     my $buffer = $self->{+_EVENTS_BUFFER};
     return unless @$buffer;
 
-    my $event_data = $buffer->[0];
+    my $event_data = decode_json($buffer->[0]);
     my $id = $event_data->{stream_id};
 
     # We need to wait for these to catch up.
@@ -255,27 +297,32 @@ sub _poll_stdout {
     while (my $line = shift @$buffer) {
         chomp($line);
 
-        if ($line =~ m/^T2-HARNESS-ESYNC: (\d+)$/) {
+        my $esync = 0;
+        if ($line =~ s/T2-HARNESS-ESYNC: (\d+)$//) {
             $self->{+_STDOUT_INDEX} = $1;
-            last;
+            $esync = 1;
         }
+
+        last if $esync && !length($line);
 
         my $id = $self->{+_STDOUT_ID}; # Do not bump yet!
         my $event_id = "stdout-$id";
 
-        my $event_data = $self->_process_stdout_line($event_id, $line);
+        my @event_datas = $self->_process_stdout_line($event_id, $line);
 
-        if(my $sid = $event_data->{stream_id}) {
-            $self->{+_STDOUT_INDEX} = $sid;
-            push @{$self->{+_EVENTS_BUFFER}} => $event_data;
-            last;
+        for my $event_data (@event_datas) {
+            if(my $sid = $event_data->{stream_id}) {
+                $self->{+_STDOUT_INDEX} = $sid;
+                push @{$self->{+_EVENTS_BUFFER}} => $event_data;
+                last;
+            }
+
+            # Now we bump it!
+            $self->{+_STDOUT_ID}++;
+            push @out => $event_data;
         }
 
-        # Now we bump it!
-        $self->{+_STDOUT_ID}++;
-        push @out => $event_data;
-
-        last if $max && @out >= $max;
+        last if $esync || ($max && @out >= $max);
     }
 
     return @out;
@@ -287,15 +334,16 @@ sub _poll_stderr {
 
     my @out;
 
-    until ($self->{+_STDERR_INDEX} > $self->{+_EVENTS_INDEX} || @out >= $max) {
+    until ($self->{+_STDERR_INDEX} > $self->{+_EVENTS_INDEX} || ($max && @out >= $max)) {
         my $buffer = $self->{+_STDERR_BUFFER} or last;
 
         my @lines;
         while (my $line = shift @$buffer) {
             chomp($line);
 
-            if ($line =~ m/^T2-HARNESS-ESYNC: (\d+)$/) {
+            if ($line =~ s/T2-HARNESS-ESYNC: (\d+)$//) {
                 $self->{+_STDERR_INDEX} = $1;
+                push @lines => $line if length($line);
                 last;
             }
 
@@ -347,31 +395,27 @@ sub _process_stdout_line {
 
     chomp($line);
 
-    my $event_data;
+    my @event_datas;
 
-    if ($line =~ m/^T2-HARNESS-EVENT: (\d+) (.*)/) {
+    if ($line =~ s/T2-HARNESS-EVENT: (\d+) (.+)$//) {
         my ($sid, $json) = ($1, $2);
 
-        $event_data = decode_json($json);
+        my $event_data = decode_json($json);
         $event_data->{stream_id} = $sid;
+        push @event_datas => $event_data;
     }
-    else {
+
+    if (length($line)) {
         my $facet_data;
 
         # Sometimes clever scripts mix events and directly printed TAP... sigh.
         $facet_data = parse_stdout_tap($line);
 
         $facet_data ||= {info => [{details => $line, tag => 'STDOUT', debug => 0}]};
-        $event_data = {facet_data => $facet_data};
+        push @event_datas => {facet_data => $facet_data};
     }
 
-    return {
-        %$event_data,
-
-        job_id   => $self->{+JOB_ID},
-        run_id   => $self->{+RUN_ID},
-        event_id => $event_id,
-    };
+    return map {{ %{$_}, job_id => $self->{+JOB_ID}, run_id => $self->{+RUN_ID}, event_id => $event_id }} @event_datas;
 }
 
 sub _process_start_line {
@@ -403,8 +447,8 @@ sub _process_exit_line {
 
     chomp($value);
 
-    my $stdout = read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stdout"));
-    my $stderr = read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stderr"));
+    my $stdout = maybe_read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stdout"));
+    my $stderr = maybe_read_file(File::Spec->catfile($self->{+JOB_ROOT}, "stderr"));
 
     return {
         event_id => $event_id,

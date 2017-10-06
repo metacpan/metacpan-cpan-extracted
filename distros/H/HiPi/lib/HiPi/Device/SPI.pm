@@ -19,7 +19,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi :spi );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw ( fh fno delay speed bitsperword ) );
 
@@ -85,6 +85,14 @@ sub transfer {
     return $rval;
 }
 
+sub transfer_byte_array {
+    my( $self, @bytes) = @_;
+    my $packcount = scalar( @bytes );
+    my $packfmt = 'C' . $packcount;
+    my @resultarray = unpack($packfmt, $self->transfer( pack($packfmt, @bytes) ) );
+    return @resultarray;
+}
+
 sub bus_transfer {
     my $self = shift;
     return $self->transfer( @_ ); 
@@ -109,6 +117,15 @@ sub get_bus_maxspeed {
     my($self, $speed) = @_;
     return HiPi::Device::SPI::_get_spi_max_speed($self->fno);
 }
+
+sub set_transfer_bitsperword { shift->bitsperword( @_ ); }
+sub get_transfer_bitsperword { shift->bitsperword(); }
+
+sub set_transfer_speed { shift->speed( @_ ); }
+sub get_transfer_speed { shift->speed(); }
+
+sub set_transfer_delay { shift->delay( @_ ); }
+sub get_transfer_delay { shift->delay(); }
 
 sub close {
     my $self = shift;

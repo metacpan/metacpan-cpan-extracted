@@ -48,7 +48,7 @@ if (not defined $AsposeSlidesCloud::Configuration::api_key or $AsposeSlidesCloud
 	$AsposeStorageCloud::Configuration::api_key = $AsposeSlidesCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

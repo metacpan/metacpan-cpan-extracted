@@ -1,0 +1,50 @@
+---
+abstract: 'Easily create a facet parameterized Type::Tiny type'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
+  Test::More: '0'
+  Type::Library: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Type-TinyX-Facets
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Type::TinyX::Facets:
+    file: lib/Type/TinyX/Facets.pm
+    version: '0.01'
+requires:
+  B: '0'
+  Carp: '0'
+  Data::OptList: '0'
+  Exporter: '0'
+  Safe::Isa: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Type-TinyX-Facets
+  repository: git://github.com/djerius/type-tinyx-facets.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

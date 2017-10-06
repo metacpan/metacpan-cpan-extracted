@@ -3,7 +3,7 @@ package Spp::Cursor;
 use 5.012;
 no warnings "experimental";
 
-use Spp::Core qw(to_end);
+use Spp::Builtin qw(to_end);
 
 sub new {
    my ($class, $str, $ns) = @_;
@@ -16,7 +16,6 @@ sub new {
       off     => 0,
       line    => 1,
       pos     => 0,
-      depth   => 0,
       maxoff  => 0,
       maxline => 1,
       maxpos  => 0,
@@ -38,7 +37,7 @@ sub len {
    return $self->{'len'};
 }
 
-sub go {
+sub to_next {
    my $self = shift;
    if (get_char($self) eq "\n") {
       $self->{line}++;
@@ -63,7 +62,7 @@ sub cache {
    return [$off, $line, $pos];
 }
 
-sub recover {
+sub reset_cache {
    my ($self, $cache) = @_;
    my ($off, $line, $pos) = @{$cache};
    $self->{off}  = $off;
@@ -99,14 +98,6 @@ Warning! Stop match at line: $line
    $tip_str
    $tip_char
 EOF
-}
-
-sub error {
-   my ($self, $message) = @_;
-   my $max_report = $self->max_report();
-   say $max_report; 
-   say $message;
-   exit();
 }
 
 1;

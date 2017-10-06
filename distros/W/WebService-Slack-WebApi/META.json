@@ -4,7 +4,7 @@
       "Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "mit"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -142,12 +142,13 @@
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
-      "likkradyus <git@li.que.jp>",
-      "Yanick Champoux <yanick@babyl.dyndns.org>",
+      "Askar Timirgazin <anotheroneackap@gmail.com>",
       "Sterling Hanenkamp <sterling@hanenkamp.com>",
       "Steven Arnott <steven.arnott@grantstreet.com>",
-      "Askar Timirgazin <anotheroneackap@gmail.com>"
-   ]
+      "Yanick Champoux <yanick@babyl.dyndns.org>",
+      "likkradyus <git@li.que.jp>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

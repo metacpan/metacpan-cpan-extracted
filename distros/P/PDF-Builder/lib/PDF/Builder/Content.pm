@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '3.007'; # VERSION
 my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
 
 use Carp;

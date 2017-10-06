@@ -51,25 +51,24 @@ tested against 3.004 July 2017
                  whether the supposed UTF-8 text being printed simply needs to
                  be updated from 0093 to 201C, to make it real UTF-8.
 
- 027_winfont     runs for a few seconds and ends without producing any output 
-                 file and no messages. The PDF::Builder::Win32->enumwinfonts()
-                 method is returning no fonts. See bug CTS 3.
-
 =========== successful (produced reasonable looking PDF, and no messages):
 
  011_open_update  BASE is one page Hello World!. UPDATED is two page, second
                  page is new Hello World! (2). Internal string adds third page
                  Hello World! (3). STRING PDF adds fourth page Hello World! (4).
 
- 012_pages       output pages numbered 1, 9, 2 - 8 (generate pages 1 - 8,
-                 insert page 9 before 2)
+ 012_pages       output pages numbered i - iii, 1, 9, 2 - 8 (generate pages 
+                 1 - 8, insert page 9 before 2, insert Front Matter i-iii)
 
  020_corefonts   latin1 encoding only (actually looks more like Windows-1252). 
                  4 variants most faces
-                 one page per font name, not exactly sure what second page is
-                     (fnt->automap()), apparently some non-Latin-1 extensions
+                 one page per font plane (256 characters each), as most fonts
+                     have more than 256 glyphs from a variety of encodings
+                     (uses automap).
                  command line list of core fonts to display, or entire list
-                 by default
+                     by default
+                 note that "utf8" (and any other multibyte characters) does not
+                     appear to work with core fonts!
 
  020_textrise    show a line of text with rise of +5 (superscript) and -5
                  (subscript). Also +/- 10 and 20 units.
@@ -77,24 +76,38 @@ tested against 3.004 July 2017
  020_textunderline  show off textlabel() call with angles, colors, and a
                  variety of underlining.
 
+ 021_psfonts     Given one or more Type1 (PS) fonts and their metrics files
+                 on the command line, a PDF showing the characters and CID
+                 details is produced for each font file.
+
  021_synfonts    .75 slant, 12 oblique, 4 bold, and small caps variants (where
                  available) of the given core fonts, as available, for 29 core 
                  fonts.
 
  022_truefonts   Given one or more TrueType (.ttf) font FILES on the command
-                 line, a PDF showing the characters, CID details, and some
+                 line, a PDF showing the characters (256 per indicated SINGLE
+                 BYTE encoding, default is 'latin1'), the CID details for all
+                 the characters in the font, and some ASCII
                  sample text is produced for each file. Note that unlike most
                  of the other example programs, the resulting PDF(s) are in
                  the directory you run the program from, not the examples/ 
-                 directory where 022_truefonts lives!
+                 directory where 022_truefonts lives! OpenType (.otf) fonts
+                 also appear to work well here. The first (encoding) page works
+                 only with single byte encodings (not UTF-8). The CID list is
+                 independent of the encoding, and the sample text is ASCII.
 
  022_truefonts_diacrits_utf8   similar to 022_truefonts in its inputs and
-                 outputs. times.ttf and tahoma.ttf (and presumably others)
-                 contain the U+0x0361 combining diacritic.
+                 outputs (no CId character dump). times.ttf and tahoma.ttf 
+                 (and presumably others) contain the U+0361 combining diacritic
+                 used on the second page.
+                 'utf8' encoding doesn't work for the first page (dump of 256
+                 characters in given encoding), only single byte encodings.
+                 UTF-8 input is used for the second page string, and the 
+                 encoding is ignored.
 
  023_cjkfonts    (MyungJo fonts only) the last several hundred characters (2 
                  pages, rotated ASCII) get an undefined value returned by 
-                 $font->uniByCId($xo), and so end up being formatted U+0x???? 
+                 $font->uniByCId($xo), and so end up being formatted U+???? 
                  to avoid a fatal error. Presumably, rotated text should not
                  have a Unicode number.
                  The Lorem Ipsum text on the last page of some fonts (KozGo, 
@@ -143,3 +156,14 @@ BarCode.pl       demonstrate the bar code library, 1 page.
   and there may be other problems, so my advice is NOT to use the barcodes in
   production code until they have been tested and verified.
 
+Windows/
+  027_winfont  demo Windows registry access
+  Win32.pm     glue routine (lib/PDF/Builder/Win32.pm) only used in 027_winfont.
+               The Windows routines have been broken at least since Windows 7,
+               and the demo wasn't terribly useful, anyway, so it has been 
+               removed.
+  Notes:
+   * Makefile.PL  commented out Win32::TieRegistry prereq
+   * examples.bat has been updated to remove Windows test (027_winfont)
+   * t/00-all-usable.t has not been changed, as Win32.pm should not be 
+      encountered during testing

@@ -13,6 +13,10 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
+use Archive::Tar;
+use Cwd qw/abs_path/;
+use Cwd::Guard qw/cwd_guard/;
+
 our @EXPORT = (
     @Test::More::EXPORT,
     @Test::Deep::EXPORT,
@@ -23,12 +27,6 @@ our @EXPORT = (
 
 sub extract_tar {
     my ($filepath, $outdir) = @_;
-
-    require Archive::Tar;
-    require Cwd;
-    require Cwd::Guard;
-    Cwd->import('abs_path');
-    Cwd::Guard->import('cwd_guard');
 
     my $abs_path = abs_path($filepath);
     my $guard    = cwd_guard($outdir);

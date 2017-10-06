@@ -10,7 +10,7 @@ use Moo;
 use MooX::StrictConstructor;
 use namespace::autoclean;
 
-our $VERSION = '1.027';
+our $VERSION = '1.031';
 
 with qw(
     Locale::TextDomain::OO::Role::Logger
@@ -21,7 +21,9 @@ sub lexicon_ref {
 
     ref $hash_lexicon eq 'HASH'
         or confess 'The given lexicon should be a hash reference';
-    my $lexicon  = Locale::TextDomain::OO::Singleton::Lexicon->instance->data;
+    my $instance = Locale::TextDomain::OO::Singleton::Lexicon->instance;
+    $self->logger and $instance->logger( $self->logger );
+    my $lexicon = $instance->data;
     my $key_util = Locale::TextDomain::OO::Util::JoinSplitLexiconKeys->instance;
     while ( my ($lexicon_key, $lexicon_value) = each %{$hash_lexicon} ) {
         my $header = $lexicon_value->[0];
@@ -62,7 +64,7 @@ sub lexicon_ref {
             );
     }
 
-    return;
+    return $self;
 }
 
 1;
@@ -73,13 +75,13 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::Hash - Lexicon from data structure
 
-$Id: Hash.pm 651 2017-05-31 18:10:43Z steffenw $
+$Id: Hash.pm 698 2017-09-28 05:21:05Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/Hash.pm $
 
 =head1 VERSION
 
-1.027
+1.031
 
 =head1 DESCRIPTION
 
@@ -89,8 +91,8 @@ This module allows to create a lexicon from data structure.
 
     require Locale::TextDomain::OO::Lexicon::Hash;
     use Log::Any qw($log);
-    
-    Locale::TextDomain::OO::Lexicon::Hash
+
+    $logger = Locale::TextDomain::OO::Lexicon::Hash
         ->new(
             # all parameters are optional
             logger => sub {
@@ -100,7 +102,8 @@ This module allows to create a lexicon from data structure.
                 return;
             },
         )
-        ->lexicon_ref({ ... });
+        ->lexicon_ref({ ... })
+        ->logger;
 
 =head1 SUBROUTINES/METHODS
 
@@ -166,7 +169,7 @@ are written as key "msgstr_plural" with an array reference as value.
 
 =head2 method logger
 
-Set the logger
+Set the logger and get back them
 
     $lexicon_hash->logger(
         sub {
@@ -176,12 +179,15 @@ Set the logger
             return;
         },
     );
+    $logger = $lexicon_hash->logger;
 
 $arg_ref contains
 
     object => $lexicon_hash, # the object itself
     type   => 'debug',
-    event  => 'lexicon,load',
+    event  => 'lexicon,load', # The logger will be copied to
+                              # Locale::TextDomain::OO::Singleton::Lexicon
+                              # so more events are possible.
 
 =head1 EXAMPLE
 

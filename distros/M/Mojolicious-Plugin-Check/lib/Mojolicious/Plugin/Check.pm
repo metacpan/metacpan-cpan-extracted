@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::Check;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION        = '0.01';
+our $VERSION        = '0.02';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -30,8 +30,6 @@ sub register {
 
     $app->hook(around_action => sub {
         my ($next, $c, $action, $last) = @_;
-
-        return $next->() unless $last;
 
         my $checkers    = $c->app->routes->{$conf->{stash_checkers}}    //= {};
         my $actions      = $c->stash->{$conf->{stash_actions}}          //= [];

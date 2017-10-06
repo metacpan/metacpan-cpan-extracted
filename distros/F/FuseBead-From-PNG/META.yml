@@ -3,27 +3,28 @@ abstract: 'Convert PNGs into plans to build a fuse bead replica. '
 author:
   - 'Travis Chase (gaudeon@cpan.org)'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: FuseBead-From-PNG
 no_index:
   directory:
     - t
     - inc
 requires:
-  Data::Debug: 0.03
-  File::Temp: 0.23
-  Image::PNG::Libpng: 0.39
-  JSON: 2.9
-  Test::Simple: 0.44
-  perl: 5.014000
+  Data::Debug: '0.03'
+  File::Temp: '0.23'
+  Image::PNG::Libpng: '0.39'
+  JSON: '2.9'
+  Test::Simple: '0.44'
+  perl: '5.014000'
 resources:
   repository: https://github.com/gaudeon/FuseBead-From-Png
-version: 0.02
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

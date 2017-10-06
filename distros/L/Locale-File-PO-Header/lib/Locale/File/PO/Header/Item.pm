@@ -2,11 +2,9 @@ package Locale::File::PO::Header::Item; ## no critic (TidyCode)
 
 use Moose;
 use MooseX::StrictConstructor;
-
 use namespace::autoclean;
-use syntax qw(method);
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 
 extends qw(Locale::File::PO::Header::Base);
 
@@ -25,11 +23,15 @@ has item => (
     is      => 'rw',
     isa     => 'Str|Undef',
     lazy    => 1,
-    default => method {
+    default => sub {
+        my $self = shift;
+
         return $self->default;
     },
-    trigger => method ($item, $current_item) {
-        $self->trigger_helper({
+    trigger => sub {
+        my ($self, $item, $current_item) = @_;
+
+        return $self->trigger_helper({
             new     => $item,
             current => $current_item,
             default => scalar $self->default,
@@ -38,11 +40,15 @@ has item => (
     },
 );
 
-method data ($key, @args) {
+sub data {
+    my ($self, $key, @args) = @_;
+
     return $self->item( @args ? $args[0] : () );
 }
 
-method extract_msgstr ($msgstr_ref) {
+sub extract_msgstr {
+    my ($self, $msgstr_ref) = @_;
+
     my $name = $self->name;
     ${$msgstr_ref} =~ s{
         ^
@@ -57,7 +63,9 @@ method extract_msgstr ($msgstr_ref) {
     return;
 };
 
-method lines {
+sub lines {
+    my $self = shift;
+
     length $self->item
         or return;
 

@@ -1,0 +1,52 @@
+Index: inc/Module/Install/PRIVATE/Net/SSLeay.pm
+===================================================================
+--- inc/Module/Install/PRIVATE/Net/SSLeay.pm	(revision 499)
++++ inc/Module/Install/PRIVATE/Net/SSLeay.pm	(working copy)
+@@ -26,26 +26,29 @@
+     my $prefix = $self->find_openssl_prefix;
+     my $exec   = $self->find_openssl_exec($prefix);
+ 
+-    unless (-x $exec) {
+-        print <<EOM;
+-*** Could not find OpenSSL
+-    If it's already installed, please set the OPENSSL_PREFIX environment
+-    variable accordingly. If it isn't installed yet, get the latest version
+-    from http://www.openssl.org/.
+-EOM
+-        exit 0; # according http://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
++    if (-x $exec) {
++        $self->check_openssl_version($prefix, $exec);
++        my $opts = $self->ssleay_get_build_opts($prefix, $exec);
++
++        $self->makemaker_args(
++            CCCDLFLAGS => $opts->{cccdlflags},
++            OPTIMIZE => $opts->{optimize},
++            INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
++            LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
++        );
++    } else {
++    
++        $self->makemaker_args(
++            CC => '$(FULLPERL) -MAlien::Base::Wrapper=Alien::LibreSSL -e cc --',
++            LD => '$(FULLPERL) -MAlien::Base::Wrapper=Alien::LibreSSL -e ld --',
++            BUILD_REQUIRES => {
++                'Alien::LibreSSL'      => 0,
++                'Alien::Base::Wrapper' => 0,
++            },
++        );
++    
+     }
+ 
+-    $self->check_openssl_version($prefix, $exec);
+-    my $opts = $self->ssleay_get_build_opts($prefix, $exec);
+-
+-    $self->makemaker_args(
+-        CCCDLFLAGS => $opts->{cccdlflags},
+-        OPTIMIZE => $opts->{optimize},
+-        INC => join(' ', map qq{"-I$_"}, @{$opts->{inc_paths}}),
+-        LIBS => join(' ', (map qq{"-L$_"}, @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
+-    );
+-
+     if ( $self->prompt(
+             "Do you want to run external tests?\n".
+             "These tests *will* *fail* if you do not have network connectivity.",

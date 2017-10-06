@@ -1,5 +1,9 @@
 Revision history for Getopt-Alt
 
+0.4.7   2017-09-24
+        Updating for release of version 0.4.7
+        Increasing minimum acceptible version of Test::Warnings (Ivan Wills)
+
 0.4.6   2017-09-03
         Updating for release of version 0.4.6
         Adding thoughts about Module based sub-commands (Ivan Wills)

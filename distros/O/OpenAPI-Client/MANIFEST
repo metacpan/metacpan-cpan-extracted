@@ -14,6 +14,8 @@ t/client.t
 t/command-local.t
 t/command-remote.t
 t/command.t
+t/default-base-url.t
+t/json-request.t
 t/spec.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

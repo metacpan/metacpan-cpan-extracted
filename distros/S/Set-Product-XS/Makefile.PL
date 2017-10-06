@@ -18,6 +18,10 @@ my %conf = (
             repository => 'https://github.com/gray/set-product-xs',
         },
     },
+
+    # Needed so cxinc is defined.
+    DEFINE => ($] < 5.012) ? '-DPERL_EXT' : '',
+
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Set-Product-XS-*' },
 );

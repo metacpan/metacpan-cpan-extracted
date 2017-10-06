@@ -1,5 +1,5 @@
 package HackaMol::Roles::SelectionRole;
-$HackaMol::Roles::SelectionRole::VERSION = '0.044';
+$HackaMol::Roles::SelectionRole::VERSION = '0.045';
 #ABSTRACT: Atom selections in molecules
 use Moose::Role;
 use HackaMol::AtomGroup;
@@ -60,9 +60,24 @@ sub select_group {
 
 sub _regex_method {
     my $str = shift;
+    
+    # allow and or  .and.  .or. ...  does this cause other problems with names?
+    $str =~ s/\sand\s/ \.and\. /g;
+    $str =~ s/\sor\s/ \.or\. /g;
+    $str =~ s/\snot\s/ \.not\. /g;
 
     #print "$str not implemented yet"; return(sub{0});
     #my @parenth = $str =~ /(\(([^()]|(?R))*\))/g
+
+    # ranges resid 1+3-10+20 -> resid =~ /^(1|3|4|5|6|7|8|9|10|20)$/
+    my @ranges = $str =~ /(\w+\s+(?:\w+|\d+)(?:\+|\-)[^\s]+)/g;
+    foreach my $range (@ranges){
+      my ($attr,$sel) = split(/\s+/, $range);
+      #$range =~ s/\+/\\+/g;
+      #$range =~ s/\-/\\-/g;
+      my $gsel = join '|',map{/(.+)-(.+)/ ? ($1 .. $2) : $_ } split('\+', $sel );
+      $str =~ s/\Q$range\E/\$\_->$attr =~ \/^($gsel)\$\//g;
+    }
 
     $str =~ s/(\w+)\s+(\d*[A-Za-z]+\d*)/\$\_->$1 eq \'$2\'/g;  # resnames must have at least 1 letter
     $str =~ s/(\w+)\s+(-?\d+)/\$\_->$1 == $2/g;
@@ -92,7 +107,7 @@ HackaMol::Roles::SelectionRole - Atom selections in molecules
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 DESCRIPTION
 

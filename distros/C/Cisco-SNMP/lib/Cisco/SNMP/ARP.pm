@@ -20,56 +20,55 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _arpOID {
-    return '.1.3.6.1.2.1.4.22.1'
+    return '.1.3.6.1.2.1.4.22.1';
 }
 
 sub arpOIDs {
-    return qw(IfIndex PhysAddress NetAddress Type)
+    return qw(IfIndex PhysAddress NetAddress Type);
 }
 
 sub arp_clear {
-    my $self  = shift;
-    my ($idx, $ip) = @_;
+    my $self = shift;
+    my ( $idx, $ip ) = @_;
 
-    if (!defined $idx) {
+    if ( not defined $idx ) {
         $Cisco::SNMP::LASTERROR = "ifIndex required";
-        return undef
-    } elsif ($idx !~ /^\d+$/) {
+        return undef;
+    } elsif ( $idx !~ /^\d+$/ ) {
         $Cisco::SNMP::LASTERROR = "Invalid ifIndex `$idx'";
-        return undef
+        return undef;
     }
-    if (!defined $ip) {
+    if ( not defined $ip ) {
         $Cisco::SNMP::LASTERROR = "IP address required";
-        return undef
-    } elsif ($ip !~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
+        return undef;
+    } elsif ( $ip !~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ ) {
         $Cisco::SNMP::LASTERROR = "Invalid IP Address `$ip'";
-        return undef
+        return undef;
     }
 
     my $s = $self->session;
-    my $r = $s->set_request(
-        _arpOID() . ".4.$idx.$ip", INTEGER, 2
-    );
-    if (!defined $r) {
+    my $r = $s->set_request( _arpOID() . ".4.$idx.$ip", INTEGER, 2 );
+    if ( not defined $r ) {
         $Cisco::SNMP::LASTERROR = $s->error;
-        return undef
+        return undef;
     }
-    return $r->{_arpOID() . ".4.$idx.$ip"}
+    return $r->{_arpOID() . ".4.$idx.$ip"};
 }
 
 sub arp_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @ARPKEYS = arpOIDs();
-    for my $oid (0..$#ARPKEYS) {
-        $ret{$ARPKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _arpOID() . '.' . ($oid+1));
-        if (!defined $ret{$ARPKEYS[$oid]}) {
+    for my $oid ( 0 .. $#ARPKEYS ) {
+        $ret{$ARPKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _arpOID() . '.' . ( $oid + 1 ) );
+        if ( not defined $ret{$ARPKEYS[$oid]} ) {
             $Cisco::SNMP::LASTERROR = "Cannot get ARP `$ARPKEYS[$oid]' info";
-            return undef
+            return undef;
         }
     }
 
@@ -80,42 +79,50 @@ sub arp_info {
         4 => 'STATIC'
     );
     my @ArpInfo;
-    for my $arp (0..$#{$ret{$ARPKEYS[0]}}) {
+    for my $arp ( 0 .. $#{$ret{$ARPKEYS[0]}} ) {
         my %ArpInfoHash;
-        for (0..$#ARPKEYS) {
-            if ($_ == 1) {
-                $ArpInfoHash{$ARPKEYS[$_]} =  ($ret{$ARPKEYS[$_]}->[$arp] =~ /^\0/) ? unpack('H12', $ret{$ARPKEYS[$_]}->[$arp]) : (($ret{$ARPKEYS[$_]}->[$arp] =~ /^0x/) ? substr($ret{$ARPKEYS[$_]}->[$arp],2) : $ret{$ARPKEYS[$_]}->[$arp])
-            } elsif ($_ == 3) {
-                $ArpInfoHash{$ARPKEYS[$_]} =  exists($ArpType{$ret{$ARPKEYS[$_]}->[$arp]}) ? $ArpType{$ret{$ARPKEYS[$_]}->[$arp]} : $ret{$ARPKEYS[$_]}->[$arp]
+        for ( 0 .. $#ARPKEYS ) {
+            if ( $_ == 1 ) {
+                $ArpInfoHash{$ARPKEYS[$_]}
+                  = ( $ret{$ARPKEYS[$_]}->[$arp] =~ /^\0/ )
+                  ? unpack( 'H12', $ret{$ARPKEYS[$_]}->[$arp] )
+                  : ( ( $ret{$ARPKEYS[$_]}->[$arp] =~ /^0x/ )
+                    ? substr( $ret{$ARPKEYS[$_]}->[$arp], 2 )
+                    : $ret{$ARPKEYS[$_]}->[$arp] );
+            } elsif ( $_ == 3 ) {
+                $ArpInfoHash{$ARPKEYS[$_]}
+                  = exists( $ArpType{$ret{$ARPKEYS[$_]}->[$arp]} )
+                  ? $ArpType{$ret{$ARPKEYS[$_]}->[$arp]}
+                  : $ret{$ARPKEYS[$_]}->[$arp];
             } else {
-                $ArpInfoHash{$ARPKEYS[$_]} =  $ret{$ARPKEYS[$_]}->[$arp]
+                $ArpInfoHash{$ARPKEYS[$_]} = $ret{$ARPKEYS[$_]}->[$arp];
             }
         }
-        push @ArpInfo, \%ArpInfoHash
+        push @ArpInfo, \%ArpInfoHash;
     }
-    return bless \@ArpInfo, $class
+    return bless \@ArpInfo, $class;
 }
 
-for (arpOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('arp', $_)
+for ( arpOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'arp', $_ );
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = arpOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_arp" . $OIDS[$o]} = sub {
-        my $self  = shift;
-        my ($val1, $val2) = @_;
+        my $self = shift;
+        my ( $val1, $val2 ) = @_;
 
-        if (!defined $val1) { $val1 = 1 }
-        if (!defined $val2) { $val2 = '1.1.1.1' }
+        if ( not defined $val1 ) { $val1 = 1 }
+        if ( not defined $val2 ) { $val2 = '1.1.1.1' }
         my $s = $self->session;
-        my $r = $s->get_request(
-            varbindlist => [_arpOID() . '.' . ($o+1) . '.' . "$val1.$val2"]
-        );
-        return $r->{_arpOID() . '.' . ($o+1) . '.' . "$val1.$val2"}
-    }
+        my $r = $s->get_request( varbindlist =>
+              [_arpOID() . '.' . ( $o + 1 ) . '.' . "$val1.$val2"] );
+        return $r->{_arpOID() . '.' . ( $o + 1 ) . '.' . "$val1.$val2"};
+      }
 }
 
 ##################################################

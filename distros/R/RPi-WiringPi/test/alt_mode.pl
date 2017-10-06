@@ -5,7 +5,7 @@ use feature 'say';
 use Data::Dumper;
 use JSON;
 use RPi::WiringPi;
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use WiringPi::API qw(:perl);
 
 my $pi = RPi::WiringPi->new;

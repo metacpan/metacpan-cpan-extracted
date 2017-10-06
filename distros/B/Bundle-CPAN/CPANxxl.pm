@@ -1,7 +1,7 @@
 package Bundle::CPANxxl;
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.3';
+$VERSION = '0.4';
 
 1;
 
@@ -27,11 +27,19 @@ YAML
 
 Bundle::CPAN
 
+Module::Info
+
 Module::Signature
 
 CPAN::Reporter
 
 Kwalify
+
+V
+
+Devel::PatchPerl
+
+Module::Versions::Report
 
 =head1 DESCRIPTION
 
@@ -48,6 +56,9 @@ Last not least every full installation of CPAN needs the
 CPAN::Reporter. I put it into this xxl bundle because it may be a bit
 overkill for small installations. Maybe we will shift it over to
 Bundle::CPAN.
+
+After several years of frugality I found also indispensible:
+Module::Info, V, Devel::PatchPerl, and Module::Versions::Report.
 
 =head1 AUTHOR
 

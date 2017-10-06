@@ -95,6 +95,8 @@ constant(name=Nullch)
 	PG_LSEG               = 601
 	PG_LSEGARRAY          = 1018
 	PG_MACADDR            = 829
+	PG_MACADDR8           = 774
+	PG_MACADDR8ARRAY      = 775
 	PG_MACADDRARRAY       = 1040
 	PG_MONEY              = 790
 	PG_MONEYARRAY         = 791
@@ -114,8 +116,10 @@ constant(name=Nullch)
 	PG_PG_ATTRIBUTE       = 75
 	PG_PG_CLASS           = 83
 	PG_PG_DDL_COMMAND     = 32
+	PG_PG_DEPENDENCIES    = 3402
 	PG_PG_LSN             = 3220
 	PG_PG_LSNARRAY        = 3221
+	PG_PG_NDISTINCT       = 3361
 	PG_PG_NODE_TREE       = 194
 	PG_PG_PROC            = 81
 	PG_PG_TYPE            = 71
@@ -311,7 +315,9 @@ void state(dbh)
 	SV *dbh
 	CODE:
 	D_imp_dbh(dbh);
-	ST(0) = strEQ(imp_dbh->sqlstate,"00000") ? &PL_sv_no : newSVpv(imp_dbh->sqlstate, 5);
+	ST(0) = strEQ(imp_dbh->sqlstate,"00000")
+          ? &PL_sv_no
+          : sv_2mortal(newSVpv(imp_dbh->sqlstate, 5));
 
 
 void do(dbh, statement, attr=Nullsv, ...)
@@ -830,7 +836,9 @@ SV *sth;
 	CODE:
 		D_imp_sth(sth);
 		D_imp_dbh_from_sth;
-		ST(0) = strEQ(imp_dbh->sqlstate,"00000") ? &PL_sv_no : newSVpv(imp_dbh->sqlstate, 5);
+		ST(0) = strEQ(imp_dbh->sqlstate,"00000")
+                  ? &PL_sv_no
+                  : sv_2mortal(newSVpv(imp_dbh->sqlstate, 5));
 
 void
 pg_ready(sth)

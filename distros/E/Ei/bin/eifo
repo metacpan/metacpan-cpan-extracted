@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Ei;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+sub usage;
+sub fatal;
+
+(my $prog = $0) =~ s{.+/}{};
+
+my $config_file;
+GetOptions(
+    'c|config-file=s' => \$config_file,
+) or usage;
+usage if @ARGV < 2;
+my $location = shift @ARGV;
+
+if (!defined $config_file) {
+    ($config_file) =
+        grep { defined && -f } (
+            $ENV{'EI_CONFIG'},
+            map { glob($_) } qw(~/.eirc ~/etc/ei/ei.conf /etc/ei/ei.conf)
+        )
+    ;
+}
+my $ei = Ei->new(
+    defined $config_file ? ('config_file' => $config_file) : (),
+);
+my %config = %{ $ei->{config} };
+my @photos;
+while (@ARGV) {
+    my $arg = shift @ARGV;
+    if (-f $arg) {
+        push @photos, $arg;
+    }
+    elsif (-d _) {
+        unshift @ARGV, grep { /\.jpg$/i } glob("$arg/*");
+    }
+    else {
+        usage;
+    }
+}
+
+my @items = grep { $_->{'location'} eq $location } $ei->items;
+if (@items) {
+    printf STDERR "The inventory already includes %d %s in %s\n", sgpl(scalar(@items), 'item'), $location;
+    my %action = (
+        1 => \&add_new_items,
+        2 => \&add_new_photos,
+    );
+    print STDERR <<'EOS';
+What do you want to do?
+    1) Add new items
+    2) Add new photos to existing items
+    q) Quit
+EOS
+    my $ans = 2;
+    fatal 'cancelled' if !ask('Your choice:', \$ans, qr/^[12q]$/i);
+    exit 0 if $ans =~ /^q/i;
+    $action{$ans}->();
+}
+
+# --- Functions
+
+sub add_new_items {
+    system qw(clear);
+    print "Add new items\n\n";
+}
+
+sub add_new_photos {
+    system qw(clear);
+    print "Add new photos\n\n";
+}
+
+sub ask {
+    my ($prompt, $ansref, $rx) = @_;
+    $prompt .= sprintf(' [%s]', $$ansref) if defined $ansref;
+    $prompt .= ' ';
+    while (1) {
+        print STDERR $prompt;
+        my $ans = <STDIN>;
+        return if !defined $ans;
+        chomp $ans;
+        if (length $ans) {
+            next if defined($rx) && $ans !~ $rx;
+            return $$ansref = $ans;
+        }
+        elsif (defined $ansref) {
+            return $$ansref;
+        }
+    }
+}
+
+sub sgpl {
+    my ($n, $sg, $pl) = @_;
+    return $n, $sg if $n == 1;
+    return $n, $pl // $sg.'s';
+}
+
+sub usage {
+    print STDERR "usage: $prog LOCATION FILE_OR_DIR...\n";
+    exit 1;
+}
+
+sub fatal {
+    print STDERR "$prog: @_\n";
+    exit 2;
+}
+

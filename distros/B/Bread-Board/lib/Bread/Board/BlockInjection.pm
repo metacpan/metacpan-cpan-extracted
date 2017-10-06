@@ -1,7 +1,7 @@
 package Bread::Board::BlockInjection;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service instantiated via custom subroutine
-$Bread::Board::BlockInjection::VERSION = '0.35';
+$Bread::Board::BlockInjection::VERSION = '0.36';
 use Moose;
 
 with 'Bread::Board::Service::WithParameters',
@@ -36,7 +36,7 @@ Bread::Board::BlockInjection - service instantiated via custom subroutine
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

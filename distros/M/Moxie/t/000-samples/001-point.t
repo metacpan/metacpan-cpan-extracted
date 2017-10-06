@@ -18,9 +18,6 @@ package Point {
     has _x => ( default => sub { 0 } );
     has _y => ( default => sub { 0 } );
 
-    my sub _x : private;
-    my sub _y : private;
-
     sub BUILDARGS : init_args(
         x? => _x,
         y? => _y,
@@ -49,8 +46,6 @@ package Point3D {
     extends 'Point';
 
     has _z => ( default => sub { 0 } );
-
-    my sub _z : private;
 
     sub BUILDARGS : init_args(
         x? => super(x),

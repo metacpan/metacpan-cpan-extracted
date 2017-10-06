@@ -1,7 +1,7 @@
 package Bread::Board::ConstructorInjection;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service instantiating objects via a constructor
-$Bread::Board::ConstructorInjection::VERSION = '0.35';
+$Bread::Board::ConstructorInjection::VERSION = '0.36';
 use Moose;
 
 use Try::Tiny;
@@ -37,7 +37,7 @@ Bread::Board::ConstructorInjection - service instantiating objects via a constru
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

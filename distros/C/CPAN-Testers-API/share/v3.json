@@ -8,7 +8,7 @@
     "contact": {
       "name": "CPAN Testers core team",
       "email": "admin@cpantesters.org",
-      "url": "cpantesters.org"
+      "url": "http://cpantesters.org"
     },
     "license": {
       "name": "perl",

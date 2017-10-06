@@ -4,14 +4,24 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.022';
+our $VERSION = '0.024';
 
 use Moose;
 
-with qw(
-  Dist::Zilla::Role::BeforeBuild
-  Dist::Zilla::Role::FileMunger
-  Dist::Zilla::Role::TextTemplate
+with(
+    'Dist::Zilla::Role::BeforeBuild',
+    'Dist::Zilla::Role::FileFinderUser' => {
+        method           => 'found_module_files',
+        finder_arg_names => ['module_finder'],
+        default_finders  => [':InstallModules'],
+    },
+    'Dist::Zilla::Role::FileFinderUser' => {
+        method           => 'found_script_files',
+        finder_arg_names => ['script_finder'],
+        default_finders  => [':PerlExecFiles'],
+    },
+    'Dist::Zilla::Role::FileMunger',
+    'Dist::Zilla::Role::TextTemplate',
 );
 
 sub mvp_multivalue_args { return (qw( skip stopwords travis_ci_ignore_perl )) }
@@ -43,6 +53,7 @@ has _travis_available_perl => (
 
 use Carp;
 use Config::Std { def_sep => q{=} };
+use File::Spec;
 use List::MoreUtils qw(uniq);
 use Path::Tiny;
 
@@ -62,11 +73,6 @@ sub munge_files {
     my ($self) = @_;
 
     # Files are already generated in the before build phase.
-    #
-    # But for a release build, the $VERSION of this module changes during the
-    # "munge files" phase. We have to recreate the files during the "munge
-    # files" phase to add the correct version to the generated files.
-    return if !exists $ENV{DZIL_RELEASING};
 
     # This module is part of the Author::SKIRMESS plugin bundle. The bundle
     # is either used to release itself, but also to release other
@@ -81,29 +87,38 @@ sub munge_files {
     # If __FILE__ is inside lib of the cwd we are run with Bootstrap::lib
     # which means we are building the bundle. Otherwise we use the bundle to
     # build another distribution.
-    return if !path('lib')->realpath->subsumes( path(__FILE__)->realpath() );
+    if ( exists $ENV{DZIL_RELEASING} && path('lib')->realpath->subsumes( path(__FILE__)->realpath() ) ) {
 
-    # Ok, we are releasing the bundle itself. That means that $VERSION of
-    # this module is not set correctly as the module was require'd before
-    # the $VERSION was adjusted in the file (during the "munge files" phase).
-    # We have to fix this now to write the correct version to the generated
-    # files.
+        # Ok, we are releasing the bundle itself. That means that $VERSION of
+        # this module is not set correctly as the module was require'd before
+        # the $VERSION was adjusted in the file (during the "munge files"
+        # phase). We have to fix this now to write the correct version to the
+        # generated files.
 
-    # NOTE: Just a reminder if someone wants to refactor this module.
-    # $self->zilla->version() must not be called in the "before build" phase
-    # because it calls _build_version which is going to fail the build.
-    # Besides that, VersionFromMainModule is run during the "munge files"
-    # phase and before that we can't even know the new version of the bundle.
+        # NOTE: Just a reminder if someone wants to refactor this module.
+        # $self->zilla->version() must not be called in the "before build"
+        # phase because it calls _build_version which is going to fail the
+        # build. Besides that, VersionFromMainModule is run during the
+        # "munge files" phase and before that we can't even know the new
+        # version of the bundle.
 
-    {
         ## no critic (ValuesAndExpressions::RequireConstantVersion)
         ## no critic (Variables::ProhibitLocalVars)
         local $VERSION = $self->zilla->version;
 
         # re-write all generated files
         $self->_write_files();
+
+        return;
     }
 
+    # We are building, or releasing something else - not the bundle itself.
+
+    # We always have to write t/00-load.t during the munge files phase
+    # because this file is not created correctly during the before
+    # build phase because the FileFinderUser isn't initialized that
+    # early
+    $self->_write_file('t/00-load.t');
     return;
 }
 
@@ -113,29 +128,39 @@ sub _write_files {
     my %file_to_skip = map { $_ => 1 } grep { defined && !m{ ^ \s* $ }xsm } @{ $self->skip };
 
   FILE:
-    for my $file ( map { path($_) } sort $self->files() ) {
+    for my $file ( sort $self->files() ) {
         if ( exists $file_to_skip{$file} ) {
             next FILE;
         }
 
-        if ( -e $file ) {
-            $file->remove();
-        }
-        else {
-            # If the file does not yet exist, the basedir might also not
-            # exist. Create it if required.
-            my $parent = $file->parent();
-            if ( !-e $parent ) {
-                $self->log("Creating directory $parent");
-                $parent->mkpath();
-            }
-        }
-
-        $self->log("Generate file $file");
-
-        # write the file to disk
-        $file->spew( $self->file($file) );
+        $self->_write_file($file);
     }
+
+    return;
+}
+
+sub _write_file {
+    my ( $self, $file ) = @_;
+
+    $file = path($file);
+
+    if ( -e $file ) {
+        $file->remove();
+    }
+    else {
+        # If the file does not yet exist, the basedir might also not
+        # exist. Create it if required.
+        my $parent = $file->parent();
+        if ( !-e $parent ) {
+            $self->log("Creating directory $parent");
+            $parent->mkpath();
+        }
+    }
+
+    $self->log("Generate file $file");
+
+    # write the file to disk
+    $file->spew( $self->file($file) );
 
     return;
 }
@@ -150,7 +175,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.022
+Version 0.024
 
 =head1 SYNOPSIS
 
@@ -282,7 +307,6 @@ only = 1
 [Modules::ProhibitAutomaticExportation]
 [Modules::ProhibitConditionalUseStatements]
 [Modules::ProhibitEvilModules]
-[Modules::ProhibitExcessMainComplexity]
 [Modules::ProhibitMultiplePackages]
 [Modules::RequireBarewordIncludes]
 [Modules::RequireEndWithOne]
@@ -509,6 +533,86 @@ use warnings;
 # {{ ref $plugin }} {{ $plugin->VERSION() }}
 
 _TEST_HEADER
+
+=head2 t/00-load.t
+
+Verifies that all modules and perl scripts can be compiled with require_ok
+from L<Test::More|Test::More>.
+
+=cut
+
+    $file{q{t/00-load.t}} = sub {
+        my ($self) = @_;
+
+        my %use_lib_args = (
+            lib  => undef,
+            q{.} => undef,
+        );
+
+        my @modules;
+      MODULE:
+        for my $module ( map { $_->name } @{ $self->found_module_files() } ) {
+            next MODULE if $module =~ m{ [.] pod $}xsm;
+
+            my @dirs = File::Spec->splitdir($module);
+            if ( $dirs[0] eq 'lib' && $dirs[-1] =~ s{ [.] pm $ }{}xsm ) {
+                shift @dirs;
+                push @modules, join q{::}, @dirs;
+                $use_lib_args{lib} = 1;
+                next MODULE;
+            }
+
+            $use_lib_args{q{.}} = 1;
+            push @modules, $module;
+        }
+
+        my @scripts = map { $_->name } @{ $self->found_script_files() };
+        if (@scripts) {
+            $use_lib_args{q{.}} = 1;
+        }
+
+        my $content = $test_header . <<'T_OO_LOAD_T';
+use Test::More;
+
+T_OO_LOAD_T
+
+        if ( !@scripts && !@modules ) {
+            $content .= qq{BAIL_OUT("No files found in distribution");\n};
+
+            return $content;
+        }
+
+        $content .= 'use lib qw(';
+        if ( defined $use_lib_args{lib} ) {
+            if ( defined $use_lib_args{q{.}} ) {
+                $content .= 'lib .';
+            }
+            else {
+                $content .= 'lib';
+            }
+        }
+        else {
+            $content .= q{.};
+        }
+        $content .= ");\n\n";
+
+        $content .= "my \@modules = qw(\n";
+
+        for my $module ( @modules, @scripts ) {
+            $content .= "  $module\n";
+        }
+        $content .= <<'T_OO_LOAD_T';
+);
+
+plan tests => scalar @modules;
+
+for my $module (@modules) {
+    require_ok($module) || BAIL_OUT();
+}
+T_OO_LOAD_T
+
+        return $content;
+    };
 
 =head2 xt/author/clean-namespaces.t
 

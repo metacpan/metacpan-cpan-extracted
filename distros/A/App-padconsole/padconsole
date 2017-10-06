@@ -20,7 +20,7 @@ binmode STDOUT, ":utf8";
 BEGIN {
     use Exporter ();
     use vars qw($VERSION);
-    $VERSION     = '0.10';
+    $VERSION     = '0.11';
 }
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
@@ -171,7 +171,7 @@ if (defined $user && defined $passwd) {
 #################
 # Initiate instance binding
 #################
-my $ec = Etherpad::API->new(\%args);
+my $ec = Etherpad->new(\%args);
 if (!$ec->check_token()) {
     print STDERR 'ERROR: Unable to bind with the etherpad instance.', "\n";
     exit 4;
@@ -347,7 +347,7 @@ sub _use {
                 $args{password} = $passwd;
             }
 
-            $ec = Etherpad::API->new(\%args);
+            $ec = Etherpad->new(\%args);
             if (!$ec->check_token()) {
                 print STDERR 'ERROR: Unable to bind with the etherpad instance.', "\n";
                 exit 5;
@@ -624,7 +624,7 @@ The better way to install it is by CPAN:
 
 You can install it manually:
 
-    wget "https://framagit.org/luc/padconsole/repository/archive.zip?ref=master" -O padconsole.zip
+    wget https://framagit.org/luc/padconsole/repository/master/archive.zip-O padconsole.zip
     unzip padconsole.zip
     cd padconsole-master
     perl Makefile.PL

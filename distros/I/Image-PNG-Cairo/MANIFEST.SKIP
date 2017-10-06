@@ -12,3 +12,4 @@ MYMETA..*
 ^lib/Image/PNG/Cairo\.pod\.tmpl$
 ^make-pod\.pl$
 ^examples/.*-out\.txt$
+^xt/.*\.t$

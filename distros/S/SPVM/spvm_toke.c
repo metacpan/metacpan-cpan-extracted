@@ -37,6 +37,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   compiler->befbufptr = compiler->bufptr;
   _Bool before_is_comma = compiler->before_is_comma;
   compiler->before_is_comma = 0;
+
+  _Bool before_is_package = compiler->before_is_package;
+  compiler->before_is_package = 0;
   
   // Constant minus sign
   int32_t minus = 0;
@@ -140,6 +143,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               
               compiler->cur_file = cur_file;
               compiler->cur_package_name_with_template_args = op_use->uv.use->package_name_with_template_args;
+              compiler->cur_op_use = op_use;
+              
               
               // Read file content
               fseek(fh, 0, SEEK_END);
@@ -245,7 +250,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '-':
         compiler->bufptr++;
         
-        if (isdigit(*compiler->bufptr)) {
+        // 10 digit literal or floating point literal allow minus
+        if (
+          isdigit(*compiler->bufptr)
+          &&
+          (
+            (*compiler->bufptr != '0')
+            || ((*compiler->bufptr == '0') && (*(compiler->bufptr + 1) == '.')))
+          )
+        {
           minus = 1;
           continue;
         }
@@ -805,24 +818,46 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             cur_token_ptr = compiler->bufptr;
           }
           
-          // Hex number
-          _Bool hex;
-          if (*(compiler->bufptr) == '0' && *(compiler->bufptr + 1) == 'x') {
-            hex = 1;
+          // Digit
+          int32_t digit = 0;
+          if (*(compiler->bufptr) == '0') {
+            if (*(compiler->bufptr + 1) == 'x') {
+              cur_token_ptr = compiler->bufptr + 2;
+              digit = 16;
+            }
+            else if (*(compiler->bufptr + 1) == 'b') {
+              cur_token_ptr = compiler->bufptr + 2;
+              digit = 2;
+            }
+            else if (isdigit(*(compiler->bufptr + 1))) {
+              cur_token_ptr = compiler->bufptr + 1;
+              digit = 8;
+            }
           }
           else {
-            hex = 0;
+            digit = 10;
           }
           
           _Bool is_floating_number = 0;
           
           compiler->bufptr++;
           // Scan number
-          if (hex) {
+          if (digit == 16) {
             compiler->bufptr += 2;
             while(
               isdigit(*compiler->bufptr)
+              || *compiler->bufptr == 'a' || *compiler->bufptr == 'b' || *compiler->bufptr == 'c' || *compiler->bufptr == 'd' || *compiler->bufptr == 'e' || *compiler->bufptr == 'f'
               || *compiler->bufptr == 'A' || *compiler->bufptr == 'B' || *compiler->bufptr == 'C' || *compiler->bufptr == 'D' || *compiler->bufptr == 'E' || *compiler->bufptr == 'F'
+              || *compiler->bufptr == '_'
+            )
+            {
+              compiler->bufptr++;
+            }
+          }
+          else if (digit == 8 || digit == 2) {
+            compiler->bufptr += 1;
+            while(
+              isdigit(*compiler->bufptr)
               || *compiler->bufptr == '_'
             )
             {
@@ -861,7 +896,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // Constant
           SPVM_TYPE* constant_type;
           
-          if (*compiler->bufptr == 'b')  {
+          if (*compiler->bufptr == 'y')  {
             constant_type = SPVM_TYPE_get_byte_type(compiler);
             compiler->bufptr++;
           }
@@ -916,60 +951,111 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           // byte
           else if (constant_type->code == SPVM_TYPE_C_CODE_BYTE) {
-            int32_t num;
+            int64_t num;
             errno = 0;
-            if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = (int32_t)(uint32_t)strtoul(num_str, &end, 16);
+            _Bool out_of_range = 0;
+            _Bool invalid = 0;
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (unum > UINT8_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
+              num = (int64_t)unum;
             }
             else {
-              num = (int32_t)strtol(num_str, &end, 10);
+              num = (int64_t)strtoll(num_str, &end, 10);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (num < INT8_MIN || num > INT8_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
             }
-            if (*end != '\0') {
+            
+            if (invalid) {
               fprintf(stderr, "Invalid byte literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            else if (num < INT8_MIN || num > UINT8_MAX || errno == ERANGE) {
-              fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
+            else if (out_of_range) {
+              fprintf(stderr, "byte literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            op_constant = SPVM_OP_new_op_constant_byte(compiler, (int8_t)num, compiler->cur_file, compiler->cur_line);
+            op_constant = SPVM_OP_new_op_constant_byte(compiler, num, compiler->cur_file, compiler->cur_line);
           }
           // short
           else if (constant_type->code == SPVM_TYPE_C_CODE_SHORT) {
-            int32_t num;
+            int64_t num;
             errno = 0;
-            if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = (int32_t)(uint32_t)strtoul(num_str, &end, 16);
+            _Bool out_of_range = 0;
+            _Bool invalid = 0;
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (unum > UINT16_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
+              num = (int64_t)unum;
             }
             else {
-              num = (int32_t)strtol(num_str, &end, 10);
+              num = (int64_t)strtoll(num_str, &end, 10);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (num < INT16_MIN || num > INT16_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
             }
-            if (*end != '\0') {
+            
+            if (invalid) {
               fprintf(stderr, "Invalid short literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            else if (num < INT16_MIN || num > UINT16_MAX || errno == ERANGE) {
-              fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
+            else if (out_of_range) {
+              fprintf(stderr, "short literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            op_constant = SPVM_OP_new_op_constant_short(compiler, (int16_t)num, compiler->cur_file, compiler->cur_line);
+            op_constant = SPVM_OP_new_op_constant_short(compiler, num, compiler->cur_file, compiler->cur_line);
           }
           // int
           else if (constant_type->code == SPVM_TYPE_C_CODE_INT) {
-            int32_t num;
+            int64_t num;
             errno = 0;
-            if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = (int32_t)(uint32_t)strtoul(num_str, &end, 16);
+            _Bool out_of_range = 0;
+            _Bool invalid = 0;
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (unum > UINT32_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
+              num = (int64_t)unum;
             }
             else {
-              num = (int32_t)strtol(num_str, &end, 10);
+              num = (int64_t)strtoll(num_str, &end, 10);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (num < INT32_MIN || num > INT32_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
             }
-            if (*end != '\0') {
+            
+            if (invalid) {
               fprintf(stderr, "Invalid int literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            else if (errno == ERANGE) {
-              fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
+            else if (out_of_range) {
+              fprintf(stderr, "int literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
             op_constant = SPVM_OP_new_op_constant_int(compiler, num, compiler->cur_file, compiler->cur_line);
@@ -978,21 +1064,37 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           else if (constant_type->code == SPVM_TYPE_C_CODE_LONG) {
             int64_t num;
             errno = 0;
-            if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = (int64_t)(uint64_t)strtoull(num_str, &end, 16);
+            _Bool out_of_range = 0;
+            _Bool invalid = 0;
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (unum > UINT64_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
+              num = (int64_t)unum;
             }
             else {
               num = (int64_t)strtoll(num_str, &end, 10);
+              if (*end != '\0') {
+                invalid = 1;
+              }
+              else if (num < INT64_MIN || num > INT64_MAX || errno == ERANGE) {
+                out_of_range = 1;
+              }
             }
-            if (*end != '\0') {
+            
+            if (invalid) {
               fprintf(stderr, "Invalid long literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            else if (errno == ERANGE) {
-              fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
+            else if (out_of_range) {
+              fprintf(stderr, "long literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            
             op_constant = SPVM_OP_new_op_constant_long(compiler, num, compiler->cur_file, compiler->cur_line);
           }
           else {
@@ -1033,6 +1135,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           memcpy(keyword, cur_token_ptr, str_len);
           keyword[str_len] = '\0';
+          
+          char* original_keyword = keyword;
           
           // Replace template variable
           const char* found_template_var = strstr(keyword, "type");
@@ -1244,6 +1348,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 compiler->current_package_count++;
                 
+                compiler->before_is_package = 1;
+                
                 yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_PACKAGE);
                 return PACKAGE;
               }
@@ -1309,6 +1415,18 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           if (has_double_underline) {
             fprintf(stderr, "Can't contain __ in package, subroutine or field name at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
             exit(EXIT_FAILURE);
+          }
+          
+          // Package name must be same as use package name
+          if (before_is_package) {
+            
+            SPVM_OP* op_use = compiler->cur_op_use;
+            SPVM_USE* use = op_use->uv.use;
+            
+            if (strcmp(keyword, use->package_name_with_template_args) != 0) {
+              fprintf(stderr, "Package name \"%s\" must be match corresponding file path at %s line %" PRId32 "\n", original_keyword, compiler->cur_file, compiler->cur_line);
+              exit(EXIT_FAILURE);
+            }
           }
           
           SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_NAME);

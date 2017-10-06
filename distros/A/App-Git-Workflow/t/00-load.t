@@ -9,6 +9,7 @@ use File::Spec;
 use_ok('App::Git::Workflow');
 use_ok('App::Git::Workflow::Command');
 use_ok('App::Git::Workflow::Command::BranchClean');
+use_ok('App::Git::Workflow::Command::Branches');
 use_ok('App::Git::Workflow::Command::BranchGrep');
 use_ok('App::Git::Workflow::Command::Committers');
 use_ok('App::Git::Workflow::Command::Cows');
@@ -19,6 +20,7 @@ use_ok('App::Git::Workflow::Command::Pom');
 use_ok('App::Git::Workflow::Command::TagGrep');
 use_ok('App::Git::Workflow::Command::UpToDate');
 use_ok('App::Git::Workflow::Command::Recent');
+use_ok('App::Git::Workflow::Command::Search');
 use_ok('App::Git::Workflow::Command::Watch');
 use_ok('App::Git::Workflow::Pom');
 use_ok('App::Git::Workflow::Repository');
@@ -27,6 +29,7 @@ use_ok('Mock::App::Git::Workflow::Repository');
 
 my $perl = File::Spec->rel2abs($^X);
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-branch-clean"), "bin/git-branch-clean compiles");
+ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-branches"    ), "bin/git-branches compiles"    );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-branch-grep" ), "bin/git-branch-grep compiles" );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-committers"  ), "bin/git-committers compiles"  );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-cows"        ), "bin/git-cows compiles"        );
@@ -38,6 +41,7 @@ ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-pom"         ), "bi
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-tag-grep"    ), "bin/git-tag-grep compiles"    );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-up-to-date"  ), "bin/git-up-to-date compiles"  );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-recent"      ), "bin/git-recent compiles"      );
+ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-search"      ), "bin/git-search compiles"      );
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-watch"       ), "bin/git-watch compiles"       );
 
 diag( "Testing App-Git-Workflow, Perl $], $^X" );

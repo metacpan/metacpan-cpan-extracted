@@ -1,7 +1,7 @@
 package Bread::Board::LifeCycle::Singleton::WithParameters;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: singleton lifecycle role for a parameterized service
-$Bread::Board::LifeCycle::Singleton::WithParameters::VERSION = '0.35';
+$Bread::Board::LifeCycle::Singleton::WithParameters::VERSION = '0.36';
 use Moose::Role;
 
 with 'Bread::Board::LifeCycle';
@@ -61,7 +61,7 @@ Bread::Board::LifeCycle::Singleton::WithParameters - singleton lifecycle role fo
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

@@ -33,6 +33,7 @@ my %build_args = (
     'Shell::Config::Generate' => 0,
     'JSON::PP'         => 0,
     'Path::Tiny'       => '0.077',
+    'Alien::Base::PkgConfig' => '1.20',
   },
   test_requires => {
     'Test2::V0'              => '0.000071',

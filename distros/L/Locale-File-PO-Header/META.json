@@ -4,7 +4,7 @@
       "Steffen Winkler <steffenw at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -17,57 +17,51 @@
       "build" : {
          "requires" : {
             "Test::Differences" : "0.60",
-            "Test::Exception" : 0,
-            "Test::More" : 0,
+            "Test::Exception" : "0",
+            "Test::More" : "0",
             "Test::NoWarnings" : "1.03"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Pod::Coverage::Moose" : 0,
+            "Pod::Coverage::Moose" : "0",
             "Test::Pod" : "1.14",
             "Test::Pod::Coverage" : "1.04"
          },
          "requires" : {
-            "Clone" : 0,
-            "Moose" : 0,
-            "MooseX::StrictConstructor" : 0,
-            "Syntax::Feature::Method" : 0,
-            "namespace::autoclean" : 0,
-            "perl" : "5.006",
-            "syntax" : 0
+            "Clone" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Locale::File::PO::Header" : {
          "file" : "lib/Locale/File/PO/Header.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Locale::File::PO::Header::Base" : {
          "file" : "lib/Locale/File/PO/Header/Base.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       },
       "Locale::File::PO::Header::ContentTypeItem" : {
          "file" : "lib/Locale/File/PO/Header/ContentTypeItem.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       },
       "Locale::File::PO::Header::ExtendedItem" : {
          "file" : "lib/Locale/File/PO/Header/ExtendedItem.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       },
       "Locale::File::PO::Header::Item" : {
          "file" : "lib/Locale/File/PO/Header/Item.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       },
       "Locale::File::PO::Header::MailItem" : {
          "file" : "lib/Locale/File/PO/Header/MailItem.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -76,5 +70,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

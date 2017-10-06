@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.66
+version 2.67
 
 # SYNOPSIS
 
@@ -415,6 +415,7 @@ Dave Rolsky <autarch@urth.org>
 - Rohan Carly <se456@rohan.id.au>
 - Ross Attrill <ross.attrill@gmail.com>
 - Salvador Fandiño <sfandino@yahoo.com>
+- Slaven Rezic <srezic@cpan.org>
 - Steve Bertrand <steveb@cpan.org>
 - Whitney Jackson <whitney.jackson@baml.com>
 

@@ -26,9 +26,9 @@ my $v = Lingua::Awkwords->parse_string(q{ o*10/i/ie/e*32/a*22/u*3 });
 # only these appear as leading vowels
 my $vl = Lingua::Awkwords->parse_string(q{ a/e });
 
-# consonant clusters include st, th, sh,
-# br, dl, gr, sw, tr only at beginning
-# nd only at end
+# consonant clusters include st, th, sh, (15% of corpus)        D
+# br, dl, gr, sw, tr only at beginning (9% of corpus)           L
+# nd only at end (2% of corpus)                                 T
 my $cc  = Lingua::Awkwords->parse_string(q{ st*2/th*5/sh*6 });
 my $ccl = Lingua::Awkwords->parse_string(q{ br*2/dl/gr/sw/tr });
 my $cct = Lingua::Awkwords->parse_string(q{ nd });
@@ -42,11 +42,11 @@ Lingua::Awkwords::Subpattern->set_patterns(
     T => $cct,
 );
 
-# these probably need weights so that various consonant clusters are
-# less likely, though too specific rules from the get-go may exclude
-# interesting possibilities
+# guesswork on the weights; CV and CVC probably should be higher but
+# that might be less interesting
 my $syl =
-  Lingua::Awkwords->parse_string(q{ V/CV/CVC/DV/DVC/LV/LVC/XC/XT/CVT/DVT/LVT });
+  Lingua::Awkwords->parse_string(
+    q{ V/CV*40/CVC*40/DV*15/DVC*15/LV*9/LVC*9/XC*9/XT*2/CVT*2/DVT*2/LVT*2 });
 
 Lingua::Awkwords::Subpattern->set_patterns( S => $syl );
 

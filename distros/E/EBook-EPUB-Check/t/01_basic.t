@@ -66,10 +66,10 @@ subtest 'undefined epub file path' => sub {
 subtest 'command line interface' => sub {
     my $perl = Probe::Perl->find_perl_interpreter;
 
-    my $out1 = qx($perl bin/epubcheck epub/valid.epub 2>&1);
+    my $out1 = qx($perl script/epubcheck epub/valid.epub 2>&1);
     like($out1, qr/No errors or warnings detected/i);
 
-    my $out2 = qx($perl bin/epubcheck -out output.xml epub/valid.epub 2>&1);
+    my $out2 = qx($perl script/epubcheck -out output.xml epub/valid.epub 2>&1);
     like($out2, qr/Assessment XML document was saved in: output.xml/i);
 };
 

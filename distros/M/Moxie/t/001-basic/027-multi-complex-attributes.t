@@ -28,18 +28,18 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar' => sub { Bar->new };
-    has 'baz' => sub { Baz->new };
+    has _bar => sub { Bar->new };
+    has _baz => sub { Baz->new };
 
-    sub bar       : ro;
-    sub has_bar   : predicate;
-    sub set_bar   : wo;
-    sub clear_bar : clearer;
+    sub bar       : ro(_bar);
+    sub has_bar   : predicate(_bar);
+    sub set_bar   : wo(_bar);
+    sub clear_bar : clearer(_bar);
 
-    sub baz       : ro;
-    sub has_baz   : predicate;
-    sub set_baz   : wo;
-    sub clear_baz : clearer;
+    sub baz       : ro(_baz);
+    sub has_baz   : predicate(_baz);
+    sub set_baz   : wo(_baz);
+    sub clear_baz : clearer(_baz);
 }
 
 {

@@ -1,0 +1,49 @@
+---
+abstract: 'PDL types using Type::Tiny'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PDL::Lite: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-PDL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Types::PDL:
+    file: lib/Types/PDL.pm
+    version: '0.01'
+requires:
+  B: '0'
+  Carp: '0'
+  String::Errf: '0'
+  Type::Library: '0'
+  Type::TinyX::Facets: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Types-PDL
+  repository: git://github.com/djerius/types-pdl.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

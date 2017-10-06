@@ -1,3 +1,15 @@
+2017-10-03  Dominique Dumont  <domi.dumont@free.fr> v0.122
+
+    * Build.PL: require Config::Model::Itself 2.012 for tests
+    * Build.PL: remove obsolete dependency on Exception::Class
+
+2017-10-01  Dominique Dumont  <domi.dumont@free.fr> v0.121
+
+   * changed test backend specification to use rw_config instead of
+     read_config following the deprecation done in Config::Model 2.111
+   * Renamed meta model extension to follow the changes done in
+     Config::Model::Itself 2.012
+
 2017-05-14  Dominique Dumont  <domi.dumont@free.fr> v0.120
 
    * tweak test to cope with '.' removal from @INC
@@ -56,38 +68,38 @@
           * require Config::Model 1.255
 
 
-2010-12-13  Dominique Dumont  <dominique.dumont@hp.com> v0.109
+2010-12-13  Dominique Dumont  <domi.dumont@free.fr> v0.109
 
         * updated tests to work with Config::Model 1.236
           (fix Ubuntu bug #749108)
 
-2010-12-13  Dominique Dumont  <dominique.dumont@hp.com> v0.108
+2010-12-13  Dominique Dumont  <domi.dumont@free.fr> v0.108
 
         * updated tests to work with Config::Model 1.207
         * C::M::B::Augeas: synopsis is now a model snippet
-        
-2009-05-29  Dominique Dumont  <dominique.dumont@hp.com> v0.107
+
+2009-05-29  Dominique Dumont  <domi.dumont@free.fr> v0.107
 
 	* lib/Config/Model/Backend/Augeas.pm (all): Use Log::Log4perl for
 	trace with Data::Read and Data::Write categories
 
-2009-05-28  Dominique Dumont  <dominique.dumont@hp.com>
+2009-05-28  Dominique Dumont  <domi.dumont@free.fr>
 
 	* lib/Config/Model/Backend/Augeas.pm: replaced obsolete
 	config_file parameter with file (Config::Model 0.636)
 	(all): ignore Augeas #comment nodes
 
-2009-03-31  Dominique Dumont  <dominique.dumont@hp.com> v0.106
+2009-03-31  Dominique Dumont  <domi.dumont@free.fr> v0.106
 
 	* t/*.t: fixed tests that broke with Config::Model 0.634
 	(Fixes Debian bug #521968)
 
-2009-01-28  Dominique Dumont  <dominique.dumont@hp.com> v0.105
+2009-01-28  Dominique Dumont  <domi.dumont@free.fr> v0.105
 
 	* t/augeas*.t: Sometimes the Augeas locale bug workaround also
 	needs LC_ALL=C.
 
-2009-01-27  Dominique Dumont  <dominique.dumont@hp.com> v0.104
+2009-01-27  Dominique Dumont  <domi.dumont@free.fr> v0.104
 
 	* lib/Config/Model/Backend/Augeas.pm (write): Do no create
 	directory to store config files. Creating dir for file is Augeas
@@ -99,19 +111,19 @@
 	tests can be run on amd64 arch. The workaround re-run tests with
 	LANG=C environment
 
-2009-01-19  Dominique Dumont  <dominique.dumont@hp.com> v0.102
+2009-01-19  Dominique Dumont  <domi.dumont@free.fr> v0.102
 
 	* lib/Config/Model/Backend/Augeas.pm: Lots of improvement to deal
 	with sshd_config lenses
 
-2008-11-16  Domi  <domi@bilbo.maison> 
+2008-11-16  Dominique Dumont  <domi.dumont@free.fr>
 
 	* lib/Config/Model/Backend/Augeas.pm (write): Fixed a bug that
 	prevented to write through Augeas even if read through Augeas was
 	not done.
 
-2008-11-13  Dominique Dumont  <dominique.dumont@hp.com> v0.101
+2008-11-13  Dominique Dumont  <domi.dumont@free.fr> v0.101
 
 	* lib/Config/Model/Backend/Augeas.pm: First version
-	
+
 

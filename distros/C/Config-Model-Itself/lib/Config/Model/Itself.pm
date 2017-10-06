@@ -8,9 +8,9 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Itself ;
-$Config::Model::Itself::VERSION = '2.011';
+$Config::Model::Itself::VERSION = '2.012';
 use Mouse ;
-use Config::Model 2.103;
+use Config::Model 2.111;
 use 5.010;
 
 use IO::File ;
@@ -297,6 +297,8 @@ sub read_all {
             my $raw_model =  $tmp_model -> get_raw_model( $model_name ) ;
             my $new_model =  $tmp_model -> get_model( $model_name ) ;
 
+            $self->upgrade_model($model_name, $new_model);
+
             # track read class to identify later classes added by user
             $self->add_tracked_class($model_name);
 
@@ -375,6 +377,38 @@ sub read_all {
     }
 
     return $self->{map} = \%class_file_map ;
+}
+
+# can be removed end of 2019 (after buster is released)
+sub upgrade_model {
+    my ($self, $config_class_name, $model) = @_ ;
+
+    my $multi_backend = 0;
+    foreach my $config (qw/read_config write_config/) {
+        my $ref = $model->{$config};
+        if ($ref and ref($ref) eq 'ARRAY') {
+            if (@$ref == 1) {
+                $model->{$config} = $ref->[0];
+            }
+            elsif (@$ref > 1){
+                $logger->warn("$config_class_name $config: cannot migrate multiple backends to rw_config");
+                $multi_backend++;
+            }
+        }
+    }
+
+    if ($model->{read_config} and not $multi_backend) {
+        say ("Model $config_class_name: moving read_config specification to rw_config");
+        $model->{rw_config} = delete $model->{read_config};
+    }
+
+    if ($model->{write_config} and not $multi_backend) {
+        say "Model $config_class_name: merging write_config specification in rw_config";
+        if (not $multi_backend) {
+            map {$model->{rw_config}{$_} = $model->{write_config}{$_} } keys %{$model->{write_config}} ;
+            delete $model->{write_config};
+        }
+    }
 }
 
 # internal
@@ -765,7 +799,7 @@ Config::Model::Itself - Model editor for Config::Model
 
 =head1 VERSION
 
-version 2.011
+version 2.012
 
 =head1 SYNOPSIS
 

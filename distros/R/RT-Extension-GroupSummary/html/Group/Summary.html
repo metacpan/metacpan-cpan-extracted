@@ -1,0 +1,38 @@
+<& /Elements/Header, Title => loc('Group: [_1]', $Group->Name) &>
+<& /Elements/Tabs &>
+    
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => loc('Group Information'), class => "group extra-info" &>
+<& /Elements/ShowRecord,
+    Object      => $Group,
+    Format      => "Name, Description",
+    TrustFormat => 1, # Only modifiable by the RT server admin, so no need to scrub.
+    Class       => "group-summary",
+    &>
+</&>
+
+<& /Elements/ShowCustomFieldCustomGroupings, %ARGS, Object => $Group &>
+
+<%INIT>
+my $Group = RT::Group->new($session{'CurrentUser'});
+my ($status, $msg) = $Group->Load($id);
+unless ($status) {
+    RT->Logger->error("Unable to load group $id: $msg");
+    Abort("Unable to load Group $id");
+}
+
+my @results;
+if ($Group->Disabled){
+    if ($session{'CurrentUser'}->HasRight(
+        Object => RT->System, Right => 'AdminUsers')){
+        push @results, loc('Group [_1] is currently disabled. Edit the group and check "Enabled" to enable.', $Group->Name);
+    }
+    else{
+        push @results, loc('Group [_1] is currently disabled.', $Group->Name);
+    }
+}
+</%INIT>
+<%ARGS>
+$id => undef
+</%ARGS>

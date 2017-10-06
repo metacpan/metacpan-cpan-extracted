@@ -2,6 +2,14 @@
 # TODO: Add FAQ.pm
 # TODO: Document examples
 
+0.11 20170925
+    + Updated to libccv 0.7 from http://libccv.org/
+      This is likely the last release of libccv as it was last
+      updated in 2014
+    . Travis CI enabled
+    . More modern Makefile.PL distribution
+    . Documentation URLs point to https where possible
+
 0.10 20140907
     . Documentation/installation hints, you need the dev versions of libpng and libjpg (ISYNC)
     . Example programs now use 'warnings.pm'

@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v1.0.0');
+use version 0.77; our $VERSION = version->declare('v1.0.1');
 use charnames qw/ :full lao /;
 use parent 'Exporter';
 
@@ -142,7 +142,7 @@ my $re7     = '$x1? $x $x2? $x4_1t4 $x5? $x8? $x9a10_3?';
 
 my $re8     = '$x1? $x $x2? $x4_5 $x5? $x7_2? $x9a10_3?';
 
-my $re9     = '$x1? $x $x2? $x4_6 $x5? (?: $x8 $x9a10_3? | $x6_1 $x7_1 )';
+my $re9     = '$x1? $x $x2? $x4_6 $x5? ( $x8 $x9a10_3? | $x6_1 $x7_1 )';
 
 my $re10    = '$x1? $x $x2? $x4_7 $x5? $x6_1? $x8 $x9a10_3?';
 
@@ -161,19 +161,32 @@ my $rex1012 = '$x10_12';
 # This is the basic regexp that matches a syllable, still with variables to be
 # substituted
 my $re_basic = <<"EOF";
-(?:
-  (?:
-    (?: $re1_all (?: $re1_1 | $re1_2 | $re1_3 | $re1_4 | $re1_5 | $re1_6 | $re1_8 ) ) |
-    (?: $re2_all (?: $re2_1 | $re2_2 | $re2_3 ) ) |
-    (?: $re3_all (?: $re3_1 | $re3_2 | $re3_3 ) ) |
+(
+  (
+    ( $re1_all ( $re1_1 | $re1_2 | $re1_3 | $re1_4 | $re1_5 | $re1_6 | $re1_8 ) ) |
+    ( $re2_all ( $re2_1 | $re2_2 | $re2_3 ) ) |
+    ( $re3_all ( $re3_1 | $re3_2 | $re3_3 ) ) |
     $re4  | $re5  | $re6  | $re7  | $re8  | $re9  |
     $re10 | $re11 | $re12 | $re13 | $re14
   ) $rex1012? |
   $re_num+
 )
 EOF
-$re_basic =~ s/\n//gs;
-$re_basic =~ s/\s+/ /g; # keep it a bit more readable. could use s/\s+//g
+
+# A simplified lookahead expression that matches only the syllables not starting
+# in x0/x1. For the latter, matching their first character is sufficient.
+my $re_lookahead = <<"EOF";
+(
+  $re6 | $re7 | $re8 | $re9 | $re10 | $re11 | $re12 | $re13 | $re14 | $re_num+
+)
+EOF
+
+# Fix up regexen
+for( $re_basic, $re_lookahead ) {
+    s/\n//gs;      # Remove newlines
+    s/\(/(?:/gs;   # Make all groups non-capturing
+    s/\s+//g;
+}
 
 # Functional names for all the x-something groups from the original paper
 # Used for named captures.
@@ -282,27 +295,25 @@ though.
 =cut
 
 sub get_sylre_basic {
-    my $syl_re = $re_basic;
-    for my $atom (@SORTED_X_NAMES) {
-        $syl_re =~ s/\$($atom)/$regexp_fragments{$1}/eg;
-    }
-
+    my $syl_re = _subst_regexp_fragments($re_basic);
     return qr/ $syl_re /x;
 }
 
 =head2 get_sylre_full
 
 In addition to the matching done by L<get_sylre_basic>, this one makes sure
-matches are either followed by another complete syllable, a space, the end of
-string/line or some non-Lao character. This ensures correct matching of
-ambiguous syllable boundaries where the core consonant of a following syllable
-could also be an end consonant of the current one.
+matches are either followed by another complete syllable (or what can only be
+the start of one), a space, the end of string/line or some non-Lao character.
+This ensures correct matching of ambiguous syllable boundaries where the core
+consonant of a following syllable could also be an end consonant of the current
+one.
 
 =cut
 
 sub get_sylre_full {
-    my $syl_short = get_sylre_basic();
-    return qr/ $syl_short (?= \P{Lao} | \s | $ | $syl_short ) /x;
+    return _format_syllable_regexp(
+        _subst_regexp_fragments($re_basic),
+    );
 }
 
 =head2 get_sylre_named
@@ -314,13 +325,9 @@ from C<%+>.
 =cut
 
 sub get_sylre_named {
-    my $syl_short = get_sylre_basic();
-    my $syl_capture = $re_basic;
-    for my $atom (@SORTED_X_NAMES) {
-        $syl_capture =~ s/\$($atom)/_named_capture(\%regexp_fragments, $atom, $1)/eg;
-    }
-
-    return qr/ $syl_capture (?= \P{Lao} | \s | $ | $syl_short )/x;
+    return _format_syllable_regexp(
+        _subst_regexp_fragments_named($re_basic),
+    );
 }
 
 =head2 is_long_vowel
@@ -371,5 +378,40 @@ sub _named_capture {
 
     return $fragments->{$match};
 }
+
+sub _subst_regexp_fragments_named {
+    my $re = shift;
+
+    for my $atom (@SORTED_X_NAMES) {
+        $re =~ s/\$($atom)/_named_capture(\%regexp_fragments, $atom, $1)/eg;
+    }
+
+    return $re;
+}
+
+sub _subst_regexp_fragments {
+    my $re = shift;
+
+    for my $atom (@SORTED_X_NAMES) {
+        $re =~ s/\$($atom)/$regexp_fragments{$1}/eg;
+    }
+
+    return $re;
+}
+
+sub _format_syllable_regexp {
+    my $re = shift;
+    my $lookahead = _subst_regexp_fragments($re_lookahead);
+
+    my $expr = sprintf(
+        '%s (?= [%s] | \s | \P{Lao} | $ | %s )',
+        $re,
+        join('', @regexp_fragments{qw/ x0_1 x0_2 x0_3 x0_4 x0_5 x1 /} ),
+        $lookahead
+    );
+
+    return qr/ $expr /x;
+}
+
 
 1;

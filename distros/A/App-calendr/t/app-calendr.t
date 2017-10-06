@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use App::calendr;
 use Test::More;
 
-my $min_ver = 0.23;
+my $min_ver = 0.46;
 eval "use Calendar::Bahai $min_ver";
 plan skip_all => "Calendar::Bahai $min_ver required" if $@;
 

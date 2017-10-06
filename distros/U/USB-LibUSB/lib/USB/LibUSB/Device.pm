@@ -5,7 +5,7 @@ package USB::LibUSB::Device;
 use Moo;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
     
 has 'ctx' => (
     is => 'ro',

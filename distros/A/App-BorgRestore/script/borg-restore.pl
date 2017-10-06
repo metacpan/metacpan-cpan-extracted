@@ -125,7 +125,7 @@ See LICENSE for the full license text.
 
 =cut
 
-use v5.10;
+use v5.14;
 
 use App::BorgRestore;
 use App::BorgRestore::Borg;

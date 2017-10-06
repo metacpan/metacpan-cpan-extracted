@@ -1,3 +1,13 @@
+0.056	- 2017-09-22,  H.Merijn Brand
+    * Use Darwin infor internally lowercase (RT#97441 from Test::Smoke)
+    * Add arm for aarch64 (RT#119691)
+    * Add info for Ubuntu-16.04
+    * Use lsb_release (command) as fallback
+    * Add fedora-27
+    * Add tests for Raspbian-9
+    * Fix cpu test for armv6 with new cpuinfo format
+    * Add s390x support (RT#122772)
+
 0.055	- 2017-05-12,  H.Merijn Brand
     * Make a longer description
     * Chomp entries in internal info (Linux)
@@ -16,7 +26,7 @@
     * Add tests for Fedora-23
     * Add tests for OpenELEC-6.95.3 (7-beta)
     * Add tests for Fedora-14
-    * Add tests for Rasbian-8
+    * Add tests for Raspbian-8
     * Add tests for opensuse Tumbleweed
     * Use DISTRIB_RELEASE
     * Use VERSION_ID (Tumbleweed)

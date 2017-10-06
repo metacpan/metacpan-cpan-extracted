@@ -4,7 +4,7 @@ Photonic::Retarded::GreenP
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ version 0.007
 
 =head1 DESCRIPTION
 
-Calculates the longitudinal dielectric function for a given fixed
+Calculates the dielectric function for a given fixed
 Photonic::Retarded::AllH structure as a function of the dielectric
 functions of the components.
 
@@ -22,7 +22,7 @@ functions of the components.
 
 =over 4
 
-=item * new(haydock=>$h, nh=>$nh, small=>$small)
+=item * new(haydock=>$h, nh=>$nh, smallE=>$smallE)
 
 Initializes the structure.
 
@@ -30,12 +30,12 @@ $h is a Photonic::Retarded::AllH structure (required).
 
 $nh is the maximum number of Haydock coefficients to use (required).
 
-$small is the criteria of convergence (defaults to 1e-7)
+$smallE is the criteria of convergence (defaults to 1e-7)
 
 =item * evaluate($epsB)
 
-Returns the macroscopic dielectric function for a given complex value of the
-dielectric functions of the particle $epsB.
+Returns the macroscopic projected green'S function for a given complex
+value of the  dielectric functions of the particle $epsB.
 
 =back
 
@@ -72,9 +72,9 @@ The actual number of Haydock coefficients used in the last calculation
 
 Flags that the last calculation converged before using up all coefficients
 
-=item * small
+=item * smallE
 
-Criteria of convergence. 0 means don't check.
+Criteria of convergence. 0 means don't check. From Photonic::Roles::EpsParams. 
 
 =back
 
@@ -87,7 +87,7 @@ Criteria of convergence. 0 means don't check.
 =cut
 
 package Photonic::Retarded::GreenP;
-$Photonic::Retarded::GreenP::VERSION = '0.007';
+$Photonic::Retarded::GreenP::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -96,7 +96,7 @@ use Photonic::Retarded::AllH;
 use Moose;
 use Photonic::Types;
 
-with 'Photonic::Roles::EpsParams'; #nh, small, epsA, epsB, u
+with 'Photonic::Roles::EpsParams'; #nh, smallE, epsA, epsB, u
 has 'haydock' =>(is=>'ro', isa=>'Photonic::Retarded::AllH', required=>1);
 has 'Gpp'=>(is=>'ro', isa=>'PDL::Complex', init_arg=>undef, writer=>'_Gpp');
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef, 
@@ -129,7 +129,7 @@ sub evaluate {
     my ($Cnm1, $Dnm1)=($fnm1, r2C(0)); #previous coeffs.
     my ($fn, $Cn, $Dn); #current coeffs.
     my $Deltan;
-    while($n<=$self->nh && $n<=$self->haydock->iteration){
+    while($n<$self->nh && $n<$self->haydock->iteration){
 	$Dn=$u-$as->[$n]-$bcs->[$n]*$Dnm1;
 	$Dn=r2C($tiny) if $Dn->re==0 and $Dn->im==0;
 	$Cn=$u-$as->[$n]-$bcs->[$n]/$Cnm1;
@@ -137,12 +137,15 @@ sub evaluate {
 	$Dn=1/$Dn;
 	$Deltan=$Cn*$Dn;
 	$fn=$fnm1*$Deltan;
-	last if $converged=$Deltan->approx(1, $self->small)->all;
+	last if $converged=$Deltan->approx(1, $self->smallE)->all;
 	$fnm1=$fn;
 	$Dnm1=$Dn;
 	$Cnm1=$Cn;
 	$n++;
     }
+    #If there are less available coefficients than $self->nh and all
+    #of them were used, there is no remaining work to do, so, converged 
+    $converged=1 if $self->haydock->iteration < $self->nh;
     $self->_converged($converged);
     $self->_nhActual($n);
     my $g0b02=$self->haydock->gs->[0]*$self->haydock->b2s->[0];

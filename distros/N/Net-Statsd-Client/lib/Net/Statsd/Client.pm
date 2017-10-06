@@ -3,7 +3,7 @@ use Moo;
 use Sub::Quote;
 
 # ABSTRACT: Send data to StatsD / Graphite
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.32'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Etsy::StatsD 1.001;
@@ -100,13 +100,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::Statsd::Client - Send data to StatsD / Graphite
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -116,7 +118,7 @@ version 0.31
 
     my $timer = $stats->timer("request_duration");
     # ... do something expensive ...
-    $timer->finish;
+    my $elapsed_ms = $timer->finish;
 
 =head1 ATTRIBUTES
 
@@ -170,7 +172,8 @@ Record an event of duration C<$time> milliseconds for the named timing metric.
 
 Returns a L<Net::Statsd::Client::Timer> object for the named timing metric.
 The timer begins when you call this method, and ends when you call C<finish>
-on the timer.
+on the timer.  Calling C<finish> on the timer returns the elapsed time in
+milliseconds.
 
 =head2 $stats->gauge($metric, $value, [$sample_rate])
 
@@ -191,7 +194,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Andrew Rodland.
+This software is copyright (c) 2017 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

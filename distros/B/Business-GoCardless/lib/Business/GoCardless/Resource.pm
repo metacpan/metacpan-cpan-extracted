@@ -85,7 +85,7 @@ sub find_with_client {
         # so we need to be able to handle attributes we don't know about yet, hence the eval
         eval { $self->$attr( $data->{$attr} ); };
         $@ && do {
-            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $@" );
         };
     }
 
@@ -111,16 +111,28 @@ sub _operation {
             if ref( $self ) eq 'Business::GoCardless::Payment';
         $data = $data->{subscriptions}
             if ref( $self ) eq 'Business::GoCardless::Subscription';
+        $data = $data->{mandates}
+            if ref( $self ) eq 'Business::GoCardless::Mandate';
     }
 
     foreach my $attr ( keys( %{ $data } ) ) {
         eval { $self->$attr( $data->{$attr} ); };
         $@ && do {
-            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $_" );
+            carp( "Couldn't set $attr on @{[ ref( $self ) ]}: $@" );
         };
     }
 
     return $self;
+}
+
+sub uri {
+    my ( $self ) = @_;
+
+    my $endpoint = sprintf( $self->endpoint,$self->id );
+
+    return $self->client->api_version > 1
+        ? join( '/',$self->client->base_url . $self->client->api_path . $endpoint )
+        : join( '/',$self->client->base_url . $endpoint );
 }
 
 =head2 to_hash

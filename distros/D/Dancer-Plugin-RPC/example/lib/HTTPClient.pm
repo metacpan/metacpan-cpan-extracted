@@ -39,7 +39,7 @@ around BUILDARGS => sub {
 sub _build_client {
     my $self = shift;
     return HTTP::Tiny->new(
-        agent      => "XS4ALL-do-rpc/$VERSION",
+        agent      => "Dancer-Plugin-RPC-do-rpc/$VERSION",
         verify_SSL => 0,
         timeout    => $self->timeout,
     );

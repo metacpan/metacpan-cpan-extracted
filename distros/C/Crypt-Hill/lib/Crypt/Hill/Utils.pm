@@ -1,6 +1,6 @@
 package Crypt::Hill::Utils;
 
-$Crypt::Hill::Utils::VERSION   = '0.08';
+$Crypt::Hill::Utils::VERSION   = '0.09';
 $Crypt::Hill::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,24 +9,21 @@ Crypt::Hill::Utils - Utils package for Crypt::Hill.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(to_matrix_2_x_1
-                to_matrix_1_x_2
-                inverse_matrix
-                generate_table
-                get_determinant
-                multiply_mod);
+our @EXPORT_OK = qw(to_matrix_2_x_1
+                    to_matrix_1_x_2
+                    inverse_matrix
+                    generate_table
+                    get_determinant
+                    multiply_mod);
 
 =head1 DESCRIPTION
 

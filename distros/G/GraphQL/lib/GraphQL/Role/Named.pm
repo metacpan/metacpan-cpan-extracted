@@ -38,6 +38,19 @@ Optional description.
 
 has description => (is => 'ro', isa => Str);
 
+=head1 METHODS
+
+=head2 to_string
+
+Part of serialisation.
+
+=cut
+
+has to_string => (is => 'lazy', isa => Str, init_arg => undef, builder => sub {
+  my ($self) = @_;
+  $self->name;
+});
+
 __PACKAGE__->meta->make_immutable();
 
 1;

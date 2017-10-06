@@ -1,3 +1,9 @@
+libqbit-application-model-db-clickhouse-perl (0.005) raring; urgency=low
+
+  * move sub into base class
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 30 Sep 2017 21:10:15 +0300
+
 libqbit-application-model-db-clickhouse-perl (0.004) raring; urgency=low
 
   * get_dbh -> dbh

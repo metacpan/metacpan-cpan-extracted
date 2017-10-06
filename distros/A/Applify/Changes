@@ -1,5 +1,9 @@
 Revision history for perl distribution Applify
 
+0.14 2017-10-06T10:26:43+0200
+ - Add support for subcommands #4
+   Contributor: Roy Storey
+
 0.13 2017-06-24T09:34:05+0200
  - Allow changing names of the exported functions
  - Add "isa" to option, which upgrades a plain value into an object

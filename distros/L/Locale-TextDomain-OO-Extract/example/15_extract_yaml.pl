@@ -37,7 +37,7 @@ for my $file ( map { path($_) } @files ) {
     ->Useqq(1)
     ->Dump;
 
-# $Id: 14_extract_html.pl 683 2017-08-22 18:41:42Z steffenw $
+# $Id: 15_extract_yaml.pl 695 2017-09-02 09:24:08Z steffenw $
 
 __END__
 

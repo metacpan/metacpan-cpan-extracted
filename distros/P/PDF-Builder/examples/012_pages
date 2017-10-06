@@ -15,13 +15,17 @@ my $font = $pdf->corefont('Arial-Bold');
 # input: empty page. writes current page number on it (total number of pages)
 # uses global $pdf to get number of pages
 sub mark {
-    my ($page) = @_;
+    my ($page, $pageno) = @_;
 
     my $t = $page->text();
 
     $t->font($font, 20);
     $t->translate(20, 700);
-    $t->text($pdf->pages());
+    if (defined $pageno) {
+        $t->text($pageno);  # the given page number 
+    } else {
+        $t->text($pdf->pages());  # current page number 1, 2, 3,...
+    }
 }
 
 # create pages 1 - 8
@@ -31,6 +35,11 @@ for (1..8) {
 
 # create ninth page, inserted before old page 2
 mark($pdf->page(2));
+
+# create some Front Matter (TOC, etc.) pages i, ii, iii
+mark($pdf->page(1), 'i');
+mark($pdf->page(2), 'ii');
+mark($pdf->page(3), 'iii');
 
 $pdf->saveas("$0.pdf");
 

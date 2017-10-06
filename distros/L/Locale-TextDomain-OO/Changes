@@ -1,5 +1,21 @@
 Revision history for Perl extension Locale::TextDomain::OO.
 
+1.033  Tue Oct  3 07:15:30 2017
+- updated dependency of Locale::MO::File
+  to version 0.08 because 0.007 was broken
+
+1.032  Thu Sep 28 09:33:33 2017
+- added test for lexicon manipulation (merge, copy, move, delete)
+
+1.031  Wed Sep 27 17:48:02 2017
+- Added logger to Locale::TextDomain::OO::Singleton::Lexicon.
+  Logger will be copied during runtime from
+  Locale::TextDomain::OO::Lexicon::File::*.
+  Then Locale::TextDomain::OO::Lexicon::Hash modules be able to log lexicon
+  changes using logger of Locale::TextDomain::OO::Singleton::Lexicon.
+- new method copy_lexicon similar to merge_lexicon
+- added example for lexicon manipulation (merge, copy, move, delete)
+
 1.030  Tue Aug 29 23:32:58 2017
 - extended/fixed Pod
 - moved begin/end domain/capacity switching into one common role

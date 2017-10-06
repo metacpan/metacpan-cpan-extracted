@@ -14,9 +14,9 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
-my ( $btype1, $btype2, $btype3) = ( 1, 2, 3 );
+my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
 my $israspberry = 0;
 my $israspberry2 = 0;
@@ -96,7 +96,7 @@ my %_revinfostash = (
         '7'  => $btype3,
         '8'  => $btype3,
         '9'  => $btype3,
-        '10' => $btype3,
+        '10' => $btype4,
         '11' => $btype3,
         '12' => $btype3,
         '13' => $btype3,
@@ -147,6 +147,8 @@ sub home_directory { return $homedir; }
 
 sub board_type { return $_config->{board_type}; }
 
+sub gpio_header_type { return $_config->{board_type}; }
+
 sub manufacturer { return $_config->{manufacturer}; }
 
 sub release_date { return $_config->{release}; }
@@ -171,13 +173,15 @@ sub board_description {
         $description = 'Type 2 26 pin GPIO header';
     } elsif($_config->{board_type} == $btype3 ) {
         $description = 'Type 3 40 pin GPIO header';
+    } elsif($_config->{board_type} == $btype4 ) {
+        $description = 'Type 4 Compute Module';
     }
     return $description;
 }
 
 sub _configure {
     
-    my %_cpuinfostash;
+    my %_cpuinfostash = ();
     
     my $device_tree_boardname = '';
     
@@ -296,20 +300,20 @@ sub dump_board_info {
     my $dump = qq(--------------------------------------------------\n);
     $dump .= qq(Raspberry Pi Board Info\n);
     $dump .= qq(--------------------------------------------------\n);
-    $dump .= qq(Model Name    : $_config->{model_name}\n);
-    $dump .= qq(Released      : $_config->{release}\n);
-    $dump .= qq(Manufacturer  : $_config->{manufacturer}\n);
-    $dump .= qq(Memory        : $_config->{memory}\n);
-    $dump .= qq(Processor     : $_config->{processor}\n);
-    $dump .= qq(Hardware      : $_config->{hardware}\n);
+    $dump .= qq(Model Name       : $_config->{model_name}\n);
+    $dump .= qq(Released         : $_config->{release}\n);
+    $dump .= qq(Manufacturer     : $_config->{manufacturer}\n);
+    $dump .= qq(Memory           : $_config->{memory}\n);
+    $dump .= qq(Processor        : $_config->{processor}\n);
+    $dump .= qq(Hardware         : $_config->{hardware}\n);
     my $description = board_description();
-    $dump .= qq(Description   : $description\n);
-    $dump .= qq(Revision      : $_config->{revision}\n);
-    $dump .= qq(Serial Number : $_config->{serial}\n);
-    
+    $dump .= qq(Description      : $description\n);
+    $dump .= qq(Revision         : $_config->{revision}\n);
+    $dump .= qq(Serial Number    : $_config->{serial}\n);
+    $dump .= qq(GPIO Header Type : $_config->{board_type}\n);
     my $devtree = ( has_device_tree() ) ? 'Yes' : 'No';
     
-    $dump .= qq(Device Tree   : $devtree\n);
+    $dump .= qq(Device Tree      : $devtree\n);
     
     return $dump;
 }

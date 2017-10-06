@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 b32f0e82f8f723f52ee119dacea20895e5a47aaa Changes
+SHA1 dbe4cb934240d70d51411ed1af1b9e093d7ca4ee MANIFEST
+SHA1 163f059b47ae67b4dd2808ff4951e86e4fe95175 META.json
+SHA1 a4f71e8a48a1d3e3a400216c037a4283142354d8 META.yml
+SHA1 38cb1429486674c7d399b9d35265cbf24dc3d5ab Makefile.PL
+SHA1 a5e51753bc2830a83f7d669d7657e4b9f64fc9f7 README
+SHA1 9fe132436836396294d6a7dccff5873f128865f8 lib/WebService/Vichan.pm
+SHA1 871934c99c45af29c5bc70cef7fb0b8ed5f14e58 t/WebService-Vichan.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlnP5SUQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYmnTEACYTAzHznxCkW9Rjx6eBDV8KJjJ8DR9ax7g
+I7d4Ndv7pJM3HIr0I9Iawy1V61m9ACJCtXGGrdqE8EiUtI2JRxYLSMdOUchfK0bl
+j7RCLNaAwLTmOfpjHsSfJbxtikrCjXVm7qcysP4fH5tDfu3Y5RV8FXNjgub+w90m
+8koxZktaRmCRSYDa93aLVsfy+1oLD1rEU+RzD16ATTrPpGPqjSq9IYkW+oZBsGRt
+ZlQwdrxbhSIOuqKRmiZvDmEdUz1/WZw84gU9bERL0hdJv6RZc582VAXkPrMHx20Q
+K1iVSyb0sPHRTf5Qfaz/+Zy01lcx4dXy5Gh0eZw32z5sHl36nJ4Ej4ztk6O9QFka
+QILUNhioOl2w0FyD7LvLL28sA1JULQAxa/0P1OMo+rBwQNlhd8Xah5OVNhva57n8
+obeCXPPB8uca7DzolW6XVJPxjfjyYjHaBtGxKtTF1BtxUBdRcTaOkOHwJ7W5yReU
+wHczIab9K8xQC8qmSTrsMUuxPNymkwK1Ph243wl8EAQNbSil7r6LFOvbnuvVRSsy
+eqCjIOvLNN087rgSPzqE1NHkMyDc0XzqJ09yWpdRXvJMo7ka/l7qgqa5qLwJQ6xC
+620IEydA+zzEdSph5oaCf0hwwfySTVKREjQgQZAqhb1WfWwvwwJzF52u+z9vsQG4
+6M+hYZfJWA==
+=C1mn
+-----END PGP SIGNATURE-----

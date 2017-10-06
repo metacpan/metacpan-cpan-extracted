@@ -1,5 +1,14 @@
 Revision history for App-Devel-MAT-Explorer-GTK
 
+0.04    2017-09-29 19:15:21
+        [CHANGES]
+         * Add a 'pmat'-style REPL shell
+         * Implement the Devel::MAT::UI / ::Cmd integration methods for tools
+           to use; up to Devel::MAT version 0.27
+
+        [BUGFIXES]
+         * 64bit perls need to use the Glib::Long types in SV list data model
+
 0.03    2016/09/09 17:13:06
         [BUGFIXES]
          * Fix for 'bytes2size' function reference

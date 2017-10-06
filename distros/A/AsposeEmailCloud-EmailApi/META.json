@@ -63,7 +63,7 @@
       },
       "AsposeEmailCloud::EmailApi" : {
          "file" : "lib/AsposeEmailCloud/EmailApi.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       },
       "AsposeEmailCloud::Object::BaseObject" : {
          "file" : "lib/AsposeEmailCloud/Object/BaseObject.pm"
@@ -159,8 +159,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/mit-license.php"
+         "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "1.01"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

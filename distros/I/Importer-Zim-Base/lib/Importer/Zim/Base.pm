@@ -1,20 +1,18 @@
 
 package Importer::Zim::Base;
-$Importer::Zim::Base::VERSION = '0.5.0';
+$Importer::Zim::Base::VERSION = '0.8.0';
 # ABSTRACT: Base module for Importer::Zim backends
 
-use 5.018;
-no strict 'refs';
+use 5.010001;
 
-use Carp            ();
 use Module::Runtime ();
 
-use constant DEBUG => $ENV{IMPORTER_ZIM_DEBUG} || 0;
+use Importer::Zim::Utils qw(DEBUG carp croak);
 
 sub _prepare_args {
     my $class   = shift;
     my $package = shift
-      or Carp::croak qq{Usage: use $class MODULE => [\%OPTS =>] EXPORTS...\n};
+      or croak qq{Usage: use $class MODULE => [\%OPTS =>] EXPORTS...\n};
 
     my $opts = _module_opts( ref $_[0] eq 'HASH' ? shift : {} );
     my @version = exists $opts->{-version} ? ( $opts->{-version} ) : ();
@@ -29,22 +27,22 @@ sub _prepare_args {
         my @symbols = _expand_symbol( $package, shift );
         my $opts = _import_opts( ref $_[0] eq 'HASH' ? shift : {}, $opts );
         for my $symbol (@symbols) {
-            Carp::croak qq{"$symbol" is not exported by "$package"}
+            croak qq{"$symbol" is not exported by "$package"}
               if $can_export && !$can_export->{$symbol};
-            Carp::croak qq{Can't handle "$symbol"}
+            croak qq{Can't handle "$symbol"}
               if $symbol =~ /^[\$\@\%\*]/;
             my $sub    = *{"${package}::${symbol}"}{CODE};
             my $export = do {
                 local $_ = $opts->{-as} // $symbol;
                 exists $opts->{-map} ? $opts->{-map}->() : $_;
             };
-            Carp::croak qq{Can't find "$symbol" in "$package"}
+            croak qq{Can't find "$symbol" in "$package"}
               unless $sub;
             my $seen = $seen{$export}{$sub}++;
-            Carp::croak qq{Can't import as "$export" twice}
+            croak qq{Can't import as "$export" twice}
               if keys %{ $seen{$export} } > 1;
             unless ($seen) {
-                warn(qq{Importing "${package}::${symbol}" as "$export"\n})
+                warn(qq{  Importing "${package}::${symbol}" as "$export"\n})
                   if DEBUG;
                 push @exports, { export => $export, code => $sub };
             }
@@ -63,7 +61,7 @@ sub _module_opts {
     exists $o->{-map} and $opts{-map} = $o->{-map}
       or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
     if ( my @bad = grep { !$IS_MODULE_OPTION->{$_} } keys %$o ) {
-        Carp::carp qq{Ignoring unknown module options (@bad)\n};
+        carp qq{Ignoring unknown module options (@bad)\n};
     }
     return \%opts;
 }
@@ -79,7 +77,7 @@ sub _import_opts {
     exists $o->{-map} and $opts{-map} = $o->{-map}
       or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
     if ( my @bad = grep { !$IS_IMPORT_OPTION->{$_} } keys %$o ) {
-        Carp::carp qq{Ignoring unknown symbol options (@bad)\n};
+        carp qq{Ignoring unknown symbol options (@bad)\n};
     }
     return \%opts;
 }
@@ -111,6 +109,8 @@ sub _can_export {
     }
     return \%exports;
 }
+
+no Importer::Zim::Utils qw(DEBUG carp croak);
 
 1;
 
@@ -148,7 +148,7 @@ Importer::Zim::Base - Base module for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.5.0
+version 0.8.0
 
 =head1 DESCRIPTION
 

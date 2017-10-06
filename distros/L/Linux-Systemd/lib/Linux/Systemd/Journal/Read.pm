@@ -1,5 +1,5 @@
-package Linux::Systemd::Journal::Read;
-$Linux::Systemd::Journal::Read::VERSION = '1.162700';
+package Linux::Systemd::Journal::Read 1.172760;
+
 # ABSTRACT: Read from systemd journals
 
 # TODO make sure all text is utf8
@@ -102,7 +102,7 @@ Linux::Systemd::Journal::Read - Read from systemd journals
 
 =head1 VERSION
 
-version 1.162700
+version 1.172760
 
 =head1 METHODS
 
@@ -174,7 +174,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ioan Rogers.
+This software is Copyright (c) 2017 by Ioan Rogers.
 
 This is free software, licensed under:
 

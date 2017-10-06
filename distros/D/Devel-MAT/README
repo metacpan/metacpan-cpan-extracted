@@ -91,8 +91,13 @@ METHODS
 
     elide => BOOL
 
-      If true, attempt to neaten up the output by skipping over REF()-type
-      SVs which occur a lot in perl data structures.
+      If true, attempt to neaten up the output by skipping over certain
+      structures.
+
+      REF()-type SVs will be skipped to their referrant.
+
+      Members of the symbol table will be printed as being a 'root' element
+      of the given symbol name.
 
  find_symbol
 
@@ -110,8 +115,15 @@ METHODS
 
        $gv = $pmat->find_glob( $name )
 
-    Attempts to walk to the symbol table looking for a symbol of the given
+    Attempts to walk the symbol table looking for a symbol of the given
     name, returning the GLOB object if found.
+
+ find_stash
+
+       $stash = $pmat->find_stash( $name )
+
+    Attempts to walk the symbol table looking for a stash of the given
+    name.
 
 AUTHOR
 

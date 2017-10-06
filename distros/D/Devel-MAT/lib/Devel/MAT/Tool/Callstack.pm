@@ -7,8 +7,9 @@ package Devel::MAT::Tool::Callstack;
 
 use strict;
 use warnings;
+use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use constant CMD => "callstack";
 
@@ -48,12 +49,6 @@ sub _stringify
    }
 }
 
-sub new
-{
-   my $class = shift;
-   return bless { df => shift->dumpfile }, $class;
-}
-
 =head1 COMMANDS
 
 =head2 callstack
@@ -66,7 +61,7 @@ sub run_cmd
 {
    my $self = shift;
 
-   foreach my $ctx ( $self->{df}->contexts ) {
+   foreach my $ctx ( $self->df->contexts ) {
       my $where;
       my @more;
 

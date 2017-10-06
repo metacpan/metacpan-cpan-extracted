@@ -1,5 +1,10 @@
 Revision history for WWW-Kickstarter
 
+1.12.0  2017-09-25
+        - The values of the goal and pledged queries were changed in the
+          Kickstarter API. Adjusted the validation checks and documentation.
+        - Minor markup fixes in the documentation.
+
 1.10.0  2017-09-20
         - Documentation fixes.
         - Updated list of tags.

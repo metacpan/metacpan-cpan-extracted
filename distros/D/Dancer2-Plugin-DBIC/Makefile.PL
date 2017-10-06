@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Dancer2::Plugin::DBIC",
   "PREREQ_PM" => {
-    "DBICx::Sugar" => 0,
+    "DBICx::Sugar" => "0.0200",
     "Dancer2" => "0.153002",
     "Dancer2::Plugin" => 0,
     "strict" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "blib" => "1.01",
     "lib" => 0
   },
-  "VERSION" => "0.0013",
+  "VERSION" => "0.0100",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBI" => 0,
-  "DBICx::Sugar" => 0,
+  "DBICx::Sugar" => "0.0200",
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,
   "DBIx::Class::Schema::Loader" => 0,

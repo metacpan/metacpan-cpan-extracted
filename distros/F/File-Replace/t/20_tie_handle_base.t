@@ -31,7 +31,7 @@ use FindBin ();
 use lib $FindBin::Bin;
 use File_Replace_Testlib;
 
-use Test::More tests=>48;
+use Test::More tests=>52;
 
 use Encode qw/encode/;
 
@@ -88,24 +88,83 @@ ok close($fh), 'close 2';
 is $y, encode('UTF-8',$str,Encode::FB_CROAK), 'scalar file 3';
 
 # test a few variations of open
-my $fn = spew(newtempfn,"blah");
+my $fn = newtempfn("blah");
 ok open($fh, '<', $fn), "3-arg open";
 ok open($fh, '<:utf8', $fn), "3-arg open w/layer";  ## no critic (RequireEncodingWithUTF8Layer)
 ok open($fh, "<$fn"), "2-arg open";  ## no critic (ProhibitTwoArgOpen)
-like exception { open($fh) },  ## no critic (RequireCheckedOpen)
-	qr/\bnot enough arguments\b/i, 'open not enough args';
 close $fh;
+# open: "As a shortcut a one-argument call takes the filename from the
+# global scalar variable of the same name as the filehandle".
+our $TESTFILE = $fn;
+*SOMEHANDLE = Tie::Handle::Base->new(*TESTFILE);
+ok open(SOMEHANDLE), '1-arg open';  ## no critic (ProhibitBarewordFileHandles)
+is <SOMEHANDLE>, "blah", '1-arg open read';
+close SOMEHANDLE;
 
 ok my $fh2 = Tie::Handle::Base->new(), 'new'; # don't pass in a handle here
 isa_ok tied(*$fh2), 'Tie::Handle::Base';
 # NOTE that :raw does not quite work right on Perl <5.14, but it does work here
-my $fn2 = spew(newtempfn,"Foo\n",':raw');
+my $fn2 = newtempfn("Foo\n",':raw');
 ok open($fh2,'>>:raw:crlf',$fn2), 'open 2' or die $!;
 ok print($fh2 "Bar\n"), 'print 2';
 ok close($fh2), 'close 3';
 is slurp($fn2,':raw'), "Foo\nBar\x0D\x0A", 'check file';
 untie(*$fh2);
 ok !defined(tied(*$fh2)), 'untie';
+
+subtest 'return values' => sub {
+	my $s1 = "Hello";
+	my $s2 = "\x{2764}\x{1F42A}";
+	ok open(my $ofh, '+<:raw', newtempfn("")), 'open orig';
+	ok open(my $tfh, '+<:raw', newtempfn("")), 'open tied';
+	$tfh = Tie::Handle::Base->new($tfh);
+	is syswrite($tfh,$s1), syswrite($ofh,$s1), 'syswrite matches';
+	# "sysread(), recv(), syswrite() and send() operators
+	# are deprecated on handles that have the :utf8 layer"
+	my $s2e = encode('UTF-8',my $temp=$s2,Encode::FB_CROAK);
+	is syswrite($tfh,$s2e), syswrite($ofh,$s2e), 'syswrite enc matches';
+	# print only "Returns true if successful." (and printf is "equivalent" to print),
+	# so in our tests we don't care what that true value is.
+	ok print($ofh "abc"), 'print orig true';
+	ok print($tfh "abc"), 'print tied true';
+	ok printf($ofh "%c%s",100,"ef"), 'printf orig true';
+	ok printf($tfh "%c%s",100,"ef"), 'printf tied true';
+	# check this case, since WRITE will return a length of 0 (false)
+	ok print($ofh ""), 'print empty orig true';
+	ok print($tfh ""), 'print empty tied true';
+	ok printf($ofh ""), 'printf empty orig true';
+	ok printf($tfh ""), 'printf empty tied true';
+	# now read back
+	ok seek($ofh,0,0), 'seek orig';
+	ok seek($tfh,0,0), 'seek tied';
+	is sysread($tfh,my $rt1,length($s1)), sysread($ofh,my $ro1,length($s1)), 'sysread matches';
+	is $ro1, $s1, 'sysread orig';
+	is $rt1, $s1, 'sysread tied';
+	ok binmode($ofh,':encoding(UTF-8)'), 'binmode orig';
+	ok binmode($tfh,':encoding(UTF-8)'), 'binmode tied';
+	is read($tfh,my $rt2,length($s2)+6), read($ofh,my $ro2,length($s2)+6), 'read matches';
+	is $ro2, $s2."abcdef", 'read orig';
+	is $rt2, $s2."abcdef", 'read tied';
+	ok eof($ofh), 'eof orig';
+	ok eof($tfh), 'eof tied';
+	ok close($ofh), 'close orig';
+	ok close($tfh), 'close tied';
+	# check what our three emulated functions return on failure
+	# (read and sysread return the same values on errors, and we pass both
+	# of those through to read, so we don't need to check them)
+	is grep({/\bon closed filehandle\b/} warns {
+		no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
+		is_deeply [syswrite($ofh,$s1)], [undef], 'syswrite fail returns undef';
+		is_deeply [syswrite($tfh,$s1)], [syswrite($ofh,$s1)], 'syswrite fail matches';
+		is_deeply [print($ofh "abc")], [undef], 'print fail returns undef';
+		is_deeply [print($tfh "abc")], [print($ofh "abc")], 'print fail matches';
+		is_deeply [printf($ofh "%s","def")], [undef], 'printf fail returns undef';
+		is_deeply [printf($tfh "%s","def")], [printf($ofh "%s","def")], 'printf fail matches';
+	}), 9, 'warns about closed fh';
+	# for completeness, confirm what close returns
+	is_deeply [close $ofh], [!1], 'close orig fail';
+	is_deeply [close $tfh], [close $ofh], 'close fail matches';
+};
 
 {
 	# author tests make warnings fatal, disable that here
@@ -116,12 +175,13 @@ ok !defined(tied(*$fh2)), 'untie';
 		}), 'tiehandle too many args';
 }
 
-{
-	package Tie::Handle::Unprintable;
-	require Tie::Handle::Base;
-	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
-	# we can't mock CORE::print, but we can use a tied handle to cause it to return false
-	sub PRINT { return }
-}
 ok !print( {Tie::Handle::Base->new( Tie::Handle::Unprintable->new )} "Foo" ), 'print fails';
+
+{ # mostly for code coverage
+	open my $hnd, '>', \(my $foo) or die $!;
+	bless $hnd, 'SomeClass';
+	ok Tie::Handle::Base::inner_write($hnd,"Foo"), 'inner_write';
+	close $hnd;
+	is $foo, "Foo", 'inner_write data';
+}
 

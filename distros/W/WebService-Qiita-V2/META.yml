@@ -1,0 +1,42 @@
+---
+abstract: 'Qiita API(v2) Client'
+author:
+  - 'risou <risou.f@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Qiita-V2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Qiita::V2:
+    file: lib/WebService/Qiita/V2.pm
+    version: '0.01'
+  WebService::Qiita::V2::Client:
+    file: lib/WebService/Qiita/V2/Client.pm
+  WebService::Qiita::V2::Client::Base:
+    file: lib/WebService/Qiita/V2/Client/Base.pm
+  WebService::Qiita::V2::Client::Methods:
+    file: lib/WebService/Qiita/V2/Client/Methods.pm
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/risou/WebService-Qiita-V2/issues
+  homepage: https://github.com/risou/WebService-Qiita-V2
+  repository: git://github.com/risou/WebService-Qiita-V2.git
+version: '0.01'

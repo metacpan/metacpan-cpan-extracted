@@ -80,13 +80,15 @@ elsif($^O eq 'MSWin32' && $Config{ptrsize} == 8)
 
 share {
 
+
   # For platforms where there is a binary release, use that:
   if($binary_release_name && !$ENV{ALIEN_CMAKE_FROM_SOURCE})
   {
+    start_url 'https://cmake.org/download/';
     plugin Download => (
-      url     => 'https://cmake.org/download/',
       filter  => qr/^cmake-[0-9\.]+-\Q$binary_release_name\E\.\Q$binary_format\E$/,
       version => qr/([0-9\.]+)/,
+      ($^O eq 'MSWin32' ? (bootstrap_ssl => 1) : ()),
     );
     plugin Extract => $binary_format;
     if($^O eq 'MSWin32')
@@ -111,8 +113,8 @@ share {
   # For platforms without a (recent) binary release, build it from source
   else
   {
+    start_url 'https://cmake.org/download/';
     plugin Download => (
-      url     => 'https://cmake.org/download/',
       filter  => qr/^cmake-[0-9\.]+\.tar.gz$/,
       version => qr/([0-9\.]+)/,
     );

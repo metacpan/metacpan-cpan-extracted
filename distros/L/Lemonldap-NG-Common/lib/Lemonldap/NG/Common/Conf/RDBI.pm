@@ -5,7 +5,7 @@ use utf8;
 use Lemonldap::NG::Common::Conf::Serializer;
 use Lemonldap::NG::Common::Conf::_DBI;
 
-our $VERSION = '1.9.11';
+our $VERSION = '1.9.13';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::_DBI);
 
 sub store {
@@ -17,8 +17,6 @@ sub store {
     my $req;
     my $lastCfg = $self->lastCfg;
 
-    $self->_dbh->begin_work;
-    eval { $self->_dbh->do("BEGIN") };
     if ( $lastCfg == $cfgNum ) {
         $req = $self->_dbh->prepare(
 "UPDATE $self->{dbiTable} SET field=?, value=? WHERE cfgNum=? AND field=?"
@@ -47,7 +45,6 @@ sub store {
             return UNKNOWN_ERROR;
         }
     }
-    eval { $self->_dbh->do("COMMIT") };
     return $cfgNum;
 }
 

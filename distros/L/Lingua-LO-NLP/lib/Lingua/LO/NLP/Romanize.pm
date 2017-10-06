@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.012000;
 use utf8;
-use version 0.77; our $VERSION = version->declare('v1.0.0');
+use version 0.77; our $VERSION = version->declare('v1.0.1');
 use Carp;
 use Scalar::Util 'blessed';
 use Class::Accessor::Fast 'antlers';
@@ -54,17 +54,19 @@ ones are always recognized:
 =item C<variant>
 
 Standard according to which to romanize; this determines the
-L<Lingua::LO::NLP::Romanize> subclass to actually instantiate. This argument is mandatory.
+L<Lingua::LO::NLP::Romanize> subclass to actually instantiate. This argument is
+mandatory.
 
 =item C<hyphen>
 
-Separate runs of Lao syllables with hyphens. Set this to the character you
+Separate runs of Lao syllables with "hyphens". Set this to the character you
 would like to use as a hyphen - usually this will be the ASCII "hyphen minus"
 (U+002D) but it can be the unambiguous Unicode hyphen ("‐", U+2010), a slash or
-anything you like. As a special case, you can pass a 1 to use the ASCII
-version. If this argument is missing, C<undef> or C<0>, blanks are used.
-Syllables duplicated using "ໆ" are always joined with a hyphen: either the one
-you specify or the ASCII one.
+anything you like (except for the special-cased '0' and '1' - but you wouldn't
+want those between your syllables anyway!). As a special case, you can pass a 1
+to use the ASCII version. If this argument is missing, C<undef> or C<0>, blanks
+are used. Syllables duplicated using "ໆ" are always joined with a hyphen:
+either the one you specify or the ASCII one.
 
 =item C<normalize>
 
@@ -132,17 +134,38 @@ sub romanize {
 
 =head2 romanize_syllable
 
-    romanize_syllable( $syllable )
+    romanize_syllable( $syllable | $analysis )
 
-Return the romanization of a single C<$syllable> according to the standard passed to the
-constructor. This is a virtual method that must be implemented by subclasses.
+Return the romanization of a single C<$syllable> according to the standard
+passed to the constructor. This method accepts either a plain string or an
+analysis result from L<Lingua::LO::NLP::Analyze>. The latter helps avoid
+redundant parsing if you need both an analysis and a romanization.
 
 =cut
 
 sub romanize_syllable {
+    my ($self, $thing) = @_;
+    unless( blessed($thing) ) {
+        # Analyze syllable first unless we got an analysis result already
+        # (we just assume it is one if we have an object)
+        $thing = Lingua::LO::NLP::Analyze->new($thing);
+    }
+    return $self->_romanize_syllable( $thing );
+}
+
+=head2 _romanize_syllable
+
+    _romanize_syllable( $analysis )
+
+Return the romanization of a syllable passed in as a 'Lingua::LO::NLP::Analyze'
+result, according to the standard passed to the constructor. This is a virtual
+method that must be implemented by subclasses.
+
+=cut
+
+sub _romanize_syllable {
     my $self = shift;
-    ref $self or die "romanize_syllable is not a class method";
-    die blessed($self) . " must implement romanize_syllable()";
+    die blessed($self) . " must implement _romanize_syllable()";
 }
 
 =head2 hyphen

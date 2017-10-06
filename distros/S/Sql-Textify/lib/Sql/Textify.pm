@@ -13,11 +13,11 @@ Sql::Textify - Run SQL queries and get the result in text format (markdown, html
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw(textify);
 
@@ -372,7 +372,7 @@ sub quote_markdown {
 	# there's not a standard way to quote markdown
 	my $s = shift;
 
-	if ($s) {
+	if (defined $s) {
 		# quote |
 		$s =~ s/\|/\\\|/g;
 

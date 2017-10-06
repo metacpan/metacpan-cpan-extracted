@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo KZBRKZBR@ gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -53,6 +53,10 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "DBIx::Class" : "0.082840",
+            "DBIx::Tracer" : "0.03"
+         },
          "requires" : {
             "Capture::Tiny" : "0",
             "DBD::SQLite" : "1.31",
@@ -65,7 +69,7 @@
    "provides" : {
       "DBIx::Sunny" : {
          "file" : "lib/DBIx/Sunny.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "DBIx::Sunny::Schema" : {
          "file" : "lib/DBIx/Sunny/Schema.pm"
@@ -88,11 +92,12 @@
          "web" : "https://github.com/kazeburo/DBIx-Sunny"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "motemen <motemen@gmail.com>",
-      "nanto_vi <nanto@moon.email.ne.jp>",
-      "Masahiro Nagano <kazeburo@gmail.com>"
+      "nanto_vi <nanto@moon.email.ne.jp>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -10,6 +10,7 @@ lib/Patro/N3.pm
 lib/Patro/N4.pm
 lib/Patro/N5.pm
 lib/Patro/N6.pm
+lib/Patro/Server.pm
 lib/threadsx/shared.pm
 LICENSE
 Makefile.PL
@@ -17,11 +18,11 @@ MANIFEST
 README.md
 t/00-load.t
 t/01-scalar.t
-t/02-array.t
+t/02a-array.t
 t/02b-splice.t
 t/03-hash.t
 t/04a-code.t
-t/04b-code.t
+t/04b-dispatch.t
 t/05a-filehandles.t
 t/05b-filehandles.t
 t/05c-filehandles.t
@@ -33,9 +34,12 @@ t/09-config.t
 t/11-ScalarObj.t
 t/12-ArrayObj.t
 t/13-HashObj.t
-t/20-overload.t
+t/20a-overload.t
 t/20b-overload.t
 t/20c-overload.t
 t/21-sideeffects.t
+t/30-patroarchy.t
+t/31-race-condition.t
+t/32-waitnotify.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

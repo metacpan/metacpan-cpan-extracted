@@ -2,73 +2,91 @@ use strict;
 use warnings FATAL => 'all';
 use utf8;
 
-use Test::MockObject;
 use Test::Mock::Guard;
+use Test::Mock::Time;
+use Test::MockObject;
 
 use lib '.';
 use t::Util;
 use Devel::Cover::Report::Codecov;
 
-sub send_report {
-    Devel::Cover::Report::Codecov::send_report(@_);
-}
+subtest 'without retry' => sub {
+    my $url = Test::MockObject->new;
+    my $res = Test::MockObject->new;
+    my $ok  = { ok => 1 };
 
-sub _make_furl {
-    my $res = shift;
-
-    my $furl = Test::MockObject->new;
-    $furl->mock(post => sub {
-        my ($class, $url, $headers, $json) = @_;
-
-        is $url, 'http://www.example.com';
-        cmp_deeply $headers, ['Accept' => 'application/json'];
-        is $json, '{"test":1}';
-
-        return $res;
+    my $guard = mock_guard('Devel::Cover::Report::Codecov', {
+        send_report_once => sub {
+            is $_[0], $url;
+            is $_[1], $res;
+            return $ok;
+        },
     });
 
-    return $furl;
-}
+    subtest 'n_times = 0' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 0;
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ok;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1;
+    };
 
-subtest 'if 200' => sub {
-    my $res  = Test::MockObject->new;
-    my $furl = _make_furl($res);
+    subtest 'n_times = 1' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 1;
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ok;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1 + 1;
+    };
 
-    $res->mock(code    => sub { 200 });
-    $res->mock(message => sub { 'OK' });
-    $res->mock(content => sub { '{"message":"OK","url":"http://www.example.net/ok"}' });
-
-    my $guard = mock_guard('Furl', { new => sub { $furl } });
-
-    my $message = <<EOF;
-200 OK
-OK
-http://www.example.net/ok
-EOF
-
-    cmp_deeply
-        send_report('http://www.example.com', '{"test":1}'),
-        { ok => 1, message => $message };
+    subtest 'n_times = 5' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 5;
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ok;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1 + 1 + 1;
+    };
 };
 
-subtest 'if not 200' => sub {
-    my $res  = Test::MockObject->new;
-    my $furl = _make_furl($res);
+subtest 'with retry' => sub {
+    my $url = Test::MockObject->new;
+    my $res = Test::MockObject->new;
+    my $ok  = { ok => 1 };
+    my $ng  = { ok => 0 };
 
-    $res->mock(code    => sub { 400 });
-    $res->mock(message => sub { 'Bad Request' });
-    $res->mock(content => sub { '{"message":"ERROR"}' });
+    my $count = 0;
+    my $guard = mock_guard('Devel::Cover::Report::Codecov', {
+        send_report_once => sub {
+            is $_[0], $url;
+            is $_[1], $res;
 
-    my $guard = mock_guard('Furl', { new => sub { $furl } });
+            $count++;
+            return $count < 5 ? $ng : $ok;
+        },
+    });
 
-    my $message = <<EOF;
-400 Bad Request
-{"message":"ERROR"}
-EOF
+    subtest 'n_times = 0' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 0;
 
-    cmp_deeply
-        send_report('http://www.example.com', '{"test":1}'),
-        { ok => 0, message => $message };
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ng;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1;
+    };
+
+    $count = 0;
+    subtest 'n_times = 3' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 3;
+
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ng;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1 + 3;
+    };
+
+    $count = 0;
+    subtest 'n_times = 5' => sub {
+        local $Devel::Cover::Report::Codecov::RETRY_TIMES = 5;
+
+        my $result = Devel::Cover::Report::Codecov::send_report($url, $res);
+        is $result, $ok;
+        is $guard->call_count('Devel::Cover::Report::Codecov', 'send_report_once'), 1 + 3 + 5;
+    };
 };
 
 done_testing;

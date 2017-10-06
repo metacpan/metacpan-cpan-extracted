@@ -10,6 +10,23 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.8.1',
 	META_MERGE     => {
 		'meta-spec'  => { version => 2 },
+		provides     => {
+			'File::Replace' => {
+				file    => 'lib/File/Replace.pm',
+				version => '0.06',
+			},
+			'Tie::Handle::Base' => {
+				file    => 'lib/Tie/Handle/Base.pm',
+				version => '0.06',
+			},
+		},
+		no_index     => {
+			directory => [ 't' ],
+			file      => [
+					'lib/File/Replace/DualHandle.pm',
+					'lib/File/Replace/SingleHandle.pm',
+				],
+		},
 		resources    => {
 			homepage    => 'https://bitbucket.org/haukex/file-replace',
 			repository  => {
@@ -45,7 +62,6 @@ WriteMakefile(
 		'File::Temp'             => 0,
 		'File::Basename'         => 0,
 		'File::Spec::Functions'  => 0,
-		'File::stat'             => 0,
 		'Fcntl'                  => 0,
 		'Exporter'               => 0,
 	},
@@ -56,6 +72,7 @@ WriteMakefile(
 		'Encode'                 => 0,
 		'Test::More'             => '1.302096',
 		'FindBin'                => 0,
+		'File::stat'             => 0,
 		# note I haven't included modules needed for author tests here
 	},
 );

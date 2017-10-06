@@ -1,0 +1,41 @@
+<%INIT>
+if ($Path =~ m{^/Admin/Groups}) {
+    if ($session{'CurrentUser'}->HasRight(Right => 'ShowConfigTab', Object => $RT::System)) {
+        if ( $DECODED_ARGS->{'id'} && $DECODED_ARGS->{'id'} =~ /^\d+$/ ) {
+            my $id = $DECODED_ARGS->{'id'};
+            my $obj = RT::Group->new($session{'CurrentUser'});
+            $obj->Load($id);
+            if ( $obj and $obj->id ) {
+                PageMenu()->child(summary => title => loc('Group Summary'), path => '/Group/Summary.html?id=' . $id);
+            }
+        }
+    }
+}
+elsif ($Path =~ m{^/Group/Summary\.html}) {
+    if ($session{'CurrentUser'}->HasRight(Right => 'ShowConfigTab', Object => $RT::System)) {
+        PageMenu()->child(basics => title => loc('Edit'), path => '/Admin/Groups/Modify.html?id=' . $DECODED_ARGS->{'id'});
+        PageMenu()->child(members => title => loc('Members'), path => '/Admin/Groups/Members.html?id=' . $DECODED_ARGS->{'id'});
+        PageMenu()->child(memberships => title => loc('Memberships'), path => '/Admins/Group/Memberships.html?id=' . $DECODED_ARGS->{'id'});
+        PageMenu()->child('group-rights' => title => loc('Group Rights'), path => '/Admin/Groups/GroupRights.html?id=' . $DECODED_ARGS->{'id'});
+        PageMenu()->child('user-rights' => title => loc('User Rights'), path => '/Admin/Groups/UserRights.html?id=' . $DECODED_ARGS->{'id'});
+        PageMenu()->child(history => title => loc('History'), path => '/Admin/Groups/History.html?id=' . $DECODED_ARGS->{'id'});
+    }
+    if ($session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'SeeGroup')) {
+        PageMenu()->child(display => title => loc('Summary'), path => '/Group/Summary.html?id=' . $DECODED_ARGS->{'id'});
+    }
+}
+if ($session{'CurrentUser'}->HasRight(Object => $RT::System, Right => 'SeeGroup')) {
+    my $search = Menu()->child('search');
+    if ($search) {
+        my $user_search = $search->child('users');
+        if ($user_search) {
+            $user_search->add_after(groups => title => loc('Groups'), path => "/Group/index.html" )
+        } else {
+            $search->child(groups => title => loc('Groups'), path => "/Group/index.html" )
+        }
+    }
+}
+</%INIT>
+<%ARGS>
+$Path => undef
+</%ARGS>

@@ -47,3 +47,7 @@ Revision history for App-PFT
 
 1.2.1   2017-06-15
         Some minor bugs fixed
+
+1.2.2   2017-09-25
+        Fixed error handling
+        Fixed regex modifier (works in perl < 5.22)

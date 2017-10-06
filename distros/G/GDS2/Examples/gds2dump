@@ -6,7 +6,7 @@ use strict;
 use warnings;
 #use diagnostics;
 $|++;
-require 5.006;
+require 5.010;
 our $VERSION = '2.0';
 use Getopt::Long qw(GetOptions);
 use Cwd;

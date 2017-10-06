@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Scalar::Util qw( refaddr );
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _apply_callbacks {
@@ -62,7 +62,7 @@ Log::Dispatch::Base - Code shared by dispatch and output objects.
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

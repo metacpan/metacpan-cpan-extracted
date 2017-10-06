@@ -83,7 +83,7 @@ define ([
         initRoundTwo('drowselect');
 
         // fire up the main menu
-        stack.push(target.pull('demoMenu'), null);
+        stack.push('demoMenu');
     };
 
 });

@@ -1,0 +1,39 @@
+---
+abstract: 'Install OTRS add ons'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OTRS-OPM-Installer
+requires:
+  App::cpanminus: '0'
+  Capture::Tiny: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  HTTP::Tiny: '0'
+  HTTP::Tiny::FileProtocol: '0.02'
+  IO::All: '0'
+  Module::Path: '0'
+  Moo: '0'
+  OTRS::OPM::Parser: '0'
+  OTRS::Repository: '0'
+  Regexp::Common: '0'
+  Test::More: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/reneeb/OTRS-OPM-Installer/issues
+  homepage: http://github.com/reneeb/OTRS-OPM-Installer
+  repository: http://github.com/reneeb/OTRS-OPM-Installer.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -62,7 +62,7 @@ my $new_url = $GoCardless->new_bill_url(
 _post_to_gocardless( $new_url,'bill' );
 my $confirm_resource_data = _get_confirm_resource_data( "$tmp_dir/redirect_flow.json" );
 
-note explain $confirm_resource_data;
+note explain $confirm_resource_data if $DEBUG;
 
 isa_ok(
     my $Bill = $GoCardless->confirm_resource( %{ $confirm_resource_data } ),
@@ -116,13 +116,20 @@ isa_ok(
 	'->create_payment',
 );
 
-note explain $Payment;
+note explain $Payment if $DEBUG;
 
 ok( $Bill = $PreAuthorization->bill(
 	amount   => 100,
 	currency => 'EUR',
 ),'PreAuthorization->bill' );
 ok( $Bill->cancel,'->cancel' );
+
+my $Mandate = $PreAuthorization->mandate;
+ok( !$Mandate->active,'mandate is active' );
+ok( $Mandate->pending_submission,'mandate is pending_submission' );
+ok( $Mandate->update( metadata => { foo => "bar" } ),'->update mandate' );
+ok( $Mandate->cancel,'->cancel mandate' );
+ok( $Mandate->cancelled,' ... mandate was cancelled' );
 
 my $new_subscription_url = $GoCardless->new_subscription_url(
 	session_token        => 'bar',

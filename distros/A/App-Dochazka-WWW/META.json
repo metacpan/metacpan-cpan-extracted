@@ -29,8 +29,7 @@
       "runtime" : {
          "requires" : {
             "App::CELL" : "0.196",
-            "App::MFILE" : "0.181",
-            "App::MFILE::WWW" : "0.158",
+            "App::MFILE::WWW" : "0.161",
             "File::ShareDir" : "1.00",
             "File::Temp" : "0",
             "perl" : "5.012"
@@ -40,7 +39,7 @@
    "provides" : {
       "App::Dochazka::WWW" : {
          "file" : "lib/App/Dochazka/WWW.pm",
-         "version" : "0.148"
+         "version" : "0.151"
       },
       "App::Dochazka::WWW::Dispatch" : {
          "file" : "lib/App/Dochazka/WWW/Dispatch.pm",
@@ -60,5 +59,5 @@
          "url" : "https://github.com/smithfarm/dochazka-www"
       }
    },
-   "version" : "0.148"
+   "version" : "0.151"
 }

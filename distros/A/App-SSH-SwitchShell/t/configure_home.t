@@ -13,6 +13,8 @@ use Test::More;
 use Test::MockModule;
 use Test::TempDir::Tiny;
 
+use lib qw(.);
+
 ## no critic (RegularExpressions::RequireDotMatchAnything)
 ## no critic (RegularExpressions::RequireExtendedFormatting)
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)
@@ -91,7 +93,10 @@ sub main {
     }
 
   SKIP: {
-        skip 'The symlink function is unimplemented' if !eval { symlink q{}, q{}; 1 };
+        {
+            no autodie;
+            skip 'The symlink function is unimplemented' if !eval { symlink q{}, q{}; 1 };
+        }
 
         note('HOME and script basedir are reached through symlink');
         {

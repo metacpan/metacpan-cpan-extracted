@@ -34,3 +34,6 @@ Revision history for MooX-LazierAttributes
 1.02   18/09/2017
 		- Fix the I do not have Moose installed test
 
+1.03   24/09/2017
+		- add exportable constant coe == (coerce => 1)
+

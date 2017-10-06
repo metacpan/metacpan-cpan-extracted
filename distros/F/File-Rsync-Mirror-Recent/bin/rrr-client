@@ -24,25 +24,22 @@ my @opt = <<'=back' =~ /B<--(\S+)>/g;
 
 =item B<--help|h>
 
-Prints a brief message and exists.
+Prints a brief message and exits.
 
-=item B<--source=s>
+=item B<--max-files-per-connection=i>
 
-Source to mirror from, including the name of the RECENT metadata file.
-For example C<cpan-rsync.perl.org::CPAN/RECENT.recent>.
-
-=item B<--target=s>
-
-Destination directory for the mirror.
-
-=item B<--user=s>
-
-Username if the rsync source requires it.
+Defaults to 20000. Same as max_files_per_connection in
+File::Rsync::Mirror::Recent
 
 =item B<--password=s>
 
 Password if the rsync source requires it.  Can also be set by setting
 the environment variable RSYNC_PASSWORD.
+
+=item B<--rsync-timeout=i>
+
+Defaults to 30. Same as C<timeout> within C<rsync_options> in
+File::Rsync::Mirror::Recent
 
 =item B<--runstatusfile=s>
 
@@ -54,10 +51,23 @@ Argument is passed through to the File::Rsync::Mirror::Recent object.
 Defaults to false. If true, skips all delete events in the index files
 which means no files are being deleted that have been deleted upstream.
 
+=item B<--source=s>
+
+Source to mirror from, including the name of the RECENT metadata file.
+For example C<cpan-rsync.perl.org::CPAN/RECENT.recent>.
+
+=item B<--target=s>
+
+Destination directory for the mirror.
+
 =item B<--tmpdir=s>
 
 Directory for temporary files; should be on the same file system
 partition as the C<--target> directory.
+
+=item B<--user=s>
+
+Username if the rsync source requires it.
 
 =item B<--verbose!>
 
@@ -89,29 +99,31 @@ if ($Opt{help}) {
 pod2usage(1) unless $Opt{source} and $Opt{target};
 
 $ENV{RSYNC_PASSWORD} = $Opt{password} if $Opt{password};
-$Opt{verbose} ||= 0;
+$Opt{"max-files-per-connection"} ||= 20000;
+$Opt{"rsync-timeout"} ||= 30;
 $Opt{"skip-deletes"} ||=0;
+$Opt{verbose} ||= 0;
 
 use File::Rsync::Mirror::Recent;
 my $rrr = File::Rsync::Mirror::Recent->new
   (
-   ignore_link_stat_errors => 1,
-   localroot => $Opt{target},
-   ($Opt{tmpdir} ? (tempdir => $Opt{tmpdir}) : ()),
-   remote => ($Opt{user} ? $Opt{user} . '@' : '') . $Opt{source},
-   max_files_per_connection => 20000,
+   ignore_link_stat_errors  => 1,
+   localroot                => $Opt{target},
+   max_files_per_connection => $Opt{"max-files-per-connection"},
+   remote                   => ($Opt{user} ? $Opt{user} . '@' : '') . $Opt{source},
    rsync_options => {
-                     compress => 1,
-                     links => 1,
+                     compress     => 1,
+                     links        => 1,
                      'safe-links' => 1,
-                     times => 1,
-                     checksum => 0,
-                     timeout       => 30, # do not allow rsync to hang for too long
+                     times        => 1,
+                     checksum     => 0,
+                     timeout      => $Opt{"rsync-timeout"},
                      ($Opt{tmpdir} ? ('temp-dir' => $Opt{tmpdir}) : ()),
                     },
+   ($Opt{runstatusfile} ? (runstatusfile => $Opt{runstatusfile}) : ()),
+   ($Opt{tmpdir} ? (tempdir => $Opt{tmpdir}) : ()),
    verbose => $Opt{verbose},
    ($Opt{verboselog}    ? (verboselog    => $Opt{verboselog})    : ()),
-   ($Opt{runstatusfile} ? (runstatusfile => $Opt{runstatusfile}) : ()),
    # _logfilefordone => "recent-rmirror-donelog.log",
   );
 

@@ -1,0 +1,2 @@
+Compress::Zstd::Compressor T_PTROBJ
+Compress::Zstd::Decompressor T_PTROBJ

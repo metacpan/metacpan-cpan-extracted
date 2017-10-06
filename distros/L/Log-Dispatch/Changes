@@ -1,3 +1,10 @@
+2.67     2017-09-24
+
+- Added a lazy_open option to the File output. This delays opening the file
+  until the first time a log message is written to it. Implemented by Slaven
+  Rezić. GH #50.
+
+
 2.66     2017-08-14
 
 - Fixed the ApacheLog output, which was broken in 2.60. Fixed by Michael

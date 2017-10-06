@@ -7,7 +7,7 @@ use Env qw( @PATH );
 use File::Spec;
 
 # ABSTRACT: Find or build nasm, the netwide assembler
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 my $in_path;
@@ -49,9 +49,11 @@ Alien::nasm - Find or build nasm, the netwide assembler
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
+
+From your Perl script:
 
  use Alien::nasm ();
  use Env qw( @PATH );
@@ -59,19 +61,16 @@ version 0.18
  unshift @ENV, Alien::nasm->bin_dir;
  system 'nasm', ...;
 
-Or with L<Alien::Build::ModuleBuild>:
+From L<alienfile>:
 
- use Alien::Base::ModuleBuild;
- Alien::Base::ModuleBuild->new(
-   ...
-   alien_bin_requires => {
-     'Alien::nasm' => '0.11',
-   },
-   alien_build_commands => {
-     "%{nasm} ...",
-   },
-   ...
- )->create_build_script;
+ use alienfile;
+ 
+ share {
+   requires 'Alien::nasm';
+   build [
+     '%{nasm} ...',
+   ];
+ };
 
 =head1 DESCRIPTION
 
@@ -90,6 +89,9 @@ Returns the name of the nasm executable.  As of this writing it is always
 C<nasm>, but in the future it may have a different value.
 
 =head1 CAVEATS
+
+On Windows for share builds, we install binaries.  This avoids needing
+to depend on L<Alien::MSYS>.
 
 This version of L<Alien::nasm> adds nasm to your path, if it isn't
 already there when you use it, like this:

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Configure endpoints for XMLRPC and JSONRPC procedures",
+   "abstract" : "Configure endpoints for XMLRPC, JSONRPC and RESTRPC procedures",
    "author" : [
       "Abe Timmerman <abeltje@cpan.org>"
    ],
@@ -36,8 +36,9 @@
          "requires" : {
             "Dancer" : "1.31",
             "JSON" : "2.0",
-            "Params::Validate" : "1.0",
+            "Params::ValidationCompiler" : "0.24",
             "RPC::XML" : "0.56",
+            "Types::Standard" : "1.00",
             "perl" : "5.010001"
          }
       }
@@ -51,5 +52,5 @@
          "web" : "https://github.com/abeltje/Dancer-Plugin-RPC"
       }
    },
-   "version" : "1.04"
+   "version" : "1.05"
 }

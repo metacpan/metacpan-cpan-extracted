@@ -1,10 +1,10 @@
 package WWW::CheckGzip;
 use warnings;
 use strict;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 use Carp;
 use Gzip::Faster;
-use LWP::UserAgent;
+use HTTP::Tiny;
 
 sub builtin_test
 {
@@ -21,7 +21,7 @@ sub new
 {
     my ($class, $test) = @_;
     my $o = bless {};
-    $o->{ua} = LWP::UserAgent->new (agent => __PACKAGE__);
+    $o->{ua} = HTTP::Tiny->new (agent => __PACKAGE__);
     if (! $test) {
 	$test = \& builtin_test;
     }
@@ -33,8 +33,7 @@ sub get_compressed
 {
     my ($o, $url) = @_;
     my $ua = $o->{ua};
-    $ua->default_header ('Accept-Encoding' => 'gzip');
-    my $r = $ua->get ($url);
+    my $r = $ua->get ($url, {headers => {'Accept-Encoding' => 'gzip'}});
     return $r;
 }
 
@@ -42,9 +41,16 @@ sub get_uncompressed
 {
     my ($o, $url) = @_;
     my $ua = $o->{ua};
-    $ua->default_header ('Accept-Encoding' => '');
-    my $r = $ua->get ($url);
+    my $r = $ua->get ($url, {headers => {'Accept-Encoding' => ''}});
     return $r;
+}
+
+# Private
+
+sub getce
+{
+    my ($r) = @_;
+    return $r->{headers}{'content-encoding'};
 }
 
 sub check
@@ -59,15 +65,16 @@ sub check
     # Test with compressed.
 
     my $r = $o->get_compressed ($url);
-    my $get_ok = $r->is_success ();
+    my $get_ok = $r->{success};
     & {$o->{test}} (!! $get_ok, "successfully got compressed $url");
     if (! $get_ok) {
 	return;
     }
-    my $content_encoding = $r->header ('Content-Encoding');
+
+    my $content_encoding = getce ($r);
     & {$o->{test}} (!! $content_encoding, "got content encoding");
     & {$o->{test}} ($content_encoding eq 'gzip', "content encoding is gzip");
-    my $text = $r->content ();
+    my $text = $r->{content};
     my $unc;
     eval {
 	$unc = gunzip ($text);
@@ -79,11 +86,11 @@ sub check
     # Test with uncompressed.
 
     my $runc = $o->get_uncompressed ($url);
-    my $get_ok_unc = $runc->is_success ();
-    & {$o->{test}} (!! $get_ok, "successfully got uncompressed $url");
-    my $content_encoding_unc = $runc->header ('Content-Encoding');
+    my $get_ok_unc = $runc->{success};
+    & {$o->{test}} ($get_ok_unc, "successfully got uncompressed $url");
+    my $content_encoding_unc = getce ($runc);
     & {$o->{test}} (! $content_encoding_unc, "Did not get content encoding");
-    my $unctext = $runc->content ();
+    my $unctext = $runc->{content};
     eval {
 	gunzip ($unctext);
     };

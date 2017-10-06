@@ -13,7 +13,7 @@ which you can use to open and process GDS2 files
 as a pipe from Perl.
 
 2014: after 15 years I'm opening up this module for anyone
-to take over in PAUSE (https://pause.perl.org/pause/).
+to help take over in PAUSE (https://pause.perl.org/pause/).
 Peace,
 Ken Schumack
 

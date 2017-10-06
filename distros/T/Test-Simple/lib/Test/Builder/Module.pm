@@ -7,7 +7,7 @@ use Test::Builder;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.302096';
+our $VERSION = '1.302098';
 
 
 =head1 NAME

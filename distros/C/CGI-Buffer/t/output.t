@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 102;
+use Test::Most tests => 103;
 use Compress::Zlib;
 use Test::TempDir::Tiny;
 use IO::Uncompress::Brotli;
@@ -159,8 +159,9 @@ OUTPUT: {
 	ok($headers =~ /^Content-Encoding: br/m);
 	ok($headers =~ /ETag: "[A-Za-z0-F0-f]{32}"/m);
 
+	ok(defined($body));
 	ok(length($body) eq $length);
-	$body = unbro($body);
+	$body = unbro($body, 1024);
 	ok(defined($body));
 	ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
 	html_ok($body, 'HTML:Lint shows no errors');

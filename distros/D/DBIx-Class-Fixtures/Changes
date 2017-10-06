@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-Fixtures
 
+1.001039  2017-09-25 14:15:55+00:00 UTC
+
+- remove trailing comma in tests that was breaking on most JSON parsers.
+
 1.001038  2017-09-20 21:13:13+00:00 UTC
 
 - stop sorting source names before dumping, this allows for some hackery when you need certain sources to dump first (see https://github.com/dbsrgits/DBIx-Class-Fixtures/pull/12 for details) (cngarrison++)

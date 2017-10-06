@@ -3,6 +3,8 @@ use Dwarf::Pragma;
 use parent 'Dwarf::Module';
 use Dwarf::Validator;
 use Dwarf::Validator::Constraint;
+use Dwarf::Util qw/safe_decode_json encode_utf8/;
+use Carp qw/croak/;
 use HTTP::Date;
 
 use Dwarf::Accessor {
@@ -47,7 +49,6 @@ sub init {
 		$self->type('application/xml; charset=UTF-8');
 	}
 
-	$self->call_before_trigger($c);
 	$self->will_dispatch($c);
 	$self->error->flush;
 	$self->error->autoflush(1);
@@ -74,11 +75,6 @@ sub init_plugins  {
 	);
 }
 
-sub call_before_trigger {
-	my ($self, $c) = @_;
-	$c->call_trigger(BEFORE_DISPATCH => $c, $c->request);
-}
-
 sub will_dispatch {}
 sub did_dispatch {}
 
@@ -96,18 +92,30 @@ sub validate {
 	}
 }
 
+sub validate_json_body {
+	my ($self, @rules) = @_;
+	my $json = $self->c->req->content;
+
+	$json = eval { safe_decode_json(encode_utf8 $json) };
+	if ($@) {
+		$self->c->error->ERROR('JSON decode error: ' . $@);
+	}
+
+	$json = [ $json ] unless ref $json eq 'ARRAY';
+
+	eval { $self->args({ @rules }, $self, $_) for @$json };
+	if ($@) {
+		$self->c->error->ERROR($@);
+	}
+}
+
 sub validate_response {
 	my ($self, @rules) = @_;
 	return if $self->c->is_production;
 
-	eval {
-		$self->args(
-			{ @rules },
-			$self,
-			$self->c->response->body
-		);
-	};
+	my $res = $self->c->response->body;
 
+	eval { $self->args({ @rules }, $self, $res) };
 	if ($@) {
 		$self->c->error->ERROR($@);
 	}

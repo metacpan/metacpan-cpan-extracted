@@ -8,7 +8,7 @@ require 5.10.0;
 use version;
 
 package code::UnifdefPlus;
-our $VERSION = version->declare("v0.3.0");
+our $VERSION = version->declare("v0.4.0");
 
 use Storable qw(dclone);
 
@@ -1190,6 +1190,41 @@ sub parseLines {
 ## --------------------------------------------------------------------------
 ## MAKEFILE support:
 ##
+
+sub makefileSimplifyIfMacro {
+	my $self = shift;
+	my $prefix = shift;
+	my $paramsRef = shift;
+
+	my @params = @$paramsRef;
+	return if (scalar @params < 2) || (scalar @params > 3);
+	my $cond = $params[0]{simplified};
+	my $condRss = $params[0]{rss};
+	my $trueExpr = $params[1]{simplified};
+	my $trueRss = $params[1]{rss};
+	my $falseExpr; my $falseRss;
+	if (scalar @params == 3) {
+		$falseExpr = $params[2]{simplified};
+		$falseRss = $params[2]{rss};
+	} else {
+		$falseExpr = "";
+		$falseRss = RSS_UNCHANGED;
+	}
+	my $rss = max($condRss, $trueRss, $falseRss);
+	
+	$condRss = max($condRss, RSS_SIMPLIFIED) if ($cond =~ s/^\s++|\s++$//g);
+	
+	return ($trueExpr, max($rss,RSS_SIMPLIFIED)) if $self->isMakefileExprNonBlank($cond);
+	return ($falseExpr, max($rss,RSS_SIMPLIFIED)) if $self->isMakefileExprBlank($cond);
+	
+	my $rtStr;
+	$rtStr = "\$(".$prefix.$cond.",".$trueExpr.",".$falseExpr.")" if (scalar @params == 3);
+	$rtStr = "\$(".$prefix.$cond.",".$trueExpr.")" if (scalar @params == 2);
+
+	return ($rtStr, $rss);
+}
+
+
 sub makefileSimplifyOr {
 	my $self = shift;
 	my $prefix = shift;
@@ -1287,7 +1322,7 @@ my %makefileMacroSimplifiers = (
 	"or" =>         \&makefileSimplifyOr,
 	"and" =>        \&makefileSimplifyAnd,
 	"strip" => 	    \&makefileSimplifyStrip,
-#	"if" => \&makefileSimplifyAnd,
+	"if" =>         \&makefileSimplifyIfMacro,
 );
 
 

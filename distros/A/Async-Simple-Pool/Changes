@@ -14,3 +14,7 @@ Revision history for Async-Simple-Pool
 0.12    Tests fix for Win* and Tests timeoust was corrected.
 0.13    Testfixes. Try to support Windows.
 0.14    Support for Windows added. ForkTmpFile fixes.
+0.15    Windows tmp files fix. Logger added.
+0.16    Windows tmp directory finding fix. Test fixes. Test for Pool were splitted to useful cathegories.
+0.17    Rereading of used data fixed.
+0.18    Minor test fixes.

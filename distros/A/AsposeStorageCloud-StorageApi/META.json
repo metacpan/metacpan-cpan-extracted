@@ -155,7 +155,7 @@
       },
       "AsposeStorageCloud::StorageApi" : {
          "file" : "lib/AsposeStorageCloud/StorageApi.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -164,6 +164,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

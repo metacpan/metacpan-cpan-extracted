@@ -1,17 +1,24 @@
-[Changes for 0.011 - Sat May  2 18:44:52 CST 2015]
+0.021   2017-09-30
 
-* LICENSING CHANGE: This module is now in the public domain under
-  CC0 1.0 Universal terms.
-* Fix Module::Signature compatibility.
+        * Correct some typos in the documentation.
 
-[Changes for 0.01]
-____________________________________________________________________________
-[  8516] By: autrijus                              on 2003/10/21  07:04:37
+0.02    2017-08-20
+
+        * Convert to Dist-Zilla.
+
+0.011   2015-05-02
+
+        * LICENSING CHANGE: This module is now in the public domain under
+          CC0 1.0 Universal terms.
+        * Fix Module::Signature compatibility.
+
+0.01    2003-10-21
+
+        [  8516] By: autrijus
         Log: * This be 0.01, initial CPAN release.
-	   + MANIFEST Makefile.PL README t/0-signature.t
-	   ! lib/WWW/REST.pm t/1-basic.t
-____________________________________________________________________________
-[  8416] By: autrijus                              on 2003/10/15  07:31:47
+           + MANIFEST Makefile.PL README t/0-signature.t
+           ! lib/WWW/REST.pm t/1-basic.t
+        [  8416] By: autrijus
         Log: * make it work under the new namespace.
              * switch to Class::Struct.
-	   ! lib/WWW/REST.pm t/1-basic.t
+           ! lib/WWW/REST.pm t/1-basic.t

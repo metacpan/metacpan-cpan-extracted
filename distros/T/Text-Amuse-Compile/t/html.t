@@ -84,7 +84,7 @@ sub test_file {
             like($body, qr/div#page\s*\{\s*margin:20px;\s*padding:20px;\s*\}/s,
                  "Found the margins in the CSS");
             unlike($body, qr/\@font-face/, "\@font-face not found");
-            unlike($body, qr{font-size:.*pt}, "Font side not set");
+            unlike($body, qr{font-size:.*pt}, "Font size not set");
             like($body, qr/font-family:.*serif;/, "Found the serif font family");
             unlike($body, qr/\@page/, "\@page not found");
             like($body, qr/text-align: justify/, "No justify found in the body");

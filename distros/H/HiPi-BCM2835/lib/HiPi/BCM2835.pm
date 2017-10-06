@@ -21,7 +21,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi :i2c );
 
-our $VERSION ='0.62';
+our $VERSION ='0.63';
 
 XSLoader::load('HiPi::BCM2835', $VERSION) if HiPi::is_raspberry_pi();
 
@@ -1082,5 +1082,31 @@ sub hipi_set_PWM0 {
 }
 
 1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HiPi::BCM2835 - Modules for Raspberry Pi GPIO
+
+=head1 DESCRIPTION
+
+This is a deprecated module providing access to the bcm2835 library for HiPi Perl modules.
+
+Documentation and details are available at
+
+http://raspberry.znix.com
+
+=head1 AUTHOR
+
+Mark Dootson, C<< mdootson@cpan.org >>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2013 - 2017 Mark Dootson
+
+=cut
 
 __END__

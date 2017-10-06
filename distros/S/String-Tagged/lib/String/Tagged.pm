@@ -8,7 +8,7 @@ package String::Tagged;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Scalar::Util qw( blessed );
 
@@ -275,6 +275,115 @@ sub _mkextent
    $flags &= (FLAG_ANCHOR_BEFORE|FLAG_ANCHOR_AFTER);
 
    return bless [ $self, $start, $end, $flags ], 'String::Tagged::Extent';
+}
+
+=head2 from_sprintf
+
+   $str = String::Tagged->from_sprintf( $format, @args )
+
+I<Since version 0.15.>
+
+Returns a new instance of a C<String::Tagged> object, initialised by
+formatting the supplied arguments using the supplied format.
+
+The C<$format> string is similar to that supported by the core C<sprintf>
+operator, though a few features such as out-of-order argument indexing and
+vector formatting are missing. This format string may be a plain perl string,
+or an instance of C<String::Tagged>. In the latter case, any tags within it
+are preserved in the result.
+
+In the case of a C<%s> conversion, the value of the argument consumed may
+itself be a C<String::Tagged> instance. In this case it will be appended to
+the returned object, preserving any tags within it.
+
+All other conversions are handled individually by the core C<sprintf>
+operator and appended to the result.
+
+=cut
+
+sub from_sprintf
+{
+   my $class = shift;
+   my ( $format, @args ) = @_;
+
+   # Clone the format string into the candidate return value, and then
+   # repeatedly replace %... expansions with their required value using
+   # ->set_substr, so that embedded tags in the format will behave sensibly.
+
+   my $ret = ( blessed $format and $format->isa( __PACKAGE__ ) ) ?
+      $class->clone( $format ) :
+      $class->new( $format );
+
+   my $pos = 0;
+
+   while( $pos < length $ret ) {
+      my $str = "$ret";
+      pos( $str ) = $pos;
+
+      my $replacement;
+
+      if( $str =~ m/\G[^%]+/gc ) {
+         # A literal span
+         $pos = $+[0];
+         next;
+      }
+      elsif( $str =~ m/\G%%/gc ) {
+         # A literal %% conversion
+         $replacement = "%";
+      }
+      elsif( $str =~ m/\G%([-]?)(\d+|\*)?(?:\.(\d+|\*))?s/gc ) {
+         # A string
+         my ( $flags, $width, $precision ) = ( $1, $2, $3 );
+         $width     = shift @args if defined $width     and $width eq "*";
+         $precision = shift @args if defined $precision and $precision eq "*";
+         my $arg    = shift @args;
+
+         if( defined $precision ) {
+            if( blessed $arg and $arg->isa( __PACKAGE__ ) ) {
+               $arg = $arg->substr( 0, $precision );
+            }
+            else {
+               $arg = substr $arg, 0, $precision;
+            }
+         }
+
+         my $leftalign = $flags =~ m/-/;
+
+         my $padding = defined $width ? $width - length $arg : 0;
+         $padding = 0 if $padding < 0;
+
+         $replacement = "";
+
+         $replacement .= " " x $padding if !$leftalign;
+
+         $replacement .= $arg;
+
+         $replacement .= " " x $padding if $leftalign;
+      }
+      elsif( $str =~ m/\G%(.*?)([cduoxefgXEGbBpaAiDUOF])/gc ) {
+         # Another conversion format
+         my ( $template, $flags ) = ( $2, $1 );
+         my $argc = 1;
+         $argc += ( () = $flags =~ m/\*/g );
+
+         $replacement = sprintf "%$flags$template", @args[0..$argc-1];
+         splice @args, 0, $argc;
+      }
+      elsif( $str =~ m/\G%(.*?)([a-zA-Z])/gc ) {
+         warn "Unrecognised sprintf conversion %$2";
+      }
+      else {
+         # must be at EOF now
+         last;
+      }
+
+      my $templatelen = $+[0] - $-[0];
+      $ret->set_substr( $-[0], $templatelen, $replacement );
+
+      $pos += length( $replacement );
+   }
+
+   return $ret;
 }
 
 =head1 METHODS
@@ -1492,6 +1601,25 @@ sub split
    return @ret;
 }
 
+=head2 sprintf
+
+   $ret = $st->sprintf( @args )
+
+I<Since version 0.15.>
+
+Returns a new string by using the given instance as the format string for a
+L</from_sprintf> constructor call. The returned instance will be of the same
+class as the invocant.
+
+=cut
+
+sub sprintf
+{
+   my $self = shift;
+
+   return ( ref $self )->from_sprintf( $self, @_ );
+}
+
 =head2 debug_sprintf
 
    $ret = $st->debug_sprintf
@@ -1554,7 +1682,7 @@ sub debug_sprintf
 
       $ret .= ( $tf & FLAG_ANCHOR_AFTER ) ? "> " : "  ";
 
-      $ret .= sprintf "%-*s => %s\n", $maxnamelen, $tn, $tv;
+      $ret .= CORE::sprintf "%-*s => %s\n", $maxnamelen, $tn, $tv;
    }
 
    return $ret;

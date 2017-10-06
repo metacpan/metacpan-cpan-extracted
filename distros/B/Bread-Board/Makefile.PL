@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Bread::Board",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Exporter" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
+    "Moose::Exporter" => "2.1200",
     "Moose::Role" => 0,
     "Moose::Util" => 0,
     "Moose::Util::TypeConstraints" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Requires" => 0
   },
-  "VERSION" => "0.35",
+  "VERSION" => "0.36",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
@@ -60,6 +59,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
+  "Moose::Exporter" => "2.1200",
   "Moose::Role" => 0,
   "Moose::Util" => 0,
   "Moose::Util::TypeConstraints" => 0,

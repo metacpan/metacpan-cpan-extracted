@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/String/Tagged/Terminal.pm
+MANIFEST			This list of files
+t/00use.t
+t/01build.t
+t/10formatting.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   WebService::Mackerel:
     file: lib/WebService/Mackerel.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   HTTP::Tiny: '0.050'
   JSON: '2.90'
@@ -39,9 +39,10 @@ resources:
   bugtracker: https://github.com/myfinder/webservice-mackerel/issues
   homepage: https://github.com/myfinder/webservice-mackerel
   repository: git://github.com/myfinder/webservice-mackerel.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'Makoto Sasaki <wanigoya@gmail.com>'
   - 'Tatsuro Hisamori <medianetworks@gmail.com>'
-  - 'yohei yoshimuta <yoheimuta@gmail.com>'
   - 'papix <mail@papix.net>'
+  - 'yohei yoshimuta <yoheimuta@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

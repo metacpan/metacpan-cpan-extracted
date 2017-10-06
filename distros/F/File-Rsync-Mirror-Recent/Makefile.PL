@@ -14,8 +14,11 @@ if ($ARGV[0]){
         local $ENV{LANG} = "C";
         my $dirty = `git status --porcelain --untracked-files=no`;
         die "Not everything checked in or out?\n====\n$dirty====\n" if $dirty;
-        use lib "lib";
-        eval {  require $version_from; }; die $@ if $@;
+        use lib "./lib";
+        my ($namespace) = $version_from;
+        $namespace =~ s|^lib/(.+)\.pm$|$1|;
+        $namespace =~ s|/|::|g;
+        eval qq{  require $namespace; }; die $@ if $@;
         my $makefile = "Makefile";
         unless (-f $makefile) {
             $makefile = "Makefile.old";
@@ -27,9 +30,6 @@ if ($ARGV[0]){
         local $/;
         my ($have_version) = <$fh> =~ /^version\s+([\d\._]+)/m;
         close $fh or die "Could not close: $!";
-        my ($namespace) = $version_from;
-        $namespace =~ s|^lib/(.+)\.pm$|$1|;
-        $namespace =~ s|/|::|g;
         eval qq{ if (\$$namespace\::VERSION != \$version) {
         warn "Not equal: $namespace\\::VERSION[\$$namespace\::VERSION] MM generated version[\$version]";
         \$version_diff = 1;
@@ -79,6 +79,8 @@ WriteMakefile
       'File::Rsync'      => 0,
       'File::Spec'       => 0,
       'File::Temp'       => '0.21', # removes bogus test on parent directory
+      'FindBin'          => 0,
+      'Hash::Util'       => 0,
       'JSON'             => '2',
       'List::MoreUtils'  => 0,
       'List::Pairwise'   => 0,

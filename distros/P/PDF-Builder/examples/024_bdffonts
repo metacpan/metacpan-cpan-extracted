@@ -119,9 +119,9 @@ foreach my $yp (0..15) {
         $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-14);
 	# Unicode number (16 bit)
         if (defined $font->uniByEnc($ci)) {
-            $txt2->text(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+            $txt2->text(sprintf('U+%04X',$font->uniByEnc($ci)));
 	} else {
-            $txt2->text('U=0x????');
+            $txt2->text('U+????');
 	}
         $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-19);
         $txt2->text($font->glyphByEnc($ci)); # glyph name

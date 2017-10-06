@@ -1,12 +1,11 @@
 package Authen::U2F;
-$Authen::U2F::VERSION = '0.002';
+$Authen::U2F::VERSION = '0.003';
 # ABSTRACT: FIDO U2F library
 
-use 5.010;
 use warnings;
 use strict;
 
-use namespace::sweep;
+use namespace::autoclean;
 
 use Types::Standard -types, qw(slurpy);
 use Type::Params qw(compile);
@@ -28,11 +27,16 @@ sub u2f_challenge           { __PACKAGE__->challenge(@_) }
 sub u2f_registration_verify { __PACKAGE__->registration_verify(@_) }
 sub u2f_signature_verify    { __PACKAGE__->signature_verify(@_) }
 
+# Param checks
+my $challenge_check;
+my $registration_check;
+my $signature_check;
+
 sub challenge {
-  state $check = compile(
+  $challenge_check ||= compile(
     ClassName,
   );
-  my ($class) = $check->(@_);
+  my ($class) = $challenge_check->(@_);
 
   my $raw = pack "L*", map { irand } 1..8;
   my $challenge = encode_base64url($raw);
@@ -40,7 +44,7 @@ sub challenge {
 }
 
 sub registration_verify {
-  state $check = compile(
+  $registration_check ||= compile(
     ClassName,
     slurpy Dict[
       challenge         => Str,
@@ -50,7 +54,7 @@ sub registration_verify {
       client_data       => Str,
     ],
   );
-  my ($class, $args) = $check->(@_);
+  my ($class, $args) = $registration_check->(@_);
 
   my $client_data = decode_base64url($args->{client_data});
   croak "couldn't decode client data; not valid Base64-URL?"
@@ -135,7 +139,7 @@ sub registration_verify {
 }
 
 sub signature_verify {
-  state $check = compile(
+  $signature_check ||= compile(
     ClassName,
     slurpy Dict[
       challenge      => Str,
@@ -147,7 +151,7 @@ sub signature_verify {
       client_data    => Str,
     ],
   );
-  my ($class, $args) = $check->(@_);
+  my ($class, $args) = $signature_check->(@_);
 
   my $key = decode_base64url($args->{key});
   croak "couldn't decode key; not valid Base64-URL?"

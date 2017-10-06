@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Type::Library
   -base,
-  -declare => qw( StrNameValid FieldMapInput FieldMapOutput Int32Signed );
+  -declare => qw( StrNameValid FieldMapInput ValuesMatchTypes );
 use Type::Utils -all;
 use Types::TypeTiny -all;
 use Types::Standard -all;
@@ -36,10 +36,51 @@ an exception. Suitable for passing to an C<isa> constraint in L<Moo>.
 
 declare "StrNameValid", as StrMatch[ qr/^[_a-zA-Z][_a-zA-Z0-9]*$/ ];
 
+=head2 ValuesMatchTypes
+
+Subtype of L<Types::Standard/HashRef>, whose values are hash-refs. Takes
+two parameters:
+
+=over
+
+=item value keyname
+
+Optional within the second-level hashes.
+
+=item type keyname
+
+Values will be a L<GraphQL::Type>. Mandatory within the second-level hashes.
+
+=back
+
+In the second-level hashes, the values (if given) must pass the GraphQL
+type constraint.
+
+=cut
+
+declare "ValuesMatchTypes",
+  constraint_generator => sub {
+    my ($value_key, $type_key) = @_;
+    declare as HashRef[Dict[
+      $type_key => ConsumerOf['GraphQL::Role::Input'],
+      slurpy Any,
+    ]], where {
+      !grep {
+        $_->{$value_key} and !$_->{$type_key}->is_valid($_->{$value_key})
+      } values %$_
+    }, inline_as {
+      (undef, <<EOF);
+        !grep {
+          \$_->{$value_key} and !\$_->{$type_key}->is_valid(\$_->{$value_key})
+        } values %{$_[1]}
+EOF
+    };
+};
+
 =head2 FieldMapInput
 
-Hash-ref mapping field names to a hash-ref description. Description keys,
-all optional except C<type>:
+Hash-ref mapping field names to a hash-ref
+description. Description keys, all optional except C<type>:
 
 =over
 
@@ -50,7 +91,8 @@ GraphQL input type for the field.
 =item default_value
 
 Default value for this argument if none supplied. Must be same type as
-the C<type>.
+the C<type> (implemented with type L</ValuesMatchTypes>.
+B<NB> this is a Perl value, not a JSON/GraphQL value.
 
 =item description
 
@@ -64,17 +106,15 @@ declare "FieldMapInput", as Map[
   StrNameValid,
   Dict[
     type => ConsumerOf['GraphQL::Role::Input'],
-    # TODO: change Any to check that is same as supplied "type". Possibly
-    # with builder?
     default_value => Optional[Any],
     description => Optional[Str],
   ]
-];
+] & ValuesMatchTypes['default_value', 'type' ];
 
 =head2 FieldMapOutput
 
-Hash-ref mapping field names to a hash-ref description. Description keys,
-all optional except C<type>:
+Hash-ref mapping field names to a hash-ref
+description. Description keys, all optional except C<type>:
 
 =over
 
@@ -84,11 +124,118 @@ GraphQL output type for the field.
 
 =item args
 
-Array-ref of L<GraphQL::Argument>s.
+A L</FieldMapInput>.
 
 =item resolve
 
 Code-ref to return a given property from a given source-object.
+A key concept is to remember that the "object" on which these fields
+exist, were themselves returned by other fields.
+
+An example function that takes a name and GraphQL type, and returns a
+field definition, with a resolver that calls read-only L<Moo> accessors,
+suitable for placing (several of) inside the hash-ref defining a type's
+fields:
+
+  sub _make_moo_field {
+    my ($field_name, $type) = @_;
+    ($field_name => { resolve => sub {
+      my ($root_value, $args, $context, $info) = @_;
+      my @passon = %$args ? ($args) : ();
+      return undef unless $root_value->can($field_name);
+      $root_value->$field_name(@passon);
+    }, type => $type });
+  }
+  # ...
+    fields => {
+      _make_moo_field(name => $String),
+      _make_moo_field(description => $String),
+    },
+  # ...
+
+The code-ref will be called with these parameters:
+
+=over
+
+=item $source
+
+The Perl entity (possibly a blessed object) returned by the resolver
+that conjured up this GraphQL object.
+
+=item $args
+
+Hash-ref of the arguments passed to the field. The values will be
+Perl values.
+
+=item $context
+
+The "context" value supplied to the call to
+L<GraphQL::Execution/execute>. Can be used for authenticated user
+information, or a per-request cache.
+
+=item $info
+
+A hash-ref with these keys:
+
+=over
+
+=item field_name
+
+The real name of this field.
+
+=item field_nodes
+
+The array of Abstract Syntax Tree (AST) nodes that refer to this field
+in this "selection set" (set of fields) on this object. There may be
+more than one such set for a given field, if it is requested with more
+than one name - i.e. with an alias.
+
+=item return_type
+
+The return type.
+
+=item parent_type
+
+The type of which this field is part.
+
+=item path
+
+The hierarchy of fields from the query root to this field-resolution.
+
+=item schema
+
+L<GraphQL::Schema> object.
+
+=item fragments
+
+Any fragments applying to this request.
+
+=item root_value
+
+The "root value" given to C<execute>.
+
+=item operation
+
+A hash-ref describing the operation (C<query>, etc) being executed.
+
+=item variable_values
+
+the operation's arguments, filled out with the variables hash supplied
+to the request.
+
+=back
+
+=back
+
+There are no restrictions on what you can return, so long as it is a
+scalar, and if your return type is a L<list|GraphQL::Type::List>, that
+scalar is an array-ref.
+
+Emphasis has been put on there being Perl values here. Conversion
+between Perl and GraphQL values is taken care of by
+L<scalar|GraphQL::Type::Scalar> types, and it is only scalar information
+that will be returned to the client, albeit in the shape dictated by
+the object types.
 
 =item subscribe
 
@@ -96,7 +243,8 @@ Code-ref to return a given property from a given source-object.
 
 =item deprecation_reason
 
-Reason if deprecated.
+Reason if deprecated. If given, also sets a boolean key of
+C<is_deprecated> to true.
 
 =item description
 
@@ -110,7 +258,7 @@ declare "FieldMapOutput", as Map[
   StrNameValid,
   Dict[
     type => ConsumerOf['GraphQL::Role::Output'],
-    args => Optional[ArrayRef[InstanceOf['GraphQL::Argument']]],
+    args => Optional[FieldMapInput],
     resolve => Optional[CodeRef],
     subscribe => Optional[CodeRef],
     deprecation_reason => Optional[Str],
@@ -136,15 +284,6 @@ declare "ArrayRefNonEmpty", constraint_generator => sub {
   intersection [ ArrayRef[@_], Tuple[Any, slurpy Any] ]
 };
 
-=head2 Thunk
-
-Can be either a L<Types::TypeTiny/CodeLike> or the type(s) given as
-parameters.
-
-=cut
-
-declare "Thunk", constraint_generator => sub { union [ CodeLike, @_ ] };
-
 =head2 UniqueByProperty
 
 An ArrayRef, its members' property (the one in the parameter) can occur
@@ -168,9 +307,20 @@ declare "UniqueByProperty",
       my %seen;
       !grep $seen{$_->$prop}++, @$_;
     }, inline_as {
-      (undef, "do { my %seen; !grep \$seen{\$_->$prop}++, \@$_[1]; }");
+      (undef, "my %seen; !grep \$seen{\$_->$prop}++, \@{$_[1]};");
     };
   };
+
+=head2 ExpectObject
+
+A C<Maybe[HashRef]> that produces a GraphQL-like message if it fails,
+saying "found not an object".
+
+=cut
+
+declare "ExpectObject",
+  as Maybe[HashRef],
+  message { "found not an object" };
 
 =head1 AUTHOR
 

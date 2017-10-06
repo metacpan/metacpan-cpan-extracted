@@ -90,7 +90,7 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 /*
  * Perl < 5.18 had some kind of different SvIV_please_nomg
  */
-#if PERL_VERSION < 18
+#if PERL_VERSION_LE(5,18,0)
 #undef SvIV_please_nomg
 #  define SvIV_please_nomg(sv) \
         (!SvIOKp(sv) && (SvNOK(sv) || SvPOK(sv)) \
@@ -233,7 +233,7 @@ LMUncmp(pTHX_ SV* left, SV * right)
 #ifndef PadARRAY
 typedef AV PADNAMELIST;
 typedef SV PADNAME;
-# if PERL_VERSION < 8 || (PERL_VERSION == 8 && !PERL_SUBVERSION)
+# if PERL_VERSION_LE(5,8,0)
 typedef AV PADLIST;
 typedef AV PAD;
 # endif
@@ -247,12 +247,6 @@ typedef AV PAD;
 # define PadnameOURSTASH(pn)    SvOURSTASH(pn)
 # define PadnameOUTER(pn)       !!SvFAKE(pn)
 # define PadnamePV(pn)          (SvPOKp(pn) ? SvPVX(pn) : NULL)
-#endif
-#ifndef PadnameSV
-# define PadnameSV(pn)          pn
-#endif
-#ifndef PadnameFLAGS
-# define PadnameFLAGS(pn)       (SvFLAGS(PadnameSV(pn)))
 #endif
 
 static int 
@@ -279,8 +273,10 @@ in_pad (pTHX_ SV *code)
                     continue;
 #               endif
 
-                if (!(PadnameFLAGS(name_sv)) & SVf_OK)
+#if PERL_VERSION_LT(5,21,7)
+		if (!SvOK(name_sv))
                     continue;
+#endif
 
                 if (strEQ(name_str, "$a") || strEQ(name_str, "$b"))
                     return 1;
@@ -2114,7 +2110,8 @@ CODE:
 
     if(seen_undef == max)
     {
-        EXTEND(SP, ++count);
+	++count;
+        EXTEND(SP, count);
         ST(count-1) = &PL_sv_undef;
     }
 
@@ -2310,7 +2307,7 @@ CODE:
         idx = SvIV(*PL_stack_sp);
 
         if (UNLIKELY(idx < 0 && (idx += (AvFILLp(tmp)+1)) < 0))
-            croak("Modification of non-creatable array value attempted, subscript %ld", idx);
+            croak("Modification of non-creatable array value attempted, subscript %" IVdf, idx);
 
         if(UNLIKELY(NULL == (inner = av_fetch(tmp, idx, FALSE))))
         {

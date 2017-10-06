@@ -1,9 +1,164 @@
 ==================================================
-Changes from 2006-10-12 00:00:00 +0000 to present.
+Changes from 2007-10-02 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.0100 at 2016-10-09 04:13:59 +0000
+version 0.0200 at 2017-09-29 01:03:32 +0000
+-------------------------------------------
+
+  Change: b0ceabb33df843b11871a21209e5fd4bf1831fb9
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2017-09-28 21:02:24 +0000
+
+    v0.0200 
+
+  Change: 86a1ec89187cdd64286444448e5a3cab788859b8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-03-02 10:25:46 +0000
+
+    Merge pull request #5 from PerlDancer/sawyer/feature/reentrant-schema
+
+    Make schema() possibly reentrant 
+
+  Change: d319f5adbd6accadde265a294176b3454fc950a0
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-16 00:52:33 +0000
+
+    Add test for feature 
+
+  Change: 2e6d0056b2342debce14ecfd41f362e2ef9eff81
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-16 00:52:33 +0000
+
+    Add support for schema configuration in schema() call:
+
+    What troubles me is that this module is not reentrant. You will
+    always get the same schema object and you can only configure it once.
+    Configuring it once is great, but having to argue with the code over
+    at which point to do it is annoying.
+
+    (Example: Issue #12 in Dancer2-Plugin-DBIC.)
+
+    This now allows the schema() function to also receive parameters to
+    use instead of the default configuration. It tries todo it in a
+    non-intrusive way for the code with minimal code changes and without
+    altering anything outside this function (like the global
+    configuration). 
+
+  Change: 21a44eb576168081e0ec5793671b26b586347e2d
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-16 00:52:33 +0000
+
+    Retrieve the options before fetching the schema:
+
+    The previous logic would try to look up the schema and return it, and
+    if it didn't exist, it would fetch the options and try to create one.
+    This makes sense.
+
+    However, this also means that if we want to create a schema without
+    rummaging in the cache, you will have to check whether to even check
+    the cache.
+
+    Instead, we simply retrieve the relevant information for creation
+    before deciding what to do. Then we could either create a new one
+    with this configuration or return one. 
+
+  Change: b406d522942e8596affe45f47b679d44d22e1f5a
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-16 00:52:33 +0000
+
+    Refactor: Move creation of schemas outside schema():
+
+    The schema() function is in charge of finding the right plugin, but
+    also creates them. Ths makes it difficult to have logic that allows
+    creating without saving or retrieval. We just split the creation into
+    its own function.
+
+    I also added comments to make it a bit clearer. 
+
+  Change: bc90045822e7d3fc0f4e8f0d10a45044bcba9773
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-02-13 10:04:52 +0000
+
+    Merge pull request #4 from PerlDancer/sawyer/fixes
+
+    Various fixes and cleanups 
+
+  Change: bcee651ab7580e899ad906be872c4874f333d156
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-13 10:56:10 +0000
+
+    Revert "Cleanup: Explicitly use DBIx::Class::Schema::Loader:"
+
+    This reverts commit 4f80a6f9ef3c994ffda9991d7fe7839307b6abbf. 
+
+  Change: 9e527d272a25e4be0a64454d8b258211f171211e
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 11:12:43 +0000
+
+    Do not add DBIx::Class::Schema::Loader as hard prereq:
+
+    Currently DBIx::Class::Schema::Loader is loaded optionally, but
+    reported as a hard dependency. (See previous commit.)
+
+    This makes it recommended, but optional. 
+
+  Change: 4f80a6f9ef3c994ffda9991d7fe7839307b6abbf
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 11:12:39 +0000
+
+    Cleanup: Explicitly use DBIx::Class::Schema::Loader:
+
+    In Dancer2-Plugin-DBIC, DBIx::Class::Schema::Loader is mentioned as a
+    requirement. It's a lazy optional one. It's also hard to spot because
+    it's being loaded as a string using Module::Load.
+
+    Instead, this makes it a bit clearer by using 'require' directly.
+
+    It would be better to make this an optional requirement instead of a
+    default one. 
+
+  Change: 1b545771aec22a89989c284f950526270ae272b5
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:58:09 +0000
+
+    Cleanup: Replace die() with croak():
+
+    croak() is used in some places but not everywhere, so might as well
+    report from the caller everywhere. 
+
+  Change: c6f2031977572bcfd4352e131eb274cbc0be14d0
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:56:38 +0000
+
+    Cleanup: Simply conditions code 
+
+  Change: d9042c990068eb816b21396573704012d66c2ead
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:56:20 +0000
+
+    Cleanup: Fix extra or missing semicolons 
+
+  Change: 30166bce0c49ca7e979c9bbd82b582850805df7d
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:56:20 +0000
+
+    Add provides metadata:
+
+    The following plugin will add the provides metadata to the
+    distribution, which is considered a best practice. 
+
+  Change: 35e6040f94c561ab29811fe1db8164f03492d87f
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:56:20 +0000
+
+    Provide META.json file in distribution:
+
+    The following plugin adds the META.json file. This is considered the
+    more modern META data format. 
+
+-------------------------------------------
+version 0.0100 at 2016-10-09 04:10:17 +0000
 -------------------------------------------
 
   Change: 1a805013fbef23417d4911ad2dae6b88d30df82a

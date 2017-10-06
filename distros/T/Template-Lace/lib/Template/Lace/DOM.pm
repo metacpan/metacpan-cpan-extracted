@@ -54,15 +54,20 @@ sub repeat {
   my ($self, $cb, @items) = @_;
   my $index = 0;
   my @nodes = map {
+    my $context = $_;
     my $cloned_dom = $self->clone;
-    $index++;
-    my $returned_dom = $cb->($cloned_dom, $_, $index);
+    my $returned_dom = $cb->($cloned_dom, $context, $index);
     $returned_dom;
   } @items;
 
+  #$self->parent->content('');
+  $self->_replace(
+    Mojo::DOM58::_parent($self->tree), 
+    $self->tree, 
+    [map { $_->tree } @nodes],
+  );
 
-  # Might be a faster way to do this...
-  $self->replace(join '', @nodes);
+  #$self->replace(join '', @nodes);
   return $self;
 }
 
@@ -497,11 +502,26 @@ sub dl {
   } elsif(ref($proto) eq 'ARRAY') {
     my $dl = $self->at("dl$id");
     my $collection = $dl->find("dt,dd");
-    my $new = ref($self)
-      ->new($collection->join)
-      ->fill($proto);
-    $dl->content($new);
+
+    my @nodes = ();
+    foreach my $item(@$proto) {
+      $collection->each(sub {
+        my ($dom, $idx) = @_;
+        my $clone = Storable::dclone($dom->parent);
+        $clone->fill($item);
+        $clone->find($dom->tag)->each(sub {push @nodes, $_->tree});
+      });
+    }
+
+    $dl->content('');
+
+    splice
+     @{$dl->tree},
+     Mojo::DOM58::_start($dl->tree),
+     0,
+     @{Mojo::DOM58::_link($dl->tree,\@nodes)};
   }
+
   return $self;
 }
 

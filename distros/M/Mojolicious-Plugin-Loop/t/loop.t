@@ -4,12 +4,20 @@ use Test::More;
 
 use Mojolicious::Lite;
 plugin 'loop';
-get '/array' => {v => [qw(24 25 26)]}, 'index';
-get '/hash' => {v => {x => 24, y => 25, z => 26}}, 'index';
+get
+  '/array' => {v => [qw(24 25 26)]},
+  'index';
+
+
+get
+  '/hash' => {v => {x => 24, y => 25, z => 26}},
+  'index';
+
+get '/obj' => 'obj';
 
 my $t = Test::Mojo->new;
 
-$t->get_ok('/array')->content_is(<<'HERE');
+$t->get_ok('/array')->status_is(200)->content_is(<<'HERE');
 
 ---
 key/val: 0/24
@@ -45,7 +53,7 @@ first: no
 last: yes
 HERE
 
-$t->get_ok('/hash')->content_is(<<'HERE');
+$t->get_ok('/hash')->status_is(200)->content_is(<<'HERE');
 
 ---
 key/val: x/24
@@ -81,6 +89,8 @@ first: no
 last: yes
 HERE
 
+$t->get_ok('/obj')->status_is(200)->content_like(qr{0=5\s*1=7\s*2=9}s);
+
 done_testing;
 
 __DATA__
@@ -97,3 +107,8 @@ odd/even: <%= loop->odd ? 'odd' : loop->even ? 'even' : 'unknown' %>
 first: <%= loop->first ? 'yes' : 'no' %>
 last: <%= loop->last ? 'yes' : 'no' %>
 % end
+@@ obj.html.ep
+% my $i = loop [5,7,9];
+% while ($i->next) {
+%= join "=", $i->index, $i->val
+% }

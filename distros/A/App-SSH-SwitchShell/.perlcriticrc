@@ -1,5 +1,5 @@
 # Automatically generated file
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.021
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.024
 
 severity = 1
 only = 1
@@ -71,7 +71,6 @@ exclude_functions = print
 [Modules::ProhibitAutomaticExportation]
 [Modules::ProhibitConditionalUseStatements]
 [Modules::ProhibitEvilModules]
-[Modules::ProhibitExcessMainComplexity]
 [Modules::ProhibitMultiplePackages]
 [Modules::RequireBarewordIncludes]
 [Modules::RequireEndWithOne]

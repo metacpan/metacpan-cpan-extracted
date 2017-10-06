@@ -308,7 +308,7 @@ sub should_return_information_about_the_generated_plan {
         }
     };
 
-    my $expected_in_both = { %$expected_in_millimeters, %$expected_in_inches };
+    my $expected_in_both = { rows => $width / $unit_size, cols => $height / $unit_size, %$expected_in_millimeters, %$expected_in_inches };
 
     is_deeply($result->{'info'}, $expected_in_both, "Information about plan, in both imperial and metric, is correct");
 

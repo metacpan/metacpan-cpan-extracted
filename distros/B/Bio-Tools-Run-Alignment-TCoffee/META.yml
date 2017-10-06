@@ -4,16 +4,15 @@ author:
   - 'Jason Stajich <jason@bioperl.org>'
   - 'Peter Schattner <schattner@alum.mit.edu>'
 build_requires:
-  Env::Path: '0.18'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
   Test::More: '0'
-  Test::Most: '0'
   blib: '1.01'
   perl: '5.006'
 configure_requires:
+  Devel::CheckBin: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
@@ -41,7 +40,7 @@ resources:
   bugtracker: https://github.com/bioperl/bio-tools-run-alignment-tcoffee/issues
   homepage: https://metacpan.org/release/Bio-Tools-Run-Alignment-TCoffee
   repository: git://github.com/bioperl/bio-tools-run-alignment-tcoffee.git
-version: 1.7.2
+version: 1.7.3
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -341,7 +340,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-Tools-Run-Alignment-TCoffee-v1.7.2
+          tag: Bio-Tools-Run-Alignment-TCoffee-v1.7.3
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:
@@ -352,9 +351,13 @@ x_Dist_Zilla:
       name: '@BioPerl/Git::Tag'
       version: '2.041'
     -
-      class: Dist::Zilla::Plugin::RequiresExternal
-      name: RequiresExternal
-      version: '1.006'
+      class: Dist::Zilla::Plugin::CheckBin
+      config:
+        Dist::Zilla::Plugin::CheckBin:
+          command:
+            - t_coffee
+      name: CheckBin
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

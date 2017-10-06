@@ -18,13 +18,14 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Importer::Zim::Utils' => 'v0.8.0',
                                       'Module::Runtime' => '0',
-                                      'perl' => '5.018',
+                                      'perl' => '5.010001',
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                      'Importer::Zim::Lexical' => 'v0.5.0'
-                                    }
+                                    'Importer::Zim::Lexical' => 'v0.6.0'
+                                  }
                     },
        'test' => {
                    'recommends' => {

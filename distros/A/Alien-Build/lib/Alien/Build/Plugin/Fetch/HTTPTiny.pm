@@ -7,7 +7,7 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has '+url' => '';
@@ -98,13 +98,15 @@ Alien::Build::Plugin::Fetch::HTTPTiny - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
  use alienfile;
- meta->prop->{start_url} = 'http://ftp.gnu.org/gnu/make';
- plugin 'Fetch::HTTPTiny' => ();
+ share {
+   start_url 'http://ftp.gnu.org/gnu/make';
+   plugin 'Fetch::HTTPTiny';
+ };
 
 =head1 DESCRIPTION
 
@@ -176,6 +178,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

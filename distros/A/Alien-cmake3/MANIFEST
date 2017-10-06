@@ -9,7 +9,6 @@ Makefile.PL
 README
 alienfile
 author.yml
-cpanfile
 dist.ini
 lib/Alien/cmake3.pm
 maint/ci-install-cmake

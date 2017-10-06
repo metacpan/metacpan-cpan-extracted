@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 272;
+plan tests => 282;
 
 use Math::AnyNum qw(:misc);
 
@@ -375,3 +375,14 @@ is(rat_approx($o->new_q(6,  13)->as_dec), '6/13');
 
 is(rat_approx($o->new_f('-5.0108932461873638344226579520697167755991285403')), '-2300/459');
 is(rat_approx($o->new_f('-5.0544662309368191721132897603485838779956427015')), '-2320/459');
+
+is(acmp(-3,              3),            0);
+is(acmp(-4,              3),            1);
+is(acmp(4,               -5),           -1);
+is(acmp(-9,              -5),           1);
+is(acmp('3+4i',          float(5)),     0);
+is(acmp(complex('3+4i'), 5),            0);
+is(acmp(complex('3+4i'), rat(5)),       0);
+is(acmp(complex(42),     complex(-42)), 0);
+is(acmp(rat(42),         complex(-42)), 0);
+is(acmp(42,              complex(-43)), -1);

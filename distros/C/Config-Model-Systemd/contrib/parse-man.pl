@@ -18,7 +18,7 @@ use lib 'lib';
 
 use XML::Twig;
 use Path::Tiny;
-use Config::Model::Itself 2.005;
+use Config::Model::Itself 2.012;
 use Config::Model::Exception;
 use Getopt::Long;
 use experimental qw/postderef signatures/ ;
@@ -365,7 +365,7 @@ foreach my $service (@service_list) {
               rules:\$disable
                 level=hidden - - -
           include:=Systemd::CommonElements
-          read_config:0
+          rw_config
             backend=Systemd::Unit
             file=&index.$service
             auto_delete=1
@@ -387,7 +387,7 @@ foreach my $service (@service_list) {
             cargo
               type=node
               config_class_name=Systemd::$name - -
-          read_config:0
+          rw_config
             backend=Systemd
             auto_create=1 -
           !

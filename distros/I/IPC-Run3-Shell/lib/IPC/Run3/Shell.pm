@@ -17,7 +17,7 @@ use strict;
 # Try the command "perldoc perlartistic" or see
 # http://perldoc.perl.org/perlartistic.html .
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 use Carp;
 use warnings::register;
@@ -93,6 +93,15 @@ sub import_into {
 				no strict 'refs';  ## no critic (ProhibitNoStrict)
 				*{"${callpack}::$sym"} = make_cmd(\%opt);
 			}
+			elsif ($sym eq 'AUTOLOAD') {
+				debug "Exporting '${callpack}::$sym'" if $DEBUG;
+				no strict 'refs';  ## no critic (ProhibitNoStrict)
+				*{"${callpack}::AUTOLOAD"} = \&{"${OBJECT_PACKAGE}::AUTOLOAD"};
+			}
+			elsif ($sym eq 'FATAL') {
+				debug "Enabling fatal warnings";
+				warnings->import(FATAL=>'IPC::Run3::Shell');
+			}
 			else {
 				croak "$class can't export \"$sym\"" unless $EXPORTABLE{$sym};
 				my $target = __PACKAGE__."::$sym";
@@ -149,7 +158,7 @@ sub make_cmd {  ## no critic (ProhibitExcessComplexity)
 				# We throw our own custom warning instead of Perl's regular warning because Perl's warning
 				# would be reported in this module instead of the calling code.
 				warnings::warnif('numeric','Argument "'.(defined($_)?$_:"(undef)").'" isn\'t numeric in allow_exit')
-					unless looks_like_number($_);
+					unless defined && looks_like_number($_);
 				no warnings 'numeric', 'uninitialized';  ## no critic (ProhibitNoWarnings)
 				$_ = 0+$_; # so later usage as a number isn't a warning
 			}

@@ -1,27 +1,27 @@
 
 package Importer::Zim::Lexical;
-$Importer::Zim::Lexical::VERSION = '0.6.0';
-# ABSTRACT: Import functions with lexical scope
+$Importer::Zim::Lexical::VERSION = '0.8.0';
+# ABSTRACT: Import functions as lexical subroutines
 
 use 5.018;
 
-BEGIN {
-    require Importer::Zim::Base;
-    Importer::Zim::Base->VERSION('0.5.0');
-    our @ISA = qw(Importer::Zim::Base);
-}
+use Importer::Zim::Base 0.8.0;
+BEGIN { our @ISA = qw(Importer::Zim::Base); }
 
-use Sub::Inject ();
-
-use constant DEBUG => $ENV{IMPORTER_ZIM_DEBUG} || 0;
+use Sub::Inject 0.2.0;
+use Importer::Zim::Utils 0.8.0 qw(DEBUG carp);
 
 sub import {
     my $class = shift;
 
-    warn "$class->import(@_)\n" if DEBUG;
+    carp "$class->import(@_)" if DEBUG;
     my @exports = $class->_prepare_args(@_);
-    Sub::Inject::sub_inject( map { @{$_}{qw(export code)} } @exports );
+
+    @_ = map { @{$_}{qw(export code)} } @exports;
+    goto &Sub::Inject::sub_inject;
 }
+
+no Importer::Zim::Utils qw(DEBUG carp);
 
 1;
 
@@ -37,12 +37,12 @@ sub import {
 #pod
 #pod     use Importer::Zim::Lexical 'Foo' => { -version => '3.0' } => 'foo';
 #pod
-#pod     use zim 'Krazy::Taco' => qw(tacos burritos poop);
+#pod     use Importer::Zim::Lexical 'Krazy::Taco' => qw(tacos burritos poop);
 #pod
 #pod =head1 DESCRIPTION
 #pod
 #pod    "It's... INCREDIBLE! There's stuff down here I've never even
-#pod     dreamed of! I'm gonna try to blow it up."
+#pod    dreamed of! I'm gonna try to blow it up."
 #pod      – Dib
 #pod
 #pod This is a backend for L<Importer::Zim> which gives lexical scope
@@ -69,11 +69,11 @@ __END__
 
 =head1 NAME
 
-Importer::Zim::Lexical - Import functions with lexical scope
+Importer::Zim::Lexical - Import functions as lexical subroutines
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 SYNOPSIS
 
@@ -85,12 +85,12 @@ version 0.6.0
 
     use Importer::Zim::Lexical 'Foo' => { -version => '3.0' } => 'foo';
 
-    use zim 'Krazy::Taco' => qw(tacos burritos poop);
+    use Importer::Zim::Lexical 'Krazy::Taco' => qw(tacos burritos poop);
 
 =head1 DESCRIPTION
 
    "It's... INCREDIBLE! There's stuff down here I've never even
-    dreamed of! I'm gonna try to blow it up."
+   dreamed of! I'm gonna try to blow it up."
      – Dib
 
 This is a backend for L<Importer::Zim> which gives lexical scope

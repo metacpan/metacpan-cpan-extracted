@@ -3,7 +3,7 @@ package Alien::Base::ModuleBuild::Repository::Local;
 use strict;
 use warnings;
 
-our $VERSION = '0.046';
+our $VERSION = '1.00';
 
 use Carp;
 use File::chdir;

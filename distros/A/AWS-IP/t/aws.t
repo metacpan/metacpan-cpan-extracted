@@ -1,9 +1,12 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Slurp;
 
-my $test_data = read_file('t/ip-ranges.json');
+my $test_data = do {
+  open my $test_fh, '<', 't/ip-ranges.json' or die $!;
+  local $/;
+  <$test_fh>;
+};
 
 # loads ok
 use_ok('AWS::IP', 'load module');

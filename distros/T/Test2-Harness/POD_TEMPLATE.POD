@@ -9,6 +9,8 @@ __END__
 
 =head1 DESCRIPTION
 
+=head1 SYNOPSIS
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at

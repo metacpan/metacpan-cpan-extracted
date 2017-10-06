@@ -107,7 +107,7 @@ my $this_system = System::Info::Generic->new;
     is_deeply $ppc->old_dump, {
 	_host     => $this_system->host,
 	_os       => $this_system->os,
-	_cpu_type => "ppc",
+	_cpu_type => $CPU_TYPE,
 	_cpu      => "7400, altivec supported PowerMac G4 (400.000000MHz)",
 	_ncpu     => 1,
 	}, "Read /proc/cpuinfo for ppc";
@@ -119,19 +119,31 @@ my $this_system = System::Info::Generic->new;
     is_deeply $i386_2->old_dump, {
 	_host     => $this_system->host,
 	_os       => $this_system->os,
-	_cpu_type => "i386_2",
+	_cpu_type => $CPU_TYPE,
 	_cpu      => "Intel(R) Core(TM)2 CPU T5600 @ 1.83GHz (GenuineIntel 1000MHz)",
 	_ncpu     => "1 [2 cores]",
 	}, "Read /proc/cpuinfo for duo i386";
 
-    $CPU_TYPE = "arm_v6";
+    $CPU_TYPE = "arm_v6l";
 
     my $arm_v6 = System::Info::Linux->new;
 
     is_deeply $arm_v6->old_dump, {
 	_host     => $this_system->host,
 	_os       => $this_system->os,
-	_cpu_type => "arm_v6",
+	_cpu_type => $CPU_TYPE,
+	_cpu      => "ARMv6-compatible processor rev 7 (v6l) (700 MHz)",
+	_ncpu     => 1,
+	}, "Read /proc/cpuinfo for ARM v6";
+
+    $CPU_TYPE = "arm_v6l2";
+
+    my $arm_v62 = System::Info::Linux->new;
+
+    is_deeply $arm_v62->old_dump, {
+	_host     => $this_system->host,
+	_os       => $this_system->os,
+	_cpu_type => $CPU_TYPE,
 	_cpu      => "ARMv6-compatible processor rev 7 (v6l) (700 MHz)",
 	_ncpu     => 1,
 	}, "Read /proc/cpuinfo for ARM v6";
@@ -143,10 +155,10 @@ my $this_system = System::Info::Generic->new;
     is_deeply $arm_v7->old_dump, {
 	_host     => $this_system->host,
 	_os       => $this_system->os,
-	_cpu_type => "arm_v7",
+	_cpu_type => $CPU_TYPE,
 	_cpu      => "ARMv7 Processor rev 2 (v7l) (300 MHz)",
 	_ncpu     => 1,
-	}, "Read /proc/cpuinfo for ARM v6";
+	}, "Read /proc/cpuinfo for ARM v7";
 
     $CPU_TYPE = "i386_16";
     my $i386_16 = System::Info::Linux->new;
@@ -180,6 +192,28 @@ my $this_system = System::Info::Generic->new;
 	_cpu      => "Quad-Core AMD Opteron(tm) Processor 8356 (AuthenticAMD 1200MHz)",
 	_ncpu     => "4 [16 cores]",
 	}, "Read /proc/cpuinfo for vogon";
+
+    $CPU_TYPE = "s390x_sles11_sp2";
+    my $s390xsles11sp2 = System::Info::Linux->new;
+
+    is_deeply $s390xsles11sp2->old_dump, {
+	_host     => $this_system->host,
+	_os       => $this_system->os,
+	_cpu_type => $CPU_TYPE,
+	_cpu      => "IBM/S390 (1300 MHz)",
+	_ncpu     => "3",
+	}, "Read /proc/cpuinfo for s390x SLES 11-SP2";
+
+    $CPU_TYPE = "s390x_fedora";
+    my $s390xfedora = System::Info::Linux->new;
+
+    is_deeply $s390xfedora->old_dump, {
+	_host     => $this_system->host,
+	_os       => $this_system->os,
+	_cpu_type => $CPU_TYPE,
+	_cpu      => "IBM/S390 (2900 MHz)",
+	_ncpu     => "2",
+	}, "Read /proc/cpuinfo for s390x Fedora";
     }
 
 done_testing;
@@ -273,18 +307,34 @@ bogomips	: 3657.62
 clflush size	: 64
 __EOINFO__
 
-    $files{arm_v6} = <<'__EOINFO__'; # RaspberryPI, raspbian
-Processor      : ARMv6-compatible processor rev 7 (v6l)
-BogoMIPS       : 697.95
-Features       : swp half thumb fastmult vfp edsp java tls 
-CPU implementer        : 0x41
+    $files{arm_v6l} = <<'__EOINFO__'; # RaspberryPI, raspbian 8.0
+Processor       : ARMv6-compatible processor rev 7 (v6l)
+BogoMIPS        : 697.95
+Features        : swp half thumb fastmult vfp edsp java tls 
+CPU implementer : 0x41
 CPU architecture: 7
-CPU variant    : 0x0
-CPU part       : 0xb76
-CPU revision   : 7
-Hardware       : BCM2708
-Revision       : 000e
-Serial         : 00000000dc08448c
+CPU variant     : 0x0
+CPU part        : 0xb76
+CPU revision    : 7
+Hardware        : BCM2708
+Revision        : 000e
+Serial          : 00000000dc08448c
+__EOINFO__
+
+    $files{arm_v6l2} = <<'__EOINFO__'; # RaspberryPI, raspbian 9.1
+processor       : 0
+model name      : ARMv6-compatible processor rev 7 (v6l)
+BogoMIPS        : 697.95
+Features        : half thumb fastmult vfp edsp java tls
+CPU implementer : 0x41
+CPU architecture: 7
+CPU variant     : 0x0
+CPU part        : 0xb76
+CPU revision    : 7
+
+Hardware        : BCM2835
+Revision        : 000f
+Serial          : 00000000c7982c01
 __EOINFO__
 
     $files{arm_v7} = <<'__EOINFO__'; # Archos 101IT, Android 2.2
@@ -1248,6 +1298,38 @@ address sizes	: 48 bits physical, 48 bits virtual
 power management: ts ttp tm stc 100mhzsteps hwpstate
 
 __EOINFO__
+
+    $files{"s390x_sles11_sp2"} = <<'__EOINFO__';
+vendor_id       : IBM/S390
+# processors    : 3
+bogomips per cpu: 1258.00
+features        : esan3 zarch stfle msa ldisp eimm dfp edat etf3eh highgprs
+processor 0: version = 00,  identification = 002623,  machine = 2064
+processor 1: version = 00,  identification = 102623,  machine = 2064
+processor 2: version = 00,  identification = 202623,  machine = 2064
+__EOINFO__
+
+    $files{"s390x_fedora"} = <<'__EOINFO__';
+vendor_id       : IBM/S390
+# processors    : 2
+bogomips per cpu: 2913.00
+max thread id   : 0
+features        : esan3 zarch stfle msa ldisp eimm dfp edat etf3eh highgprs te sie 
+cache0          : level=1 type=Data scope=Private size=96K line_size=256 associativity=6
+cache1          : level=1 type=Instruction scope=Private size=64K line_size=256 associativity=4
+cache2          : level=2 type=Data scope=Private size=1024K line_size=256 associativity=8
+cache3          : level=2 type=Instruction scope=Private size=1024K line_size=256 associativity=8
+cache4          : level=3 type=Unified scope=Shared size=49152K line_size=256 associativity=12
+cache5          : level=4 type=Unified scope=Shared size=393216K line_size=256 associativity=24
+processor 0: version = FF,  identification = 35C047,  machine = 2827
+processor 1: version = FF,  identification = 35C047,  machine = 2827
+cpu number      : 0
+cpu MHz dynamic : 5504
+cpu MHz static  : 5504
+cpu number      : 1
+cpu MHz dynamic : 5504
+cpu MHz static  : 5504
+__EOINFO__
     }
 
 package ReadProc;
@@ -1261,6 +1343,8 @@ sub TIEHANDLE {
 sub READLINE {
     my $buffer = shift;
     length $$buffer or return;
+    $$buffer =~ s/[ \t\r\xa0]+/ /g;
+    $$buffer =~ s/ \n/\n/g;
     if (wantarray) {
 	my @list = map "$_\n" => split m/\n/, $$buffer;
 	$$buffer = "";

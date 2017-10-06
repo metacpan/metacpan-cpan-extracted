@@ -4,7 +4,7 @@
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "TOML::Parser" : {
          "file" : "lib/TOML/Parser.pm",
-         "version" : "0.10"
+         "version" : "0.90"
       },
       "TOML::Parser::Tokenizer" : {
          "file" : "lib/TOML/Parser/Tokenizer.pm"
@@ -88,13 +88,13 @@
          "web" : "https://github.com/karupanerura/TOML-Parser"
       }
    },
-   "version" : "0.10",
+   "version" : "0.90",
    "x_authority" : "cpan:KARUPA",
    "x_contributors" : [
       "Olivier Mengué <dolmen@cpan.org>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
       "karupanerura <karupanerura@users.noreply.github.com>",
-      "yowcow <yowcow@cpan.org>",
-      "Syohei YOSHIDA <syohex@gmail.com>"
+      "yowcow <yowcow@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

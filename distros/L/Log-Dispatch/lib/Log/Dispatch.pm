@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Carp ();
 use Log::Dispatch::Types;
@@ -298,7 +298,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 
@@ -711,7 +711,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Ollis Gregory Oschwald Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Steve Bertrand Whitney Jackson
+=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Ollis Gregory Oschwald Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Slaven Rezic Steve Bertrand Whitney Jackson
 
 =over 4
 
@@ -782,6 +782,10 @@ Ross Attrill <ross.attrill@gmail.com>
 =item *
 
 Salvador Fandiño <sfandino@yahoo.com>
+
+=item *
+
+Slaven Rezic <srezic@cpan.org>
 
 =item *
 

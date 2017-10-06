@@ -34,3 +34,6 @@ Revision history for Mojolicious::Plugin::RenderFile
 
 0.11
         Add "content_type" option
+
+0.12 
+        Fix warning about content_type and format incompatiblity

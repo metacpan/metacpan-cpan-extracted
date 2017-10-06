@@ -7,7 +7,7 @@ Pcore::PDF - non-blocking HTML to PDF converter
     use Pcore::PDF;
 
     my $pdf = Pcore::PDF->new({
-        prince      => 'path-to-princexml-executable',
+        bin         => 'path-to-princexml-executable',
         max_threads => 4,
     });
 
@@ -33,7 +33,7 @@ Generate PDF from HTML templates, using princexml.
 
 # ATTRIBUTES
 
-- prince
+- bin
 
     Path to `princexml` executable. Mandatory attribute.
 

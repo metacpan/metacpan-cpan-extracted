@@ -76,27 +76,27 @@
    "provides" : {
       "CPAN::Testers::API" : {
          "file" : "lib/CPAN/Testers/API.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "CPAN::Testers::API::Base" : {
          "file" : "lib/CPAN/Testers/API/Base.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "CPAN::Testers::API::Controller::Release" : {
          "file" : "lib/CPAN/Testers/API/Controller/Release.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "CPAN::Testers::API::Controller::Report" : {
          "file" : "lib/CPAN/Testers/API/Controller/Report.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "CPAN::Testers::API::Controller::Summary" : {
          "file" : "lib/CPAN/Testers/API/Controller/Summary.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       },
       "CPAN::Testers::API::Controller::Upload" : {
          "file" : "lib/CPAN/Testers/API/Controller/Upload.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -112,7 +112,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
    },
-   "version" : "0.018",
+   "version" : "0.020",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>"

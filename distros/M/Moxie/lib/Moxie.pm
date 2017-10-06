@@ -8,21 +8,21 @@ use experimental qw[
     postderef
 ];
 
-use experimental           (); # need this later when we load features
-use Module::Runtime        (); # load things so they DWIM
-use BEGIN::Lift            (); # fake some keywords
-use B::CompilerPhase::Hook (); # multi-phase programming
-use Method::Traits         (); # for accessor/method generators
+use experimental    (); # need this later when we load features
+use Module::Runtime (); # load things so they DWIM
+use Devel::Hook     (); # multiphase programming
+use BEGIN::Lift     (); # fake some keywords
+use Method::Traits  (); # for accessor/method generators
+use Sub::Inject     (); # to inject lexical sub definitions
 
 use MOP;
 use MOP::Internal::Util;
 
-use Moxie::Slot::Initializer;
 use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -78,27 +78,41 @@ sub import_into ($class, $caller, $opts) {
     BEGIN::Lift::install(
         ($caller, 'has') => sub ($name, @args) {
 
-            my $initializer;
-            if ( @args && (scalar @args % 2) == 0 ) {
-                $initializer = Moxie::Slot::Initializer->new(
-                    meta => $meta,
-                    name => $name,
-                    @args
-                );
-            }
-            elsif ( @args && ref $args[0] eq 'CODE' ) {
-                $initializer = Moxie::Slot::Initializer->new(
-                    meta    => $meta,
-                    name    => $name,
-                    default => $args[0]
-                );
-            }
-            else {
-                $initializer = Moxie::Slot::Initializer->new(
-                    meta => $meta,
-                    name => $name
-                );
-            }
+            # NOTE:
+            # Handle the simple case of `has $name => $code`
+            # by converting it into the more complex
+            # `has $name => %opts` version, just easier
+            # to maintain internal consistency.
+            # - SL
+
+            @args = ( default => $args[0] )
+                if scalar @args == 1
+                && ref $args[0] eq 'CODE';
+
+            my $initializer = MOP::Slot::Initializer->new(
+                meta => $meta,
+                name => $name,
+                @args
+            );
+
+            # XXX:
+            # The DB::args stuff below is fragile because it
+            # is susceptible to alteration of @_ in the
+            # method that calls these accessors. Perhaps this
+            # can be fixed with XS, but for now we are going
+            # to assume people aren't doing this since they
+            # *should* be using the signatures that we enable
+            # for them.
+            # - SL
+
+            Sub::Inject::sub_inject(
+                $name, sub : lvalue prototype() {
+                    package DB; @DB::args = ();
+                    my () = caller(1);
+                    my ($self) = @DB::args;
+                    $self->{$name};
+                }
+            );
 
             $meta->add_slot( $name, $initializer );
             return;
@@ -140,15 +154,15 @@ sub import_into ($class, $caller, $opts) {
     Method::Traits->import_into( $meta, @traits );
 
     # install our class finalizer
-    B::CompilerPhase::Hook::append_UNITCHECK {
+    Devel::Hook->push_UNITCHECK_hook(sub {
 
         # pre-populate the cache for all the slots
         if ( $meta->isa('MOP::Class') ) {
             foreach my $super ( map { MOP::Role->new( name => $_ ) } $meta->mro->@* ) {
-                foreach my $attr ( $super->slots ) {
-                    $meta->alias_slot( $attr->name, $attr->initializer )
-                        unless $meta->has_slot( $attr->name )
-                            || $meta->has_slot_alias( $attr->name );
+                foreach my $slot ( $super->slots ) {
+                    $meta->alias_slot( $slot->name, $slot->initializer )
+                        unless $meta->has_slot( $slot->name )
+                            || $meta->has_slot_alias( $slot->name );
                 }
             }
         }
@@ -169,7 +183,7 @@ sub import_into ($class, $caller, $opts) {
         # compile time.
         # - SL
 
-    };
+    });
 }
 
 1;
@@ -184,7 +198,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -256,11 +270,6 @@ being built.
 
 This module is used to handle the method traits which are used
 mostly for method generation (accessors, predicates, etc.).
-
-=item L<B::CompilerPhase::Hook>
-
-This allows us to better manipulate the various compiler phases
-that Perl has.
 
 =back
 
@@ -482,35 +491,6 @@ No attempt will be made to verify that the value stored in
 C<$slot_name> is an object, or that it responds to the
 C<$delegate_method> specified, this is the responsibility of
 the writer of the class.
-
-=item C<private( ?$slot_name )>
-
-This will generate a private read-write accessor for a slot. The
-C<$slot_name> can optionally be specified, otherwise it will use the
-name of the method that the trait is being applied to.
-
-    my sub foo : private;
-    my sub foo : private(_foo);
-
-The privacy is accomplished via the use of a lexical method, this means
-that the method is not availble outside of the package scope and is
-not available to participate in method dispatch, however it does
-know the current invocant, so there is no need to pass that in. This
-results in code that looks like this:
-
-    sub my_method ($self, @stuff) {
-        # simple access ...
-        my $foo = foo();
-
-        # passing to other methods ...
-        $self->do_something_with_foo( foo() );
-
-        # calling methods on an embedded object ...
-        foo()->call_method_on_foo();
-    }
-
-This feature is considered experimental, but then again, so is this
-whole module, so I guess you can safely ignore that then.
 
 =back
 

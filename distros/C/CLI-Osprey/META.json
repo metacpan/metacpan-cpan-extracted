@@ -24,7 +24,8 @@
             "Getopt::Long::Descriptive" : "0",
             "Module::Runtime" : "0",
             "Moo" : "0",
-            "Moo::Role" : "0"
+            "Moo::Role" : "0",
+            "Path::Tiny" : "0"
          }
       }
    },
@@ -44,7 +45,7 @@
          "web" : "http://github.com/arodland/CLI-Osprey"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:ARODLAND",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

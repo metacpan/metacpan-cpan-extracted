@@ -1,5 +1,25 @@
 Revision history for Jenkins-API
 
+0.16      2017-10-03 13:15:02+01:00 Europe/London
+
+          Removed debug statement.
+          Added Travis tests for 5.10
+
+0.15      2017-10-02 18:56:42+01:00 Europe/London
+
+          Made git commit steps in build process more logical.
+
+0.14      2017-10-02 18:48:24+01:00 Europe/London
+
+          Making the release process more automatic.
+
+0.13      2017-10-02 18:37:04+01:00 Europe/London
+
+        Switched to Test2 explicitly.
+        Updated build process to make better use of Dzil.
+        Wired in Travis and coveralls.
+        Increased test coverage.
+
 0.12      2017-04-09 20:04:10+01:00 Europe/London
 
         Converted to Dzil to fix issue #18.

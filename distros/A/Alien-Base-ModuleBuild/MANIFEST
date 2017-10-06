@@ -34,8 +34,6 @@ corpus/alien_base_modulebuild__find_lib/static/lib/libmylib.a
 corpus/alien_base_modulebuild__find_lib/static/lib/libotherlib.a
 corpus/alien_base_modulebuild__find_lib/static/lib/mylib.lib
 corpus/alien_base_modulebuild__find_lib/static/lib/otherlib.lib
-corpus/alien_base_modulebuild_pkgconfig/gsl.pc
-corpus/alien_base_modulebuild_pkgconfig/test.pc
 corpus/alien_base_modulebuild_repository_http/index.html
 lib/Alien/Base/ModuleBuild.pm
 lib/Alien/Base/ModuleBuild/API.pod
@@ -48,19 +46,15 @@ lib/Alien/Base/ModuleBuild/Repository/FTP.pm
 lib/Alien/Base/ModuleBuild/Repository/HTTP.pm
 lib/Alien/Base/ModuleBuild/Repository/Local.pm
 lib/Alien/Base/ModuleBuild/Utils.pm
-lib/Alien/Base/PkgConfig.pm
 LICENSE
 maint/min-perl.pl
 maint/releaseprep
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/00_diag.t
 t/alien_base_modulebuild.t
 t/alien_base_modulebuild_cabinet.t
 t/alien_base_modulebuild_file.t
-t/alien_base_modulebuild_pkgconfig.t
 t/alien_base_modulebuild_repository.t
 t/alien_base_modulebuild_repository_ftp.t
 t/alien_base_modulebuild_repository_http.t
@@ -69,3 +63,5 @@ t/alien_base_modulebuild_utils.t
 t/inline.t
 t/inline_cpp.t
 t/lib/Test2/Plugin/AlienEnv.pm
+META.yml
+META.json

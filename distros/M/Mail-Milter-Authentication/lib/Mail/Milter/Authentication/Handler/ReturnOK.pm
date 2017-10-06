@@ -2,13 +2,27 @@ package Mail::Milter::Authentication::Handler::ReturnOK;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Net::DNS;
 use Sys::Syslog qw{:standard :macros};
 
 sub default_config {
     return {};
+}
+
+## ToDo
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'ReturnOK_metrics' );
+    return \@rows;
+}
+
+sub register_metrics {
+    return {
+        'returnok_total' => 'The number of emails processed for ReturnOK',
+    };
 }
 
 sub _check_address {
@@ -104,6 +118,7 @@ sub _check_address {
     );
 
     $self->add_auth_header($header);
+    $self->metric_count( 'returnok_total', { 'result' => $result} );
 
     return;
 }

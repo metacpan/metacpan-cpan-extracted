@@ -1,5 +1,25 @@
 Revision history for Math-AnyNum
 
+0.14    2017-09-26
+
+        [BUG-FIXES]
+
+        - Fixed the sign in the results returned by the second-pentagonal functions `polygonal_root2(n,k)` and `ipolygonal_root2(n,k)`.
+
+0.13    2017-09-26
+
+        [ADDITIONS]
+
+        - acmp(x, y): absolute comparison of `x` and `y`.
+        - polygonal(n, k): returns the nth k-gonal number.
+        - polygonal_root(n, k): returns the k-gonal root of `n`.
+        - polygonal_root2(n, k): returns the second k-gonal root of `n`.
+        - ipolygonal_root(n, k): returns the integer k-gonal root of `n`.
+        - ipolygonal_root2(n, k): returns the second integer k-gonal root of `n`.
+        - is_polygonal(n, k): returns 1 when `n` is a k-gonal number.
+        - is_polygonal2(n, k): returns 1 when `n` is a second k-gonal number.
+        - faulhaber_sum(n, p): computes 1^p + 2^p + 3^p + ... + n^p, using Faulhaber's formula.
+
 0.12    2017-09-18
 
         [ADDITIONS]

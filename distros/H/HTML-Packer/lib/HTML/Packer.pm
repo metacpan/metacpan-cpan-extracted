@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -108,14 +108,14 @@ our $NEWLINES = [
 
             my $ret;
 
-            if ( $pre eq '>' or $post eq '<' ) {
-                $ret = $pre . ' ' . $post;
+            if ( $pre eq '>' and $post eq '<' ) {
+                $ret = $pre . $post;
             }
-            elsif ( $pre =~ /[\w-]/ and $post =~ /[\w-]/ ) {
-                $ret = $pre . ' ' . $post;
+            elsif ( $pre eq '-' and $post =~ /[\w]/ ) {
+                $ret = $pre . $post;
             }
             else {
-                $ret = $pre . $post;
+                $ret = $pre . ' ' . $post;
             }
 
             return $ret;
@@ -439,7 +439,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.04
+Version 2.06
 
 =head1 DESCRIPTION
 

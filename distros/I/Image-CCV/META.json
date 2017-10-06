@@ -3,8 +3,8 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -19,33 +19,15 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Carp" : "0",
-            "DynaLoader" : "0",
-            "Exporter" : "0",
-            "warnings" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Imager" : "0.78",
-            "List::Util" : "0",
-            "perl" : "5.006"
-         }
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/Corion/image-ccv"
+         "type" : "git",
+         "url" : "git://github.com/Corion/image-ccv.git",
+         "web" : "https://github.com/Corion/image-ccv"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "x_static_install" : 0
 }

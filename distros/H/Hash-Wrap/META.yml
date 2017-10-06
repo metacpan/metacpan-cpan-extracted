@@ -1,0 +1,55 @@
+---
+abstract: 'create lightweight on-the-fly objects from hashes'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Number::Tolerant: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Wrap
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Hash::Wrap:
+    file: lib/Hash/Wrap.pm
+    version: '0.03'
+  Hash::Wrap::Base:
+    file: lib/Hash/Wrap/Base.pm
+    version: '0.03'
+  Hash::Wrap::Base::LValue:
+    file: lib/Hash/Wrap/Base/LValue.pm
+    version: '0.03'
+  Hash::Wrap::Class:
+    file: lib/Hash/Wrap/Class.pm
+    version: '0.03'
+  Hash::Wrap::Class::LValue:
+    file: lib/Hash/Wrap/Class/LValue.pm
+    version: '0.03'
+requires:
+  Hash::Util: '0'
+  MRO::Compat: '0'
+  Scalar::Util: '0'
+  perl: '5.008009'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
+  repository: git://github.com/djerius/hash-wrap.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

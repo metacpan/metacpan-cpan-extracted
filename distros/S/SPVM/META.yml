@@ -1,5 +1,5 @@
 ---
-abstract: 'Fast calculation, GC, static typing, VM with perlish syntax'
+abstract: 'Fast Calculation and Easy C/C++ Binding with perlish syntax and static typing'
 author:
   - 'A. U. Thor <kimoto@sakura.ne.jp>'
 build_requires:
@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.0270'
+version: '0.0276'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

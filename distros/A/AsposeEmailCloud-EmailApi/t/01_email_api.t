@@ -45,7 +45,7 @@ if (not defined $AsposeEmailCloud::Configuration::api_key or $AsposeEmailCloud::
 	$AsposeStorageCloud::Configuration::api_key = $AsposeEmailCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

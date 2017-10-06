@@ -1,20 +1,63 @@
 <script type="text/x-template" class="lifecycle-inspector-template" data-type="transition">
     <div class="transition">
-       Transition from <a href="#" class="select-status" data-name="{{transition.from}}">{{transition.from}}</a> to <a href="#" class="select-status" data-name="{{transition.to}}">{{transition.to}}</a><br><br>
-       Right: <input type="text" name="right" value="{{transition.right}}"><br>
-       Style: <select name="style">
-                 {{#select transition.style}}
-                 <option value="solid"><&|/l&>solid</&></option>
-                 <option value="dashed"><&|/l&>dashed</&></option>
-                 <option value="dotted"><&|/l&>dotted</&></option>
-                 {{/select}}
-             </select><br>
+        <table>
+          <tr>
+	    <td colspan=2><&|/l_unsafe, '<a href="#" class="select-status" data-name="{{transition.from}}">{{transition.from}}</a>', '<a href="#" class="select-status" data-name="{{transition.to}}">{{transition.to}}' &>Transition from [_1] to [_2]</&></td>
+          </tr>
+
+          <tr>
+            <td><&|/l&>Right</&>:</td>
+            <td>
+%# taken from RT's /Widgets/ComboBox, except we can't know at Mason time which
+%# values to provide
+% my $z_index = 9999;
+% my $Class = "";
+% my $Name = "right";
+% my $Size = undef;
+% my $Default = "{{transition.right}}";
+% my $Rows = 5;
+              <nobr>
+                <div id="<% $Name %>_Container" class="combobox <%$Class%>" style="z-index: <%$z_index--%>">
+                  <input name="<% $Name %>" id="<% $Name %>" class="combo-text" value="<% $Default || '' %>" type="text" <% $Size ? "size='$Size'" : '' |n %> autocomplete="off" />
+                  <br style="display: none" />
+                  <span id="<% $Name %>_Button" class="combo-button">&#9660;</span>
+                  <select name="List-<% $Name %>" id="<% $Name %>_List" class="combo-list" onchange="ComboBox_SimpleAttach(this, this.form[<% $Name |n,j%>]); " size="<% $Rows %>">
+                    <optgroup>
+{{#each (selectedRights lifecycle)}}
+                      <option value="{{this}}">{{this}}</option>
+{{/each}}
+                    </optgroup>
+                    <optgroup>
+% for my $map (map { $RT::ACE::RIGHTS{$_} } sort keys %RT::ACE::RIGHTS) {
+% for my $right (sort map { $_->{Name} } values %$map ) {
+                      <option value="<% $right %>"><% $right %></option>
+% }
+% }
+                    </optgroup>
+                  </select>
+                </div>
+              </nobr>
+            </td>
+          </tr>
+
+          <tr>
+            <td><&|/l&>Style</&>:</td>
+            <td><select name="style">
+              {{#select transition.style}}
+              <option value="solid"><&|/l&>solid</&></option>
+              <option value="dashed"><&|/l&>dashed</&></option>
+              <option value="dotted"><&|/l&>dotted</&></option>
+              {{/select}}
+            </select></td>
+          </tr>
+        </table>
 
         <ul class="actions">
         {{#each transition.actions}}
             {{> lifecycleui_action action=this lifecycle=../lifecycle}}
         {{/each}}
         </ul>
+
         <button class="add-action"><&|/l&>Add Action</&></button><br>
         <button class="delete"><&|/l&>Delete Transition</&></button>
     </div>

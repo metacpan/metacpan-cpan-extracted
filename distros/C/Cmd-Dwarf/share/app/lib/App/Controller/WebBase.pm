@@ -20,7 +20,7 @@ sub init_plugins {
 			session_key         => conf('/session/state/name'),
 			session_table       => conf('/session/store/table'),
 			session_expires     => 60 * 60 * 24 * 21,
-			session_clean_thres => 1,
+			session_clean_thres => 0.001,
 			param_name          => 'session_id',
 			cookie_path         => '/',
 			cookie_domain       => undef,

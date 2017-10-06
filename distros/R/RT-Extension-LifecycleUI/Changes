@@ -1,0 +1,23 @@
+0.02 2017-09-28
+  - for interactive display on tickets, highlight the status that user
+    clicked which opened a menu
+  - add way to resize circle decorations
+  - polish inspector UI
+  - hide approvals and reminders options for non-ticket lifecycles
+  - add more localization tags
+  - stop picking random colors for new statuses
+  - animate new status nodes and decorations into the scene
+  - improve animations around transitions by drawing them from status to status
+  - change the permission entry field from textbox to combobox
+  - avoid rendering issues dragging status nodes over top of eachother
+  - avoid rendering issues with transitions being drawn inside status circles
+  - add new option for selecting whether user can pan and zoom on ticket
+    display
+  - add new option for selecting the initial center point on ticket display:
+    origin, current status, or zoom to fit
+  - hide canvas border on ticket display when sensible
+  - make add/select controls available when any node is selected
+  - disable, don't hide, undo/redo buttons that are unavailable
+
+0.01 2017-09-08
+  - initial release

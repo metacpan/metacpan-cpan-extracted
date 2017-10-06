@@ -4,7 +4,7 @@
       "Adriano Ferreira <ferreira@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,12 +33,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Importer::Zim::Utils" : "v0.8.0",
             "Module::Runtime" : "0",
-            "perl" : "5.018",
+            "perl" : "5.010001",
             "warnings" : "0"
          },
          "suggests" : {
-            "Importer::Zim::Lexical" : "v0.5.0"
+            "Importer::Zim::Lexical" : "v0.6.0"
          }
       },
       "test" : {
@@ -56,11 +57,11 @@
    "provides" : {
       "Importer::Zim" : {
          "file" : "lib/Importer/Zim.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.6.0"
       },
       "zim" : {
          "file" : "lib/zim.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim"
       }
    },
-   "version" : "0.3.0",
+   "version" : "0.6.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

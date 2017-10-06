@@ -1,6 +1,6 @@
 package Config::Std;
 
-our $VERSION = '0.901';
+our $VERSION = '0.902';
 
 require v5.7.3; # RT#21184
 

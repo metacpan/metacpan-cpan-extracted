@@ -16,6 +16,7 @@ $modules{$_} = $_ for qw(
   Test2::Require
   Test2::V0
   Test::Alien
+  Test::Alien::Build
   Text::ParseWords
 );
 

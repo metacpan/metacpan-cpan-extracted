@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.016   September 25, 2017
+        - Some Template::Lace::DOM optimizations
+        - Fixed issue where setup time components didn't have the correct
+          content.
+        - Allow you to return a literal css match for a component to return
+          a collection of nodes and not the stringified content form.
+
 0.015   August 28, 2017
         - Restored feature where components normalized scripts and styles
 

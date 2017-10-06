@@ -1,0 +1,8 @@
+Revision history for IO-AIO-LoadLimited
+
+0.02    27.09.2017
+        Fixed tests and moduled to run under perl 5.8.9
+
+0.01    24.09.2017
+        First version, released on an unsuspecting world.
+

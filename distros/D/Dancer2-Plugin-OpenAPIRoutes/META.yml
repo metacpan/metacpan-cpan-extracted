@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'Anton Petrusevich'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-OpenAPIRoutes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2: '0'
+  Data::Walk: '0'
+  File::Spec: '0'
+  JSON: '0'
+  JSON::Pointer: '0'
+  Module::Load: '0'
+  YAML::XS: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/jef-sure/d2-oar/issues
+  repository: https://github.com/jef-sure/d2-oar.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

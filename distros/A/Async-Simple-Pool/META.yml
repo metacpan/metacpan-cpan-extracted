@@ -4,6 +4,7 @@ author:
   - 'ANTONC <antonc@cpan.org>'
 build_requires:
   File::Spec: '0'
+  JSON::XS: '0'
   Modern::Perl: '0'
   Module::Metadata: '1.000009'
   POSIX: '0'
@@ -32,26 +33,27 @@ no_index:
 provides:
   Async::Simple::Pool:
     file: lib/Async/Simple/Pool.pm
-    version: '0.14'
+    version: '0.18'
   Async::Simple::Task:
     file: lib/Async/Simple/Task.pm
-    version: '0.14'
+    version: '0.18'
   Async::Simple::Task::Fork:
     file: lib/Async/Simple/Task/Fork.pm
-    version: '0.14'
+    version: '0.18'
   Async::Simple::Task::ForkTmpFile:
     file: lib/Async/Simple/Task/ForkTmpFile.pm
-    version: '0.14'
+    version: '0.18'
 requires:
   Class::Load: '0'
   Clone: '0'
   Data::Dumper: '0'
   Data::Serializer: '0'
   File::Spec: '0'
+  JSON::XS: '0'
   Modern::Perl: '0'
   Moose: '0'
   Time::HiRes: '0'
   namespace::autoclean: '0'
   perl: '5.014000'
-version: '0.14'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

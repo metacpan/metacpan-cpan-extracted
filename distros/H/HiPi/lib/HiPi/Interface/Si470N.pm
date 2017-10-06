@@ -18,7 +18,7 @@ use HiPi qw( :i2c :si470n :rpi );
 use Time::HiRes qw( usleep );
 use HiPi::GPIO;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw(
     devicename address
@@ -57,7 +57,7 @@ sub new {
         devicename   => ( $pi->board_type == RPI_BOARD_TYPE_1 ) ? '/dev/i2c-0' : '/dev/i2c-1',
         address     => 0x10,
         device      => undef,
-        backend     => 'smbus',
+        backend     => 'i2c',
         sdapin      => RPI_PIN_3,
         sclpin      => RPI_PIN_5,
     );
@@ -69,6 +69,11 @@ sub new {
     
     unless( defined($params{resetpin}) ) {
         croak qq(you must connect a reset pin to the device and pass the GPIO number to the constructor as param 'resetpin');
+    }
+    
+    if( $params{backend} eq 'smbus ') {
+        carp qq(busmode smbus not supported - switching to i2c);
+        $params{backend} = 'i2c';
     }
     
     $params{gpiodev} = HiPi::GPIO->new;
@@ -328,11 +333,7 @@ sub register_to_name {
 sub read_registers {
     my($self) = @_;
     
-    # chip is odd and always overwrites register 0x2 with
-    # what should be register address on read
-    
-    my $cmdval = $self->get_register(POWERCFG) >> 8;
-    my @bytes = $self->device->bus_read( $cmdval, 32 );
+    my @bytes = $self->device->bus_read( undef, 32 );
     
     # change 32 bytes into 16 16 bit words
     my @words = ();

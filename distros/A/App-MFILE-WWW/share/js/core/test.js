@@ -32,7 +32,8 @@
 //
 // test.js
 //
-// runs routines in tests/ directory to declare unit tests
+// runs routines in tests/ directory to declare unit tests. Each js file in
+// tests/ needs to be mentioned here.
 //
 "use strict";
 
@@ -44,13 +45,14 @@ require ([
     'tests/lib',
     'tests/prototypes'
 ], function (
-    qunit,
+    QUnit,
     dummyTests,
     cfTests,
     currentUserTests,
     libTests,
     prototypeTests
 ) {
+    QUnit.module("mfile-www core");
     dummyTests();
     cfTests();
     currentUserTests();

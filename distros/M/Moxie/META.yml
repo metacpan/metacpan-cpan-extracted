@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,29 +17,26 @@ name: Moxie
 provides:
   Moxie:
     file: lib/Moxie.pm
-    version: '0.03'
+    version: '0.04'
   Moxie::Enum:
     file: lib/Moxie/Enum.pm
-    version: '0.03'
+    version: '0.04'
   Moxie::Object:
     file: lib/Moxie/Object.pm
-    version: '0.03'
+    version: '0.04'
   Moxie::Object::Immutable:
     file: lib/Moxie/Object/Immutable.pm
-    version: '0.03'
-  Moxie::Slot::Initializer:
-    file: lib/Moxie/Slot/Initializer.pm
-    version: '0.03'
+    version: '0.04'
   Moxie::Traits::Provider:
     file: lib/Moxie/Traits/Provider.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  B::CompilerPhase::Hook: '0.04'
-  BEGIN::Lift: '0.05'
-  MOP: '0.08'
+  BEGIN::Lift: '0.06'
+  Devel::Hook: '0'
+  MOP: '0.09'
   Method::Traits: '0.05'
   Module::Runtime: '0'
-  PadWalker: '0'
+  Sub::Inject: '0'
   Sub::Util: '0'
   UNIVERSAL::Object: '0.11'
   experimental: '0'
@@ -47,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-Moxie/issues
   repository: https://github.com/stevan/p5-Moxie.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

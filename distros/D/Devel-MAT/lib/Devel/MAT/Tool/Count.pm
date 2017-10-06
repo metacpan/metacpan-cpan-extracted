@@ -7,8 +7,9 @@ package Devel::MAT::Tool::Count;
 
 use strict;
 use warnings;
+use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use constant CMD => "count";
 
@@ -21,12 +22,6 @@ C<Devel::MAT::Tool::Count> - count the various kinds of SV
 This C<Devel::MAT> tool counts the different kinds of SV in the heap.
 
 =cut
-
-sub new
-{
-   my $class = shift;
-   return bless { df => shift->dumpfile }, $class;
-}
 
 =head1 METHODS
 
@@ -85,7 +80,7 @@ sub run_cmd
 
    Devel::MAT::Cmd->printf( "  %-20s %-10s %-10s\n", "Kind", "Count", "(blessed)" );
 
-   my ( $kinds, $blessed ) = $self->count_svs( $self->{df} );
+   my ( $kinds, $blessed ) = $self->count_svs( $self->df );
 
    foreach my $kind ( sort keys %$kinds ) {
       Devel::MAT::Cmd->printf( "  %-20s %-10s %-10s\n", $kind, $kinds->{$kind}, $blessed->{$kind} // "" );

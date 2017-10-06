@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::Class::Moose bare => 1;
-use Test2::Bundle::Extended '!meta';
+use Test2::V0 '!meta';
 use Test2::Plugin::NoWarnings;
 
 use App::CISetup::Travis::ConfigFile;
@@ -50,6 +50,7 @@ sub test_create_and_update {
               ^addons:.+\n
               ^language:.+\n
               ^perl:.+\n
+              ^cache:.+\n
               ^matrix:.+\n
               ^env:.+\n
           before_install:.+\n
@@ -81,6 +82,9 @@ sub test_create_and_update {
                     5.14
                     )
             ],
+            cache => {
+                directories => ['$HOME/perl5'],
+            },
             matrix => {
                 allow_failures => [ { perl => 'blead' } ],
                 include        => [
@@ -91,15 +95,19 @@ sub test_create_and_update {
                 ],
             },
             env => { global => [ 'AUTHOR_TESTING=1', 'RELEASE_TESTING=1' ] },
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
         },
         'travis config contains expected content'
     );
 
     $self->_test_cisetup_flags_comment(
         $file,
-        { force_threaded_perls => 0 }
+        {
+            force_threaded_perls => 0,
+            perl_caching         => 1,
+        }
     );
 
     App::CISetup::Travis::ConfigFile->new(
@@ -124,7 +132,7 @@ sub test_force_threaded_perls {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 5.26.0 )) {
+    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.4 5.24.2 5.26.1 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
@@ -136,7 +144,48 @@ sub test_force_threaded_perls {
 
     $self->_test_cisetup_flags_comment(
         $file,
-        { force_threaded_perls => 1 }
+        {
+            force_threaded_perls => 1,
+            perl_caching         => 1,
+        }
+    );
+}
+
+sub test_no_perl_caching {
+    my $self = shift;
+
+    my $dir  = tempdir();
+    my $file = $dir->child('.travis.yml');
+
+    App::CISetup::Travis::ConfigFile->new(
+        file                 => $file,
+        force_threaded_perls => 0,
+        perl_caching         => 0,
+    )->create_file;
+
+    my $yaml   = $file->slurp;
+    my $travis = Load($yaml);
+
+    is(
+        $travis,
+        hash {
+            field cache => DNE();
+            etc();
+        },
+        'no cache block when perl_caching is disabled'
+    );
+    is(
+        $travis->{before_install},
+        ['eval $(curl https://travis-perl.github.io/init) --auto'],
+        'call to travis-perl init does not include  --always-upgrade-modules flag'
+    );
+
+    $self->_test_cisetup_flags_comment(
+        $file,
+        {
+            force_threaded_perls => 0,
+            perl_caching         => 0,
+        }
     );
 }
 
@@ -154,7 +203,7 @@ sub test_distro_has_xs {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 5.26.0 )) {
+    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.4 5.24.2 5.26.1 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
@@ -175,7 +224,7 @@ sub test_update_helpers_usage {
         $file, {
             language       => 'perl',
             before_install => [
-                '$(curl git://github.com/haarg/perl-travis-helper) --auto'
+                '$(curl git://github.com/haarg/perl-travis-helper) --auto --always-upgrade-modules'
             ],
             perl => ['5.26'],
         }
@@ -189,13 +238,18 @@ sub test_update_helpers_usage {
     my $travis = LoadFile($file);
     is(
         $travis->{before_install},
-        ['eval $(curl https://travis-perl.github.io/init) --auto'],
+        [
+            'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+        ],
         'old travis-perl URL is replaced'
     );
 
     $self->_test_cisetup_flags_comment(
         $file,
-        { force_threaded_perls => 0 }
+        {
+            force_threaded_perls => 0,
+            perl_caching         => 1,
+        }
     );
 }
 
@@ -207,10 +261,11 @@ sub test_maybe_disable_sudo {
 
     DumpFile(
         $file, {
-            sudo     => 'true',
-            language => 'perl',
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            sudo           => 'true',
+            language       => 'perl',
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
             perl => ['5.26'],
         }
     );
@@ -227,10 +282,11 @@ sub test_maybe_disable_sudo {
     );
     DumpFile(
         $file, {
-            sudo     => 'true',
-            language => 'perl',
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            sudo           => 'true',
+            language       => 'perl',
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
             install => ['sudo foo'],
             perl    => ['5.26'],
         }
@@ -261,8 +317,9 @@ sub test_coverity_email {
             addons   => {
                 coverity_scan => { notification_email => 'foo@example.com' }
             },
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
             perl => ['5.26'],
         }
     );
@@ -284,6 +341,7 @@ sub test_coverity_email {
         {
             email_address        => 'bar@example.com',
             force_threaded_perls => 0,
+            perl_caching         => 1,
         }
     );
 }
@@ -296,10 +354,11 @@ sub test_email_notifications {
 
     DumpFile(
         $file, {
-            sudo     => 'true',
-            language => 'perl',
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            sudo           => 'true',
+            language       => 'perl',
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
             perl => ['5.26'],
         }
     );
@@ -331,10 +390,11 @@ sub test_slack_notifications {
 
     DumpFile(
         $file, {
-            sudo     => 'true',
-            language => 'perl',
-            before_install =>
-                ['eval $(curl https://travis-perl.github.io/init) --auto'],
+            sudo           => 'true',
+            language       => 'perl',
+            before_install => [
+                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
+            ],
             perl => ['5.26'],
         }
     );
@@ -382,6 +442,7 @@ sub test_slack_notifications {
     $self->_test_cisetup_flags_comment(
         $file, {
             force_threaded_perls => 0,
+            perl_caching         => 1,
             github_user          => 'autarch',
         }
     );

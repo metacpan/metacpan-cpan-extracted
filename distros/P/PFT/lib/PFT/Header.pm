@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Header v1.2.0;
+package PFT::Header v1.2.1;
 
 =encoding utf8
 
@@ -155,11 +155,14 @@ sub new {
 sub load {
     my($cls, $from) = @_;
 
+    my $fname;
     if (my $type = ref $from) {
+        $fname = "?? $type ??";
         unless ($type eq 'GLOB' || $type eq 'IO::File') {
             confess "Only supporting GLOB and IO::File. Got $type";
         }
     } else {
+        $fname = $from;
         $from = IO::File->new($from) or confess "Cannot open $from";
     }
     binmode $from, ':encoding(locale)' or confess "Binmode: $!";
@@ -173,8 +176,8 @@ sub load {
         $text .= $_;
     }
 
-    my $hdr = eval { YAML::Tiny::Load($text) };
-    $hdr or confess "File has corrupt header";
+    my $hdr = eval { YAML::Tiny::Load($text || '') };
+    $hdr or confess "File $fname has corrupt header";
 
     my $date;
     $hdr->{Date} and $date = eval {

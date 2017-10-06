@@ -1,9 +1,9 @@
-<div class="lifecycle-ui<% $Editing ? ' editing' : '' %><% $Interactive ? ' interactive' : '' %>" id="lifecycle-<% $id %>">
+<div class="lifecycle-ui<% $Editing ? ' editing' : '' %><% $Interactive ? ' interactive' : '' %><% $Zoomable ? ' zoomable' : '' %> center-<% $Center || 'origin' %>" id="lifecycle-<% $id %>">
     <div class="lifecycle-view">
       <div class="overlay-buttons">
-          <button class="zoom-in">+</button>
-          <button class="zoom-reset">0</button>
-          <button class="zoom-out">-</button>
+          <button class="zoom zoom-in">+</button>
+          <button class="zoom zoom-reset">0</button>
+          <button class="zoom zoom-out">-</button>
       </div>
       <svg>
           <& /Elements/LifecycleGraphExtras, %ARGS &>
@@ -52,6 +52,8 @@
 <%ARGS>
 $Editing => 0
 $Interactive => 0
+$Zoomable => 0
+$Center => 'origin'
 $Lifecycle => undef
 $Ticket => undef
 </%ARGS>
@@ -63,4 +65,10 @@ my $config = RT->Config->Get('Lifecycles')->{$Lifecycle};
 Abort("Invalid Lifecycle") if !$Lifecycle || !$config;
 
 my $id = $Lifecycle . '-' . int(rand(2**31));
+
+if ($Editing) {
+    $Zoomable = 1;
+    $Center = 'origin';
+}
+
 </%INIT>

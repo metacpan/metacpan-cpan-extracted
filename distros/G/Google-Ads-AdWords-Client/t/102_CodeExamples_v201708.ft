@@ -258,7 +258,7 @@ require qw(examples/v201708/optimization/get_keyword_bid_simulations.pl);
 ok(get_keyword_bid_simulations($client, $search_ad_group_id, $search_keyword_id),
    "Test of get_keyword_bid_simulations example");
 require qw(examples/v201708/optimization/get_keyword_ideas.pl);
-ok(get_keyword_ideas($client), "Test of get_keyword_ideas example");
+ok(get_keyword_ideas($client, undef), "Test of get_keyword_ideas example");
 
 # remarketing
 require qw(examples/v201708/remarketing/add_audience.pl);

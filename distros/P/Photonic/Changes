@@ -15,4 +15,9 @@
   1. Put authors in Build.PL
   2. Update references in README
   3. Add modules for retarded calculations.
+* 0.008
+  1. Added two smallness parameters, one for Haydock and one for
+     continued fractions.
+  2. 
+
 

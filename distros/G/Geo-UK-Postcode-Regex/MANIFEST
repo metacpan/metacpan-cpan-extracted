@@ -14,6 +14,7 @@ lib/Geo/UK/Postcode/Regex/Simple.pm
 share/get_pc_districts.pl
 t/01-use.t
 t/author-pod-syntax.t
+t/data-filehandle-multi-read.t
 t/extract.t
 t/lib/TestGeoUKPostcode.pm
 t/outcode.t

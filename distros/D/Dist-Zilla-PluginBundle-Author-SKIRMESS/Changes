@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.024  2017-09-24 17:32:56 UTC
+
+  - Always create the 00-load.t test in the munge file phase
+
+0.023  2017-09-24 16:18:25 UTC
+
+  - Create the 00-load.t test
+  - Removed Perl::Critic policy Modules::ProhibitExcessMainComplexity
+
 0.022  2017-09-19 21:56:17 UTC
 
   - Also commit files copied from bin/ with CopyFilesFromRelease

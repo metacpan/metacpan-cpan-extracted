@@ -77,6 +77,7 @@
             "Net::OAuth" : "0",
             "Plack" : "0",
             "Plack::Handler::CLI" : "0",
+            "Regexp::Common" : "0",
             "Router::Simple" : "0",
             "Scalar::Util" : "0",
             "Starman" : "0",
@@ -97,11 +98,11 @@
    "provides" : {
       "Cmd::Dwarf" : {
          "file" : "lib/Cmd/Dwarf.pm",
-         "version" : "1.50"
+         "version" : "1.60"
       },
       "Dwarf" : {
          "file" : "lib/Dwarf.pm",
-         "version" : "1.50"
+         "version" : "1.60"
       }
    },
    "release_status" : "stable",
@@ -115,7 +116,7 @@
          "web" : "https://github.com/seagirl/dwarf"
       }
    },
-   "version" : "1.50",
+   "version" : "1.60",
    "x_authority" : "cpan:seagirl",
    "x_contributors" : [
       "tak <yoshizu@sb163.s2factory.co.jp>",

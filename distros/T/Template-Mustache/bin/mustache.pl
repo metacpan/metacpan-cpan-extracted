@@ -44,7 +44,7 @@ mustache.pl
 
 =head1 VERSION
 
-version 1.0.4
+version 1.1.0
 
 =head1 NAME
 

@@ -4,6 +4,8 @@ use JSON;
 use Mouse;
 use Lemonldap::NG::Common::PSGI;
 
+our $VERSION = '1.9.13';
+
 has iniFile => ( is => 'ro', isa => 'Str' );
 
 has app => ( is => 'ro', isa => 'CodeRef' );
@@ -126,7 +128,8 @@ sub jsonResponse {
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }
-    my $href = from_json( $res->[2]->[0] ) or die 'Response is not JSON';
+    my $href = from_json( $res->[2]->[0], { allow_nonref => 1 } )
+      or die 'Response is not JSON';
     return $href;
 }
 
@@ -139,7 +142,8 @@ sub jsonPostResponse {
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }
-    my $href = from_json( $res->[2]->[0] ) or die 'Response is not JSON';
+    my $href = from_json( $res->[2]->[0], { allow_nonref => 1 } )
+      or die 'Response is not JSON';
     return $href;
 }
 
@@ -152,7 +156,8 @@ sub jsonPutResponse {
         print STDERR "Result dump :\n" . Data::Dumper::Dumper($res);
         die "Manager lib does not return a 200 code, aborting";
     }
-    my $href = from_json( $res->[2]->[0] ) or die 'Response is not JSON';
+    my $href = from_json( $res->[2]->[0], { allow_nonref => 1 } )
+      or die 'Response is not JSON';
     return $href;
 }
 

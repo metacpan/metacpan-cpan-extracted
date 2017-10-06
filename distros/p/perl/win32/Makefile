@@ -38,7 +38,7 @@ INST_TOP	= $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	= \5.26.0
+#INST_VER	= \5.26.1
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -143,6 +143,8 @@ CCTYPE		= MSVC60
 #CCTYPE		= MSVC140
 # Visual C++ 2015 Express Edition (aka Visual C++ 14.0) (free version)
 #CCTYPE		= MSVC140FREE
+# Visual C++ 2017 (aka Visual C++ 14.1) (all versions)
+#CCTYPE		= MSVC141
 
 #
 # If you are using Intel C++ Compiler uncomment this
@@ -217,16 +219,23 @@ CCTYPE		= MSVC60
 #ALL_STATIC	= define
 
 #
+# set the install location of the compiler
+# Running VCVARS32.BAT, VCVARSALL.BAT or similar is *required* when using
+# Visual C++.
+# Versions of Visual C++ up to VC++ 7.1 define $(MSVCDir); versions since then
+# define $(VCINSTALLDIR) instead, but for VC++ 14.1 we need the subfolder given
+# by $(VCToolsInstallDir).
 #
-# set the install locations of the compiler include/libraries
-# Running VCVARS32.BAT is *required* when using Visual C.
-# Some versions of Visual C don't define MSVCDIR in the environment,
-# so you may have to set CCHOME explicitly (spaces in the path name should
-# not be quoted)
-#
+!IF "$(CCTYPE)" == "MSVC60" || \
+    "$(CCTYPE)" == "MSVC70" || "$(CCTYPE)" == "MSVC70FREE"
 CCHOME		= $(MSVCDIR)
-CCINCDIR	= $(CCHOME)\include
-CCLIBDIR	= $(CCHOME)\lib
+!ELSE
+!  IF "$(CCTYPE)" == "MSVC141"
+CCHOME		= $(VCTOOLSINSTALLDIR)
+!  ELSE
+CCHOME		= $(VCINSTALLDIR)
+!  ENDIF
+!ENDIF
 
 #
 # Additional compiler flags can be specified here.
@@ -439,6 +448,19 @@ EMBED_EXE_MANI	= if exist $@.manifest mt -nologo -manifest $@.manifest -outputre
 EMBED_DLL_MANI	= if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2 && \
 		  if exist $@.manifest del $@.manifest
 
+# Set the install location of the compiler headers/libraries.
+# These are saved into $Config{incpath} and $Config{libpth}.
+CCINCDIR	= $(CCHOME)\include
+!IF "$(CCTYPE)" == "MSVC141"
+!  IF "$(WIN64)" == "define"
+CCLIBDIR	= $(CCHOME)\lib\x64
+!  ELSE
+CCLIBDIR	= $(CCHOME)\lib\x86
+!  ENDIF
+!ELSE
+CCLIBDIR	= $(CCHOME)\lib
+!ENDIF
+
 ARCHDIR		= ..\lib\$(ARCHNAME)
 COREDIR		= ..\lib\CORE
 AUTODIR		= ..\lib\auto
@@ -449,7 +471,6 @@ CPANDIR		= ..\cpan
 PODDIR		= ..\pod
 HTMLDIR		= .\html
 
-#
 INST_SCRIPT	= $(INST_TOP)$(INST_VER)\bin
 INST_BIN	= $(INST_SCRIPT)$(INST_ARCH)
 INST_LIB	= $(INST_TOP)$(INST_VER)\lib
@@ -481,7 +502,8 @@ DEFINES		= -DWIN32 -D_CONSOLE -DNO_STRICT
 LOCDEFS		= -DPERLDLL -DPERL_CORE
 CXX_FLAG	= -TP -EHsc
 
-!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE" \
+    || "$(CCTYPE)" == "MSVC141"
 LIBC		= ucrt.lib
 !ELSE
 LIBC		= msvcrt.lib
@@ -496,7 +518,8 @@ OPTIMIZE	= -Od -MD -Zi
 LINK_DBG	= -debug
 !ELSE
 !IF  "$(CFG)" == "DebugFull"
-!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE" \
+    || "$(CCTYPE)" == "MSVC141"
 LIBC		= ucrtd.lib
 !ELSE
 LIBC		= msvcrtd.lib
@@ -536,7 +559,8 @@ DEFINES		= $(DEFINES) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
 !ENDIF
 
 # Likewise for deprecated Winsock APIs in VC++ 14.0 for now.
-!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE" \
+    || "$(CCTYPE)" == "MSVC141"
 DEFINES		= $(DEFINES) -D_WINSOCK_DEPRECATED_NO_WARNINGS
 !ENDIF
 
@@ -560,7 +584,8 @@ LIBBASEFILES	= \
 		netapi32.lib uuid.lib ws2_32.lib mpr.lib winmm.lib \
 		version.lib odbc32.lib odbccp32.lib comctl32.lib
 
-!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE" \
+    || "$(CCTYPE)" == "MSVC141"
 !  IF  "$(CFG)" == "DebugFull"
 LIBBASEFILES	= $(LIBBASEFILES) msvcrtd.lib vcruntimed.lib
 !  ELSE
@@ -610,6 +635,8 @@ PRIV_LINK_FLAGS	= $(PRIV_LINK_FLAGS) "/manifestdependency:type='Win32' name='Mic
 !ELSE
 RSC_FLAGS	= -DINCLUDE_MANIFEST
 !ENDIF
+
+# VS 2017 (VC++ 14.1) requires at minimum Windows 7 SP1 (with latest Windows Updates)
 
 # For XP support in >= VS 2013 (VC++ 12.0), subsystem is always in Config.pm
 # LINK_FLAGS else subsystem is only needed for EXE building, not XS DLL building
@@ -964,7 +991,7 @@ perlglob$(o)  : perlglob.c
 	@echo.>>$@
 	@echo #ifndef _config_h_footer_>>$@
 	@echo #define _config_h_footer_>>$@
-!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE"
+!IF "$(CCTYPE)" == "MSVC140" || "$(CCTYPE)" == "MSVC140FREE" || "$(CCTYPE)" == "MSVC141"
 	@echo #undef FILE_ptr>>$@
 	@echo #define FILE_ptr(fp) PERLIO_FILE_ptr(fp)>>$@
 	@echo #undef FILE_cnt>>$@
@@ -1260,7 +1287,7 @@ utils: $(PERLEXE) ..\utils\Makefile
 	copy ..\README.tw       ..\pod\perltw.pod
 	copy ..\README.vos      ..\pod\perlvos.pod
 	copy ..\README.win32    ..\pod\perlwin32.pod
-	copy ..\pod\perldelta.pod ..\pod\perl5260delta.pod
+	copy ..\pod\perldelta.pod ..\pod\perl5261delta.pod
 	cd ..\win32
 	$(PERLEXE) $(PL2BAT) $(UTILS)
 	$(MINIPERL) -I..\lib ..\autodoc.pl ..
@@ -1359,7 +1386,7 @@ distclean: realclean
 	-if exist $(LIBDIR)\Win32API rmdir /s /q $(LIBDIR)\Win32API
 	-if exist $(LIBDIR)\XS rmdir /s /q $(LIBDIR)\XS
 	-cd $(PODDIR) && del /f *.html *.bat roffitall \
-	    perl5260delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
+	    perl5261delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
 	    perlapi.pod perlbs2000.pod perlce.pod perlcn.pod perlcygwin.pod \
 	    perldos.pod perlfreebsd.pod perlhaiku.pod perlhpux.pod \
 	    perlhurd.pod perlintern.pod perlirix.pod perljp.pod perlko.pod \

@@ -23,7 +23,7 @@ __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 use constant {
     MODE1      => 0x00, 
@@ -158,7 +158,7 @@ my $pwm = HiPi::Interface::PCA9685->new( external_clock => 16 );
         {
             pulse_min         => 550,
             pulse_max         => 2350,
-            degree_range      => 160,
+            degree_range      => 150,
             degree_min        => 15,
             degree_max        => 165,
         },
@@ -263,7 +263,7 @@ sub set_servo_pulse {
 }
 
 sub get_servo_pulse {
-    my( $self, $channel, $servotype ) = @_;
+    my( $self, $channel ) = @_;
     my ( $on, $duration ) = $self->read_channel( $channel ) ;
     $duration &= PCA_9685_SERVO_CHANNEL_MASK;
     my $us = $self->duration_to_microseconds($duration);

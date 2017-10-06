@@ -1,37 +1,40 @@
 {
-   "abstract" : "processes conditional parts of makefiles, c/c++ and kconfig files",
+   "abstract" : "unknown",
    "author" : [
-      "John Ulvr <perldev@ulvr.com>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "code-UnifdefPlus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
-      }
-   },
-   "provides" : {
-      "code::UnifdefPlus" : {
-         "file" : "lib/UnifdefPlus.pm",
-         "version" : "v0.3.0"
+      },
+      "runtime" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "version" : "v0.005.004",
-   "x_serialization_backend" : "JSON version 2.90"
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

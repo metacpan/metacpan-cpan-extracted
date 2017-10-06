@@ -7,7 +7,7 @@
       "Stefan Hornburg (Racke) <racke@linuxia.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -78,6 +78,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#interchange"
    },
-   "version" : "0.141",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.150",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

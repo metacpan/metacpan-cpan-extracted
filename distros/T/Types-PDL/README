@@ -1,0 +1,125 @@
+Types::PDL
+
+This module provides Type::Tiny compatible types for PDL.
+
+  Types
+
+Types which accept parameters (see "Parameters") will list them.
+
+   "Piddle"
+
+Allows an object blessed into the class "PDL", e.g.
+
+  validate( [pdl], Piddle );
+
+It accepts the following parameters:
+
+  null
+  empty
+  ndims
+  ndims_min
+  ndims_max
+
+   "Piddle0D"
+
+Allows an object blessed into the class "PDL" with "ndims" = 0. It
+accepts the following parameters:
+
+  null
+
+   "Piddle1D"
+
+Allows an object blessed into the class "PDL" with "ndims" = 1. It
+accepts the following parameters:
+
+  null
+  empty
+
+   "Piddle2D"
+
+Allows an object blessed into the class "PDL" with "ndims" = 2. It
+accepts the following parameters:
+
+  null
+  empty
+
+   "Piddle3D"
+
+Allows an object blessed into the class "PDL" with "ndims" = 3. It
+accepts the following parameters:
+
+  null
+  empty
+
+  Coercions
+
+The following coercions are provided, and may be applied via a type
+object's "plus_coercions" in Type::Tiny or "plus_fallback_coercions" in
+Type::Tiny methods, e.g.
+
+  Piddle->plus_coercions( PiddleFromAny );
+
+   "PiddleFromAny"
+
+Uses "topdl" in PDL::Core to coerce the value into a piddle.
+
+  Parameters
+
+Some types take optional parameters which add additional constraints on
+the object. For example, to indicate that only empty piddles are
+accepted:
+
+  validate( [pdl], Piddle[ empty => 1 ] );
+
+The available parameters are:
+
+   "empty"
+
+This accepts a boolean value; if true the piddle must be empty (i.e. the
+"isempty" method returns true), if false, it must not be empty.
+
+   "null"
+
+This accepts a boolean value; if true the piddle must be a null piddle,
+if false, it must not be null.
+
+   "ndims"
+
+This specifies a fixed number of dimensions which the piddle must have.
+Don't mix use this with "ndims_min" or "ndims_max".
+
+   "ndims_min"
+
+The minimum number of dimensions the piddle may have. Don't specify this
+with "ndims".
+
+   "ndims_max"
+
+The maximum number of dimensions the piddle may have. Don't specify this
+with "ndims".
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

@@ -4,7 +4,7 @@ package WebService::Rollbar::Notifier;
 use strict;
 use warnings;
 
-our $VERSION = '1.002008'; # VERSION
+our $VERSION = '1.002009'; # VERSION
 
 use Carp;
 use Scalar::Util qw/blessed/;
@@ -144,7 +144,7 @@ sub _post {
     );
     my @request_optionals = (
         map +( exists $request_optionals->{$_} ? ( $_ => $request_optionals->{$_} ) : () ),
-            qw/level context request person server client custom fingerprint uuid /
+            qw/level context request person server client custom fingerprint uuid title/
     );
 
     my $response = $self->_ua->post(

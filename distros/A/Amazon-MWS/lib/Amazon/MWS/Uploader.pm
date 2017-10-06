@@ -567,7 +567,8 @@ sub _build_products_to_upload {
             foreach my $child (@$children) {
                 # skip failed children, but if the current status of
                 # parent is failed, and we reached this point, retry.
-                if ($existing->{$child} and
+                if (! exists $self->_force_hashref->{$child} and
+                    $existing->{$child} and
                     $existing->{$sku} and
                     $existing->{$sku}->{status} ne 'failed' and
                     $existing->{$child}->{status} eq 'failed') {
@@ -1635,7 +1636,7 @@ sub register_order_ack_errors {
     elsif (@errors) {
         my $error = shift @errors;
         %update = (
-                   error_msg => $error->{type} . ' ' . $_->{message} . ' ' . $_->{code},
+                   error_msg => $error->{type} . ' ' . $error->{message} . ' ' . $error->{code},
                    error_code => $error->{code},
                   );
     }

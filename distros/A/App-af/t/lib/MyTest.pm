@@ -58,4 +58,7 @@ sub run
   $ret;
 }
 
+delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
+$ENV{ALIEN_BUILD_RC} = '-';
+
 1;

@@ -12,6 +12,7 @@ const our $EXT_TYPE_MAP => {
     yml  => $DATA_TYPE_YAML,
     xml  => $DATA_TYPE_XML,
     ini  => $DATA_TYPE_INI,
+    toml => $DATA_TYPE_TOML,
 };
 
 sub load ( $cfg, @ ) {
@@ -62,7 +63,7 @@ sub store ( $path, $cfg, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 49                   | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 50                   | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

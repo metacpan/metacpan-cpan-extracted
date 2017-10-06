@@ -10,10 +10,10 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
-our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test );
+our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url );
 
 
 sub requires
@@ -89,6 +89,18 @@ sub _in_phase
   Carp::croak "$sub must be in a $phase block"
     unless $meta->{phase} eq $phase;
 }
+
+sub start_url
+{
+  my($url) = @_;
+  _in_phase 'share';
+  my $caller = caller;
+  my $meta = $caller->meta;
+  $meta->prop->{start_url} = $url;
+  $meta->add_requires('configure' => 'Alien::Build' => '1.19');
+  return;
+}
+
 
 sub download
 {
@@ -294,7 +306,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -305,10 +317,12 @@ Do-it-yourself approach:
  probe [ 'pkg-config --exists libarchive' ];
  
  share {
-
+   
+   start_url 'http://libarchive.org/downloads/libarchive-3.2.2.tar.gz';
+   
    # the first one which succeeds will be used
-   download [ 'wget http://libarchive.org/downloads/libarchive-3.2.2.tar.gz' ];
-   download [ 'curl -o http://libarchive.org/downloads/libarchive-3.2.2.tar.gz' ];
+   download [ 'wget %{.meta.start_url}' ];
+   download [ 'curl -o %{.meta.start_url}' ];
    
    extract [ 'tar xf %{.install.download}' ];
    
@@ -334,13 +348,13 @@ With plugins (better):
  plugin 'PkgConfig' => 'libarchive';
  
  share {
+   start_url 'http://libarchive.org/downloads/';
    plugin Download => (
-     url => 'http://libarchive.org/downloads/',
      filter => qr/^libarchive-.*\.tar\.gz$/,
      version => qr/([0-9\.]+)/,
    );
    plugin Extract => 'tar.gz';
-   plugin 'Build::Autoconf' => ();
+   plugin 'Build::Autoconf';
    build [
      '%{configure} --disable-shared',
      '%{make}',
@@ -425,7 +439,7 @@ Examples:
  plugin 'Fetch' => 'http://ftp.gnu.org/gnu/gcc';
  
  # loads the plugin with the badly named class!
- plugin '=Badly::Named::Plugin::Not::In::Alien::Build::Namespace' => ();
+ plugin '=Badly::Named::Plugin::Not::In::Alien::Build::Namespace';
 
  # explicitly loads Alien::Build::Plugin::Prefer::SortVersions
  plugin 'Prefer::SortVersions => (
@@ -465,6 +479,14 @@ System block.  Allowed directives are: requires and gather.
  };
 
 System block.  Allowed directives are: download, fetch, decode, prefer, extract, build, gather.
+
+=head2 start_url
+
+ share {
+   start_url $url;
+ };
+
+Set the start URL for download.  This should be the URL to an index page, or the actual tarball of the source.
 
 =head2 download
 
@@ -694,6 +716,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

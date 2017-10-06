@@ -7,10 +7,10 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
-has '+url' => sub { Carp::croak "url is a required property" };
+has '+url' => undef;
 
 
 has 'filter'  => undef;
@@ -27,6 +27,9 @@ has 'passive' => 0;
 has 'scheme'  => undef;
 
 
+has 'bootstrap_ssl' => 0;
+
+
 sub pick
 {
   my($self) = @_;
@@ -37,7 +40,18 @@ sub pick
       : $self->url =~ m!^([a-z]+):!i
   ) unless defined $self->scheme;
   
-  if($self->scheme =~ /^https?$/)
+  if($self->scheme eq 'https' || ($self->scheme eq 'http' && $self->ssl))
+  {
+    if($self->bootstrap_ssl && ! eval { require Net::SSLeay; 1 })
+    {
+      return (['Fetch::CurlCommand','Fetch::Wget'], 'Decode::HTML');
+    }
+    else
+    {
+      return ('Fetch::HTTPTiny', 'Decode::HTML');
+    }
+  }
+  elsif($self->scheme eq 'http')
   {
     return ('Fetch::HTTPTiny', 'Decode::HTML');
   }
@@ -68,6 +82,18 @@ sub init
 {
   my($self, $meta) = @_;
   
+  unless(defined $self->url)
+  {
+    if(defined $meta->prop->{start_url})
+    {
+      $self->url($meta->prop->{start_url});
+    }
+    else
+    {
+      Carp::croak "url is a required property unless you use the start_url directive";
+    }
+  }
+  
   $meta->add_requires('share' => 'Alien::Build::Plugin::Download::Negotiate' => '0.61')
     if $self->passive;
 
@@ -75,11 +101,19 @@ sub init
 
   my($fetch, @decoders) = $self->pick;
   
-  $meta->apply_plugin($fetch,
-    url     => $self->url,
-    ssl     => $self->ssl,
-    ($fetch eq 'Fetch::NetFTP' ? (passive => $self->passive) : ()),
-  );
+  $fetch = [ $fetch ] unless ref $fetch;
+
+  foreach my $fetch (@$fetch)
+  {
+    my @args;
+    push @args, ssl => $self->ssl;
+    # For historical reasons, we pass the URL into older fetch plugins, because
+    # this used to be the interface.  Using start_url is now preferred!
+    push @args, url => $self->url if $fetch =~ /^Fetch::(HTTPTiny|LWP|Local|LocalDir|NetFTP)$/;
+    push @args, passive => $self->passive if $fetch eq 'Fetch::NetFTP';
+  
+    $meta->apply_plugin($fetch, @args);
+  }
   
   if($self->version)
   {
@@ -105,16 +139,18 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
  use alienfile;
- plugin 'Download' => (
-   url => 'http://ftp.gnu.org/gnu/make',
-   filter => qr/^make-.*\.tar.\gz$/,
-   version => qr/([0-9\.]+)/,
- );
+ share {
+   start_url 'http://ftp.gnu.org/gnu/make';
+   plugin 'Download' => (
+     filter => qr/^make-.*\.tar.\gz$/,
+     version => qr/([0-9\.]+)/,
+   );
+ };
 
 =head1 DESCRIPTION
 
@@ -127,6 +163,8 @@ than the Fetch, Decode and Prefer plugins directly from your L<alienfile>.
 =head1 PROPERTIES
 
 =head2 url
+
+[DEPRECATED] use C<start_url> instead.
 
 The Initial URL for your package.  This may be a directory listing (either in
 HTML or ftp listing format) or the final tarball intended to be downloaded.
@@ -158,6 +196,15 @@ Perl SSL modules will be loaded.
 =head2 passive
 
 If using FTP, attempt a passive mode transfer first, before trying an active mode transfer.
+
+=head2 bootstrap_ssl
+
+If set to true, then the download negotiator will avoid using plugins that have a dependency
+on L<Net::SSLeay>, or other Perl SSL modules.  The intent for this option is to allow
+OpenSSL to be alienized and be a useful optional dependency for L<Net::SSLeay>.
+
+The implementation may improve over time, but as of this writing, this option relies on you
+having a working C<curl> or C<wget> with SSL support in your C<PATH>.
 
 =head1 METHODS
 
@@ -214,6 +261,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

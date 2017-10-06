@@ -6,9 +6,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 t/010_over.t
 t/011_undef.t
+t/012_no_over.t
 t/020_stashless.t
 t/030_save.t
 t/040_under.t
+t/041_cascade.t
+t/050_undef_pattern.t
 t/080_noconflict.t
 t/090_manifest.t
 t/091_pod.t

@@ -1,5 +1,9 @@
 Revision history for Perl extension EBook-EPUB-Check
 
+0.05 2017-10-03T15:46:21Z
+
+    - Updated minilla (https://github.com/pawa-/EBook-EPUB-Check/issues/1 reported by eserte)
+
 0.04 2014-02-13T15:53:07Z
 
     - Added support for Cygwin platform

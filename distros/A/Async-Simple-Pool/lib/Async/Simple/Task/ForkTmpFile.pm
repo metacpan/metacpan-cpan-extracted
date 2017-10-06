@@ -121,7 +121,7 @@ use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
 use File::Spec;
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 extends 'Async::Simple::Task::Fork';
 
@@ -183,6 +183,41 @@ Possible keys for %all_optional_params:
 
 =cut
 
+=head2 tmp_dir
+
+    Path, that used for store tomporary files.
+    This path must be writable.
+    It can be empty; in this case ( File::Spec->tmpdir() || $ENV{TEMP} ) will be used
+
+    By default:
+    During taint -T mode always writes files to current directory ( path = '' )
+    Windows outside taint -T mode writes files by default to C:\TEMP or C:\TMP
+    Unix    outside taint -T mode writes files by default to /var/tmp/
+
+=cut
+
+has tmp_dir => (
+    is       => 'ro',
+    isa      => 'Str',
+    lazy     => 1,
+    builder  => 'make_tmp_dir',
+);
+
+sub make_tmp_dir {
+    my ( $self ) = @_;
+
+    my $tmp_dir = File::Spec->tmpdir() || '';
+
+    # For WIN taint mode calculated path starts with '\'. Remove it and stay at current(empty) dir
+    $tmp_dir = '' if $tmp_dir =~ /^\\$/;
+
+    # TEMP = C:\Users\XXXXXX~1\AppData\Local\Temp
+    $tmp_dir ||= $ENV{TEMP} // '';
+
+    # Untaint ENV: fallback, if File::Spec->tmpdir failed
+    return [ $tmp_dir =~ /^(.+)$/ ]->[0];
+};
+
 
 =head2 BUILD
 
@@ -211,20 +246,6 @@ has reader => (
 );
 
 
-#   Path to store temporary files
-#   During taint -T mode always writes files to current directory ( path = '' )
-#   Windows outside taint -T mode writes files by default to C:\TEMP or C:\TMP
-#   Unix    outside taint -T mode writes files by default to /var/tmp/
-#   You can set this to any destination path you like
-# TODO: use it!
-#has tmp_dir => (
-#    is       => 'rw',
-#    isa      => 'Str',
-#    builder  => sub { File::Spec->tmpdir() },
-#    required => 1,
-#);
-
-
 =head2 fork_child
 
 Makes child process and returns pid of child process to parent or 0 to child process
@@ -234,14 +255,21 @@ Makes child process and returns pid of child process to parent or 0 to child pro
 sub fork_child {
     my ( $self ) = @_;
 
-    my $tmp_dir = File::Spec->tmpdir();
+    my( $randname, $parent_writer_fname, $parent_reader_fname );
+    $randname = sub {
+        my @x = ( 'a'..'z', 'A'..'Z', 0..9 );
+        join( "", map { $x[ int( rand @x - 0.01 ) ] } 1 .. 64 )
+    };
 
-    my $parent_writer_fname = File::Spec->catfile( $tmp_dir, '_pw_tmp_' . int( rand 999_999_999_999 ) );
-    my $parent_reader_fname = File::Spec->catfile( $tmp_dir, '_pr_tmp_' . int( rand 999_999_999_999 ) );
+    for ( 1..10 ) {
+    	$parent_writer_fname = File::Spec->catfile( $self->tmp_dir, '_pw_tmp_' . $randname->() );
+    	$parent_reader_fname = File::Spec->catfile( $self->tmp_dir, '_pr_tmp_' . $randname->() );
 
-    # For WIN taint mode calculated path starts with '\'. Remove it and stay at current dir
-    $parent_reader_fname =~ s/^\\//;
-    $parent_writer_fname =~ s/^\\//;
+  	next if -f $parent_writer_fname || -f $parent_reader_fname;
+	last;
+    };
+
+    die 'Can`t obtain unique fname'  if -f $parent_writer_fname || -f $parent_reader_fname;
 
     my $pid = fork() // die "fork() failed: $!";
 
@@ -293,7 +321,12 @@ sub get {
 
     close( $fh );
 
-    unlink $self->reader;
+    # In case, when reader still opened for writing
+    # We are not allowed to remove file, so we should wait
+    for ( 1..10 ) {
+        last  if unlink $self->reader;
+	sleep $self->timeout;
+    }
 
     my $answer = $data
         ? eval{ $self->serializer->deserialize( $data )->[0] }
@@ -317,12 +350,18 @@ sub put {
     unlink $self->writer;
     $self->clear_answer;
 
+    my $save_flush = $|;
+    $| = 1;
+
     open( my $fh, '>', $self->writer );
 
     # Each pack starts with an empty line and serialized string of useful data
     say $fh $self->serializer->serialize( [ $data ] );
 
     close $fh;
+
+    $| = $save_flush;
+
 };
 
 

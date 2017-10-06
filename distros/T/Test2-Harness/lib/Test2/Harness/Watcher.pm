@@ -2,11 +2,11 @@ package Test2::Harness::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
-use Time::HiRes qw/time/;
+use List::Util qw/first max/;
 
 use Test2::Harness::Util::HashBase qw{
     -job
@@ -26,6 +26,7 @@ use Test2::Harness::Util::HashBase qw{
     -_sub_info
     -nested
     -subtests
+    -numbers
 
     -last_event
 };
@@ -39,6 +40,8 @@ sub init {
     $self->{+_FAILURES}       = 0;
     $self->{+_ERRORS}         = 0;
     $self->{+ASSERTION_COUNT} = 0;
+
+    $self->{+NUMBERS} = {};
 
     $self->{+NESTED} = 0 unless defined $self->{+NESTED};
 }
@@ -57,7 +60,7 @@ sub process {
 
     $self->{+LAST_EVENT} = time;
 
-    my $f = $event->facet_data;
+    my $f = $event->{facet_data};
 
     return ($event, $f) if $f->{trace}->{buffered};
 
@@ -130,6 +133,9 @@ sub subtest_process {
 
     $event ||= Test2::Harness::Event->new(facet_data => $f);
 
+    $self->{+NUMBERS}->{$f->{assert}->{number}}++
+        if $f->{assert} && $f->{assert}->{number};
+
     if ($f->{parent} && $f->{assert}) {
         my $subwatcher = blessed($self)->new(nested => $self->{+NESTED} + 1, job => $self->{+JOB});
 
@@ -151,9 +157,15 @@ sub subtest_process {
 
             push @{$f->{info}} => @info;
         }
-        elsif($event->causes_fail) {
-            $self->{+_SUB_FAILURES}++;
-            $f->{assert}->{pass} = 0;
+        else {
+            my $fail = $f->{assert} && !$f->{assert}->{pass} && !($f->{amnesty} && @{$f->{amnesty}});
+            $fail ||= $f->{control} && ($f->{control}->{halt} || $f->{control}->{terminate});
+            $fail ||= $f->{errors} && first { $_->{fail} } @{$f->{errors}};
+
+            if ($fail) {
+                $self->{+_SUB_FAILURES}++;
+                $f->{assert}->{pass} = 0;
+            }
         }
     }
 
@@ -162,8 +174,11 @@ sub subtest_process {
     if ($f->{assert} && !$f->{assert}->{pass} && !($f->{amnesty} && @{$f->{amnesty}})) {
         $self->{+_FAILURES}++;
     }
-    elsif ($event->causes_fail) {
-        $self->{+_ERRORS}++;
+
+    if ($f->{control} || $f->{errors}) {
+        my $err ||= $f->{control} && ($f->{control}->{halt} || $f->{control}->{terminate});
+        $err ||= $f->{errors} && first { $_->{fail} } @{$f->{errors}};
+        $self->{+_ERRORS}++ if $err;
     }
 
     if ($f->{plan} && !$f->{plan}->{none}) {
@@ -192,6 +207,19 @@ sub subtest_fail_info_facet_list {
 
     my $plan = $self->{+PLAN} ? $self->{+PLAN}->{count} : undef;
     my $count = $self->{+ASSERTION_COUNT};
+
+    my $numbers = $self->{+NUMBERS};
+    my $max = max(keys %$numbers);
+    if ($max) {
+        for my $i (1 .. $max) {
+            if (!$numbers->{$i}) {
+                push @out => {tag => 'REASON', debug => 1, details => "Assertion number $i was never seen"};
+            }
+            elsif ($numbers->{$i} > 1) {
+                push @out => {tag => 'REASON', debug => 1, details => "Assertion number $i was seen more than once"};
+            }
+        }
+    }
 
     if (!$self->{+_PLANS}) {
         if ($count) {
@@ -226,7 +254,10 @@ sub fail_info_facet_list {
         if $incomplete_subtests;
 
     if (my $wstat = $self->{+EXIT}) {
-        if (my $exit = ($wstat >> 8)) {
+        if ($wstat == -1) {
+            push @out => {tag => 'REASON', debug => 1, details => "The harness could not get the exit code! (Code: $wstat)"}
+        }
+        elsif (my $exit = ($wstat >> 8)) {
             push @out => {tag => 'REASON', debug => 1, details => "Test script returned error (Code: $exit)"}
         }
         elsif (my $sig = $wstat & 127) {
@@ -272,6 +303,11 @@ sub kill {
 
     return kill('TERM', $pid) if $pid;
     return 0;
+}
+
+sub set_complete {
+    my $self = shift;
+    ($self->{+_COMPLETE}) = @_;
 }
 
 sub complete {

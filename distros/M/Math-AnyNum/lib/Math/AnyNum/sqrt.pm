@@ -11,8 +11,9 @@ sub __sqrt__ {
 
         # Complex for x < 0
         if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-            $x = _mpfr2mpc($x);
-            goto Math_MPC;
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_sqrt($r, $r, $ROUND);
+            return $r;
         }
 
         my $r = Math::MPFR::Rmpfr_init2($PREC);

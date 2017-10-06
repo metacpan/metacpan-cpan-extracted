@@ -15,14 +15,20 @@ our $VERSION = $Cisco::SNMP::VERSION;
 
 our @ISA = qw(Cisco::SNMP);
 
+my $warn
+  = sprintf "\n"
+  . "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+  . "'Cisco::SNMP::Password' is deprecated.\n"
+  . "Instead, use 'Crypt::Cisco'\n"
+  . "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" . "\n";
+
 # Cisco's XOR key
 my @xlat = (
-    0x64, 0x73, 0x66, 0x64, 0x3B, 0x6B, 0x66, 0x6F, 0x41, 0x2C,
-    0x2E, 0x69, 0x79, 0x65, 0x77, 0x72, 0x6B, 0x6C, 0x64, 0x4A,
-    0x4B, 0x44, 0x48, 0x53, 0x55, 0x42, 0x73, 0x67, 0x76, 0x63,
-    0x61, 0x36, 0x39, 0x38, 0x33, 0x34, 0x6E, 0x63, 0x78, 0x76,
-    0x39, 0x38, 0x37, 0x33, 0x32, 0x35, 0x34, 0x6B, 0x3B, 0x66,
-    0x67, 0x38, 0x37
+    0x64, 0x73, 0x66, 0x64, 0x3B, 0x6B, 0x66, 0x6F, 0x41, 0x2C, 0x2E, 0x69,
+    0x79, 0x65, 0x77, 0x72, 0x6B, 0x6C, 0x64, 0x4A, 0x4B, 0x44, 0x48, 0x53,
+    0x55, 0x42, 0x73, 0x67, 0x76, 0x63, 0x61, 0x36, 0x39, 0x38, 0x33, 0x34,
+    0x6E, 0x63, 0x78, 0x76, 0x39, 0x38, 0x37, 0x33, 0x32, 0x35, 0x34, 0x6B,
+    0x3B, 0x66, 0x67, 0x38, 0x37
 );
 
 ##################################################
@@ -31,85 +37,94 @@ my @xlat = (
 
 # Override with empty new()
 sub new {
-    return bless {}, __PACKAGE__
+    warn($warn);
+    return bless {}, __PACKAGE__;
 }
 
 sub password_decrypt {
+    warn($warn);
     my $self = shift;
 
     my $passwd;
 
     # Call as sub
-    if ($self =~ /^Cisco::SNMP/) {
-        ($passwd) = @_
+    if ( $self =~ /^Cisco::SNMP/ ) {
+        ($passwd) = @_;
     } else {
-        $passwd = $self
+        $passwd = $self;
     }
 
-    if (($passwd =~ /^[\da-f]+$/i) && (length($passwd) > 2)) {
-        if (!(length($passwd) & 1)) {
+    if ( ( $passwd =~ /^[\da-f]+$/i ) && ( length($passwd) > 2 ) ) {
+        if ( !( length($passwd) & 1 ) ) {
             my $dec = "";
-            my ($s, $e) = ($passwd =~ /^(..)(.+)/o);
+            my ( $s, $e ) = ( $passwd =~ /^(..)(.+)/o );
 
-            for (my $i = 0; $i < length($e); $i+=2) {
+            for ( my $i = 0; $i < length($e); $i += 2 ) {
+
                 # If we move past the end of the XOR key, reset
-                if ($s > $#xlat) { $s = 0 }
-                $dec .= sprintf "%c",hex(substr($e,$i,2))^$xlat[$s++]
+                if ( $s > $#xlat ) { $s = 0 }
+                $dec .= sprintf "%c",
+                  hex( substr( $e, $i, 2 ) ) ^ $xlat[$s++];
             }
-            return $dec
+            return $dec;
         }
     }
     $Cisco::SNMP::LASTERROR = "Invalid password `$passwd'";
-    return(0)
+    return (0);
 }
 
 sub password_encrypt {
+    warn($warn);
     my $self = shift;
 
-    my ($cleartxt, $index);
+    my ( $cleartxt, $index );
 
     # Call as sub
-    if ($self =~ /^Cisco::SNMP/) {
-        ($cleartxt, $index) = @_
+    if ( $self =~ /^Cisco::SNMP/ ) {
+        ( $cleartxt, $index ) = @_;
     } else {
         $cleartxt = $self;
-        ($index) = @_
+        ($index) = @_;
     }
 
     my $start = 0;
-    my $end = $#xlat;
+    my $end   = $#xlat;
 
-    if (defined $index) {
-        if ($index =~ /^\d+$/) {
-            if (($index < 0) || ($index > $#xlat)) {
-                $Cisco::SNMP::LASTERROR = "Index out of range 0-$#xlat: $index";
-                return(0)
+    if ( defined $index ) {
+        if ( $index =~ /^\d+$/ ) {
+            if ( ( $index < 0 ) || ( $index > $#xlat ) ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Index out of range 0-$#xlat: $index";
+                return (0);
             } else {
                 $start = $index;
-                $end   = $index
+                $end   = $index;
             }
-        } elsif ($index eq "") {
+        } elsif ( $index eq "" ) {
+
             # Do them all - currently set for that.
         } else {
-            my $random = int(rand($#xlat + 1));
+            my $random = int( rand( $#xlat + 1 ) );
             $start = $random;
-            $end   = $random
+            $end   = $random;
         }
     }
 
     my @passwds;
-    for (my $j = $start; $j <= $end; $j++) {
+    for ( my $j = $start; $j <= $end; $j++ ) {
         my $encrypt = sprintf "%02i", $j;
-        my $s       = $j;
+        my $s = $j;
 
-        for (my $i = 0; $i < length($cleartxt); $i++) {
+        for ( my $i = 0; $i < length($cleartxt); $i++ ) {
+
             # If we move past the end of the XOR key, reset
-            if ($s > $#xlat) { $s = 0 }
-            $encrypt .= sprintf "%02X", ord(substr($cleartxt,$i,1))^$xlat[$s++]
+            if ( $s > $#xlat ) { $s = 0 }
+            $encrypt .= sprintf "%02X",
+              ord( substr( $cleartxt, $i, 1 ) ) ^ $xlat[$s++];
         }
-        push @passwds, $encrypt
+        push @passwds, $encrypt;
     }
-    return \@passwds
+    return \@passwds;
 }
 
 ##################################################
@@ -133,6 +148,9 @@ Cisco::SNMP::Password - Password Interface for Cisco Management
   use Cisco::SNMP::Password;
 
 =head1 DESCRIPTION
+
+This module is deprecated.  Please use B<Crypt::Cisco>.  This will be 
+removed from future releases.
 
 The following methods implement the type-7 password encryption / decryption.  
 The algorithm is freely available on the Internet on several sites; thus, 
@@ -211,6 +229,10 @@ None by default.
 This distribution comes with several scripts (installed to the default
 C<bin> install directory) that not only demonstrate example uses but also
 provide functional execution.
+
+=head1 SEE ALSO
+
+L<Crypt::Cisco>
 
 =head1 LICENSE
 

@@ -3,132 +3,78 @@ package GraphQL::Error;
 use 5.014;
 use strict;
 use warnings;
-
-=head1 NAME
-
-GraphQL::Error - Perl implementation
-
-=head1 VERSION
-
-Version 0.02
-
-=cut
+use Moo;
+use Types::Standard -all;
+use GraphQL::Type::Library -all;
+use Return::Type;
+use Function::Parameters;
 
 our $VERSION = '0.02';
 
+=head1 NAME
+
+GraphQL::Error - GraphQL error object
 
 =head1 SYNOPSIS
 
-Perhaps a little code snippet.
+  use GraphQL::Error;
+  die GraphQL::Error->new(message => 'Something is not right...');
 
-    use GraphQL;
+=head1 DESCRIPTION
 
-    my $foo = GraphQL->new();
-    ...
+Class implementing GraphQL error object.
 
-=head1 EXPORT
+=head1 ATTRIBUTES
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
+=head2 message
 
 =cut
 
-sub function1 {
+has message => (is => 'ro', isa => Str, required => 1);
+
+=head2 original_error
+
+If there is an original error to be preserved.
+
+=cut
+
+has original_error => (is => 'ro', isa => Any);
+
+=head1 METHODS
+
+=head2 is
+
+Is the supplied scalar an error object?
+
+=cut
+
+method is(Any $item) :ReturnType(Bool) { ref $item eq __PACKAGE__ }
+
+=head2 coerce
+
+If supplied scalar is an error object, return. If not, return one with
+it as message. If an object, message will be stringified version of that,
+it will be preserved as C<original_error>.
+
+=cut
+
+method coerce(Any $item) :ReturnType(InstanceOf[__PACKAGE__]) {
+  return $item if $self->is($item);
+  is_InstanceOf($item)
+    ? $self->new(message => $item.'', original_error => $item)
+    : $self->new(message => $item);
 }
 
-=head2 function2
+=head2 to_string
+
+Converts to string.
 
 =cut
 
-sub function2 {
+method to_string() :ReturnType(Str) {
+  $self->message;
 }
 
-=head1 AUTHOR
-
-Ed J, C<< <etj at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-graphql at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc GraphQL
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=GraphQL>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/GraphQL>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/GraphQL>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/GraphQL/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Ed J.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=cut
+__PACKAGE__->meta->make_immutable();
 
 1;

@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
@@ -26,9 +26,15 @@ has email_address => (
 );
 
 has force_threaded_perls => (
-    is       => 'ro',
-    isa      => Bool,
-    required => 1,
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
+has perl_caching => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 1,
 );
 
 has github_user => (
@@ -77,10 +83,23 @@ sub _maybe_update_travis_perl_usage {
         && grep {/perl-travis-helper|travis-perl/}
         @{ $travis->{before_install} } );
 
+    $self->_maybe_add_cache_block($travis);
     $self->_fixup_helpers_usage($travis);
     $self->_rewrite_perl_block($travis);
     $self->_update_perl_matrix($travis);
     $self->_update_env_vars($travis);
+
+    return;
+}
+
+sub _maybe_add_cache_block {
+    my $self   = shift;
+    my $travis = shift;
+
+    return unless $self->perl_caching;
+    return if exists $travis->{cache};
+
+    $travis->{cache} = { directories => ['$HOME/perl5'] };
 
     return;
 }
@@ -116,8 +135,10 @@ sub _fixup_helpers_usage {
         @{ $travis->{before_install} };
         $i = 0 if $i < 0;
 
-        $travis->{before_install}[$i]
-            = 'eval $(curl https://travis-perl.github.io/init) --auto';
+        my $auto = 'eval $(curl https://travis-perl.github.io/init) --auto';
+        $auto .= ' --always-upgrade-modules' if $self->perl_caching;
+
+        $travis->{before_install}[$i] = $auto;
         splice( @{ $travis->{before_install} }, $i + 1, 0 )
             if @{ $travis->{before_install} } > 1;
     }
@@ -136,9 +157,9 @@ sub _rewrite_perl_block {
     my @perls = qw(
         blead
         dev
-        5.26.0
-        5.24.1
-        5.22.3
+        5.26.1
+        5.24.2
+        5.22.4
         5.20.3
         5.18.3
         5.16.3
@@ -178,14 +199,23 @@ sub _update_perl_matrix {
     push @bleads, 'blead-thr'
         if grep { $_ eq 'blead-thr' } @{ $travis->{perl} };
 
+    my @include = @{ $travis->{matrix}{include} // [] };
+    push @include, {
+        perl => '5.26',
+        env  => 'COVERAGE=1',
+        }
+        unless grep { $_->{perl} eq '5.26' && $_->{env} eq 'COVERAGE=1' }
+        @include;
+
+    my @allow_failures = @{ $travis->{matrix}{allow_failures} // [] };
+    for my $blead (@bleads) {
+        push @allow_failures, { perl => $blead }
+            unless grep { $_->{perl} eq $blead } @allow_failures;
+    }
+
     $travis->{matrix} = {
-        include => [
-            {
-                perl => '5.26',
-                env  => 'COVERAGE=1',
-            }
-        ],
-        allow_failures => [ map { { perl => $_ } } @bleads ],
+        include        => \@include,
+        allow_failures => \@allow_failures,
     };
 
     return;
@@ -309,6 +339,7 @@ my @BlocksOrder = qw(
     perl
     php
     python
+    cache
     solution
     matrix
     env
@@ -367,7 +398,8 @@ sub _cisetup_flags {
     my $self = shift;
 
     my %flags = (
-        force_threaded_perls => $self->force_threaded_perls,
+        force_threaded_perls => $self->force_threaded_perls ? 1 : 0,
+        perl_caching         => $self->perl_caching         ? 1 : 0,
     );
 
     $flags{email_address} = $self->email_address

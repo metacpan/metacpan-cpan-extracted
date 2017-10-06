@@ -7,6 +7,7 @@ use MooX::Aliases;
 use WebService::Solr;
 use Catmandu::Store::Solr::Bag;
 use Catmandu::Error;
+use LWP::UserAgent;
 
 with 'Catmandu::Store';
 with 'Catmandu::Transactional';
@@ -17,7 +18,7 @@ Catmandu::Store::Solr - A searchable store backed by Solr
 
 =cut
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 =head1 SYNOPSIS
 
@@ -74,45 +75,43 @@ our $VERSION = '0.0302';
 
 =cut
 
-has url => (is => 'ro', default => sub { 'http://localhost:8983/solr' });
-
-has solr => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_solr',
-);
-
+has url        => (is => 'ro', default => sub {'http://localhost:8983/solr'});
+has keep_alive => (is => 'ro', default => sub {0});
+has solr => (is => 'lazy');
 has bag_key => (is => 'lazy', alias => 'bag_field');
-
 has on_error => (
-    is => 'ro',
+    is  => 'ro',
     isa => sub {
-        array_includes([qw(throw ignore)],$_[0]) or die("on_error must be 'throw' or 'ignore'");
+        array_includes([qw(throw ignore)], $_[0])
+            or die("on_error must be 'throw' or 'ignore'");
     },
-    lazy => 1,
-    default => sub { "throw" }
+    lazy    => 1,
+    default => sub {"throw"}
 );
+has _bags_used => (is => 'ro', lazy => 1, default => sub {[];});
 
-has _bags_used => (
-    is => 'ro',
-    lazy => 1,
-    default => sub { []; }
-);
 around 'bag' => sub {
-
     my $orig = shift;
     my $self = shift;
 
     my $bags_used = $self->_bags_used;
-    unless(array_includes($bags_used,$_[0])){
-        push @$bags_used,$_[0];
+    unless (array_includes($bags_used, $_[0])) {
+        push @$bags_used, $_[0];
     }
 
-    $orig->($self,@_);
+    $orig->($self, @_);
 };
 
 sub _build_solr {
-    WebService::Solr->new($_[0]->url, {autocommit => 0, default_params => {wt => 'json'}});
+    my ($self) = @_;
+    WebService::Solr->new(
+        $_[0]->url,
+        {
+            autocommit     => 0,
+            default_params => {wt => 'json'},
+            agent => LWP::UserAgent->new(keep_alive => $self->keep_alive),
+        }
+    );
 }
 
 sub _build_bag_key {
@@ -120,29 +119,29 @@ sub _build_bag_key {
 }
 
 sub transaction {
-    my($self,$sub)=@_;
+    my ($self, $sub) = @_;
 
-    if($self->{_tx}){
+    if ($self->{_tx}) {
         return $sub->();
     }
     my $solr = $self->solr;
     my @res;
 
     eval {
-        #flush buffers of all known bags ( with commit=true ), to ensure correct state
-        for my $bag_name(@{ $self->_bags_used() }){
-            $self->bag($bag_name)->commit();
+#flush buffers of all known bags ( with commit=true ), to ensure correct state
+        for my $bag_name (@{$self->_bags_used}) {
+            $self->bag($bag_name)->commit;
         }
 
-        #mark store as 'in transaction'. All subsequent calls to commit only flushes buffers without setting 'commit' to 'true' in solr
+#mark store as 'in transaction'. All subsequent calls to commit only flushes buffers without setting 'commit' to 'true' in solr
         $self->{_tx} = 1;
 
         #transaction
         @res = $sub->();
 
         #flushing buffers of all known bags (with commit=false)
-        for my $bag_name(@{ $self->_bags_used() }){
-            $self->bag($bag_name)->commit();
+        for my $bag_name (@{$self->_bags_used}) {
+            $self->bag($bag_name)->commit;
         }
 
         #commit in solr
@@ -153,12 +152,15 @@ sub transaction {
         1;
     } or do {
         my $err = $@;
-        #remove remaining documents from all buffers, because they were added during the transaction
-        for my $bag_name(@{ $self->_bags_used() }){
-            $self->bag($bag_name)->clear_buffer();
+
+#remove remaining documents from all buffers, because they were added during the transaction
+        for my $bag_name (@{$self->_bags_used}) {
+            $self->bag($bag_name)->clear_buffer;
         }
+
         #rollback in solr
-        eval { $solr->rollback };
+        eval {$solr->rollback};
+
         #remove mark 'in transaction'
         $self->{_tx} = 0;
         Catmandu::Error->throw($err);
@@ -286,6 +288,30 @@ and a commit is issued in solr.
     });
 
     # Record is still { _id => "test" }
+
+=head1 INHERITED METHODS
+
+This Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Store>
+
+=item L<Catmandu::Transactional>
+
+=back
+
+Each Catmandu::Bag in this Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Bag>
+
+=item L<Catmandu::Searchable>
+
+=item L<Catmandu::CQLSearchable>
+
+=back
 
 =head1 SEE ALSO
 

@@ -1,3 +1,13 @@
+v0.4.2 2017-10-05T23:58:12Z
+ - bin path builder fixed
+
+v0.4.1 2017-10-05T23:50:37Z
+ - princexml path fixed
+
+v0.4.0 2017-10-05T23:43:01Z
+ - princexml v11.3
+ - update deps on install
+
 v0.3.7 2017-05-28T19:33:28Z
  - No issues on bugtracker were closed since the last release
  - typo

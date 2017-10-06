@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20170902';
+our $VERSION = '20171005';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -19,6 +19,7 @@ use POSIX qw(strftime);                                                         
 use Data::Dump qw(dump);
 use JSON;
 use MIME::Base64;
+use String::Numeric qw(is_float);
 use utf8;
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
@@ -37,7 +38,7 @@ sub timeStamp                                                                   
 
 sub xxx(@)                                                                      # Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
  {my (@cmd) = @_;                                                               # Command to execute followed by an optional regular expression to test the results
-  @cmd or confess "No command";                                                 # Check that there is a command to execute
+  @cmd or confess "No command\n";                                               # Check that there is a command to execute
   $_ or confess "Missing command component\n" for @cmd;                         # Check that there are no undefined command components
   my $success = $cmd[-1];                                                       # Error check if present
   my $check = ref($success) =~ /RegExp/i;                                       # Check for error check
@@ -106,7 +107,7 @@ sub filePathDir(@)                                                              
 sub filePathExt(@)                                                              # File name from file name components and extension
  {my (@File) = @_;                                                              # File components and extension
   my @file = grep{$_} @_;                                                       # Remove undefined and blank components
-  @file > 1 or confess "At least two non blank file name components required";
+  @file > 1 or confess "At least two non blank file name components required\n";
   my $x = pop @file;
   my $n = pop @file;
   my $f = "$n.$x";
@@ -149,11 +150,17 @@ sub currentDirectory                                                            
  {renormalizeFolderName(getcwd)
  }
 
+sub userId                                                                      # Get the current user id via whoami
+ {my $u = qx(whoami);
+  chomp($u);
+  $u
+ }
+
 sub currentDirectoryAbove                                                       # The path to the folder above the current working folder
  {my $p = currentDirectory;
   my @p = split m(/)s, $p;
   shift @p if @p and $p[0] =~ m/\A\s*\Z/;
-  @p or confess "No directory above\n:".currentDirectory;
+  @p or confess "No directory above\n:".currentDirectory, "\n";
   pop @p;
   my $r = shift @p;
   filePathDir("/$r", @p);
@@ -248,10 +255,12 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
  {my (@foldersandExtensions) = @_;                                              # Mixture of folder names and extensions
   my @folder     = grep { -d $_ } @_;                                           # Folders
   my @extensions = grep {!-d $_ } @_;                                           # Extensions
+  my $e = join '|', @extensions;                                                # Files
   my @f;                                                                        # Files
   for my $dir(@folder)                                                          # Directory
-   {for my $ext(@extensions)                                                    # Extensions
-     {push @f, fileList(filePathExt($dir, qq(*), $ext));                        # Record files that match
+   {for(split /\0/, qx(find $dir -print0))
+     {next if -d $_;                                                            # Do not include folder names
+      push @f, $_ if m(($e)\Z)s;
      }
    }
   sort @f
@@ -269,16 +278,30 @@ sub matchPath($)                                                                
   ''                                                                            # Nothing matches
  } # matchPath
 
+sub clearFolder($$)                                                             # Remove all the files and folders under and including the specified folder as long as the number of files to be removed is less than the specified limit.
+ {my ($folder, $limitCount) = @_;                                               # Folder, maximum number of files to remove to limit damage
+  return unless -d $folder;                                                     # Only works on a folder that exists
+  my @f = findFiles($folder);                                                   # Find files to be removed
+  if (@f > $limitCount)                                                         # Limit the number of files that can be deleted to limit potential opportunity for damage
+   {my $f = @f;
+    confess "Limit is $limitCount, but $f files under folder:\n$folder\n";
+   }
+  my @d = findDirs($folder);                                                    # These directories should be empty and thus removable after removing the files
+  unlink $_ for @f;                                                             # Remove files
+  rmdir $_  for reverse @d;                                                     # Remove empty folders
+  -e $folder and carp "Unable to completely remove folder:\n$folder\n";         # Complain if the folder still exists
+ }
+
 #2 Read and write files                                                         # Read and write strings from and to files creating paths as needed
 
 sub readFile($)                                                                 # Read a file containing unicode
  {my ($file) = @_;                                                              # Name of unicode file to read
   my $f = $file;
-  defined($f) or confess "Cannot read undefined file";
-  $f =~ m(\n) and confess "File name contains a new line:\n=$file=";
+  defined($f) or  confess "Cannot read undefined file\n";
+  $f =~ m(\n) and confess "File name contains a new line:\n=$file=\n";
   -e $f or confess "Cannot read file because it does not exist, file:\n$f\n";
   open(my $F, "<:encoding(UTF-8)", $f) or confess
-    "Cannot open $f for unicode input";
+    "Cannot open file for unicode input, file:\n$f\n";
   local $/ = undef;
   my $s = eval {<$F>};
   $@ and confess $@;
@@ -288,8 +311,8 @@ sub readFile($)                                                                 
 sub readBinaryFile($)                                                           # Read binary file - a file whose contents are not to be interpreted as unicode
  {my ($file) = @_;                                                              # File to read
   my $f = $file;
-  -e $f or confess "Cannot read binary file $f because it does not exist";
-  open my $F, "<$f" or confess "Cannot open binary file $f for input";
+  -e $f or confess "Cannot read binary file because it does not exist:\n$f\n";
+  open my $F, "<$f" or confess "Cannot open binary file for input:\n$f\n";
   local $/ = undef;
   <$F>;
  }
@@ -302,63 +325,64 @@ sub makePath($)                                                                 
   my $p = join '/', @p;
   return 2 if -d $p;
   eval {make_path($p)};
-  -d $p or confess "Cannot makePath $p";
+  -d $p or confess "Cannot make path:\n$p\n";
   0
  }
 
 sub writeFile($$)                                                               # Write a unicode string to a file after creating a path to the file if necessary
  {my ($file, $string) = @_;                                                     # File to write to, unicode string to write
-  $file or confess "No file name supplied";
-  $string or carp "No string for file $file";
+  $file or confess "No file name supplied\n";
+  $string or carp "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">$file" or confess "Cannot open $file for write";
+  open my $F, ">$file" or confess "Cannot open for write file:\n$file\n";
   binmode($F, ":utf8");
   print  {$F} $string;
   close  ($F);
-  -e $file or confess "Failed to write to file $file";
+  -e $file or confess "Failed to write to file:\n$file\n";
  }
 
 sub appendFile($$)                                                              # Append a unicode string to a file after creating a path to the file if necessary
  {my ($file, $string) = @_;                                                     # File to append to, unicode string to append
-  $file or confess "No file name supplied";
-  $string or carp "No string for file $file";
+  $file or confess "No file name supplied\n";
+  $string or carp "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">>$file" or confess "Cannot open $file for write";
+  open my $F, ">>$file" or confess "Cannot open for write file:\n$file\n";
   binmode($F, ":utf8");
   print  {$F} $string;
   close  ($F);
-  -e $file or confess "Failed to write to file $file";
+  -e $file or confess "Failed to write to file:\n$file\n";
  }
 
 sub writeBinaryFile($$)                                                         # Write a non unicode string to a file in after creating a path to the file if necessary
  {my ($file, $string) = @_;                                                     # File to write to, non unicode string to write
-  $file or confess "No file name supplied";
-  $string or confess "No string for file $file";
+  $file or confess "No file name supplied\n";
+  $string or confess "No string for file:\n$file\n";
   makePath($file);
-  open my $F, ">$file" or confess "Cannot open $file for binary write";
+  open my $F, ">$file" or confess "Cannot open file for binary write:\n$file\n";
   binmode($F);
   print  {$F} $string;
   close  ($F);
-  -e $file or confess "Failed to write in binary to file $file";
+  -e $file or confess "Failed to write in binary to file:\n$file\n";
  }
 
 #1 Images                                                                       # Image operations
 sub imageSize($)                                                                # Return (width, height) of an image obtained via imagemagick
  {my ($image) = @_;                                                             # File containing image
-  -e $image or confess "Cannot get size of image $image as file does not exist";
+  -e $image or confess
+    "Cannot get size of image as file does not exist:\n$image\n";
   my $s = qx(identify -verbose "$image");
   if ($s =~ /Geometry: (\d+)x(\d+)/s)
    {return ($1, $2);
    }
   else
-   {confess "Cannot get image size for $image from:\n$s";
+   {confess "Cannot get image size for file:\n$image\nfrom:\n$s\n";
    }
  }
 
 sub convertImageToJpx($$$)                                                      # Convert an image to jpx format
  {my ($source, $target, $size) = @_;                                            # Source file, target folder (as multiple files will be created),  size of each tile
   -e $source or confess
-   "convertImageJpx: cannot convert image file $source, as file does not exist";
+   "Cannot convert image file as file does not exist:\n$source\n";
   makePath($target);
   my ($w, $h) = imageSize($source);
   writeFile(filePath($target, "jpx.data"), <<END);
@@ -384,8 +408,8 @@ END
      {for my $X(1..$W)
        {my $s = "${target}-$k";
         my $t = "${target}/${Y}_${X}.jpg";
-        rename $s, $t or confess "Cannot rename $s to $t";
-        -e $t or confess "Cannot create $t";
+        rename $s, $t or confess "Cannot rename file:\n$s\nto:\n$t\n";
+        -e $t or confess "Cannot create file:\n$t\n";
         ++$k;
        }
      }
@@ -414,7 +438,7 @@ sub decodeBase64($)                                                             
   decode_base64($string)
  }
 
-#1 Powers                                                                       # Integer powers of two
+#1 Numbers                                                                      # Numeric operations
 
 sub powerOfTwo($)                                                               #X Test whether a number is a power of two, return the power if it is else B<undef>
  {my ($n) = @_;                                                                 # Number to check
@@ -433,14 +457,60 @@ sub containingPowerOfTwo($)                                                     
   undef
  }
 
+
+#1 Arrays                                                                       # Array operations
+
+sub contains($@)                                                                # Returns the indices at which an item matches an array. If item is a regular expression then it is matched as one else it is a number it is matched as a number, else a string
+ {my ($item, @array) = @_;                                                      # Item, array
+  my @r;
+  if (ref($item) =~ m(Regexp))                                                  # Match via a regular expression
+   {for(keys @array)
+     {push @r, $_ if $array[$_] =~ m($item)s;
+     }
+   }
+  elsif (is_float($item))                                                       # Match as a number
+   {for(keys @array)
+     {push @r, $_ if $array[$_]+0 == $item;
+     }
+   }
+  else                                                                          # Match as a string
+   {for(keys @array)
+     {push @r, $_ if $array[$_] eq $item;
+     }
+   }
+  @r
+ }
+
+sub min(@)                                                                      # Find the minimum number in a list
+ {my (@n) = @_;                                                                 # Numbers
+  return undef unless @n;
+  return $n[0] if @n == 0;
+  my $m = $n[0];
+  for(@n)
+   {$m = $_ if $_ < $m;
+   }
+  $m
+ }
+
+sub max(@)                                                                      # Find the maximum number in a list
+ {my (@n) = @_;                                                                 # Numbers
+  return undef unless @n;
+  return $n[0] if @n == 0;
+  my $M = $n[0];
+  for(@n)
+   {$M = $_ if $_ > $M;
+   }
+  $M
+ }
+
 #1 Format                                                                       # Format data structures as tables
 sub formatTableBasic($;$)                                                       # Tabularize text - basic version
  {my ($data, $separator) = @_;                                                  # Data to be formatted, optional line separator
   my $d = $data;
-  ref($d) =~ /array/i or confess "Array reference required";
+  ref($d) =~ /array/i or confess "Array reference required\n";
   my @D;
   for   my $e(@$d)
-   {ref($e) =~ /array/i or confess "Array reference required";
+   {ref($e) =~ /array/i or confess "Array reference required\n";
     for my $D(0..$#$e)
      {my $a = $D[$D]           // 0;                                            # Maximum length of data so far
       my $b = length($e->[$D]) // 0;                                            # Length of current item
@@ -615,9 +685,9 @@ sub checkKeys($$)                                                               
  {my ($test, $permitted) = @_;                                                  # The hash to test, the permitted keys and their meanings
 
   ref($test)      =~ /hash/igs or                                               # Check parameters
-    confess "Hash reference required for first parameter";
+    confess "Hash reference required for first parameter\n";
   ref($permitted) =~ /hash/igs or
-    confess "Hash referebce required for second parameter";
+    confess "Hash reference required for second parameter\n";
 
   my %parms = %$test;                                                           # Copy keys supplied
   delete $parms{$_} for keys %$permitted;                                       # Remove permitted keys
@@ -633,22 +703,24 @@ sub checkKeys($$)                                                               
  }
 
 #1 LVALUE methods                                                               # Replace $a->{value} = $b with $a->value = $b which reduces the amount of typing required, is easier to read and provides a hard check that {value} is spelt correctly.
-sub genLValueScalarMethods(@)                                                   # Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Example: $a->value = 1;
+sub genLValueScalarMethods(@)                                                   # Generate LVALUE scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value undef. Suffixing B<X> to the scalar name will confess if a value has not been set.  Example: $a->value = 1;
  {my (@names) = @_;                                                             # List of method names
   my ($package) = caller;                                                       # Package
   for(@_)                                                                       # Name each method
-   {my $s = 'sub '.$package.'::'.$_.':lvalue {my $v; $_[0]{"'.$_.'"} //= $v}';
+   {my $s = 'sub '.$package.'::'.$_.':lvalue {my $v; $_[0]{"'.$_.'"} //= $v}'.
+            'sub '.$package.'::'.$_.'X:lvalue {my $v = $_[0]{"'.$_.'"}; confess q(No value supplied for "'.$_.'") unless defined($v); $v}';
     eval $s;
-    confess "Unable to create LValue scalar method for: '$_' because\n$@" if $@;
+    confess "Unable to create LValue scalar method for: '$_' because\n$@\n" if $@;
    }
  }
+
 sub genLValueScalarMethodsWithDefaultValues(@)                                  # Generate LVALUE scalar methods with default values in the current package. A reference to a method whose value has not yet been set will return a scalar whose value is the name of the method.  Example: $a->value == qq(value);
  {my (@names) = @_;                                                             # List of method names
   my ($package) = caller;                                                       # Package
   for(@_)                                                                       # Name each method
    {my $s = 'sub '.$package.'::'.$_.':lvalue {my $v = "'.$_.'"; $_[0]{"'.$_.'"} //= $v}';
     eval $s;
-    confess "Unable to create LValue scalar method for: '$_' because\n$@" if $@;
+    confess "Unable to create LValue scalar method for: '$_' because\n$@\n" if $@;
    }
  }
 
@@ -658,7 +730,7 @@ sub genLValueArrayMethods(@)                                                    
   for(@_)                                                                       # Name each method
    {my $s = 'sub '.$package.'::'.$_.':lvalue {$_[0]{"'.$_.'"} //= []}';
     eval $s;
-    confess "Unable to create LValue array method for: '$_' because\n$@" if $@;
+    confess "Unable to create LValue array method for: '$_' because\n$@\n" if $@;
    }
  }
 
@@ -668,7 +740,7 @@ sub genLValueHashMethods(@)                                                     
   for(@_)                                                                       # Name each method
    {my $s = 'sub '.$package.'::'.$_.':lvalue {$_[0]{"'.$_.'"} //= {}}';
     eval $s;
-    confess "Unable to create LValue hash method for: '$_' because\n$@" if $@;
+    confess "Unable to create LValue hash method for: '$_' because\n$@\n" if $@;
    }
  }
 
@@ -703,7 +775,7 @@ sub nws($)                                                                      
   $string =~ s/\A\s+//r =~ s/\s+\Z//r =~ s/\s+/ /gr
  }
 
-sub javaPackage($)                                                              # Extract the package name from a java string or file,
+sub javaPackage($)                                                              # Extract the package name from a java string or file.
  {my ($java) = @_;                                                              # Java file if it exists else the string of java
 
   my $s = sub
@@ -713,6 +785,15 @@ sub javaPackage($)                                                              
 
   my ($p) = $s =~ m(package\s+(\S+)\s*;);
   $p
+ }
+
+sub javaPackageAsFileName($)                                                    # Extract the package name from a java string or file and convert it to a file name.
+ {my ($java) = @_;                                                              # Java file if it exists else the string of java
+
+  if (my $p = javaPackage($java))
+   {return $p =~ s/\./\//gr;
+   }
+  undef
  }
 
 sub perlPackage($)                                                              # Extract the package name from a perl string or file,
@@ -849,9 +930,26 @@ END
 
       @parameters == length($signature) or                                      # Check signature length
         confess "Signature $signature for method: $name".
-                " has wrong number of parameters";
+                " has wrong number of parameters\n";
 
       my @parmDescriptions = map {ucfirst()} split /,\s*/, $parmDescriptions;   # Parameter descriptions with first letter uppercased
+
+      if (1)                                                                    # Check parameters comment
+       {my $p = @parmDescriptions;
+        my $l = length($signature);
+        $p == $l or confess <<"END";
+Method: $name($signature). The comment describing the parameters for this
+method has descriptions for $p parameters but the signature suggests that there
+are $l parameters.
+
+The comment is split on /,/ to divide the comment into descriptions of each
+parameter.
+
+The comment supplied is:
+$parmDescriptions
+END
+       }
+
       my $parametersAsString = join ', ', @parameters;                          # Parameters as a comma separated string
       my $headLevel = $level+$off+1;                                            # Heading level
       my $methodSignature = "$name($parametersAsString)";                       # Method(signature)
@@ -1046,7 +1144,7 @@ END
 
 sub updatePerlModuleDocumentation($)                                            # Update the documentation in a perl file and show said documentation in a web browser
  {my ($perlModule) = @_;                                                        # File containing the code of the perl module
-  -e $perlModule or confess "No such file: $perlModule";
+  -e $perlModule or confess "No such file:\n$perlModule\n";
   my $t = extractDocumentation($perlModule);                                    # Get documentation
   my $S = my $s = readFile($perlModule);                                        # Read module source
   writeFile(filePathExt($perlModule, qq(backup)), $s);                          # Backup module source
@@ -1084,7 +1182,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(appendFile
 checkFile checkFilePath checkFilePathExt checkFilePathDir
-checkKeys containingPowerOfTwo
+checkKeys clearFolder contains containingPowerOfTwo
 containingFolder convertImageToJpx currentDirectory currentDirectoryAbove
 dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64 extractDocumentation
@@ -1094,17 +1192,19 @@ formatTableBasic fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 imageSize indentString isBlank
-javaPackage
+javaPackage javaPackageAsFileName
 keyCount
 loadArrayArrayFromLines loadArrayFromLines
 loadHashArrayFromLines loadHashFromLines
-makePath matchPath
-nws pad parseFileName powerOfTwo quoteFile
+makePath matchPath max min
+nws
+pad parseFileName powerOfTwo printFullFileName
+quoteFile
 readBinaryFile readFile
-printFullFileName
 saveToS3 searchDirectoryTreesForMatchingFiles
 temporaryDirectory temporaryFile temporaryFolder timeStamp trim
-updatePerlModuleDocumentation writeBinaryFile writeFile
+updatePerlModuleDocumentation userId
+writeBinaryFile writeFile
 xxx);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
@@ -1121,21 +1221,9 @@ Data::Table::Text - Write data in tabular text format
 
 =head1 Synopsis
 
+Print an array of hashes:
+
  use Data::Table::Text;
-
- say STDERR formatTable([
-   [".", "aa", "bb", "cc"],
-   [1, "A", "B", "C"],
-   [2, "AA", "BB", "CC"],
-   [3, "AAA", "BBB", "CCC"],
-   [4, 1, 22, 333]]);
-
- #    .  aa   bb   cc
- # 1  1  A    B    C
- # 2  2  AA   BB   CC
- # 3  3  AAA  BBB  CCC
- # 4  4    1   22  333
-
 
  say STDERR formatTable([
    { aa => "A", bb => "B", cc => "C" },
@@ -1149,6 +1237,7 @@ Data::Table::Text - Write data in tabular text format
  # 3  AAA  BBB  CCC
  # 4    1   22  333
 
+Print a hash of arrays:
 
  say STDERR formatTable({
    "" => ["aa", "bb", "cc"],
@@ -1163,6 +1252,7 @@ Data::Table::Text - Write data in tabular text format
  #  333  AAA  BBB  CCC
  # 4444    1   22  333
 
+Print a hash of hashes:
 
  say STDERR formatTable({
    a => { aa => "A", bb => "B", cc => "C" },
@@ -1175,6 +1265,7 @@ Data::Table::Text - Write data in tabular text format
  # aaa   AAA  BBB  CCC
  # aaaa    1   22  333
 
+Print an array of scalars:
 
  say STDERR formatTable(["a", "bb", "ccc", 4444]);
  # 0  a
@@ -1182,6 +1273,7 @@ Data::Table::Text - Write data in tabular text format
  # 2  ccc
  # 3  4444
 
+Print a hash of scalars:
 
  say STDERR formatTable({ aa => "A", bb => "B", cc => "C" });
  # aa  A
@@ -1192,8 +1284,6 @@ Data::Table::Text - Write data in tabular text format
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
-
-
 
 =head1 Time stamps
 
@@ -1455,9 +1545,9 @@ Convert an image to jpx format
   2  $target  Target folder (as multiple files will be created)
   3  $size    Size of each tile
 
-=head1 Json
+=head1 Encoding and Decoding
 
-Encode and decode Json
+Encode and decode using Json and Mime
 
 =head2 encodeJson($)
 
@@ -1471,9 +1561,21 @@ Decode Perl from Json
 
   1  $string  Data to decode
 
-=head1 Powers
+=head2 encodeBase64($)
 
-Integer powers of two
+Encode a string in base 64
+
+  1  $string  String to encode
+
+=head2 decodeBase64($)
+
+Decode a string in base 64
+
+  1  $string  String to decode
+
+=head1 Numbers
+
+Numeric operations
 
 =head2 powerOfTwo($)
 
@@ -1490,6 +1592,18 @@ Find log two of the lowest power of two greater than or equal to a number
   1  $n  Number to check
 
 Use B<containingPowerOfTwoX> to execute L<containingPowerOfTwo|/containingPowerOfTwo> but B<die> 'containingPowerOfTwo' instead of returning B<undef>
+
+=head2 min(@)
+
+Find the minimum number in a list
+
+  1  @n  Numbers
+
+=head2 max(@)
+
+Find the maximum number in a list
+
+  1  @n  Numbers
 
 =head1 Format
 
@@ -1807,123 +1921,131 @@ Extract a line of a test
 
 14 L<dateTimeStamp|/dateTimeStamp>
 
-15 L<decodeJson|/decodeJson>
+15 L<decodeBase64|/decodeBase64>
 
-16 L<denormalizeFolderName|/denormalizeFolderName>
+16 L<decodeJson|/decodeJson>
 
-17 L<encodeJson|/encodeJson>
+17 L<denormalizeFolderName|/denormalizeFolderName>
 
-18 L<extractDocumentation|/extractDocumentation>
+18 L<encodeBase64|/encodeBase64>
 
-19 L<extractTest|/extractTest>
+19 L<encodeJson|/encodeJson>
 
-20 L<fileList|/fileList>
+20 L<extractDocumentation|/extractDocumentation>
 
-21 L<fileModTime|/fileModTime>
+21 L<extractTest|/extractTest>
 
-22 L<fileOutOfDate|/fileOutOfDate>
+22 L<fileList|/fileList>
 
-23 L<fileOutOfDateX|/fileOutOfDate>
+23 L<fileModTime|/fileModTime>
 
-24 L<filePath|/filePath>
+24 L<fileOutOfDate|/fileOutOfDate>
 
-25 L<filePathDir|/filePathDir>
+25 L<fileOutOfDateX|/fileOutOfDate>
 
-26 L<filePathExt|/filePathExt>
+26 L<filePath|/filePath>
 
-27 L<fileSize|/fileSize>
+27 L<filePathDir|/filePathDir>
 
-28 L<findDirs|/findDirs>
+28 L<filePathExt|/filePathExt>
 
-29 L<findFiles|/findFiles>
+29 L<fileSize|/fileSize>
 
-30 L<formatTable|/formatTable>
+30 L<findDirs|/findDirs>
 
-31 L<formatTableA|/formatTableA>
+31 L<findFiles|/findFiles>
 
-32 L<formatTableAA|/formatTableAA>
+32 L<formatTable|/formatTable>
 
-33 L<formatTableAH|/formatTableAH>
+33 L<formatTableA|/formatTableA>
 
-34 L<formatTableBasic|/formatTableBasic>
+34 L<formatTableAA|/formatTableAA>
 
-35 L<formatTableH|/formatTableH>
+35 L<formatTableAH|/formatTableAH>
 
-36 L<formatTableHA|/formatTableHA>
+36 L<formatTableBasic|/formatTableBasic>
 
-37 L<formatTableHH|/formatTableHH>
+37 L<formatTableH|/formatTableH>
 
-38 L<fullFileName|/fullFileName>
+38 L<formatTableHA|/formatTableHA>
 
-39 L<genLValueArrayMethods|/genLValueArrayMethods>
+39 L<formatTableHH|/formatTableHH>
 
-40 L<genLValueHashMethods|/genLValueHashMethods>
+40 L<fullFileName|/fullFileName>
 
-41 L<genLValueScalarMethods|/genLValueScalarMethods>
+41 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-42 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+42 L<genLValueHashMethods|/genLValueHashMethods>
 
-43 L<imageSize|/imageSize>
+43 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-44 L<indentString|/indentString>
+44 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-45 L<isBlank|/isBlank>
+45 L<imageSize|/imageSize>
 
-46 L<javaPackage|/javaPackage>
+46 L<indentString|/indentString>
 
-47 L<keyCount|/keyCount>
+47 L<isBlank|/isBlank>
 
-48 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+48 L<javaPackage|/javaPackage>
 
-49 L<loadArrayFromLines|/loadArrayFromLines>
+49 L<keyCount|/keyCount>
 
-50 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+50 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-51 L<loadHashFromLines|/loadHashFromLines>
+51 L<loadArrayFromLines|/loadArrayFromLines>
 
-52 L<makePath|/makePath>
+52 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-53 L<matchPath|/matchPath>
+53 L<loadHashFromLines|/loadHashFromLines>
 
-54 L<nws|/nws>
+54 L<makePath|/makePath>
 
-55 L<pad|/pad>
+55 L<matchPath|/matchPath>
 
-56 L<parseFileName|/parseFileName>
+56 L<max|/max>
 
-57 L<perlPackage|/perlPackage>
+57 L<min|/min>
 
-58 L<powerOfTwo|/powerOfTwo>
+58 L<nws|/nws>
 
-59 L<powerOfTwoX|/powerOfTwo>
+59 L<pad|/pad>
 
-60 L<printFullFileName|/printFullFileName>
+60 L<parseFileName|/parseFileName>
 
-61 L<quoteFile|/quoteFile>
+61 L<perlPackage|/perlPackage>
 
-62 L<readBinaryFile|/readBinaryFile>
+62 L<powerOfTwo|/powerOfTwo>
 
-63 L<readFile|/readFile>
+63 L<powerOfTwoX|/powerOfTwo>
 
-64 L<renormalizeFolderName|/renormalizeFolderName>
+64 L<printFullFileName|/printFullFileName>
 
-65 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+65 L<quoteFile|/quoteFile>
 
-66 L<temporaryDirectory|/temporaryDirectory>
+66 L<readBinaryFile|/readBinaryFile>
 
-67 L<temporaryFile|/temporaryFile>
+67 L<readFile|/readFile>
 
-68 L<temporaryFolder|/temporaryFolder>
+68 L<renormalizeFolderName|/renormalizeFolderName>
 
-69 L<timeStamp|/timeStamp>
+69 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-70 L<trim|/trim>
+70 L<temporaryDirectory|/temporaryDirectory>
 
-71 L<writeBinaryFile|/writeBinaryFile>
+71 L<temporaryFile|/temporaryFile>
 
-72 L<writeFile|/writeFile>
+72 L<temporaryFolder|/temporaryFolder>
 
-73 L<xxx|/xxx>
+73 L<timeStamp|/timeStamp>
+
+74 L<trim|/trim>
+
+75 L<writeBinaryFile|/writeBinaryFile>
+
+76 L<writeFile|/writeFile>
+
+77 L<xxx|/xxx>
 
 =head1 Installation
 
@@ -1991,7 +2113,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 87;
+use Test::More tests => 102;
 
 #Test::More->builder->output("/dev/null");
 
@@ -2100,6 +2222,22 @@ if (1)                                                                          
    }
  }
 
+if (1)                                                                          # Clear folder
+ {my $d = 'a';
+  my @d = qw(a b c d);
+  my @D = @d;
+  while(@D)
+   {my $f = filePathExt(@D, qw(test data));
+    writeFile($f, '1');
+    pop @D;
+   }
+  ok findFiles($d) == 4;
+  eval {clearFolder($d, 3)};
+  ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
+  clearFolder($d, 4);
+  ok !-e $d;
+ }
+
 if (1)                                                                          # Format table and AA
  {my $t = [qw(aa bb cc)];
   my $d = [[qw(1 A   B   C)],
@@ -2186,7 +2324,10 @@ if (1)                                                                          
   my $a = bless{};
   Data::Table::Text::genLValueScalarMethods(qw(aa bb cc));
   $a->aa = 'aa';
-  Test::More::ok $a->aa eq 'aa';
+  Test::More::ok  $a->aa eq 'aa';
+  Test::More::ok !$a->bb;
+  eval {$a->bbX};
+  Test::More::ok $@ =~ m(\ANo value supplied for "bb")s;
  }
 
 if (1)                                                                          # SM
@@ -2252,6 +2393,7 @@ if (1)
 package com.xyz;
 END
   ok javaPackage($f) eq "com.xyz", $f;
+  ok javaPackageAsFileName($f) eq "com/xyz";
   unlink $f;
  }
 
@@ -2284,3 +2426,15 @@ if (1)
   ok $a eq $b, "Mime $B";
   ok $a eq $b, "$b";
  }
+
+ok !max;
+ok max(1) == 1;
+ok max(1,4,2,3) == 4;
+
+ok min(1) == 1;
+ok min(5,4,2,3) == 2;
+
+is_deeply [1],       [contains(1,0..1)];
+is_deeply [1,3],     [contains(1, qw(0 1 0 1 0 0))];
+is_deeply [0, 5],    [contains('a', qw(a b c d e a b c d e))];
+is_deeply [0, 1, 5], [contains(qr(a+), qw(a baa c d e aa b c d e))];

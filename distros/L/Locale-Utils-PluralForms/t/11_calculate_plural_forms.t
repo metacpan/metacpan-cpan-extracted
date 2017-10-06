@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25 + 1;
+use Test::More tests => 26;
 use Test::NoWarnings;
 use Test::Differences;
 BEGIN {

@@ -27,5 +27,19 @@ qx.Class.define('callbackery.data.Config', {
             nullable : true,
             event : 'changeUserConfig'
         }
+    },
+    members: {
+        /* get access to the parameters specified after # in the url */
+        getUrlConfig: function(){
+            var ha = {};
+            var base = window.location.hash.match(/^#(.+)/);
+            if (base){
+                base[1].split(/;/).forEach(function(kv){
+                    var list = kv.split('=');
+                    ha[list[0]] = list[1];
+                });
+            }
+            return ha;
+        }
     }
 });

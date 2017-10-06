@@ -3,6 +3,7 @@ package Bitmask::Data;
 # ============================================================================
 use strict;
 use warnings;
+no if $] >= 5.017004, warnings => qw(experimental::smartmatch);
 
 use parent qw(Class::Data::Inheritable);
 use 5.010;
@@ -12,7 +13,7 @@ use Config;
 use List::Util qw(reduce);
 use Scalar::Util qw(blessed);
 
-our $VERSION = version->new('2.04');
+our $VERSION = version->new('2.05');
 our $AUTHORITY = 'cpan:MAROS';
 
 our $ZERO = chr(0);
@@ -61,7 +62,7 @@ overloaded arithmetic and bit operators.
 
 Bitmask::Data does not store bitmasks as integers internally, but as 
 strings conststing of \0 and \1, hence makinging unlimited length bitmasks
-possible (32-bit perl can handle integer bitmasks only up to 40 bits).
+possible.
 
 =head1 METHODS
 
@@ -84,7 +85,7 @@ Default: undef
 
 =head3 bitmask_lazyinit
 
-If true value that disables warnings for lazy initialization. (Lazy 
+If true warning for lazy initialization are disabled. (Lazy 
 initialization = call of init without bitmask bit values).
 
 Default: 0
@@ -358,7 +359,7 @@ sub bit2bit {
 
     my $bitmask_string = CLASS->any2bitmask(ANYTHING);
 
-Helper method that tries to turn a data into the internal bitmask 
+Helper method that tries to turn arbitrary arguments into the internal bitmask
 representation. This method can hanle
 
 =over
@@ -467,7 +468,7 @@ Bitmask::Data uses overload by default.
 =item * Numeric context
 
 Returns bitmask integer value (see L<integer> method). For large bitmasks 
-(> 40 bits) this will allways be a L<Math::BigInt> object (hence using this
+(> 40 bits) this will always be a L<Math::BigInt> object (hence using this
 method is not recommended).
 
 =item * Scalar context
@@ -478,11 +479,11 @@ Returns bitmask string representation (see L<string> method)
 
 Works like 'has_any'
 
-=item * Smartmatch
+=item * ~~
 
 Works like L<has_any>.
 
- $bm = new Somebitmask->new('v1','v2');
+ $bm = Somebitmask->new('v1','v2');
  $bm ~~ ['v1','v3'] # true, because 'v1' matches even if 'v3' is not set
 
 =item * +, -
@@ -521,9 +522,9 @@ Performs the bitwise operations on the current bitmask object.
     my $bm = MyBitmask->new([32, 'value1', 0b00010000010000]);
 
 Create a new bitmask object. You can supply almost any combination of 
-ARRAYREFS, bits, Bitmask::Data objects, Math::BigInt objects, bitmasks and 
-values, even mix different types. See L<any2bitmask> for details on possible
-formats.
+ARRAYREFS, bits, integers, Bitmask::Data objects, Math::BigInt objects, 
+bitmasks and values, even mix different types. See L<any2bitmask> for details 
+on possible formats.
 
 =cut
 
@@ -573,7 +574,7 @@ sub new_from_bitmask {
 
     my $bm_new = $bm->clone();
 
-Clones an existing Bitmask::Data object and.
+Clones an existing Bitmask::Data object and returns it.
 
 =cut
 
@@ -589,7 +590,7 @@ sub clone {
 
     $bm->set(PARAMS);
     
-This methpd resets the current bitmask and sets the supplied arguments. 
+This method resets the current bitmask and sets the supplied arguments. 
 Takes the same arguments as C<new>. 
 
 Returns the object.
@@ -964,7 +965,7 @@ bitmask and not a value)
 
 Bitmask::Data adds a considerable processing overhead to bitmask 
 manipulations. If you either don't need the extra comfort or use 
-bitmasks with less that 40 bits that you should consider using just the perl 
+bitmasks with less that 32 bits that you should consider using just the perl 
 built in bit operators on simple integer values.
 
 =head1 SUBCLASSING
@@ -984,7 +985,7 @@ Bitmask::Data was designed to be subclassed.
 
 =head1 WORKING WITH DATABASES
 
-This module comes with support for POSTGRESQL databases (patches for other
+This module comes with support for PostgreSQL databases (patches for other
 database vendors are welcome). 
 
 First you need to create the correct column types:
@@ -1009,8 +1010,8 @@ This module provides three convenient methods to work with databases:
 
 =back
 
-If you are working with l<DBIx::Class> you might also install de- and 
-inflators for Bitmask::Data objects:
+If you are working with l<DBIx::Class> you might also install in- and 
+deflators for Bitmask::Data objects:
 
     __PACKAGE__->inflate_column('fieldname',{
         inflate => sub {
@@ -1043,7 +1044,7 @@ on your report as I make changes.
     CPAN ID: MAROS
     maros [at] k-1.com
     
-    L<http://www.revdev.at>
+    L<http://www.k-1.com>
 
 =head1 ACKNOWLEDGEMENTS 
 

@@ -43,6 +43,7 @@
             "ExtUtils::CppGuess" : "0",
             "Test2::Require" : "0.000060",
             "Test::Alien" : "1.00",
+            "Test::Alien::Build" : "1.21",
             "Text::ParseWords" : "0",
             "perl" : "5.008001"
          }
@@ -67,7 +68,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.98",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.99",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

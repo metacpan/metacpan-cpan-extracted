@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use Storable;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 RT->AddJavaScript("d3.min.js");
 RT->AddJavaScript("handlebars-4.0.6.min.js");
+RT->AddJavaScript("combobox.js");
 RT->AddJavaScript("lifecycleui-model.js");
 RT->AddJavaScript("lifecycleui-viewer.js");
 RT->AddJavaScript("lifecycleui-viewer-interactive.js");

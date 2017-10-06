@@ -26,9 +26,11 @@ sub prepare_sysinfo {
     $self->prepare_proc_cpuinfo or return;
 
     for ($self->get_cpu_type) {
-	m/arm/   && do {$self->linux_arm;   last};
-	m/ppc/   && do {$self->linux_ppc;   last};
-	m/sparc/ && do {$self->linux_sparc; last};
+	m/arm/     and do { $self->linux_arm;   last };
+	m/aarch64/ and do { $self->linux_arm;   last };
+	m/ppc/     and do { $self->linux_ppc;   last };
+	m/sparc/   and do { $self->linux_sparc; last };
+	m/s390x/   and do { $self->linux_s390x; last };
 	# default
 	$self->linux_generic;
 	}
@@ -54,13 +56,39 @@ sub _file_info {
 	    # Having a value prevails over being defined
 	    defined $os->{$k} and next;
 	    $v =~ s/^"\s*(.*?)\s*"$/$1/;
+	    $v =~ m{^["(]?undef(?:ined)?[")]$}i and $v = "undefined";
 	    $os->{$k} = $v;
 	    next;
 	    }
+	m/^[12][0-9]{3}(?:,\s*[12][0-9]{3})*$/ and next; # Copyright years
 	exists $os->{$_} or $os->{$_} = undef;
 	}
     close $fh;
     } # _file_info
+
+sub _lsb_release {
+    my $os = shift;
+
+    $ENV{SMOKE_USE_ETC} and return;
+
+    $os->{DISTRIB_ID} || $os->{DISTRIB_RELEASE} || $os->{DISTRIB_CODENAME}
+	or return;
+
+    #use DP;die DDumper $os;
+    open my $ch, "lsb_release -a 2>&1 |" or return;
+    my %map = (
+	"LSB Version"		=> "don't care",
+	"Distributor ID"	=> "DISTRIB_ID",
+	"Description"		=> "DISTRIB_DESCRIPTION",
+	"Release"		=> "DISTRIB_RELEASE",
+	"Code"			=> "DISTRIB_CODENAME",
+	);
+    while (<$ch>) {
+	chomp;
+	m/^\s*(\S.*?)\s*:\s*(.*?)\s*$/ or next;
+	$os->{$map{$1} || $1} ||= $2 unless $2 eq "n/a";
+	}
+    } # _lsb_release
 
 sub prepare_os {
     my $self = shift;
@@ -69,8 +97,7 @@ sub prepare_os {
     my @dist_file = grep { -f $_ && -s _ } map {
 	-d $_ ? glob ("$_/*") : ($_)
 	} glob ("$etc/*[-_][rRvV][eE][lLrR]*"), "$etc/issue",
-		"$etc.defaults/VERSION", "$etc/VERSION", "$etc/release"
-	or return;
+		"$etc.defaults/VERSION", "$etc/VERSION", "$etc/release";
 
     my $os = $self->_os;
     my %os;
@@ -83,6 +110,10 @@ sub prepare_os {
 	    }
 	_file_info ($df, \%os);
 	}
+    _lsb_release (\%os);
+
+    keys %os or return;
+
     foreach my $key (keys %os) {
 	my $KEY = uc $key;
 	defined $os{$key} or next;
@@ -294,7 +325,8 @@ sub linux_arm {
 
     $self->{__cpu_count} = $self->count_in_cpuinfo (qr/^processor\s+:\s+/i);
 
-    my $cpu  = $self->from_cpuinfo ("Processor");
+    my $cpu  = $self->from_cpuinfo ("Processor") ||
+	       $self->from_cpuinfo ("Model[_ ]name");
     my $bogo = $self->from_cpuinfo ("BogoMIPS");
     my $mhz  = 100 * int (($bogo + 50) / 100);
     $cpu =~ s/\s+/ /g;
@@ -366,6 +398,37 @@ sub linux_sparc {
     $self->{__cpu} = $cpu;
     } # linux_sparc
 
+=head2 $si->linux_s390x
+
+Check C</proc/cpuinfo> for these keys:
+
+=over
+
+=item "processor"  (count occurrence for __cpu_count)
+
+=item "Processor" (part of __cpu)
+
+=item "BogoMIPS"  (part of __cpu)
+
+=back
+
+=cut
+
+sub linux_s390x {
+    my $self = shift;
+
+    $self->{__cpu_count} = $self->count_in_cpuinfo (qr/^processor\s+\d+:\s+/i);
+
+    my $cpu  = $self->from_cpuinfo ("vendor_id") ||
+	       $self->from_cpuinfo ("Processor") ||
+	       $self->from_cpuinfo ("Model[_ ]name");
+    my $bogo = $self->from_cpuinfo (qr{BogoMIPS(?:\s*per[ _]CPU)?}i);
+    my $mhz  = 100 * int (($bogo + 50) / 100);
+    $cpu =~ s/\s+/ /g;
+    $mhz and $cpu .= " ($mhz MHz)";
+    $self->{__cpu} = $cpu;
+    } # _linux_s390x
+
 =head2 $si->prepare_proc_cpuinfo
 
 Read the complete C<< /proc/cpuinfo >>.
@@ -377,6 +440,8 @@ sub prepare_proc_cpuinfo {
 
     if (open my $pci, "<", "/proc/cpuinfo") {
 	chomp (my @pci = <$pci>);
+	s/[\s\xa0]+/ /g for @pci;
+	s/ $//          for @pci;
 	$self->{__proc_cpuinfo} = \@pci;
 	close $pci;
 	return 1;
@@ -390,8 +455,7 @@ Returns the number of lines $regex matches for.
 =cut
 
 sub count_in_cpuinfo {
-    my $self = shift;
-    my ($regex) = @_;
+    my ($self, $regex) = @_;
 
     return scalar grep /$regex/, $self->_proc_cpuinfo;
     } # count_in_cpuinfo
@@ -403,8 +467,7 @@ Returns the number of lines $regex matches for.
 =cut
 
 sub count_unique_in_cpuinfo {
-    my $self = shift;
-    my ($regex) = @_;
+    my ($self, $regex) = @_;
 
     my %match = map { $_ => 1 } grep /$regex/ => $self->_proc_cpuinfo;
     return scalar keys %match;
@@ -417,14 +480,11 @@ Returns the first value of that key in C<< /proc/cpuinfo >>.
 =cut
 
 sub from_cpuinfo {
-    my $self = shift;
-    my ($key) = @_;
+    my ($self, $key) = @_;
 
     my ($first) = grep m/^\s*$key\s*[:=]\s*/i => $self->_proc_cpuinfo;
     defined $first or $first = "";
     $first =~ s/^\s*$key\s*[:=]\s*//i;
-    $first =~ s/\s+/ /g;
-    $first =~ s/\s+$//;
     return $first;
     } # from_cpuinfo
 

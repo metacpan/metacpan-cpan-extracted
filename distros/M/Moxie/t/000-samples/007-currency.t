@@ -62,11 +62,11 @@ BEGIN {
         extends 'Moxie::Object';
            with 'Comparable', 'Printable';
 
-        has '$!amount' => ( default => sub { 0 } );
+        has _amount => ( default => sub { 0 } );
 
-        sub BUILDARGS : init_args( amount? => $!amount );
+        sub BUILDARGS : init_args( amount? => _amount );
 
-        sub amount : ro( $!amount );
+        sub amount : ro(_amount);
 
         sub compare ($self, $other) {
             $self->amount <=> $other->amount;

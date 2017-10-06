@@ -1,9 +1,102 @@
 ==================================================
-Changes from 2006-05-28 00:00:00 +0000 to present.
+Changes from 2007-10-02 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.0013 at 2016-05-25 16:41:33 +0000
+version 0.0100 at 2017-09-29 01:08:59 +0000
+-------------------------------------------
+
+  Change: e5e3fa0d4fd600937b88904981a2baa8b773d4a3
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2017-09-28 21:06:36 +0000
+
+    v0.0100 
+
+  Change: 60e24cec0cc166f86fd2414b31c3dc0ab328fe56
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-03-02 10:43:10 +0000
+
+    Merge pull request #20 from
+    PerlDancer/sawyer/feature/schema-with-config
+
+    Schema with config 
+
+  Change: 902d66c0080075b30d3186a1e78bf8d69e5d47b6
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-12 15:12:01 +0000
+
+    Add tests 
+
+  Change: 5adc08004ee6905e5dab9839737421ea73e8c691
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2017-02-10 16:45:25 +0000
+
+    Merge pull request #19 from PerlDancer/sawyer/fixes
+
+    Various fixes and cleanups 
+
+  Change: 721fd53552a30402653153b76b0053134f0e7075
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 12:17:46 +0000
+
+    Support DBIC::Sugar ability to call the schema with config:
+
+    This makes it easier to test or to have finer-grained control over
+    the schema that will be generated.
+
+    This requires an up-to-date version of DBIC::Sugar, which the feature
+    is actually implemented. 
+
+  Change: 04782d23434dd89c45767192ff80c5858d9bd443
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 10:29:09 +0000
+
+    Cleanup: Remove useless comment:
+
+    This, I assume, meant to be a shebang, but missing the bang. It's
+    also useless because perl is called explicitly on tests, as well as
+    none of the other tests havin a shebang. 
+
+  Change: fa5d480f6b1b54a1a1d27191aca0c1c70ed61aa1
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 08:11:38 +0000
+
+    Cleanup: Unnececssary semicolon 
+
+  Change: 9a3af0c7ae1fdaa6aee356a8aa5d914cf2e888d3
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 08:10:50 +0000
+
+    Add provides metadata:
+
+    The following plugin will add the provides metadata to the
+    distribution, which is considered a best practice. 
+
+  Change: 9dfb87cbcba5fb1a1da799f940849752555ef5aa
+  Author: Sawyer X <xsawyerx@cpan.org>
+  Date : 2017-02-10 08:10:11 +0000
+
+    Provide META.json file in distribution:
+
+    The following plugin adds the META.json file. This is considered the
+    more modern META data format. 
+
+-------------------------------------------
+version 0.0014 at 2016-06-24 20:16:51 +0000
+-------------------------------------------
+
+  Change: ad766c263d0a712b80c5158c80cdd12d48572dc0
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-06-24 16:16:51 +0000
+
+    v0.0014 fix issue #17
+
+    The correct way to use the plugin with Dancer2 is now:
+
+    use Dancer2::Plugin::DBIC; 
+
+-------------------------------------------
+version 0.0013 at 2016-05-25 16:27:57 +0000
 -------------------------------------------
 
   Change: bcd2928bb6f114eb24272224ad6594b67757265f

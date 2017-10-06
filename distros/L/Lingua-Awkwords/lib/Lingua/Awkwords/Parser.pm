@@ -14,7 +14,7 @@ use Lingua::Awkwords::OneOf;
 use Lingua::Awkwords::String;
 use Lingua::Awkwords::Subpattern;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub parse {
     my $self = shift;
@@ -65,10 +65,11 @@ sub _parse_unit {
 
             # NOTE original version instead treats [a*10*20/b] as a
             # weight of 1020 then reduces that to 128 (with a warning)
+            # as of 0.06 upper limit removed from this implementation
             $self->fail("weight already set") if $weight;
 
             my $num = $self->token_int;
-            $self->fail("weight must be 1..128") if $num < 1 or $num > 128;
+            $self->fail("weight must be positive integer") if $num < 1;
             $weight = $num;
             1;
         },
@@ -256,8 +257,8 @@ C<VV> the same as C<[VV]>.
 
 C<[a*10*20/b]> in the original code parses as a weight of C<1020> which
 is then (with a warning) reduced to the maximum C<128>. This
-implementation instead throws an error should multiple weights be
-specified within an alternation.
+implementation instead throws an error if multiple weights are parsed,
+and accepts any (supported by perl) integer above 128.
 
 =back
 

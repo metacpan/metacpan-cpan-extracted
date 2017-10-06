@@ -1,0 +1,55 @@
+{
+   "abstract" : "Object-oriented interface for reading/writing SeaBASS files",
+   "author" : [
+      "Jason Lefler <jason.lefler@nasa.gov>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-SeaBASS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Date::Calc" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "List::MoreUtils" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Clone" : "0",
+            "Test::More" : "0",
+            "Test::Trap" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.172780",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

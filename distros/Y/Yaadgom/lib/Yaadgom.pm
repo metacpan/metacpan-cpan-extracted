@@ -2,7 +2,7 @@ use strict;
 
 package Yaadgom;
 use 5.008_005;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Moo;
 use Devel::GlobalDestruction;
 
@@ -96,7 +96,7 @@ sub _write_preformated {
 
 sub format_body {
     my ( $self, $str ) = @_;
-    my ( $header, $body ) = split /\n\n/, $str;
+    my ( $header, $body ) = split /\n\n/, $str, 2;
     if ( $header =~ /application\/json/ && $body ) {
         $body = $self->_json_ed->encode( $self->_json_ed->decode($body) );
         $body = decode( 'utf8', $body );

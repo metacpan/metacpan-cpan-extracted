@@ -8,15 +8,15 @@ use base qw/HTTP::BrowserDetect/;
 
 =head1 NAME
 
-CGI::BrowserDetect - The great new CGI::BrowserDetect!
+CGI::BrowserDetect - Browser Detect
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
 	my $pkg = shift;
@@ -56,18 +56,20 @@ sub device_type {
 			: 'computer';
 }
 
-sub lang {
-	my ($self) = @_;
+sub lang { language(@_); }
 
-	return $self->language if $self->language;
-	return $self->{_lang};
+sub language {
+	my ($self) = @_;
+	my $language = $self->SUPER::language();
+	return $language || $self->{_lang};
 }
 
-sub cnty {
-	my ($self) = @_;
+sub cnty { country(@_); }
 
-	return $self->country if $self->country;
-	return $self->{_cnty};
+sub country {
+	my ($self) = @_;
+	my $country = $self->SUPER::country();
+	return $country || $self->{_cnty};
 }
 
 1;
@@ -81,9 +83,9 @@ Perhaps a little code snippet.
 	use CGI::BrowserDetect;
 
 	my $ua = CGI::BrowserDetect->new($ENV{HTTP_USER_AGENT}, $ENV{HTTP_ACCEPT_LANGUAGE});
-    ...
+	...
 
-	my $hash = $ua->detect(qw/os browser type lang cnty/);
+	my $hash = $ua->detect(qw/os browser type language country/);
 
 
 =head1 SUBROUTINES/METHODS

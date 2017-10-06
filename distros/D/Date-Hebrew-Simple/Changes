@@ -1,5 +1,12 @@
 Revision history for Date::Hebrew::Simple
 
+0.04  Sun Oct 01 12:00:00 2017
+      - Fixed method from_julian() giving negative days.
+
+0.03  Fri Sep 29 10:20:00 2017
+      - Added validation for Hebrew month for leap year.
+      - Overriden method get_method_name() to handle leap year.
+
 0.02  Sun Jul 23 03:01:00 2017
       - Fixed typo.
 

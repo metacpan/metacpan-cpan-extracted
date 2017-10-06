@@ -172,7 +172,9 @@ sub _tokenize_value {
     elsif (/\G$grammar_regexp->{value}->{string}/mgc) {
         warn "[TOKEN] STRING: $1" if DEBUG;
         $class->_skip_whitespace();
-        return [TOKEN_STRING, defined $1 ? $1 : defined $2 ? $2 : ''];
+
+        my $is_raw = defined $2;
+        return [TOKEN_STRING, defined $1 ? $1 : defined $2 ? $2 : '', $is_raw];
     }
     elsif (/\G$grammar_regexp->{value}->{inline}->{start}/mgc) {
         warn "[TOKEN] INLINE TABLE" if DEBUG;
@@ -282,10 +284,11 @@ sub _tokenize_array_of_table {
 
 sub _extract_multi_line_string {
     my ($class, $delimiter) = @_;
+    my $is_raw = $delimiter eq q{'''};
     if (/\G(.+?)\Q$delimiter/smgc) {
         warn "[TOKEN] MULTI LINE STRING: $1" if DEBUG;
         $class->_skip_whitespace();
-        return [TOKEN_STRING, $1];
+        return [TOKEN_STRING, $1, $is_raw];
     }
     $class->_syntax_error();
 }
@@ -394,14 +397,15 @@ sub _error {
     my ($class, $msg) = @_;
 
     my $src   = $_;
+    my $curr  = pos || 0;
     my $line  = 1;
     my $start = pos $src || 0;
-    while ($src =~ /$/smgco and pos $src <= pos) {
+    while ($src =~ /$/smgco and pos $src <= $curr) {
         $start = pos $src;
         $line++;
     }
     my $end = pos $src;
-    my $len = pos() - $start;
+    my $len = $curr - $start;
     $len-- if $len > 0;
 
     my $trace = join "\n",

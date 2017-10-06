@@ -27,17 +27,34 @@ is( $backbone->natoms,                   114, 'select_group("backbone")' );
 is( $mol->select_group('water')->natoms, 2,   'select_group("water")' );
 is( $mol->select_group("sidechains")->natoms,
     180, 'select_group("sidechains")' );
-is(
-    $mol->select_group('resname TYR .and. occ 1')->natoms,
-    $mol->select_group('resname TYR')->natoms - 7,
-    'tyr occ 1 natms == tyr - 7'
-);
 
-is(
-    $mol->select_group('resname TYR .and. resname CYS')->natoms,
+foreach my $and (qw(and .and.)){
+  is(
+    $mol->select_group("resname TYR $and occ 1")->natoms,
+    $mol->select_group('resname TYR')
+        ->select_group('occ 1')->natoms,
+    'tyr occ 1 natms == tyr chained to occ 1'
+  );
+
+  is(
+    $mol->select_group("resname TYR $and resname CYS")->natoms,
     0,
     'none found: TYR and CYS'
-);
+  );
+  is(
+    $mol->select_group("resname TYR $and occ 0.25")->natoms,
+    3,
+    'tyr occ 0.25 natms == 3'
+  );
+  foreach my $not (qw(not .not.)){
+    is( $mol->select_group("chain I $and $not water")->natoms,
+      11, "select_group(\"chain I $and $not water\")" );
+  }
+}
+
+is ($mol->select_group('resname ARG+TYR')->natoms, '58', 'resname ARG+TYR');
+is ($mol->select_group('resid 7+1-5+245-246+252')->natoms, '69', 'resid 7+1-5+245-246+252');
+is ($mol->select_group('chain E-I and resid 7+1-5')->natoms, '45', 'chain E-I and resid 7+1-5');
 
 is(
     $mol->select_group('(resname TYR .or. resname CYS) .and. occ 1')->natoms,
@@ -45,20 +62,12 @@ is(
     'none found: (TYR or CYS) and occ 1'
 );
 
-
-is(
-    $mol->select_group('resname TYR .and. occ 0.25')->natoms,
-    3,
-    'tyr occ 0.25 natms == 3'
-);
 is(
     $mol->select_group('metals')->natoms,
     $mol->select_group('ligands')->natoms,
     'select_group("metals") yields same as select_group("ligands") for 2sic'
 );
 
-is( $mol->select_group('chain I .and. .not. water')->natoms,
-    11, 'select_group("chain I .and. .not. water")' );
 
 # testcase from the docs for selections attr
 $mol->set_selection_cr(

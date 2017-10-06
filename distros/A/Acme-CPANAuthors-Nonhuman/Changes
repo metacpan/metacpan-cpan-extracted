@@ -1,5 +1,8 @@
 Revision history for Acme-CPANAuthors-Nonhuman
 
+0.026     2017-09-30 19:14:01Z
+          - updated distribution build code to use the metacpan v1 fastapi.
+
 0.025     2016-08-22 22:38:41Z
           - welcome ALTREUS, our latest member!
 

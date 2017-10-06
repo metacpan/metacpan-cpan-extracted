@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.005'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.007'; # VERSION
+my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
 
 # basic language word-splitting routines for PDF::Builder.
 # This is currently all that is supported. Not language-specific.
@@ -22,8 +22,13 @@ sub splitWord {
     # various settings, some of which may be language-specific
     my $minBegin = 2;  # minimum 2 characters before split
     my $minEnd   = 2;  # minimum 2 characters to next line
-    my $hyphen = '-';  # add an ASCII hyphen at split, unless splitting at -
+   #my $hyphen = '-';
+    my $hyphen = '\xAD';  # add a hyphen at split, unless splitting at -
                        # or other dash character
+    # NOTE: PDF-1.7 14.8.2.2.3 suggests using a soft hyphen (\AD) when splitting
+    #       a word at the end of the line, so that when text is extracted for
+    #       a screen reader, etc., the closed-up word can have the "visible"
+    #       hyphen removed. PDF readers should render as -.
     my @suppressHyphen = ( # ASCII/Latin-1/UTF-8 ordinals to NOT add - after
        #  -   en-dash em-dash /
 	  45, 8211,   8212,   47,

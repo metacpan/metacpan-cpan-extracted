@@ -7,13 +7,15 @@ my $ua = CGI::BrowserDetect->new(
 	"en-UK, blah, blah, blah"
 );
 
-my $detect = $ua->detect(qw/os lang cnty device_type/);
+my $detect = $ua->detect(qw/os lang language cnty country device device_type/);
 
 my $expected = {
   'os' => 'macosx',
   'cnty' => 'UK',
   'device_type' => 'computer',
-  'lang' => 'en'
+  'lang' => 'en',
+  'language' => 'en',
+  'country' => 'UK',
 };
 
 is_deeply($detect, $expected);

@@ -10,7 +10,7 @@ Base class for DB tables.
 =cut
 
 package QBit::Application::Model::DB::Table;
-$QBit::Application::Model::DB::Table::VERSION = '0.020';
+$QBit::Application::Model::DB::Table::VERSION = '0.022';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -270,9 +270,7 @@ sub get_all {
 
     $query->group_by(@{$opts{'group_by'}}) if $opts{'group_by'};
 
-    if ($opts{'having'}) {
-        throw 'Have not realized yet';
-    }
+    $query->having($opts{'having'}) if $opts{'having'};
 
     $query->order_by(@{$opts{'order_by'}}) if $opts{'order_by'};
 

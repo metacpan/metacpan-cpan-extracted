@@ -8,7 +8,8 @@ our $VERSION = '0.10';
 use Exporter 'import';
 our @EXPORT = qw/ dispatch_item /;
 
-use Params::Validate ':all';
+use Types::Standard;
+use Params::ValidationCompiler 'validation_for';
 
 =head1 NAME
 
@@ -73,28 +74,24 @@ Getter for the C<package> attribute
 
 sub new {
     my $class = shift;
-    my $self = validate_with(
-        params => \@_,
-        spec => {
+    my %self = validation_for(
+        params => {
             code    => {optional => 0},
             package => {optional => 1},
         },
-        allow_extra => 0,
-    );
-    return bless $self, $class;
+    )->(@_);
+    return bless \%self, $class;
 }
 sub code    { $_[0]->{code} }
 sub package { $_[0]->{package} // '' }
 
 sub dispatch_item {
-    my %args = validate_with(
-        params => \@_,
-        spec => {
+    my %args = validation_for(
+        params => {
             code    => {optional => 0},
             package => {optional => 1},
         },
-        allow_extra => 0,
-    );
+    )->(@_);
     return Dancer::RPCPlugin::DispatchItem->new(%args);
 }
 

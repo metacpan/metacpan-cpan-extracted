@@ -1,7 +1,7 @@
 package Bread::Board::Service::WithClass;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: role for services returning instances of a given class
-$Bread::Board::Service::WithClass::VERSION = '0.35';
+$Bread::Board::Service::WithClass::VERSION = '0.36';
 use Moose::Role;
 use Module::Runtime ();
 
@@ -35,7 +35,7 @@ Bread::Board::Service::WithClass - role for services returning instances of a gi
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

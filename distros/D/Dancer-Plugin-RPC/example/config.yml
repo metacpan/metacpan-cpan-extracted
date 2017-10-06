@@ -1,7 +1,10 @@
 ---
 
+port: 3000
+
 log: core
-logger: console
+logger: file
+log_path: .
 
 plugins:
     'RPC::RESTRPC':

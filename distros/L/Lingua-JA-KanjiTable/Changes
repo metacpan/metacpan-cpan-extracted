@@ -1,5 +1,10 @@
 Revision history for Perl extension Lingua-JA-KanjiTable
 
+0.14 2017-10-02T14:50:57Z
+
+    - Added "渾" to Jinmeiyo Kanji
+    - Added `InJinmeiyoKanji20170925`
+
 0.13 2015-02-21T17:31:16Z
 
     - Updated Jinmeiyo Kanji

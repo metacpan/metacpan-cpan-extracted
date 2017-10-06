@@ -2,7 +2,7 @@ package Test2::Harness::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak/;
 
@@ -18,7 +18,6 @@ use Test2::Harness::Util::HashBase qw{
     -args
     -input
     -times
-    -chdir
     -load
     -load_import
     -preload
@@ -26,6 +25,9 @@ use Test2::Harness::Util::HashBase qw{
     -use_fork
     -use_stream
     -use_timeout
+
+    -event_timeout
+    -postexit_timeout
 };
 
 sub init {

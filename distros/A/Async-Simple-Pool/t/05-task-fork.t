@@ -6,9 +6,9 @@ use Test::Spec;
 use Test::Exception;
 use Time::HiRes qw/ sleep /;
 
-use lib '../lib';
-use Async::Simple::Task::Fork;
+# use lib '../lib';
 
+use Async::Simple::Task::Fork;
 
 if ( $^O =~ /^(dos|os2|MSWin32|NetWare)$/ ) {
     plan tests => 1;
@@ -61,7 +61,7 @@ describe 'All' => sub {
             is( $task->kill_on_exit, 1, 'default kill_on_exit' );
             is( waitpid( $task->pid, WNOHANG ), 0, 'kid is active' );
             undef $task;
-            sleep 0.2;
+            sleep 0.5;
             ok( waitpid( $pid, WNOHANG ) =~ /^\d{2,}$/, 'kid closed' );
         };
 

@@ -26,7 +26,7 @@ my $dist_dir = path(Alien::autoconf->dist_dir);
 
 run_ok($wrapper->($_, '--version'))
   ->success
-  ->note for qw( autoconf autoheader autoreconf autoscan autoupdate );
+  ->note for qw( autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames );
 
 my $configure_ac = path('corpus/configure.ac')->absolute;
 

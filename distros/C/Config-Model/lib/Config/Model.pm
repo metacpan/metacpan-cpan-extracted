@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.110';
+$Config::Model::VERSION = '2.112';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -191,12 +191,21 @@ sub initialize_log4perl {
     my $log4perl_user_conf_file = path( File::HomeDir->my_home . '/.log4config-model' );
 
     my $fallback_conf           = << 'EOC';
-log4perl.logger=WARN, Screen
+log4perl.rootLogger=WARN, Screen
+log4perl.logger.Model.Legacy = INFO, SimpleScreen
+log4perl.additivity.Model.Legacy = 0
 
 log4perl.appender.Screen        = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr = 0
 log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
 log4perl.appender.Screen.layout.ConversionPattern = %M %m (line %L)%n
+
+log4perl.appender.SimpleScreen        = Log::Log4perl::Appender::Screen
+log4perl.appender.SimpleScreen.stderr = 0
+log4perl.appender.SimpleScreen.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.SimpleScreen.layout.ConversionPattern = %p: %m%n
+
+log4perl.oneMessagePerAppender = 1
 EOC
 
     my @log4perl_conf_lines =
@@ -209,13 +218,13 @@ EOC
         $log4perl_conf{'log4perl.logger'} = $args->{log_level}.', Screen';
     }
 
-    Log::Log4perl::init_once(\%log4perl_conf);
+    Log::Log4perl::init(\%log4perl_conf);
 
 }
 
 sub BUILD {
     my $self = shift;
-    $self->initialize_log4perl(shift) ;
+    $self->initialize_log4perl(shift) unless Log::Log4perl->initialized();
 }
 
 sub show_legacy_issue {
@@ -224,13 +233,14 @@ sub show_legacy_issue {
     my $behavior = shift || $self->legacy;
 
     my @msg = ref $ref ? @$ref : $ref;
+    unshift @msg, "Model ";
     if ( $behavior eq 'die' ) {
         die @msg, "\n";
     }
     elsif ( $behavior eq 'warn' ) {
-        warn @msg, "\n";
+        $legacy_logger->warn(@msg);
     } elsif ( $behavior eq 'note' ) {
-        say @msg;
+        $legacy_logger->info( @msg);
     }
 }
 
@@ -1813,7 +1823,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

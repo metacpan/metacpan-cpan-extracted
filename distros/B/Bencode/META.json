@@ -4,13 +4,13 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bencode",
    "prereqs" : {
@@ -21,7 +21,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Exporter::Tidy" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -30,10 +29,8 @@
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "Test::Differences" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0"
          }
       }
    },
@@ -42,12 +39,12 @@
       "bugtracker" : {
          "web" : "http://github.com/ap/Bencode/issues"
       },
-      "homepage" : "http://github.com/ap/Bencode",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Bencode"
+         "url" : "git://github.com/ap/Bencode",
+         "web" : "http://github.com/ap/Bencode"
       }
    },
-   "version" : "1.402"
+   "version" : "1.501"
 }
 

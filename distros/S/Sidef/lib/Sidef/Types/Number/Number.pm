@@ -707,7 +707,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            return Math::GMPz::Rmpz_get_str($x, 10);
+            push @_, 10;
+            goto &Math::GMPz::Rmpz_get_str;
         }
 
       Math_GMPq: {
@@ -4809,7 +4810,7 @@ package Sidef::Types::Number::Number {
 
             for (1 .. $n) {
                 my $t = __floor__($f);
-                push @cfrac, bless \$t;
+                push @cfrac, bless \(_any2mpz($t) // $t);
 
                 Math::MPFR::Rmpfr_eq($f, $t, $p) && last;
                 Math::MPFR::Rmpfr_sub($f, $f, $t, $ROUND);
@@ -4833,7 +4834,7 @@ package Sidef::Types::Number::Number {
 
             for (1 .. $n) {
                 my $t = __floor__($c);
-                push @cfrac, bless \$t;
+                push @cfrac, bless \(_any2mpz($t) // $t);
 
                 Math::MPC::Rmpc_real($real_1, $c, $ROUND);
                 Math::MPC::Rmpc_imag($imag_1, $c, $ROUND);
@@ -4893,6 +4894,34 @@ package Sidef::Types::Number::Number {
     }
 
     *as_dec = \&as_float;
+
+    sub convergents {
+        my ($x, $n) = @_;
+
+        my @cfrac = @{$x->as_cfrac($n)};
+
+        if (defined($n)) {
+            $n = _any2ui($$n) // 0;
+            $n = @cfrac if $n > @cfrac;
+        }
+        else {
+            $n = @cfrac;
+        }
+
+        my @convergents;
+        foreach my $k (1 .. $n) {
+            my @terms = map { $$_ } reverse(@cfrac[0 .. $k - 1]);
+
+            my $convergent = $terms[0];
+            foreach my $i (1 .. $#terms) {
+                $convergent = __add__($terms[$i], __inv__($convergent));
+            }
+
+            push @convergents, bless \$convergent;
+        }
+
+        Sidef::Types::Array::Array->new(\@convergents);
+    }
 
     sub dump {
         my ($x) = @_;
@@ -5679,6 +5708,92 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int',
                               Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
     }
+
+    sub faulhaber_sum {
+        my ($n, $p) = @_;
+
+        _valid(\$p);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $p = _any2ui($$p)  // goto &nan;
+
+        # Unbox `n` when it fits inside a native unsigned integer
+        my $native_n = 0;
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $native_n = 1;
+            $n        = Math::GMPz::Rmpz_get_ui($n);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        my $numerator   = Math::GMPz::Rmpz_init_set_ui(0);
+        my $denominator = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $j (0 .. $p) {
+
+            $j % 2 == 0 or $j == 1 or next;
+
+            Math::GMPz::Rmpz_bin_uiui($t, $p + 1, $j);    # t = binomial(p+1, j)
+
+#<<<
+            $native_n
+              ? Math::GMPz::Rmpz_ui_pow_ui($u, $n, $p + 1 - $j)     # u = n^(p+1 - j)
+              : Math::GMPz::Rmpz_pow_ui(   $u, $n, $p + 1 - $j);    # ==//==
+#>>>
+
+            # Bernouli(j) as `bn` and `bd`
+            my ($bn, $bd) = Math::Prime::Util::GMP::bernfrac($j);
+
+            Math::GMPz::Rmpz_mul($t, $t, $u);             # t = t * u
+
+            # True if `bn` is a native integer
+            if ($bn < ULONG_MAX and $bn > LONG_MIN) {
+                if ($bn == 1) {
+                    ## ok
+                }
+                elsif ($bn == -1) {
+                    Math::GMPz::Rmpz_neg($t, $t);         # t = -t
+                }
+                else {
+                    $bn < 0
+                      ? Math::GMPz::Rmpz_mul_si($t, $t, $bn)    # t = t * bn
+                      : Math::GMPz::Rmpz_mul_ui($t, $t, $bn);   # ==//==
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($u, $bn, 10);          # u = bn
+                Math::GMPz::Rmpz_mul($t, $t, $u);               # t = t * u
+            }
+
+            # `bd` is always positive
+            if ($bd < ULONG_MAX) {
+#<<<
+                Math::GMPz::Rmpz_mul_ui($numerator,   $numerator,   $bd);    # numerator   = numerator   * bd
+                Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
+                Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $bd);    # denominator = denominator * bd
+#>>>
+            }
+            else {
+#<<<
+                Math::GMPz::Rmpz_set_str($u, $bd, 10);                       # u = bd
+                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator * u
+                Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
+                Math::GMPz::Rmpz_mul(   $denominator, $denominator, $u);     # denominator = denominator * u
+#>>>
+            }
+        }
+
+#<<<
+        Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $p + 1);        # denominator = denominator * (p+1)
+        Math::GMPz::Rmpz_divexact($numerator, $numerator, $denominator);    # numerator = numerator / denominator
+#>>>
+
+        bless \$numerator;
+    }
+
+    *faulhaber = \&faulhaber_sum;
 
     sub binomial {
         my ($x, $y) = @_;
@@ -6645,6 +6760,285 @@ package Sidef::Types::Number::Number {
     }
 
     *next_power = \&next_pow;
+
+    #
+    ## Is a polygonal number?
+    #
+
+    # $n is a Math::GMPz object
+    # $k is a Math::GMPz object
+    # $second is a boolean
+
+    sub __is_polygonal__ {
+        my ($n, $k, $second) = @_;
+
+        Math::GMPz::Rmpz_sgn($n) || return 1;
+
+        # polygonal_root(n, k)
+        #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
+        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+
+        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
+        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+
+        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+        Math::GMPz::Rmpz_perfect_square_p($t) || return 0;
+        Math::GMPz::Rmpz_sqrt($t, $t);         # t = sqrt(t)
+
+        Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
+
+        $second
+          ? Math::GMPz::Rmpz_sub($t, $u, $t)    # t = t-u
+          : Math::GMPz::Rmpz_add($t, $t, $u);   # t = t+u
+
+        Math::GMPz::Rmpz_add_ui($u, $u, 2);     # u = u+2
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);   # u = u*2
+
+        Math::GMPz::Rmpz_divisible_p($t, $u);   # true iff u|t
+    }
+
+    sub is_polygonal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        __is_polygonal__($n, $k)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_polygonal2 {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        __is_polygonal__($n, $k, 1)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    #
+    ## Integer polygonal root
+    #
+
+    # $n is a Math::GMPz object
+    # $k is a Math::GMPz object
+    # $second is a boolean
+
+    sub __ipolygonal_root__ {
+        my ($n, $k, $second) = @_;
+
+        # polygonal_root(n, k)
+        #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
+        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+
+        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
+        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+
+        Math::GMPz::Rmpz_sgn($t) < 0 && goto &_nan;    # `t` is negative
+
+        Math::GMPz::Rmpz_sqrt($t, $t);                 # t = sqrt(t)
+        Math::GMPz::Rmpz_sub_ui($u, $k, 4);            # u = k-4
+
+        $second
+          ? Math::GMPz::Rmpz_sub($t, $u, $t)           # t = u-t
+          : Math::GMPz::Rmpz_add($t, $t, $u);          # t = t+u
+
+        Math::GMPz::Rmpz_add_ui($u, $u, 2);            # u = u+2
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);          # u = u*2
+
+        Math::GMPz::Rmpz_sgn($u) || return $n;         # `u` is zero
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_div($r, $t, $u);              # r = floor(t/u)
+        return $r;
+    }
+
+    #
+    ## Integer k-gonal root of `n`
+    #
+
+    sub ipolygonal_root {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        bless \__ipolygonal_root__($n, $k);
+    }
+
+    #
+    ## Second integer k-gonal root of `n`
+    #
+
+    sub ipolygonal_root2 {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        bless \__ipolygonal_root__($n, $k, 1);
+    }
+
+    #
+    ## n-th k-gonal number
+    #
+
+    sub polygonal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        # polygonal(n, k) = n * (k*n - k - 2*n + 4) / 2
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mul($r, $n, $k);    # r = n*k
+        Math::GMPz::Rmpz_sub($r, $r, $k);    # r = r-k
+        Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
+        Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
+        Math::GMPz::Rmpz_add_ui($r, $r, 4);  # r = r+4
+        Math::GMPz::Rmpz_mul($r, $r, $n);    # r = r*n
+        Math::GMPz::Rmpz_div_2exp($r, $r, 1);    # r = r/2
+
+        bless \$r;
+    }
+
+    #
+    ## k-gonal root of `n`
+    #
+
+    sub __polygonal_root__ {
+        my ($n, $k, $second) = @_;
+        goto(join('__', ref($n), ref($k)) =~ tr/:/_/rs);
+
+        # polygonal_root(n, k)
+        #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
+
+      Math_MPFR__Math_MPFR: {
+            my $t = Math::MPFR::Rmpfr_init2($PREC);
+            my $u = Math::MPFR::Rmpfr_init2($PREC);
+
+            Math::MPFR::Rmpfr_sub_ui($u, $k, 2, $ROUND);    # u = k-2
+            Math::MPFR::Rmpfr_mul($t, $n, $u, $ROUND);      # t = n*u
+            Math::MPFR::Rmpfr_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+
+            Math::MPFR::Rmpfr_sub_ui($u, $u, 2, $ROUND);    # u = u-2
+            Math::MPFR::Rmpfr_sqr($u, $u, $ROUND);          # u = u^2
+            Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);      # t = t+u
+
+            # Return a complex number for `t < 0`
+            if (Math::MPFR::Rmpfr_sgn($t) < 0) {
+                $n = _mpfr2mpc($n);
+                $k = _mpfr2mpc($k);
+                goto Math_MPC__Math_MPC;
+            }
+
+            Math::MPFR::Rmpfr_sqrt($t, $t, $ROUND);         # t = sqrt(t)
+            Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+
+            $second
+              ? Math::MPFR::Rmpfr_sub($t, $u, $t, $ROUND)    # t = u-t
+              : Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);   # t = t+u
+
+            Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
+            Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+            Math::MPFR::Rmpfr_sgn($u) || return $n;          # `u` is zero
+            Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);       # t = t/u
+            return $t;
+        }
+
+      Math_MPFR__Math_MPC: {
+            $n = _mpfr2mpc($n);
+            goto Math_MPC__Math_MPC;
+        }
+
+      Math_MPC__Math_MPFR: {
+            $k = _mpfr2mpc($k);
+            goto Math_MPC__Math_MPC;
+        }
+
+      Math_MPC__Math_MPC: {
+            my $t = Math::MPC::Rmpc_init2($PREC);
+            my $u = Math::MPC::Rmpc_init2($PREC);
+
+            Math::MPC::Rmpc_sub_ui($u, $k, 2, $ROUND);    # u = k-2
+            Math::MPC::Rmpc_mul($t, $n, $u, $ROUND);      # t = n*u
+            Math::MPC::Rmpc_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+
+            Math::MPC::Rmpc_sub_ui($u, $u, 2, $ROUND);    # u = u-2
+            Math::MPC::Rmpc_sqr($u, $u, $ROUND);          # u = u^2
+            Math::MPC::Rmpc_add($t, $t, $u, $ROUND);      # t = t+u
+
+            Math::MPC::Rmpc_sqrt($t, $t, $ROUND);         # t = sqrt(t)
+            Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+
+            $second
+              ? Math::MPC::Rmpc_sub($t, $u, $t, $ROUND)    # t = u-t
+              : Math::MPC::Rmpc_add($t, $t, $u, $ROUND);   # t = t+u
+
+            Math::MPC::Rmpc_add_ui($u, $u, 2, $ROUND);     # u = u+2
+            Math::MPC::Rmpc_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+            if (Math::MPC::Rmpc_cmp_si($t, 0) == 0) {      # `u` is zero
+                return $n;
+            }
+
+            Math::MPC::Rmpc_div($t, $t, $u, $ROUND);       # t = t/u
+            return $t;
+        }
+    }
+
+    #
+    ## k-gonal root of `n`
+    #
+
+    sub polygonal_root {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y));
+    }
+
+    #
+    ## Second k-gonal root of `n`
+    #
+
+    sub polygonal_root2 {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y), 1);
+    }
 
     sub shift_left {
         my ($x, $y) = @_;

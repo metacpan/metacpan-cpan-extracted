@@ -1,5 +1,11 @@
 Revision history for DBIx-Class-DeploymentHandler
 
+0.002221  2017-09-27 21:19:42-04:00 America/New_York
+ - Allow easy changing the version storage table name, which makes subclassing
+   much less painful (Thanks Andrew Gregory!)
+ - Fix args passed to SQL::Translator::Diff
+ - Add Michael McClimon as comaint
+
 0.002220  2017-08-29 16:59:10-07:00 America/Los_Angeles
  - generate short package names for scripts (Fixes GH#55)
    (Thanks Andrew Gregory!)

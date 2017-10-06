@@ -8,7 +8,6 @@ sub __acosh__ {
     goto(ref($x) =~ tr/:/_/rs);
 
   Math_MPFR: {
-        my ($x) = @_;
 
         # Return a complex number for x < 1
         if (Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0) {

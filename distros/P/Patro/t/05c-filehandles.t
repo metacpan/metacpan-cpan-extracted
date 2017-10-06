@@ -17,14 +17,14 @@ of worms and an oozy smell, nor yet a dry, bare,
 sandy hole with nothing in it to sit down on or
 to eat: it was a hobbit-hold, and that means comfort.';
 
-open my $fh_tmp, '>', 't/t-05c.in';
+open my $fh_tmp, '>', 't/t-05c.input';
 print $fh_tmp $r0;
 close $fh_tmp;
 
 my ($f4,$f5); # = Symbol::gensym();
 
 open $f4, '<', \$r0;
-open $f5, '<', 't/t-05c.in';
+open $f5, '<', 't/t-05c.input';
 
 ok($f5 && ref($f5) eq 'GLOB', 'created remote filehandle');
 my $cfg = patronize($f4,$f5);
@@ -71,6 +71,10 @@ ok($xx eq "123In " || $xx eq "123a h",
 
 done_testing;
 
+close $f5;
+#eval { close $p5 };
+unlink 't/t-05c.input' unless $ENV{KEEP};
+
 END {
-    unlink 't/t-05c.in' unless $ENV{KEEP};
+    unlink 't/t-05c.input' unless $ENV{KEEP};
 }

@@ -1,6 +1,14 @@
-REM this should be simple enough to convert to a bash script
-echo === use  |more  filter to page through test results
-echo ===   or |grep -v "^ok" |more   to catch failing results 
+echo off
+REM This should be simple enough to convert to a bash script. Or, you can
+REM run Makefile.PL to create the Makefile, and do a "make test" to run all
+REM these tests (you may even be able to do this without having yet installed
+REM PDF::Builder!). You can also look at ways (such as with the "prove" command)
+REM to run arbitrary versions of the product. Most often, you would run the t
+REM tests as a regression bucket after making any changes to PDF::Builder
+REM itself (in development). To each his own!
+echo "=== use  |more  filter to page through test results"
+echo "===   or |grep -v '^ok' |more   to catch failing results"
+echo on
 perl t\00-all-usable.t
 perl t\01-basic.t
 perl t\02-xrefstm.t

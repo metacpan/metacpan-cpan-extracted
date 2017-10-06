@@ -4,7 +4,11 @@ use 5.014;
 use strict;
 use warnings;
 use Moo;
-use Types::Standard qw(ArrayRef);
+use Types::Standard -all;
+use GraphQL::Type::Library -all;
+use MooX::Thunking;
+use Function::Parameters;
+use Return::Type;
 extends qw(GraphQL::Type);
 with qw(
   GraphQL::Role::Output
@@ -12,6 +16,7 @@ with qw(
   GraphQL::Role::Nullable
   GraphQL::Role::Named
   GraphQL::Role::FieldsOutput
+  GraphQL::Role::HashMappable
 );
 
 our $VERSION = '0.02';
@@ -27,7 +32,7 @@ GraphQL::Type::Object - GraphQL object type
   my $implementing_type = GraphQL::Type::Object->new(
     name => 'Object',
     interfaces => [ $interface_type ],
-    fields => { fieldName => { type => $scalar_type, resolve => sub { '' } }},
+    fields => { field_name => { type => $scalar_type, resolve => sub { '' } }},
   );
 
 =head1 ATTRIBUTES
@@ -37,11 +42,32 @@ Has C<fields> from L<GraphQL::Role::FieldsOutput>.
 
 =head2 interfaces
 
-Optional array-ref of interface type objects implemented.
+Optional, thunked array-ref of interface type objects implemented.
 
 =cut
 
-has interfaces => (is => 'ro', isa => ArrayRef);
+has interfaces => (is => 'thunked', isa => ArrayRef[InstanceOf['GraphQL::Type::Interface']]);
+
+=head2 is_type_of
+
+Optional code-ref. Input is a value, an execution context hash-ref,
+and resolve-info hash-ref.
+
+=cut
+
+has is_type_of => (is => 'ro', isa => CodeRef);
+
+method graphql_to_perl(Maybe[HashRef] $item) :ReturnType(Maybe[HashRef]) {
+  return $item if !defined $item;
+  $item = $self->uplift($item);
+  my $fields = $self->fields;
+  $self->hashmap($item, $fields, sub {
+    my ($key, $value) = @_;
+    $fields->{$key}{type}->graphql_to_perl(
+      $value // $fields->{$key}{default_value}
+    );
+  });
+}
 
 __PACKAGE__->meta->make_immutable();
 

@@ -13,7 +13,7 @@ package HiPi::Energenie;
 use strict;
 use warnings;
 use parent qw( HiPi::Interface );
-use HiPi qw( :energenie :openthings );
+use HiPi qw( :energenie :openthings :rpi );
 use Time::HiRes qw( usleep );
 use HiPi::RF::OpenThings::Message;
 use UNIVERSAL::require;
@@ -22,7 +22,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( backend ook_repeat can_rx ) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 use constant {
     STATE_LISTEN                => 2,
@@ -53,6 +53,7 @@ sub new {
         can_rx       => 1,
         devicename   => '/dev/spidev0.1',
         ook_repeat   => ENERGENIE_TXOOK_REPEAT_RATE,
+        reset_gpio   => RPI_PIN_22,
     );
     
     foreach my $key (sort keys(%userparams)) {
@@ -68,6 +69,7 @@ sub new {
             my $dev = HiPi::Energenie::ENER314_RT->new(
                 led_on      => 0,
                 devicename  => $params{devicename},
+                reset_gpio  => $params{reset_gpio},
             );
             $params{device} = $dev;
             

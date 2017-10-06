@@ -1,6 +1,6 @@
 package Template::Lace;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 1;
 
@@ -405,14 +405,19 @@ a CSS match to the current DOM.  In Perl when a variable starts with a '\' the m
 a reference; so you can think of this as a reference to a point in the current DOM.
 
 In general the value here is just a normal CSS match specification (see L<Mojo::DOM58> for
-details on the match specifications supported).  However we have added two minor bits to
+details on the match specifications supported).  However we have added a few minor bits to
 how L<Mojo::DOM58> works to make some types matching easier.  First, if a match specification
 ends in ':content' that means 'match the content, not the full node'.  In the example case
-"title=\'title:content'" that would get the text value of the title tag.  Second, in the case
-where you want the match to return a collection of nodes all matching the specification, you
-would prepend a '@' to the front of it (think in Perl @variable means an array variable). In
-the given example "css=\'@link'" we want the attribute 'css' to be a collection of all the
-linked stylesheets in the current DOM.
+"title=\'title:content'" that would get the text value of the title tag.  This could also be
+used to get a stringified form of a matches content when the content is complex such as a match
+like "body=\'body:content'.  If you want the contents of a match in the form of a collection of
+nodes instead using "body=\'body:nodes'.  You might wish to do this if the contents are large
+and you want to avoid unnessary stringification and parsing.
+
+Lastly, in the case where you want the match to return a collection of nodes all matching the 
+specification, you would prepend a '@' to the front of it (think in Perl @variable means an
+array variable). In the given example "css=\'@link'" we want the attribute 'css' to be a
+collection of all the linked stylesheets in the current DOM.
 
 You will use this type of value when you are making components that do complex layout
 and overlays of the current DOM (such as when you are creating a master layout page for

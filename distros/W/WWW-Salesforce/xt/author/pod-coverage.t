@@ -25,7 +25,11 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 
 plan tests => scalar @modules;
 
-my %trustme = ();
+my %trustme = (
+             'WWW::Salesforce' => [
+                                    qr/^(?:get_clientM?|get_session_headerM?|get_username)$/
+                                  ]
+           );
 
 my @also_private;
 

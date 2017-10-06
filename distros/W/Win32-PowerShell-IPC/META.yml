@@ -1,0 +1,35 @@
+---
+abstract: 'Interactively manipulate a captive PowerShell process'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-PowerShell-IPC
+requires:
+  Carp: '0'
+  Log::Any: '0'
+  Moo: '2'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Win32: '0'
+  Win32::API: '0'
+  Win32::Process: '0'
+  Win32API::File: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-Win32-PowerShell-IPC/issues
+  homepage: https://github.com/nrdvana/perl-Win32-PowerShell-IPC
+  repository: git://github.com/nrdvana/perl-Win32-PowerShell-IPC.git
+version: '0.02'

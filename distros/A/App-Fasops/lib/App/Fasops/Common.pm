@@ -1021,7 +1021,7 @@ sub polarize_indel {
 
         my ( $indel_type, $indel_occured, $indel_freq );
 
-        my $indel_set = AlignDB::IntSpan->new->add_pair( $site->{indel_start}, $site->{indel_end} );
+        my $indel_set = AlignDB::IntSpan->new()->add_pair( $site->{indel_start}, $site->{indel_end} );
 
         # this line is different to previous subroutines
         my @uniq_indel_seqs = uniq( @indel_seqs, $indel_outgroup_seq );
@@ -1114,7 +1114,6 @@ sub polarize_indel {
     return $sites;
 }
 
-# Give a chr position, return an align position starting from '1'.
 sub chr_to_align {
     my AlignDB::IntSpan $intspan = shift;
     my $pos = shift;
@@ -1141,10 +1140,6 @@ sub chr_to_align {
     return $align_pos;
 }
 
-# Give a chr position, return an align position starting from '1'.
-# If the position in target is located in a gap, then return the left base's position.
-# 5' for positive strand and 3' for negative stran.
-# (Just like GATK's indel left align)
 sub align_to_chr {
     my AlignDB::IntSpan $intspan = shift;
     my $pos = shift;
@@ -1268,6 +1263,22 @@ App::Fasops::Common - collection of common subroutines
     my $length = App::Fasops::Common::seq_length("AGCTTT---CCA");
 
 =head1 METHODS
+
+=head2 chr_to_align
+
+    my $chr_pos = App::Fasops::Common::align_to_chr( $intspan, $pos, $chr_start, $chr_strand, );
+    my $chr_pos = App::Fasops::Common::align_to_chr( $intspan, $pos, $chr_start, );
+
+Give a chr position, return an align position starting from '1'.
+
+=head2 align_to_chr
+
+    my $pos = App::Fasops::Common::align_to_chr( $intspan, $chr_pos, $chr_start, $chr_strand, );
+    my $pos = App::Fasops::Common::align_to_chr( $intspan, $chr_pos, $chr_start, );
+
+Give a chr position, return an align position starting from '1'.
+If the position in target is located in a gap, then return the left base's position.
+5' for positive strand and 3' for negative stran. (Just like GATK's indel left align.)
 
 =head2 calc_ld
 

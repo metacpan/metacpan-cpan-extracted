@@ -4,7 +4,26 @@ use Template::Lace::DOM;
 use_ok 'Template::Lace::Factory';
 
 {
-  package  Local::Template::Master;
+  package Local::Template::Nav;
+
+  use Moo;
+
+  has 'content' => (is=>'ro');
+
+  sub template {
+    return q[
+      <nav>
+      </nav>
+    ]
+  }
+
+  sub on_component_add {
+    my ($self, $dom) = @_;
+    $dom->at('nav')
+      ->content($self->content);
+  }
+
+  package Local::Template::Master;
 
   use Moo;
 
@@ -73,6 +92,11 @@ use_ok 'Template::Lace::Factory';
           <title>Page Title</title>
         </head>
         <body>
+          <layout-nav>
+            <ul>
+              <li>aaa</li>
+            </ul>
+          </layout-nav>
           <section id='story'>
             Story
           </section>
@@ -224,9 +248,9 @@ $renderer->call(sub {
 $renderer->call('add_debug');
 
 ok my $html = $renderer->render;
-
 ok my $dom = Template::Lace::DOM->new($html);
 
+is $dom->at('nav li')->content, 'aaa';
 is $dom->find('meta')->[0]->attr('charset'), 'utf-8';
 is $dom->find('meta')->[1]->attr('name'), 'viewport';
 is $dom->find('link')->[0]->attr('href'), '/static/base.css';

@@ -184,7 +184,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     this.fireEvent('popupClosed');
                                 },this,100);
                                 if (!(btCfg.options && btCfg.options.noReload)){
-                                    this.fireDataEvent('actionResponse',{action: 'reload'});
+                                    this.fireDataEvent('actionResponse',{action: ( btCfg.options && btCfg.options.reloadStatusOnClose ) ? 'reloadStatus' : 'reload'});
                                 }
                             },this);
                             if (btCfg.set){

@@ -57,7 +57,7 @@ sub add_universal_app_campaign {
       description4 => "4 colorful fun skins"
     });
 
-  # Optional: You can set up to 10 image assets for your campaign.
+  # Optional: You can set up to 20 image assets for your campaign.
   # See upload_image.pl for an example on how to upload images.
   # universalAppSetting->set_imageMediaIds([INSERT_IMAGE_MEDIA_ID_HERE]);
 

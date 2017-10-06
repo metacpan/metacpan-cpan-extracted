@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-const char ebb_http_header[] = "HTTP/1.1 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: %zd\r\n\r\n";
+const char ebb_http_header[] = "HTTP/1.0 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: %zd\r\n\r\n";
 
 void uri_ebb_buf_free(ebb_buf* buf)
 {
@@ -34,6 +34,15 @@ static uri_dispatch_t uri_map[] = {
 		.destroy = uri_bbf_detect_objects_destroy,
 	},
 	{
+		.uri = "/convnet/classify",
+		.init = uri_convnet_classify_init,
+		.parse = uri_convnet_classify_parse,
+		.get = uri_convnet_classify_intro,
+		.post = uri_convnet_classify,
+		.delete = 0,
+		.destroy = uri_convnet_classify_destroy,
+	},
+	{
 		.uri = "/dpm/detect.objects",
 		.init = uri_dpm_detect_objects_init,
 		.parse = uri_dpm_detect_objects_parse,
@@ -50,6 +59,15 @@ static uri_dispatch_t uri_map[] = {
 		.post = uri_icf_detect_objects,
 		.delete = 0,
 		.destroy = uri_icf_detect_objects_destroy,
+	},
+	{
+		.uri = "/scd/detect.objects",
+		.init = uri_scd_detect_objects_init,
+		.parse = uri_scd_detect_objects_parse,
+		.get = uri_scd_detect_objects_intro,
+		.post = uri_scd_detect_objects,
+		.delete = 0,
+		.destroy = uri_scd_detect_objects_destroy,
 	},
 	{
 		.uri = "/sift",

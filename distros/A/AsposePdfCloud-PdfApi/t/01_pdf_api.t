@@ -49,7 +49,7 @@ if (not defined $AsposePdfCloud::Configuration::api_key or $AsposePdfCloud::Conf
 	$AsposeStorageCloud::Configuration::api_key = $AsposePdfCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

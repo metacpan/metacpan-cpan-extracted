@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse;
-$QBit::Application::Model::DB::clickhouse::VERSION = '0.004';
+$QBit::Application::Model::DB::clickhouse::VERSION = '0.005';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);

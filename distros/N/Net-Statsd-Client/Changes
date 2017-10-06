@@ -1,3 +1,9 @@
+0.32      2017-10-02 18:47:40 America/New_York
+  * Calling 'finish' on a Net::Statsd::Client::Timer now returns the
+    number of milliseconds that the timer measured, in case you want
+    to do something with the information other than send it to statsd.
+    Thanks to Brad Lhotsky (reyjrar) for the contribution.
+
 0.31      2013-09-20 11:16:13 America/New_York
   * BUG FIX: 0.30 would send sampled timers using an incorrect format.
 

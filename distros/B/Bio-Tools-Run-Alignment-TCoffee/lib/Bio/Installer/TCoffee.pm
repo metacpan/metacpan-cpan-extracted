@@ -1,5 +1,5 @@
 package Bio::Installer::TCoffee;
-$Bio::Installer::TCoffee::VERSION = '1.7.2';
+$Bio::Installer::TCoffee::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -82,7 +82,7 @@ Bio::Installer::TCoffee - DESCRIPTION of Object
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

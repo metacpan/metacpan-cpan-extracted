@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Fatal;
 use Test::DZil;
@@ -70,6 +70,7 @@ foreach my $eumm_version ('6.00', '0')
             prereqs => superhashof({
                 configure => {
                     requires => {
+                        'ExtUtils::MakeMaker' => ignore,
                         'Module::Build::Tiny' => ignore,
                         'perl' => '5.006',
                     },

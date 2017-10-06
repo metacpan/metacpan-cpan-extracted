@@ -40,9 +40,9 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar' => sub { 10 };
+    has _bar => ( default => sub { 10 } );
 
-    sub bar : ro;
+    sub bar : ro(_bar);
 }
 
 package FooBar {
@@ -50,9 +50,9 @@ package FooBar {
 
     extends 'Foo';
 
-    has 'bar' => sub { 100 };
+    has _bar => ( default => sub { 100 } );
 
-    sub derived_bar : ro('bar');
+    sub derived_bar : ro(_bar);
 }
 
 my $foobar = FooBar->new;

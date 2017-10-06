@@ -1,5 +1,5 @@
 {
-   "abstract" : "Geocode addresses with the OpenCage Geocoder API",
+   "abstract" : "Geocode coordinates and addresses with the OpenCage Geocoder",
    "author" : [
       "edf <edf@opencagedata.com>"
    ],
@@ -21,26 +21,27 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.26",
-            "HTTP::Tiny" : "0.028",
-            "JSON" : "2.53",
-            "List::MoreUtils" : "0.33",
+            "Carp" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "2.94",
+            "JSON::XS" : "3.04",
             "Pod::Perldoc" : "3.21",
-            "URI" : "1.60"
+            "URI" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Test::Exception" : "0.32",
             "Test::More" : "0.92",
-            "Test::Pod" : "1.51"
+            "Test::Pod" : "1.51",
+            "Test::Warn" : "0"
          }
       }
    },
    "provides" : {
       "Geo::Coder::OpenCage" : {
          "file" : "lib/Geo/Coder/OpenCage.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -55,7 +56,7 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Coder-OpenCage"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

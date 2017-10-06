@@ -4,7 +4,7 @@ Photonic::Retarded::Wave
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ functions of the components.
 
 =over 4
 
-=item * new(metric=>$m, nh=>$nh, small=>$small, keepStates=>$k)
+=item * new(metric=>$m, nh=>$nh, smallH=>$smallH, smallE=>$smallE, keepStates=>$k)  
 
 Initializes the structure.
 
@@ -30,7 +30,8 @@ $m Photonic::Retarded::Metric describing the structure and some parametres.
 
 $nh is the maximum number of Haydock coefficients to use.
 
-$small is the criteria of convergence (default 1e-7)
+$smallH and $smallE are the criteria of convergence (default 1e-7) for
+Haydock coefficients and for continued fraction.
 
 $k is a flag to keep states in Haydock calculations (default 0)
 
@@ -58,7 +59,7 @@ The macroscopic wave operator of the last operation
 =cut
 
 package Photonic::Retarded::Wave;
-$Photonic::Retarded::Wave::VERSION = '0.007';
+$Photonic::Retarded::Wave::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -82,7 +83,7 @@ around 'evaluate' => sub {
     my $green=$self->$orig(@_);
     #make a real matrix from [[R -I][I R]] to solve complex eq.
     my $greenreim=$green->re->append(-$green->im)
-       ->glue(1,$green->im->append($green->re))->sever;
+       ->glue(1,$green->im->append($green->re))->sever; #copy vs sever?
     my($lu, $perm, $par)=$greenreim->lu_decomp;
     my $d=$self->geometry->ndims;
     my $idreim=identity($d)->glue(1,PDL->zeroes($d,$d))->mv(0,-1);

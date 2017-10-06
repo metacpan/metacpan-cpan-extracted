@@ -41,8 +41,10 @@ extern "C" {
 /**
  * parameters used by sse2.
  */
+#ifdef HAVE_SSE2
 static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2,
 					SFMT_MSK3, SFMT_MSK4}};
+#endif
 /*----------------
   STATIC FUNCTIONS
   ----------------*/
@@ -336,7 +338,9 @@ void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
  * @param size the size of the array
  * @param rsize the size of each record in the array
  */
+#if !defined(__OpenBSD__) && !defined(__FreeBSD__)
 #include <alloca.h>
+#endif
 
 void sfmt_genrand_shuffle(sfmt_t * sfmt, void *array, int size, int rsize) {
 	int i, j;

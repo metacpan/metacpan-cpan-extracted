@@ -1,4 +1,5 @@
-package Catmandu::Store::Solr::CQL; #TODO see Catmandu::Store::ElasticSearch::CQL
+package Catmandu::Store::Solr::CQL
+    ;    #TODO see Catmandu::Store::ElasticSearch::CQL
 
 use Catmandu::Sane;
 use CQL::Parser;
@@ -8,15 +9,15 @@ use Moo;
 
 with 'Catmandu::Logger';
 
-our $VERSION = "0.0302";
+our $VERSION = "0.0303";
 
-has parser  => (is => 'ro', lazy => 1, builder => '_build_parser');
+has parser => (is => 'ro', lazy => 1, builder => '_build_parser');
 has mapping => (is => 'ro');
 
-my $any_field = qr'^(srw|cql)\.(serverChoice|anywhere)$'i;
-my $match_all = qr'^(srw|cql)\.allRecords$'i;
+my $any_field         = qr'^(srw|cql)\.(serverChoice|anywhere)$'i;
+my $match_all         = qr'^(srw|cql)\.allRecords$'i;
 my $distance_modifier = qr'\s*\/\s*distance\s*<\s*(\d+)'i;
-my $reserved = qr'[\+\-\&\|\!\(\)\{\}\[\]\^\"\~\*\?\:\\]';
+my $reserved          = qr'[\+\-\&\|\!\(\)\{\}\[\]\^\"\~\*\?\:\\]';
 
 sub _build_parser {
     CQL::Parser->new;
@@ -25,9 +26,7 @@ sub _build_parser {
 sub parse {
     my ($self, $query) = @_;
     $self->log->debug("cql query: $query");
-    my $node = eval {
-        $self->parser->parse($query)
-    } or do {
+    my $node = eval {$self->parser->parse($query)} or do {
         my $error = $@;
         $self->log->error("cql error: $error");
         die "cql error: $error";
@@ -71,17 +70,20 @@ sub visit {
         if ($base eq 'scr') {
             if ($mapping && $mapping->{default_relation}) {
                 $base = $mapping->{default_relation};
-            } else {
+            }
+            else {
                 $base = '=';
             }
         }
 
         #default field
         if ($qualifier =~ $any_field) {
+
             #set default field explicitely
-            if ( $mapping && $mapping->{default_index} ) {
+            if ($mapping && $mapping->{default_index}) {
                 $qualifier = $mapping->{default_index};
             }
+
             #make solr decide what the default field should be
             else {
                 $qualifier = "";
@@ -89,20 +91,25 @@ sub visit {
         }
 
         #field search: new way
-        if( $indexes ) {
+        if ($indexes) {
 
             #empty qualifier: Solr should decide how to query
-            if ( is_string( $qualifier ) ) {
+            if (is_string($qualifier)) {
 
                 #change qualifier
                 $qualifier = lc $qualifier;
                 my $old_qualifier = $qualifier;
-                $qualifier =~ s/(?<=[^_])_(?=[^_])//g if $mapping->{strip_separating_underscores};
-                unless($qualifier eq $old_qualifier){
-                    $self->log->debug("value of qualifier '$old_qualifier' reset to '$qualifier' because of setting 'strip_separating_underscores'");
+                $qualifier =~ s/(?<=[^_])_(?=[^_])//g
+                    if $mapping->{strip_separating_underscores};
+                unless ($qualifier eq $old_qualifier) {
+                    $self->log->debug(
+                        "value of qualifier '$old_qualifier' reset to '$qualifier' because of setting 'strip_separating_underscores'"
+                    );
                 }
-                my $q_mapping = $indexes->{$qualifier} or confess "cql error: unknown index $qualifier";
-                $q_mapping->{op}->{$base} or confess "cql error: relation $base not allowed";
+                my $q_mapping = $indexes->{$qualifier}
+                    or confess "cql error: unknown index $qualifier";
+                $q_mapping->{op}->{$base}
+                    or confess "cql error: relation $base not allowed";
 
                 my $op = $q_mapping->{op}->{$base};
 
@@ -111,14 +118,17 @@ sub visit {
 
                     $qualifier = $op->{field};
 
-                } elsif ($q_mapping->{field}) {
+                }
+                elsif ($q_mapping->{field}) {
 
                     $qualifier = $q_mapping->{field};
 
                 }
 
-                unless($qualifier eq $old_qualifier){
-                    $self->log->debug("value of qualifier '$old_qualifier' reset to '$qualifier' because of field mapping");
+                unless ($qualifier eq $old_qualifier) {
+                    $self->log->debug(
+                        "value of qualifier '$old_qualifier' reset to '$qualifier' because of field mapping"
+                    );
                 }
 
                 #add solr ':'
@@ -130,7 +140,8 @@ sub visit {
 
                     $filters = $op->{filter};
 
-                } elsif ($q_mapping->{filter}) {
+                }
+                elsif ($q_mapping->{filter}) {
 
                     $filters = $q_mapping->{filter};
 
@@ -138,7 +149,8 @@ sub visit {
                 if ($filters) {
                     for my $filter (@$filters) {
                         if ($filter eq 'lowercase') {
-                            $self->log->debug("term '$term' filtered to lowercase");
+                            $self->log->debug(
+                                "term '$term' filtered to lowercase");
                             $term = lc $term;
                         }
                     }
@@ -147,17 +159,21 @@ sub visit {
                 #change term using callbacks
                 if (ref $op && $op->{cb}) {
                     my ($pkg, $sub) = @{$op->{cb}};
-                    $self->log->debug("term '$term' changed to ${pkg}->${sub}");
+                    $self->log->debug(
+                        "term '$term' changed to ${pkg}->${sub}");
                     $term = require_package($pkg)->$sub($term);
-                } elsif ($q_mapping->{cb}) {
+                }
+                elsif ($q_mapping->{cb}) {
                     my ($pkg, $sub) = @{$q_mapping->{cb}};
-                    $self->log->debug("term '$term' changed to ${pkg}->${sub}");
+                    $self->log->debug(
+                        "term '$term' changed to ${pkg}->${sub}");
                     $term = require_package($pkg)->$sub($term);
                 }
 
             }
 
         }
+
         #field search: old way
         else {
             #add solr ':'
@@ -171,72 +187,87 @@ sub visit {
                     return "$qualifier$term~";
                 }
             }
-            return $qualifier.$term;
-        } elsif ($base eq '<') {
+            return $qualifier . $term;
+        }
+        elsif ($base eq '<') {
             $term = quote_term($term);
-            return $qualifier."{* TO $term}";
-        } elsif ($base eq '>') {
+            return $qualifier . "{* TO $term}";
+        }
+        elsif ($base eq '>') {
             $term = quote_term($term);
-            return $qualifier."{$term TO *}";
-        } elsif ($base eq '<=') {
+            return $qualifier . "{$term TO *}";
+        }
+        elsif ($base eq '<=') {
             $term = quote_term($term);
-            return $qualifier."[* TO $term]";
-        } elsif ($base eq '>=') {
+            return $qualifier . "[* TO $term]";
+        }
+        elsif ($base eq '>=') {
             $term = quote_term($term);
-            return $qualifier."[$term TO *]";
-        } elsif ($base eq '<>') {
+            return $qualifier . "[$term TO *]";
+        }
+        elsif ($base eq '<>') {
             $term = quote_term($term);
             return "-$qualifier$term";
-        } elsif ($base eq 'exact') {
-            return $qualifier.quote_term($term);
-        } elsif ($base eq 'all') {
+        }
+        elsif ($base eq 'exact') {
+            return $qualifier . quote_term($term);
+        }
+        elsif ($base eq 'all') {
             my @terms = split /\s+/, $term;
             if (@terms == 1) {
-                return $qualifier.$term;
+                return $qualifier . $term;
             }
-            $term = join ' ', map { "+$_" } @terms;
+            $term = join ' ', map {"+$_"} @terms;
             if ($qualifier) {
                 return "$qualifier($term)";
             }
             return $term;
-        } elsif ($base eq 'any') {
-            $term = join ' OR ', map { $qualifier.$_ } split /\s+/, $term;
+        }
+        elsif ($base eq 'any') {
+            $term = join ' OR ', map {$qualifier . $_} split /\s+/, $term;
             return "( $term)";
-        } elsif ($base eq 'within') {
+        }
+        elsif ($base eq 'within') {
             my @range = split /\s+/, $term;
             if (@range == 1) {
-                return $qualifier.$term;
-            } else {
-                return $qualifier."[$range[0] TO $range[1]]";
+                return $qualifier . $term;
             }
-        } else {
-            return $qualifier.quote_term($term);
+            else {
+                return $qualifier . "[$range[0] TO $range[1]]";
+            }
+        }
+        else {
+            return $qualifier . quote_term($term);
         }
     }
 
     #TODO: apply cql_mapping
     elsif ($node->isa('CQL::ProxNode')) {
-        my $distance = 1;
+        my $distance  = 1;
         my $qualifier = $node->left->getQualifier;
-        my $term = escape_term(join(' ', $node->left->getTerm, $node->right->getTerm));
+        my $term      = escape_term(
+            join(' ', $node->left->getTerm, $node->right->getTerm));
 
         if (my ($n) = $node->op =~ $distance_modifier) {
             $distance = $n if $n > 1;
         }
         if ($qualifier =~ $any_field) {
             return qq("$term"~$distance);
-        } else {
+        }
+        else {
             return qq($qualifier:"$term"~$distance);
         }
     }
 
     elsif ($node->isa('CQL::BooleanNode')) {
-        my $lft = $node->left;
-        my $rgt = $node->right;
+        my $lft   = $node->left;
+        my $rgt   = $node->right;
         my $lft_q = $self->visit($lft);
         my $rgt_q = $self->visit($rgt);
-        $lft_q = "( $lft_q)" unless $lft->isa('CQL::TermNode') || $lft->isa('CQL::ProxNode');
-        $rgt_q = "( $rgt_q)" unless $rgt->isa('CQL::TermNode') || $rgt->isa('CQL::ProxNode');
+        $lft_q = "( $lft_q)"
+            unless $lft->isa('CQL::TermNode') || $lft->isa('CQL::ProxNode');
+        $rgt_q = "( $rgt_q)"
+            unless $rgt->isa('CQL::TermNode') || $rgt->isa('CQL::ProxNode');
 
         return join ' ', $lft_q, uc $node->op, $rgt_q;
     }

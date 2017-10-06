@@ -1,0 +1,28 @@
+---
+abstract: 'manage an inventory of stuff'
+author:
+  - 'Paul Hoffman <nkuitse@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ei
+requires:
+  Clone: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  String::Expando: '0'
+  Text::ParseWords: '0'
+  Text::Table: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.07'

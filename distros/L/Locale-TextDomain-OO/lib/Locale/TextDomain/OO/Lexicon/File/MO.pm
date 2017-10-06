@@ -7,7 +7,7 @@ use Moo;
 use MooX::StrictConstructor;
 use namespace::autoclean;
 
-our $VERSION = '1.027';
+our $VERSION = '1.031';
 
 with qw(
     Locale::TextDomain::OO::Lexicon::Role::File
@@ -30,13 +30,13 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::File::MO - Gettext mo file as lexicon
 
-$Id: MO.pm 651 2017-05-31 18:10:43Z steffenw $
+$Id: MO.pm 698 2017-09-28 05:21:05Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/File/MO.pm $
 
 =head1 VERSION
 
-1.027
+1.031
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ This module reads a gettext mo file into the lexicon.
     use Locale::TextDomain::OO::Lexicon::File::MO;
     use Log::Any qw($log);
 
-    Locale::TextDomain::OO::Lexicon::File::MO
+    $logger = Locale::TextDomain::OO::Lexicon::File::MO
         ->new(
             # all parameters are optional
             decode_code => sub {
@@ -89,13 +89,17 @@ This module reads a gettext mo file into the lexicon.
                 # and store that as "de-at::" lexicon with all messages now.
                 merge_lexicon => 'de::', 'de-at::' => 'de-at::',
 
+                # Copy a lexicon into another domain and/or category:
+                copy_lexicon => 'i-default::' => 'i-default:LC_MESSAGES:domain',
+
                 # Move a lexicon into another domain and/or category:
                 move_lexicon => 'i-default::' => 'i-default:LC_MESSAGES:domain',
 
                 # Delete a lexicon:
                 delete_lexicon => 'i-default::',
             ],
-        });
+        })
+        ->logger;
 
 =head1 SUBROUTINES/METHODS
 
@@ -116,7 +120,7 @@ to run the mo file specific code.
 
 =head2 method logger
 
-Set the logger
+Set the logger and get back them
 
     $lexicon_file_mo->logger(
         sub {
@@ -126,12 +130,15 @@ Set the logger
             return;
         },
     );
+    $logger = $lexicon_hash->logger;
 
 $arg_ref contains
 
     object => $lexicon_file_mo, # the object itself
     type   => 'debug',
-    event  => 'lexicon,load',
+    event  => 'lexicon,load', # The logger will be copied to
+                              # Locale::TextDomain::OO::Singleton::Lexicon
+                              # so more events are possible.
 
 =head1 EXAMPLE
 

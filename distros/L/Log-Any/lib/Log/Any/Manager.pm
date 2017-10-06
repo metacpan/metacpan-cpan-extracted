@@ -4,7 +4,7 @@ use warnings;
 
 package Log::Any::Manager;
 
-our $VERSION = '1.049';
+our $VERSION = '1.701';
 
 sub new {
     my $class = shift;
@@ -16,6 +16,8 @@ sub new {
         category_cache  => {},
         # The adapter to use if no other adapter is appropriate
         default_adapter => {},
+        # The context hashref that is passed to all proxies
+        context => {},
     };
     bless $self, $class;
 
@@ -24,7 +26,7 @@ sub new {
 
 sub has_consumer {
     my ( $self ) = @_;
-    return !!( @{ $self->{entries} } || keys %{ $self->{default_adapter} } );
+    return !!( @{ $self->{entries} } || keys %{ $self->{default_adapter} } || $ENV{LOG_ANY_DEFAULT_ADAPTER} );
 }
 
 sub get_adapter {
@@ -46,6 +48,11 @@ sub get_adapter {
     *get_logger = \&get_adapter;    # backwards compatibility
 }
 
+sub get_context {
+    my ( $self ) = @_;
+    return $self->{context};
+}
+
 sub _choose_entry_for_category {
     my ( $self, $category ) = @_;
 
@@ -55,8 +62,9 @@ sub _choose_entry_for_category {
         }
     }
     # nothing requested so fallback to default
+    my $default_adapter_name = $ENV{LOG_ANY_DEFAULT_ADAPTER} || "Null";
     my $default = $self->{default_adapter}{$category}
-        || [ $self->_get_adapter_class("Null"), [] ];
+        || [ $self->_get_adapter_class($default_adapter_name), [] ];
     my ($adapter_class, $adapter_params) = @$default;
     _require_dynamic($adapter_class);
     return {
@@ -241,7 +249,7 @@ Log::Any::Manager
 
 =head1 VERSION
 
-version 1.049
+version 1.701
 
 =head1 AUTHORS
 

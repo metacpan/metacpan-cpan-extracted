@@ -1,0 +1,31 @@
+This module provides an easy way to interactively run PowerShell
+commands from a perl script in a persistent shell environment.
+This allows you to connect to remote services such as Office365
+hosted Exchange and execute commands on demand rather than having
+to shell out for each one of them and wait for the 10+ second
+remote session startup overhead.
+
+This module only runs on Windows environments. (I was late to the
+party to find out that PowerShell for Linux exists)  On a Linux
+system most of the problems solved by this module aren't problems.
+
+The documentation can be viewed at:
+  https://metacpan.org/pod/Win32::PowerShell::IPC
+
+The module is easiest installed via CPAN:
+  cpanm Win32::PowerShell::IPC
+
+but to install from this source, use
+  dzil build
+  cd Win32-PowerShell-IPC-$VERSION/
+  perl Makefile.PL
+  make install
+
+and if you don't have Dist::Zilla yet, you can install via
+  cpanm Dist::Zilla
+  cpanm `dzil authordeps`
+ 
+This software is copyright (c) 2017 by Michael Conrad.
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

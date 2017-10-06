@@ -1,0 +1,533 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Ei;
+use Text::Table;
+use Text::ParseWords qw(shellwords);
+use Clone qw(clone);
+use String::Expando;
+use Getopt::Long
+    qw(:config posix_default gnu_compat require_order bundling no_ignore_case);
+
+sub usage;
+sub fatal;
+
+(my $prog = $0) =~ s{.+/}{};
+
+my %shell;
+my $config_file;
+GetOptions(
+    'c|config-file=s' => \$config_file,
+) or usage;
+if (!defined $config_file) {
+    ($config_file) =
+        grep { defined && -f } (
+            $ENV{'EI_CONFIG'},
+            map { glob($_) } qw(~/.eirc ~/etc/ei/ei.conf /etc/ei/ei.conf)
+        )
+    ;
+}
+
+my $ei = Ei->new(
+    defined $config_file ? ('config_file' => $config_file) : (),
+    'running' => 1,
+);
+my (%config, @items);
+init();
+
+my %outprop = (
+    'default' => [
+        ['#'        => 'Item'           ],
+        ['title'    => 'Title',    ''   ],
+        ['location' => 'Location', ''   ],
+    ],
+);
+my $outform = 'default';
+my $display = $config{'display'};
+if ($display) {
+    while (my ($form, $disp) = each %$display) {
+        my $cols = $disp->{columns} or next;
+        my @outprops;
+        foreach (@$cols) {
+            my ($prop, $label) = @$_{qw(property label)};
+            push @outprops, [ $prop, $label, '' ];
+        }
+        $outprop{$form} = \@outprops;
+    }
+}
+
+if (@ARGV == 0) {
+    @ARGV = ('shell');
+}
+elsif ($ARGV[0] =~ m{^\@(.+)$}) {
+    splice @ARGV, 0, 1, qw(ls -l), $1;
+}
+elsif ($ARGV[0] =~ m{^/(.+)/$}) {
+    splice @ARGV, 0, 1, qw(grep), $1;
+}
+elsif ($ARGV[0] =~ m{^[+](.+)}) {
+    splice @ARGV, 0, 1, qw(add -p), $1;
+}
+
+&{ __PACKAGE__->can('cmd_' . shift) || usage };
+
+# --- Commands
+
+sub cmd_ls {
+    #@ ls [-l LOC] [-p PROTO] :: list items
+    my ($l, $p) = @shell{qw(location prototype)};
+    GetOptions(
+        'l|location=s' => \$l,
+        'p|prototype=s' => \$p,
+    ) or usage;
+    my @items_to_list;
+    if ($l) {
+        @items_to_list = grep { ($_->{location} // '') eq $l } @items;
+    }
+    elsif ($p) {
+        @items_to_list = grep { ($_->{type} // '') eq $p } @items;
+    }
+    out( sort byid @items_to_list );
+}
+
+sub cmd_add {
+    #@ add [-p PROTO] :: add items to the inventory
+    my $p = $shell{'prototype'} || 'object';
+    my $l = $shell{'location'};
+    GetOptions(
+        'l|location=s' => \$l,
+        'p|prototype=s' => \$p,
+    ) or usage;
+    usage if @ARGV;
+    my $proto = $ei->prototype($p) or fatal "No such prototype: $p";
+    my $fh;
+    my ($n, $nadded) = (0, 0);
+    my $save_file = $config{files}{save};
+    $save_file = $config{files}{save} = $config{files}{root} . '/' . $save_file if $save_file !~ m{^/};
+    open $fh, '>>', scalar glob($save_file) or fatal "Can't save to $save_file: $!";
+    # $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = sub { $ei->{running} = 0; print STDERR "\n" };
+ITEM:
+    while (1) {
+        print STDERR '-' x 80, "\n";
+        # printf STDERR "\e[32;1m%80d\e[0m\n", ++$n;
+        my $obj = clone($proto->{properties});
+        $obj->{'location'} = $l if defined $l;
+        my $ok;
+        eval {
+            $ei->fill_placeholders($obj);
+            $ok = 1;
+        };
+        last if !$ok || !$ei->{running};
+        my $id = $obj->{'id'};
+        $ei->write($fh, $obj);
+        print STDERR "Item $id saved in $save_file\n";
+        $nadded++;
+        print STDERR "Continue? [Yn] ";
+        my $ans = <STDIN>;
+        last if ($ans // 'y') =~ /^[NnQq]/;
+    }
+    print STDERR '-' x 80, "\n";
+    printf STDERR "\n\e[1m%d %s added\e[0m\n",
+        $nadded,
+        $nadded == 1 ? 'item' : 'items';
+    $ei->reload, init() if %shell;
+}
+
+sub cmd_e { goto &cmd_edit }
+    #@= edit
+
+sub cmd_edit {
+    #@ edit ITEM :: edit an item
+    @ARGV = ($shell{'item'}) if !@ARGV && $shell{'item'};
+    usage if @ARGV < 1;
+    my $id = shift @ARGV;
+    my @items_to_edit = grep { $_->{'#'} eq $id } @items;
+    fatal "no such item(s): @ARGV" if !@items_to_edit;
+    system($ENV{'VISUAL'}||$ENV{'EDITOR'}||'vi', "+$_->{'.'}", $_->{'/'}) for $items_to_edit[0];
+    if (%shell) {
+        $ei->reload, init();
+        $shell{'item'} = $id;
+    }
+}
+
+sub cmd_item {
+    #@ item ITEM :: list a single item
+    usage if @ARGV < 1;
+    my $i = shift @ARGV;
+    out( grep { $_->{'#'} eq $i } @items );
+}
+
+sub cmd_grep {
+    #@ grep PATTERN :: list items that match the given pattern
+    usage if @ARGV < 1;
+    my $patt = shift @ARGV;
+    my $rx = qr/$patt/i;
+    out( grep { match(sub { $_ =~ $rx }) } @items );
+    #out( grep { 0 < grep { $_ =~ $rx } values %$_ } @items );
+}
+
+sub cmd_batch {
+    #@ batch [-l LOC] [-f INF] [-O] [-o OUTF] :: add a batch of items
+    my $in_file = '-';
+    my $location = $shell{'location'} || 'home';
+    my ($out_file);
+    GetOptions(
+        'f|file=s' => \$in_file,
+        'o|output=s' => \$out_file,
+        'O' => sub { $out_file = '-' },  # Print to stdout
+        'l|location=s' => \$location,
+    ) or usage;
+    if (defined $in_file && $in_file ne '-' && $in_file ne '/dev/stdin') {
+        open \*STDIN, '<', $in_file or fatal "open $in_file for input: $!";
+    }
+    if (defined $out_file && $out_file ne '-' && $out_file ne '/dev/stdout') {
+        open \*STDOUT, '>>', $out_file or fatal "open $out_file for output: $!";
+    }
+    elsif (!defined $out_file) {
+        my $save_file = $config{files}{save};
+        $save_file = $config{files}{root} . '/' . $save_file if $save_file !~ m{^/};
+        open \*STDOUT, '>>', scalar glob($save_file) or fatal "Can't save to $save_file: $!";
+    }
+    my %proto;
+    while (<STDIN>) {
+        if (/^add\s+(\S+)\s+\{$/) {
+            my $p = $1;
+            my $proto = $proto{$p} ||= $ei->prototype($p) || fatal "No such prototype: $p";
+            my $hash = $ei->_read_hash(\*STDIN, '-', $.);
+            my $obj = clone({ %{$proto->{properties}}, %$hash });
+            $ei->fill_placeholders($obj,
+                '*' => sub {
+                    my ($key, $setter, @args) = @_;
+                    $setter->(undef);
+                },
+            );
+            $obj->{location} //= $location;
+            foreach (keys %$obj) {
+                delete $obj->{$_} if !defined $obj->{$_};
+            }
+            $ei->write(\*STDOUT, $obj);
+        }
+        elsif (/^delete\s+(\S+)$/) {
+            fatal "delete not yet implemented";
+        }
+        elsif (/^update\s+(\S+)\s+\{$/) {
+            fatal "update not yet implemented";
+        }
+    }
+}
+
+sub cmd_proto {
+    #@ proto [PROTO] :: list (a) prototype(s)
+    if (!@ARGV) {
+        print $_, "\n" for sort $ei->prototypes;
+        return;
+    }
+    foreach my $p (@ARGV) {
+        my $proto = $ei->prototype($p) or fatal "No such prototype: $p";
+        1;
+    }
+}
+
+sub cmd_export {
+    #@ export [-t TYPE] [-l LOC] :: export item data
+    my $l = $shell{'location'};
+    my $t = 'native';
+    GetOptions(
+        'l|location=s' => \$l,
+        't|format=s' => \$t,
+    ) or usage;
+    my @items_to_export = @items;
+    if ($l) {
+        @items_to_export = grep { ($_->{location} // '') eq $l } @items_to_export;
+    }
+    foreach (@items_to_export) {
+        print_item($_);
+    }
+}
+
+sub print_item {
+    my ($item, $format) = @_;
+    my $formatter = __PACKAGE__->can('as_'.lc($format // $shell{'format'} // 'native'))
+        or fatal "unknown format: $format";
+    my %item = %$item;
+    $item{'id'}   ||= delete $item{'#'};
+    $item{'file'} ||= delete $item{'/'};
+    $item{'line'} ||= delete $item{'.'};
+    print $formatter->(\%item);
+}
+
+sub cmd_help {
+    #@ help :: show helpful information
+    my $pfx = %shell ? '' : 'ei [-c CONFIGFILE] ';
+    print STDERR <<'EOS';
+usage: ${pfx}COMMAND [ARG...]
+commands:
+EOS
+    my $w = 0;
+    my ($commands, $aliases) = commands();
+    my $table = Text::Table->new(\'  ', 'command', \'  ', 'description');
+    foreach (sort { $a->{'name'} cmp $b->{'name'} } @$commands) {
+        my ($name, $args, $descrip) = @$_{qw(name args description)};
+        $table->add(join(' ', $name, @{ $args || [] }), $descrip || '');
+    }
+    print $table->body;
+    $table = Text::Table->new(\'  ', 'alias', \' = ', 'command');
+    print "aliases:\n";
+    foreach (sort keys %$aliases) {
+        $table->add($_, $aliases->{$_});
+    }
+    print $table->body;
+}
+
+sub cmd_shell {
+    init_shell();
+    compile_prompt($shell{'prompt'});
+    print STDERR $shell{'prompter'}->();
+    while (<STDIN>) {
+        next if /^\s*(?:#.*)?$/;  # Skip blank lines and comments
+        chomp;
+        if (s/^!\s*//) {
+            system($ENV{'SHELL'} || 'sh', '-c', $_);
+            next;
+        }
+        elsif (/^{(.+)}$/) {
+            eval $1;
+            next;
+        }
+        local @ARGV = shellwords($_);
+        my $cmd = shift @ARGV;
+        $cmd =~ tr/-/_/;
+        if ($shell{'aliases'}{$cmd}) {
+            $cmd = $shell{'aliases'}{$cmd};
+            if (ref $cmd) {
+                ($cmd, @ARGV) = (@$cmd, @ARGV);
+            }
+        }
+        my $sub = __PACKAGE__->can("shellcmd_$cmd")
+               || __PACKAGE__->can("cmd_$cmd");
+        if (!$sub) {
+            print "unrecognized command: $cmd\nenter 'help' for a list\n";
+            next;
+        }
+        eval {
+            $shell{'cmd'} = $cmd;
+            $sub->();
+        };
+        last if !$shell{'running'};
+    }
+    continue {
+        print STDERR $shell{'prompter'}->();
+    }
+}
+
+# --- Shell commands
+
+sub shellcmd_goto {
+    usage if @ARGV != 1;
+    my ($loc) = @ARGV;
+    print STDERR "empty location: $loc\n" if !exists $shell{'locations'}{$loc};
+    $shell{'location'} = $loc;
+}
+
+sub shellcmd_quit {
+    CORE::exit;
+}
+
+sub shellcmd_proto {
+    usage if @ARGV != 1;
+    $shell{'prototype'} = shift @ARGV;
+}
+
+sub shellcmd_view {
+    usage if @ARGV > 1;
+    my $id = @ARGV ? shift @ARGV : $shell{'item'};
+    fatal "no current item" if !$id;
+    my ($item) = grep { $_->{'#'} eq $id } @items;
+    fatal "no such item: $id" if !$item;
+    $shell{'item'} = $id;
+    print_item($item);
+}
+
+sub shellcmd_format {
+    if (@ARGV != 1) {
+        print $shell{'format'} ||= 'native', "\n";
+    }
+    else {
+        my $format = shift @ARGV;
+        usage if !__PACKAGE__->can('as_'.$format);
+        $shell{'format'} = $format;
+    }
+}
+
+sub shellcmd_locations {
+    my $locations = $ei->locations;
+    my $table = Text::Table->new('key', 'value');
+    foreach my $l (sort keys %$locations) {
+        $table->add($l, $locations->{$l}{'title'});
+    }
+    print $table->body;
+}
+
+# --- Other functions
+
+sub init {
+    @items = $ei->items;
+    %config = %{ $ei->{config} };
+}
+
+sub init_shell {
+    %shell = (
+        'running' => 1,
+        'prompt' => 'ei(%(location))> ',
+        %{ $config{'shell'} ||= {} },
+    );
+    {
+        no strict 'refs';
+        no warnings 'redefine';
+        *exit = sub {
+            die;  # Abort current command
+        };
+    }
+    $shell{'items'} = \@items;
+    $shell{'locations'} = $ei->{'config'}{'locations'};
+    my %contents;
+    foreach my $item (@items) {
+        push @{ $contents{$item->{'location'} || ''} ||= [] }, $item;
+    }
+    $shell{'contents'} = \%contents;
+    $shell{'aliases'}{'q'} ||= 'quit';
+}
+
+sub as_native {
+    my ($item) = @_;
+    return $ei->serialize($item) . "\n";
+}
+
+sub as_yaml {
+    my ($item) = @_;
+    eval "use YAML qw(); 1" or fatal "YAML export not available";
+    return YAML::Dump($item);
+}
+
+sub as_flat {
+    my ($item) = @_;
+    eval "use Hash::Flatten qw(flatten); 1" or fatal "flattened export not available";
+    my $flat = flatten($item);
+    my $table = Text::Table->new('key', 'value');
+    foreach (sort keys %$flat) {
+        $table->add($_, $flat->{$_});
+    }
+    return $table->body;
+}
+
+sub byid {
+    my ($aa, $an) = ($a->{'#'} =~ /^([a-z]*)([0-9]*)/);
+    my ($ba, $bn) = ($b->{'#'} =~ /^([a-z]*)([0-9]*)/);
+    return $aa cmp $ba || $an <=> $bn;
+}
+
+sub match {
+    my ($cond) = @_;
+    my %ref2code = (
+        '' => sub {
+            my ($c) = @_;
+            return $c->();
+        },
+        'HASH' => sub {
+            foreach (values %$_) {
+                return 1 if match(@_);
+            }
+        },
+        'ARRAY' => sub {
+            foreach (@$_) {
+                return 1 if match(@_);
+            }
+        },
+    );
+    return $ref2code{ref $_}->($cond);
+    #return $cond->() if !ref;
+    #return match_hash($cond, $_) if $r eq 'HASH';
+}
+
+sub out {
+    return if !@_;
+    my (@fld, @col, @def);
+    foreach (@{ $outprop{$outform} }) {
+        push @fld, $_->[0];
+        push @col, \'  ' if @col;
+        push @col, $_->[1];
+        push @def, (@$_ > 2 ? $_->[2] : undef);
+    }
+    my $table = Text::Table->new(@col);
+    foreach my $item (@_) {
+        my @row;
+        foreach my $i (0..$#fld) {
+            my ($f, $d) = ($fld[$i], $def[$i]);
+            push @row, $item->{$f} // $d // die "No default $f for item $item->{'#'}";
+        }
+        $table->add(@row);
+    }
+    print $table->title, $table->rule(sub { '-' x $_[1] }, sub { '' }), $table->body;
+    ### printf "%5s %-12.12s %s\n", 'Item', 'Location', 'Description';
+    ### foreach (@_) {
+    ###     printf "%5d %-12.12s %s\n", $_->{'#'} // 0, $_->{'loc'} // '', $_->{'descrip'} // '';
+    ### }
+}
+
+sub usage {
+    print STDERR "usage: $prog [-c CONFIGFILE] COMMAND [OPTION]...\n";
+    ::exit(1);
+}
+
+sub fatal {
+    print STDERR "${prog} @_\n";
+    ::exit(2);
+}
+
+sub exit {
+    CORE::exit(@_);
+}
+
+sub commands {
+    open my $fh, '<', $0 or die "open $0: $!";
+    my (@commands, %alias);
+COMMAND:
+    while (<$fh>) {
+        next if !/^sub cmd_(\w+) {/;
+        my $name = $1;
+        my %cmd = ('name' => $name);
+        while (<$fh>) {
+            $alias{$name} = $1, next COMMAND if /^\s*#\@=\s*(\w+)/;
+            last if !/^\s*#\@ (\w+(?:\s+(.+))?) :: (.+)/;
+            my ($args, $descrip) = ($2, $3);
+            $cmd{'args'} = [ shellwords($args) ],
+            $cmd{'description'} = $3;
+        }
+        push @commands, \%cmd;
+    }
+    $alias{'/PATT/'} = 'grep PATT';
+    $alias{'@LOC'}   = 'ls -l LOC';
+    return (\@commands, \%alias);
+}
+
+sub compile_prompt {
+    my ($prompt) = @_;
+    my %unesc = (
+        '\e' => "\e",
+        '\n' => "\n",
+        '\r' => "\r",
+        '\t' => "\t",
+        '\\' => "\\",
+    );
+    $prompt =~ s/(\\[\\entr])/$unesc{$1}/g;
+    $shell{'prompt'} = $prompt;
+    my $prompt_expando = String::Expando->new;
+    return $shell{'prompter'} = sub {
+        $prompt_expando->expand($prompt, {
+            'location' => $shell{'location'},
+        });
+    }
+}
+

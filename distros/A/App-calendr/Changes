@@ -1,5 +1,12 @@
 Revision history for App::calendr
 
+0.23  Thu Sep 28 12:20:00 2017
+      - Downgraded min version requirement for Calendar::Julian.
+      - Upgraded min version requirement for Calendar::Bahai in the test script t/app-calendr.t
+
+0.22  Wed Sep 27 10:50:00 2017
+      - Proposed fix for issue RT #123094 (added min version requirement for installed calendars).
+
 0.21  Thu Aug 24 12:00:00 2017
       - Added order to command line options.
 

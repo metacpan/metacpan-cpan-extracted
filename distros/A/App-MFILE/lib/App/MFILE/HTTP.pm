@@ -48,10 +48,11 @@ use LWP::UserAgent;
 use Params::Validate qw( :all );
 use Try::Tiny;
 
+
+
 =head1 NAME
 
 App::MFILE::HTTP - general REST request forwarder for MFILE-based clients
-
 
 
 
@@ -61,10 +62,9 @@ App::MFILE::HTTP - general REST request forwarder for MFILE-based clients
 
 
 
-
 =head1 DESCRIPTION
 
-Module where C<rest_req> resides.
+Module where C<rest_req> and other shared code resides.
 
 
 
@@ -72,34 +72,14 @@ Module where C<rest_req> resides.
 
 =cut
 
-our @EXPORT_OK = qw( rest_req );
-
+our @EXPORT_OK = qw(
+    rest_req
+    _is_authorized
+);
 
 
 
 =head1 FUNCTIONS
-
-
-=head2 init_ua
-
-Initialize a LWP::UserAgent singleton object.
-
-Takes two _mandatory_ parameters:
-
-    - a LWP::UserAgent object
-    - a scalar (filename of cookie jar)
-
-=cut
-
-sub init_ua {
-    # process arguments
-    my ( $ua, $cj ) = validate_pos( @_,
-        { type => HASHREF, can => 'cookie_jar' },
-        { type => SCALAR },
-    );
-    $ua->cookie_jar( { file => $cj } );
-    return;
-}
 
 
 =head2 rest_req
@@ -178,3 +158,89 @@ sub rest_req {
     };
 }
 
+
+=head2 _is_authorized
+
+This function does the actual work for C<is_authorized> in the Dispatch.pm
+module of an C<App::MFILE::WWW>-based application.
+
+This function belongs in Dispatch.pm - it is here only to prevent code
+duplication.
+
+=cut
+
+sub _is_authorized {
+    my ( $self ) = @_;
+
+    $log->debug( "Entering " . __PACKAGE__ . "::_is_authorized()" );
+
+    my $r = $self->request;
+    #my $session = $r->{'env'}->{'psgix.session'};
+    my $session = $self->session;
+    #my $remote_addr = $r->{'env'}->{'REMOTE_ADDR'};
+    my $remote_addr = $self->remote_addr;
+    my $ce;
+
+    #$log->debug( "Environment is " . Dumper( $r->{'env'} ) );
+    $log->debug( "Session is " . Dumper( $session ) );
+
+    # authorized session
+    if ( $ce = $session->{'currentUser'} and
+         $session->{'ip_addr'} and
+         $session->{'ip_addr'} eq $remote_addr and
+         _is_fresh( $session ) )
+    {
+        $log->debug( "is_authorized: Authorized session, employee " . $ce->{'nick'} );
+        $session->{'last_seen'} = time;
+        return 1;
+    }
+
+    # login attempt
+    if ( $r->method eq 'POST' and
+         $self->context->{'request_body'} and
+         $self->context->{'request_body'}->{'method'} and
+         $self->context->{'request_body'}->{'method'} =~ m/^LOGIN/i ) {
+        $log->debug( "is_authorized: Login attempt - pass it on" );
+        return 1;
+    }
+
+    # login bypass
+    $meta->set('META_LOGIN_BYPASS_STATE', 0) if not defined $meta->META_LOGIN_BYPASS_STATE;
+    if ( $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and not $meta->META_LOGIN_BYPASS_STATE ) {
+        $log->notice("Bypassing login dialog! Using default credentials");
+        $session->{'ip_addr'} = $remote_addr;
+        $session->{'last_seen'} = time;
+        my $bypass_result = $self->_login_dialog( {
+            'nam' => $site->MFILE_WWW_DEFAULT_LOGIN_CREDENTIALS->{'nam'},
+            'pwd' => $site->MFILE_WWW_DEFAULT_LOGIN_CREDENTIALS->{'pwd'},
+        } );
+        $meta->set('META_LOGIN_BYPASS_STATE', 1);
+        return $bypass_result;
+    }
+
+    # unauthorized session
+    $log->debug( "is_authorized fall-through: " . $r->method . " " . $self->request->path_info );
+    return ( $r->method eq 'GET' ) ? 1 : 0;
+}
+
+
+=head2 _is_fresh
+
+Takes a single argument, the PSGI session, which is assumed to contain a
+C<last_seen> attribute containing the number of seconds since epoch when the
+session was last seen.
+
+=cut
+
+sub _is_fresh {
+    my ( $session ) = validate_pos( @_, { type => HASHREF } );
+
+    return 0 unless my $last_seen = $session->{'last_seen'};
+
+    return ( time - $last_seen > $site->MFILE_WWW_SESSION_EXPIRATION_TIME )
+        ? 0
+        : 1;
+}
+
+
+1;

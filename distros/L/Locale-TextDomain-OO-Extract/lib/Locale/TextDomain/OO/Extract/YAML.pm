@@ -235,9 +235,9 @@ __END__
 Locale::TextDomain::OO::Extract::YAML
 - Extracts internationalization data from HTML::FormFu field definition YAML file
 
-$Id: $
+$Id: YAML.pm 695 2017-09-02 09:24:08Z steffenw $
 
-$HeadURL: $
+$HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/YAML.pm $
 
 =head1 VERSION
 

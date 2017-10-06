@@ -61,23 +61,18 @@ define ([
     prototypes
 ) {
 
-    var 
-        //
-        // object for storing targets
-        //
+    var // target storage
         _store = {},
-        //
+
         // function for retrieving a single target by name
-        //
         pull = function (tn) {
             if (_store.hasOwnProperty(tn)) {
                 return _store[tn];
             }
             return undefined;
         },
-        //
+
         // function for retrieving set of all targets of a given type
-        //
         getAll = function (tt) {
             var buffer = {},
                 i;
@@ -91,9 +86,8 @@ define ([
             }
             return buffer;
         },
-        //
+
         // function for pushing set of properties onto a target
-        //
         push = function (tn, props) {
             var target,
                 i;
@@ -108,11 +102,7 @@ define ([
             }
         };
 
-    //
-    // export the 'target' object
-    //
     return { 
-        "_store": _store, 
         "pull": pull, 
         "getAll": getAll, 
         "push": push 

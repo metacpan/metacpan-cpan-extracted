@@ -1,13 +1,13 @@
 package Geo::Coder::OpenCage;
-$Geo::Coder::OpenCage::VERSION = '0.10';
+$Geo::Coder::OpenCage::VERSION = '0.14';
 use strict;
 use warnings;
 
-use JSON;
-use HTTP::Tiny;
-use URI;
 use Carp;
-use List::MoreUtils qw(none);
+use Data::Dumper;
+use HTTP::Tiny;
+use JSON;
+use URI;
 
 sub new {
     my $class = shift;
@@ -27,34 +27,43 @@ sub new {
 }
 
 # see list: https://geocoder.opencagedata.com/api#forward-opt
-my @valid_params = qw(
-    add_request
-    abbrv
-    bounds
-    countrycode
-    language
-    limit
-    min_confidence
-    no_annotations
-    no_dedupe
-    no_record
-    q
+my %valid_params = (
+    abbrv            => 1,
+    add_request      => 1,
+    bounds           => 1,
+    countrycode      => 1,
+    format           => 0,    
+    jsonp            => 0,
+    language         => 1,
+    limit            => 1,
+    min_confidence   => 1,
+    no_annotations   => 1,
+    no_dedupe        => 1,
+    no_record        => 1,
+    q                => 1,
+    pretty           => 1,  # makes no actual difference
 );
+
 sub geocode {
     my $self = shift;
     my %params = @_;
 
-    if ($params{location}) {
+    if (defined($params{location})) {
         $params{q} = delete $params{location};
     }
     else {
-        croak "location is a required parameter for geocode()";
+        warn "location is a required parameter for geocode()";
+        return undef;
     }
 
     for my $k (keys %params){
-        if (none { $k eq $_ } @valid_params ) {
+        if (!defined($params{$k})){
             warn "Unknown geocode parameter: $k";
             delete $params{$k};
+        }
+        if (!$params{$k}){  # is a real parameter but we dont support it
+            warn "Unsupported geocode parameter: $k";
+            delete $params{$k};            
         }
     }
 
@@ -66,41 +75,37 @@ sub geocode {
 
     my $response = $self->{ua}->get($URL);
 
-    if (!$response || !$response->{success}) {
-        croak "failed to fetch '$URL': ", $response->{reason};
+    if (!$response){ 
+        warn "failed to fetch '$URL': ", $response->{reason};        
+        return undef;
     }
 
-    my $raw_content = $response->{content};
+    my $rh_content = $self->{json}->decode( $response->{content} );
 
-    my $result = $self->{json}->decode($raw_content);
-
-    return $result;
+    if (!$response->{success}) {
+        warn "response when requesting '$URL': "
+            . $rh_content->{status}{code}
+            . ', '
+            . $rh_content->{status}{message};
+        return undef;
+    }
+   
+    return $rh_content;
 }
 
 sub reverse_geocode {
     my $self = shift;
     my %params = @_;
 
-    croak "lat is a required parameter" if !$params{lat};
-    croak "lng is a required parameter" if !$params{lng};
-
-    $params{q} = join(",", delete @params{'lat','lng'});
-
-    my $URL = $self->{url}->clone();
-    $URL->query_form(
-        key => $self->{api_key},
-        %params,
-    );
-
-    my $response = $self->{ua}->get($URL);
-
-    if (!$response || !$response->{success}) {
-        croak "failed to fetch '$URL': ", $response->{reason};
+    foreach my $k (qw(lat lng)){
+        if (!defined($params{$k})){
+            warn "$k is a required parameter";
+            return undef;
+        }
     }
 
-    my $raw_content = $response->{content};
-    return $self->{json}->decode($raw_content);
-
+    $params{location} = join(',', delete @params{'lat','lng'});
+    return $self->geocode(%params);
 }
 
 1;
@@ -117,7 +122,7 @@ Geo::Coder::OpenCage
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -129,11 +134,11 @@ version 0.10
 
 This module provides an interface to the OpenCage geocoding service.
 
-For full details on the API visit L<http://geocoder.opencagedata.com/api>.
+For full details of the API visit L<https://geocoder.opencagedata.com/api>.
 
 =head1 NAME
 
-Geo::Coder::OpenCage - Geocode addresses with the OpenCage Geocoder API
+Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geocoder
 
 =head1 METHODS
 
@@ -141,7 +146,7 @@ Geo::Coder::OpenCage - Geocode addresses with the OpenCage Geocoder API
 
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
-You can get your API key from http://geocoder.opencagedata.com
+Get your API key from L<https://geocoder.opencagedata.com>
 
 =head2 geocode
 
@@ -149,15 +154,16 @@ Takes a single named parameter 'location' and returns a result hashref.
 
     my $result = $Geocoder->geocode(location => "Mudgee, Australia");
 
-The OpenCage Geocoder has a few optional parameters, some of which this module
-supports and some of which it doesn't.
+warns and returns undef if the query fails for some reason.
+
+The OpenCage Geocoder has a few optional parameters
 
 =over 1
 
 =item Supported Parameters
 
-please see the geocoder documentation almost all of the various optional 
-parameters are supported
+please see L<the OpenCage geocoder documentation|https://geocoder.opencagedata.com/api>. Most of 
+L<the various optional parameters|https://geocoder.opencagedata.com/api#forward-opt> are supported. For example:
 
 =over 2
 
@@ -166,25 +172,24 @@ parameters are supported
 An IETF format language code (such as es for Spanish or pt-BR for Brazilian
 Portuguese); if this is omitted a code of en (English) will be assumed.
 
+=item limit
+
+Limits the maximum number of results returned. Default is 10.  
+
 =item countrycode
 
 Provides the geocoder with a hint to the country that the query resides in.
 This value will help the geocoder but will not restrict the possible results to
 the supplied country.
 
-The country code is a 3 character code as defined by the ISO 3166-1 Alpha 3
-standard.
+The country code is a comma seperated list of 2 character code as defined by 
+the ISO 3166-1 Alpha 2standard.
 
 =back
 
 =item Not Supported
 
 =over 2
-
-=item format
-
-This module only ever uses the JSON format. For other formats you should access
-the API directly using HTTP::Tiny or similar user agent module.
 
 =item jsonp
 
@@ -209,11 +214,13 @@ Takes two named parameters 'lat' and 'lng' and returns a result hashref.
 
     my $result = $Geocoder->reverse_geocode(lat => -22.6792, lng => 14.5272);
 
-This supports the optional 'language' parameter in the same way that geocode() does.
+This method supports the optional parameters in the same way that geocode() 
+does.
 
 =head1 ENCODING
 
-All strings passed to and recieved from Geo::Coder::OpenCage methods are expected to be character strings, not byte strings.
+All strings passed to and recieved from Geo::Coder::OpenCage methods are 
+expected to be character strings, not byte strings.
 
 For more information see L<perlunicode>.
 
@@ -229,7 +236,7 @@ Ed Freyfogle
 
 Copyright 2017 OpenCage Data Ltd <cpan@opencagedata.com>
 
-Please check out all our open source work over at L<https://github.com/opencagedata> and our developer blog: L<http://blog.opencagedata.com>
+Please check out all our open source work over at L<https://github.com/opencagedata> and our developer blog: L<https://blog.opencagedata.com>
 
 Thanks!
 

@@ -45,7 +45,7 @@
 // - first argument === undefined
 //   the "full current-user object" is returned, i.e.:
 //   {
-//       obj: { nick: '...', passhash: '...', salt: '...', etc. },
+//       obj: { nick: '...', eid: '...', etc. },
 //       priv: 'passerby'
 //   }
 //
@@ -70,34 +70,35 @@ define ([
     prototypes
 ) {
 
-    console.log("Entering mfile-www current-user function");
+    console.log("current-user initialization routine");
 
-    // Initialization routine (run only once but the variables are available
-    // to the current-user function and provide storage for the object it
-    // returns)
     var cu = Object.create(prototypes.user),
         ce = cf('currentUser'),
         priv = cf('currentUserPriv'),
         flag1;
 
-    // console.log("current-user: ce is ", ce);
-    // console.log("current-user: priv is " + priv);
+    console.log("current-user: ce is ", ce);
+    console.log("current-user: priv is " + priv);
 
     if (ce) {
         $.extend(cu, ce)
     }
 
-    // current-user function
     return function (sw, arg) { 
+        var emptyObj = { "nick": null };
         if (sw === 'obj') {
-            // console.log('current-user function called with "obj"');
+            console.log('current-user function called with "obj"', arg);
             if (arg) {
                 console.log('NOTICE: setting current user object to ', arg);
                 cu = arg;
                 cf('currentUser', cu);
             }
-            console.log('cu.nick is ' + cu.nick);
-            return cu.nick ? cu : null;
+            if (arg === null) {
+                console.log('NOTICE: resetting currentUser object');
+                cu = emptyObj;
+                cf('currentUser', cu);
+            }
+            return cu;
         }
         if (sw === 'priv') {
             // console.log('current-user function called with "priv"');
@@ -106,11 +107,16 @@ define ([
                 priv = arg;
                 cf('currentUserPriv', priv);
             }
+            if (arg === null || arg === "") {
+                console.log('NOTICE: resetting current user priv');
+                priv = null;
+                cf('currentUserPriv', priv);
+            }
             return priv;
         }
         if (sw === 'flag1') {
             // console.log('current-user function called with "flag1"');
-            if (arg || arg === 0) {
+            if (arg || arg === 0 || arg === 'null') {
                 console.log('NOTICE: setting current user flag1 to ' + arg);
                 flag1 = arg;
             }

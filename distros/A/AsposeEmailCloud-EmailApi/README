@@ -2,9 +2,15 @@
 
 This repository contains Aspose.Email Cloud SDK for Perl source code. This SDK allows you to work with Aspose.Email Cloud REST APIs in your Perl applications quickly and easily. 
 
-## How to use the SDK?
+<p>
+ <a title="Download complete Aspose.Email for Cloud source code" href="https://github.com/asposeemail/Aspose_Email_Cloud/archive/master.zip">
+	<img src="https://raw.github.com/AsposeExamples/java-examples-dashboard/master/images/downloadZip-Button-Large.png" />
+  </a>
+</p>
 
-The complete source code is available in this repository folder. For more details, please visit our [documentation website](http://www.aspose.com/docs/display/emailcloud/How+to+Setup+Aspose.Email+Cloud+SDK+for+perl).
+##How to use the SDK?
+The complete source code is available in this repository folder. For more details, please visit our [documentation website](http://www.aspose.com/docs/display/emailcloud/Available+SDKs).
+
 
 ## Quick SDK Tutorial
 ```javascript
@@ -54,3 +60,6 @@ if($response->{'Status'} eq 'OK'){
 
 
 ```
+
+##Contact Us
+Your feedback is very important to us. Please feel free to contact us using our [Support Forums](https://www.aspose.com/community/forums/).

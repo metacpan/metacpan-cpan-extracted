@@ -3,7 +3,7 @@ package Log::Dispatch::Output;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Carp ();
 use Try::Tiny;
@@ -204,7 +204,7 @@ Log::Dispatch::Output - Base class for all Log::Dispatch::* objects
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

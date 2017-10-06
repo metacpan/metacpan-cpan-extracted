@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Regexp-Debugger",
    "no_index" : {
@@ -39,5 +39,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.002000"
+   "version" : "0.002001"
 }

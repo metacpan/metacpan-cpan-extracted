@@ -112,6 +112,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Neil Bowers</foaf:name>
       <foaf:mbox rdf:resource="mailto:neil@bowers.com" />
     </foaf:Person>
@@ -358,6 +364,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.34</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-03-28</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.35</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-07-31</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

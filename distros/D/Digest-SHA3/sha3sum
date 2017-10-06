@@ -4,14 +4,13 @@
 	##
 	## Copyright (C) 2012-2017 Mark Shelor, All Rights Reserved
 	##
-	## Version: 0.26
-	## Wed Sep  6 02:23:08 MST 2017
+	## Version: 0.27
+	## Wed Oct  4 00:40:04 MST 2017
 
 	## sha3sum SYNOPSIS adapted from GNU Coreutils sha1sum. Add
 	## "-a" option for algorithm selection,
 	## "-U" option for Universal Newlines support,
 	## "-0" option for reading bit strings, and
-	## "-p" option for portable digests (to be deprecated).
 
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
@@ -19,6 +18,7 @@ use strict;
 use warnings;
 use Fcntl;
 use Getopt::Long;
+use Digest::SHA3;
 
 my $POD = <<'END_OF_POD';
 
@@ -42,7 +42,6 @@ sha3sum - Print or Check SHA-3 Checksums
                          ASCII '0' interpreted as 0-bit,
                          ASCII '1' interpreted as 1-bit,
                          all other characters ignored
-   -p, --portable    read in portable mode (to be deprecated)
 
  The following three options are useful only when verifying checksums:
    -s, --status      don't output anything, status code shows success
@@ -56,10 +55,10 @@ sha3sum - Print or Check SHA-3 Checksums
  When checking, the input should be a former output of this program.
  The default mode is to print a line with checksum, a character
  indicating type (`*' for binary, ` ' for text, `U' for UNIVERSAL,
- `^' for BITS, `?' for portable), and name for each FILE.  The line
- starts with a `\' character if the FILE name contains either newlines
- or backslashes, which are then replaced by the two-character sequences
- `\n' and `\\' respectively.
+ `^' for BITS), and name for each FILE.  The line starts with a `\'
+ character if the FILE name contains either newlines or backslashes,
+ which are then replaced by the two-character sequences `\n' and
+ `\\' respectively.
 
  Report sha3sum bugs to mshelor@cpan.org
 
@@ -98,24 +97,7 @@ I<sha3sum> is implemented using the Perl module L<Digest::SHA3>.
 
 END_OF_POD
 
-my $VERSION = "0.26";
-
-
-	## Try to use Digest::SHA3.  If not installed, use the slower
-	## but functionally equivalent Digest::SHA3::PurePerl instead.
-
-my $MOD_PREFER = "Digest::SHA3";
-my $MOD_SECOND = "Digest::SHA3::PurePerl";	# Not yet implemented
-
-my $module = $MOD_PREFER;
-eval "require $module";
-if ($@) {
-	# $module = $MOD_SECOND;
-	# eval "require $module";
-	# die "Unable to find $MOD_PREFER or $MOD_SECOND\n" if $@;
-	die "Unable to find $MOD_PREFER\n" if $@;
-}
-
+my $VERSION = "0.27";
 
 sub usage {
 	my($err, $msg) = @_;
@@ -140,8 +122,8 @@ select((select(STDERR), $| = 1)[0]);
 
 	## Collect options from command line
 
-my ($alg, $binary, $check, $text, $status, $quiet, $warn, $help, $version);
-my ($portable, $BITS, $UNIVERSAL);
+my ($alg, $binary, $check, $text, $status, $quiet, $warn, $help);
+my ($version, $BITS, $UNIVERSAL);
 
 eval { Getopt::Long::Configure ("bundling") };
 GetOptions(
@@ -152,7 +134,6 @@ GetOptions(
 	'h|help' => \$help, 'v|version' => \$version,
 	'U|UNIVERSAL' => \$UNIVERSAL,
 	'0|01' => \$BITS,
-	'p|portable' => \$portable,
 ) or usage(1, "");
 
 
@@ -162,7 +143,7 @@ usage(0)
 	if $help;
 usage(1, "sha3sum: Ambiguous file mode\n")
 	if scalar(grep {defined $_}
-		($binary, $portable, $text, $BITS, $UNIVERSAL)) > 1;
+		($binary, $text, $BITS, $UNIVERSAL)) > 1;
 usage(1, "sha3sum: --warn option used only when verifying checksums\n")
 	if $warn && !$check;
 usage(1, "sha3sum: --status option used only when verifying checksums\n")
@@ -189,13 +170,12 @@ if ($version) {
 	## Try to figure out if the OS is DOS-like.  If it is,
 	## default to binary mode when reading files, unless
 	## explicitly overridden by command line "--text" or
-	## "--UNIVERSAL" or "--portable" options.
+	## "--UNIVERSAL" options.
 
 my $isDOSish = ($^O =~ /^(MSWin\d\d|os2|dos|mint|cygwin)$/);
-if ($isDOSish) { $binary = 1 unless $text || $UNIVERSAL || $portable }
+if ($isDOSish) { $binary = 1 unless $text || $UNIVERSAL }
 
-my $modesym = $binary ? '*' : ($UNIVERSAL ? 'U' :
-		($BITS ? '^' : ($portable ? '?' : ' ')));
+my $modesym = $binary ? '*' : ($UNIVERSAL ? 'U' : ($BITS ? '^' : ' '));
 
 
 	## Read from STDIN (-) if no files listed on command line
@@ -208,9 +188,8 @@ my $modesym = $binary ? '*' : ($UNIVERSAL ? 'U' :
 sub sumfile {
 	my $file = shift;
 
-	my $mode = $binary ? 'b' : ($UNIVERSAL ? 'U' :
-			($BITS ? '0' : ($portable ? 'p' : '')));
-	my $digest = eval { $module->new($alg)->addfile($file, $mode) };
+	my $mode = $binary ? 'b' : ($UNIVERSAL ? 'U' : ($BITS ? '0' : ''));
+	my $digest = eval { Digest::SHA3->new($alg)->addfile($file, $mode) };
 	if ($@) { warn "sha3sum: $file: $!\n"; return }
 	$digest->hexdigest;
 }
@@ -228,7 +207,6 @@ sub unescape {
 	$_ = shift;
 	s/\\\\/\0/g;
 	s/\\n/\n/g;
-	return if /\\/;
 	s/\0/\\/g;
 	return $_;
 }
@@ -248,12 +226,10 @@ sub verify {
 	or sysopen(FH, $checkfile, O_RDONLY)
 		or die "sha3sum: $checkfile: $!\n";
 	while (<FH>) {
-		next if /^#/; s/\n$//; s/^[ \t]+//; $num_lines++;
-		$bslash = s/^\\//;
-		($sum, $modesym, $fname) =
-			/^([\da-fA-F]+)[ \t]([ *?^U])([^\0]*)/;
+		next if /^#/; $num_lines++;
+		($bslash, $sum, $modesym, $fname) =
+			/^[ \t]*(\\?)([\da-fA-F]+)[ \t]([ *^U])(.+)/;
 		$alg = defined $sum ? $len2alg{length($sum)} : undef;
-		$fname = unescape($fname) if defined $fname && $bslash;
 		if (grep { ! defined $_ } ($alg, $sum, $modesym, $fname)) {
 			$alg = 1 unless defined $alg;
 			warn("sha3sum: $checkfile: $.: improperly formatted" .
@@ -261,10 +237,10 @@ sub verify {
 			$fmt_errs++;
 			next;
 		}
-		$fname =~ s/\r$// unless -e $fname;
+		$fname = unescape($fname) if $bslash;
 		$rsp = "$fname: "; $num_files++;
-		($binary, $text, $UNIVERSAL, $BITS, $portable) =
-			map { $_ eq $modesym } ('*', ' ', 'U', '^', 'p');
+		($binary, $text, $UNIVERSAL, $BITS) =
+			map { $_ eq $modesym } ('*', ' ', 'U', '^');
 		$isOK = 0;
 		unless ($digest = sumfile($fname)) {
 			$rsp .= "FAILED open or read\n";

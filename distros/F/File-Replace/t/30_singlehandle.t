@@ -41,7 +41,7 @@ BEGIN {
 }
 
 subtest 'two SingleHandles (in/out)' => sub { plan tests=>8;
-	my $fn = spew(newtempfn,"Foo\nBar\nQuz\n");
+	my $fn = newtempfn("Foo\nBar\nQuz\n");
 	my ($ifh,$ofh) = replace2($fn);
 	isa_ok tied(*$ifh)->replace, 'File::Replace';
 	is tied(*$ifh)->replace, tied(*$ofh)->replace, 'same replace object';
@@ -60,7 +60,7 @@ subtest 'two SingleHandles (in/out)' => sub { plan tests=>8;
 };
 
 subtest 'reverse close order' => sub { plan tests=>3;
-	my $fn = spew(newtempfn,"Hello,\nWorld!");
+	my $fn = newtempfn("Hello,\nWorld!");
 	my ($ifh,$ofh) = replace2($fn);
 	while (<$ifh>) {
 		tr/ol/ui/;
@@ -74,7 +74,7 @@ subtest 'reverse close order' => sub { plan tests=>3;
 };
 
 subtest 'close and discard reference' => sub { plan tests=>3;
-	my $fn = spew(newtempfn,"Foo\nBar\n");
+	my $fn = newtempfn("Foo\nBar\n");
 	my ($ifh,$ofh) = replace2($fn);
 	while (<$ifh>) {
 		chomp;
@@ -89,7 +89,7 @@ subtest 'close and discard reference' => sub { plan tests=>3;
 };
 
 subtest 'one SingleHandle (out)' => sub { plan tests=>2;
-	my $fn = spew(newtempfn,"Blah\nBlah\n");
+	my $fn = newtempfn("Blah\nBlah\n");
 	my $ofh = replace2($fn);
 	print $ofh "Hi\nthere";
 	is slurp($fn), "Blah\nBlah\n", 'after print';
@@ -100,7 +100,7 @@ subtest 'one SingleHandle (out)' => sub { plan tests=>2;
 subtest 'autocancel, autofinish' => sub { plan tests=>8;
 	ok !grep( {/\bunclosed file\b/i}
 		warns {
-			my $fn = spew(newtempfn, "xxxxx\n");
+			my $fn = newtempfn("xxxxx\n");
 			my ($ifh,$ofh) = replace2($fn, autocancel=>1);
 			print $ofh "yyyyyyyy\n";
 			is slurp($fn), "xxxxx\n", 'original unchanged';
@@ -111,7 +111,7 @@ subtest 'autocancel, autofinish' => sub { plan tests=>8;
 		}), 'no warn with autocancel';
 	ok !grep( {/\bunclosed file\b/i}
 		warns {
-			my $fn = spew(newtempfn, "xxxxx\n");
+			my $fn = newtempfn("xxxxx\n");
 			my ($ifh,$ofh) = replace2($fn, autofinish=>1);
 			print $ofh "yyyyyyyy\n";
 			is slurp($fn), "xxxxx\n", 'original unchanged';
@@ -122,7 +122,7 @@ subtest 'autocancel, autofinish' => sub { plan tests=>8;
 		}), 'no warn with autocancel';
 };
 
-subtest 'warnings and errors' => sub { plan tests=>10;
+subtest 'warnings and errors' => sub { plan tests=>17;
 	like exception { my ($r) = replace2() },
 		qr/\bnot enough arguments\b/i, 'replace2 not enough args';
 	like exception { my ($r) = replace2("somefn",BadArg=>"boom") },
@@ -146,6 +146,27 @@ subtest 'warnings and errors' => sub { plan tests=>10;
 		tied(*$i)->replace->finish;
 		open $i, '<', 'somefn';  ## no critic (RequireBriefOpen, RequireCheckedOpen)
 	}, qr/\bcan't reopen\b/i, 'open fails';
+	
+	like exception {
+		my ($i,$o) = replace2(newtempfn, autocancel=>1);
+		Tie::Handle::Unclosable->install( $i, 'ifh' );
+		close $i; close $o;
+	}, qr/\bcouldn't close (?:input )?handle\b/, 'close can die 1';
+	like exception {
+		my ($i,$o) = replace2(newtempfn, autocancel=>1);
+		Tie::Handle::Unclosable->install( $i, 'ifh' );
+		close $o; close $i;
+	}, qr/\bcouldn't close (?:input )?handle\b/, 'close can die 2';
+	like exception {
+		my ($i,$o) = replace2(newtempfn, autocancel=>1);
+		Tie::Handle::Unclosable->install( $o, 'ofh' );
+		close $i; close $o;
+	}, qr/\bcouldn't close (?:output )?handle\b/, 'close can die 3';
+	like exception {
+		my ($i,$o) = replace2(newtempfn, autocancel=>1);
+		Tie::Handle::Unclosable->install( $o, 'ofh' );
+		close $o; close $i;
+	}, qr/\bcouldn't close (?:output )?handle\b/, 'close can die 4';
 	
 	# author tests make warnings fatal, disable that here
 	no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
@@ -177,6 +198,18 @@ subtest 'warnings and errors' => sub { plan tests=>10;
 				1; # so object doesn't get returned from do
 			};
 		}), 3, 'unclosed file';
+	is grep( {/\balready closed\b/}
+		warns {
+			my ($ifh,$ofh) = replace2(newtempfn(""));
+			close $ifh;
+			close $ofh;
+			# note we know what a failed close returns from the tests
+			# for Tie::Handle::Base
+			is_deeply [close $ofh], [!1], 'close fails 1';
+			my $sfh = replace2(newtempfn(""));
+			close $sfh;
+			is_deeply [close $sfh], [!1], 'close fails 2';
+		}), 2, 'already closed warns';
 	
 };
 

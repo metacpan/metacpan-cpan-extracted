@@ -1,5 +1,19 @@
 Revision history for Amazon::MWS
 
+0.150 Sat Sep 23 13:20:08 2017 CEST
+
+     [BUG FIXES]
+
+     * Fix error diagnostics for ack response (Marco Pessotto).
+     * Don't skip failed variants for forced uploads (Stefan Hornburg/Racke).
+
+     [ENHANCEMENTS]
+
+     * Add API methods (James Risner):
+
+       GetInboundGuidanceForASIN
+       GetInboundGuidanceForSKU
+
 0.141 Mon Dec  5 13:30:14 2016 CET
 
      [BUG FIXES]

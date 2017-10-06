@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::SenderID;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Sys::Syslog qw{:standard :macros};
 
@@ -14,6 +14,13 @@ sub default_config {
     return {
         'hide_none' => 1,
     };
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'SenderID_metrics' );
+    return \@rows;
 }
 
 sub setup_callback {

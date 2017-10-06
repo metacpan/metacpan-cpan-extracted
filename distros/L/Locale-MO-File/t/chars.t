@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -52,6 +52,7 @@ find(
 plan( tests => 6 * scalar @list );
 
 my @ignore_non_ascii = (
+    qr{ _ (?: utf-8 ) [.] (?: t | pl ) \z }xms,
 );
 
 for my $file_name (sort @list) {

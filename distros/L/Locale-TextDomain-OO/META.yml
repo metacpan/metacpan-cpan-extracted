@@ -18,7 +18,7 @@ name: Locale-TextDomain-OO
 provides:
   Locale::TextDomain::OO:
     file: lib/Locale/TextDomain/OO.pm
-    version: '1.030'
+    version: '1.033'
   Locale::TextDomain::OO::FunctionalInterface:
     file: lib/Locale/TextDomain/OO/FunctionalInterface.pm
     version: '1.000'
@@ -27,16 +27,16 @@ provides:
     version: '1.017'
   Locale::TextDomain::OO::Lexicon::File::MO:
     file: lib/Locale/TextDomain/OO/Lexicon/File/MO.pm
-    version: '1.027'
+    version: '1.031'
   Locale::TextDomain::OO::Lexicon::File::PO:
     file: lib/Locale/TextDomain/OO/Lexicon/File/PO.pm
-    version: '1.027'
+    version: '1.031'
   Locale::TextDomain::OO::Lexicon::Hash:
     file: lib/Locale/TextDomain/OO/Lexicon/Hash.pm
-    version: '1.027'
+    version: '1.031'
   Locale::TextDomain::OO::Lexicon::Role::File:
     file: lib/Locale/TextDomain/OO/Lexicon/Role/File.pm
-    version: '1.023'
+    version: '1.031'
   Locale::TextDomain::OO::Lexicon::Role::GettextToMaketext:
     file: lib/Locale/TextDomain/OO/Lexicon/Role/GettextToMaketext.pm
     version: '1.000'
@@ -93,7 +93,7 @@ provides:
     version: '1.027'
   Locale::TextDomain::OO::Singleton::Lexicon:
     file: lib/Locale/TextDomain/OO/Singleton/Lexicon.pm
-    version: '1.026'
+    version: '1.031'
   Locale::TextDomain::OO::Singleton::Translator:
     file: lib/Locale/TextDomain/OO/Singleton/Translator.pm
     version: '1.010'
@@ -115,7 +115,7 @@ requires:
   Hash::Util: '0'
   JSON: '2.50'
   JSON::PP: '0'
-  Locale::MO::File: '0.06'
+  Locale::MO::File: '0.08'
   Locale::PO: '0.24'
   Locale::TextDomain::OO::Util: '2.002'
   Locale::TextDomain::OO::Util::ExtractHeader: '3.006'
@@ -135,5 +135,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.030'
+version: '1.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

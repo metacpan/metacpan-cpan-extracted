@@ -5,7 +5,7 @@ use warnings;
 
 require Carp;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $registry      = {};
 my $magic_counter = 0;
@@ -223,7 +223,8 @@ sub AUTOLOAD {
 }
 
 sub _dispatch {
-    my ($ref_self, $method, @args) = @_;
+    my $ref_self = shift;
+    my $method = shift;
 
     my $calls   = $registry->{$ref_self}->{'calls'}   ||= {};
     my $returns = $registry->{$ref_self}->{'returns'} ||= {};
@@ -235,7 +236,7 @@ sub _dispatch {
     foreach my $mock (@{$mocks->{$method}}) {
         if (my $options = $mock->{options}) {
             if (my $when = $options->{when}) {
-                next unless $when->(@args);
+                next unless $when->(@_);
             }
 
             if (defined(my $frame = $options->{frame})) {
@@ -249,15 +250,15 @@ sub _dispatch {
 
         $calls->{$method}->{called}++;
 
-        push @{$calls->{$method}->{stack}}, [@args[1 .. $#args]];
+        push @{$calls->{$method}->{stack}}, [@_[1 .. $#_]];
 
         my @result;
 
         if (my $code = $mock->{code}) {
-            @result = $code->(@args);
+            @result = $code->(@_);
         }
         elsif (my $orig_code = $mock->{orig_code}) {
-            @result = $orig_code->(@args);
+            @result = $orig_code->(@_);
         }
         else {
             Carp::croak("Unmocked method '$method'");

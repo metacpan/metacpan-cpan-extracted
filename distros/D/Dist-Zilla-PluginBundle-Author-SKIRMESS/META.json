@@ -30,7 +30,6 @@
       },
       "develop" : {
          "requires" : {
-            "File::Spec" : "0",
             "Perl::Critic" : "1.130",
             "Perl::Critic::Policy::Moose::ProhibitDESTROYMethod" : "1.05",
             "Perl::Critic::Policy::Moose::ProhibitLazyBuild" : "1.05",
@@ -117,10 +116,12 @@
             "Dist::Zilla::Plugin::VerifyPhases" : "0",
             "Dist::Zilla::Plugin::VersionFromMainModule" : "0",
             "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
             "Dist::Zilla::Role::FileMunger" : "0",
             "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::TextTemplate" : "0",
+            "File::Spec" : "0",
             "List::MoreUtils" : "0",
             "Moose" : "0.99",
             "Path::Tiny" : "0",
@@ -133,6 +134,7 @@
       "test" : {
          "requires" : {
             "Test::More" : "0",
+            "lib" : "0",
             "perl" : "5.006"
          }
       }
@@ -140,15 +142,15 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "Dist::Zilla::PluginBundle::Author::SKIRMESS" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -163,7 +165,7 @@
          "web" : "https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS"
       }
    },
-   "version" : "0.022",
+   "version" : "0.024",
    "x_BuiltWith" : {
       "modules" : {
          "Carp" : "1.40",
@@ -171,7 +173,7 @@
          "Dist::Zilla" : "6.010",
          "Dist::Zilla::Plugin::Authority" : "1.009",
          "Dist::Zilla::Plugin::AutoPrereqs" : "6.010",
-         "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic" : "0.003",
+         "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic" : "0.004",
          "Dist::Zilla::Plugin::Bootstrap::lib" : "1.001002",
          "Dist::Zilla::Plugin::CPANFile" : "6.010",
          "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.010",
@@ -222,6 +224,7 @@
          "Dist::Zilla::Plugin::VerifyPhases" : "0.016",
          "Dist::Zilla::Plugin::VersionFromMainModule" : "0.03",
          "Dist::Zilla::Role::BeforeBuild" : "6.010",
+         "Dist::Zilla::Role::FileFinderUser" : "6.010",
          "Dist::Zilla::Role::FileMunger" : "6.010",
          "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0.202",
          "Dist::Zilla::Role::PluginBundle::Easy" : "6.010",
@@ -257,6 +260,7 @@
          "Test::Portability::Files" : "0.07",
          "Test::Spelling" : "0.20",
          "Test::Version" : "2.05",
+         "lib" : "0.63",
          "namespace::autoclean" : "0.28",
          "strict" : "1.11",
          "warnings" : "1.36"
@@ -384,12 +388,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase",
-            "version" : "0.021"
+            "version" : "0.023"
          },
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::InsertVersion",
-            "version" : "0.021"
+            "version" : "0.023"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -414,6 +418,7 @@
                      "README.md",
                      "cpanfile",
                      "dist.ini",
+                     "t/00-load.t",
                      "xt/author/clean-namespaces.t",
                      "xt/author/critic.t",
                      "xt/author/minimum_version.t",
@@ -466,7 +471,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic",
             "name" : "@Author::SKIRMESS/AutoPrereqs::Perl::Critic",
-            "version" : "0.003"
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -779,6 +784,7 @@
                      "README.md",
                      "cpanfile",
                      "dist.ini",
+                     "t/00-load.t",
                      "xt/author/clean-namespaces.t",
                      "xt/author/critic.t",
                      "xt/author/minimum_version.t",
@@ -821,7 +827,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.022",
+                  "tag" : "0.024",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

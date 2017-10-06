@@ -1,0 +1,5 @@
+/* Example of hiding the priority label on ticket dipslay with some CSS */
+
+tr.priority {
+    display: none;
+}

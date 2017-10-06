@@ -1,14 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # for done_testing
-use Test::Differences;
+use Test::More tests => 25;
 use Bencode 'bencode';
 
 sub enc_ok {
 	my ( $frozen, $thawed ) = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	eq_or_diff bencode( $thawed ), $frozen, "encode $frozen";
+	is bencode( $thawed ), $frozen, "encode $frozen";
 }
 
 enc_ok 'i4e'                      => 4;
@@ -25,4 +24,19 @@ enc_ok 'de'                       => {};
 enc_ok 'd3:agei25e4:eyes4:bluee'  => { 'age' => 25, 'eyes' => 'blue' };
 enc_ok 'd8:spam.mp3d6:author5:Alice6:lengthi100000eee' => { 'spam.mp3' => { 'author' => 'Alice', 'length' => 100000 } };
 
-done_testing;
+is bencode( undef ),        '0:',  'undef in implicit default mode';
+is bencode( undef, undef ), '0:',  'undef in explicit default mode';
+is bencode( undef, 'str' ), '0:',  'undef in str mode';
+is bencode( undef, 'num' ), 'i0e', 'undef in num mode';
+
+{
+	my $frozen = eval { bencode [[[undef]]], 'die' }; my $e = $@;
+	is $frozen, undef, 'undef in die mode';
+	is $e, sprintf( "unhandled data type at %s line %d.\n", __FILE__, __LINE__ - 2 ), '... fails for the right reason';
+}
+
+for my $mode ( qw( foo bar baz ) ) {
+	my $frozen = eval { bencode 1, $mode }; my $e = $@;
+	is $frozen, undef, qq'bad undef mode "$mode"';
+	is $e, sprintf( qq'undef_mode argument must be "str", "num", "die" or undefined, not "%s" at %s line %d.\n', $mode, __FILE__, __LINE__ - 2 ), '... fails for the right reason';
+}

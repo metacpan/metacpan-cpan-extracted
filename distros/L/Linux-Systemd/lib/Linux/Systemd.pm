@@ -1,5 +1,5 @@
-package Linux::Systemd;
-$Linux::Systemd::VERSION = '1.162700';
+package Linux::Systemd 1.172760;
+
 use v5.16;
 
 # ABSTRACT: Use the systemd journal
@@ -20,7 +20,7 @@ Linux::Systemd - Use the systemd journal
 
 =head1 VERSION
 
-version 1.162700
+version 1.172760
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ioan Rogers.
+This software is Copyright (c) 2017 by Ioan Rogers.
 
 This is free software, licensed under:
 

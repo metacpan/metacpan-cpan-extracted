@@ -7,3 +7,6 @@ Revision history for Perl extension App::PLab.
         - some refreshments
 
 0.03  s/IPA/Prima::IPA/
+
+0.04  Oct 5 2017 
+        - hidef fixes

@@ -29,10 +29,10 @@
    "provides" : {
       "Cuckoo::Filter" : {
          "file" : "lib/Cuckoo/Filter.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

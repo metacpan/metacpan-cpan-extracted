@@ -5,7 +5,7 @@ use 5.012000;
 use utf8;
 use feature qw/ unicode_strings say /;
 use charnames qw/ :full lao /;
-use version 0.77; our $VERSION = version->declare('v1.0.0');
+use version 0.77; our $VERSION = version->declare('v1.0.1');
 use Carp;
 use List::Util 1.33 'none';
 use Lingua::LO::NLP::Analyze;
@@ -121,7 +121,6 @@ my %VOWELS = (
     'ເXືອ'  => 'ua',
     'ເXືອຍ' => 'uai',
     'Xົວະ'  => 'oua',
-    'Xັວ '  => 'oua',
     'Xົວ'   => 'oua',
     'Xວ'   => 'oua',
     'Xວຍ'  => 'ouai',
@@ -158,18 +157,9 @@ sub new {
     }, $class;
 }
 
-=head2 romanize_syllable
-
-    romanize_syllable( $syllable )
-
-Return the romanization of a single C<$syllable>. See L<Lingua::LO::NLP::Romanize/romanize_syllable>
-
-=cut
-
-sub romanize_syllable {
-    my ($self, $syllable) = @_;
+sub _romanize_syllable {
+    my ($self, $c) = @_;
     my ($endcons, $result);
-    my $c = Lingua::LO::NLP::Analyze->new($syllable);
     my $parse = $c->parse;
     my $vowel = $c->vowel;
     

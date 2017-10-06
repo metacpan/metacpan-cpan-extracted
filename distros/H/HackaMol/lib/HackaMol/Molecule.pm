@@ -1,5 +1,5 @@
 package HackaMol::Molecule;
-$HackaMol::Molecule::VERSION = '0.044';
+$HackaMol::Molecule::VERSION = '0.045';
 #ABSTRACT: Molecule class for HackaMol
 use 5.008;
 use Moose;
@@ -12,8 +12,8 @@ use MooseX::StrictConstructor;
 
 with 'HackaMol::Roles::PhysVecMVRRole',
      'HackaMol::Roles::BondsAnglesDihedralsRole', 
-     'HackaMol::Roles::QmMolRole',
-     'HackaMol::Roles::SelectionRole';
+     'HackaMol::Roles::QmMolRole'; #,
+ #    'HackaMol::Roles::SelectionRole';
 #, Storage( 'format' => 'JSON', 'io' => 'File' );
 
 extends 'HackaMol::AtomGroup';
@@ -262,7 +262,7 @@ HackaMol::Molecule - Molecule class for HackaMol
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 SYNOPSIS
 
@@ -453,13 +453,11 @@ L<Chemistry::Molecule>
 
 =item * L<HackaMol::Roles::PhysVecMVRRole>
 
-=item * L<HackaMol::Roles::PhysVecMVRRole|HackaMol::Roles::BondsAnglesDihedralsRole|HackaMol::Roles::QmMolRole|HackaMol::Roles::SelectionRole>
+=item * L<HackaMol::Roles::PhysVecMVRRole|HackaMol::Roles::BondsAnglesDihedralsRole|HackaMol::Roles::QmMolRole>
 
 =item * L<HackaMol::Roles::QmAtomRole>
 
 =item * L<HackaMol::Roles::QmMolRole>
-
-=item * L<HackaMol::Roles::SelectionRole>
 
 =back
 

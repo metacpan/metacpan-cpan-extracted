@@ -16,12 +16,13 @@ build_requires:
 configure_requires:
   ExtUtils::CBuilder: '0'
   ExtUtils::F77: '1.20'
+  File::Copy: '0'
   Module::Build: '0.4004'
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::Fortran: '0.26'
   Module::Build::Pluggable::PDL: '0.23'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,76 +31,82 @@ name: Photonic
 provides:
   Photonic:
     file: lib/Photonic.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::CharacteristicFunctions:
     file: lib/Photonic/CharacteristicFunctions.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::ExtraUtils:
     file: lib/Photonic/ExtraUtils.pd
-    version: '0.007'
+    version: '0.009'
   Photonic::Geometry:
     file: lib/Photonic/Geometry.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Geometry::FromImage2D:
     file: lib/Photonic/Geometry/FromImage2D.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::AllH:
     file: lib/Photonic/NonRetarded/AllH.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::EpsL:
     file: lib/Photonic/NonRetarded/EpsL.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::EpsTensor:
     file: lib/Photonic/NonRetarded/EpsTensor.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::FieldH:
     file: lib/Photonic/NonRetarded/FieldH.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::OneH:
     file: lib/Photonic/NonRetarded/OneH.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::SH:
     file: lib/Photonic/NonRetarded/SH.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::SHChiTensor:
     file: lib/Photonic/NonRetarded/SHChiTensor.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::NonRetarded::SHP:
     file: lib/Photonic/NonRetarded/SHP.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::AllH:
     file: lib/Photonic/Retarded/AllH.pm
-    version: '0.007'
+    version: '0.009'
+  Photonic::Retarded::EpsilonP:
+    file: lib/Photonic/Retarded/EpsilonP.pm
+    version: '0.009'
   Photonic::Retarded::EpsilonTensor:
     file: lib/Photonic/Retarded/EpsilonTensor.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::Green:
     file: lib/Photonic/Retarded/Green.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::GreenP:
     file: lib/Photonic/Retarded/GreenP.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::Metric:
     file: lib/Photonic/Retarded/Metric.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::OneH:
     file: lib/Photonic/Retarded/OneH.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Retarded::Wave:
     file: lib/Photonic/Retarded/Wave.pm
-    version: '0.007'
+    version: '0.009'
+  Photonic::Retarded::WaveP:
+    file: lib/Photonic/Retarded/WaveP.pm
+    version: '0.009'
   Photonic::Roles::EpsParams:
     file: lib/Photonic/Roles/EpsParams.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Roles::KeepStates:
     file: lib/Photonic/Roles/KeepStates.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Types:
     file: lib/Photonic/Types.pm
-    version: '0.007'
+    version: '0.009'
   Photonic::Utils:
     file: lib/Photonic/Utils.pm
-    version: '0.007'
+    version: '0.009'
 requires:
   Carp: '0'
   Inline: '0'
@@ -115,5 +122,5 @@ requires:
   Storable: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.007'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

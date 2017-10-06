@@ -17,7 +17,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0.06"
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.010"
          }
       },
       "runtime" : {
@@ -51,7 +52,7 @@
             "constant" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.018",
+            "perl" : "5.010",
             "strict" : "0",
             "true" : "0",
             "utf8" : "0",
@@ -59,14 +60,17 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::Perl::Critic" : "0",
+            "Test::UseAllModules" : "0"
+         },
          "requires" : {
             "Class::Data::Inheritable" : "0.08",
-            "Statistics::Normality" : "0",
             "Test::Class" : "0.50",
             "Test::Most" : "0.35",
-            "Test::Perl::Critic" : "1.03",
             "Test::UseAllModules" : "0",
-            "autodie" : "0"
+            "autodie" : "0",
+            "perl" : "5.010"
          }
       }
    },
@@ -81,7 +85,7 @@
          "web" : "https://github.com/galantelab/simulate_reads"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

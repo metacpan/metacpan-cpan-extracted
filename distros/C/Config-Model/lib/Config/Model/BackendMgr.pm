@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.110';
+$Config::Model::BackendMgr::VERSION = '2.112';
 use Mouse;
 use strict;
 use warnings;
@@ -300,7 +300,7 @@ sub read_config_data {
             $auto_create ||= delete $read->{allow_empty};
         }
 
-        $auto_create ||= delete $read->{auto_create} if defined $read->{auto_create};
+        $auto_create ||= $read->{auto_create} if defined $read->{auto_create};
 
         if ( $read->{default_layer} ) {
             $self->read_config_sub_layer( $read, $root_dir, $config_file_override, $check,
@@ -716,7 +716,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

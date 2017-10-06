@@ -1,5 +1,8 @@
 Revision history for Alien-Role-Dino
 
+0.06      2017-09-23 06:05:29 -0400
+  - Add support for Solaris (gcc and sun studio)
+
 0.05      2017-08-17 16:53:17 -0400
   - Transferring to the Perl5-Alien orginzation
 

@@ -16,11 +16,13 @@ sub init {
 	$conf->{pretty}          //= 0;
 	$conf->{convert_blessed} //= 0;
 	$conf->{ascii}           //= 1;
+	$conf->{canonical}       //= 1;
 
 	$c->{'dwarf.json'} = JSON->new();
 	$c->{'dwarf.json'}->pretty($conf->{pretty});
 	$c->{'dwarf.json'}->convert_blessed($conf->{convert_blessed});
 	$c->{'dwarf.json'}->ascii($conf->{ascii});
+	$c->{'dwarf.json'}->canonical($conf->{canonical});
 
 	add_method($c, json => sub {
 		my $self = shift;

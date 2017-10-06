@@ -3,6 +3,11 @@ use strict;
 
 use Test::More;
 
+BEGIN{
+    BAIL_OUT "A bug in Perl 5.20 regex compilation prevents the use of PPR under that release"
+        if $] > 5.020 && $] < 5.022;
+}
+
 plan tests => 15;
 
 use PPR;
@@ -26,7 +31,7 @@ $source_code =~ m{ (?<Block> (?&PerlBlock) )  $PPR::GRAMMAR }x;
 is $PPR::ERROR->source, 'my $y = 2:'                 => '1: Error source identified';
 is $PPR::ERROR->prefix, substr($source_code, 0, 41)  => '1: Prefix identified';
 is $PPR::ERROR->line, 3                              => '1: Line identified';
-is $PPR::ERROR->line($OFFSET), 14                    => '1: Line with offset identified';
+is $PPR::ERROR->line($OFFSET), 19                    => '1: Line with offset identified';
 is $PPR::ERROR->diagnostic, 'syntax error near "2:"' => '1: Diagnostic identified';
 
 # Pre-locate the source code fragment...

@@ -27,7 +27,7 @@ $opts->{share_dir} ||= dist_dir("Cmd-Dwarf");
 my $dst = $opts->{output} . "/" . $opts->{name};
 
 my $src;
-for my $a (qw/app htdocs/) {
+for my $a (qw/app htdocs docker docker-compose.yml README.md/) {
 	$src = $opts->{share_dir} . "/$a";
 	mkpath $dst unless -d $dst;
 	system "cp -rf $src $dst";

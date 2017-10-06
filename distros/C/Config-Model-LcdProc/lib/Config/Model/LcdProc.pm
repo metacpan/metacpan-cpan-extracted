@@ -8,10 +8,10 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::LcdProc;
-$Config::Model::LcdProc::VERSION = '2.051';
+$Config::Model::LcdProc::VERSION = '2.052';
 use 5.10.1;
 
-use Config::Model 2.043;
+use Config::Model 2.111;
 
 1;
 
@@ -29,7 +29,7 @@ Config::Model::LcdProc - Edit and validate LcdProc configuration file
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 SYNOPSIS
 

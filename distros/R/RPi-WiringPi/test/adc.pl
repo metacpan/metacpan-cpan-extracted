@@ -3,7 +3,7 @@ use strict;
 
 use constant PWM_MAX => 1023;
 
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use RPi::WiringPi;
 
 die if $> != 0;

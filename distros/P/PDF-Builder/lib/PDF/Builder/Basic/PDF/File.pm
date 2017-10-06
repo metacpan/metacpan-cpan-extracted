@@ -16,7 +16,7 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '3.007'; # VERSION
 my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
 
 =head1 NAME

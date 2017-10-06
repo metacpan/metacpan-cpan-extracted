@@ -99,17 +99,15 @@ L<http://perldoc.perl.org/perlartistic.html>.
 	# DiesOnStringify: Just for testing, dies when stringification is attempted.
 	package DiesOnStringify;
 	use overload '""'=>\&str, fallback=>1;
-	use Carp;
 	sub new { return bless \"$_[1]0", $_[0] }
-	sub str { confess "ARRRGH" }
+	sub str { die "ARRRGH" }  ## no critic (RequireCarping)
 }
 {
 	# DiesOnNumify: Just for testing, dies on numification (w/ fallback stringification)
 	package DiesOnNumify;
 	use overload '0+'=>\&num, fallback=>1;
-	use Carp;
 	sub new { return bless \($_[1]+1), $_[0] }
-	sub num { confess "BLAMMO" }
+	sub num { die "BLAMMO" }  ## no critic (RequireCarping)
 }
 
 

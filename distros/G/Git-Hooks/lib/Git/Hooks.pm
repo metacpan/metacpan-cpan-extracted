@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.1.5';
+$Git::Hooks::VERSION = '2.1.6';
 use 5.010;
 use strict;
 use warnings;
@@ -83,9 +83,9 @@ sub run_hook {
     if (my $errors = $git->get_errors()) {
         if (($hook_basename eq 'commit-msg' or $hook_basename eq 'pre-commit')
                 and not $git->get_config(githooks => 'abort-commit')) {
-            carp $errors;
+            warn $errors;
         } else {
-            croak $errors;
+            die $errors;
         }
     }
 
@@ -107,7 +107,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.1.5
+version 2.1.6
 
 =head1 SYNOPSIS
 

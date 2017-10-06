@@ -13,7 +13,7 @@ use overload (
 use Net::IPAddress::Util qw( :constr :manip );
 require Net::IPAddress::Util::Collection;
 
-our $VERSION = '4.000';
+our $VERSION = '4.004';
 
 sub new {
   my $class = shift;
@@ -182,7 +182,7 @@ Net::IPAddress::Util::Range - Representation of a range of IP addresses
 
 =head1 VERSION
 
-Version 4.000
+Version 4.004
 
 =head1 SYNOPSIS
 
@@ -294,7 +294,7 @@ aligned to legal subnet boundaries.
 =head2 tight
 
 Returns a collection of subnets that (between them) exactly match the
-addresses in this range. The returned object is a Net::IPAddress::Util::Collection,
+addresses in this range. The returned object is a L<Net::IPAddress::Util::Collection>,
 which can be treated as an array reference of Net::IPAddress::Util::Range objects.
 
 =head2 loose

@@ -8,7 +8,9 @@ use Time::HiRes;
 my $sleepwait = 1000;
 
 SKIP: {
-        skip 'not in dist testing', 12 unless $ENV{HIPI_MODULES_DIST_TEST_HIPI};
+        skip 'not in dist testing', 12 unless $ENV{HIPI_MODULES_DIST_TEST_RFSPI};
+
+diag('SPI RF tests are running');
     
 use_ok( HiPi::Energenie );
 

@@ -8,7 +8,8 @@ use Time::HiRes qw/ sleep /;
 
 plan tests => 6;
 
-use lib '.';
+# use lib '.';
+
 use Async::Simple::Task;
 
 describe 'init' => sub {

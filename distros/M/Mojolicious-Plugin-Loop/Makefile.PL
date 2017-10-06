@@ -6,20 +6,20 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Mojolicious/Plugin/Loop.pm',
   VERSION_FROM => 'lib/Mojolicious/Plugin/Loop.pm',
-  EXE_FILES => [qw(  )],
+  EXE_FILES => [qw()],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/mojolicious-plugin-loop/issues',
       homepage => 'https://github.com/jhthorsen/mojolicious-plugin-loop',
-      repository => 'https://github.com/jhthorsen/mojolicious-plugin-loop',
+      repository => 'https://github.com/jhthorsen/mojolicious-plugin-loop.git',
     },
   },
   BUILD_REQUIRES => {
-  'Test::More' => '0.88'
+  'Test::More' => '1.00'
 }
 ,
   PREREQ_PM => {
-  'perl' => 'v5.10.0'
+  'Mojolicious' => '7.18'
 }
 ,
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},

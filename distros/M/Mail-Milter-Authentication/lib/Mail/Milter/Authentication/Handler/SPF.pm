@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::SPF;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Sys::Syslog qw{:standard :macros};
 
@@ -13,6 +13,13 @@ sub default_config {
         'hide_received-spf_header' => 0,
         'hide_none'                => 0,
     };
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'SPF_metrics' );
+    return \@rows;
 }
 
 sub setup_callback {

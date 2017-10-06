@@ -1,0 +1,12 @@
+History for OTRS::OPM::Installer
+================================
+
+0.02 2017-10-05
+
+     * usability improvements
+       - add --sudo flag to use sudo for CPAN installations
+       - print message and exit when addon is already installed
+
+0.01 2017-10-04
+
+     * initial release

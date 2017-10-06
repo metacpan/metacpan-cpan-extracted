@@ -5,3 +5,5 @@ README
 examples/numbers.pl
 lib/Convert/Number/Ethiopic.pm
 t/numbers.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -25,3 +25,11 @@ Revision history for Perl extension Sys::Utmp.
         - Tainting wasn't working
         - Improved test coverage
         - Removed useless const code in .xs
+
+1.7 Sun Oct 27 14:00:00 GMT 2013
+		- Update the metadata
+		- Apply some fixes from RT
+
+1.8 Fri 29 Sep 19:59:36 BST 2017
+		- Fix for NetBSD
+		- Modernise the code slightly

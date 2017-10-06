@@ -1,7 +1,20 @@
 
 Release history for Importer-Zim-Lexical
 
-0.6.0     2017-09-21 18:32:52-07:00 America/Los_Angeles
+0.8.0     2017-09-29 11:29:07-07:00 America/Los_Angeles
+
+    - Produce DEBUG message with carp()
+    - Depend on Importer::Zim::Utils 0.8.0
+    - Depend on Importer::Zim::Base 0.8.0
+    - Depend on Sub::Lexical 0.2.0
+
+v0.7     2017-09-28 09:48:28-07:00 America/Los_Angeles
+
+    [FIX]
+    - Inject subroutines into the proper lexical context
+      of the caller (think warnings, hints, etc.)
+
+v0.6     2017-09-21 18:32:52-07:00 America/Los_Angeles
 
     - Depend on Importer::Zim::Base 0.5.0
 

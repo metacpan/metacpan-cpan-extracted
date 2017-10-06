@@ -91,7 +91,7 @@ like exception { is $s->perl({_BAD_OPT=>1},'-e','print "foo"'), "foo", "unknown 
 	qr/\Qunknown option "_BAD_OPT"/, "unknown opt 1B";
 like exception { $s->perl('-e','kill 9, $$'); 1 }, $SIG9_ERROR_RE, "fail 4";
 
-is warns { # warning tests
+{ # warning tests
 	# make warnings nonfatal in a way compatible with Perl v5.6, which didn't yet have "NONFATAL"
 	no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
 	# the following is a workaround for Perl v5.6 not yet having the NONFATAL keyword;
@@ -107,13 +107,13 @@ is warns { # warning tests
 		};
 	# on some Windows systems, there is an extra warning like the following
 	# (seen on some CPAN Testers results for v0.51)
-	if ($^O eq 'MSWin32' && @w1==5) # this workaround is slightly hackish
-		{ like splice(@w1,1,1), qr/\QCan't spawn "cmd.exe"/, "extra Windows warning" }
-	is @w1, 4, "warning test count";
-	like $w1[0], qr/exit (status|value) 1\b/, "warning test 1C";
-	like $w1[1], qr/\QCommand "ignore_this_error_it_is_intentional" failed/, "warning test 2C";
-	like $w1[2], qr/exit (status|value) 123\b/, "warning test 3D";
-	like $w1[3], $SIG9_ERROR_RE, "warning test 4C";
+	# /\QCan't spawn "cmd.exe"/
+	# but we can just ignore that here, since we're just looking for our custom warnings
+	ok @w1>=4, "warning test count";
+	is grep({/exit (status|value) 1\b/} @w1), 1, "warning test 1C";
+	is grep({/\QCommand "ignore_this_error_it_is_intentional" failed/} @w1), 1, "warning test 2C";
+	is grep({/exit (status|value) 123\b/} @w1), 1, "warning test 3D";
+	is grep({/$SIG9_ERROR_RE/} @w1), 1, "warning test 4C";
 	# make sure fail_on_stderr is still fatal
 	like exception { $s->perl({fail_on_stderr=>1},'-e','print STDERR "bang"') },
 		qr/\Qwrote to STDERR: "bang"/, "fail_on_stderr with nonfatal warnings";
@@ -125,13 +125,13 @@ is warns { # warning tests
 			like $s->perl('-e','print ">>@ARGV<<"','--','x',[1,2],'y'), qr/^>>x ARRAY\(0x[0-9a-fA-F]+\) y<<$/, "undef/ref warn 1B";
 			is $s->perl({_BAD_OPT=>1},'-e','print "foo"'), "foo", "unknown opt 2A";
 		};
-	is @w3, 2, "warn count";
-	like $w3[0], qr/contains?.+references/, "undef/ref warn 1E";
-	like $w3[1], qr/\Qunknown option "_BAD_OPT"/, "unknown opt 2B";
+	ok @w3>=2, "warn count";
+	is grep({/contains?.+references/} @w3), 1, "undef/ref warn 1E";
+	is grep({/\Qunknown option "_BAD_OPT"/} @w3), 1, "unknown opt 2B";
 	# the numeric category should still be fatal
 	like exception { $s->perl({allow_exit=>'A'},'-e','print "foo"') },
 		qr/\bisn't numeric\b.+\ballow_exit\b.+\bat (?:\Q${\__FILE__}\E|.*\bTest\/Fatal\.pm) line\b/, "allow_exit warn 1C";
-}, 0, "no unexpected warns";
+}
 
 { # disable warnings
 	use warnings FATAL=>'all';
@@ -148,9 +148,8 @@ is warns { # warning tests
 			like $s->perl('-e','print ">>@ARGV<<"','--','x',[1,2],'y'), qr/^>>x ARRAY\(0x[0-9a-fA-F]+\) y<<$/, "no warn 7";
 			is $s->perl({_BAD_OPT=>1},'-e','print "foo"'), "foo", "unknown opt 3";
 		};
-	if ($^O eq 'MSWin32' && @w4==1) # same workaround as above
-		{ like shift(@w4), qr/\QCan't spawn "cmd.exe"/, "extra Windows warning" }
-	is @w4, 0, "no warnings";
+	# regexen copied and adapted from above
+	is grep({/\QCan't spawn "cmd.exe"\E|exit (status|value)\b|\QCommand "ignore_this_error_it_is_intentional" failed\E|$SIG9_ERROR_RE/} @w4), 0, "no warnings";
 	# the uninitialized category should still be fatal too
 	like exception { $s->perl('-e','print ">>@ARGV<<"','--','x',undef,0,undef,'y') },
 		qr/^Use of uninitialized value in argument list\b/, "uninizialized still fatal here";
@@ -163,21 +162,19 @@ is warns { # warning tests
 }
 
 # only IPC::Run3::Shell warnings enabled
-is warns {
-		no warnings;  ## no critic (ProhibitNoWarnings)
-		use warnings FATAL=>'IPC::Run3::Shell';
-		is 5 + undef, 5, "check warnings disabled";
-		like exception { $s->perl('-e','exit 123'); 1 }, qr/exit (status|value) 123\b/, "module warn only";
-	}, 0, "module warnings only";
+{
+	no warnings;  ## no critic (ProhibitNoWarnings)
+	use warnings FATAL=>'IPC::Run3::Shell';
+	is warns { my $xyz = 5 + undef }, 0, "check warnings disabled";
+	like exception { $s->perl('-e','exit 123'); 1 }, qr/exit (status|value) 123\b/, "module warn only";
+}
 
-is warns { # warning only tests (i.e. all warnings enabled but nonfatal)
+{ # warning only tests (i.e. all warnings enabled but nonfatal)
 	no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
-	my @w5 = warns {
-			IPC::Run3::Shell->import(undef);
-		};
-	is @w5, 1, "warning count";
-	like $w5[0], qr/\bUse of uninitialized value in import\b/i, "undef in import warn";
-}, 0, "no unexpected warns";
+	my @w5 = warns { IPC::Run3::Shell->import(undef) };
+	ok @w5>=1, "warning count";
+	is grep({/\bUse of uninitialized value in import\b/} @w5), 1, "undef in import warn";
+}
 
 
 done_testing;

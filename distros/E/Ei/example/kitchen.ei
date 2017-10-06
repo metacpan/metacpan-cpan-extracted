@@ -1,0 +1,10 @@
+99 {
+    title = Cuisinart food processor
+    manufacture {
+        company = Cuisinart
+    }
+    purchase {
+    }
+    loc = kitchen
+}
+

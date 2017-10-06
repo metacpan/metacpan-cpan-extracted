@@ -9,7 +9,7 @@ you well on your way with manipulating your Raspberry Pi with the
 L<RPi::WiringPi> and related distributions.
 
 In this document we use constants that are provided with the C<:all> tag in
-L<RPi::WiringPi::Constant> module.
+L<RPi::Const> module.
 
 =head1 GLOSSARY OF TERMS
 
@@ -183,7 +183,7 @@ pulses.
 The Raspberry Pi default is balanced mode.
 
 C<0> for Mark-Space or C<1> for balanced. If you're using
-C<RPi::WiringPi::Constant>, you can also use C<PWM_MODE_MS> or C<PWM_MODE_BAL>.
+C<RPi::Const>, you can also use C<PWM_MODE_MS> or C<PWM_MODE_BAL>.
 
 Example:
 
@@ -603,13 +603,14 @@ your program (or a crash), we reset everything back to default.
     $servo->pwm(50);  # all the way left
     $servo->pwm(250); # all the way right
 
-=head1 UTIL LIBRARY
+=head1 CORE/UTIL LIBRARY
 
 =head2 Overview
 
-The included L<RPi::WiringPi::Util> module contains a few helper-type methods
-for internal and external use. Most of these you won't need, but others are
-very helpful when writing your own scripts that go beyond trivial.
+The included L<RPi::WiringPi::Core> module contains a few helper-type methods
+along with some low-level operations for the hardware itself. for internal and
+external use. Most of these you won't need, but others are very helpful when
+writing your own scripts that go beyond trivial.
 
 You can transform pin numbers from one scheme to another, get full pin number
 maps/translation hashes, manually export and unexport GPIO pins etc.
@@ -659,6 +660,16 @@ between the Tx and Rx pins, and:
     export RPI_SERIAL=1
 
 These tests will skip by default otherwise.
+
+=head3 HCSR04 Ultrasonic Testing
+
+For this test, please see the documentation for L<RPi::HCSR04>, and check the
+test files for the pins that are needed. After confirmed and connected, set
+
+    export RPI_HCSR04=1
+
+These tests only occur in automated mode when building on a Perl that doesn't
+have prerequisites installed.
 
 =head2 Automated with L<Test::BrewBuild>
 
@@ -715,6 +726,7 @@ environment variables for the full test platform.
     PI_BOARD=1                  # It's a Pi
     RPI_ARDUINO=1               # Arduino I2C connected
     RPI_SERIAL=1                # Serial enabled, and loopback
+    RPI_HCSR04=1                # sonic distance sensor
     BB_RPI_LCD=5,6,4,17,27,22   # Auto-testing LCD enabled
     RELEASE_TESTING=1           # Author tests (POD, manifest etc)
 
@@ -727,10 +739,10 @@ add things as I think of them.
 =head2 Pins
 
 Any time you accept a pin number to pass along to an external module for use,
-you *must* call C<$self->register_pin($pin_num)> in order to have the cleanup
-functionality tidy things up properly. Neglecting to do this will prevent the
-cleanup regimen from knowing about these pins, and therefore will be left in an
-inconsistent state, possibly causing damage on a different run.
+you *must* call C<$self-E<gt>>register_pin($pin_num)> in order to have the
+cleanup functionality tidy things up properly. Neglecting to do this will
+prevent the cleanup regimen from knowing about these pins, and therefore will be
+left in an inconsistent state, possibly causing damage on a different run.
 
 =head1 AUTHOR
 

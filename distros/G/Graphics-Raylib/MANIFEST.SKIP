@@ -3,5 +3,4 @@ XS/_Inline/
 XS/MYMETA.json
 XS/MYMETA.yml
 XS/pm_to_blib
-XS/Makefile
 XS/*.o

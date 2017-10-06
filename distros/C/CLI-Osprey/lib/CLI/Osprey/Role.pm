@@ -8,7 +8,7 @@ use Scalar::Util qw(blessed);
 use CLI::Osprey::Descriptive;
 
 # ABSTRACT: Role for CLI::Osprey applications
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 sub _osprey_option_to_getopt {
@@ -340,7 +340,7 @@ CLI::Osprey::Role - Role for CLI::Osprey applications
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

@@ -24,6 +24,7 @@ use overload
 # override UNIVERSAL methods
 foreach my $umethod (keys %UNIVERSAL::) {
     no strict 'refs';
+    next unless defined &{"UNIVERSAL::" . $umethod};
     *{$umethod} = sub {
 	my $proxy = shift;
 	if (!CORE::ref($proxy)) {

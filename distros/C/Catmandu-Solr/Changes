@@ -1,5 +1,8 @@
 Revision history for Catmandu-Solr
 
+0.0303  2017-10-03 16:55:18 CEST
+       - support http keep-alive
+
 0.0302  2017-04-20 15:36:51 CEST
        - fix typo
        - more pod

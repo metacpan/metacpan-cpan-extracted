@@ -4,7 +4,7 @@
       "Xavier Guimard, E<lt>x.guimard@free.frE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -39,11 +39,11 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.2.5"
+         "version" : "v1.2.8"
       },
       "Apache::Session::Browseable::DBI" : {
          "file" : "lib/Apache/Session/Browseable/DBI.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.7"
       },
       "Apache::Session::Browseable::File" : {
          "file" : "lib/Apache/Session/Browseable/File.pm",
@@ -63,7 +63,7 @@
       },
       "Apache::Session::Browseable::MySQLJSON" : {
          "file" : "lib/Apache/Session/Browseable/MySQLJSON.pm",
-         "version" : "v1.2.5"
+         "version" : "v1.2.7"
       },
       "Apache::Session::Browseable::Oracle" : {
          "file" : "lib/Apache/Session/Browseable/Oracle.pm",
@@ -71,11 +71,11 @@
       },
       "Apache::Session::Browseable::PgHstore" : {
          "file" : "lib/Apache/Session/Browseable/PgHstore.pm",
-         "version" : "v1.2.5"
+         "version" : "v1.2.7"
       },
       "Apache::Session::Browseable::PgJSON" : {
          "file" : "lib/Apache/Session/Browseable/PgJSON.pm",
-         "version" : "v1.2.5"
+         "version" : "v1.2.7"
       },
       "Apache::Session::Browseable::Postgres" : {
          "file" : "lib/Apache/Session/Browseable/Postgres.pm",
@@ -123,7 +123,7 @@
       },
       "Apache::Session::Browseable::Store::SQLite" : {
          "file" : "lib/Apache/Session/Browseable/Store/SQLite.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.7"
       },
       "Apache::Session::Browseable::Store::Sybase" : {
          "file" : "lib/Apache/Session/Browseable/Store/Sybase.pm",
@@ -143,7 +143,7 @@
       },
       "Apache::Session::Serialize::JSON" : {
          "file" : "lib/Apache/Session/Serialize/JSON.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.6"
       }
    },
    "release_status" : "stable",
@@ -152,6 +152,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v1.2.5",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v1.2.8",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

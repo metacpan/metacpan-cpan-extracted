@@ -4,6 +4,9 @@ use utf8;
 use Test::More;
 
 BEGIN{ 
+    BAIL_OUT
+        "A bug in Perl 5.20 regex compilation prevents the use of PPR under that release"
+        if $] > 5.020 && $] < 5.022;
     plan skip_all => "Perl 5.16 or later required for Acme::LookOfDisapproval"
         if $] < 5.016;
     plan skip_all => "Acme::LookOfDisapproval not installed"

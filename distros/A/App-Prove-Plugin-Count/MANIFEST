@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+appveyor.yml
+cpanfile
+lib/App/Prove/Plugin/Count.pm
+minil.toml
+t/00_compile.t
+t/prove.t
+tests/test1.t
+tests/test2.t
+META.yml
+MANIFEST

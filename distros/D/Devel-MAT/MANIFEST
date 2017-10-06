@@ -1,9 +1,7 @@
 bin/pmat
 bin/pmat-cat-svpv
 bin/pmat-diff
-bin/pmat-dump-symbols
 bin/pmat-find-pv
-bin/pmat-largest-svs
 bin/pmat-list-dangling-ptrs
 bin/pmat-list-orphans
 bin/pmat-sizes
@@ -28,8 +26,10 @@ lib/Devel/MAT/Tool/Identify.pm
 lib/Devel/MAT/Tool/Inrefs.pm
 lib/Devel/MAT/Tool/IO.pm
 lib/Devel/MAT/Tool/Reachability.pm
+lib/Devel/MAT/Tool/Roots.pm
 lib/Devel/MAT/Tool/Show.pm
 lib/Devel/MAT/Tool/Sizes.pm
+lib/Devel/MAT/Tool/Symbols.pm
 lib/Devel/MAT/UI.pod
 lib/Devel/MAT/UserGuide.pod
 LICENSE
@@ -74,6 +74,7 @@ share/icons/type-UNDEF.svg
 t/00use.t
 t/01self.t
 t/02contexts.t
+t/10tool-identify.t
 t/10tool-inrefs.t
 t/10tool-reachability.t
 t/10tool-sizes.t

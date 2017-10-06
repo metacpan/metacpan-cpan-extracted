@@ -122,9 +122,15 @@ sub create_dom {
 
 sub create_model {
   my ($self, %args) = @_;
-  my $model = $self->has_model_constructor ?
-    $self->model_constructor->($self->model_class, %args) :
-    $self->model_class->new(%args);
+  my $model = eval {
+    $self->has_model_constructor ?
+      $self->model_constructor->($self->model_class, %args) :
+        $self->model_class->new(%args);
+  } || do {
+    use Data::Dumper;
+    my $args = Dumper(\%args);
+    die "Cannot construct instance for ${\$self->model_class} with args $args: $@";
+  };
   return $model;
 }
 

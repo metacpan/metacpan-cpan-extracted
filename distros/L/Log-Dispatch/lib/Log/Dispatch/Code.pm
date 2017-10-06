@@ -3,7 +3,7 @@ package Log::Dispatch::Code;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -53,7 +53,7 @@ Log::Dispatch::Code - Object for logging to a subroutine reference
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

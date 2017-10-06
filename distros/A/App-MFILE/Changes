@@ -127,3 +127,7 @@ Revision history for App::MFILE
 - build/ops: change OBS project back to Application:Dochazka
 - HTTP.pm: Allow rest_req() to send DELETE requests
 
+0.182 2017-09-27 14:43 CEST
+- Build.PL: require recent App::CELL
+- HTTP.pm: migrate is_authorized code from mfile-www and dochazka-www
+

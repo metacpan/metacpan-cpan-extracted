@@ -10,7 +10,7 @@ use File::Temp 'tempfile';
 use FindBin '$Bin';
 use Test::Builder;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub new
 {
@@ -159,6 +159,11 @@ sub test_if_modified_since
     # the thing again without overwriting our precious stuff.
     my $saved_run_options = $self->{run_options};
     my %run_options = %$saved_run_options;
+    if ($run_options{expect_errors}) {
+	if (! $self->{no_warn}) {
+	    carp "The expect_errors option is often incompatible with do_caching_test (1), suggest switching off testing of caching when expecting errors";
+	}
+    }
     $self->{run_options} = \%run_options;
     my $saved_no_warn = $self->{no_warn};
     $self->{no_warn} = 1;
@@ -770,6 +775,22 @@ sub test_411
     $options->{REQUEST_METHOD} = $rm;
 }
 
+sub test_options
+{
+    my ($self) = @_;
+    my %options = (
+	REQUEST_METHOD => 'OPTIONS',
+	QUERY_STRING => '',
+    );
+    $self->{run_options} = \%options;
+    $valid_request_method{OPTIONS} = 1;
+    $self->run_private ();
+    $self->check_headers_private ();
+    my $headers = $options{headers};
+    $self->do_test ($headers->{allow}, "Got allow header");
+    delete $valid_request_method{OPTIONS};
+}
+
 # Send bullshit queries expecting a 400 response.
 
 sub test_broken_queries
@@ -945,6 +966,11 @@ sub run3
 	print $in $self->{input};
 	close $in or die $!;
 	$cmd .= " < " . $self->{infile};
+    }
+    else {
+	# Make sure that the program does not hang waiting for STDIN
+	# to complete.
+	$cmd .= " < /dev/null ";
     }
     my $out;
     ($out, $self->{outfile}) = tempfile ("/tmp/output-XXXXXX");

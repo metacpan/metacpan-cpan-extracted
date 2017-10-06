@@ -1,0 +1,11 @@
+Version 0.02 - 2017-09-29
+  * Actually add version to module file
+  * Add more (much-needed) test cases
+  * Fix bug in newline trimming when reading command output
+  * Fix bugs in PeekNamedPipe
+  * Use better list of Dist::Zilla plugins
+
+Version 0.01 - 2017-09-28
+  * Exchanges simple ASCII text with PowerShell
+  * Terminates child processes before global destruction
+  * Debug/Trace logging via Log::Any

@@ -28,7 +28,7 @@ apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.020';
+$QBit::Application::Model::DB::VERSION = '0.022';
 use qbit;
 
 use base qw(QBit::Application::Model);

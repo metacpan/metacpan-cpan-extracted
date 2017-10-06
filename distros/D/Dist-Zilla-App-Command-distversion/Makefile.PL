@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "report the dist version on stdot",
+  "ABSTRACT" => "report your dist version",
   "AUTHOR" => "Alastair McGowan-Douglas <altreus\@altre.us>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -15,15 +15,29 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Dist-Zilla-App-Command-distversion",
   "LICENSE" => "bsd",
   "NAME" => "Dist::Zilla::App::Command::distversion",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.001",
+  "PREREQ_PM" => {
+    "Capture::Tiny" => 0,
+    "Dist::Zilla" => 0
+  },
+  "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.02",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
+  "Dist::Zilla" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
+  "Test::More" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

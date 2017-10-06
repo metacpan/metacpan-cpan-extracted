@@ -3,6 +3,12 @@ use warnings;
 
 use Test::More;
 
+BEGIN{
+    BAIL_OUT "A bug in Perl 5.20 regex compilation prevents the use of PPR under that release"
+        if $] > 5.020 && $] < 5.022;
+}
+
+
 use PPR;
 
 my $neg = 0;
@@ -56,4 +62,24 @@ BAR
 BAZ
     bar
 BAR
+####
+s/${\<<FOO}/<<"BAR"/e;
+    ${\<<"BAR"}
+    something
+BAR
+    something
+FOO
+    ${\<<"BAZ"}
+    something
+BAZ
+    something
+BAR
+####
+# THIS SHOULD FAIL
+$_ = "";
+#line 1
+s/ /<<END
+ /e
+END
+/
 ####

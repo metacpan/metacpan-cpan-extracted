@@ -1,6 +1,6 @@
-.gitignore
 Changes
 examples/synopsis.pl
+examples/test.sh
 lib/WWW/CheckGzip.pm
 lib/WWW/CheckGzip.pod
 Makefile.PL
@@ -9,9 +9,5 @@ MANIFEST.SKIP
 README
 script/checkgzip
 t/www-checkgzip.t
-xt/checkpod.t
-xt/depend.t
-xt/distro.t
-xt/git.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use RPi::WiringPi;
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use Test::More;
 
 if (! $ENV{PI_BOARD}){

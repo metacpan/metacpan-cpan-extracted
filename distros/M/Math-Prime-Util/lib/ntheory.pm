@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.66';
+  $ntheory::VERSION = '0.67';
 }
 
 BEGIN {
@@ -131,6 +131,7 @@ Tags:
   forderange { ... } n                loop over derangements
   prime_iterator                      returns a simple prime iterator
   prime_iterator_object               returns a prime iterator object
+  lastfor                             stop iteration of for.... loop
 
 =head2 RANDOM NUMBERS
 
@@ -182,6 +183,7 @@ Tags:
   fromdigits(\@d,[,base])             convert base digit vector to number
   fromdigits(str,[,base])             convert base digit string to number
   sumdigits(n)                        sum of digits, with optional base
+  is_square(n)                        return 1 if n is a perfect square
   is_power(n)                         return k if n = c^k for integer c
   is_power(n,k)                       return 1 if n = c^k for integer c, k
   is_power(n,k,\$root)                as above but also set $root to c.
@@ -193,6 +195,8 @@ Tags:
   is_primitive_root(r,n)              is r a primitive root mod n
   is_pillai(n)                        v where  v! % n == n-1  and  n % v != 1
   is_semiprime(n)                     does n have exactly 2 prime factors
+  is_polygonal(n,k)                   is n a k-polygonal number
+  is_polygonal(n,k,\$root)            as above but also set $root
   sqrtint(n)                          integer square root
   rootint(n,k)                        integer k-th root
   rootint(n,k,\$rk)                   as above but also set $rk to r^k

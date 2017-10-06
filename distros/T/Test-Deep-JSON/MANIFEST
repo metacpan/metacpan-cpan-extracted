@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Test/Deep/JSON.pm
+minil.toml
 t/00_compile.t
 t/01_test.t
 xt/02_perlcritic.t

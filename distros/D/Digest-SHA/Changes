@@ -1,5 +1,16 @@
 Revision history for Perl extension Digest::SHA.
 
+5.98  Wed Oct  4 00:40:02 MST 2017
+	- removed "portable" mode from shasum and addfile
+		-- rarely used, mostly in outdated systems
+		-- potentially confusing features (e.g. \r\r\n -> \n)
+		-- Universal Newlines mode (-U) a much cleaner approach
+			-- mimics Universal Newlines in Python
+	- shasum now uses Digest::SHA explicitly
+		-- no longer loads Digest::SHA::PurePerl as an option
+			-- hence no need for -R switch
+		-- Digest::SHA::PurePerl has its own shasum: shasumpp
+
 5.97  Wed Sep  6 02:23:02 MST 2017
 	- added 'quiet' option to shasum
 		-- thanks to Chris David for suggestion and initial patch

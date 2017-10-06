@@ -45,7 +45,6 @@ dir
 distro
 lib
 mark
-mfowler
 param
 setup
 travis

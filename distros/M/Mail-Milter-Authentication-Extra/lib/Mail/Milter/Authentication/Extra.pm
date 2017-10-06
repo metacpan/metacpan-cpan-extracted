@@ -1,7 +1,7 @@
 package Mail::Milter::Authentication::Extra;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.3');
 
 1;
 
@@ -35,7 +35,7 @@ Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2015
+Copyright 2017
 
 This library is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -98,5 +98,6 @@ t/one_liner.t
 t/clear_actions.t
 t/ws_redefine.t
 t/pseudovars.t
+t/non_backtracking.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

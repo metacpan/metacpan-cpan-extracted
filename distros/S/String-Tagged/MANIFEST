@@ -24,6 +24,7 @@ t/21merge-tags-anchors.t
 t/30appendinsert.t
 t/31matches.t
 t/32split.t
+t/33sprintf.t
 t/40operators.t
 t/50subclass.t
 t/99pod.t

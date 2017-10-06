@@ -1,0 +1,139 @@
+=pod
+
+=head1 Name
+
+UR::Object::Command::Crud
+
+=head1 Synopsis
+
+Automatic generation of CRUD (create, list (read), update and delete plus copy) sub commands for UR objects.
+
+=head1 Usage
+
+Invoke building of of CRUD commands with UR::Object::Command::Crud->create_command_classes(%params). Example and config parameters are listed below.
+
+=head1 Example
+
+=over
+
+=item *
+I<t/TestCrudClasses.pm> Full test classes
+
+=item *
+I<example/muppet.pl> The implementation of CRUD command below
+
+=back
+
+=head2 muppet.pl
+
+A script to manipulate muppets!
+
+	#!/usr/bin/env perl
+	
+	use strict;
+	use warnings 'FATAL';
+	
+	use Path::Class;
+	
+	use lib file(__FILE__)->dir->parent->subdir('t')->stringify;
+	use lib file(__FILE__)->dir->parent->subdir('lib')->stringify;
+	
+	use UR;
+	use UR::Object::Command::Crud;
+	use TestEnvCrud;
+	
+	UR::Object::Command::Crud->create_command_classes(
+	    target_class => 'Test:Muppet',
+	    namespace => 'Muppet'
+	    target_name => 'muppet',
+	);
+	
+	Muppet::Command->execute_with_shell_params_and_exit();
+
+=head1 Sub Command Structure
+
+Each CRUD function will get an in memory class created. These classes are used used for the command line interface. Under the update command, each object property will get its own command. If the relationship of the property is 'has many', there will be an add and remove command for the property.
+
+=head2 script command structure
+
+	$ muppet.pl --help
+	Sub-commands for muppet.pl:
+	 copy         copy a muppet
+	 create       create muppets
+	 delete       delete muppet
+	 list         muppets
+	 update  ...  properties on muppets
+
+=head2 update command tree
+
+	$ muppet.pl update -h
+	Sub-commands for muppet.pl update:
+	 best-friend       update muppets best_friend
+	 friends      ...  add/remove friends
+	 job               update muppets job
+	 name              update muppets name
+	 title             update muppets title
+
+=head2 add/remove friends tree
+
+	$ muppet.pl update friends --help
+	Sub-commands for muppet.pl update friends:
+	 add       friends to muppets
+	 remove    friends from muppets
+
+=head1 Config Parameters
+
+*Optional unless noted*
+
+=head2 Main Parameters
+
+=over
+
+=item *
+B<target_class> (required): The class name of the objects to create CRUD commands.
+
+=item *
+B<target_name> (optional): The space separated singular name of the objects. Default is to convert the class name from camel case to a space separated string. Our example, 'Test::Muppet' would be 'test muppet'. To make it just 'muppet', supply this value.
+
+=item *
+B<namespace> (optional): The class name to be the namespace ofthe commadn structure. By default, command is added to the target class, then sub commands are then created from that class name. Use if wanting to adjust the command line structure abd naming. Ex: 'Muppet::Command'
+
+=item *
+B<sub_command_configs> (optional): A HASH with command names as keys and config HASHes as values. See below for more details.  Ex: { list => { show => 'id,name' } ... }
+
+=back
+
+=head2 Sub Command Configs
+
+*All params are optional*
+
+=head2 All Sub Commands
+
+=over
+
+=item *
+B<skip>: Skip, do not generate this sub command.
+
+=back
+
+=head2 Create
+
+B<exclude> (optional): Exclude these properties, do not include them when creating an object.
+
+=head2 List
+
+B<show> (optional): The default object properties to show. Give as a comma separated string. Ex: 'id,name,friends'.
+B<order_by> (optional): The default order to list the objects in. The ID is the default. Give as string. Ex: 'name'.
+
+=head2 Update
+
+B<exclude> (optional): Exclude these properties, do not make sub commmands for them.
+B<only_if_null> (optional): Only allow updating of a property if it is null.
+
+=head1 See Also
+
+L<UR>
+
+=head1 Copyright
+
+Copyright (c) 2012-2017 Eddie Belter <ebelter@wustl.edu>. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See LICENSE for full details.

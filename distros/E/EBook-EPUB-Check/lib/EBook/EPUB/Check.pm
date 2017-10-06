@@ -9,7 +9,7 @@ use File::ShareDir ();
 use IPC::Run3 ();
 use EBook::EPUB::Check::Result ();
 
-our $VERSION   = "0.04";
+our $VERSION   = "0.05";
 our @EXPORT    = qw(epubcheck);
 our @EXPORT_OK = qw();
 

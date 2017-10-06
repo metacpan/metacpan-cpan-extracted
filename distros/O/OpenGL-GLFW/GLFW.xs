@@ -775,7 +775,8 @@ glfwSetWindowPosCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowposfun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowposfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowposfun callback
      fpstatus = glfwSetWindowPosCallback(window, windowposfun_callback);
 
@@ -802,7 +803,8 @@ glfwSetWindowSizeCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowsizefun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowsizefun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowsizefun callback
      fpstatus = glfwSetWindowSizeCallback(window, windowsizefun_callback);
 
@@ -828,7 +830,8 @@ glfwSetWindowCloseCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowclosefun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowclosefun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowclosefun callback
      fpstatus = glfwSetWindowCloseCallback(window, windowclosefun_callback);
 
@@ -854,7 +857,8 @@ glfwSetWindowRefreshCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowrefreshfun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowrefreshfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowrefreshfun callback
      fpstatus = glfwSetWindowRefreshCallback(window, windowrefreshfun_callback);
 
@@ -880,7 +884,8 @@ glfwSetWindowFocusCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowfocusfun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowfocusfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowfocusfun callback
      fpstatus = glfwSetWindowFocusCallback(window, windowfocusfun_callback);
 
@@ -906,7 +911,8 @@ glfwSetWindowIconifyCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,windowiconifyfun,cbfun);
+     if (NULL == av_store((AV*)upoint,windowiconifyfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper windowiconifyfun callback
      fpstatus = glfwSetWindowIconifyCallback(window, windowiconifyfun_callback);
 
@@ -932,7 +938,8 @@ glfwSetFramebufferSizeCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,framebuffersizefun,cbfun);
+     if (NULL == av_store((AV*)upoint,framebuffersizefun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper framebuffersizefun callback
      fpstatus = glfwSetFramebufferSizeCallback(window, framebuffersizefun_callback);
 
@@ -958,7 +965,8 @@ glfwSetKeyCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,keyfun,cbfun);
+     if (NULL == av_store((AV*)upoint,keyfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper keyfun callback
      fpstatus = glfwSetKeyCallback(window, keyfun_callback);
 
@@ -985,7 +993,8 @@ glfwSetCharCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,charfun,cbfun);
+     if (NULL == av_store((AV*)upoint,charfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper charfun callback
      fpstatus = glfwSetCharCallback(window, charfun_callback);
 
@@ -1011,7 +1020,8 @@ glfwSetCharModsCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,charmodsfun,cbfun);
+     if (NULL == av_store((AV*)upoint,charmodsfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper charmodsfun callback
      fpstatus = glfwSetCharModsCallback(window, charmodsfun_callback);
 
@@ -1037,7 +1047,8 @@ glfwSetMouseButtonCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,mousebuttonfun,cbfun);
+     if (NULL == av_store((AV*)upoint,mousebuttonfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper mousebuttonfun callback
      fpstatus = glfwSetMouseButtonCallback(window, mousebuttonfun_callback);
 
@@ -1063,7 +1074,8 @@ glfwSetCursorPosCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,cursorposfun,cbfun);
+     if (NULL == av_store((AV*)upoint,cursorposfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper cursorposfun callback
      fpstatus = glfwSetCursorPosCallback(window, cursorposfun_callback);
 
@@ -1089,7 +1101,8 @@ glfwSetCursorEnterCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,cursorenterfun,cbfun);
+     if (NULL == av_store((AV*)upoint,cursorenterfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper cursorenterfun callback
      fpstatus = glfwSetCursorEnterCallback(window, cursorenterfun_callback);
 
@@ -1115,7 +1128,8 @@ glfwSetScrollCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,scrollfun,cbfun);
+     if (NULL == av_store((AV*)upoint,scrollfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper scrollfun callback
      fpstatus = glfwSetScrollCallback(window, scrollfun_callback);
 
@@ -1141,7 +1155,8 @@ glfwSetDropCallback(window, cbfun);
            av_store((AV*)upoint,i,&PL_sv_undef);
         glfwSetWindowUserPointer(window,upoint);
      }
-     av_store((AV*)upoint,dropfun,cbfun);
+     if (NULL == av_store((AV*)upoint,dropfun,SvREFCNT_inc(cbfun)))
+	SvREFCNT_dec(cbfun);
      // Enable the C wrapper dropfun callback
      fpstatus = glfwSetDropCallback(window, dropfun_callback);
 

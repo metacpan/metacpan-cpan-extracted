@@ -145,6 +145,28 @@ CONSTRUCTOR
     Called as an instance (rather than a class) method, the newly-cloned
     instance is returned in the same class as the original.
 
+ from_sprintf
+
+       $str = String::Tagged->from_sprintf( $format, @args )
+
+    Since version 0.15.
+
+    Returns a new instance of a String::Tagged object, initialised by
+    formatting the supplied arguments using the supplied format.
+
+    The $format string is similar to that supported by the core sprintf
+    operator, though a few features such as out-of-order argument indexing
+    and vector formatting are missing. This format string may be a plain
+    perl string, or an instance of String::Tagged. In the latter case, any
+    tags within it are preserved in the result.
+
+    In the case of a %s conversion, the value of the argument consumed may
+    itself be a String::Tagged instance. In this case it will be appended
+    to the returned object, preserving any tags within it.
+
+    All other conversions are handled individually by the core sprintf
+    operator and appended to the result.
+
 METHODS
 
  str
@@ -509,6 +531,16 @@ METHODS
     the entire remainder of the input string as the final element. If the
     $regexp contains a capture group then the content of the first one will
     be added to the return list as well.
+
+ sprintf
+
+       $ret = $st->sprintf( @args )
+
+    Since version 0.15.
+
+    Returns a new string by using the given instance as the format string
+    for a "from_sprintf" constructor call. The returned instance will be of
+    the same class as the invocant.
 
  debug_sprintf
 

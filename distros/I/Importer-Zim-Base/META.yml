@@ -7,6 +7,7 @@ build_requires:
   File::Spec: '0'
   Module::Build: '0.28'
   Test::More: '0.96'
+  strict: '0'
   warnings: '0'
 configure_requires:
   Module::Build: '0.28'
@@ -20,16 +21,17 @@ name: Importer-Zim-Base
 provides:
   Importer::Zim::Base:
     file: lib/Importer/Zim/Base.pm
-    version: v0.5.0
+    version: v0.8.0
+  Importer::Zim::Utils:
+    file: lib/Importer/Zim/Utils.pm
+    version: v0.8.0
 requires:
   Carp: '0'
   Module::Runtime: '0'
-  constant: '0'
-  perl: '5.018'
-  strict: '0'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/aferreira/cpan-Importer-Zim-Base/issues
   homepage: https://github.com/aferreira/cpan-Importer-Zim-Base
   repository: https://github.com/aferreira/cpan-Importer-Zim-Base.git
-version: 0.5.0
+version: 0.8.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -2,7 +2,7 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME => 'Applify',
-  AUTHOR => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR => 'Roy Storey <kiwiroy@users.noreply.github.com>',
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Applify.pm',
   VERSION_FROM => 'lib/Applify.pm',

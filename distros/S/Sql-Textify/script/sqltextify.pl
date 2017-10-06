@@ -35,8 +35,8 @@ use Getopt::Long;
 use utf8;
 use Sql::Textify;
 
-our $VERSION = "0.05";
-our $RELEASEDATE = "September 14th, 2017";
+our $VERSION = "0.06";
+our $RELEASEDATE = "September 26th, 2017";
 
 =head1 OPTIONS
 

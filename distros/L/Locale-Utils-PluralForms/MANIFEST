@@ -5,7 +5,6 @@ example/02_plural_forms_from_data_struct.pl
 example/03_calculate_plural_forms_only.pl
 lib/Locale/Utils/PluralForms.pm
 MANIFEST			This list of files
-META.json
 README
 t/01_use.t
 t/02_exceptions.t
@@ -21,3 +20,4 @@ t/pod_coverage.t
 t/prereq_build.t
 Makefile.PL
 META.yml
+META.json

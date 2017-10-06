@@ -1,0 +1,10 @@
+Revision history for Perl extension Smart-Args-TypeTiny
+
+0.02 2017-09-29T04:29:56Z
+
+    - require Test2::Suite >= 0.000077 for Test2::V0
+
+0.01 2017-09-28T05:18:37Z
+
+    - original version
+

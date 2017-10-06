@@ -1,5 +1,12 @@
 Revision history for Bencode
 
+1.501 Sat 30 Sep 2017
+	- No test failures under Carp < 1.25
+	- No test dependency on Test::More >= 0.88
+
+1.500 Wed 27 Sep 2017
+	- New $undef_mode parameter to properly handle undefs during encoding
+
 1.402 Sat 10 Jan 2015
 	- No functional changes
 	- No longer contains INSTALL file with install-as-root instructions

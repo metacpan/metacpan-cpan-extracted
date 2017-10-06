@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.022-5-g1b5ac33
+package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.023-9-g04d48cb
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Generate a Makefile.PL containing a warning for legacy users
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain legacy ancient backcompat
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::MakeMaker::Awesome' => { -version => '0.26' };
@@ -27,12 +27,6 @@ around dump_config => sub
 
     return $config;
 };
-
-sub register_prereqs
-{
-    # block ExtUtils::MakeMaker from being added, since we expect Build.PL to
-    # be preferred (so the requirements for *that* file are what matters)
-}
 
 sub after_build
 {
@@ -83,21 +77,27 @@ CODE
 CODE
     . "\x7d\x7d);\n" . <<'CODE'
 
-my @missing = grep {
-    ! eval "require $_; $_->VERSION($configure_requires{$_}); 1"
+my %errors = map {
+    eval "require $_; $_->VERSION($configure_requires{$_}); 1";
+    $_ => $@,
 } keys %configure_requires;
 
-if (@missing)
+if (grep { $_ } values %errors)
 {
-    if (not $ENV{PERL_MM_FALLBACK_SILENCE_WARNING})
-    {
-        warn <<'EOW';
+    warn "Errors from configure prereqs:\n"
+        . do {
+            require Data::Dumper; Data::Dumper->new([ \%errors ])->Indent(2)->Terse(1)->Sortkeys(1)->Dump;
+        };
+}
+
+if (not $ENV{PERL_MM_FALLBACK_SILENCE_WARNING})
+{
+    warn <<'EOW';
 CODE
-        . join('', <DATA>)
-        . <<'CODE';
+    . join('', <DATA>)
+    . <<'CODE';
 EOW
-        sleep 10 if -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
-    }
+    sleep 10 if -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT));
 }
 } # end BEGIN
 CODE
@@ -160,7 +160,7 @@ __PACKAGE__->meta->make_immutable;
 #pod =head1 DESCRIPTION
 #pod
 #pod This plugin is a derivative of C<[MakeMaker]>, generating a F<Makefile.PL> in
-#pod your dist, with an added preamble that is printed when it is run:
+#pod your distribution, with an added preamble that is printed when it is run:
 #pod
 #pod =for stopwords cpanminus mb
 #pod
@@ -185,8 +185,10 @@ __PACKAGE__->meta->make_immutable;
 #pod If you're using cpanminus, you shouldn't be seeing this message in the first
 #pod place, so please file an issue on github.
 #pod
+#pod If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+#pod
 #pod If you're installing manually, please retrain your fingers to run Build.PL
-#pod when present instead.
+#pod when present instead of Makefile.PL.
 #pod
 #pod This public service announcement was brought to you by the Perl Toolchain
 #pod Gang, the irc.perl.org #toolchain IRC channel, and the number 42.
@@ -204,6 +206,9 @@ __PACKAGE__->meta->make_immutable;
 #pod =end :verbatim
 #pod
 #pod =for stopwords ModuleBuildTiny
+#pod
+#pod Additionally, any errors resulting from loading configure-require prerequisites are captured and printed, which
+#pod indicates a failure of the user or the tools to read and understand F<META.yml> or F<META.json>.
 #pod
 #pod It is a fatal error to use this plugin when there is not also another
 #pod plugin enabled that generates a F<Build.PL> (such as
@@ -247,7 +252,7 @@ Dist::Zilla::Plugin::MakeMaker::Fallback - Generate a Makefile.PL containing a w
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -261,7 +266,7 @@ C<configure_requires>:
 =head1 DESCRIPTION
 
 This plugin is a derivative of C<[MakeMaker]>, generating a F<Makefile.PL> in
-your dist, with an added preamble that is printed when it is run:
+your distribution, with an added preamble that is printed when it is run:
 
 =for Pod::Coverage after_build build test
 
@@ -286,8 +291,10 @@ your dist, with an added preamble that is printed when it is run:
     If you're using cpanminus, you shouldn't be seeing this message in the first
     place, so please file an issue on github.
 
+    If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+
     If you're installing manually, please retrain your fingers to run Build.PL
-    when present instead.
+    when present instead of Makefile.PL.
 
     This public service announcement was brought to you by the Perl Toolchain
     Gang, the irc.perl.org #toolchain IRC channel, and the number 42.
@@ -302,6 +309,9 @@ your dist, with an added preamble that is printed when it is run:
     PERL_MM_FALLBACK_SILENCE_WARNING environment variable.
 
 =for stopwords ModuleBuildTiny
+
+Additionally, any errors resulting from loading configure-require prerequisites are captured and printed, which
+indicates a failure of the user or the tools to read and understand F<META.yml> or F<META.json>.
 
 It is a fatal error to use this plugin when there is not also another
 plugin enabled that generates a F<Build.PL> (such as
@@ -388,8 +398,10 @@ If you're using CPANPLUS to install things, then you can upgrade it using:
 If you're using cpanminus, you shouldn't be seeing this message in the first
 place, so please file an issue on github.
 
+If you're using a packaging tool through a unix distribution, this issue should be reported to the package manager.
+
 If you're installing manually, please retrain your fingers to run Build.PL
-when present instead.
+when present instead of Makefile.PL.
 
 This public service announcement was brought to you by the Perl Toolchain
 Gang, the irc.perl.org #toolchain IRC channel, and the number 42.

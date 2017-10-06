@@ -1,0 +1,6 @@
+Revision history for Perl extension Sendmail::AbuseIPDB.
+
+0.01  Sun Sep 17 06:30:35 2017
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Sendmail::AbuseIPDB
+

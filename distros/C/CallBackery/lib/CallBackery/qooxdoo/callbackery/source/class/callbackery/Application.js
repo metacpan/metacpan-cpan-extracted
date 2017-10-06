@@ -36,17 +36,17 @@ qx.Class.define("callbackery.Application", {
             }
             var rpc = callbackery.data.Server.getInstance();
             var root = this.getRoot();
-
+            root.set({
+                blockerColor   : '#fff',
+                blockerOpacity : 0.7
+            });
             var desktopContainer = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
-
             root.add(desktopContainer,{top: 0, left: 0, right: 0, bottom: 0});
 
-            this._tuneBlocker(desktopContainer);
-            
             /* give the History object a more relaxed attitude towards encoding stuff */
             qx.Class.patch(qx.bom.History,callbackery.data.MHistoryRelaxedEncoding);
-            qx.bom.History.getInstance().addListener('changeState', this._changeLanguage, this);
-            this._changeLanguage();
+            qx.bom.History.getInstance().addListener('changeState', this.__changeLanguage, this);
+            this.__changeLanguage();
 
             rpc.callAsyncSmart(function(baseCfg){
                 callbackery.data.Config.getInstance().setBaseConfig(baseCfg);
@@ -80,7 +80,7 @@ qx.Class.define("callbackery.Application", {
             return callbackery.ui.Plugins.getInstance().register(type, func);
         },
 
-        _changeLanguage: function() {
+        __changeLanguage: function() {
             var h = qx.bom.History.getInstance();
             var state = h.getState();
             var items = state.split(';');
@@ -95,30 +95,6 @@ qx.Class.define("callbackery.Application", {
             if (lang) {
                 qx.locale.Manager.getInstance().setLocale(lang);
             }
-        },
-        
-        _tuneBlocker: function(desktopContainer){
-            var root = this.getRoot();
-            root.set({
-                blockerColor   : '#fff',
-                blockerOpacity : 0.5
-            });
-
-            var blocker = root.getBlocker();
-            var desktopCoEl = desktopContainer.getContentElement();
-            blocker.addListener('blocked',function(){
-                desktopCoEl.setStyles({
-                    filter: 'blur(3px)',
-                    webkitFilter: 'blur(3px)'
-                });
-            });
-            blocker.addListener('unblocked',function(){
-                desktopCoEl.setStyles({
-                   filter: 'blur(0px)',
-                   webkitFilter: 'blur(0px)'
-                });
-            });
-
         }
 
     }

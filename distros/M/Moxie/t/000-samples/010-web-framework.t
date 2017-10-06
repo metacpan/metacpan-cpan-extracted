@@ -42,11 +42,11 @@ package Todo {
 
     extends 'Moxie::Object';
 
-    has 'description';
-    has 'is_done';
+    has '_description';
+    has '_is_done';
 
-    sub description : ro JSONParameter;
-    sub is_done     : ro JSONParameter;
+    sub description : ro(_description) JSONParameter;
+    sub is_done     : ro(_is_done)     JSONParameter;
 }
 
 # this is the web-service for it
@@ -58,8 +58,6 @@ package TodoService {
     extends 'Moxie::Object';
 
     has 'todos' => ( default => sub { +{} } );
-
-    my sub todos : private;
 
     sub get_todo ($self, $id) : Path('/:id') GET Produces('application/json') {
         todos->{ $id };

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use constant CMD => "io";
 
@@ -62,7 +62,7 @@ sub run_cmd_list
 
    my %ios;
 
-   foreach my $sv ( $self->{df}->heap ) {
+   foreach my $sv ( $self->df->heap ) {
       next unless $sv->type eq "IO";
 
       my $ifileno = $sv->ifileno // -1;
@@ -74,7 +74,8 @@ sub run_cmd_list
    foreach ( sort _by_fileno keys %ios ) {
       my $sv = $ios{$_};
 
-      Devel::MAT::Cmd->printf( "%-30s %-8s %-8s\n", $sv->desc_addr, $sv->ifileno // "-", $sv->ofileno // "-" );
+      my $len = Devel::MAT::Cmd->print_sv( $sv );
+      Devel::MAT::Cmd->printf( "%s %-8s %-8s\n", " " x ( 30 - $len ), $sv->ifileno // "-", $sv->ofileno // "-" );
    }
 }
 
@@ -95,12 +96,13 @@ sub run_cmd_find
 
    Devel::MAT::Cmd->printf( "%-30s %-8s %-8s\n", "Addr", "ifileno", "ofileno" );
 
-   foreach my $sv ( $self->{df}->heap ) {
+   foreach my $sv ( $self->df->heap ) {
       next unless $sv->type eq "IO";
 
       next unless $sv->ifileno == $num or $sv->ofileno == $num;
 
-      Devel::MAT::Cmd->printf( "%-30s %-8s %-8s\n", $sv->desc_addr, $sv->ifileno // "-", $sv->ofileno // "-" );
+      my $len = Devel::MAT::Cmd->print_sv( $sv );
+      Devel::MAT::Cmd->printf( "%s %-8s %-8s\n", " " x ( 30 - $len ), $sv->ifileno // "-", $sv->ofileno // "-" );
    }
 }
 

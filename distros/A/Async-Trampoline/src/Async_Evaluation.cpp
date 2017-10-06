@@ -1,6 +1,8 @@
 #include "Async.h"
 #include "Scheduler.h"
 
+#define UNUSED(x) static_cast<void>(x)
+
 #define EVAL_RETURN(next_async, blocked_async) \
     (void)  (next = next_async, blocked = blocked_async)
 
@@ -89,6 +91,8 @@ Async_RawThunk_eval(
     assert(self);
     assert(self->type == Async_Type::IS_RAWTHUNK);
 
+    UNUSED(next);
+    UNUSED(blocked);
     assert(0);  // TODO not implemented
 }
 

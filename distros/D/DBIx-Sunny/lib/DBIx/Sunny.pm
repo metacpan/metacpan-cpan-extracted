@@ -5,7 +5,7 @@ use warnings;
 use 5.008005;
 use DBI 1.615;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use parent qw/DBI/;
 
@@ -81,7 +81,7 @@ sub __set_comment {
         my $file = $caller[1];
         $file =~ s!\*/!*\//!g;
         $trace = "/* $file line $caller[2] */"; 
-        last if $caller[0] ne ref($self) && $caller[0] !~ /^(:?DBIx?|DBD)\b/;
+        last if $caller[0] ne ref($self) && $caller[0] !~ /^(:?DBIx?|DBD|Try::Tiny|Context::Preserve)\b/;
         $i++;
     }
     $query =~ s! ! $trace !;
@@ -286,6 +286,18 @@ select_(one|row|all) and  query methods support auto-expanding arrayref bind par
   $dbh->select_all('SELECT * FROM id IN (?)', [1 2 3])
   #SQL: 'SELECT * FROM id IN (?,?,")'
   #@BIND: (1, 2, 3)
+
+=item Typed bind parameters
+
+DBIx::Sunny allows you to specify data types of bind parameters. If a bind parameter is L<SQL::Maker::SQLType> object, its value is passed as its type, otherwise it is passed as default type (VARCHAR).
+
+  use SQL::Maker::SQLType qw/sql_type/;
+  use DBI qw/:sql_types/
+
+  $dbh->query(
+      'INSERT INTO bin_table (bin_col) VALUES (?)',
+      sql_type(\"\xDE\xAD\xBE\xEF", SQL_BINARY)),
+  );
 
 =back
 

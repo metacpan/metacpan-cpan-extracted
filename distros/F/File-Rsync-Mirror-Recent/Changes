@@ -1,3 +1,18 @@
+2017-10-04  k  <andk@cpan.org>
+
+	* release 0.4.5
+
+	* add options to rrr-client: --max-files-per-connection and
+	--rsync-timeout; sort options in manpage; no functional change
+
+2017-10-02  k  <andk@cpan.org>
+
+	* release 0.4.4
+
+	* bugfix #123171: do not expect rrr-fsck in ./bin/ (Ask Bjørn Hansen)
+
+	* add Hash::Util to PREREQ_PM; no functional change (Andreas König)
+
 2016-06-11  k  <andk@cpan.org>
 
 	* release 0.4.3

@@ -9,6 +9,7 @@ BEGIN { use lib -d 't' ? "t/lib" : "lib"; }
 use Test::More;
 use Test::Fatal;
 use Lingua::LO::NLP::Romanize;
+use Lingua::LO::NLP::Analyze;
 
 like(
     exception { Lingua::LO::NLP::Romanize->new(hyphen => 1) },
@@ -20,17 +21,9 @@ like(
 like(
     exception { Lingua::LO::NLP::Romanize->new(variant => 'Faulty')->romanize('ຟູ') },
     ## no critic (RegularExpressions::ProhibitComplexRegexes) (this is not actually complex)
-    qr/Lingua::LO::NLP::Romanize::Faulty must implement romanize_syllable\(\)/,
-    'romanize_syllable is virtual'
+    qr/Lingua::LO::NLP::Romanize::Faulty must implement _romanize_syllable\(\)/,
+    '_romanize_syllable is virtual'
 );
-
-# romanize_syllable as class method
-like(
-    exception { Lingua::LO::NLP::Romanize->romanize_syllable('ຟູ') },
-    qr/romanize_syllable is not a class method/,
-    'romanize_syllable enforces object method call'
-);
-
 
 my $r = Lingua::LO::NLP::Romanize->new(variant => 'PCGN');
 isa_ok($r, 'Lingua::LO::NLP::Romanize::PCGN', 'PCGN subclass created');

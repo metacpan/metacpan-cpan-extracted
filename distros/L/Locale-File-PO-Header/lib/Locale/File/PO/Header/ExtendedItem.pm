@@ -3,13 +3,11 @@ package Locale::File::PO::Header::ExtendedItem; ## no critic (TidyCode)
 use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
-
 use namespace::autoclean;
-use syntax qw(method);
 
 use Clone qw(clone);
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 
 extends qw(Locale::File::PO::Header::Base);
 
@@ -27,11 +25,15 @@ has extended => (
     isa => 'ExtendedArray|Undef',
 );
 
-method data ($key, @args) {
+sub data {
+    my ($self, $key, @args) = @_;
+
     return $self->extended( @args ? $args[0] : () );
 }
 
-method extract_msgstr ($msgstr_ref) {
+sub extract_msgstr {
+    my ($self, $msgstr_ref) = @_;
+
     my @extended;
     while (
         ${$msgstr_ref} =~ s{
@@ -50,7 +52,9 @@ method extract_msgstr ($msgstr_ref) {
     return;
 }
 
-method lines {
+sub lines {
+    my $self = shift;
+
     my $extended = $self->extended;
     defined $extended
         or return;

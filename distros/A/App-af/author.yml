@@ -10,6 +10,17 @@ pod_spelling_system:
     - subcommands
     - alienized
     - REPL
+    - DJERIUS
+    - Diab
+    - Jerius
+    - precompile
+    - cflags
+    - modversion
+    - palien
+    - dll
+    - DLLs
+    - libs
+    - sep
 
 pod_coverage:
   skip: 0

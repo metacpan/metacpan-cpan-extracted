@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 lib/Importer/Zim.pm
+lib/Importer/Zim/Cookbook.pod
 lib/zim.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

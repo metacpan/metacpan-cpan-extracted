@@ -1,15 +1,16 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use FindBin;
+use lib "${FindBin::RealBin}/../lib";
+use lib "${FindBin::RealBin}/../local/lib/perl5";
 use Cwd qw/abs_path/;
 use Data::Section::Simple;
 use File::Path 'mkpath';
-use FindBin;
 use Getopt::Long;
 use Pod::Usage 'pod2usage';
 use String::CamelCase qw(decamelize);
 use Text::Xslate;
-use lib "${FindBin::RealBin}/../lib";
 use Dwarf::Util qw(write_file);
 
 my $opts = { output => $FindBin::RealBin . '/../lib' };
@@ -114,9 +115,10 @@ sub any {
 
 base=${0%/*}/..
 lib=${base}/lib
+local_lib=${base}/local/lib/perl5
 app=${base}/cli.psgi
 
-perl -I $lib $app cli <: $name2 :>
+perl -I $lib -I $local_lib $app cli <: $name2 :>
 
 @@ Web.pm
 

@@ -8,7 +8,7 @@ use Specio::Library::Builtins;
 
 use Moo;
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 extends 'Code::TidyAll::Plugin';
 
@@ -51,7 +51,7 @@ documents with tidyall
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 

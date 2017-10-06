@@ -13,19 +13,19 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Import functions with lexical scope",
+  "dist_abstract" => "Import functions as lexical subroutines",
   "dist_author" => [
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim-Lexical",
-  "dist_version" => "0.6.0",
+  "dist_version" => "0.8.0",
   "license" => "perl",
   "module_name" => "Importer::Zim::Lexical",
   "recursive_test_files" => 1,
   "requires" => {
-    "Importer::Zim::Base" => "v0.5.0",
-    "Sub::Inject" => 0,
-    "constant" => 0,
+    "Importer::Zim::Base" => "v0.8.0",
+    "Importer::Zim::Utils" => "v0.8.0",
+    "Sub::Inject" => "v0.2.0",
     "perl" => "5.018"
   },
   "test_requires" => {

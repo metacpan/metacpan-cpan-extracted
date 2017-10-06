@@ -2,6 +2,10 @@
 use strict;
 use warnings;
 
+# inserted by Dist::Zilla::Plugin::CheckBin 0.007
+use Devel::CheckBin;
+check_bin('clustalw');
+
 use 5.006;
 
 use ExtUtils::MakeMaker;
@@ -10,6 +14,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Object for the calculation of a multiple sequence alignment from a set of unaligned sequences or alignments using the Clustalw program",
   "AUTHOR" => "Peter Schattner <schattner\@alum.mit.edu>",
   "CONFIGURE_REQUIRES" => {
+    "Devel::CheckBin" => 0,
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Bio-Tools-Run-Alignment-Clustalw",
@@ -33,16 +38,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Env::Path" => "0.18",
     "File::Spec" => 0,
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "1.7.2",
+  "VERSION" => "1.7.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,13 +62,11 @@ my %FallbackPrereqs = (
   "Bio::SimpleAlign" => 0,
   "Bio::Tools::Run::WrapperBase" => 0,
   "Bio::TreeIO" => 0,
-  "Env::Path" => "0.18",
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "base" => 0,
   "blib" => "1.01",
   "strict" => 0,

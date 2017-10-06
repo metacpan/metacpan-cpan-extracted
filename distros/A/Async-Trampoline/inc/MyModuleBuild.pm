@@ -22,29 +22,28 @@ sub cbuilder {
     return $cbuilder;
 }
 
+sub _construct {
+    my ($class, @args) = @_;
+
+    if ($ENV{AUTOMATED_TESTING}) {
+        for my $var (qw( CXXFLAGS PERL_MB_OPT )) {
+            if (exists $ENV{$var}) {
+                warn sprintf "env %s=%s\n", $var, $ENV{$var} // q();
+            }
+            else {
+                warn "env $var not set\n";
+            }
+        }
+    }
+
+    return $class->SUPER::_construct(@args);
+}
+
 sub __MyModuleBuild_CBuilder_patched_compile {
     my ($orig, $self, %args) = @_;
     my $source = $args{source};
     $args{'C++'} //= ($source =~ /\.(?:cpp|cxx|c\+\+)$/);
     return $self->$orig(%args);
-}
-
-sub _construct {
-    my ($class, %args) = @_;
-    my $extra_config = delete $args{args}{config} // {};
-
-    my $self = $class->SUPER::_construct(%args);
-
-    if (my $cxxflags = delete $extra_config->{cxxflags}) {
-        my $existing_flags =
-                $class->config('cxxflags')
-            ||  $class->config('cflags');
-        $class->config(cxxflags => "$existing_flags $cxxflags");
-    }
-
-    $class->config($_ => $extra_config->{$_}) for sort keys %$extra_config;
-
-    return $self;
 }
 
 sub _infer_xs_spec {

@@ -8,7 +8,7 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Net::FTP plugin for fetching files
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has '+url' => '';
@@ -158,13 +158,15 @@ Alien::Build::Plugin::Fetch::NetFTP - Net::FTP plugin for fetching files
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
  use alienfile;
- meta->prop->{start_url} = 'ftp://ftp.gnu.org/gnu/make';
- plugin 'Fetch::NetFTP' => ();
+ share {
+   start_url 'ftp://ftp.gnu.org/gnu/make';
+   plugin 'Fetch::NetFTP';
+ };
 
 =head1 DESCRIPTION
 
@@ -237,6 +239,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

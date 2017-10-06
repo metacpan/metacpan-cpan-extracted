@@ -9,7 +9,7 @@ Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -125,6 +125,12 @@ To enable save\_to, a info and lingua arguments must also be given.
 It works best when cache is also given.
 Only use where output is guaranteed to be the same with a given set of arguments
 (the same criteria for enabling generate\_304).
+You can turn it off on a case by case basis thus:
+
+    my $params = CGI::Info->new()->params();
+    if($params->{'send_private_email'}) {
+        $buffer->init('save_to' => undef);
+    }
 
 Info is an optional argument to give information about the FCGI environment, e.g.
 a [CGI::Info](https://metacpan.org/pod/CGI::Info) object.

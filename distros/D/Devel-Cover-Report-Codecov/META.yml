@@ -14,6 +14,7 @@ build_requires:
   Test::Deep: '0.117'
   Test::Exception: '0.40'
   Test::Mock::Guard: '0.10'
+  Test::Mock::Time: v0.1.6
   Test::MockObject: '1.20150527'
   Test::More: '1.001014'
   Test::Perl::Critic: '1.03'
@@ -40,7 +41,7 @@ no_index:
 provides:
   Devel::Cover::Report::Codecov:
     file: lib/Devel/Cover/Report/Codecov.pm
-    version: '0.19'
+    version: '0.21'
   Devel::Cover::Report::Codecov::Service::AppVeyor:
     file: lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm
   Devel::Cover::Report::Codecov::Service::Circle:
@@ -61,8 +62,6 @@ provides:
     file: lib/Devel/Cover/Report/Codecov/Service/Semaphore.pm
   Devel::Cover::Report::Codecov::Service::Shippable:
     file: lib/Devel/Cover/Report/Codecov/Service/Shippable.pm
-  Devel::Cover::Report::Codecov::Service::Snap:
-    file: lib/Devel/Cover/Report/Codecov/Service/Snap.pm
   Devel::Cover::Report::Codecov::Service::Travis:
     file: lib/Devel/Cover/Report/Codecov/Service/Travis.pm
   Devel::Cover::Report::Codecov::Service::Wercker:
@@ -74,13 +73,14 @@ requires:
   IO::Socket::SSL: '2.016'
   JSON::XS: '3.01'
   Module::Find: '0.13'
+  Sub::Retry: '0.06'
   URI: '1.60'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/codecov/codecov-perl/issues
   homepage: https://github.com/codecov/codecov-perl
   repository: git://github.com/codecov/codecov-perl.git
-version: '0.19'
+version: '0.21'
 x_authority: cpan:PINE
 x_contributors:
   - 'M Somerville <dracos@users.noreply.github.com>'

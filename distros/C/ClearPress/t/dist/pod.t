@@ -1,8 +1,14 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
+#########
+# Author: rmp
+#
+use Test::More;
 use strict;
 use warnings;
-use Test::More;
+
+our $VERSION = q[477.1.2];
+
 eval {
   require Test::Pod;
   Test::Pod->import();

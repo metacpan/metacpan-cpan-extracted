@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kablamo/perl-string-camelsnakekebab.svg?branch=master)](https://travis-ci.org/kablamo/perl-string-camelsnakekebab) [![Coverage Status](https://img.shields.io/coveralls/kablamo/perl-string-camelsnakekebab/master.svg)](https://coveralls.io/r/kablamo/perl-string-camelsnakekebab?branch=master)
+[![Build Status](https://travis-ci.org/kablamo/perl-string-camelsnakekebab.svg?branch=master)](https://travis-ci.org/kablamo/perl-string-camelsnakekebab) [![Coverage Status](https://img.shields.io/coveralls/kablamo/perl-string-camelsnakekebab/master.svg?style=flat)](https://coveralls.io/r/kablamo/perl-string-camelsnakekebab?branch=master)
 # NAME
 
 String::CamelSnakeKebab - word case conversion
@@ -28,6 +28,12 @@ String::CamelSnakeKebab - word case conversion
     http_header_case "x-ssl-cipher"
     # => "X-SSL-Cipher"
 
+    word_split 'ASnakeSlithersSlyly'
+    # => ["A", "Snake", "Slithers", "Slyly"]
+
+    word_split 'flux-capacitor'
+    # => ["flux", "capacitor"]
+
 # DESCRIPTION
 
 Camel-Snake-Kebab is a Clojure library for word case conversions.  This library
@@ -48,6 +54,8 @@ is ported from the original Clojure.
 ## kebab\_case()
 
 ## http\_header\_case()
+
+## word\_split()
 
 # ERROR HANDLING
 

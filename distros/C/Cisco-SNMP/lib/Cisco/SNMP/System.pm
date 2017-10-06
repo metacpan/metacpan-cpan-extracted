@@ -20,74 +20,75 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _sysOID {
-    return '1.3.6.1.2.1.1'
+    return '1.3.6.1.2.1.1';
 }
 
 sub sysOIDs {
-    return qw(Descr ObjectID UpTime Contact Name Location Services ORLastChange)
+    return qw(Descr ObjectID UpTime Contact Name Location Services
+      ORLastChange);
 }
 
 sub system_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my $response = Cisco::SNMP::_snmpwalk($session, _sysOID());
-    if (defined $response) {
+    my $response = Cisco::SNMP::_snmpwalk( $session, _sysOID() );
+    if ( defined $response ) {
 
         my $sysinfo;
         my @SYSKEYS = sysOIDs();
-        for (0..$#SYSKEYS) {
-            $sysinfo->{$SYSKEYS[$_]}  = $response->[$_]
+        for ( 0 .. $#SYSKEYS ) {
+            $sysinfo->{$SYSKEYS[$_]} = $response->[$_];
         }
-        return bless $sysinfo, $class
+        return bless $sysinfo, $class;
     } else {
         $Cisco::SNMP::LASTERROR = "Cannot read system MIB";
-        return undef
+        return undef;
     }
 }
 
 sub sysDescr {
     my $self = shift;
-    return $self->{Descr}
+    return $self->{Descr};
 }
 
 sub sysObjectID {
     my $self = shift;
-    return $self->{ObjectID}
+    return $self->{ObjectID};
 }
 
 sub sysUpTime {
     my $self = shift;
-    return $self->{UpTime}
+    return $self->{UpTime};
 }
 
 sub sysContact {
     my $self = shift;
-    return $self->{Contact}
+    return $self->{Contact};
 }
 
 sub sysName {
     my $self = shift;
-    return $self->{Name}
+    return $self->{Name};
 }
 
 sub sysLocation {
     my $self = shift;
-    return $self->{Location}
+    return $self->{Location};
 }
 
 sub sysORLastChange {
     my $self = shift;
-    return $self->{ORLastChange}
+    return $self->{ORLastChange};
 }
 
 sub sysServices {
-    my ($self, $arg) = @_;
+    my ( $self, $arg ) = @_;
 
-    if (defined($arg) && ($arg >= 1)) {
-        return $self->{Services}
+    if ( defined($arg) && ( $arg >= 1 ) ) {
+        return $self->{Services};
     } else {
         my %Services = (
             1  => 'Physical',
@@ -99,56 +100,55 @@ sub sysServices {
             64 => 'Application'
         );
         my @Svcs;
-        for (sort {$b <=> $a} (keys(%Services))) {
-            push @Svcs, $Services{$_} if ($self->{Services} & int($_))
+        for ( sort { $b <=> $a } ( keys(%Services) ) ) {
+            push @Svcs, $Services{$_} if ( $self->{Services} & int($_) );
         }
-        return \@Svcs
+        return \@Svcs;
     }
 }
 
 sub sysOSVersion {
     my $self = shift;
 
-    if ($self->{Descr} =~ /Version ([^ ,\n\r]+)/) {
-        return $1
+    if ( $self->{Descr} =~ /Version ([^ ,\n\r]+)/ ) {
+        return $1;
     } else {
-        return "Cannot determine OS Version"
+        return "Cannot determine OS Version";
     }
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = sysOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_sys" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
 
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_sysOID() . '.' . ($o+1) . '.0']
-        );
-        return $r->{_sysOID() . '.' . ($o+1) . '.0'}
-    }
+            varbindlist => [_sysOID() . '.' . ( $o + 1 ) . '.0'] );
+        return $r->{_sysOID() . '.' . ( $o + 1 ) . '.0'};
+      }
 }
 
 # set_ direct
-for my $o (3..5) {
+for my $o ( 3 .. 5 ) {
     *{"set_sys" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = '' }
+        if ( not defined $val ) { $val = '' }
         my $s = $self->session;
-        my $r = $s->set_request(
-            _sysOID() . '.' . ($o+1) . '.0', OCTET_STRING, $val
-        );
-        if (!defined $r) {
+        my $r = $s->set_request( _sysOID() . '.' . ( $o + 1 ) . '.0',
+            OCTET_STRING, $val );
+        if ( not defined $r ) {
             $Cisco::SNMP::LASTERROR = $s->error;
-            return
+            return;
         } else {
-            return $r->{_sysOID() . '.' . ($o+1) . '.0'}
+            return $r->{_sysOID() . '.' . ( $o + 1 ) . '.0'};
         }
-    }
+      }
 }
 
 ##################################################

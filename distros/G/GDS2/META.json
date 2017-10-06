@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Process GDS2 files",
    "author" : [
-      "SCHUMACK Ken Schumack"
+      "Ken Schumack <Schumack@cpan.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Ken by hand along with ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,8 +16,7 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc",
-         "t"
+         "inc"
       ]
    },
    "prereqs" : {
@@ -31,20 +30,39 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
-            "Config" : "0"
-            "IO::File" : "0"
+            "perl" : "5.010001",
+            "Config" : "0",
+            "IO::File" : "0",
+            "strict" : "0",
+            "warnings" : "0",
+            "Fcntl" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "IO::File" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0",
             "Fcntl" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=GDS2"
+      },
       "homepage" : "https://metacpan.org/module/GDS2",
       "license" : [
          "http://opensource.org/licenses/artistic-license-2.0"
-      ]
-      "repository" : "https://github.com/Coolwater357/GDS2"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Coolwater357/GDS2"
+      }
    },
-   "version" : "3.33"
+   "version" : "3.35",
+   "keywords" : [ "GDS2", "GDSII", "SREF", "AREF", "STREAM", "DATATYPE", "RECORD" ],
+   "description" : "This is GDS2, a module for creating programs to read and/or write GDS2 files."
 }

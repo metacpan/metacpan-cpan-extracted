@@ -61,7 +61,7 @@ define ([
 
     return function (param, override) {
         var r;
-        if (override) {
+        if (override || override === null) {
             state[param] = override;
             console.log("cf() override: config param '" + param + "' reset to", state[param]);
             return override;

@@ -41,25 +41,19 @@ use strict;
 use warnings;
 
 use App::CELL qw( $CELL $log $meta $site );
-use App::MFILE::HTTP qw( rest_req );
 use Data::Dumper;
-use File::Temp qw( tempfile );
 use JSON;
-use LWP::UserAgent;
 use Params::Validate qw(:all);
 use Try::Tiny;
 
 # methods/attributes not defined in this module will be inherited from:
 use parent 'App::MFILE::WWW::Resource';
 
-our $ualt = {};  # user agent lookup table
-
 
 
 =head1 NAME
 
 App::MFILE::WWW::Dispatch - app dispatch stub
-
 
 
 
@@ -81,97 +75,7 @@ application's dispatch module will be used, instead.
 
 
 
-
 =head1 METHODS
-
-
-=head2 is_authorized
-
-Since all requests go through this function at a fairly early stage, we 
-leverage it to validate the session. 
-
-=cut
-
-sub is_authorized {
-    my ( $self ) = @_;
-
-    $log->debug( "Entering " . __PACKAGE__ . "::is_authorized()" );
-
-    my $r = $self->request;
-    my $session = $self->session;
-    my $remote_addr = $r->{'env'}->{'REMOTE_ADDR'};
-    my $ce;
-
-    #$log->debug( "Environment is " . Dumper( $r->{'env'} ) );
-    $log->debug( "Session is " . Dumper( $session ) );
-
-    # authorized session
-    if ( $ce = $session->{'currentUser'} and
-         $session->{'ip_addr'} and
-         $session->{'ip_addr'} eq $remote_addr and
-         _is_fresh( $session ) )
-    {
-        $log->debug( "is_authorized: Authorized session, employee " . $ce->{'nick'} );
-        $session->{'last_seen'} = time;
-        return 1;
-    }
-
-    # login attempt
-    if ( $r->method eq 'POST' and 
-         $self->context->{'request_body'} and 
-         $self->context->{'request_body'}->{'method'} and
-         $self->context->{'request_body'}->{'method'} =~ m/^LOGIN/i ) {
-        $log->debug( "is_authorized: Login attempt - pass it on" );
-        return 1;
-    }
-
-    # login bypass
-    $meta->set('META_LOGIN_BYPASS_STATE', 0) if not defined $meta->META_LOGIN_BYPASS_STATE;
-    if ( $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and not $meta->META_LOGIN_BYPASS_STATE ) {
-        $log->notice("Bypassing login dialog! Using default credentials");
-        $session->{'ip_addr'} = $remote_addr;
-        $session->{'last_seen'} = time;
-        my $bypass_result = $self->_login_dialog( {
-            'nam' => $site->MFILE_WWW_DEFAULT_LOGIN_CREDENTIALS->{'nam'},
-            'pwd' => $site->MFILE_WWW_DEFAULT_LOGIN_CREDENTIALS->{'pwd'},
-        } );
-        $meta->set('META_LOGIN_BYPASS_STATE', 1);
-        return $bypass_result;
-    }
-
-    # unauthorized session
-    $log->debug( "is_authorized fall-through: " . $r->method . " " . $self->request->path_info );
-    return 1;
-}
-
-
-=head2 ua
-
-Returns the LWP::UserAgent object obtained from the lookup table.
-Creates it first if necessary.
-
-=cut
-
-sub ua {
-    my $self = shift;
-    $log->debug( "Entering " . __PACKAGE__ . "::ua()" );
-    my $id = $self->session_id;
-    $log->debug( "ua: session_id is $id" );
-
-    # already in lookup table
-    if ( exists $ualt->{$id} ) {
-         $log->debug( "Session $id already has a LWP::UserAgent object" );
-         return $ualt->{$id};
-    }
-
-    # not in lookup table yet
-    my $tf = "";
-    ( undef, $tf ) = tempfile();
-    $ualt->{$id} = LWP::UserAgent->new;
-    $ualt->{$id}->cookie_jar({ file => $tf });
-    $log->info("New user agent created with cookies in $tf");
-    return $ualt->{$id};
-}
 
 
 =head2 process_post
@@ -196,7 +100,7 @@ back to the JavaScript side.
 
 There is one special case: the POST request from the login dialog looks like this:
 
-    { method: "LOGIN", path: "login", body: { nam: 'nick', pwd: 'kcin" } }
+    { method: "LOGIN", path: "login", body: { nam: "foo", pwd: "bar" } }
 
 Login requests receive special handling.
 
@@ -215,9 +119,23 @@ sub process_post {
         return 0;
     }
 
-    my $method = $ajax->{'method'};
-    my $path = $ajax->{'path'};
-    my $body = $ajax->{'body'} || {};
+    my ( $method, $path, $body );
+
+    if ( exists $ajax->{'method'} ) {
+        $method = $ajax->{'method'};
+    } else {
+        $log->crit( 'POST request received, but missing mandatory attribute "method" - ' .
+                    'here is the entire request body: ' . Dumper( $ajax ) );
+        return 0;
+    }
+    if ( exists $ajax->{'path'} and $ajax->{'path'} ) {
+        $path = $ajax->{'path'};
+    } else {
+        $log->crit( 'POST request received, but missing mandatory attribute "path" - ' .
+                    'here is the entire request body: ' . Dumper( $ajax ) );
+        return 0;
+    }
+    $body = $ajax->{'body'} || {};
 
     $log->debug( "process_post: method $method, path $path, body " . Dumper $body );
 
@@ -228,8 +146,8 @@ sub process_post {
     }
 
     # two possibilities: login/logout attempt or normal AJAX call
-    # - login/logout attempt
     if ( $method =~ m/^LOGIN/i ) {
+        $log->debug( "Incoming login/logout attempt" );
         if ( $path =~ m/^login/i ) {
             return $self->_login_dialog( $body );
         } else {
@@ -237,11 +155,10 @@ sub process_post {
         }
     }
 
-    # - normal AJAX call (shown for didactic purposes only; App::MFILE::WWW
-    #   itself doesn't generate any AJAX calls)
+    # - normal AJAX call
     $log->debug( "Calling rest_req $method $path on session ID " . $self->session_id );
     $session->{'last_seen'} = time;
-    my $rr = rest_req( $self->ua(), {
+    my $rr = $self->rest_req( {
         server => $site->DOCHAZKA_WWW_BACKEND_URI,
         method => $method,
         path => $path,
@@ -252,6 +169,14 @@ sub process_post {
     return $self->_prep_ajax_response( $hr, $rr->{'body'} );
 }
 
+
+=head2 _login_dialog
+
+Called from C<process_post> to process login requests (special AJAX requests)
+originating from the JavaScript side (i.e. the login screen in
+login-dialog.js, via login.js).
+
+=cut
 
 sub _login_dialog {
     my ( $self, $body ) = @_;
@@ -267,7 +192,7 @@ sub _login_dialog {
     $log->debug( "DOCHAZKA_WWW_BACKEND_URI is " .  $site->DOCHAZKA_WWW_BACKEND_URI );
 
     my ( $code, $message, $body_json );
-    my $rr = rest_req( $self->ua(), {
+    my $rr = $self->rest_req( {
         server => $site->DOCHAZKA_WWW_BACKEND_URI,
         nick => $nick,
         password => $password,
@@ -277,38 +202,27 @@ sub _login_dialog {
     $message = $rr->{'hr'}->message;
     $body_json = $rr->{'body'};
 
-    my $status;
-    if ( $code == 200 ) {
-        $session->{'ip_addr'} = $r->{'env'}->{'REMOTE_ADDR'};
-        $session->{'currentUser'} = $body_json->{'payload'}->{'emp'};
-        $session->{'currentUserPriv'} = $body_json->{'payload'}->{'priv'};
-        $session->{'last_seen'} = time;
-        $log->debug( 
-            "Login successful, currentUser is now " . 
-            Dumper( $body_json->{'payload'}->{'emp'} ) .
-            " and privilege level is " . $body_json->{'payload'}->{'priv'}
-        );
-        return 1 if $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and ! $meta->META_LOGIN_BYPASS_STATE;
-        $status = $CELL->status_ok( 'MFILE_WWW_LOGIN_OK', payload => $body_json->{'payload'} );
-    } else {
-        $session = {};
-        $log->debug( "Login unsuccessful, reset session" );
-        return 0 if $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and ! $meta->META_LOGIN_BYPASS_STATE;
-        $status = $CELL->status_not_ok( 
-            'MFILE_WWW_LOGIN_FAIL: %s', 
-            args => [ $code ],
-            payload => { code => $code, message => $message },
-        );
+    if ( $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and ! $meta->META_LOGIN_BYPASS_STATE ) {
+        return ( $code == 200 ) ? 1 : 0;
     }
-    $self->response->header( 'Content-Type' => 'application/json' );
-    $self->response->body( to_json( $status->expurgate ) );
-    return 1;
+
+    my $status = $self->login_status( $code, $message, $body_json );
+    return $status;
 }
          
+
+=head2 _logout
+
+Called from C<process_post> to process logout requests (special AJAX requests)
+originating from the JavaScript side.
+
+=cut
+
 sub _logout {
-    my ( $self, $body ) = @_;
+    my ( $self ) = @_;
     $log->debug( "Entering " . __PACKAGE__ . "::_logout()" );
-    my $rr = rest_req( $self->ua(), {
+
+    my $rr = $self->rest_req( {
         server => $site->DOCHAZKA_WWW_BACKEND_URI,
         method => 'POST',
         path => 'session/terminate',
@@ -317,19 +231,31 @@ sub _logout {
         $log->error("session/terminate AJAX call FAILED: " . Dumper( $rr ) );
     };
     $self->request->{'env'}->{'psgix.session'} = {};
-    $self->response->header( 'Content-Type' => 'application/json' );
-    $self->response->body( to_json( $CELL->status_ok( 'MFILE_WWW_LOGOUT_OK' )->expurgate ) );
-    return 1;
+
+    #my $status = $CELL->status_ok( 'DOCHAZKA_WWW_LOGOUT_OK' );
+    #$self->response->header( 'Content-Type' => 'application/json' );
+    #$self->response->body( to_json( $status->expurgate ) );
+    #return 1;
+
+    my $hr = $rr->{'hr'};
+    return $self->_prep_ajax_response( $hr, $rr->{'body'} );
 }
+
+
+=head3 _prep_ajax_response
+
+Code shared between C<_login_dialog> and C<_logout>
+
+=cut
 
 sub _prep_ajax_response {
     my ( $self, $hr, $body ) = @_;
     $log->debug( "Entering " . __PACKAGE__ . "::_prep_ajax_response()" );
+    $log->debug( "AJAX response body: " . Dumper( $body ) );
     my $expurgated_status;
     if ( $hr->is_success ) {
         $expurgated_status = $body;
     } else {
-        $log->debug( "AJAX response body: " . Dumper( $body ) );
         $expurgated_status = $CELL->status_err( 
             $body->{'code'},
             payload => { code => $hr->code, message => $body->{'text'} },
@@ -340,20 +266,5 @@ sub _prep_ajax_response {
     $self->response->body( JSON->new->encode( $expurgated_status ) );
     return 1;
 }
-
-=head3 _is_fresh
-
-=cut
-
-sub _is_fresh {
-    my ( $session ) = validate_pos( @_, { type => HASHREF } );
-
-    return 0 unless my $last_seen = $session->{'last_seen'};
-
-    return ( time - $last_seen > $site->MFILE_WWW_SESSION_EXPIRATION_TIME )
-        ? 0
-        : 1;
-}
-
 
 1;

@@ -1,10 +1,11 @@
 package App::BorgRestore::Settings;
-use v5.10;
+use v5.14;
 use strict;
 use warnings;
 
 use App::BorgRestore::Helper;
 
+use autodie;
 use File::Path qw(mkpath);
 use Sys::Hostname;
 

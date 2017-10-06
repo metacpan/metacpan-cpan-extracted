@@ -6,7 +6,7 @@ use Encode;
 use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.13';
 
 BEGIN {
     *Lemonldap::NG::Common::Conf::normalize      = \&normalize;
@@ -98,7 +98,11 @@ sub unserialize {
             unless ( utf8::is_utf8($v) ) {
                 $v = encode( 'UTF-8', $v );
             }
-            $conf->{$k} = ( $v =~ /./ ? eval { from_json($v) } : {} );
+            $conf->{$k} = (
+                $v =~ /./
+                ? eval { from_json( $v, { allow_nonref => 1 } ) }
+                : {}
+            );
             if ($@) {
                 $Lemonldap::NG::Common::Conf::msg .=
                   "Unable to decode $k, switching to old format.\n";

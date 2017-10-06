@@ -8,6 +8,7 @@ binmode Test::More->builder->output,         ":encoding(utf8)";
 binmode Test::More->builder->failure_output, ":encoding(utf8)";
 binmode Test::More->builder->todo_output,    ":encoding(utf8)";
 
+use lib './lib';  # actually use the module, not other versions installed
 use Geo::Coder::OpenCage;
 
 my $api_key;
@@ -59,7 +60,7 @@ my @tests = (
             location => "東京都",
             language => "jp",
         },
-        output => [ 35.6823815, 139.7530053 ],
+        output => [ 35.79, 139.77 ],
     },
 
     # country

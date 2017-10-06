@@ -5,7 +5,7 @@ use Mouse;
 use JSON;
 use URI::Escape;
 
-our $VERSION = '1.9.6';
+our $VERSION = '1.9.13';
 
 #       http          ://  server   / path      ? query      # fragment
 # m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
@@ -138,7 +138,7 @@ sub jsonBodyToObj {
         return undef;
     }
     return $self->body if ( ref( $self->body ) );
-    my $j = eval { from_json( $self->body ) };
+    my $j = eval { from_json( $self->body, { allow_nonref => 1 } ) };
     if ($@) {
         $self->error("$@$!");
         return undef;

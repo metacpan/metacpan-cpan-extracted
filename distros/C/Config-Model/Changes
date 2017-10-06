@@ -1,3 +1,20 @@
+2.112 2017-10-01
+
+  Fix bugs to make warp mechanism more consistent:
+    * Value: trigger a warp after apply_fix is called
+    * Value: apply replace when warping
+
+  Other bug fixes:
+    * don't initialise Log4Perl if already done
+    * Avoid warning when YAML data is missing
+
+2.111 2017-09-22
+
+  Deprecating features might be necessary, but there's no need to be
+  obnoxious about it:
+   * Reduce the number of legacy warning
+   * use logger mechanism to issue these warnings
+
 2.110 2017-09-21
 
   Unfortunately the deprecations and updates done last release broke

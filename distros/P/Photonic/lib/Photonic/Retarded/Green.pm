@@ -4,7 +4,7 @@ Photonic::Retarded::Green
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,8 @@ functions of the components.
 
 =over 4
 
-=item * new(metric=>$m, nh=>$nh, small=>$small, keepStates=>$k)
+=item * new(metric=>$m, nh=>$nh, smallH=>$smallH, smallE=>$smallE,
+keepStates=>$k)  
 
 Initializes the structure.
 
@@ -30,7 +31,8 @@ $m Photonic::Retarded::Metric describing the structure and some parametres.
 
 $nh is the maximum number of Haydock coefficients to use.
 
-$small is the criteria of convergence (default 1e-7)
+$smallH and $smallE are the criteria of convergence (default 1e-7) for
+Haydock coefficients and continued fraction
 
 $k is a flag to keep states in Haydock calculations (default 0)
 
@@ -86,16 +88,17 @@ The actual number of Haydock coefficients used in the last calculation
 
 Flags that the last calculation converged before using up all coefficients
 
-=item * small
+=item * smallH, smallE
 
-Criteria of convergence. 0 means don't check.
+Criteria of convergence of Haydock coefficients and continued
+fraction. 0 means don't check. 
 
 =back
 
 =cut
 
 package Photonic::Retarded::Green;
-$Photonic::Retarded::Green::VERSION = '0.007';
+$Photonic::Retarded::Green::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -107,12 +110,12 @@ use Photonic::Retarded::AllH;
 use Photonic::Retarded::GreenP;
 use Moose;
 use Photonic::Types;
+with 'Photonic::Roles::KeepStates';
+with 'Photonic::Roles::EpsParams';
 
 has 'metric'=>(is=>'ro', isa => 'Photonic::Retarded::Metric',
     handles=>[qw(geometry B dims r G GNorm L scale f)],required=>1
 );
-with 'Photonic::Roles::KeepStates';
-with 'Photonic::Roles::EpsParams';
 has 'haydock' =>(is=>'ro', isa=>'ArrayRef[Photonic::Retarded::AllH]',
             init_arg=>undef, lazy=>1, builder=>'_build_haydock',
             documentation=>'Array of Haydock calculators');
@@ -166,7 +169,7 @@ sub _build_haydock { # One Haydock coefficients calculator per direction0
 	#Build a corresponding Photonic::Retarded::AllH structure
 	my $haydock=Photonic::Retarded::AllH->new(
 	    metric=>$m, polarization=>$e, nh=>$self->nh,
-	    keepStates=>$self->keepStates, small=>$self->small);
+	    keepStates=>$self->keepStates, smallH=>$self->smallH);
 	push @haydock, $haydock;
     }
     return [@haydock]
@@ -177,7 +180,7 @@ sub _build_greenP {
     my @greenP;
     foreach(@{$self->haydock}){
 	my $g=Photonic::Retarded::GreenP->new(
-	    haydock=>$_, nh=>$self->nh, small=>$self->small);
+	    haydock=>$_, nh=>$self->nh, smallE=>$self->smallE);
 	push @greenP, $g;
     }
     return [@greenP]

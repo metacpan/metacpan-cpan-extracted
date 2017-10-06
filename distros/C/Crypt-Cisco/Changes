@@ -1,0 +1,4 @@
+Revision history for Perl extension Crypt::Cisco.
+
+1.00  Mon Sep 25 12:30:00 2017
+      - Was Cisco::SNMP::Password

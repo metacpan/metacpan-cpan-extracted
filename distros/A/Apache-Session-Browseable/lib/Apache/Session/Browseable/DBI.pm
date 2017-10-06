@@ -6,7 +6,7 @@ use DBI;
 use Apache::Session;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.7';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub searchOn {
@@ -195,6 +195,16 @@ sub _classDbh {
       DBI->connect_cached( $datasource, $username, $password,
         { RaiseError => 1, AutoCommit => 1 } )
       || die $DBI::errstr;
+    if ( $datasource =~ /^dbi:sqlite/i ) {
+        $dbh->{sqlite_unicode} = 1;
+    }
+    elsif ( $datasource =~ /^dbi:mysql/i ) {
+        $dbh->{mysql_enable_utf8} = 1;
+    }
+    elsif ( $datasource =~ /^dbi:pg/i ) {
+        $dbh->{pg_enable_utf8} = 1;
+    }
+    return $dbh;
 }
 
 1;

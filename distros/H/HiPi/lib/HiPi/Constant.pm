@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -139,6 +139,9 @@ my $const = {
         RPI_PUD_UP             => 2,
         
         RPI_BOARD_REVISION     => HiPi::RaspberryPi::board_type(),
+        
+        DEV_GPIO_PIN_STATUS_NONE         => 0x00,
+        DEV_GPIO_PIN_STATUS_EXPORTED     => 0x01,
     },
     
     spi => {
@@ -234,14 +237,14 @@ my $const = {
         MCP_PIN_A5     => 'A5',
         MCP_PIN_A6     => 'A6',
         MCP_PIN_A7     => 'A7',
-        MCP_PIN_B1     => 'B0',
-        MCP_PIN_B2     => 'B1',
-        MCP_PIN_B3     => 'B2',
-        MCP_PIN_B4     => 'B3',
-        MCP_PIN_B5     => 'B4',
-        MCP_PIN_B6     => 'B5',
-        MCP_PIN_B7     => 'B6',
-        MCP_PIN_B8     => 'B7',
+        MCP_PIN_B0     => 'B0',
+        MCP_PIN_B1     => 'B1',
+        MCP_PIN_B2     => 'B2',
+        MCP_PIN_B3     => 'B3',
+        MCP_PIN_B4     => 'B4',
+        MCP_PIN_B5     => 'B5',
+        MCP_PIN_B6     => 'B6',
+        MCP_PIN_B7     => 'B7',
     },
     
     mpl3115a2 => {

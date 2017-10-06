@@ -1,4 +1,4 @@
-pp_setversion('0.007');
+pp_setversion('0.009');
 
 pp_addpm({At=>Top},<<'EOD');
 
@@ -10,8 +10,8 @@ Photonic::ExtraUtils - Glue for utility Fortran routines
 
        use Photonic::ExtraUtils;
 
-       dgtsl($c, $d, $e, $b, $info);
-       cgtsl($c, $d, $e, $b, $info);
+       dgtsl($c, $d, $e, $b, $info=PDL->null);
+       cgtsl($c, $d, $e, $b, $info=PDL->null);
       
 
 =head1 DESCRIPTION
@@ -33,10 +33,10 @@ system of equations in double precission.
 
 =for usage
 
-       dgtsl($c, $d, $e, $b, $info);
+       dgtsl($c, $d, $e, $b, $info=PDL->null);
 
 where $c(1..$n-1) is the subdiagonal, $d(0..$n-1) the diagonal and
-$e(0..$n-2) the supradiagonal of an $nX$n tridiagonal
+$e(0..$n-2) the supradiagonal of an $nX$n tridiagonal double precission
 matrix. $b(0..$n-1) is the right hand side vector. $b is replaced by
 the solution. $info returns 0 for success or k if the k-1-th element
 of the diagonal became zero.
@@ -51,16 +51,20 @@ system of equations.
 
 =for usage
 
-       dgtsl($c, $d, $e, $b, $info);
+       cgtsl($c, $d, $e, $b, $info=PDL->null);
 
 where $c(2,1..$n-1) is the subdiagonal, $d(2,0..$n-1) the diagonal and
-$e(2,0..$n-2) the supradiagonal of an $nX$n tridiagonal complex
+$e(2,0..$n-2) the supradiagonal of an $nX$n tridiagonal complex double precission
 matrix. $b(2,0..$n-1) is the right hand side vector. $b is replaced by
 the solution. $info returns 0 for success or k if the k-1-th element
 of the diagonal became zero. Either 2Xn pdl's are used to represent
 complex numbers, as in PDL::Complex.
 
 =begin Pod::Coverage
+
+       dgtls
+
+       cgtls
 
 =head2 set_boundscheck
 
@@ -75,7 +79,10 @@ complex numbers, as in PDL::Complex.
 END
 
 use strict;
+use Carp;
 use ExtUtils::F77;
+use PDL::Complex;
+
 my $underscore=ExtUtils::F77->trail_? "_" : ""; #need fortran underscores?
 
 pp_addhdr(qq{
@@ -86,20 +93,82 @@ pp_addhdr(qq{
 });
           
 pp_def('dgtsl', 
-       Pars=>'c(n); d(n); e(n); [o] b(n); int [o] info();',
+       Pars=>'[phys] c(n); [phys] d(n); [phys] e(n); [phys] y(n); [o] b(n); int [o] info();',
        GenericTypes=>['D'],
+       PMCode => q{
+          sub PDL::dgtsl {
+	      use Carp;
+	      confess "Wrong number of arguments"
+	       	      unless scalar(@_)==6 or scalar(@_)==4;
+	      my ($c, $d, $e, $y, $b, $i)=@_;
+	      $i=PDL->null unless defined $i;
+	      map {
+		  $_=$_->copy unless $_->is_inplace;
+	          $_->set_inplace(0); 
+              }  ($c, $d, $e);  
+	      if($y->is_inplace){$b=$y}
+	      elsif(not defined $b and not $y->is_inplace){
+		  $b=$y->copy;
+	      }elsif(defined $b and not $y->is_inplace){$b.=$y}
+	      else {die "Weird";}
+	      $y->set_inplace(0);
+	      PDL::_dgtsl_int($c, $d, $e, $b, $b, $i);
+	      return ($b, $i);
+	      }
+        },
        Code=> qq{
           int N=\$SIZE(n);
-          dgtsl$underscore(&N, \$P(c), \$P(d), \$P(e),\$P(b), \$P(info));
+	  dgtsl$underscore(&N, \$P(c), \$P(d), \$P(e),\$P(b), \$P(info));
        },
     );
 pp_def('cgtsl', 
-       Pars=>'c(2,n); d(2,n); e(2,n); [o] b(2,n); int [o] info();',
+       Pars=>'[phys]c(2,n); [phys]d(2,n); [phys]e(2,n); [phys]y(2,n); [o] b(2,n); int [o] info();',
        GenericTypes=>['D'],
+       PMCode => q{
+          sub PDL::cgtsl {
+	      use Carp;
+	      use PDL::Complex;
+	      confess "Wrong number of arguments"
+	       	      unless scalar(@_)==6 or scalar(@_)==4;
+	      my ($c, $d, $e, $y, $b, $i)=@_;
+	      my $complex=$y->isa("PDL::Complex");
+	      $i=PDL->null unless defined $i;
+	      map {
+		  $_=$_->copy unless $_->is_inplace;
+	          $_->set_inplace(0); 
+              }  ($c, $d, $e);  
+	      if($y->is_inplace){$b=$y}
+	      elsif(not defined $b and not $y->is_inplace){
+		  $b=$y->copy;
+	      }elsif(defined $b and not $y->is_inplace){$b.=$y}
+	      else {die "Weird";}
+	      PDL::_cgtsl_int($c, $d, $e, undef, $b, $i);
+	      $y->is_inplace(0);
+      	      return ($b->complex, $i) if $complex;
+	      return ($b, $i) unless $complex;
+	      }
+        },
        Code=> qq{
           int N=\$SIZE(n);
+	  /* parameter \$y is here unneeded */
           cgtsl$underscore(&N, \$P(c), \$P(d), \$P(e),\$P(b), \$P(info));
        },
     );
+#pp_def('test', 
+#       Pars=>'a(); [o] b();',
+# 	#       GenericTypes=>['D'],
+#       PMCode => q{
+#       	          sub PDL::test { #NOp
+#		      my ($a)=@_;
+#		      $b=PDL->null;
+#		      PDL::_test_int($a, $b);
+#		      return $b;
+#	          }
+#       },
+#	 Code=> q{
+#      	  $b()=2*$a();
+#     },
+# );
+
 pp_done();
 

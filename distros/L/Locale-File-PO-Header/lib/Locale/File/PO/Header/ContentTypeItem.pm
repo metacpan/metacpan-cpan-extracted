@@ -2,11 +2,9 @@ package Locale::File::PO::Header::ContentTypeItem; ## no critic (TidyCode)
 
 use Moose;
 use MooseX::StrictConstructor;
-
 use namespace::autoclean;
-use syntax qw(method);
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 
 extends qw(Locale::File::PO::Header::Base);
 
@@ -18,9 +16,12 @@ has name => (
 has default => (
     is      => 'rw',
     isa     => 'HashRef',
-    trigger => method ($arg_ref) {
+    trigger => sub {
+        my ($self, $arg_ref) = @_;
+
         $self->default_content_type( $arg_ref->{'Content-Type'} );
         $self->default_charset( $arg_ref->{charset} );
+
         return $arg_ref;
     },
 );
@@ -39,11 +40,15 @@ has content_type => (
     is      => 'rw',
     isa     => 'Str|Undef',
     lazy    => 1,
-    default => method {
+    default => sub {
+        my $self = shift;
+
         return $self->default_content_type;
     },
-    trigger => method ($content_type, $current_content_type) {
-        $self->trigger_helper({
+    trigger => sub {
+        my ($self, $content_type, $current_content_type) = @_;
+
+        return $self->trigger_helper({
             new     => $content_type,
             current => $current_content_type,
             default => scalar $self->default_content_type,
@@ -56,11 +61,15 @@ has charset => (
     is      => 'rw',
     isa     => 'Str|Undef',
     lazy    => 1,
-    default => method {
+    default => sub {
+        my $self = shift;
+
         return $self->default_charset;
     },
-    trigger => method ($charset, $current_charset) {
-        $self->trigger_helper({
+    trigger => sub {
+        my ($self, $charset, $current_charset) = @_;
+
+        return $self->trigger_helper({
             new     => $charset,
             current => $current_charset,
             default => scalar $self->default_charset,
@@ -69,13 +78,15 @@ has charset => (
     },
 );
 
-method header_keys {
-    my $name = $self->name;
+sub header_keys {
+    my $self = shift;
 
-    return $name, 'charset';
+    return $self->name, 'charset';
 }
 
-method data ($key, @args) {
+sub data {
+    my ($self, $key, @args) = @_;
+
     defined $key
         or confess 'Undefined key';
     my $value = @args ? $args[0] : ();
@@ -107,7 +118,9 @@ method data ($key, @args) {
     confess "Unknown key $key";
 }
 
-method extract_msgstr ($msgstr_ref) {
+sub extract_msgstr {
+    my ($self, $msgstr_ref) = @_;
+
     ${$msgstr_ref} =~ s{
         ^
         Content-Type :
@@ -124,7 +137,9 @@ method extract_msgstr ($msgstr_ref) {
     return;
 }
 
-method lines {
+sub lines {
+    my $self = shift;
+
     return $self->format_line(
         '{name}: {content_type}; charset={charset}',
         name         => $self->name,

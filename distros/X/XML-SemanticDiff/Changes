@@ -1,5 +1,10 @@
 Revision history for Perl module XML::SemanticDiff
 
+1.0006 2017-09-27
+    - Fixed bug: https://rt.cpan.org/Public/Bug/Display.html?id=84546
+      where the code was failing to find the difference in this scenario
+      Before: <element>0</element> After: <element></element>
+
 1.0005 2017-02-06
     - Convert the distribution to use git, GitHub, and Dist-Zilla.
     - Correct some spelling errors and add more tests.

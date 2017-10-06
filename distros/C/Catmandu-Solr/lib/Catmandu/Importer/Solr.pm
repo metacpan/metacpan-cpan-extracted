@@ -5,57 +5,53 @@ use Catmandu::Store::Solr;
 use Catmandu;
 use Moo;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 with 'Catmandu::Importer';
 
-has fq => (is => 'ro');
-has query    => (is => 'ro');
-has url => ( is => 'ro' );
-has bag => ( is => 'ro' );
-has id_field  => (is => 'ro', default => sub { '_id' });
-has bag_field => (is => 'ro', default => sub { '_bag' });
-has _bag  => (
-    is       => 'ro',
-    lazy     => 1,
-    builder  => '_build_bag',
-);
-has fl => (
-    is => 'ro',
-    lazy => 1,
-    default => sub { "*" }
-);
+has fq        => (is => 'ro');
+has query     => (is => 'ro');
+has url       => (is => 'ro');
+has bag       => (is => 'ro');
+has id_field  => (is => 'ro', default => sub {'_id'});
+has bag_field => (is => 'ro', default => sub {'_bag'});
+has _bag      => (is => 'ro', lazy => 1, builder => '_build_bag',);
+has fl        => (is => 'ro', lazy => 1, default => sub {"*"});
 
 sub _build_bag {
     my $self = $_[0];
-    Catmandu::Store::Solr->new( url => $self->url, bag_field => $self->bag_field, id_field => $self->id_field )->bag($self->bag());
+    Catmandu::Store::Solr->new(
+        url       => $self->url,
+        bag_field => $self->bag_field,
+        id_field  => $self->id_field
+    )->bag($self->bag());
 }
 
 sub generator {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return sub {
+    return sub {
         state $start = 0;
         state $limit = 100;
         state $total = 100;
-        state $hits = [];
+        state $hits  = [];
 
-        unless(scalar(@$hits)){
+        unless (scalar(@$hits)) {
 
             return if $start >= $total;
 
             my $res = $self->_bag()->search(
-                query => $self->query,
-                fq => $self->fq,
-                start => $start,
-                limit => $limit,
-                fl => $self->fl,
-                facet => "false",
+                query      => $self->query,
+                fq         => $self->fq,
+                start      => $start,
+                limit      => $limit,
+                fl         => $self->fl,
+                facet      => "false",
                 spellcheck => "false",
-                sort => $self->id_field()." asc"
+                sort       => $self->id_field() . " asc"
             );
             $total = $res->total;
-            $hits = $res->hits();
+            $hits  = $res->hits();
 
             $start += $limit;
 
@@ -63,14 +59,19 @@ sub generator {
 
         shift(@$hits);
 
-	}
+        }
 }
 
 sub count {
-    my ( $self ) = @_;
-    $self->_bag()->search( query => $self->query, fq => $self->fq, limit => 0, facet => "false", spellcheck => "false" )->total();
+    my ($self) = @_;
+    $self->_bag()->search(
+        query      => $self->query,
+        fq         => $self->fq,
+        limit      => 0,
+        facet      => "false",
+        spellcheck => "false"
+    )->total();
 }
-
 
 =head1 NAME
 

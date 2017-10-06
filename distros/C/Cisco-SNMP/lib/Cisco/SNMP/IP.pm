@@ -20,43 +20,44 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _ipOID {
-    return '.1.3.6.1.2.1.4'
+    return '.1.3.6.1.2.1.4';
 }
 
 sub ipOIDs {
     return qw(
-        Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors 
-        ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests 
-        OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs 
-        ReasmFails FragOKs FragFails FragCreates
-    )
+      Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+      ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+      OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs
+      ReasmFails FragOKs FragFails FragCreates
+    );
 }
 
 sub addrOIDs {
-    return qw(Addr IfIndex NetMask BcastAddr ReasmMaxSize)
+    return qw(Addr IfIndex NetMask BcastAddr ReasmMaxSize);
 }
 
 sub routeOIDs {
     return qw(
-        Dest IfIndex Metric1 Metric2 Metric3 
-        Metric4 NextHop Type Proto Age
-        Mask Metric5 Info
-    )
+      Dest IfIndex Metric1 Metric2 Metric3
+      Metric4 NextHop Type Proto Age
+      Mask Metric5 Info
+    );
 }
 
 sub ip_info {
-    my ($self, $arg) = @_;
+    my ( $self, $arg ) = @_;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @IPKEYS = ipOIDs();
-    for my $oid (0..$#IPKEYS) {
-        $ret{$IPKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _ipOID() . '.' . ($oid+1));
-        if (!defined $ret{$IPKEYS[$oid]}) {
+    for my $oid ( 0 .. $#IPKEYS ) {
+        $ret{$IPKEYS[$oid]}
+          = Cisco::SNMP::_snmpwalk( $session, _ipOID() . '.' . ( $oid + 1 ) );
+        if ( not defined $ret{$IPKEYS[$oid]} ) {
             $Cisco::SNMP::LASTERROR = "Cannot get IP `$IPKEYS[$oid]' info";
-            return undef
+            return undef;
         }
     }
 
@@ -65,76 +66,83 @@ sub ip_info {
         2 => 'not-forwarding'
     );
     my @IpInfo;
-    for my $ip (0..$#{$ret{$IPKEYS[0]}}) {
+    for my $ip ( 0 .. $#{$ret{$IPKEYS[0]}} ) {
         my %IpInfoHash;
-        for (0..$#IPKEYS) {
-            if ($_ == 0) {
-                $IpInfoHash{$IPKEYS[$_]} = exists($ForType{$ret{$IPKEYS[$_]}->[$ip]}) ? $ForType{$ret{$IPKEYS[$_]}->[$ip]} : $ret{$IPKEYS[$_]}->[$ip]
+        for ( 0 .. $#IPKEYS ) {
+            if ( $_ == 0 ) {
+                $IpInfoHash{$IPKEYS[$_]}
+                  = exists( $ForType{$ret{$IPKEYS[$_]}->[$ip]} )
+                  ? $ForType{$ret{$IPKEYS[$_]}->[$ip]}
+                  : $ret{$IPKEYS[$_]}->[$ip];
             } else {
-                $IpInfoHash{$IPKEYS[$_]} = $ret{$IPKEYS[$_]}->[$ip]
+                $IpInfoHash{$IPKEYS[$_]} = $ret{$IPKEYS[$_]}->[$ip];
             }
         }
-        push @IpInfo, \%IpInfoHash
+        push @IpInfo, \%IpInfoHash;
     }
-    return bless \@IpInfo, $class
-}    
+    return bless \@IpInfo, $class;
+}
 
-for (ipOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('ip', $_)
+for ( ipOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'ip', $_ );
 }
 
 sub ip_forwardingOn {
-    return set_ipForwarding(shift, 1)
+    return set_ipForwarding( shift, 1 );
 }
 
 sub ip_forwardingOff {
-    return set_ipForwarding(shift, 2)
+    return set_ipForwarding( shift, 2 );
 }
 
 sub addr_info {
-    my ($self, $arg) = @_;
+    my ( $self, $arg ) = @_;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @ADDRKEYS = addrOIDs();
-    for my $oid (0..$#ADDRKEYS) {
-        $ret{$ADDRKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _ipOID() . '.20.1.' . ($oid+1));
-        if (!defined $ret{$ADDRKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get address `$ADDRKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#ADDRKEYS ) {
+        $ret{$ADDRKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _ipOID() . '.20.1.' . ( $oid + 1 ) );
+        if ( not defined $ret{$ADDRKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get address `$ADDRKEYS[$oid]' info";
+            return undef;
         }
     }
 
     my %AddrInfo;
-    for my $ip (0..$#{$ret{$ADDRKEYS[0]}}) {
+    for my $ip ( 0 .. $#{$ret{$ADDRKEYS[0]}} ) {
         my %AddrInfoHash;
-        for (0..$#ADDRKEYS) {
-            $AddrInfoHash{$ADDRKEYS[$_]} = $ret{$ADDRKEYS[$_]}->[$ip]
+        for ( 0 .. $#ADDRKEYS ) {
+            $AddrInfoHash{$ADDRKEYS[$_]} = $ret{$ADDRKEYS[$_]}->[$ip];
         }
-        push @{$AddrInfo{$ret{$ADDRKEYS[1]}->[$ip]}}, \%AddrInfoHash
+        push @{$AddrInfo{$ret{$ADDRKEYS[1]}->[$ip]}}, \%AddrInfoHash;
     }
-    return bless \%AddrInfo, $class
+    return bless \%AddrInfo, $class;
 }
 
-for (addrOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_2('if', 'addr', $_)
+for ( addrOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_2( 'if', 'addr', $_ );
 }
 
 sub route_info {
-    my ($self, $arg) = @_;
+    my ( $self, $arg ) = @_;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @ROUTEKEYS = routeOIDs();
-    for my $oid (0..$#ROUTEKEYS) {
-        $ret{$ROUTEKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _ipOID() . '.21.1.' . ($oid+1));
-        if (!defined $ret{$ROUTEKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get route `$ROUTEKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#ROUTEKEYS ) {
+        $ret{$ROUTEKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _ipOID() . '.21.1.' . ( $oid + 1 ) );
+        if ( not defined $ret{$ROUTEKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get route `$ROUTEKEYS[$oid]' info";
+            return undef;
         }
     }
 
@@ -145,15 +153,15 @@ sub route_info {
         4 => 'indirect'
     );
     my %RouteProto = (
-        1 => 'other',
-        2 => 'local',
-        3 => 'netmgmt',
-        4 => 'icmp',
-        5 => 'egp',
-        6 => 'ggp',
-        7 => 'hello',
-        8 => 'rip',
-        9 => 'is-is',
+        1  => 'other',
+        2  => 'local',
+        3  => 'netmgmt',
+        4  => 'icmp',
+        5  => 'egp',
+        6  => 'ggp',
+        7  => 'hello',
+        8  => 'rip',
+        9  => 'is-is',
         10 => 'es-is',
         11 => 'ciscoIgrp',
         12 => 'bbnSpfIgp',
@@ -161,91 +169,94 @@ sub route_info {
         14 => 'bgp'
     );
     my @RouteInfo;
-    for my $ip (0..$#{$ret{$ROUTEKEYS[0]}}) {
+    for my $ip ( 0 .. $#{$ret{$ROUTEKEYS[0]}} ) {
         my %RouteInfoHash;
-        for (0..$#ROUTEKEYS) {
-            if ($_ == 8) {
-                $RouteInfoHash{$ROUTEKEYS[$_]} = exists($RouteType{$ret{$ROUTEKEYS[$_]}->[$ip]}) ? $RouteType{$ret{$ROUTEKEYS[$_]}->[$ip]} : $ret{$ROUTEKEYS[$_]}->[$ip]
-            } elsif ($_ == 9) {
-                $RouteInfoHash{$ROUTEKEYS[$_]} = exists($RouteProto{$ret{$ROUTEKEYS[$_]}->[$ip]}) ? $RouteProto{$ret{$ROUTEKEYS[$_]}->[$ip]} : $ret{$ROUTEKEYS[$_]}->[$ip]
+        for ( 0 .. $#ROUTEKEYS ) {
+            if ( $_ == 8 ) {
+                $RouteInfoHash{$ROUTEKEYS[$_]}
+                  = exists( $RouteType{$ret{$ROUTEKEYS[$_]}->[$ip]} )
+                  ? $RouteType{$ret{$ROUTEKEYS[$_]}->[$ip]}
+                  : $ret{$ROUTEKEYS[$_]}->[$ip];
+            } elsif ( $_ == 9 ) {
+                $RouteInfoHash{$ROUTEKEYS[$_]}
+                  = exists( $RouteProto{$ret{$ROUTEKEYS[$_]}->[$ip]} )
+                  ? $RouteProto{$ret{$ROUTEKEYS[$_]}->[$ip]}
+                  : $ret{$ROUTEKEYS[$_]}->[$ip];
             } else {
-                $RouteInfoHash{$ROUTEKEYS[$_]} = $ret{$ROUTEKEYS[$_]}->[$ip]
+                $RouteInfoHash{$ROUTEKEYS[$_]} = $ret{$ROUTEKEYS[$_]}->[$ip];
             }
         }
-        push @RouteInfo, \%RouteInfoHash
+        push @RouteInfo, \%RouteInfoHash;
     }
-    return bless \@RouteInfo, $class
+    return bless \@RouteInfo, $class;
 }
 
-for (routeOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('route', $_)
+for ( routeOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'route', $_ );
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = ipOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_ip" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
 
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_ipOID() . '.' . ($o+1) . '.0']
-        );
-        return $r->{_ipOID() . '.' . ($o+1) . '.0'}
-    }
+            varbindlist => [_ipOID() . '.' . ( $o + 1 ) . '.0'] );
+        return $r->{_ipOID() . '.' . ( $o + 1 ) . '.0'};
+      }
 }
 
 @OIDS = addrOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_addr" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = '0.0.0.0' }
+        if ( not defined $val ) { $val = '0.0.0.0' }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_ipOID() . '.20.1.' . ($o+1) . '.' . $val]
-        );
-        return $r->{_ipOID() . '.20.1.' . ($o+1) . '.' . $val}
-    }
+            varbindlist => [_ipOID() . '.20.1.' . ( $o + 1 ) . '.' . $val] );
+        return $r->{_ipOID() . '.20.1.' . ( $o + 1 ) . '.' . $val};
+      }
 }
 
 @OIDS = routeOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_route" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = '0.0.0.0' }
+        if ( not defined $val ) { $val = '0.0.0.0' }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_ipOID() . '.21.1.' . ($o+1) . '.' . $val]
-        );
-        return $r->{_ipOID() . '.21.1.' . ($o+1) . '.' . $val}
-    }
+            varbindlist => [_ipOID() . '.21.1.' . ( $o + 1 ) . '.' . $val] );
+        return $r->{_ipOID() . '.21.1.' . ( $o + 1 ) . '.' . $val};
+      }
 }
 
 # set_ direct
 @OIDS = ipOIDs();
-for my $o (0..1) {
+for my $o ( 0 .. 1 ) {
     my $def = 1;
-    if ($o == 1) { $def = 255 }
+    if ( $o == 1 ) { $def = 255 }
     *{"set_ip" . $OIDS[$o]} = sub {
         my $self = shift;
         my ($val) = @_;
-        if (!defined $val) { $val = $def }
+        if ( not defined $val ) { $val = $def }
         my $s = $self->session;
-        my $r = $s->set_request(
-            _ipOID() . '.' . ($o+1) . '.0', INTEGER, $val
-        );
-        if (!defined $r) {
+        my $r = $s->set_request( _ipOID() . '.' . ( $o + 1 ) . '.0', INTEGER,
+            $val );
+        if ( not defined $r ) {
             $Cisco::SNMP::LASTERROR = $s->error;
-            return
+            return;
         } else {
-            return $r->{_ipOID() . '.' . ($o+1) . '.0'}
+            return $r->{_ipOID() . '.' . ( $o + 1 ) . '.0'};
         }
-    }
+      }
 }
 
 ##################################################

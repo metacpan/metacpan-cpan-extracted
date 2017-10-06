@@ -10,7 +10,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has '+format' => 'tar';
@@ -36,16 +36,20 @@ has xz_cmd => sub {
 has tar_cmd => sub {
   _which('bsdtar')
     ? 'bsdtar'
-    # TODO: GNU tar can be iffy on windows, where absolute
-    # paths get confused with remote tars.  *sigh* fix later
-    # if we can, for now just assume that 'tar.exe' is borked
-    # on windows to be on the safe side.  The Fetch::ArchiveTar
-    # is probably a better plugin to use on windows anyway.
-    : _which('tar') && $^O ne 'MSWin32'
-      ? 'tar'
-      : _which('ptar')
-        ? 'ptar'
-        : undef;
+    # Slowlaris /usr/bin/tar doesn't seem to like pax global header
+    # but seems to have gtar in the path by default, which is okay with it
+    : $^O eq 'solaris' && _which('gtar')
+      ? 'gtar'
+      # TODO: GNU tar can be iffy on windows, where absolute
+      # paths get confused with remote tars.  *sigh* fix later
+      # if we can, for now just assume that 'tar.exe' is borked
+      # on windows to be on the safe side.  The Fetch::ArchiveTar
+      # is probably a better plugin to use on windows anyway.
+      : _which('tar') && $^O ne 'MSWin32'
+        ? 'tar'
+        : _which('ptar')
+          ? 'ptar'
+          : undef;
 };
 
 
@@ -300,7 +304,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -407,6 +411,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

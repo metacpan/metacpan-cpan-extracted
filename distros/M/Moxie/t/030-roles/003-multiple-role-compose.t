@@ -8,15 +8,15 @@ use Test::More;
 package Foo {
     use Moxie;
 
-    has 'bar' => sub { 'bar' };
-    sub bar ($self) { $self->{bar} }
+    has _bar => sub { 'bar' };
+    sub bar { _bar }
 }
 
 package Bar {
     use Moxie;
 
-    has 'foo' => sub { 'foo' };
-    sub foo ($self) { $self->{foo} }
+    has _foo => sub { 'foo' };
+    sub foo { _foo }
 }
 
 package Baz {
@@ -41,17 +41,17 @@ my $bar_method = MOP::Role->new(name => 'Baz')->get_method('bar');
 ok( $bar_method->isa( 'MOP::Method' ), '... got a method object' );
 is( $bar_method->name, 'bar', '... got the method we expected' );
 
-my $bar_slot = MOP::Role->new(name => 'Baz')->get_slot('bar');
+my $bar_slot = MOP::Role->new(name => 'Baz')->get_slot('_bar');
 ok( $bar_slot->isa( 'MOP::Slot' ), '... got an slot object' );
-is( $bar_slot->name, 'bar', '... got the slot we expected' );
+is( $bar_slot->name, '_bar', '... got the slot we expected' );
 
 my $foo_method = MOP::Role->new(name => 'Baz')->get_method('foo');
 ok( $foo_method->isa( 'MOP::Method' ), '... got a method object' );
 is( $foo_method->name, 'foo', '... got the method we expected' );
 
-my $foo_slot = MOP::Role->new(name => 'Baz')->get_slot('foo');
+my $foo_slot = MOP::Role->new(name => 'Baz')->get_slot('_foo');
 ok( $foo_slot->isa( 'MOP::Slot' ), '... got an slot object' );
-is( $foo_slot->name, 'foo', '... got the slot we expected' );
+is( $foo_slot->name, '_foo', '... got the slot we expected' );
 
 my $baz_method = MOP::Role->new(name => 'Baz')->get_method('baz');
 ok( $baz_method->isa( 'MOP::Method' ), '... got a method object' );

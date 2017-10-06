@@ -23,7 +23,7 @@ use Carp;
 __PACKAGE__->create_ro_accessors( qw( configclass filepath default ) );
 __PACKAGE__->create_accessors( qw( config _configkey ) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -42,6 +42,8 @@ sub new {
     
     $params{default}->{'hipi-config-version'} = $VERSION;
     
+    use Data::Dumper;
+        
     my $fileroot = ( $> ) ? qq($ENV{HOME}/.hipi-perl) : '/etc/hipi-perl';
     my $filename = ( $> ) ? 'user.conf' : 'global.conf';
     
@@ -55,6 +57,17 @@ sub new {
     
     if( -f $self->filepath ) {
         $self->read_config;
+        # update any new defaults 
+        my $conf = $self->config;
+        my $updatedefaults = 0;
+        for my $itemname ( keys %{ $params{default} } ) {
+            if( !exists( $conf->{$itemname} ) || !defined($conf->{$itemname}) ) {
+                $conf->{$itemname} = $params{default}->{$itemname};
+                $updatedefaults = 1;
+            }
+        }
+        $self->write_config if $updatedefaults;
+        
     } else {
         $self->config( $self->default );
         $self->write_config;

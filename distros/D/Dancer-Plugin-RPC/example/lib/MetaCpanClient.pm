@@ -15,7 +15,9 @@ sub call {
         GET => $endpoint . "/?q=$query"
     );
 
-    return decode_json($response->{content});
+    my $content = eval { decode_json($response->{content}) };
+    return $content if !$@;
+    return { error => $@, data => $response->{content} };
 }
 
 1;

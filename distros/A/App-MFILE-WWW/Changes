@@ -968,3 +968,48 @@ Revision history for App::MFILE::WWW
 - tests: js: add #mainarea introspection to dmenu test
 - tests: js: migrate QUnit from 1.15.0 to 2.4.0
 
+0.159 2017-09-23 23:52 CEST
+- js: core: migrate to JQuery 3.2.1
+- doc: describe how to add new JavaScript unit tests
+- doc: JS unit testing: include QUnit documentation links
+- js: core: upgrade to RequireJS 2.3.5
+- js: core: strictly separate dmenu submit codepaths
+- js: tests: test what happens when 0 is pressed in demoMenu
+- js: core: drop passhash and salt from user prototype
+- js: root: prevent login dialog from appearing in tests
+- Resource.pm: do not set currentUser when testing
+- js: core: current-user: handle null values
+- js: core: cf, current-user: allow override with null
+- js: core: root: reset stack on every invocation
+- js: core: stack: implement getStack method
+- Refactor login, logout codepaths to allow login/logout from tests
+- js: core: rename logout.js to loggout.js
+- js: tests: declare QUnit module "mfile-www core"
+
+0.160 2017-09-25 17:33 CEST
+- js: make login() take an object instead of two positional arguments
+- js: export mmKeyListener from start()
+- js: core: lib: add displayResult function
+- js: stack: add getLength() method
+- js: refrain from calling loggout from ajax.js
+- js: lib.js: add focusedItem function
+- js: stack.js: fix reference to "push" attribute
+- Resource.pm: tell browsers not to cache
+- Provide way to specify result line when starting a target
+- stack.js: make getTarget take an offset
+- start.js: unify arguments taken by primitive start functions
+
+0.161 2017-09-28 11:42 CEST
+- stack.js: implement restart() and pushWithoutStart() methods
+- target.js: do not export _store
+- js: core: html.js: put functions in alphabetical order
+- build/ops: hopefully do not install Vim .swp files
+- js: cleanup: rearrange lib.js functions and drop holdObject()
+- js: fix logout breakage introduced by recent refactoring
+- js: hack standalone demo app tests following recent refactoring
+- Dispatch.pm: migrate is_authorized to App::MFILE::HTTP
+- Eliminate dependency on App::MFILE distro
+- html.js: tweak valueToDisplay()
+- lib.js: displayError use css center
+- start.js: reset result line to &nbsp instead of null
+

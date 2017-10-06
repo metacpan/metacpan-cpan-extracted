@@ -31,15 +31,6 @@ register jsonrpc => sub {
             $publisher = $_;
         }
     }
-
-    my $code_wrapper = $arguments->{code_wrapper}
-        ? $arguments->{code_wrapper}
-        : sub {
-            my $code = shift;
-            my $pkg  = shift;
-            $code->(@_);
-        };
-    my $callback = $arguments->{callback};
     my $dispatcher = $publisher->($arguments->{arguments}, $endpoint);
 
     my $lister = Dancer::RPCPlugin::DispatchMethodList->new();
@@ -49,17 +40,29 @@ register jsonrpc => sub {
         methods  => [ sort keys %{ $dispatcher } ],
     );
 
+    my $code_wrapper = $arguments->{code_wrapper}
+        ? $arguments->{code_wrapper}
+        : sub {
+            my $code = shift;
+            my $pkg  = shift;
+            $code->(@_);
+        };
+    my $callback = $arguments->{callback};
+
+    debug("Starting jsonrpc-handler build: ", $lister);
     my $handle_call = sub {
         if (request->content_type ne 'application/json') {
             pass();
         }
+        debug("[handle_jsonrpc_request] Processing: ", request->body);
 
         my @requests = unjson(request->body);
 
+        content_type 'application/json';
         my @responses;
         for my $request (@requests) {
             my $method_name = $request->{method};
-            debug("[handle_jsonrpc_call] $method_name ", $request);
+            debug("[handle_jsonrpc_call($method_name)] $method_name ", $request);
 
             if (!exists $dispatcher->{$method_name}) {
                 push(
@@ -105,19 +108,15 @@ register jsonrpc => sub {
                 );
                 next;
             }
-
-            if (!$continue->success) {
-                push(
-                    @responses,
-                    jsonrpc_error_response(
+            elsif (blessed($continue) && !$continue->success) {
+                    push @responses, jsonrpc_error_response(
                         $request->{id},
                         {
                             code    => $continue->error_code,
                             message => $continue->error_message,
                         }
-                    )
-                );
-                next;
+                    );
+                    next;
             }
 
             my Dancer::RPCPlugin::DispatchItem $di = $dispatcher->{$method_name};
@@ -129,7 +128,7 @@ register jsonrpc => sub {
             };
             my $error = $@;
 
-            debug("[handeled_jsonrpc_call] ", $result);
+            debug("[handeled_jsonrpc_call($method_name)] ", $result);
             if ($error) {
                 push @responses, jsonrpc_error_response(
                     $request->{id},
@@ -159,13 +158,13 @@ register jsonrpc => sub {
             $response = to_json($responses[0]);
         }
         else {
-            $response = to_json(\@responses);
+            $response = to_json([grep {defined($_->{id})} @responses]);
         }
 
-        content_type 'application/json';
         return $response;
     };
 
+    debug("setting route (jsonrpc): $endpoint ", $lister);
     post $endpoint, $handle_call;
 };
 
@@ -203,12 +202,13 @@ sub jsonrpc_error_response {
 }
 
 sub build_dispatcher_from_pod {
-    my ($pkgs) = @_;
+    my ($pkgs, $endpoint) = @_;
     debug("[build_dispatcher_from_pod]");
 
     return dispatch_table_from_pod(
+        plugin   => 'jsonrpc',
         packages => $pkgs,
-        label    => 'jsonrpc',
+        endpoint => $endpoint,
     );
 }
 
@@ -217,7 +217,7 @@ sub build_dispatcher_from_config {
     debug("[build_dispatcher_from_config] $endpoint");
 
     return dispatch_table_from_config(
-        key      => 'jsonrpc',
+        plugin   => 'jsonrpc',
         config   => $config,
         endpoint => $endpoint,
     );

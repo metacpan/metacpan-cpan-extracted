@@ -26,6 +26,7 @@ lib/MooseX/DIC/Injectable.pm
 lib/MooseX/DIC/Injected.pm
 lib/MooseX/DIC/Loggable.pm
 lib/MooseX/DIC/PackageIsNotServiceException.pm
+lib/MooseX/DIC/PackageNotFoundException.pm
 lib/MooseX/DIC/ServiceCreationException.pm
 lib/MooseX/DIC/ServiceFactory.pm
 lib/MooseX/DIC/ServiceFactory/Factory.pm
@@ -34,6 +35,13 @@ lib/MooseX/DIC/ServiceFactoryFactory.pm
 lib/MooseX/DIC/ServiceRegistry.pm
 lib/MooseX/DIC/Types.pm
 lib/MooseX/DIC/UnregisteredServiceException.pm
+t/unit/build_class.t
+t/unit/build_class/lib/Test1.pm
+t/unit/build_class/lib/Test1Impl.pm
+t/unit/build_class/lib/Test2.pm
+t/unit/build_class/lib/Test2Impl.pm
+t/unit/build_class/lib/Test3.pm
+t/unit/build_class/lib/Test5.pm
 t/unit/builders.t
 t/unit/builders/lib/Test1.pm
 t/unit/builders/lib/Test1Impl.pm

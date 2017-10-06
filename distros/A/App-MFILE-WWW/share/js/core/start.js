@@ -88,10 +88,10 @@ define ([
                 stack.push(entry, {});
             }
         },
-        dmenuSubmitKey = function (dmn) {
+        dmenuSubmitEvent = function (dmn) {
             return function (event) {
+                console.log(dmn + " form submission event");
                 event.preventDefault();
-                //console.log("Submitting: " + dmn);
                 dmenuSubmit(dmn);
             };
         },
@@ -99,7 +99,9 @@ define ([
             return function (event) {
                 lib.logKeyPress(event);
                 if (event.keyCode === 13) {
-                    dmenuSubmitKey(dmn);
+                    console.log("Detected ENTER keypress; submitting " + dmn + " form");
+                    event.preventDefault();
+                    dmenuSubmit(dmn);
                 } else if (event.keyCode === 9) {
                     event.preventDefault();
                 }
@@ -112,13 +114,17 @@ define ([
         mmKeyListener = function (evt) {
 
             var len = $("input:text").length,
-                n = $("input:text").index($(document.activeElement));
+                n = $("input:text").index($(document.activeElement)),
+                i;
 
             lib.logKeyPress(evt);
     
             if (evt.keyCode === 13) {
                 console.log('MiniMenu listener detected <ENTER> keypress');
                 console.log("This form has elements 0 through " + (len - 1));
+                for (i=0; i<len; i++) {
+                    console.log("Element " + i, $("input:text")[i]);
+                }
                 console.log("The current element is no. " + n);
                 evt.preventDefault();
                 if ( n === len - 1 ) {
@@ -235,7 +241,7 @@ define ([
             }
             $('#submitButton').on("click", function (event) {
                 event.preventDefault;
-                //console.log("Submitting form " + dfn);
+                console.log("Submitting form " + dfn);
                 dformSubmit(dfn, obj);
             });
             $('#' + dfn).on("keypress", mmKeyListener);
@@ -293,7 +299,7 @@ define ([
                 }
             };
         },
-        dbrowserListen = function () {
+        dbrowserListen = function (resultLine) {
             var dbo = lib.dbrowserState.obj,
                 set = lib.dbrowserState.set,
                 pos = lib.dbrowserState.pos;
@@ -301,9 +307,12 @@ define ([
             console.log("Listening in browser " + dbo.name);
             console.log("Browser set is", set, "cursor position is " + pos);
             $('#mainarea').html(dbo.source(set, pos));
-            // lib.holdObject(set[pos]); // hold object so hooks can get it
-            $('#result').html("Displaying no. " + (pos + 1) + " of " + 
-                              lib.genObjStr(set.length) + " in result set");
+            if (resultLine) {
+                lib.displayResult(resultLine);
+            } else {
+                lib.displayResult("Displaying no. " + (pos + 1) + " of " + 
+                                  lib.genObjStr(set.length) + " in result set");
+            }
             $('#' + dbo.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
             $('#submitButton').on("click", function (event) {
@@ -403,7 +412,6 @@ define ([
                 pos = lib.drowselectState.pos;
             $('#result').text("Displaying rowselect with " + lib.genObjStr(set.length));
             $('#mainarea').html(drso.source(set));
-            // lib.holdObject(set[pos]); // hold object so hooks can get it
             lib.reverseVideo(pos, true);
             console.log("Listening in rowselect " + drso.name);
             $('#' + drso.name).submit(suppressSubmitEvent);
@@ -422,28 +430,32 @@ define ([
             // dmn is dmenu name
             // dmo is dmenu object
             var dmo = target.pull(dmn);
-            return function (obj) {
+            return function (state, opts) {
                 console.log('Entering start.dmenu with argument: ' + dmn);
                 // lib.clearResult();
                 stack.setFlag();
                 $('#mainarea').html(dmo.source);
                 $('input[name="sel"]').val('').focus();
-                $('#' + dmn).submit(dmenuSubmitKey(dmn));
+                $('#' + dmn).submit(dmenuSubmitEvent(dmn));
                 $('input[name="sel"]').keydown(dmenuKeyListener(dmn));
             };
         }, // dmenu
 
         dform: function (dfn) {
             var dfo = target.pull(dfn);
-            return function (obj) {
-                console.log('Entering start.dform with argument: ' + dfn);
-                if (! obj) {
-                    obj = stack.getState();
+            return function (state, opts) {
+                console.log('Entering start method of target ' + dfn);
+                if (typeof opts !== 'object') {
+                    opts = {};
                 }
-                console.log('The object we are working with is:', obj);
-                // lib.clearResult();
-                $('#mainarea').html(dfo.source(obj));
-                dformListen(dfn, obj);
+                opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
+                lib.displayResult(opts.resultLine);
+                if (! state) {
+                    state = stack.getState();
+                }
+                console.log('The object we are working with is:', state);
+                $('#mainarea').html(dfo.source(state));
+                dformListen(dfn, state);
             };
         }, // dform
 
@@ -453,23 +465,22 @@ define ([
                 // that we are being called from the second stage of dbrowser
                 // initialization (i.e., one-time event) -- generate and
                 // return the start function for this dbrowser
-                return function (obj) { 
-                    lib.clearResult();
-                    console.log('Starting new ' + dbn + ' dbrowser with object', obj);
-                    if (! obj) {
-                        obj = stack.getState();
+                return function (state, opts) {
+                    console.log('Starting new ' + dbn + ' dbrowser with state', state);
+                    if (! state) {
+                        state = stack.getState();
                     }
-                    console.log('The browser state object is', obj);
+                    console.log('dbrowser state', state);
                     // (re)initialize dbrowser state
                     if (lib.dbrowserStateOverride) {
                         lib.dbrowserStateOverride = false;
                     } else {
                         lib.dbrowserState.obj = target.pull(dbn);
-                        lib.dbrowserState.set = obj.set;
-                        lib.dbrowserState.pos = obj.pos;
+                        lib.dbrowserState.set = state.set;
+                        lib.dbrowserState.pos = state.pos;
                     }
                     // start browsing
-                    dbrowserListen(); 
+                    dbrowserListen(stack.getResultLine());
                 };
             }
         }, // dbrowser
@@ -478,14 +489,15 @@ define ([
 
         dnotice: function (dnn) {
             var dno = target.pull(dnn);
-            return function (noticeString) {
+            return function (state, opts) {
+                // state is a string to be displayed on the screen
                 console.log("Entering start.dnotice with argument: " + dnn);
-                if (! noticeString) {
-                    noticeString = stack.getState();
+                if (! state) {
+                    state = stack.getState();
                 }
                 lib.clearResult();
                 $('#mainarea').html(dno.source()); // write HTML to screen
-                $("#noticeText").html(noticeString);
+                $("#noticeText").html(state);
                 $('input[name="sel"]').focus();
                 dnoticeListen(dno);
             };
@@ -493,15 +505,16 @@ define ([
 
         dtable: function (dtn) {
             var dto = target.pull(dtn);
-            return function (dataset) {
+            return function (state, opts) {
+                // state is a array of objects to be displayed as a table
                 lib.clearResult();
                 console.log('Starting new ' + dtn + ' dtable');
-                if (! dataset) {
-                    dataset = stack.getState();
+                if (! state) {
+                    state = stack.getState();
                 }
-                console.log('The dataset is', dataset);
-                $('#mainarea').html(dto.source(dataset));
-                $('#result').text('Displaying table with ' + lib.genObjStr(dataset.length));
+                console.log('The dataset is', state);
+                $('#mainarea').html(dto.source(state));
+                $('#result').text('Displaying table with ' + lib.genObjStr(state.length));
                 dtableListen(dto);
             };
         }, // dtable
@@ -513,20 +526,20 @@ define ([
                 // that we are being called from the second stage of drowselect
                 // initialization (i.e., one-time event) -- generate and
                 // return the start function for this drowselect
-                return function (obj) {
+                return function (state, opts) {
                     lib.clearResult();
                     console.log('Starting new ' + drsn + ' drowselect');
-                    if (! obj) {
-                        obj = stack.getState();
+                    if (! state) {
+                        state = stack.getState();
                     }
-                    console.log('The rowselect state object is', obj);
+                    console.log('rowselect state', state);
                     // (re)initialize drowselect state
                     if (lib.drowselectStateOverride) {
                         lib.drowselectStateOverride = false;
                     } else {
                         lib.drowselectState.obj = target.pull(drsn);
-                        lib.drowselectState.set = obj.set;
-                        lib.drowselectState.pos = obj.pos;
+                        lib.drowselectState.set = state.set;
+                        lib.drowselectState.pos = state.pos;
                     }
                     // start browsing
                     drowselectListen();
@@ -534,7 +547,9 @@ define ([
             }
         }, // drowselect
 
-        drowselectListen: drowselectListen
+        drowselectListen: drowselectListen,
+
+        mmKeyListener: mmKeyListener,
 
     }
 });

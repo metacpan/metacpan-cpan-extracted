@@ -12,8 +12,8 @@ require 5.10.0;
 
 # Copyright (C) 2016, John Ulvr
 
-my $version = "0.005.004";
-my $versionString = "0.5.4";
+my $version = "0.005.005";
+my $versionString = "0.5.5";
 
 my $usage = q{
 Usage: 
@@ -121,7 +121,7 @@ while ( my $arg = shift ) {
         $undefines{$macro} = "X";
     }
     elsif ( $arg =~ /^--lang(?:uage)?=(.*)/i ) {
-        my $language = $1;
+        $language = $1;
         $language = shift if ( $language !~ /^\S/ );
         die2("ERROR: could not parse --lang parameters") if ( $language eq "" );
     }
@@ -158,7 +158,7 @@ while ( my $arg = shift ) {
         print $OUTFILE "FOR A PARTICULAR PURPOSE.\n";
         exit 0;
     }
-    elsif ( $arg =! /^--brcm/ ) {
+    elsif ( $arg =~ /^--brcm/ ) {
     	$isBrcm = 1;
     }
     elsif ( $arg =~ /^--help/ ) {

@@ -5,11 +5,11 @@ use warnings;
 
 use Test::More;
 
-$ENV{TEST_AUTHOR}
-    or plan skip_all => 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+$ENV{AUTHOR_TESTING}
+    or plan skip_all => 'Set $ENV{AUTHOR_TESTING} to a true value to run.';
 
 SKIP: {
-    plan(tests => 2 + 1);
+    plan tests => 3;
     require Test::NoWarnings; Test::NoWarnings->import;
     use Test::Differences;
     use Test::Exception;

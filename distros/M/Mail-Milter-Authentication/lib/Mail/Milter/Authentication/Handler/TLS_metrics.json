@@ -1,0 +1,238 @@
+{
+   "collapse" : true,
+   "height" : 250,
+   "panels" : [
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "fill" : 1,
+         "id" : 26,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 1,
+         "links" : [],
+         "nullPointMode" : "null",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_tls_connect_total{node=~\"$node\"}[$ratetime]))",
+               "hide" : false,
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "TLS",
+               "refId" : "A",
+               "step" : 4
+            },
+            {
+               "expr" : "sum(rate(authmilter_connect_total{node=~\"$node\"}[$ratetime]))",
+               "hide" : false,
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "Total Connections",
+               "refId" : "B",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Connections",
+         "tooltip" : {
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : "0",
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "fill" : 1,
+         "id" : 27,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 1,
+         "links" : [],
+         "nullPointMode" : "null",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_tls_connect_total{node=~\"$node\"}[$ratetime])) by(bits)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ bits }}",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Bits",
+         "tooltip" : {
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      },
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "fill" : 1,
+         "id" : 28,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 1,
+         "links" : [],
+         "nullPointMode" : "null",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_tls_connect_total{node=~\"$node\"}[$ratetime])) by(cipher)",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "{{ cipher }}",
+               "refId" : "A",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Ciphers",
+         "tooltip" : {
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "individual"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      }
+   ],
+   "repeat" : null,
+   "repeatIteration" : null,
+   "repeatRowId" : null,
+   "showTitle" : true,
+   "title" : "TLS Handler",
+   "titleSize" : "h6"
+}

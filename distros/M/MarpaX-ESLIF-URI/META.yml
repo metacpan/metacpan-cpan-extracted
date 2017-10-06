@@ -1,0 +1,69 @@
+---
+abstract: 'URI as per RFC3986/RFC6874'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-ESLIF-URI
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  MarpaX::ESLIF::URI:
+    file: lib/MarpaX/ESLIF/URI.pm
+    version: '0.002'
+  MarpaX::ESLIF::URI::file:
+    file: lib/MarpaX/ESLIF/URI/file.pm
+    version: '0.002'
+  MarpaX::ESLIF::URI::ftp:
+    file: lib/MarpaX/ESLIF/URI/ftp.pm
+    version: '0.002'
+  MarpaX::ESLIF::URI::http:
+    file: lib/MarpaX/ESLIF/URI/http.pm
+    version: '0.002'
+  MarpaX::ESLIF::URI::https:
+    file: lib/MarpaX/ESLIF/URI/https.pm
+    version: '0.002'
+  MarpaX::ESLIF::URI::mailto:
+    file: lib/MarpaX/ESLIF/URI/mailto.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Class::Method::Modifiers: '0'
+  Class::Tiny::Antlers: '0'
+  Log::Any: '0'
+  MarpaX::ESLIF: '0'
+  Net::servent: '0'
+  Safe::Isa: '0'
+  overload: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF-URI
+  homepage: https://metacpan.org/release/MarpaX-ESLIF-URI
+  repository: git://github.com/jddurand/perl-config-autoconf-ini.git
+version: '0.002'
+x_authority: cpan:JDDPAUSE
+x_contributors:
+  - 'Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

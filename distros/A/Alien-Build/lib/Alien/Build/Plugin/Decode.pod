@@ -14,12 +14,13 @@ Alien::Build::Plugin::Decode - Decode Alien::Build plugins
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
  use alienfile;
- plugin 'Download' => 'http://ftp.gnu.org/gnu/make';
+ plugin 'Decode::HTML';
+ plugin 'Decode::DirListing';
 
 =head1 DESCRIPTION
 
@@ -84,6 +85,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

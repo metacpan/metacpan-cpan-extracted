@@ -1,6 +1,7 @@
 package Template::Mustache::Token::Template;
 our $AUTHORITY = 'cpan:YANICK';
-$Template::Mustache::Token::Template::VERSION = '1.0.4';
+# ABSTRACT: Object representing a Template block
+$Template::Mustache::Token::Template::VERSION = '1.1.0';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ] };
@@ -43,11 +44,11 @@ __END__
 
 =head1 NAME
 
-Template::Mustache::Token::Template
+Template::Mustache::Token::Template - Object representing a Template block
 
 =head1 VERSION
 
-version 1.0.4
+version 1.1.0
 
 =head1 AUTHORS
 

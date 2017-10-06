@@ -2,7 +2,7 @@ package Test2::Harness::Feeder::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak carp/;
 use Scalar::Util qw/blessed/;
@@ -21,6 +21,8 @@ use Test2::Harness::Util::HashBase qw{
     -run_id
     -dir
     -keep_dir
+
+    -last_poll
 };
 
 sub init {
@@ -50,6 +52,8 @@ sub poll {
     my $self = shift;
     my ($max) = @_;
 
+    $self->{+LAST_POLL} = time;
+
     return if $self->{+_COMPLETE};
 
     my @events = $self->{+DIR}->poll($max);
@@ -57,12 +61,18 @@ sub poll {
     return @events;
 }
 
+sub set_runner_exited {
+    my $self = shift;
+    my $dir = $self->{+DIR} or return;
+    $dir->set_runner_exited($_[1]);
+}
+
 sub set_complete {
     my $self = shift;
 
     $self->{+_COMPLETE} = 1;
 
-    remove_tree($self->{+DIR}->job_root, {safe => 1})
+    remove_tree($self->{+DIR}->job_root, {safe => 1, keep_root => 1})
         unless $self->{+KEEP_DIR};
 
     delete $self->{+DIR};

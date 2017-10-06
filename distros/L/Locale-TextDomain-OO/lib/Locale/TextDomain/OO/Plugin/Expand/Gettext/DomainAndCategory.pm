@@ -234,7 +234,7 @@ __END__
 
 Locale::TextDomain::OO::Plugin::Expand::Gettext::DomainAndCategory - Methods for dynamic domain and/or category, prefixed with __
 
-$Id: DomainAndCategory.pm 651 2017-05-31 18:10:43Z steffenw $
+$Id: DomainAndCategory.pm 689 2017-08-29 21:37:38Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Plugin/Expand/Gettext/DomainAndCategory.pm $
 

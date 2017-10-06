@@ -74,9 +74,7 @@ my $error;
 
 # Session check
     ok (($cm->{'_SESSION_'}->{'_hostname'} eq $router)
-    && ($cm->{'hostname'} eq $router)
-    && ($cm->{'_SESSION_'}->{'_security'}->{'_community'} eq $community)
-    && ($cm->{'community'} eq $community),
+    && ($cm->{'_SESSION_'}->{'_security'}->{'_community'} eq $community),
     "Session (Hostname and community correct)");
 
 # Check Net::SNMP session

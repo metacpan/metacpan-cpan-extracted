@@ -1,5 +1,9 @@
 Revision history for Perl extension Locale::TextDomain:OO::Extract.
 
+2.012  Fri Sep 29 22:22:40 2017
+- Test::Differences has problems with different Data::Dumper's output of Perl
+  and XS Version. Adding local Data::Dumper::Useperl = 1; to some tests.
+
 2.011  Sat Sep  2 11:18:09 2017
 - added YAML extractor
 

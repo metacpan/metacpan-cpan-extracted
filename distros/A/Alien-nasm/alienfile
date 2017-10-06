@@ -1,5 +1,6 @@
 use alienfile;
 use Capture::Tiny qw( capture );
+use Config;
 
 configure { requires 'Capture::Tiny' };
 
@@ -7,6 +8,13 @@ plugin 'Probe::CommandLine' => (
   command => 'nasm',
   args    => ['-v'],
   match   => qr/NASM version/,
+);
+
+plugin 'Probe::CommandLine' => (
+  command      => 'ndisasm',
+  args         => ['-v'],
+  match_stderr => qr/NDISASM version/,
+  secondary    => 1,
 );
 
 share {
@@ -27,10 +35,25 @@ share {
     
     die "unable to find first level candidate"
       unless @{ $res->{list} } > 0;
+
+    my $url;
+    my $regex;
+
+    if($^O eq 'MSWin32')
+    {
+      my $bits = $Config{ptrsize} == 4 ? '32' : '64';
+      $url   = $res->{list}->[0]->{url} . "/win$bits";
+      $regex = qr/^nasm-[0-9\.]+-win$bits\.zip$/;
+    }
+    else
+    {
+      $url = $res->{list}->[0]->{url};
+      $regex = qr/^nasm-[0-9\.]+\.tar\.gz$/;
+    }
     
-    $res = $build->decode($build->fetch($res->{list}->[0]->{url}));
+    $res = $build->decode($build->fetch($url));
     
-    $res->{list} = [grep { $_->{filename} =~ /^nasm-[0-9\.]+\.tar\.gz$/ } @{ $res->{list} }];
+    $res->{list} = [grep { $_->{filename} =~ $regex } @{ $res->{list} }];
 
     $res = $build->prefer($res);
 
@@ -38,21 +61,35 @@ share {
       unless @{ $res->{list} } > 0;
     
     $res = $build->fetch($res->{list}->[0]->{url});
-
     Path::Tiny->new($res->{filename})->spew_raw($res->{content});
-
     $build->runtime_prop->{command} = 'nasm';
   };
 
-  plugin 'Extract' => 'tar.gz';  
-  plugin 'Build::MSYS' => ();
+  if($^O eq 'MSWin32')
+  {
+    requires 'Path::Tiny';
+    plugin 'Extract' => 'zip';
+    build sub {
+      my($build) = @_;
+      my $dest = Path::Tiny->new($build->install_prop->{prefix})->child('bin');
+      $dest->mkpath;
+      foreach my $exe (qw( nasm.exe ndisasm.exe ))
+      {
+        Path::Tiny->new($exe)->copy($dest->child($exe));
+      }
+    };
+  }
+  else
+  {
+    plugin 'Extract' => 'tar.gz';  
+    plugin 'Build::MSYS' => ();
 
-  build [
-    'sh configure --prefix=%{alien.install.prefix}',
-    '%{gmake}',
-    '%{gmake} install',
-  ];
-  
+    build [
+      'sh configure --prefix=%{alien.install.prefix}',
+      '%{gmake}',
+      '%{gmake} install',
+    ];
+  }
 };
 
 gather sub {

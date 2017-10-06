@@ -1,0 +1,9 @@
+Revision history for String-Tagged-Terminal
+
+0.02    2017-10-03 15:53:04
+        [BUGFIXES]
+         * Declare dependency on Convert::Color::XTerm (RT123182)
+
+0.01    2017-10-02 19:27:18
+        First version, released on an unsuspecting world.
+

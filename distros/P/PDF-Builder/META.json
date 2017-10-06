@@ -27,31 +27,24 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.5503"
          }
       },
       "runtime" : {
          "requires" : {
-            "Compress::Zlib" : "1.0",
-            "File::Basename" : "0",
-            "File::Find" : "0",
-            "File::Temp" : "0",
-            "Font::TTF" : "0",
-            "IO::File" : "0",
-            "List::Util" : "0",
-            "Math::Trig" : "0",
-            "POSIX" : "0",
-            "Scalar::Util" : "0",
+            "Compress::Zlib" : "1",
+            "Font::TTF" : "1.04",
+            "perl" : "5.008006"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Exception" : "0",
-            "Unicode::UCD" : "0",
-            "Win32::TieRegistry" : "0",
-            "perl" : "5.008005",
-            "utf8" : "0",
-            "warnings" : "0"
+            "Test::Memory::Cycle" : "1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "3.005",
+   "version" : "3.007",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

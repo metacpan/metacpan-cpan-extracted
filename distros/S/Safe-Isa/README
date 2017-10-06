@@ -86,6 +86,9 @@ DESCRIPTION
     way to check for something you might be able to call methods on if you
     want to do that.
 
+    We are careful to make sure that scalar/list context is preserved for
+    the method that is eventually called.
+
 EXPORTS
   $_isa
       $maybe_an_object->$_isa('Foo');

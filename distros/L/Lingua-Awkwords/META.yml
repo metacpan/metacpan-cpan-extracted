@@ -27,7 +27,7 @@ requires:
   namespace::clean: '0'
   perl: '5.014000'
   strict: '0'
-version: '0.05'
+version: '0.06'
 x_homepageresources:
   repository:
     type: git

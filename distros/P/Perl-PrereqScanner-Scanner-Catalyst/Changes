@@ -1,0 +1,8 @@
+Revision history for Perl::PrereqScanner::Scanner::Catalyst
+
+0.002   2017-09-27
+    - Support Catalyst action class
+
+0.001   2017-09-24
+    - First release
+

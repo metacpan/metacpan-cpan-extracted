@@ -11,9 +11,6 @@ my %module_build_args = (
     "Module::Build" => "0.28"
   },
   "c_source" => "src",
-  "config" => {
-    "cxxflags" => "-std=c++11"
-  },
   "configure_requires" => {
     "ExtUtils::CBuilder" => "0.280226",
     "Module::Build" => "0.28"
@@ -23,12 +20,17 @@ my %module_build_args = (
     "Lukas Atkinson <amon\@cpan.org>"
   ],
   "dist_name" => "Async-Trampoline",
-  "dist_version" => "0.001000",
+  "dist_version" => "0.001002",
+  "extra_compiler_flags" => "-std=c++11",
   "extra_linker_flags" => "-lstdc++",
   "license" => "perl",
   "module_name" => "Async::Trampoline",
   "recursive_test_files" => 1,
+  "requires" => {
+    "perl" => "5.014"
+  },
   "test_requires" => {
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Output" => 0
   }
@@ -37,6 +39,7 @@ my %module_build_args = (
 
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Output" => 0
 );

@@ -156,7 +156,7 @@ foreach my $key ( RT->Config->Options( Overridable => undef, Sorted => 0 ) ) {
     my $is_password = ($key =~ /Password/i and $key !~ /MinimumPasswordLength|AllowLoginPasswordAutoComplete/ );
     my $is_immutable = $meta->{Immutable}
                     || $meta->{Obfuscate}
-                    || ($is_code && $val =~ s/sub { "DUMMY" }/sub { ... }/g)
+                    || ($is_code && $val =~ s/sub \{ "DUMMY" \}/sub { ... }/g)
                     || ($is_code && !$has_execute_code);
 
     my $current_value = $is_code ? $val : $raw_value;

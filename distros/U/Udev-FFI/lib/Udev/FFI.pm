@@ -15,7 +15,7 @@ use Udev::FFI::Enumerate;
 use IPC::Cmd qw(can_run run);
 
 
-$Udev::FFI::VERSION = '0.098000';
+$Udev::FFI::VERSION = '0.098004';
 
 
 use constant {
@@ -319,9 +319,24 @@ Udev::FFI - Perl bindings for libudev using ffi.
 
 Udev::FFI exposes OO interface to libudev.
 
+=head1 CONSTRUCTOR
+ 
+=over 4
+ 
+=item new ()
+ 
+This is the constructor for a new Udev::FFI object.
+
+If the constructor fails undef will be returned and an error message will be in $@.
+
+    my $udev = Udev::FFI->new() or
+        die "Can't create udev context: $@";
+
+=back
+
 =head1 EXAMPLES
 
-See examples folder.
+Examples are provided with the Udev::FFI distribution in the "examples" directory.
 
 =head1 SEE ALSO
 
@@ -334,6 +349,10 @@ L<FFI::CheckLib> (Check that a library is available for FFI)
 =head1 AUTHOR
 
 Ilya Pavlov, E<lt>ilux@cpan.orgE<gt>
+
+Contributors:
+
+Mohammad S Anwar
 
 =head1 COPYRIGHT AND LICENSE
 

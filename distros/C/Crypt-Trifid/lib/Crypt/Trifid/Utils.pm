@@ -1,6 +1,6 @@
 package Crypt::Trifid::Utils;
 
-$Crypt::Trifid::Utils::VERSION   = '0.08';
+$Crypt::Trifid::Utils::VERSION   = '0.09';
 $Crypt::Trifid::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,19 +9,16 @@ Crypt::Trifid::Utils - Helper package for Crypt::Trifid.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 use 5.006;
 use strict; use warnings;
-
 use Data::Dumper;
-use vars qw(@ISA @EXPORT_OK);
+use parent 'Exporter';
 
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(generate_chart);
+our @EXPORT_OK = qw(generate_chart);
 
 =head1 DESCRIPTION
 

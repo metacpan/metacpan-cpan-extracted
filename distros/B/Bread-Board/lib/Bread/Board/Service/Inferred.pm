@@ -1,7 +1,7 @@
 package Bread::Board::Service::Inferred;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Helper for inferring a service from a Moose object
-$Bread::Board::Service::Inferred::VERSION = '0.35';
+$Bread::Board::Service::Inferred::VERSION = '0.36';
 use Moose;
 use Moose::Util::TypeConstraints 'find_type_constraint';
 
@@ -224,7 +224,7 @@ Bread::Board::Service::Inferred - Helper for inferring a service from a Moose ob
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

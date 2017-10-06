@@ -3,7 +3,7 @@ package Catmandu::Store::Solr::Searcher;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = "0.0302";
+our $VERSION = "0.0303";
 
 with 'Catmandu::Iterable';
 
@@ -13,20 +13,16 @@ has start => (is => 'ro', required => 1);
 has limit => (is => 'ro', required => 1);
 has sort  => (is => 'ro', required => 0);
 has total => (is => 'ro');
-has fl => (
-    is => 'ro',
-    lazy => 1,
-    default => sub { "*" }
-);
+has fl => (is => 'ro', lazy => 1, default => sub {"*"});
 
 sub generator {
-    my ($self) = @_;
-    my $store  = $self->bag->store;
-    my $name   = $self->bag->name;
-    my $limit  = $self->limit;
-    my $query  = $self->query;
+    my ($self)    = @_;
+    my $store     = $self->bag->store;
+    my $name      = $self->bag->name;
+    my $limit     = $self->limit;
+    my $query     = $self->query;
     my $bag_field = $self->bag->bag_field;
-    my $fq     = qq/{!type=lucene}$bag_field:"$name"/;
+    my $fq        = qq/{!type=lucene}$bag_field:"$name"/;
     sub {
         state $start = $self->start;
         state $total = $self->total;
@@ -35,18 +31,21 @@ sub generator {
             return unless $total;
         }
         unless ($hits && @$hits) {
-            if ( $total && $limit > $total ) {
+            if ($total && $limit > $total) {
                 $limit = $total;
             }
-            $hits = $store->solr->search($query, {
-                start => $start,
-                rows => $limit,
-                fq => $fq,
-                sort => $self->sort,
-                fl => $self->fl,
-                facet => "false",
-                spellcheck => "false"
-            })->content->{response}{docs};
+            $hits = $store->solr->search(
+                $query,
+                {
+                    start      => $start,
+                    rows       => $limit,
+                    fq         => $fq,
+                    sort       => $self->sort,
+                    fl         => $self->fl,
+                    facet      => "false",
+                    spellcheck => "false"
+                }
+            )->content->{response}{docs};
             $start += $limit;
         }
         if ($total) {
@@ -66,16 +65,16 @@ sub slice {
         query => $self->query,
         start => $self->start + $start,
         limit => $self->limit,
-        sort => $self->sort,
+        sort  => $self->sort,
         total => $total,
     );
 }
 
 sub count {
-    my ($self) = @_;
-    my $name   = $self->bag->name;
+    my ($self)    = @_;
+    my $name      = $self->bag->name;
     my $bag_field = $self->bag->bag_field;
-    my $res    = $self->bag->store->solr->search(
+    my $res       = $self->bag->store->solr->search(
         $self->query,
         {
             rows       => 0,

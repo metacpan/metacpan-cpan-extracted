@@ -1,3 +1,17 @@
+libqbit-application-model-db-perl (0.022) raring; urgency=low
+
+  * move _after_group_by
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 30 Sep 2017 20:47:04 +0300
+
+libqbit-application-model-db-perl (0.021) raring; urgency=low
+
+  * support having in Table
+
+  * having
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 30 Sep 2017 20:23:01 +0300
+
 libqbit-application-model-db-perl (0.020) raring; urgency=low
 
   * added drop for table

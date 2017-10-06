@@ -15,7 +15,7 @@ name: Linux-DesktopFiles
 provides:
   Linux::DesktopFiles:
     file: lib/Linux/DesktopFiles.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   perl: '5.014'
 resources:
@@ -23,5 +23,5 @@ resources:
   homepage: https://github.com/trizen/Linux-DesktopFiles
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/trizen/Linux-DesktopFiles
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

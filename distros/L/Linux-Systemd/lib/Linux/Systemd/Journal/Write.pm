@@ -1,5 +1,5 @@
-package Linux::Systemd::Journal::Write;
-$Linux::Systemd::Journal::Write::VERSION = '1.162700';
+package Linux::Systemd::Journal::Write 1.172760;
+
 # ABSTRACT: XS wrapper around sd-journal
 
 # TODO Helper script to generate message catalogs?
@@ -31,6 +31,18 @@ has priority => (
     isa     => sub {
         die 'Invalid log level' unless (defined $_[0] && $_[0] =~ /^[0-7]$/);
     },
+);
+
+
+has caller_details => (
+    is      => 'ro',
+    default => 1,
+);
+
+
+has caller_level => (
+    is      => 'ro',
+    default => 0,
 );
 
 
@@ -84,11 +96,14 @@ sub send {
         $data->{syslog_identifier} = $self->app_id;
     }
 
-    my @caller = caller(0);
+    if ($self->caller_details) {
+        my @caller = caller($self->caller_level);
+        $data->{CODE_LINE} = $caller[2];
+        $data->{CODE_FILE} = $caller[1];
 
-    # $data->{CODE_FUNC} = $caller[3];
-    $data->{CODE_LINE} = $caller[2];
-    $data->{CODE_FILE} = $caller[1];
+        @caller = caller($self->caller_level + 1);
+        $data->{CODE_FUNC} = $caller[3];
+    }
 
     # flatten it out
     my @array = map { uc($_) . '=' . ($data->{$_} // 'undef') } keys %$data;
@@ -120,7 +135,7 @@ Linux::Systemd::Journal::Write - XS wrapper around sd-journal
 
 =head1 VERSION
 
-version 1.162700
+version 1.172760
 
 =head1 SYNOPSIS
 
@@ -160,6 +175,23 @@ Will be used to set C<SYSLOG_IDENTIFIER>. Defaults to C<basename($0)>;
 =head2 C<priority>
 
 Default log priority. See L</"Log Levels">
+
+=head2 C<caller_details>
+
+Boolean controlling whether to log the C<CODE_FILE>, C<CODE_LINE>, and
+C<CODE_FUNC> of the L<caller>.
+
+Optional. Defaults to C<true>;
+
+See also L<systemd.journal-fields(7)>
+
+=head2 C<caller_level>
+
+If this module is not being used directly, but through some proxy module for
+instance, C<caller_level> is used to determine the number of frames to look back
+through.
+
+Optional. Defaults to C<0>;
 
 =head1 METHODS
 
@@ -234,7 +266,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ioan Rogers.
+This software is Copyright (c) 2017 by Ioan Rogers.
 
 This is free software, licensed under:
 

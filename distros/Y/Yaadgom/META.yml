@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/renatocron/Yaadgom/issues
   homepage: https://github.com/renatocron/Yaadgom
   repository: https://github.com/renatocron/Yaadgom.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'Renato CRON <renato.cron@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

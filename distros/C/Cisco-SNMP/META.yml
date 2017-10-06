@@ -23,5 +23,5 @@ requires:
   Socket: '0'
   Sys::Hostname: '0'
   Test::Simple: '0'
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

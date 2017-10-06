@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002000';
+our $VERSION = '0.002001';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -157,7 +157,8 @@ sub import {
         qr => sub {
             my ($raw, $cooked, $type) = @_;
 
-            my $lexical_scope = (caller 1)[10]{'Regexp::Debugger::lexical_scope'};
+            my $hints = (caller 1)[10] // {};
+            my $lexical_scope = $hints->{'Regexp::Debugger::lexical_scope'};
 
             # In active scope and really a regex and interactivity possible...
             my $is_interactive = defined $arg{save_to} || -t *STDIN && -t *STDOUT;
@@ -180,7 +181,8 @@ sub unimport {
 
 # Encapsulate the hoopy user-defined pragma interface...
 sub _module_is_active {
-    return (caller 1)[10]->{'Regexp::Debugger::active'};
+    my $hints = (caller 1)[10] // return 0;
+    return $hints->{'Regexp::Debugger::active'};
 }
 
 # Load ~/.rxrx config...
@@ -3330,7 +3332,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002000
+This document describes Regexp::Debugger version 0.002001
 
 
 =head1 SYNOPSIS

@@ -1,6 +1,6 @@
 #include "ccv.h"
 #include "ccv_internal.h"
-#include "3rdparty/sha1/sha1.h"
+#include "3rdparty/siphash/siphash24.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -43,15 +43,23 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE | CCV_NO_DATA_ALLOC) & ~CCV_GARBAGE;
 		mat->data.u8 = data;
 	} else {
+		const size_t hdr_size = (sizeof(ccv_dense_matrix_t) + 15) & -16;
 		mat = (ccv_dense_matrix_t*)(data ? data : ccmalloc(ccv_compute_dense_matrix_size(rows, cols, type)));
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE) & ~CCV_GARBAGE;
 		mat->type |= data ? CCV_UNMANAGED : CCV_REUSABLE; // it still could be reusable because the signature could be derived one.
-		mat->data.u8 = (unsigned char*)(mat + 1);
+		mat->data.u8 = (unsigned char*)mat + hdr_size;
 	}
 	mat->sig = sig;
+#if CCV_NNC_TENSOR_TFB
+	mat->resides = CCV_TENSOR_CPU_MEMORY;
+	mat->format = CCV_TENSOR_FORMAT_NHWC;
+	mat->datatype = CCV_GET_DATA_TYPE(type);
+	mat->channels = CCV_GET_CHANNEL(type);
+	mat->reserved = 0;
+#endif
 	mat->rows = rows;
 	mat->cols = cols;
-	mat->step = (cols * CCV_GET_DATA_TYPE_SIZE(type) * CCV_GET_CHANNEL(type) + 3) & -4;
+	mat->step = CCV_GET_STEP(cols, type);
 	mat->refcount = 1;
 	return mat;
 }
@@ -103,11 +111,17 @@ ccv_dense_matrix_t ccv_dense_matrix(int rows, int cols, int type, void* data, ui
 {
 	ccv_dense_matrix_t mat;
 	mat.sig = sig;
-	mat.type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE | CCV_UNMANAGED) & ~CCV_GARBAGE;
+	mat.type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE | CCV_NO_DATA_ALLOC | CCV_UNMANAGED) & ~CCV_GARBAGE;
 	mat.rows = rows;
 	mat.cols = cols;
-	mat.step = (cols * CCV_GET_DATA_TYPE_SIZE(type) * CCV_GET_CHANNEL(type) + 3) & -4;
+	mat.step = CCV_GET_STEP(cols, type);
 	mat.refcount = 1;
+#if CCV_NNC_TENSOR_TFB
+	mat.resides = CCV_TENSOR_CPU_MEMORY;
+	mat.format = CCV_TENSOR_FORMAT_NHWC | CCV_GET_DATA_TYPE(type);
+	mat.channels = CCV_GET_CHANNEL(type);
+	mat.reserved = 0;
+#endif
 	mat.data.u8 = (unsigned char*)data;
 	return mat;
 }
@@ -120,17 +134,12 @@ ccv_sparse_matrix_t* ccv_sparse_matrix_new(int rows, int cols, int type, int maj
 	mat->cols = cols;
 	mat->type = type | CCV_MATRIX_SPARSE | ((type & CCV_DENSE_VECTOR) ? CCV_DENSE_VECTOR : CCV_SPARSE_VECTOR);
 	mat->major = major;
-	mat->prime = 0;
-	mat->load_factor = 0;
+	mat->prime_index = 1; // See ccv_util.c to know why this is 1 and why size is 2.
+	mat->size = 2;
+	mat->rnum = 0;
 	mat->refcount = 1;
-	mat->vector = (ccv_dense_vector_t*)ccmalloc(CCV_GET_SPARSE_PRIME(mat->prime) * sizeof(ccv_dense_vector_t));
-	int i;
-	for (i = 0; i < CCV_GET_SPARSE_PRIME(mat->prime); i++)
-	{
-		mat->vector[i].index = -1;
-		mat->vector[i].length = 0;
-		mat->vector[i].next = 0;
-	}
+	mat->index = (ccv_sparse_matrix_index_t*)cccalloc(sizeof(ccv_sparse_matrix_index_t), mat->size);
+	mat->vector = (ccv_sparse_matrix_vector_t*)ccmalloc(sizeof(ccv_sparse_matrix_vector_t) * mat->size);
 	return mat;
 }
 
@@ -146,20 +155,9 @@ void ccv_matrix_free_immediately(ccv_matrix_t* mat)
 	} else if (type & CCV_MATRIX_SPARSE) {
 		ccv_sparse_matrix_t* smt = (ccv_sparse_matrix_t*)mat;
 		int i;
-		for (i = 0; i < CCV_GET_SPARSE_PRIME(smt->prime); i++)
-			if (smt->vector[i].index != -1)
-			{
-				ccv_dense_vector_t* iter = &smt->vector[i];
-				ccfree(iter->data.u8);
-				iter = iter->next;
-				while (iter != 0)
-				{
-					ccv_dense_vector_t* iter_next = iter->next;
-					ccfree(iter->data.u8);
-					ccfree(iter);
-					iter = iter_next;
-				}
-			}
+		for (i = 0; i < smt->size; i++)
+			if (smt->index[i].ifbit)
+				ccfree(smt->vector[i].data.u8);
 		ccfree(smt->vector);
 		ccfree(smt);
 	} else if ((type & CCV_MATRIX_CSR) || (type & CCV_MATRIX_CSC)) {
@@ -194,20 +192,12 @@ void ccv_matrix_free(ccv_matrix_t* mat)
 	} else if (type & CCV_MATRIX_SPARSE) {
 		ccv_sparse_matrix_t* smt = (ccv_sparse_matrix_t*)mat;
 		int i;
-		for (i = 0; i < CCV_GET_SPARSE_PRIME(smt->prime); i++)
-			if (smt->vector[i].index != -1)
-			{
-				ccv_dense_vector_t* iter = &smt->vector[i];
-				ccfree(iter->data.u8);
-				iter = iter->next;
-				while (iter != 0)
-				{
-					ccv_dense_vector_t* iter_next = iter->next;
-					ccfree(iter->data.u8);
-					ccfree(iter);
-					iter = iter_next;
-				}
-			}
+		for (i = 0; i < smt->size; i++)
+		{
+			if (smt->index[i].ifbit > 1)
+				ccfree(smt->vector[i].index); // It is a union of index / data, can just free them.
+		}
+		ccfree(smt->index);
 		ccfree(smt->vector);
 		ccfree(smt);
 	} else if ((type & CCV_MATRIX_CSR) || (type & CCV_MATRIX_CSC)) {
@@ -299,21 +289,22 @@ void ccv_enable_default_cache(void)
 	ccv_enable_cache(CCV_DEFAULT_CACHE_SIZE);
 }
 
+static uint8_t key_siphash[16] = "libccvky4siphash";
+
 uint64_t ccv_cache_generate_signature(const char* msg, int len, uint64_t sig_start, ...)
 {
-	blk_SHA_CTX ctx;
-	blk_SHA1_Init(&ctx);
-	uint64_t sigi;
+	uint64_t sig_out, sig_in[2]; // 1 is in, 0 is out
+	siphash((uint8_t*)&sig_out, (const uint8_t*)msg, len, key_siphash);
 	va_list arguments;
 	va_start(arguments, sig_start);
-	for (sigi = sig_start; sigi != 0; sigi = va_arg(arguments, uint64_t))
-		blk_SHA1_Update(&ctx, &sigi, 8);
+	sig_in[0] = sig_out;
+	sig_in[1] = sig_start;
+	while (sig_in[1] != 0)
+	{
+		siphash((uint8_t*)&sig_out, (const uint8_t*)sig_in, sizeof(uint64_t) * 2, key_siphash);
+		sig_in[0] = sig_out;
+		sig_in[1] = va_arg(arguments, uint64_t);
+	}
 	va_end(arguments);
-	blk_SHA1_Update(&ctx, msg, len);
-	union {
-		uint64_t u;
-		uint8_t chr[20];
-	} sig;
-	blk_SHA1_Final(sig.chr, &ctx);
-	return sig.u;
+	return sig_out;
 }

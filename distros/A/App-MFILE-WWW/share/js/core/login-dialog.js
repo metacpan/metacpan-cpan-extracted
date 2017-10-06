@@ -36,19 +36,17 @@
 
 define ([
     'jquery', 
-    'ajax', 
     'cf',
     'html', 
-    'lib'
+    'lib',
+    'login'
 ], function (
     $, 
-    ajax, 
     cf,
     html, 
-    lib
+    lib,
+    login
 ) {
-
-    console.log("Entering loginDialog");
 
     return function () {
 
@@ -57,30 +55,10 @@ define ([
             submitCallback = function (event) {
                 console.log("Entering submitCallback()");
                 event.preventDefault();
-                var found,
-                    i,
-                    rest = {
-                        "method": 'LOGIN',
-                        "path": 'login',
-                        "body": { nam: $('input[name="nam"]').val(),
-                                  pwd: $('input[name="pwd"]').val() }
-                    },
-                    // success callback
-                    sc = function (st) {
-                        // trigger GET request to the server -- no console.log messages here
-                        // because the reload will make them go away
-                        location.reload();
-                    },
-                    // failure callback
-                    fc = function (st) {
-                        console.log("Login failed", st);
-                        $('#result').html('Login failed: code ' + st.payload.code + 
-                                          ' (' + st.payload.message + ')');
-                        $('input[name="nam"]').focus();
-                        $('input[name="pwd"]').val('');
-                    };
-                console.log("Initiating AJAX call");
-                ajax(rest, sc, fc);
+                login({
+                    "nam": $('input[name="nam"]').val(),
+                    "pwd": $('input[name="pwd"]').val()
+                });
             },
 
             // formHandler processes user input in login dialog form

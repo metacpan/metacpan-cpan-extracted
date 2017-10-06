@@ -17,7 +17,7 @@ $loaded = 1;
 ok(1,$loaded,'problem with GDS2 load.');
 
 open(DUMPIN,"TEST.dump") or die "Unable to read TEST.dump because $!";
-my $gds2FileOut = new GDS2(-fileName => ">testdump.gds");
+my $gds2FileOut = new GDS2(-fileName => ">testdump$$.gds");
 my $dataString;
 while (<DUMPIN>)
 {
@@ -42,10 +42,11 @@ while (<DUMPIN>)
 $gds2FileOut -> close;
 close DUMPIN;
 
-my $gds2File = new GDS2(-fileName => 'testdump.gds');
+sleep 2;
+my $gds2File = new GDS2(-fileName => "testdump$$.gds");
 my $G_epsilon = $gds2File -> getG_epsilon;
 my $G_fltLen = $gds2File -> getG_fltLen;
-open(DUMPOUT,">dump.gdt") or die "Unable to create dump.gdt $!";
+open(DUMPOUT,">dump$$.gdt") or die "Unable to create dump$$.gdt $!";
 my $printLine = "";
 while ($gds2File -> readGds2Record)
 {
@@ -55,7 +56,7 @@ while ($gds2File -> readGds2Record)
 close DUMPOUT;
 
 my $good=1;
-open(DUMPNEW,"dump.gdt") or die "Unable to read dump.gdt $!";
+open(DUMPNEW,"dump$$.gdt") or die "Unable to read dump$$.gdt $!";
 open(DUMPOLD,"TEST.gdt") or die "Unable to read TEST.gdt because $!";
 READGDT: while (my $line1 = <DUMPOLD>)
 {
@@ -71,10 +72,11 @@ READGDT: while (my $line1 = <DUMPOLD>)
 }
 close DUMPOLD;
 close DUMPNEW;
+sleep 2;
 if ($good)
 {
-    unlink"testdump.gds";
-    unlink "dump.gdt";
+    unlink "testdump$$.gds";
+    unlink "dump$$.gdt";
 }
 ok(2,$good,'problem with ascii dump.');
 0;

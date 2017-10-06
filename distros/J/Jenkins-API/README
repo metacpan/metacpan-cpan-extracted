@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.12
+    version 0.16
 
 SYNOPSIS
 
@@ -35,7 +35,7 @@ SYNOPSIS
 
  base_url
 
-    This is the base url for your jenkins installation. This is commonly
+    This is the base url for your Jenkins installation. This is commonly
     running on port 8080 so it's often something like http://jenkins:8080
 
  api_key
@@ -66,7 +66,7 @@ SYNOPSIS
 
  api_pass
 
-    The api token for basic auth. Go to the Jenkins wiki page on
+    The API token for basic auth. Go to the Jenkins wiki page on
     authenticating scripted clients
     <https://wiki.jenkins-ci.org/display/JENKINS/Authenticating+scripted+clients>
     for information on getting an API token for your user to use for
@@ -76,7 +76,7 @@ METHODS
 
  check_jenkins_url
 
-    Checks the url provided to the api has a Jenkins server running on it.
+    Checks the url provided to the API has a Jenkins server running on it.
     It returns the version number of the Jenkins server if it is running.
 
         $jenkins->check_jenkins_url;
@@ -271,7 +271,7 @@ METHODS
         $jenkins->build_queue();
 
     This allows the same extra_params as the "current_status" call. The
-    depth and tree parameters work in the same way. See the Jenkins api
+    depth and tree parameters work in the same way. See the Jenkins API
     documentation for more details.
 
     The method will die saying 'Invalid response' if the server doesn't
@@ -291,7 +291,7 @@ METHODS
         # }
 
     This also allows the same extra_params as the "current_status" call.
-    The depth and tree parameters work in the same way. See the Jenkins api
+    The depth and tree parameters work in the same way. See the Jenkins API
     documentation for more details.
 
     The method will die saying 'Invalid response' if the server doesn't
@@ -300,21 +300,21 @@ METHODS
 
  create_job
 
-    Takes the project name and the xml for a config file and gets Jenkins
+    Takes the project name and the XML for a config file and gets Jenkins
     to create the job.
 
         my $success = $api->create_job($project_name, $config_xml);
 
  project_config
 
-    This method returns the configuration for the project in xml.
+    This method returns the configuration for the project in XML.
 
         my $config = $api->project_config($project_name);
 
  set_project_config
 
     This method allows you to set the configuration for the project using
-    xml.
+    XML.
 
         my $success = $api->set_project_config($project_name, $config);
 
@@ -372,12 +372,11 @@ METHODS
  response_content
 
     This method returns the content of the HTTP response from our last
-    request to the Jenkins server. This may be useful when an error
-    occurrs.
+    request to the Jenkins server. This may be useful when an error occurs.
 
 BUGS
 
-    The API wrapper doesn't deal with jenkins installations not running
+    The API wrapper doesn't deal with Jenkins installations not running
     from the root path. I don't actually know if that's an install option,
     but the internal url building just doesn't deal with that situation
     properly. If you want that fixing a patch is welcome.

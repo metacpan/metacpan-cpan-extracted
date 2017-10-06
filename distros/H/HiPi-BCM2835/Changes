@@ -1,3 +1,6 @@
+Version 0.63  - 24 September 2017
+              - Added tests and dependency on HiPi 0.66
+
 Version 0.62  - 20 March 2017
               - Build errors after release 0.61
 

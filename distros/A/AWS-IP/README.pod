@@ -1,0 +1,108 @@
+=head2 SYNOPSIS
+
+  use AWS::IP;
+
+  my $aws = AWS::IP->new(600, '/tmp/aws_ip_cache');
+
+  # get the raw data as a Perl reference
+  my $aws_ip_data = $aws->get_raw_data;
+
+  # check if an ip address is AWS
+  if ($aws->is_aws_ip('50.0.0.1')
+  {
+    ..
+  }
+
+  # get a list of all AWS cidrs
+  my $cidrs = $aws->get_cidrs;
+
+  for (@$cidrs)
+  {
+    ...
+  }
+
+  # create your own ip checks
+  use Net::CIDR::Set;
+
+  my $ec2_cidrs = $aws->get_cidrs_by_service('EC2');
+  my $aws_ec2_set = Net::CIDR::Set->new( @$ec2_cidrs );
+
+  if ($aws_ec2_set->contains($ip)
+  {
+    ...
+  }
+
+  # time passes, cache has expired
+  $aws_ip_data = $aws->get_raw_data; # auto refreshes
+
+=head2 DESCRIPTION
+
+AWS L<publish|https://ip-ranges.amazonaws.com/ip-ranges.json> their IP ranges, which periodically change. This module downloads and serializes the IP ranges into a Perl data hash reference. It caches the data, and if the cache expires, re-downloads a new version. This can be helpful if you want to block all AWS IP addresses and periodically refresh the blocked IPs.
+
+=head2 new ($cache_timeout_secs, [$cache_path])
+
+Creates a new AWS::IP object and sets up the cache. Requires an number for the cache timeout seconds. Optionally takes a cache path argument. If no cache path is supplied, AWS::IP will use a random temp directory. If you want to reuse the cache over multiple processes, provide a cache path.
+
+
+=cut
+
+=head2 ip_is_aws ($ip, [$service])
+
+Boolean method to test if an ip address is from AWS. Optionally takes a service name (AMAZON|EC2|CLOUDFRONT|ROUTE53|ROUTE53_HEALTHCHECKS) and restricts the check to AWS ip addresses for that service.
+
+If you are checking more than one ip address, it's more efficient to pull the CIDRs you want, then use L<Net::CIDR::Set> to test if the ips are present in the CIDRs (see example in SYNOPSIS).
+
+
+=cut
+
+=head2 get_raw_data
+
+Returns the entire raw IP dataset as a Perl data structure.
+
+
+=cut
+
+=head2 get_cidrs
+
+Returns an arrayref of the L<CIDRs|http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing> in the AWS IP address data.
+
+
+=cut
+
+=head2 get_cidrs_by_region ($region)
+
+Returns an arrayref of CIDRs matching the provided region.
+
+
+=cut
+
+=head2 get_cidrs_by_service ($service)
+
+Returns an arrayref of CIDRs matching the provided service (AMAZON|EC2|CLOUDFRONT|ROUTE53|ROUTE53_HEALTHCHECKS).
+
+
+=cut
+
+=head2 get_regions
+
+Returns an arrayref of the regions in the AWS IP address data.
+
+
+=cut
+
+=head2 get_services
+
+Returns an arrayref of the services (Amazon, EC2 etc) in the AWS IP address data.
+
+
+=cut
+
+=head2 SEE ALSO
+
+L<AWS::Networks> - is similar to this module but does not provide cacheing.
+
+Amazon's L<page|http://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html> on AWS IP ranges.
+
+
+=cut
+

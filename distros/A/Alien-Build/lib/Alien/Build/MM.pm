@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 sub new
@@ -17,12 +17,21 @@ sub new
   
   my $self = bless {}, $class;
   
+  my %meta = map { $_ => $prop{$_} } grep /^my_/, keys %prop;
+
   my $build = $self->{build} =
     Alien::Build->load('alienfile',
       root     => "_alien",
       (-d 'patch' ? (patch => 'patch') : ()),
+      meta_prop => \%meta,
     )
   ;
+  
+  if(%meta)
+  {
+    $build->meta->add_requires(configure => 'Alien::Build::MM' => '1.20');
+    $build->meta->add_requires(configure => 'Alien::Build' => '1.20');
+  }
   
   if(defined $prop{alienfile_meta})
   {
@@ -344,7 +353,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -487,6 +496,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

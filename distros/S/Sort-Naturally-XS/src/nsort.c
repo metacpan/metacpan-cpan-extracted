@@ -16,14 +16,8 @@ int _ncmp(const char *a, const char *b, int reverse, int use_locale) {
     int offset_b = 0;
     bool is_digit_a = NULL;
     bool is_digit_b = NULL;
-    bool is_last_chunk_a_digit = NULL;
-    bool is_last_chunk_b_digit = NULL;
     bool is_fist_char_a_alpha = isAlpha(a[0]);
     bool is_fist_char_b_alpha = isAlpha(b[0]);
-    char *chunk_a;
-    char *chunk_b;
-    int chunk_a_int;
-    int chunk_b_int;
     int result = 0;
 
     if (!use_locale && is_fist_char_a_alpha && is_fist_char_b_alpha) {
@@ -37,11 +31,14 @@ int _ncmp(const char *a, const char *b, int reverse, int use_locale) {
     }
 
     if (result == 0) {
+        int chunk_a_int;
+        int chunk_b_int;
+
         while (offset_a != len_a && offset_b != len_b) {
-            chunk_a = get_next_chunk(a, &offset_a, &is_digit_a);
-            chunk_b = get_next_chunk(b, &offset_b, &is_digit_b);
-            is_last_chunk_a_digit = !is_digit_a;
-            is_last_chunk_b_digit = !is_digit_b;
+            char *chunk_a = get_next_chunk(a, &offset_a, &is_digit_a);
+            char *chunk_b = get_next_chunk(b, &offset_b, &is_digit_b);
+            bool is_last_chunk_a_digit = !is_digit_a;
+            bool is_last_chunk_b_digit = !is_digit_b;
 
             if (is_last_chunk_a_digit == is_last_chunk_b_digit) {
                 if (is_last_chunk_a_digit) {

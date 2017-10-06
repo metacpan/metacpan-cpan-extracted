@@ -89,26 +89,17 @@ getutent() - it is recommended that endutent() is called first.
 =cut
 
 use strict;
-use Carp;
+use warnings;
+use Carp qw(croak);
 
 require Exporter;
 require DynaLoader;
 
-use vars qw(
-            @ISA
-            %EXPORT_TAGS
-            @EXPORT_OK
-            @EXPORT
-            $VERSION
-            $AUTOLOAD
-            @constants
-           );
-
-@ISA = qw(Exporter DynaLoader);
+use base qw(Exporter DynaLoader);
 
 BEGIN
 {
-   @constants = qw(
+   our @constants = qw(
                    ACCOUNTING
                    BOOT_TIME
                    DEAD_PROCESS
@@ -121,41 +112,37 @@ BEGIN
                    USER_PROCESS
                   );
 }
+
 use Sys::Utmp::Utent;
 
 BEGIN
 {
-   %EXPORT_TAGS = (  
-                    'constants' => [ @constants ],
+   our %EXPORT_TAGS = (  
+                    'constants' => [ @Sys::Utmp::constants ],
                     'fields'    => [ @Sys::Utmp::Utent::EXPORT]
                   );
 
-   @EXPORT_OK = ( @{ $EXPORT_TAGS{'constants'} }, @{ $EXPORT_TAGS{'fields'}} );
+   our @EXPORT_OK = ( @{ $EXPORT_TAGS{'constants'} }, @{ $EXPORT_TAGS{'fields'}} );
 }
 
-$VERSION = '1.7';
+our $VERSION = '1.8';
 
-sub new 
-{
-  my ( $proto, %args ) = @_;
+sub new {
+    my ( $proto, %args ) = @_;
 
-  my $self = {};
+    my $self = {};
+    my $class = ref($proto) || $proto;
+    bless $self, $class;
 
-  my $class = ref($proto) || $proto;
-
-  bless $self, $class;
-
-  if ( exists $args{Filename} and -s $args{Filename} )
-  {
-    $self->utmpname($args{Filename});
-  }
-  
-  return $self;
+    if ( exists $args{Filename} and -s $args{Filename} ) {
+        $self->utmpname($args{Filename});
+    }
+    return $self;
 }
 
+our $AUTOLOAD;
 
-sub AUTOLOAD 
-{
+sub AUTOLOAD {
     my ( $self ) = @_;
 
     my $constname;
@@ -164,13 +151,12 @@ sub AUTOLOAD
     ($constname = $AUTOLOAD) =~ s/.*:://;
     croak "& not defined" if $constname eq 'constant';
     my $val = constant($constname, @_ ? $_[0] : 0);
-    if ($! != 0) 
-    {
+    if ($! != 0) {
 	    croak "Your vendor has not defined Sys::Utmp macro $constname";
     }
     {
-	no strict 'refs';
-	*{$AUTOLOAD} = sub { $val };
+	    no strict 'refs';
+	    *{$AUTOLOAD} = sub { $val };
     }
     goto &$AUTOLOAD;
 }

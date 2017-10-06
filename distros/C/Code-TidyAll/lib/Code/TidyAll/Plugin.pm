@@ -15,7 +15,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 has argv => (
     is      => 'ro',
@@ -251,7 +251,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 

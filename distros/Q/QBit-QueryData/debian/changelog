@@ -1,3 +1,17 @@
+libqbit-querydata-perl (0.005) raring; urgency=low
+
+  * added tests
+
+  * fix empty fields list
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 30 Sep 2017 16:04:21 +0300
+
+libqbit-querydata-perl (0.004) raring; urgency=low
+
+  * fix empty data
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 24 Sep 2017 11:43:08 +0300
+
 libqbit-querydata-perl (0.003) raring; urgency=low
 
   * added order by hash

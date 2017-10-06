@@ -1,5 +1,10 @@
 Revision history for String-Tagged
 
+0.15    2017-10-02 16:09:35
+        [CHANGES]
+         * Added ->from_sprintf constructor and ->sprintf convenience wrapper
+           method
+
 0.14    2017/04/24 15:46:45
         [BUGFIXES]
          * Ensure that ->get_tag_extent can see non-initial tags (RT120691)

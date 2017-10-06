@@ -1,0 +1,101 @@
+NAME
+    IO::AIO::LoadLimited - A tiny IO::AIO extension that allows to load
+    multiple files
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use IO::AIO;
+        use IO::AIO::LoadLimited;
+
+        my @pathnames = ( '/path/to/file', ...);
+        my $group = aio_group sub { ... };
+        my $limit = 10;
+        aio_load_limited @pathnames, sub {
+            my ($pathname, $content) = @_;
+
+            warn "could not read $pathname: $!" unless defined $content;
+            # whatever is neccessary...
+            ...
+        }, $group, $limit;
+
+    or
+
+        aio_load_limited @pathnames, sub {
+            my ($pathname, $content) = @_;
+
+            warn "could not read $pathname: $!" unless defined $content;
+            # whatever is neccessary...
+            ...
+        }, sub {
+             # done cb
+        };
+
+        IO::AIO::flush; # or use AnyEvent::AIO
+
+EXPORT
+    IO::AIO::LoadLimited exports aio_load_limited.
+
+SUBROUTINES
+    aio_load_limited @files, $cb, $group_or_donecb, $limit = 10;
+        The function aio_load_limited loads a list of files asynchronously
+        where the number of open filehandles used are limited so you don't
+        hit the hard limit of your operating system. The limit is archived
+        using the group and limit functionality of "IO::AIO". The callback
+        $cb gets invoked once for each file with the pathname as the first
+        parameter and the content of the file as the second. If the file can
+        not be opened or read the content is "undef". The third parameter
+        $group_or_donecb is either another callback that thats called when
+        everthing is done or an IO::AIO::GRP object. The last parameter
+        $limit is optional, its default value is 10.;
+
+SEE ALSO
+    IO::AIO
+    AnyEvent::IO and AnyEvent::AIO
+
+AUTHOR
+    Martin Barth, "<martin at senfdax.de>"
+
+BUGS
+    Please report any bugs or feature requests to
+    <https://github.com/ufobat/p5-IO-AIO-LoadLimited/issues>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc IO::AIO::LoadLimited
+
+    You can also look for information at:
+
+    *   Github: issue and request tracker (report bugs here)
+
+        <https://github.com/ufobat/p5-IO-AIO-LoadLimited/issues>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/IO-AIO-LoadLimited>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/IO-AIO-LoadLimited>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/IO-AIO-LoadLimited/>
+
+ACKNOWLEDGEMENTS
+    Thanks to M.Lehmann for IO::AIO and thanks to www.netdescribe.com.
+    Thanks to Moritz Lenz and Steffen Winkler for reviewing.
+
+LICENSE AND COPYRIGHT
+    Copyright 2017 Martin Barth.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

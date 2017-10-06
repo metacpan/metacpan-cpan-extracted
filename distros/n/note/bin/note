@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # note - console notes management with database and encryption support.
-# Copyright (C) 1999-2016 T.v.Dein   (see README for details!)
+# Copyright (C) 1999-2017 T.v.Dein   (see README for details!)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -38,29 +38,28 @@ use Getopt::Long;
 use FileHandle;
 use File::Spec;
 use YAML;
-#use Data::Dumper;
 
 
 #
 # prototypes
 #
-sub usage;		# print usage message for us thumb userz :-)
-sub find_editor;	# returns an external editor for use
-sub output;		# used by &list and &display
-sub C;			# print colourized 
-sub num_bereich;	# returns array from "1-4" (1,2,3,4)
-sub getdate;		# return pretty formatted day
-sub new;		# crate new note
-sub edit;		# edit a note
-sub del;		# delete a note
-sub display;		# display one or more notes
-sub list;		# note-listing
-sub help;		# interactive help screen
-sub import;		# import from notedb-dump
-sub display_tree;	# show nice tree-view
-sub tree;		# build the tree
-sub print_tree;		# print the tree, contributed by Jens Heunemann <Jens dot Heunemann at consol dot de>. THX!
-sub ticket;             # return a random string which is used as ticket number for new note entries
+sub usage;        # print usage message for us thumb userz :-)
+sub find_editor;  # returns an external editor for use
+sub output;       # used by &list and &display
+sub C;            # print colourized 
+sub num_bereich;  # returns array from "1-4" (1,2,3,4)
+sub getdate;      # return pretty formatted day
+sub new;          # crate new note
+sub edit;         # edit a note
+sub del;          # delete a note
+sub display;      # display one or more notes
+sub list;         # note-listing
+sub help;         # interactive help screen
+sub import;       # import from notedb-dump
+sub display_tree; # show nice tree-view
+sub tree;         # build the tree
+sub print_tree;   # print the tree, contributed by Jens Heunemann <Jens dot Heunemann at consol dot de>. THX!
+sub ticket;       # return a random string which is used as ticket number for new note entries
 
 #
 # globals
@@ -97,7 +96,7 @@ my (
     # internals
     #
     $TYPE, $mode, $NoteKey, %Color, @LastTopic, $timelen, $maxlen,
-    $version, $CurTopic, $CurDepth, $WantTopic, $db,
+    $VERSION, $CurTopic, $CurDepth, $WantTopic, $db,
     $sizeof, %TP, $TreeType, $ListType, $SetTitle, $clearstring,
     @ArgTopics, $key, $typedef, @NumBlock, $has_nothing, @completion_topics, @completion_notes,
     @randomlist, $hardparams
@@ -110,44 +109,42 @@ my (
 #
 
 %conf = (
-	 'numbercolor'       => 'blue',
-	 'bordercolor'       => 'black',
-	 'timecolor'         => 'black',
-	 'topiccolor'        => 'black',
-	 'notecolor'         => 'green',
-	 'alwaysinteractive' => 1,
-	 'keeptimestamp'     => 0,
-	 'readonly'          => 0,
-	 'shortcd'           => 1,
-	 'autoclear'         => 0,
-	 'maxlen'            => 'auto',
-	 'defaultlong'       => 0,
-	 'dbdriver'          => 'binary',
-	 'timeformat'        => 'DD.MM.YYYY hh:mm:ss',
-	 'usecolors'         => 0,
-	 'addticket'         => 0,
-	 'formattext'        => 0,
-	 'alwayseditor'      => 1,
-	 'useencryption'     => 0,
-	 'tempdirectory'     => File::Spec->tmpdir(),
-	 'topicseparator'    => '/',
-	 'printlines'        => 0,
-	 'cache'             => 0,
-	 'preferrededitor'   => '',
-	 'motd'              => ''
+     'numbercolor'       => 'blue',
+     'bordercolor'       => 'black',
+     'timecolor'         => 'black',
+     'topiccolor'        => 'black',
+     'notecolor'         => 'green',
+     'alwaysinteractive' => 1,
+     'keeptimestamp'     => 0,
+     'readonly'          => 0,
+     'shortcd'           => 1,
+     'autoclear'         => 0,
+     'maxlen'            => 'auto',
+     'defaultlong'       => 0,
+     'dbdriver'          => 'binary',
+     'timeformat'        => 'DD.MM.YYYY hh:mm:ss',
+     'usecolors'         => 0,
+     'addticket'         => 0,
+     'formattext'        => 0,
+     'alwayseditor'      => 1,
+     'useencryption'     => 0,
+     'tempdirectory'     => File::Spec->tmpdir(),
+     'topicseparator'    => '/',
+     'printlines'        => 0,
+     'cache'             => 0,
+     'preferrededitor'   => '',
+     'motd'              => ''
 );
 
 # these are not customizable at runtime!
 $hardparams = "(readonly|maxlen|dbdriver|useencryption|cryptmethod)";
-
-$CONF 		= File::Spec->catfile($ENV{HOME}, ".noterc");
-$USER 		= getlogin || getpwuid($<);
-chomp $USER;
-$TOPIC 		= 1;
-$version 	= "1.3.24";
-$CurDepth 	= 1;		# the current depth inside the topic "directory" structure...
-$maxlen         = "auto";
-$timelen        = 22;
+$CONF       = File::Spec->catfile($ENV{HOME}, ".noterc");
+$USER       = getlogin || getpwuid($<); chomp $USER;
+$TOPIC      = 1;
+$VERSION    = "1.3.25";
+$CurDepth   = 1;        # the current depth inside the topic "directory" structure...
+$maxlen     = "auto";
+$timelen    = 22;
 
 @randomlist = ('a'..'z', 0..9, 'A'..'Z');
 
@@ -199,31 +196,31 @@ if ($ARGV[0] eq "") {
 }
 elsif ($#ARGV == 0 && $ARGV[0] eq "-") {
   $mode = "new";
-  $NewType = 1;			# read from STDIN until EOF
+  $NewType = 1;            # read from STDIN until EOF
   shift;
   undef $has_nothing;
 }
 else {
   Getopt::Long::Configure( qw(no_ignore_case));
   GetOptions (
-              "interactive|i!"       => \$opt_i, # no arg
-              "config|c=s"	     => \$opt_c, # string,  required
-              "raw|r!"	             => \$opt_r, # no arg
-              "edit|e=i"	     => \$opt_e, # integer, required
-              "delete|d=s"	     => \$opt_d, # integer, required
-              "search|s=s"	     => \$opt_s, # string,  required
-              "tree|topic|t!"	     => \$opt_t, # no arg
-              "longtopic|T!"	     => \$opt_T, # no arg
-              "list|l:s"	     => \$opt_l, # string,  optional
-              "longlist|L:s"	     => \$opt_L, # string,  optional
-              "dump|Dump|D:s"       => \$opt_D, # string,  optional
-              "import|Import|I:s"    => \$opt_I, # string,  optional
-              "overwrite|o!"	     => \$opt_o, # no arg
-              "help|h|?!"	     => \$opt_h, # no arg
-              "version|v!"	     => \$opt_v, # no arg
-              "encrypt=s"            => \$opt_enc, # string, required
+              "interactive|i!"    => \$opt_i, # no arg
+              "config|c=s"        => \$opt_c, # string,  required
+              "raw|r!"            => \$opt_r, # no arg
+              "edit|e=i"          => \$opt_e, # integer, required
+              "delete|d=s"        => \$opt_d, # integer, required
+              "search|s=s"        => \$opt_s, # string,  required
+              "tree|topic|t!"     => \$opt_t, # no arg
+              "longtopic|T!"      => \$opt_T, # no arg
+              "list|l:s"          => \$opt_l, # string,  optional
+              "longlist|L:s"      => \$opt_L, # string,  optional
+              "dump|Dump|D:s"     => \$opt_D, # string,  optional
+              "import|Import|I:s" => \$opt_I, # string,  optional
+              "overwrite|o!"      => \$opt_o, # no arg
+              "help|h|?!"         => \$opt_h, # no arg
+              "version|v!"        => \$opt_v, # no arg
+              "encrypt=s"         => \$opt_enc, # string, required
              );
-  $opt_n = shift;		# after that @ARGV contains eventually
+  $opt_n = shift;        # after that @ARGV contains eventually
   # a note-number
   # $opt_ is a single dash, in case of existence!
   #
@@ -277,7 +274,7 @@ else {
       }
     }
     else {
-      $dump_file = "-";		# use STDIN
+      $dump_file = "-";        # use STDIN
     }
   }
   elsif (defined $opt_I) {
@@ -296,7 +293,7 @@ else {
     }
   }
   elsif ($opt_v) {
-    print "This is note $version by Thomas Linden <tom at linden dot at>.\n";
+    print "This is note $VERSION by Thomas Linden <tom at linden dot at>.\n";
     exit(0);
   }
   elsif ($opt_h) {
@@ -307,7 +304,7 @@ else {
       $mode = "new";
     }
     elsif ($opt_c && $mode eq "") {
-      $mode = "";		# huh?!
+      $mode = "";        # huh?!
     }
     else {
       $has_nothing = 1;
@@ -348,7 +345,7 @@ if ($has_nothing && $mode eq "") {
 
 
 # read the configfile.
-$CONF = $opt_c if($opt_c);	# if given by commandline, use this.
+$CONF = $opt_c if($opt_c);    # if given by commandline, use this.
 if (-e $CONF) {
   &getconfig($CONF);
 }
@@ -485,7 +482,7 @@ if ($conf{cache}) {
 
 
 # add the backend version to the note version:
-$version .= ", " . $conf{dbdriver} . " " . $db->version();
+$VERSION .= ", " . $conf{dbdriver} . " " . $db->version();
 
 
 # main loop: ###############
@@ -532,7 +529,8 @@ sub encrypt_passwd {
   if ($@) {
     print "Something went wrong: $@\n";
     exit 1;
-  } else {
+  }
+  else {
     print "Encrypted password:\n$crypt_string\n";
   }
 }
@@ -551,19 +549,19 @@ sub display {
     my($N,$match,$note,$date,$num);
     # display a certain note
     print "\n";
-    &num_bereich;		# get @NumBlock from $numer
+    &num_bereich;        # get @NumBlock from $numer
     my $count = scalar @NumBlock;
     foreach $N (@NumBlock) {
       ($note, $date) = $db->get_single($N);
       if ($note) {
-	if ($Raw) {
-	  print "$N\n$date\n$note\n\n";
-	}
-	else {
-	  output($N, $note, $date, "SINGLE", $count);
-	  print "\n";
-	}
-	$match = 1;
+    if ($Raw) {
+      print "$N\n$date\n$note\n\n";
+    }
+    else {
+      output($N, $note, $date, "SINGLE", $count);
+      print "\n";
+    }
+    $match = 1;
       }
       $count--;
     }
@@ -585,16 +583,16 @@ sub search {
       my $nummatches = scalar keys %res;
       &determine_width;
       foreach $num (sort { $a <=> $b } keys %res) {
-	if ($nummatches == 1) {
-	  output($num, $res{$num}->{'note'}, $res{$num}->{'date'}, "SINGLE");
-	}
-	else {
-	  output($num, $res{$num}->{'note'}, $res{$num}->{'date'}, "search");
-	}
-	$match = 1;
+        if ($nummatches == 1) {
+          output($num, $res{$num}->{'note'}, $res{$num}->{'date'}, "SINGLE");
+        }
+        else {
+          output($num, $res{$num}->{'note'}, $res{$num}->{'date'}, "search");
+        }
+        $match = 1;
       }
       if (!$match) {
-	print "no matching note found!\n";
+        print "no matching note found!\n";
       }
       print "\n";
     }
@@ -622,82 +620,82 @@ sub list {
       $n = $res{$num}->{'note'};
       $t = $res{$num}->{'date'};
       if ($TOPIC) {
-	# this allows us to have multiple topics (subtopics!)
-	my ($firstline,$dummy) = split /\n/, $n, 2;
-	if ($firstline =~ /^($conf{topicseparator})/) {
-	  @topic = split(/$conf{topicseparator}/,$firstline);
-	}
-	else {
-	  @topic = ();
-	}
-	# looks like: "\topic\"
-	# collect a list of topics under the current topic
-	if ($topic[$CurDepth-1] eq $CurTopic && $topic[$CurDepth] ne "") {
-	  if (exists $TP{$topic[$CurDepth]}) {
-	    $TP{$topic[$CurDepth]}++;
-	  }
-	  else {
-	    # only if the next item *is* a topic!
-	    $TP{$topic[$CurDepth]} = 1 if(($CurDepth) <= $#topic);
-	  }
-	}
-	elsif ($topic[$CurDepth-1] eq $CurTopic || ($topic[$CurDepth] eq "" && $CurDepth ==1)) {
-	  # cut the topic off the note-text
-	  if ($n =~ /^($conf{topicseparator})/) {
-	    $CurItem[$i]->{'note'} = $dummy;
-	  }
-	  else {
-	    $CurItem[$i]->{'note'} = $n;
-	  }
-	  # save for later output() call
-	  $CurItem[$i]->{'num'}  = $num;
-	  $CurItem[$i]->{'time'} = $t;
-	  $i++;
-	  # use this note for building the $PATH!
-	  if ($RealTopic[0] eq "") {
-	    @RealTopic = @topic;
-	  }
-	}
+        # this allows us to have multiple topics (subtopics!)
+        my ($firstline,$dummy) = split /\n/, $n, 2;
+        if ($firstline =~ /^($conf{topicseparator})/) {
+          @topic = split(/$conf{topicseparator}/,$firstline);
+        }
+        else {
+          @topic = ();
+        }
+        # looks like: "\topic\"
+        # collect a list of topics under the current topic
+        if ($topic[$CurDepth-1] eq $CurTopic && $topic[$CurDepth] ne "") {
+          if (exists $TP{$topic[$CurDepth]}) {
+            $TP{$topic[$CurDepth]}++;
+          }
+          else {
+            # only if the next item *is* a topic!
+            $TP{$topic[$CurDepth]} = 1 if(($CurDepth) <= $#topic);
+          }
+        }
+        elsif ($topic[$CurDepth-1] eq $CurTopic || ($topic[$CurDepth] eq "" && $CurDepth ==1)) {
+          # cut the topic off the note-text
+          if ($n =~ /^($conf{topicseparator})/) {
+            $CurItem[$i]->{'note'} = $dummy;
+          }
+          else {
+            $CurItem[$i]->{'note'} = $n;
+          }
+          # save for later output() call
+          $CurItem[$i]->{'num'}  = $num;
+          $CurItem[$i]->{'time'} = $t;
+          $i++;
+          # use this note for building the $PATH!
+          if ($RealTopic[0] eq "") {
+            @RealTopic = @topic;
+          }
+        }
       }
       else {
-	output($num, $n, $t);
+        output($num, $n, $t);
       }
     }
     if ($TOPIC) {
       if ($CurTopic ne "") {
-	if ($i) {
-	  # only if there were notes under current topic
-	  undef $PATH;
-	  foreach (@RealTopic) {
-	    $PATH .= $_ . $conf{topicseparator};
-	    last if($_ eq $CurTopic);
-	  }
-	}
-	else {
-	  # it is an empty topic, no notes here
-	  $PATH = join $conf{topicseparator}, @LastTopic;
-	  $PATH .= $conf{topicseparator} . $CurTopic . $conf{topicseparator};
-	  $PATH =~ s/^\Q$conf{topicseparator}$conf{topicseparator}\E/$conf{topicseparator}/;
-	}
+        if ($i) {
+          # only if there were notes under current topic
+          undef $PATH;
+          foreach (@RealTopic) {
+            $PATH .= $_ . $conf{topicseparator};
+            last if($_ eq $CurTopic);
+          }
+        }
+        else {
+          # it is an empty topic, no notes here
+          $PATH = join $conf{topicseparator}, @LastTopic;
+          $PATH .= $conf{topicseparator} . $CurTopic . $conf{topicseparator};
+          $PATH =~ s/^\Q$conf{topicseparator}$conf{topicseparator}\E/$conf{topicseparator}/;
+        }
       }
       else {
-	$PATH = $conf{topicseparator};
+        $PATH = $conf{topicseparator};
       }
 
       @completion_topics = ();
       @completion_notes  = ();
       # we are at top level, print a list of topics...
       foreach $top (sort(keys %TP)) {
-	push @completion_topics, $top;
-	output("-", " => ". $top . "$conf{topicseparator} ($TP{$top} notes)",
-	       " Sub Topic         ");
+        push @completion_topics, $top;
+        output("-", " => ". $top . "$conf{topicseparator} ($TP{$top} notes)",
+               " Sub Topic         ");
       }
       #print Dumper(@CurItem);
       for ($in=0;$in<$i;$in++) {
-	push @completion_notes, $CurItem[$in]->{'num'};
-	output( $CurItem[$in]->{'num'},
-		$CurItem[$in]->{'note'},
-		$CurItem[$in]->{'time'} );
+        push @completion_notes, $CurItem[$in]->{'num'};
+        output( $CurItem[$in]->{'num'},
+                $CurItem[$in]->{'note'},
+                $CurItem[$in]->{'time'} );
       }
     }
 
@@ -708,8 +706,8 @@ sub list {
 sub new {
     my($TEMP,$editor, $date, $note, $WARN, $c, $line, $num, @topic);
     if ($conf{readonly}) {
-	print "readonly\n";
-	return;
+    print "readonly\n";
+    return;
     }
     $date = &getdate;
     return if $db->lock();
@@ -720,29 +718,29 @@ sub new {
       # let the user edit it...
       $editor = &find_editor;
       if ($editor) {
-	# create the temp file
-	open NEW, "> $TEMP" or die "Could not write $TEMP: $!\n";
-	close NEW;
-	system "chattr", "+s", $TEMP; # ignore errors, since only on ext2 supported!
-	system $editor, $TEMP;
+        # create the temp file
+        open NEW, "> $TEMP" or die "Could not write $TEMP: $!\n";
+        close NEW;
+        system "chattr", "+s", $TEMP; # ignore errors, since only on ext2 supported!
+        system $editor, $TEMP;
       }
       else {
-	print "Could not find an editor to use!\n";
-	$db->unlock();
-	exit(0);
+        print "Could not find an editor to use!\n";
+        $db->unlock();
+        exit(0);
       }
       # read it in ($note)
       $note = "";
       open E, "<$TEMP" or $WARN = 1;
       if ($WARN) {
-	print "...edit process interupted! No note has been saved.\n";
-	undef $WARN;
-	$db->unlock();
-	return;
+        print "...edit process interupted! No note has been saved.\n";
+        undef $WARN;
+        $db->unlock();
+        return;
       }
       $c = 0;
       while (<E>) {
-	$note = $note . $_;
+        $note = $note . $_;
       }
       chomp $note;
       close E;
@@ -754,21 +752,21 @@ sub new {
       $line = "";
       # create a new note
       if ($NewType) {
-	# be silent! read from STDIN until EOF.
-	while (<STDIN>) {
-	  $note .= $_;
-	}
+        # be silent! read from STDIN until EOF.
+        while (<STDIN>) {
+          $note .= $_;
+        }
       }
       else {
-	print "enter the text of the note, end with a single .\n";
-	do
-	  {
-	    $line = <STDIN>;
-	    $note = $note . $line;
-	  } until $line eq ".\n";
-	# remove the . !
-	chop $note;
-	chop $note;
+        print "enter the text of the note, end with a single .\n";
+        do
+          {
+            $line = <STDIN>;
+            $note = $note . $line;
+          } until $line eq ".\n";
+        # remove the . !
+        chop $note;
+        chop $note;
       }
     }
     # look if the note was empty, so don't store it!
@@ -782,7 +780,7 @@ sub new {
     if ($TOPIC && $CurTopic ne "") {
       @topic = split(/$conf{topicseparator}/,$note);
       if ($topic[1] eq "") {
-	$note = $PATH . "\n$note";
+        $note = $PATH . "\n$note";
       }
     }
     $note = &add_ticket($note);
@@ -794,30 +792,30 @@ sub new {
   }
 
 sub add_ticket {
-	my $orignote = shift;
-	if ($conf{addticket}) {
-	  my ($topic, $title, $rest) = split /\n/, $orignote, 3;
-	  my $note = "";
-	  if ($topic =~ /^\//) {
-	    # topic path, keep it
-	    $note .= "$topic\n";
-	  }
-	  else {
-	    # no topic
-	    $rest  = "$title\n$rest";
-	    $title = $topic;
-	  }
-	  if ($title !~ /^\[[a-z0-9A-Z]+\]/) {
-	    # no ticket number, so create one
-	    my $ticket = &ticket();
-	    $title = "[" . ticket() . "] " . $title;
-	  }
-	  $note .= "$title\n$rest";
-	  return $note;
-	}
-        else {
-	  return $orignote;
-        }
+    my $orignote = shift;
+    if ($conf{addticket}) {
+      my ($topic, $title, $rest) = split /\n/, $orignote, 3;
+      my $note = "";
+      if ($topic =~ /^\//) {
+        # topic path, keep it
+        $note .= "$topic\n";
+      }
+      else {
+        # no topic
+        $rest  = "$title\n$rest";
+        $title = $topic;
+      }
+      if ($title !~ /^\[[a-z0-9A-Z]+\]/) {
+        # no ticket number, so create one
+        my $ticket = &ticket();
+        $title = "[" . ticket() . "] " . $title;
+      }
+      $note .= "$title\n$rest";
+      return $note;
+    }
+    else {
+      return $orignote;
+    }
 }
 
 
@@ -826,20 +824,20 @@ sub del {
     my($i,@count, $setnum, $pos, $ERR);
     if ($conf{readonly}) {
         print "readonly\n";
-	return;
+    return;
     }
     # delete a note
-    &num_bereich;		# get @NumBlock from $number
+    &num_bereich;        # get @NumBlock from $number
 
     return if $db->lock();
 
     foreach $_ (@NumBlock) {
       $ERR = $db->set_del($_);
       if ($ERR) {
-	print "no note with number $_ found!\n";
+        print "no note with number $_ found!\n";
       }
       else {
-	print "note number $_ has been deleted.\n";
+        print "note number $_ has been deleted.\n";
       }
     }
     # recount the notenumbers:
@@ -865,12 +863,12 @@ sub edit {
     if ($keeptime eq "") {
       print "no note with that number found ($number)!\n\n";
       if($mode ne "interactive") {
-	$db->unlock();
-	exit(0);
+        $db->unlock();
+        exit(0);
       }
       else {
-	$db->unlock();
-	return;
+        $db->unlock();
+        return;
       }
     }
 
@@ -907,10 +905,10 @@ sub edit {
 
     if ($note ne $backup) {
       if ($conf{keeptimestamp}) {
-	$t = $keeptime;
+        $t = $keeptime;
       }
       else {
-	$t = $date;
+        $t = $date;
       }
       # we got it, now save to db
       $db->set_edit($number, $note, $t);
@@ -998,15 +996,15 @@ sub determine_width {
     eval {
       my $wide = `stty -a`;
       if ($wide =~ /columns (\d+?);/) {
-	$maxlen = $1 - 32; # (32 = timestamp + borders)
+        $maxlen = $1 - 32; # (32 = timestamp + borders)
       }
       elsif ($wide =~ /; (\d+?) columns;/) {
-	# bsd
+        # bsd
         $maxlen = $1 - 32; # (32 = timestamp + borders)
       }
       else {
-	# stty didn't work
-	$maxlen = 80 - 32;
+        # stty didn't work
+        $maxlen = 80 - 32;
       }
     };
   }
@@ -1040,16 +1038,16 @@ sub interactive {
     # create menu:
     $B = "<white_black>";
     $BB = "</white_black>";
-    $menu = 	"[" .  $B . "L" . $BB . "-List ";
+    $menu =     "[" .  $B . "L" . $BB . "-List ";
     if ($TOPIC) {
       $menu .= $B . "T" . $BB . "-Topics ";
     }
-    $menu	.= $B . "N" . $BB . "-New "
-                 . $B . "D" . $BB . "-Delete "
-	         . $B . "S" . $BB . "-Search "
-	         . $B . "E" . $BB . "-Edit "
-	         . $B . "?" . $BB . "-Help "
-	         . $B . "Q" . $BB . "-Quit] "; # $CurTopic will be empty if $TOPIC is off!
+    $menu   .= $B . "N" . $BB . "-New "
+             . $B . "D" . $BB . "-Delete "
+             . $B . "S" . $BB . "-Search "
+             . $B . "E" . $BB . "-Edit "
+             . $B . "?" . $BB . "-Help "
+             . $B . "Q" . $BB . "-Quit] "; # $CurTopic will be empty if $TOPIC is off!
 
     # per default let's list all the stuff:
     # Initially do a list command!
@@ -1076,225 +1074,225 @@ sub interactive {
       $ListType = ($conf{defaultlong}) ? "LONG" : "";
       undef $SetTitle;
       if ($CurDepth > 2) {
-	print C $menu . $TOPICC . "../" . $CurTopic . $_TOPICC;
+        print C $menu . $TOPICC . "../" . $CurTopic . $_TOPICC;
       }
       else {
-	print C $menu . $TOPICC . $CurTopic . $_TOPICC;
+        print C $menu . $TOPICC . $CurTopic . $_TOPICC;
       }
 
       if ($conf{readonly}) {
-	print " [readonly] ";
+        print " [readonly] ";
       }
 
       print ">";
 
       # endless until user press "Q" or "q"!
       if ($term) {
-	if (defined ($char = $term->readline(" "))) {
-	  $term->addhistory($char) if $char =~ /\S/;
-	  $char =~ s/\s*$//; # remove trailing whitespace (could come from auto-completion)
-	}
-	else {
-	  # shutdown
-	  $| = $Channel;
-	  print "\n\ngood bye!\n";
-	  exit(0);
-	}
+        if (defined ($char = $term->readline(" "))) {
+          $term->addhistory($char) if $char =~ /\S/;
+          $char =~ s/\s*$//; # remove trailing whitespace (could come from auto-completion)
+        }
+        else {
+          # shutdown
+          $| = $Channel;
+          print "\n\ngood bye!\n";
+          exit(0);
+        }
       }
       else {
-	$char = <STDIN>;
-	chomp $char;
+        $char = <STDIN>;
+        chomp $char;
       }
 
       &determine_width;
       &clear;
 
       if ($char =~ /^\d+\s*[\di*?,*?\-*?]*$/) {
-	$ListType = "";		#overrun
-				# display notes
-	$number = $char;
-	&display;
+        $ListType = "";        #overrun
+        # display notes
+        $number = $char;
+        &display;
       }
       elsif ($char =~ /^n$/i) {
-	# create a new one
-	&new;
+        # create a new one
+        &new;
       }
       elsif ($char =~ /^$/) {
-	&list;
+        &list;
       }
       elsif ($char =~ /^l$/) {
-	$ListType = "";
-	&list;
+        $ListType = "";
+        &list;
       }
       elsif ($char =~ /^L$/) {
-	$ListType = "LONG";
-	&list;
-	undef $SetTitle;
+        $ListType = "LONG";
+        &list;
+        undef $SetTitle;
       }
       elsif ($char =~ /^h$/i || $char =~ /^\?/) {
-	# zu dumm der Mensch ;-)
-	&help;
+        # zu dumm der Mensch ;-)
+        &help;
       }
       elsif ($char =~ /^d\s+([\d*?,*?\-*?]*)$/i) {
-	# delete one!
-	$number = $1;
-	&del;
+        # delete one!
+        $number = $1;
+        &del;
       }
       elsif ($char =~ /^d$/i) {
-	# we have to ask her:
-	print "enter number(s) of note(s) you want to delete: ";
-	$char = <STDIN>;
-	chomp $char;
-	$number = $char;
-	&del;
+        # we have to ask her:
+        print "enter number(s) of note(s) you want to delete: ";
+        $char = <STDIN>;
+        chomp $char;
+        $number = $char;
+        &del;
       }
       elsif ($char =~ /^e\s+(\d+\-*\,*\d*)/i) {
-	# edit one!
-	$number = $1;
-	&edit;
+        # edit one!
+        $number = $1;
+        &edit;
       }
       elsif ($char =~ /^e$/i) {
-	# we have to ask her:
-	print "enter number of the note you want to edit: ";
-	$char = <STDIN>;
-	chomp $char;
-	$number = $char;
-	&edit;
+        # we have to ask her:
+        print "enter number of the note you want to edit: ";
+        $char = <STDIN>;
+        chomp $char;
+        $number = $char;
+        &edit;
       }
       elsif ($char =~ /^s\s+/i) {
-	# she want's to search
-	$searchstring = $';
-	chomp $searchstring;
-	&search;
+        # she want's to search
+        $searchstring = $';
+        chomp $searchstring;
+        &search;
       }
       elsif ($char =~ /^s$/i) {
-	# we have to ask her:
-	print "enter the string you want to search for: ";
-	$char = <STDIN>;
-	chomp $char;
-	$char =~ s/^\n//;
-	$searchstring = $char;
-	&search;
+        # we have to ask her:
+        print "enter the string you want to search for: ";
+        $char = <STDIN>;
+        chomp $char;
+        $char =~ s/^\n//;
+        $searchstring = $char;
+        &search;
       }
       elsif ($char =~ /^q$/i) {
-	# schade!!!
-	$| = $Channel;
-	print "\n\ngood bye!\n";
-	exit(0);
+        # schade!!!
+        $| = $Channel;
+        print "\n\ngood bye!\n";
+        exit(0);
       }
       elsif ($char =~ /^t$/) {
-	$TreeType = "";
-	&display_tree;
+        $TreeType = "";
+        &display_tree;
       }
       elsif ($char =~ /^T$/) {
-	$TreeType = "LONG";
-	&display_tree;
-	$TreeType = "";
+        $TreeType = "LONG";
+        &display_tree;
+        $TreeType = "";
       }
       elsif ($char =~ /^c\s*$/) {
-	print "Missing parameter (parameter=value), available ones:\n";
-	foreach my $var (sort keys %conf) {
-	  if ($var !~ /^$hardparams/ && $var !~ /::/) {
-	    printf "%20s = %s\n", $var, $conf{$var};
-	  }
-	}
+        print "Missing parameter (parameter=value), available ones:\n";
+        foreach my $var (sort keys %conf) {
+          if ($var !~ /^$hardparams/ && $var !~ /::/) {
+            printf "%20s = %s\n", $var, $conf{$var};
+          }
+        }
       }
       elsif ($char =~ /^c\s*(.+?)\s*=\s*(.+?)/) {
-	# configure
-	my $param = $1;
-	my $value = $2;
-	if ($param !~ /^$hardparams/ && $param !~ /::/ && exists $conf{$param}) {
-	    print "Changing $param from $conf{$param} to $value\n";
-	    $conf{$param} = $value;
-	}
-	else {
-	  print "Unknown config parameter $param!\n";
-	}
+        # configure
+        my $param = $1;
+        my $value = $2;
+        if ($param !~ /^$hardparams/ && $param !~ /::/ && exists $conf{$param}) {
+          print "Changing $param from $conf{$param} to $value\n";
+          $conf{$param} = $value;
+        }
+        else {
+          print "Unknown config parameter $param!\n";
+        }
       }
       elsif ($char =~ /^\.\.$/ || $char =~ /^cd\s*\.\.$/) {
-	$CurDepth-- if ($CurDepth > 1);
-	$CurTopic = $LastTopic[$CurDepth];
-	pop @LastTopic; # remove last element
-	&list;
+        $CurDepth-- if ($CurDepth > 1);
+        $CurTopic = $LastTopic[$CurDepth];
+        pop @LastTopic; # remove last element
+        &list;
       }
       elsif ($char =~ /^l\s+(\w+)$/) {
-	# list
-	$WantTopic = $1;
-	if (exists $TP{$WantTopic}) {
-	  my %SaveTP = %TP;
-	  $LastTopic[$CurDepth] = $CurTopic;
-	  $CurTopic = $1;
-	  $CurDepth++;
-	  &list;
-	  $CurTopic = $LastTopic[$CurDepth];
-	  $CurDepth--;
-	  %TP = %SaveTP;
-	}
-	else {
-	  print "\nunknown command!\n";
-	}
+        # list
+        $WantTopic = $1;
+        if (exists $TP{$WantTopic}) {
+          my %SaveTP = %TP;
+          $LastTopic[$CurDepth] = $CurTopic;
+          $CurTopic = $1;
+          $CurDepth++;
+          &list;
+          $CurTopic = $LastTopic[$CurDepth];
+          $CurDepth--;
+          %TP = %SaveTP;
+        }
+        else {
+          print "\nunknown command!\n";
+        }
       }
       else {
-	# unknown
-	my $unchar = $char;
-	$unchar =~ s/^cd //;	# you may use cd <topic> now!
-	if ($unchar =~ /^\d+?$/ && $conf{short_cd}) {
-	  # just a number!
-	  my @topic;
-	  my ($cnote, $cdate) = $db->get_single($unchar);
-	  my ($firstline,$dummy) = split /\n/, $cnote, 2;
-	  if ($firstline =~ /^($conf{topicseparator})/) {
-	    @topic = split(/$conf{topicseparator}/,$firstline);
-	  }
-	  else {
-	    @topic = ();
-	  }
-	  if (@topic) {
-	    # only jump, if, and only if there were at least one topic!
-	    $CurDepth = $#topic + 1;
-	    $CurTopic = pop @topic;
-	    @LastTopic = ("");
-	    push @LastTopic, @topic;
-	  }
-	  &list;
-	}
-	elsif ($unchar eq $conf{topicseparator}) {
-	  # cd /
-	  $CurDepth = 1;
-	  $CurTopic = "";
-	  &list;
-	}
-	elsif (exists $TP{$char} || exists $TP{$unchar}) {
-	  $char = $unchar if(exists $TP{$unchar});
-	  $LastTopic[$CurDepth] = $CurTopic;
-	  $CurTopic = $char;
-	  $CurDepth++;
-	  &list;
-	}
-	else {
-	  # try incomplete match
-	  my @matches;
-	  foreach my $topic (keys %TP) {
-	    if ($topic =~ /^$char/) {
-	      push @matches, $topic;
-	    }
-	  }
-	  my $nm = scalar @matches;
-	  if ($nm == 1) {
-	    # match on one incomplete topic, use this
-	    $LastTopic[$CurDepth] = $CurTopic;
-	    $CurTopic = $matches[0];
-	    $CurDepth++;
-	    &list;
-	  }
-	  elsif ($nm > 1) {
-	    print "available topics: " . join( "," , @matches) . "\n";
-	  }
-	  else {
-	    print "\nunknown command!\n";
-	  }
-	}
-	undef $unchar;
+        # unknown
+        my $unchar = $char;
+        $unchar =~ s/^cd //;    # you may use cd <topic> now!
+        if ($unchar =~ /^\d+?$/ && $conf{short_cd}) {
+          # just a number!
+          my @topic;
+          my ($cnote, $cdate) = $db->get_single($unchar);
+          my ($firstline,$dummy) = split /\n/, $cnote, 2;
+          if ($firstline =~ /^($conf{topicseparator})/) {
+            @topic = split(/$conf{topicseparator}/,$firstline);
+          }
+          else {
+            @topic = ();
+          }
+          if (@topic) {
+            # only jump, if, and only if there were at least one topic!
+            $CurDepth = $#topic + 1;
+            $CurTopic = pop @topic;
+            @LastTopic = ("");
+            push @LastTopic, @topic;
+          }
+          &list;
+        }
+        elsif ($unchar eq $conf{topicseparator}) {
+          # cd /
+          $CurDepth = 1;
+          $CurTopic = "";
+          &list;
+        }
+        elsif (exists $TP{$char} || exists $TP{$unchar}) {
+          $char = $unchar if(exists $TP{$unchar});
+          $LastTopic[$CurDepth] = $CurTopic;
+          $CurTopic = $char;
+          $CurDepth++;
+          &list;
+        }
+        else {
+          # try incomplete match
+          my @matches;
+          foreach my $topic (keys %TP) {
+            if ($topic =~ /^$char/) {
+              push @matches, $topic;
+            }
+          }
+          my $nm = scalar @matches;
+          if ($nm == 1) {
+            # match on one incomplete topic, use this
+            $LastTopic[$CurDepth] = $CurTopic;
+            $CurTopic = $matches[0];
+            $CurDepth++;
+            &list;
+          }
+          elsif ($nm > 1) {
+            print "available topics: " . join( "," , @matches) . "\n";
+          }
+          else {
+            print "\nunknown command!\n";
+          }
+        }
+        undef $unchar;
       }
     }
   }
@@ -1302,11 +1300,11 @@ sub interactive {
 
 sub usage
   {
-    print qq~This is the program note $version by Thomas Linden (c) 1999-2009.
+    print qq~This is the program note $VERSION by T.v.Dein (c) 1999-2017.
 It comes with absolutely NO WARRANTY. It is distributed under the
 terms of the GNU General Public License. Use it at your own risk :-)
 
-Usage: 	note [ options ] [ number [,number...]]
+Usage:     note [ options ] [ number [,number...]]
 
 Options:
 
@@ -1441,79 +1439,79 @@ sub output {
       $L = $BORDERC . "[" . $_BORDERC;
       $R = $BORDERC . "]" . $_BORDERC;
     }
-    $PathLen = length($PATH);	# will be ZERO, if not in TOPIC mode!
-    $VersionLen = length($version) + 7;
+    $PathLen = length($PATH);    # will be ZERO, if not in TOPIC mode!
+    $VersionLen = length($VERSION) + 7;
 
     if ($TYPE ne "SINGLE") {
       if (!$SetTitle) {
-	$SP = "";
-	# print only if it is the first line!
-	$SP = " " x ($maxlen - 2 - $PathLen - $VersionLen);
-	if (!$Raw) {
-	  # no title in raw-mode!
-	  print C $LINE if ($conf{printlines});
-	  print C "$L $NUMC#$_NUMC  ";
-	  if ($ListType eq "LONG") {
-	    print C " $TIMEC" . "creation date$_TIMEC          ";
-	  }
-	  else {
-	    print $LONGSPC if ($conf{printlines});
-	  }
-	  if ($TOPIC) {
-	    print C $TOPICC . "$PATH    $_TOPICC$SP" . " note $version $R\n";
-	  }
-	  else {
-	    print C $NOTEC . "note$_NOTEC$SP" . " note $version $R\n";
-	  }
-	  print C $LINE if ($conf{printlines});
-	}
-	$SetTitle = 1;
+        $SP = "";
+        # print only if it is the first line!
+        $SP = " " x ($maxlen - 2 - $PathLen - $VersionLen);
+        if (!$Raw) {
+          # no title in raw-mode!
+          print C $LINE if ($conf{printlines});
+          print C "$L $NUMC#$_NUMC  ";
+          if ($ListType eq "LONG") {
+            print C " $TIMEC" . "creation date$_TIMEC          ";
+          }
+          else {
+            print $LONGSPC if ($conf{printlines});
+          }
+          if ($TOPIC) {
+            print C $TOPICC . "$PATH    $_TOPICC$SP" . " note $VERSION $R\n";
+          }
+          else {
+            print C $NOTEC . "note$_NOTEC$SP" . " note $VERSION $R\n";
+          }
+          print C $LINE if ($conf{printlines});
+        }
+        $SetTitle = 1;
       }
       $title = "";
       $CUTSPACE = " " x $txtlen;
       if ($TYPE eq "search") {
-	$note =~ s/^\Q$conf{topicseparator}\E.+?\Q$conf{topicseparator}\E\n//;
+        $note =~ s/^\Q$conf{topicseparator}\E.+?\Q$conf{topicseparator}\E\n//;
       }
       $note =~ s/\n/$CUTSPACE/g;
       $len   = length($note);
       if ($len < ($txtlen - 2 - $nlen)) {
-	$diff = $txtlen - $len;
-	if (!$Raw) {
-	  if ($num eq "-") {
-	    $Space = " " x $diff;
-	    $title = $BORDERC . $TOPICC . $note . " " . $_TOPICC . $Space . "$_BORDERC";
-	  }
-	  else {
-	    $Space = " " x ($diff - ($nlen - 1));
-	    $title = $BORDERC . $NOTEC  . $note . " " . $_NOTEC . $Space . "$_BORDERC";
-	  }
-	}
-	else {
-	  $title = $note;
-	}
+        $diff = $txtlen - $len;
+        if (!$Raw) {
+          if ($num eq "-") {
+            $Space = " " x $diff;
+            $title = $BORDERC . $TOPICC . $note . " " . $_TOPICC . $Space . "$_BORDERC";
+          }
+          else {
+            $Space = " " x ($diff - ($nlen - 1));
+            $title = $BORDERC . $NOTEC  . $note . " " . $_NOTEC . $Space . "$_BORDERC";
+          }
+        }
+        else {
+          $title = $note;
+        }
       }
       else {
-	$title = substr($note,0,($txtlen - 2 - $nlen));
-	if (!$Raw) {
-	  $title = $BORDERC . $NOTEC . $title . " $_NOTEC$_BORDERC";
-	}
+        $title = substr($note,0,($txtlen - 2 - $nlen));
+        if (!$Raw) {
+          $title = $BORDERC . $NOTEC . $title . " $_NOTEC$_BORDERC";
+        }
       }
       if ($Raw) {
-	print "$num  ";
-	print "$time  " if($ListType eq "LONG");
-	if ($title =~ /^ => (.*)$conf{topicseparator} (.*)$/) {
-	  $title = "$1$conf{topicseparator} $2"; # seems to be a topic!
-	}
-	print "$title\n";
+        print "$num  ";
+        print "$time  " if($ListType eq "LONG");
+        if ($title =~ /^ => (.*)$conf{topicseparator} (.*)$/) {
+          $title = "$1$conf{topicseparator} $2"; # seems to be a topic!
+        }
+        print "$title\n";
       }
       else {
-	# $title should now look as: "A sample note                       "
-	print C "$L $NUMC$num$_NUMC $R";
-	if ($ListType eq "LONG") {
-	  print C "$L$TIMEC" . $time . " $_TIMEC$R"; 
-	}
-	print C "$L $NOTEC" . $title . "$_NOTEC $R\n";
-	print C $LINE if ($conf{printlines});
+        # $title should now look as: "A sample note                       "
+        print C "$L $NUMC$num$_NUMC $R";
+        if ($ListType eq "LONG") {
+          print C "$L$TIMEC" . $time . " $_TIMEC$R"; 
+        }
+        print C "$L $NOTEC" . $title . "$_NOTEC $R\n";
+        print C $LINE if ($conf{printlines});
       }
     }
     else {
@@ -1525,15 +1523,15 @@ sub output {
       my $usecol = $conf{usecolors};
 
       if ($conf{less}) {
-	      my $less = "less";
-	      if ($conf{less} ne 1) {
-		      # use given less command line
-		      $less = $conf{less};
-	      }
-	      if (open LESS, "|$less") {
-		      *CHANNEL = *LESS;
-		      $conf{usecolors} = 0;
-	      }
+        my $less = "less";
+        if ($conf{less} ne 1) {
+          # use given less command line
+          $less = $conf{less};
+        }
+        if (open LESS, "|$less") {
+          *CHANNEL = *LESS;
+          $conf{usecolors} = 0;
+        }
       }
 
       print CHANNEL C $LINE if ($conf{printlines});
@@ -1543,7 +1541,7 @@ sub output {
       print CHANNEL C $LINE if ($count == 1 && $conf{printlines});
 
       if ($conf{less}) {
-	      close LESS;
+        close LESS;
       }
 
       $conf{usecolors} = $usecol;
@@ -1558,15 +1556,15 @@ sub C {
     $S = $_[0];
     foreach $Col (%Color) {
       if ($S =~ /<$Col>/g) {
-	if ($conf{usecolors}) {
-	  $NC = "\033[" . $Color{$Col} . "m";
-	  $S =~ s/<$Col>/$NC/g;
-	  $S =~ s/<\/$Col>/$default/g;
-	}
-	else {
-	  $S =~ s/<$Col>//g;
-	  $S =~ s/<\/$Col>//g;
-	}
+        if ($conf{usecolors}) {
+          $NC = "\033[" . $Color{$Col} . "m";
+          $S =~ s/<$Col>/$NC/g;
+          $S =~ s/<\/$Col>/$default/g;
+        }
+        else {
+          $S =~ s/<$Col>//g;
+          $S =~ s/<\/$Col>//g;
+        }
       }
     }
     return $S;
@@ -1578,7 +1576,7 @@ sub num_bereich {
     my($m,@LR,@Sorted_LR,$i);
     # $number is the one we want to delete!
     # But does it contain commas?
-    @NumBlock = ();		#reset
+    @NumBlock = ();        #reset
     $m = 0;
     if ($number =~ /\,/) {
       # accept -d 3,4,7
@@ -1590,20 +1588,20 @@ sub num_bereich {
       @Sorted_LR = ();
 
       if ($LR[0] > $LR[1]) {
-	@Sorted_LR = ($LR[1], $LR[0]);
+        @Sorted_LR = ($LR[1], $LR[0]);
       }
       elsif ($LR[0] == $LR[1]) {
-	# 0 and 1 are the same
-	@Sorted_LR = ($LR[0], $LR[1]);
+        # 0 and 1 are the same
+        @Sorted_LR = ($LR[0], $LR[1]);
       }
       else {
-	@Sorted_LR = ($LR[0], $LR[1]);
+        @Sorted_LR = ($LR[0], $LR[1]);
       }
 
       for ($i=$Sorted_LR[0]; $i<=$Sorted_LR[1]; $i++) {
-	# from 3-6 create @NumBlock (3,4,5,6)
-	$NumBlock[$m] = $i;
-	$m++;
+        # from 3-6 create @NumBlock (3,4,5,6)
+        $NumBlock[$m] = $i;
+        $m++;
       }
     }
     else {
@@ -1669,13 +1667,13 @@ sub help {
 
     print C qq~$BORDERC
 ----------------------------------------------------------------------$_BORDERC $TOPICC
-HELP for interactive note       $version
+HELP for interactive note       $VERSION
 $_TOPICC $NOTEC
 The following commands are available:
 $L       List notes. L=long, with timestamp and l=short without timestamp.
         You can also just hit <enter> for short list.
-	If you specify a subtopic, then list will display it's contents, 
-	i.e.: "l mytopic" will dislpay notes under mytopic.
+        If you specify a subtopic, then list will display it's contents, 
+        i.e.: "l mytopic" will dislpay notes under mytopic.
 $N       Create a new note.
 $D       Delete a note. You can either hit "d 1" or "d 1-4" or just hit "d".
         If you don't specify a number, you will be asked for.
@@ -1689,7 +1687,7 @@ $Q       Exit the program.~;
     if ($TOPIC) {
       print C qq~
 $T       print a list of all existing topics as a tree. T prints the tree
-	with all notes under each topic.~;
+        with all notes under each topic.~;
     }
     print C qq~
 
@@ -1735,7 +1733,8 @@ sub tree {
       $LocalTree->{$node}->{$NoteKey} = [];
     }
     &tree($num, $text, $LocalTree->{$node}, @nodes);
-  } else {
+  }
+  else {
     if (length($text) > ($maxlen - 5)) {
       $text = substr($text, 0, ($maxlen -5));
     }
@@ -1754,8 +1753,8 @@ sub print_tree {
   if ($TreeType eq "LONG") {
     for my $note (@notes) {
       if ($note ne "") {
-	print C $BORDERC ;	# . $prefix. "|\n";
-	print C "$prefix+---<" . $NOTEC . $note . $BORDERC . ">" . $_NOTEC . "\n";
+        print C $BORDERC ;    # . $prefix. "|\n";
+        print C "$prefix+---<" . $NOTEC . $note . $BORDERC . ">" . $_NOTEC . "\n";
       }
     }
   }
@@ -1780,25 +1779,25 @@ sub getconfig {
       $value =~ s/\s*$//;
       $value =~ s/\s*#.*$//;
       if ($value =~ /^(~\/)(.*)$/) {
-	$value = File::Spec->catfile($ENV{HOME}, $2);
+        $value = File::Spec->catfile($ENV{HOME}, $2);
       }
 
       if ($value =~ /^(yes|on|1)$/i) {
-	$value = 1;
+        $value = 1;
       }
       elsif ($value =~ /^(no|off|0)$/i) {
-	$value = 0;
+        $value = 0;
       }
 
       $option = lc($option);
 
       if ($option =~ /^(.+)::(.*)$/) {
-	# driver option
-	$driver{$1}->{$2} = $value;
+        # driver option
+        $driver{$1}->{$2} = $value;
       }
       else {
-	# other option
-	$conf{$option} = $value;
+        # other option
+        $conf{$option} = $value;
       }
     }
 

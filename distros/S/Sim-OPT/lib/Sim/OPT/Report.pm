@@ -1070,12 +1070,9 @@ sub report # This function retrieves the results of interest from the texts file
                 $semaphore2 = "off"; 
               }
               
-              $line =~ s/  / / ;
-		  	      $line =~ s/  / / ;
-		  	      $line =~ s/  / / ;
-		  	      $line =~ s/  / / ;
-		  	      $line =~ s/  / / ;
-  			      $line =~ s/ /,/ ;
+              $line =~ s/^\s+// ;
+              #$line =~ s/\s+/ /g ;
+  			      #$line =~ s/ /,/ ;
               chomp( $line ); chomp( $line ); 
               #$line = $line . " ";
               
@@ -1124,12 +1121,11 @@ sub report # This function retrieves the results of interest from the texts file
                     {  
                       if ( not ( $afterlin =~ /-/ ) )
                       {
-                         $afterlin =~ s/  / / ;
-                         $afterlin =~ s/  / / ;
-                         $afterlin =~ s/  / / ;
-                         $afterlin =~ s/  / / ;
-                         $afterlin =~ s/  / / ;
-                         $afterlin =~ s/ /,/ ;
+                          $line =~ s/^\s+// ;
+                          #$line =~ s/\s+/ /g ;
+                          #$line =~ s/ /,/ ;
+                          chomp( $line ); chomp( $line ); 
+                          #$line = $line . " ";
                         push ( @bringer, $afterlin );
                       }
                       else
@@ -1189,15 +1185,10 @@ sub report # This function retrieves the results of interest from the texts file
       {
         $thing =~ s/\n/ /g ; $thing =~ s/\n/ /g ; $thing =~ s/\r/ /g ; $thing =~ s/\r/ /g ;
         $thing =~ s/\r\n/ /g; $thing =~ s/\r\n/ /g;
-        $thing =~ s/  / / ;
-        $thing =~ s/  / / ;
-        $thing =~ s/  / / ;
-        $thing =~ s/  / / ;
-        $thing =~ s/  / / ;
-        $thing =~ s/  / / ;
-        $thing =~ s/ ,/,/ ;
-        $thing =~ s/, /,/ ;
-        $thing =~ s/ /,/ ;
+        $thing =~ s/\s+/ /g ;
+        $thing =~ s/ ,/,/g ;
+        $thing =~ s/, /,/g ;
+        $thing =~ s/ /,/g ;
         print REPFILE $thing;
         print REPFILE ",";
       }
@@ -1238,15 +1229,10 @@ sub report # This function retrieves the results of interest from the texts file
   open( REPSTORE, ">$repstore" ) or die "$!";
   foreach my $lin ( @lins )
   {
-  	$lin =~ s/  / / ;
-    $lin =~ s/  / / ;
-    $lin =~ s/  / / ;
-    $lin =~ s/  / / ;
-    $lin =~ s/  / / ;
-    $lin =~ s/  / / ;
-    $lin =~ s/ ,/,/ ;
-    $lin =~ s/, /,/ ;
-    $lin =~ s/ /,/ ;
+  	$thing =~ s/\s+/ /g ;
+    $thing =~ s/ ,/,/g ;
+    $thing =~ s/, /,/g ;
+    $thing =~ s/ /,/g ;
     print REPSTORE "$lin";
   }
 

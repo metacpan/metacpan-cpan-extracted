@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Module::Build: '0.4005'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.098000'
+    version: '0.098004'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
@@ -38,16 +38,19 @@ provides:
   Udev::FFI::Monitor:
     file: lib/Udev/FFI/Monitor.pm
 recommends:
-  PkgConfig: '0.16026'
+  PkgConfig: '0.17026'
 requires:
   FFI::CheckLib: '0'
   FFI::Platypus: '0'
+  IPC::Cmd: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.098000'
+version: '0.098004'
 x_contributors:
   - 'Ilya <ilya@orz1e1.mydomain>'
   - 'Ilya Pavlov <iluxz@mail.ru>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

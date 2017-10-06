@@ -20,64 +20,62 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _imageOID {
-    return '.1.3.6.1.4.1.9.9.25.1.1.1.2'
+    return '.1.3.6.1.4.1.9.9.25.1.1.1.2';
 }
 
 sub image_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my $response = Cisco::SNMP::_snmpwalk($session, _imageOID());
+    my $response = Cisco::SNMP::_snmpwalk( $session, _imageOID() );
 
     my %ImageHash;
-    for (@{$response}) {
-        my ($key, $value) = split /\$/, $_, 2;
+    for ( @{$response} ) {
+        my ( $key, $value ) = split /\$/, $_, 2;
         $key =~ s/^CW_//;
-        $key = ucfirst(lc($key));
+        $key = ucfirst( lc($key) );
         $value =~ s/\$$//;
-        $ImageHash{$key} = $value
+        $ImageHash{$key} = $value;
     }
 
     no strict 'refs';
-    for my $key (keys(%ImageHash)) {
+    for my $key ( keys(%ImageHash) ) {
         *{"image" . $key} = sub {
-            return $ImageHash{$key}
-        }
+            return $ImageHash{$key};
+          }
     }
     use strict;
 
-    if (defined $response) {
-        return bless $response, $class
+    if ( defined $response ) {
+        return bless $response, $class;
     } else {
         $Cisco::SNMP::LASTERROR = "Cannot read image MIB";
-        return undef
+        return undef;
     }
 }
 
 sub imageString {
-    my $self  = shift;
+    my $self = shift;
     my ($idx) = @_;
 
-    if (!defined $idx) {
-        $idx = 0
-    } elsif ($idx !~ /^\d+$/) {
+    if ( not defined $idx ) {
+        $idx = 0;
+    } elsif ( $idx !~ /^\d+$/ ) {
         $Cisco::SNMP::LASTERROR = "Invalid image index `$idx'";
-        return undef
+        return undef;
     }
-    return $self->[$idx]
+    return $self->[$idx];
 }
 
 sub get_imageString {
-    my $self  = shift;
+    my $self = shift;
     my ($idx) = @_;
 
     my $s = $self->session;
-    my $r = $s->get_request(
-        varbindlist => [_imageOID() . '.' . ($idx)]
-    );
-    return $r->{_imageOID() . '.' . ($idx)}
+    my $r = $s->get_request( varbindlist => [_imageOID() . '.' . ($idx)] );
+    return $r->{_imageOID() . '.' . ($idx)};
 }
 
 ##################################################

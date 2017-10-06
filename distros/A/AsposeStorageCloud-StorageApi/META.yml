@@ -82,7 +82,7 @@ provides:
     file: lib/AsposeStorageCloud/Object/Underline.pm
   AsposeStorageCloud::StorageApi:
     file: lib/AsposeStorageCloud/StorageApi.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -110,5 +110,5 @@ requires:
   warnings: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -19,6 +19,21 @@ SCOPE:
 
 SCOPE:
 {
+    # typical structure when parsing XML using XML::Hash::XS
+    my %src = (
+        root => {
+            foo_list => {foo_elem => {attr => 42}},
+            bar_list => {bar_elem => [{hummel => 2}, {hummel => 3}, {hummel => 5}]}
+        }
+    );
+    my @foo_elems = arrayify $src{root}->{foo_list}->{foo_elem};
+    is_deeply(\@foo_elems, [{attr => 42}], "arrayified struct with one element");
+    my @bar_elems = arrayify $src{root}->{bar_list}->{bar_elem};
+    is_deeply(\@bar_elems, [{hummel => 2}, {hummel => 3}, {hummel => 5}], "arrayified struct with three elements");
+}
+
+SCOPE:
+{
     my @in;
     tie @in, "Tie::StdArray";
     @in = (1 .. 4, [5 .. 7], 8 .. 11, [[12 .. 17]]);

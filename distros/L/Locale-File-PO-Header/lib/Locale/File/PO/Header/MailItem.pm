@@ -2,11 +2,9 @@ package Locale::File::PO::Header::MailItem; ## no critic (TidyCode)
 
 use Moose;
 use MooseX::StrictConstructor;
-
 use namespace::autoclean;
-use syntax qw(method);
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 
 extends qw(Locale::File::PO::Header::Base);
 
@@ -19,8 +17,10 @@ has mail_name => (
     is      => 'rw',
     isa     => 'Str|Undef',
     default => q{},
-    trigger => method ($mail_name, $current_mail_name) {
-        $self->trigger_helper({
+    trigger => sub {
+        my ($self, $mail_name, $current_mail_name) = @_;
+
+        return $self->trigger_helper({
             new     => $mail_name,
             current => $current_mail_name,
             default => q{},
@@ -33,8 +33,10 @@ has mail_address => (
     is      => 'rw',
     isa     => 'Str|Undef',
     default => q{},
-    trigger => method ($mail_address, $current_mail_address) {
-        $self->trigger_helper({
+    trigger => sub {
+        my ($self, $mail_address, $current_mail_address) = @_;
+
+        return $self->trigger_helper({
             new     => $mail_address,
             current => $current_mail_address,
             default => q{},
@@ -43,12 +45,17 @@ has mail_address => (
     },
 );
 
-method header_keys {
+sub header_keys {
+    my $self = shift;
+
     my $name = $self->name;
+
     return "${name}_name", "${name}_address";
 }
 
-method data ($key, @args) {
+sub data {
+    my ($self, $key, @args) = @_;
+
     defined $key
         or confess 'Undefined key';
     my $value = @args ? $args[0] : ();
@@ -76,7 +83,9 @@ method data ($key, @args) {
     confess "Unknown key $key";
 }
 
-method extract_msgstr ($msgstr_ref) {
+sub extract_msgstr {
+    my ($self, $msgstr_ref) = @_;
+
     my $name = $self->name;
     ${$msgstr_ref} =~ s{
         ^
@@ -103,7 +112,9 @@ method extract_msgstr ($msgstr_ref) {
     return;
 };
 
-method lines {
+sub lines {
+    my $self = shift;
+
     if ( ! length $self->mail_name && ! length $self->mail_address ) {
         return;
     }

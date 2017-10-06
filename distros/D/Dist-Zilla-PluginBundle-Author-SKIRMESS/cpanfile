@@ -54,10 +54,12 @@ requires "Dist::Zilla::Plugin::UploadToCPAN" => "0";
 requires "Dist::Zilla::Plugin::VerifyPhases" => "0";
 requires "Dist::Zilla::Plugin::VersionFromMainModule" => "0";
 requires "Dist::Zilla::Role::BeforeBuild" => "0";
+requires "Dist::Zilla::Role::FileFinderUser" => "0";
 requires "Dist::Zilla::Role::FileMunger" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Config::Slicer" => "0";
 requires "Dist::Zilla::Role::PluginBundle::Easy" => "0";
 requires "Dist::Zilla::Role::TextTemplate" => "0";
+requires "File::Spec" => "0";
 requires "List::MoreUtils" => "0";
 requires "Moose" => "0.99";
 requires "Path::Tiny" => "0";
@@ -68,6 +70,7 @@ requires "warnings" => "0";
 
 on 'test' => sub {
   requires "Test::More" => "0";
+  requires "lib" => "0";
   requires "perl" => "5.006";
 };
 
@@ -77,7 +80,6 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "File::Spec" => "0";
   requires "Perl::Critic" => "1.130";
   requires "Perl::Critic::Policy::Moose::ProhibitDESTROYMethod" => "1.05";
   requires "Perl::Critic::Policy::Moose::ProhibitLazyBuild" => "1.05";

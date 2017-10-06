@@ -120,7 +120,7 @@ $loc->loc_('text of domain d and category c');
 $loc->loc_end_dc;
 $loc->loc_('text of no domain and no category');
 
-# $Id: gettext_loc.pl 691 2017-08-31 16:46:05Z steffenw $
+# $Id: gettext_loc.pl 683 2017-08-22 18:41:42Z steffenw $
 
 __END__
 

@@ -11,10 +11,12 @@ author.yml
 dist.ini
 lib/Test/Alien/CPP.pm
 lib/Test/Alien/CanCompileCpp.pm
+maint/travis-install-mods
 t/00_diag.t
 t/01_use.t
 t/test_alien_cancompilecpp.t
 t/test_alien_cpp.t
+t/test_alien_cpp__gh1.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

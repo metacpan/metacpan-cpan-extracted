@@ -9,7 +9,7 @@ use Test::Output;
     use feature 'say';
 
 
-#line 65 lib/Async/Trampoline.pm
+#line 67 lib/Async/Trampoline.pm
 use Async::Trampoline qw(
     await
     async async_value async_error async_cancel
@@ -18,8 +18,15 @@ use Async::Trampoline qw(
 
 ;
 
-#line 71 lib/Async/Trampoline.pm
-# creating asyncs
+#line 73 lib/Async/Trampoline.pm
+use Async::Trampoline ':all';
+
+;
+
+#line 75 lib/Async/Trampoline.pm
+;
+
+#line 78 lib/Async/Trampoline.pm
 $async = async_value 1, 2, 3;
 $async = async_error "oops";
 $async = async_cancel;
@@ -29,8 +36,7 @@ $async = async { ...; return $new_async };
 $async = async_value 1, 2, 3;
 
 
-#line 80 lib/Async/Trampoline.pm
-# running asyncs
+#line 88 lib/Async/Trampoline.pm
 @result = $async->run_until_completion;
 
 ;
@@ -42,51 +48,76 @@ $other_async = async { async_value "other async" };
     $y = async_value "y";
 
 
-#line 92 lib/Async/Trampoline.pm
-# combining asyncs
+#line 101 lib/Async/Trampoline.pm
 $async = $other_async->await(sub {
     my (@values) = @_;
     # ...
     return $new_async;
 });
+
+;
+
+#line 107 lib/Async/Trampoline.pm
 $async = await [$x, $y] => sub {
     my (@x_and_y_values) = @_;
     # ...
     return $new_async;
 };
+
+;
+
+#line 113 lib/Async/Trampoline.pm
 $async = $x->complete_then($y);
 $async = $x->resolved_or($y);
 $async = $x->resolved_then($y);
 $async = $x->value_or($y);
 $async = $x->value_then($y);
+
+;
+
+#line 119 lib/Async/Trampoline.pm
 $async = $x->concat($y);
 
 ;
 
-#line 110 lib/Async/Trampoline.pm
-# generators
+#line 123 lib/Async/Trampoline.pm
 $gen = async_yield async_value(1, 2, 3) => sub {
     # ...
     return $next_generator;
 };
+
+;
+
+#line 128 lib/Async/Trampoline.pm
 $gen = $gen->gen_map(sub {
     my (@values) = @_;
     # ...
     return $new_async;
 });
+
+;
+
+#line 134 lib/Async/Trampoline.pm
 $async = $gen->gen_foreach(sub {
     my (@values) = @_;
     return async_cancel if not @values;  # like "last" in Perl
     # ...
     return async_value;  # like "next" in Perl
 });
+
+;
+
+#line 141 lib/Async/Trampoline.pm
 $async = $gen->gen_collect;
 
 ;
 
-#line 128 lib/Async/Trampoline.pm
-# misc
+#line 145 lib/Async/Trampoline.pm
 $str = $async->to_string;
+
+;
+
+#line 147 lib/Async/Trampoline.pm
 $bool = $async->is_complete;
 $bool = $async->is_cancelled;
 $bool = $async->is_error;
@@ -94,12 +125,12 @@ $bool = $async->is_value;
 
 ;
 
-#line 160 lib/Async/Trampoline.pm
+#line 177 lib/Async/Trampoline.pm
 my @items;
 
 ;
 
-#line 162 lib/Async/Trampoline.pm
+#line 179 lib/Async/Trampoline.pm
 my $i = 5;
 while ($i) {
     push @items, $i--;
@@ -109,7 +140,7 @@ while ($i) {
 is "@items", "5 4 3 2 1", q(Synchronous/imperative);
 
 
-#line 172 lib/Async/Trampoline.pm
+#line 189 lib/Async/Trampoline.pm
 sub loop {
     my ($items, $i) = @_;
     return $items if not $i;
@@ -119,14 +150,14 @@ sub loop {
 
 ;
 
-#line 179 lib/Async/Trampoline.pm
+#line 196 lib/Async/Trampoline.pm
 my $items = loop([], 5);
 
 ;
 is "@$items", "5 4 3 2 1", q(Synchronous/recursive);
 
 
-#line 186 lib/Async/Trampoline.pm
+#line 203 lib/Async/Trampoline.pm
 sub loop_async {
     my ($items, $i) = @_;
     return async_value $items if not $i;
@@ -136,14 +167,14 @@ sub loop_async {
 
 ;
 
-#line 193 lib/Async/Trampoline.pm
+#line 210 lib/Async/Trampoline.pm
 my $items = loop_async([], 5)->run_until_completion;
 
 ;
 is "@$items", "5 4 3 2 1", q(Async/recursive);
 
 
-#line 200 lib/Async/Trampoline.pm
+#line 217 lib/Async/Trampoline.pm
 sub loop_gen {
     my ($i) = @_;
     return async_cancel if not $i;
@@ -154,29 +185,29 @@ sub loop_gen {
 
 ;
 
-#line 208 lib/Async/Trampoline.pm
+#line 225 lib/Async/Trampoline.pm
 my $items = loop_gen(5)->gen_collect->run_until_completion;
 
 ;
 is "@$items", "5 4 3 2 1", q(Async/generators);
 
  
-#line 265 lib/Async/Trampoline.pm
+#line 282 lib/Async/Trampoline.pm
 $async = async { ... };
 
 ;
 
-#line 274 lib/Async/Trampoline.pm
+#line 291 lib/Async/Trampoline.pm
 $async = async_value @values;
 
 ;
 
-#line 281 lib/Async/Trampoline.pm
+#line 298 lib/Async/Trampoline.pm
 $async = async_error $error;
 
 ;
 
-#line 290 lib/Async/Trampoline.pm
+#line 307 lib/Async/Trampoline.pm
 $async = async_cancel;
 
 ;
@@ -184,7 +215,7 @@ $dependency = async { async_value 1,2, 3 };
     @dependencies = (async_value(1), async_value(), async_value(3));
 
 
-#line 303 lib/Async/Trampoline.pm
+#line 320 lib/Async/Trampoline.pm
 $async = $dependency->await(sub {
     my (@result) = @_;
     # ...
@@ -193,7 +224,7 @@ $async = $dependency->await(sub {
 
 ;
 
-#line 309 lib/Async/Trampoline.pm
+#line 326 lib/Async/Trampoline.pm
 $async = await $dependency => sub {
     my (@result) = @_;
     # ...
@@ -202,7 +233,7 @@ $async = await $dependency => sub {
 
 ;
 
-#line 315 lib/Async/Trampoline.pm
+#line 332 lib/Async/Trampoline.pm
 $async = await [@dependencies] => sub {
     my (@results) = @_;
     # ...
@@ -215,25 +246,25 @@ $first_async = async { async_value };
     $second_async = $alternative_async;
 
 
-#line 338 lib/Async/Trampoline.pm
+#line 355 lib/Async/Trampoline.pm
 $async = $first_async->resolved_or($alternative_async);
 $async = $first_async->value_or($alternative_async);
 
 ;
 
-#line 359 lib/Async/Trampoline.pm
+#line 376 lib/Async/Trampoline.pm
 $async = $first_async->complete_then($second_async);
 $async = $first_async->resolved_then($second_async);
 $async = $first_async->value_then($second_async);
 
 ;
 
-#line 386 lib/Async/Trampoline.pm
+#line 403 lib/Async/Trampoline.pm
 $async = $first_async->concat($second_async);
 
 ;
 
-#line 392 lib/Async/Trampoline.pm
+#line 409 lib/Async/Trampoline.pm
 $async = (async_value 1, 2, 3)->concat(async_value 4, 5);
 #=> async_value 1, 2, 3, 4, 5
 
@@ -243,7 +274,7 @@ $async = (async_value 1, 2, 3)->concat(async_value 4, 5);
 }
 
 
-#line 419 lib/Async/Trampoline.pm
+#line 436 lib/Async/Trampoline.pm
 sub count_down_generator {
     my ($i) = @_;
     return async_cancel if $i < 0;
@@ -254,12 +285,12 @@ sub count_down_generator {
 
 ;
 
-#line 427 lib/Async/Trampoline.pm
+#line 444 lib/Async/Trampoline.pm
 my $countdown_gen = count_down_generator(10);
 
 ;
 
-#line 431 lib/Async/Trampoline.pm
+#line 448 lib/Async/Trampoline.pm
 $countdown_gen = $countdown_gen->gen_map(sub {
     my ($i) = @_;
     return async_value "ignition" if $i == 3;
@@ -272,7 +303,7 @@ $result = $countdown_gen->gen_collect->run_until_completion;
     is "@$result", "10 9 8 7 6 5 4 ignition 2 1 liftoff", q(countdown map);
 
 
-#line 444 lib/Async/Trampoline.pm
+#line 461 lib/Async/Trampoline.pm
 my $finished_async = $countdown_gen->gen_foreach(sub {
     my ($i) = @_;
     say $i;
@@ -286,7 +317,7 @@ stdout_is { $result = $finished_async->run_until_completion }
     is $result, undef, q(countdown result);
 
 
-#line 458 lib/Async/Trampoline.pm
+#line 475 lib/Async/Trampoline.pm
 sub repeat_gen {
     my ($gen) = @_;
     return $gen->await(sub {
@@ -306,12 +337,12 @@ $result = repeat_gen(count_down_generator(2))
     is "@$result", "2 2 1 1 0 0", q(repetition);
 
 
-#line 478 lib/Async/Trampoline.pm
+#line 495 lib/Async/Trampoline.pm
 $generator = async_yield $async => sub { return $next_generator }
 
 ;
 
-#line 488 lib/Async/Trampoline.pm
+#line 505 lib/Async/Trampoline.pm
 $generator = $generator->gen_map(sub {
     my (@values) = @_;
     # ...
@@ -320,7 +351,7 @@ $generator = $generator->gen_map(sub {
 
 ;
 
-#line 506 lib/Async/Trampoline.pm
+#line 523 lib/Async/Trampoline.pm
 $async = $generator->gen_foreach(sub {
     my (@values) = @_;
     # ...
@@ -329,27 +360,27 @@ $async = $generator->gen_foreach(sub {
 
 ;
 
-#line 523 lib/Async/Trampoline.pm
+#line 540 lib/Async/Trampoline.pm
 $async = $generator->gen_collect;
 
 ;
 $async = async { async_value 1, 2, 3 };
 
 
-#line 535 lib/Async/Trampoline.pm
+#line 552 lib/Async/Trampoline.pm
 @result = $async->run_until_completion;
 
 ;
 is "@result", "1 2 3", q(run_until_completion());
 
 
-#line 553 lib/Async/Trampoline.pm
+#line 570 lib/Async/Trampoline.pm
 $str = $async->to_string;
 $str = "$async";
 
 ;
 
-#line 568 lib/Async/Trampoline.pm
+#line 585 lib/Async/Trampoline.pm
 $bool = $async->is_complete;
 $bool = $async->is_cancelled;
 $bool = $async->is_resolved;

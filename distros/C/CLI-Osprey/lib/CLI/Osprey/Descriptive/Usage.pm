@@ -11,7 +11,7 @@ use overload (
 use Getopt::Long::Descriptive::Usage ();
 
 # ABSTRACT: Produce usage information for CLI::Osprey apps
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 my %format_doc = (
@@ -333,7 +333,7 @@ CLI::Osprey::Descriptive::Usage - Produce usage information for CLI::Osprey apps
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 

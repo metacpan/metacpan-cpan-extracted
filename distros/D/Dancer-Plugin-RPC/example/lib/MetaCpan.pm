@@ -11,7 +11,7 @@ has mc_client => (
 sub mc_search {
     my $self = shift;
     my $args = shift;
-    my $response =$self->mc_client->call($args->{query});
+    my $response = $self->mc_client->call($args->{query});
     if (exists $response->{hits}) {
         my @hits = map {
             {

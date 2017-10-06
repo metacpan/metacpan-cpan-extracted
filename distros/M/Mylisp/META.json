@@ -37,7 +37,7 @@
    "provides" : {
       "Mylisp" : {
          "file" : "lib/Mylisp.pm",
-         "version" : "1.08"
+         "version" : "2.0"
       },
       "Mylisp::Ast" : {
          "file" : "lib/Mylisp/Ast.pm"
@@ -48,14 +48,11 @@
       "Mylisp::Grammar" : {
          "file" : "lib/Mylisp/Grammar.pm"
       },
-      "Mylisp::OptAstAtom" : {
-         "file" : "lib/Mylisp/OptAstAtom.pm"
+      "Mylisp::Lint" : {
+         "file" : "lib/Mylisp/Lint.pm"
       },
-      "Mylisp::OptAstMacro" : {
-         "file" : "lib/Mylisp/OptAstMacro.pm"
-      },
-      "Mylisp::Stable" : {
-         "file" : "lib/Mylisp/Stable.pm"
+      "Mylisp::OptAst" : {
+         "file" : "lib/Mylisp/OptAst.pm"
       },
       "Mylisp::ToPerl" : {
          "file" : "lib/Mylisp/ToPerl.pm"
@@ -67,6 +64,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.08",
+   "version" : "2.0",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

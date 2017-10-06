@@ -1,2 +1,5 @@
+Version 0.02: 2017-09-30
+  * Add missing prereq: Path::Tiny
+
 Version 0.01: 2017-07-30
   * Initial release

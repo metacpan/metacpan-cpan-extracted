@@ -1,3 +1,8 @@
+# Sort-Naturally-XS
+
+[![Build Status](https://travis-ci.org/CaballerosTeam/Sort-Naturally-XS.svg?branch=master)](
+https://travis-ci.org/CaballerosTeam/Sort-Naturally-XS)
+
 ## NAME
 
 Sort::Naturally::XS - Perl extension for human-friendly ("natural") sort order
@@ -32,7 +37,7 @@ or for Windows:
   @result = sort ncmp @mixed_list; # same, but use standard sort function
 
   @result = sort {ncmp($a, $b)} @mixed_list; # same as ncmp, but argument pass explicitly
-  
+
   my $result = Sort::Naturally::XS::sorted(\@mixed_list, locale => 'ru_RU.utf8'); # pass custom locale
 ```
 
@@ -162,10 +167,51 @@ systems only.
 
 By default the module exports `ncmp` and `nsort` subroutines.
 
+## BENCHMARK
+
+```perl
+  require Benchmark;
+  require Sort::Naturally::XS;
+  require Sort::Naturally;
+
+  my @list = (
+      'H4', 'T25', 'H5', 'T27', 'H8', 'T30', 'HEX', 'T35', 'M10', 'T4', 'M12', 'T40', 'M13',
+      'T45', 'M14', 'T47', 'M16', 'T5', 'M4', 'T50', 'M5', 'T55', 'M6', 'T6', 'M7', 'T60',
+      'M8', 'T7', 'M9', 'T70', 'Ph0', 'T8', 'Ph1', 'T9', 'Ph2', 'TT10', 'Ph3', 'TT15', 'Ph4',
+      'TT20', 'Pz0', 'TT25', 'Pz1', 'TT27', 'Pz2', 'TT30', 'Pz3', 'TT40', 'Pz4', 'TT45',
+      'R10', 'TT50', 'R12', 'TT55', 'R13', 'TT6', 'R14', 'TT60', 'R5', 'TT7', 'R6', 'TT70',
+      'R7', 'TT8', 'R8', 'TT9', 'S', 'TX', 'Sl', 'XZN', 'T10', 'T15', 'T20'
+  );
+
+  Benchmark::cmpthese(-3, {
+      my => sub { Sort::Naturally::XS::nsort(@list) },
+      other => sub { Sort::Naturally::nsort(@list) },
+  });
+
+  #          Rate other    my
+  # other   561/s    --  -97%
+  # my    20693/s 3588%    --
+
+  Benchmark::cmpthese(-10, {
+      std   => sub { sort @list },
+      other => sub { sort {Sort::Naturally::ncmp($a, $b)} @list },
+      my    => sub { sort {Sort::Naturally::XS::ncmp($a, $b)} @list },
+  });
+
+  #            Rate other   std    my
+  # other 7977106/s    --   -3%   -5%
+  # std   8232321/s    3%    --   -2%
+  # my    8426303/s    6%    2%    --
+```
+
 ## NOTES
 
 * There are differences in sorting outcomes compared with the `Sort::Naturally` module. Capital letters always come
 before lower case letters, digits always come before letters.
+```
+  9x 14 foo fooa foolio Foolio foo12 foo12a Foo12a foo12z foo13a # Sort::Naturally
+  9x 14 Foo12a Foolio foo foo12 foo12a foo12z foo13a fooa foolio # Sort::Naturally::XS
+```
 * Due to a significant strain it is not recommended for sorting lists consisting of letters or digits only.
 * Due to the complexity of a cross-platform support, a locale aware sorting is guaranteed on Unix-like operating systems
 only.

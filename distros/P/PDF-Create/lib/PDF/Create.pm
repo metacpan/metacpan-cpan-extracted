@@ -1,6 +1,6 @@
 package PDF::Create;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ PDF::Create - Create PDF files.
 
 =head1 VERSION
 
-Version 1.42
+Version 1.43
 
 =cut
 
@@ -232,7 +232,7 @@ sub new {
         $self->{'filename'} = $params{'filename'};
         my $fh = FileHandle->new( "> $self->{'filename'}" );
         carp "PDF::Create.pm: $self->{'filename'}: $!\n" unless defined $fh;
-        binmode $fh, ':utf8';
+        binmode $fh;
         $self->{'fh'} = $fh;
     }
 

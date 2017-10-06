@@ -13,7 +13,7 @@ use Carp;
 use Exporter 'import';
 our @EXPORT = @USB::LibUSB::XS::EXPORT;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has 'ctx' => (
     is => 'ro',
@@ -255,10 +255,21 @@ C<USB_LIBUSB_INCLUDE> and C<USB_LIBUSB_LIB> environment variables as follows:
 
  > SET USB_LIBUSB_INCLUDE=-IC:\Users\simon\libusb-1.0\include\libusb-1.0
  > SET USB_LIBUSB_LIB=-lC:\Users\simon\libusb-1.0\MinGW64\dll\libusb-1.0.dll.a
- > path C:\Users\simon\libusb-1.0\MinGW64\dll;%PATH%
+
+You will also need to add
+
+ C:\Users\simon\libusb-1.0\MinGW64\dll
+
+to the B<Path> environment variable.
 
 The latest supported version of Strawberry Perl is 5.20. In our tests the build
 fails for newer versions.
+
+=head4 Driver Installation
+
+On Windows you need an additional driver to use a device with libusb. See
+the L<Windows|https://github.com/libusb/libusb/wiki/Windows> section in the
+libusb wiki.
 
 =head2 Building USB::LibUSB
 
@@ -282,6 +293,12 @@ The rest of the installation can be done by a CPAN client like cpanm:
 =head3 exit
 
  $ctx->exit();
+
+=head3 last_retval
+
+ my $retval = $ctx->last_retval();
+
+Get return value of last called libusb function.
 
 =head2 Device handling and enumeration
 

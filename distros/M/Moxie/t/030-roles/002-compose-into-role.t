@@ -10,9 +10,9 @@ use MOP;
 package Foo {
     use Moxie;
 
-    has 'bar' => sub { 'bar' };
+    has _bar => sub { 'bar' };
 
-    sub bar { $_[0]->{bar} }
+    sub bar { _bar }
 }
 
 package Baz {
@@ -43,9 +43,9 @@ package Gorch {
     ok( $baz_method->isa( 'MOP::Method' ), '... got a method object' );
     is( $baz_method->name, 'baz', '... got the method we expected' );
 
-    my $bar_slot = $baz_meta->get_slot_alias('bar');
+    my $bar_slot = $baz_meta->get_slot_alias('_bar');
     ok( $bar_slot->isa( 'MOP::Slot' ), '... got an slot object' );
-    is( $bar_slot->name, 'bar', '... got the slot we expected' );
+    is( $bar_slot->name, '_bar', '... got the slot we expected' );
 
     my $bar_method_alias = $baz_meta->get_method_alias('bar');
     ok( $bar_method_alias->isa( 'MOP::Method' ), '... got a method object' );
@@ -65,9 +65,9 @@ package Gorch {
     ok( $baz_method->isa( 'MOP::Method' ), '... got a method object' );
     is( $baz_method->name, 'baz', '... got the method we expected' );
 
-    my $bar_slot = $gorch_meta->get_slot_alias('bar');
+    my $bar_slot = $gorch_meta->get_slot_alias('_bar');
     ok( $bar_slot->isa( 'MOP::Slot' ), '... got an slot object' );
-    is( $bar_slot->name, 'bar', '... got the slot we expected' );
+    is( $bar_slot->name, '_bar', '... got the slot we expected' );
 }
 
 {

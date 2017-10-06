@@ -47,7 +47,11 @@ int main(int argc, char** argv)
 				continue;
 			video_stream = i;
 			video_st = ic->streams[i];
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 45, 101)
+			picture = av_frame_alloc();
+#else
 			picture = avcodec_alloc_frame();
+#endif
 			rgb_picture.data[0] = (uint8_t*)ccmalloc(avpicture_get_size(PIX_FMT_RGB24, enc->width, enc->height));
 			avpicture_fill((AVPicture*)&rgb_picture, rgb_picture.data[0], PIX_FMT_RGB24, enc->width, enc->height);
 			break;
@@ -119,12 +123,12 @@ int main(int argc, char** argv)
 		ccv_write(image, filename, 0, CCV_IO_PNG_FILE, 0);
 		ccv_matrix_free(image);
 		if (tld->found)
-			printf("%d,%d,%d,%d,%f\n", newbox.rect.x, newbox.rect.y, newbox.rect.width + newbox.rect.x - 1, newbox.rect.height + newbox.rect.y - 1, newbox.confidence);
+			printf("%d,%d,%d,%d,%f\n", newbox.rect.x, newbox.rect.y, newbox.rect.width + newbox.rect.x - 1, newbox.rect.height + newbox.rect.y - 1, newbox.classification.confidence);
 		else
 			printf("NaN,NaN,NaN,NaN,NaN\n");
 		*/
 		if (tld->found)
-			printf("%05d: %d %d %d %d %f\n", tld->count, newbox.rect.x, newbox.rect.y, newbox.rect.width, newbox.rect.height, newbox.confidence);
+			printf("%05d: %d %d %d %d %f\n", tld->count, newbox.rect.x, newbox.rect.y, newbox.rect.width, newbox.rect.height, newbox.classification.confidence);
 		else
 			printf("%05d: --------------\n", tld->count);
 		x = y;

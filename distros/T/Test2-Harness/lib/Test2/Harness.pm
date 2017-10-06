@@ -2,13 +2,15 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
 use Time::HiRes qw/sleep time/;
+use Data::Dumper;
 
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
+use Test2::Harness::Util::Debug qw/DEBUG/;
 
 use Test2::Harness::Util::HashBase qw{
     -feeder
@@ -20,6 +22,7 @@ use Test2::Harness::Util::HashBase qw{
     -active
     -live
     -jobs
+    -jobs_todo
     -event_timeout
     -post_exit_timeout
     -run_id
@@ -46,18 +49,21 @@ sub init {
 sub run {
     my $self = shift;
 
-    while (1) {
-        $self->{+CALLBACK}->() if $self->{+CALLBACK};
-        my $complete = $self->{+FEEDER}->complete;
-        $self->iteration();
-        last if $complete;
-        sleep 0.02;
+    {
+        while (1) {
+            DEBUG("Harness run loop");
+            $self->{+CALLBACK}->() if $self->{+CALLBACK};
+            my $complete = $self->{+FEEDER}->complete;
+            $self->iteration();
+            last if $complete;
+            sleep 0.02;
+        }
     }
 
-    my(@fail, @pass);
-    for my $job_id (sort keys %{$self->{+WATCHERS}}) {
-        my $watcher = $self->{+WATCHERS}->{$job_id};
-
+    my(@fail, @pass, $seen);
+    while (my ($job_id, $watcher) = each %{$self->{+WATCHERS}}) {
+        DEBUG("Harness watcher loop ($job_id)");
+        $seen++;
         if ($watcher->fail) {
             push @fail => $watcher->job;
         }
@@ -66,9 +72,15 @@ sub run {
         }
     }
 
+    my $lost;
+    if (my $want = $self->{+JOBS_TODO}) {
+        $lost = $want - $seen;
+    }
+
     return {
         fail => \@fail,
         pass => \@pass,
+        lost => $lost,
     }
 }
 
@@ -79,17 +91,19 @@ sub iteration {
     my $jobs = $self->{+JOBS};
 
     while (1) {
+        DEBUG("Harness iteration loop");
         my @events;
 
         # Track active watchers in a second hash, this avoids looping over all
         # watchers each iteration.
-        for my $job_id (sort keys %{$self->{+ACTIVE}}) {
-            my $watcher = $self->{+ACTIVE}->{$job_id};
-
+        while(my ($job_id, $watcher) = each %{$self->{+ACTIVE}}) {
+            DEBUG("Harness active watcher loop: $job_id");
+        #for my $watcher (values %{$self->{+ACTIVE}}) {
             # Give it up to 5 seconds
-            my $killed = $watcher->killed;
-            my $done = $watcher->complete || ($killed ? (time - $killed) > 5 : 0);
+            my $killed = $watcher->killed || 0;
+            my $done = $watcher->complete || ($killed ? (time - $killed) > 5 : 0) || 0;
 
+            DEBUG("Harness active watcher $job_id - KILLED: $killed, DONE: $done");
             if ($done) {
                 $self->{+FEEDER}->job_completed($job_id);
                 delete $self->{+ACTIVE}->{$job_id};
@@ -101,10 +115,12 @@ sub iteration {
 
         push @events => $self->{+FEEDER}->poll($self->{+BATCH_SIZE});
 
+        DEBUG("Harness iteration got events: " . scalar(@events));
+
         last unless @events;
 
         for my $event (@events) {
-            my $job_id = $event->job_id;
+            my $job_id = $event->{job_id};
             next if $jobs && !$jobs->{$job_id};
 
             # Log first, before the watchers transform the events.
@@ -114,7 +130,7 @@ sub iteration {
                 my $watcher = $self->{+WATCHERS}->{$job_id};
 
                 unless ($watcher) {
-                    my $job = $event->facet_data->{harness_job}
+                    my $job = $event->{facet_data}->{harness_job}
                         or die "First event for job ($job_id) was not a job start!";
 
                     $watcher = Test2::Harness::Watcher->new(
@@ -161,9 +177,16 @@ sub check_timeout {
     return unless $watcher->job->use_timeout;
     return if $watcher->killed;
 
+    my $last_poll = $self->{+FEEDER}->job_lookup->{$watcher->job->job_id}->last_poll() or return;
+    my $poll_delta = $stamp - $last_poll;
+
+    # If we have not polled recently then we cannot fault the job for having no
+    # events.
+    return if $poll_delta > 2;
+
     my $delta = $stamp - $watcher->last_event;
 
-    if (my $timeout = $self->{+EVENT_TIMEOUT}) {
+    if (my $timeout = $watcher->job->event_timeout || $self->{+EVENT_TIMEOUT}) {
         return $self->timeout($watcher, 'event', $timeout, <<"        EOT") if $delta >= $timeout;
 This happens if a test has not produced any events within a timeout period, but
 does not appear to be finished. Usually this happens when a test has frozen.
@@ -173,7 +196,7 @@ does not appear to be finished. Usually this happens when a test has frozen.
     # Not done if there is no exit
     return unless $watcher->has_exit;
 
-    if (my $timeout = $self->{+POST_EXIT_TIMEOUT}) {
+    if (my $timeout = $watcher->job->postexit_timeout || $self->{+POST_EXIT_TIMEOUT}) {
         return $self->timeout($watcher, 'post-exit', $timeout, <<"        EOT") if $delta >= $timeout;
 Sometimes a test will fork producing output in the child while the parent is
 allowed to exit. In these cases we cannot rely on the original process exit to
@@ -221,12 +244,17 @@ to the top of your test file (but below the #! line).
     return $event unless $self->{+LIVE};
     my $pid = $watcher->job->pid || 'NA';
 
+    if($type eq 'post-exit') {
+        $watcher->set_complete(1);
+        return;
+    }
+
     push @info => {
         details   => "Killing job: $job_id, PID: $pid",
         debug     => 1,
         important => 1,
         tag       => 'TIMEOUT',
-    } unless $type eq 'post-exit';
+    };
 
     return $event if $watcher->kill;
 

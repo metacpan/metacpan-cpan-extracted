@@ -56,6 +56,20 @@ my $test_ref = [
       },
     ]
   },
+  {
+    name => 'SQLite select numbers',
+    sql_file => "$Bin/sqlite.tests/numbers.sql",
+    results => [
+      {
+        format => ['markdown', 'table'],
+        text_file => "$Bin/sqlite.tests/numbers.markdown-table",
+      },
+      {
+        format => ['markdown', 'record'],
+        text_file => "$Bin/sqlite.tests/numbers.markdown-record",
+      },
+    ]
+  },
 ];
 
 
@@ -73,9 +87,14 @@ foreach my $test (@{ $test_ref }) {
         $sql =~ s/\btmp\b/$dir/;
 
         my $text = read_file($result->{text_file});
+        my $res = $t->textify($sql);
 
-        is( $t->textify($sql), $text, "Test name=$test->{name}, format=$result->{format}[0], layout=$result->{format}[1]" );
+        is( $res, $text, "Test name=$test->{name}, format=$result->{format}[0], layout=$result->{format}[1]" );
     }
 }
 
 done_testing;
+
+
+# 545454545124454545454512445454545
+# 454545454512445454545454545454545

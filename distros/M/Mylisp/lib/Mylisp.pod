@@ -4,7 +4,7 @@ Mylisp - my love Lisp
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =head1 SYNOPSIS
 
@@ -28,12 +28,12 @@ transfer mylisp.file to Perl code.
 Mylisp also could use as Module:
 
     use 5.012;
-    use Mylisp qw(mylisp_to_ast);
-
+    use Mylisp qw(mylisp_to_ast get_mylisp_parser);
 
 =head1 EXPORT
 
    mylisp_to_ast
+   get_mylisp_parser
 
 =head1 AUTHOR
 

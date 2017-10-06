@@ -4,7 +4,7 @@
       "Chris Williams <chris@bingosnet.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
             "Carp" : "0",
             "File::Spec" : "0",
             "File::Spec::Unix" : "0",
-            "LWP::UserAgent" : "5.835",
+            "HTTP::Tiny" : "0.012",
             "URI" : "1.56",
             "YAML::XS" : "0.64",
             "perl" : "v5.6.0"
@@ -40,6 +40,8 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
+            "HTTP::Daemon" : "0",
+            "HTTP::Response" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0"
@@ -55,7 +57,7 @@
          "web" : "https://github.com/bingos/cpan-recent-uploads"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

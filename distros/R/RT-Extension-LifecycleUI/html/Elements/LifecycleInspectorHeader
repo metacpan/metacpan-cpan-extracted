@@ -1,0 +1,65 @@
+<script type="text/x-template" class="lifecycle-inspector-template" data-type="header">
+  <ul class="toplevel">
+    <li class="has-children"><a href="javascript:void(0)" class="menu-item"><&|/l&>Add...</&></a>
+      <ul>
+        <li><a href="javascript:void(0)" class="menu-item add-status"><&|/l&>Add Status</&></a></li>
+        <li><a href="javascript:void(0)" class="menu-item add-text"><&|/l&>Add Label</&></a></li>
+        <li><a href="javascript:void(0)" class="menu-item add-polygon" data-type="Triangle"><&|/l&>Add Triangle</&></a></li>
+        <li><a href="javascript:void(0)" class="menu-item add-polygon" data-type="Rectangle"><&|/l&>Add Rectangle</&></a></li>
+        <li><a href="javascript:void(0)" class="menu-item add-circle"><&|/l&>Add Circle</&></a></li>
+        <li><a href="javascript:void(0)" class="menu-item add-line"><&|/l&>Add Line</&></a></li>
+      </ul>
+    </li>
+    <li class="has-children"><a href="javascript:void(0)" class="menu-item"><&|/l&>Select...</&></a>
+      <ul>
+        <li class="has-children"><a href="javascript:void(0)" class="menu-item"><&|/l&>Select Status...</&></a>
+            <ul>
+            {{#each lifecycle.statuses}}
+            <li><a href="javascript:void(0)" class="menu-item select-status" data-name="{{this}}">{{this}}</a></li>
+            {{/each}}
+            </ul>
+         </li>
+        <li class="has-children"><a href="javascript:void(0)" class="menu-item"><&|/l&>Select Transition...</&></a>
+            <ul>
+            {{#each lifecycle.statuses}}
+            <li class="has-children"><a href="javascript:void(0)" class="menu-item select-status" data-name="{{this}}"><&|/l, "{{this}}"&>from [_1]</&></a>
+              <ul>
+                {{#with this as |from|}}
+                {{#with ../lifecycle as |lc|}}
+                {{#each lc.statuses}}
+                  <li class="menu-item {{#if (canSelectTransition from this lc)}}{{else}}hidden{{/if}}"><a href="#" class="menu-item select-transition" data-from="{{from}}" data-to="{{this}}"><&|/l, "{{this}}"&>to [_1]</&></a></li>
+                {{/each}}
+                {{/with}}
+                {{/with}}
+              </ul>
+            </li>
+            {{/each}}
+            </ul>
+         </li>
+         <li class="has-children"><a href="javascript:void(0)" class="menu-item"><&|/l&>Select Decoration...</&></a>
+            <ul>
+            {{#each lifecycle.decorations.text}}
+            <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.text}}</a></li>
+            {{/each}}
+            {{#each lifecycle.decorations.polygon}}
+            <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+            {{/each}}
+            {{#each lifecycle.decorations.circle}}
+            <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+            {{/each}}
+            {{#each lifecycle.decorations.line}}
+            <li><a href="javascript:void(0)" class="menu-item select-decoration" data-key="{{this._key}}">{{truncate this.label}}</a></li>
+            {{/each}}
+            </ul>
+         </li>
+       </ul>
+    </li>
+  </ul>
+
+  <hr class="clear" />
+
+  <div class="controls">
+    <button {{#unless lifecycle._canUndo}}disabled{{/unless}} class="undo"><&|/l&>Undo</&></button>
+    <button {{#unless lifecycle._canRedo}}disabled{{/unless}} class="redo"><&|/l&>Redo</&></button>
+  </div>
+</script>

@@ -24,7 +24,7 @@ sub ok
         print STDERR " ERROR: @info\n" if @info;
     }
 }
-
+chmod 0777, ".";
 my $gds2File = new GDS2(-fileName=>'>test.gds');
 my $G_epsilon = $gds2File -> getG_epsilon;
 my $G_fltLen = $gds2File -> getG_fltLen;
@@ -62,6 +62,7 @@ $gds2File -> printBoundary(
 $gds2File -> printEndstr;
 $gds2File -> printEndlib();
 $gds2File -> close();
+sleep 2;
 
 ok 2,(stat("test.gds"))[7] == 362, 'Size of created test.gds looks wrong.';
 

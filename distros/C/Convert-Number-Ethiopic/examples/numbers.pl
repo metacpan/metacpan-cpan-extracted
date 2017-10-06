@@ -1,10 +1,13 @@
 #!/usr/bin/perl -w
 
+use utf8;
+use strict;
+
 use Convert::Number::Ethiopic;
 
-use utf8;
 if ( $] >= 5.007 ) {
 	binmode (STDOUT, ":utf8");
+	binmode (STDERR, ":utf8");
 }
 
 

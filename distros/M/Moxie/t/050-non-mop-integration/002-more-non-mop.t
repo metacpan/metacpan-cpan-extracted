@@ -33,14 +33,20 @@ BEGIN {
 
     extends 'Moxie::Object', 'Person';
 
-    has 'manager';
+    has _manager => ();
 
-    sub REPR {
-        my ($class, $proto) = @_;
+    sub BUILDARGS ($class, @args) {
+        my $proto = $class->next::method( @args );
+        $proto->{_manager} = delete $proto->{manager}
+            if exists $proto->{manager};
+        return $proto;
+    }
+
+    sub REPR ($class, $proto) {
         $class->Person::new( $proto );
     }
 
-    sub manager : rw;
+    sub manager : rw(_manager);
 }
 
 #warn Dumper mop::meta('Employee');

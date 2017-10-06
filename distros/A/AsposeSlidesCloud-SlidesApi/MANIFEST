@@ -97,14 +97,7 @@ lib/AsposeSlidesCloud/Object/Underline.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 Makefile.PL
 MANIFEST
-README
-t/01_slides_api.t
-t/data/demo.pptx
-t/data/friday_1484.odp
-t/data/ReadMe.html
-t/data/sample-input.pptx
-t/data/sample.pptx
-t/data/Test.html
-t/data/welcome.pptx
-META.yml
 META.json
+META.yml
+README.md
+t/01_slides_api.t

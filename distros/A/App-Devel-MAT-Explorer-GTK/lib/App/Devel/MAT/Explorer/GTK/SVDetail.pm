@@ -10,7 +10,7 @@ use warnings;
 use feature qw( switch );
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Devel::MAT 0.23; # ->ifileno, ->ofileno on IO SVs
 

@@ -29,10 +29,10 @@ if ( ! -e 't/02-rspamd.t' ) {
 
 chdir 't';
 
-plan tests => 4;
+plan tests => 6;
 
 {
-    system 'rm -rf tmp';
+    #system 'rm -rf tmp';
     mkdir 'tmp';
     mkdir 'tmp/result';
 

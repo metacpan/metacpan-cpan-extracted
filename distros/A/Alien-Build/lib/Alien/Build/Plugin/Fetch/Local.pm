@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Local file plugin for fetching files
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has '+url' => '';
@@ -102,13 +102,15 @@ Alien::Build::Plugin::Fetch::Local - Local file plugin for fetching files
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
  use alienfile;
- meta->prop->{start_url} = 'patch/libfoo-1.00.tar.gz';
- plugin 'Fetch::Local';
+ share {
+   start_url 'patch/libfoo-1.00.tar.gz';
+   plugin 'Fetch::Local';
+ };
 
 =head1 DESCRIPTION
 
@@ -196,6 +198,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

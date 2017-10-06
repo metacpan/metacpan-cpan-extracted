@@ -33,17 +33,24 @@ WriteMakefile(
     CCFLAGS => $ccflags,
     OPTIMIZE => '-O3',
     OBJECT            => '$(O_FILES)', # link all the C files too
-    $debug ? (DEFINE => '-DDEBUG') : ()
+    $debug ? (DEFINE => '-DDEBUG') : (),
+    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );
 
 
 # Build shared library
 sub MY::postamble {
   my $postamble = SPVM::Build::create_postamble(
-    module_names => [
-      'SPVM::std',
-      'SPVM::Math'
-    ]
+    module_names => [qw(
+      SPVM::std
+      SPVM::Math
+      SPVM::Byte
+      SPVM::Short
+      SPVM::Integer
+      SPVM::Long
+      SPVM::Float
+      SPVM::Double
+    )]
   );
   
   return $postamble;

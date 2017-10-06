@@ -1,5 +1,9 @@
 Revision history for CGI-Buffer
 
+0.80	Mon Sep 25 13:03:24 EDT 2017
+	Remove false positive bug reports
+	Work with the latest IO::Compress::Brotli
+
 0.79	Fri Jan  6 11:17:01 EST 2017
 	Fix Brotli tests which failed in some places
 	Improved handling of HTTP status

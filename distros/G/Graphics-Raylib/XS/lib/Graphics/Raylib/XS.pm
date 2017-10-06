@@ -281,6 +281,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawTexturePro
 	DrawTextureRec
 	DrawTextureV
+	DrawSOSTexture
 	DrawTriangle
 	DrawTriangleLines
 	EnableCursor
@@ -389,6 +390,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LoadImageEx
 	LoadImageFromRES
 	LoadImageRaw
+	LoadSOSImage
+	LoadImageFromAV
+    LoadImageFromAV_uninitialized_mem
 	LoadMaterial
 	LoadModel
 	LoadModelEx
@@ -466,6 +470,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	UpdateMusicStream
 	UpdateSound
 	UpdateTexture
+	UpdateTextureFromImage
 	UpdateVrTracking
 	VectorToFloat
 	WaveCopy
@@ -979,6 +984,7 @@ None by default.
                     float rotation, Color tint)
   void DrawTextureRec(Texture2D texture, Rectangle sourceRec, Vector2 position, Color tint)
   void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
+  void DrawSOSTexture(void)
   void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void DrawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void EnableCursor(void)
@@ -1089,6 +1095,9 @@ None by default.
   Image LoadImageEx(Color *pixels, int width, int height)
   Image LoadImageFromRES(const char *rresName, int resId)
   Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
+  Image LoadSOSImage(void)
+  Image LoadImageFromAV(SV *array_ref, SV *color_cb, int width, int height)
+  Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
   Material LoadMaterial(const char *fileName)
   Model LoadModel(const char *fileName)
   Model LoadModelEx(Mesh data, int dynamic)
@@ -1168,6 +1177,7 @@ None by default.
   void UpdateMusicStream(Music music)
   void UpdateSound(Sound sound, void *data, int numSamples)
   void UpdateTexture(Texture2D texture, void *pixels)
+  void UpdateTextureFromImage(Texture2D texture, Image image)
   void UpdateVrTracking(Camera *camera)
   float *VectorToFloat(Vector3 vec)
   Wave WaveCopy(Wave wave)

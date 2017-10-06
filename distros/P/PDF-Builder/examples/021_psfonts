@@ -1,0 +1,594 @@
+#!/usr/bin/perl
+
+# wants one or more font names on the command line. They must have a file
+# extension of .pfa or .pfb, and have an associated metrics file of the same
+# path and name, except with extension .afm or .pfm respectively.
+
+# CAUTION: the displayed Unicode value (U+xxxx) appears to be correct in most
+# cases, except that the MS Smart Quotes (32 characters) are given as U+0080
+# through U+009F. Those Unicode values are reserved for the C1 Control character
+# group, not printable glyphs. I don't know if the font files hold incorrect
+# Unicode values, or this program is in error. See PDF::Builder::Resource::
+# Glyphs for u2n and n2u tables -- they may be in error. Note that UTF-8 and 
+# other multibyte encodings are not usable with T1 fonts. Note that some fonts
+# may spill over onto 1 or more additional pages, which of course is beyond
+# single byte encoding (automap is used here). 
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+use File::Basename;
+
+my $compress = 'none';  # uncompressed streams
+#my $compress = 'flate';  # compressed streams
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;    # nominal font size in points
+my $gLLx = 50;  # lower left position of grid
+my $gLLy = 50;
+
+# build lists of metric paths, glyph files, and metric files
+my @gns = (); # glyphs: path, name, extension
+my @mns = (); # metrics: path, name, extension
+my @ecs = (); # encodings until further notice (one string for each
+              # font, with one or more encodings space-separated)
+my $mpath = '@./';  # default path list = same dir as glyph file (-m)
+                    # must end in / or \ (not added or checked)
+my $ecflag = 'latin1';  # default encoding to display (-e)
+
+# no args, or just  -h, -?, or --help
+if (scalar @ARGV == 0 || (scalar @ARGV == 1 && ($ARGV[0] eq '-h' ||
+		                                $ARGV[0] eq '-?' ||
+					        $ARGV[0] eq '--help'))) {
+    usage();
+    exit(1);
+}    
+
+# loop through @ARGV, building up @gns (list of glyph file path+names),
+#                                 @mns (list of metric file path+names),
+#                                 @ecs (list of encodings for each font file)
+# check that requested files exist. fatal error if not (show usage).
+
+if (processCMD(@ARGV)) {
+    usage();
+    exit(2);
+}
+
+# use only with single byte encodings, as multibyte (including UTF-8) don't
+# appear to be compatible with these T1/PS fonts
+# there may be a number of aliases available for each encoding.
+#
+# available encodings (believed to be single byte): 
+#   7bit-jis  AdobeStandardEncoding  AdobeSymbol  AdobeZdingbat  ascii  
+#   ascii-ctrl  cp1006  cp1026  cp1047  cp1250  cp1251  cp1252  cp1253  cp1254  
+#   cp1255  cp1256  cp1257  cp1258  cp37  cp424  cp437  cp500  cp737  cp775  
+#   cp850  cp852  cp855  cp856  cp857  cp858  cp860  cp861  cp862  cp863  cp864 
+#   cp865  cp866  cp869  cp874  cp875  dingbats  hp-roman8  iso-8859-1  
+#   iso-8859-2  iso-8859-3  iso-8859-4  iso-8859-5  iso-8859-6  iso-8859-7  
+#   iso-8859-8  iso-8859-9  iso-8859-10  iso-8859-11  iso-8859-13  iso-8859-14  
+#   iso-8859-15  iso-8859-16  iso-ir-165  jis0201-raw  koi8-f  koi8-r  koi8-u  
+#   MacArabic  MacCentralEurRoman  MacCroatian  MacCyrillic  MacDingbats  
+#   MacFarsi  MacGreek  MacHebrew  MacIcelandic  MacRoman  MacRomanian  
+#   MacRumanian  MacSami  MacSymbol  MacThai  MacTurkish  MacUkrainian  nextstep
+#   null  posix-bc  symbol  viscii
+#
+# multibyte encodings (do not use):
+#  big5-eten  big5-hkscs  cp932  cp936  cp949  cp950  euc-cn  euc-jp  euc-kr  
+#  gb12345-raw  gb2312-raw  gsm0338  hz  iso-2022-jp  iso-2022-jp-1  iso-2022-kr
+#  jis0208-raw  jis0212-raw  johab  ksc5601-raw  MacChineseSimp  MacChineseTrad 
+#  MacJapanese  MacKorean  MIME-B  MIME-Header  MIME-Header-ISO_2022_JP  MIME-Q 
+#  shiftjis  UCS-2BE  UCS-2LE  UTF-16  UTF-16BE  UTF-16LE  UTF-32  UTF-32BE  
+#  UTF-32LE  UTF-7  utf-8-strict  utf8   and probably others
+
+my ($i, $base, $x, $y, $pdf, $fn, $fnM, $ec, $f1, $yp);
+
+# should have same number of entries each in @gns, @mns, @ecs
+# loop through list of font names (glyph file names)
+for ($i=0; $i<scalar @gns; $i++) {
+    $fn = $gns[$i];   # glyph file
+    $fnM = $mns[$i];  # metric file to go with glyph file
+    my $flavor = '?';  # a = ASCII, b = binary metrics file
+    if ($fnM =~ m/\.afm$/i) { $flavor = 'a'; }
+    if ($fnM =~ m/\.pfm$/i) { $flavor = 'b'; }
+    # might be other PS/T1 flavors
+
+    $base = $fn;
+    $base =~ m#([^/\\]+)$#;
+    $base = $1;
+    $base =~ s#\.pf[ab]$##i;
+
+    # at least one page for each encoding 
+    foreach $ec (split / /, $ecs[$i]) {
+	
+        $pdf = PDF::Builder->new(-compress => $compress);
+        $f1 = $pdf->corefont('Helvetica');  # for various labels
+
+        print STDERR "\n$base -- $ec\n";
+        initNameTable();  # set up u2n and n2u hashes
+	my $fnt;
+	if ($fnM ne '') { 
+	    if ($flavor eq 'a') {
+		print "Process glyph file $fn\n with AFM file $fnM,\n $ec encoding\n";
+                $fnt = $pdf->psfont($fn, -afmfile => $fnM, -encode => $ec);
+	    } else {
+		print "Process glyph file $fn\n with PFM file $fnM,\n $ec encoding\n";
+                $fnt = $pdf->psfont($fn, -pfmfile => $fnM, -encode => $ec);
+	    }
+	} else {
+	    # no metrics file to be used
+	    print "Process glyph file $fn\n with no metrics file, $ec encoding\n";
+            $fnt = $pdf->psfont($fn, -encode => $ec);
+	}
+        my @planes = ($fnt, $fnt->automap());
+	my $flight = -1;
+        foreach my $plane (@planes) {   
+	    $flight++;
+
+	    # for plane 1+ ($flight > 0) check if any characters in it
+	    if ($flight > 0) {
+		my $flag = 0; # no character found yet
+                foreach $yp (0..15) {
+                    foreach $x (0..15) {  
+		        my $ci = $yp*16 + $x;  # 0..255 value
+			# always seems to be something at
+			# ci = 32 (U=0020, space)
+			# ci = 33 (U=E000, .notdef)
+			if ($ci == 32 || $ci == 33) { next; }
+
+                        if (defined $plane->uniByEnc($ci) && $plane->uniByEnc($ci) > 0) { 
+			    $flag = 1;
+			    last;
+			}
+		    }
+		    if ($flag) { last; }
+		}
+		if (!$flag) { next; } # no characters on this plane
+	    }
+
+
+            # subfonts within overall font (223 characters per plane + space)
+	    # they can be treated just like regular fonts
+            my $page = $pdf->page();
+            $page->mediabox(595,842);
+
+            my $gfx = $page->gfx();
+
+            my $txt = $page->text();
+            $txt->font($plane,$fx);
+
+            my $txt2 = $page->text();
+
+            $txt2->textlabel($gLLx,800, $f1,20, "font='".$plane->fontname()." / ".$plane->name()."'  plane $flight", -hscale=>75);
+            $txt2->textlabel($gLLx,780, $f1,20, "encoding='$ec'");
+
+            $txt2->font($f1, 5);
+            $txt2->hscale(80);
+
+	    # distance below baseline (<0) to clear descenders
+            my $u = $plane->underlineposition()*$fx/1000;
+
+	    # draw grid of characters and information
+	    # yp character row value (0..F T to B)
+            foreach $yp (0..15) {
+		$y = 15 - $yp;  # y vertical (row) position T to B
+                print STDERR ".";
+                foreach $x (0..15) {  # x horizontal (column) position L to R
+                    $txt->translate($gLLx+($sx*$x),$gLLy+($sy*$y));
+		    my $ci = $yp*16 + $x;  # 0..255 value
+		    my $c  = chr($ci);
+                    $txt->text($c);
+
+                    my $wx = $plane->width($c)*$fx;
+
+		    # bounding box cell around character
+                    $gfx->strokecolor('lightblue');
+                    $gfx->move($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$fx);
+                    $gfx->line($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$u);
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$u);
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$fx);
+                    $gfx->close();
+                    $gfx->stroke();
+
+		    # baseline
+                    $gfx->strokecolor('gray');
+                    $gfx->move($gLLx+($sx*$x)    ,$gLLy+($sy*$y));
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y));
+                    $gfx->stroke();
+
+		    # character data
+                    $txt2->translate($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)-6);
+                    $txt2->text_right($ci);
+                    $txt2->translate($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)-11);
+                    if (defined $plane->uniByEnc($ci)) {
+                        $txt2->text_right(sprintf('U+%04X',$plane->uniByEnc($ci)));
+                    } else {
+                        $txt2->text_right('U+????');
+		    }
+                    $txt2->translate($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)-16);
+                    $txt2->text_right($plane->glyphByEnc($ci));
+                    $txt2->translate($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)-21);
+                    $txt2->text_right(sprintf('wx=%i',$plane->wxByEnc($ci)));
+                } # loop through columns (x)
+            } # loop through rows (yp/y)
+            print STDERR "\n";
+        } # loop through "sub" fonts (planes)
+        $pdf->saveas("$0.$base.$ec.pdf");
+        $pdf->end();
+
+    } # loop through each encoding (ec)
+} # loop $i for each font name (fn) and metrics file (fnM)
+
+exit;
+
+# consider a -p flag like -m, but for glyph files
+# would look for glyph file, push path+token instead of just token
+sub usage {
+   print "\n021_psfonts [flags_1] glyph_file [flags_2] glyph_file [flags_2]...\n\n";
+   print "flags_1 --\n";
+   print "  -m  metrics files paths\n";
+   print "     : or ; separated directories specifying where to look for font\n";
+   print "     metrics files. If relative paths (not starting with /), they are\n";
+   print "     relative to the glyph file being processed if @ prepended, else\n";
+   print "     (no @) relative to the current directory. The default metrics\n";
+   print "     path string is just @./ (glyph file's directory). Entries will\n";
+   print "     apply to following glyph file names until a new -m. The paths\n";
+   print "     are not used if a -M or -N flag is given for a glyph file.\n";
+   print "  -e  encodings list\n";
+   print "     latin1 latin2 etc. Default is latin1. Any name with characters\n";
+   print "     other than A-Za-z0-9- is assumed to be a glyph file name or\n";
+   print "     another flag (if starts with -). Entries will apply to the\n";
+   print "     following glyph file names until a new -e.\n\n";
+   print "glyph_file --\n";
+   print "  a .pfa or .pfb extension T1 (PS) glyph file (with path)\n\n";
+   print "flags_2 --\n";
+   print "  -m  metrics files paths\n";
+   print "     as in flags_1, but replaces whatever existed before. Note that\n";
+   print "     the new path list takes effect at the next glyph file, not the\n";
+   print "     previously-given one.\n";
+   print "  -e  encodings list\n";
+   print "     as in flags_1, but replaces whatever existed before. Note that\n";
+   print "     the new encoding list takes effect at the next glyph file, not\n";
+   print "     the previously-given one.\n";
+   print "  -M  metrics file path and name\n";
+   print "     an absolute (starting with /) or relative (to the glyph file path\n";
+   print "     if starts with @, otherwise relative to the current directory)\n"; 
+   print "     path and name. This overrides the -m path list for this ONE\n";
+   print "     glyph file. Normally, -M is needed only when the file name\n";
+   print "     differs between the glyph and metrics files, which is unusual,\n";
+   print "     or you don't want to list this path in -m, or perhaps you have\n";
+   print "     only one glyph file to display and want to give the exact metrics\n";
+   print "     file path and name. It must come IMMEDIATELY AFTER the glyph file\n";
+   print "     it pertains to, and applies only to that one glyph file.\n";
+   print "  -N\n";
+   print "     there is no metrics file for the preceeding glyph file. It must\n";
+   print "     come IMMEDIATELY AFTER the glyph file it pertains to, and applies\n";
+   print "     only to that one glyph file.\n\n";
+   print "Going through glyph file names, the complete path, name, and extension\n";
+   print "  must be given for each (no wildcards). The base name and extension\n";
+   print "  are case-sensitive. If a -M or -N flag is not given, the program\n";
+   print "  will search for the metrics file (.afm or .pfm) using each metrics\n";
+   print "  file path entry appended to the glyph file path, the base name of\n";
+   print "  the glyph file, and each extension .afm and .pfm are tried (in that\n";
+   print "  order for a .pfa glyph file, and in the reverse order for a .pfb\n";
+   print "  glyph file). Matching of extensions is case-insensitive, even on\n";
+   print "  Linux systems (e.g., times-roman.AFM is considered a match for\n";
+   print "  times-roman.pfb).\n\n";
+}
+
+# fill the glyph, metrics, and encoding arrays from the command line
+# input: @ARGV command line
+# output: 0 = OK, 1 = failed
+sub processCMD {
+    my @args = @_;
+
+    my ($token, @mpaths, $Mpath, $i, $j, $path, $basename, $extension);
+    my $tokenNumber = 0;
+ 
+    # at this point, $mpath is default path list and $ecflag is default encoding
+    @mpaths = split /[:;]+/, $mpath;   # each element should end in / or \
+    
+    $ecflag =~ s/^\s+//;  # clean off any leading or trailing whitespace
+    $ecflag =~ s/\s+$//; 
+    @ecs = split /\s+/, $ecflag;
+
+    while (@args) {
+        # -m or -e at any time
+        # -M or -N after a glyph file
+        $token = shift @args;
+        $tokenNumber++;  # original token index for messages
+
+        if      (substr($token, 0, 2) eq '-m') {
+	    $token = substr($token, 2);  # strip off -m if run-together
+	    if ($token eq '') {
+                # -m flag was by itself. next token is actual path (must exist)
+	        if (!scalar @args) {
+		    print "missing metrics path after -m (arg $tokenNumber)\n";
+		    return 1;
+	        }
+	        $mpath = shift @args;
+	    } else {
+	        # -m flag and path run together
+	        $mpath = stripQuotes($token);
+	    }
+	    # TBD validate mpath: valid structure, valid dirs
+            # $mpath should not have any leading or trailing whitespace, may
+	    #   have embedded whitespace (Windows)
+	    @mpaths = split /[:;]+/, $mpath;
+	    if (!@args) {
+	        print "no glyph files after -m path list! (arg $tokenNumber)\n";
+	        return 1;
+	    }
+
+	    # each mpaths entry should end in a /
+	    for ($i=0; $i<scalar @mpaths; $i++) {
+	       if ($mpaths[$i] !~ m#[/\\]$#) {
+		   $mpaths[$i] .= '/';
+	       }
+	    }
+
+	    next; # back to top of loop
+        } # end -m processing
+
+        if (substr($token, 0, 2) eq '-e') {
+	    $token = substr($token, 2);  # strip off -e if run-together
+	    if ($token ne '') {
+                # -e flag was run together with first (or only) encoding. 
+	        # next token(s) are rest of list (optional)
+	        # NO ' or " around list
+	        @ecs = ($token);
+	    } else {
+	        @ecs = ();
+	    }
+	    # zero or more names of encodings
+	    while (@args) {
+	        $token = shift @args;
+	        $tokenNumber++;
+
+	            if ($token =~ m/^[a-z0-9-]+$/i && substr($token, 0, 1) ne '-') {
+	 	    # appears to be an encoding. add to list
+		    push @ecs, $token;
+	        } else {
+		    # does not appear to be an encoding. return to args
+		    unshift @args, $token;
+		    last;
+	        }
+	    }
+	    if (!scalar @ecs) {
+	        print "missing encodings list after -e (arg $tokenNumber)\n";
+	        return 1;
+	    }
+	    if (!@args) {
+	        print "no glyph files after -e encodings list! (arg $tokenNumber)\n";
+	        return 1;
+	    }
+	    next; # back to top of loop
+        } # end -e processing
+
+        # at this point, should be glyph file name (no flags)
+
+        if (substr($token, 0, 1) eq '-') {
+	    print "unknown or unexpected flag '$token' (arg $tokenNumber)\n";
+	    return 1;
+        }
+          
+        # split into path, basename, extension
+        ($path, $basename, $extension) = splitPath($token);
+        if ($extension =~ m/^pf[ab]$/i) {
+	    # acceptable extension name
+        } else {
+	    print "expected glyph file extension .pfa or .pfb not found in glyph file '$token' (arg $tokenNumber)\n";
+	    return 1;
+        }
+
+        # TBD if -p used, prepend path to token
+        if (!-r $token) {
+	    print "glyph file '$token' not found or not readable (arg $tokenNumber)\n";
+	    return 1;
+        }
+
+        push @gns, $token;  
+
+        # look ahead one token for any -M or -N flag NEXT. process and set to ''
+        if (scalar @args) {
+
+            if (substr($args[0], 0, 2) eq '-N') {
+	        # no metrics file to be used
+	        push @mns, '';
+	        shift @args;
+	        $tokenNumber++;
+	        next;
+            }
+
+            if (substr($args[0], 0, 2) eq '-M') {
+	        # explicit metrics file given
+	        # if path is relative, append to glyph file's path
+	        $token = shift @args;
+	        $tokenNumber++;
+    
+	        if ($token eq '-M') {
+	            # next token is path itself
+	            if (!scalar @args) {
+	                print "-M flag missing file name following (arg $tokenNumber)\n";
+	                return 1;
+	            }
+	            $Mpath = shift @args;
+	            $tokenNumber++;
+
+                } else {
+	            # -M and file run together in one token
+	            $Mpath = stripQuotes(substr($token, 2));
+                }
+
+	        $Mpath = makeMPath($path, $basename, $extension, $Mpath);
+	        if ($Mpath ne '') {
+	            # OK path found
+		    push @mns, $Mpath;
+		    next;
+	        } else {
+		    print "metrics file extension '$Mpath' not .afm or .pfm, or\n";
+		    print "metrics file not found or is not readable (arg $tokenNumber)\n";
+		    return 1;
+	        }
+
+            } # end of -M processing
+
+	} # there were more tokens to look at (-N or -M)
+
+        if (substr($token, 0, 1) eq '-') {
+	    print "unknown or unexpected flag '$token' (arg $tokenNumber)\n";
+	    return 1;
+        }
+
+        # if fell through to here, assume it's a glyph file next up
+	# so process the current glyph file (look for metrics file)
+
+        # no -M or -N seen, so look for metrics file from -m path
+	$j = 0; # nothing found so far
+        for ($i=0; $i<scalar @mpaths; $i++) {
+	    $Mpath = $mpaths[$i];
+	    $Mpath = makeMPath($path, $basename, $extension, $Mpath);
+	    if ($Mpath ne '') {
+	        # OK path found
+		push @mns, $Mpath;
+		$j = 1; # found a metrics file
+		last;
+	    } 
+	}
+	# if we fell through to here, couldn't find a metrics file
+	if (!$j) {
+	    print "unable to find a metrics file for $path$basename.$extension\n";
+	    return 1;
+	}
+
+    } # while loop through @args
+    return 0;
+
+} # end of processCMD()
+
+# split up a path/filename into path, basename, extension
+sub splitPath {
+    my $token = shift;
+    my ($path, $basename, $extension);
+
+    if      ($token =~ m#^(.*)([/\\])([^/\\]+)$#) {
+        $path = $1.$2;
+	$basename = $3;
+    } elsif ($token =~ m#^(.*)([/\\])$#) {
+        $path = $1.$2;
+	$basename = '';
+    } elsif ($token =~ m#^([/\\])([^/\\]+)$#) {
+        $path = $1;
+	$basename = $2;
+    } else {
+	$path = '';
+	$basename = $token;
+    }
+
+    if ($basename =~ m#^(.*)\.([^.]+)$#) {
+	$basename = $1;
+	$extension = $2;
+    } else {
+	$extension = '';
+    }
+
+    return ($path, $basename, $extension);
+} # end of splitPath()
+
+# given glyph file path, basename, extension; and proposed metrics file path
+# (optionally with a .afm or .pfm file), create the full path of the metrics
+# file. test if file exists and is readable, and if not, return ''. if a
+# proposed metrics file path includes the metrics file name, just use that. 
+# a path prefixed with @ is relative to the glyph file path (appended to it).
+sub makeMPath {
+    my ($gPath, $gName, $gExt, $mPath) = @_;
+
+    my ($i, $j, $isRelative, $dh, $entry);
+
+    # $mPath might be empty, or dir with or without trailing / or \
+    # $mPath might start with a @ -- if relative path, is relative to gPath
+
+    # $mPath might be a full path+name+afm/pfm
+    my ($p, $b, $e) = splitPath($mPath);
+    if ($b ne '' && $e ne '') {
+	if ($e !~ m/^[ap]fm$/i) { return ''; }
+	# full path and file. see if exists. return either way
+	if (-r $mPath) {
+            # metrics file is readable. return it
+	    return $mPath;
+	} else {
+            # metrics file not found or is unreadable. return empty
+	    # if starts with @ (shouldn't), it will die here
+	    return '';
+	}
+    }
+
+    # try each gPath + gName + afm or pfm
+    # .pfa tries .afm before .pfm, .pfb tries .pfm before .afm
+    my @extList = qw/ .afm .pfm /;
+    if ($gExt =~ m#^pfb$#i) {
+        @extList = qw/ .pfm .afm /; # or reverse @extList
+    }
+
+    $isRelative = 0;
+    if (substr($mPath, 0, 1) eq '@') {
+	$isRelative = 1;  # is relative to glyph file path, not current dir
+	$mPath = substr($mPath, 1); # strip @
+    }
+
+    if ($mPath !~ m#^[/\\]# && $isRelative) {
+        # relative path: prepend glyph file's path
+	$mPath = $gPath . $mPath;  # gPath SHOULD end with / or \
+    }
+
+    # make sure mPath ends with / or \
+    if ($mPath !~ m#[/\\]$#) {
+	$mPath .= '/';
+    }
+
+    if (!opendir $dh, $mPath) {
+        print "can't open -m directory $mPath: $!\n";
+        return 1;
+    }
+    while ($entry = readdir $dh) {
+        if ($entry eq '.' || $entry eq '..') { next; }
+        if (-d $mPath.$entry) { next; }
+
+        # have an $entry that might be gName.ext
+        for ($j=0; $j<scalar @extList; $j++) {
+            if ($entry =~ m#^$gName$extList[$j]$#i) {
+	        # we have a match! remember it if it's readable
+	        if (-r $mPath.$entry) {
+                    closedir $dh;
+	            return $mPath.$entry;
+	        }
+	    }
+        }
+    }
+    closedir $dh;
+    # got to end of entries without success. indicate failure
+    return '';
+
+} # end of makeMPath()
+
+# strip off any ' or " surrounding a string
+# I'm not sure you'll see something like -M"\Program Files\..." as 
+# "\Program Files\...", \Program Files\..., or just \Program.
+sub stripQuotes {
+    my $string = shift;
+
+    if (length($string) < 3) { return $string; }
+
+    if      (substr($string, 0, 1) eq "'" && substr($string, -1, 1) eq "'") {
+        $string = substr($string, 1, length($string) - 2);
+    } elsif (substr($string, 0, 1) eq '"' && substr($string, -1, 1) eq '"') {
+        $string = substr($string, 1, length($string) - 2);
+    }
+
+    return $string;
+} # end of stripQuotes()
+
+__END__

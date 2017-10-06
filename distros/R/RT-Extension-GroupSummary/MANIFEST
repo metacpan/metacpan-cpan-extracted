@@ -1,0 +1,37 @@
+Changes
+etc/GroupSummary_Config.pm
+html/Callbacks/RT-Extension-GroupSummary/Elements/Tabs/Privileged
+html/Elements/ShowGroup
+html/Elements/ShowPrincipal
+html/Group/Search.html
+html/Group/Summary.html
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Substitute.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/YAML/Tiny.pm
+lib/RT/Extension/GroupSummary.pm
+lib/RT/Extension/GroupSummary/Test.pm.in
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+xt/00-load.t
+xt/group-modify.t
+xt/group-search.t
+xt/group-summary.t
+xt/ticket-group-watcher.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

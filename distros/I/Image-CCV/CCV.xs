@@ -171,7 +171,7 @@ myccv_detect_faces (filename, training_data)
 			av_push( res, newSVnv( comp->rect.y ));
 			av_push( res, newSVnv( comp->rect.width ));
 			av_push( res, newSVnv( comp->rect.height ));
-			av_push( res, newSVnv( comp->confidence ));
+			av_push( res, newSVnv( comp->classification.confidence ));
                         Inline_Stack_Push(sv_2mortal(newRV_noinc((SV*) res)));
 		}
 		ccv_array_free(seq);

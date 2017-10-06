@@ -1,4 +1,4 @@
 name = "Udev-FFI"
 # badges = ["travis"]
-module_maker="ModuleBuild"
+module_maker="ModuleBuildTiny_Extend"
 

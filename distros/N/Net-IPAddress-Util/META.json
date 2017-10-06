@@ -4,7 +4,7 @@
       "Paul Bennett <paul.w.bennett@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "4.000",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "4.004",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

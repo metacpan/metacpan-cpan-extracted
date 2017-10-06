@@ -2,6 +2,7 @@ use 5.010;
 use warnings;
 BEGIN{
     use Test::More;
+    plan skip_all => "Perl v5.14 or later required for this test" if $] < 5.014;
     plan skip_all => "Moose required for testing moosey objrules" if !eval{require Moose};
 }
 

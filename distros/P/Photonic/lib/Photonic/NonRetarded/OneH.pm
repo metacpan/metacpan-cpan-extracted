@@ -4,7 +4,7 @@ Photonic::NonRetarded::OneH
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ Haydock coefficient at a time.
 
 =over 4
 
-=item * new(geometry=>$g[, small=>$s])
+=item * new(geometry=>$g[, smallH=>$s])
 
 Create a new Ph::NR::OneH object with GeometryG0 $g and optional
 smallness parameter  $s.
@@ -48,10 +48,10 @@ be given in the initializer.
 
 Accesors handled by geometry (see Photonic::Geometry)
 
-=item * small 
+=item * smallH
 
 A small number used as tolerance to end the iteration. Small negative
-b^2 coefficients are taken to be zero.
+b^2 coefficients are taken to be zero. Handled by Photonic::Roles::EpsParams
 
 =item * previousState currentState nextState 
 
@@ -86,7 +86,7 @@ next_b2, next_b, shifting the current values where necessary. Returns
 =cut
 
 package Photonic::NonRetarded::OneH;
-$Photonic::NonRetarded::OneH::VERSION = '0.007';
+$Photonic::NonRetarded::OneH::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -96,11 +96,12 @@ use List::Util;
 use Carp;
 use Moose;
 use Photonic::Types;
+with "Photonic::Roles::EpsParams";
 
 has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::GeometryG0',
     handles=>[qw(B dims r G GNorm L scale f)],required=>1
 );
-has 'small' => (is=>'ro', required=>1, default=>1e-7);
+
 has 'currentState' => (is=>'ro', isa=>'PDL::Complex', writer=>'_currentState',
       lazy=>1, init_arg=>undef,  default=>sub {0+i*0});
 has 'previousState' =>(is=>'ro', isa=>'PDL::Complex', writer=>'_previousState',
@@ -164,7 +165,7 @@ sub _iterate_indeed {
     # next b^2
     my $next_b2=Cabs2($GBGpsi_G)->sum #square magnitude of state
 	-$current_a**2 - $self->current_b2;
-    carp "\$next_b2=$next_b2 is too negative!" if $next_b2 < -$self->small;
+    carp "\$next_b2=$next_b2 is too negative!" if $next_b2 < -$self->smallH;
     $next_b2=0 if $next_b2<0; 
     my $next_b=sqrt($next_b2);
     #If b is too small, time to quit.
@@ -172,7 +173,7 @@ sub _iterate_indeed {
     $next_state=$GBGpsi_G - $current_a*$psi_G -
 	$self->current_b*$self->previousState,  
 	$next_state=Cscale($next_state,1/$next_b)
-	unless $next_b2 < $self->small;
+	unless $next_b2 < $self->smallH;
     #save values
     $self->_current_a($current_a);
     $self->_next_b2($next_b2);

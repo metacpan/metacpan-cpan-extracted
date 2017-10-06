@@ -7,8 +7,8 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '3.005'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.007'; # VERSION
+my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -202,7 +202,9 @@ sub handle_ccitt {
     $self->{'DecodeParms'}->{'K'} = (($tif->{'ccitt'} == 4 || ($tif->{'g3Options'} & 0x1))? PDFNum(-1): PDFNum(0));
     $self->{'DecodeParms'}->{'Columns'} = PDFNum($tif->{'imageWidth'});
     $self->{'DecodeParms'}->{'Rows'} = PDFNum($tif->{'imageHeight'});
-    $self->{'DecodeParms'}->{'Blackls1'} = PDFBool($tif->{'whiteIsZero'} == 1? 1: 0);
+    # deprecated Blackls1 (incorrectly named). will be removed 8/2018 or later
+    $self->{'DecodeParms'}->{'Blackls1'} = 
+    $self->{'DecodeParms'}->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 1? 1: 0);
     if (defined($tif->{'g3Options'}) && ($tif->{'g3Options'} & 0x4)) {
         $self->{'DecodeParms'}->{'EndOfLine'} = PDFBool(1);
         $self->{'DecodeParms'}->{'EncodedByteAlign'} = PDFBool(1);

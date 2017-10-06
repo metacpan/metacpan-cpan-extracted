@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::Sanitize;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Sys::Syslog qw{:standard :macros};
 
@@ -13,9 +13,16 @@ sub default_config {
     };
 }
 
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'Sanitize_metrics' );
+    return \@rows;
+}
+
 sub register_metrics {
     return {
-        'sanitize_removed_total' => 'The number Authentication Results headers removed',
+        'sanitize_remove_total' => 'The number Authentication Results headers removed',
     };
 }
 
@@ -47,12 +54,12 @@ sub is_hostname_mine {
 }
 
 sub remove_auth_header {
-    my ( $self, $value ) = @_;
+    my ( $self, $index ) = @_;
     $self->metric_count( 'sanitize_remove_total' );
     if ( !exists( $self->{'remove_auth_headers'} ) ) {
         $self->{'remove_auth_headers'} = [];
     }
-    push @{ $self->{'remove_auth_headers'} }, $value;
+    push @{ $self->{'remove_auth_headers'} }, $index;
     return;
 }
 
@@ -98,9 +105,9 @@ sub eom_callback {
     my $config = $self->handler_config();
     return if ( lc $config->{'remove_headers'} eq 'no' );
     if ( exists( $self->{'remove_auth_headers'} ) ) {
-        foreach my $header ( reverse @{ $self->{'remove_auth_headers'} } ) {
-            $self->dbgout( 'RemoveAuthHeader', $header, LOG_DEBUG );
-            $self->change_header( 'Authentication-Results', $header, q{} );
+        foreach my $index ( reverse @{ $self->{'remove_auth_headers'} } ) {
+            $self->dbgout( 'RemoveAuthHeader', $index, LOG_DEBUG );
+            $self->change_header( 'Authentication-Results', $index, q{} );
         }
     }
     return;

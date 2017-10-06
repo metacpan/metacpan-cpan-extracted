@@ -1,7 +1,7 @@
 package Bread::Board::Service::Deferred;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Helper for holding a service that is not quite constructed yet
-$Bread::Board::Service::Deferred::VERSION = '0.35';
+$Bread::Board::Service::Deferred::VERSION = '0.36';
 use Moose ();
 
 use overload
@@ -95,7 +95,7 @@ Bread::Board::Service::Deferred - Helper for holding a service that is not quite
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

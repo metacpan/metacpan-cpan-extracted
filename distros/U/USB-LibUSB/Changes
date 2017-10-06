@@ -1,5 +1,19 @@
 Revision history for Perl extension USB::LibUSB.
 
+0.05 2017-09-29
+    - Add driver installation docs for Windows
+    - document 'last_retval' method
+
+0.04 2017-09-21
+    - Fix documentation of bulk_write and interrupt_write
+    - Makefile.PL: Check libusb version with pkg-config
+
+0.03 2017-08-27
+    - Add missing functions to @EXPORT list
+    
+0.02 2017-08-24
+    - Add repo data to META
+    
 0.01 2017-08-23
 	- first CPAN release
     - on PrePAN: http://prepan.org/module/nYfNhvSqeCm
@@ -8,8 +22,4 @@ Revision history for Perl extension USB::LibUSB.
     - Raw XS interface: USB::LibUSB::XS
     - More High-level interface: USB::LibUSB (currently uses Moo for OO)
 
-0.02 2017-08-24
-    - Add repo data to META
 
-0.03 2017-08-27
-    - Add missing functions to @EXPORT list

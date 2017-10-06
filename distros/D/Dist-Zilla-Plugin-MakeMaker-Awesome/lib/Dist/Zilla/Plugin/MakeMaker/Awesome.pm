@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.37-3-gc893035
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.38-10-g5fd51ab
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -117,6 +117,11 @@ around dump_config => sub
     };
     $config->{+__PACKAGE__} = $data if keys %$data;
 
+    $config->{'Dist::Zilla::Plugin::MakeMaker'}{make_path} ||= $self->make_path;
+    $config->{'Dist::Zilla::Plugin::MakeMaker'}{version} ||= Dist::Zilla::Plugin::MakeMaker->VERSION;
+    $config->{'Dist::Zilla::Role::TestRunner'}{default_jobs} ||= $self->default_jobs;
+    $config->{'Dist::Zilla::Role::TestRunner'}{version} ||= Dist::Zilla::Role::TestRunner->VERSION;
+
     return $config;
 };
 
@@ -164,7 +169,7 @@ sub _build_WriteMakefile_args {
     # higher configure-requires version, we should at least warn the user
     # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/215
     foreach my $phase (qw(configure build test runtime)) {
-        if (my @version_ranges = pairgrep { !version::is_lax($b) } %{ $require_prereqs{$phase} }
+        if (my @version_ranges = pairgrep { defined $b && !version::is_lax($b) } %{ $require_prereqs{$phase} }
                 and $self->eumm_version < '7.1101') {
             $self->log_fatal([
                 'found version range in %s prerequisites, which ExtUtils::MakeMaker cannot parse (must specify eumm_version of at least 7.1101): %s %s',
@@ -281,7 +286,7 @@ has exe_files => (
     isa           => ArrayRef[Str],
     lazy          => 1,
     builder       => '_build_exe_files',
-    documentation => "The test directories given to ExtUtils::MakeMaker's EXE_FILES (in munged form)",
+    documentation => "The list of filenames given to ExtUtils::MakeMaker's EXE_FILES (in munged form)",
 );
 
 sub _build_exe_files {
@@ -354,6 +359,8 @@ has header => (
 
 sub _build_header {
     my $self = shift;
+    $self->log_fatal([ 'header_file %s does not exist!', $self->header_file->stringify ])
+        if $self->header_file and not -e $self->header_file;
     join "\n",
         @{$self->header_strs},
         ( $self->header_file ? path($self->header_file)->slurp_utf8 : () );
@@ -382,6 +389,8 @@ has footer => (
 
 sub _build_footer {
     my $self = shift;
+    $self->log_fatal([ 'footer_file %s does not exist!', $self->footer_file->stringify ])
+        if $self->footer_file and not -e $self->footer_file;
     join "\n",
         @{$self->footer_strs},
         ( $self->footer_file ? path($self->footer_file)->slurp_utf8 : () );
@@ -422,8 +431,6 @@ sub gather_files
 sub setup_installer
 {
     my $self = shift;
-
-    $self->log_debug('setup_installer');
 
     ## Sanity checks
     $self->log_fatal("can't install files with whitespace in their names")
@@ -476,7 +483,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

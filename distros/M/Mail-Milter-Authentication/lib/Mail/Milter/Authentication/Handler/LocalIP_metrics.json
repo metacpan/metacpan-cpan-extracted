@@ -1,0 +1,97 @@
+{
+   "collapse" : true,
+   "height" : 250,
+   "panels" : [
+      {
+         "aliasColors" : {},
+         "bars" : false,
+         "datasource" : "${DS_PROMETHEUS}",
+         "editable" : true,
+         "error" : false,
+         "fill" : 1,
+         "grid" : {},
+         "id" : 12,
+         "legend" : {
+            "avg" : false,
+            "current" : false,
+            "max" : false,
+            "min" : false,
+            "show" : true,
+            "total" : false,
+            "values" : false
+         },
+         "lines" : true,
+         "linewidth" : 2,
+         "links" : [],
+         "nullPointMode" : "connected",
+         "percentage" : false,
+         "pointradius" : 5,
+         "points" : false,
+         "renderer" : "flot",
+         "seriesOverrides" : [],
+         "span" : 12,
+         "stack" : false,
+         "steppedLine" : false,
+         "targets" : [
+            {
+               "expr" : "sum(rate(authmilter_connect_total{node=~\"$node\"}[$ratetime]))",
+               "intervalFactor" : 2,
+               "legendFormat" : "Connections",
+               "metric" : "authmilter_connect_total",
+               "refId" : "A",
+               "step" : 4
+            },
+            {
+               "expr" : "sum(rate(authmilter_localip_connect_total{node=~\"$node\"}[$ratetime]))",
+               "interval" : "",
+               "intervalFactor" : 2,
+               "legendFormat" : "Local connections",
+               "metric" : "connect",
+               "refId" : "B",
+               "step" : 4
+            }
+         ],
+         "thresholds" : [],
+         "timeFrom" : null,
+         "timeShift" : null,
+         "title" : "Local/NonLocal IP rate",
+         "tooltip" : {
+            "msResolution" : false,
+            "shared" : true,
+            "sort" : 2,
+            "value_type" : "cumulative"
+         },
+         "type" : "graph",
+         "xaxis" : {
+            "mode" : "time",
+            "name" : null,
+            "show" : true,
+            "values" : []
+         },
+         "yaxes" : [
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            },
+            {
+               "format" : "short",
+               "label" : null,
+               "logBase" : 1,
+               "max" : null,
+               "min" : null,
+               "show" : true
+            }
+         ]
+      }
+   ],
+   "repeat" : null,
+   "repeatIteration" : null,
+   "repeatRowId" : null,
+   "showTitle" : true,
+   "title" : "LocalIP Handler",
+   "titleSize" : "h6"
+}

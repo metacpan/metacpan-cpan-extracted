@@ -8,7 +8,6 @@ use IO::Handle; # allow method calls on filehandles on older Perls
 use File::Temp qw/tempfile/;
 use File::Basename qw/fileparse/;
 use File::Spec::Functions qw/devnull/;
-use File::stat;
 use Fcntl qw/S_IMODE/;
 use Exporter 'import';
 use File::Replace::SingleHandle ();
@@ -30,7 +29,7 @@ BEGIN {
 
 ## no critic (RequireArgUnpacking)
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw/ replace replace2 /;
 our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle /;
@@ -38,7 +37,7 @@ our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle /;
 our $DISABLE_CHMOD;
 
 my %NEW_KNOWN_OPTS = map {$_=>1} qw/ debug layers devnull create chmod
-	perms autocancel autofinish /;
+	perms autocancel autofinish in_fh /;
 sub new {  ## no critic (ProhibitExcessComplexity)
 	my $class = shift;
 	@_ or croak "$class->new: not enough arguments";
@@ -51,7 +50,28 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 	croak "$class->new: can't use autocancel and autofinish at once"
 		if $opts{autocancel} && $opts{autofinish};
 	unless (defined wantarray) { warnings::warnif("Useless use of $class->new in void context"); return }
-	my $self = bless { devnull=>1, chmod=>!$DISABLE_CHMOD, %opts, is_open=>0 }, $class;
+	if (exists $opts{devnull}) { # compatibility mode + deprecation warning
+		   if ($opts{create} ) { $opts{create}='now'   }
+		elsif ($opts{devnull}) { $opts{create}='later' }
+		else                   { $opts{create}='off'   }
+		delete $opts{devnull};
+		carp "The 'devnull' option has been deprecated, use create=>'$opts{create}' instead";
+	}
+	elsif (exists $opts{create}) { # normalize 'create' values
+		my $warn;
+		  if (!$opts{create}) # some false value
+			 { $opts{create}='later'; $warn=1 }
+		elsif ($opts{create} eq 'off' || $opts{create} eq 'no')
+			 { $opts{create} = 'off' }
+		elsif ($opts{create} eq 'now' || $opts{create} eq 'later')
+			 { } # nothing needed
+		else { $opts{create} = 'now'; $warn=1 } # other true value
+		$warn and carp "This 'create' value is deprecated, use create=>'$opts{create}' instead";
+	}
+	else { $opts{create} = 'later' } # default
+	# create the object
+	my $self = bless { chmod=>!$DISABLE_CHMOD, %opts, is_open=>0 }, $class;
+	$self->{debug} = \*STDERR if $self->{debug} && !ref($self->{debug});
 	if (defined $_layers) {
 		exists $self->{layers} and croak "$class->new: layers specified twice";
 		$self->{layers} = $_layers }
@@ -66,31 +86,53 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 	binmode $self->{ofh}, $self->{layers} if defined $self->{layers};
 	# input file
 	my $openmode = defined $self->{layers} ? '<'.$self->{layers} : '<';
-	if ( not open $self->{ifh}, $openmode, $filename ) {
-		if ( $!{ENOENT} && ($self->{create} || $self->{devnull}) ) { # No such file or directory
-			$self->{create} and $openmode = defined $self->{layers} ? '+>'.$self->{layers} : '+>';
+	if ( defined $self->{in_fh} ) {
+		croak "in_fh appears to be closed" unless defined fileno($self->{in_fh});
+		$self->{ifh} = delete $self->{in_fh};
+	}
+	elsif ( not open $self->{ifh}, $openmode, $filename ) {
+		# No such file or directory:
+		if ( $!{ENOENT} && ($self->{create} eq 'now' || $self->{create} eq 'later') ) {
+			$self->{create} eq 'now' and $openmode = defined $self->{layers} ? '+>'.$self->{layers} : '+>';
 			# note we call &devnull() like this because otherwise it would
 			# be inlined and we want to be able to mock it for testing
-			if ( open $self->{ifh}, $openmode, $self->{create} ? $filename : &devnull() )
+			if ( open $self->{ifh}, $openmode, $self->{create} eq 'now' ? $filename : &devnull() )
 				{ $self->{setperms}=oct('666')&~umask unless defined $self->{setperms} }
 			else { $self->{ifh}=undef }
 		} else { $self->{ifh}=undef }
 	}
-	else { $self->{setperms} = S_IMODE(stat($self->{ifh})->mode)
-			unless defined $self->{setperms} }
 	if ( !defined $self->{ifh} ) {
 		my $e=$!;
 		close  $self->{ofh}; $self->{ofh} = undef;
 		unlink $self->{ofn}; $self->{ofn} = undef;
 		$!=$e;  ## no critic (RequireLocalizedPunctuationVars)
 		croak "$class->new: failed to open '$filename': $!" }
+	else {
+		if (!defined $self->{setperms}) {
+			if ($self->{chmod}) {
+				# we're providing our own error, don't need the extra warning
+				no warnings 'unopened';  ## no critic (ProhibitNoWarnings)
+				my (undef,undef,$mode) = stat($self->{ifh})
+					or croak "stat failed: $!";
+				$self->{setperms} = S_IMODE($mode);
+			}
+			else { $self->{setperms}=0 }
+		}
+	}
 	$self->{ifn} = $filename;
 	# finish init
 	$self->{is_open} = 1;
-	$self->{debug} and print STDERR "$class->new: input '".$self->{ifn}
-		."', output '".$self->{ofn}."', layers "
-		.(defined $self->{layers} ? "'".$self->{layers}."'" : 'undef')."\n";
+	$self->_debug("$class->new: input '", $self->{ifn},
+		"', output '", $self->{ofn}, "', layers ",
+		(defined $self->{layers} ? "'".$self->{layers}."'" : 'undef'), "\n");
 	return $self;
+}
+
+sub _debug {
+	my $self = shift;
+	return 1 unless $self->{debug};
+	local ($",$,,$\) = (' ');
+	return print {$self->{debug}} @_;
 }
 
 sub is_open  { return !!shift->{is_open} }
@@ -129,8 +171,8 @@ sub finish {
 		my $e=$!; unlink($ofn); $!=$e;  ## no critic (RequireLocalizedPunctuationVars)
 		croak ref($self)."->finish: $fail: $!";
 	}
-	$self->{debug} and print STDERR ref($self)."->finish:"
-		." renamed '$ofn' to '$ifn', perms ".sprintf('%05o',$self->{setperms})."\n";
+	$self->_debug(ref($self),"->finish: renamed '$ofn' to '$ifn', perms ",
+		sprintf('%05o',$self->{setperms}), "\n");
 	return 1;
 }
 
@@ -163,10 +205,10 @@ sub _cancel {
 			.": unclosed file '".$self->{ifn}."' not replaced!") }
 	elsif ($from eq 'cancel')
 		{ $self->{is_open} or warnings::warnif(ref($self)."->cancel: already closed") }
-	if ($self->{debug} && !($from eq 'destroy' && !$self->{is_open}))
-		{ print STDERR ref($self)."->cancel: not replacing input file ",
+	if (!($from eq 'destroy' && !$self->{is_open}))
+		{ $self->_debug(ref($self), "->cancel: not replacing input file ",
 			(defined $self->{ifn} ? "'$self->{ifn}'" : "(unknown)"),
-			(defined $self->{ofn} ? ", will attempt to unlink '$self->{ofn}'" : ""), "\n" }
+			(defined $self->{ofn} ? ", will attempt to unlink '$self->{ofn}'" : ""), "\n") }
 	my ($ifh,$ofh,$ofn) = @{$self}{qw/ifh ofh ofn/};
 	@{$self}{qw/ifh ofh ofn ifn is_open/} = (undef) x 5;
 	my $success = 1;
@@ -180,8 +222,10 @@ sub cancel { return shift->_cancel('cancel') }
 
 sub DESTROY {
 	my $self = shift;
-	   if ($self->{autocancel}) { $self->cancel }
-	elsif ($self->{autofinish}) { $self->finish }
+	if ($self->{is_open}) {
+		   if ($self->{autocancel}) { $self->cancel }
+		elsif ($self->{autofinish}) { $self->finish }
+	}
 	$self->_cancel('destroy');
 	return;
 }
@@ -261,26 +305,25 @@ exist, and will always point to either the new or the old version of the file,
 so a user attempting to open and read the file will always be able to do so,
 and never see an unfinished version of the file while it is being written.
 
-* Unfortunately, whether or not a rename will actually be atomic in your
-specific circumstances is not always an easy question to answer, as it depends
-on exact details of the operating system and file system. Consult your system's
-documentation and search the Internet for "atomic rename" for more details.
+* B<Warning:> Unfortunately, whether or not a rename will actually be atomic in
+your specific circumstances is not always an easy question to answer, as it
+depends on exact details of the operating system and file system. Consult your
+system's documentation and search the Internet for "atomic rename" for more
+details. This module's job is to perform the C<rename>, and it can make
+B<no guarantees> as to whether it will be atomic or not.
 
 =head2 Version
 
-This documentation describes version 0.04 of this module.
-
-B<This is an alpha version.> While the module works and has a full test suite,
-I may still decide to change the API as I gain experience with it. I will try
-to make such changes compatible, but can't guarantee that just yet.
+This documentation describes version 0.06 of this module.
 
 =head1 Constructors and Overview
 
 The functions C<< File::Replace->new() >>, C<replace()>, and C<replace2()> take
-exactly the same arguments, and differ only in their return values. Note that
-C<replace()> and C<replace2()> are normal functions and not methods, don't
-attempt to call them as such. If you don't want to import them you can always
-call them as, for example, C<File::Replace::replace()>.
+exactly the same arguments, and differ only in their return values - C<replace>
+and C<replace2> wrap the functionality of C<File::Replace> inside C<tie>d
+filehandles. Note that C<replace()> and C<replace2()> are normal functions and
+not methods, don't attempt to call them as such. If you don't want to import
+them you can always call them as, for example, C<File::Replace::replace()>.
 
  File::Replace->new( $filename );
  File::Replace->new( $filename, $layers );
@@ -288,9 +331,11 @@ call them as, for example, C<File::Replace::replace()>.
  File::Replace->new( $filename, $layers, option => 'value', ... );
  # replace(...) and replace2(...) take the same arguments
 
-The options are described in L</Options>. The constructors will C<die> in case
-of errors. It is strongly recommended that you C<use warnings;>, as then this
-module will issue warnings which may be of interest to you.
+The constructors will open the input file and the temporary output file (the
+latter via L<File::Temp|File::Temp>), and will C<die> in case of errors. The
+options are described in L</Options>. It is strongly recommended that you
+C<use warnings;>, as then this module will issue warnings which may be of
+interest to you.
 
 =head2 C<< File::Replace->new >>
 
@@ -332,7 +377,8 @@ such as C<< <$handle> >>, C<readline>, C<sysread>, C<seek>, C<tell>, C<eof>,
 etc. are passed through to the input handle. You can still access these
 operations on the output handle via e.g. C<< eof( tied(*$handle)->out_fh ) >>
 or C<< tied(*$handle)->out_fh->tell() >>. The replace operation (C<finish>) is
-performed when you C<close> the handle.
+performed when you C<close> the handle, which means that C<close> may C<die>
+instead of just returning a false value.
 
 Re-C<open>ing the handle causes a new underlying C<File::Replace> object to be
 created. You should explicitly C<close> the filehandle first so that the
@@ -354,9 +400,10 @@ confusion.
 
 In list context, returns a two-element list of two tied filehandles, the first
 being the input filehandle, and the second the output filehandle, and the
-replace operation (C<finish>) is performed when both handles are closed. In
+replace operation (C<finish>) is performed when both handles are C<close>d. In
 scalar context, it returns only the output filehandle, and the replace
-operation is performed when this handle is closed.
+operation is performed when this handle is C<close>d. This means that C<close>
+may C<die> instead of just returning a false value.
 
 You cannot re-C<open> these tied filehandles.
 
@@ -372,12 +419,9 @@ these handles as this may lead to confusion.
 
 A filename. The temporary output file will be created in the same directory as
 this file, its name will be based on the original filename, but prefixed with a
-dot (C<.>) and suffixed with a random string and an extension of C<.tmp>.
-
-If the input file does not exist (C<ENOENT>), then the behavior will depend on
-the options L</devnull> (enabled by default) and L</create>. If either of these
-options are set, the input file will be created (just at different times), if
-neither are enabled, then attempting to open a nonexistent file will fail.
+dot (C<.>) and suffixed with a random string and an extension of C<.tmp>. If
+the input file does not exist (C<ENOENT>), then the behavior will depend on the
+L</create> option.
 
 =head2 C<layers>
 
@@ -387,28 +431,69 @@ is a list of PerlIO layers such as C<":utf8">, C<":raw:crlf">, or
 C<":encoding(UTF-16)">. Note that the default layers differ based on operating
 system, see L<perlfunc/open>.
 
-=head2 C<devnull>
-
-This option, which is enabled by default, causes the case of nonexistent input
-files to be handled by opening F</dev/null> or its equivalent instead of the
-input file. This means that while the output file is being written, the input
-file name will not exist, and only come into existence when the rename
-operation is performed. If you disable this option, and attempt to open a
-nonexistent file, then the constructor will C<die>.
-
-The option L</create> being set overrides this option.
-
 =head2 C<create>
 
-Enabling this option causes the case of nonexistent input files to be handled
-by opening the input file name with a mode of C<< +> >>, meaning that it is
-created and opened in read-write mode. However, it is strongly recommended that
-you don't take advantage of the read-write mode by writing to the input file,
-as that contradicts the purpose of this module - instead, the input file will
-exist and remain empty until the replace operation.
+This option configures the behavior of the module when the input file does not
+exist (C<ENOENT>). There are three modes, which you specify as one of the
+following strings. If you need more precise control of the input file, see the
+L</in_fh> option - note that C<create> is ignored when you use that option.
 
-Setting this option overrides L</devnull>. If this option is disabled (the
-default), L</devnull> takes precedence.
+=over
+
+=item C<"later"> (default when C<create> omitted)
+
+Instead of the input file, F</dev/null> or its equivalent is opened. This means
+that while the output file is being written, the input file name will not
+exist, and only come into existence when the rename operation is performed.
+
+=item C<"now">
+
+If the input file does not exist, it is immediately created and opened. There
+is currently a potential race condition: if the file is created by another
+process before this module can create it, then the behavior is undefined - the
+file may be emptied of its contents, or you may be able to read its contents.
+This behavior may be fixed and specified in a future version. The race
+condition is discussed some more in L</Concurrency and File Locking>.
+
+Currently, this option is implemented by opening the file with a mode of
+C<< +> >>, meaning that it is created (clobbered) and opened in read-write
+mode. I<However>, that should be considered an implementation detail that is
+subject to change. Do not attempt to take advantage of the read-write mode by
+writing to the input file - that contradicts the purpose of this module anyway.
+Instead, the input file will exist and remain empty until the replace
+operation.
+
+=item C<"off"> (or C<"no">)
+
+Attempting to open a nonexistent input file will cause the constructor to
+C<die>.
+
+=back
+
+The above values were introduced in version 0.06. Using any other than the
+above values will trigger a mandatory deprecation warning. For backwards
+compatibility, if you specify any other than the above values, then a true
+value will be the equivalent of C<now>, and a false value the equivalent of
+C<later>. The deprecation warning will become a fatal error in a future
+version, to allow new values to be added in the future.
+
+B<< The C<devnull> option has been deprecated >> as of version 0.06. Its
+functionality has been merged into the C<create> option. If you use it, then
+the module will operate in a compatibility mode, but also issue a mandatory
+deprecation warning, informing you what C<create> setting to use instead. The
+C<devnull> option will be entirely removed in a future version.
+
+=head2 C<in_fh>
+
+This option allows you to pass an existing input filehandle to this module,
+instead of having the constructors open the input file for you. Use this option
+if you need more precise control over how the input file is opened, e.g. if you
+want to use C<sysopen> to open it. The handle must be open, which will be
+checked by calling C<fileno> on the handle. The module makes no attempt to
+check that the filename you pass to the module matches the filehandle. The
+module will attempt to C<stat> the handle to get its permissions, except when
+you have specified the L</perms> option or disabled the L</chmod> option. The
+L</create> option is ignored when you use this option.
 
 =head2 C<perms>
 
@@ -431,6 +516,10 @@ the C<chmod> operation that is normally performed just before the C<rename>
 will not be attempted. This is mostly intended for systems where you know the
 C<chmod> will fail. See also L</perms>, which allows you to define what
 permissions will be used.
+
+Note that the temporary files created with L<File::Temp|File::Temp> will have
+0600 permissions if left unchanged (except of course on systems that don't
+support these kind of restrictive permissions).
 
 =head2 C<autocancel>
 
@@ -458,7 +547,35 @@ This option cannot be used together with C<autocancel>.
 
 =head2 C<debug>
 
-Enables some debug output for C<new>, C<finish>, and C<cancel>.
+If set to a true value, this option enables some debug output for C<new>,
+C<finish>, and C<cancel>. You may also set this to a filehandle, and debug
+output will be sent there.
+
+=head1 Notes and Caveats
+
+=head2 Concurrency and File Locking
+
+This module is very well suited for situations where a file has one writer and
+one or more readers.
+
+Among other things, this is reflected in the case of a nonexistent file, where
+the L</create> settings C<now> and C<later> (the default) are currently
+implemented as a two-step process, meaning there is the potential of the input
+file being created in the short period of time between the first and second
+C<open> attempts, which this module currently will not notice.
+
+Having multiple writers is possible, but care must be taken to ensure proper
+coordination of the writers!
+
+For example, a simple L<flock|perlfunc/flock> of the input file is B<not>
+enough: if there are multiple processes, remember that each process will
+I<replace> the original input file by a new and different file! One possible
+solution would be a separate lock file that does not change and is only used
+for C<flock>ing. There are other possible methods, but that is currently beyond
+the scope of this documentation.
+
+(For the sake of completeness, note that you cannot C<flock> the C<tie>d
+handles, only the underlying filehandles.)
 
 =head1 Author, Copyright, and License
 

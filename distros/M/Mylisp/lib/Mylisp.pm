@@ -5,84 +5,74 @@ no warnings "experimental";
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(mylisp_to_ast);
+our @EXPORT = qw(mylisp_to_ast get_mylisp_parser);
 
-our $VERSION = '1.08';
-use Spp qw(lint_spp_ast match grammar_to_ast ast_to_parser);
-use Spp::Builtin;
-use Spp::Core;
+our $VERSION = '2.0';
+use Spp qw(match_text spp_to_ast ast_to_parser);
+use Spp::Builtin qw(uuid is_false error to_json clean_ast write_file see_ast);
 use Mylisp::Grammar qw(get_mylisp_grammar);
 use Mylisp::Ast qw(get_mylisp_ast);
-use Mylisp::OptAstAtom qw(opt_ast_atom);
-use Mylisp::OptAstMacro qw(opt_ast_macro);
-use Mylisp::Stable;
+use Mylisp::OptAst qw(opt_ast);
 use Mylisp::ToPerl qw(ast_to_perl ast_to_perl_repl);
+use Mylisp::Lint;
+
+sub get_mylisp_parser {
+   my $mylisp_ast = get_mylisp_ast();
+   Spp::lint_ast($mylisp_ast);
+   return ast_to_parser($mylisp_ast);
+}
 
 sub repl {
-   my $mylisp_ast = get_mylisp_ast();
-   my $parser     = ast_to_parser($mylisp_ast);
+   my $parser = get_mylisp_parser();
    say 'This is Mylisp REPL, type enter to exit.';
    while (1) {
       print '>> ';
       my $line = <STDIN>;
       exit() if $line eq "\n";
-      $line = trim($line);
-      my $match = match($parser, $line);
+      my $match = match_text($parser, $line);
       if (is_false($match)) {
          my $error_report = $match->[1];
          error($error_report);
       }
-      # say 'match ->    ', to_json($match);
-      my $ast = opt_ast_atom($match);
-      # say 'opt-atom -> ', to_json(clean_ast($ast));
-      $ast = opt_ast_macro($ast);
-      say 'opt-macro -> ', to_json(clean_ast($ast));
-      # $ast = get_ast_type_ast($ast);
-      # say 'type-ast  -> ', to_json($ast);
-      # $ast = clean_type_ast($ast);
-      # say 'clean-ast -> ', to_json($ast);
-      my $stable = Mylisp::Stable->new($line);
-      $stable->lint_ast($ast);
-      # say '.. ', to_json(clean_ast($ast));
-      # say to_json($ast);
+      say 'match ->    ', to_json(clean_ast($match));
+      my $ast = opt_ast($match);
+      say 'opt-ast   -> ', to_json(clean_ast($ast));
+      my $lint = new_lint($line);
+      lint_ast($lint, $ast);
       my $perl_code = ast_to_perl_repl($ast);
       say 'perl-code-> ', $perl_code;
-
+      # my $mylisp_code = to_mylisp($ast);
+      # say 'mylisp code -> ', $mylisp_code;
    }
 }
 
 sub mylisp_to_ast {
    my $text = shift;
-   my $mylisp_ast  = get_mylisp_ast();
-   lint_spp_ast($mylisp_ast);
-   my $parser = ast_to_parser($mylisp_ast);
-   my $match  = match($parser, $text);
-   if (is_false($match)) {
-      my $error_report = $match->[1];
-      error($error_report);
-   }
+   my $parser = get_mylisp_parser();
+   my $match  = match_text($parser, $text);
+   # say see_ast($match); exit();
    print "Matching ok ..";
-   my $ast = opt_ast_atom($match);
-   print "Opt atom ok ..";
-   my $opt_ast = opt_ast_macro($ast);
-   say "Opt Macro ok ..";
-   # my $stable = Mylisp::Stable->new($text);
-   # $stable->lint_ast($opt_ast);
-   return $opt_ast;
+   my $ast = opt_ast($match);
+   print "Opt ok ..";
+   #my $lint = new_lint($text);
+   #lint_ast($lint, $ast);
+   # say to_json($ast);
+   $ast = clean_ast($ast);
+   return $ast;
 }
 
 sub update {
    my $grammar = get_mylisp_grammar();
-   my $ast     = grammar_to_ast($grammar);
+   my $ast     = spp_to_ast($grammar);
    my $code    = write_mylisp_ast($ast);
-   rename('Mylisp/Ast.pm', 'Mylisp/Ast.pm.bak');
+   my $uuid = substr(time(), 0, 5);
+   rename('Mylisp/Ast.pm', "Mylisp/Ast.pm.$uuid");
    write_file('Mylisp/Ast.pm', $code);
 }
 
 sub write_mylisp_ast {
    my $ast = shift;
    my $str = <<'EOFF';
-## Create by Mylisp::write_mylisp_ast()   
 package Mylisp::Ast;
 
 use 5.012;

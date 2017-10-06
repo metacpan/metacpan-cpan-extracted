@@ -4,7 +4,7 @@
       "Steffen Winkler <steffenw at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "perl_5"
    ],
@@ -16,15 +16,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Differences" : 0,
-            "Test::Exception" : 0,
-            "Test::More" : 0,
-            "Test::NoWarnings" : 0
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "Module::Build" : "0.38"
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
          }
       },
       "runtime" : {
@@ -33,23 +28,21 @@
             "Test::Pod::Coverage" : "1.04"
          },
          "requires" : {
-            "English" : 0,
-            "HTML::Entities" : 0,
-            "LWP::UserAgent" : 0,
-            "Moose" : 0,
-            "MooseX::StrictConstructor" : 0,
-            "Safe" : 0,
-            "Syntax::Feature::Method" : 0,
-            "namespace::autoclean" : 0,
-            "perl" : "5.006",
-            "syntax" : 0
+            "English" : "0",
+            "HTML::Entities" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Safe" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Locale::Utils::PluralForms" : {
          "file" : "lib/Locale/Utils/PluralForms.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -58,5 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.001"
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

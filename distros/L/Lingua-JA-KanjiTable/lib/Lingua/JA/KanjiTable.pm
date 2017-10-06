@@ -5,18 +5,24 @@ use strict;
 use warnings;
 use Exporter qw/import/;
 
-our $VERSION   = "0.13";
+our $VERSION   = "0.14";
 our @EXPORT    = qw/InJoyoKanji InJouyouKanji InJinmeiyoKanji InJinmeiyouKanji/;
-our @EXPORT_OK = qw/InJoyoKanji20101130 InJouyouKanji20101130 InJinmeiyoKanji20101130 InJinmeiyouKanji20101130 InJinmeiyoKanji20150107 InJinmeiyouKanji20150107/;
+our @EXPORT_OK = qw/
+    InJoyoKanji20101130      InJouyouKanji20101130
+    InJinmeiyoKanji20101130  InJinmeiyouKanji20101130
+    InJinmeiyoKanji20150107  InJinmeiyouKanji20150107
+    InJinmeiyoKanji20170925  InJinmeiyouKanji20170925
+/;
 
 *InJoyoKanji           = \&InJoyoKanji20101130;
 *InJouyouKanji         = \&InJoyoKanji;
 *InJouyouKanji20101130 = \&InJoyoKanji20101130;
 
-*InJinmeiyoKanji          = \&InJinmeiyoKanji20150107;
+*InJinmeiyoKanji          = \&InJinmeiyoKanji20170925;
 *InJinmeiyouKanji         = \&InJinmeiyoKanji;
 *InJinmeiyouKanji20101130 = \&InJinmeiyoKanji20101130;
 *InJinmeiyouKanji20150107 = \&InJinmeiyoKanji20150107;
+*InJinmeiyouKanji20170925 = \&InJinmeiyoKanji20170925;
 
 sub InJoyoKanji20101130
 {
@@ -2001,6 +2007,14 @@ sub InJoyoKanji20101130
 END
 }
 
+sub InJinmeiyoKanji20170925
+{
+    return <<"END";
++Lingua::JA::KanjiTable::InJinmeiyoKanji20150107
+6E3E
+END
+}
+
 sub InJinmeiyoKanji20150107
 {
     return <<"END";
@@ -2875,6 +2889,7 @@ Lingua::JA::KanjiTable - User-Defined Character Properties for Joyo Kanji and Ji
   '柊' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
   '苺' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
   '姦' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 0
+  '渾' =~ /^\p{InJinmeiyoKanji}$/ ? 1 : 0; # => 1
 
 =for test_synopsis_expectation_no_test
 
@@ -2915,7 +2930,7 @@ By default Lingua::JA::KanjiTable exports the following user-defined character p
 
 =item InJouyouKanji - ditto
 
-=item InJinmeiyoKanji - The latest Jinmeiyou Kanji table（2015年1月7日版）
+=item InJinmeiyoKanji - The latest Jinmeiyou Kanji table（2017年9月25日版）
 
 =item InJinmeiyouKanji - ditto
 
@@ -2928,6 +2943,10 @@ The following properties are not exported by default:
 =item InJoyoKanji20101130 - 常用漢字表（平成22年11月30日内閣告示第2号）
 
 =item InJouyouKanji20101130 - ditto
+
+=item InJinmeiyoKanji20170925 - 人名用漢字表（2017年9月25日版）
+
+=item InJinmeiyouKanji20170925 - ditto
 
 =item InJinmeiyoKanji20150107 - 人名用漢字表（2015年1月7日版）
 

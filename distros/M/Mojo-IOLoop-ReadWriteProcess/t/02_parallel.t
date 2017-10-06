@@ -113,6 +113,7 @@ subtest "Working with pools" => sub {
     $i++;
   }
   ok $pool->get(0) != $pool->get(1);
+  ok $pool->get(3);
   $pool->remove(3);
   is $pool->get(3), undef;
 };

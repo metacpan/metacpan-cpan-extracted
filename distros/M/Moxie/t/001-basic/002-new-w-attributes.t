@@ -29,9 +29,9 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has bar => sub { +{ baz => $::BAZ } };
+    has _bar => (default => sub { +{ baz => $::BAZ } });
 
-    sub bar { $_[0]->{bar} }
+    sub bar { _bar }
 }
 
 my $foo = Foo->new;
@@ -52,9 +52,9 @@ package Bar {
 
     extends 'Moxie::Object';
 
-    has bar => sub { +{ baz => $::BAZ } };
+    has _bar => (default => sub { +{ baz => $::BAZ } });
 
-    sub bar { $_[0]->{bar} }
+    sub bar { _bar }
 }
 
 my $bar = Bar->new;

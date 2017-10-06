@@ -4,6 +4,7 @@
 ######################### We start with some black magic to print on failure.
 
 use utf8;
+use strict;
 use Test;
 use strict;
 use vars qw/$loaded/;
@@ -27,7 +28,8 @@ ok (1,1);
 ######################### End of black magic.
 
 if ( $] > 5.007 ) {
-	binmode(STDOUT, ":utf8");
+	binmode (STDOUT, ":utf8");
+	binmode (STDERR, ":utf8");
 }
 
 my @testNumbers = (

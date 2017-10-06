@@ -4,15 +4,15 @@ author:
   - 'Thiago L. A. Miller <tmiller@mochsl.org.br>'
 build_requires:
   Class::Data::Inheritable: '0.08'
-  Statistics::Normality: '0'
   Test::Class: '0.50'
   Test::Most: '0.35'
-  Test::Perl::Critic: '1.03'
   Test::UseAllModules: '0'
   autodie: '0'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -50,7 +50,7 @@ requires:
   constant: '0'
   feature: '0'
   namespace::autoclean: '0'
-  perl: '5.018'
+  perl: '5.010'
   strict: '0'
   'true': '0'
   utf8: '0'
@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://github.com/galantelab/simulate_reads/issues
   repository: git://github.com/galantelab/simulate_reads.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

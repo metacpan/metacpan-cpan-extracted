@@ -51,4 +51,6 @@ mylib/include/local-i2c-dev.h
 mylib/include/ppport.h
 README
 t/000-load.t
+t/001-gpio.t
+t/003-i2c.t
 typemap

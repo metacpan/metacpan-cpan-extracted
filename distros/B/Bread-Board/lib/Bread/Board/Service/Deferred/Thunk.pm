@@ -1,7 +1,7 @@
 package Bread::Board::Service::Deferred::Thunk;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Helper for using services with incomplete parameters
-$Bread::Board::Service::Deferred::Thunk::VERSION = '0.35';
+$Bread::Board::Service::Deferred::Thunk::VERSION = '0.36';
 use Moose;
 
 has 'thunk' => (
@@ -28,7 +28,7 @@ Bread::Board::Service::Deferred::Thunk - Helper for using services with incomple
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

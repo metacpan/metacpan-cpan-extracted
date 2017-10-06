@@ -19,7 +19,7 @@ use HiPi::Device::SPI;
 
 __PACKAGE__->create_ro_accessors( qw( devicename hsb_mask max_channel ic devbits ) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -93,7 +93,7 @@ sub percent_read {
     my($self, $channel) = @_;
     my $raw = $self->single_read( $channel );
     return $raw if !$raw;
-    my $div = ( $self->devbits == 12 ) ? 4096 : 1024;
+    my $div = ( $self->devbits == 12 ) ? 4095 : 1023;
     my $float = ( $raw / $div ) * 100;
     my $result = sprintf('%.0f', $float);
     return $result;

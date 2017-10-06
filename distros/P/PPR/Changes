@@ -115,3 +115,12 @@ Revision history for PPR
 
     * Removed spurious Regexp::Debugger dependency
       (Thanks Slaven!)
+
+
+0.000014  Thu Sep 28 21:43:51 2017
+
+    * Added BAIL_OUTs to test suite to accelerate 
+      and clarify testing under Perl 5.20
+
+    * Added missing optional whitespace to DESTROY and AUTOLOAD declarations
+      (thanks, Hauke D)

@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Win32/AutoItX.pm
+lib/Win32/AutoItX/Control.pm
+lib/Win32/AutoItX/Control/ListView.pm
+lib/Win32/AutoItX/Control/TreeView.pm
+lib/Win32/AutoItX/Window.pm
+t/00-pod.t
+t/01-require.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 62;
 use Test::Differences;
 use Bencode 'bdecode';
 
@@ -96,5 +96,3 @@ eq_or_diff(
 	{ a => '', b => '', },
 	'accept missorted keys when decoding leniently',
 );
-
-done_testing;

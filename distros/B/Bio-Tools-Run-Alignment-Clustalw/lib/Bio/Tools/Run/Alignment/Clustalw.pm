@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Alignment::Clustalw;
-$Bio::Tools::Run::Alignment::Clustalw::VERSION = '1.7.2';
+$Bio::Tools::Run::Alignment::Clustalw::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -441,7 +441,7 @@ Bio::Tools::Run::Alignment::Clustalw - Object for the calculation of a multiple 
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

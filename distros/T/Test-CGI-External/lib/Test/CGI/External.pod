@@ -76,7 +76,7 @@ produces output
     1..30
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/synopsis.pl> in the distribution.)
 
 
 After the test has run, the uncompressed output is in
@@ -84,8 +84,8 @@ C<$options{body}>.
 
 =head1 VERSION
 
-This documents Test::CGI::External version 0.22
-corresponding to git commit L<240033de16aaa936eba002912df13b193e26fea1|https://github.com/benkasminbullock/test-cgi-external/commit/240033de16aaa936eba002912df13b193e26fea1> released on Mon Mar 6 16:51:25 2017 +0900.
+This documents Test::CGI::External version 0.23
+corresponding to git commit L<4597dfaadaf6015964e45fed18a5f1f8d62f57f9|https://github.com/benkasminbullock/test-cgi-external/commit/4597dfaadaf6015964e45fed18a5f1f8d62f57f9> released on Fri Oct 6 14:17:09 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -166,6 +166,8 @@ Create a new testing object.
 
 =head2 plan
 
+    $tester->plan ();
+
 Print the TAP (Test Anything Protocol) plan. This has to be done at
 the end of the execution. As shown in L</SYNOPSIS>, you usually don't
 have to print this but can use L<Test::More/done_testing>, since this
@@ -209,7 +211,7 @@ produces output
     1..10
 
 
-(This example is included as L<F<rupert.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/rupert.pl> in the distribution.)
+(This example is included as L<F<rupert.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/rupert.pl> in the distribution.)
 
 
 You can also use run without an argument to do basic tests, but this
@@ -388,7 +390,7 @@ produces output
     1..29
 
 
-(This example is included as L<F<bad-request.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/bad-request.pl> in the distribution.)
+(This example is included as L<F<bad-request.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/bad-request.pl> in the distribution.)
 
 
 This method was added in version 0.19.
@@ -454,6 +456,19 @@ You need to set L</REQUEST_METHOD> to C<POST>. The output is not
 checked for a correct Content-Type: header.
 
 This method was added in version 0.22. See also L<this discussion|https://groups.google.com/forum/#!topic/sljfaqorg/HqhWjPg25lU> for motivation.
+
+=head2 test_options
+
+    $tester->test_options ();
+
+Test the response of the CGI executable to an OPTIONS request. See
+section 9.2 of L<RFC 2616|/Specification for HTTP headers>. This
+method does not take any arguments. It tests that the CGI executable
+correctly produces an C<Allow:> header containing the allowed
+methods. It does not test whether or not the allowed methods returned
+are valid. There is no return value.
+
+This method was added in version 0.23.
 
 =head1 TEST OPTION METHODS
 
@@ -524,7 +539,7 @@ produces output
     1..21
 
 
-(This example is included as L<F<never-modified.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/never-modified.pl> in the distribution.)
+(This example is included as L<F<never-modified.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/never-modified.pl> in the distribution.)
 
 
 This method was added in version 0.10.
@@ -775,7 +790,7 @@ produces output
     1..16
 
 
-(This example is included as L<F<png-test.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/png-test.pl> in the distribution.)
+(This example is included as L<F<png-test.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/png-test.pl> in the distribution.)
 
 
 It will also print a warning message if the mime type has not been set
@@ -893,7 +908,7 @@ produces output
     1..9
 
 
-(This example is included as L<F<length.pl>|https://api.metacpan.org/source/BKB/Test-CGI-External-0.22/examples/length.pl> in the distribution.)
+(This example is included as L<F<length.pl>|https://fastapi.metacpan.org/source/BKB/Test-CGI-External-0.23/examples/length.pl> in the distribution.)
 
 
 =item error_output
@@ -1280,6 +1295,9 @@ CGI program for you and returns its output for you to test yourself.
 
 =head1 HISTORY
 
+See also the file Changes in the distribution for the dates of the
+following changes.
+
 This module started out as a test program for a CGI program written in
 C. Originally, it didn't use the Perl Test::More-style framework, but
 counted its pass and fail tests itself. I released the module to CPAN
@@ -1313,6 +1331,9 @@ Version 0.21 added L</test_status>.
 
 Version 0.22 changed to always set L</QUERY_STRING> and introduced
 L</test_411>.
+
+Version 0.23 plugged a loophole for programs reading from standard
+input and added the L</test_options> method.
 
 
 =head1 AUTHOR

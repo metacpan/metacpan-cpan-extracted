@@ -4,12 +4,12 @@ Photonic::Retarded::OneH
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
     use Photonic::Retarded::OneH;
-    my $nr=Photonic::Retarded::OneH->new(geometry=>$geometry);
+    my $nr=Photonic::Retarded::OneH->new(metric=>$g, polarization=>$p);
     $nr->iterate;
     say $nr->iteration;
     say $nr->current_a;
@@ -27,7 +27,7 @@ Haydock coefficient at a time.
 
 =over 4
 
-=item * new(metric=>$m, polarization=>$e, [, small=>$s])
+=item * new(metric=>$m, polarization=>$e, [, smallH=>$s])
 
 Create a new Ph::R::OneH object with PDL::Retarded::Metric $m, with a
 field along the complex direction $e and with smallness parameter  $s.
@@ -49,10 +49,10 @@ host dielectric function. Required in the initializer.
 A non null vector defining the complex direction of the macroscopic
 field. 
 
-=item * small 
+=item * smallH 
 
 A small number used as tolerance to end the iteration. Small negative
-b^2 coefficients are taken to be zero.
+b^2 coefficients are taken to be zero. From Photonic::Roles::EpsParams.
 
 =item * B ndims dims epsilon
 
@@ -107,7 +107,7 @@ next_b2, next_c, next_g, shifting the current values where necessary. Returns
 =cut
 
 package Photonic::Retarded::OneH;
-$Photonic::Retarded::OneH::VERSION = '0.007';
+$Photonic::Retarded::OneH::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -117,6 +117,7 @@ use List::Util;
 use Carp;
 use Moose;
 #use Photonic::Types;
+with 'Photonic::Roles::EpsParams';
 
 has 'metric'=>(is=>'ro', isa => 'Photonic::Retarded::Metric',
     handles=>[qw(B ndims dims epsilon)],required=>1
@@ -124,7 +125,8 @@ has 'metric'=>(is=>'ro', isa => 'Photonic::Retarded::Metric',
 
 has 'polarization' =>(is=>'ro', required=>1, isa=>'PDL::Complex');
 
-has 'small' => (is=>'ro', required=>1, default=>1e-7);
+has 'normalizedPolarization' =>(is=>'ro', isa=>'PDL::Complex',
+     init_arg=>undef, writer=>'_normalizedPolarization');
 
 has 'previousState' =>(is=>'ro', isa=>'PDL::Complex',
     writer=>'_previousState', lazy=>1, init_arg=>undef, 
@@ -205,13 +207,13 @@ sub _iterate_indeed {
     # gPsi_np1 is RorI xyz nx ny nz
     # Eq. 4.41
     my $a_n=$g_n*($gpsi->Cconj*$psi_np1)->re->sum;
-    my $err = $g_n*($gpsi->Cconj*$psi_np1)->im->sum;
-    #croak "Imaginary part of \$a_n too large: $err" unless abs($err) < $small; 
-    # Eq 4.43
+    #my $err = $g_n*($gpsi->Cconj*$psi_np1)->im->sum;
+    #croak "Imaginary part of \$a_n too large: $err" unless abs($err)
+    #< $smallH;   Eq 4.43
     my $psi2_np1=($psi_np1->Cconj*$gPsi_np1)->re->sum;
-    $err = ($psi_np1->Cconj*$gPsi_np1)->im->sum;
+    #$err = ($psi_np1->Cconj*$gPsi_np1)->im->sum;
     #croak "Imaginary part of \$psi2_np1 too large: $err" unless
-    #abs($err) < $small;
+    #abs($err) < $smallH;
     # Eq. 4.30
     my $g_np1=1;
     my $b2_np1=$psi2_np1-$g_n*$a_n**2-$g_nm1*$b2_n;
@@ -223,7 +225,7 @@ sub _iterate_indeed {
     # Eq. 4.33
     my $next_state=undef;
     $next_state=($psi_np1-$a_n*$psi_n-$c_n*$psi_nm1)/$b_np1 
-	unless $b2_np1 < $self->small;
+	unless $b2_np1 < $self->smallH;
     #save values
     $self->_nextState($next_state);
     $self->_current_a($a_n);
@@ -252,6 +254,7 @@ sub BUILD {
     croak "Polarization should be non null" unless
 	$modulus2 > 0;
     $e=$e/sqrt($modulus2);
+    $self->_normalizedPolarization($e);
     my $phi=$e*$v(*1); #initial state ordinarily normalized 
                        # RorI xyz nx ny nz
     my $gphi=($self->metric->value*$phi(:,:,*1))->sumover;

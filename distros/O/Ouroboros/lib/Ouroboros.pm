@@ -157,7 +157,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT = qw();
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 require XSLoader;
 XSLoader::load('Ouroboros', $VERSION);
@@ -1115,11 +1115,9 @@ C<@Ouroboros::CONSTS> contains names of all constants provided by this package.
 
 =item C<SV_CATUTF8>
 
+=item C<SV_CONST_RETURN>
+
 =item C<SV_COW_DROP_PV>
-
-=item C<SV_COW_OTHER_PVS>
-
-=item C<SV_COW_SHARED_HASH_KEYS>
 
 =item C<SV_FORCE_UTF8_UPGRADE>
 
@@ -1129,17 +1127,111 @@ C<@Ouroboros::CONSTS> contains names of all constants provided by this package.
 
 =item C<SV_IMMEDIATE_UNREF>
 
-=item C<SV_MUTABLE_RETURN>
-
 =item C<SV_NOSTEAL>
-
-=item C<SV_SKIP_OVERLOAD>
 
 =item C<SV_SMAGIC>
 
-=item C<SV_UNDEF_RETURNS_NULL>
+=item C<GV_ADD>
 
-=item C<SV_UTF8_NO_ENCODING>
+=item C<GV_ADDMG>
+
+=item C<GV_ADDMULTI>
+
+=item C<GV_NOADD_NOINIT>
+
+=item C<GV_NOEXPAND>
+
+=item C<GV_NOINIT>
+
+=item C<GV_SUPER>
+
+=item C<PERL_MAGIC_arylen>
+
+=item C<PERL_MAGIC_arylen_p>
+
+=item C<PERL_MAGIC_backref>
+
+=item C<PERL_MAGIC_bm>
+
+=item C<PERL_MAGIC_checkcall>
+
+=item C<PERL_MAGIC_collxfrm>
+
+=item C<PERL_MAGIC_dbfile>
+
+=item C<PERL_MAGIC_dbline>
+
+=item C<PERL_MAGIC_debugvar>
+
+=item C<PERL_MAGIC_defelem>
+
+=item C<PERL_MAGIC_env>
+
+=item C<PERL_MAGIC_envelem>
+
+=item C<PERL_MAGIC_ext>
+
+=item C<PERL_MAGIC_fm>
+
+=item C<PERL_MAGIC_foo>
+
+=item C<PERL_MAGIC_hints>
+
+=item C<PERL_MAGIC_hintselem>
+
+=item C<PERL_MAGIC_isa>
+
+=item C<PERL_MAGIC_isaelem>
+
+=item C<PERL_MAGIC_lvref>
+
+=item C<PERL_MAGIC_nkeys>
+
+=item C<PERL_MAGIC_overload_table>
+
+=item C<PERL_MAGIC_pos>
+
+=item C<PERL_MAGIC_qr>
+
+=item C<PERL_MAGIC_regdata>
+
+=item C<PERL_MAGIC_regdatum>
+
+=item C<PERL_MAGIC_regex_global>
+
+=item C<PERL_MAGIC_rhash>
+
+=item C<PERL_MAGIC_shared>
+
+=item C<PERL_MAGIC_shared_scalar>
+
+=item C<PERL_MAGIC_sig>
+
+=item C<PERL_MAGIC_sigelem>
+
+=item C<PERL_MAGIC_substr>
+
+=item C<PERL_MAGIC_sv>
+
+=item C<PERL_MAGIC_symtab>
+
+=item C<PERL_MAGIC_taint>
+
+=item C<PERL_MAGIC_tied>
+
+=item C<PERL_MAGIC_tiedelem>
+
+=item C<PERL_MAGIC_tiedscalar>
+
+=item C<PERL_MAGIC_utf8>
+
+=item C<PERL_MAGIC_uvar>
+
+=item C<PERL_MAGIC_uvar_elem>
+
+=item C<PERL_MAGIC_vec>
+
+=item C<PERL_MAGIC_vstring>
 
 
 

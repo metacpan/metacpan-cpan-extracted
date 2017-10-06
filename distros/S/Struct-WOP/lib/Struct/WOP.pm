@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our (%HELP, @MAYBE, $caller, $destruct);
 BEGIN {
 	%HELP = (
@@ -43,7 +43,7 @@ sub maybe_encode {
 sub _maybe {
 	my $ref = reftype($_[0]);
 	return $HELP{scalar}->($_[1], $_[0]) if !$ref;
-	return $destruct ? _d_recurse($_[0], $ref, $_[2]) : _recurse($_[0], $ref, $_[2], $_[3] // {});
+	return $destruct ? _d_recurse($_[0], $ref, $_[2]) : _recurse($_[0], $ref, $_[2], $_[3] || {});
 }
 
 sub _recurse {
@@ -57,7 +57,7 @@ sub _d_recurse {
 }
 
 1;
-
+# one is going to re-write this.. to become more flexible but try to fix the run-away thing by setting ||
 __END__
 
 =head1 NAME
@@ -66,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

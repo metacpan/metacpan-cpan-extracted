@@ -6,9 +6,10 @@ use Test::Spec;
 use Test::Exception;
 use Time::HiRes qw/ sleep /;
 
-plan tests => 18;
+plan tests => 21;
 
 # use lib '../lib';
+
 use Async::Simple::Task::ForkTmpFile;
 
 my $task;
@@ -34,15 +35,17 @@ describe 'All' => sub {
             my $task = Async::Simple::Task::ForkTmpFile->new( task => $sub, id => 12345 );
             my $pid = $task->pid;
 
-            isa_ok( $task, 'Async::Simple::Task::ForkTmpFile', 'successful init' );
-            is( ref $task->reader, '', 'have scalar reader' );
-            is( ref $task->writer, '', 'have scalar writer' );
+            isa_ok( $task, 'Async::Simple::Task::ForkTmpFile', 'successful init.' );
+            is( ref $task->reader, '', 'have scalar reader=' . $task->reader );
+            is( ref $task->writer, '', 'have scalar writer=' . $task->writer );
             isa_ok( $task->task, 'CODE', 'task exists and is a CODE' );
 
             is( $task->timeout, 0.01, 'default timeout' );
             is( $task->id, 12345, 'id found' );
             ok( $task->pid =~ /^-?\d{2,}$/, 'fork done, pid setted' );
             is( $task->kill_on_exit, 1, 'default kill_on_exit' );
+            ok( -d $task->tmp_dir, 'tmp directory exists:' . $task->tmp_dir );
+            ok( -w $task->tmp_dir, 'tmp dir is writable' . $task->tmp_dir );
             is( waitpid( $task->pid, WNOHANG ), 0, 'kid is active' );
             undef $task;
             sleep 0.2;
@@ -50,9 +53,10 @@ describe 'All' => sub {
         };
 
         it 'init params check' => sub {
-            $task = Async::Simple::Task::ForkTmpFile->new( task => $sub, timeout => 1, kill_on_exit => 0 );
-            is( $task->timeout, 1, 'timeout setted ok' );
-            is( $task->kill_on_exit, 0, 'kill_on_exit setted ok' );
+            my $task = Async::Simple::Task::ForkTmpFile->new( task => $sub, timeout => 1, kill_on_exit => 0, tmp_dir => 'var_tmp' );
+            is( $task->timeout, 1, 'timeout setted' );
+            is( $task->tmp_dir, 'var_tmp', 'tmpdir setted to user`s' );
+            is( $task->kill_on_exit, 0, 'kill_on_exit setted' );
             $task->kill_on_exit(1);
             undef $task;
         };

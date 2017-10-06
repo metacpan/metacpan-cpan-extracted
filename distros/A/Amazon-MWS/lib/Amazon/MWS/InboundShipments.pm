@@ -15,6 +15,30 @@ define_api_method GetServiceStatus =>
         return $root->{Status};
    };
 
+define_api_method GetInboundGuidanceForASIN =>
+    version => '2010-10-01',
+    raw_body => 1,
+    service => "$inbound_service",
+    parameters => {
+        ASINList        => {
+             type       => 'ASINList',
+             required   => 1
+        },
+	MarketplaceId   => { type => 'string', required=>1 },
+    };
+
+define_api_method GetInboundGuidanceForSKU =>
+    version => '2010-10-01',
+    raw_body => 1,
+    service => "$inbound_service",
+    parameters => {
+        SellerSKUList   => {
+             type       => 'SellerSKUList',
+             required   => 1
+        },
+	MarketplaceId   => { type => 'string', required=>1 },
+    };
+
 define_api_method GetPrepInstructionsForASIN =>
     version => '2010-10-01',
     raw_body => 1,

@@ -1,5 +1,8 @@
 Revision history for App-Fasops
 
+0.5.12 2017-09-26T11:54:31Z
+    - Add --nosingle, --noindel and --nocomplex to `fasops xlsx`
+
 0.5.11 2016-12-19T19:56:59Z
     - Add `fasops stat`
 
@@ -75,7 +78,7 @@ Revision history for App-Fasops
     - Clean prompts
 
 0.4.3  2016-05-21 19:47:58 CST
-    - Parallelise command refine
+    - Parallelize command refine
 
 0.4.2  2016-05-14 03:54:19 CST
     - Add `fasops join`

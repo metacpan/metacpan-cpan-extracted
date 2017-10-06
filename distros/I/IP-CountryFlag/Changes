@@ -1,5 +1,8 @@
 Revision history for IP::CountryFlag
 
+0.10    Fri Sep 22 15:40:00 2017
+        - Improved method exporting.
+
 0.09    Fri Sep 08 12:00:00 2017
         - Updated copyright year information.
 

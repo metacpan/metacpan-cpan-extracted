@@ -4,6 +4,7 @@
 Changes
 cpanfile
 examples/reloader.pl
+examples/rollup.pl
 examples/sprites.pl
 lib/Mojolicious/Plugin/AssetPack.pm
 lib/Mojolicious/Plugin/AssetPack/Asset.pm
@@ -22,8 +23,10 @@ lib/Mojolicious/Plugin/AssetPack/Pipe/Jpeg.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Less.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Png.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Reloader.pm
+lib/Mojolicious/Plugin/AssetPack/Pipe/require.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/riot.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/Riotjs.pm
+lib/Mojolicious/Plugin/AssetPack/Pipe/Rollupjs.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Sass.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/typescript.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/TypeScript.pm
@@ -41,6 +44,9 @@ t/assets/example.css
 t/assets/image/master_favicon_thumbnail.png
 t/assets/image/photo-1429734160945-4f85244d6a5a.jpg
 t/assets/image/sample.png
+t/assets/js/export.js
+t/assets/js/some-lib.js
+t/assets/js/vue-app.js
 t/assets/other/dummy.gif
 t/assets/other/dummy.ico
 t/assets/other/dummy.mp3
@@ -58,6 +64,7 @@ t/assets/sass/sass-1.scss
 t/assets/sass/sass-2-dup.scss
 t/assets/sass/sass-2-dup/_mixins.scss
 t/assets/vue/example.vue
+t/assets/vue/Test.vue
 t/base-url.t
 t/bin/coffee
 t/coffee.t
@@ -86,6 +93,7 @@ t/reloader-process.t
 t/reloader.t
 t/riotjs-not-loaded.t
 t/riotjs.t
+t/rollup.t
 t/route.t
 t/sass-bin.t
 t/sass-dynamic-include.t

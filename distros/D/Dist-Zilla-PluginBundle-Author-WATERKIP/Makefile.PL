@@ -26,9 +26,14 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::More" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "1.4",
+  "VERSION" => "1.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,10 +45,15 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "Dist::Zilla::Role::PluginBundle::PluginRemover" => "0.103",
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "List::Util" => 0,
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

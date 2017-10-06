@@ -2,8 +2,13 @@
 $Ticket
 </%ARGS>
 <%INIT>
-my $config = $Ticket->LifecycleObj->{data}{ticket_display} || 'hidden';
-return unless $config eq 'readonly' || $config eq 'interactive';
+my $config = $Ticket->LifecycleObj->{data};
+
+my $display_config = $config->{ticket_display} || 'hidden';
+return unless $display_config eq 'readonly' || $display_config eq 'interactive';
+
+my $zoom_config = $config->{ticket_zoom} || 'static';
+my $center_config = $config->{ticket_center} || 'origin';
 </%INIT>
 <&| /Widgets/TitleBox,
     title => loc("Lifecycle"),
@@ -11,6 +16,8 @@ return unless $config eq 'readonly' || $config eq 'interactive';
 &>
     <& /Elements/LifecycleGraph,
            Ticket => $Ticket,
-           Interactive => ($config eq 'interactive'),
+           Interactive => ($display_config eq 'interactive'),
+           Zoomable => ($zoom_config eq 'dynamic'),
+           Center => $center_config,
     &>
 </&>

@@ -1,13 +1,14 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = "0.05";
+our $VERSION = '0.08';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
 use Mojo::IOLoop::ReadWriteProcess::Exception;
 use Mojo::IOLoop::ReadWriteProcess::Pool;
+use Mojo::IOLoop::ReadWriteProcess::Queue;
 
-our @EXPORT_OK = qw(parallel batch process pool);
+our @EXPORT_OK = qw(parallel batch process pool queue);
 use Exporter 'import';
 use B::Deparse;
 use Carp 'confess';
@@ -50,6 +51,7 @@ sub new {
 
 sub process { Mojo::IOLoop::ReadWriteProcess->new(@_) }
 sub batch   { Mojo::IOLoop::ReadWriteProcess::Pool->new(@_) }
+sub queue   { Mojo::IOLoop::ReadWriteProcess::Queue->new(@_) }
 
 sub parallel {
   my $c = batch();
@@ -63,13 +65,20 @@ sub _diag {
   print STDERR ">> ${caller}(): @messages\n" if ($self->verbose || DEBUG);
 }
 
+sub _open_collect_status {
+  my $self = shift;
+  return unless $self;
+  $self->_status($?);
+  $self->_clean_pidfile;
+}
+
 # Use open3 to launch external program.
 sub _open {
   my ($self, @args) = @_;
   $self->_diag('Execute: ' . (join ', ', map { "'$_'" } @args)) if DEBUG;
   $SIG{CHLD} = sub {
     local ($!, $?);
-    $self->_shutdown while ((my $pid = waitpid(-1, WNOHANG)) > 0);
+    $self->emit('collect_status') while ((my $pid = waitpid(-1, WNOHANG)) > 0);
   };
 
   my ($wtr, $rdr, $err);
@@ -80,8 +89,7 @@ sub _open {
   $self->process_id($pid);
 
   # Defered collect of return status and removal of pidfile
-  $self->once(collect_status =>
-      sub { $self->_status($?); unlink($self->pidfile) if $self->pidfile; });
+  $self->once(collect_status => \&_open_collect_status);
 
   return $self unless $self->set_pipes();
 
@@ -92,6 +100,50 @@ sub _open {
     : $self->write_stream);
 
   return $self;
+}
+
+sub _clean_pidfile { unlink(shift->pidfile) if $_[0]->pidfile }
+
+sub _fork_collect_status {
+  my $self = shift;
+  return unless $self;
+  my $return_reader;
+  my $internal_err_reader;
+  my @result_return;
+  my @result_error;
+
+  $self->_status($?);
+
+  if ($self->_internal_return) {
+    $return_reader
+      = $self->_internal_return->isa("IO::Pipe::End") ?
+      $self->_internal_return
+      : $self->_internal_return->reader();
+    $self->_new_err('Cannot read from return code pipe') && return
+      unless IO::Select->new($return_reader)->can_read(10);
+    @result_return = $return_reader->getlines();
+    $self->return_status(@result_return) if @result_return;
+
+    $self->_diag("Forked code Process Returns: " . join("\n", @result_return))
+      if DEBUG;
+  }
+  if ($self->_internal_err) {
+    $internal_err_reader
+      = $self->_internal_err->isa("IO::Pipe::End") ?
+      $self->_internal_err
+      : $self->_internal_err->reader();
+    $self->_new_err('Cannot read from errors code pipe') && return
+      unless IO::Select->new($internal_err_reader)->can_read(10);
+    @result_error = $internal_err_reader->getlines();
+    push(
+      @{$self->error},
+      map { Mojo::IOLoop::ReadWriteProcess::Exception->new($_) } @result_error
+    ) if @result_error;
+    $self->_diag("Forked code Process Errors: " . join("\n", @result_error))
+      if DEBUG;
+  }
+
+  $self->_clean_pidfile;
 }
 
 # Handle forking of code
@@ -129,51 +181,7 @@ sub _fork {
   }
 
   # Defered collect of return status
-  $self->once(
-    collect_status => sub {
-      my $self = shift;
-      $self or return;
-      my $return_reader;
-      my $internal_err_reader;
-      my @result_return;
-      my @result_error;
-
-      $self->_status($?) if defined $?;
-
-      if ($self->_internal_return) {
-        $return_reader
-          = $self->_internal_return->isa("IO::Pipe::End")
-          ?
-          $self->_internal_return
-          : $self->_internal_return->reader();
-        $self->_new_err('Cannot read from return code pipe') && return
-          unless IO::Select->new($return_reader)->can_read(10);
-        @result_return = $return_reader->getlines();
-        $self->return_status(@result_return) if @result_return;
-
-        $self->_diag(
-          "Forked code Process Returns: " . join("\n", @result_return))
-          if DEBUG;
-      }
-      if ($self->_internal_err) {
-        $internal_err_reader
-          = $self->_internal_err->isa("IO::Pipe::End") ?
-          $self->_internal_err
-          : $self->_internal_err->reader();
-        $self->_new_err('Cannot read from errors code pipe') && return
-          unless IO::Select->new($internal_err_reader)->can_read(10);
-        @result_error = $internal_err_reader->getlines();
-        push(
-          @{$self->error},
-          map { Mojo::IOLoop::ReadWriteProcess::Exception->new($_) }
-            @result_error
-        ) if @result_error;
-        $self->_diag("Forked code Process Errors: " . join("\n", @result_error))
-          if DEBUG;
-      }
-
-      unlink($self->pidfile) if $self->pidfile;
-    });
+  $self->once(collect_status => \&_fork_collect_status);
 
   if (DEBUG) {
     my $code_str = $self->_deparse->coderef2text($code);
@@ -255,7 +263,7 @@ sub _fork {
 
   $SIG{CHLD} = sub {
     local ($!, $?);
-    $self->_shutdown while ((my $pid = waitpid(-1, WNOHANG)) > 0);
+    $self->emit('collect_status') while ((my $pid = waitpid(-1, WNOHANG)) > 0);
   };
 
   return $self unless $self->set_pipes();
@@ -345,11 +353,10 @@ sub write_channel {
 # Get all lines from the current process output stream
 sub read_all_stdout { _getlines(shift->read_stream) }
 
-sub read_all_channel {
-  _getlines(shift->channel_out);
-}    # Get all lines from the process channel
-sub read_stdout  { _getline(shift->read_stream) }
-sub read_channel { _getline(shift->channel_out) }
+# Get all lines from the process channel
+sub read_all_channel { _getlines(shift->channel_out); }
+sub read_stdout      { _getline(shift->read_stream) }
+sub read_channel     { _getline(shift->channel_out) }
 
 sub read_all_stderr {
   return $_[0]->getline unless $_[0]->separate_err;
@@ -438,7 +445,8 @@ sub stop {
 
 sub _shutdown {
   my $self = shift;
-  $self->emit('collect_status');
+  $self->emit('collect_status') if !defined $self->_status;
+  $self->_clean_pidfile;
   $self->emit('process_error', $self->error)
     if $self->error && $self->error->size > 0;
   $self->emit('stop');
@@ -727,20 +735,6 @@ call C<_status()>.
 
 Inspect the codeblock return.
 
-=head2 process()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(process);
-    my $p = process sub { print "Hello\n" };
-    $p->start()->wait_stop;
-
-or even:
-
-    process(sub { print "Hello\n" })->start->wait_stop;
-
-Returns a L<Mojo::IOLoop::ReadWriteProcess> object that represent a process.
-
-It accepts the same arguments as L<Mojo::IOLoop::ReadWriteProcess>.
-
 =head2 diag()
 
     use Mojo::IOLoop::ReadWriteProcess qw(process);
@@ -750,28 +744,6 @@ It accepts the same arguments as L<Mojo::IOLoop::ReadWriteProcess>.
 
 Internal function to print information to STDERR if verbose attribute is set or either DEBUG mode enabled.
 You can use it if you wish to display information on the process status.
-
-=head2 parallel()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(parallel);
-    my $pool = parallel sub { print "Hello\n" } => 5;
-    $pool->start();
-    $pool->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
-    $pool->stop();
-
-Returns a L<Mojo::IOLoop::ReadWriteProcess::Pool> object that represent a group of processes.
-
-It accepts the same arguments as L<Mojo::IOLoop::ReadWriteProcess>, and the last one represent the number of processes to generate.
-
-=head2 batch()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(batch);
-    my $pool = batch;
-    $pool->add(sub { print "Hello\n" });
-    $pool->on(stop => sub { shift->_diag("Done!") })->start->wait_stop;
-
-Returns a L<Mojo::IOLoop::ReadWriteProcess::Pool> object generated from supplied arguments.
-It accepts as input the same parameter of L<Mojo::IOLoop::ReadWriteProcess::Pool> constructor ( see parallel() ).
 
 =head2 wait()
 
@@ -919,6 +891,53 @@ Gets all the STDERR output of the process.
     $p->signal(POSIX::SIGKILL);
 
 Send a signal to the process
+
+=head1 EXPORTS
+
+=head2 parallel()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(parallel);
+    my $pool = parallel sub { print "Hello\n" } => 5;
+    $pool->start();
+    $pool->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
+    $pool->stop();
+
+Returns a L<Mojo::IOLoop::ReadWriteProcess::Pool> object that represent a group of processes.
+
+It accepts the same arguments as L<Mojo::IOLoop::ReadWriteProcess>, and the last one represent the number of processes to generate.
+
+=head2 batch()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(batch);
+    my $pool = batch;
+    $pool->add(sub { print "Hello\n" });
+    $pool->on(stop => sub { shift->_diag("Done!") })->start->wait_stop;
+
+Returns a L<Mojo::IOLoop::ReadWriteProcess::Pool> object generated from supplied arguments.
+It accepts as input the same parameter of L<Mojo::IOLoop::ReadWriteProcess::Pool> constructor ( see parallel() ).
+
+=head2 process()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+    my $p = process sub { print "Hello\n" };
+    $p->start()->wait_stop;
+
+or even:
+
+    process(sub { print "Hello\n" })->start->wait_stop;
+
+Returns a L<Mojo::IOLoop::ReadWriteProcess> object that represent a process.
+
+It accepts the same arguments as L<Mojo::IOLoop::ReadWriteProcess>.
+
+=head2 queue()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(queue);
+    my $q = queue;
+    $q->add(sub { return 42 } );
+    $q->consume;
+
+Returns a L<Mojo::IOLoop::ReadWriteProcess::Queue> object that represent a queue.
 
 =head1 DEBUGGING
 

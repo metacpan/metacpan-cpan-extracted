@@ -3,8 +3,13 @@ abstract: 'An plugin bundle for all distributions by WATERKIP'
 author:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::More: '0'
   perl: '5.010'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
@@ -26,5 +31,5 @@ requires:
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/Dist-Zilla-PluginBundle-Author-WATERKIP
-version: '1.4'
+version: '1.5'
 x_serialization_backend: 'YAML::Tiny version 1.70'

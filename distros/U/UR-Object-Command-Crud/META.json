@@ -1,0 +1,77 @@
+{
+   "abstract" : "Create, List (Read), Update and Delete plus Copy (CRUD) Command Line Interfaces for UR Objects",
+   "author" : [
+      "Eddie Belter <ebelter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "UR-Object-Command-Crud",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Inflect" : "0",
+            "List::MoreUtils" : "0",
+            "Sub::Install" : "0",
+            "UR" : "0",
+            "YAML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "Scope::Guard" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "UR::Object::Command::Copy" : {
+         "file" : "lib/UR/Object/Command/Copy.pm"
+      },
+      "UR::Object::Command::Create" : {
+         "file" : "lib/UR/Object/Command/Create.pm"
+      },
+      "UR::Object::Command::Crud" : {
+         "file" : "lib/UR/Object/Command/Crud.pm"
+      },
+      "UR::Object::Command::CrudUtil" : {
+         "file" : "lib/UR/Object/Command/CrudUtil.pm"
+      },
+      "UR::Object::Command::Delete" : {
+         "file" : "lib/UR/Object/Command/Delete.pm"
+      },
+      "UR::Object::Command::Update" : {
+         "file" : "lib/UR/Object/Command/Update.pm"
+      },
+      "UR::Object::Command::UpdateIsMany" : {
+         "file" : "lib/UR/Object/Command/UpdateIsMany.pm"
+      },
+      "UR::Object::Command::UpdateTree" : {
+         "file" : "lib/UR/Object/Command/UpdateTree.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

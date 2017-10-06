@@ -3,8 +3,8 @@
 #ifdef WIN32
 #include "winsock2.h"
 #endif
-#include "ccv-src/lib/3rdparty/sha1/sha1.h"
-#include "ccv-src/lib/3rdparty/sha1/sha1.c"
+#include "ccv-src/lib/3rdparty/siphash/siphash24.h"
+#include "ccv-src/lib/3rdparty/siphash/siphash24.c"
 #include "ccv-src/lib/3rdparty/kissfft/kiss_fft.h"
 #include "ccv-src/lib/3rdparty/kissfft/kiss_fft.c"
 #include "ccv-src/lib/ccv.h"

@@ -1,5 +1,9 @@
 Revision history for perl module Test::MonkeyMock
 
+0.10 2017-09-29T17:49:14Z
+
+ - preserve aliases
+
 0.09 2015-12-01T09:12:45Z
 
  - fix class names when mocking

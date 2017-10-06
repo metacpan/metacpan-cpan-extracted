@@ -1,0 +1,372 @@
+
+# PODNAME: Importer::Zim::Cookbook
+# ABSTRACT: Cooking imports à la Invader Zim
+
+#pod =encoding utf8
+#pod
+#pod =head1 RECIPES
+#pod
+#pod All these recipes use L<zim>, the abbreviation for L<Importer::Zim>.
+#pod If you prefer non-pragma-looking names, suit yourself.
+#pod
+#pod =head2 Importing one subroutine
+#pod
+#pod     use zim 'Scalar::Util' => 'blessed';
+#pod
+#pod =head2 Importing a few subroutines
+#pod
+#pod     use zim 'List::Util' => qw(any all none notall);
+#pod
+#pod =head2 Importing a subroutine with a new name
+#pod
+#pod     use zim 'List::Util' => 'pairs' => { -as => 'kv' };
+#pod
+#pod =head2 Importing all subroutines under a tag
+#pod
+#pod     use zim 'Mango::BSON' => ':bson';
+#pod
+#pod Imports 18 subs (as of Mango 1.29), like C<bson_bin>,
+#pod C<bson_code>, etc.
+#pod
+#pod =head2 Importing all subroutines exported by default
+#pod
+#pod     use zim 'Carp';
+#pod
+#pod Imports C<confess>, C<croak> and C<carp>.
+#pod
+#pod =head2 Importing a few subroutines (again)
+#pod
+#pod Now with an array ref:
+#pod
+#pod     use zim 'List::Util' => [qw(any all none notall)];
+#pod
+#pod Notice that array refs are supposed to contain
+#pod only subroutine names. If you put a C<:tag> in there,
+#pod it will likely fail, just like
+#pod
+#pod     use zim 'Mango::BSON' => [':bson'];
+#pod
+#pod fails with
+#pod
+#pod     ":bson" is not exported by "Mango::BSON" at ...
+#pod
+#pod =head2 Importing subroutines with prefixed names
+#pod
+#pod     use zim 'Mango::BSON' => ':bson' => { -prefix => 'mango_' };
+#pod
+#pod Imports subs with names like C<mango_bson_bin>, C<mango_bson_code>,
+#pod etc.
+#pod
+#pod =head2 Checking for minimum version
+#pod
+#pod     use zim 'List::Util' => { -version => '1.33' } => qw(any all none notall);
+#pod
+#pod =head2 Importing a subroutine not declared as exported
+#pod
+#pod Because you know what you're doing.
+#pod
+#pod     use zim 'charnames' => { -strict => 0 } => 'vianame';
+#pod
+#pod     use zim 'Sub::Inject' => { -strict => 0 } => 'sub_inject';
+#pod
+#pod     use zim 'String::Truncate' => { -strict => 0 } => 'elide';
+#pod
+#pod There may be good reasons to do that, including
+#pod
+#pod =over 4
+#pod
+#pod =item *
+#pod
+#pod to create a shortcut to a stable subroutine in other package
+#pod
+#pod =item *
+#pod
+#pod to bypass the lack of C<@EXPORT_OK> or C<@EXPORT>
+#pod due to the use of exporters which don't set them
+#pod (like L<Sub::Exporter>).
+#pod
+#pod =back
+#pod
+#pod =head2 Importing subroutines with crafted names
+#pod
+#pod     use zim 'Mango::BSON' => ':bson' => {
+#pod         -map => sub { s/^(bson_)/\U$1/; $_ }
+#pod     };
+#pod
+#pod This time, subs will be imported with names like
+#pod C<BSON_bin>, C<BSON_code>, etc.
+#pod
+#pod =head2 Cherry-picking subroutines to import
+#pod
+#pod All different specifications of symbols to import mentioned above
+#pod (subroutine names, tags, array refs) can be put together.
+#pod
+#pod     use zim 'Fcntl' => qw(:flock :seek S_ISUID);
+#pod
+#pod     use zim 'Mojo::Util' => [qw(b64_decode b64_encode)], 'trim';
+#pod
+#pod =head2 Writing a module with functions to be imported
+#pod
+#pod     package YourModule;
+#pod     our @EXPORT_OK = qw(munge frobnicate);
+#pod
+#pod And the users of this module can say
+#pod
+#pod     use zim 'YourModule' => qw(frobnicate);
+#pod     frobnicate($left, $right);
+#pod
+#pod =head2 Writing a module with many functions to be imported
+#pod
+#pod If there are too many symbols to be imported,
+#pod for example tens of constants, it is a good idea
+#pod to provide tags to name useful subsets of
+#pod the imported symbols.
+#pod
+#pod     package YourModule;
+#pod     our @EXPORT_OK   = qw(BIT1 BIT2 BIT3 BIT4 MASK1 MASK2 MASK3);
+#pod     our %EXPORT_TAGS = (    #
+#pod         bit  => [qw(BIT1 BIT2 BIT3 BIT4)],
+#pod         mask => [qw(MASK1 MASK2 MASK3)]
+#pod     );
+#pod
+#pod The users of such module can write
+#pod
+#pod     use zim 'YourModule' => qw(:bit :mask);
+#pod     $mode = BIT1 | BIT3 | MASK1 | MASK3;
+#pod
+#pod =head2 Writing a module with default exports
+#pod
+#pod Default exports are defined at C<@EXPORT> package variables.
+#pod When exporters were used and imported symbols were not automatically
+#pod cleaned, default exports were not such a good idea.
+#pod (Read it: namespace pollution for free.)
+#pod
+#pod One of the best uses for default exports is to hold
+#pod the list of symbols a user of your module is most likely
+#pod to want available.
+#pod
+#pod This is the case of "encode" and "decode" subroutines in
+#pod modules like L<JSON>, L<JSON::XS>, etc.
+#pod
+#pod     use zim 'JSON::XS';
+#pod
+#pod imports C<encode_json> and C<decode_json>, which is probably
+#pod what you want while writing quick-and-dirty scripts.
+#pod
+#pod =head2 From CamelCase to snake_case
+#pod
+#pod     use zim 'Mojo::Util' => 'decamelize';
+#pod     use zim 'YAML' => [qw(LoadFile DumpFile)] => { -map => \&decamelize };
+#pod
+#pod =head1 WHICH BACKEND?
+#pod
+#pod The short answer to "What Importer::Zim backend should one use?"
+#pod is L<Importer::Zim::Lexical>.
+#pod
+#pod However L<Importer::Zim::Lexical> requires perl 5.18 or newer,
+#pod and a compiler will be needed to install the L<Sub::Inject>
+#pod dependency.
+#pod
+#pod If you got an older perl, you might want to try
+#pod L<Importer::Zim::EndOfScope> or L<Importer::Zim::Unit>.
+#pod
+#pod If you got no compiler to build XS dependencies,
+#pod L<Importer::Zim::EndOfScope> may work.
+#pod
+#pod =cut
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Importer::Zim::Cookbook - Cooking imports à la Invader Zim
+
+=head1 VERSION
+
+version 0.6.0
+
+=head1 RECIPES
+
+All these recipes use L<zim>, the abbreviation for L<Importer::Zim>.
+If you prefer non-pragma-looking names, suit yourself.
+
+=head2 Importing one subroutine
+
+    use zim 'Scalar::Util' => 'blessed';
+
+=head2 Importing a few subroutines
+
+    use zim 'List::Util' => qw(any all none notall);
+
+=head2 Importing a subroutine with a new name
+
+    use zim 'List::Util' => 'pairs' => { -as => 'kv' };
+
+=head2 Importing all subroutines under a tag
+
+    use zim 'Mango::BSON' => ':bson';
+
+Imports 18 subs (as of Mango 1.29), like C<bson_bin>,
+C<bson_code>, etc.
+
+=head2 Importing all subroutines exported by default
+
+    use zim 'Carp';
+
+Imports C<confess>, C<croak> and C<carp>.
+
+=head2 Importing a few subroutines (again)
+
+Now with an array ref:
+
+    use zim 'List::Util' => [qw(any all none notall)];
+
+Notice that array refs are supposed to contain
+only subroutine names. If you put a C<:tag> in there,
+it will likely fail, just like
+
+    use zim 'Mango::BSON' => [':bson'];
+
+fails with
+
+    ":bson" is not exported by "Mango::BSON" at ...
+
+=head2 Importing subroutines with prefixed names
+
+    use zim 'Mango::BSON' => ':bson' => { -prefix => 'mango_' };
+
+Imports subs with names like C<mango_bson_bin>, C<mango_bson_code>,
+etc.
+
+=head2 Checking for minimum version
+
+    use zim 'List::Util' => { -version => '1.33' } => qw(any all none notall);
+
+=head2 Importing a subroutine not declared as exported
+
+Because you know what you're doing.
+
+    use zim 'charnames' => { -strict => 0 } => 'vianame';
+
+    use zim 'Sub::Inject' => { -strict => 0 } => 'sub_inject';
+
+    use zim 'String::Truncate' => { -strict => 0 } => 'elide';
+
+There may be good reasons to do that, including
+
+=over 4
+
+=item *
+
+to create a shortcut to a stable subroutine in other package
+
+=item *
+
+to bypass the lack of C<@EXPORT_OK> or C<@EXPORT>
+due to the use of exporters which don't set them
+(like L<Sub::Exporter>).
+
+=back
+
+=head2 Importing subroutines with crafted names
+
+    use zim 'Mango::BSON' => ':bson' => {
+        -map => sub { s/^(bson_)/\U$1/; $_ }
+    };
+
+This time, subs will be imported with names like
+C<BSON_bin>, C<BSON_code>, etc.
+
+=head2 Cherry-picking subroutines to import
+
+All different specifications of symbols to import mentioned above
+(subroutine names, tags, array refs) can be put together.
+
+    use zim 'Fcntl' => qw(:flock :seek S_ISUID);
+
+    use zim 'Mojo::Util' => [qw(b64_decode b64_encode)], 'trim';
+
+=head2 Writing a module with functions to be imported
+
+    package YourModule;
+    our @EXPORT_OK = qw(munge frobnicate);
+
+And the users of this module can say
+
+    use zim 'YourModule' => qw(frobnicate);
+    frobnicate($left, $right);
+
+=head2 Writing a module with many functions to be imported
+
+If there are too many symbols to be imported,
+for example tens of constants, it is a good idea
+to provide tags to name useful subsets of
+the imported symbols.
+
+    package YourModule;
+    our @EXPORT_OK   = qw(BIT1 BIT2 BIT3 BIT4 MASK1 MASK2 MASK3);
+    our %EXPORT_TAGS = (    #
+        bit  => [qw(BIT1 BIT2 BIT3 BIT4)],
+        mask => [qw(MASK1 MASK2 MASK3)]
+    );
+
+The users of such module can write
+
+    use zim 'YourModule' => qw(:bit :mask);
+    $mode = BIT1 | BIT3 | MASK1 | MASK3;
+
+=head2 Writing a module with default exports
+
+Default exports are defined at C<@EXPORT> package variables.
+When exporters were used and imported symbols were not automatically
+cleaned, default exports were not such a good idea.
+(Read it: namespace pollution for free.)
+
+One of the best uses for default exports is to hold
+the list of symbols a user of your module is most likely
+to want available.
+
+This is the case of "encode" and "decode" subroutines in
+modules like L<JSON>, L<JSON::XS>, etc.
+
+    use zim 'JSON::XS';
+
+imports C<encode_json> and C<decode_json>, which is probably
+what you want while writing quick-and-dirty scripts.
+
+=head2 From CamelCase to snake_case
+
+    use zim 'Mojo::Util' => 'decamelize';
+    use zim 'YAML' => [qw(LoadFile DumpFile)] => { -map => \&decamelize };
+
+=head1 WHICH BACKEND?
+
+The short answer to "What Importer::Zim backend should one use?"
+is L<Importer::Zim::Lexical>.
+
+However L<Importer::Zim::Lexical> requires perl 5.18 or newer,
+and a compiler will be needed to install the L<Sub::Inject>
+dependency.
+
+If you got an older perl, you might want to try
+L<Importer::Zim::EndOfScope> or L<Importer::Zim::Unit>.
+
+If you got no compiler to build XS dependencies,
+L<Importer::Zim::EndOfScope> may work.
+
+=head1 AUTHOR
+
+Adriano Ferreira <ferreira@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Adriano Ferreira.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

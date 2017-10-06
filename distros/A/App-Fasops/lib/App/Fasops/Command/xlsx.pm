@@ -19,6 +19,9 @@ sub opt_spec {
         [ 'colors=i',   'number of colors',                  { default => 15 }, ],
         [ 'section=i', 'start section', { default => 1, hidden => 1 }, ],
         [ 'outgroup',  'alignments have an outgroup', ],
+        [ 'noindel',   'omit indels', ],
+        [ 'nosingle',  'omit singleton SNPs and indels', ],
+        [ 'nocomplex', 'omit complex SNPs and indels', ],
         { show_defaults => 1, }
     );
 }
@@ -192,12 +195,12 @@ sub create_formats {
 
     # snp base
     my $snp_fg_of = {
-        A   => { color => 58, },        # Dark Green
-        C   => { color => 18, },        # Dark Blue
-        G   => { color => 28, },        # Dark Purple
-        T   => { color => 16, },        # Dark Red
-        N   => { color => 8 },          # Black
-        '-' => { color => 8 },          # Black
+        'A' => { color => 58, },        # Dark Green
+        'C' => { color => 18, },        # Dark Blue
+        'G' => { color => 28, },        # Dark Purple
+        'T' => { color => 16, },        # Dark Red
+        'N' => { color => 8, },         # Black
+        '-' => { color => 8, },         # Black
     };
 
     for my $fg ( keys %{$snp_fg_of} ) {
@@ -261,11 +264,31 @@ sub get_variations {
 
     my %variations;
     for my $site ( @{$indel_sites} ) {
+        if ( $opt->{nocomplex} and $site->{indel_freq} == -1 ) {
+            next;
+        }
+
+        if ( $opt->{nosingle} and $site->{indel_freq} <= 1 ) {
+            next;
+        }
+
+        if ( $opt->{noindel} ) {
+            next;
+        }
+
         $site->{var_type} = 'indel';
         $variations{ $site->{indel_start} } = $site;
     }
 
     for my $site ( @{$snp_sites} ) {
+        if ( $opt->{nocomplex} and $site->{snp_freq} == -1 ) {
+            next;
+        }
+
+        if ( $opt->{nosingle} and $site->{snp_freq} <= 1 ) {
+            next;
+        }
+
         $site->{var_type} = 'snp';
         $variations{ $site->{snp_pos} } = $site;
     }

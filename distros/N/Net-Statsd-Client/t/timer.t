@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 use TestStatsd;
+use Time::HiRes qw(sleep);
 
 use_ok 'Net::Statsd::Client';
 
@@ -22,5 +23,11 @@ sends_ok {
   $timer->metric("bar");
   $timer->finish;
 } $client, qr/bar/, "changed metric";
+
+# Test that the timer returns the milliseconds
+my $timer = $client->timer('foo');
+sleep 0.1;
+my $elapsed_ms = $timer->finish;
+ok( $elapsed_ms > 100, "timer->finish returned elapsed ms");
 
 done_testing;

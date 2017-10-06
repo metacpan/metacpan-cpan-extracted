@@ -82,11 +82,13 @@ set( 'MFILE_WWW_STANDALONE_CREDENTIALS_DATABASE', [
     {
         'nam' => 'root',
         'pwd' => 'root',
+        'eid' => 1,
         'priv' => 'admin',
     },
     {
         'nam' => 'demo',
         'pwd' => 'demo',
+        'eid' => 2,
         'priv' => 'passerby',
     },
 ] );

@@ -15,32 +15,36 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA512
 
 SHA1 a76fa1dfc018a4cfd8b958516756622f64348161 .travis.yml
-SHA1 4385cda254799c261914dc4af08786c5dc101a46 Changes
+SHA1 6650ebb6a0cf7533f259296a15e2b6dc4d2512f3 Changes
 SHA1 8c3363843c9427feb1cbf7b748aff30fc448ce49 LICENSE
-SHA1 3f784d535ae2af6016032585d0f4a1b729c8af9b MANIFEST
-SHA1 65ee6b1925f2b38d9426c3eb3f4c0812cd25109c META.json
-SHA1 d52f9d61bc715fb0424cf2cf63ca21c1efd073a9 META.yml
-SHA1 541c9596d205a121942079ae52e624d9773b8e66 Makefile.PL
-SHA1 d2c971f7bb56aa25b75a8880da933f7e1cb19d5d README
-SHA1 a6116901303f8a8f52a041cfc1d9d9658c12af19 cpanfile
+SHA1 e9536476831d6c397fd31a978a526c86e5bba997 MANIFEST
+SHA1 9a03e249bdbe6a8d830a89f68c0ee72d48cd0efb META.json
+SHA1 f411d1f293ecfd01413369cbfd3ad0f2804eb386 META.yml
+SHA1 b9912bdf76978fc85e8d9b8aab8880d6182ecc1c Makefile.PL
+SHA1 9adf66d9071039cf3ceea9d59410f89d639e1049 README
+SHA1 626324c49177821f9488a40f834759b4aa98a757 cpanfile
 SHA1 c406a195c7ae3c97aef628c944c408259a1580fe dist.ini
-SHA1 85306e0062759ff45c1fe92d8a8b9bbfc7074325 lib/MooseX/AttributeShortcuts.pm
-SHA1 41c1730ba37aaaf8ed432ca2c8b1d5d4094b0a71 lib/MooseX/AttributeShortcuts/Trait/Attribute.pm
-SHA1 cfe914c868e3b28fbb0774c47042ea63b1bd985e lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm
-SHA1 ef3ffa8721de3ff3191fbd6341bca1b810f9403a lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm
+SHA1 c171d1107aba40034b6749e82878780c2d03f92a lib/MooseX/AttributeShortcuts.pm
+SHA1 547d604244bc0897760e598ee8d7d4609b1186b2 lib/MooseX/AttributeShortcuts/Trait/Attribute.pm
+SHA1 7d5803b30872e2154a0cad6d05de323d16938b7e lib/MooseX/AttributeShortcuts/Trait/Attribute/HasAnonBuilder.pm
+SHA1 b696edc1b29464b6ae2b646d13a3d254cb6787fb lib/MooseX/AttributeShortcuts/Trait/Method/Builder.pm
+SHA1 aa532f0deb7c33b1776055202bde1113e197a819 lib/MooseX/AttributeShortcuts/Trait/Method/HasDefinitionContext.pm
+SHA1 dbbb895d9e672f9d017755c9cf355f22d617f29d lib/MooseX/AttributeShortcuts/Trait/Role/Attribute.pm
+SHA1 d8b1285777e50b0aa4a67931963b85a6921e2c89 lib/MooseX/AttributeShortcuts/Trait/Role/Method/Builder.pm
 SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
-SHA1 541d87257238a9b48ee2217f25ee4a2805e5030e t/00-compile.t
-SHA1 c796e67bdc66bfc3901261ef0ab42775d43d6736 t/00-report-prereqs.dd
+SHA1 bc4fa164d24143e5b8d5c973f9f562088476ea9b t/00-compile.t
+SHA1 35acce97e38c5a466cd8dffafbfb6ff9552f0078 t/00-report-prereqs.dd
 SHA1 a325b35cd3d7c0b7e852e993b0c1058caa4490e1 t/00-report-prereqs.t
 SHA1 6e5ff5b73ac86b06b924cc48e9090a29e04eeefa t/02-parameterized.t
 SHA1 d911b985b0842c8e771d2f301383ae8e23de9c19 t/03-lazy.t
 SHA1 8f69e6e8d0f7349405a2266ba949c680d2eb9014 t/05-extend.t
 SHA1 3a08df42847426d463259d8947242bb3c0a2974c t/06-role.t
-SHA1 8d6ea1892867c59580ba2e4ac7f3fd4d8031f964 t/builder/anon-builder-conflict-toclass.t
-SHA1 af5bf4f00ebb1ff7680280115a656c9a01c05fc0 t/builder/anon-builder-conflict-torole.t
-SHA1 323272fee90097c87aca07024156a38b67c24361 t/builder/anon-role-role-class.t
-SHA1 9d0ea8608c6b94fe10d9fde56f98dd3a91772737 t/builder/anon.t
 SHA1 d9a360ac4ea0ebef915ba38768e8ab2e5cd91da7 t/builder/basic.t
+SHA1 8d6ea1892867c59580ba2e4ac7f3fd4d8031f964 t/builder/inline-builder-conflict-toclass.t
+SHA1 af5bf4f00ebb1ff7680280115a656c9a01c05fc0 t/builder/inline-builder-conflict-torole.t
+SHA1 bcacdbfa83cceeb97e53b92f3247789d2ad72368 t/builder/inline-definition-context.t
+SHA1 323272fee90097c87aca07024156a38b67c24361 t/builder/inline-role-role-class.t
+SHA1 9d0ea8608c6b94fe10d9fde56f98dd3a91772737 t/builder/inline.t
 SHA1 c05f7e78b52fd62e7d252396b60338e2595bc9a1 t/clearer.t
 SHA1 cdb770dcc3e7834ebfef966b99b65696b4bebfe9 t/constraint.t
 SHA1 947381506e1c2495852eba7dd715cea2476264e0 t/funcs.pm
@@ -60,29 +64,29 @@ SHA1 c875cbecfd4b18c98c0dd2efed0e240ba4306a35 t/old/07-trigger.t
 SHA1 771c13fb730f9305e6b4253a2a96668397317014 t/others/semiaffordanceaccessor.t
 SHA1 bfd3bbf9d0cce9d776ca7a1a6d01745b26bc3b7b t/predicate.t
 SHA1 3cecf2110b71875b121c7788bdb70e669cbbcca2 t/trigger.t
-SHA1 7ead768e3227ddb8ba12c1546fd985701e05263c xt/author/eol.t
-SHA1 912c4e425f234d16dd82b25e56caa888e45f672b xt/author/no-tabs.t
+SHA1 9c754d47b0d7717bf806a964081a8fd5abdf59de xt/author/eol.t
+SHA1 c61959c9bae0d6f4983949f852abc9002fac85d3 xt/author/no-tabs.t
 SHA1 0559ee48678416f7fe3dd2da8d858854fa58d37b xt/author/pod-coverage.t
 SHA1 7ff9e063382140b61258c872e951d58ce7628482 xt/author/pod-linkcheck.t
-SHA1 824b619380829bc45bcf83f90567a3f7ed20d1e2 xt/author/pod-spell.t
+SHA1 a9f4dec9778b475e93e21ee1b844968e98518b4e xt/author/pod-spell.t
 SHA1 5375da63551c2f6e2736b998c0b64e32d8fb93fc xt/author/pod-syntax.t
 SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
 SHA1 302b5f5c926586a890586cfafdd2029f213ba4bd xt/release/has-version.t
 SHA1 d148df4b53cdb64138d3081f2968bf4e18276651 xt/release/minimum-version.t
-SHA1 930484ef1524b3cd9a4494fd44661924b7cbec12 xt/release/no-smart-comments.t
+SHA1 65b915ec5367e42e6af4308509c03369ed6f41d0 xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEqvAjTK4OlkLFh465K77AqDC8C58FAll33+AACgkQK77AqDC8
-C5/9ag//S4cJmrL7S+Ocxvis5rc0SO+BtaMzIm/K/u9OMgau402rk4IBIohAxfar
-zjx6Gkc5k+i5rs8Rlm/bPoJI3Leof4JOmzWWzPMoaFW0VzuVVvPjO+oHSKexy+Lj
-/oV2CuLgAKWTCk1ku8V53q9NDdsqtRQyCZ9qRm3mV5KrtrK3ggW6iRSCQEN+kOrq
-5LXAFr9CwYXp9ZaUBMcUlUd2Zavk1lXXalQ8KmIt7YBmWAnhVZwnfuMAM/LQrnEA
-SHMm3QipAfMTh6UKF9Jenm/tY/+o9kEweIdYS/KAT8swBR+xvSqZpQqgxIbhnpi2
-8eKFI8uiP8Juv/B+vI9C8bqcc5njJD4dQoCaYvabqRwarp9XfvWzBinN4o6V9D8U
-VzskpQ8M0KI2yeU0hsFLxveoenfN9rcX7Uv2j1jvJvpbWbExQZpESC6ZmH1MgxWB
-1StoYPKLaqBwHsCxktxVrBfMB68ddKQsx9ANMPItd74vnQURJbE7k6wJxfA04G4X
-YYQi8uNAbD/ynrMlVnDrWHgC4kcd3tsOtvQtpoKDhEpGD7Iw1r8lNAM4+jR3mG2f
-B7eyoZB15JTCbAGID1ccxSEoOaLJKXVuyNCgApErcqFVP/J8mO0z0Kd4Y4jEmFqS
-roG6DvyuTihG/zQNAApePKxH/g1SDAvYPVPn+nbAAhWee/FLXfg=
-=TZjK
+iQIzBAEBCgAdFiEEqvAjTK4OlkLFh465K77AqDC8C58FAlnFsNQACgkQK77AqDC8
+C58svRAAq522AaDph/tHzsjlP9RuJ2zV1zcF2AHS2IBFgnCxAWykfPpCI4Dv29bM
+AwX9N/WxZVZTzM5bKE/e0QZzizMnsAabzoBqao1ijjXcmddxBz4YNagJFmMxqAR5
+TBhIs6NDiGvj50VTOBHmOW/k0YmOnbsjZSJYyh+UM2YieSF9fUT8S1AC4e9yocv7
+AAgAyWx6scPnKlMfINt6wka9d/H3Tw/n6pQWquWMywTgEbrjzoVCRmPYq057iPyE
+XehHyWh96ktXdJ3q4rGauD3M+9KRYG0Fu0YH++Xzix2KDB5RX4naMIcF1LFks0sn
+rLXYjANiRqwzHFTkEtHFDjwry7XhYlTJZxMgxSaPoDXND9YPzyXjmPqNJD9nQCTx
+2Myjq/L7KMdkO01TAFoi+yhfxaYB7mL41Rm0aCs6x9Ootdh43zGtQfp7F5aSzZ8o
+kG5WZI82v8JEUrwRoTwcohgm6Z9o961eLUiAuxsSKU8Q+0dDqGbZbeG++B3+b8xC
+j+6Wrvvzlull9hCYL2hTD9FYaXDNl/bm10sUMXAjb3wIS5p40ILtD7OI5I8dr94i
+WZ4fxUhEaLjjZtjnWT1aISUMHHx2S3NLm1igWbRN/CgKHtPdGQCQxc4CiMaBs4g1
+mhUu/Q9e4Zi7ToNn77F3QrOdCnIaSqADARTcCyEAtmsbnLlFdII=
+=R0v1
 -----END PGP SIGNATURE-----

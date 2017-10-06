@@ -7,6 +7,6 @@ further details on libvirt consult its website http://libvirt.org/
 The only pre-requisite for this module is libvirt itself. For
 installation instructions, consult the INSTALL file.
 
-The current minimum required version of libvirt is 3.7.0
+The current minimum required version of libvirt is 3.8.0
 
 -- End

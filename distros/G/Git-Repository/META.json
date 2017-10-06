@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "git",
       "wrapper"
@@ -62,7 +62,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Requires::Git" : "1.005",
-            "blib" : "1.01",
             "constant" : "0",
             "lib" : "0",
             "overload" : "0"
@@ -81,13 +80,14 @@
          "web" : "https://github.com/book/Git-Repository"
       }
    },
-   "version" : "1.320",
+   "version" : "1.321",
    "x_contributors" : [
+      "Ron Savage <rsavage@cpan.org>",
       "Samit Badle <Samit.Badle@gmail.com>",
       "Lisa Hansen <Lisa.Hansen@sas.com>",
       "Alex Raguero <jhavero@gmail.com>",
       "Gregor Herrmann <gregoa@cpan.org>",
-      "Petr Šabata <contyk@cpan.org>",
+      "Petr \u0160abata <contyk@cpan.org>",
       "Tim Bunce <timb@cpan.org>",
       "Aristotle Pagaltzis <aristotle@cpan.org>",
       "Michael G. Schwern <mschwern@cpan.org>",
@@ -97,7 +97,7 @@
       "Christian Walde <mithaldu@cpan.org>",
       "Yanick Champoux <yanick@cpan.org>",
       "Thomas Klausner <domm@cpan.org>",
-      "Olivier Mengué <dolmen@cpan.org>",
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>",
       "Nigel Metheringham <nigel.metheringham@dev.intechnology.co.uk>",
       "Lasse Makholm <lasse.makholm@nokia.com>",
       "Kazuhiro Shibuya <shibuya@cpan.org>",
@@ -105,7 +105,8 @@
       "Olivier Raginel <babar@cpan.org>",
       "Anton Berezin <gruber@cpan.org>",
       "Alessandro Ghedini <alexbio@cpan.org>",
-      "Gustavo Leite de Mendonça Chaves <gnustavo@cpan.org>"
-   ]
+      "Gustavo Leite de Mendon\u00e7a Chaves <gnustavo@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

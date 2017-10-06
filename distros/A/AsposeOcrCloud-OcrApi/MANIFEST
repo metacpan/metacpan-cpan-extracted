@@ -23,8 +23,7 @@ lib/AsposeOcrCloud/Object/Underline.pm
 lib/AsposeOcrCloud/OcrApi.pm
 Makefile.PL
 MANIFEST
-README
-t/01_ocr_api.t
-t/data/Sampleocr.bmp
-META.yml
 META.json
+META.yml
+README.md
+t/01_ocr_api.t

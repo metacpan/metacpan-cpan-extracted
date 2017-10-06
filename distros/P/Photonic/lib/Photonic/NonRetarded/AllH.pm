@@ -4,7 +4,7 @@ Photonic::NonRetarded::AllH
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ Array of Haydock b coefficients squared
 =cut
 
 package Photonic::NonRetarded::AllH;
-$Photonic::NonRetarded::AllH::VERSION = '0.007';
+$Photonic::NonRetarded::AllH::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use Moose;

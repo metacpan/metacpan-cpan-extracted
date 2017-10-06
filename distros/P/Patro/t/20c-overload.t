@@ -6,9 +6,9 @@ use warnings;
 # what about HASH-type objects that overload '@{}'?
 # ... that overload %{}?
 
-diag "HASH-type reference";
 my $r1 = Hashem->new;
 
+# HASH-type reference
 ok($r1->{quux} == 42, 'hash deref 1');
 ok($r1->[2] == 9, 'array deref 1');
 $r1->[3] = 11;
@@ -25,8 +25,7 @@ ok($r1->{quux} == 42, 'hash deref 5');
 $r1 = Hashem->new;
 
 
-
-diag "ARRAY-type reference";
+# ARRAY-type reference
 my $r2 = Arrayed->new( { foo => 123, bar => 456 }, [7,8,9], 42 );
 ok($r2->{foo} == 123, 'hash deref');
 ok($r2->[0] == 7, 'array deref');
@@ -38,8 +37,7 @@ $r2 = Arrayed->new( { foo => 123, bar => 456 }, [7,8,9], 42 );
 
 
 
-
-diag "REF-type reference";
+# REF-type reference
 my $r3 = Scalard->new( { foo => 123, bar => 456 }, [7,8,9], 42 );
 ok($r3->{foo} == 123, 'hash deref');
 ok($r3->[0] == 7, 'array deref');
@@ -54,7 +52,7 @@ $r3 = Scalard->new( { foo => 123, bar => 456 }, [7,8,9], 42 );
 my ($p1,$p2,$p3) = getProxies(patronize($r1,$r2,$r3));
 ok($p1, 'got proxy Hashem');
 
-diag "HASH-type reference as proxy";
+# HASH-type reference as proxy
 is(Patro::ref($p1), 'Hashem', 'proxy has correct ref');
 is(Patro::reftype($p1),'HASH', 'proxy has correct reftype');
 ok($p1->{quux} == 42, 'hash deref 1 over proxy');
@@ -72,8 +70,7 @@ ok($p1->{quux} == 42, 'hash deref 5 over proxy');
 ok($$p1 eq 'buzz', 'scalar deref over proxy');
 
 
-
-diag "ARRAY-type reference as proxy";
+# ARRAY-type reference as proxy
 is(Patro::ref($p2), 'Arrayed', 'proxy has correct ref');
 is(Patro::reftype($p2),'ARRAY', 'proxy has correct reftype');
 ok($p2->{foo} == 123, 'hash deref in proxy');
@@ -84,7 +81,7 @@ ok($p2->[3] == 14, 'push and array deref in proxy');
 
 
 
-diag "REF-type reference as proxy";
+# REF-type reference as proxy
 is(Patro::ref($p3), 'Scalard', 'proxy has correct ref');
 is(Patro::reftype($p3), 'REF', 'proxy has correct reftype');
 ok($p3->{foo} == 123, 'hash deref in proxy');

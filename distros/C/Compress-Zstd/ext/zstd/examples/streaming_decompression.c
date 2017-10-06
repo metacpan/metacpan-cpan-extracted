@@ -1,9 +1,10 @@
-/**
- * Copyright 2016-present, Yann Collet, Facebook, Inc.
+/*
+ * Copyright (c) 2016-present, Yann Collet, Facebook, Inc.
  * All rights reserved.
  *
- * This source code is licensed under the license found in the
- * LICENSE-examples file in the root directory of this source tree.
+ * This source code is licensed under both the BSD-style license (found in the
+ * LICENSE file in the root directory of this source tree) and the GPLv2 (found
+ * in the COPYING file in the root directory of this source tree).
  */
 
 
@@ -99,7 +100,6 @@ static void decompressFile_orDie(const char* fname)
 int main(int argc, const char** argv)
 {
     const char* const exeName = argv[0];
-    const char* const inFilename = argv[1];
 
     if (argc!=2) {
         fprintf(stderr, "wrong arguments\n");
@@ -107,6 +107,8 @@ int main(int argc, const char** argv)
         fprintf(stderr, "%s FILE\n", exeName);
         return 1;
     }
+
+    const char* const inFilename = argv[1];
 
     decompressFile_orDie(inFilename);
     return 0;

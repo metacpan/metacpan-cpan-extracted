@@ -36,88 +36,17 @@
 
 define ([
     'cf',
-    'current-user',
     'lib',
     'app/lib',
     'target'
 ], function (
     cf,
-    currentUser,
     lib,
     appLib,
     target
 ) {
-    var 
-        //
-        // "Your choice" section at the bottom - shared by all target types
-        //
-        yourChoice = function () {
-            return '<br><b>Your choice:</b> <input name="sel" size=3 maxlength=2> ' +
-                   '<input id="submitButton" type="submit" value="Submit"><br><br>'
-        },
-        //
-        // miniMenu is shared by dform and dbrowser
-        //
-        miniMenu = function (mm) {
-            // mm is the dbrowser miniMenu object
-            var entries = (mm.entries === null) ? [] : mm.entries,
-                len = entries.length,
-                entry,
-                i,
-                r;
-            console.log("miniMenu is ", mm);
-            console.log("miniMenu length is " + len);
-            if (len > 0) {
-                r = 'Menu:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                for (i = 0; i < len; i += 1) {
-                    //console.log("i === " + i);
-                    console.log("Attempting to pull target " + entries[i] + " from miniMenu");
-                    entry = target.pull(entries[i]);
-                    if (lib.privCheck(entry.aclProfile)) {
-                        r += i + '. ' + entry.menuText + '&nbsp;&nbsp;';
-                    }
-                }
-                r += 'X. Exit/back';
-            } else {
-                r = "To leave this page, press ENTER or click the Submit button";
-            }
-            return r;
-        },        
-        valueToDisplay = function (obj, prop) {
-            console.log("valueToDisplay with object", obj, "and prop " + prop);
-            // given an object and a property, return the value to display
-            // if (! obj.hasOwnProperty(prop)) {
-            //     return '(NO_SUCH_PROP)';
-            if (obj[prop] === undefined) {
-                return '(undefined)';
-            } else if (obj[prop] === false) {
-                return 'NO';
-            } else if (obj[prop] === true) {
-                return 'YES';
-            } else if (obj[prop] === null) {
-                return '(none)';
-            } else if (obj[prop] === NaN) {
-                return '(NOT_A_NUMBER)';
-            }
-            return obj[prop];
-        },
-        maxLength = function (arr) {
-            var len, max;
-            len = arr ? arr.length : 0;
-            console.log("arr has " + len + " members");
-            max = arr.reduce(function(prevVal, elem) {
-                if (elem.text === null) {
-                    elem.text = '';
-                }
-                if (elem.text.length > prevVal) {
-                    prevVal = elem.text.length;
-                }
-                return prevVal;
-            }, arr[0].text.length);
-            console.log("The longest entry is " + max + " characters long");
-            return max;
-        },
-        browserNavMenu = function (len, pos) {
+
+    var browserNavMenu = function (len, pos) {
             var r = '',
                 context = {
                     forward: 0,
@@ -135,11 +64,10 @@ define ([
             // here in html.js, we add <span> elements for each context-sensitive
             // selection. Each such element has a unique identifier, so that in 
             // start.js we can check for the presence of each and handle accordingly
+
             if (len > 1) {
-                //
-                // there is at least one record to display:
+
                 // (a) determine context
-                //
                 if (len > 1) {
                     context.forward = 1;
                     context.back = 1;
@@ -156,9 +84,8 @@ define ([
                     context.forward = 0;
                     context.jumpToEnd = 0;
                 }
-                //
+
                 // (b) construct navigation menu
-                //
                 r += 'Navigation:&nbsp;&nbsp;';
                 if (context.back) {
                     r += '<span id="navBack">[\u2190] Previous </span>';
@@ -177,7 +104,8 @@ define ([
                 r = '';
             }
             return r;
-        },
+        }, // browserNavMenu
+
         genericTable = function (tname, tobj, targetType) {
             return function (set) {
 
@@ -280,35 +208,82 @@ define ([
                 r += '</form>';
                 console.log("Assembled source code for " + tname + " - it has " + r.length + " characters");
                 return r;
+            };
+        }, // genericTable
+
+        maxLength = function (arr) {
+            var len, max;
+            len = arr ? arr.length : 0;
+            console.log("arr has " + len + " members");
+            max = arr.reduce(function(prevVal, elem) {
+                if (elem.text === null) {
+                    elem.text = '';
+                }
+                if (elem.text.length > prevVal) {
+                    prevVal = elem.text.length;
+                }
+                return prevVal;
+            }, arr[0].text.length);
+            console.log("The longest entry is " + max + " characters long");
+            return max;
+        }, // maxLength
+
+        miniMenu = function (mm) {
+            var entries = (mm.entries === null) ? [] : mm.entries,
+                len = entries.length,
+                entry,
+                i,
+                r;
+            console.log("miniMenu is ", mm);
+            console.log("miniMenu length is " + len);
+            if (len > 0) {
+                r = 'Menu:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                for (i = 0; i < len; i += 1) {
+                    //console.log("i === " + i);
+                    console.log("Attempting to pull target " + entries[i] + " from miniMenu");
+                    entry = target.pull(entries[i]);
+                    if (lib.privCheck(entry.aclProfile)) {
+                        r += i + '. ' + entry.menuText + '&nbsp;&nbsp;';
+                    }
+                }
+                r += 'X. Exit/back';
+            } else {
+                r = "To leave this page, press ENTER or click the Submit button";
             }
-        }; // genericTable
+            return r;
+        }, // miniMenu       
+
+        valueToDisplay = function (obj, prop, mode) {
+            console.log("valueToDisplay with object", obj, "and prop " + prop);
+            // given an object and a property, return the value to display
+            if (typeof obj !== 'object') {
+                return '(NOT_AN_OBJECT)';
+            } else if (! (prop in obj) || obj[prop] === null) {
+                if (mode === 'read') {
+                    return '(none)';
+                } else {
+                    return '';
+                }
+            } else if (obj[prop] === undefined) {
+                return '(undefined)';
+            } else if (obj[prop] === false) {
+                return 'NO';
+            } else if (obj[prop] === true) {
+                return 'YES';
+            } else if (obj[prop] === NaN) {
+                return '(NOT_A_NUMBER)';
+            }
+            return obj[prop];
+        }, // valueToDisplay
+
+        // "Your choice" section at the bottom - shared by all target types
+        yourChoice = function () {
+            return '<br><b>Your choice:</b> <input name="sel" size=3 maxlength=2> ' +
+                   '<input id="submitButton" type="submit" value="Submit"><br><br>'
+        };
 
 
     return {
-
-        loginDialog: function () {
-            var r = '';
-            r += '<form id="loginform">';
-            r += '<br><br><br>';
-            r += cf('loginDialogChallengeText');
-            r += '<br><br>';
-            r += 'Username: <input name="nam" size="' + cf('loginDialogMaxLengthUsername') + '"';
-            r += 'maxlength="' + cf('loginDialogMaxLengthUsername') + '" /><br>';
-            r += 'Password: <input name="pwd" type="password" size="' + cf('loginDialogMaxLengthPassword') + '"';
-            r += 'maxlength="' + cf('loginDialogMaxLengthPassword') + '" /><br><br>';
-            r += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-            r += '<input type="submit" value="Submit"><br><br>';
-            r += '</form>';
-            return r;
-        }, // loginDialog
-
-        logout: function () {
-            var r = '';
-            r += '<br><br><br>';
-            r += 'You have been logged out of our humble application<br><br>';
-            r += 'Have a lot of fun!<br><br><br>';
-            return r;
-        }, // logout
 
         body: function () {
             var r = '';
@@ -345,116 +320,6 @@ define ([
             }
             return r;
         }, // body
-
-        dmenu: function (dmn) {
-            console.log("Entering html.dmenu with argument " + dmn);
-            // dmn is dmenu name
-            // dmo is dmenu object
-            var dmo = target.pull(dmn),
-                r = '',
-                len = dmo.entries.length,
-                i,
-                back = target.pull(dmo.back),
-                entry;
-        
-            r += '<form id="' + dmn + '"><br><b>' + dmo.title + '</b><br><br>';
-
-            for (i = 0; i < len; i += 1) {
-                // the entries are names of targets
-                entry = target.pull(dmo.entries[i]);
-                console.log("Pulled target " + dmo.entries[i] + " with result ", entry);
-                if (lib.privCheck(entry.aclProfile)) {
-                    r += i + '. ' + entry.menuText + '<br>';
-                }
-            }
-            r += 'X. Exit/back<br>';
-
-            r += yourChoice();
-
-            r += '</form>';
-            return r;
-        }, // dmenu
-
-        dform: function (dfn) {
-            // dfn is dform name
-            // dfo is dform object
-            var dfo = target.pull(dfn);
-            return function (obj) {
-                console.log("Generating source code of dform " + dfn +
-                            " with object", obj);
-                var r = '<form id="' + dfo.name + '">',
-                    len,
-                    i,
-                    allEntries,
-                    needed,
-                    entry;
-
-                r += '<br><b>' + dfo.title + '</b><br><br>';
-        
-                if (dfo.preamble) {
-                    r += dfo.preamble + '<br><br>';
-                }
-        
-                // determine characters needed for padding (based on longest
-                // entry)
-                if (dfo.entriesRead !== undefined) {
-                    console.log("entriesRead", dfo.entriesRead);
-                    allEntries = lib.forceArray(dfo.entriesRead);
-                }
-                if (dfo.entriesWrite !== undefined) {
-                    console.log("entriesWrite", dfo.entriesWrite);
-                    allEntries = allEntries.concat(
-                        dfo.entriesWrite === null ? [] : dfo.entriesWrite
-                    );
-                }
-                console.log("About to call maxLength() on allEntries", allEntries);
-                needed = maxLength(allEntries) + 2;
-
-                // READ-ONLY entries first
-                len = dfo.entriesRead ? dfo.entriesRead.length : 0;
-                console.log("Processing " + len + " read-only dform entries");
-                for (i = 0; i < len; i += 1) {
-                    entry = dfo.entriesRead[i];
-                    if (entry.name === 'divider') {
-                        r += Array(entry.maxlen).join(entry.text) + '<br>';
-                    } else if (entry.name === 'emptyLine') {
-                        r += '<br>';
-                    } else if (lib.privCheck(entry.aclProfileRead)) {
-                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
-                        r += '<span id="' + entry.name + '">';
-                        r += valueToDisplay(obj, entry.prop);
-                        r += '</span><br>';
-                    }
-                }
-                r += '<br>';
-        
-                // READ-WRITE entries second
-                len = dfo.entriesWrite ? dfo.entriesWrite.length : 0;
-                console.log("Processing " + len + " read-write dform entries");
-                for (i = 0; i < len; i += 1) {
-                    entry = dfo.entriesWrite[i];
-                    if (lib.privCheck(entry.aclProfileWrite)) {
-                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
-                        r += '<input id="' + entry.name + '" ';
-                        r += 'name="entry' + i + '" ';
-                        r += 'value="' + (obj[entry.prop] || '') + '" ';
-                        r += 'size="' + entry.maxlen + '" ';
-                        r += 'maxlength="' + entry.maxlen + '"><br>';
-                    }
-                }
-                r += '<br>';
-        
-                // miniMenu at the bottom
-                r += miniMenu(dfo.miniMenu);
-
-                // your choice section
-                r += yourChoice();
-
-                r += '</form>';
-                //console.log("Assembled source code for " + dfn + " - it has " + r.length + " characters");
-                return r;
-            };
-        }, // dform
 
         dbrowser: function (dbn) {
             // dfn is dbrowser name
@@ -517,8 +382,119 @@ define ([
                 r += '</form>';
                 console.log("Assembled source code for " + dbn + " - it has " + r.length + " characters");
                 return r;
+
             };
         }, // dbrowser
+
+        dform: function (dfn) {
+            // dfn is dform name
+            // dfo is dform object
+            var dfo = target.pull(dfn);
+            return function (obj) {
+                console.log("Generating source code of dform " + dfn +
+                            " with object", obj);
+                var r = '<form id="' + dfo.name + '">',
+                    len,
+                    i,
+                    allEntries,
+                    needed,
+                    entry;
+
+                r += '<br><b>' + dfo.title + '</b><br><br>';
+        
+                if (dfo.preamble) {
+                    r += dfo.preamble + '<br><br>';
+                }
+        
+                // determine characters needed for padding (based on longest
+                // entry)
+                if (dfo.entriesRead !== undefined) {
+                    console.log("entriesRead", dfo.entriesRead);
+                    allEntries = lib.forceArray(dfo.entriesRead);
+                }
+                if (dfo.entriesWrite !== undefined) {
+                    console.log("entriesWrite", dfo.entriesWrite);
+                    allEntries = allEntries.concat(
+                        dfo.entriesWrite === null ? [] : dfo.entriesWrite
+                    );
+                }
+                console.log("About to call maxLength() on allEntries", allEntries);
+                needed = maxLength(allEntries) + 2;
+
+                // READ-ONLY entries first
+                len = dfo.entriesRead ? dfo.entriesRead.length : 0;
+                console.log("Processing " + len + " read-only dform entries");
+                for (i = 0; i < len; i += 1) {
+                    entry = dfo.entriesRead[i];
+                    if (entry.name === 'divider') {
+                        r += Array(entry.maxlen).join(entry.text) + '<br>';
+                    } else if (entry.name === 'emptyLine') {
+                        r += '<br>';
+                    } else if (lib.privCheck(entry.aclProfileRead)) {
+                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                        r += '<span id="' + entry.name + '">';
+                        r += valueToDisplay(obj, entry.prop, "read");
+                        r += '</span><br>';
+                    }
+                }
+                r += '<br>';
+        
+                // READ-WRITE entries second
+                len = dfo.entriesWrite ? dfo.entriesWrite.length : 0;
+                console.log("Processing " + len + " read-write dform entries");
+                for (i = 0; i < len; i += 1) {
+                    entry = dfo.entriesWrite[i];
+                    if (lib.privCheck(entry.aclProfileWrite)) {
+                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                        r += '<input id="' + entry.name + '" ';
+                        r += 'name="entry' + i + '" ';
+                        r += 'value="' + valueToDisplay(obj, entry.prop, "write") + '" ';
+                        r += 'size="' + entry.maxlen + '" ';
+                        r += 'maxlength="' + entry.maxlen + '"><br>';
+                    }
+                }
+                r += '<br>';
+        
+                // miniMenu at the bottom
+                r += miniMenu(dfo.miniMenu);
+
+                // your choice section
+                r += yourChoice();
+
+                r += '</form>';
+                //console.log("Assembled source code for " + dfn + " - it has " + r.length + " characters");
+                return r;
+            };
+        }, // dform
+
+        dmenu: function (dmn) {
+            console.log("Entering html.dmenu with argument " + dmn);
+            // dmn is dmenu name
+            // dmo is dmenu object
+            var dmo = target.pull(dmn),
+                r = '',
+                len = dmo.entries.length,
+                i,
+                back = target.pull(dmo.back),
+                entry;
+        
+            r += '<form id="' + dmn + '"><br><b>' + dmo.title + '</b><br><br>';
+
+            for (i = 0; i < len; i += 1) {
+                // the entries are names of targets
+                entry = target.pull(dmo.entries[i]);
+                console.log("Pulled target " + dmo.entries[i] + " with result ", entry);
+                if (lib.privCheck(entry.aclProfile)) {
+                    r += i + '. ' + entry.menuText + '<br>';
+                }
+            }
+            r += 'X. Exit/back<br>';
+
+            r += yourChoice();
+
+            r += '</form>';
+            return r;
+        }, // dmenu
 
         dnotice: function (dnn) {
             console.log("Entering html.dnotice with argument " + dnn);
@@ -537,15 +513,39 @@ define ([
             };
         }, // dnotice
 
+        drowselect: function (drsn) {
+            var drso = target.pull(drsn);
+            return genericTable(drsn, drso, 'drowselect');
+        }, // dtable
+
         dtable: function (dtn) {
             var dto = target.pull(dtn);
             return genericTable(dtn, dto, 'dtable');
         }, // dtable
 
-        drowselect: function (drsn) {
-            var drso = target.pull(drsn);
-            return genericTable(drsn, drso, 'drowselect');
-        } // dtable
+        loginDialog: function () {
+            var r = '';
+            r += '<form id="loginform">';
+            r += '<br><br><br>';
+            r += cf('loginDialogChallengeText');
+            r += '<br><br>';
+            r += 'Username: <input name="nam" size="' + cf('loginDialogMaxLengthUsername') + '"';
+            r += 'maxlength="' + cf('loginDialogMaxLengthUsername') + '" /><br>';
+            r += 'Password: <input name="pwd" type="password" size="' + cf('loginDialogMaxLengthPassword') + '"';
+            r += 'maxlength="' + cf('loginDialogMaxLengthPassword') + '" /><br><br>';
+            r += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+            r += '<input type="submit" value="Submit"><br><br>';
+            r += '</form>';
+            return r;
+        }, // loginDialog
+
+        logout: function () {
+            var r = '';
+            r += '<br><br><br>';
+            r += 'You have been logged out of our humble application<br><br>';
+            r += 'Have a lot of fun!<br><br><br>';
+            return r;
+        } // logout
 
     };
 });

@@ -176,6 +176,14 @@ Constructs a widget displaying a fixed text string next to an icon.
 
 Constructs a widget displaying a labeled table of other widgets.
 
+=head2 current_sv
+
+  $sv = Devel::MAT::UI->current_sv
+
+If the UI has a concept of the "current" SV that the user is viewing, this
+method returns it. This may be used by tools to pick a default SV on which to
+operate, in case one was not supplied on the commandline.
+
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>

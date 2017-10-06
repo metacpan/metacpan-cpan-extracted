@@ -5,9 +5,8 @@ use Prima::StdBitmap;
 
 my $bmImageFile = Prima::Utils::find_image( '', "App::PLab::ButtonGlyphs.gif");
 
-sub icon { return Prima::StdBitmap::load_std_bmp( $_[0], 1, 0, $bmImageFile); }
-sub image{ return Prima::StdBitmap::load_std_bmp( $_[0], 0, 0, $bmImageFile); }
-
+sub icon  { return Prima::StdBitmap::load_std_bmp( index => $_[0], icon => 1, copy => 0, file => $bmImageFile); }
+sub image { return Prima::StdBitmap::load_std_bmp( index => $_[0], icon => 0, copy => 0, file => $bmImageFile); }
 
 package bg;
 

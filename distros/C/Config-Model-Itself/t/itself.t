@@ -152,6 +152,14 @@ my $expected_map
 is_deeply($expected_map, $map, "Check file class map") ;
 print Dumper $map if $trace ;
 
+# check that deprecated backend specs are removed
+my $master_model = $meta_inst->grab('class:MasterModel');
+# check => skip prevents deprecation warnings
+is($master_model->grab(step => 'read_config', check => 'skip')->fetch_size, 0, "read_config was removed");
+is($master_model->grab(step => 'write_config', check => 'skip')->fetch_size, 0, "write_config was removed");
+is($master_model->grab_value('rw_config backend'), 'cds_file', "read_config data was migrated in rw_config");
+is($master_model->grab_value('rw_config file'), 'mymaster.cds', "write_config data was migrated in rw_config");
+
 # add a new class 
 $meta_root->load("class:Master::Created element:created1 type=leaf value_type=number"
                      ." - element:created2 type=leaf value_type=uniline") ;

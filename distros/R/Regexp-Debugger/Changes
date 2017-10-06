@@ -228,3 +228,9 @@ Revision history for Regexp-Debugger
     - Improved visualizations when stepping backwards
 
     - Fixed edge cases when visualizing charsets and escaped characters
+
+
+0.002001  Wed Sep 27 06:52:10 2017
+
+    - Harden extraction of lexical hints
+      (thanks, Timothy)

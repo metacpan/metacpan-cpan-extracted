@@ -19,6 +19,7 @@ t/12_big_endian.t
 t/13_little_endian_utf-8.t
 t/14_big_endian_utf-8.t
 t/21_test_examples.t
+t/22_test_examples_utf-8.t
 t/chars.t
 t/perl_critic.t
 t/pod.t

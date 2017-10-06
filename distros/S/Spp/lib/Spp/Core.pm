@@ -5,46 +5,30 @@ no warnings "experimental";
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(ast_to_table concat start_with end_with
-  to_end append is_atom_name is_false
-  is_match is_true is_bool is_atom_sym is_atom_token
-  is_atom_tillnot is_atom_str is_atom_expr clean_ast);
+our @EXPORT = qw(match get_rept_time is_atom_name 
+  is_tillnot is_look is_rept is_sym is_atom_str);
 
-use Spp::Builtin;
+use Spp::Builtin qw(is_atom len rest to_json);
 
-sub ast_to_table {
-   my $ast   = shift;
-   my $table = {};
-   for my $spec (@{$ast}) {
-      my ($name, $rule) = @{$spec};
-      if (exists $table->{$name}) {
-         say "repeated key: |$name|.";
-      }
-      $table->{$name} = $rule;
+sub match {
+  my $atoms = shift;
+  if (len($atoms) > 1) {
+    return $atoms->[0], rest($atoms);
+  }
+  if (len($atoms) == 1) {
+    return $atoms->[0], [];
+  }
+  say to_json($atoms);
+  say "match element less 2"; exit();
+}
+
+sub get_rept_time {
+   my $rept = shift;
+   given ($rept) {
+      when ('?')  { return (0,  1) }  
+      when ('*')  { return (0, -1) } 
+      default { return (1, -1) } 
    }
-   return $table;
-}
-
-sub start_with {
-   my ($str, $start) = @_;
-   return 1 if index($str, $start) == 0;
-   return 0;
-}
-
-sub end_with {
-   my ($str, $end) = @_;
-   my $len = length($end);
-   return substr($str, -$len) eq $end;
-}
-
-sub to_end {
-   my $str   = shift;
-   my @chars = ();
-   for my $char (split '', $str) {
-      last if $char eq "\n";
-      push @chars, $char;
-   }
-   return join('', @chars);
 }
 
 sub is_atom_name {
@@ -52,37 +36,7 @@ sub is_atom_name {
    return (is_atom($atom) and $atom->[0] eq $name);
 }
 
-sub is_false {
-   my $atom = shift;
-   return is_atom_name($atom, 'false');
-}
-
-sub is_match {
-   my $atom = shift;
-   return not(is_false($atom));
-}
-
-sub is_true {
-   my $atom = shift;
-   return is_atom_name($atom, 'true');
-}
-
-sub is_bool {
-   my $atom = shift;
-   return (is_false($atom) or is_true($atom));
-}
-
-sub is_atom_sym {
-   my $atom = shift;
-   return is_atom_name($atom, 'Sym');
-}
-
-sub is_atom_token {
-   my $atom = shift;
-   return is_atom_name($atom, 'Token');
-}
-
-sub is_atom_tillnot {
+sub is_tillnot {
    my $s = shift;
    if (is_atom($s)) {
       return 1 if $s->[0] eq 'Till';
@@ -91,14 +45,24 @@ sub is_atom_tillnot {
    return 0;
 }
 
-sub is_atom_str {
+sub is_rept {
    my $atom = shift;
-   return is_atom_name($atom, 'Str');
+   return is_atom_name($atom, '_rept')
 }
 
-sub is_atom_expr {
+sub is_look {
    my $atom = shift;
-   return is_atom_name($atom, 'Expr');
+   return is_atom_name($atom, '_look')
+}
+
+sub is_sym {
+   my $atom = shift;
+   return is_atom_name($atom, 'Sym')
+}
+
+sub is_atom_str {
+   my $atom = shift;
+   return is_atom_name($atom, 'Str')
 }
 
 1;

@@ -8,8 +8,9 @@ use Time::HiRes;
 my $sleepwait = 1000;
 
 SKIP: {
-        skip 'not in dist testing', 93 unless $ENV{HIPI_MODULES_DIST_TEST};
-    
+        skip 'not in dist testing', 93 unless $ENV{HIPI_MODULES_DIST_TEST_I2C};
+        
+        diag('I2C tests are running');
         use_ok( HiPi::Device::I2C );
         use_ok( HiPi::Interface::MPL3115A2 );
         use_ok( HiPi::Interface::MCP23017 );

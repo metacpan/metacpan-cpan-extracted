@@ -1,7 +1,7 @@
 package Bundle::CPAN;
 use strict;
 use vars qw($VERSION);
-$VERSION = '1.862'; # use 3 digits to minimize confusion with the
+$VERSION = '1.863'; # use 3 digits to minimize confusion with the
                     # other CPAN.pm
 
 1;
@@ -21,6 +21,8 @@ Bundle::CPAN - Bundle to optimize the behaviour of CPAN.pm
 ExtUtils::MakeMaker -- bundles sane ExtUtils::Install
 
 Test::Harness -- critical prereq because must be >=2.62
+
+CPAN::Meta::Requirements
 
 ExtUtils::CBuilder -- some of the things below depend on it without declaring (as of 2006-10)
 

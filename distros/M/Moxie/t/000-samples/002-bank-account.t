@@ -16,13 +16,13 @@ package BankAccount {
 
     extends 'Moxie::Object';
 
-    has '$!balance' => ( default => sub { 0 } );
+    has _balance => ( default => sub { 0 } );
 
-    my sub _balance : private( $!balance );
+    sub BUILDARGS : init_args(
+        balance => _balance
+    );
 
-    sub BUILDARGS : init_args( balance => $!balance );
-
-    sub balance : ro( $!balance );
+    sub balance : ro(_balance);
 
     sub deposit ($self, $amount) { _balance += $amount }
 
@@ -38,16 +38,14 @@ package CheckingAccount {
 
     extends 'BankAccount';
 
-    has '$!overdraft_account';
-
-    my sub _overdraft_account : private( $!overdraft_account );
+    has '_overdraft_account';
 
     sub BUILDARGS : init_args(
-        overdraft_account => $!overdraft_account,
+        overdraft_account => _overdraft_account,
         balance?          => super(balance),
     );
 
-    sub overdraft_account : ro( $!overdraft_account );
+    sub overdraft_account : ro(_overdraft_account);
 
     sub withdraw ($self, $amount) {
 

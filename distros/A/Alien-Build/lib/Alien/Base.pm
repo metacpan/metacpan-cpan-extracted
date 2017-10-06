@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_merged/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 sub import {
@@ -438,7 +438,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -735,7 +735,7 @@ need it.  From the L<alienfile> of C<Alien::nasm>:
  share {
    ...
    plugin 'Extract' => 'tar.gz';
-   plugin 'Build::MSYS' => ();
+   plugin 'Build::MSYS';
    
    build [
      'sh configure --prefix=%{alien.install.prefix}',
@@ -893,6 +893,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

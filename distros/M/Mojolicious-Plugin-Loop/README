@@ -37,6 +37,8 @@ DESCRIPTION
     Mojolicious::Plugin::Loop is a plugin with helpers for iterating over
     either array, hashes or array/hash-like structures.
 
+    NOTE: THIS MODULE IS EXPERIMENTAL AND THE API MAY CHANGE AT ANY TIME
+
 TEMPLATE METHODS
   count
       $int = $loop->count;
@@ -75,6 +77,16 @@ TEMPLATE METHODS
 
     Returns "size" - 1.
 
+  next
+      $bool = $self->next;
+
+    Move the iterator forward one step. Example:
+
+      % my $i = loop [1, 2, 3];
+      % while ($i->next) {
+      %= $i->val;
+      % }
+
   odd
       $bool = $loop->odd;
 
@@ -100,6 +112,11 @@ TEMPLATE METHODS
       $loop->index == 1
       $loop->peek(1) == "c"
 
+  reset
+      $self = $self->reset;
+
+    Used to reset the iterator.
+
   size
       $int = $loop->size;
 
@@ -116,6 +133,8 @@ METHODS
 
 AUTHOR
     Jan Henning Thorsen
+
+    Marcus Ramberg
 
 COPYRIGHT AND LICENSE
     This program is free software, you can redistribute it and/or modify it

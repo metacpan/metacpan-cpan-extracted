@@ -10,11 +10,11 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar';
+    has _bar => ();
 
     sub bar ($self, $x = undef) {
-        $self->{bar} = $x if $x;
-        $self->{bar} + 1;
+        _bar = $x if $x;
+        _bar + 1;
     }
 }
 

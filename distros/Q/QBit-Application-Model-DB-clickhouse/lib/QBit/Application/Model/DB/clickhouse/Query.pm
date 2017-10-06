@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse::Query;
-$QBit::Application::Model::DB::clickhouse::Query::VERSION = '0.004';
+$QBit::Application::Model::DB::clickhouse::Query::VERSION = '0.005';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Query);
@@ -16,12 +16,6 @@ sub _found_rows {
     my ($self) = @_;
 
     return $self->db->dbh->{'__FOUND_ROWS__'};
-}
-
-sub _get_table_alias {
-    my ($self, $table) = @_;
-
-    return $self->{'without_table_alias'} ? '' : $self->quote_identifier($self->_table_alias($table)) . '.';
 }
 
 TRUE;

@@ -1,0 +1,3 @@
+repository=file://hallo/test
+repository=http://opar.perl-services.de/1234
+otrs_path=otrs

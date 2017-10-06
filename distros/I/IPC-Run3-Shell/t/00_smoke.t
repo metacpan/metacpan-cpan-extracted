@@ -18,14 +18,14 @@ use FindBin ();
 use lib $FindBin::Bin;
 use IPC_Run3_Shell_Testlib;
 
-use Test::More tests=>14;
+use Test::More tests=>14; # remember to keep in sync with done_testing
 use Test::Fatal 'exception';
 
 BEGIN {
 	use_ok 'IPC::Run3';
 	use_ok 'IPC::Run3::Shell';
 }
-is $IPC::Run3::Shell::VERSION, '0.54', 'version matches tests';
+is $IPC::Run3::Shell::VERSION, '0.56', 'version matches tests';
 use warnings FATAL=>'IPC::Run3::Shell';
 
 # Note that for testing, we're basically only calling an external perl process.
@@ -40,7 +40,7 @@ use warnings FATAL=>'IPC::Run3::Shell';
 # Testers has shown this works just about everywhere.
 
 # check warns() and output_is() from our test lib
-is_deeply [ warns { warn "I am a warning\n"; } ], ["I am a warning\n"], 'test warns()';
+is grep({/\bI am a warning\b/} warns { warn "I am a warning\n"; }), 1, 'test warns()';
 output_is { warn "I am warn\n"; print "I am output" } "I am output", "I am warn\n", 'test output_is()';
 
 if ($AUTHOR_TESTS)
@@ -65,4 +65,8 @@ my @sout = $s->perl('-e','warn "warn0\n";print <STDIN>."beep".<STDIN>; print STD
 is $?, 0, 'simple test $?';
 is_deeply \@sout, ["foo","beepbar"], 'simple test stdout';
 is $serr, "warn0\nerr", 'simple test stderr';
+
+if (my $cnt = grep {!$_} Test::More->builder->summary)
+	{ BAIL_OUT("$cnt smoke tests failed") }
+done_testing(14);
 

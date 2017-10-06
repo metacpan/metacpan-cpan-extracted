@@ -13,7 +13,7 @@ Bread::Board::Manual::Example::FormSensible - A Form::Sensible and Catalyst exam
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

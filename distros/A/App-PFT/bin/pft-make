@@ -322,7 +322,7 @@ sub compile_entry {
 
         my($symbol, $reason) = @$_;
         say STDERR "- link: $symbol";
-        say STDERR "- reason: $reason";
+        say STDERR "  reason: $reason";
 
         undef $first;
     }

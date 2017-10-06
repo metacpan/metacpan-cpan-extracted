@@ -10,6 +10,8 @@ use File::Spec;
 
 use Test::More;
 
+use lib qw(.);
+
 main();
 
 sub main {

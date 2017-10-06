@@ -31,58 +31,58 @@ name: Log-Dispatch
 provides:
   Log::Dispatch:
     file: lib/Log/Dispatch.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::ApacheLog:
     file: lib/Log/Dispatch/ApacheLog.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Base:
     file: lib/Log/Dispatch/Base.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Code:
     file: lib/Log/Dispatch/Code.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Email:
     file: lib/Log/Dispatch/Email.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Email::MIMELite:
     file: lib/Log/Dispatch/Email/MIMELite.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Email::MailSend:
     file: lib/Log/Dispatch/Email/MailSend.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Email::MailSender:
     file: lib/Log/Dispatch/Email/MailSender.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Email::MailSendmail:
     file: lib/Log/Dispatch/Email/MailSendmail.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::File:
     file: lib/Log/Dispatch/File.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::File::Locked:
     file: lib/Log/Dispatch/File/Locked.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Handle:
     file: lib/Log/Dispatch/Handle.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Null:
     file: lib/Log/Dispatch/Null.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Output:
     file: lib/Log/Dispatch/Output.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Screen:
     file: lib/Log/Dispatch/Screen.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Syslog:
     file: lib/Log/Dispatch/Syslog.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Types:
     file: lib/Log/Dispatch/Types.pm
-    version: '2.66'
+    version: '2.67'
   Log::Dispatch::Vars:
     file: lib/Log/Dispatch/Vars.pm
-    version: '2.66'
+    version: '2.67'
 requires:
   Carp: '0'
   Devel::GlobalDestruction: '0'
@@ -112,7 +112,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/Log-Dispatch/issues
   homepage: http://metacpan.org/release/Log-Dispatch
   repository: git://github.com/houseabsolute/Log-Dispatch.git
-version: '2.66'
+version: '2.67'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -287,7 +287,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -305,7 +305,7 @@ x_Dist_Zilla:
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.053'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@DROLSKY/Test::Pod::Coverage::Configurable'
@@ -699,7 +699,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.66
+          tag: v2.67
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -854,6 +854,7 @@ x_contributors:
   - 'Rohan Carly <se456@rohan.id.au>'
   - 'Ross Attrill <ross.attrill@gmail.com>'
   - 'Salvador Fandiño <sfandino@yahoo.com>'
+  - 'Slaven Rezic <srezic@cpan.org>'
   - 'Steve Bertrand <steveb@cpan.org>'
   - 'Whitney Jackson <whitney.jackson@baml.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

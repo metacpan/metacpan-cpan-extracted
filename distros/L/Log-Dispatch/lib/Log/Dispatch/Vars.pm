@@ -3,7 +3,7 @@ package Log::Dispatch::Vars;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Exporter qw( import );
 
@@ -69,7 +69,7 @@ Log::Dispatch::Vars - Variables used internally by multiple packages
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 DESCRIPTION
 

@@ -6,13 +6,11 @@ build_requires:
   Alien::Build: '0.49'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::Autoconf: '0.47'
-  Env: '0'
   ExtUtils::MakeMaker: '6.52'
   File::chdir: '0'
   Path::Tiny: '0'
   Test2::V0: '0.000060'
   Test::Alien: '0'
-  Test::More: '0.94'
   perl: '5.008001'
 configure_requires:
   Alien::Build: '0.32'
@@ -21,7 +19,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,5 +34,18 @@ resources:
   bugtracker: https://github.com/plicease/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/plicease/Alien-autoconf.git
-version: '0.09'
+version: '0.11'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Alien::m4: '0.11'
+      Archive::Tar: '0'
+      Config: '0'
+      IO::Zlib: '0'
+      Net::FTP: '0'
+      Path::Tiny: '0'
+      Sort::Versions: '0'
+      URI: '0'
+    system: {}
 x_serialization_backend: 'YAML::Tiny version 1.70'

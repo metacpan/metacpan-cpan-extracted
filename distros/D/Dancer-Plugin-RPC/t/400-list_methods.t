@@ -4,6 +4,7 @@ use Test::More;
 
 use Dancer qw/:syntax !pass/;
 use Dancer::Plugin::RPC::JSONRPC;
+use Dancer::Plugin::RPC::RESTRPC;
 use Dancer::Plugin::RPC::XMLRPC;
 use Dancer::RPCPlugin::CallbackResult;
 use Dancer::RPCPlugin::DispatchItem;
@@ -27,16 +28,17 @@ my $p = RPC::XML::ParserFactory->new();
                     code => sub {
                         my ($method, $args) = @_;
                         require Dancer::RPCPlugin::DispatchMethodList;
-                        return Dancer::RPCPlugin::DispatchMethodList::list_methods(
-                            $args->{protocol} // 'any'
-                        );
+                        my $ml = Dancer::RPCPlugin::DispatchMethodList->new();
+                        return $ml->list_methods($args->{protocol} // 'any');
                     },
+                    package => 'main',
                 ),
             };
         },
         callback => sub { return callback_success() },
     };
     jsonrpc '/system' => $ep;
+    restrpc '/system' => $ep;
     xmlrpc  '/system' => $ep;
 
     route_exists([POST => '/system'], "/system registered");
@@ -46,6 +48,7 @@ my $p = RPC::XML::ParserFactory->new();
         {
             headers => [
                 'Content-Type' => 'application/json',
+                'Accept'       => 'application/json',
             ],
             body => to_json(
                 {
@@ -56,11 +59,18 @@ my $p = RPC::XML::ParserFactory->new();
             ),
         }
     );
-    my $list = from_json($response->{content})->{result};
+    my $list;
+    eval {
+        $list = from_json($response->{content})->{result};
+        1;
+    } or diag(explain($response));
     is_deeply(
         $list,
         {
             'jsonrpc' => {
+                '/system' => ['code.ping', 'system.listMethods']
+            },
+            'restrpc' => {
                 '/system' => ['code.ping', 'system.listMethods']
             },
             'xmlrpc' => {
@@ -68,7 +78,7 @@ my $p = RPC::XML::ParserFactory->new();
             },
         },
         "/system => system.listMethods"
-    );
+    ) or diag(explain($list));
 
     my $xml_response = dancer_response(
         POST => '/system',

@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 lib/Importer/Zim/Base.pm
+lib/Importer/Zim/Utils.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-load.t

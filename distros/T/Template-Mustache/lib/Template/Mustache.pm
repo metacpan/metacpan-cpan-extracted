@@ -1,7 +1,7 @@
 package Template::Mustache;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Drawing Mustaches on Perl for fun and profit
-$Template::Mustache::VERSION = '1.0.4';
+$Template::Mustache::VERSION = '1.1.0';
 use 5.12.0;
 
 use Moo;
@@ -205,7 +205,7 @@ delimiter_change_inner: '=' {
     $item[4]
 }
 
-partial: /\s*/ opening_tag '>' /\s*/ /[\w.]+/ /\s*/ closing_tag /\s*/ { 
+partial: /\s*/ opening_tag '>' /\s*/ /[-\w.]+/ /\s*/ closing_tag /\s*/ {
     my $prev = $thisparser->{prev_is_standalone};
     $thisparser->{prev_is_standalone} = 0;
     my $indent = '';
@@ -227,7 +227,7 @@ partial: /\s*/ opening_tag '>' /\s*/ /[\w.]+/ /\s*/ closing_tag /\s*/ {
         )
 }
 
-open_section: /\s*/ opening_tag /[#^]/ /\s*/ /[\w.]+/ /\s*/ closing_tag /\s*/ { 
+open_section: /\s*/ opening_tag /[#^]/ /\s*/ /[-\w.]+/ /\s*/ closing_tag /\s*/ {
     my $prev = $thisparser->{prev_is_standalone};
     $thisparser->{prev_is_standalone} = 0;
     if ( $item[1] =~ /\n/ or $prev ) {
@@ -341,7 +341,7 @@ variable: /\s*/ opening_tag /\s*/ variable_name /\s*/ closing_tag {
     );
 }
 
-variable_name: /[\w.]+/
+variable_name: /[-\w.]+/
 
 verbatim: { $thisparser->{opening_tag} } /^\s*\S*?(?=\Q$item[1]\E|\s|$)/ {
     $thisparser->{prev_is_standalone} = 0;
@@ -363,7 +363,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 =head1 VERSION
 
-version 1.0.4
+version 1.1.0
 
 =head1 SYNOPSIS
 

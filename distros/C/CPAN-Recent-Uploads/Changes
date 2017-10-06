@@ -1,6 +1,18 @@
 ==================================================
-Changes from 2012-05-13 00:00:00 +0000 to present.
+Changes from 2012-09-26 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.14 at 2017-09-25 13:39:09 +0000
+-----------------------------------------
+
+  Change: 3b9c5d7d17af9b30ad4143b557216d5ae48f29da
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-09-25 14:39:09 +0000
+
+    Switch to using HTTP::Tiny instead of LWP
+
+    Also add HTTP::Reponse and HTTP::Daemon as test_requires 
 
 -----------------------------------------
 version 0.12 at 2017-05-12 07:58:19 +0000
@@ -48,5 +60,5 @@ version 0.08 at 2014-05-19 12:57:28 +0000
     Added a 'proper' test. 
 
 ================================================
-Plus 3 releases after 2012-05-13 00:00:00 +0000.
+Plus 3 releases after 2012-09-26 00:00:00 +0000.
 ================================================

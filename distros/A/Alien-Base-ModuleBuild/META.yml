@@ -23,34 +23,32 @@ no_index:
 provides:
   Alien::Base::ModuleBuild:
     file: lib/Alien/Base/ModuleBuild.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Cabinet:
     file: lib/Alien/Base/ModuleBuild/Cabinet.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::File:
     file: lib/Alien/Base/ModuleBuild/File.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Repository:
     file: lib/Alien/Base/ModuleBuild/Repository.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Repository::FTP:
     file: lib/Alien/Base/ModuleBuild/Repository/FTP.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Repository::HTTP:
     file: lib/Alien/Base/ModuleBuild/Repository/HTTP.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Repository::Local:
     file: lib/Alien/Base/ModuleBuild/Repository/Local.pm
-    version: '0.046'
+    version: '1.00'
   Alien::Base::ModuleBuild::Utils:
     file: lib/Alien/Base/ModuleBuild/Utils.pm
-    version: '0.046'
-  Alien::Base::PkgConfig:
-    file: lib/Alien/Base/PkgConfig.pm
-    version: '0.046'
+    version: '1.00'
 recommends:
   HTML::LinkExtor: '0'
 requires:
+  Alien::Base::PkgConfig: '1.20'
   Archive::Extract: '0'
   Capture::Tiny: '0.17'
   File::chdir: '0.1005'
@@ -72,5 +70,5 @@ resources:
   bugtracker: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/Perl5-Alien/Alien-Base-ModuleBuild
-version: '0.046'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

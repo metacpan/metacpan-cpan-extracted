@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-our $VERSION = '0.018';
+our $VERSION = '0.020';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -24,6 +24,7 @@ use FindBin ();
 use CPAN::Testers::Schema;
 use Mojo::Util qw( b64_decode );
 use Beam::Minion;
+use Data::Dumper;
 
 #pod =head1 CONFIG
 #pod
@@ -142,6 +143,13 @@ sub handle_register( $c ) {
     for my $body ( @things ) {
         my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
             ->from_struct( $body );
+        $c->app->log->debug( sprintf 'Got %s object during registration', ref $fact );
+
+        if ( ref $fact->content ne 'ARRAY' ) {
+            $c->app->log->warn( 'Registration fact object content is not an array. Skipping!' );
+            $c->app->log->debug( sprintf 'Fact object content %s', Dumper $fact->content );
+            next;
+        }
 
         my ( $fullname ) = grep { $_->isa( 'Metabase::User::FullName' ) } $fact->content->@*;
         my ( $email ) = grep { $_->isa( 'Metabase::User::EmailAddress' ) } $fact->content->@*;
@@ -153,7 +161,7 @@ sub handle_register( $c ) {
         });
 
         $c->app->log->info(
-            sprintf 'Registered user %s from %s (%s)', $row->resource, $row->fullname, $row->email,
+            sprintf 'Registered user ID %s named "%s" (email: %s)', $row->resource, $row->fullname, $row->email,
         );
     }
 
@@ -230,7 +238,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.018
+version 0.020
 
 =head1 SYNOPSIS
 

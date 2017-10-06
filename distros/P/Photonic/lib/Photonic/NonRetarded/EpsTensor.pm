@@ -4,7 +4,7 @@ Photonic::NonRetarded::EpsTensor
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ functions of the components.
 
 =over 4
 
-=item * new(geometry=>$g, nh=>$nh, small=>$small, keepStates=>$k)
+=item * new(geometry=>$g, nh=>$nh, smallH=>$smallH, smallE=>$smallE, keepStates=>$k) 
 
 Initializes the structure.
 
@@ -30,7 +30,8 @@ $g Photonic::Geometry describing the structure
 
 $nh is the maximum number of Haydock coefficients to use.
 
-$small is the criteria of convergence (default 1e-7)
+$smallH and $smallE are the criteria of convergence (default 1e-7) for
+the Haydock coefficients and the tensor calculations.
 
 $k is a flag to keep states in Haydock calculations (default 0)
 
@@ -85,16 +86,19 @@ The actual number of Haydock coefficients used in the last calculation
 
 Flags that the last calculation converged before using up all coefficients
 
-=item * small
+=item * smallH smallE
 
-Criteria of convergence. 0 means don't check.
+Criteria of convergence for Haydock and epsilon calculations. 0 means
+don't check. From Photonic::Roles::EpsParams.
+
+    *Check last remark* 
 
 =back
 
 =cut
 
 package Photonic::NonRetarded::EpsTensor;
-$Photonic::NonRetarded::EpsTensor::VERSION = '0.007';
+$Photonic::NonRetarded::EpsTensor::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -106,6 +110,7 @@ use Photonic::NonRetarded::AllH;
 use Photonic::NonRetarded::EpsL;
 use Moose;
 use Photonic::Types;
+with 'Photonic::Roles::EpsParams';
 
 has 'geometry'=>(is=>'ro', isa => 'Photonic::Geometry',
     handles=>[qw(B dims r G GNorm L scale f)],required=>1
@@ -120,6 +125,9 @@ has 'epsL'=>(is=>'ro', isa=>'ArrayRef[Photonic::NonRetarded::EpsL]',
              documentation=>'Array of epsilon calculators');
 has 'epsTensor'=>(is=>'ro', isa=>'PDL', init_arg=>undef, writer=>'_epsTensor', 
              documentation=>'Dielectric Tensor from last evaluation');
+has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
+             documentation=>
+                  'All EpsL evaluations converged in last evaluation'); 
 
 sub evaluate {
     my $self=shift;
@@ -127,9 +135,12 @@ sub evaluate {
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
     my @eps; #array of @eps along different directions.
+    my $converged=1;
     foreach(@{$self->epsL}){
 	push @eps, $_->evaluate($epsA, $epsB);
+	$converged &&=$_->converged;
     }
+    $self->_converged($converged);
     my $reEpsL=PDL->pdl([map {$_->re} @eps]);
     my $imEpsL=PDL->pdl([map {$_->im} @eps]);
     my ($lu, $perm, $parity)=@{$self->geometry->unitDyadsLU};
@@ -156,7 +167,7 @@ sub _build_nr { # One Haydock coefficients calculator per direction0
 	my $g=dclone($self->geometry); #clone geometry
 	$g->Direction0($_); #add G0 direction
 	#Build a corresponding NonRetarded::AllH structure
-	my $nr=Photonic::NonRetarded::AllH->new(geometry=>$g, small=>$self->small, 
+	my $nr=Photonic::NonRetarded::AllH->new(geometry=>$g, smallH=>$self->smallH, 
 			   nh=>$self->nh, keepStates=>$self->keepStates);
 	push @nr, $nr;
     }
@@ -168,7 +179,7 @@ sub _build_epsL {
     my @eps;
     foreach(@{$self->nr}){
 	my $e=Photonic::NonRetarded::EpsL->
-	    new(nr=>$_, nh=>$self->nh, small=>$self->small);
+	    new(nr=>$_, nh=>$self->nh, smallE=>$self->smallE);
 	push @eps, $e;
     }
     return [@eps]

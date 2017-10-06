@@ -7,7 +7,7 @@ use warnings;
 # For use autodie qw( :all ) elsewhere
 use IPC::System::Simple ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 1;
 
@@ -25,7 +25,7 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -52,21 +52,11 @@ Dave Rolsky <autarch@urth.org>
 
 =back
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Mark Fowler Zak B. Elep
-
-=over 4
-
-=item *
-
-Mark Fowler <mfowler@maxmind.com>
-
-=item *
+=for stopwords Zak B. Elep
 
 Zak B. Elep <zakame@zakame.net>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

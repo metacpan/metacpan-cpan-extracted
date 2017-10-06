@@ -4,12 +4,12 @@ Photonic::NonRetarded::EpsL
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
    use Photonic::NonRetarded::EpsL;
-   my $eps=Photonic::NonRetarded::EpsL(nr=>$nr, nh=>$nh);
+   my $eps=Photonic::NonRetarded::EpsL->new(nr=>$nr, nh=>$nh);
    my $epsilonLongitudinal=$eps->evaluate($epsA, $epsB);
 
 =head1 DESCRIPTION
@@ -22,7 +22,7 @@ functions of the components.
 
 =over 4
 
-=item * new(nr=>$nr, nh=>$nh, small=>$small)
+=item * new(nr=>$nr, nh=>$nh, smallE=>$smallE)
 
 Initializes the structure.
 
@@ -30,7 +30,8 @@ $nr is a Photonic::NonRetarded::AllH structure (required).
 
 $nh is the maximum number of Haydock coefficients to use (required).
 
-$small is the criteria of convergence (defaults to 1e-7)
+$smallE is the criteria of convergence for the continued fraction 
+(defaults to 1e-7)
 
 =item * evaluate($epsA, $epsB)
 
@@ -72,9 +73,10 @@ The actual number of Haydock coefficients used in the last calculation
 
 Flags that the last calculation converged before using up all coefficients
 
-=item * small
+=item * smallE
 
-Criteria of convergence. 0 means don't check.
+Criteria of convergence for continued fraction. 0 means don't
+check. From Photonic::Roles::EpsParams
 
 =back
 
@@ -87,7 +89,7 @@ Criteria of convergence. 0 means don't check.
 =cut
 
 package Photonic::NonRetarded::EpsL;
-$Photonic::NonRetarded::EpsL::VERSION = '0.007';
+$Photonic::NonRetarded::EpsL::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -129,7 +131,7 @@ sub evaluate {
     my ($Cnm1, $Dnm1)=($fnm1, r2C(0)); #previous coeffs.
     my ($fn, $Cn, $Dn); #current coeffs.
     my $Deltan;
-    while($n<=$self->nh && $n<=$self->nr->iteration){
+    while($n<$self->nh && $n<$self->nr->iteration){
 	$Dn=$u-$as->[$n]-$b2s->[$n]*$Dnm1;
 	$Dn=r2C($tiny) if $Dn->re==0 and $Dn->im==0;
 	$Cn=$u-$as->[$n]-$b2s->[$n]/$Cnm1;
@@ -137,12 +139,16 @@ sub evaluate {
 	$Dn=1/$Dn;
 	$Deltan=$Cn*$Dn;
 	$fn=$fnm1*$Deltan;
-	last if $converged=$Deltan->approx(1, $self->small)->all;
+	last if $converged=$Deltan->approx(1, $self->smallE)->all;
 	$fnm1=$fn;
 	$Dnm1=$Dn;
 	$Cnm1=$Cn;
 	$n++;
     }
+    #If there are less available coefficients than $self->nh and all
+    #of them were used, there is no remaining work to do, so, converged 
+    $converged=1 if $self->nr->iteration < $self->nh;
+    $self->_converged($converged);
     $self->_converged($converged);
     $self->_nhActual($n);
     $self->_epsL($epsA*$fn/$u);

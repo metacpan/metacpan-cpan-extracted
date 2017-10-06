@@ -11,13 +11,16 @@ STDOUT->autoflush(1);
 
 my $file = shift @ARGV or die "Need dumpfile\n";
 
-my $pmat = Devel::MAT->load( $file,
-   progress => ( -t STDOUT ? sub {
-      print "\r\e[K" . shift;
-   } : undef ),
+my $progress = ( -t STDOUT ?
+   sub { print "\r\e[K" . ( shift // "" ); } :
+   undef
 );
 
-print "\r\e[K" if -t;
+my $pmat = Devel::MAT->load( $file,
+   progress => $progress,
+);
+
+$progress->() if $progress;
 
 my $df = $pmat->dumpfile;
 
@@ -32,10 +35,39 @@ sub Devel::MAT::Cmd::printf
    printf $fmt, @args;
 }
 
+my @STYLE = (
+   "\e[33m", # yellow
+   "\e[36m", # cyan
+   "\e[35m", # magenta
+);
+my $STYLE_SV = "\e[1;3m";
+
+my $NORMAL = "\e[m";
+
+sub Devel::MAT::Cmd::print_note
+{
+   shift;
+   my ( $str, $idx ) = @_;
+   $idx //= 0;
+
+   print $STYLE[$idx % 3] . $str . $NORMAL;
+}
+
+sub Devel::MAT::Cmd::print_sv
+{
+   shift;
+   my ( $sv ) = @_;
+
+   print $STYLE_SV . ( my $str = $sv->desc_class_addr ) . $NORMAL;
+   return length $str;
+}
+
 if( @ARGV ) {
    my $cmd = shift @ARGV;
 
-   $pmat->load_tool_for_command( $cmd )->run_cmd( @ARGV );
+   $pmat->load_tool_for_command( $cmd,
+      progress => $progress,
+   )->run_cmd( @ARGV );
    exit
 }
 
@@ -50,10 +82,19 @@ while( defined( my $line = $rl->readline( 'pmat> ') ) ) {
    last if $cmd eq "exit";
 
    eval {
-      $pmat->load_tool_for_command( $cmd )->run_cmd( @args );
+      # We just have to hope nobody catches this one.
+      # It would be nice to  next COMMAND  but awkward perl internals reasons
+      # mean we can't do that from a signal handler
+      local $SIG{INT} = sub { die "\nAborted\n"; };
+
+      $pmat->load_tool_for_command( $cmd,
+         progress => $progress,
+      )->run_cmd( @args );
       1;
    } or
       print STDERR "$@";
 
    print "\n";
 }
+
+print "\n";

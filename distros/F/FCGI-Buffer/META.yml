@@ -7,6 +7,7 @@ build_requires:
   Capture::Tiny: '0'
   DateTime: '0'
   DateTime::Format::HTTP: '0'
+  ExtUtils::MakeMaker: '0'
   HTTP::Headers: '0'
   HTTP::Response: '0'
   IPC::System::Simple: '0'
@@ -39,7 +40,7 @@ requires:
   HTML::Packer: '1'
   HTTP::Date: '0'
   HTTP::Status: '0'
-  IO::Compress::Brotli: '0'
+  IO::Compress::Brotli: '0.003'
   IO::String: '0'
   JavaScript::Packer: '2'
   Storable: '0'
@@ -48,5 +49,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer
   repository: git://github.com/nigelhorne/FCGI-Buffer.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,7 +9,7 @@ use 5.014;
 #use strict;
 #use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 our %TRUE_VALUES = (
                     'true' => 1,
@@ -168,15 +168,21 @@ sub parse {
             }
         }
 
-        # Parse categories
-        (
-         my @categories =
-           grep { exists $self->{_categories}{$_} }
-           $self->{case_insensitive_cats}
-         ? (map { lc($_) =~ tr/_a-z0-9/_/cr } split(/;/, $info{Categories} // ''))
-         : (split(/;/, $info{Categories} // ''))
-        )
-          || (!$self->{keep_unknown_categories} and next);
+        # Parse categories (and remove any duplicates)
+        my %categories;
+
+#<<<
+        @categories{
+            grep { exists $self->{_categories}{$_} } (
+                      $self->{case_insensitive_cats}
+                      ? (map { lc($_) =~ tr/_a-z0-9/_/cr } split(/;/, $info{Categories} // ''))
+                      : (split(/;/, $info{Categories} // ''))
+            )
+        } = ();
+#>>>
+
+        # Skip entry when there are no categories and `keep_unknown_categories` is false
+        scalar(%categories) or $self->{keep_unknown_categories} or next;
 
         # Remove `% ...` from the value of `Exec`
         index($info{Exec}, ' %') != -1 and $info{Exec} =~ s/ +%.*//s;
@@ -212,8 +218,8 @@ sub parse {
         }
 
         # Push the entry into its belonging categories
-        if (scalar(@categories)) {
-            foreach my $category (@categories) {
+        if (scalar(%categories)) {
+            foreach my $category (keys %categories) {
                 push @{$file_data->{$category}}, {map { $_ => $info{$_} } @{$self->{keys_to_keep}}};
             }
         }

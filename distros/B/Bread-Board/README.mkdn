@@ -4,7 +4,7 @@ Bread::Board - A solderless way to wire up your application components
 
 # VERSION
 
-version 0.35
+version 0.36
 
 # SYNOPSIS
 

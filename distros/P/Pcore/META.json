@@ -124,6 +124,7 @@
             "String::CRC32" : "0",
             "Sub::Util" : "0",
             "Sys::CpuAffinity" : "0",
+            "TOML" : "0",
             "Term::ReadKey" : "0",
             "Term::Size::Any" : "0",
             "Text::Xslate" : "0",
@@ -137,7 +138,7 @@
             "XML::Hash::XS" : "0",
             "YAML::XS" : "0",
             "multidimensional" : "0",
-            "perl" : "v5.26.0"
+            "perl" : "v5.26.1"
          }
       },
       "test" : {
@@ -158,6 +159,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.54.0",
+   "version" : "v0.55.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

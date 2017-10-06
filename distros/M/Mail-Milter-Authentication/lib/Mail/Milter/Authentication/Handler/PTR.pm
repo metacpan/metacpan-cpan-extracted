@@ -2,12 +2,25 @@ package Mail::Milter::Authentication::Handler::PTR;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Sys::Syslog qw{:standard :macros};
 
 sub default_config {
     return {};
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'PTR_metrics' );
+    return \@rows;
+}
+
+sub register_metrics {
+    return {
+        'ptr_total' => 'The number of emails processed for PTR',
+    };
 }
 
 sub helo_callback {
@@ -24,24 +37,34 @@ sub helo_callback {
     }
 
     my $iprev_handler = $self->get_handler('IPRev');
-    my $domain =
+    my $domains =
       exists( $iprev_handler->{'verified_ptr'} )
       ? $iprev_handler->{'verified_ptr'}
       : q{};
 
-    if ( lc $domain eq lc $helo_host ) {
+    my $found_match = 0;
+
+    foreach my $domain ( split ',', $domains ) {
+        if ( lc $domain eq lc $helo_host ) {
+            $found_match = 1;
+        }
+    }
+
+    if ( $found_match ) {
         $self->dbgout( 'PTRMatch', 'pass', LOG_DEBUG );
         $self->add_c_auth_header(
                 $self->format_header_entry( 'x-ptr',        'pass' ) . q{ }
               . $self->format_header_entry( 'x-ptr-helo',   $helo_host ) . q{ }
-              . $self->format_header_entry( 'x-ptr-lookup', $domain ) );
+              . $self->format_header_entry( 'x-ptr-lookup', $domains ) );
+        $self->metric_count( 'ptr_total', { 'result' => 'pass'} );
     }
     else {
         $self->dbgout( 'PTRMatch', 'fail', LOG_DEBUG );
         $self->add_c_auth_header(
                 $self->format_header_entry( 'x-ptr',        'fail' ) . q{ }
               . $self->format_header_entry( 'x-ptr-helo',   $helo_host ) . q{ }
-              . $self->format_header_entry( 'x-ptr-lookup', $domain ) );
+              . $self->format_header_entry( 'x-ptr-lookup', $domains ) );
+        $self->metric_count( 'ptr_total', { 'result' => 'fail'} );
     }
     return;
 }

@@ -12,13 +12,15 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar';
+    has _bar => ();
 
-    sub bar : ro;
+    sub BUILDARGS : init_args( bar? => _bar );
+
+    sub bar : ro(_bar);
 
     sub baz ($self, $bar) {
         if (ref($self)) {
-            $self->{bar} = $bar;
+            _bar = $bar;
         }
         else {
             $self = __PACKAGE__->new( bar => $bar );

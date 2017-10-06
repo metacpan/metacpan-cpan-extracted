@@ -46,20 +46,33 @@ sub print {
     $html .= qq{</style>\n\n};
 
     # Info
+    my $rows   = $args{'info'}{'rows'};
+    my $cols   = $args{'info'}{'cols'};
+    my $length = $args{'info'}{'metric'}{'length'}
+                    . ' '
+                    . FuseBead::From::PNG::Const->METRIC_SUFFIX
+                    . ' ('
+                    . $args{'info'}{'imperial'}{'length'}
+                    . ' '
+                    . FuseBead::From::PNG::Const->IMPERIAL_SUFFIX
+                    . ')';
+    my $height = $args{'info'}{'metric'}{'height'}
+                    . ' '
+                    . FuseBead::From::PNG::Const->METRIC_SUFFIX
+                    . ' ('
+                    . $args{'info'}{'imperial'}{'height'}
+                    . ' '
+                    . FuseBead::From::PNG::Const->IMPERIAL_SUFFIX
+                    . ')';
+
     $html .= qq{<section class="info">\n};
     $html .= qq{<h2>Info</h2>\n};
-    for my $type(qw/metric imperial/) {
-        if (exists $args{'info'}{$type}) {
-            my $suffix_key = uc($type) . '_SUFFIX';
-            my $suffix     = FuseBead::From::PNG::Const->$suffix_key;
-
-            my ($length, $height) = @{$args{'info'}{$type}}{qw/length height/};
-            $html .= qq{<table><tbody>\n};
-            $html .= qq{<tr><td>Length:</td><td>$length $suffix</td></tr>\n};
-            $html .= qq{<tr><td>Height:</td><td>$height $suffix</td></tr>\n};
-            $html .= qq{</tbody></table>\n};
-        }
-    }
+    $html .= qq{<table><tbody>\n};
+    $html .= qq{<tr><td>Rows:</td><td>$rows</td></tr>\n};
+    $html .= qq{<tr><td>Cols:</td><td>$cols</td></tr>\n};
+    $html .= qq{<tr><td>Length:</td><td>$length</td></tr>\n};
+    $html .= qq{<tr><td>Height:</td><td>$height</td></tr>\n};
+    $html .= qq{</tbody></table>\n};
     $html .= qq{</section>\n\n};
 
     # Bead List

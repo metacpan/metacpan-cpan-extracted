@@ -33,7 +33,7 @@ Several other core modules are required,
 which should have been distributed with your copy of Perl.
 The full list of required modules can be found in the file "Makefile.PL".
 
-AUHTOR, COPYRIGHT AND LICENCE
+AUHTOR, COPYRIGHT AND LICENSE
 
 Copyright (c) 2014 Hauke Daempfling (haukex@zero-g.net).
 

@@ -9,11 +9,11 @@ bin/cisco-entity.pl
 bin/cisco-intf.pl
 bin/cisco-line.pl
 bin/cisco-memory.pl
-bin/cisco-pass.pl
 bin/cisco-ping.pl
 bin/cisco-system.pl
 t/02-pod-coverage.t
 t/03-test-pod.t
+t/08-Cisco-SNMP.t
 t/09-Cisco-SNMP-ARP.t
 t/10-Cisco-SNMP-Config.t
 t/11-Cisco-SNMP-CPU.t
@@ -23,7 +23,6 @@ t/14-Cisco-SNMP-Interface.t
 t/15-Cisco-SNMP-IP.t
 t/16-Cisco-SNMP-Line.t
 t/17-Cisco-SNMP-Memory.t
-t/18-Cisco-SNMP-Password.t
 t/19-Cisco-SNMP-ProxyPing.t
 t/20-Cisco-SNMP-Sensor.t
 t/21-Cisco-SNMP-System.t

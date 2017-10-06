@@ -4,9 +4,9 @@ use DBICx::Sugar qw(config rset resultset schema);
 use File::Temp qw(tempfile);
 use Test::Requires qw(DBD::SQLite);
 
-plan tests => 3;
+plan tests => 4;
 
-my @dbfiles = map { (tempfile SUFFIX => '.db' )[1] } 1..2;
+my @dbfiles = map { (tempfile SUFFIX => '.db' )[1] } 1..3;
 
 subtest 'two schemas' => sub {
     config({
@@ -55,6 +55,24 @@ subtest 'two schemas with a default schema' => sub {
 
     ok my $bob = schema->resultset('User')->find('bob'), 'found bob';
     is $bob->age => 30;
+};
+
+subtest 'Schema-specific configuation in schema() call' => sub {
+    my $schema = schema(
+        'bar',
+        {
+            'schema_class' => 'Foo',
+            'dsn'          => "dbi:SQLite:dbname=$dbfiles[2]",
+        },
+    );
+
+    $schema->deploy;
+    $schema->resultset('User')
+        ->create( { 'name' => 'Bat Sheva', 'age' => 7 } );
+
+    my $bat_sheva = $schema->resultset('User')->find('Bat Sheva');
+    ok( $bat_sheva, 'Found Bat Sheva' );
+    is( $bat_sheva->age, 7 );
 };
 
 unlink @dbfiles;

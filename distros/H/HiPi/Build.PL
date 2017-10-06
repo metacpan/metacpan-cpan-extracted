@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 my $requires = {
         'Try::Tiny'             => '0',
@@ -15,7 +15,7 @@ my $requires = {
         'UNIVERSAL::require'    => '0',
         'File::Copy::Recursive' => '0',
         'JSON'                  => '0',
-        'threads::shared'       => '0',
+        'Getopt::Long'          => '0',
 };
 
 if( $^O =~ /^linux$/i ) {

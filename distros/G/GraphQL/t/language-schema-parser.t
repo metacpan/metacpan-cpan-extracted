@@ -45,1244 +45,379 @@ sub do_parse {
 done_testing;
 
 __DATA__
-{
-  'graphql' => [
-    [
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'schemaDefinition' => [
-                  [
-                    {
-                      'operationTypeDefinition' => [
-                        {
-                          'operationType' => 'query'
-                        },
-                        {
-                          'namedType' => {
-                            'name' => 'QueryType'
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      'operationTypeDefinition' => [
-                        {
-                          'operationType' => 'mutation'
-                        },
-                        {
-                          'namedType' => {
-                            'name' => 'MutationType'
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'objectTypeDefinition' => [
-                    {
-                      'name' => 'Foo'
-                    },
-                    {
-                      'implementsInterfaces' => [
-                        [
-                          {
-                            'namedType' => {
-                              'name' => 'Bar'
-                            }
-                          }
-                        ]
-                      ]
-                    },
-                    [
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'one'
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'two'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'InputType'
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'three'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'InputType'
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'other'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'String'
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Int'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'four'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'String'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => [
-                                        {
-                                          'value_const' => {
-                                            'string' => 'string'
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'String'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'five'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'listType' => [
-                                            {
-                                              'type' => [
-                                                {
-                                                  'namedType' => {
-                                                    'name' => 'String'
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => [
-                                        {
-                                          'value_const' => {
-                                            'listValue_const' => [
-                                              [
-                                                {
-                                                  'value_const' => {
-                                                    'string' => 'string'
-                                                  }
-                                                },
-                                                {
-                                                  'value_const' => {
-                                                    'string' => 'string'
-                                                  }
-                                                }
-                                              ]
-                                            ]
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'String'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'six'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'InputType'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => [
-                                        {
-                                          'value_const' => {
-                                            'objectValue_const' => [
-                                              [
-                                                {
-                                                  'objectField_const' => [
-                                                    {
-                                                      'name' => 'key'
-                                                    },
-                                                    {
-                                                      'value_const' => {
-                                                        'string' => 'value'
-                                                      }
-                                                    }
-                                                  ]
-                                                }
-                                              ]
-                                            ]
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'seven'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'Int'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => []
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
+[
+  {
+    'kind' => 'schema',
+    'node' => {
+      'mutation' => 'MutationType',
+      'query' => 'QueryType'
+    }
+  },
+  {
+    'kind' => 'type',
+    'node' => {
+      'fields' => {
+        'five' => {
+          'args' => {
+            'argument' => {
+              'default_value' => [
+                'string',
+                'string'
+              ],
+              'type' => [
+                'list',
+                {
+                  'type' => 'String'
                 }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'objectTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedObject'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onObject'
-                            },
-                            {
-                              'arguments' => [
-                                [
-                                  {
-                                    'argument' => [
-                                      {
-                                        'name' => 'arg'
-                                      },
-                                      {
-                                        'value' => {
-                                          'string' => 'value'
-                                        }
-                                      }
-                                    ]
-                                  }
-                                ]
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    [
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'annotatedField'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'arg'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'Type'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => [
-                                        {
-                                          'value_const' => {
-                                            'string' => 'default'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'directives' => [
-                                        {
-                                          'directive' => [
-                                            {
-                                              'name' => 'onArg'
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            'directives' => [
-                              {
-                                'directive' => [
-                                  {
-                                    'name' => 'onField'
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
+              ]
+            }
+          },
+          'type' => 'String'
+        },
+        'four' => {
+          'args' => {
+            'argument' => {
+              'default_value' => 'string',
+              'type' => 'String'
+            }
+          },
+          'type' => 'String'
+        },
+        'one' => {
+          'type' => 'Type'
+        },
+        'seven' => {
+          'args' => {
+            'argument' => {
+              'default_value' => undef,
+              'type' => 'Int'
+            }
+          },
+          'type' => 'Type'
+        },
+        'six' => {
+          'args' => {
+            'argument' => {
+              'default_value' => {
+                'key' => 'value'
+              },
+              'type' => 'InputType'
+            }
+          },
+          'type' => 'Type'
+        },
+        'three' => {
+          'args' => {
+            'argument' => {
+              'type' => 'InputType'
+            },
+            'other' => {
+              'type' => 'String'
+            }
+          },
+          'type' => 'Int'
+        },
+        'two' => {
+          'args' => {
+            'argument' => {
+              'type' => [
+                'non_null',
+                {
+                  'type' => 'InputType'
                 }
-              }
-            ]
-          }
-        ]
+              ]
+            }
+          },
+          'type' => 'Type'
+        }
       },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'interfaceTypeDefinition' => [
-                    {
-                      'name' => 'Bar'
-                    },
-                    [
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'one'
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'four'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'argument'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'String'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'defaultValue' => [
-                                        {
-                                          'value_const' => {
-                                            'string' => 'string'
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'String'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
+      'interfaces' => [
+        'Bar'
+      ],
+      'name' => 'Foo'
+    }
+  },
+  {
+    'kind' => 'type',
+    'node' => {
+      'directives' => [
+        {
+          'arguments' => {
+            'arg' => 'value'
+          },
+          'name' => 'onObject'
+        }
+      ],
+      'fields' => {
+        'annotatedField' => {
+          'args' => {
+            'arg' => {
+              'default_value' => 'default',
+              'directives' => [
+                {
+                  'name' => 'onArg'
                 }
-              }
-            ]
-          }
-        ]
+              ],
+              'type' => 'Type'
+            }
+          },
+          'directives' => [
+            {
+              'name' => 'onField'
+            }
+          ],
+          'type' => 'Type'
+        }
       },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'interfaceTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedInterface'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onInterface'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    [
-                      {
-                        'fieldDefinition' => [
-                          {
-                            'name' => 'annotatedField'
-                          },
-                          {
-                            'argumentsDefinition' => [
-                              [
-                                {
-                                  'inputValueDefinition' => [
-                                    {
-                                      'name' => 'arg'
-                                    },
-                                    {
-                                      'type' => [
-                                        {
-                                          'namedType' => {
-                                            'name' => 'Type'
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      'directives' => [
-                                        {
-                                          'directive' => [
-                                            {
-                                              'name' => 'onArg'
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            'directives' => [
-                              {
-                                'directive' => [
-                                  {
-                                    'name' => 'onField'
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
+      'name' => 'AnnotatedObject'
+    }
+  },
+  {
+    'kind' => 'interface',
+    'node' => {
+      'fields' => {
+        'four' => {
+          'args' => {
+            'argument' => {
+              'default_value' => 'string',
+              'type' => 'String'
+            }
+          },
+          'type' => 'String'
+        },
+        'one' => {
+          'type' => 'Type'
+        }
+      },
+      'name' => 'Bar'
+    }
+  },
+  {
+    'kind' => 'interface',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onInterface'
+        }
+      ],
+      'fields' => {
+        'annotatedField' => {
+          'args' => {
+            'arg' => {
+              'directives' => [
+                {
+                  'name' => 'onArg'
                 }
-              }
-            ]
-          }
-        ]
+              ],
+              'type' => 'Type'
+            }
+          },
+          'directives' => [
+            {
+              'name' => 'onField'
+            }
+          ],
+          'type' => 'Type'
+        }
       },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'unionTypeDefinition' => [
-                    {
-                      'name' => 'Feed'
-                    },
-                    {
-                      'unionMembers' => [
-                        {
-                          'namedType' => {
-                            'name' => 'Story'
-                          }
-                        },
-                        {
-                          'namedType' => {
-                            'name' => 'Article'
-                          }
-                        },
-                        {
-                          'namedType' => {
-                            'name' => 'Advert'
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'unionTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedUnion'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onUnion'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      'unionMembers' => [
-                        {
-                          'namedType' => {
-                            'name' => 'A'
-                          }
-                        },
-                        {
-                          'namedType' => {
-                            'name' => 'B'
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'scalarTypeDefinition' => [
-                    {
-                      'name' => 'CustomScalar'
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'scalarTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedScalar'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onScalar'
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'enumTypeDefinition' => [
-                    {
-                      'name' => 'Site'
-                    },
-                    [
-                      {
-                        'enumValueDefinition' => [
-                          {
-                            'enumValue' => {
-                              'name' => 'DESKTOP'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        'enumValueDefinition' => [
-                          {
-                            'enumValue' => {
-                              'name' => 'MOBILE'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'enumTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedEnum'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onEnum'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    [
-                      {
-                        'enumValueDefinition' => [
-                          {
-                            'enumValue' => {
-                              'name' => 'ANNOTATED_VALUE'
-                            }
-                          },
-                          {
-                            'directives' => [
-                              {
-                                'directive' => [
-                                  {
-                                    'name' => 'onEnumValue'
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'enumValueDefinition' => [
-                          {
-                            'enumValue' => {
-                              'name' => 'OTHER_VALUE'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'inputObjectTypeDefinition' => [
-                    {
-                      'name' => 'InputType'
-                    },
-                    [
-                      {
-                        'inputValueDefinition' => [
-                          {
-                            'name' => 'key'
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'String'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        'inputValueDefinition' => [
-                          {
-                            'name' => 'answer'
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Int'
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            'defaultValue' => [
-                              {
-                                'value_const' => {
-                                  'int' => '42'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'inputObjectTypeDefinition' => [
-                    {
-                      'name' => 'AnnotatedInput'
-                    },
-                    {
-                      'directives' => [
-                        {
-                          'directive' => [
-                            {
-                              'name' => 'onInputObjectType'
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    [
-                      {
-                        'inputValueDefinition' => [
-                          {
-                            'name' => 'annotatedField'
-                          },
-                          {
-                            'type' => [
-                              {
-                                'namedType' => {
-                                  'name' => 'Type'
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            'directives' => [
-                              {
-                                'directive' => [
-                                  {
-                                    'name' => 'onField'
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeExtensionDefinition' => [
-                  {
-                    'objectTypeDefinition' => [
-                      {
-                        'name' => 'Foo'
-                      },
-                      [
-                        {
-                          'fieldDefinition' => [
-                            {
-                              'name' => 'seven'
-                            },
-                            {
-                              'argumentsDefinition' => [
-                                [
-                                  {
-                                    'inputValueDefinition' => [
-                                      {
-                                        'name' => 'argument'
-                                      },
-                                      {
-                                        'type' => [
-                                          {
-                                            'listType' => [
-                                              {
-                                                'type' => [
-                                                  {
-                                                    'namedType' => {
-                                                      'name' => 'String'
-                                                    }
-                                                  }
-                                                ]
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              ]
-                            },
-                            {
-                              'type' => [
-                                {
-                                  'namedType' => {
-                                    'name' => 'Type'
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeExtensionDefinition' => [
-                  {
-                    'objectTypeDefinition' => [
-                      {
-                        'name' => 'Foo'
-                      },
-                      {
-                        'directives' => [
-                          {
-                            'directive' => [
-                              {
-                                'name' => 'onType'
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      []
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'typeDefinition' => {
-                  'objectTypeDefinition' => [
-                    {
-                      'name' => 'NoFields'
-                    },
-                    []
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'directiveDefinition' => [
-                  {
-                    'name' => 'skip'
-                  },
-                  {
-                    'argumentsDefinition' => [
-                      [
-                        {
-                          'inputValueDefinition' => [
-                            {
-                              'name' => 'if'
-                            },
-                            {
-                              'type' => [
-                                {
-                                  'namedType' => {
-                                    'name' => 'Boolean'
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    ]
-                  },
-                  {
-                    'directiveLocations' => [
-                      {
-                        'name' => 'FIELD'
-                      },
-                      {
-                        'name' => 'FRAGMENT_SPREAD'
-                      },
-                      {
-                        'name' => 'INLINE_FRAGMENT'
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'typeSystemDefinition' => [
-              {
-                'directiveDefinition' => [
-                  {
-                    'name' => 'include'
-                  },
-                  {
-                    'argumentsDefinition' => [
-                      [
-                        {
-                          'inputValueDefinition' => [
-                            {
-                              'name' => 'if'
-                            },
-                            {
-                              'type' => [
-                                {
-                                  'namedType' => {
-                                    'name' => 'Boolean'
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    ]
-                  },
-                  {
-                    'directiveLocations' => [
-                      {
-                        'name' => 'FIELD'
-                      },
-                      {
-                        'name' => 'FRAGMENT_SPREAD'
-                      },
-                      {
-                        'name' => 'INLINE_FRAGMENT'
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+      'name' => 'AnnotatedInterface'
+    }
+  },
+  {
+    'kind' => 'union',
+    'node' => {
+      'name' => 'Feed',
+      'types' => [
+        'Story',
+        'Article',
+        'Advert'
+      ]
+    }
+  },
+  {
+    'kind' => 'union',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onUnion'
+        }
+      ],
+      'name' => 'AnnotatedUnion',
+      'types' => [
+        'A',
+        'B'
+      ]
+    }
+  },
+  {
+    'kind' => 'scalar',
+    'node' => {
+      'name' => 'CustomScalar'
+    }
+  },
+  {
+    'kind' => 'scalar',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onScalar'
+        }
+      ],
+      'name' => 'AnnotatedScalar'
+    }
+  },
+  {
+    'kind' => 'enum',
+    'node' => {
+      'name' => 'Site',
+      'values' => {
+        'DESKTOP' => {},
+        'MOBILE' => {}
       }
-    ]
-  ]
-}
+    }
+  },
+  {
+    'kind' => 'enum',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onEnum'
+        }
+      ],
+      'name' => 'AnnotatedEnum',
+      'values' => {
+        'ANNOTATED_VALUE' => {
+          'directives' => [
+            {
+              'name' => 'onEnumValue'
+            }
+          ]
+        },
+        'OTHER_VALUE' => {}
+      }
+    }
+  },
+  {
+    'kind' => 'input',
+    'node' => {
+      'fields' => {
+        'answer' => {
+          'default_value' => 42,
+          'type' => 'Int'
+        },
+        'key' => {
+          'type' => [
+            'non_null',
+            {
+              'type' => 'String'
+            }
+          ]
+        }
+      },
+      'name' => 'InputType'
+    }
+  },
+  {
+    'kind' => 'input',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onInputObjectType'
+        }
+      ],
+      'fields' => {
+        'annotatedField' => {
+          'directives' => [
+            {
+              'name' => 'onField'
+            }
+          ],
+          'type' => 'Type'
+        }
+      },
+      'name' => 'AnnotatedInput'
+    }
+  },
+  {
+    'kind' => 'extend',
+    'node' => {
+      'fields' => {
+        'seven' => {
+          'args' => {
+            'argument' => {
+              'type' => [
+                'list',
+                {
+                  'type' => 'String'
+                }
+              ]
+            }
+          },
+          'type' => 'Type'
+        }
+      },
+      'name' => 'Foo'
+    }
+  },
+  {
+    'kind' => 'extend',
+    'node' => {
+      'directives' => [
+        {
+          'name' => 'onType'
+        }
+      ],
+      'fields' => {},
+      'name' => 'Foo'
+    }
+  },
+  {
+    'kind' => 'type',
+    'node' => {
+      'fields' => {},
+      'name' => 'NoFields'
+    }
+  },
+  {
+    'kind' => 'directive',
+    'node' => {
+      'args' => {
+        'if' => {
+          'type' => [
+            'non_null',
+            {
+              'type' => 'Boolean'
+            }
+          ]
+        }
+      },
+      'locations' => [
+        'FIELD',
+        'FRAGMENT_SPREAD',
+        'INLINE_FRAGMENT'
+      ],
+      'name' => 'skip'
+    }
+  },
+  {
+    'kind' => 'directive',
+    'node' => {
+      'args' => {
+        'if' => {
+          'type' => [
+            'non_null',
+            {
+              'type' => 'Boolean'
+            }
+          ]
+        }
+      },
+      'locations' => [
+        'FIELD',
+        'FRAGMENT_SPREAD',
+        'INLINE_FRAGMENT'
+      ],
+      'name' => 'include'
+    }
+  }
+]

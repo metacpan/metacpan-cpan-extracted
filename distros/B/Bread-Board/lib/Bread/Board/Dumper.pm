@@ -1,7 +1,7 @@
 package Bread::Board::Dumper;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Pretty printer for visualizing the layout of your Bread::Board
-$Bread::Board::Dumper::VERSION = '0.35';
+$Bread::Board::Dumper::VERSION = '0.36';
 use Moose;
 
 sub dump {
@@ -72,7 +72,7 @@ Bread::Board::Dumper - Pretty printer for visualizing the layout of your Bread::
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

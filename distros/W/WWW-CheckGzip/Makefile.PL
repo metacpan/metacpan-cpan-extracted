@@ -14,7 +14,7 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Carp' => '0',
-	'LWP::UserAgent' => '6.26',
+	'HTTP::Tiny' => '0.070',
 	'Gzip::Faster' => '0.20',
     },
     META_MERGE => {

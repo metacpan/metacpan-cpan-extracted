@@ -19,12 +19,6 @@ package LinkedList {
     has '_tail';
     has '_count' => ( default => sub { 0 } );
 
-    # private lvalue accessors
-
-    my sub _head  : private;
-    my sub _tail  : private;
-    my sub _count : private;
-
     # public read only accessors
 
     sub head  : ro( _head );
@@ -105,11 +99,6 @@ package LinkedListNode {
     # public slot
 
     has 'value';
-
-    # private r/w accessors
-
-    my sub _prev : private;
-    my sub _next : private;
 
     # public r/w API
 

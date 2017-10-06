@@ -1,5 +1,5 @@
 package Git::Repository::Plugin;
-$Git::Repository::Plugin::VERSION = '1.320';
+$Git::Repository::Plugin::VERSION = '1.321';
 use strict;
 use warnings;
 use 5.006;
@@ -7,7 +7,6 @@ use Carp;
 
 sub install {
     my ( $class, @keywords ) = @_;
-    no strict 'refs';
 
     # get the list of keywords to install
     my %keyword = map { $_ => 1 } my @all_keywords = $class->_keywords;
@@ -18,13 +17,14 @@ sub install {
     carp "No keywords installed from $class" if !@keywords;
 
     # install keywords
+    no strict 'refs';
     *{"Git::Repository::$_"} = \&{"$class\::$_"} for @keywords;
 }
 
 sub _keywords {
     my ($class) = @_;
-    no strict 'refs';
     carp "Use of \@KEYWORDS by $class is deprecated";
+    no strict 'refs';
     return @{"$class\::KEYWORDS"};
 }
 

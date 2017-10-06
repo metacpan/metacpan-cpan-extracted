@@ -1,0 +1,24 @@
+<%args>
+$Object
+$PostUser => undef
+$Separator => ", "
+$Link => 1
+</%args>
+<%init>
+if ($Object->isa("RT::Group")) {
+    # Link the users (non-recursively)
+    my @ret = map {$m->scomp("ShowPrincipal", Object => $_->[1], PostUser => $PostUser, Link => $Link)}
+        sort {$a->[0] cmp $b->[0]}
+        map {+[($_->EmailAddress||''), $_]}
+        @{ $Object->UserMembersObj( Recursively => 0 )->ItemsArrayRef };
+
+    # Hack to also link the groups
+    push @ret, sort map {$m->scomp("ShowGroup", Group => $_, Link => $Link)}
+        @{ $Object->GroupMembersObj( Recursively => 0)->ItemsArrayRef };
+
+    $m->out( join($Separator, @ret) );
+} else {
+    $m->comp("/Elements/ShowUser", User => $Object, Link => $Link);
+    $m->out( $PostUser->($Object) ) if $PostUser;
+}
+</%init>

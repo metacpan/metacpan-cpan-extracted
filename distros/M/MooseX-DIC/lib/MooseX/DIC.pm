@@ -1,6 +1,6 @@
 package MooseX::DIC;
 
-our $VERSION = '0.3.3';
+our $VERSION = '0.4.0';
 
 use MooseX::DIC::ContainerFactory;
 use MooseX::DIC::Injected

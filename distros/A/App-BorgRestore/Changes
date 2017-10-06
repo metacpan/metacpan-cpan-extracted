@@ -1,5 +1,10 @@
 Revision history for Perl extension App-BorgRestore
 
+2.1.1 2017-10-05T07:58:12Z
+	- Fix incorrect/missing dependencies
+	- Use autodie everywhere to catch errors early
+	- Add basic documentation to internal packages
+
 2.1.0 2017-06-24T15:26:08Z
 	- Improve documentation
 	- chdir back to original working directory after restore

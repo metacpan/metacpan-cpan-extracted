@@ -1,6 +1,6 @@
 package Date::Hebrew::Simple;
 
-$Date::Hebrew::Simple::VERSION   = '0.02';
+$Date::Hebrew::Simple::VERSION   = '0.04';
 $Date::Hebrew::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Hebrew::Simple - Represents Hebrew date.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -18,6 +18,7 @@ use Data::Dumper;
 use Time::localtime;
 use POSIX qw/floor ceil/;
 use Date::Calc qw/Delta_Days/;
+use Date::Exception::InvalidMonth;
 
 use Moo;
 use namespace::clean;
@@ -32,8 +33,8 @@ Represents the Hebrew date.
 
 our $HEBREW_MONTHS = [
     '',
-    'Nisan',   'Iyar',    'Sivan',  'Tammuz', 'Av',     'Elul',
-    'Tishrel', 'Heshvan', 'Kislev', 'Tevet',  'Shevat', 'Adar',
+    'Nisan',   'Iyar',     'Sivan',  'Tammuz', 'Av',     'Elul',
+    'Tishrei', 'Cheshvan', 'Kislev', 'Tevet',  'Shevat', 'Adar',
 ];
 
 our $HEBREW_DAYS = [
@@ -54,9 +55,9 @@ with 'Date::Utils';
 sub BUILD {
     my ($self) = @_;
 
-    $self->validate_year($self->year)   if $self->has_year;
-    $self->validate_month($self->month) if $self->has_month;
-    $self->validate_day($self->day)     if $self->has_day;
+    $self->validate_year($self->year)          if $self->has_year;
+    $self->validate_hebrew_month($self->month) if $self->has_month;
+    $self->validate_day($self->day)            if $self->has_day;
 
     unless ($self->has_year && $self->has_month && $self->has_day) {
         my $today = localtime;
@@ -92,7 +93,6 @@ sub to_julian {
     $day    = $self->day   unless defined $day;
     $month  = $self->month unless defined $month;
     $year   = $self->year  unless defined $year;
-
     my $months = $self->months_in_year($year);
     my $julian_day = $self->hebrew_epoch + $self->delay_1($year) + $self->delay_2($year) + $day + 1;
 
@@ -131,14 +131,13 @@ sub from_julian {
         $year++;
     }
 
-    my $first = ($julian_day < $self->to_julian($year, 7, 1)) ? (7) : (1);
+    my $first = ($julian_day < $self->to_julian($year, 1, 1)) ? (7) : (1);
     my $month = $first;
-    for (my $i = $first; $julian_day > $self->to_julian($year, $i, $self->days_in_month_year($i, $year)); $i++) {
+    for (my $m = $first; $julian_day > $self->to_julian($year, $m, $self->days_in_month_year($m, $year)); $m++) {
         $month++;
     }
 
     my $day = ($julian_day - $self->to_julian($year, $month, 1)) + 1;
-
     return Date::Hebrew::Simple->new({ year => $year, month => $month, day => $day });
 }
 
@@ -166,7 +165,6 @@ sub from_gregorian {
 
     $self->validate_date($year, $month, $day);
     my $julian_day = $self->gregorian_to_julian($year, $month, $day) + (floor(0 + 60 * (0 + 60 * 0) + 0.5) / 86400.0);
-
     return $self->from_julian($julian_day);
 }
 
@@ -272,7 +270,7 @@ sub days_in_month_year {
         return 29;
     }
 
-    # If it's Heshvan, days depend on length of year
+    # If it's Cheshvan, days depend on length of year
     if (($month == 8) && !(($self->days_in_year($year) % 10) == 5)) {
         return 29;
     }
@@ -284,6 +282,70 @@ sub days_in_month_year {
 
     # Nope, it's a 30 day month
     return 30;
+}
+
+sub validate_hebrew_month {
+    my ($self, $month, $year) = @_;
+
+    $year = $self->year unless defined $year;
+    if (defined $month && ($month !~ /^[-+]?\d+$/)) {
+        return $self->validate_hebrew_month_name($month, $year);
+    }
+
+    my @caller = caller(0);
+    @caller    = caller(2) if $caller[3] eq '(eval)';
+
+    Date::Exception::InvalidMonth->throw({
+        method      => __PACKAGE__."::validate_hebrew_month",
+        message     => sprintf("ERROR: Invalid month [%s].", defined($month)?($month):('')),
+        filename    => $caller[1],
+        line_number => $caller[2] })
+        unless (defined($month)
+                && ($month =~ /^\+?\d+$/)
+                && ($month >= 1)
+                && (($self->is_leap_year($year) && $month <= 13)
+                    || ($month <= 12)));
+}
+
+sub validate_hebrew_month_name {
+    my ($self, $month_name, $year) = @_;
+
+    my @caller = caller(0);
+    @caller    = caller(2) if $caller[3] eq '(eval)';
+
+    $year = $self->year unless defined $year;
+    my $months = $self->months;
+    if ($self->is_leap_year($year)) {
+        $months->[12] = 'Adar I';
+        $months->[13] = 'Adar II';
+    }
+
+    Date::Exception::InvalidMonth->throw({
+        method      => __PACKAGE__."::validate_hebrew_month_name",
+        message     => sprintf("ERROR: Invalid month name [%s].", defined($month_name)?($month_name):('')),
+        filename    => $caller[1],
+        line_number => $caller[2] })
+        unless (defined($month_name) && ($month_name !~ /^[-+]?\d+$/) && (grep /$month_name/i, @{$months}[1..$#$months]));
+}
+
+sub get_month_name {
+    my ($self, $month, $year) = @_;
+
+    $year = $self->year unless defined $year;
+    if (defined $month) {
+        $self->validate_hebrew_month($month, $year);
+    }
+    else {
+        $month = $self->month;
+    }
+
+    my $months = $self->months;
+    if ($self->is_leap_year($year)) {
+        $months->[12] = 'Adar I';
+        $months->[13] = 'Adar II';
+    }
+
+    return $months->[$month];
 }
 
 sub as_string {

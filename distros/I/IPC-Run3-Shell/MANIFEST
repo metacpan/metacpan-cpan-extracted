@@ -20,6 +20,7 @@ t/23_opt_show_cmd.t
 t/24_opt_both.t
 t/29_opt_inherit.t
 t/30_run3.t
+t/31_autoload_fatal.t
 t/40_os_nix.t
 t/41_os_darwin.t
 t/42_os_win32.t

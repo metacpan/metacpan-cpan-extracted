@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::ScriptHelpers;
-$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::ScriptHelpers::VERSION = '0.002220';
+$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::ScriptHelpers::VERSION = '0.002221';
 # ABSTRACT: CodeRef Transforms for common use-cases in DBICDH Migrations
 
 use strict;

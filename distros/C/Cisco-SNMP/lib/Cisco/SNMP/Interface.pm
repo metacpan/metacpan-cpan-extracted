@@ -20,27 +20,32 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _ifOID {
-    return '1.3.6.1.2.1.2.2.1'
+    return '1.3.6.1.2.1.2.2.1';
 }
 
 sub ifOIDs {
-    return qw(Index Description Type MTU Speed PhysAddress AdminStatus OperStatus LastChange Duplex Name Alias)
+    return qw(Index Description Type MTU Speed PhysAddress AdminStatus
+      OperStatus LastChange Duplex Name Alias);
 }
 
 sub ipOIDs {
-    return qw(Addr NetMask)
+    return qw(Addr NetMask);
 }
 
 sub ifMetricUserOIDs {
-    return qw(Multicasts Broadcasts Octets Unicasts Discards Errors Unknowns)
+    return qw(Multicasts Broadcasts Octets Unicasts Discards Errors
+      Unknowns);
 }
 
 sub ifMetricOIDs {
-    return qw(InMulticasts OutMulticasts InBroadcasts OutBroadcasts InOctets OutOctets InUnicasts OutUnicasts InDiscards OutDiscards InErrors OutErrors InUnknowns)
+    return qw(InMulticasts OutMulticasts InBroadcasts OutBroadcasts
+      InOctets OutOctets InUnicasts OutUnicasts InDiscards OutDiscards
+      InErrors OutErrors InUnknowns);
 }
 
 sub _ifMetricOIDVals {
-    return qw(InOctets 10 OutOctets 16 InUnicasts 11 OutUnicasts 17 InDiscards 13 OutDiscards 19 InErrors 14 OutErrors 20 InUnknowns 15)
+    return qw(InOctets 10 OutOctets 16 InUnicasts 11 OutUnicasts 17
+      InDiscards 13 OutDiscards 19 InErrors 14 OutErrors 20 InUnknowns 15);
 }
 
 sub interface_getbyindex {
@@ -50,43 +55,43 @@ sub interface_getbyindex {
 
     my $uIfx;
     my %args;
-    if (@_ == 1) {
+    if ( @_ == 1 ) {
         ($uIfx) = @_;
-        if ($uIfx !~ /^\d+$/) {
+        if ( $uIfx !~ /^\d+$/ ) {
             $Cisco::SNMP::LASTERROR = "Invalid ifIndex `$uIfx'";
-            return undef
+            return undef;
         }
     } else {
         %args = @_;
-        for (keys(%args)) {
-            if ((/^-?interface$/i) || (/^-?index$/i)) {
-                if ($args{$_} =~ /^\d+$/) {
-                    $uIfx = $args{$_}
+        for ( keys(%args) ) {
+            if ( (/^-?interface$/i) || (/^-?index$/i) ) {
+                if ( $args{$_} =~ /^\d+$/ ) {
+                    $uIfx = $args{$_};
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid ifIndex `$args{$_}'";
-                    return undef
+                    return undef;
                 }
             }
         }
     }
-    if (!defined $uIfx) {
+    if ( not defined $uIfx ) {
         $Cisco::SNMP::LASTERROR = "No ifIndex provided";
-        return undef
+        return undef;
     }
-    my $rIf  = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.2');
-    if (!defined $rIf) {
+    my $rIf = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.2' );
+    if ( not defined $rIf ) {
         $Cisco::SNMP::LASTERROR = "Cannot get interface names from device";
-        return undef
+        return undef;
     }
-    my $rIfx = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.1');
+    my $rIfx = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.1' );
 
-    for (0..$#{$rIfx}) {
-        if ($rIfx->[$_] == $uIfx) {
-            return $rIf->[$_]
+    for ( 0 .. $#{$rIfx} ) {
+        if ( $rIfx->[$_] == $uIfx ) {
+            return $rIf->[$_];
         }
     }
     $Cisco::SNMP::LASTERROR = "Cannot get interface for ifIndex `$uIfx'";
-    return undef
+    return undef;
 }
 
 sub interface_getbyname {
@@ -94,131 +99,146 @@ sub interface_getbyname {
 
     my $session = $self->{_SESSION_};
 
-    my %params = (
-        'index' => 0
-    );
+    my %params = ( 'index' => 0 );
 
     my %args;
-    if (@_ == 1) {
-        ($params{uIf}) = @_
+    if ( @_ == 1 ) {
+        ( $params{uIf} ) = @_;
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?interface$/i) {
-                $params{uIf} = $args{$_}
+                $params{uIf} = $args{$_};
             } elsif (/^-?index$/i) {
-                if ($args{$_} == 1) {
-                    $params{index} = 1
+                if ( $args{$_} == 1 ) {
+                    $params{index} = 1;
                 }
             }
         }
     }
-    if (!exists($params{uIf})) {
+    if ( !exists( $params{uIf} ) ) {
         $Cisco::SNMP::LASTERROR = "No interface provided";
-        return undef
+        return undef;
     }
 
-    my $rIf  = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.2');
-    if (!defined $rIf) {
+    my $rIf = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.2' );
+    if ( not defined $rIf ) {
         $Cisco::SNMP::LASTERROR = "Cannot get interface names from device";
-        return undef
+        return undef;
     }
-    my $rIfx = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.1');
+    my $rIfx = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.1' );
 
     # user Provided
     # split Gig0/1 into 'Gig' '0/1'
-    my @parts = split /([0-9])/, $params{uIf}, 2;
-    my $uIfNamePart =  shift @parts;
-    my $uIfNumPart  =  "@parts";
-       $uIfNumPart  =~ s/\s+//;
+    my @parts       = split /([0-9])/, $params{uIf}, 2;
+    my $uIfNamePart = shift @parts;
+    my $uIfNumPart  = "@parts";
+    $uIfNumPart =~ s/\s+//;
 
     my @matches;
     my $idx;
-    for (0..$#{$rIf}) {
+    for ( 0 .. $#{$rIf} ) {
+
         # Real Names
         @parts = split /([0-9])/, $rIf->[$_], 2;
-        my $rIfNamePart =  shift @parts;
-        my $rIfNumPart  =  "@parts";
-           $rIfNumPart  =~ s/\s+//;
-        if (($rIfNamePart =~ /^$uIfNamePart/i) && ($rIfNumPart eq $uIfNumPart)) {
+        my $rIfNamePart = shift @parts;
+        my $rIfNumPart  = "@parts";
+        $rIfNumPart =~ s/\s+//;
+        if (   ( $rIfNamePart =~ /^$uIfNamePart/i )
+            && ( $rIfNumPart eq $uIfNumPart ) ) {
             push @matches, $rIf->[$_];
-            $idx = $rIfx->[$_]
+            $idx = $rIfx->[$_];
         }
     }
-    if (@matches == 1) {
-        if ($params{index} == 0) {
-            return "@matches"
+    if ( @matches == 1 ) {
+        if ( $params{index} == 0 ) {
+            return "@matches";
         } else {
-            return $idx
+            return $idx;
         }
-    } elsif (@matches == 0) {
+    } elsif ( @matches == 0 ) {
         $Cisco::SNMP::LASTERROR = "Cannot find interface `$params{uIf}'";
-        return undef
+        return undef;
     } else {
         print "Interface `$params{uIf}' not specific enough - [@matches]";
-        return undef
+        return undef;
     }
 }
 
 sub interface_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my %params = (
-        'ifs' => [-1]
-    );
+    my %params = ( 'ifs' => [-1] );
 
     my %args;
-    if (@_ == 1) {
-        ($params{ifs}) = @_;
-        if (!defined($params{ifs} = Cisco::SNMP::_get_range($params{ifs}))) {
-            return undef
+    if ( @_ == 1 ) {
+        ( $params{ifs} ) = @_;
+        if (not defined(
+                $params{ifs} = Cisco::SNMP::_get_range( $params{ifs} )
+            )
+          ) {
+            return undef;
         }
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?interface(?:s)?$/i) {
-                if (!defined($params{ifs} = Cisco::SNMP::_get_range($args{$_}))) {
-                    return undef
+                if (not defined(
+                        $params{ifs} = Cisco::SNMP::_get_range( $args{$_} )
+                    )
+                  ) {
+                    return undef;
                 }
             }
         }
     }
 
     my %IfInfo;
-    for my $ifs (@{$params{ifs}}) {
+    for my $ifs ( @{$params{ifs}} ) {
 
         my $interface;
-        if ($ifs == -1) {
-            $interface = ''
+        if ( $ifs == -1 ) {
+            $interface = '';
         } else {
-            $interface = '.' . $ifs
+            $interface = '.' . $ifs;
         }
 
         my %ret;
         my @IFKEYS = ifOIDs();
+
         # -3 because last key (Duplex Name Alias) are different OID
-        for my $oid (0..$#IFKEYS-3) {
-            $ret{$IFKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.' . ($oid+1) . $interface);
-            if (!defined $ret{$IFKEYS[$oid]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFKEYS[$oid]'";
-                return undef
+        for my $oid ( 0 .. $#IFKEYS - 3 ) {
+            $ret{$IFKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.' . ( $oid + 1 ) . $interface );
+            if ( not defined $ret{$IFKEYS[$oid]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFKEYS[$oid]'";
+                return undef;
             }
         }
+
         # Name Alias are different OID
-        $ret{Name} = Cisco::SNMP::_snmpwalk($session, '.1.3.6.1.2.1.31.1.1.1.1' . $interface);
-        $ret{Alias} = Cisco::SNMP::_snmpwalk($session, '.1.3.6.1.2.1.31.1.1.1.18' . $interface);
+        $ret{Name} = Cisco::SNMP::_snmpwalk( $session,
+            '.1.3.6.1.2.1.31.1.1.1.1' . $interface );
+        $ret{Alias} = Cisco::SNMP::_snmpwalk( $session,
+            '.1.3.6.1.2.1.31.1.1.1.18' . $interface );
+
         # Duplex is different OID
         my $OIDS;
-        ($OIDS, $ret{$IFKEYS[9]}) = Cisco::SNMP::_snmpwalk($session, '1.3.6.1.2.1.10.7.2.1.19' . $interface);
+        ( $OIDS, $ret{$IFKEYS[9]} )
+          = Cisco::SNMP::_snmpwalk( $session,
+            '1.3.6.1.2.1.10.7.2.1.19' . $interface );
         my %duplexIfs;
-        for (0..$#{$OIDS}) {
+        for ( 0 .. $#{$OIDS} ) {
+
             # split the OID at dots
             my @if = split /\./, $OIDS->[$_];
+
             # take the last value, which is the ifIndex equal to value returned
-            $duplexIfs{$if[$#if]} = $ret{$IFKEYS[9]}->[$_]
+            $duplexIfs{$if[$#if]} = $ret{$IFKEYS[9]}->[$_];
         }
 
         my %UpDownStatus = (
@@ -235,84 +255,106 @@ sub interface_info {
             2 => 'HALF',
             3 => 'FULL'
         );
-        for my $idx (0..$#{$ret{$IFKEYS[0]}}) {
+        for my $idx ( 0 .. $#{$ret{$IFKEYS[0]}} ) {
             my %IfInfoHash;
-            for (0..$#IFKEYS) {
-                if ($_ == 5) {
-                    $IfInfoHash{$IFKEYS[$_]} = ($ret{$IFKEYS[$_]}->[$idx] =~ /^\0/) ? unpack('H12', $ret{$IFKEYS[$_]}->[$idx]) : (($ret{$IFKEYS[$_]}->[$idx] =~ /^0x/) ? substr($ret{$IFKEYS[$_]}->[$idx],2) : $ret{$IFKEYS[$_]}->[$idx])
-                } elsif (($_ == 6) || ($_ == 7)) {
-                    $IfInfoHash{$IFKEYS[$_]} = exists($UpDownStatus{$ret{$IFKEYS[$_]}->[$idx]}) ? $UpDownStatus{$ret{$IFKEYS[$_]}->[$idx]} : $ret{$IFKEYS[$_]}->[$idx]
-                } elsif ($_ == 9) {
+            for ( 0 .. $#IFKEYS ) {
+                if ( $_ == 5 ) {
+                    $IfInfoHash{$IFKEYS[$_]}
+                      = ( $ret{$IFKEYS[$_]}->[$idx] =~ /^\0/ )
+                      ? unpack( 'H12', $ret{$IFKEYS[$_]}->[$idx] )
+                      : ( ( $ret{$IFKEYS[$_]}->[$idx] =~ /^0x/ )
+                        ? substr( $ret{$IFKEYS[$_]}->[$idx], 2 )
+                        : $ret{$IFKEYS[$_]}->[$idx] );
+                } elsif ( ( $_ == 6 ) || ( $_ == 7 ) ) {
+                    $IfInfoHash{$IFKEYS[$_]}
+                      = exists( $UpDownStatus{$ret{$IFKEYS[$_]}->[$idx]} )
+                      ? $UpDownStatus{$ret{$IFKEYS[$_]}->[$idx]}
+                      : $ret{$IFKEYS[$_]}->[$idx];
+                } elsif ( $_ == 9 ) {
+
                     # if $duplexIfs{ifIndex}, not necessarily the current array index
-                    if (exists $duplexIfs{$ret{$IFKEYS[0]}->[$idx]}) {
-                        $IfInfoHash{$IFKEYS[$_]} = exists($DuplexType{$duplexIfs{$ret{$IFKEYS[0]}->[$idx]}}) ? $DuplexType{$duplexIfs{$ret{$IFKEYS[0]}->[$idx]}} : $duplexIfs{$ret{$IFKEYS[0]}->[$idx]}
+                    if ( exists $duplexIfs{$ret{$IFKEYS[0]}->[$idx]} ) {
+                        $IfInfoHash{$IFKEYS[$_]}
+                          = exists(
+                            $DuplexType{$duplexIfs{$ret{$IFKEYS[0]}->[$idx]}}
+                          )
+                          ? $DuplexType{$duplexIfs{$ret{$IFKEYS[0]}->[$idx]}}
+                          : $duplexIfs{$ret{$IFKEYS[0]}->[$idx]};
                     } else {
-                        $IfInfoHash{$IFKEYS[$_]} = ''
+                        $IfInfoHash{$IFKEYS[$_]} = '';
                     }
                 } else {
-                    $IfInfoHash{$IFKEYS[$_]} = $ret{$IFKEYS[$_]}->[$idx]
+                    $IfInfoHash{$IFKEYS[$_]} = $ret{$IFKEYS[$_]}->[$idx];
                 }
             }
-            $IfInfo{$ret{$IFKEYS[0]}->[$idx]} = \%IfInfoHash
+            $IfInfo{$ret{$IFKEYS[0]}->[$idx]} = \%IfInfoHash;
         }
     }
-    return bless \%IfInfo, $class
+    return bless \%IfInfo, $class;
 }
 
-for (ifOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_1('if', $_)
+for ( ifOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_1( 'if', $_ );
 }
 
 sub interface_metrics {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my %params = (
-        'ifs' => [-1],
-    );
+    my %params = ( 'ifs' => [-1], );
+
     # assume all metrics
     my @IFMETRICUSERKEYS = ifMetricUserOIDs();
     for (@IFMETRICUSERKEYS) {
-        $params{$_} = 1
+        $params{$_} = 1;
     }
 
     my %args;
-    if (@_ == 1) {
-        ($params{ifs}) = @_;
-        if (!defined($params{ifs} = Cisco::SNMP::_get_range($params{ifs}))) {
-            return undef
+    if ( @_ == 1 ) {
+        ( $params{ifs} ) = @_;
+        if (not defined(
+                $params{ifs} = Cisco::SNMP::_get_range( $params{ifs} )
+            )
+          ) {
+            return undef;
         }
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?interface(?:s)?$/i) {
-                if (!defined($params{ifs} = Cisco::SNMP::_get_range($args{$_}))) {
-                    return undef
+                if (not defined(
+                        $params{ifs} = Cisco::SNMP::_get_range( $args{$_} )
+                    )
+                  ) {
+                    return undef;
                 }
             } elsif (/^-?metric(?:s)?$/i) {
+
                 # metrics provided - only use provided
                 for (@IFMETRICUSERKEYS) {
-                    $params{$_} = 0
+                    $params{$_} = 0;
                 }
-                if (ref($args{$_}) eq 'ARRAY') {
+                if ( ref( $args{$_} ) eq 'ARRAY' ) {
                     $params{oids} = '';
-                    for my $mets (@{$args{$_}}) {
-                        if (exists($params{ucfirst(lc($mets))})) {
-                            $params{ucfirst(lc($mets))} = 1
+                    for my $mets ( @{$args{$_}} ) {
+                        if ( exists( $params{ucfirst( lc($mets) )} ) ) {
+                            $params{ucfirst( lc($mets) )} = 1;
                         } else {
-                            $Cisco::SNMP::LASTERROR = "Invalid metric `$mets'";
-                            return undef
+                            $Cisco::SNMP::LASTERROR
+                              = "Invalid metric `$mets'";
+                            return undef;
                         }
                     }
                 } else {
                     $params{oids} = '';
-                    if (exists($params{ucfirst(lc($args{$_}))})) {
-                        $params{ucfirst(lc($args{$_}))} = 1
+                    if ( exists( $params{ucfirst( lc( $args{$_} ) )} ) ) {
+                        $params{ucfirst( lc( $args{$_} ) )} = 1;
                     } else {
-                        $Cisco::SNMP::LASTERROR = "Invalid metric `$args{$_}'";
-                        return undef
+                        $Cisco::SNMP::LASTERROR
+                          = "Invalid metric `$args{$_}'";
+                        return undef;
                     }
                 }
             }
@@ -321,194 +363,256 @@ sub interface_metrics {
 
     my %IfMetric;
     my @IFMETRICKEYS = ifMetricOIDs();
-    for my $ifs (@{$params{ifs}}) {
+    for my $ifs ( @{$params{ifs}} ) {
 
         my $interface;
-        if ($ifs == -1) {
-            $interface = ''
+        if ( $ifs == -1 ) {
+            $interface = '';
         } else {
-            $interface = '.' . $ifs
+            $interface = '.' . $ifs;
         }
 
         my %ret;
-        $ret{Index} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.1' . $interface);
-        if (!defined $ret{Index}) {
+        $ret{Index}
+          = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.1' . $interface );
+        if ( not defined $ret{Index} ) {
             $Cisco::SNMP::LASTERROR = "Cannot get ifIndex `$interface'";
-            return undef
+            return undef;
         }
+
         # multicasts
-        if ($params{$IFMETRICUSERKEYS[0]}) {
+        if ( $params{$IFMETRICUSERKEYS[0]} ) {
+
             # In
-            $ret{$IFMETRICKEYS[0]} = Cisco::SNMP::_snmpwalk($session, '1.3.6.1.2.1.31.1.1.1.2' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[0]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[0]'";
-                return undef
+            $ret{$IFMETRICKEYS[0]} = Cisco::SNMP::_snmpwalk( $session,
+                '1.3.6.1.2.1.31.1.1.1.2' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[0]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[0]'";
+                return undef;
             }
+
             # Out
-            $ret{$IFMETRICKEYS[1]} = Cisco::SNMP::_snmpwalk($session, '1.3.6.1.2.1.31.1.1.1.4' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[1]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[1]'";
-                return undef
-            }
-        }
-        # broadcasts
-        if ($params{$IFMETRICUSERKEYS[1]}) {
-            # In
-            $ret{$IFMETRICKEYS[2]} = Cisco::SNMP::_snmpwalk($session, '1.3.6.1.2.1.31.1.1.1.3' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[2]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[2]'";
-                return undef
-            }
-            # Out
-            $ret{$IFMETRICKEYS[3]} = Cisco::SNMP::_snmpwalk($session, '1.3.6.1.2.1.31.1.1.1.5' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[3]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[3]'";
-                return undef
-            }
-        }
-        # octets
-        if ($params{$IFMETRICUSERKEYS[2]}) {
-            # In
-            $ret{$IFMETRICKEYS[4]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.10' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[4]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[4]'";
-                return undef
-            }
-            # Out
-            $ret{$IFMETRICKEYS[5]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.16' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[5]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[5]'";
-                return undef
-            }
-        }
-        # unicasts
-        if ($params{$IFMETRICUSERKEYS[3]}) {
-            # In
-            $ret{$IFMETRICKEYS[6]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.11' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[6]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[6]'";
-                return undef
-            }
-            # Out
-            $ret{$IFMETRICKEYS[7]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.17' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[7]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[7]'";
-                return undef
-            }
-        }
-        # discards
-        if ($params{$IFMETRICUSERKEYS[4]}) {
-            # In
-            $ret{$IFMETRICKEYS[8]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.13' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[8]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[8]'";
-                return undef
-            }
-            # Out
-            $ret{$IFMETRICKEYS[9]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.19' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[9]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[9]'";
-                return undef
-            }
-        }
-        # errors
-        if ($params{$IFMETRICUSERKEYS[5]}) {
-            # In
-            $ret{$IFMETRICKEYS[10]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.14' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[10]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[10]'";
-                return undef
-            }
-            # Out
-            $ret{$IFMETRICKEYS[11]} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.20' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[11]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[11]'";
-                return undef
-            }
-        }
-        # unknowns
-        if ($params{$IFMETRICUSERKEYS[6]}) {
-            # In
-            $ret{$IFMETRICKEYS[12]}  = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.15' . $interface);
-            if (!defined $ret{$IFMETRICKEYS[12]}) {
-                $Cisco::SNMP::LASTERROR = "Cannot get interface `$interface' `$IFMETRICKEYS[12]'";
-                return undef
+            $ret{$IFMETRICKEYS[1]} = Cisco::SNMP::_snmpwalk( $session,
+                '1.3.6.1.2.1.31.1.1.1.4' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[1]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[1]'";
+                return undef;
             }
         }
 
-        for my $idx (0..$#{$ret{Index}}) {
-            my %IfMetricHash;
-            for (0..$#IFMETRICKEYS) {
-                $IfMetricHash{$IFMETRICKEYS[$_]}  = $ret{$IFMETRICKEYS[$_]}->[$idx]
+        # broadcasts
+        if ( $params{$IFMETRICUSERKEYS[1]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[2]} = Cisco::SNMP::_snmpwalk( $session,
+                '1.3.6.1.2.1.31.1.1.1.3' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[2]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[2]'";
+                return undef;
             }
-            $IfMetric{$ret{Index}->[$idx]} = \%IfMetricHash
+
+            # Out
+            $ret{$IFMETRICKEYS[3]} = Cisco::SNMP::_snmpwalk( $session,
+                '1.3.6.1.2.1.31.1.1.1.5' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[3]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[3]'";
+                return undef;
+            }
+        }
+
+        # octets
+        if ( $params{$IFMETRICUSERKEYS[2]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[4]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.10' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[4]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[4]'";
+                return undef;
+            }
+
+            # Out
+            $ret{$IFMETRICKEYS[5]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.16' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[5]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[5]'";
+                return undef;
+            }
+        }
+
+        # unicasts
+        if ( $params{$IFMETRICUSERKEYS[3]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[6]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.11' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[6]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[6]'";
+                return undef;
+            }
+
+            # Out
+            $ret{$IFMETRICKEYS[7]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.17' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[7]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[7]'";
+                return undef;
+            }
+        }
+
+        # discards
+        if ( $params{$IFMETRICUSERKEYS[4]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[8]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.13' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[8]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[8]'";
+                return undef;
+            }
+
+            # Out
+            $ret{$IFMETRICKEYS[9]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.19' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[9]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[9]'";
+                return undef;
+            }
+        }
+
+        # errors
+        if ( $params{$IFMETRICUSERKEYS[5]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[10]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.14' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[10]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[10]'";
+                return undef;
+            }
+
+            # Out
+            $ret{$IFMETRICKEYS[11]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.20' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[11]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[11]'";
+                return undef;
+            }
+        }
+
+        # unknowns
+        if ( $params{$IFMETRICUSERKEYS[6]} ) {
+
+            # In
+            $ret{$IFMETRICKEYS[12]} = Cisco::SNMP::_snmpwalk( $session,
+                _ifOID() . '.15' . $interface );
+            if ( not defined $ret{$IFMETRICKEYS[12]} ) {
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get interface `$interface' `$IFMETRICKEYS[12]'";
+                return undef;
+            }
+        }
+
+        for my $idx ( 0 .. $#{$ret{Index}} ) {
+            my %IfMetricHash;
+            for ( 0 .. $#IFMETRICKEYS ) {
+                $IfMetricHash{$IFMETRICKEYS[$_]}
+                  = $ret{$IFMETRICKEYS[$_]}->[$idx];
+            }
+            $IfMetric{$ret{Index}->[$idx]} = \%IfMetricHash;
         }
     }
-    return bless \%IfMetric, $class
+    return bless \%IfMetric, $class;
 }
 
-for (ifMetricOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_1('if', $_)
+for ( ifMetricOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_1( 'if', $_ );
 }
 
 sub interface_utilization {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my %params = (
-        'polling' => 10
-    );
+    my %params = ( 'polling' => 10 );
 
     my %args;
-    if (@_ != 1) {
+    if ( @_ != 1 ) {
         %args = @_;
-        for (keys(%args)) {
-            if ((/^-?polling$/i) || (/^-?interval$/i)) {
-                if (($args{$_} =~ /^\d+$/) && ($args{$_} > 0)) {
-                    $params{polling} = $args{$_}
+        for ( keys(%args) ) {
+            if ( (/^-?polling$/i) || (/^-?interval$/i) ) {
+                if ( ( $args{$_} =~ /^\d+$/ ) && ( $args{$_} > 0 ) ) {
+                    $params{polling} = $args{$_};
                 } else {
-                    $Cisco::SNMP::LASTERROR = "Invalid polling interval `$args{$_}'";
-                    return undef
+                    $Cisco::SNMP::LASTERROR
+                      = "Invalid polling interval `$args{$_}'";
+                    return undef;
                 }
             } elsif (/^-?recursive$/i) {
-                $params{recur} = $args{$_}
+                $params{recur} = $args{$_};
             }
         }
     }
 
     my $prev;
-    if (exists($params{recur}) && (ref($params{recur}) eq __PACKAGE__)) {
-        $prev = $params{recur}
+    if ( exists( $params{recur} )
+        && ( ref( $params{recur} ) eq __PACKAGE__ ) ) {
+        $prev = $params{recur};
     } else {
-        if (!defined($prev = $self->interface_metrics(@_))) {
-            $Cisco::SNMP::LASTERROR = "Cannot get initial utilization: " . $Cisco::SNMP::LASTERROR;
-            return undef
+        if ( not defined( $prev = $self->interface_metrics(@_) ) ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get initial utilization: " . $Cisco::SNMP::LASTERROR;
+            return undef;
         }
     }
     sleep $params{polling};
     my $curr;
-    if (!defined($curr = $self->interface_metrics(@_))) {
-        $Cisco::SNMP::LASTERROR = "Cannot get current utilization: " . $Cisco::SNMP::LASTERROR;
-        return undef
+    if ( not defined( $curr = $self->interface_metrics(@_) ) ) {
+        $Cisco::SNMP::LASTERROR
+          = "Cannot get current utilization: " . $Cisco::SNMP::LASTERROR;
+        return undef;
     }
 
     my %IfUtil;
     my @IFMETRICKEYS = ifMetricOIDs();
-    for my $ifs (sort {$a <=> $b} (keys(%{$prev}))) {
+    for my $ifs ( sort { $a <=> $b } ( keys( %{$prev} ) ) ) {
         my %IfUtilHash;
-        for (0..$#IFMETRICKEYS) {
-            if (($_ == 4) || ($_ == 5)) {
-                $IfUtilHash{$IFMETRICKEYS[$_]}  = defined($curr->{$ifs}->{$IFMETRICKEYS[$_]})  ? (($curr->{$ifs}->{$IFMETRICKEYS[$_]}  - $prev->{$ifs}->{$IFMETRICKEYS[$_]}) * 8) / $params{polling} : undef;
+        for ( 0 .. $#IFMETRICKEYS ) {
+            if ( ( $_ == 4 ) || ( $_ == 5 ) ) {
+                $IfUtilHash{$IFMETRICKEYS[$_]}
+                  = defined( $curr->{$ifs}->{$IFMETRICKEYS[$_]} )
+                  ? (
+                    (       $curr->{$ifs}->{$IFMETRICKEYS[$_]}
+                          - $prev->{$ifs}->{$IFMETRICKEYS[$_]}
+                    ) * 8
+                  ) / $params{polling}
+                  : undef;
             } else {
-                $IfUtilHash{$IFMETRICKEYS[$_]}  = defined($curr->{$ifs}->{$IFMETRICKEYS[$_]})  ?  ($curr->{$ifs}->{$IFMETRICKEYS[$_]}  - $prev->{$ifs}->{$IFMETRICKEYS[$_]})      / $params{polling} : undef;
+                $IfUtilHash{$IFMETRICKEYS[$_]}
+                  = defined( $curr->{$ifs}->{$IFMETRICKEYS[$_]} )
+                  ? ( $curr->{$ifs}->{$IFMETRICKEYS[$_]}
+                      - $prev->{$ifs}->{$IFMETRICKEYS[$_]} )
+                  / $params{polling}
+                  : undef;
             }
         }
-        $IfUtil{$ifs} = \%IfUtilHash
+        $IfUtil{$ifs} = \%IfUtilHash;
     }
     $prev = bless \%IfUtil, $class;
-    return wantarray ? ($prev, $curr) : $prev
+    return wantarray ? ( $prev, $curr ) : $prev;
 }
 
 sub interface_updown {
@@ -516,142 +620,146 @@ sub interface_updown {
 
     my $session = $self->{_SESSION_};
 
-    my %op     = (
+    my %op = (
         'UP'   => 1,
         'DOWN' => 2
     );
-    my %params = (
-        'oper' => $op{UP}
-    );
+    my %params = ( 'oper' => $op{UP} );
 
     my %args;
     my $oper = 'UP';
-    if (@_ == 1) {
-        ($params{ifs}) = @_;
-        if (!defined($params{ifs} = Cisco::SNMP::_get_range($params{ifs}))) {
-            return undef
+    if ( @_ == 1 ) {
+        ( $params{ifs} ) = @_;
+        if (not defined(
+                $params{ifs} = Cisco::SNMP::_get_range( $params{ifs} )
+            )
+          ) {
+            return undef;
         }
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?interface(?:s)?$/i) {
-                if (!defined($params{ifs} = Cisco::SNMP::_get_range($args{$_}))) {
-                    return undef
+                if (not defined(
+                        $params{ifs} = Cisco::SNMP::_get_range( $args{$_} )
+                    )
+                  ) {
+                    return undef;
                 }
-            } elsif ((/^-?operation$/i) || (/^-?command$/i)) {
-                if (exists($op{uc($args{$_})})) {
-                    $params{oper} = $op{uc($args{$_})};
-                    $oper = uc($args{$_})
+            } elsif ( (/^-?operation$/i) || (/^-?command$/i) ) {
+                if ( exists( $op{uc( $args{$_} )} ) ) {
+                    $params{oper} = $op{uc( $args{$_} )};
+                    $oper = uc( $args{$_} );
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid operation `$args{$_}'";
-                    return undef
+                    return undef;
                 }
             }
         }
     }
 
-    if (!defined $params{ifs}) {
-        $params{ifs} = Cisco::SNMP::_snmpwalk($session, _ifOID() . '.1');
-        if (!defined $params{ifs}) {
+    if ( not defined $params{ifs} ) {
+        $params{ifs} = Cisco::SNMP::_snmpwalk( $session, _ifOID() . '.1' );
+        if ( not defined $params{ifs} ) {
             $Cisco::SNMP::LASTERROR = "Cannot get interfaces to $oper";
-            return undef
+            return undef;
         }
     }
 
     my @intf;
-    for (@{$params{ifs}}) {
-        if (defined $session->set_request(_ifOID() . '.7.' . $_, INTEGER, $params{oper})) {
-            push @intf, $_
+    for ( @{$params{ifs}} ) {
+        if (defined $session->set_request(
+                _ifOID() . '.7.' . $_,
+                INTEGER, $params{oper}
+            )
+          ) {
+            push @intf, $_;
         } else {
             $Cisco::SNMP::LASTERROR = "Failed to $oper interface $_";
-            return undef
+            return undef;
         }
     }
-    return \@intf
+    return \@intf;
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = ifOIDs();
+
 # -3 because last keys (Duplex Name Alias) are different OID
-for my $o (0..$#OIDS-3) {
+for my $o ( 0 .. $#OIDS - 3 ) {
     *{"get_if" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_ifOID() . '.' . ($o+1) . '.' . $val]
-        );
-        return $r->{_ifOID() . '.' . ($o+1) . '.' . $val}
-    }
+            varbindlist => [_ifOID() . '.' . ( $o + 1 ) . '.' . $val] );
+        return $r->{_ifOID() . '.' . ( $o + 1 ) . '.' . $val};
+      }
 }
 
 sub get_ifDuplex {
-    my $self  = shift;
+    my $self = shift;
     my ($val) = @_;
 
-    if (!defined $val) { $val = 0 }
+    if ( not defined $val ) { $val = 0 }
     my $s = $self->session;
-    my $r = $s->get_request(
-        varbindlist => ['1.3.6.1.2.1.10.7.2.1.19.' . $val]
-    );
-    return $r->{'1.3.6.1.2.1.10.7.2.1.19.' . $val}
+    my $r
+      = $s->get_request( varbindlist => ['1.3.6.1.2.1.10.7.2.1.19.' . $val] );
+    return $r->{'1.3.6.1.2.1.10.7.2.1.19.' . $val};
 }
 
 sub get_ifName {
-    my $self  = shift;
+    my $self = shift;
     my ($val) = @_;
 
-    if (!defined $val) { $val = 0 }
+    if ( not defined $val ) { $val = 0 }
     my $s = $self->session;
-    my $r = $s->get_request(
-        varbindlist => ['1.3.6.1.2.1.31.1.1.1.1.' . $val]
-    );
-    return $r->{'1.3.6.1.2.1.31.1.1.1.1.' . $val}
+    my $r
+      = $s->get_request( varbindlist => ['1.3.6.1.2.1.31.1.1.1.1.' . $val] );
+    return $r->{'1.3.6.1.2.1.31.1.1.1.1.' . $val};
 }
 
 sub get_ifAlias {
-    my $self  = shift;
+    my $self = shift;
     my ($val) = @_;
 
-    if (!defined $val) { $val = 0 }
+    if ( not defined $val ) { $val = 0 }
     my $s = $self->session;
-    my $r = $s->get_request(
-        varbindlist => ['1.3.6.1.2.1.31.1.1.1.18.' . $val]
-    );
-    return $r->{'1.3.6.1.2.1.31.1.1.1.18.' . $val}
+    my $r
+      = $s->get_request( varbindlist => ['1.3.6.1.2.1.31.1.1.1.18.' . $val] );
+    return $r->{'1.3.6.1.2.1.31.1.1.1.18.' . $val};
 }
 
 my %OIDS = _ifMetricOIDVals();
-for my $o (keys(%OIDS)) {
+for my $o ( keys(%OIDS) ) {
     *{"get_if" . $o} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_ifOID() . '.' . $OIDS{$o} . '.' . $val]
-        );
-        return $r->{_ifOID() . '.' . $OIDS{$o} . '.' . $val}
-    }
+            varbindlist => [_ifOID() . '.' . $OIDS{$o} . '.' . $val] );
+        return $r->{_ifOID() . '.' . $OIDS{$o} . '.' . $val};
+      }
 }
 
 @OIDS = qw(InMulticasts InBroadcasts OutMulticasts OutBroadcasts);
-for my $o (0..3) {
+for my $o ( 0 .. 3 ) {
     *{"get_if" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
-        my $r = $s->get_request(
-            varbindlist => ['1.3.6.1.2.1.31.1.1.1.' . ($o+2) . '.' . $val]
-        );
-        return $r->{'1.3.6.1.2.1.31.1.1.1.' . ($o+2) . '.' . $val}
-    }
+        my $r = $s->get_request( varbindlist =>
+              ['1.3.6.1.2.1.31.1.1.1.' . ( $o + 2 ) . '.' . $val] );
+        return $r->{'1.3.6.1.2.1.31.1.1.1.' . ( $o + 2 ) . '.' . $val};
+      }
 }
 
 ##################################################

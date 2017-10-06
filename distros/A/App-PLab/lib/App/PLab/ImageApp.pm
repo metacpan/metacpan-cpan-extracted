@@ -1438,7 +1438,6 @@ sub sb_text
 
 # SB_END
 
-
 sub profile_default
 {
    my $def = $_[ 0]-> SUPER::profile_default;
@@ -1452,7 +1451,6 @@ sub profile_default
    return $def;
 }
 
-
 sub init
 {
    my $self = shift;
@@ -1461,11 +1459,14 @@ sub init
    my $w = $self;
    my ($x, $y) = $w-> size;
 
+   my $scale = $::application-> uiScaling;
+   $scale = 1 if $scale < 1;
+
    $w-> insert( "Panel",
       text      => "",
       name      => "ToolBar",
-      origin    => [ 2, $y - 40],
-      size      => [ $x - 4, 38],
+      origin    => [ 2, $y - 2 - 38 * $scale],
+      size      => [ $x - 4, 38 * $scale],
       raise     => 1,
       image     => App::PLab::ImageAppGlyphs::image( bga::tile_m),
       growMode  => gm::GrowHiX | gm::GrowLoY,
@@ -1477,7 +1478,7 @@ sub init
      selectable  => 0,
      transparent => 1,
      flat        => 1,
-     size        => [ 36, 36],
+     size        => [ map { $_ * $scale } 36, 36],
      borderWidth => 1,
    );
 
@@ -1491,7 +1492,7 @@ sub init
       ],
       [ SpeedButton =>
          name    => "PrevImage",
-         origin  => [42, 1],
+         origin  => [42 * $scale, 1],
          image   => App::PLab::ImageAppGlyphs::icon( bga::prev),
          enabled => 0,
          hint    => 'Previous image',
@@ -1500,7 +1501,7 @@ sub init
       ],
       [ SpeedButton =>
          name    => "NextImage",
-         origin  => [78, 1],
+         origin  => [78 * $scale, 1],
          image   => App::PLab::ImageAppGlyphs::icon( bga::next),
          enabled => 0,
          hint    => 'Next image',

@@ -1,0 +1,8 @@
+Revision history for Alien-LibreSSL
+
+0.02      2017-10-03 11:24:46 -0400
+  - Patch for Microsoft Visual C++
+  - Fallback on http if https is not available
+
+0.01      2017-10-03 09:20:50 -0400
+  - initial version

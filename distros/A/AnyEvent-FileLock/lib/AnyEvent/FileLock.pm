@@ -1,6 +1,6 @@
 package AnyEvent::FileLock;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ sub flock {
         open $fh, $mode, $file or return
     }
     else {
-        $fh = delete $opts{file} // croak "file or fh argument is required";
+        $fh = delete $opts{fh} // croak "file or fh argument is required";
     }
 
     my $self = { file => $file,
@@ -85,12 +85,12 @@ sub _acquire_lock {
         $self->{user_cb}->($self->{fh});
     }
     elsif ($! == Errno::EAGAIN() and
-           (!defined($self->{max_time}) or $self->{max_time} <= $now)) {
+           (!defined($self->{max_time}) or $self->{max_time} >= $now)) {
         # we add some randomness into the delay to avoid the case
         # where all the contenders follow exactly the same pattern so
-        # that they end looking for the pattern all at once everytime
+        # that they end looking for the pattern all at once every time
         # (and obviosly all but one failing).
-        &AE::timer($self->{delay} * (0.8 + rand 0.40), 0, $self->{acquire_lock_cb});
+        $self->{timer} = &AE::timer($self->{delay} * (0.8 + rand 0.40), 0, $self->{acquire_lock_cb});
         return;
     }
     else {
@@ -103,7 +103,6 @@ sub _acquire_lock {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -122,7 +121,7 @@ AnyEvent::FileLock - Lock files asynchronously
 
 =head1 DESCRIPTION
 
-This module tries to lock some file repeatly until it success or a
+This module tries to lock some file repeatedly until it success or a
 timeout happens.
 
 =head2 API
@@ -150,7 +149,7 @@ to obtain the lock under the hood.
 The default is C<flock>.
 
 In order to use locks of type C<fcntl>, the module L<Fctnl::Packer>
-has to be also instaled.
+has to be also installed.
 
 =item cb => $sub_ref
 
@@ -185,17 +184,17 @@ Configures both C<open_mode> and C<lock_mode>.
 The operation is aborted if the lock operation can not be completed
 for the given lapse.
 
-Note that this timeout is aproximate, it is checked just after every
+Note that this timeout is approximate, it is checked just after every
 failed locking attempt.
 
 =item delay => $seconds
 
-Time to be delayed between consecutive locking attemps. Defaults to 1
+Time to be delayed between consecutive locking attempts. Defaults to 1
 second.
 
 Some randomness will be added to the delay to avoid the degenerate
 case where all the contenders look for the lock at the same time
-everytime.
+every time.
 
 =item whence => $whence
 
@@ -216,13 +215,15 @@ L<AnyEvent>.
 L<perlfunc/flock>, L<perlfunc/fcntl>, L<fcntl(2)>, L<Fcntl>,
 L<Fcntl::Packer>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Salvador FandiE<ntilde>o, E<lt>sfandino@yahoo.comE<gt>
 
+Manfred Stock, E<lt>mstock@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 by Qindel FormaciE<ntilde>n y Servicios S.L.
+Copyright (C) 2013, 2017 by Qindel FormaciE<oacute>n y Servicios S.L.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

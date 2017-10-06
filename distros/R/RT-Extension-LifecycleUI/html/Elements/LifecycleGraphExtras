@@ -1,5 +1,5 @@
 <defs>
-  <marker id="transition_arrowhead" markerHeight=5 markerWidth=5 markerUnits="strokeWidth" orient="auto" refX=40 refY=0 viewBox="-5 -5 10 10">
+  <marker id="transition_arrowhead" markerHeight=5 markerWidth=5 markerUnits="strokeWidth" orient="auto" refX=0 refY=0 viewBox="-5 -5 10 10">
     <path d="M 0,0 m -5,-5 L 5,0 L -5,5 Z" fill="black" />
   </marker>
   <marker id="line_marker_arrowhead" markerHeight=5 markerWidth=5 markerUnits="strokeWidth" orient="auto" refX=0 refY=0 viewBox="-5 -5 10 10">

@@ -7,8 +7,8 @@ lib/Spp/Builtin.pm
 lib/Spp/Core.pm
 lib/Spp/Ast.pm
 lib/Spp/Cursor.pm
+lib/Spp/Estr.pm
 lib/Spp/Grammar.pm
-lib/Spp/LintAst.pm
 lib/Spp/MatchRule.pm
 lib/Spp/OptAst.pm
 lib/Spp/ToSpp.pm

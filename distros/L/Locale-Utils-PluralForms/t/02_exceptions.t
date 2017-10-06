@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2 + 1;
+use Test::More tests => 3;
 use Test::NoWarnings;
 use Test::Exception;
 

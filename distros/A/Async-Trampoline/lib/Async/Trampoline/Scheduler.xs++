@@ -10,6 +10,7 @@ extern "C" {
 #include "ppport.h"
 }
 
+#define UNUSED(x) static_cast<void>(x)
 
 MODULE = Async::Trampoline::Scheduler PACKAGE = Async::Trampoline::Scheduler
 
@@ -18,6 +19,7 @@ Async_Trampoline_Scheduler::new(initial_capacity = 32);
         UV initial_capacity;
     INIT:
         CXX_TRY
+        UNUSED(CLASS);
     CLEANUP:
         CXX_CATCH
 
@@ -75,3 +77,10 @@ Async_Trampoline_Scheduler::complete(Async* async);
     }
     CLEANUP:
         CXX_CATCH
+
+    /*  The boot function is declared as extern "C" twice.
+     *   Boot is always the last function so that it will see all xsubs
+     */
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wduplicate-decl-specifier"
+#endif

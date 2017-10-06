@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::XGoogleDKIM;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.2');
+use version; our $VERSION = version->declare('v1.1.3');
 
 use Data::Dumper;
 use English qw{ -no_match_vars };
@@ -16,6 +16,13 @@ sub default_config {
     return {
         'hide_none'         => 0,
     };
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'XGoogleDKIM_metrics' );
+    return \@rows;
 }
 
 sub register_metrics {

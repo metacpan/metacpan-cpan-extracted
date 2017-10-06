@@ -38,8 +38,8 @@ use warnings;
 #    user documentation
 # 5/ Write the resulting LCDd model
 
-use Config::Model 2.076;
-use Config::Model::Itself 2.005;    # to create the model
+use Config::Model 2.111;
+use Config::Model::Itself 2.012;    # to create the model
 
 use 5.010;
 use Path::Tiny;
@@ -145,11 +145,11 @@ $model->create_config_class(
             config_class_name => 'Dummy::Class'
         }
     ],
-    read_config => [{
+    rw_config => {
         backend => 'IniFile',
         config_dir => 'tmp', # created above
         file => 'LCDd.conf'
-    }]
+    }
 );
 
 # Now the dummy configuration class is created. Let's create a
@@ -191,7 +191,7 @@ $meta_root->load( qq!
 # add INI backend (So LCDd model will be able to read INI files)
 $meta_root->load( qq!
     class:LCDd
-        read_config:0
+        rw_config
             backend=ini_file
             config_dir="/etc"
             file="LCDd.conf"

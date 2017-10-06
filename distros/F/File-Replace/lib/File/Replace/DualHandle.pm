@@ -11,11 +11,9 @@ use Scalar::Util qw/blessed/;
 
 ## no critic (RequireFinalReturn, RequireArgUnpacking)
 
-sub new {
-	my $class = shift;
-	my $fh = \do{local*HANDLE;*HANDLE};  ## no critic (RequireInitializationForLocalVars)
-	tie *$fh, $class, @_;
-	return $fh;
+BEGIN {
+	require Tie::Handle::Base;
+	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
 }
 
 sub TIEHANDLE {
@@ -23,7 +21,9 @@ sub TIEHANDLE {
 	my ($class,$repl) = @_;
 	croak "$class->TIEHANDLE: argument must be a File::Replace object"
 		unless blessed($repl) && $repl->isa('File::Replace');
-	return bless { repl=>$repl }, $class;
+	my $self = $class->SUPER::TIEHANDLE($repl->in_fh);
+	$self->{repl} = $repl;
+	return $self;
 }
 
 sub replace { return shift->{repl} }
@@ -32,36 +32,27 @@ sub out_fh  { return shift->{repl}->out_fh }
 
 sub OPEN {
 	my $self = shift;
-	croak "only 2 and 3-arg open supported" unless @_==1||@_==2;
+	croak "this handle only supports 2- or 3-arg open" unless @_==1||@_==2;
 	croak "layers/filename may not contain an open mode (<, >, etc.)"
 		if $_[0]=~/^\s*\+?[<>]/;
 	my $opts = $self->{repl}->options; # old options to copy over
-	$opts->{layers} = shift if @_==2;
+	$opts->{layers} = @_==2 ? shift : undef;
 	my $filename = shift;
 	# just let the previous $self->{repl} get destroyed here
 	$self->{repl} = File::Replace->new($filename, %$opts);
+	$self->set_inner_handle($self->{repl}->in_fh);
 	return 1;
 }
 
 sub CLOSE {
 	my $self = shift;
-	return 1 unless $self->{repl}->is_open;
-	return $self->{repl}->finish;
+	return !!$self->{repl}->finish;
 }
 
-# The following are simple enough to just copy out of Tie::Handle::Base and adapt
-sub READ     { read($_[0]->{repl}->in_fh, $_[1], $_[2], defined $_[3] ? $_[3] : 0 ) }
-sub READLINE { readline  shift->{repl}->in_fh }
-sub GETC     {     getc  shift->{repl}->in_fh }
-sub EOF      {      eof  shift->{repl}->in_fh }
-sub SEEK     {     seek  shift->{repl}->in_fh, $_[0], $_[1] }
-sub TELL     {     tell  shift->{repl}->in_fh }
-
-sub PRINT    {    print {shift->{repl}->out_fh} @_ }
-sub PRINTF   {   printf {shift->{repl}->out_fh} shift, @_ }
-
-require Tie::Handle::Base;
-sub WRITE { Tie::Handle::Base::_WRITE(shift->{repl}->out_fh, @_) }  ## no critic (ProtectPrivateSubs)
+sub WRITE {
+	my $self = shift;
+	$self->inner_write($self->{repl}->out_fh, @_);
+}
 
 sub BINMODE {
 	my $self = shift;
@@ -81,12 +72,14 @@ sub UNTIE {
 	my $self = shift;
 	warnings::warnif("Please don't untie ".ref($self)." handles");
 	$self->{repl} = undef;
+	$self->SUPER::UNTIE(@_);
 }
 
 sub DESTROY {
 	my $self = shift;
 	# File::Replace destructor will warn on unclosed file
 	$self->{repl} = undef;
+	$self->SUPER::DESTROY(@_);
 }
 
 1;

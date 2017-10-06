@@ -1,9 +1,9 @@
 {
-   "abstract" : "A reference implementation of the GraphQL spec in Perl.",
+   "abstract" : "Perl implementation of GraphQL",
    "author" : [
       "Ed J <etj@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
@@ -32,6 +32,7 @@
       },
       "develop" : {
          "requires" : {
+            "Pod::Markdown" : "0",
             "Test::CheckManifest" : "0.9",
             "Test::Pod" : "1.22",
             "Test::Pod::Coverage" : "1.08"
@@ -39,12 +40,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Function::Parameters" : "0",
+            "Function::Parameters" : "2.001001",
+            "JSON::MaybeXS" : "1.003009",
+            "JSON::PP" : "2.92",
             "Moo" : "0",
+            "MooX::Thunking" : "0.07",
             "Pegex" : "0",
             "Return::Type" : "0",
             "Type::Tiny" : "0",
             "perl" : "5.014"
+         },
+         "suggests" : {
+            "Cpanel::JSON::XS" : "3.0237"
          }
       },
       "test" : {
@@ -56,6 +63,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/graphql-perl/graphql-perl/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -65,5 +75,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.07"
+   "version" : "0.10"
 }

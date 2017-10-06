@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: RapidApp-powered blog
 
-use RapidApp 1.3003;
+use RapidApp 1.3004;
 
 use Moose;
 extends 'RapidApp::Builder';
@@ -19,7 +19,7 @@ require Module::Locate;
 use Path::Class qw/file dir/;
 use YAML::XS 0.64 'LoadFile';
 
-our $VERSION = '1.0100';
+our $VERSION = 1.0101;
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;

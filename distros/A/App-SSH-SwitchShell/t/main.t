@@ -14,6 +14,8 @@ use Test::More;
 use Test::MockModule;
 use Test::TempDir::Tiny;
 
+use lib qw(.);
+
 ## no critic (RegularExpressions::RequireDotMatchAnything)
 ## no critic (RegularExpressions::RequireExtendedFormatting)
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)

@@ -11,7 +11,7 @@ around module_build_args => sub {
     my ($self, @args) = @_;
     my $mb_args = $orig->($self, @args);
     $mb_args->{c_source} = 'src';
-    $mb_args->{config}{cxxflags} = '-std=c++11';
+    $mb_args->{extra_compiler_flags} = '-std=c++11';
     $mb_args->{extra_linker_flags} = '-lstdc++';
     return $mb_args;
 };

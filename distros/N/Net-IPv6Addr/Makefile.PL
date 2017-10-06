@@ -29,6 +29,7 @@ WriteMakefile(
 	    'Joacim Haggmark',
 	    'Ben Bullock <bkb@cpan.org>',
 	    'Neil Bowers <neilb@cpan.org>',
+	    'Salvador Fandiño García <salva@cpan.org>',
 	],
 	bugtracker => {
 	    web => "https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr",

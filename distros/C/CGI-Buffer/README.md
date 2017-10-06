@@ -9,7 +9,7 @@ Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.79
+Version 0.80
 
 # SYNOPSIS
 

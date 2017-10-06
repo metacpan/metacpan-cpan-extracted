@@ -3,33 +3,35 @@ abstract: 'Send data to StatsD / Graphite'
 author:
   - 'Andrew Rodland <arodland@cpan.org>'
 build_requires:
-  Exporter: 0
-  FindBin: 0
-  IO::Socket: 0
-  Test::More: 0
-  strict: 0
-  warnings: 0
+  Exporter: '0'
+  FindBin: '0'
+  IO::Socket: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Statsd-Client
 no_index:
   directory:
     - t
 requires:
-  Etsy::StatsD: 1.001
-  Moo: 0
-  Sub::Quote: 0
-  Time::HiRes: 0
+  Etsy::StatsD: '1.001'
+  Moo: '0'
+  Sub::Quote: '0'
+  Time::HiRes: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Statsd-Client
   homepage: http://metacpan.org/release/Net-Statsd-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/arodland/Net-Statsd-Client.git
-version: 0.31
+version: '0.32'
 x_authority: cpan:ARODLAND
+x_serialization_backend: 'YAML::Tiny version 1.70'

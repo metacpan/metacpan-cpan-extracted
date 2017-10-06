@@ -15,15 +15,14 @@ name: Test-Simple
 requires:
   File::Spec: '0'
   File::Temp: '0'
-  PerlIO: '0'
   Scalar::Util: '1.13'
   Storable: '0'
-  perl: '5.008001'
+  perl: '5.006002'
   utf8: '0'
 resources:
   bugtracker: http://github.com/Test-More/test-more/issues
   repository: http://github.com/Test-More/test-more/
-version: '1.302096'
+version: '1.302098'
 x_breaks:
   Log::Dispatch::Config::TestLog: '<= 0.02'
   Net::BitTorrent: '<= 0.052'

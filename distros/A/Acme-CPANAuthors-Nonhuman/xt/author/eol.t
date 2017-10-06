@@ -20,7 +20,6 @@ my @files = (
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-coverage.t',
-    'xt/author/pod-no404s.t',
     'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',

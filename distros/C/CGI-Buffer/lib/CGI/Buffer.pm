@@ -16,11 +16,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.79
+Version 0.80
 
 =cut
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 =head1 SYNOPSIS
 
@@ -539,7 +539,7 @@ END {
 			if($logger) {
 				$logger->debug("Set ETag to $etag");
 			}
-		} elsif($logger && (($status == 200) || $status == 304) && !is_cached()) {
+		} elsif($logger && (($status == 200) || $status == 304) && $body && !is_cached()) {
 			$logger->warn("BUG: ETag not generated, status $status");
 		}
 	}

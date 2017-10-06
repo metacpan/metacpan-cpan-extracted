@@ -1,4 +1,94 @@
-3.005     2017-07-14
+See also Changes-ver_2 for changes released for PDF::API2, and incorporated
+into PDF::Builder.
+
+
+3.007     2017-09-26
+
+   Makefile.PL add missing prerequisite Test::Memory::Cycle.
+
+3.006     2017-09-23
+
+   lib/PDF/Builder/Page.pm POD glitch reported by Kwalitee fixed.
+
+   lib/PDF/Builder.pm update history to mention Text::PDF origin (requested
+     by SPROUT)
+
+   lib/PDF/Builder/Win32.pm, examples/027_winfont moved to examples/Windows.
+     examples/README, examples/examples.output, examples.bat, Makefile.PL, 
+     MANIFEST updated. The Windows-specific code in Win32.pm has not worked 
+     since at least Windows 7, and the demo doesn't do anything particularly 
+     useful. Rather than erasing the code, it is still available if you 
+     actually use it (move Win32.pm back to Builder/ and install 
+     Win32::Tie::Registry), and you can look at it for examples of Windows 
+     Registry access.
+
+   Makefile.PL cleanup and rearrangement (thanks to Johan Vromans). Note that
+     the Perl minimum has been upped from 5.8.5 to 5.8.6, for better UTF-8
+     support, and a number of prereqs found in CORE have been removed. Still
+     unresolved is the best way (and whether) to put $VERSION in all .pl and
+     .pm files, or just Builder.pm, and the associated build process. Also
+     under discussion is how to indicate when a file was last updated -- is
+     there a better way than $LAST_UPDATE? It is provided as a local variable
+     in case anyone wants to access it in their code.
+
+   examples/020_corefonts and examples/021_synfonts [ref #68, CTS 9] updated 
+     "@fonts" list to "@planes" to clarify that these fonts are 256 character 
+     planes of part of a font's glyph list. Also updated 
+     lib/PDF/Builder/Resource/Font.pm to document the automap() method, and 
+     lib/PDF/Builder.pm to mention that UTF-8 cannot be used in corefonts and 
+     psfonts (at least, non-CID fonts). PS (Type 1) fonts may use automap(), 
+     although such fonts are usually (non-CID) limited to 256 glyphs. In that 
+     case, automap() will return nothing for the extended planes.
+
+   lib/PDF/Builder.pm and lib/PDF/Builder/Resource/Font.pm update comments 
+     (POD) on character encoding (per Johan Vromans).
+
+   lib/PDF/Builder/Content/Hyphenate_basic.pm in basic hyphenation, split word 
+     with SHY (soft hyphen) instead of -, so a screen reader or other text 
+     scraper or resizable display knows it can omit the hyphen when gluing a 
+     word back together. A SHY is supposed to display as a normal hyphen -.
+
+   lib/PDF/Builder/Resource/XObject/Image/TIFF.pm (reported by Ivan Middleton)
+     [ref RT 15730, Rejected] the BlackIs1 DecodeParm hash member was misspelled
+     as Blackls1 (el instead of EYE). BlackIs1 has been added, and Blackls1 is 
+     now DEPRECATED. It will be removed some time after July 2018, so please 
+     update your code if you use it. The original bug report also stated that 
+     the value of this member /may/ be the reverse of what it should be, so 
+     further corrections to the code /may/ be necessary in the future.
+
+   lib/PDF/Builder.pm (per Johan Vromans) add $VERSION to Builder.pm so that
+     a developer can run PDF::Builder directly from git.
+
+   Please read the DEPRECATED file (new) for a list of deprecated names and
+     interfaces which will disappear at some time in the future!
+
+   The build process has been modified to ensure that all text (non-binary) 
+     files are now "Unix style" (LF for end-of-line) per Jeffrey Ratcliffe. 
+     Before, some text files were "DOS style" (CRLF for end-of-line), which 
+     caused problems for tools used by some Linux-based developers. DOS-only 
+     files, such as .bat files, have been left in DOS style.
+
+   lib/PDF/Builder.pm the default /Producer PDF tag had the producer's operating
+     system in the string, which led to different PDF file lengths depending on 
+     which OS a PDF was produced on. This has been changed to a URL for the 
+     support area for this product. Of course, you can always override the 
+     Producer (and Creator) tags with whatever strings you want (see the info() 
+     call).
+
+   t-tests.bat (per Johan Vromans and Jeffrey Ratcliffe) add some comments on
+     ways to run t tests in various situations.
+
+   examples/012_pages insert pages i-iii in front of other pages, to show how
+     (for instance) a Table of Contents could be inserted after writing the 
+     rest of the document.
+
+   examples/ font display utilities change Unicode formatting to U+nnnn and
+     align character description text under character box.
+
+   examples/021_psfonts added to display Type1 fonts (.pfa, .pfb glyph files
+     and .afm, .pfm metrics files).
+
+3.005     2017-07-16
 
    Some minor POD cleanups (missing > brackets) and fix VERSION in .pm files.
    Otherwise no code changes. Some build cleanup.

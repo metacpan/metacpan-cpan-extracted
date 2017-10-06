@@ -119,7 +119,7 @@ use Time::HiRes qw/ alarm sleep /;
 
 
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 
 extends 'Async::Simple::Task';
@@ -214,6 +214,7 @@ has pid => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
+    lazy     => 1,
     builder  => 'fork_child',
 );
 

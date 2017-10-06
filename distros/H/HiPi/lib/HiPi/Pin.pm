@@ -1,6 +1,6 @@
 #########################################################################################
-# Package       HiPi::Pin
-# Description:  GPIO / Extender Pin
+# Package        HiPi::Pin
+# Description:   GPIO / Extender Pin
 # Copyright    : Copyright (c) 2013-2017 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
@@ -15,7 +15,7 @@ use warnings;
 use parent qw( HiPi::Class );
 use HiPi qw( :rpi );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_ro_accessors( qw( pinid ) );
 
@@ -44,6 +44,32 @@ sub mode {
     }
 }
 
+sub set_pud {
+    my($self, $newval) = @_;
+    $newval //= RPI_PUD_OFF;
+    my $rval;
+    if( $newval == RPI_PUD_OFF || $newval == RPI_PUD_DOWN || $newval == RPI_PUD_UP )  {
+        $rval = $self->_do_setpud( $newval );
+    } else {
+        croak(qq(Invalid PUD setting $newval));
+    }
+    return $rval;
+}
+
+sub get_function {
+    my( $self ) = @_;
+    return $self->_do_get_function_name();
+}
+
+sub active_low {
+    my($self, $newval) = @_;
+    if(defined($newval)) {
+        return $self->_do_activelow($newval);
+    } else {
+        return $self->_do_activelow();
+    } 
+}
+
 sub interrupt {
     my($self, $newedge) = @_;
     if(defined($newedge)) {
@@ -58,35 +84,9 @@ sub interrupt {
     }
 }
 
-sub get_edge_detect {
-    my($self) = @_;
-    $self->_do_get_edge_detect;
-}
-
-
-sub clear_edge_detect {
-    my($self) = @_;
-    $self->_do_clear_edge_detect;
-}
-
-sub set_pud {
-    my($self, $newval) = @_;
-    my $rval;
-    if( $newval == RPI_PUD_OFF || $newval == RPI_PUD_DOWN || $newval == RPI_PUD_UP )  {
-        $rval = $self->_do_setpud( $newval );
-    } else {
-        croak(qq(Invalid PUD setting $newval));
-    }
-    return $rval;
-}
-
-sub active_low {
-    my($self, $newval) = @_;
-    if(defined($newval)) {
-        return $self->_do_activelow($newval);
-    } else {
-        return $self->_do_activelow();
-    } 
+sub get_interrupt_filepath {
+    my( $self ) = @_;
+    return $self->_do_get_interrupt_filepath();
 }
 
 1;

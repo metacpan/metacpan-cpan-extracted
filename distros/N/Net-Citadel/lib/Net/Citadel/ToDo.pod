@@ -73,7 +73,7 @@ should be sent.)
 In the existing test code for the C<retract_floor> function, there is a comment
 saying C<CITADEL BUG>; investigate if it an issue with the function itself, an
 actual issue with Citadel, and/or just something to do with the test script.
- The documentation for the function itself refers back to Citadel v7.20, so
+The documentation for the function itself refers back to Citadel v7.20, so
 there may not be any issue with it now.
 
 
@@ -86,6 +86,14 @@ not just one. The second one is just "<$s>;" and that has the comment
 with that, save it somewhere? At least the <system name> part of it?  (The
 first command on that line just establishes the $s variable for that read.)
 At least, put them on separate lines.
+
+Resolve the following from the Perl Critic testing:
+Always unpack @_ first at line 308, column 1. See page 178 of PBP.(Severity: 4)
+
+
+=item C<change_user> function
+
+Always unpack @_ first at line 637, column 1.  See page 178 of PBP.  (Severity: 4)
 
 
 =item C<citadel_time> function
@@ -123,6 +131,9 @@ of the module?
 
 =head2 Testing
 
+Change the default name for the Citadel administration user to 'admin' in the
+t/test.yaml file?  It does seem to be the default name in the Citadel setup.
+
 Will the differences with the newer Citadels justify or neccessitate checking
 the version of the Citadel being tested and doing different tests depending
 on that version?
@@ -157,7 +168,8 @@ Use Config::YAML::Tiny instead of Config::YAML? (Does not appear to be in
 Debian as yet, although YAML::Tiny is.)
 
 Use something like Test::MockObject to do at least basic testing of the 
-various functions. And/or Test::TCP?
+various functions? And/or Test::TCP? Could use Test::TCP::CheckPort to 
+first check if there is even something up on the standard Citadel port 504.
 
 Testing of the citadel_info function currently just checks the number of
 information lines returned by the server. That could change over time and
@@ -177,7 +189,7 @@ Robert James Clay, C<< <jame at rocasa.us> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016 Robert James Clay, all rights reserved.
+Copyright 2017 Robert James Clay, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

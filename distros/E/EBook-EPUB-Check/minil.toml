@@ -1,7 +1,1 @@
 name = "EBook-EPUB-Check"
-
-[build]
-build_class = "builder::MyBuilder"
-
-[no_index]
-directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder']

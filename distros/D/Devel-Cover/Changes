@@ -1,5 +1,9 @@
 Devel::Cover history
 
+Release 1.28 - 5 October 2017
+ - Fix typo in docs (Gregor Herrmann) (github 195)
+ - Fix up options to cover program (github 194)
+
 Release 1.27 - 20 September 2017
  - Test against 5.27.3
  - Add dependency on B::Debug (Ryan Voots) (github 189)

@@ -3,7 +3,7 @@ use strict;
 use vars qw/$VERSION %released %version %families %upstream
 	    %bug_tracker %deprecated %delta/;
 use version;
-$VERSION = '5.20170920';
+$VERSION = '5.20170923';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -321,6 +321,8 @@ sub changes_between {
     5.027002 => '2017-07-20',
     5.027003 => '2017-08-21',
     5.027004 => '2017-09-20',
+    5.024003 => '2017-09-22',
+    5.026001 => '2017-09-22',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14426,6 +14428,35 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.024003 => {
+        delta_from => 5.024002,
+        changed => {
+            'B::Op_private'         => '5.024003',
+            'Config'                => '5.024003',
+            'Module::CoreList'      => '5.20170922_24',
+            'Module::CoreList::TieHashDelta'=> '5.20170922_24',
+            'Module::CoreList::Utils'=> '5.20170922_24',
+            'POSIX'                 => '1.65_01',
+            'Time::HiRes'           => '1.9741',
+        },
+        removed => {
+        }
+    },
+    5.026001 => {
+        delta_from => 5.026000,
+        changed => {
+            'B::Op_private'         => '5.026001',
+            'Config'                => '5.026001',
+            'Module::CoreList'      => '5.20170922_26',
+            'Module::CoreList::TieHashDelta'=> '5.20170922_26',
+            'Module::CoreList::Utils'=> '5.20170922_26',
+            '_charnames'            => '1.45',
+            'base'                  => '2.26',
+            'charnames'             => '1.45',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -15228,6 +15259,20 @@ sub is_core
     },
     5.027004 => {
         delta_from => 5.027003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.024003 => {
+        delta_from => 5.024002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.026001 => {
+        delta_from => 5.026000,
         changed => {
         },
         removed => {

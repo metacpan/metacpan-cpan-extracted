@@ -1,7 +1,7 @@
 package Bread::Board::Service;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: Base service role
-$Bread::Board::Service::VERSION = '0.35';
+$Bread::Board::Service::VERSION = '0.36';
 use Moose::Role;
 use Module::Runtime ();
 
@@ -128,7 +128,7 @@ Bread::Board::Service - Base service role
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

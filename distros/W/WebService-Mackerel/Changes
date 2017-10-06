@@ -1,5 +1,9 @@
 Revision history for Perl extension Webservice-Mackerel
 
+0.05 2017-10-05T06:29:05Z
+    - add `get_service_metrics` method. thanks @wanij
+    - use new API endpoint
+
 0.04 2017-02-22T07:30:31Z
     - support to graph annotations api
 

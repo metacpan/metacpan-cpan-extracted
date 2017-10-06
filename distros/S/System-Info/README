@@ -26,6 +26,15 @@ The standard install procedure applies:
     $ make test
     $ make install
 
+If you like to test non-released active development, fetch like
+
+    $ git clone https://github.com/Tux/System-Info System-Info
+
+ or get it as a tgz:
+
+    $ wget --output-document=System-Info-git.tgz \
+          https://github.com/Tux/System-Info/archive/master.tar.gz
+
 =head1 COPYRIGHT and LICENSE
 
 Copyright (C) 2016 - 2017

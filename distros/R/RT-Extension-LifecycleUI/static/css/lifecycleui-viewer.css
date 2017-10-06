@@ -4,10 +4,22 @@
     height: 309px;
 }
 
+.lifecycle-ui.center-fit:not(.zoomable) svg {
+    border: none;
+}
+
 .lifecycle-ui .overlay-buttons {
     position: absolute;
     top: 1em;
     left: 391px;
+}
+
+.lifecycle-ui .overlay-buttons .zoom {
+    display: none;
+}
+
+.lifecycle-ui.zoomable .overlay-buttons .zoom {
+    display: inline-block;
 }
 
 .lifecycle-ui .statuses circle {
@@ -75,11 +87,11 @@
     opacity: 1;
 }
 
-.lifecycle-ui .has-focus .statuses circle.focus {
+.lifecycle-ui .has-focus .statuses .focus circle {
     stroke-width: 6px;
 }
 
-.lifecycle-ui .has-focus .statuses circle.focus,
+.lifecycle-ui .has-focus .statuses .focus circle,
 .lifecycle-ui .has-focus .transitions .focus,
 .lifecycle-ui .has-focus .decorations :not(text).focus {
     filter: url(#focus);

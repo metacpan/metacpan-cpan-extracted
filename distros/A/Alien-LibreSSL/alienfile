@@ -1,0 +1,73 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'openssl';
+
+share {
+
+  start_url 'https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/';
+  plugin Download => (
+    version       => qr/^libressl-([0-9\.]+)\.tar\.gz$/,
+    bootstrap_ssl => 1,
+  );
+
+  unless(meta->has_hook('fetch'))
+  {
+    my $ftp_ok = $ENV{ALIEN_OPENSSL_FTP};
+    $ftp_ok = 1 unless defined $ftp_ok;
+    if($ftp_ok)
+    {
+      log(" ************************************************* ");
+      log(" *  WARNING downloading LibreSSL via HTTP        * ");
+      log(" ************************************************* ");
+      start_url 'http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/';
+      plugin 'Fetch::HTTPTiny';
+    }
+    else
+    {
+      log("Unable to download LibreSSL via https without OpenSSL!");
+      log("Recommend installing wget or curl to bootstrap Alien::LibreSSL");
+      die "unable to download LibreSSL via https";
+    }
+  }
+
+  plugin Extract => 'tar.gz';
+
+  meta->prop->{out_of_source} = 1;
+
+  if($^O eq 'MSWin32')
+  {
+    plugin 'Build::CMake';
+
+    if(meta->prop->{platform}->{compiler_type} eq 'microsoft')
+    {
+      requires 'Text::Patch';
+      requires 'Path::Tiny';
+
+      meta->after_hook(
+        extract => sub {
+          my($build) = @_;
+          my($dir) = map { $_->basename } Path::Tiny->new('.')->children;
+          chdir $dir;
+          $build->system('%{perl} %{.install.patch}/libressl-2.6.2.pl');
+          die 'execute failed' if $?;
+          chdir '..';
+        }
+      );
+
+      gather sub {
+        my($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+
+	my @libs = grep /^[a-z]+\.lib$/, map { $_->basename } Path::Tiny->new('.')->child('lib')->children;
+        
+        $build->runtime_prop->{$_} = "-I$prefix/include " for qw( cflags cflags_static );
+        $build->runtime_prop->{$_} = "-LIBPATH:$prefix/lib @libs " for qw( libs libs_static );
+      };
+    }
+  }
+  else
+  {
+    plugin 'Build::Autoconf';
+  }
+}
+

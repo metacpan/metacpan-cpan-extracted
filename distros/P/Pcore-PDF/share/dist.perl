@@ -26,5 +26,5 @@
         }
     },
 
-    princexml_ver => '11.1',
+    princexml_ver => '11.3',
 }

@@ -10,12 +10,12 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'collector' => sub { [] };
+    has _collector => ( default => sub { [] } );
 
-    sub collector { $_[0]->{collector} };
+    sub collector : ro(_collector);
 
     sub collect ($self, $stuff) {
-        push @{ $_[0]->{collector} } => $stuff;
+        push _collector->@* => $stuff;
     }
 
     sub BUILD ($self, $params) {

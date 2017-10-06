@@ -29,6 +29,48 @@ like( $result->error, qr{doesn't exist}, 'infile not exists' );
     is( $sheet->{Cells}[19][8]{Val}, "D1", "Cell content 2" );
 }
 
+{    # population --noindel
+    my $temp = Path::Tiny->tempfile;
+    $result = test_app( 'App::Fasops' => [ qw(xlsx t/example.fas --noindel -o ), $temp->stringify ] );
+    is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 3, 'line count' );
+    like( $result->stdout, qr{Section \[4}, 'sections 4 writed' );
+
+    my $xlsx  = Spreadsheet::XLSX->new( $temp->stringify );
+    my $sheet = $xlsx->{Worksheet}[0];
+
+    # row-col
+    is( $sheet->{Cells}[1][1]{Val},  "G",  "Cell content 1" );
+    is( $sheet->{Cells}[19][8]{Val}, "C", "Cell content 2" );
+}
+
+{    # population --nocomplex
+    my $temp = Path::Tiny->tempfile;
+    $result = test_app( 'App::Fasops' => [ qw(xlsx t/example.fas --nocomplex -o ), $temp->stringify ] );
+    is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 3, 'line count' );
+    unlike( $result->stdout, qr{Section \[4}, 'sections 4 not writed' );
+
+    my $xlsx  = Spreadsheet::XLSX->new( $temp->stringify );
+    my $sheet = $xlsx->{Worksheet}[0];
+
+    # row-col
+    is( $sheet->{Cells}[13][7]{Val}, "D1", "Cell content 1" );
+    is( $sheet->{Cells}[13][8]{Val}, "T", "Cell content 2" );
+}
+
+{    # population --nosingle
+    my $temp = Path::Tiny->tempfile;
+    $result = test_app( 'App::Fasops' => [ qw(xlsx t/example.fas --nosingle -o ), $temp->stringify ] );
+    is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 3, 'line count' );
+    unlike( $result->stdout, qr{Section \[4}, 'sections 4 not writed' );
+
+    my $xlsx  = Spreadsheet::XLSX->new( $temp->stringify );
+    my $sheet = $xlsx->{Worksheet}[0];
+
+    # row-col
+    is( $sheet->{Cells}[13][3]{Val}, "I1", "Cell content 1" );
+    is( $sheet->{Cells}[13][4]{Val}, "G", "Cell content 2" );
+}
+
 {    # outgroup
     my $temp = Path::Tiny->tempfile;
     $result = test_app(

@@ -26,28 +26,24 @@ package BinaryTree {
 
     extends 'Moxie::Object';
 
-    has 'node';
-    has 'parent';
-    has 'left';
-    has 'right';
-
-    my sub _parent : private( parent );
-    my sub _left   : private( left );
-    my sub _right  : private( right );
+    has _node   => ();
+    has _parent => ();
+    has _left   => ();
+    has _right  => ();
 
     sub BUILDARGS : init_args(
-        node?   => node,
-        parent? => parent,
+        node?   => _node,
+        parent? => _parent,
     );
 
     sub BUILD ($self, $) { Scalar::Util::weaken( _parent ) }
 
-    sub node   : rw;
-    sub parent : ro;
+    sub node   : rw(_node);
+    sub parent : ro(_parent);
 
-    sub has_parent : predicate;
-    sub has_left   : predicate;
-    sub has_right  : predicate;
+    sub has_parent : predicate(_parent);
+    sub has_left   : predicate(_left);
+    sub has_right  : predicate(_right);
 
     sub left  ($self) { _left  //= $self->new( parent => $self ) }
     sub right ($self) { _right //= $self->new( parent => $self ) }
@@ -71,12 +67,12 @@ package BinaryTree {
     ok($t->left->has_parent, '... left has a parent');
     is($t->left->parent, $t, '... and it is us');
 
-    ok(Scalar::Util::isweak( $t->left->{parent} ), '... the field was weakened correctly');
+    ok(Scalar::Util::isweak( $t->left->{_parent} ), '... the field was weakened correctly');
 
     ok($t->right->has_parent, '... right has a parent');
     is($t->right->parent, $t, '... and it is us');
 
-    ok(Scalar::Util::isweak( $t->right->{parent} ), '... the field was weakened correctly');
+    ok(Scalar::Util::isweak( $t->right->{_parent} ), '... the field was weakened correctly');
 }
 
 {
@@ -110,8 +106,8 @@ package MyBinaryTree {
     ok($t->has_left, '... left node has now been created');
     ok($t->has_right, '... right node has now been created');
 
-    ok(Scalar::Util::isweak( $t->left->{parent} ), '... the field was weakened correctly');
-    ok(Scalar::Util::isweak( $t->right->{parent} ), '... the field was weakened correctly');
+    ok(Scalar::Util::isweak( $t->left->{_parent} ), '... the field was weakened correctly');
+    ok(Scalar::Util::isweak( $t->right->{_parent} ), '... the field was weakened correctly');
 }
 
 done_testing;

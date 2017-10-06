@@ -3,10 +3,10 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi::BCM2835;
 
-our $VERSION ='0.62';
+our $VERSION ='0.63';
 
 my $requires = {
-        'HiPi'             => '0.62',
+        'HiPi'             => '0.66',
         'threads::shared'  => '0',
 };
 

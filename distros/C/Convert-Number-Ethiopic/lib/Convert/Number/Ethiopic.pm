@@ -8,7 +8,7 @@ BEGIN
 	use strict;
 	use vars qw($VERSION @ENumbers %ENumbers);
 
-	$VERSION = "0.16";
+	$VERSION = "0.17";
 
 	require 5.000;
 
@@ -103,26 +103,56 @@ sub _fromEthiopic
 	#
 	s/([፻፼])([፩-፱])/$1."0$2"/oge;    # add 0 if tens place empty
 	s/([፲-፺])([^፩-፱])/$1."0$2"/oge;  # add 0 if ones place empty
-	s/([፲-፺])\b/$1."0"/oe;           # repeat at end of string
+	if ( $] >= 5.012 ) {
+		s/([፲-፺])$/$1."0"/oe;    # repeat at end of string
+	}
+	else {
+		s/([፲-፺])\b/$1."0"/oe;    # repeat at end of string
+	}
 
 
 	# pad 0s for meto
 	#
 	#  s/(፻)$/$1."00"/e;  # this is stupid but tricks perl 5.6 into working
-	s/፻\b/፻00/o;
+	if ( $] >= 5.012 ) {
+		s/፻$/፻00/o;
+	}
+	else {
+		s/፻\b$/፻00/o;
+	}
 
 	# pad 0s for ilf
 	#
-	s/፼\b/፼0000/o;
+	if ( $] >= 5.012 ) {
+		s/፼$/፼0000/o;
+	}
+	else {
+		s/፼\b/፼0000/o;
+	}
 	s/፼፼/፼0000፼/og;  # since /g doesn't work the first time..
 	s/፼፼/፼0000፼/og;  # ...we do it again!
 	s/፻፼/፼00፼/og;
 	s/፼0([፩-፱])፼/፼000$1፼/og;
-	s/፼0([፩-፱])\b/፼000$1/o;          # repeat at end of string
+	if ( $] >= 5.012 ) {
+		s/፼0([፩-፱])$/፼000$1/o;          # repeat at end of string
+	}
+	else {
+		s/፼0([፩-፱])\b/፼000$1/o;          # repeat at end of string
+	}
 	s/፼([፲-፺]0)፼/፼00$1፼/og;
-	s/፼([፲-፺]0)\b/፼00$1/o;           # repeat at end of string
+	if ( $] >= 5.012 ) {
+		s/፼([፲-፺]0)$/፼00$1/o;           # repeat at end of string
+	}
+	else {
+		s/፼([፲-፺]0)\b/፼00$1/o;           # repeat at end of string
+	}
 	s/፼([፩-፺]{2})፼/፼00$1፼/og;
-	s/፼([፩-፺]{2})\b/፼00$1/o;         # repeat at end of string
+	if ( $] >= 5.012 ) {
+		s/፼([፩-፺]{2})$/፼00$1/o;         # repeat at end of string
+	}
+	else {
+		s/፼([፩-፺]{2})\b/፼00$1/o;         # repeat at end of string
+	}
 
 	s/[፻፼]//og;
 

@@ -5,60 +5,67 @@ no warnings "experimental";
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(get_spp_grammar);
+our @EXPORT = qw(get_grammar);
 
-sub get_spp_grammar {
+sub get_grammar {
    return << 'EOF'
-spp       = ^ |_ Spec|+ $ ;
 
-_         = |\s+ _comm|+ ;
-_comm     = '//' ~ $$ ;
+  spp       = |_ Spec|+ $ ;
 
-Spec      = Token \s* '=' |_ Branch rule|+ |';' $| ;
+  _         = |\s+ _comm|+ ;
+  _comm     = '//' ~ $$ ;
 
-rule      = |
-               Group
+  Spec      = Token \s* '=' |_ Branch @rule|+ |';' $| ;
+  
+  @rule      = |
+               Group In Out Qstr Qint
                Token Str String Kstr Point
                Cclass Char Chclass
                Sym Expr Assert Any
-               Look Not Till
-            | ;
+               Look Not Till Int
+              | ;
 
-Branch    = '|'  |_ rule|+ '|' ;
-Group     = '{'  |_ Branch rule|+ '}' ;
+  Branch    = '|'  |_ @rule|+ '|' ;
+  Group     = '{'  |_ Branch @rule|+ '}' ;
 
-Token     = [\a\-]+ ;
-Kstr      = ':' [\a\-]+ ;
-Point     = '0x' \x+ ;
+  In        = '<' ;
+  Out       = '>' ;
+  Qstr      = '#' ;
+  Qint      = '&' ;
 
-Str       = \' |Chars Char|+ \' ;
-Chars     = [^\\']+ ;
+  Token     = [@\a\-]+ ;
+  Kstr      = ':' [\a\-]+ ;
+  Point     = '0x' \x+ ;
 
-String    = \" |Schars Char|+ \" ;
-Schars    = [^\\"]+ ;
+  Str       = \' |Chars Char|+ \' ;
+  Chars     = [^\\']+ ;
 
-Cclass    = \\ [ adhlsuvwxADHLSUVWX] ;
-Char      = \\ . ;
+  String    = \" |Schars Char|+ \" ;
+  Schars    = [^\\"]+ ;
 
-Chclass   = \[ Flip? |_ Cclass Char Range Cchar|+ \] ;
-Flip      = '^' ;
-Range     = \w \- \w ;
-Cchar     = [^ \s \] \/ \\] ;
+  Cclass    = \\ [ adhlsuvwxADHLSUVWX] ;
+  Char      = \\ . ;
 
-Assert    = | '^^' '$$' '$' '^' | ;
-Any       = '.' ;
+  Chclass   = \[ Flip? |_ Cclass Char Range Cchar|+ \] ;
+  Flip      = '^' ;
+  Range     = \w \- \w ;
+  Cchar     = [^ \s \] \/ \\] ;
 
-Look      = Rept Flag? ;
-Rept      = [?*+] ;
-Flag      = '?' ;
-Not       = '!' ;
-Till      = '~' ;
+  Assert    = | '^^' '$$' '^' '$' | ;
+  Any       = '.' ;
 
-Sym       = '@' [\a\-]+ ;
-Expr      = '(' |_ atom|+ ')' ;
-Array     = '[' |_ atom|* ']' ;
-atom      = | Int Expr Array Str String Sym Kstr | ;
-Int       = \d+ ;
+  Look      = Rept Flag? ;
+  Rept      = [?*+] ;
+  Flag      = '?' ;
+  Not       = '!' ;
+  Till      = '~' ;
+
+  Sym       = '$' [\a\-]+ ;
+  Expr      = '(' |_ @atom|+ ')' ;
+  Array     = '[' |_ @atom|* ']' ;
+  Sub       = [\a\-]+ ; 
+  Int       = \d+ ;
+  @atom     = | Expr Array Str Sub Sym Kstr Int | ;
 
 EOF
 }

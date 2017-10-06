@@ -1,6 +1,6 @@
 package IP::CountryFlag::Params;
 
-$IP::CountryFlag::Params::VERSION   = '0.09';
+$IP::CountryFlag::Params::VERSION   = '0.10';
 $IP::CountryFlag::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ IP::CountryFlag::Params - Placeholder for parameters for IP::CountryFlag.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -17,11 +17,9 @@ use 5.006;
 use strict; use warnings;
 use Data::Dumper;
 use Data::Validate::IP qw(is_ipv4 is_ipv6);
-use vars qw(@ISA @EXPORT @EXPORT_OK);
+use parent 'Exporter';
 
-require Exporter;
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(validate);
+our @EXPORT_OK = qw(validate);
 
 sub check_ip   { die "ERROR: Received invalid IP [$_[0]]."    unless (is_ipv4($_[0]) || is_ipv6($_[0])) };
 sub check_path { die "ERROR: Received invalid Path [$_[0]]."  unless (-d "$_[0]")                       };

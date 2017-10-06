@@ -4,7 +4,7 @@ use strict;
 use ExtUtils::MakeMaker;
 
 my $PM = 'lib/Digest/SHA/PurePerl.pm';
-my $SHASUM = 'shasum';
+my $SHASUMPP = 'shasumpp';
 
 	# 'use warnings' if possible, but stay portable
 
@@ -15,7 +15,7 @@ my $warn_0 = 'BEGIN { $^W = 0 }';
 	eval "require warnings; import warnings";
 	$use_warnings = $@ ? 0 : 1;
 
-	local(@ARGV) = ($PM, $SHASUM);
+	local(@ARGV) = ($PM, $SHASUMPP);
 	while (<>) {
 		if (
 		(!$use_warnings && /^(use|no) warnings\b/) ||
@@ -45,7 +45,7 @@ if (@EDITs) {
 my %attr = (
 	'NAME'		=> 'Digest::SHA::PurePerl',
 	'VERSION_FROM'	=> $PM,
-	'EXE_FILES'	=> [ $SHASUM ],
+	'EXE_FILES'	=> [ $SHASUMPP ],
 );
 
 my $MMversion = $ExtUtils::MakeMaker::VERSION || '0.00_00';

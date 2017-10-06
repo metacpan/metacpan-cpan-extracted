@@ -4,7 +4,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 my %mocked;
 sub new {
@@ -44,6 +44,20 @@ sub DESTROY {
 sub get_package {
 	my $self = shift;
 	return $self->{_package};
+}
+
+sub redefine {
+	my ($self, @mocks) = (shift, @_);
+
+	while ( my ($name, $value) = splice @mocks, 0, 2 ) {
+		my $sub_name = $self->_full_name($name);
+		my $coderef = *{$sub_name}{'CODE'};
+		if ('CODE' ne ref $coderef) {
+			croak "$sub_name does not exist!";
+		}
+	}
+
+	return $self->mock(@_);
 }
 
 sub mock {
@@ -182,6 +196,10 @@ Test::MockModule - Override subroutines in a module for unit testing
 		my $module = Test::MockModule->new('Module::Name');
 		$module->mock('subroutine', sub { ... });
 		Module::Name::subroutine(@args); # mocked
+
+		#Same effect, but this will die() if other_subroutine()
+		#doesn't already exist, which is often desirable.
+		$module->redefine('other_subroutine', sub { ... });
 	}
 
 	Module::Name::subroutine(@args); # original subroutine
@@ -316,6 +334,13 @@ you can instead mock it in the module you are testing:
 	my $mymodule = Test::MockModule->new("MyModule", no_auto => 1);
 	$mymodule->mock("strftime", "Yesterday");
 	is MyModule::minus_twentyfour(), "Yesterday", "`minus-tewntyfour` got mocked"; # suceeds
+
+=item redefine($subroutine)
+
+The same behavior as C<mock()>, but this will preemptively check to be
+sure that all passed subroutines actually exist. This is useful to ensure that
+if a mocked module's interface changes the test doesn't just keep on testing a
+code path that no longer behaves consistently with the mocked behavior.
 
 =item original($subroutine)
 

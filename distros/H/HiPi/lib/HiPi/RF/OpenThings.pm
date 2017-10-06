@@ -18,7 +18,7 @@ use HiPi qw( :openthings :energenie );
 my $products = {};
 my $manufacturers = {};
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 for my $manutemplate
 (
@@ -102,6 +102,11 @@ sub format_sensor_id {
 
 sub parameter_map {
     my ($class, $param ) = @_;
+    
+    unless( defined( $param ) ) {
+        my $undefname = 'Parameter Undefined';
+        return ( wantarray ) ? ( $undefname, '' ) : $undefname;
+    }
     
     my($name, $units) = ('Unknown - ' . $param, '');
     

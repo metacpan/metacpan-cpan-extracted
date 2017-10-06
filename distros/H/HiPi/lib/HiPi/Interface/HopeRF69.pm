@@ -20,7 +20,7 @@ use Time::HiRes qw( usleep );
 __PACKAGE__->create_accessors( qw( devicename reset_gpio update_default_on_reset
                                    fsk_config ook_config ook_repeat) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 # Hope recommended updated reset defaults
 my $reset_defaults = [
@@ -148,20 +148,15 @@ sub write_register {
     my( $self, @data ) = @_;
     # address is first byte
     $data[0] |= RF69_MASK_REG_WRITE;
-    my $packcount = scalar( @data );
-    my $packfmt = 'C' . $packcount;
-    $self->device->bus_transfer( pack($packfmt, @data ) );
-    return;
+    $self->device->transfer_byte_array( @data );
 }
 
 sub read_register {
     my( $self, $addr, $numbytes ) = @_;
     $numbytes ||= 1;
-    my $packcount = 1 + $numbytes;
-    my $packfmt = 'C' . $packcount;
-    my @data = ( 0 ) x $packcount;
+    my @data = ( 0 ) x ( $numbytes + 1 );
     $data[0] = $addr;
-    my ($retaddr, @rvals ) = unpack($packfmt, $self->device->bus_transfer( pack($packfmt, @data)));
+    my ($retaddr, @rvals ) = $self->device->transfer_byte_array( @data );
     return ( wantarray ) ? @rvals : $rvals[0];
 }
 

@@ -16,19 +16,17 @@ name: Mylisp
 provides:
   Mylisp:
     file: lib/Mylisp.pm
-    version: '1.08'
+    version: '2.0'
   Mylisp::Ast:
     file: lib/Mylisp/Ast.pm
   Mylisp::Core:
     file: lib/Mylisp/Core.pm
   Mylisp::Grammar:
     file: lib/Mylisp/Grammar.pm
-  Mylisp::OptAstAtom:
-    file: lib/Mylisp/OptAstAtom.pm
-  Mylisp::OptAstMacro:
-    file: lib/Mylisp/OptAstMacro.pm
-  Mylisp::Stable:
-    file: lib/Mylisp/Stable.pm
+  Mylisp::Lint:
+    file: lib/Mylisp/Lint.pm
+  Mylisp::OptAst:
+    file: lib/Mylisp/OptAst.pm
   Mylisp::ToPerl:
     file: lib/Mylisp/ToPerl.pm
 requires:
@@ -39,5 +37,5 @@ requires:
   perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.08'
+version: '2.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

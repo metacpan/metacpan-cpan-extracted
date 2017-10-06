@@ -32,16 +32,15 @@
 //
 // test.js
 //
-// runs routines in tests/ directory to declare unit tests
+// runs routines in tests/ directory to declare unit tests. Each js file in
+// tests/ needs to be mentioned here.
 //
 "use strict";
 
 require ([
-    'QUnit',
     'app/tests/dummy',
     'app/tests/dmenu',
 ], function (
-    qunit,
     dummyTests,
     dmenuTests
 ) {

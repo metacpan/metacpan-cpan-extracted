@@ -2,6 +2,10 @@ NAME
 
     Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
+VERSION
+
+    version 0.003
+
 SYNOPSIS
 
         use Graphics::Raylib;
@@ -41,7 +45,7 @@ IMPLEMENTATION
     feature complete.
 
     You can import Graphics::Raylib::XS for any functions not yet exposed
-    perlishly.
+    perlishly. Scroll down for an example.
 
 METHODS/SUBS AND ARGUMENTS
 
@@ -73,10 +77,13 @@ EXAMPLES
 
     Conway's Game of Life
 
-          my $HZ = 60;
-          my $SIZE = 80;
+          my $HZ = 120;
+          my $SIZE = 160;
+          my $MUTATION_CHANCE = 0.000;
       
-          my $CELL_SIZE = 6;
+          ###########
+      
+          my $CELL_SIZE = 3;
       
           use Graphics::Raylib;
           use Graphics::Raylib::Shape;
@@ -102,27 +109,29 @@ EXAMPLES
           $g->fps($HZ);
       
           my $text = Graphics::Raylib::Text->new(
-              color => Graphics::Raylib::Color::DARKGRAY,
+              color => Graphics::Raylib::Color::RED,
               size => 20,
           );
       
-          my $rainbow = Graphics::Raylib::Color::Rainbow->new(colors => 240);
+          my $bitmap = Graphics::Raylib::Shape->bitmap(
+              matrix => unpdl($gen),
+              # color => Graphics::Raylib::Color::RED; # commented-out, we are doing it fancy
+          );
       
-          my $i = 0;
-          while (!$g->exiting)
-          {
-              my $bitmap = Graphics::Raylib::Shape->bitmap(
-                  matrix => unpdl($gen),
-                  color  => $rainbow->cycle,
-              );
+          my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
       
+          $g->clear(Graphics::Raylib::Color::BLACK);
+      
+          while (!$g->exiting) {
               Graphics::Raylib::draw {
                   $g->clear(Graphics::Raylib::Color::BLACK);
       
-                  $text->{text} = "Generation " . ($i++);
-                  $text->draw;
-      
+                  $bitmap->matrix = unpdl($gen);
+                  $bitmap->color = $rainbow->();
                   $bitmap->draw;
+      
+                  $text->text = "Generation " . ($i++);
+                  $text->draw;
               };
       
       
@@ -134,9 +143,14 @@ EXAMPLES
               #  next gen are live cells with three neighbours or any with two
               my $next = $gen & ($neighbourhood == 4) | ($neighbourhood == 3);
       
+              # mutation
+              $next |= $neighbourhood == 2 if rand(1) < $MUTATION_CHANCE;
+      
               # procreate
               $gen = $next;
           }
+
+ Result
 
 GIT REPOSITORY
 

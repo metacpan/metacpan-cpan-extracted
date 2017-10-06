@@ -1,0 +1,10 @@
+Revision history for CPAN-Perl-Releases-MetaCPAN
+
+0.003  2017-09-23 18:07:03 JST
+    - Corrected typo in exported functions (bingos #1)
+
+0.002  2017-09-23 12:29:01 JST
+    - Fix "status" handling
+
+0.001  2017-09-23 12:02:58 JST
+    - Initial release

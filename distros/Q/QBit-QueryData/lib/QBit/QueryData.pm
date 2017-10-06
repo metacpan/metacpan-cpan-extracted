@@ -1,5 +1,5 @@
 package QBit::QueryData;
-$QBit::QueryData::VERSION = '0.003';
+$QBit::QueryData::VERSION = '0.005';
 use qbit;
 
 use base qw(QBit::Class);
@@ -83,8 +83,10 @@ sub fields {
             delete($self->{'__FIELDS__'});
         } else {
             #set fields
-            my @not_exists = grep {!$self->{'__EXISTS_FIELDS__'}{$_}} @$fields;
-            throw gettext('Unknown fields: %s', join(', ', @not_exists)) if @not_exists;
+            if (exists($self->{'__EXISTS_FIELDS__'})) {
+                my @not_exists = grep {!$self->{'__EXISTS_FIELDS__'}{$_}} @$fields;
+                throw gettext('Unknown fields: %s', join(', ', @not_exists)) if @not_exists;
+            }
 
             $self->{'__FIELDS__'} = $fields;
         }
@@ -209,7 +211,7 @@ sub get_all {
 
     my @result = ();
 
-    my @fields = @{$self->get_fields()};
+    my @fields = @{$self->get_fields() // []};
     if ($self->{'__DISTINCT__'}) {
         my %uniq = ();
 
@@ -264,7 +266,8 @@ sub _filter {
     my @part = ();
     if (ref($filter) eq 'HASH') {
         foreach my $field (keys(%$filter)) {
-            throw gettext('Unknown field "%s"', $field) unless $self->{'__EXISTS_FIELDS__'}{$field};
+            throw gettext('Unknown field "%s"', $field)
+              if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$field};
 
             my $type_operation = $self->_get_filter_operation($field, '=');
 
@@ -290,7 +293,8 @@ sub _filter {
     } elsif (ref($filter) eq 'ARRAY' && @$filter == 3) {
         my ($field, $op, $value) = @$filter;
 
-        throw gettext('Unknown field "%s"', $field) unless $self->{'__EXISTS_FIELDS__'}{$field};
+        throw gettext('Unknown field "%s"', $field)
+          if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$field};
 
         $op    = uc($op);
         $value = $$value;
@@ -328,17 +332,18 @@ sub _get_order {
     foreach my $order (@order_by) {
         my @path = split(/\./, $order->[0]);
 
-        throw gettext('Unknown field "%s"', $path[0]) unless $self->{'__EXISTS_FIELDS__'}{$path[0]};
+        throw gettext('Unknown field "%s"', $path[0])
+          if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$path[0]};
 
         my $type_operation = $self->_get_order_operation($order->[0]);
 
         my $value = '$_[%s]';
         $value .= "->{$_}" foreach @path;
 
-        unless ($order->[1]) {
-            push(@part, sprintf("($value %s $value)", 0, $type_operation, 1));
-        } else {
+        if ($order->[1]) {
             push(@part, sprintf("($value %s $value)", 1, $type_operation, 0));
+        } else {
+            push(@part, sprintf("($value %s $value)", 0, $type_operation, 1));
         }
     }
 
@@ -376,6 +381,7 @@ sub _get_value {
     my $type = $self->definition->{$field}{'type'} // 'string';
 
     if ($type eq 'string') {
+        $value =~ s/\\/\\\\/g;
         $value =~ s/'/\\'/g;
         $value = "'$value'";
     } else {

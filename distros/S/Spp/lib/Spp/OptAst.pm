@@ -5,12 +5,12 @@ no warnings "experimental";
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(opt_spp_ast);
+our @EXPORT = qw(opt_ast);
 
 use Spp::Builtin;
-use Spp::Core;
+use Spp::Core qw(is_tillnot is_look is_rept is_sym);
 
-sub opt_spp_ast {
+sub opt_ast {
    my $ast = shift;
    return [ opt_atom($ast) ] if is_atom($ast);
    return map_opt_atom($ast);
@@ -25,27 +25,28 @@ sub opt_atom {
    my $atom = shift;
    my ($name, $value) = @{$atom};
    given ($name) {
-      when ('Spec')    { return opt_spec($value)  }
-      when ('Group')   { return opt_group($value) }
+      when ('Group')   { return opt_group($value)  }
       when ('Branch')  { return opt_branch($value) }
+      when ('Spec')    { return opt_spec($value)   }
       when ('Cclass')  { return opt_cclass($value) }
-      when ('Char')    { return opt_char($value) }
-      when ('Str')     { return opt_str($value) }
-      when ('String')  { return opt_str($value) }
-      when ('Kstr')    { return opt_kstr($value) }
-      when ('Point')   { return opt_point($value) }
-      when ('Chclass') { return opt_chclass($value) }
-      when ('Look')    { return opt_look($value) }
-      when ('Token')   { return opt_token($value) }
-      when ('Expr')    { return opt_expr($value) }
-      when ('Sym')     { return opt_sym($value) }
-      when ('Array')   { return opt_array($value) }
-      when ('Assert')  { return $atom }
-      when ('Any')     { return $atom }
-      when ('Till')    { return $atom }
-      when ('Not')     { return $atom }
-      when ('Int')     { return $atom }
-      default { error("unknown Spp atom to opt: |$name|") }
+      when ('Char')    { return opt_char($value)   }
+      when ('Str')     { return opt_str($value)    }
+      when ('String')  { return opt_str($value)    }
+      when ('Kstr')    { return opt_kstr($value)   }
+      when ('Point')   { return opt_point($value)  }
+      when ('Chclass') { return opt_chclass($value)}
+      when ('Look')    { return opt_look($value)   }
+      when ('Token')   { return opt_token($value)  }
+      when ('Expr')    { return opt_expr($value)   }
+      when ('Sym')     { return opt_sym($value)    }
+      when ('Sub')     { return opt_sym($value)    }
+      when ('Array')   { return opt_array($value)  }
+      when ('In')      { return opt_in($value)     }
+      when ('Out')     { return opt_out($value)    }
+      when ('Qstr')    { return opt_qstr($value)   }
+      when ('Qint')    { return opt_qint($value)   }
+      when ('Int')     { return opt_int($value)    }
+      default { return $atom }
    }
 }
 
@@ -58,10 +59,25 @@ sub opt_spec {
 }
 
 sub opt_rules {
-   my $rules     = shift;
-   my $opt_rules = opt_atoms($rules);
-   return $opt_rules->[0] if len($opt_rules) == 1;
-   return ['Rules', $opt_rules];
+   my $atoms = shift;
+   return opt_sets('Rules', $atoms);
+}
+
+sub opt_group {
+   my $atoms = shift;
+   return opt_sets('Group', $atoms);
+}
+
+sub opt_branch {
+   my $atoms = shift;
+   return opt_sets('Branch', $atoms);
+}
+
+sub opt_sets {
+   my ($name, $atoms) = @_;
+   my $opt_atoms = opt_atoms($atoms);
+   return $opt_atoms->[0] if len($opt_atoms) == 1;
+   return [$name, $opt_atoms];
 }
 
 sub opt_atoms {
@@ -78,20 +94,6 @@ sub opt_point {
    return ['Char', chr(hex($point))];
 }
 
-sub opt_group {
-   my $atoms     = shift;
-   my $opt_atoms = opt_atoms($atoms);
-   return $opt_atoms->[0] if len($opt_atoms) == 1;
-   return ['Group', $opt_atoms];
-}
-
-sub opt_branch {
-   my $atoms     = shift;
-   my $opt_atoms = opt_atoms($atoms);
-   return $opt_atoms->[0] if len($opt_atoms) == 1;
-   return ['Branch', $opt_atoms];
-}
-
 sub opt_kstr {
    my $kstr = shift;
    my $str  = substr($kstr, 1);
@@ -101,7 +103,7 @@ sub opt_kstr {
 
 sub opt_cclass {
    my $cclass = shift;
-   return ['Cclass', substr($cclass, -1)];
+   return ['Cclass', tail($cclass)];
 }
 
 sub opt_char {
@@ -111,7 +113,7 @@ sub opt_char {
 
 sub opt_escape_char {
    my $str  = shift;
-   my $char = substr($str, -1);
+   my $char = tail($str);
    given ($char) {
       when ('b') { return ' ' }
       when ('f') { return "\f" }
@@ -120,6 +122,26 @@ sub opt_escape_char {
       when ('t') { return "\t" }
       default    { return $char }
    }
+}
+
+sub opt_str {
+   my $atoms     = shift;
+   my $opt_atoms = [];
+   for my $atom (@{$atoms}) {
+      my ($name, $value) = @{$atom};
+      given ($name) {
+         when ('Char') {
+            my $char = opt_escape_char($value);
+            push @{$opt_atoms}, $char;
+         }
+         default {
+            push @{$opt_atoms}, $value;
+         }
+      }
+   }
+   my $str = join('', @{$opt_atoms});
+   return ['Char', $str] if len($str) == 1;
+   return ['Str', $str];
 }
 
 sub opt_chclass {
@@ -141,11 +163,16 @@ sub opt_chclass {
 sub opt_catom {
    my ($name, $value) = @_;
    given ($name) {
-      when ('Cclass') { return opt_cclass($value) }
-      when ('Range')  { return opt_range($value) }
-      when ('Char')   { return opt_char($value) }
-      when ('Cchar')  { return ['Char', $value] }
-      default         { die("unknown cclass atom $name") }
+      when ('Cclass') {
+         return opt_cclass($value)
+      }
+      when ('Range')  { 
+         return opt_range($value)
+      }
+      when ('Char')   { 
+         return opt_char($value) 
+      }
+      default { return ['Char', $value] }
    }
 }
 
@@ -168,7 +195,7 @@ sub gather_tillnot {
    my $cache     = '';
    for my $atom (@{$atoms}) {
       if ($flag == 0) {
-         if (is_atom_tillnot($atom)) {
+         if (is_tillnot($atom)) {
             $flag  = 1;
             $cache = $atom;
          } else {
@@ -176,7 +203,7 @@ sub gather_tillnot {
          }
       }
       else {
-         if (!is_atom_tillnot($atom)) {
+         if (!is_tillnot($atom)) {
             my $name = $cache->[0];
             $cache = [$name, $atom];
             push @opt_atoms, $cache;
@@ -198,14 +225,14 @@ sub gather_look {
    my $look      = '';
    for my $atom (@{$atoms}) {
       if ($flag == 0) {
-         if (is_atom_name($atom, '_look')) {
+         if (is_look($atom)) {
             die("Look token less prefix atom: $atom");
          } else {
             $cache = $atom;
             $flag  = 1;
          }
       } elsif ($flag == 1) {
-         if (is_atom_name($atom, '_look')) {
+         if (is_look($atom)) {
             $look = $atom->[1];
             $flag = 2;
          } else {
@@ -213,7 +240,7 @@ sub gather_look {
             $cache = $atom;
          }
       } else {
-         if (!is_atom_name($atom, '_look')) {
+         if (!is_look($atom)) {
             $cache = ['Look', [$look, $cache, $atom]];
             push @opt_atoms, $cache;
             $flag = 0;
@@ -234,7 +261,7 @@ sub gather_rept {
    my $cache = '';
    for my $atom (@{$atoms}) {
       if ($flag == 0) {
-         if (is_atom_name($atom, '_rept')) {
+         if (is_rept($atom)) {
             die("rept without token");
          }
          else {
@@ -243,7 +270,7 @@ sub gather_rept {
          }
       }
       else {
-         if (is_atom_name($atom, '_rept')) {
+         if (is_rept($atom)) {
             my $rept = $atom->[1];
             push @opt_atoms, ['Rept', [$rept, $cache]];
             $flag = 0;
@@ -261,17 +288,16 @@ sub gather_rept {
 sub opt_token {
    my $name = shift;
    my $char = first($name);
-   return ['Ntoken', $name] if is_char_upper($char);
-   return ['Ctoken', $name] if is_char_lower($char);
    return ['Rtoken', $name] if $char eq '_';
-   die "Unknown token: <$name> to Opt";
+   return ['Ntoken', $name] if is_upper($char);
+   return ['Ctoken', $name];
 }
 
 sub opt_expr {
    my $atoms     = shift;
    my $opt_atoms = map_opt_atom($atoms);
    my $action    = $opt_atoms->[0];
-   if (is_atom_sym($action)) {
+   if (is_sym($action)) {
       $opt_atoms->[0] = $action->[1];
       return ['Expr', $opt_atoms];
    }
@@ -292,24 +318,18 @@ sub opt_array {
    return ['Array', $opt_atoms];
 }
 
-sub opt_str {
-   my $atoms     = shift;
-   my $opt_atoms = [];
-   for my $atom (@{$atoms}) {
-      my ($name, $value) = @{$atom};
-      given ($name) {
-         when ('Schars') { push @{$opt_atoms}, $value }
-         when ('Chars')  { push @{$opt_atoms}, $value }
-         when ('Char') {
-            my $char = opt_escape_char($value);
-            push @{$opt_atoms}, $char;
-         }
-         default { die("unknown string atom: <$name>") }
-      }
-   }
-   my $str = join('', @{$opt_atoms});
-   return ['Char', $str] if len($str) == 1;
-   return ['Str', join('', @{$opt_atoms})];
+sub opt_in { return ['Char', In] }
+
+sub opt_out { return ['Char', Out] }
+
+sub opt_qstr { return ['Char', Qstr] }
+
+sub opt_qint { return ['Char', Qint] }
+
+sub opt_int {
+  my $int = shift;
+  return ['Char', $int] if len($int) == 1;
+  return ['Str', $int];
 }
 
 1;

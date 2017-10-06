@@ -5,6 +5,7 @@ README
 t/test.yaml
 t/00pods.t
 t/01citadel.t
+t/02critic.t
 lib/Net/Citadel.pm
 lib/Net/Citadel/ToDo.pod
 META.json

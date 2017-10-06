@@ -13,10 +13,11 @@ use t::model::derived;
 use t::view::derived;
 use t::view::touchy;
 use JSON;
+use Test::Number::Delta;
 
 eval {
   require DBD::SQLite;
-  plan tests => 9;
+  plan tests => 11;
 } or do {
   plan skip_all => 'DBD::SQLite not installed';
 };
@@ -75,6 +76,8 @@ eval {
 					       },
 			    });
   my $ref = $util->dbh->selectall_arrayref(q[SELECT * FROM derived], {Slice => {}});
+  delta_ok($ref->[0]->{float_dummy}, 42.7, 'float value');
+  delete $ref->[0]->{float_dummy};
   is_deeply($ref, [
 		   {
 		    id_derived_parent => 1,
@@ -83,7 +86,7 @@ eval {
 		    int_dummy => 5,
 		    id_derived => 1,
 		    id_derived_status => 2,
-		    float_dummy => 42.7,
+#		    float_dummy => 42.7,
 		   }
 		  ], 'update (id in url) with json postdata');
 }
@@ -113,6 +116,8 @@ eval {
 					       },
 			    });
   my $ref = $util->dbh->selectall_arrayref(q[SELECT * FROM derived], {Slice => {}});
+  delta_ok($ref->[0]->{float_dummy}, 42.7, 'float value');
+  delete $ref->[0]->{float_dummy};
   is_deeply($ref, [
 		   {
 		    id_derived_parent => 1,
@@ -120,7 +125,7 @@ eval {
 		    text_dummy => 'some text',
 		    id_derived_status => 2,
 		    id_derived => 1,
-		    float_dummy => 42.7,
+#		    float_dummy => 42.7,
 		    int_dummy => 42
 		   },
 		   {

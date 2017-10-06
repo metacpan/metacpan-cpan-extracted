@@ -1,5 +1,11 @@
 Summary of important user-visible changes for Bio-Tools-Run-Alignment-Clustawl
 ------------------------------------------------------------------------------
 
+1.7.3     2017-09-27 18:30:00+01:00 Europe/London
+  * Replace requires_external.t with a check in the Makefile.PL for
+    clustalw.  This ensures that the installation fails instead of
+    triggering a test failure since a test failure indicates a bug in
+    the package.  This avoids failure reports CPAN Testers.
+
 1.7.2     2017-09-14 16:04:14+01:00 Europe/London
   * First release after split from bioperl-run.

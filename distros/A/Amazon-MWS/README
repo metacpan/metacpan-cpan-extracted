@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.141
+    0.150
 
 DESCRIPTION
 
@@ -191,6 +191,10 @@ MWS in practice
 
     There is no point in using such big image files for Amazon.
 
+  Error 99001: "brand_name"
+
+    Brand is a required field for products.
+
 Uploader Module
 
     Amazon::MWS::Uploader is an upload agent for Amazon::MWS.
@@ -220,6 +224,10 @@ XML Modules
     OrderlineItem
 
       Amazon::MWS::XML::OrderlineItem
+
+ACKNOWLEDGEMENTS
+
+    James Rinser (additional API methods).
 
 AUTHORS
 

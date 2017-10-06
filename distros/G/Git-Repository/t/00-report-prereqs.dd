@@ -43,7 +43,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
                                    'Test::Requires::Git' => '1.005',
-                                   'blib' => '1.01',
                                    'constant' => '0',
                                    'lib' => '0',
                                    'overload' => '0'

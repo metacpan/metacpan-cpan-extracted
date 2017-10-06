@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
-# given one or more .TTF files on the command line, display their contents
-# and some sample text.
+# given one or more .TTF files on the command line, display their contents:
+# 256 bytes in one single-byte encoding, plus some sample UTF-8 text.
+# -e encoding (default is latin1) SINGLE BYTE ONLY!
 # note that use of -file in new() leaves the PDF in THIS directory, not the
 #   one with the 022_truefonts_diacrits_utf8 file!
 
@@ -23,6 +24,8 @@ my $sx = 33;
 my $sy = 45;
 my $fx = 20;
 my $LoremIpsum = qq|Sed ut perspici\x{0361}atis.|;  # times.ttf includes
+# U+0361 is combining double inverted breve (spans i to t)
+# "use utf8" says to interpret string as UTF-8
 my $encoding = 'latin1';
 
 my ($fn, $pdf, $f1, $f2, $gfx, $text, $x, $y, $yp, $page);
@@ -35,13 +38,13 @@ GetOptions(
 die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
 
 foreach $fn (@ARGV) {
-    if (!-e $fn) {
+    if (!-r $fn) {
 	print "$fn cannot be read. Skipping...\n\n";
 	next;
     }
 
     my $myName = basename($fn);
-    $myName =~ s/\.ttf$//i;  # remove .ttf (any case)
+    $myName =~ s/\.[ot]tf$//i;  # remove .ttf/.otf (any case)
 
     $pdf = PDF::Builder->new(-compress => $compress,
 	                  -file => basename($0).'.'.$myName.".pdf");
@@ -54,9 +57,12 @@ foreach $fn (@ARGV) {
     my $font=$pdf->ttfont($fn, -encode => $encoding);
     $font->data->{'nosubset'}=1;
     # produce a page with dump of font
-    if (1) {
+    # single byte encoding (16 rows x 16 columns)
+    if ($encoding =~ m/^utf/i || $encoding =~ m/^ucs/i) {
+        print STDERR "can't display page for multibyte encoding.\n";
+    } else {
         $page = $pdf->page();
-        $page->mediabox(595,842);
+        $page->mediabox(595,842); # A4
 
         $gfx = $page->gfx();
 
@@ -84,6 +90,13 @@ foreach $fn (@ARGV) {
                 $txt->translate(50+($sx*$x),50+($sy*$y));
 		my $ci = $yp*16 + $x;
 		my $c  = chr($ci);
+	       #if ($encoding =~ m/^utf/i || $encoding =~ m/^ucs/i) {
+	       #    # by default, ci=x80 through xFF isn't treated as UTF-8,
+	       #    # so need to manually encode
+	       #    if ($ci >= 128 && $ci < 256) {
+	       #	$c = Encode::decode('cp-1252', $c);
+	       #    }
+	       #}
                 $txt->text($c);
 
                 my $wx=$font->width($c)*$fx;
@@ -102,23 +115,29 @@ foreach $fn (@ARGV) {
                 $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
                 $gfx->stroke();
 
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-6);
                 $txt2->text_right($ci);
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
-                $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($ci)));
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-11);
+                if (defined $font->uniByEnc($ci)) {
+                    $txt2->text_right(sprintf('U+%04X', $font->uniByEnc($ci)));
+		} else {
+                    $txt2->text_right('U+????');
+		}
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-16);
                 $txt2->text_right($font->glyphByEnc($ci));
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-21);
                 $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($ci)));
             } # loop x L to R along row
         } # loop yp B to T along column and y T to B
-    } # always do this section (if 1)
+    } # single byte encoding display chars
     
+    # unlike 022_truefonts, there is no CId dump
+
     # print out some text in this font on next page
     my $textL = $LoremIpsum;
 
     $page = $pdf->page();
-    $page->mediabox(595,842);
+    $page->mediabox(595,842); # A4
     $text = $page->text();
     $text->transform(-translate => [50, 800]);
     $text->fillcolor('black');

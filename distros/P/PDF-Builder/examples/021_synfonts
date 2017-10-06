@@ -48,6 +48,7 @@ foreach $fn (qw(
     wingdings
     webdings
 )) {
+   #if ($fn eq 'Times-Italic') { last; } # for testing
 
     my $pdf = PDF::Builder->new(-compress => $compress);
     initNameTable();
@@ -59,20 +60,20 @@ foreach $fn (qw(
 
     my $fn1 = $pdf->corefont($fn, -encode => 'latin1');
 
-    my @fonts = ($fn1, $fn1->automap());
+    my @planes = ($fn1, $fn1->automap());
     my @variants = ({-slant=>0.750}, {-oblique=>12}, {-bold=>4}, {-caps=>1});
     my @varLabels = ('slant 0.750', 'oblique 12', 'bold 4', 'caps 1');
     my $varNum = 0;
 
     print STDERR "  ".(scalar @variants)." variants of font, each ".
-                      (scalar @fonts)." page(s)\n";
+                      (scalar @planes)." page(s)\n";
 
     foreach $varNum ( 0..$#variants ) {
 	# 4 or so variants requested per font
 	$k = $variants[$varNum];
 
-        foreach my $fnt (@fonts) {  
-	    # individual pages of each font, character list varies by font
+        foreach my $fnt (@planes) {  
+	    # individual planes of each font, character list varies by font
 
             my $font = $pdf->synfont($fnt, %{$k});
 
@@ -139,17 +140,17 @@ foreach $fn (qw(
                     $gfx->stroke();
 
 		    # character data
-                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-6);
+                    $txt2->translate(50+($sx*$x)+$wx, 50+($sy*$y)-6);
                     $txt2->text_right($ci);
-                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-11);
+                    $txt2->translate(50+($sx*$x)+$wx, 50+($sy*$y)-11);
                     if (defined $font->uniByEnc($ci)) {
-                        $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+                        $txt2->text_right(sprintf('U+%04X',$font->uniByEnc($ci)));
 		    } else {
-                        $txt2->text_right('U=0x????');
+                        $txt2->text_right('U+????');
 	            }
-                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-16);
+                    $txt2->translate(50+($sx*$x)+$wx, 50+($sy*$y)-16);
                     $txt2->text_right($font->glyphByEnc($ci));
-                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-21);
+                    $txt2->translate(50+($sx*$x)+$wx, 50+($sy*$y)-21);
                     $txt2->text_right(sprintf('wx=%i', $font->wxByEnc($ci)));
                 }
             }

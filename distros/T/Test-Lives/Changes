@@ -1,5 +1,8 @@
 Release history for Test-Lives
 
+1.002 Wed 04 Oct 2017
+	- No non-core dependencies
+
 1.001 Thu 19 Mar 2015
 	- PAUSE indigestion fix
 

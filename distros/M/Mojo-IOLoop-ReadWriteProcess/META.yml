@@ -27,19 +27,20 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.05'
+    version: '0.08'
   Mojo::IOLoop::ReadWriteProcess::Exception:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm
   Mojo::IOLoop::ReadWriteProcess::Pool:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm
+  Mojo::IOLoop::ReadWriteProcess::Queue:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm
 requires:
-  Mojo::Base: '0'
-  Mojo::File: '0'
+  Mojolicious: '7.24'
 resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.05'
+version: '0.08'
 x_contributors:
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

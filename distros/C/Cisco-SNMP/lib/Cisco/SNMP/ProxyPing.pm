@@ -20,10 +20,10 @@ use Socket qw(AF_INET);
 
 # use Net::IPv6Addr;
 my $HAVE_Net_IPv6Addr = 0;
-if ($Socket::VERSION >= 1.94) {
+if ( $Socket::VERSION >= 1.94 ) {
     eval "use Net::IPv6Addr 0.2";
-    if(!$@) {
-        $HAVE_Net_IPv6Addr = 1
+    if ( !$@ ) {
+        $HAVE_Net_IPv6Addr = 1;
     }
 }
 
@@ -34,63 +34,64 @@ my $AF_INET6 = eval { Socket::AF_INET6() };
 ##################################################
 
 sub _ppOID {
-    return '1.3.6.1.4.1.9.9.16.1.1.1'
+    return '1.3.6.1.4.1.9.9.16.1.1.1';
 }
 
 sub proxy_ping {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %params = (
-        count  => 1,
-        size   => 64,
-        wait   => 1
+        count => 1,
+        size  => 64,
+        wait  => 1
     );
 
     my %args;
-    if (@_ == 1) {
-        ($params{host}) = @_
+    if ( @_ == 1 ) {
+        ( $params{host} ) = @_;
     } else {
         %args = @_;
-        for (keys(%args)) {
-            if ((/^-?host(?:name)?$/i) || (/^-?dest(?:ination)?$/i)) {
-                $params{host} = $args{$_}
+        for ( keys(%args) ) {
+            if ( (/^-?host(?:name)?$/i) || (/^-?dest(?:ination)?$/i) ) {
+                $params{host} = $args{$_};
             } elsif (/^-?size$/i) {
-                if ($args{$_} =~ /^\d+$/) {
-                    $params{size} = $args{$_}
+                if ( $args{$_} =~ /^\d+$/ ) {
+                    $params{size} = $args{$_};
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid size `$args{$_}'";
-                    return undef
+                    return undef;
                 }
             } elsif (/^-?family$/i) {
-                 if ($args{$_} =~ /^(?:(?:(:?ip)?v?(?:4|6))|${\AF_INET}|$AF_INET6)$/) {
-                    if ($args{$_} =~ /^(?:(?:(:?ip)?v?4)|${\AF_INET})$/) {
-                        $params{family} = AF_INET
+                if ( $args{$_}
+                    =~ /^(?:(?:(:?ip)?v?(?:4|6))|${\AF_INET}|$AF_INET6)$/ ) {
+                    if ( $args{$_} =~ /^(?:(?:(:?ip)?v?4)|${\AF_INET})$/ ) {
+                        $params{family} = AF_INET;
                     } else {
-                        $params{family} = $AF_INET6
+                        $params{family} = $AF_INET6;
                     }
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid family `$args{$_}'";
-                    return undef
+                    return undef;
                 }
             } elsif (/^-?count$/i) {
-                if ($args{$_} =~ /^\d+$/) {
-                    $params{count} = $args{$_}
+                if ( $args{$_} =~ /^\d+$/ ) {
+                    $params{count} = $args{$_};
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid count `$args{$_}'";
-                    return undef
+                    return undef;
                 }
-            } elsif ((/^-?wait$/i) || (/^-?timeout$/i)) {
-                if ($args{$_} =~ /^\d+$/) {
-                    $params{wait} = $args{$_}
+            } elsif ( (/^-?wait$/i) || (/^-?timeout$/i) ) {
+                if ( $args{$_} =~ /^\d+$/ ) {
+                    $params{wait} = $args{$_};
                 } else {
                     $Cisco::SNMP::LASTERROR = "Invalid wait time `$args{$_}'";
-                    return undef
+                    return undef;
                 }
             } elsif (/^-?vrf(?:name)?$/i) {
-                $params{vrf} = $args{$_}
+                $params{vrf} = $args{$_};
             }
         }
     }
@@ -98,128 +99,156 @@ sub proxy_ping {
     $pp->{_params_} = \%params;
 
     # host must be defined
-    if (!defined $params{host}) {
-        $params{host} = hostname
+    if ( not defined $params{host} ) {
+        $params{host} = hostname;
     }
 
     # inherit from new()
-    if (!defined $params{family}) {
-        $params{family} = $self->{family}
+    if ( not defined $params{family} ) {
+        $params{family} = $self->{family};
     }
 
     # resolve host our way
-    if (defined(my $ret = Cisco::SNMP::_resolv($params{host}, $params{family}))) {
+    if (defined(
+            my $ret = Cisco::SNMP::_resolv( $params{host}, $params{family} )
+        )
+      ) {
         $params{host}   = $ret->{addr};
-        $params{family} = $ret->{family}
+        $params{family} = $ret->{family};
     } else {
-        return undef
+        return undef;
     }
 
-    my $instance = int(rand(1024)+1024);
-      # Prepare object by clearing row
-    my $response = $session->set_request(_ppOID() . '.16.' . $instance, INTEGER, 6);
-    if (!defined $response) {
+    my $instance = int( rand(1024) + 1024 );
+
+    # Prepare object by clearing row
+    my $response
+      = $session->set_request( _ppOID() . '.16.' . $instance, INTEGER, 6 );
+    if ( not defined $response ) {
         $Cisco::SNMP::LASTERROR = "proxy ping NOT SUPPORTED";
-        return undef
+        return undef;
     }
 
     # Convert destination to Hex equivalent
     my $dest;
-    if ($params{family} == AF_INET) {
-        for (split(/\./, $params{host})) {
-            $dest .= sprintf("%02x",$_)
+    if ( $params{family} == AF_INET ) {
+        for ( split( /\./, $params{host} ) ) {
+            $dest .= sprintf( "%02x", $_ );
         }
     } else {
         if ($HAVE_Net_IPv6Addr) {
-            my $addr = Net::IPv6Addr->new($params{host});
+            my $addr = Net::IPv6Addr->new( $params{host} );
             my @dest = $addr->to_array;
-            $dest .= join '', $_ for (@dest)
+            $dest .= join '', $_ for (@dest);
         } else {
-            $Cisco::SNMP::LASTERROR = "Socket > 1.94 and Net::IPv6Addr required";
-            return undef
+            $Cisco::SNMP::LASTERROR
+              = "Socket > 1.94 and Net::IPv6Addr required";
+            return undef;
         }
     }
 
-      # ciscoPingEntryStatus (5 = createAndWait, 6 = destroy)
-    $response = $session->set_request(_ppOID() . '.16.' . $instance, INTEGER, 6);
-    $response = $session->set_request(_ppOID() . '.16.' . $instance, INTEGER, 5);
-      # ciscoPingEntryOwner (<anyname>)
-    $response = $session->set_request(_ppOID() . '.15.' . $instance, OCTET_STRING, __PACKAGE__);
-      # ciscoPingProtocol (1 = IP, 20 = IPv6)
-    $response = $session->set_request(_ppOID() . '.2.' . $instance, INTEGER, ($params{family} == AF_INET) ? 1 : 20);
-    if (!defined $response) {
-        $Cisco::SNMP::LASTERROR = "Device does not support ciscoPingProtocol 20 (IPv6)";
-        return undef
-    }
-      # ciscoPingAddress (NOTE: hex string, not regular IP)
-    $response = $session->set_request(_ppOID() . '.3.' . $instance, OCTET_STRING, pack('H*', $dest));
-      # ciscoPingPacketTimeout (in ms)
-    $response = $session->set_request(_ppOID() . '.6.' . $instance, INTEGER32, $params{wait}*100);
-      # ciscoPingDelay (Set gaps (in ms) between successive pings)
-    $response = $session->set_request(_ppOID() . '.7.' . $instance, INTEGER32, $params{wait}*100);
-      # ciscoPingPacketCount
-    $response = $session->set_request(_ppOID() . '.4.' . $instance, INTEGER, $params{count});
-      # ciscoPingPacketSize (protocol dependent)
-    $response = $session->set_request(_ppOID() . '.5.' . $instance, INTEGER, $params{size});
+    # ciscoPingEntryStatus (5 = createAndWait, 6 = destroy)
+    $response
+      = $session->set_request( _ppOID() . '.16.' . $instance, INTEGER, 6 );
+    $response
+      = $session->set_request( _ppOID() . '.16.' . $instance, INTEGER, 5 );
 
-    if (exists $params{vrf}) {
-          # ciscoPingVrfName (<name>)
-        $response = $session->set_request(_ppOID() . '.17.' . $instance, OCTET_STRING, $params{vrf})
+    # ciscoPingEntryOwner (<anyname>)
+    $response = $session->set_request( _ppOID() . '.15.' . $instance,
+        OCTET_STRING, __PACKAGE__ );
+
+    # ciscoPingProtocol (1 = IP, 20 = IPv6)
+    $response = $session->set_request( _ppOID() . '.2.' . $instance,
+        INTEGER, ( $params{family} == AF_INET ) ? 1 : 20 );
+    if ( not defined $response ) {
+        $Cisco::SNMP::LASTERROR
+          = "Device does not support ciscoPingProtocol 20 (IPv6)";
+        return undef;
     }
-      # Verify ping is ready (ciscoPingEntryStatus = 2)
-    $response = $session->get_request(_ppOID() . '.16.' . $instance);
-    if (defined $response->{_ppOID() . '.16.' . $instance}) {
-        if ($response->{_ppOID() . '.16.' . $instance} != 2) {
+
+    # ciscoPingAddress (NOTE: hex string, not regular IP)
+    $response = $session->set_request( _ppOID() . '.3.' . $instance,
+        OCTET_STRING, pack( 'H*', $dest ) );
+
+    # ciscoPingPacketTimeout (in ms)
+    $response = $session->set_request( _ppOID() . '.6.' . $instance,
+        INTEGER32, $params{wait} * 100 );
+
+    # ciscoPingDelay (Set gaps (in ms) between successive pings)
+    $response = $session->set_request( _ppOID() . '.7.' . $instance,
+        INTEGER32, $params{wait} * 100 );
+
+    # ciscoPingPacketCount
+    $response = $session->set_request( _ppOID() . '.4.' . $instance,
+        INTEGER, $params{count} );
+
+    # ciscoPingPacketSize (protocol dependent)
+    $response = $session->set_request( _ppOID() . '.5.' . $instance,
+        INTEGER, $params{size} );
+
+    if ( exists $params{vrf} ) {
+
+        # ciscoPingVrfName (<name>)
+        $response = $session->set_request( _ppOID() . '.17.' . $instance,
+            OCTET_STRING, $params{vrf} );
+    }
+
+    # Verify ping is ready (ciscoPingEntryStatus = 2)
+    $response = $session->get_request( _ppOID() . '.16.' . $instance );
+    if ( defined $response->{_ppOID() . '.16.' . $instance} ) {
+        if ( $response->{_ppOID() . '.16.' . $instance} != 2 ) {
             $Cisco::SNMP::LASTERROR = "Ping not ready";
-            return undef
+            return undef;
         }
     } else {
         $Cisco::SNMP::LASTERROR = "proxy ping NOT SUPPORTED (after setup)";
-        return undef
+        return undef;
     }
 
-      # ciscoPingEntryStatus (1 = activate)
-    $response = $session->set_request(_ppOID() . '.16.' . $instance, INTEGER, 1);
+    # ciscoPingEntryStatus (1 = activate)
+    $response
+      = $session->set_request( _ppOID() . '.16.' . $instance, INTEGER, 1 );
 
     # Wait sample interval
     sleep $params{wait};
 
-      # Get results
-    $response = $session->get_table(_ppOID());
+    # Get results
+    $response = $session->get_table( _ppOID() );
     $pp->{Sent}     = $response->{_ppOID() . '.9.' . $instance}  || 0;
     $pp->{Received} = $response->{_ppOID() . '.10.' . $instance} || 0;
     $pp->{Minimum}  = $response->{_ppOID() . '.11.' . $instance} || 0;
     $pp->{Average}  = $response->{_ppOID() . '.12.' . $instance} || 0;
     $pp->{Maximum}  = $response->{_ppOID() . '.13.' . $instance} || 0;
 
-      # destroy entry
-    $response = $session->set_request(_ppOID() . '.16.' . $instance, INTEGER, 6);
-    return bless $pp, $class
+    # destroy entry
+    $response
+      = $session->set_request( _ppOID() . '.16.' . $instance, INTEGER, 6 );
+    return bless $pp, $class;
 }
 
 sub ppSent {
     my $self = shift;
-    return $self->{Sent}
+    return $self->{Sent};
 }
 
 sub ppReceived {
     my $self = shift;
-    return $self->{Received}
+    return $self->{Received};
 }
 
 sub ppMinimum {
     my $self = shift;
-    return $self->{Minimum}
+    return $self->{Minimum};
 }
 
 sub ppAverage {
     my $self = shift;
-    return $self->{Average}
+    return $self->{Average};
 }
 
 sub ppMaximum {
     my $self = shift;
-    return $self->{Maximum}
+    return $self->{Maximum};
 }
 
 ##################################################

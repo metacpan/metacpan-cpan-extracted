@@ -91,7 +91,7 @@ INSTALLATION
 
     You can install it manually:
 
-        wget https://github.com/ldidry/padconsole/archive/master.zip -O padconsole.zip
+        wget https://framagit.org/luc/padconsole/repository/master/archive.zip-O padconsole.zip
         unzip padconsole.zip
         cd padconsole-master
         perl Makefile.PL
@@ -106,12 +106,12 @@ BUGS and SUPPORT
 
            Bugs and feature requests will be tracked at github:
 
-               https://github.com/ldidry/padconsole/issues/
+               https://framagit.org/luc/padconsole/issues/
 
            The latest source code can be browsed and fetched at:
 
-               https://github.com/ldidry/padconsole
-               git clone git://github.com/ldidry/padconsole.git
+               https://framagit.org/luc/padconsole
+               git clone https://framagit.org/luc/padconsole.git
 
            You can also look for information at:
 
@@ -131,7 +131,7 @@ AUTHOR
                Luc DIDRY
                CPAN ID: LDIDRY
                ldidry@cpan.org
-               http://www.fiat-tux.fr/
+               https://fiat-tux.fr/
 
 COPYRIGHT
            This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -139,5 +139,5 @@ COPYRIGHT
            The full text of the license can be found in the LICENSE file included with this module.
 
 SEE ALSO
-           L<Etherpad::API>, L<https://github.com/ldidry/etherpad-admin>
+           L<Etherpad>, L<https://framagit.org/luc/etherpad-admin>
 

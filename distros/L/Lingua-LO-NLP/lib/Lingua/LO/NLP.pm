@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v1.0.0');
+use version 0.77; our $VERSION = version->declare('v1.0.1');
 use Lingua::LO::NLP::Syllabify;
 use Lingua::LO::NLP::Analyze;
 use Lingua::LO::NLP::Romanize;
@@ -37,7 +37,7 @@ Lingua::LO::NLP - Various Lao text processing functions
     }
 
     say $lao->romanize("ສະບາຍດີ", variant => 'PCGN', hyphen => "\N{HYPHEN}");  # sa‐bay‐di
-    say $lao->romanize("ສະບາຍດີ", variant => 'IPA');                           # sa baːj diː
+    say $lao->romanize("ສະບາຍດີ", variant => 'IPA');                           # saʔ baːj diː
 
 =head1 DESCRIPTION
 
@@ -140,6 +140,42 @@ sub romanize {
     my (undef, $lao, %options) = @_;
     $options{variant} //= 'PCGN';
     return Lingua::LO::NLP::Romanize->new(%options)->romanize( $lao );
+}
+
+=head2 analyze_text
+
+    my @syllables = $object->analyze_text( $text, %options );
+
+Split Lao text into its syllables and analyze them, returning an array of
+hashes. Each hash has at least a key 'analysis' with a
+L<Lingua::LO::NLP::Analyze> object as a value. If the C<romanize>option is set
+to a true value, it also has a "romanization" key. In this case, the C<variant>
+option (see L<Lingua::LO::NLP::Romanize/new>) is also required.
+
+=cut
+sub analyze_text {
+    my $self = shift;
+    my $text = shift;
+    my %opts = @_;
+    my $romanizer;
+    $romanizer = Lingua::LO::NLP::Romanize->new( %opts ) if delete $opts{romanize};
+
+    my @result = Lingua::LO::NLP::Syllabify->new(
+        $text,
+        normalize => $self->{normalize},
+        %opts
+    )->get_syllables;
+
+    if($romanizer) {
+        return map {
+            {
+                analysis => $_,
+                romanization => $romanizer->romanize_syllable($_)
+            }
+        } @result;
+    } else {
+        return map { { analysis => $_ } } @result;
+    }
 }
 
 =head1 SEE ALSO

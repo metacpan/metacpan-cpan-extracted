@@ -102,12 +102,6 @@ METHODS
     apps in another user interface. Typically this call is used by partner
     applications to render Salesforce data in another user interface.
 
-  get_client( $readable )
-    Get a client
-
-  get_session_header()
-    Gets the session header
-
   get_session_id()
     Gets the Salesforce SID
 
@@ -261,8 +255,6 @@ METHODS
     the fields (the keys of the hash) and the values of the record that will
     be updated.
 
-  get_clientM( $readable )
-  get_session_headerM()
   describeMetadata()
     Get some metadata info about your instance.
 
@@ -335,37 +327,27 @@ HISTORY
     Francisco.
 
 AUTHORS
+    Byrne Reese - <byrne at majordojo dot com>
+
+    Chase Whitener <capoeirab@cpan.org>
+
     Fred Moyer <fred at redhotpenguin dot com>
 
-    Thanks to:
+CONTRIBUTORS
+    Michael Blanco
 
-    Chase Whitener <cwhitener at gmail dot com> - Maintaining this module
-    and working on development version.
+    Garth Webb
 
-    Michael Blanco - Finding and fixing some bugs.
+    Jun Shimizu
 
-    Garth Webb - Finding and fixing bugs. Adding some additional features
-    and more constant types.
+    Ron Hess
 
-    Ron Hess - Finding and fixing bugs. Adding some additional features.
-    Adding more tests to the build. Providing a lot of other help.
+    Tony Stubblebine
 
-    Tony Stubblebine - Finding a bug and providing a fix.
+COPYRIGHT & LICENSE
+    Copyright 2003-2004 Byrne Reese, Chase Whitener, Fred Moyer. All rights
+    reserved.
 
-    Jun Shimizu - Providing more to the WWW::Salesforce::Constants module
-    and submitting fixes for various other bugs.
-
-    Byrne Reese - <byrne at majordojo dot com> - Byrne Reese wrote the
-    original Salesforce module.
-
-COPYRIGHT
-    Copyright 2010-2016 Fred Moyer, All rights reserved.
-
-    Copyright 2005-2007 Chase Whitener.
-
-    Copyright 2003-2004 Byrne Reese, Chase Whitener. All rights reserved.
-
-LICENSE
-    This library is free software and may be distributed under the same
-    terms as perl itself.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

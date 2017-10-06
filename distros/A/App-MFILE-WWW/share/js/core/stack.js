@@ -61,33 +61,54 @@ define ([
         // pop a target and its state off the stack
         // ARG1 (optional) - object to be merged into stateObj
         // ARG2 (optional) - boolean, whether to call start() (default: true)
-        pop = function (mo, start) {
-            start = (start === false) ? false : true;
-            console.log("Entering stack.pop() with stack", _stack);
-            var stackObj,
-                type;
-            _stack.pop(); 
-            if (_stack.length === 0) {
+        pop = function (newState, opts) {
+            console.log("Entering stack.pop() with new state", newState, "and opts", opts);
+            var resultLine,
+                stackState,
+                stackTarget,
+                stackLength;
+
+            opts = lib.objectify(opts);
+            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : false;
+            opts['_start'] = ('_start' in opts) ? opts.start : true;
+            opts['_restart'] = ('_restart' in opts) ? opts._restart : false;
+            opts['_start'] = opts._restart ? true : opts._start;
+            console.log("stack.pop() adjusted opts", opts);
+
+            // pop item off the stack, unless called by stack.restart()
+            if (! opts._restart ) {
+                _stack.pop();
+                console.log("Stack top item popped off and discarded.");
+            } else {
+                console.log("Restarting stack top item.");
+            }
+            stackLength = getLength();
+            if (stackLength === 0) {
                 console.log("Stack empty - logging out");
-                target.pull('logout').start();
+                target.pull('logout').start("Empty stack - please report bug");
                 return;
             }
-            stackObj = _stack[_stack.length - 1];
-            if (typeof mo === 'object') {
-                console.log("pop() was passed an object", mo);
-                $.extend(stackObj.state, mo);
+            stackTarget = getTarget();
+            stackState = getState();
+            console.log("Now, the stack length is " + stackLength +
+                        " and the top target is " + stackTarget.name);
+            if (typeof newState === 'object') {
+                $.extend(stackState, newState);
+                setState(stackState);
             }
-            stackObj.pushed = false;
-            console.log("Popped " + stackObj.target.name);
-            type = stackObj.target.type;
-            if (start) {
-                lib.clearResult();
-                stackObj.target.start();
+            setPush(false);
+            if (opts._start) {
+                delete opts["_start"];
+                delete opts["_restart"];
+                stackTarget.start(newState, opts);
             }
         },
 
-        popWithoutStart = function (mo) {
-            pop(mo, false);
+        popWithoutStart = function (newState, opts) {
+            opts = lib.objectify(opts);
+            opts['_start'] = false;
+            opts['_restart'] = false;
+            pop(newState, opts);
         },
 
         // push a target and its state onto the stack
@@ -95,10 +116,10 @@ define ([
             console.log("Entering stack.push() with target", tgt, "object", obj, "and opts", opts);
             // console.log("and stack", _stack);
             var flag,
+                resultLine,
                 xtarget;
-            if (obj === undefined || obj === null) {
-                obj = {};
-            }
+            obj = lib.objectify(obj);
+            opts = lib.objectify(opts);
             if (typeof tgt === "string") {
                 tgt = target.pull(tgt);
             }
@@ -106,40 +127,93 @@ define ([
                 console.log("ERROR in stack.push() - found no target object");
                 return;
             }
-            if (typeof opts === "object") {
-                flag = opts.hasOwnProperty('flag') ? opts.flag : false;
-                xtarget = opts.hasOwnProperty('xtarget') ? opts.xtarget : null;
-                console.log("In stack.push(), setting flag", flag, "and xtarget", xtarget);
-            }
+            opts['flag'] = ('flag' in opts) ? opts.flag : false;
+            opts['xtarget'] = ('xtarget' in opts) ? opts.xtarget : null;
+            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : null;
+            opts['_start'] = ('_start' in opts) ? opts._start : true;
+            console.log("stack.push() adjusted opts", opts);
             if (tgt.pushable) {
                 _stack.push({
-                    "flag": flag,
+                    "flag": opts.flag,
                     "push": true,
+                    "resultLine": opts.resultLine,
                     "state": obj,
                     "target": tgt,
-                    "xtarget": xtarget
+                    "xtarget": opts.xtarget
                 });
             }
-            lib.clearResult();
-            tgt.start(obj);
+            if (opts._start) {
+                tgt.start(obj);
+            }
+        },
+
+        pushWithoutStart = function (newState, opts) {
+            if (typeof opts !== 'object') {
+                opts = {};
+            }
+            opts['_start'] = false;
+            push(newState, opts);
+        },
+
+        restart = function (newState, opts) {
+            // does the exact same thing as pop, except it leaves the top
+            // item on the stack and restarts it with new state and opts
+            if (typeof opts !== 'object') {
+                opts = {};
+            }
+            opts["_start"] = true;
+            opts["_restart"] = true;
+            pop(newState, opts);
         },
 
         getFlag = function () {
             return _stack[_stack.length - 1].flag;
         },
+        getLength = function () {
+            return _stack.length;
+        },
         getPush = function () {
             return _stack[_stack.length - 1].push;
         },
-        getState = function () {
+        getResultLine = function () {
+            return _stack[_stack.length - 1].resultLine;
+        },
+        getStack = function () {
+            // returns the entire stack
+            return _stack;
+        },
+        getState = function (offset) {
+            // offset -1 for target under top target
+            // offset -2 for two targets down, etc.
+            if (offset === undefined) {
+                offset = 0;
+            }
+            if (_stack.length === 0) {
+                console.log("Ignoring attempt to get target from empty stack");
+                return null;
+            }
             return _stack[_stack.length - 1].state;
         },
-        getTarget = function () {
-            return _stack[_stack.length - 1].target;
+        getTarget = function (offset) {
+            // offset -1 for target under top target
+            // offset -2 for two targets down, etc.
+            if (offset === undefined) {
+                offset = 0;
+            }
+            if (_stack.length === 0) {
+                console.log("Ignoring attempt to get target from empty stack");
+                return null;
+            }
+            return _stack[_stack.length + offset - 1].target;
         },
         getXTarget = function () {
             return _stack[_stack.length - 1].xtarget;
         },
 
+        resetStack = function () {
+            console.log("Resetting the stack");
+            _stack = [];
+        },
 
         setFlag = function () {
             _stack[_stack.length - 1].flag = true;
@@ -214,7 +288,10 @@ define ([
 
     return {
         "getFlag": getFlag,
+        "getLength": getLength,
         "getPush": getPush,
+        "getResultLine": getResultLine,
+        "getStack": getStack,
         "getState": getState,
         "getTarget": getTarget,
         "getXTarget": getXTarget,
@@ -222,6 +299,9 @@ define ([
         "pop": pop,
         "popWithoutStart": popWithoutStart,
         "push": push,
+        "pushWithoutStart": popWithoutStart,
+        "resetStack": resetStack,
+        "restart" : restart,
         "setFlag": setFlag,
         "setPush": setPush,
         "setState": setState,

@@ -1,4 +1,4 @@
-Regexp::Debugger version 0.002000
+Regexp::Debugger version 0.002001
 
 This module causes any regex in the same lexical scope to be visually
 (and interactively) debugged as it matches.

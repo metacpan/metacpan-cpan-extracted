@@ -1,5 +1,29 @@
 Revision history for Alien-Build
 
+1.22      2017-10-05 11:43:25 -0400
+  - Improved bootstrap_ssl to allow use of Net::SSLeay, if it is already
+    installed.
+  - Windows path fix in test suite
+
+1.21      2017-10-02 15:36:33 -0400
+  - Fix bug in Test::Alien where extra_compiler_flags or extra_linker_flags
+    could override (instead of augment) the alien cflags or libs.  This is
+    most commonly a problem when using Test::Alien::CPP.
+
+1.20      2017-10-01 06:52:36 -0400
+  - Remove dependency on Alien::Base::ModuleBuild
+  - Add access to environment via %{env.VARNAME}
+  - Move Alien::Base::PkgConfig from ABMB
+
+1.19_01   2017-09-28 13:06:28 -0400
+  - Add Alien::Build::Version::Basic
+  - Add Alien::Build::Plugin::Fetch::CurlCommand
+  - Add Alien::Build::Plugin::Fetch::Wget
+  - Workaround for old tar on Solaris
+  - Fix test for Solaris 64 bit
+  - Add start_url directive to alienfile
+  - Add bootstrap_ssl property to Alien::Build::Plugin::Download::Negotiate
+
 1.18      2017-09-22 06:40:51 -0400
   - Fixed bug where Probe::CBuilder plugin might not play nice with other
     probes.

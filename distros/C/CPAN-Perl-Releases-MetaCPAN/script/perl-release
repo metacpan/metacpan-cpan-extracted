@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use CPAN::Perl::Releases::MetaCPAN;
+
+my ($latest, $want);
+if (my $arg = shift) {
+    if ($arg eq "latest") {
+        $latest++;
+    } elsif ($arg =~ /^(-h|--help)$/) {
+        die "Usage: $0 [version|latest]\n";
+    } else {
+        $want = $arg;
+    }
+}
+
+my $cpan = CPAN::Perl::Releases::MetaCPAN->new;
+my @releases =
+    map {
+        my $name = $_->{name};
+        $name =~ s/^perl-?//;
+        my $url = $_->{download_url};
+        { name => $name, url => $url };
+    }
+    @{$cpan->get};
+
+if ($latest) {
+    my $numify = sub {
+        my $name = shift;
+        if (my ($v1, $v2) = $name =~ /^5\.(\d+)\.(\d+)$/) {
+            if ($v1 % 2 == 0) {
+                return 0+sprintf "%03d%03d", $v1, $v2;
+            }
+        }
+        return;
+    };
+
+    my ($latest) =
+        map  { $_->[0] }
+        sort { $b->[1] <=> $a->[1] }
+        map  { my $n = $numify->($_->{name}); $n ? [$_, $n] : () }
+        @releases;
+    print "$latest->{name}\t$latest->{url}\n";
+} elsif ($want) {
+    for my $r (@releases) {
+        if ($r->{name} eq $want) {
+            print $r->{url}, "\n";
+            exit;
+        }
+    }
+    exit 1;
+} else {
+    for my $r (@releases) {
+        print "$r->{name}\t$r->{url}\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+perl-release - show perl tarball urls
+
+=head1 SYNOPSIS
+
+    # show all
+    > perl-release
+    5.26.1	https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-5.26.1.tar.bz2
+    5.24.3	https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-5.24.3.tar.bz2
+    5.27.4	https://cpan.metacpan.org/authors/id/G/GE/GENEHACK/perl-5.27.4.tar.bz2
+    5.26.1-RC1	https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-5.26.1-RC1.tar.bz2
+    ...
+
+    # show specific version
+    > perl-release 5.14.2
+    https://cpan.metacpan.org/authors/id/F/FL/FLORA/perl-5.14.2.tar.bz2
+
+    # show latest
+    > perl-release latest
+    5.26.1	https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-5.26.1.tar.bz2
+
+=cut

@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Importer-Zim-Lexical,
-version 0.6.0:
+version 0.8.0:
 
-  Import functions with lexical scope
+  Import functions as lexical subroutines
 
 This software is copyright (c) 2017 by Adriano Ferreira.
 

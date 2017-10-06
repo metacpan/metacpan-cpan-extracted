@@ -1,10 +1,62 @@
 ==================================================
-Changes from 2016-08-22 00:00:00 +0000 to present.
+Changes from 2016-09-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-08-22 06:46:18 +0000
+version 0.005 at 2017-09-30 13:04:21 +0000
 ------------------------------------------
+
+  Change: 6e7363c8222c1d65811c45f155ee58f992ad948b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 16:02:50 +0000
+
+    added tests 
+
+  Change: 8a660611ebe67e86933bcdcb9b86386f90181efd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 15:54:55 +0000
+
+    Merge branch 'master' of
+    https://github.com/QBitFramework/QBit-QueryData 
+
+  Change: 31dcbcea744081dc32812e5435665b56b3d79d72
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 15:54:31 +0000
+
+    fix empty fields list 
+
+------------------------------------------
+version 0.004 at 2017-09-24 08:43:28 +0000
+------------------------------------------
+
+  Change: 88d7b4cf0812c1c9d6f1e4c8e1427653730098c1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-24 11:43:28 +0000
+
+    Version 0.004 
+
+  Change: 1282904245ce8675b81b6df3ea860869cd7ee1ac
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-24 11:42:24 +0000
+
+    Merge branch 'master' of
+    https://github.com/QBitFramework/QBit-QueryData 
+
+  Change: f3134f07c51c4adad0e06b3b7975bef842adf21f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-24 11:41:52 +0000
+
+    fix empty data 
+
+------------------------------------------
+version 0.003 at 2017-08-22 06:46:38 +0000
+------------------------------------------
+
+  Change: 937289f35a0201ac1a3501529418b03b13a8aad7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-08-22 09:46:38 +0000
+
+    Version 0.003 
 
   Change: cdc78ae2e967c1d346542840a79754580704c59c
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>

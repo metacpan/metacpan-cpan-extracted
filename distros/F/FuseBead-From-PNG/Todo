@@ -2,3 +2,6 @@ TODO list for Perl module FuseBead::From::PNG
 
 - add more bead colors
 - indexed pngs break the color optimization process, needs to be true rgb mode, figure out solution
+- add support for a 'paint-by-numbers' version of the instructions, allow custom mapping of colors to numbers / symbols
+- add support to modify cells to change to different supported beads in the html view
+- use perler bead images instead of cell background colors...

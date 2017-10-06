@@ -1,5 +1,18 @@
 Revision history for Perl extension List-MoreUtils-XS
 
+0.426	2017-10-02
+    - release 0.425_001 as 0.426
+
+0.425_001	2017-09-27
+    - Fix broken format in part (fixes issues/4, thanks Andreas Schwab
+      for reporting and testing the fix)
+    - Fix gcc 4.7 sequence point warning (fixes issues/5, thanks Andreas
+      Schwab for reporting and testing the fix)
+    - Fix incorrect padname resolving for perl > 5.21.6 (Fixes RT#122883,
+      thanks Alexander Bluhm <alexander.bluhm@gmx.net> for reporting).
+    - Fix compiling issue on CentOS 4 & CentOS 5 (thanks Alex Karelas
+      <alex.karelas@gmail.com> for reporting and testing the fix)
+
 0.423	2017-08-19
     - Fix dealing with lists with one element on bremove/binsert.
       Thanks shawnlaffan for reporting this via issues#2

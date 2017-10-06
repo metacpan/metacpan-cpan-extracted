@@ -15,6 +15,7 @@ use List::Util qw( pairs );
 use List::UtilsBy qw( sort_by );
 
 use App::Devel::MAT::Explorer::GTK::Resources qw( get_icon );
+use App::Devel::MAT::Explorer::GTK::Shell;
 use App::Devel::MAT::Explorer::GTK::SVDetail;
 use App::Devel::MAT::Explorer::GTK::Utils qw( bytes2size );
 use App::Devel::MAT::Explorer::GTK::Widgets qw( framed vscrollable );
@@ -205,6 +206,11 @@ my $inrefs_mth = "inrefs";
    {
       display_sv( $current_sv ) if $current_sv;
    }
+
+   sub Devel::MAT::UI::current_sv
+   {
+      return $current_sv;
+   }
 }
 
 add_menuitem( $navmenu, "Back" => \&history_back );
@@ -249,12 +255,12 @@ foreach my $tool ( sort Devel::MAT->available_tools ) {
 
       my $tool = $pmat->load_tool( $tool, progress => \&progress );
       $tool->init_ui( "Devel::MAT::UI" );
-      progress( "Done" );
+      progress();
    });
 }
 
-my $pane = Gtk2::HPaned->new;
-$winbox->add( $pane );
+$winbox->add( my $vpane = Gtk2::VPaned->new );
+$vpane->pack1( my $hpane = Gtk2::HPaned->new, TRUE, TRUE );
 
 my $statusbar = Gtk2::Statusbar->new;
 $winbox->pack_end( $statusbar, FALSE, TRUE, 0 );
@@ -266,11 +272,12 @@ $statusbar->pack_start( framed( my $bytetotal_label = Gtk2::Label->new( "" ) ), 
 $win->show_all;
 
 {
-   my $id;
+   my $id = $statusbar->get_context_id( "progress" );
+
    sub progress
    {
-      $statusbar->pop( $id ) if $id;
-      $id = $statusbar->push( $statusbar->get_context_id("progress"), "Progress: $_[0]" );
+      $statusbar->pop( $id );
+      $statusbar->push( $id, "Progress: $_[0]" ) if defined $_[0];
       Gtk2->main_iteration_do( FALSE ) while Gtk2->events_pending;
    }
 }
@@ -299,7 +306,7 @@ foreach ( pairs $df->roots ) {
 
 my $svlist_model = Gtk2::ListStore->new(
    "Glib::String",
-   "Glib::Int",
+   ( $df->ptr_len > 4 ? "Glib::Long" : "Glib::Int" ),
    "Glib::String",
    "Glib::Int",
    "Glib::String",
@@ -365,7 +372,7 @@ add_svlist_column title => "Inrefs",      idx => 6;
 
 $svlist_view->get_column( $_ )->set_sort_column_id( $_ ) for 0, 1, 3;
 
-$pane->add1( vscrollable( $svlist_view ) );
+$hpane->add1( vscrollable( $svlist_view ) );
 
 my $total = scalar $df->heap;
 my $count = 0;
@@ -406,13 +413,13 @@ sub reset_svlist_refs
          $count, $total, $count*100 / $total ) if ($count % 1000) == 0;
    }
 
-   progress( "Done" );
+   progress();
 }
 
 $bytetotal_label->set_text( $bytes . " bytes" );
 
 my $table = Gtk2::Table->new( 1, 3 );
-$pane->add2( $table );
+$hpane->add2( $table );
 
 $svlist_view->signal_connect( row_activated => sub {
    my( $self, $path, $column ) = @_;
@@ -423,7 +430,9 @@ $svlist_view->signal_connect( row_activated => sub {
    history_nav( $sv );
 });
 
-progress( "Done" );
+$vpane->pack2( App::Devel::MAT::Explorer::GTK::Shell->build_widget( $pmat ), FALSE, TRUE );
+
+progress();
 
 $win->show_all;
 Gtk2->main;
@@ -600,5 +609,5 @@ sub Devel::MAT::UI::set_svlist_column_values
          $count, $total, $count*100 / $total ) if ($count % 1000) == 0;
    }
 
-   progress( "Done" );
+   progress();
 }

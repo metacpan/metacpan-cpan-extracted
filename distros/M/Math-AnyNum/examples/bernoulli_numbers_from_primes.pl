@@ -9,6 +9,7 @@ use 5.010;
 use strict;
 use warnings;
 
+use lib qw(../lib);
 #use Math::AnyNum qw(:overload);       # can be uncommented
 use Math::AnyNum qw(factorial next_prime ceil float is_div);
 

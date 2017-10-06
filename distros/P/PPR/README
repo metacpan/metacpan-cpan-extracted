@@ -1,4 +1,4 @@
-PPR version 0.000013
+PPR version 0.000014
 
 This module defines a single regex that will match syntactically valid
 Perl documents, or valid components (such as statements, expressions,

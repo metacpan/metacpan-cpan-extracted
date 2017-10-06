@@ -13,7 +13,10 @@ t/02_rootclass.t
 t/03_txn.t
 t/04_mysql.t
 t/05_typed.t
-t/TestSchema.pm
+t/06_dbic.t
+t/lib/MyApp/Schema.pm
+t/lib/MyApp/Schema/Result/Foo.pm
+t/lib/TestSchema.pm
 t/schema_00_compile.t
 t/schema_01_basic.t
 t/schema_03_txn.t

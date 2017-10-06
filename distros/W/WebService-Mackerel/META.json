@@ -4,7 +4,7 @@
       "Tatsuro Hisamori <myfinder@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.9",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "WebService::Mackerel" : {
          "file" : "lib/WebService/Mackerel.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -74,11 +74,12 @@
          "web" : "https://github.com/myfinder/webservice-mackerel"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
+      "Makoto Sasaki <wanigoya@gmail.com>",
       "Tatsuro Hisamori <medianetworks@gmail.com>",
-      "yohei yoshimuta <yoheimuta@gmail.com>",
-      "papix <mail@papix.net>"
+      "papix <mail@papix.net>",
+      "yohei yoshimuta <yoheimuta@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

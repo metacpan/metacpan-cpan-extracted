@@ -18,7 +18,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( groupid backend repeat ) );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 # Switch Data
 # $data = $switchmask->[$socketnum - 1]->[$offon];
@@ -50,14 +50,14 @@ sub new {
         
         if ( $params{backend} eq 'ENER314_RT' ) {
             # Two way configurable board
-            require HiPi::Board::ENER314_RT;
+            require HiPi::Energenie::ENER314_RT;
             $params{repeat} //= ENERGENIE_TXOOK_REPEAT_RATE;
-            my $dev = HiPi::Board::ENER314_RT->new();
+            my $dev = HiPi::Energenie::ENER314_RT->new();
             $params{device} = $dev;
         } elsif( $params{backend} eq 'ENER314' ) { 
             # simple 1 way single group board
-            require HiPi::Board::ENER314;
-            my $dev = HiPi::Board::ENER314->new();
+            require HiPi::Energenie::ENER314;
+            my $dev = HiPi::Energenie::ENER314->new();
             $params{device} = $dev;
         } else {
             croak qq(Invalid backend $params{backend} specified);

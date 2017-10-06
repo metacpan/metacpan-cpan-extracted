@@ -17,8 +17,8 @@ no_index:
 provides:
   MooX::LazierAttributes:
     file: lib/MooX/LazierAttributes.pm
-    version: '1.02'
+    version: '1.03'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/MooX-LazierAttributes.git
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

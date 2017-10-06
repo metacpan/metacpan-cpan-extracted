@@ -1,0 +1,20 @@
+# -------------------------------------------------------------------
+# This file contains field definitions and data common to all objects
+# -------------------------------------------------------------------
+@schema item
+field:category Category         := REF(categories) DEFAULT(computers)
+field:descrip  Description      := TEXT REQUIRED
+field:idate    Inventory date   := DATE
+field:loc      Location         := REF(locations) | TEXT
+field:mdate    Manufacture date := DATE
+field:mname    Manufacturer     := TEXT
+field:model    Model            := TEXT
+field:mref     Manual (URL)     := URI
+field:nick     Nickname         := TEXT REPEATABLE
+field:owner    Owner            := REF(people)
+field:partnum  Part number      := TEXT
+field:pdate    Purchase date    := DATE
+field:pprice   Purchase price   := CURRENCY(USD)
+field:ptype    Purchase type    := TEXT ONEOF(purch, gift)
+field:sn       Serial number    := TEXT
+

@@ -1,5 +1,7 @@
 Revision history for Sql-Textify
 
+0.06	Fixed a bug, 0 was sometimes converted to markdown empty string
+
 0.02, 0.03, 0.04, 0.05
 		14 September 2017
 		- little fixes to make CPAN tests happy

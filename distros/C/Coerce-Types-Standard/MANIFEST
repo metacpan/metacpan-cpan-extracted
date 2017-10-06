@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+lib/Coerce/Types/Standard.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-types.t
+t/02-stringsToArrays.t
+t/03-stringsToHashes.t
+t/04-arraysToHashes.t
+t/05-HashesToArrays.t
+t/06-html.t
+t/07-uri.t
+t/08-json.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

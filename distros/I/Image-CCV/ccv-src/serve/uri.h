@@ -5,10 +5,10 @@
 #include <stddef.h>
 
 /* have to be static const char so that can use sizeof */
-static const char ebb_http_404[] = "HTTP/1.1 404 Not Found\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 6\r\n\r\nfalse\n";
-static const char ebb_http_empty_object[] = "HTTP/1.1 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 3\r\n\r\n{}\n";
-static const char ebb_http_empty_array[] = "HTTP/1.1 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 3\r\n\r\n[]\n";
-static const char ebb_http_ok_true[] = "HTTP/1.1 200 OK\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 5\r\n\r\ntrue\n";
+static const char ebb_http_404[] = "HTTP/1.0 404 Not Found\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 6\r\n\r\nfalse\n";
+static const char ebb_http_empty_object[] = "HTTP/1.0 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 3\r\n\r\n{}\n";
+static const char ebb_http_empty_array[] = "HTTP/1.0 201 Created\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 3\r\n\r\n[]\n";
+static const char ebb_http_ok_true[] = "HTTP/1.0 200 OK\r\nCache-Control: no-cache\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 5\r\n\r\ntrue\n";
 /* we should never sizeof ebb_http_header */
 extern const char ebb_http_header[];
 
@@ -113,7 +113,7 @@ typedef enum {
 
 typedef struct {
 	string_state_t state;
-	char string[16];
+	char string[256];
 	int cursor;
 } string_parser_t;
 
@@ -228,6 +228,12 @@ void* uri_icf_detect_objects_parse(const void* context, void* parsed, int resour
 int uri_icf_detect_objects_intro(const void* context, const void* parsed, ebb_buf* buf);
 int uri_icf_detect_objects(const void* context, const void* parsed, ebb_buf* buf);
 
+void* uri_scd_detect_objects_init(void);
+void uri_scd_detect_objects_destroy(void* context);
+void* uri_scd_detect_objects_parse(const void* context, void* parsed, int resource_id, const char* buf, size_t len, uri_parse_state_t state, int header_index);
+int uri_scd_detect_objects_intro(const void* context, const void* parsed, ebb_buf* buf);
+int uri_scd_detect_objects(const void* context, const void* parsed, ebb_buf* buf);
+
 void* uri_sift_init(void);
 void uri_sift_destroy(void* context);
 void* uri_sift_parse(const void* context, void* parsed, int resource_id, const char* buf, size_t len, uri_parse_state_t state, int header_index);
@@ -246,5 +252,11 @@ void* uri_tld_track_object_parse(const void* context, void* parsed, int resource
 int uri_tld_track_object_intro(const void* context, const void* parsed, ebb_buf* buf);
 int uri_tld_track_object(const void* context, const void* parsed, ebb_buf* buf);
 int uri_tld_track_object_free(const void* context, const void* parsed, ebb_buf* buf);
+
+void* uri_convnet_classify_init(void);
+void uri_convnet_classify_destroy(void* context);
+void* uri_convnet_classify_parse(const void* context, void* parsed, int resource_id, const char* buf, size_t len, uri_parse_state_t state, int header_index);
+int uri_convnet_classify_intro(const void* context, const void* parsed, ebb_buf* buf);
+int uri_convnet_classify(const void* context, const void* parsed, ebb_buf* buf);
 
 #endif

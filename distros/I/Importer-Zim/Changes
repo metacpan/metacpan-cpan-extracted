@@ -1,7 +1,29 @@
 
 Release history for Importer-Zim
 
-0.3.0     2017-09-15 19:51:53-07:00 America/Los_Angeles
+0.6.0     2017-09-29 14:44:56-07:00 America/Los_Angeles
+
+    - Produce DEBUG message with carp()
+    - goto backend->import() to report from the correct location
+    - Require Importer::Zim::Utils 0.8.0+
+    - Require +Lexical 0.8.0+
+    - Require +EndOfScope 0.2.0+
+    - Require +Unit 0.3.0+
+
+v0.5     2017-09-26 13:15:04-07:00 America/Los_Angeles
+
+    - Reduced perl requirement to 5.10.1
+    - Try +Lexical, +EndOfScope, +Unit backends by default
+    - Support to try alternative backends
+    - Debugging enabled with IMPORTER_ZIM_DEBUG
+
+v0.4     2017-09-22 10:51:00-07:00 America/Los_Angeles
+
+    - Handle "use IMPORTER MODULE => \@EXPORTS"
+    - Require +Lexical 0.6.0+
+    - Include a cookbook for usage examples
+
+v0.3     2017-09-15 19:51:53-07:00 America/Los_Angeles
 
     - Require +Lexical 0.5.0+
 

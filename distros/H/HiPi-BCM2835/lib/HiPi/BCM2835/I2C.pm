@@ -24,7 +24,7 @@ __PACKAGE__->create_accessors( qw(
     _hipi_baseaddr peripheral address _function_mode _clock_divider _baud_reference readmode
 ));
 
-our $VERSION ='0.62';
+our $VERSION ='0.63';
 
 our @EXPORT = ();
 our @EXPORT_OK = ();
@@ -304,12 +304,19 @@ sub delayMicroseconds {
 sub bus_write { shift->i2c_write( @_ ); }
 
 sub bus_read {
-    my( $self, @params ) = @_;
-    my $readfunc = 'i2c_read_register';
-    if($self->readmode == I2C_READMODE_REPEATED_START  ) {
-        $readfunc = 'i2c_read_register_rs';
+    my( $self, $cmdval, $numbytes ) = @_;
+    
+    my @returnvals;
+    
+    if( !defined($cmdval) ) {
+        @returnvals = $self->i2c_read( $numbytes );
+    } elsif($self->readmode == I2C_READMODE_REPEATED_START  ) {
+        @returnvals = $self->i2c_read_register_rs($cmdval, $numbytes);
+    } else {
+        @returnvals = $self->i2c_read_register($cmdval, $numbytes);
     }
-    $self->$readfunc(@params);
+    
+    return @returnvals;
 }
 
 sub bus_read_bits {
@@ -346,4 +353,6 @@ sub bus_write_bits {
     $self->i2c_write($register, @bytes);
 }
 
+
+sub busmode { return 'bcm2835'; }
 1;

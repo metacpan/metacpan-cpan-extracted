@@ -28,4 +28,5 @@ t/lib/Test/DB/Table.pm
 t/lib/TestAppDB.cfg
 t/lib/TestAppDB.pm
 t/lib/TestTimeLog.pm
+t/qbit-application-model-db-query-having.t
 t/qbit-application-model-db.t

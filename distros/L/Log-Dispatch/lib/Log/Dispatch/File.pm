@@ -3,7 +3,7 @@ package Log::Dispatch::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use IO::Handle;
 use Log::Dispatch::Types;
@@ -37,6 +37,10 @@ sub APPEND {0}
                 type    => t('Bool'),
                 default => 0,
             },
+            lazy_open => {
+                type    => t('Bool'),
+                default => 0,
+            },
             permissions => {
                 type     => t('PositiveOrZeroInt'),
                 optional => 1,
@@ -49,14 +53,22 @@ sub APPEND {0}
         slurpy => 1,
     );
 
+    # We stick these in $self as-is without looking at them in new().
+    my @self_p = qw(
+        autoflush
+        binmode
+        close_after_write
+        filename
+        lazy_open
+        permissions
+        syswrite
+    );
+
     sub new {
         my $class = shift;
         my %p     = $validator->(@_);
 
-        my $self
-            = bless { map { $_ => delete $p{$_} }
-                qw( filename binmode autoflush close_after_write permissions syswrite )
-            }, $class;
+        my $self = bless { map { $_ => delete $p{$_} } @self_p }, $class;
 
         if ( $self->{close_after_write} ) {
             $self->{mode} = '>>';
@@ -74,16 +86,11 @@ sub APPEND {0}
         delete $p{mode};
 
         $self->_basic_init(%p);
-        $self->_make_handle;
+        $self->_open_file()
+            unless $self->{close_after_write} || $self->{lazy_open};
 
         return $self;
     }
-}
-
-sub _make_handle {
-    my $self = shift;
-
-    $self->_open_file() unless $self->{close_after_write};
 }
 
 sub _open_file {
@@ -126,6 +133,10 @@ sub log_message {
 
     if ( $self->{close_after_write} ) {
         $self->_open_file;
+    }
+    elsif ( $self->{lazy_open} ) {
+        $self->_open_file;
+        $self->{lazy_open} = 0;
     }
 
     my $fh = $self->{fh};
@@ -172,7 +183,7 @@ Log::Dispatch::File - Object for logging to files
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 
@@ -235,6 +246,11 @@ defaults to false.
 
 If this is true, then the mode will always be append, so that the file is not
 re-written for each new message.
+
+=item * lazy_open ($)
+
+Whether or not the file should be opened only on first write. This defaults to
+false.
 
 =item * autoflush ($)
 

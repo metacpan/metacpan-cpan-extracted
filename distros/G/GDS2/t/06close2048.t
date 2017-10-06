@@ -17,7 +17,7 @@ sub ok
     my ($n, $result, @info) = @_;
     if ($result) {
         print "ok $n\n";
-        unlink "test.gds";
+        unlink "test$$.gds";
     }
     else {
         print "not ok $n\n";
@@ -25,7 +25,7 @@ sub ok
     }
 }
 
-my $gds2File = new GDS2(-fileName=>'>test.gds');
+my $gds2File = new GDS2(-fileName=>">test$$.gds");
 $gds2File -> printInitLib(-name=>'testlib');
 $gds2File -> printBgnstr(-name=>'test');
 $gds2File -> printPath(
@@ -53,5 +53,6 @@ $gds2File -> printBoundary(
 $gds2File -> printEndstr;
 $gds2File -> printEndlib();
 $gds2File -> close(-pad=>2048);
-ok 2,(stat("test.gds"))[7] == 2048, 'Size of test.gds looks wrong.';
+sleep 2;
+ok 2,(stat("test$$.gds"))[7] == 2048, "Size of test$$.gds looks wrong.";
 

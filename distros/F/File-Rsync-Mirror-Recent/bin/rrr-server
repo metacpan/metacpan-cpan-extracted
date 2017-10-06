@@ -18,7 +18,7 @@ my @opt = <<'=back' =~ /B<--(\S+)>/g;
 
 =item B<--help|h>
 
-Prints a brief message and exists.
+Prints a brief message and exits.
 
 =item B<--verbose|v+>
 
@@ -47,6 +47,7 @@ use warnings;
 use File::Find qw(find);
 use File::Rsync::Mirror::Recent;
 use File::Spec;
+use FindBin;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 use Time::HiRes qw(time);
@@ -187,7 +188,8 @@ sub init {
 # Need also to verify that we watch all directories we encounter.
 sub fsck {
     my($rf) = @_;
-    0 == system $^X, "-Ilib", "bin/rrr-fsck", $rf->rfile, "--verbose" or die;
+    0 == system $^X, "-I$FindBin::Bin/../lib", "$FindBin::Bin/rrr-fsck", $rf->rfile, "--verbose"
+        or die "Could not run rrr-fsck";
 }
 
 MAIN: {

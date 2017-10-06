@@ -208,4 +208,13 @@ subtest 'return return stack by index' => sub {
     is_deeply([$mock->mocked_return_args('foo', 2)], ['qux']);
 };
 
+subtest 'mock method with aliasing' => sub {
+    my $mock = Test::MonkeyMock->new(MyClass->new());
+    $mock->mock(foo => sub { $_[1] = '123' });
+
+    $mock->foo(my $bar);
+
+    is $bar, '123';
+};
+
 done_testing;

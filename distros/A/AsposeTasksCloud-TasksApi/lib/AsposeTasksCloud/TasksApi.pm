@@ -12,7 +12,7 @@ use File::Slurp;
 use AsposeTasksCloud::ApiClient;
 use AsposeTasksCloud::Configuration;
 
-my $VERSION = '1.01';
+my $VERSION = '1.03';
 
 sub new {
     my $class   = shift;

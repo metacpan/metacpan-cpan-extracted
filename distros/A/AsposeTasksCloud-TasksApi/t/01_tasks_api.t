@@ -44,7 +44,7 @@ if (not defined $AsposeTasksCloud::Configuration::api_key or $AsposeTasksCloud::
 	$AsposeStorageCloud::Configuration::api_key = $AsposeTasksCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

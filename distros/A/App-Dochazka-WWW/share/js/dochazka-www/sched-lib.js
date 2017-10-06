@@ -55,14 +55,52 @@ define ([
 ) {
 
     var 
-        scheduleForDisplay = Object.create(prototypes.schedObjectForDisplay),
+        actionDisplaySchedule = function (obj) {
+            stack.push(
+                'schedDisplay',
+                mungeScheduleForDisplay(obj),
+            );
+        },
 
-        getScheduleForDisplay = function () { return scheduleForDisplay; },
-
-        setScheduleForDisplay = function (obj) {
-            scheduleForDisplay = Object.create(prototypes.schedObjectForDisplay),
-            $.extend(scheduleForDisplay, obj);
-            return scheduleForDisplay;
+        actionSchedLookup = function (obj) {
+            console.log("Entering target 'actionSchedLookup' with argument", obj);
+            browsing = false;
+            var rest = {
+                    "method": 'GET',
+                },
+                scheduleObj,
+                // success callback
+                sc = function (st) {
+                    if (st.code === 'DISPATCH_SCHEDULE_FOUND') {
+                        console.log("Payload is", st.payload);
+                        scheduleObj = $.extend(
+                            Object.create(prototypes.schedObjectForDisplay), {
+                                'sid': st.payload.sid,
+                                'scode': st.payload.scode,
+                                'schedule': st.payload.schedule,
+                                'disabled': st.payload.disabled,
+                                'remark': st.payload.remark
+                            }
+                        );
+                        stack.push('schedDisplay', mungeScheduleForDisplay(scheduleObj), {
+                            "xtarget": "schedLookup"
+                        });
+                    }
+                },
+                // failure callback
+                fc = function (st) {
+                    console.log("AJAX: " + rest["path"] + " failed with", st);
+                    coreLib.displayError(st.payload.message);
+                };
+            if (obj.searchKeySchedID) {
+                rest["path"] = 'schedule/sid/' + encodeURIComponent(obj.searchKeySchedID);
+            } else if (obj.searchKeySchedCode) {
+                rest["path"] = 'schedule/scode/' + encodeURIComponent(obj.searchKeySchedCode);
+            } else {
+                coreLib.displayError("Please enter a schedule code or ID to search for");
+                return;
+            }
+            ajax(rest, sc, fc);
         },
 
         browsing,
@@ -84,7 +122,7 @@ define ([
 
                         console.log("Found " + count + " schedules");
                         for (var i=0; i<count; i++) {
-                            mungedRS.push(mungeObjectForDisplay(rs[i]));
+                            mungedRS.push(mungeScheduleForDisplay(rs[i]));
                         }
                         stack.push('simpleScheduleBrowser', {
                             'pos': 0,
@@ -100,12 +138,12 @@ define ([
             ajax(rest, sc, fc);
         },
 
-        mungeObjectForDisplay = function (obj) {
+        mungeScheduleForDisplay = function (obj) {
             var schedule = JSON.parse(obj.schedule),
                 slen = schedule.length,
                 daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
                 mungedObj = Object.create(prototypes.schedObjectForDisplay);
-            console.log("mungeObjectForDisplay: schedule has " + slen + " intervals");
+            console.log("mungeScheduleForDisplay: schedule has " + slen + " intervals");
             mungedObj['sid'] = obj.sid;
             mungedObj['scode'] = obj.scode;
             mungedObj['remark'] = obj.remark;
@@ -129,46 +167,6 @@ define ([
             }
             // console.log("mungemungedObjectForDisplay: mungedObj", mungedObj);
             return mungedObj;
-        },
-
-        actionSchedLookup = function (obj) {
-            console.log("Entering target 'actionSchedLookup' with argument", obj);
-            browsing = false;
-            var rest = {
-                    "method": 'GET',
-                },
-                scheduleObj,
-                // success callback
-                sc = function (st) {
-                    if (st.code === 'DISPATCH_SCHEDULE_FOUND') {
-                        console.log("Payload is", st.payload);
-                        scheduleObj = $.extend(
-                            Object.create(prototypes.schedObjectForDisplay), {
-                                'sid': st.payload.sid,
-                                'scode': st.payload.scode,
-                                'schedule': st.payload.schedule,
-                                'disabled': st.payload.disabled,
-                                'remark': st.payload.remark
-                            }
-                        );
-                        stack.push('schedDisplay', mungeObjectForDisplay(scheduleObj), {
-                            "xtarget": "schedLookup"
-                        });
-                    }
-                },
-                // failure callback
-                fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
-                    coreLib.displayError(st.payload.message);
-                };
-            if (obj.searchKeySchedID) {
-                rest["path"] = 'schedule/sid/' + encodeURIComponent(obj.searchKeySchedID);
-            } else if (obj.searchKeySchedCode) {
-                rest["path"] = 'schedule/scode/' + encodeURIComponent(obj.searchKeySchedCode);
-            } else {
-                coreLib.displayError("Please enter a schedule code or ID to search for");
-            }
-            ajax(rest, sc, fc);
         },
 
         prepSchedIntvl = function (dow, uint) {
@@ -211,8 +209,11 @@ define ([
                                 'remark': st.payload.remark
                             }
                         );
-                        stack.unwindToTarget('mainSched');
-                        coreLib.displayError(st.text);
+                        stack.push(
+                            'actionDisplaySchedule',
+                            scheduleObj,
+                            {'resultLine': st.text},
+                        );
                     }
                 },
                 // failure callback
@@ -279,11 +280,11 @@ define ([
                             $.extend(coreLib.dbrowserState.obj, schedObj);
                             $.extend(obj, schedObj);
                             stack.unwindToTarget('simpleScheduleBrowser');
+                        } else if (stack.grep('schedDisplay')) {
+                            stack.unwindToTarget('schedDisplay', schedObj);
                         } else {
                             dispMsg = "Don't know what to do here";
                         }
-                        // scheduleForDisplay.scode = schedObj.scode;
-                        // scheduleForDisplay.remark = schedObj.remark;
                     } else if (mode === "delete") {
                         dispMsg = "Schedule deleted";
                         if (browsing) {
@@ -297,7 +298,7 @@ define ([
                         }
                         stack.unwindToFlag();
                     }
-                    $("#result").html(dispMsg);
+                    coreLib.displayResult(dispMsg);
                 },
                 fc = function (st) {
                     console.log("AJAX: " + rest["path"] + " failed with", st);
@@ -314,9 +315,9 @@ define ([
     // here is where we define methods implementing the various
     // schedule-related actions (see daction-start.js)
     return {
-        getScheduleForDisplay: getScheduleForDisplay,
-        browseAllSchedules: browseAllSchedules,
+        actionDisplaySchedule: actionDisplaySchedule,
         actionSchedLookup: actionSchedLookup,
+        browseAllSchedules: browseAllSchedules,
         createSchedule: createSchedule,
         schedEditSave: function (obj) {
             schedGen('edit', obj);

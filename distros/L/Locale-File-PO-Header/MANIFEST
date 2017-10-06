@@ -9,7 +9,6 @@ lib/Locale/File/PO/Header/ExtendedItem.pm
 lib/Locale/File/PO/Header/Item.pm
 lib/Locale/File/PO/Header/MailItem.pm
 MANIFEST			This list of files
-META.json
 README
 t/01_use.t
 t/02_exceptions.t
@@ -23,3 +22,4 @@ t/pod_coverage.t
 t/prereq_build.t
 Makefile.PL
 META.yml
+META.json

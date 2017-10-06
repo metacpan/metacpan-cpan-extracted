@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.66';
+  $Math::Prime::Util::PP::VERSION = '0.67';
 }
 
 BEGIN {
@@ -2716,6 +2716,7 @@ sub _gcd_ui {
 sub is_power {
   my ($n, $a, $refp) = @_;
   croak("is_power third argument not a scalar reference") if defined($refp) && !ref($refp);
+  _validate_integer($n);
   return 0 if abs($n) <= 3 && !$a;
 
   if ($Math::Prime::Util::_GMPfunc{"is_power"} &&
@@ -2784,6 +2785,14 @@ sub is_power {
   0;
 }
 
+sub is_square {
+  my($n) = @_;
+  return 0 if $n < 0;
+  #is_power($n,2);
+  _validate_integer($n);
+  _is_perfect_square($n);
+}
+
 sub is_prime_power {
   my ($n, $refp) = @_;
   croak("is_prime_power second argument not a scalar reference") if defined($refp) && !ref($refp);
@@ -2795,6 +2804,38 @@ sub is_prime_power {
   return 0 unless $k && Math::Prime::Util::is_prime($r);
   $$refp = $r if defined $refp;
   $k;
+}
+
+sub is_polygonal {
+  my ($n, $k, $refp) = @_;
+  croak("is_polygonal third argument not a scalar reference") if defined($refp) && !ref($refp);
+  croak("is_polygonal: k must be >= 3") if $k < 3;
+  return 0 if $n <= 0;
+  if ($n == 1) { $$refp = 1 if defined $refp; return 1; }
+  my($D,$R);
+  if ($k == 4) {
+    return 0 unless _is_perfect_square($n);
+    $$refp = sqrtint($n) if defined $refp;
+    return 1;
+  }
+  if ($n <= MPU_HALFWORD && $k <= MPU_HALFWORD) {
+    $D = ($k==3) ? 1+($n<<3) : (8*$k-16)*$n + ($k-4)*($k-4);
+    return 0 unless _is_perfect_square($D);
+    $D = $k-4 + Math::Prime::Util::sqrtint($D);
+    $R = 2*$k-4;
+  } else {
+    if ($k == 3) {
+      $D = vecsum(1, vecprod($n, 8));
+    } else {
+      $D = vecsum(vecprod($n, vecprod(8, $k) - 16),  vecprod($k-4,$k-4));;
+    }
+    return 0 unless _is_perfect_square($D);
+    $D = vecsum( sqrtint($D), $k-4 );
+    $R = vecprod(2, $k) - 4;
+  }
+  return 0 if ($D % $R) != 0;
+  $$refp = $D / $R if defined $refp;
+  1;
 }
 
 sub valuation {
@@ -6095,6 +6136,8 @@ sub _forcompositions {
   $sub->() if $n == 0 && $minn <= 1;
   return if $n < $minn || $minn > $maxn || $mina > $maxa || $maxn <= 0 || $maxa <= 0;
 
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   my ($x, $y, $r, $k);
   my @a = (0) x ($n);
   $k = 1;
@@ -6129,8 +6172,10 @@ sub _forcompositions {
     }
     next if $primeq == 0 && Math::Prime::Util::vecany(sub{ is_prime($_) }, @a[0..$k]);
     next if $primeq == 2 && Math::Prime::Util::vecany(sub{ !is_prime($_) }, @a[0..$k]);
+    last if Math::Prime::Util::_get_forexit();
     $sub->(@a[0 .. $k]);
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 sub forcomb {
   my($sub, $n, $k) = @_;
@@ -6142,9 +6187,12 @@ sub forcomb {
   }
   return $sub->() if $k == 0;
   return if $k > $n || $n == 0;
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   my @c = 0 .. $k-1;
   while (1) {
     $sub->(@c);
+    last if Math::Prime::Util::_get_forexit();
     next if $c[-1]++ < $n-1;
     my $i = $k-2;
     $i-- while $i >= 0 && $c[$i] >= $n-($k-$i);
@@ -6152,6 +6200,7 @@ sub forcomb {
     $c[$i]++;
     while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 sub _forperm {
   my($sub, $n, $all_perm) = @_;
@@ -6159,6 +6208,8 @@ sub _forperm {
   my @c = reverse 0 .. $k-1;
   my $inc = 0;
   my $send = 1;
+  my $oldexitloop = Math::Prime::Util::_get_forexit();
+  Math::Prime::Util::_set_forexit(0);
   while (1) {
     if (!$all_perm) {   # Derangements via simple filtering.
       $send = 1;
@@ -6169,7 +6220,10 @@ sub _forperm {
         }
       }
     }
-    $sub->(reverse @c) if $send;
+    if ($send) {
+      $sub->(reverse @c);
+      last if Math::Prime::Util::_get_forexit();
+    }
     if (++$inc & 1) {
       @c[0,1] = @c[1,0];
       next;
@@ -6182,6 +6236,7 @@ sub _forperm {
     @c[$j,$m] = @c[$m,$j];
     @c[0..$j-1] = reverse @c[0..$j-1];
   }
+  Math::Prime::Util::_set_forexit($oldexitloop);
 }
 sub forperm {
   my($sub, $n, $k) = @_;
@@ -6220,7 +6275,7 @@ sub _multiset_permutations {
     }
   } elsif ($sum == scalar(@n)) {         # All entries have 1 occurance
     my @i = map { $_->[0] } @n;
-    Math::Prime::Util::forperm { $sub->(@$prefix, @i[@_]) } scalar(@i);
+    Math::Prime::Util::forperm(sub { $sub->(@$prefix, @i[@_]) }, 1+$#i);
   } else {                               # Recurse over each leading value
     for my $v (@n) {
       $v->[1]--;
@@ -6579,7 +6634,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 
 =head1 SYNOPSIS

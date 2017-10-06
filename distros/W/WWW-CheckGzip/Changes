@@ -1,5 +1,13 @@
 Revision history for Perl module WWW::CheckGzip
 
+0.05 2017-10-04
+
+- Bug fix for checkgzip script
+
+0.04 2017-10-01
+
+- Switch to HTTP::Tiny instead of LWP::UserAgent
+
 0.03 2017-08-17
 
 - Dependencies in Makefile.PL

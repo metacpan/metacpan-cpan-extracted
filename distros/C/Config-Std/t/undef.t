@@ -16,5 +16,5 @@ my $output;
 
 ok !eval{ write_config %data => \$output }    => 'Write failed as expected';
 
-like $@, qr/\ACan't save undefined value for key {'FOO'}{'foo2'}/
+like $@, qr(\A\QCan't save undefined value for key {'FOO'}{'foo2'})
                                             => 'Failed with expected exception';

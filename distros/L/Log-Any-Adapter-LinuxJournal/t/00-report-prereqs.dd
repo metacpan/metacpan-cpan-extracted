@@ -1,0 +1,54 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Linux::Systemd::Journal::Write' => '1.172760',
+                                      'Log::Any::Adapter::Base' => '0',
+                                      'Log::Any::Adapter::Util' => '0',
+                                      'base' => '0',
+                                      'perl' => 'v5.12.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Log::Any' => '0',
+                                   'Log::Any::Adapter' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::More' => '0.94',
+                                   'blib' => '1.01'
+                                 }
+                 }
+     };
+  $x;
+ }

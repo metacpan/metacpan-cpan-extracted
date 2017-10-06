@@ -59,6 +59,7 @@ subtest 'Changes' => sub {
 };
 
 module_boilerplate_ok('bin/git-branch-clean');
+module_boilerplate_ok('bin/git-branches');
 module_boilerplate_ok('bin/git-branch-grep');
 module_boilerplate_ok('bin/git-committers');
 module_boilerplate_ok('bin/git-cows');
@@ -70,10 +71,12 @@ module_boilerplate_ok('bin/git-pom');
 module_boilerplate_ok('bin/git-tag-grep');
 module_boilerplate_ok('bin/git-up-to-date');
 module_boilerplate_ok('bin/git-recent');
+module_boilerplate_ok('bin/git-search');
 module_boilerplate_ok('bin/git-watch');
 module_boilerplate_ok('lib/App/Git/Workflow.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/BranchClean.pm');
+module_boilerplate_ok('lib/App/Git/Workflow/Command/Branches.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/BranchGrep.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/Committers.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/Cows.pm');
@@ -84,6 +87,7 @@ module_boilerplate_ok('lib/App/Git/Workflow/Command/Pom.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/TagGrep.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/UpToDate.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/Recent.pm');
+module_boilerplate_ok('lib/App/Git/Workflow/Command/Search.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Command/Watch.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Pom.pm');
 module_boilerplate_ok('lib/App/Git/Workflow/Repository.pm');

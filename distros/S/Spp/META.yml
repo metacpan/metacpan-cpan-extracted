@@ -16,7 +16,7 @@ name: Spp
 provides:
   Spp:
     file: lib/Spp.pm
-    version: '1.22'
+    version: '2.0'
   Spp::Ast:
     file: lib/Spp/Ast.pm
   Spp::Builtin:
@@ -25,10 +25,10 @@ provides:
     file: lib/Spp/Core.pm
   Spp::Cursor:
     file: lib/Spp/Cursor.pm
+  Spp::Estr:
+    file: lib/Spp/Estr.pm
   Spp::Grammar:
     file: lib/Spp/Grammar.pm
-  Spp::LintAst:
-    file: lib/Spp/LintAst.pm
   Spp::MatchRule:
     file: lib/Spp/MatchRule.pm
   Spp::OptAst:
@@ -36,11 +36,10 @@ provides:
   Spp::ToSpp:
     file: lib/Spp/ToSpp.pm
 requires:
-  File::Spec: '0'
   JSON::XS: '0'
-  List::MoreUtils: '0'
+  Time::Piece: '0'
   perl: '5.012'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.22'
+version: '2.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

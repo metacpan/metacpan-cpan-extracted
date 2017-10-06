@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new CGI::BrowserDetect!'
+abstract: 'Browser Detect'
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
 requires:
   HTTP::BrowserDetect: '3.14'
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

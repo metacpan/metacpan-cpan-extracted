@@ -30,12 +30,12 @@ my %trustme = (
                                 qr/^(?:warn|err|crit|emerg)$/,
                                 qr/^is_\w+$/
                               ],
-             'Log::Dispatch::File' => [
-                                      qr/^(?:O_)?APPEND$/
-                                    ],
              'Log::Dispatch::Output' => [
                                         qr/^new$/
-                                      ]
+                                      ],
+             'Log::Dispatch::File' => [
+                                      qr/^(?:O_)?APPEND$/
+                                    ]
            );
 
 my @also_private;

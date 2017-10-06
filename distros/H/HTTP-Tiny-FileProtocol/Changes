@@ -1,0 +1,18 @@
+Change history for HTTP::Tiny::FileProtocol
+===========================================
+
+0.04  2017-10-04T10:06:00
+
+      update dist.ini
+
+0.03  2017-10-04T09:00:00
+
+      tiny doc improvements
+
+0.02  2017-10-03T13:39:00
+
+      add 'mirror' for files
+
+0.01  2017-10-02T20:13:00
+
+      initial release

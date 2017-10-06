@@ -1,5 +1,7 @@
 Revision history for Perl extension GDS2 releases
 
+3.35  Tweaks to testing - playing the Kwalitee game
+3.34  Tweaks
 3.33  Tweaks
 3.32  Better GDT
 3.31  Added GDT test to t/

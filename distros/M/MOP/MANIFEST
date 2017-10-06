@@ -14,6 +14,7 @@ lib/MOP/Internal/Util.pm
 lib/MOP/Method.pm
 lib/MOP/Role.pm
 lib/MOP/Slot.pm
+lib/MOP/Slot/Initializer.pm
 t/001-examples/001-point.t
 t/001-examples/007-currency.t
 t/010-role/001-basic.t

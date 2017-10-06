@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-# given one or more .TTF files on the command line, display their contents
-# and some sample text.
+# given one or more .TTF files on the command line, display their contents:
+# 256 bytes in one single-byte encoding, plus all glyphs in font by CId,
+# and some sample ASCII text.
+# -e encoding  (default is latin1) SINGLE BYTE ONLY!
 # note that use of -file in new() leaves the PDF in THIS directory, not the
 #   one with the 022_truefonts file!
 
@@ -36,13 +38,13 @@ GetOptions(
 die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
 
 foreach $fn (@ARGV) {
-    if (!-e $fn) {
+    if (!-r $fn) {
         print "$fn cannot be read. Skipping...\n\n";
         next;
     }
 
     my $myName = basename($fn);
-    $myName =~ s/\.ttf$//i;  # remove .ttf (any case)
+    $myName =~ s/\.[to]tf$//i;  # remove .ttf/.otf (any case)
 
     $pdf = PDF::Builder->new(-compress => $compress, 
                           -file => basename($0).'.'.$myName.".pdf");
@@ -55,9 +57,12 @@ foreach $fn (@ARGV) {
     my $font = $pdf->ttfont($fn, -encode => $encoding);
     $font->data()->{'nosubset'} = 1;
     # produce a page with dump of font
-    if (1) {
+    # single byte encoding (16 rows x 16 columns)
+    if ($encoding =~ m/^utf/i || $encoding =~ m/^ucs/i) {
+	print STDERR "can't display page for multibyte encoding.\n";
+    } else {
         my $page = $pdf->page();
-        $page->mediabox(595,842);
+        $page->mediabox(595,842); # A4
 
         my $gfx = $page->gfx();
 
@@ -103,21 +108,21 @@ foreach $fn (@ARGV) {
                 $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
                 $gfx->stroke();
 
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-6);
                 $txt2->text_right($ci);
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-11);
                 if (defined $font->uniByEnc($ci)) {
-                    $txt2->text_right(sprintf('U=0x%04X', $font->uniByEnc($ci)));
+                    $txt2->text_right(sprintf('U+%04X', $font->uniByEnc($ci)));
 		} else {
-                    $txt2->text_right('U=0x????');
+                    $txt2->text_right('U+????');
 		}
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-16);
                 $txt2->text_right($font->glyphByEnc($ci));
-                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                $txt2->translate(50+($sx*$x)+$wx,50+($sy*$y)-21);
                 $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($ci)));
             } # loop x L to R along row
         } # loop yp B to T along column and y T to B
-    } # always do this section (if 1)
+    } # single byte encoding display chars
 
     my @cids = (0 .. $font->glyphNum()-1);
     # warning: apparently not all fonts have fontbbox
@@ -131,21 +136,22 @@ foreach $fn (@ARGV) {
     my $sY = 0.045;
 
     # one or more pages to display all the cids, 10 col/x x 15 rows/y per page
+    # CId list is simply 0..number of glyphs in font-1
     while (scalar @cids>0) {
         $page = $pdf->page();
-        $page->mediabox(595,842);
+        $page->mediabox(595,842); # A4
 
         $gfx = $page->gfx();
         $tx  = $page->text();
         #delete $gfx->{'Filter'};
 
-	# loop through y coordinates of rows
+	# loop through y coordinates of rows 15 rows of 10 columns)
 	foreach $yp (0 .. 14) {
 	    my $y = 750 - $yp*50;
 	    # loop through x coordinates of columns
 	    foreach $xp (1 .. 10) {
 		my $x = $xp * 50;
-                my $xo = shift(@cids);
+                my $xo = shift(@cids);  # 0, 1, 2,...
                 $gfx->save();
                 $gfx->fillcolor('black');
                 $gfx->transform(-translate => [$x, $y], -scale => [0.045, 0.045]);
@@ -181,13 +187,13 @@ foreach $fn (@ARGV) {
                 $tx->text("G+$xo"); 
                 $tx->translate($x+25*$sX,$y+10*$sY);
 		if (defined $font->uniByCId($xo)) {
-                    $tx->text(sprintf('U+0x%04X', $font->uniByCId($xo)));
+                    $tx->text(sprintf('U+%04X', $font->uniByCId($xo)));
 	        } else {
-                    $tx->text('U+0x????');
+                    $tx->text('U+????');
 		}
 
                 my $name = $font->glyphByCId($xo);
-                if ($name eq '') {
+                if (!defined $name || $name eq '') {
                     $tx->fillcolor('red');
                     $name="NONE";
                 } else {
@@ -226,7 +232,7 @@ foreach $fn (@ARGV) {
     my $textL = $LoremIpsum;
 
     $page = $pdf->page();
-    $page->mediabox(595,842);
+    $page->mediabox(595,842); # A4
     $tx = $page->text();
     $tx->transform(-translate => [50, 800]);
     $tx->fillcolor('black');

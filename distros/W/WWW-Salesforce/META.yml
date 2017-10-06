@@ -3,6 +3,7 @@ abstract: 'this class provides a simple abstraction layer between SOAP::Lite and
 author:
   - 'Chase Whitener <capoeirab@cpan.org>'
   - 'Byrne Reese <byrne@cpan.org>'
+  - 'Fred Moyer <phred@cpan.org>'
 build_requires:
   DateTime: '0'
   ExtUtils::MakeMaker: '0'
@@ -32,24 +33,26 @@ no_index:
 provides:
   WWW::Salesforce:
     file: lib/WWW/Salesforce.pm
-    version: '0.301'
+    version: '0.302'
   WWW::Salesforce::Constants:
     file: lib/WWW/Salesforce/Constants.pm
-    version: '0.301'
+    version: '0.302'
   WWW::Salesforce::Deserializer:
     file: lib/WWW/Salesforce/Deserializer.pm
-    version: '0.301'
+    version: '0.302'
   WWW::Salesforce::Serializer:
     file: lib/WWW/Salesforce/Serializer.pm
-    version: '0.301'
+    version: '0.302'
   WWW::Salesforce::Simple:
     file: lib/WWW/Salesforce/Simple.pm
-    version: '0.301'
+    version: '0.302'
 requires:
   DateTime: '0'
   Exporter: '5.57'
   IO::Socket::SSL: '1.94'
+  LWP::Protocol::https: '6.00'
   SOAP::Lite: '1.0'
+  base: '0'
   perl: '5.008001'
   strict: '0'
   warnings: '0'
@@ -57,7 +60,7 @@ resources:
   bugtracker: https://github.com/p5-salesforce/WWW-Salesforce/issues
   homepage: https://github.com/p5-salesforce/WWW-Salesforce
   repository: https://github.com/p5-salesforce/WWW-Salesforce.git
-version: '0.301'
+version: '0.302'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -241,7 +244,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -264,7 +267,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -281,7 +284,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -294,11 +297,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.301
+          tag: v0.302
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -312,7 +315,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -397,21 +400,41 @@ x_Dist_Zilla:
           stopwords:
             - Blanco
             - CPAN
+            - SOQL
+            - SOSL
             - Salesforce
             - Shimizu
             - Stubblebine
+            - checkAsyncStatus
+            - checkRetrieveStatus
             - complexTypes
+            - convertLead
             - describeGlobal
+            - describeLayout
+            - describeMetadata
             - describeSObject
+            - describeSObjects
+            - describeTabs
             - dreamForce
+            - getDeleted
+            - getErrorDetails
+            - getServerTimestamp
+            - getUpdated
+            - getUserInfo
             - github
             - gmail
             - majordojo
+            - queryAll
             - queryLocator
+            - queryMore
             - redhotpenguin
+            - resetPassword
+            - retrieveMetadata
             - salesforce
             - searchString
             - serverUrl
+            - setPassword
+            - upsert
             - userId
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

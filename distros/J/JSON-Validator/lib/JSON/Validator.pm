@@ -19,7 +19,7 @@ use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
 use constant DEBUG => $ENV{JSON_VALIDATOR_DEBUG} || 0;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -221,11 +221,8 @@ sub _load_schema_from_url {
 }
 
 sub _default_id {
-  my $path = path($0)->to_abs;
   state $id = 0;
-  $path = $path->dirname if $path;
-  $path = path() unless $path;
-  return path($path, sprintf 'json-validator-%s.json', ++$id)->to_string;
+  return sprintf 'http://local/json-validator/default-id-%s', ++$id;
 }
 
 sub _register_document {
@@ -618,7 +615,7 @@ sub _validate_type_object {
   while (my ($k, $r) = each %{$schema->{properties}}) {
     push @{$rules{$k}}, $r;
   }
-  while (my ($p, $r) = each %{$schema->{patternProperties}}) {
+  while (my ($p, $r) = each %{$schema->{patternProperties} || {}}) {
     push @{$rules{$_}}, $r for grep { $_ =~ /$p/ } keys %$data;
   }
 
@@ -761,6 +758,11 @@ sub _guessed_right {
   return _guess_data_type($_[0]) eq $_[1] ? $_[1] : undef;
 }
 
+sub _invalid {
+  warn sprintf "[JSON::Validator] Failed validation: $_[0]\n" if DEBUG;
+  return 0;
+}
+
 sub _is_date_time {
   my @time = $_[0]
     =~ m!^(\d{4})-(\d\d)-(\d\d)[T ](\d\d):(\d\d):(\d\d(?:\.\d+)?)(?:Z|([+-])(\d+):(\d+))?$!io;
@@ -805,7 +807,34 @@ sub _is_true {
 sub _is_regex {
   eval {qr{$_[0]}};
 }
-sub _is_uri { $_[0] =~ qr!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!o; }
+
+# From Data::Validate::URI
+sub _is_uri {
+  return unless $_[0];
+
+  my ($scheme, $authority, $path, $query, $fragment)
+    = $_[0] =~ qr!^(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?$!o;
+
+  return _invalid('Scheme and path are required')
+    unless defined $scheme
+    and length $scheme
+    and defined $path;
+
+  return _invalid('Scheme must begin with a letter')
+    unless lc($scheme) =~ m!^[a-z][a-z0-9\+\-\.]*$!;
+
+  return _invalid('Hex escapes are not complete') if $_[0] =~ /%[^0-9a-f]/i;
+  return _invalid('Hex escapes are not complete') if $_[0] =~ /%[0-9a-f](:?[^0-9a-f]|$)/i;
+
+  if (defined $authority and length $authority) {
+    return _invalid('Path must be empty or begin with a /') unless !length $path or $path =~ m!^/!;
+  }
+  else {
+    return _invalid('Path must not start with //') if $path =~ m!^//!;
+  }
+
+  return 1;
+}
 
 sub _merge_errors {
   join ' ', map {
@@ -850,7 +879,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-1.02
+1.04
 
 =head1 SYNOPSIS
 

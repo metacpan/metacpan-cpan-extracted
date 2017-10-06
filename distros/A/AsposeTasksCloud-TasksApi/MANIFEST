@@ -116,12 +116,7 @@ lib/AsposeTasksCloud/Object/WorkingTime.pm
 lib/AsposeTasksCloud/TasksApi.pm
 Makefile.PL
 MANIFEST
-README
-t/01_tasks_api.t
-t/data/ExtendedAttribute.mpp
-t/data/Outlinecode.mpp
-t/data/ResourceWithExtAttribs.xml
-t/data/sample-project-2.mpp
-t/data/sample-project.mpp
-META.yml
 META.json
+META.yml
+README.md
+t/01_tasks_api.t

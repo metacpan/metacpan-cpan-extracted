@@ -11,8 +11,7 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'foo';
-    has 'bar';
+    has foo => ();
 
     sub bar { 'Foo::bar' }
 
@@ -21,8 +20,8 @@ package Foo {
     }
 
     sub test ($self, $x = undef) {
-        $self->{foo} = $x if $x;
-        $self->{foo};
+        foo = $x if $x;
+        foo;
     }
 
     sub test_bar ($self) { $self->bar . "x2" }

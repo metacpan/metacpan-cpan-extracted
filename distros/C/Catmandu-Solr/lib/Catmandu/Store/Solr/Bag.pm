@@ -10,7 +10,7 @@ use Catmandu::Error;
 use Moo;
 use MooX::Aliases;
 
-our $VERSION = "0.0302";
+our $VERSION = "0.0303";
 
 with 'Catmandu::Bag';
 with 'Catmandu::CQLSearchable';
@@ -25,23 +25,26 @@ sub _build_bag_key {
 }
 
 sub generator {
-    my ($self) = @_;
+    my ($self)    = @_;
     my $store     = $self->store;
     my $name      = $self->name;
     my $limit     = $self->buffer_size;
     my $bag_field = $self->bag_field;
-    my $query  = qq/$bag_field:"$name"/;
+    my $query     = qq/$bag_field:"$name"/;
     sub {
         state $start = 0;
         state $hits;
         unless ($hits && @$hits) {
-            $hits = $store->solr->search($query, {
-                start => $start,
-                rows => $limit,
-                defType => "lucene",
-                facet      => "false",
-                spellcheck => "false"
-            })->content->{response}{docs};
+            $hits = $store->solr->search(
+                $query,
+                {
+                    start      => $start,
+                    rows       => $limit,
+                    defType    => "lucene",
+                    facet      => "false",
+                    spellcheck => "false"
+                }
+            )->content->{response}{docs};
             $start += $limit;
         }
         my $hit = shift(@$hits) || return;
@@ -51,10 +54,10 @@ sub generator {
 }
 
 sub count {
-    my ($self) = @_;
+    my ($self)    = @_;
     my $name      = $self->name;
     my $bag_field = $self->bag_field;
-    my $res = $self->store->solr->search(
+    my $res       = $self->store->solr->search(
         qq/$bag_field:"$name"/,
         {
             rows       => 0,
@@ -71,7 +74,7 @@ sub get {
     my $name      = $self->name;
     my $id_field  = $self->id_field;
     my $bag_field = $self->bag_field;
-    my $res  = $self->store->solr->search(
+    my $res       = $self->store->solr->search(
         qq/$bag_field:"$name" AND $id_field:"$id"/,
         {
             rows       => 1,
@@ -97,8 +100,8 @@ sub add {
         my $val = $data->{$key};
         if (is_array_ref($val)) {
             is_value($_) && push @fields,
-              WebService::Solr::Field->new($key => $_)
-              foreach @$val;
+                WebService::Solr::Field->new($key => $_)
+                foreach @$val;
         }
         elsif (is_value($val)) {
             push @fields, WebService::Solr::Field->new($key => $val);
@@ -114,23 +117,26 @@ sub add {
 
 sub delete {
     my ($self, $id) = @_;
-    my $name = $self->name;
+    my $name      = $self->name;
     my $id_field  = $self->id_field;
     my $bag_field = $self->bag_field;
-    $self->store->solr->delete_by_query(qq/$bag_field:"$name" AND $id_field:"$id"/);
+    $self->store->solr->delete_by_query(
+        qq/$bag_field:"$name" AND $id_field:"$id"/);
 }
 
 sub delete_all {
-    my ($self) = @_;
-    my $name = $self->name;
+    my ($self)    = @_;
+    my $name      = $self->name;
     my $bag_field = $self->bag_field;
     $self->store->solr->delete_by_query(qq/$bag_field:"$name"/);
 }
+
 sub delete_by_query {
     my ($self, %args) = @_;
     my $name      = $self->name;
     my $bag_field = $self->bag_field;
-    $self->store->solr->delete_by_query(qq/$bag_field:"$name" AND ($args{query})/);
+    $self->store->solr->delete_by_query(
+        qq/$bag_field:"$name" AND ($args{query})/);
 }
 
 sub commit {
@@ -138,14 +144,14 @@ sub commit {
     my $solr = $self->store->solr;
     my $err;
     if ($self->buffer_used) {
-        eval { $solr->add($self->buffer) } or push @{ $err ||= [] }, $@;
+        eval {$solr->add($self->buffer)} or push @{$err ||= []}, $@;
         $self->clear_buffer;
     }
-    unless($self->store->{_tx}){
-        eval { $solr->commit } or push @{ $err ||= [] }, $@;
+    unless ($self->store->{_tx}) {
+        eval {$solr->commit} or push @{$err ||= []}, $@;
     }
 
-    if(defined $err && $self->store->on_error eq 'throw'){
+    if (defined $err && $self->store->on_error eq 'throw') {
         Catmandu::Error->throw($err->[0]);
     }
 }
@@ -164,33 +170,38 @@ sub search {
 
     my $bag_fq = qq/{!type=lucene}$bag_field:"$name"/;
 
-    if ( $args{fq} ) {
-        if (is_array_ref( $args{fq})) {
-            $args{fq} = [ $bag_fq , @{ $args{fq} } ];
+    if ($args{fq}) {
+        if (is_array_ref($args{fq})) {
+            $args{fq} = [$bag_fq, @{$args{fq}}];
         }
         else {
             $args{fq} = [$bag_fq, $args{fq}];
         }
-    } else {
+    }
+    else {
         $args{fq} = $bag_fq;
     }
 
-    my $res = $self->store->solr->search($query, {%args, start => $start, rows => $limit});
+    my $res = $self->store->solr->search($query,
+        {%args, start => $start, rows => $limit});
 
     my $set = $res->content->{response}{docs};
 
     if ($bag) {
-        $set = [map { $bag->get($_->{$id_field}) } @$set];
-    } else {
+        $set = [map {$bag->get($_->{$id_field})} @$set];
+    }
+    else {
         $self->map_fields($_) for (@$set);
     }
 
-    my $hits = Catmandu::Hits->new({
-        limit => $limit,
-        start => $start,
-        total => $res->content->{response}{numFound},
-        hits  => $set,
-    });
+    my $hits = Catmandu::Hits->new(
+        {
+            limit => $limit,
+            start => $start,
+            total => $res->content->{response}{numFound},
+            hits  => $set,
+        }
+    );
 
     if ($res->facet_counts) {
         $hits->{facets} = $res->facet_counts;
@@ -199,7 +210,7 @@ sub search {
     if ($res->spellcheck) {
         $hits->{spellcheck} = $res->spellcheck;
     }
-    if ( $res->content->{highlighting} ) {
+    if ($res->content->{highlighting}) {
         $hits->{highlighting} = $res->content->{highlighting};
     }
 
@@ -213,32 +224,40 @@ sub searcher {
 
 sub translate_sru_sortkeys {
     my ($self, $sortkeys) = @_;
-    join(',', grep { defined $_ } map { $self->_translate_sru_sortkey($_) } split /\s+/, $sortkeys);
+    join(',',
+        grep {defined $_} map {$self->_translate_sru_sortkey($_)} split /\s+/,
+        $sortkeys);
 }
+
 sub _translate_sru_sortkey {
     my ($self, $sortkey) = @_;
     my ($field, $schema, $asc) = split /,/, $sortkey;
     $field || return;
     if (my $map = $self->cql_mapping) {
         $field = lc $field;
-        $field =~ s/(?<=[^_])_(?=[^_])//g if $map->{strip_separating_underscores};
+        $field =~ s/(?<=[^_])_(?=[^_])//g
+            if $map->{strip_separating_underscores};
         $map = $map->{indexes} || return;
         $map = $map->{$field}  || return;
         $map->{sort} || return;
         if (ref $map->{sort} && $map->{sort}{field}) {
             $field = $map->{sort}{field};
-        } elsif (ref $map->{field}) {
+        }
+        elsif (ref $map->{field}) {
             $field = $map->{field}->[0];
-        } elsif ($map->{field}) {
+        }
+        elsif ($map->{field}) {
             $field = $map->{field};
         }
     }
     $asc //= 1;
-    "${field} ".($asc ? "asc" : "desc");
+    "${field} " . ($asc ? "asc" : "desc");
 }
+
 sub translate_cql_query {
-    my($self,$query) = @_;
-    Catmandu::Store::Solr::CQL->new(mapping => $self->cql_mapping)->parse($query);
+    my ($self, $query) = @_;
+    Catmandu::Store::Solr::CQL->new(mapping => $self->cql_mapping)
+        ->parse($query);
 }
 
 sub normalize_query {

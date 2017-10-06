@@ -4,7 +4,7 @@ author:
   - unknown
 build_requires: {}
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -13,18 +13,21 @@ name: App-Devel-MAT-Explorer-GTK
 provides:
   App::Devel::MAT::Explorer::GTK:
     file: lib/App/Devel/MAT/Explorer/GTK.pm
-    version: '0.03'
+    version: '0.04'
   App::Devel::MAT::Explorer::GTK::Resources:
     file: lib/App/Devel/MAT/Explorer/GTK/Resources.pm
-    version: '0.03'
+    version: '0.04'
   App::Devel::MAT::Explorer::GTK::SVDetail:
     file: lib/App/Devel/MAT/Explorer/GTK/SVDetail.pm
-    version: '0.03'
+    version: '0.04'
+  App::Devel::MAT::Explorer::GTK::Shell:
+    file: lib/App/Devel/MAT/Explorer/GTK/Shell.pm
+    version: '0.04'
   App::Devel::MAT::Explorer::GTK::Utils:
     file: lib/App/Devel/MAT/Explorer/GTK/Utils.pm
   App::Devel::MAT::Explorer::GTK::Widgets:
     file: lib/App/Devel/MAT/Explorer/GTK/Widgets.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Devel::MAT: '0.23'
   File::ShareDir: '0'
@@ -36,5 +39,5 @@ requires:
   Struct::Dumb: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

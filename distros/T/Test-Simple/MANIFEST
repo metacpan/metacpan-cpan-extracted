@@ -120,6 +120,7 @@ t/Legacy/Regression/637.t
 t/Legacy/Regression/683_thread_todo.t
 t/Legacy/Regression/6_cmp_ok.t
 t/Legacy/Regression/736_use_ok.t
+t/Legacy/Regression/789-read-only.t
 t/Legacy/Simple/load.t
 t/Legacy/Test2/Subtest.t
 t/Legacy/Tester/tbt_01basic.t
@@ -318,6 +319,7 @@ t/regression/721-nested-streamed-subtest.t
 t/regression/757-reset_in_subtest.t
 t/regression/buffered_subtest_plan_buffered.t
 t/regression/builder_does_not_init.t
+t/regression/errors_facet.t
 t/regression/no_name_in_subtest.t
 t/zzz-check-breaks.t
 xt/author/pod-spell.t

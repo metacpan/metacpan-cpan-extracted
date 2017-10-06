@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
 WriteMakefile(
     NAME                => 'CGI::Buffer',
@@ -12,7 +12,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES            => {},
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
 	'Test::Most' => 0,
 	# 'Test::NoWarnings' => 0,
 	'Test::TempDir::Tiny' => 0,
@@ -24,7 +24,7 @@ WriteMakefile(
 	'CGI::Info' => 0.51,
 	'CSS::Packer' => 0,
 	'Compress::Zlib' => 0,
-	'IO::Compress::Brotli' => 0,
+	'IO::Compress::Brotli' => 0.003,
 	'Digest::MD5' => 0,
     	'Encode' => 0,
 	# 'HTML::Clean' => 0.8,

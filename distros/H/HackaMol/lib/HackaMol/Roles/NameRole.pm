@@ -1,5 +1,5 @@
 package HackaMol::Roles::NameRole;
-$HackaMol::Roles::NameRole::VERSION = '0.044';
+$HackaMol::Roles::NameRole::VERSION = '0.045';
 #ABSTRACT: provides name attribute
 use 5.008;
 use Moose::Role;
@@ -20,7 +20,7 @@ HackaMol::Roles::NameRole - provides name attribute
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 DESCRIPTION
 

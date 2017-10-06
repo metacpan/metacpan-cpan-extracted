@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Tagged",
    "prereqs" : {
@@ -24,7 +24,7 @@
    "provides" : {
       "String::Tagged" : {
          "file" : "lib/String/Tagged.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -33,6 +33,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

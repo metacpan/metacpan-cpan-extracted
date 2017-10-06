@@ -107,3 +107,39 @@ Revision history for Spp
 
 1.22    all branch is longest match branch, if two branch
         match same length, then first is return.
+
+1.23    parser() = [$door-rule, $table]
+        return match, if-false report, othewise return true
+
+1.24    move language related function to Builtin.pm and Spp.pl
+        lint() not exported from Spp.pm
+        delete all() of builtin.pm
+
+1.25    add Flat() to assign two symbol, Match() would send
+        rest to last symbol
+        fix a bug of Expr, add Sub as action name.
+
+1.26    2017-9-20
+        split some not export function to spp.pl, 
+        delete all not nesserary name with -spp, 
+        add Push, Unshift, rename Append, could return
+        array itself, add Chop(), add Match(), Flat(),
+        match() => match_text()"
+
+1.27    2017-9-20
+        add Time::Piece module to bakup Ast.pm.2017-09-20
+        rename grammar-to-ast() => spp-to-ast()
+        rename grammar-to-parser() -> spp-to-parser()
+
+1.28    parser is door + name-table
+        put LintAst to Spp.pm so could call ast_to_parser
+        directly.
+
+1.29    2017-9-23
+        add In Out Qstr Qint Int to match estr
+        add Estr.pm for common interface for type language
+        
+2.0     2017-9-23
+        is_false() is_true() use False and True
+        is_atom_tillnot -> is_tillnot
+        is_atom_look    => is_look

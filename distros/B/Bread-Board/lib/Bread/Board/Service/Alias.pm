@@ -1,7 +1,7 @@
 package Bread::Board::Service::Alias;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: aliases another service
-$Bread::Board::Service::Alias::VERSION = '0.35';
+$Bread::Board::Service::Alias::VERSION = '0.36';
 use Moose;
 
 use Try::Tiny;
@@ -52,7 +52,7 @@ Bread::Board::Service::Alias - aliases another service
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

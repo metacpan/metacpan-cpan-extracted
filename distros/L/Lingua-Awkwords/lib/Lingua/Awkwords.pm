@@ -7,12 +7,16 @@ package Lingua::Awkwords;
 use strict;
 use warnings;
 
+require Exporter;
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw/&percentize &set_filter &weights2str &weights_from/;
+
 use Carp qw(croak);
 use Lingua::Awkwords::Parser;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has pattern => (
     is      => 'rw',
@@ -22,6 +26,85 @@ has pattern => (
     },
 );
 has tree => ( is => 'rwp' );
+
+########################################################################
+#
+# FUNCTIONS
+#
+# TODO these probably should go in a ::Util module?
+
+# utility routine that makes percentages of the presumably numeric
+# values of the given hash reference
+sub percentize {
+    my ($href) = @_;
+    my $sum    = 0;
+    my $min    = ~0;
+    for my $v ( values %$href ) {
+        $sum += $v;
+        $min = $v if $v < $min;
+    }
+    croak "sum of values cannot be 0" if $sum == 0;
+    for my $v ( values %$href ) {
+        $v = $v / $sum * 100;
+    }
+}
+
+# utility routine for use with ->walk
+sub set_filter {
+    my $filter = shift;
+    return sub {
+        my $self = shift;
+        $self->filter_with($filter) if $self->can('filter_with');
+    };
+}
+
+sub weights2str {
+    my ($href) = @_;
+    join '/', map { join '*', $_, $href->{$_} } sort keys %$href;
+}
+
+sub weights_from {
+    my ($input) = @_;
+
+    my $type = ref $input;
+    my $fh;
+
+    if ($type eq '') {
+        open $fh, '<', \$input;
+    } elsif ($type eq 'GLOB') {
+        $fh = $input;
+    } else {
+        croak "unknown input type";
+    }
+
+    my ( %first, %mid, %last, %all );
+
+    while (readline $fh) {
+        chomp;
+      LOOP: {
+            redo LOOP if /\G\s+/cg;
+            # various \b{...} forms detailed in perlrebackslash may be
+            # better for word boundaries though require perl 5.22 or up
+            if (m/\G\b(.)/cg) {
+                $first{$1}++;
+                $all{$1}++;
+                redo LOOP;
+            }
+            if (m/\G(.)\b/cg) {
+                $last{$1}++;
+                $all{$1}++;
+                redo LOOP;
+            }
+            if (m/\G\B(.)/cg) {
+                $mid{$1}++;
+                $all{$1}++;
+                redo LOOP;
+            }
+        }
+    }
+
+    return \%first, \%mid, \%last, \%all;
+}
 
 ########################################################################
 #
@@ -41,15 +124,6 @@ sub render {
     my $tree = $self->tree;
     croak "no pattern supplied" if !defined $tree;
     return $tree->render;
-}
-
-# utility routine for use with ->walk
-sub set_filter {
-    my $filter = shift;
-    return sub {
-        my $self = shift;
-        $self->filter_with($filter) if $self->can('filter_with');
-    };
 }
 
 sub walk {
@@ -129,10 +203,10 @@ letter C<x>.
 
 =item I<*>
 
-The asterisk followed by an integer in the range C<1..128> inclusive
-weights the current term of the alternation, if any. That is, while
-C<[a/]> generates each term with equal probability, C<[a/*2]> would
-generate the empty string at twice the probability of the letter C<a>.
+The asterisk followed by an integer in the range C<1..INT_MAX> weights
+the current term of the alternation, if any. That is, while C<[a/]>
+generates each term with equal probability, C<[a/*2]> would generate the
+empty string at twice the probability of the letter C<a>.
 
 =item I<^>
 
@@ -179,14 +253,54 @@ Where the parse tree is stored.
 
 =head1 FUNCTIONS
 
+These can be called as C<Lingua::Awkwords::set_filter> or can be
+imported via
+
+  use Lingua::Awkwords qw(weights2str weights_from);
+
 =over 4
 
-=item I<set_filter>
+=item B<percentize> I<hashref>
+
+Modifies the values of the given I<hashref> to be percentages of the sum
+of the values. Will B<croak> if sum is 0. Use this to help compare
+B<weights_from> different corpus.
+
+=item B<set_filter> I<filter-value>
 
 Utility routine for use with B<walk>. Returns a subroutine that sets the
 I<filter_with> attribute to the given value.
 
   $la->walk( Lingua::Awkwords::set_filter('X') );
+
+=item B<weights2str> I<hash-reference>
+
+Constructs an awkwords choice string from a given I<hash-reference> of
+values and weights, e.g.
+
+  use Lingua::Awkwords qw(weights2str weights_from);
+
+  weights2str( ( weights_from("toki sin li toki pona") )[-1] )
+
+will return a weight string of
+
+  a*1/i*4/k*2/l*1/n*2/o*3/p*1/s*1/t*2
+
+that can then be used as a I<pattern> for this module.
+
+=item B<weights_from> I<string-or-filehandle>
+
+Parses the frequency of characters appearing in the input string or
+filehandle, and returns four hash references, I<first>, I<mid>, I<last>
+and I<all> which contain the character counts of the first letters of
+the "words" in the input, characters that appear in the middle, end, and
+a tally of all three of these positions together.
+
+"words" is used in scare quotes because there is "no generally accepted
+and completely satisfactory definition of what constitutes a word"
+(Philip Durkin. "The Oxford Guide to Etymology". p.37) and because
+instead syllables could be fed in and then patterns generated using
+those syllable-specific weights.
 
 =back
 
@@ -252,6 +366,17 @@ may not know whether a filter has been applied to the result, or the
 word may be filtered into an incorrect form. Consult the C<eg/>
 directory of this module's distribution for example code that
 customizes the filter value.
+
+Code that makes use of non-ASCII encodings may need appropriate settings
+made, e.g. to use the locale for input and output and to allow UTF-8 in
+the program text.
+
+  use open IO  => ':locale';
+  use utf8;
+
+  Lingua::Awkwords::Subpattern->set_patterns(
+      S => [qw/... UTF-8 data here .../],
+  );
 
 =head1 BUGS
 

@@ -48,13 +48,13 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test2::Bundle::Extended" => 0,
     "Test2::Plugin::NoWarnings" => "0.06",
+    "Test2::V0" => 0,
     "Test::Class::Moose" => 0,
     "Test::Class::Moose::CLI" => 0,
     "Test::More" => "1.302015"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,8 +80,8 @@ my %FallbackPrereqs = (
   "MooseX::Types::Path::Tiny" => 0,
   "Path::Iterator::Rule" => 0,
   "Path::Tiny" => 0,
-  "Test2::Bundle::Extended" => 0,
   "Test2::Plugin::NoWarnings" => "0.06",
+  "Test2::V0" => 0,
   "Test::Class::Moose" => 0,
   "Test::Class::Moose::CLI" => 0,
   "Test::More" => "1.302015",

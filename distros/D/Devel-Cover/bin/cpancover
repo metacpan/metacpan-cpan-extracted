@@ -10,7 +10,7 @@
 use 5.26.0;
 use warnings;
 
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 use Devel::Cover::Collection;
 
@@ -71,17 +71,17 @@ sub get_options {
 
 sub newcp {
     Devel::Cover::Collection->new(
-        bin_dir         => $Options->{bin_dir},
-        docker          => $Options->{docker},
-        force           => $Options->{force},
-        local           => $Options->{local},
-        modules         => $Options->{module},
-        output_file     => $Options->{output_file},
-        report          => $Options->{report},
-        results_dir     => $Options->{results_dir},
-        timeout         => $Options->{timeout},
-        verbose         => $Options->{verbose},
-        workers         => $Options->{workers},
+        bin_dir     => $Options->{bin_dir},
+        docker      => $Options->{docker},
+        force       => $Options->{force},
+        local       => $Options->{local},
+        modules     => $Options->{module},
+        output_file => $Options->{output_file},
+        report      => $Options->{report},
+        results_dir => $Options->{results_dir},
+        timeout     => $Options->{timeout},
+        verbose     => $Options->{verbose},
+        workers     => $Options->{workers},
     )
 }
 
@@ -145,7 +145,7 @@ cpancover - report coverage statistics on CPAN modules
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -202,9 +202,7 @@ The following exit values are returned:
 
 =head1 BUGS
 
- Incomplete.
  Undocumented.
- Needs to be redone properly.
 
 =head1 LICENCE
 

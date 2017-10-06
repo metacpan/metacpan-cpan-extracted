@@ -1,0 +1,8 @@
+Revision history for Clone-Choose
+
+0.002   2017-10-05
+    - When using Clone.pm enforce minimum version 0.10.
+    - Fix bug which caused clone() not to be exported in the correct namespace.
+
+0.001   2017-09-27
+    - First version, released on an unsuspecting world.

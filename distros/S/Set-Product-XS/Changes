@@ -1,5 +1,9 @@
 Revision history for Set-Product-XS
 
+0.04  Fri Oct  6 03:20:09 UTC 2017
+    - Fixed memory leak. (GH #1)
+    - Upgraded ppport.h
+
 0.03  Tue Nov 10 18:38:48 UTC 2015
     - Fixed a memory leak resulting from the multicall api not calling the
       code block in it's own scope; performance now decreased by 10%.

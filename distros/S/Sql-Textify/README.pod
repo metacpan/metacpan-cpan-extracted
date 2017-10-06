@@ -1,182 +1,172 @@
-=head1 NAME
+NAME
 
-Sql::Textify - Run SQL queries and get the result in text format (markdown, html)
+    Sql::Textify - Run SQL queries and get the result in text format
+    (markdown, html)
 
-=head1 VERSION
+VERSION
 
-Version 0.04
+    Version 0.06
 
-=head1 SYNOPSIS
+SYNOPSIS
 
-    use Sql::Textify;
-    my $t = Sql::Textify->new;
-    my $text = $t->textify( $sql );
+        use Sql::Textify;
+        my $t = Sql::Textify->new;
+        my $text = $t->textify( $sql );
+    
+        use Sql::Textify;
+        my $t = Sql::Textify->new(
+            conn => 'dbi:connection:string',
+            username => 'username',
+                password => 'password',
+            format => 'markdown',
+        );
+        my $text = $t->textify( $sql );
 
-    use Sql::Textify;
-    my $t = Sql::Textify->new(
-        conn => 'dbi:connection:string',
-        username => 'username',
-	    password => 'password',
-        format => 'markdown',
-    );
-    my $text = $t->textify( $sql );
+SYNTAX
 
-=head1 SYNTAX
+    This module executes SQL queries and produces text output (markdown,
+    html). Connection details, username and password can be specified in a
+    C-style multiline comment inside the SQL query:
 
-This module executes SQL queries and produces text output (markdown, html).
-Connection details, username and password can be specified in a C-style multiline
-comment inside the SQL query:
+        /*
+            conn="dbi:SQLite:dbname=test.sqlite3"
+            username="myusername"
+            password="mypassword"
+        */
+        select * fom gardens;
 
-    /*
-        conn="dbi:SQLite:dbname=test.sqlite3"
-        username="myusername"
-        password="mypassword"
-    */
-    select * fom gardens;
+    or they can be specified using the constructor:
 
-or they can be specified using the constructor:
+        my $t = new Sql::Textify(
+            conn => 'dbi:SQLite:dbname=test.sqlite3',
+            username => 'myusername',
+            password => 'mypassword'
+        );
+        my $text = $t->textify('select * from gardens');
 
-    my $t = new Sql::Textify(
-        conn => 'dbi:SQLite:dbname=test.sqlite3',
-        username => 'myusername',
-        password => 'mypassword'
-    );
-    my $text = $t->textify('select * from gardens');
+    multiple queries can be separated by ; and also
+    insert/update/create/etc. queries are supported. If the query doesn't
+    return any row the string 0 rows will be returned.
 
-multiple queries can be separated by C<< ; >> and also insert/update/create/etc. queries are
-supported. If the query doesn't return any row the string C<< 0 rows >> will be returned.
+OPTIONS
 
-=head1 OPTIONS
+    Sql::Textify supports a number of options to its processor which
+    control the behaviour of the output document.
 
-Sql::Textify supports a number of options to its processor which control
-the behaviour of the output document.
+    The options for the processor are:
 
-The options for the processor are:
+    format
 
-=over
+      markdown (default), html
 
-=item format
+    layout
 
-markdown (default), html
+      table (default), record
 
-=item layout
+    conn
 
-table (default), record
+      Specify the DBI connection string.
 
-=item conn
+    username
 
-Specify the DBI connection string.
+      Specify the database username.
 
-=item username
+    password
 
-Specify the database username.
+      Specify the database password.
 
-=item password
+    maxwidth
 
-Specify the database password.
+      Set a maximum width for the columns when in markdown format mode. If
+      any column contains a string longer than maxwidth it will be cropped.
 
-=item maxwidth
+METHODS
 
-Set a maximum width for the columns when in markdown format mode. If any column contains
-a string longer than maxwidth it will be cropped.
+ new
 
-=back
+    Sql::Textify constructor, see OPTIONS sections for more information.
 
-=head1 METHODS
+ textify
 
-=head2 new
+    The main function as far as the outside world is concerned. See the
+    SYNTAX for details on use.
 
-Sql::Textify constructor, see OPTIONS sections for more information.
+AUTHOR
 
-=head2 textify
+    Federico, Thiella, <fthiella at gmail.com>
 
-The main function as far as the outside world is concerned. See the SYNTAX
-for details on use.
+BUGS
 
-=head1 AUTHOR
+    Please report any bugs or feature requests to bug-sql-textify at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sql-Textify. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
 
-Federico, Thiella, C<< <fthiella at gmail.com> >>
+SUPPORT
 
-=head1 BUGS
+    You can find documentation for this module with the perldoc command.
 
-Please report any bugs or feature requests to C<bug-sql-textify at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sql-Textify>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+        perldoc Sql::Textify
 
+    You can also look for information at:
 
+      * RT: CPAN's request tracker (report bugs here)
 
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sql-Textify
 
-=head1 SUPPORT
+      * AnnoCPAN: Annotated CPAN documentation
 
-You can find documentation for this module with the perldoc command.
+      http://annocpan.org/dist/Sql-Textify
 
-    perldoc Sql::Textify
+      * CPAN Ratings
 
+      http://cpanratings.perl.org/d/Sql-Textify
 
-You can also look for information at:
+      * Search CPAN
 
-=over 4
+      http://search.cpan.org/dist/Sql-Textify/
 
-=item * RT: CPAN's request tracker (report bugs here)
+ACKNOWLEDGEMENTS
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sql-Textify>
+LICENSE AND COPYRIGHT
 
-=item * AnnoCPAN: Annotated CPAN documentation
+    Copyright 2017 Federico, Thiella.
 
-L<http://annocpan.org/dist/Sql-Textify>
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
 
-=item * CPAN Ratings
+    http://www.perlfoundation.org/artistic_license_2_0
 
-L<http://cpanratings.perl.org/d/Sql-Textify>
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
 
-=item * Search CPAN
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
 
-L<http://search.cpan.org/dist/Sql-Textify/>
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
 
-=back
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Federico, Thiella.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 

@@ -3,7 +3,7 @@ Makefile.PL
 MANIFEST
 META.yml
 README
-shasum
+shasumpp
 examples/dups
 lib/Digest/SHA/PurePerl.pm
 t/allfcns.t

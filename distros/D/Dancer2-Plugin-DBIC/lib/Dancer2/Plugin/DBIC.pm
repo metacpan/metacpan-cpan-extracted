@@ -1,6 +1,6 @@
 package Dancer2::Plugin::DBIC;
 
-our $VERSION = '0.0013'; # VERSION
+our $VERSION = '0.0100'; # VERSION
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Dancer2::Plugin;
 use DBICx::Sugar;
 
 sub _schema {
-    my ($dsl, $name) = @_;
+    my ($dsl, $name, $cfg) = @_;
     my $config;
     # ugly switch needed to support plugin2 plugins which use this plugin
     # whilst still working for plugin1
@@ -20,8 +20,8 @@ sub _schema {
         $config = plugin_setting;
     }
     DBICx::Sugar::config( $config );
-    return DBICx::Sugar::schema($name);
-};
+    return DBICx::Sugar::schema($name, $cfg);
+}
 
 sub _rset {
     my ($dsl, $rset_name) = @_;
@@ -50,12 +50,12 @@ Dancer2::Plugin::DBIC - DBIx::Class interface for Dancer2 applications
 
 =head1 VERSION
 
-version 0.0013
+version 0.0100
 
 =head1 SYNOPSIS
 
     use Dancer2;
-    use Dancer2::Plugin::DBIC qw(schema resultset rset);
+    use Dancer2::Plugin::DBIC;
 
     get '/users/:user_id' => sub {
         my $user = schema('default')->resultset('User')->find(param 'user_id');
@@ -79,6 +79,7 @@ This plugin makes it very easy to create L<Dancer2> applications that interface
 with databases.
 It automatically exports the keyword C<schema> which returns a
 L<DBIx::Class::Schema> object.
+It also exports the keywords C<resultset> and C<rset>.
 You just need to configure your database connection information.
 For performance, schema objects are cached in memory
 and are lazy loaded the first time they are accessed.

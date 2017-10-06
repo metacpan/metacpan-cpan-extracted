@@ -1,5 +1,10 @@
 Revision history for Perl extension ObjectDB
 
+3.24 2017-09-23T20:26:23Z
+
+    [FIXES]
+    - allow pages and page sizes with more than on digit
+
 3.23 2017-09-16T10:13:49Z
 
     - use the same connection for insert and auto_increment

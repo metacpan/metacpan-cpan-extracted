@@ -37,14 +37,16 @@
 "use strict";
 
 define ([
+    'QUnit'
 ], function (
+    QUnit
 ) {
 
     var prefix = "dochazka-www: ";
 
     return function () {
 
-        test(prefix + 'unit testing framework present', function (assert) {
+        QUnit.test(prefix + 'unit testing framework present', function (assert) {
             assert.ok(true, "Passed!");
         });
 

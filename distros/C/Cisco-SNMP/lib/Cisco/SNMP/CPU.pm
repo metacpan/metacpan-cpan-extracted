@@ -20,28 +20,47 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub cpuOIDs {
-    return qw(Name 5sec 1min 5min Type)
+    return qw(Name 5sec 1min 5min Type);
 }
 
 sub cpu_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
-    my ($type, $cpu5min);
+    my ( $type, $cpu5min );
+
     # IOS releases > 12.2(3.5)
-    if (($cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.8")) && (defined $cpu5min->[0])) {
+    if ((   $cpu5min = Cisco::SNMP::_snmpwalk(
+                $session, "1.3.6.1.4.1.9.9.109.1.1.1.1.8"
+            )
+        )
+        and defined $cpu5min->[0]
+      ) {
         $type = 3
-    # 12.0(3)T < IOS releases < 12.2(3.5)
-    } elsif (($cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.5")) && (defined $cpu5min->[0])) {
+
+          # 12.0(3)T < IOS releases < 12.2(3.5)
+    } elsif (
+        (   $cpu5min = Cisco::SNMP::_snmpwalk(
+                $session, "1.3.6.1.4.1.9.9.109.1.1.1.1.5"
+            )
+        )
+        and defined $cpu5min->[0]
+      ) {
         $type = 2
-    # IOS releases < 12.0(3)T
-    } elsif (($cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.2.1.58")) && (defined $cpu5min->[0])) {
-        $type = 1
+
+          # IOS releases < 12.0(3)T
+    } elsif (
+        (   $cpu5min
+            = Cisco::SNMP::_snmpwalk( $session, "1.3.6.1.4.1.9.2.1.58" )
+        )
+        and defined $cpu5min->[0]
+      ) {
+        $type = 1;
     } else {
         $Cisco::SNMP::LASTERROR = "Cannot determine CPU type";
-        return undef
+        return undef;
     }
 
     my %cpuType = (
@@ -51,53 +70,69 @@ sub cpu_info {
     );
 
     my @cpuName;
+
     # Get multiple CPU names
-    if ($type > 1) {
-        my $temp = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.2");
-        for (0..$#{$temp}) {
-            if ($temp->[$_] == 0) {
+    if ( $type > 1 ) {
+        my $temp = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.2" );
+        for ( 0 .. $#{$temp} ) {
+            if ( $temp->[$_] == 0 ) {
                 $cpuName[$_] = '';
-                next
+                next;
             }
-            if (defined(my $result = $session->get_request( -varbindlist => ['1.3.6.1.2.1.47.1.1.1.1.7.' . $temp->[$_]] ))) {
-                $cpuName[$_] = $result->{'1.3.6.1.2.1.47.1.1.1.1.7.' . $temp->[$_]}
+            if (defined(
+                    my $result = $session->get_request(
+                        -varbindlist =>
+                          ['1.3.6.1.2.1.47.1.1.1.1.7.' . $temp->[$_]]
+                    )
+                )
+              ) {
+                $cpuName[$_]
+                  = $result->{'1.3.6.1.2.1.47.1.1.1.1.7.' . $temp->[$_]};
             } else {
-                $Cisco::SNMP::LASTERROR = "Cannot get CPU name for type `$cpuType{$type}'";
-                return undef
+                $Cisco::SNMP::LASTERROR
+                  = "Cannot get CPU name for type `$cpuType{$type}'";
+                return undef;
             }
         }
     }
 
-    my ($cpu5sec, $cpu1min);
-    if ($type == 1) {
-        $cpu5sec = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.2.1.56");
-        $cpu1min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.2.1.57");
-        $cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.2.1.58")
-    } elsif ($type == 2) {
-        $cpu5sec = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.3");
-        $cpu1min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.4");
-        $cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.5")
-    } elsif ($type == 3) {
-        $cpu5sec = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.6");
-        $cpu1min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.7");
-        $cpu5min = Cisco::SNMP::_snmpwalk($session,"1.3.6.1.4.1.9.9.109.1.1.1.1.8")
-    } else { }
+    my ( $cpu5sec, $cpu1min );
+    if ( $type == 1 ) {
+        $cpu5sec = Cisco::SNMP::_snmpwalk( $session, "1.3.6.1.4.1.9.2.1.56" );
+        $cpu1min = Cisco::SNMP::_snmpwalk( $session, "1.3.6.1.4.1.9.2.1.57" );
+        $cpu5min = Cisco::SNMP::_snmpwalk( $session, "1.3.6.1.4.1.9.2.1.58" );
+    } elsif ( $type == 2 ) {
+        $cpu5sec = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.3" );
+        $cpu1min = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.4" );
+        $cpu5min = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.5" );
+    } elsif ( $type == 3 ) {
+        $cpu5sec = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.6" );
+        $cpu1min = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.7" );
+        $cpu5min = Cisco::SNMP::_snmpwalk( $session,
+            "1.3.6.1.4.1.9.9.109.1.1.1.1.8" );
+    }
 
     my @CPUInfo;
-    for my $cpu (0..$#{$cpu5min}) {
+    for my $cpu ( 0 .. $#{$cpu5min} ) {
         my %CPUInfoHash;
         $CPUInfoHash{Name}   = $cpuName[$cpu];
         $CPUInfoHash{'5sec'} = $cpu5sec->[$cpu];
         $CPUInfoHash{'1min'} = $cpu1min->[$cpu];
         $CPUInfoHash{'5min'} = $cpu5min->[$cpu];
-        $CPUInfoHash{Type} = $cpuType{$type};
-        push @CPUInfo, \%CPUInfoHash
+        $CPUInfoHash{Type}   = $cpuType{$type};
+        push @CPUInfo, \%CPUInfoHash;
     }
-    return bless \@CPUInfo, $class
+    return bless \@CPUInfo, $class;
 }
 
-for (cpuOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('cpu', $_)
+for ( cpuOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'cpu', $_ );
 }
 
 ##################################################

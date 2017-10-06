@@ -1,0 +1,6 @@
+name = "Smart-Args-TypeTiny"
+badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+

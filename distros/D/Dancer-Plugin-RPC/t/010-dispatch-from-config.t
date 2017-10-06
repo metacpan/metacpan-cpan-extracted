@@ -11,7 +11,7 @@ use Dancer::RPCPlugin::DispatchItem;
 
 {
     my $dispatch = dispatch_table_from_config(
-        key      => 'xmlrpc',
+        plugin   => 'xmlrpc',
         endpoint => '/xmlrpc',
         config   => {
             '/xmlrpc' => {
@@ -40,7 +40,7 @@ use Dancer::RPCPlugin::DispatchItem;
     like(
         exception {
             dispatch_table_from_config(
-                key      => 'xmlrpc',
+                plugin   => 'xmlrpc',
                 endpoint => '/xmlrpc',
                 config   => {
                     '/xmlrpc' => {

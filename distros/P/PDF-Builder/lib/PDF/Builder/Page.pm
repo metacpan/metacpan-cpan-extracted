@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '3.007'; # VERSION
 my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
 
 use POSIX qw(floor);
@@ -29,8 +29,6 @@ PDF::Builder::Page - Methods to interact with individual pages
 =item $page = PDF::Builder::Page->new($pdf, $parent, $index)
 
 Returns a page object (called from $pdf->page()).
-
-=back
 
 =cut
 
@@ -301,6 +299,8 @@ sub precontent {
 
 =item $gfx = $page->gfx($prepend)
 
+=item $gfx = $page->gfx()
+
 Returns a graphics content object. 
 If $prepend is I<true>, the content will be prepended to the page description.
 Otherwise, it will be appended.
@@ -334,16 +334,16 @@ after creating $I<type>:
 
 =over
 
-=item $text1 = $page->text(); 
-=item   $text1->save();
-=item $grfx1 = $page->gfx();
-=item   $grfx1->restore();
-=item   $grfx1->save();
-=item $text2 = $page->text();
-=item   $text2->restore();
-=item   $text2->save();
-=item $grfx2 = $page->gfx();
-=item   $grfx1->restore();
+ $text1 = $page->text(); 
+   $text1->save();
+ $grfx1 = $page->gfx();
+   $grfx1->restore();
+   $grfx1->save();
+ $text2 = $page->text();
+   $text2->restore();
+   $text2->save();
+ $grfx2 = $page->gfx();
+   $grfx1->restore();
 
 =back
 
@@ -362,8 +362,11 @@ sub gfx {
 
 =item $txt = $page->text($prepend)
 
+=item $txt = $page->text()
+
 Returns a text content object. 
 If $prepend is I<true>, the content will be prepended to the page description.
+Otherwise, it will be appended.
 
 Please see the discussion above in C<gfx()> regarding multiple graphics and
 text objects on one page, how they are grouped into PDF objects and streams, 

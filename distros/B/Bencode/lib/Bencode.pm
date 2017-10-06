@@ -3,28 +3,32 @@ use strict;
 use warnings;
 
 package Bencode;
-$Bencode::VERSION = '1.402';
+$Bencode::VERSION = '1.501';
 # ABSTRACT: BitTorrent serialisation format
 
-use Carp;
 use Exporter::Tidy all => [qw( bencode bdecode )];
 
-our ( $DEBUG, $do_lenient_decode, $max_depth );
+our ( $DEBUG, $do_lenient_decode, $max_depth, $undef_encoding );
 
-sub _msg { sprintf "@_", pos() || 0 }
+sub croak {
+	my ( @c, $i );
+	1 while ( @c = caller $i++ ) and $c[0] eq __PACKAGE__;
+	@c or @c = caller;
+	die @_, " at $c[1] line $c[2].\n";
+}
 
 sub _bdecode_string {
 
 	if ( m/ \G ( 0 | [1-9] \d* ) : /xgc ) {
 		my $len = $1;
 
-		croak _msg 'unexpected end of string data starting at %s'
+		croak 'unexpected end of string data starting at ', 0+pos
 			if $len > length() - pos();
 
 		my $str = substr $_, pos(), $len;
 		pos() = pos() + $len;
 
-		warn _msg STRING => "(length $len)", $len < 200 ? "[$str]" : () if $DEBUG;
+		warn "STRING (length $len)", $len < 200 ? " [$str]" : () if $DEBUG;
 
 		return $str;
 	}
@@ -32,7 +36,7 @@ sub _bdecode_string {
 		my $pos = pos();
 		if ( m/ \G -? 0? \d+ : /xgc ) {
 			pos() = $pos;
-			croak _msg 'malformed string length at %s';
+			croak 'malformed string length at ', 0+pos;
 		}
 	}
 
@@ -40,7 +44,7 @@ sub _bdecode_string {
 }
 
 sub _bdecode_chunk {
-	warn _msg 'decoding at %s' if $DEBUG;
+	warn 'decoding at ', 0+pos if $DEBUG;
 
 	local $max_depth = $max_depth - 1 if defined $max_depth;
 
@@ -48,51 +52,51 @@ sub _bdecode_chunk {
 		return $str;
 	}
 	elsif ( m/ \G i /xgc ) {
-		croak _msg 'unexpected end of data at %s' if m/ \G \z /xgc;
+		croak 'unexpected end of data at ', 0+pos if m/ \G \z /xgc;
 
 		m/ \G ( 0 | -? [1-9] \d* ) e /xgc
-			or croak _msg 'malformed integer data at %s';
+			or croak 'malformed integer data at ', 0+pos;
 
-		warn _msg INTEGER => $1 if $DEBUG;
+		warn "INTEGER $1" if $DEBUG;
 		return $1;
 	}
 	elsif ( m/ \G l /xgc ) {
-		warn _msg 'LIST' if $DEBUG;
+		warn 'LIST' if $DEBUG;
 
-		croak _msg 'nesting depth exceeded at %s'
+		croak 'nesting depth exceeded at ', 0+pos
 			if defined $max_depth and $max_depth < 0;
 
 		my @list;
 		until ( m/ \G e /xgc ) {
-			warn _msg 'list not terminated at %s, looking for another element' if $DEBUG;
+			warn 'list not terminated at ',0+pos,', looking for another element' if $DEBUG;
 			push @list, _bdecode_chunk();
 		}
 		return \@list;
 	}
 	elsif ( m/ \G d /xgc ) {
-		warn _msg 'DICT' if $DEBUG;
+		warn 'DICT' if $DEBUG;
 
-		croak _msg 'nesting depth exceeded at %s'
+		croak 'nesting depth exceeded at ', 0+pos
 			if defined $max_depth and $max_depth < 0;
 
 		my $last_key;
 		my %hash;
 		until ( m/ \G e /xgc ) {
-			warn _msg 'dict not terminated at %s, looking for another pair' if $DEBUG;
+			warn 'dict not terminated at ',0+pos,', looking for another pair' if $DEBUG;
 
-			croak _msg 'unexpected end of data at %s'
+			croak 'unexpected end of data at ', 0+pos
 				if m/ \G \z /xgc;
 
 			my $key = _bdecode_string();
-			defined $key or croak _msg 'dict key is not a string at %s';
+			defined $key or croak 'dict key is not a string at ', 0+pos;
 
-			croak _msg 'duplicate dict key at %s'
+			croak 'duplicate dict key at ', 0+pos
 				if exists $hash{ $key };
 
-			croak _msg 'dict key not in sort order at %s'
+			croak 'dict key not in sort order at ', 0+pos
 				if not( $do_lenient_decode ) and defined $last_key and $key lt $last_key;
 
-			croak _msg 'dict key is missing value at %s'
+			croak 'dict key is missing value at ', 0+pos
 				if m/ \G e /xgc;
 
 			$last_key = $key;
@@ -101,7 +105,7 @@ sub _bdecode_chunk {
 		return \%hash;
 	}
 	else {
-		croak _msg m/ \G \z /xgc ? 'unexpected end of data at %s' : 'garbage at %s';
+		croak m/ \G \z /xgc ? 'unexpected end of data' : 'garbage', ' at ', 0+pos;
 	}
 }
 
@@ -110,34 +114,32 @@ sub bdecode {
 	local $do_lenient_decode = shift;
 	local $max_depth = shift;
 	my $deserialised_data = _bdecode_chunk();
-	croak _msg 'trailing garbage at %s' if $_ !~ m/ \G \z /xgc;
+	croak 'trailing garbage at ', 0+pos if $_ !~ m/ \G \z /xgc;
 	return $deserialised_data;
 }
 
+sub _bencode;
 sub _bencode {
-	my ( $data ) = @_;
-	if ( not ref $data ) {
-		return sprintf 'i%se', $data if $data =~ m/\A (?: 0 | -? [1-9] \d* ) \z/x;
-		return length( $data ) . ':' . $data;
-	}
-	elsif ( ref $data eq 'SCALAR' ) {
-		# escape hatch -- use this to avoid num/str heuristics
-		return length( $$data ) . ':' . $$data;
-	}
-	elsif ( ref $data eq 'ARRAY' ) {
-		return 'l' . join( '', map _bencode( $_ ), @$data ) . 'e';
-	}
-	elsif ( ref $data eq 'HASH' ) {
-		return 'd' . join( '', map { _bencode( \$_ ), _bencode( $data->{ $_ } ) } sort keys %$data ) . 'e';
-	}
-	else {
-		croak 'unhandled data type';
-	}
+	map
+	+( ( not defined     ) ? ( $undef_encoding or croak 'unhandled data type' )
+	:  ( not ref         ) ? ( m/\A (?: 0 | -? [1-9] \d* ) \z/x ? 'i' . $_ . 'e' : length . ':' . $_ )
+	:  ( 'SCALAR' eq ref ) ? ( length $$_ ) . ':' . $$_ # escape hatch -- use this to avoid num/str heuristics
+	:  (  'ARRAY' eq ref ) ? 'l' . ( join '', _bencode @$_ ) . 'e'
+	:  (   'HASH' eq ref ) ? 'd' . do { my @k = sort keys %$_; join '', map +( length $k[0] ) . ':' . ( shift @k ) . $_, _bencode @$_{ @k } } . 'e'
+	:  croak 'unhandled data type'
+	), @_
 }
 
 sub bencode {
-	croak 'need exactly one argument' if @_ != 1;
-	goto &_bencode;
+	my $undef_mode = @_ == 2 ? pop : 'str';
+	$undef_mode = 'str' unless defined $undef_mode;
+	local $undef_encoding
+		= 'str' eq $undef_mode ? '0:'
+		: 'num' eq $undef_mode ? 'i0e'
+		: 'die' eq $undef_mode ? undef
+		: croak qq'undef_mode argument must be "str", "num", "die" or undefined, not "$undef_mode"';
+	croak 'need exactly one or two arguments' if @_ != 1;
+	( &_bencode )[0];
 }
 
 bdecode( 'i1e' );
@@ -154,7 +156,7 @@ Bencode - BitTorrent serialisation format
 
 =head1 VERSION
 
-version 1.402
+version 1.501
 
 =head1 SYNOPSIS
 
@@ -171,13 +173,33 @@ as described in L<http://www.bittorrent.org/beps/bep_0003.html#bencoding>.
 
 =head1 INTERFACE
 
-=head2 C<bencode( $datastructure )>
+=head2 C<bencode( $datastructure [, $undef_mode ] )>
 
-Takes a single argument which may be a scalar, or may be a reference to either
+Takes data to be encoded as a single argument which may be a scalar,
+or may be a reference to either
 a scalar, an array or a hash. Arrays and hashes may in turn contain values of
 these same types. Plain scalars that look like canonically represented integers
 will be serialised as such. To bypass the heuristic and force serialisation as
 a string, use a reference to a scalar.
+
+The second argument is optional (in which case it defaults to C<str>) and
+specifies how to treat C<undef> values. You can pick one of three options:
+
+=over 6
+
+=item C<str>
+
+to encode C<undef>s as empty strings;
+
+=item C<num>
+
+to encode C<undef>s as zeroes;
+
+=item C<die>
+
+to croak upon encountering an C<undef> value.
+
+=back
 
 Croaks on unhandled data types.
 
@@ -291,7 +313,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2017 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

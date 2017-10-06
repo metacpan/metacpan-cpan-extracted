@@ -8,9 +8,6 @@
 #ifndef CvISXSUB
 #  define CvISXSUB(cv) CvXSUB(cv)
 #endif
-#if PERL_VERSION < 12
-#  define cxinc() Perl_cxinc(aTHX)
-#endif
 
 #include "multicall.h"
 
@@ -22,7 +19,7 @@ product (code, ...)
     SV *code
 PROTOTYPE: &@
 PREINIT:
-    int i, *idx;
+    int i, j, *idx;
     AV **in;
     SV **out;
     CV *cv;
@@ -34,47 +31,47 @@ PPCODE:
       croak("Not a subroutine reference");
 
     if (2 > items)
-        XSRETURN_EMPTY;
+        XSRETURN_UNDEF;
 
-    for (i = 1; i < items; i++) {
+    for (i = items - 1; i > 0; i--) {
         SvGETMAGIC(ST(i));
         if (! SvROK(ST(i)) || SVt_PVAV != SvTYPE(SvRV(ST(i))))
             croak("Not an array reference");
     }
-    for (i = 1; i < items; i++)
+    for (i = items - 1; i > 0; i--)
         if (0 > av_len((AV *)SvRV(ST(i))))
-            XSRETURN_EMPTY;
+            XSRETURN_UNDEF;
     items--;
 
     Newx(in, items, AV*);
-    for (i = 0; i < items; i++)
+    for (i = items - 1; i >= 0; i--)
         in[i] = (AV *)SvRV(ST(i+1));
     Newx(out, items, SV*);
-    for (i = 0; i < items; i++)
+    for (i = items - 1; i >= 0; i--)
         out[i] = AvARRAY(in[i])[0];
     Newxz(idx, items, int);
 
+    SAVEFREEPV(in);
+    SAVEFREEPV(out);
+    SAVEFREEPV(idx);
+
     if (! CvISXSUB(cv)) {
         I32 gimme = G_VOID;
+        AV *av = save_ary(PL_defgv);
+        /* @_ doesn't refcount it's contents. */
+        AvREAL_off(av);
+
         dMULTICALL;
         PUSH_MULTICALL(cv);
 
         for (i = 0; i >= 0; ) {
-            int j;
-            AV * const av = GvAV(PL_defgv);
-
             av_extend(av, items - 1);
-            AvFILLp(av) = items - 1;
-            for (j = 0; j < items; j++)
-                AvARRAY(av)[j] = SvREFCNT_inc(out[j]);
+            av_fill(av, items - 1);
 
-            ENTER;
-            SAVETMPS;
+            for (j = items - 1; j >= 0; j--)
+                AvARRAY(av)[j] = out[j];
 
             MULTICALL;
-
-            FREETMPS;
-            LEAVE;
 
             for (i = items - 1; i >= 0; i--) {
                 idx[i]++;
@@ -119,6 +116,4 @@ PPCODE:
         }
     }
 
-    Safefree(in);
-    Safefree(out);
-    Safefree(idx);
+    XSRETURN_UNDEF;

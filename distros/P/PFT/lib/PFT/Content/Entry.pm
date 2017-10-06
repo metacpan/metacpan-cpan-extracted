@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 #
-package PFT::Content::Entry v1.2.0;
+package PFT::Content::Entry v1.2.1;
 
 =encoding utf8
 
@@ -99,8 +99,8 @@ sub header {
 Read the page.
 
 In scalar context returns an open file descriptor configured with the
-correct `binmode` according to the header.  In list context returns the
-header and the same descriptor. Returns undef if the file does not exist.
+correct C<binmode> according to the header.  In list context returns the
+header and the same descriptor. Returns C<undef> if the file does not exist.
 
 Croaks if the header is broken.
 
@@ -111,6 +111,10 @@ sub read {
 
     return undef unless $self->exists;
     my $fh = $self->open('r');
+
+    # We read the header even if not required by the caller, since this
+    # moves the cursor of the file descriptor. This allows the header to be
+    # skipped and only the text to be returned.
     my $h = eval { PFT::Header->load($fh) }
         or croak $@ =~ s/ at .*$//rs;
 

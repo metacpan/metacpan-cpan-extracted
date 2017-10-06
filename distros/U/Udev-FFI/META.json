@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4005"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -42,11 +42,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "PkgConfig" : "0.16026"
+            "PkgConfig" : "0.17026"
          },
          "requires" : {
             "FFI::CheckLib" : "0",
             "FFI::Platypus" : "0",
+            "IPC::Cmd" : "0",
             "perl" : "5.008001"
          }
       },
@@ -59,7 +60,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.098000"
+         "version" : "0.098004"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -88,9 +89,11 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.098000",
+   "version" : "0.098004",
    "x_contributors" : [
       "Ilya <ilya@orz1e1.mydomain>",
-      "Ilya Pavlov <iluxz@mail.ru>"
-   ]
+      "Ilya Pavlov <iluxz@mail.ru>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

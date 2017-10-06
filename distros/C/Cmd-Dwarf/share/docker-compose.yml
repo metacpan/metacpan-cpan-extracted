@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    image: <APP_NAME>-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "6000:5432"
+    container_name: <APP_NAME>-db
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+    image: <APP_NAME>-web
+    container_name: <APP_NAME>-web
+    hostname: docker
+    volumes:
+      - "./app/lib:/data/www/<APP_NAME>/app/lib"
+      - "./app/tmpl:/data/www/<APP_NAME>/app/tmpl"
+      - "./app/t:/data/www/<APP_NAME>/app/t"
+      - "./app/script:/data/www/<APP_NAME>/app/script"
+      - "./app/sql:/data/www/<APP_NAME>/app/sql"
+      - "./htdocs:/data/www/<APP_NAME>/htdocs"
+    links:
+      - db:db
+    ports:
+      - "5000:11022"

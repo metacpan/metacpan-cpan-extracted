@@ -4,6 +4,7 @@ author:
   - 'Lukas Atkinson <amon@cpan.org>'
 build_requires:
   Module::Build: '0.28'
+  Test::Exception: '0'
   Test::More: '0'
   Test::Output: '0'
 configure_requires:
@@ -16,9 +17,18 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Async-Trampoline
+provides:
+  Async::Trampoline:
+    file: lib/Async/Trampoline.pm
+    version: '0.001002'
+  Async::Trampoline::Scheduler:
+    file: lib/Async/Trampoline/Scheduler.pm
+    version: '0.001002'
+requires:
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/latk/p5-Async-Trampoline/issues
   homepage: https://github.com/latk/p5-Async-Trampoline
   repository: https://github.com/latk/p5-Async-Trampoline.git
-version: '0.001000'
+version: '0.001002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

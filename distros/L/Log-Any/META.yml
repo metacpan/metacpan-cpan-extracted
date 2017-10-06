@@ -34,56 +34,59 @@ no_index:
 provides:
   Log::Any:
     file: lib/Log/Any.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter:
     file: lib/Log/Any/Adapter.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Base:
     file: lib/Log/Any/Adapter/Base.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::File:
     file: lib/Log/Any/Adapter/File.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Null:
     file: lib/Log/Any/Adapter/Null.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Stderr:
     file: lib/Log/Any/Adapter/Stderr.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Stdout:
     file: lib/Log/Any/Adapter/Stdout.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Syslog:
     file: lib/Log/Any/Adapter/Syslog.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Test:
     file: lib/Log/Any/Adapter/Test.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Adapter::Util:
     file: lib/Log/Any/Adapter/Util.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Manager:
     file: lib/Log/Any/Manager.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Proxy:
     file: lib/Log/Any/Proxy.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Proxy::Null:
     file: lib/Log/Any/Proxy/Null.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Proxy::Test:
     file: lib/Log/Any/Proxy/Test.pm
-    version: '1.049'
+    version: '1.701'
   Log::Any::Test:
     file: lib/Log/Any/Test.pm
-    version: '1.049'
+    version: '1.701'
 requires:
   B: '0'
   Carp: '0'
   Data::Dumper: '0'
   Exporter: '0'
   Fcntl: '0'
+  File::Basename: '0'
+  FindBin: '0'
   IO::File: '0'
+  Storable: '0'
   Sys::Syslog: '0'
   Test::Builder: '0'
   constant: '0'
@@ -93,7 +96,7 @@ resources:
   bugtracker: https://github.com/preaction/Log-Any/issues
   homepage: https://github.com/preaction/Log-Any
   repository: https://github.com/preaction/Log-Any.git
-version: '1.049'
+version: '1.701'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'bj5004 <bartosz.jakubski@hurra.com>'
@@ -103,6 +106,5 @@ x_contributors:
   - 'Maxim Vuets <maxim.vuets@booking.com>'
   - 'mephinet <mephinet@gmx.net>'
   - 'Philipp Gortan <philipp.gortan@apa.at>'
-  - 'Stephen Thirlwall <sdt@dr.com>'
-  - 'Stephen Thirlwall <stephen.thirlwall@strategicdata.com.au>'
+  - 'Phill Legault <saladdayllc@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

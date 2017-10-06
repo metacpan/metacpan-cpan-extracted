@@ -4,7 +4,7 @@ package MOP;
 use strict;
 use warnings;
 
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use MOP::Role;
@@ -12,6 +12,8 @@ use MOP::Class;
 
 use MOP::Slot;
 use MOP::Method;
+
+use MOP::Slot::Initializer;
 
 1;
 
@@ -25,7 +27,7 @@ MOP - A Meta Object Protocol for Perl 5
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

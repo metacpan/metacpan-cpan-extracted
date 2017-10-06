@@ -5,7 +5,7 @@ use utf8;
 use DBI;
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.13';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::Constants);
 our ( @EXPORT, %EXPORT_TAGS );
 
@@ -56,8 +56,18 @@ sub _dbh {
     my $self = shift;
     $self->{dbiTable} ||= "lmConfig";
     return $self->{_dbh} if ( $self->{_dbh} and $self->{_dbh}->ping );
-    return DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
+    $self->{_dbh} = DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
         $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+    if ( $self->{dbiChain} =~ /^dbi:sqlite/i ) {
+        $self->{_dbh}->{sqlite_unicode} = 1;
+    }
+    elsif ( $self->{dbiChain} =~ /^dbi:mysql/i ) {
+        $self->{_dbh}->{mysql_enable_utf8} = 1;
+    }
+    elsif ( $self->{dbiChain} =~ /^dbi:pg/i ) {
+        $self->{_dbh}->{pg_enable_utf8} = 1;
+    }
+    return $self->{_dbh};
 }
 
 sub lock {

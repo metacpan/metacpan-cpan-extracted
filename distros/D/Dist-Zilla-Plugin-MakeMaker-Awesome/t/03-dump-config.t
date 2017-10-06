@@ -37,6 +37,16 @@ cmp_deeply(
                     class => 'Dist::Zilla::Plugin::MakeMaker::Awesome',
                     # [MakeMaker] and Dist::Zilla::Role::TestRunner might also
                     # record some configs of their own, depending on version
+                    config => {
+                        'Dist::Zilla::Plugin::MakeMaker' => superhashof({
+                            make_path => ignore,
+                            version => Dist::Zilla::Plugin::MakeMaker->VERSION,
+                        }),
+                        'Dist::Zilla::Role::TestRunner' => superhashof({
+                            default_jobs => ignore,
+                            version => Dist::Zilla::Role::TestRunner->VERSION,
+                        }),
+                    },
                     name => 'MakeMaker::Awesome',
                     version => Dist::Zilla::Plugin::MakeMaker::Awesome->VERSION,
                 }),

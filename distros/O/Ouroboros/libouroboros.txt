@@ -357,6 +357,8 @@ sizeof	svtype
 sizeof	PADOFFSET
 sizeof	Optype
 sizeof	ouroboros_stack_t
+sizeof	MAGIC
+sizeof	MGVTBL
 
 # Elements of svtype
 # 	perl type	C type	name
@@ -377,23 +379,76 @@ enum	IV	svtype	SVt_PVFM
 enum	IV	svtype	SVt_PVIO
 enum	IV	svtype	SVt_LAST
 
-# Assorted SV related flags and constants. SV_CONST is not a const, but all SV_CONST_* are.
-# r !awk '/\#define SV_/ && \!/SV_CHECK_/ && \!/SV_CONST/ { print("const\t" $2) }' sv.h | sort
+# SV related flags and constants.
+# r !perldoc perlapi | grep -o '\bSV_\w\+' | sort | uniq | sed 's/^/const\tUV\tU32\t/'
 # 	perl type	C type	name
 const	UV	U32	SV_CATBYTES
 const	UV	U32	SV_CATUTF8
+const	UV	U32	SV_CONST_RETURN
 const	UV	U32	SV_COW_DROP_PV
-const	UV	U32	SV_COW_OTHER_PVS
-const	UV	U32	SV_COW_SHARED_HASH_KEYS
 const	UV	U32	SV_FORCE_UTF8_UPGRADE
 const	UV	U32	SV_GMAGIC
 const	UV	U32	SV_HAS_TRAILING_NUL
 const	UV	U32	SV_IMMEDIATE_UNREF
-const	UV	U32	SV_MUTABLE_RETURN
 const	UV	U32	SV_NOSTEAL
-const	UV	U32	SV_SKIP_OVERLOAD
 const	UV	U32	SV_SMAGIC
-const	UV	U32	SV_UNDEF_RETURNS_NULL
-const	UV	U32	SV_UTF8_NO_ENCODING
+
+# GV related flags and constants.
+# r !perldoc perlapi | grep -o '\bGV_\w\+' | sort | uniq | sed 's/^/const\tUV\tU32\t/'
+# 	perl type	C type	name
+const	UV	U32	GV_ADD
+const	UV	U32	GV_ADDMG
+const	UV	U32	GV_ADDMULTI
+const	UV	U32	GV_NOADD_NOINIT
+const	UV	U32	GV_NOEXPAND
+const	UV	U32	GV_NOINIT
+const	UV	U32	GV_SUPER
+
+# Magic related constants.
+# r !perldoc perlguts | grep -o '\bPERL_MAGIC_\w\+' | sort | uniq | sed 's/^/const\tUV\tU32\t/'
+const	UV	U32	PERL_MAGIC_arylen
+const	UV	U32	PERL_MAGIC_arylen_p
+const	UV	U32	PERL_MAGIC_backref
+const	UV	U32	PERL_MAGIC_bm
+const	UV	U32	PERL_MAGIC_checkcall
+const	UV	U32	PERL_MAGIC_collxfrm
+const	UV	U32	PERL_MAGIC_dbfile
+const	UV	U32	PERL_MAGIC_dbline
+const	UV	U32	PERL_MAGIC_debugvar
+const	UV	U32	PERL_MAGIC_defelem
+const	UV	U32	PERL_MAGIC_env
+const	UV	U32	PERL_MAGIC_envelem
+const	UV	U32	PERL_MAGIC_ext
+const	UV	U32	PERL_MAGIC_fm
+const	UV	U32	PERL_MAGIC_foo
+const	UV	U32	PERL_MAGIC_hints
+const	UV	U32	PERL_MAGIC_hintselem
+const	UV	U32	PERL_MAGIC_isa
+const	UV	U32	PERL_MAGIC_isaelem
+const	UV	U32	PERL_MAGIC_lvref
+const	UV	U32	PERL_MAGIC_nkeys
+const	UV	U32	PERL_MAGIC_overload_table
+const	UV	U32	PERL_MAGIC_pos
+const	UV	U32	PERL_MAGIC_qr
+const	UV	U32	PERL_MAGIC_regdata
+const	UV	U32	PERL_MAGIC_regdatum
+const	UV	U32	PERL_MAGIC_regex_global
+const	UV	U32	PERL_MAGIC_rhash
+const	UV	U32	PERL_MAGIC_shared
+const	UV	U32	PERL_MAGIC_shared_scalar
+const	UV	U32	PERL_MAGIC_sig
+const	UV	U32	PERL_MAGIC_sigelem
+const	UV	U32	PERL_MAGIC_substr
+const	UV	U32	PERL_MAGIC_sv
+const	UV	U32	PERL_MAGIC_symtab
+const	UV	U32	PERL_MAGIC_taint
+const	UV	U32	PERL_MAGIC_tied
+const	UV	U32	PERL_MAGIC_tiedelem
+const	UV	U32	PERL_MAGIC_tiedscalar
+const	UV	U32	PERL_MAGIC_utf8
+const	UV	U32	PERL_MAGIC_uvar
+const	UV	U32	PERL_MAGIC_uvar_elem
+const	UV	U32	PERL_MAGIC_vec
+const	UV	U32	PERL_MAGIC_vstring
 
 # vim: set ts=12 tw=0 noet

@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 37;
+use Test::More tests => 42;
 
 BEGIN {
     use_ok( 'HiPi' );
@@ -9,6 +9,8 @@ BEGIN {
     use_ok( 'HiPi::Energenie' );
     use_ok( 'HiPi::Device' );
     use_ok( 'HiPi::Interface' );
+    use_ok( 'HiPi::Pin' );
+    use_ok( 'HiPi::Energenie::Command' );
     use_ok( 'HiPi::Energenie::ENER314' );
     use_ok( 'HiPi::Energenie::ENER314_RT' );
     use_ok( 'HiPi::Device::GPIO' );
@@ -35,10 +37,13 @@ BEGIN {
     use_ok( 'HiPi::Interface::MCP4DAC' );
     use_ok( 'HiPi::Interface::MCP49XX' );
     use_ok( 'HiPi::Interface::MPL3115A2' );
+    use_ok( 'HiPi::Interface::PCA9685' );
     use_ok( 'HiPi::Interface::SerLCD' );
     use_ok( 'HiPi::Interface::Si470N' );
+    use_ok( 'HiPi::RF::OpenThings' );
     use_ok( 'HiPi::RF::OpenThings::Message' );
     use_ok( 'HiPi::Utils::Exec' );
+    use_ok( 'HiPi::Utils::Config' );
     use_ok( 'HiPi::Utils' );
 }
 

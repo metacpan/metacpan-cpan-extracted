@@ -58,11 +58,11 @@ App::MFILE::WWW - Web UI development toolkit with prototype demo app
 
 =head1 VERSION
 
-Version 0.158
+Version 0.161
 
 =cut
 
-our $VERSION = '0.158';
+our $VERSION = '0.161';
 our @EXPORT_OK = ( '$VERSION' );
 
 
@@ -330,8 +330,35 @@ starting the application and then pointing the browser to a URL like:
 
     http://localhost:5001/test
 
-The tests are implemented using QUnit.
+The tests are implemented using QUnit. A good source of practical advise on the
+use of QUnit is the QUnit Cookbook, available here:
 
+    https://qunitjs.com/cookbook/
+
+The QUnit API itself is documented here:
+
+    http://api.qunitjs.com/
+
+
+=head2 Adding new test cases
+
+There are separate sets of JavaScript unit tests for each of the following
+three components:
+
+=over
+
+=item mfile-www core
+
+=item mfile-www demo app
+
+=item derived application (e.g. dochazka-www)
+
+=back
+
+To add a new test case, go to the appropriate C<tests/> directory (in mfile-www
+core, in the mfile-www demo app, or in your derived application, as
+appropriate) and create a js file (use one of the other C<tests/*.js> files
+as a model). Then add this file to the C<test.js> file in the parent directory.
 
 
 =head1 DEVELOPMENT NOTES

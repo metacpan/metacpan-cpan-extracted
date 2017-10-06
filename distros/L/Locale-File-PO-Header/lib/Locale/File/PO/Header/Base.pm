@@ -1,17 +1,17 @@
 package Locale::File::PO::Header::Base; ## no critic (TidyCode)
 
 use Moose;
-
 use namespace::autoclean;
-use syntax qw(method);
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 
-method default {
+sub default { ## no critic (BuiltinHomonyms)
     return;
 }
 
-method trigger_helper ($arg_ref) {
+sub trigger_helper {
+    my ($self, $arg_ref) = @_;
+
     my ($new, $current, $default) = map {
         defined $_ ? $_ : q{};
     } @{$arg_ref}{ qw(new current default) };
@@ -29,11 +29,15 @@ method trigger_helper ($arg_ref) {
     return;
 }
 
-method header_keys {
+sub header_keys {
+    my $self = shift;
+
     return $self->name;
 }
 
-method format_line ($line, %args) {
+sub format_line {
+    my ($self, $line, %args) = @_;
+
     for my $key ( keys %args ) {
         $line =~ s{
             [{]

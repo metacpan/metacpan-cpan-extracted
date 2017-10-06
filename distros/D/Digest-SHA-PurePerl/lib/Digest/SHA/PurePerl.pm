@@ -9,7 +9,7 @@ use Fcntl qw(O_RDONLY);
 use integer;
 use Carp qw(croak);
 
-$VERSION = '5.97';
+$VERSION = '5.98';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -937,8 +937,8 @@ sub addfile {
 	return(_addfile($self, $file)) unless ref(\$file) eq 'SCALAR';
 
 	$mode = defined($mode) ? $mode : "";
-	my ($binary, $UNIVERSAL, $BITS, $portable) =
-		map { $_ eq $mode } ("b", "U", "0", "p");
+	my ($binary, $UNIVERSAL, $BITS) =
+		map { $_ eq $mode } ("b", "U", "0");
 
 		## Always interpret "-" to mean STDIN; otherwise use
 		## sysopen to handle full range of POSIX file names
@@ -959,18 +959,11 @@ sub addfile {
 		return($self);
 	}
 
-	binmode(FH) if $binary || $portable || $UNIVERSAL;
+	binmode(FH) if $binary || $UNIVERSAL;
 	if ($UNIVERSAL && _istext(*FH, $file)) {
 		while (<FH>) {
 			s/\015\012/\012/g;	# DOS/Windows
 			s/\015/\012/g;		# early MacOS
-			$self->add($_);
-		}
-	}
-	elsif ($portable && _istext(*FH, $file)) {
-		while (<FH>) {
-			s/\015?\015\012/\012/g;
-			s/\015/\012/g;
 			$self->add($_);
 		}
 	}
@@ -1075,9 +1068,9 @@ In programs:
 
 From the command line:
 
-	$ shasum files
+	$ shasumpp files
 
-	$ shasum --help
+	$ shasumpp --help
 
 =head1 SYNOPSIS (HMAC-SHA)
 
@@ -1389,8 +1382,6 @@ argument to one of the following values:
 
 	"U"	use universal newlines
 
-	"p"	use portable mode (to be deprecated)
-
 	"0"	use BITS mode
 
 The "U" mode is modeled on Python's "Universal Newlines" concept, whereby
@@ -1399,12 +1390,6 @@ before processing.  This ensures consistent digest values when working
 simultaneously across multiple file systems.  B<The "U" mode influences
 only text files>, namely those passing Perl's I<-T> test; binary files
 are processed with no translation whatsoever.
-
-The "p" mode differs from "U" only in that it treats "\r\r\n" as a single
-newline, a quirky feature designed to accommodate legacy applications that
-occasionally added an extra carriage return before DOS line terminators.
-The "p" mode will be phased out eventually in favor of the cleaner and
-more well-established Universal Newlines concept.
 
 The BITS mode ("0") interprets the contents of I<$filename> as a logical
 stream of bits, where each ASCII '0' or '1' character represents a 0 or

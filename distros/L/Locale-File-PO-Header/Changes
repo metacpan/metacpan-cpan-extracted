@@ -1,5 +1,9 @@
 Revision history for Perl extension Locale::File::PO::Header.
 
+0.004  Sun Oct  1 21:50:09 2017
+- removed makefile dependency Module::Build
+- removed dependency of syntax module
+
 0.003  Mon Mar 20 20:24:28 2012
 - repared Makefile.PL
 

@@ -1,7 +1,21 @@
 
 Release history for Importer-Zim-Base
 
-0.5.0     2017-09-20 21:03:47-07:00 America/Los_Angeles
+0.8.0     2017-09-29 09:18:31-07:00 America/Los_Angeles
+
+    - Utils: load Sub::Inject if available
+    - Utils: Make sure DEBUG is a constant function
+
+v0.7     2017-09-28 17:30:48-07:00 America/Los_Angeles
+
+    - Importer::Zim::Utils: DEBUG, carp & croak
+    - Apply indentation to DEBUG messages
+
+v0.6     2017-09-25 12:01:45-07:00 America/Los_Angeles
+
+    - Reduced perl requirement to 5.10.1
+
+v0.5     2017-09-20 21:03:47-07:00 America/Los_Angeles
 
     - Now -map subroutines expect the argument at $_
 

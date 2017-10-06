@@ -7,7 +7,7 @@ use Storable;
 use MIME::Base64 ();
 no overloading '%{}', '${}';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my %proxyClasses = (
     'Patro::N1' => 0,    # HASH
@@ -24,10 +24,13 @@ sub isProxyRef {
 
 sub handle {
     my ($proxy) = @_;
-    if ($proxyClasses{ CORE::ref($proxy) }) {
+    my $ref = CORE::ref($proxy);
+    if ($proxyClasses{$ref}) {
 	return $proxy;
-    } else {
+    } elsif (defined $proxyClasses{$ref}) {
 	return ${$proxy};
+    } else {
+	croak "Not a Patro proxy object";
     }
 }
 
@@ -138,16 +141,12 @@ sub proxy_request {
 	# if there are any Patro'N items in $request->{args},
 	# we should convert it to ... what?
 	foreach my $arg (@{$request->{args}}) {
-	    if (isProxyRef(ref($arg))) {
+	    if (isProxyRef(CORE::ref($arg))) {
 		my $id = handle($arg)->{id};
 		$arg = bless \$id, '.Patroon';
 	    }
 	}
     }
-
-#    if ($request->{command} eq '@{}') {
-#	::xdiag("in LeumJelly::proxy_request , request=",$request);
-#    }
 
     my $sreq = serialize($request);
     my $resp;
@@ -165,6 +164,13 @@ sub proxy_request {
     }
     croak if ref($resp);
     $resp = deserialize_response($resp, $proxy->{client});
+    if ($resp->{_fatal}) {
+	# for debugging - for some errors in the server we want
+	# a stack trace in the client
+	Carp::cluck("Request caused a fatal error in the server:\n"
+		    . $resp->{_fatal});
+	exit;
+    }
     if ($resp->{error}) {
 	croak $resp->{error};
     }
@@ -230,23 +236,23 @@ sub deserialize_response {
 
     if ($response->{context}) {
 	if ($response->{context} == 1) {
-	    $response->{response} = depatrol($client,
+	    $response->{response} = unpatrofy($client,
 					     $response->{response},
 					     $response->{meta})
 	} elsif ($response->{context} == 2) {
-	    $response->{response} = [ map depatrol($client,
+	    $response->{response} = [ map unpatrofy($client,
 						   $_, $response->{meta}),
 				      @{$response->{response}} ];
 	}
     }
     if ($response->{out}) {
-	$response->{out} = [ map depatrol($client,$_,$response->{meta}),
+	$response->{out} = [ map unpatrofy($client,$_,$response->{meta}),
 			     @{$response->{out}} ];
     }
     return $response;
 }
 
-sub depatrol {
+sub unpatrofy {
     my ($client, $obj, $meta) = @_;
     if (CORE::ref($obj) ne '.Patrobras') {
 	return $obj;
@@ -257,7 +263,7 @@ sub depatrol {
     } elsif (defined $client->{proxies}{$id}) {
 	return $client->{proxies}{$id};
     }
-    warn "depatrol: reference $id $obj is not referred to in meta";
+    warn "unpatrofy: reference $id $obj is not referred to in meta";
     bless $obj, 'SCALAR';
     return $obj;
 }

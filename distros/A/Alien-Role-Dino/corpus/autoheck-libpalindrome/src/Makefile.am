@@ -1,4 +1,4 @@
-AM_CFLAGS  = -Wall
+AM_CFLAGS  = 
 AM_LDFLAGS =
 
 lib_LTLIBRARIES = libpalindrome.la

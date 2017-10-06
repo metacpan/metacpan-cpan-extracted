@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.15
 
 SYNOPSIS
 
@@ -233,6 +233,7 @@ SUBCOMMANDS
      af missing
        [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
        [ ( -p | --phase ) ( configure | any | share | system ) ]
+       [ --plugin | --precompile ]
 
   description
 
@@ -265,6 +266,20 @@ SUBCOMMANDS
 
     The phase of the requirement. Please refer to the Alien::Build
     documentation for the meaning of the various phases.
+
+   --plugin
+
+    Print out missing plugins. Caveat: to do this, af mocks part of
+    Alien::Build::Meta, which may or may not break in the future.
+
+ --precompile
+
+    Print out missing modules that are needed before the alienfile is even
+    compiled. These are usually configure time prereqs, but if they are
+    used in the alienfile instead of being declared as a requires, then
+    there is no way for Alien::Build to query for them. Caveat: since
+    alienfile is arbitrary Perl code, there may be corner cases not covered
+    by this option.
 
  prop
 

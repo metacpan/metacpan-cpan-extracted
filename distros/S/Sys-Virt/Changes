@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+3.8.0 2017-10-04
+
+ - Add VIR_STORAGE_POOL_EVENT_{DELETED,CREATED} constants
+
 3.7.0 2017-09-04
 
  - Add VIR_FROM_RESCTRL constant

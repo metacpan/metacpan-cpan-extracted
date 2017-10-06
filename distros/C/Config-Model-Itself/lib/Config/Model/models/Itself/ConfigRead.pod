@@ -13,10 +13,6 @@ Configuration classes used by L<Config::Model>
 
 =head1 Elements
 
-=head2 syntax
-
-Deprecated parameter that specified the file syntax to store permanently configuration data. Replaced by "backend" B<Deprecated> I< Optional. Type enum. choice: 'cds', 'perl', 'ini', 'custom'.  > 
-
 =head2 backend
 
 specifies the backend to store permanently configuration data. I< Optional. Type enum. choice: 'cds_file', 'perl_file', 'custom'.  > 
@@ -35,23 +31,11 @@ file with config data string. This is Config::Model own serialisation format, de
 
 =item 'custom'
 
-Custom format. You must specify your own class and method to perform the read or write function. See Config::Model::AutoRead doc for more details
+deprecated
 
 =item 'perl_file'
 
 file with a perl data structure. Configuration filename is made with instance name
-
-=back
-
-
-
-Note: backend is migrated with 'C<$old>' and with: 
-
-=over
-
-=item *
-
-C<$old> => C<- syntax>
 
 =back
 
@@ -68,6 +52,20 @@ Specify and alternate location of a configuration directory depending on the OS 
 =head2 file - target configuration file name
 
 specify the configuration file name. This parameter may not be applicable depending on your application. It may also be hardcoded in a custom backend. If not specified, the instance name is used as base name for your configuration file. The configuration file namecan be specified with &index keyword when a backend is associated to a node contained in a hash. See L<backend specifications|http://search.cpan.org/dist/Config-Model/lib/Config/Model/BackendMgr.pm#Backend_specification>. I< Optional. Type uniline.  > 
+
+=head2 auto_create - Creates configuration files as needed
+
+I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 yaml_class
 
@@ -89,7 +87,7 @@ specify the configuration file mode. C<file_mode> parameter can be used to set t
 
 =head2 default_layer - How to find default values in a global config file
 
-Specifies where to find a global configuration file that specifies default values. For instance, this is used by OpenSSH to specify a global configuration file (C</etc/ssh/ssh_config>) that is overridden by user's file. I< Optional. Type node of class L<Itself::ConfigWR::DefaultLayer|Config::Model::models::Itself::ConfigWR::DefaultLayer> .  > 
+Specifies where to find a global configuration file that specifies default values. For instance, this is used by OpenSSH to specify a global configuration file (C</etc/ssh/ssh_config>) that is overridden by user's file. I< Optional. Type node of class L<Itself::ConfigReadWrite::DefaultLayer|Config::Model::models::Itself::ConfigReadWrite::DefaultLayer> .  > 
 
 =head2 class
 
@@ -239,46 +237,6 @@ Delete configuration files when no information is left in there. This may happen
 
 I< Optional. Type uniline.  > 
 
-=head2 auto_create - Creates configuration files as needed
-
-I< Optional. Type boolean.  > 
-
-=over 4
-
-=item upstream_default value :
-
-0
-
-=back
-
-
-
-Note: auto_create is migrated with 'C<$old>' and with: 
-
-=over
-
-=item *
-
-C<$old> => C<- allow_empty>
-
-=back
-
-
-
-=head2 allow_empty - deprecated in favor of auto_create
-
-B<Deprecated> I< Optional. Type boolean.  > 
-
-=over 4
-
-=item upstream_default value :
-
-0
-
-=back
-
-
-
 =head1 SEE ALSO
 
 =over
@@ -289,7 +247,7 @@ L<cme>
 
 =item *
 
-L<Config::Model::models::Itself::ConfigWR::DefaultLayer>
+L<Config::Model::models::Itself::ConfigReadWrite::DefaultLayer>
 
 =back
 

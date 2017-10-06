@@ -20,67 +20,73 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _memOID {
-    return '1.3.6.1.4.1.9.9.48.1.1.1'
+    return '1.3.6.1.4.1.9.9.48.1.1.1';
 }
 
 sub memOIDs {
-    return qw(Name Alternate Valid Used Free LargestFree Total)
+    return qw(Name Alternate Valid Used Free LargestFree Total);
 }
 
 sub memory_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @MEMKEYS = memOIDs();
+
     # -1 because last key (Total) isn't an OID; rather, calculated from 2 other OIDs
-    for my $oid (0..$#MEMKEYS-1) {
-        $ret{$MEMKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _memOID() . '.' . ($oid+2));
-        if (!defined $ret{$MEMKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get memory `$MEMKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#MEMKEYS - 1 ) {
+        $ret{$MEMKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _memOID() . '.' . ( $oid + 2 ) );
+        if ( not defined $ret{$MEMKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get memory `$MEMKEYS[$oid]' info";
+            return undef;
         }
     }
 
     my @MemInfo;
-    for my $mem (0..$#{$ret{$MEMKEYS[0]}}) {
+    for my $mem ( 0 .. $#{$ret{$MEMKEYS[0]}} ) {
         my %MemInfoHash;
-        for (0..$#MEMKEYS) {
-            if ($_ == 2) {
-                $MemInfoHash{$MEMKEYS[$_]} = ($ret{$MEMKEYS[$_]}->[$mem] == 1) ? 'TRUE' : 'FALSE'
-            } elsif ($_ == 6) {
-                $MemInfoHash{$MEMKEYS[$_]} =  $ret{$MEMKEYS[3]}->[$mem] + $ret{$MEMKEYS[4]}->[$mem]
+        for ( 0 .. $#MEMKEYS ) {
+            if ( $_ == 2 ) {
+                $MemInfoHash{$MEMKEYS[$_]}
+                  = ( $ret{$MEMKEYS[$_]}->[$mem] == 1 ) ? 'TRUE' : 'FALSE';
+            } elsif ( $_ == 6 ) {
+                $MemInfoHash{$MEMKEYS[$_]}
+                  = $ret{$MEMKEYS[3]}->[$mem] + $ret{$MEMKEYS[4]}->[$mem];
             } else {
-                $MemInfoHash{$MEMKEYS[$_]} =  $ret{$MEMKEYS[$_]}->[$mem]
+                $MemInfoHash{$MEMKEYS[$_]} = $ret{$MEMKEYS[$_]}->[$mem];
             }
         }
-        push @MemInfo, \%MemInfoHash
+        push @MemInfo, \%MemInfoHash;
     }
-    return bless \@MemInfo, $class
+    return bless \@MemInfo, $class;
 }
 
-for (memOIDs()) {
-    Cisco::SNMP::_mk_accessors_array_1('mem', $_)
+for ( memOIDs() ) {
+    Cisco::SNMP::_mk_accessors_array_1( 'mem', $_ );
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = memOIDs();
+
 # -1 because last key (Total) isn't an OID; rather, calculated from 2 other OIDs
-for my $o (0..$#OIDS-1) {
+for my $o ( 0 .. $#OIDS - 1 ) {
     *{"get_mem" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_memOID() . '.' . ($o+2) . '.' . $val]
-        );
-        return $r->{_memOID() . '.' . ($o+2) . '.' . $val}
-    }
+            varbindlist => [_memOID() . '.' . ( $o + 2 ) . '.' . $val] );
+        return $r->{_memOID() . '.' . ( $o + 2 ) . '.' . $val};
+      }
 }
 
 ##################################################

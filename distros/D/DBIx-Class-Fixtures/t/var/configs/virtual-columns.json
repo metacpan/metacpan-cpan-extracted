@@ -1,6 +1,6 @@
 {
 	"sets": [{
 		"class": "Person",
-		"quantity": "all",
+		"quantity": "all"
 	}]
 }

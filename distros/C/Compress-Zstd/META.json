@@ -4,7 +4,7 @@
       ", Jiro Nishiguchi"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.7",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "bsd"
    ],
@@ -23,7 +23,7 @@
          "examples",
          "author",
          "builder",
-         "vendor"
+         "ext"
       ]
    },
    "prereqs" : {
@@ -61,7 +61,13 @@
    "provides" : {
       "Compress::Zstd" : {
          "file" : "lib/Compress/Zstd.pm",
-         "version" : "0.05"
+         "version" : "0.10"
+      },
+      "Compress::Zstd::Compressor" : {
+         "file" : "lib/Compress/Zstd/Compressor.pm"
+      },
+      "Compress::Zstd::Decompressor" : {
+         "file" : "lib/Compress/Zstd/Decompressor.pm"
       }
    },
    "release_status" : "stable",
@@ -75,10 +81,10 @@
          "web" : "https://github.com/spiritloose/Compress-Zstd"
       }
    },
-   "version" : "0.05",
+   "version" : "0.10",
    "x_contributors" : [
       "Jiro Nishiguchi <jiro@cpan.org>",
       "Jiro Nishiguchi <spiritloose@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

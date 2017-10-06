@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Scalar::Util qw/openhandle/;
 use Test2::Util qw/clone_io CAN_REALLY_FORK pkg_to_file/;
@@ -41,7 +41,8 @@ sub run {
     # In parent
     return ($pid, undef) if $pid;
 
-    $_->post_fork($job) for @$preloads;
+    # In Child
+    my $file = $job->file;
 
     # toggle -w switch late
     $^W = 1 if grep { m/\s*-w\s*/ } @{$job->switches};
@@ -50,10 +51,22 @@ sub run {
     $SIG{INT} = 'DEFAULT';
     $SIG{HUP} = 'DEFAULT';
 
-    for my $mod (@{$job->load || []}) {
-        my $file = pkg_to_file($mod);
-        require $file;
+    my $env = $job->env_vars;
+    {
+        no warnings 'uninitialized';
+        $ENV{$_} = $env->{$_} for keys %$env;
     }
+
+    $ENV{T2_HARNESS_FORKED}  = 1;
+    $ENV{T2_HARNESS_PRELOAD} = 1;
+
+    my ($in_file, $out_file, $err_file, $event_file) = $test->output_filenames;
+
+    $0 = File::Spec->abs2rel($file);
+    $class->_reset_DATA($file);
+    @ARGV = ();
+
+    $_->post_fork($job) for @$preloads;
 
     my $importer = eval <<'    EOT' or die $@;
 package main;
@@ -72,23 +85,10 @@ sub { shift->import(@_) }
         $importer->($mod, @args);
     }
 
-    # In Child
-    my $file = $job->file;
-
-    my $env = $job->env_vars;
-    {
-        no warnings 'uninitialized';
-        $ENV{$_} = $env->{$_} for keys %$env;
+    for my $mod (@{$job->load || []}) {
+        my $file = pkg_to_file($mod);
+        require $file;
     }
-
-    $ENV{T2_HARNESS_FORKED}  = 1;
-    $ENV{T2_HARNESS_PRELOAD} = 1;
-
-    my ($in_file, $out_file, $err_file, $event_file) = $test->output_filenames;
-
-    $0 = File::Spec->abs2rel($file);
-    $class->_reset_DATA($file);
-    @ARGV = ();
 
     # if FindBin is preloaded, reset it with the new $0
     FindBin::init() if defined &FindBin::init;

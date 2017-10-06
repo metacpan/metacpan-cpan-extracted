@@ -224,13 +224,20 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 
 	if (imp_dbh->pg_server_version <= 0) {
 		int	cnt, vmaj, vmin, vrev;
-		cnt = sscanf(PQparameterStatus(imp_dbh->conn, "server_version"), "%d.%d.%d",
-					 &vmaj, &vmin, &vrev);
-		if (cnt >= 2) {
-			if (cnt == 2) /* Account for devel version e.g. 8.3beta1 */
-				vrev = 0;
-			imp_dbh->pg_server_version = (100 * vmaj + vmin) * 100 + vrev;
+        const char *vers = PQparameterStatus(imp_dbh->conn, "server_version");
+
+        if (NULL != vers) {
+			cnt = sscanf(vers, "%d.%d.%d",
+						 &vmaj, &vmin, &vrev);
+			if (cnt >= 2) {
+				if (cnt == 2) /* Account for devel version e.g. 8.3beta1 */
+					vrev = 0;
+				imp_dbh->pg_server_version = (100 * vmaj + vmin) * 100 + vrev;
+			}
 		}
+        else {
+            imp_dbh->pg_server_version = PG_UNKNOWN_VERSION ;
+        }
 	}
 
 	pg_db_detect_client_encoding_utf8(aTHX_ imp_dbh);
@@ -482,7 +489,7 @@ int dbd_db_ping (SV * dbh)
 	}
 
 	/* No matter what state we are in, send an empty query to the backend */
-	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.6.2 */");
+	result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.7.0 */");
 	if (NULL == result) {
 		/* Something very bad, usually indicating the backend is gone */
 		return -3;
@@ -1139,10 +1146,12 @@ SV * dbd_st_FETCH_attrib (SV * sth, imp_sth_t * imp_sth, SV * keysv)
 			retsv = newSViv(imp_sth->cur_tuple);
 		break;
 
-	case 15: /* pg_prepare_name */
+	case 15: /* pg_prepare_name pg_async_status */
 
 		if (strEQ("pg_prepare_name", key))
 			retsv = newSVpv((char *)imp_sth->prepare_name, 0);
+		else if (strEQ("pg_async_status", key))
+			retsv = newSViv((IV)imp_sth->async_status);
 		break;
 
 	case 17: /* pg_server_prepare */
@@ -2992,18 +3001,23 @@ static void pg_db_detect_client_encoding_utf8(pTHX_ imp_dbh_t *imp_dbh) {
 	int i, j;
 	const char * const client_encoding =
 		PQparameterStatus(imp_dbh->conn, "client_encoding");
-	STRLEN len = strlen(client_encoding);
-	Newx(clean_encoding, len + 1, char);
-	for (i = 0, j = 0; i < len; i++) {
-		const char c = toLOWER(client_encoding[i]);
-		if (isALPHA(c) || isDIGIT(c))
-			clean_encoding[j++] = c;
-	};
-	clean_encoding[j] = '\0';
-	imp_dbh->client_encoding_utf8 =
-		(strnEQ(clean_encoding, "utf8", 4) || strnEQ(clean_encoding, "unicode", 8))
-		? DBDPG_TRUE : DBDPG_FALSE;
-	Safefree(clean_encoding);
+	if (NULL != client_encoding) {
+		STRLEN len = strlen(client_encoding);
+		Newx(clean_encoding, len + 1, char);
+		for (i = 0, j = 0; i < len; i++) {
+			const char c = toLOWER(client_encoding[i]);
+			if (isALPHA(c) || isDIGIT(c))
+				clean_encoding[j++] = c;
+		};
+		clean_encoding[j] = '\0';
+		imp_dbh->client_encoding_utf8 =
+			(strnEQ(clean_encoding, "utf8", 4) || strnEQ(clean_encoding, "unicode", 8))
+			? DBDPG_TRUE : DBDPG_FALSE;
+		Safefree(clean_encoding);
+	}
+	else {
+		imp_dbh->client_encoding_utf8 = DBDPG_FALSE;
+	}
 }
 
 /* ================================================================== */
@@ -3289,18 +3303,20 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 	/* Increment our count */
 	imp_sth->number_iterations++;
 
-	/* We must use PQexec if:
+	/* We use PQexec if:
 	   1. The statement is *not* DML (e.g. is DDL, which cannot be prepared)
 	   2. We have a DEFAULT parameter
 	   3. We have a CURRENT parameter
 	   4. pg_direct is true
-	   5. pg_server_prepare is false
-	   6. pg_server_prepare is 2, but all placeholders are not bound
+	   5. There are no placeholders
+	   6. pg_server_prepare is false
+	   7. pg_server_prepare is 2, but all placeholders are not bound
 	*/
 	if (!imp_sth->is_dml
 		|| imp_sth->has_default
 		|| imp_sth->has_current
 		|| imp_sth->direct
+		|| !imp_sth->numphs
 		|| !imp_sth->server_prepare
 		|| (2==imp_sth->server_prepare && imp_sth->numbound != imp_sth->numphs)
 		)
@@ -3621,10 +3637,10 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 			return 0;
 		}
 	}
-	else if (PGRES_COPY_OUT == status || PGRES_COPY_IN == status) {
+	else if (PGRES_COPY_OUT == status || PGRES_COPY_IN == status || PGRES_COPY_BOTH == status) {
 		if (TRACE5_slow)
 			TRC(DBILOGFP, "%sStatus was PGRES_COPY_%s\n",
-				THEADER_slow, PGRES_COPY_OUT == status ? "OUT" : "IN");
+				THEADER_slow, PGRES_COPY_OUT == status ? "OUT" : PGRES_COPY_IN == status ? "IN" : "BOTH");
 		/* Copy Out/In data transfer in progress */
 		imp_dbh->copystate = status;
 		imp_dbh->copybinary = PQbinaryTuples(imp_sth->result);
@@ -4064,7 +4080,7 @@ int pg_db_putline (SV * dbh, SV * svbuf)
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_putline\n", THEADER_slow);
 
 	/* We must be in COPY IN state */
-	if (PGRES_COPY_IN != imp_dbh->copystate)
+	if (PGRES_COPY_IN != imp_dbh->copystate && PGRES_COPY_BOTH != imp_dbh->copystate)
 		croak("pg_putline can only be called directly after issuing a COPY FROM command\n");
 
 	if (!svbuf || !SvOK(svbuf))
@@ -4108,7 +4124,7 @@ int pg_db_getline (SV * dbh, SV * svbuf, int length)
 	tempbuf = NULL;
 
 	/* We must be in COPY OUT state */
-	if (PGRES_COPY_OUT != imp_dbh->copystate)
+	if (PGRES_COPY_OUT != imp_dbh->copystate && PGRES_COPY_BOTH != imp_dbh->copystate)
 		croak("pg_getline can only be called directly after issuing a COPY TO command\n");
 
 	length = 0; /* Make compilers happy */
@@ -4151,7 +4167,7 @@ int pg_db_getcopydata (SV * dbh, SV * dataline, int async)
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_getcopydata\n", THEADER_slow);
 
 	/* We must be in COPY OUT state */
-	if (PGRES_COPY_OUT != imp_dbh->copystate)
+	if (PGRES_COPY_OUT != imp_dbh->copystate && PGRES_COPY_BOTH != imp_dbh->copystate)
 		croak("pg_getcopydata can only be called directly after issuing a COPY TO command\n");
 
 	tempbuf = NULL;
@@ -4223,7 +4239,7 @@ int pg_db_putcopydata (SV * dbh, SV * dataline)
 	if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_putcopydata\n", THEADER_slow);
 
 	/* We must be in COPY IN state */
-	if (PGRES_COPY_IN != imp_dbh->copystate)
+	if (PGRES_COPY_IN != imp_dbh->copystate && PGRES_COPY_BOTH != imp_dbh->copystate)
 		croak("pg_putcopydata can only be called directly after issuing a COPY FROM command\n");
 
 	if (imp_dbh->pg_utf8_flag && !imp_dbh->copybinary)
@@ -4235,6 +4251,12 @@ int pg_db_putcopydata (SV * dbh, SV * dataline)
 	copystatus = PQputCopyData(imp_dbh->conn, copydata, copylen);
 
 	if (1 == copystatus) {
+		if (PGRES_COPY_BOTH == imp_dbh->copystate && PQflush(imp_dbh->conn)) {
+			_fatal_sqlstate(aTHX_ imp_dbh);
+
+			TRACE_PQERRORMESSAGE;
+			pg_error(aTHX_ dbh, PGRES_FATAL_ERROR, PQerrorMessage(imp_dbh->conn));
+		}
 	}
 	else if (0 == copystatus) { /* non-blocking mode only */
 	}
@@ -4255,7 +4277,7 @@ int pg_db_putcopydata (SV * dbh, SV * dataline)
 int pg_db_putcopyend (SV * dbh)
 {
 
-	/* If in COPY_IN mode, terminate the COPYing */
+	/* If in COPY_IN or COPY_BOTH mode, terminate the COPYing */
 	/* Returns 1 on success, otherwise 0 (plus a probably warning/error) */
 
 	dTHX;
@@ -4276,7 +4298,7 @@ int pg_db_putcopyend (SV * dbh)
 		return 0;
 	}
 
-	/* Must be PGRES_COPY_IN at this point */
+	/* Must be PGRES_COPY_IN or PGRES_COPY_BOTH at this point */
 
 	TRACE_PQPUTCOPYEND;
 	copystatus = PQputCopyEnd(imp_dbh->conn, NULL);

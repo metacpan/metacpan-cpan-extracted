@@ -1,6 +1,6 @@
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
-# Compile, install, start an Android App using the sdk command line build tools
-# rather than calling them via ant or gradle.
+# Command line build of an Android apk without gradle or ant
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
 
@@ -8,13 +8,13 @@ package Android::Build;
 require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
-use Carp;
+use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '2017.528';
+our $VERSION = '20171005';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -26,68 +26,37 @@ my $permissions =                                                               
     qw(READ_EXTERNAL_STORAGE RECEIVE_BOOT_COMPLETED)];
 my $version     = strftime('%Y%m%d', localtime);                                # Version number without dots
 
-sub new()                                                                       # Create a new default build
- {bless{action     =>qq(run),
-        activity   =>qw(Activity),
-        device     =>qq(emulator-5554),
-        home       =>$home,
-        icon       =>'icon.png',
-        log        =>[],
-        parameters =>'',
-        permissions=>$permissions,
-        version    =>$version};
- }
-
-if (1)                                                                          # Parameters that can be set by the caller - see the pod at the end of this file for a complete description of what each parameter does
- {Data::Table::Text::genLValueScalarMethods(
-  qw(action),                                                                   # Default action to perform, compile, lint, run, install, default default is run
-  qw(activity),                                                                 # Activity name, default is 'Activity'
-  qw(buildTools),                                                               # Name of the folder containing the build tools to be used to build the app
-  qw(buildFolder),                                                              # Name of a folder in which to build the app
-  qw(classes),                                                                  # Classes folder to be included in lint and/or test
-  qw(copyFiles),                                                                # Sub to copy additional files into the app before it is complied
-  qw(debug),                                                                    # Make app debuggable is specified and true
-  qw(device),                                                                   # Device to run on, default is the only emulator
-  qw(icon),                                                                     # Jpg file containing a picture that will be scaled to make an icon for the app, default is 'icon.jpg'
-  qw(keyAlias),                                                                 # Alias used in keytool to name the key to be used to sign this app
-  qw(keyStoreFile),                                                             # File name of keystore
-  qw(keyStorePwd),                                                              # Password of keystore
-  qw(lintFile),                                                                 # Java source files to be linted
-  qw(log),                                                                      # Message log
-  qw(libs),                                                                     # Extra libraries
-  qw(package),                                                                  # The package name to be used in the manifest and to start the app - the file containing the Activity for the app should be in this package
-  qw(parameters),                                                               # Parameter string to be placed in res for the app
-  qw(permissions),                                                              # Permissions, a standard useful set is applied
-  qw(platform),                                                                 # Folder containing 'android.jar' - for example Android/sdk/platforms/25.0.2
-  qw(platformTools),                                                            # Folder containing Android sdk platform tools
-  qw(sdkLevels),                                                                # [minSdkVersion,targetSdkVersion], default is [15,25]
-  qw(src),                                                                      # Source of app, default is everything in './src' folder
-  qw(title),                                                                    # Title of app, default is name of app
-  qw(version),                                                                  # Version of app, default is today's date
- )}
+#-------------------------------------------------------------------------------
+# Private methods
+#-------------------------------------------------------------------------------
 
 sub getSDKLevels($)                                                             # File name of Android jar for linting
- {my ($android) = @_;
+ {my ($android) = @_;                                                           # Android build
   my $l = $android->sdkLevels;
-  return @$l if $l;
+  return @$l if $l and @$l;
   (15,25)
  }
 
 sub getInstructions                                                             # How to get the build tools
  {<<END
+Download the Linux tools as specified at the end of page:
 
-https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+  https://developer.android.com/studio/index.html
+
+last set to:
+
+  https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 
 Unzip the retrieved file to get the sdkmanager. Use the sdkmanager to get the
 version of the SDK that you need, for example:
 
-sdkmanager 'platforms;android-25'  'build-tools;25.0.3
+  sdkmanager 'platforms;android-25'  'build-tools;25.0.3
 END
 }
 
 sub getPlatform                                                                 # Get and validate the SDK Platform folder
  {my ($a) = @_;
-  my $f = $a->platform;
+  my $f = $a->platformX;
   $f or confess <<END.getInstructions;
 
 "platform" parameter required - it should be the name of the folder containing
@@ -103,7 +72,7 @@ END
 
 sub getBuildTools                                                               # Get and validate the SDK Platform build-tools folder
  {my ($a) = @_;
-  my $f = $a->buildTools;
+  my $f = $a->buildToolsX;
   $f or confess <<END.getInstructions;
 
 "buildTools" parameter required - it should be the name of the folder
@@ -119,7 +88,7 @@ END
 
 sub getPlatformTools                                                            # Get and validate the SDK Platform tools folder
  {my ($a) = @_;
-  my $f = $a->platformTools;
+  my $f = $a->platformToolsX;
   $f or confess <<END.getInstructions;
 
 "platformTools" parameter required - it should be the name of the folder
@@ -133,10 +102,20 @@ END
   $f
  }
 
-sub androidJar($)                                                               # File name of Android jar for linting
+sub getDevice($)                                                                # Device to be used
+ {my ($android) = @_;
+  my $d = $android->device;
+  return '-e' unless $d;
+  return $d if $d =~ m(\A-)s;
+  "-s $d"
+ }
+
+sub getAndroidJar($)                                                            # File name of Android jar for linting
  {my ($android) = @_;
   my $p = $android->getPlatform;
-  filePath($p, qw(android.jar))
+  my $a = filePath($p, qw(android.jar));
+  -e $a or confess "Cannot find android.jar via file:\n$a\n";
+  $a
  }
 
 sub getPackage                                                                  # Get and validate the package name for this app
@@ -154,7 +133,7 @@ END
 
 sub getLintFile                                                                 # Name of the file to be linted
  {my ($a) = @_;
-  my $f = $a->lintFile;
+  my $f = $a->lintFileX;
   $f or confess <<END;
 "lintFile" parameter required to lint a file
 END
@@ -165,35 +144,35 @@ END
   $f
  }
 
-sub appName                                                                     # Single word name of app used to construct file names
+sub getActivity                                                                 # Activity for app
+ {my ($a) = @_;
+  $a->activity // 'Activity';
+ }
+
+sub getAppName                                                                     # Single word name of app used to construct file names
  {my ($a) = @_;
   my $d = $a->getPackage;
   (split /\./, $d)[-1];
  }
 
-sub appTitle                                                                    # Title of app
+sub getTitle                                                                    # Title of app
  {my ($a) = @_;
-  $a->title // $a->appName;
- }
-
-sub sourceFolder                                                                # Folder containing source of app
- {my ($a) = @_;
-  $a->src // $home.'../src';
- }
-
-sub appLibs                                                                     # Folder containing libraries to be copied into the app
- {my ($a) = @_;
-  $a->libs // $home.'../libs';
+  $a->title // $a->getAppNameX;
  }
 
 sub apkFileName                                                                 # Apk name - shorn of path
  {my ($a) = @_;
-  $a->appName.'.apk';
+  $a->getAppName.'.apk';
  }
 
 sub apk                                                                         # Apk name - with full path
  {my ($a) = @_;
-  $a->appBinFolder.$a->apkFileName;
+  $a->getBinFolder.$a->apkFileName;
+ }
+
+sub getVersion                                                                  # Version of the app or default to today's date
+ {my ($a) = @_;
+  $a->version // $version;
  }
 
 sub buildArea($)                                                                # Build folder name
@@ -201,13 +180,11 @@ sub buildArea($)                                                                
   $a->buildFolder // $home.'../tmp/app/'                                        # Either the user supplied build folder name or the default
  }
 
-sub appBinFolder($)     {my ($a) = @_; $a->buildArea.'bin/'}                    # Bin folder name
-sub appGenFolder($)     {my ($a) = @_; $a->buildArea.'gen/'}                    # Gen folder name
-sub appResFolder($)     {my ($a) = @_; $a->buildArea.'res/'}                    # Res folder name
-sub appSrcFolder($)     {my ($a) = @_; $a->buildArea.'src/'}                    # Source folder name
-sub appLibsFolder($)    {my ($a) = @_; $a->buildArea.'libs/'}                   # Libraries folder
-sub appIcon($)          {my ($a) = @_; $a->buildArea.'icon.png'}                # Icon file name
-sub manifestFile($)     {my ($a) = @_; $a->buildArea.'AndroidManifest.xml'}     # Name of manifest file
+sub getBinFolder($)     {my ($a) = @_; $a->buildArea.'bin/'}                    # Bin folder name
+sub getGenFolder($)     {my ($a) = @_; $a->buildArea.'gen/'}                    # Gen folder name
+sub getResFolder($)     {my ($a) = @_; $a->buildArea.'res/'}                    # Res folder name
+sub getIcon($)          {my ($a) = @_; $a->buildArea.'icon.png'}                # Icon file name
+sub getManifestFile($)  {my ($a) = @_; $a->buildArea.'AndroidManifest.xml'}     # Name of manifest file
 
 sub logMessage($@)                                                              # Log a message
  {my ($android, @message) = @_;
@@ -222,36 +199,37 @@ sub logMessage($@)                                                              
 #-------------------------------------------------------------------------------
 
 sub pushIcon                                                                    # Create and transfer each icon  using Imagemagick
- {my ($android, $size, $dir) = @_;
-  my $icon    = $android->icon;
-  $icon or
-    confess "Use the icon() method to supply an icon file for this app\n";
-  -e $icon or confess "Cannot find icon file:\n$icon\n";
-  my $appIcon = $android->appIcon;
-  my $res     = $android->appResFolder;
-  my $man     = $android->manifestFile;
+ {my ($android, $icon, $size, $dir) = @_;
+  my $getIcon = $android->getIcon;
+  my $res     = $android->getResFolder;
+  my $man     = $android->getManifestFile;
   for my $i(qw(ic_launcher))
    {for my $d(qw(drawable))
-     {makePath($appIcon);
+     {makePath($getIcon);
       my $s = $size;
-      my $c = "convert -strip $icon -resize ${s}x${s}! $appIcon";
-      my $r = xxx($c, qr(convert));
+      my $c = "convert -strip $icon -resize ${s}x${s}! $getIcon";
+      my $r = xxx $c, qr(convert);
       !$r or confess "Unable to create icon:\n$r\n";
-      my $res = $android->appResFolder;
       my $T = $res.$d.'-'.$dir.'dpi/'.$i.'.png';
       makePath($T);
-      print STDERR qx(rsync $appIcon $T);
+      unlink $T;
+      copy($getIcon, $T);
+      -e $T or confess "Unable to create icon:\n$T\n";
      }
    }
  }
 
 sub pushIcons                                                                   # Create icons in parallel
  {my ($android) = @_;
+  my $icon      = $android->iconX;
+  -e $icon or confess "Cannot find icon file:\n$icon\n";
   my @pid;
   for([48, "m"], [72, "h"], [96, "xh"], [144, "xxh"])
-   {if (my $pid = fork()) {push @pid, $pid}
+   {if (my $pid = fork())                                                       # Speed up - but does produce a lot of error messages
+     {push @pid, $pid
+     }
     else
-     {$android->pushIcon(@$_);
+     {$android->pushIcon($icon, @$_);
       exit;
      }
    }
@@ -280,10 +258,9 @@ sub manifest
   my $permissions = $android->addPermissions;
   my ($minSdk, $targetSdk) = $android->getSDKLevels;
   my $package     = $android->getPackage;
-  my $version     = $android->version;
-  my $debug       = $android->debug;
-  my $man         = $android->manifestFile;
-  my $activity    = $android->activity;
+  my $version     = $android->getVersion;
+  my $man         = $android->getManifestFile;
+  my $activity    = $android->activityX;
 
   my $manifest = << "END";
 <?xml version="1.0" encoding="utf-8"?>
@@ -318,7 +295,7 @@ sub manifest
   $permissions
 </manifest>
 END
-  $manifest =~ s/android:debuggable="true"//gs unless $debug;
+  $manifest =~ s/android:debuggable="true"//gs unless $android->debug;
   writeFile($man, $manifest);
  }
 
@@ -328,13 +305,15 @@ END
 
 sub resources()
  {my ($android)  = @_;
-  my $title      = $android->title;
-  my $version    = $android->version;
-  my $parameters = $android->parameters;
-  my $res        = $android->appResFolder;
+  my $title      = $android->getTitle;
+  my $version    = $android->getVersion;
+  my $parameters = $android->parameters // '';
+  my $package    = $android->getPackage;
+  my $res        = $android->getResFolder;
   my $t = << "END";
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="packageName">$package</string>
     <string name="app_name">$title</string>
     <string name="versionName">$version</string>
     <string name="parameters">$parameters</string>
@@ -344,54 +323,18 @@ END
  }
 
 #-------------------------------------------------------------------------------
-# Copy source
-#-------------------------------------------------------------------------------
-
-sub copySource
- {my ($android) = @_;
-  my $s = $android->sourceFolder;
-  my $p = $android->getPackage;
-  my $P = $p =~ s/\./\//gr;
-  my $t = $android->appSrcFolder."$P/";
-  makePath($t);
-  print STDERR qx(rsync -r $s $t);                                              # Copy source files recursively
-  if (my $copy = $android->copyFiles)                                           # Do a copy file step to bring in additional files
-   {$copy->($android, $t);
-   }
- }
-
-#-------------------------------------------------------------------------------
-# Copy libraries
-#-------------------------------------------------------------------------------
-
-sub copyLibs
- {my ($android) = @_;
-  if (my $libSource = $android->libs)
-   {my $libTarget = $android->appLibs;
-    print STDERR qx(rsync -r $_ $libTarget) for glob("$libSource/*")
-   }
- }
-
-#-------------------------------------------------------------------------------
 # Create app
 #-------------------------------------------------------------------------------
 
 sub create
  {my ($android) = @_;
   my $buildArea = $android->buildArea;
-  my $name      = $android->appName;
-  my $activity  = $android->activity;
+  my $name      = $android->getAppName;
+  my $activity  = $android->activityX;
   my $package   = $android->getPackage;
-  if (-d $buildArea)
-   {my $r = xxx("rm -r $buildArea");                                            # Clear build area
-    !$r or confess "Unable to remove existing app build area:\n".
-                   "$buildArea\n$r\n";
-   }
-  $android->pushIcons;                                                          # Create icons
-  $android->copySource;                                                         # Copy source
-  $android->copyLibs;                                                           # Copy libraries
-  $android->manifest;                                                           # Create manifest
-  $android->resources;                                                          # Create resources
+  $android->pushIcons;
+  $android->manifest;
+  $android->resources;
  }
 
 #-------------------------------------------------------------------------------
@@ -404,43 +347,36 @@ sub getAdb
  }
 
 sub make
- {my ($android) = @_;
-  my $appName    = $android->appName;
+ {my ($android)  = @_;
+  my $getAppName    = $android->getAppName;
 
-  my $buildTools = $android->getBuildTools;
-  $buildTools or confess
-   "Supply the path to the build-tools folder in your Android sdk".
-   " via the buildTools() method\n";
-
+  my $buildTools   = $android->getBuildTools;
   my $buildArea    = $android->buildArea;
-  my $keyStoreFile = $android->keyStoreFile;
-     $keyStoreFile or confess
-   "Supply the path to the key store file via the keyStoreFile() method\n";
-  -e $keyStoreFile or confess
-   "Key store file does not exists:\n$keyStoreFile\n";
-  my $keyAlias     = $android->keyAlias;
-     $keyAlias or confess
-   "Supply the key alias to sign this app via the keyAlias() method\n";
+  my $keyStoreFile = $android->keyStoreFileX;
+  -e $keyStoreFile or confess "Key store file does not exists:\n$keyStoreFile\n";
+  my $keyAlias     = $android->keyAliasX;
   my $keyStorePwd  = $android->keyStorePwd;
 
-  my $adb        = $android->getAdb;
-  my $androidJar = $android->androidJar;
+  my $adb          = $android->getAdb;
+  my $androidJar   = $android->getAndroidJar;
 
-  my $aapt       = filePath($buildTools, qw(aapt));
-  my $dx         = filePath($buildTools, qw(dx));
-  my $zipAlign   = filePath($buildTools, qw(zipalign));
+  my $aapt         = filePath($buildTools, qw(aapt));
+  my $dx           = filePath($buildTools, qw(dx));
+  my $zipAlign     = filePath($buildTools, qw(zipalign));
 
-  my $bin        = $android->appBinFolder;
-  my $gen        = $android->appGenFolder;
-  my $res        = $android->appResFolder;
-  my $src        = $android->appSrcFolder;
-  my $manifest   = $android->manifestFile;
-  my $binRes     = filePath($bin, $res);
-  my $classes    = filePath($bin, qw(classes));
+  my $bin          = $android->getBinFolder;
+  my $gen          = $android->getGenFolder;
+  my $res          = $android->getResFolder;
+  my @src          = @{$android->src};
+  my @libs         = @{$android->libs};
 
-  my $api        = $bin."$appName.ap_";
-  my $apj        = $bin."$appName-unaligned.apk";
-  my $apk        = $bin."$appName.apk";
+  my $manifest     = $android->getManifestFile;
+  my $binRes       = filePath($bin, $res);
+  my $classes      = filePath($bin, qw(classes));
+
+  my $api          = $bin."$getAppName.ap_";
+  my $apj          = $bin."$getAppName-unaligned.apk";
+  my $apk          = $bin."$getAppName.apk";
 
   if (1)                                                                        # Confirm aapt
    {my $a = xxx("$aapt version", qr(Android Asset Packaging Tool));
@@ -493,18 +429,19 @@ sub make
 
   if (1)                                                                        # Java
    {makePath(filePathDir($classes));
-    my $j = join ' ', grep {/\.java\Z/}                                         # Find java files
-      findFiles(filePathDir($src)),
+    my $j = join ' ', grep {/\.java\Z/} @src,                                   # Java sources files
       findFiles(filePathDir($gen));
 
-    my $r = xxx("javac -source  7 -target 7 -cp $androidJar -d $classes $j");
+    my $J = join ':', $androidJar, @libs;                                       # Jar files for javac
+
+    my $r = xxx("javac -g -source  7 -target 7 -cp $J -d $classes $j");
+    $android->logMessage($r) if $r;
     $r !~ /error/ or confess "Java errors\n";
-    $android->logMessage($r);
    }
 
   if (1)                                                                        # Dx
-   {makePath($classes);
-    my $r = xxx("$dx --dex --force-jumbo --output $classes.dex $classes");
+   {my $j = join ' ', @libs;                                                    # Jar files to include in dex
+    my $r = xxx("$dx --dex --force-jumbo --output $classes.dex $classes $j");
     $android->logMessage($r);
    }
 
@@ -549,14 +486,55 @@ sub make
    }
  }
 
-#-------------------------------------------------------------------------------
-# Lint app
-#-------------------------------------------------------------------------------
+#1 Methods and attributes
 
-sub lint
- {my ($android)  = @_;
+sub new()                                                                       #S Create a new default build
+ {bless{action     =>qq(run),
+        activity   =>qw(Activity),
+        device     =>qq(emulator-5554),
+        home       =>$home,
+        icon       =>'icon.png',
+        log        =>[],
+        parameters =>'',
+        permissions=>$permissions,
+        version    =>$version};
+ }
+
+if (1) {                                                                        # Parameters that can be set by the caller - see the pod at the end of this file for a complete description of what each parameter does
+  genLValueScalarMethods(qw(activity));                                         # Activity name, default is B<Activity> this the name of the activity to start on the L<device|/device> is L<package|/package>/L<activity|/activity>
+  genLValueScalarMethods(qw(buildTools));                                       # Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
+  genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B<./tmp>
+  genLValueScalarMethods(qw(classes));                                          # A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against
+  genLValueScalarMethods(qw(debug));                                            # Make the app debuggable if this option is true
+  genLValueScalarMethods(qw(device));                                           # Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per qx(man adb)
+  genLValueScalarMethods(qw(icon));                                             # Jpg file containing a picture that will be converted and scaled by L<ImageMagick|http://imagemagick.org/script/index.php> to make an icon for the app, default is B<icon.jpg>
+  genLValueScalarMethods(qw(keyAlias));                                         # Alias used in the java keytool to name the key to be used to sign this app. See L<Signing key|/Signing key> for how to generate a key.
+  genLValueScalarMethods(qw(keyStoreFile));                                     # Name of key store file.  See L<Signing key|/Signing key> for how to generate a key.
+  genLValueScalarMethods(qw(keyStorePwd));                                      # Password of key store file.  See L<Signing key|/Signing key> for how to generate a key.
+  genLValueArrayMethods (qw(libs));                                             # A reference to an array of jar files to be copied into the app build to be used as libraries.
+  genLValueScalarMethods(qw(lintFile));                                         # A file to be linted with the L<lint|/lint> action using the android L<platform|/platform> and the L<classes|/classes> specified.
+  genLValueArrayMethods (qw(log));                                              # Output: a reference to an array of messages showing all the non fatal errors produced by this running this build. To catch fatal error enclose L<build|/build>with 𝗲𝘃𝗮𝗹 {}
+  genLValueScalarMethods(qw(package));                                          # The package name to be used in the manifest and to start the app - the file containing the L<activity|/activity> for the app should be in this package
+  genLValueScalarMethods(qw(parameters));                                       # Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app.
+  genLValueArrayMethods (qw(permissions));                                      # A reference to an array of permissions, a standard useful set is applied by default if none are specified.
+  genLValueScalarMethods(qw(platform));                                         # Folder containing B<android.jar>. For example B<~/Android/sdk/platforms/25.0.2>
+  genLValueScalarMethods(qw(platformTools));                                    # Folder containing L<adb|https://developer.android.com/studio/command-line/adb.html>
+  genLValueArrayMethods (qw(sdkLevels));                                        # [minSdkVersion, targetSdkVersion], default is [15, 25]
+  genLValueArrayMethods (qw(src));                                              # A reference to an array of java source files to be compiled to create this app
+  genLValueScalarMethods(qw(title));                                            # Title of app, the default is name of app
+  genLValueScalarMethods(qw(version));                                          # Version of app, default is today's date
+ }
+
+sub compile($)                                                                  # Compile the app
+ {my ($android)  = @_;                                                          # Android build
+  $android->create;
+  $android->make;                                                               # Compile the app
+ }
+
+sub lint($)                                                                     # Lint all the source code java files for the app
+ {my ($android)  = @_;                                                          # Android build
   my $src        = $android->getLintFile;
-  my $androidJar = $android->androidJar;
+  my $androidJar = $android->getAndroidJar;
   my $area       = $android->classes // 'Classes';
   makePath($area);
   my $cmd = qq(javac *.java -d $area -cp $androidJar:$area);                    # Android, plus locally created classes
@@ -566,17 +544,14 @@ sub lint
    }
  }
 
-#-------------------------------------------------------------------------------
-# Install app
-#-------------------------------------------------------------------------------
-
-sub install
- {my ($android)  = @_;
+sub install($)                                                                  # Install an already L<compiled|/compile> app on the selected L<device|/device>:
+ {my ($android)  = @_;                                                          # Android build
   my $apk        = $android->apk;
-  my $device     = $android->device;
+  my $device     = $android->getDevice;
   my $package    = $android->getPackage;
-  my $activity   = $android->activity;
-  my $adb        = $android->getAdb." -s $device";
+  my $activity   = $android->activityX;
+  my $adb        = $android->getAdb." $device ";
+
   if (1)
    {my $c = "$adb install -r $apk";
     my $r = xxx($c);
@@ -591,86 +566,33 @@ sub install
    }
  }
 
-#-------------------------------------------------------------------------------
-# Actions
-#-------------------------------------------------------------------------------
-
-sub compile                                                                     # Create, make
- {my ($android)  = @_;
-  $android->create;
-  $android->make;                                                               # Command
- }
-
-sub run                                                                         # Create, make, install
- {my ($android)  = @_;
+sub run($)                                                                      # L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
+ {my ($android)  = @_;                                                          # Android build
   $android->compile;
   $android->install;                                                            # Perform compile
  }                                                                              # Install and run
 
-#-------------------------------------------------------------------------------
-# Perform actions
-#-------------------------------------------------------------------------------
-
-sub build
- {my ($android, @actions) = @_;
-  @actions = ($android->action) unless @actions;                                # Default action if no action supplied
-
-  while(@actions)
-   {local $_ = shift @actions;
-
-    if    (/\A-*run\z/i)     {$android->run}                                    # Run app
-    elsif (/\A-*compile\z/i) {$android->compile}                                # Compile app
-    elsif (/\A-*lint\z/i)    {$android->lint}                                   # Lint source
-    elsif (/\A-*install\z/i) {$android->install}                                # Install on emulator
-    else
-     {confess"Ignored unknown command: $_\n";
-     }
-   }
-  $android->logMessage("Normal finish for Android::Build");
- }
-
-#-------------------------------------------------------------------------------
-# Test
-#-------------------------------------------------------------------------------
-
-sub test
- {eval join('', <Android::Build::DATA>) || die $@
- }
-
-test unless caller();
-
-# Documentation
-#extractDocumentation unless caller;
-
-#-------------------------------------------------------------------------------
-# Export
-#-------------------------------------------------------------------------------
-
-require Exporter;
-
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-
-@ISA          = qw(Exporter);
-@EXPORT       = qw();
-@EXPORT_OK    = qw();
-%EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
-
-1;
+# podDocumentation
 
 =encoding utf-8
 
 =head1 Name
 
-Android::Build - lint, compile, install, start an Android App using the command
-line tools minus ant and gradle.
+Android::Build - L<lint|/lint>, L<compile|/compile>, L<install|/install>,
+L<run|/run> an Android App using the command line tools minus ant and gradle
+thus freeing development effort from the strictures imposed by android studio.
 
 =head1 Prerequisites
 
  sudo apt-get install imagemagick zip openjdk-8-jdk
  sudo cpan install Data::Table::Text Data::Dump Carp POSIX File::Copy;
 
-You will need a version of the 𝗔𝗻𝗱𝗿𝗼𝗶𝗱 build tools. You can get these tools by
-first downloading:
+You will need a version of the
+L<Android Build Tools|https://developer.android.com/studio/index.html>
+as specified right at the end of the page below all the inappropriate
+advertising for Android Studio.
+
+Download:
 
   https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 
@@ -681,248 +603,266 @@ for example:
 
 =head1 Synopsis
 
-This file which can be found in the tar.gz file containing this module:
-
-  SampleApp/perl/makeWithperl.pl
-
-contains:
-
  use Android::Build;
 
- my $a = &Android::Build::new();
+ my $a = &Android::Build::new();                                                # Create new builder
 
- $a->buildTools    = qq(/home/phil/Android/sdk/build-tools/25.0.2/);   # Android SDK Build tools folder
- $a->icon          = qq(/home/phil/images/Jets/EEL.jpg);               # Image that will be scaled to make an icon using Imagemagick - the English Electric Lightening
- $a->keyAlias      = qq(xxx);                                          # Alias of key to be used to sign this app
- $a->keyStoreFile  = qq(/home/phil/keystore/release-key.keystore);     # Key store file
- $a->keyStorePwd   = qq(xxx);                                          # Password for key store file
- $a->package       = qq(com.appaapps.genapp);                          # Package name containing the activity for this app
- $a->platform      = qq(/home/phil/Android/sdk/platforms/android-25/); # Android SDK platform folder
- $a->platformTools = qq(/home/phil/Android/sdk/platform-tools/);       # Android SDK platform tools folder
- $a->title         = qq(Generic App);                                  # Title of the app as seen under the icon
+ $a->buildTools    = qq(~/Android/sdk/build-tools/25.0.2/);                     # Android SDK Build tools folder
+ $a->icon          = qq(~/images/Jets/EEL.jpg);                                 # Image that will be scaled to make an icon using Imagemagick - the English Electric Lightening
+ $a->keyAlias      = qq(xxx);                                                   # Alias of key to be used to sign this app
+ $a->keyStoreFile  = qq(~/keystore/release-key.keystore);                       # Key store file
+ $a->keyStorePwd   = qq(xxx);                                                   # Password for key store file
+ $a->package       = qq(com.appaapps.genapp);                                   # Package name containing the activity for this app
+ $a->platform      = qq(~/Android/sdk/platforms/android-25/);                   # Android SDK platform folder
+ $a->platformTools = qq(~/Android/sdk/platform-tools/);                         # Android SDK platform tools folder
+ $a->src           = [q(~/AndroidBuild/SampleApp/src/Activity.java)];           # Source code for the app
+ $a->title         = qq(Generic App);                                           # Title of the app as seen under the icon
 
- $a->run;                                                              # Build, install and run the app on the only emulator
+ $a->run;                                                                       # Build, install and run the app on the only emulator
 
-Modify the values above to reflect your local environment, then start an
-emulator and run:
+Modify the code above to reflect your local environment, then start an emulator
+and run the modified code to compile your app and load it into the emulator.
 
- cd SampleApp/perl/ && perl makeWithPerl.pl
+=head2 Sample App
 
-to compile the sample app and load it into the emulator.
+A sample app is included in folder:
+
+ ./SampleApp
+
+Modify the values in
+
+ ./SampleApp/perl/makeWithPerl.pl
+
+to reflect your local environment, then start an emulator and run:
+
+ perl ./SampleApp/perl/makeWithPerl.pl
+
+to compile the sample app and load it into the running emulator.
+
+=head2 Signing key
 
 If you do not already have a signing key, you can create one with the supplied
 script:
 
- SampleApp/perl/generateAKey.pl
+ ./SampleApp/perl/generateAKey.pl
 
-=head1 File layout
+=head1 Description
 
-A sample file layout is included in folder:
+The following sections describe the methods in each functional area of this
+module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
- SampleApp/
 
-If your 𝗔𝗻𝗱𝗿𝗼𝗶𝗱 build description is in file:
 
- /somewhere/$folder/perl/makeWithPerl.pl
+=head1 Methods and attributes
 
-then by default the Java source and libraries (jar files) for your app should
-be in:
+=head2 new()
 
- /somewhere/$folder/src/*.java
- /somewhere/$folder/libs/*.jar
+Create a new default build
 
-These files will be copied into the 𝗯𝘂𝗶𝗹𝗱𝗙𝗼𝗹𝗱𝗲𝗿 before starting the build of
-your app.
 
-If this does not meet your requirements, then provide a 𝘀𝘂𝗯 {}
+This is a static method and so should be invoked as:
 
- $a->copyFiles = sub ...
+  Android::Build::new
 
-which will be called just before the build begins to allow you to copy any
-other files into the 𝗯𝘂𝗶𝗹𝗱𝗙𝗼𝗹𝗱𝗲𝗿.
 
-=head1 Actions
+=head2 activity :lvalue
 
-The following actions are available:
+Activity name, default is B<Activity> this the name of the activity to start on the L<device|/device> is L<package|/package>/L<activity|/activity>
 
-=head2 compile
 
-To compile your app:
+=head2 buildTools :lvalue
 
- $android->compile
+Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
 
-=head2 lint
 
-To lint a file in your app:
+=head2 buildFolder :lvalue
 
- $android->lintFile = ...
- $android->lint
+Name of a folder in which to build the app, The default is B<./tmp>
 
-Set the file to be linted with L<"lintFile">. You can add a folder of
-precompiled classes to the lint with L<"classes">.  𝗮𝗻𝗱𝗿𝗼𝗶𝗱.𝗷𝗮𝗿  will also be
-added to the lint class path.
 
-=head2 install
+=head2 classes :lvalue
 
-To install and already compiled app on the selected L<"device">:
+A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against
 
- $android->install
 
-=head2 run
+=head2 debug :lvalue
 
-As described in L<"Synopsis">
+Make the app debuggable if this option is true
 
- $android->run
 
-will compile your app and if the compile is successful, install it on the
-selected L<"device"> and run it.
+=head2 device :lvalue
 
-=head1 Parameters
+Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per qx(man adb)
 
-You can customise your build by assigning to or reading from the following
-methods:
 
-=head2 activity
+=head2 icon :lvalue
 
-Activity name, default is '
+Jpg file containing a picture that will be converted and scaled by L<ImageMagick|http://imagemagick.org/script/index.php> to make an icon for the app, default is B<icon.jpg>
 
- Activity
 
-The name of the class to start on the L<"device"> is the concatenation of:
+=head2 keyAlias :lvalue
 
- package . '/.'. activity
+Alias used in the java keytool to name the key to be used to sign this app. See L<Signing key|/Signing key> for how to generate a key.
 
-=head2 buildTools
 
-Name of the folder containing the build tools to be used to build the app. See
-L<"Prerequisites">
+=head2 keyStoreFile :lvalue
 
-=head2 buildFolder
+Name of key store file.  See L<Signing key|/Signing key> for how to generate a key.
 
-Name of a folder in which to build the app. The default is
 
- ../tmp
+=head2 keyStorePwd :lvalue
 
-This folder will be cleared (without warning) before the app is built.
+Password of key store file.  See L<Signing key|/Signing key> for how to generate a key.
 
-=head2 classes
 
-A folder containing precompiled java classes that you wish to L<"lint"> against.
+=head2 libs :lvalue
 
-=head2 copyFiles
+A reference to an array of jar files to be copied into the app build to be used as libraries.
 
-𝘀𝘂𝗯 {} to copy additional files into the app before it is complied
 
-=head2 debug
+=head2 lintFile :lvalue
 
-Make the app debuggable if specified and true.
+A file to be linted with the L<lint|/lint> action using the android L<platform|/platform> and the L<classes|/classes> specified.
 
-=head2 device
 
-Device to run on, default is the only emulator.
+=head2 log :lvalue
 
-=head2 icon
+Output: a reference to an array of messages showing all the non fatal errors produced by this running this build. To catch fatal error enclose L<build|/build>with 𝗲𝘃𝗮𝗹 {}
 
-A file containing a picture that will be converted and scaled using
-𝗜𝗺𝗮𝗴𝗲𝗺𝗮𝗴𝗶𝗰𝗸 to make an icon for the app, default is:
 
- icon.jpg
+=head2 package :lvalue
 
-=head2 keyAlias
+The package name to be used in the manifest and to start the app - the file containing the L<activity|/activity> for the app should be in this package
 
-Alias used in the java keytool to name the key to be used to sign this app. See
-L<"Synopsis"> for how to generate a key.
 
-=head2 keyStoreFile
+=head2 parameters :lvalue
 
-Name of key store file. See L<"Synopsis"> for how to generate a key.
+Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app.
 
-=head2 keyStorePwd
 
-Password of key store file. See L<"Synopsis"> for how to generate a key.
+=head2 permissions :lvalue
 
-=head2 log
+A reference to an array of permissions, a standard useful set is applied by default if none are specified.
 
-Output: message log showing all the none fatal errors produced by this running
-this build.  To catch fatal error enclose with 𝗲𝘃𝗮𝗹 {}
 
-=head2 libs
+=head2 platform :lvalue
 
-Extra libraries (jar files) to be copied into the app build. See also:
-L<"CopyFiles">
+Folder containing B<android.jar>. For example B<~/Android/sdk/platforms/25.0.2>
 
-=head2 lintFile
 
-A file to be linted with the L<"lint"> action using the 𝗮𝗻𝗱𝗿𝗼𝗶𝗱.𝗷𝗮𝗿  and
-L<"classes"> specified.
+=head2 platformTools :lvalue
 
-=head2 package
+Folder containing L<adb|https://developer.android.com/studio/command-line/adb.html>
 
-The value of the package statement in the java file containing the 𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆
-class for this app.  This is the 𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆 that will be started to run the app
 
-=head2 platform
+=head2 sdkLevels :lvalue
 
-The name of the folder containing the 𝗮𝗻𝗱𝗿𝗼𝗶𝗱.𝗷𝗮𝗿  you wish to use.  See the
-notes in L<"Prerequisites">
+[minSdkVersion, targetSdkVersion], default is [15, 25]
 
-=head2 platformTools
 
-The name of the folder containing the  𝗔𝗻𝗱𝗿𝗼𝗶𝗱.𝗷𝗮𝗿  you wish to use.  See the
-notes in L<"Prerequisites">
+=head2 src :lvalue
 
-=head2 parameters
+A reference to an array of java source files to be compiled to create this app
 
-Optional: Parameter string to be placed in folder: 𝗿𝗲𝘀  as a string accessible
-via:
 
- R.string.parameters
+=head2 title :lvalue
 
-from within the app.
+Title of app, the default is name of app
 
-=head2 permissions
 
-Permissions for the app. A standard useful set is supplied by default if none
-are provided.
+=head2 version :lvalue
 
-=head2 sdkLevels
+Version of app, default is today's date
 
-The sdk levels to be declared for the app in the form:
 
- [minSdkVersion,targetSdkVersion],
+=head2 compile($)
 
-The default is:
+Compile the app
 
- [15,25]
+  1  $android  Android build
 
-=head2 src
+=head2 lint($)
 
-Optional: Source of app, default is everything in the:
+Lint all the source code java files for the app
 
-  ../src
+  1  $android  Android build
 
-folder.
+=head2 install($)
 
-The source files do not have to be positioned within the domain name hierarchy,
-you can for instance have all your source files at the root of source directory
-or anywhere below it if that is more convenient. This module compiles all java
-files found under the source directory plus any others that have been copied
-into the app 𝗯𝘂𝗶𝗹𝗱𝗙𝗼𝗹𝗱𝗲𝗿 by the 𝗰𝗼𝗽𝘆𝗳𝗶𝗹𝗲 option. The only requirements is that
-each java file use a package statement to declare its final position in the
-domain name hierarchy.
+Install an already L<compiled|/compile> app on the selected L<device|/device>:
 
-=head2 title
+  1  $android  Android build
 
-Title of app, default is the last word of the package name. This title will
-appear below the app icon on the 𝗔𝗻𝗱𝗿𝗼𝗶𝗱 device display.
+=head2 run($)
 
-=head2 version
+L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
 
-Optional: Version of app, default is today's date
+  1  $android  Android build
+
+
+=head1 Index
+
+
+1 L<activity|/activity>
+
+2 L<buildFolder|/buildFolder>
+
+3 L<buildTools|/buildTools>
+
+4 L<classes|/classes>
+
+5 L<compile|/compile>
+
+6 L<debug|/debug>
+
+7 L<device|/device>
+
+8 L<icon|/icon>
+
+9 L<install|/install>
+
+10 L<keyAlias|/keyAlias>
+
+11 L<keyStoreFile|/keyStoreFile>
+
+12 L<keyStorePwd|/keyStorePwd>
+
+13 L<libs|/libs>
+
+14 L<lint|/lint>
+
+15 L<lintFile|/lintFile>
+
+16 L<log|/log>
+
+17 L<new|/new>
+
+18 L<package|/package>
+
+19 L<parameters|/parameters>
+
+20 L<permissions|/permissions>
+
+21 L<platform|/platform>
+
+22 L<platformTools|/platformTools>
+
+23 L<run|/run>
+
+24 L<sdkLevels|/sdkLevels>
+
+25 L<src|/src>
+
+26 L<title|/title>
+
+27 L<version|/version>
 
 =head1 Installation
 
-Standard Module::Build process for building and installing modules:
+This module is written in 100% Pure Perl and, thus, it is easy to read, use,
+modify and install.
+
+Standard L<Module::Build> process for building and installing modules:
 
   perl Build.PL
   ./Build
@@ -931,20 +871,37 @@ Standard Module::Build process for building and installing modules:
 
 =head1 Author
 
-philiprbrenan@gmail.com
+L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
 
-http://www.appaapps.com
+L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2017 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl itself.
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
 
 =cut
-# pod2html --infile Build.pm --outfile ~/zzz.html && rm pod2htmd.tmp
 
+
+
+# Tests and documentation
+
+sub test
+ {my $p = __PACKAGE__;
+  binmode($_, ":utf8") for *STDOUT, *STDERR;
+  return if eval "eof(${p}::DATA)";
+  my $s = eval "join('', <${p}::DATA>)";
+  $@ and die $@;
+  eval $s;
+  $@ and die $@;
+ }
+
+test unless caller;
+
+1;
+# podDocumentation
 __DATA__
 use Test::More tests => 1;
 

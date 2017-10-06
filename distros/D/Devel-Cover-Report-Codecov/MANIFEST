@@ -16,7 +16,6 @@ lib/Devel/Cover/Report/Codecov/Service/Magnum.pm
 lib/Devel/Cover/Report/Codecov/Service/Mercurial.pm
 lib/Devel/Cover/Report/Codecov/Service/Semaphore.pm
 lib/Devel/Cover/Report/Codecov/Service/Shippable.pm
-lib/Devel/Cover/Report/Codecov/Service/Snap.pm
 lib/Devel/Cover/Report/Codecov/Service/Travis.pm
 lib/Devel/Cover/Report/Codecov/Service/Wercker.pm
 minil.toml
@@ -33,6 +32,7 @@ t/codecov/get_request_url.t
 t/codecov/get_services.t
 t/codecov/report.t
 t/codecov/send_report.t
+t/codecov/send_report_once.t
 t/codecov/service/appveyor/configuration.t
 t/codecov/service/appveyor/detect.t
 t/codecov/service/drone/configuration.t
@@ -50,8 +50,6 @@ t/codecov/service/semaphore/configuration.t
 t/codecov/service/semaphore/detect.t
 t/codecov/service/shippable/configuration.t
 t/codecov/service/shippable/detect.t
-t/codecov/service/snap/configuration.t
-t/codecov/service/snap/detect.t
 t/codecov/service/travis/configuration.t
 t/codecov/service/travis/detect.t
 t/codecov/service/wercker/configuration.t

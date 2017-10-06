@@ -4,7 +4,7 @@
       "Jiro Nishiguchi <jiro@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "mit"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Digest::FarmHash" : {
          "file" : "lib/Digest/FarmHash.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,9 @@
          "web" : "https://github.com/spiritloose/Digest-FarmHash"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.02",
+   "x_contributors" : [
+      "Jiro Nishiguchi <spiritloose@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

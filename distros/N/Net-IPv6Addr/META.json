@@ -47,7 +47,7 @@
          "web" : "https://github.com/benkasminbullock/net-ipv6addr"
       }
    },
-   "version" : "0.7",
+   "version" : "0.91",
    "x_bugtracker" : {
       "web" : "https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr"
    },
@@ -55,7 +55,8 @@
       "Jyrki Soini",
       "Joacim Haggmark",
       "Ben Bullock <bkb@cpan.org>",
-      "Neil Bowers <neilb@cpan.org>"
+      "Neil Bowers <neilb@cpan.org>",
+      "Salvador FandiÃ±o GarcÃ­a <salva@cpan.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

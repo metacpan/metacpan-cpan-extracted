@@ -92,6 +92,7 @@ subtest 'process is_running()' => sub {
       close(PARENT);
       open STDERR, ">&", \*CHILD or die $!;
       print STDERR "FOOBAZFTW\n";
+      1 while 1;
     });
   $p->restart()->restart()->restart();
   is $p->is_running, 1, "Process now is running";

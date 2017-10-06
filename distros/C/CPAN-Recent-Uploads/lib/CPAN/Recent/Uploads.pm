@@ -1,5 +1,5 @@
 package CPAN::Recent::Uploads;
-$CPAN::Recent::Uploads::VERSION = '0.12';
+$CPAN::Recent::Uploads::VERSION = '0.14';
 #ABSTRACT: Find the distributions recently uploaded to CPAN
 
 use strict;
@@ -81,7 +81,7 @@ CPAN::Recent::Uploads - Find the distributions recently uploaded to CPAN
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

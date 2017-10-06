@@ -12,29 +12,19 @@ To install this module, run the following commands:
     make test
     make install
 
-Alternatively, to install with Module::Build, you can use the following commands:
-
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
-
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+    Clone
     Moose
-    MooseX::StrictConstructor
-    Moose
+    Moose::Util::TypeConstraints
     MooseX::StrictConstructor
     namespace::autoclean
-    syntax
-    Syntax::Feature::Method
-    Clone
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2011 - 2012,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

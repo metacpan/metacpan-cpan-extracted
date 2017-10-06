@@ -43,7 +43,7 @@ $model_to_test = "MiniPlain";
 
     sub write {
         my $self = shift;
-        mylog("dummy write called");
+        my_log("dummy write called");
         return 1;
     }
 }

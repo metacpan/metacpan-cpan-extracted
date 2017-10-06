@@ -21,11 +21,11 @@ no_index:
     - inc
 requires:
   Calendar::Plugin::Renderer: '0.12'
-  Date::Hebrew::Simple: '0.02'
+  Date::Hebrew::Simple: '0.04'
   Moo: '2.000000'
   namespace::clean: '0.24'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Hebrew.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

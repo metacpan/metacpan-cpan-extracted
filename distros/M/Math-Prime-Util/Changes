@@ -1,5 +1,35 @@
 Revision history for Perl module Math::Prime::Util
 
+0.67 2017-09-23
+
+    [ADDED]
+
+    - lastfor                         stops forprimes (etc.) iterations
+    - is_square(n)                    returns 1 if n is a perfect square
+    - is_polygonal(n,k)               returns 1 if n is a k-gonal number
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - shuffle prototype is @ instead of ;@, so matches List::Util.
+
+    - On Perl 5.8 and earlier we will call PP instead of trying
+      direct-to-GMP.  Works around a bug in XS trying to turn the
+      result into an object where 5.8.7 and earlier gets lost.
+
+    - We create more const integers, which speeds up common uses of
+      permutations.
+
+    - CSPRNG now stores context per-thread rather than using a single
+      mutex-protected context.  This speeds up anything using random
+      numbers a fair amount, especially with threaded Perls.
+
+    - With the above two optimizations, randperm(144) is 2.5x faster.
+
+    - threading test has threaded srand/irand test added back in, showing
+      context is per-thread.  Each thread gets its own sequence and calls
+      to srand/csrand and using randomness doesn't impact other threads.
+
+
 0.66 2017-09-12
 
     [ADDED]

@@ -1,4 +1,13 @@
-v1.0.0
+v1.0.1  2017-10-03
+	* BUGFIX: remove /n/ as final-position pronunciation of ລ/ຣ
+	* BUGFIX: remove useless/misspelled vowel Xັວ
+	* IMPROVEMENT: LLONLP::Romanize::romanize_syllable() accepts an
+		analysis result from LLONLP::Analyze now, for significant
+		savings when you need both analysis and romanization.
+	* IMPROVEMENT: add glottal stop symbol in IPA for ະ
+	* IMPROVEMENT: small regexp optimization
+
+v1.0.0  2017-07-30
 	* BUGFIX: LAO VOWEL SIGN AM was "normalized" to the wrong character
 		order when used after a tone mark.
 	* BUGFIX: completely reworked the seriously broken tone rules.
@@ -8,7 +17,7 @@ v1.0.0
 	* IMPROVEMENT: Lingua::LO::NLP now accepts constructor options (one,
 	  actually) to use as defaults for other methods.
 
-v0.2.0
+v0.2.0  2017-02-28
 	* BUGFIX: add missing diphthongs ເ◌ີຍ and ເ◌ິຍ
 	* BUGFIX: Lingua::LO::NLP::Romanize::hyphen did not allow
 		to turn off hyphenation with an undef value as that

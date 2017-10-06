@@ -1,7 +1,12 @@
 use strict;
 use warnings;
 use utf8;
-use Lingua::JA::KanjiTable qw/InJinmeiyoKanji InJinmeiyouKanji InJinmeiyoKanji20101130 InJinmeiyouKanji20101130 InJinmeiyoKanji20150107 InJinmeiyouKanji20150107/;
+use Lingua::JA::KanjiTable qw/
+    InJinmeiyoKanji          InJinmeiyouKanji
+    InJinmeiyoKanji20101130  InJinmeiyouKanji20101130
+    InJinmeiyoKanji20150107  InJinmeiyouKanji20150107
+    InJinmeiyoKanji20170925  InJinmeiyouKanji20170925
+/;
 use Test::More;
 
 binmode Test::More->builder->$_ => ':utf8'
@@ -21,7 +26,9 @@ ok(/^\p{InJinmeiyouKanji}+$/,         'Jinmeiyou Kanji latest');
 ok(/^\p{InJinmeiyoKanji20101130}+$/,   'Jinmeiyo Kanji 2010-11-30');
 ok(/^\p{InJinmeiyouKanji20101130}+$/, 'Jinmeiyou Kanji 2010-11-30');
 ok(/^\p{InJinmeiyoKanji20150107}+$/,   'Jinmeiyo Kanji 2015-01-07');
-ok(/^\p{InJinmeiyouKanji20150107}+$/, 'Jinmeiyou Kanji 2010-01-07');
+ok(/^\p{InJinmeiyouKanji20150107}+$/, 'Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,   'Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/, 'Jinmeiyou Kanji 2017-09-25');
 
 ok('a' !~ /^\p{InJinmeiyouKanji}+$/, 'not Jinmeiyou Kanji');
 
@@ -34,10 +41,29 @@ for my $char ( split(//) )
     ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
 }
 
-ok(/^\p{InJinmeiyouKanji}+$/,             'Jinmeiyou Kanji latest');
-ok( ! /^\p{InJinmeiyoKanji20101130}+$/,   '"巫" is not in Jinmeiyo Kanji 2010-11-30');
-ok( ! /^\p{InJinmeiyouKanji20101130}+$/,  '"巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok(/^\p{InJinmeiyouKanji}+$/,            'Jinmeiyou Kanji latest');
+ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  '"巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyouKanji20101130}+$/, '"巫" is not in Jinmeiyou Kanji 2010-11-30');
 ok(/^\p{InJinmeiyoKanji20150107}+$/,      'Jinmeiyo Kanji 2015-01-07');
-ok(/^\p{InJinmeiyouKanji20150107}+$/,     'Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyouKanji20150107}+$/,    'Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,      'Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/,    'Jinmeiyou Kanji 2017-09-25');
+
+
+$_ .= '渾'; # Added on 09/25/2017
+is(length $_, 863, '863 kanji');
+
+for my $char ( split(//) )
+{
+    ok( $char =~ /^\p{InJinmeiyoKanji}$/, "$char: U+" . sprintf("%04X", ord $char) );
+}
+
+ok(/^\p{InJinmeiyouKanji}+$/,            'Jinmeiyou Kanji latest');
+ok( ! /^\p{InJinmeiyoKanji20101130}+$/,  '"巫" is not in Jinmeiyo Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyouKanji20101130}+$/, '"巫" is not in Jinmeiyou Kanji 2010-11-30');
+ok( ! /^\p{InJinmeiyoKanji20150107}+$/,  '"渾" is not in Jinmeiyo Kanji 2015-01-07');
+ok( ! /^\p{InJinmeiyouKanji20150107}+$/, '"渾" is not in Jinmeiyou Kanji 2015-01-07');
+ok(/^\p{InJinmeiyoKanji20170925}+$/,      'Jinmeiyo Kanji 2017-09-25');
+ok(/^\p{InJinmeiyouKanji20170925}+$/,    'Jinmeiyou Kanji 2017-09-25');
 
 done_testing;

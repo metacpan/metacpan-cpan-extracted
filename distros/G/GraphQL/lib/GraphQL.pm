@@ -6,26 +6,15 @@ use warnings;
 
 =head1 NAME
 
-GraphQL - A reference implementation of the GraphQL spec in Perl.
+GraphQL - Perl implementation of GraphQL
 
 =cut
 
-our $VERSION = '0.07';
-
-=head1 SYNOPSIS
-
-Perhaps a little code snippet.
-
-    use GraphQL;
-    my $foo = GraphQL->new();
-
-=head1 DESCRIPTION
-
-See L<GraphQL::Type> for description of how to create GraphQL types.
-
-=head1 PROJECT STATUS
+our $VERSION = '0.10';
 
 =begin markdown
+
+# PROJECT STATUS
 
 | OS      |  Build status |
 |:-------:|--------------:|
@@ -35,67 +24,132 @@ See L<GraphQL::Type> for description of how to create GraphQL types.
 
 =end markdown
 
+=head1 SYNOPSIS
+
+  use GraphQL::Schema;
+  use GraphQL::Type::Object;
+  use GraphQL::Type::Scalar qw($String);
+  use GraphQL::Execution;
+
+  my $schema = GraphQL::Schema->new(query => GraphQL::Type::Object->new(
+    name => 'QueryRoot',
+    fields => {
+      helloWorld => { type => $String, resolve => sub { 'Hello world!' } },
+    },
+  ));
+  post '/graphql' => sub {
+    send_as JSON => GraphQL::Execution->execute(
+      $schema,
+      body_parameters->{query},
+      undef,
+      undef,
+      body_parameters->{variables},
+      body_parameters->{operationName},
+      undef,
+    );
+  };
+
+The above is from L<the sample Dancer 2 applet|https://github.com/graphql-perl/sample-dancer2>.
+
+=head1 DESCRIPTION
+
+This module is a port of the GraphQL reference implementation,
+L<graphql-js|https://github.com/graphql-js/graphql-js>, to Perl 5.
+
+See L<GraphQL::Type> for description of how to create GraphQL types.
+
+=head2 Introduction to GraphQL
+
+GraphQL is a technology that lets clients talk to APIs via a single
+endpoint, which acts as a single "source of the truth". This means clients
+do not need to seek the whole picture from several APIs. Additionally,
+it makes this efficient in network traffic, time, and programming effort:
+
+=over
+
+=item Network traffic
+
+The request asks for exactly what it wants, which it gets, and no
+more. No wasted traffic.
+
+=item Time
+
+It gets all the things it needs in one go, including any connected
+resources, so it does not need to make several requests to fill its
+information requirement.
+
+=item Programming effort
+
+With "fragments" that can be attached to user-interface components,
+keeping track of what information a whole page needs to request can be
+automated. See L<Relay|https://facebook.github.io/relay/> or
+L<Apollo|http://dev.apollodata.com/> for more on this.
+
+=back
+
+=head2 Basic concepts
+
+GraphQL implements a system featuring a L<schema|GraphQL::Schema>,
+which features various classes of L<types|GraphQL::Type>, some of which
+are L<objects|GraphQL::Type::Object>. Special objects provide the roots
+of queries (mandatory), and mutations and subscriptions (both optional).
+
+Objects have fields, each of which can be specified to take arguments,
+and which have a return type. These are effectively the properties and/or
+methods on the type. If they return an object, then a query can specify
+subfields of that object, and so on - as alluded to in the "time-saving"
+point above.
+
+For more, see the JavaScript tutorial in L</"SEE ALSO">.
+
+=head2 Hooking your system up to GraphQL
+
+You will need to decide how to model your system in GraphQL terms. This
+will involve deciding on what L<output object types|GraphQL::Type::Object>
+you have, what fields they have, and what arguments and return-types
+those fields have.
+
+Additionally, you will need to design mutations if you want to be able
+to update/create/delete data. This requires some thought for return types,
+to ensure you can get all the information you need to proceed to avoid
+extra round-trips.
+
+Finally, you should consider whether you need "subscriptions". These
+are designed to hook into WebSockets. Apollo has a L<JavaScript
+module|https://github.com/apollographql/graphql-subscriptions> for this.
+
+Specifying types and fields is straightforward. See L<the
+document|GraphQL::Type::Library/FieldMapOutput> for how to make resolvers.
+
+=head1 DEBUGGING
+
+To debug, set environment variable C<GRAPHQL_DEBUG> to a true value.
+
 =head1 EXPORT
 
 None yet.
 
-=head1 SUBROUTINES/METHODS
+=head1 SEE ALSO
 
-=head2 function1
+L<http://facebook.github.io/graphql/> - GraphQL specification
 
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
+L<http://graphql.org/graphql-js/> - Tutorial on the JavaScript version,
+highly recommended.
 
 =head1 AUTHOR
 
 Ed J, C<< <etj at cpan.org> >>
 
-The creation of this work has been sponsored by Perl Careers:
-L<https://perl.careers/>.
-
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-graphql at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on
+L<https://github.com/graphql-perl/graphql-perl/issues>.
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc GraphQL
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=GraphQL>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/GraphQL>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/GraphQL>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/GraphQL>
-
-=back
-
+Or, if you prefer email and/or RT: to C<bug-graphql
+at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=GraphQL>. I will be
+notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -111,36 +165,6 @@ under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 

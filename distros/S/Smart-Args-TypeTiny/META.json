@@ -1,0 +1,80 @@
+{
+   "abstract" : "We are smart, smart for you",
+   "author" : [
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Smart-Args-TypeTiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PadWalker" : "0",
+            "Type::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test2" : "0",
+            "Test2::Suite" : "0.000077"
+         }
+      }
+   },
+   "provides" : {
+      "Smart::Args::TypeTiny" : {
+         "file" : "lib/Smart/Args/TypeTiny.pm",
+         "version" : "0.02"
+      },
+      "Smart::Args::TypeTiny::Check" : {
+         "file" : "lib/Smart/Args/TypeTiny/Check.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akiym/Smart-Args-TypeTiny/issues"
+      },
+      "homepage" : "https://github.com/akiym/Smart-Args-TypeTiny",
+      "repository" : {
+         "url" : "git://github.com/akiym/Smart-Args-TypeTiny.git",
+         "web" : "https://github.com/akiym/Smart-Args-TypeTiny"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:AKIYM",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

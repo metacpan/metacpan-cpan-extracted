@@ -1,3 +1,9 @@
+0.234.2 2017-10-05
+
+ Update following deprecations done in Config::Model 2.111:
+    * all models use rw_config (requires Config::Model 2.111)
+    * parse_man: require Config::Model::Itself 2.012
+
 0.234.1 2017-08-27
 
   Systemd model update:

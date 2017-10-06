@@ -4,7 +4,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,10 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Deep" : "0.113",
-            "Test::Exception" : "0.32",
-            "Test::More" : "0.31"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -36,6 +33,13 @@
       "runtime" : {
          "requires" : {
             "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.113",
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.31"
          }
       }
    },
@@ -52,6 +56,6 @@
          "url" : "https://github.com/Humanstate/geo-ip2location-lite"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
+use Graphics::Raylib::Color;
 package Graphics::Raylib::Shape;
 
 # ABSTRACT: Collection of drawable shapes
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -17,6 +18,10 @@ use Graphics::Raylib::XS qw(:all);
 Graphics::Raylib::Shape - Collection of drawable shapes
 
 
+=head1 VERSION
+
+version 0.003
+
 =head1 SYNOPSIS
 
     use Graphics::Raylib::Pixel;
@@ -26,7 +31,7 @@ Graphics::Raylib::Shape - Collection of drawable shapes
     use Graphics::Raylib::Poly;
 
     # example
-    
+
     my $rect = Graphics::Raylib::Rectangle(
         pos   => [0,0],
         size  => [10,10],
@@ -48,11 +53,11 @@ Coordinates and width/height pairs are represented as array-refs to 2 elements
 Call this on any of the following shapes while in a C<Graphics::Raylib::draw> block in order to draw the shape.
 
 Wrap-around progress bar example:
-    
+
     use Graphics::Raylib;
     use Graphics::Raylib::Shape;
     use Graphics::Raylib::Color;
-    
+
     my $block_size = 50;
 
     my $g = Graphics::Raylib->window($block_size*10, $block_size, "Test");
@@ -88,14 +93,15 @@ Prepares a single pixel for drawing.
     package Graphics::Raylib::Shape::Pixel;
     use Graphics::Raylib::XS qw(DrawPixel);
     sub draw { DrawPixel(@{$_[0]->{pos}}, $_[0]->{color} ) }
+    sub color :lvalue { $_[0]->{color}  }
 }
 sub pixel {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = { @_ };
 
-	bless $self, 'Graphics::Raylib::Shape::Pixel';
-	return $self;
+    bless $self, 'Graphics::Raylib::Shape::Pixel';
+    return $self;
 }
 
 
@@ -109,14 +115,15 @@ Prepares a line for drawing.
     package Graphics::Raylib::Shape::Line;
     use Graphics::Raylib::XS qw(DrawLine);
     sub draw { DrawLine(@{$_[0]->{start}}, @{$_[0]->{end}}, $_[0]->{color} ) }
+    sub color :lvalue { $_[0]->{color}  }
 }
 sub line {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = { @_ };
 
-	bless $self, 'Graphics::Raylib::Shape::Line';
-	return $self;
+    bless $self, 'Graphics::Raylib::Shape::Line';
+    return $self;
 }
 
 
@@ -132,14 +139,15 @@ Prepares a circle for drawing.
     package Graphics::Raylib::Shape::Circle;
     use Graphics::Raylib::XS qw(DrawCircle);
     sub draw { DrawCircle( @{$_[0]->{center}}, $_[0]->{radius}, $_[0]->{color} ) }
+    sub color :lvalue { $_[0]->{color}  }
 }
 sub circle {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = { @_ };
 
-	bless $self, 'Graphics::Raylib::Shape::Circle';
-	return $self;
+    bless $self, 'Graphics::Raylib::Shape::Circle';
+    return $self;
 }
 
 
@@ -159,15 +167,16 @@ Prepares a solid color rectangle for drawing. if $color is an arrayref of 2 Colo
             DrawRectangleGradient( @{$_[0]->{pos}}, @{$_[0]->{size}}, @{$_[0]->{color}} )
         }
     }
+    sub color :lvalue { $_[0]->{color}  }
 }
 
 sub rectangle {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = { @_ };
 
-	bless $self, 'Graphics::Raylib::Shape::Rectangle';
-	return $self;
+    bless $self, 'Graphics::Raylib::Shape::Rectangle';
+    return $self;
 }
 
 
@@ -184,32 +193,34 @@ Prepares a triangle for drawing.
         my @v = @{$_[0]->{vertices}};
         DrawTriangle( @{$v[0]}, @{$v[1]}, @{$v[2]}, $_[0]->{color} );
     }
+    sub color :lvalue { $_[0]->{color}  }
 }
 
 sub triangle {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = { @_ };
 
-	bless $self, 'Graphics::Raylib::Shape::Triangle';
-	return $self;
+    bless $self, 'Graphics::Raylib::Shape::Triangle';
+    return $self;
 }
 
 {
     package Graphics::Raylib::Shape::Polygon;
     # TODO: missing
+    sub color :lvalue { $_[0]->{color}  }
 }
 
 =item bitmap( matrix => $AoA, width => $screen_width, height => $screen_height, color => $color )
 
-Prepares a matrix for printing. C<$AoA> is an array of arrays ref. C<$screen_width> and C<$screenheight> are the size of the area on which the Matrix should be drawn. It defaults to the screen size.
+Creates a texture out of a matrix for printing. C<$AoA> is an array of arrays ref. C<$screen_width> and C<$screenheight> are the size of the area on which the Matrix should be drawn. It defaults to the screen size.
 
-if C<$color> is a C<Graphics::Raylib::Color>, it will be used to color all positive $AoA elements. The space occupied by negative and zero elements stays at background color.
+If C<$color> is a C<Graphics::Raylib::Color>, it will be used to color all positive $AoA elements. The space occupied by negative and zero elements stays at background color.
 
-if C<$color> is a code reference, It will be evaluated for each matrix element, with the element's value as argument. The return type of the code reference will be used for the color. Return C<undef>, for omitting the element.
+if $color is a code reference, It will be evaluated for each matrix element, with the element's value as argument. The return type of the code reference will be used for the color. Return C<undef>, for omitting the element.
 
 Example:
-    
+
     use PDL;
     use PDL::Matrix;
 
@@ -245,7 +256,7 @@ Example:
 
     }
 
-See the game of life example at L<Graphics::Raylib> for a more complete example.
+See the game of life example at L<Graphics::Raylib> (or C<t/10-game-of-life.t>) for a more complete example.
 
 =cut
 
@@ -253,38 +264,58 @@ See the game of life example at L<Graphics::Raylib> for a more complete example.
     package Graphics::Raylib::Shape::Bitmap;
     sub draw {
         my $self = shift;
-        my $matrix = $self->{matrix};
+        Graphics::Raylib::Shape::_bitmap($self) if $self->{rebitmap};
 
-        for my $i ( 0 .. $#$matrix ) {
-            for my $j ( 0 .. $#{ $matrix->[$i] } ) {
-                my $color = $self->{color}($matrix->[$i][$j]);
-                Graphics::Raylib::Shape->rectangle(
-                    pos   => [$j*$self->{width}, $i*$self->{height}],
-                    size  => [$self->{width}, $self->{height}],
-                    color => $color,
-                )->draw if defined $color;
-            }
-        }
+        Graphics::Raylib::XS::DrawTexture($self->{texture}, 0, 0, Graphics::Raylib::Color::WHITE);
+    }
+    sub matrix :lvalue {
+        my $self = shift;
+
+        $self->{rebitmap} = 1;
+        $self->{matrix};
+    }
+    sub color :lvalue { $_[0]->{color}  }
+    sub DESTROY {
+          my $self = shift;
+          Graphics::Raylib::XS::UnloadTexture($self->{texture}) if defined $self->{texture};
     }
 }
 
-
-sub bitmap {
-	my $class = shift;
-    
-    my $self = { @_ };
+sub _bitmap {
+    my $self = shift;
 
     unless (defined $self->{height} && defined $self->{width}) {
-        my $maxlen = max map { scalar @$_ } @{$self->{matrix}};
+        my $maxheight = scalar @{$self->{matrix}};
+        my $maxwidth  = max map { scalar @$_ } @{$self->{matrix}};
 
         # cell sizes
-        $self->{width} = GetScreenWidth()  / ($maxlen-1);
-        $self->{height}   = GetScreenHeight() / $#{$self->{matrix}};
+        $self->{width}  = GetScreenWidth()  / ($maxwidth-1);
+        $self->{height} = GetScreenHeight() / ($maxheight-1);
     }
-    my $color = $self->{color};
-    $self->{color} = sub { pop > 0 ? $color : undef }
-        unless ref($color) eq 'CODE';
 
+    my $color = $self->{color} // Graphics::Raylib::Color::GOLD;
+    $self->{color} = ref($color) eq 'CODE' ? $color : sub { shift > 0 ? $color : undef };
+
+    unless ($self->{uninitialized}) {
+        $self->{image} = LoadImageFromAV($self->{matrix}, $self->{color}, $self->{width}, $self->{height});
+    } else {
+        $self->{image} = LoadImageFromAV_uninitialized_mem($self->{matrix}, $self->{color}, $self->{width}, $self->{height});
+    }
+    if (defined $self->{texture}) {
+        UpdateTextureFromImage($self->{texture}, $self->{image});
+    } else {
+        $self->{texture} = LoadTextureFromImage($self->{image});
+    }
+    UnloadImage($self->{image});
+
+    $self->{rebitmap} = 0;
+}
+
+sub bitmap {
+    my $class = shift;
+    my $self = { uninitialized => 0, @_ };
+
+    _bitmap($self);
 
     bless $self, 'Graphics::Raylib::Shape::Bitmap';
     return $self;

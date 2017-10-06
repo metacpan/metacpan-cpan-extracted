@@ -35,22 +35,20 @@
 "use strict";
 
 define ([
+    'QUnit',
     'cf',
     'current-user',
     'lib'
 ], function (
+    QUnit,
     cf,
     currentUser,
     lib 
 ) {
-
-    var prefix = "core: ";
-
     return function () {
-        //
+
         // hairCut
-        //
-        test(prefix + 'internal library functions: hairCut', function (assert) {
+        QUnit.test('internal library functions: hairCut', function (assert) {
             var obj = Object.create(null);
             obj = { a: 1, b: 2, c: 3, bogusProp: "bogus" };
             assert.ok(obj.hasOwnProperty("a"), "a");
@@ -63,35 +61,37 @@ define ([
             assert.ok(obj.hasOwnProperty("c"), "c still there");
             assert.strictEqual(obj.hasOwnProperty("bogusProp"), false, "no bogus property anymore");
         });
-        //
+
         // privCheck
-        //
-        test(prefix + 'internal library functions: privCheck', function (assert) {
+        QUnit.test('internal library functions: privCheck', function (assert) {
+            assert.strictEqual(currentUser('priv'), null, "starting currentUserPriv is null");
             currentUser('priv', 'passerby');
-            assert.strictEqual(currentUser('priv'), 'passerby', "currentUserPriv override");
+            assert.strictEqual(currentUser('priv'), 'passerby', "set currentUserPriv to passerby");
             assert.strictEqual(lib.privCheck('passerby'), true, "user passerby, ACL passerby");
             assert.strictEqual(lib.privCheck('inactive'), false, "user passerby, ACL inactive");
             assert.strictEqual(lib.privCheck('active'), false, "user passerby, ACL active");
             assert.strictEqual(lib.privCheck('admin'), false, "user passerby, ACL admin");
             currentUser('priv', 'inactive');
-            assert.strictEqual(currentUser('priv'), 'inactive', "currentUserPriv override");
+            assert.strictEqual(currentUser('priv'), 'inactive', "set currentUserPriv to inactive");
             assert.strictEqual(lib.privCheck('passerby'), true, "user inactive, ACL passerby");
             assert.strictEqual(lib.privCheck('inactive'), true, "user inactive, ACL inactive");
             assert.strictEqual(lib.privCheck('active'), false, "user inactive, ACL active");
             assert.strictEqual(lib.privCheck('admin'), false, "user inactive, ACL admin");
             currentUser('priv', 'active');
-            assert.strictEqual(currentUser('priv'), 'active', "currentUserPriv override");
+            assert.strictEqual(currentUser('priv'), 'active', "set currentUserPriv to active");
             assert.strictEqual(lib.privCheck('passerby'), true, "user active, ACL passerby");
             assert.strictEqual(lib.privCheck('inactive'), true, "user active, ACL inactive");
             assert.strictEqual(lib.privCheck('active'), true, "user active, ACL active");
             assert.strictEqual(lib.privCheck('admin'), false, "user active, ACL admin");
             currentUser('priv', 'admin');
-            assert.strictEqual(currentUser('priv'), 'admin', "currentUserPriv override");
+            assert.strictEqual(currentUser('priv'), 'admin', "set currentUserPriv to admin");
             assert.strictEqual(lib.privCheck('passerby'), true, "user admin, ACL passerby");
             assert.strictEqual(lib.privCheck('inactive'), true, "user admin, ACL inactive");
             assert.strictEqual(lib.privCheck('active'), true, "user admin, ACL active");
             assert.strictEqual(lib.privCheck('admin'), true, "user admin, ACL admin");
+            currentUser('priv', null);
         });
+
     };
 });
 

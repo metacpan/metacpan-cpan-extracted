@@ -35,7 +35,6 @@ sub init {
 	$self->header('X-Frame-Options' => 'DENY'); # http://blog.mozilla.com/security/2010/09/08/x-frame-options/
 
 	$self->init_plugins($c);
-	$self->call_before_trigger($c);
 	$self->will_dispatch($c);
 	$self->error->flush;
 	$self->error->autoflush(1);
@@ -53,11 +52,6 @@ sub init_plugins  {
 		'Text::Xslate' => {},
 	);
 
-}
-
-sub call_before_trigger {
-	my ($self, $c) = @_;
-	$c->call_trigger(BEFORE_DISPATCH => $c, $c->request);
 }
 
 sub will_dispatch {}

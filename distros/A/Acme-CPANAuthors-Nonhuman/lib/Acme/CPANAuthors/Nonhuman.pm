@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Acme::CPANAuthors::Nonhuman; # git description: v0.024-4-gb0c43eb
+package Acme::CPANAuthors::Nonhuman; # git description: v0.025-4-g5e85df3
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: We are non-human CPAN authors
 # KEYWORDS: acmeism cpan authors animals fun
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use utf8;
 
@@ -15,24 +15,24 @@ my %authors = (
     ETHER => 'Karen Etheridge',
     VOJ => 'Jakob Voß',
     IVANWILLS => 'Ivan Wills',
-    MITHALDU => 'Christian Walde',
-    DOLMEN => 'Olivier Mengué',
     ZDM => 'Dmytro Zagashev',
+    MITHALDU => 'Christian Walde',
     ALTREUS => 'Alastair McGowan-Douglas',
+    DOLMEN => 'Olivier Mengué',
     HIROSE => 'HIROSE Masaaki',
     KAARE => 'Kaare Rasmussen',
+    SIMCOP => 'Ryan Voots',
     AKXLIX => 'azuma, kuniyuki',
     BBAXTER => 'Brad Baxter',
     ABERNDT => 'Alan Berndt',
     ARUNBEAR => 'Arun Prasaad',
+    SKINGTON => 'Sam Kington',
     IANKENT => 'Ian Kent',
     JTRAMMELL => 'John J. Trammell',
-    SIMCOP => 'Ryan Voots',
     CARLOS => 'Carlos Lima',
     FGA => 'Fabrice Gabolde',
-    SKINGTON => 'Sam Kington',
-    AKIHITO => 'Akihito Takeda',
     GLEACH => 'Geoffrey Leach',
+    AKIHITO => 'Akihito Takeda',
     MAXS => 'Maxime Soulé',
     ARUN => 'Arun Venkataraman',
     CKRAS => 'Christiaan Kras',
@@ -56,24 +56,24 @@ my %avatar_urls = (
     ETHER => 'https://secure.gravatar.com/avatar/bdc5cd06679e732e262f6c1b450a0237?s=80&d=identicon',
     VOJ => 'http://www.gravatar.com/avatar/9827ddb7c8cb132375cf55bf7e624250?s=80&d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2Fdcad11c6680a6c59cc31d2bf1b3975e5%3Fs%3D130%26d%3Didenticon',
     IVANWILLS => 'https://secure.gravatar.com/avatar/c668586858d59a94f3eb761903175f27?s=80&d=identicon',
-    MITHALDU => 'https://secure.gravatar.com/avatar/d9c28af939032ab0c30fd7be8fdc1040?s=80&d=identicon',
-    DOLMEN => 'https://secure.gravatar.com/avatar/70d9b050bfe39350c234d710fadfcd39?s=80',
     ZDM => 'https://secure.gravatar.com/avatar/f99956427457624457d0b626f492747d.png',
+    MITHALDU => 'https://secure.gravatar.com/avatar/d9c28af939032ab0c30fd7be8fdc1040?s=80&d=identicon',
     ALTREUS => 'https://s.gravatar.com/avatar/f6ff3f40f3b6fdf036bff73832357634?s=80',
+    DOLMEN => 'https://secure.gravatar.com/avatar/70d9b050bfe39350c234d710fadfcd39?s=80',
     HIROSE => 'https://secure.gravatar.com/avatar/9fdc92e131d7950e81895ca892b7a384?s=80&d=identicon',
     KAARE => 'https://secure.gravatar.com/avatar/4981bb322567b621afe038246f4dce1a?s=80&d=identicon',
+    SIMCOP => 'https://secure.gravatar.com/avatar/064ea1cf6dd27118fdbbc2b23d12266f?s=80&d=identicon',
     AKXLIX => 'https://secure.gravatar.com/avatar/22376afdd53ef1adc944c7168349cd8d?s=80&d=identicon',
     BBAXTER => 'https://secure.gravatar.com/avatar/af7986efb2374332f4babfaaef3b55d4?s=80&d=identicon',
     ABERNDT => 'https://secure.gravatar.com/avatar/888b4060c4844235ed6897de4946f9dd?s=80&d=identicon',
     ARUNBEAR => 'https://secure.gravatar.com/avatar/dc46344b5cdbf99fb62291b4eb9c4aef?s=80&d=identicon',
+    SKINGTON => 'https://secure.gravatar.com/avatar/faf48a00fe1d8c7b282435f54f04c747?s=80&d=identicon',
     IANKENT => 'https://secure.gravatar.com/avatar/7d3b3b7b9d22aadba754cade8781518c?s=80&d=identicon',
     JTRAMMELL => 'http://www.gravatar.com/avatar/6e8ddfd51613a0bb512abb09b64dafef?s=80&d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F7fe2f580391d8c9089747010fada9d22%3Fs%3D130%26d%3Didenticon',
-    SIMCOP => 'https://secure.gravatar.com/avatar/064ea1cf6dd27118fdbbc2b23d12266f?s=80&d=identicon',
     CARLOS => 'https://secure.gravatar.com/avatar/43d81f6a54ee06bf1190d16f25a2533a?s=80&d=identicon',
     FGA => 'https://secure.gravatar.com/avatar/a1a232556694ed753ac491703b7df184?s=80&d=identicon',
-    SKINGTON => 'https://secure.gravatar.com/avatar/faf48a00fe1d8c7b282435f54f04c747?s=80&d=identicon',
-    AKIHITO => 'https://secure.gravatar.com/avatar/3a1bdee47e9fdca1cdf3ce4f38651ba2?s=80&d=identicon',
     GLEACH => 'https://secure.gravatar.com/avatar/05cb19d7843c358211bfdc98be476b68?s=80&d=identicon',
+    AKIHITO => 'https://secure.gravatar.com/avatar/3a1bdee47e9fdca1cdf3ce4f38651ba2?s=80&d=identicon',
     MAXS => 'https://secure.gravatar.com/avatar/55768f8a3f6cbfde7396a0a34b590181?s=80&d=identicon',
     ARUN => 'https://secure.gravatar.com/avatar/8a7e477f0a86af02355043e612baad57?s=80&d=identicon',
     CKRAS => 'https://secure.gravatar.com/avatar/4745757ad4050f5a2b1ec9c9fb2ff370?s=80&d=identicon',
@@ -112,7 +112,7 @@ Acme::CPANAuthors::Nonhuman - We are non-human CPAN authors
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -141,27 +141,27 @@ On the internet, no one knows you're a cat (unless your avatar gives it away)!
 margin-left: auto; margin-right: auto; max-width: 50%">
 
 <!-- this data was generated at build time via __DATA__ section and Dist::Zilla::Plugin::MungeFile::WithDataSection 0.009 -->
-<a href="http://metacpan.org/author/ETHER"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/bdc5cd06679e732e262f6c1b450a0237?s=80&d=identicon" alt="ETHER" title="ETHER (Karen Etheridge), 205 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/VOJ"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="http://www.gravatar.com/avatar/9827ddb7c8cb132375cf55bf7e624250?s=80&d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2Fdcad11c6680a6c59cc31d2bf1b3975e5%3Fs%3D130%26d%3Didenticon" alt="VOJ" title="VOJ (Jakob Vo&szlig;), 73 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/IVANWILLS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/c668586858d59a94f3eb761903175f27?s=80&d=identicon" alt="IVANWILLS" title="IVANWILLS (Ivan Wills), 46 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/MITHALDU"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/d9c28af939032ab0c30fd7be8fdc1040?s=80&d=identicon" alt="MITHALDU" title="MITHALDU (Christian Walde), 35 distributions" /></span></a><!--
+<a href="http://metacpan.org/author/ETHER"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/bdc5cd06679e732e262f6c1b450a0237?s=80&d=identicon" alt="ETHER" title="ETHER (Karen Etheridge), 219 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/VOJ"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="http://www.gravatar.com/avatar/9827ddb7c8cb132375cf55bf7e624250?s=80&d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2Fdcad11c6680a6c59cc31d2bf1b3975e5%3Fs%3D130%26d%3Didenticon" alt="VOJ" title="VOJ (Jakob Vo&szlig;), 75 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/IVANWILLS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/c668586858d59a94f3eb761903175f27?s=80&d=identicon" alt="IVANWILLS" title="IVANWILLS (Ivan Wills), 47 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/ZDM"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/f99956427457624457d0b626f492747d.png" alt="ZDM" title="ZDM (Dmytro Zagashev), 47 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/MITHALDU"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/d9c28af939032ab0c30fd7be8fdc1040?s=80&d=identicon" alt="MITHALDU" title="MITHALDU (Christian Walde), 38 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/ALTREUS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://s.gravatar.com/avatar/f6ff3f40f3b6fdf036bff73832357634?s=80" alt="ALTREUS" title="ALTREUS (Alastair McGowan-Douglas), 26 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/DOLMEN"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/70d9b050bfe39350c234d710fadfcd39?s=80" alt="DOLMEN" title="DOLMEN (Olivier Mengu&eacute;), 26 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/ZDM"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/f99956427457624457d0b626f492747d.png" alt="ZDM" title="ZDM (Dmytro Zagashev), 25 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/ALTREUS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://s.gravatar.com/avatar/f6ff3f40f3b6fdf036bff73832357634?s=80" alt="ALTREUS" title="ALTREUS (Alastair McGowan-Douglas), 21 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/HIROSE"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/9fdc92e131d7950e81895ca892b7a384?s=80&d=identicon" alt="HIROSE" title="HIROSE (HIROSE Masaaki), 19 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/HIROSE"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/9fdc92e131d7950e81895ca892b7a384?s=80&d=identicon" alt="HIROSE" title="HIROSE (HIROSE Masaaki), 20 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/KAARE"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/4981bb322567b621afe038246f4dce1a?s=80&d=identicon" alt="KAARE" title="KAARE (Kaare Rasmussen), 14 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/SIMCOP"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/064ea1cf6dd27118fdbbc2b23d12266f?s=80&d=identicon" alt="SIMCOP" title="SIMCOP (Ryan Voots), 14 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/AKXLIX"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/22376afdd53ef1adc944c7168349cd8d?s=80&d=identicon" alt="AKXLIX" title="AKXLIX (azuma, kuniyuki), 9 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/BBAXTER"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/af7986efb2374332f4babfaaef3b55d4?s=80&d=identicon" alt="BBAXTER" title="BBAXTER (Brad Baxter), 9 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/ABERNDT"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/888b4060c4844235ed6897de4946f9dd?s=80&d=identicon" alt="ABERNDT" title="ABERNDT (Alan Berndt), 7 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/ARUNBEAR"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/dc46344b5cdbf99fb62291b4eb9c4aef?s=80&d=identicon" alt="ARUNBEAR" title="ARUNBEAR (Arun Prasaad), 6 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/ABERNDT"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/888b4060c4844235ed6897de4946f9dd?s=80&d=identicon" alt="ABERNDT" title="ABERNDT (Alan Berndt), 8 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/ARUNBEAR"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/dc46344b5cdbf99fb62291b4eb9c4aef?s=80&d=identicon" alt="ARUNBEAR" title="ARUNBEAR (Arun Prasaad), 7 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/SKINGTON"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/faf48a00fe1d8c7b282435f54f04c747?s=80&d=identicon" alt="SKINGTON" title="SKINGTON (Sam Kington), 7 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/IANKENT"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/7d3b3b7b9d22aadba754cade8781518c?s=80&d=identicon" alt="IANKENT" title="IANKENT (Ian Kent), 6 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/JTRAMMELL"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="http://www.gravatar.com/avatar/6e8ddfd51613a0bb512abb09b64dafef?s=80&d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F7fe2f580391d8c9089747010fada9d22%3Fs%3D130%26d%3Didenticon" alt="JTRAMMELL" title="JTRAMMELL (John J. Trammell), 6 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/SIMCOP"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/064ea1cf6dd27118fdbbc2b23d12266f?s=80&d=identicon" alt="SIMCOP" title="SIMCOP (Ryan Voots), 6 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/CARLOS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/43d81f6a54ee06bf1190d16f25a2533a?s=80&d=identicon" alt="CARLOS" title="CARLOS (Carlos Lima), 5 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/FGA"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/a1a232556694ed753ac491703b7df184?s=80&d=identicon" alt="FGA" title="FGA (Fabrice Gabolde), 5 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/SKINGTON"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/faf48a00fe1d8c7b282435f54f04c747?s=80&d=identicon" alt="SKINGTON" title="SKINGTON (Sam Kington), 4 distributions" /></span></a><!--
+--><a href="http://metacpan.org/author/GLEACH"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/05cb19d7843c358211bfdc98be476b68?s=80&d=identicon" alt="GLEACH" title="GLEACH (Geoffrey Leach), 4 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/AKIHITO"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/3a1bdee47e9fdca1cdf3ce4f38651ba2?s=80&d=identicon" alt="AKIHITO" title="AKIHITO (Akihito Takeda), 3 distributions" /></span></a><!--
---><a href="http://metacpan.org/author/GLEACH"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/05cb19d7843c358211bfdc98be476b68?s=80&d=identicon" alt="GLEACH" title="GLEACH (Geoffrey Leach), 3 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/MAXS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/55768f8a3f6cbfde7396a0a34b590181?s=80&d=identicon" alt="MAXS" title="MAXS (Maxime Soul&eacute;), 3 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/ARUN"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/8a7e477f0a86af02355043e612baad57?s=80&d=identicon" alt="ARUN" title="ARUN (Arun Venkataraman), 2 distributions" /></span></a><!--
 --><a href="http://metacpan.org/author/CKRAS"><span><img style="margin: 0 5px 5px 0;" width="80" height="80" src="https://secure.gravatar.com/avatar/4745757ad4050f5a2b1ec9c9fb2ff370?s=80&d=identicon" alt="CKRAS" title="CKRAS (Christiaan Kras), 2 distributions" /></span></a><!--

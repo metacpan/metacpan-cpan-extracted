@@ -3,7 +3,7 @@ package ObjectDB::Table;
 use strict;
 use warnings;
 
-our $VERSION = '3.23';
+our $VERSION = '3.24';
 
 use constant DEFAULT_PAGE_SIZE => 10;
 
@@ -60,8 +60,8 @@ sub find {
     elsif (my $page = $params{page}) {
         my $page_size = $params{page_size};
 
-        $page = 1 unless $page && $page =~ m/^[0-9]$/;
-        $page_size = DEFAULT_PAGE_SIZE unless $page_size && $page_size =~ m/^[0-9]$/;
+        $page = 1 unless $page && $page =~ m/^[0-9]+$/;
+        $page_size = DEFAULT_PAGE_SIZE unless $page_size && $page_size =~ m/^[0-9]+$/;
 
         $offset = ($page - 1) * $page_size;
         $limit  = $page_size;

@@ -358,7 +358,7 @@ void Async::set_to_Flow(Async_Flow flow)
                 : "(unknown)");
 
     type = Async_Type::IS_FLOW;
-    new (&as_flow) Async_Flow { std::move(flow) };
+    new (&as_flow) Async_Flow( std::move(flow) );
 }
 
 static void Async_Flow_clear(Async& self)

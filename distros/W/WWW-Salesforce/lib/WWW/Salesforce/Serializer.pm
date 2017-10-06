@@ -6,7 +6,7 @@ use SOAP::Lite;
 
 use base qw( SOAP::Serializer );
 
-our $VERSION = '0.301';
+our $VERSION = '0.302';
 $VERSION = eval $VERSION;
 
 

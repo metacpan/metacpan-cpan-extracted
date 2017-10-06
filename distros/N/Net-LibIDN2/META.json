@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl bindings for GNU Libidn2",
    "author" : [
-      "Thomas Jacob <jacob@internet24.de>"
+      "Thomas Jacob <gnuthor@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -16,14 +16,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : 0,
-            "ExtUtils::ParseXS" : 0,
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::ParseXS" : "0",
             "Test::More" : "0.10"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.40"
          }
       },
       "runtime" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Net::LibIDN2" : {
          "file" : "lib/Net/LibIDN2.pm",
-         "version" : "0.03"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,5 @@
          "url" : "https://github.com/gnuthor/Net--LibIDN2"
       }
    },
-   "version" : "0.03"
+   "version" : "1.00"
 }

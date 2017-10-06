@@ -3,7 +3,7 @@ build\.pl
 # Exclude the built module
 blib/.*
 # Exclude all git files
-\b\.gitignore$
+\.gitignore$
 \.git/.*
 # Don't include the Makefile made from Makefile.PL in the distribution.
 Makefile$
@@ -24,3 +24,5 @@ MYMETA..*
 ^make-pod\.pl$
 # Don't include the outputs from running the examples
 ^examples/.*-out\.txt$
+# Author tests
+^xt/.*\.t$

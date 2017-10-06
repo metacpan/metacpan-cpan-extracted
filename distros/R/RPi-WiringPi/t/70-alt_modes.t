@@ -5,7 +5,7 @@ use lib 't/';
 
 use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use Test::More;
 
 my $mod = 'RPi::WiringPi';

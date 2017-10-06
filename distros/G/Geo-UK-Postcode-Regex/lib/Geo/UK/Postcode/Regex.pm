@@ -8,7 +8,7 @@ use Geo::UK::Postcode::Regex::Hash;
 use base 'Exporter';
 our @EXPORT_OK = qw( is_valid_pc is_strict_pc is_lax_pc %REGEXES );
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =encoding utf-8
 
@@ -278,6 +278,8 @@ tie our %REGEXES, 'Geo::UK::Postcode::Regex::Hash', _fetch => sub {
 sub _outcode_data {
     my %area_districts;
 
+    # get the original position in the DATA File Handle
+    my $orig_position = tell( DATA );
     # Get outcodes from __DATA__
     while ( my $line = <DATA> ) {
         next unless $line =~ m/\w/;
@@ -290,6 +292,8 @@ sub _outcode_data {
             non_geographical => $non_geographical,
         };
     }
+    # Reset position of DATA File Handle for re-reading
+    seek DATA, $orig_position, 0;
 
     # Add in BX non-geographical outcodes
     foreach ( 1 .. 99 ) {
@@ -646,6 +650,16 @@ L<https://github.com/mjemmeson/geo-uk-postcode-regex>
 =head1 AUTHOR
 
 Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Tom Bloor C<TBSLIVER>
+
+=back
 
 =head1 COPYRIGHT
 

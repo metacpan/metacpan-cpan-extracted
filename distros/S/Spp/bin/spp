@@ -3,43 +3,104 @@
 use 5.012;
 no warnings "experimental";
 
-use Spp::Builtin qw(to_json);
-use Spp;
+use Time::Piece;
+use Spp qw(ast_to_parser match_text parse
+           lint_ast spp_to_ast);
+use Spp::Ast;
+use Spp::Grammar qw(get_grammar);
+use Spp::OptAst qw(opt_ast);
+use Spp::Builtin qw(is_false to_json from_json clean_ast read_file write_file see_ast);
+use Spp::Core qw(is_atom_str);
+use Spp::ToSpp qw(ast_to_spp);
 
-my $action       = $ARGV[0];
-my $grammar_file = $ARGV[1];
-my $text_file    = $ARGV[2];
+my $action  = $ARGV[0];
+my $grammar = $ARGV[1];
+my $text    = $ARGV[2];
 
 given ($action) {
-   when ('--repl')   { Spp::repl() }
-   when ('--update') { Spp::update() }
-   when ('--lint')   { lint($grammar_file) }
-   when ('--parse') {
-      if (-e $grammar_file) {
-         if (-e $text_file) {
-            say spp($grammar_file, $text_file);
-         }
-         else { say "text file: <$text_file> not exist!" }
-      }
-      else { say "grammar file: <$grammar_file> not exist!" }
-   }
-   default {
-      say "
-      :: show help of spp.pl usage.
-      > spp
-
-      :: test Spp rule is valid, or test rule match string.
-      > spp --repl
-
-      :: update Spp Lanugage Grammar Ast with Grammar define.
-      > spp --update
-
-      # lint grammar defined with <grammarr.spp>.
-      > spp --lint grammar.spp
-
-      :: parse <file.text> with grammar defined with <grammar.spp>.
-      > spp --parse grammar.spp file.text
-      ";
+   when ('--update') { update() }
+   when ('--lint')   { lint($grammar) }
+   when ('--spp')    { spp($grammar, $text) }
+   default { repl() }
    }
 }
 
+sub repl {
+   my $json_ast = Spp::Ast::get_ast();
+   my $ast = from_json($json_ast);
+   my $parser = ast_to_parser($ast);
+   say "This is Spp REPL, type enter to exit.";
+   while (1) {
+      print ">> ";
+      my $line = <STDIN>;
+      exit() if $line eq "\n";
+      my $match = match_text($parser, $line);
+      if (!is_false($match)) {
+         say '.. ', to_json(clean_ast($match));
+         my $ast = opt_ast($match);
+         lint_ast($ast);
+         $ast = eval_ast($ast);
+         say '.. ', see_ast($ast);
+         # say ast_to_spp($ast);
+      }
+   }
+}
+
+sub update {
+   my $grammar = get_grammar();
+   my $ast     = spp_to_ast($grammar);
+   lint_ast($ast);
+   $ast = clean_ast($ast);
+   my $code = ast_to_module($ast);
+   if (-e 'Spp/Ast.pm') {
+      my $t = localtime;
+      my $date = $t->ymd;
+      my $time = $t->hms('-');
+      rename('Spp/Ast.pm', "Spp/Ast.pm.$date-$time");
+   }
+   write_file('Spp/Ast.pm', $code);
+}
+
+sub eval_ast {
+   my $ast    = shift;
+   my $parser = ast_to_parser($ast);
+   my $table  = $parser->[1];
+   if (exists $table->{'text'}) {
+      my $text = get_text($table->{'text'});
+      return match_text($parser, $text);
+   }
+   return $ast;
+}
+
+sub get_text {
+   my $rule = shift;
+   if (is_atom_str($rule)) {
+      return $rule->[1];
+   }
+   error("could not get Rule text!");
+}
+
+sub lint {
+   my $file = shift;
+   my $grammar = read_file($file);
+   my $ast     = spp_to_ast($grammar);
+   lint_ast($ast);
+}
+
+sub spp {
+   my ($grammar_file, $text_file) = @_;
+   my $grammar = read_file($grammar_file);
+   my $text    = read_file($text_file);
+   say parse($grammar, $text);
+}
+
+sub ast_to_module {
+   my $ast = shift;
+   my $str = <<'EOFF';
+package Spp::Ast;
+
+sub get_ast {
+   return <<'EOF'
+EOFF
+   return $str . to_json($ast) . "\nEOF\n }\n1;";
+}

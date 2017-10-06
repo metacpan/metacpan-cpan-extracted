@@ -109,75 +109,75 @@
    "provides" : {
       "Log::Dispatch" : {
          "file" : "lib/Log/Dispatch.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::ApacheLog" : {
          "file" : "lib/Log/Dispatch/ApacheLog.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Base" : {
          "file" : "lib/Log/Dispatch/Base.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Code" : {
          "file" : "lib/Log/Dispatch/Code.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Email" : {
          "file" : "lib/Log/Dispatch/Email.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Email::MIMELite" : {
          "file" : "lib/Log/Dispatch/Email/MIMELite.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Email::MailSend" : {
          "file" : "lib/Log/Dispatch/Email/MailSend.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Email::MailSender" : {
          "file" : "lib/Log/Dispatch/Email/MailSender.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Email::MailSendmail" : {
          "file" : "lib/Log/Dispatch/Email/MailSendmail.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::File" : {
          "file" : "lib/Log/Dispatch/File.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::File::Locked" : {
          "file" : "lib/Log/Dispatch/File/Locked.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Handle" : {
          "file" : "lib/Log/Dispatch/Handle.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Null" : {
          "file" : "lib/Log/Dispatch/Null.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Output" : {
          "file" : "lib/Log/Dispatch/Output.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Screen" : {
          "file" : "lib/Log/Dispatch/Screen.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Syslog" : {
          "file" : "lib/Log/Dispatch/Syslog.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Types" : {
          "file" : "lib/Log/Dispatch/Types.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       },
       "Log::Dispatch::Vars" : {
          "file" : "lib/Log/Dispatch/Vars.pm",
-         "version" : "2.66"
+         "version" : "2.67"
       }
    },
    "release_status" : "stable",
@@ -192,7 +192,7 @@
          "web" : "https://github.com/houseabsolute/Log-Dispatch"
       }
    },
-   "version" : "2.66",
+   "version" : "2.67",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -418,7 +418,7 @@
                }
             },
             "name" : "@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -440,7 +440,7 @@
                }
             },
             "name" : "@DROLSKY/PromptIfStale",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
@@ -938,7 +938,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.66",
+                  "tag" : "v2.67",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -1142,6 +1142,7 @@
       "Rohan Carly <se456@rohan.id.au>",
       "Ross Attrill <ross.attrill@gmail.com>",
       "Salvador Fandi\u00f1o <sfandino@yahoo.com>",
+      "Slaven Rezic <srezic@cpan.org>",
       "Steve Bertrand <steveb@cpan.org>",
       "Whitney Jackson <whitney.jackson@baml.com>"
    ],

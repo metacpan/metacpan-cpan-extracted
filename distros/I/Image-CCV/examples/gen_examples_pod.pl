@@ -81,7 +81,7 @@ sub print_header {
 
     print '#' x 79, "\n";
     print "#\n";
-    print "# Examples - Image::CCVW examples.\n";
+    print "# Examples - Image::CCV examples.\n";
     print "#\n";
 
     print "# A documentation only module showing the examples that are\n";

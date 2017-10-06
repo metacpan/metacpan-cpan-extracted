@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Citadel.
 
+0.24    14:07 25 September 2017
+  - Add t/02critic.t for an Author test using Test::Perl::Critic.
+  - Updated lib/Net/Citadel/ToDo.pod for new version.
+
 0.23    13:55 25 August 2016
   - Change the default IP in t/test.yaml to be '127.0.0.1'.
   - Add "lib/Net/Citadel/ToDo.pod" to the PODs being checked in t/00pods.t.

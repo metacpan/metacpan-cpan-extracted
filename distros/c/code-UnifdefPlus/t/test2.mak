@@ -1,9 +1,3 @@
-#6.6:should simplify (visible) 
-ifeq ($(and ${VAR1},${VAR2},${FOO}),y)
-# 6.6 (V)
-endif
-
-
 # unifdef+ test for makefiles
 # with -D FOO -D D1=1 -D D2=1 -DX=x -U BAR -U U1 -D E= -I t\test2.mak
 
@@ -249,7 +243,7 @@ else
 endif
 
 
-# PART 5: functions (or)
+# PART 5: macro (or)
 
 #5.1: should simplify 
 ifeq ($(or $(FOO),),y)
@@ -284,7 +278,7 @@ ifeq ($(or ${VAR1},${VAR2},${BAR}),y)
 endif
 
 
-# PART 6: functions (and)
+# PART 6: macro (and)
 
 #6.1: should simplify (not visible) 
 ifeq ($(and ${FOO},${BAR}),y)
@@ -317,3 +311,74 @@ endif
 ifeq ($(and ${VAR1},${VAR2},${FOO}),y)
 # 6.6 (V)
 endif
+
+
+# PART 7: macro (if)
+# with -D FOO -D D1=1 -D D2=1 -DX=x -U BAR -U U1 -D E= -I t\test2.mak
+
+#7.1: should not simplify (not visible) 
+ifeq ($(if const1,trueExpr),trueExpr)
+# 7.1 (V)  -- should not simplify constants
+endif
+
+7.2: should simplify (ifeq not visible) 
+ifeq ($(if const1,trueExpr,${FOO}),trueExpr)
+# 7.2 (V)
+else
+# 7.2 (I)
+endif
+
+7.3: should simplify (ifeq not visible) 
+ifeq ($(if ${D1},TRUE,FALSE),TRUE)
+# 7.3 (V)
+else
+# 7.3 (I)
+endif
+
+7.4: should simplify (ifeq not visible)
+ifeq ($(if 1,${D1}),1)
+# 7.4 (V)
+else
+# 7.4 (I)
+endif
+
+#7.5: should simplify (ifeq not visible)
+ifeq ($(if ${U1},${D1},${X}),1)
+# 7.5 (I)  -- foo is blank, so if macro returns ${DX} => x, and x is not equal to 1
+else
+# 7.5 (V)
+endif
+
+#7.6: should simplify to: ifeq($(if ${UNKNOWN_},1,x),1)
+ifeq ($(if ${UNKNOWN_},${D1},${X}),1)
+# 7.6 (V)
+else
+# 7.6 (V)
+endif
+
+#7.7: should simplify should simplify (ifeq not visible, as cond is always true...)
+ifeq ($(if ${FOO}${UNKNOWN_},${D1},${X}),1)
+# 7.7 (V)
+else
+# 7.7 (V)
+endif
+
+#7.8: should simplify should simplify: ifeq(${UNKNOWN1},1)
+ifeq ($(if ${D1},${UNKNOWN1},${UNKNOWN2}),1)
+# 7.8 (V)
+else
+# 7.8 (V)
+endif
+
+#7.9: should simplify should simplify: ifeq(${UNKNOWN2},1)
+ifeq ($(if ${U1},${UNKNOWN1},${UNKNOWN2}),1)
+# 7.9 (V)
+else
+# 7.9 (V)
+endif
+
+
+
+
+
+

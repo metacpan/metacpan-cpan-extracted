@@ -403,6 +403,7 @@ PP(pp_rv2sv)
 	else if (PL_op->op_private & OPpDEREF)
 	    sv = vivify_ref(sv, PL_op->op_private & OPpDEREF);
     }
+    SPAGAIN; /* in case chasing soft refs reallocated the stack */
     SETs(sv);
     RETURN;
 }
@@ -5187,6 +5188,7 @@ PP(pp_list)
     if (GIMME_V != G_ARRAY) {
 	SV **mark = PL_stack_base + markidx;
 	dSP;
+        EXTEND(SP, 1);          /* in case no arguments, as in @empty */
 	if (++MARK <= SP)
 	    *MARK = *SP;		/* unwanted list, return last item */
 	else

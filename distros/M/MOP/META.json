@@ -30,7 +30,7 @@
             "UNIVERSAL::Object" : "0.09",
             "attributes" : "0",
             "mro" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "v5.10.1"
          }
       },
       "test" : {
@@ -51,7 +51,7 @@
          "web" : "https://github.com/stevan/p5-MOP"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

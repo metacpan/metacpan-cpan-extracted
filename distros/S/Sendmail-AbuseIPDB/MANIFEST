@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Sendmail-AbuseIPDB.t
+lib/Sendmail/AbuseIPDB.pm
+examples/abuseipdb_milter.pl
+examples/perl-Sendmail-AbuseIPDB.spec
+META.yml                                 Module meta-data (added by MakeMaker)

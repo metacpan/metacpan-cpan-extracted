@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "bsd"
    ],
@@ -83,7 +83,7 @@
          "web" : "https://gitlab.com/waterkip/test-mock-one"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0210"
 }
 

@@ -24,8 +24,8 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'git://github.com/ldidry/padconsole.git',
-                web  => 'https://github.com/ldidry/padconsole',
+                url  => 'https://framagit.org/luc/padconsole.git',
+                web  => 'https://framagit.org/luc/padconsole',
             },
         },
     },

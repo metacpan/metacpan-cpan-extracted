@@ -559,13 +559,7 @@ my($entry, $hdr);
 
 # The following block defines $entry as the entry we are going to edit.
 # In some of the cases also $hdr will be defined with the corresponding header.
-do {
-    local $SIG{__DIE__} = sub {
-        say STDERR 'Cannot edit entry: ',
-            shift =~ s/ at .*$//rs;
-        exit 6
-    };
-
+eval {
     if (defined $opts{back}) {
         my @entries;
         if (keys %datespec) {
@@ -630,6 +624,11 @@ do {
 
         $entry = $tree->content->new_entry($hdr)
     }
+    1;  # can be 1 only if there was no error.
+}
+or $@ && do {
+    say STDERR 'Editing entry: ', $@ =~ s/at .*$//rs;
+    exit 6
 };
 
 sub edit_file {

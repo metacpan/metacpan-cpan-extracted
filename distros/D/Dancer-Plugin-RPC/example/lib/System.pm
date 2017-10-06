@@ -4,6 +4,7 @@ use Moo;
 our $VERSION = '0.00';
 
 use Dancer::RPCPlugin::DispatchMethodList;
+use Dancer::RPCPlugin::ErrorResponse;
 
 sub rpc_version {
     return {software_version => $VERSION};
@@ -14,7 +15,19 @@ sub rpc_ping {
 }
 
 sub rpc_list_methods {
-    return Dancer::RPCPlugin::DispatchMethodList::list_methods();
+    my %args = %{$_[1]};
+    while (my ($k, $v) = each %args) {
+        delete $args{$k} if $k ne 'plugin';
+    }
+    if ($args{plugin} && $args{plugin} !~ /^(?:xmlrpc|jsonrpc|restrpc|any)$/) {
+        return error_response(
+            error_code    => -32001,
+            error_message => "Unknown plugin ($args{plugin})",
+        );
+    }
+
+    my $dispatch =  Dancer::RPCPlugin::DispatchMethodList->new;
+    return $dispatch->list_methods($args{plugin}//'any');
 }
 
 1;

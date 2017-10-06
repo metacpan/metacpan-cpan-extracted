@@ -2,7 +2,7 @@ package Test2::Harness::Run::Dir;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak/;
 use File::Spec();
@@ -10,7 +10,7 @@ use File::Spec();
 use Test2::Harness::Util::File::JSONL;
 use Test2::Harness::Util::File::Stream;
 
-use Test2::Harness::Util::HashBase qw/-root -_jobs_file -_err_file -_log_file/;
+use Test2::Harness::Util::HashBase qw/-root -_jobs_file -_err_file -_log_file -tail/;
 
 sub init {
     my $self = shift;
@@ -25,6 +25,7 @@ sub log_file {
     my $self = shift;
     return $self->{+_LOG_FILE} ||= Test2::Harness::Util::File::Stream->new(
         name => File::Spec->catfile($self->{+ROOT}, 'output.log'),
+        tail => $self->{+TAIL},
     );
 }
 
@@ -32,6 +33,7 @@ sub err_file {
     my $self = shift;
     return $self->{+_ERR_FILE} ||= Test2::Harness::Util::File::Stream->new(
         name => File::Spec->catfile($self->{+ROOT}, 'error.log'),
+        tail => $self->{+TAIL},
     );
 }
 

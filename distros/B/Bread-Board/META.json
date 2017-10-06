@@ -28,9 +28,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Exporter" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
+            "Moose::Exporter" : "2.1200",
             "Moose::Role" : "0",
             "Moose::Util" : "0",
             "Moose::Util::TypeConstraints" : "0",
@@ -64,99 +64,99 @@
    "provides" : {
       "Bread::Board" : {
          "file" : "lib/Bread/Board.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::BlockInjection" : {
          "file" : "lib/Bread/Board/BlockInjection.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::ConstructorInjection" : {
          "file" : "lib/Bread/Board/ConstructorInjection.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Container" : {
          "file" : "lib/Bread/Board/Container.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Container::FromParameterized" : {
          "file" : "lib/Bread/Board/Container/FromParameterized.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Container::Parameterized" : {
          "file" : "lib/Bread/Board/Container/Parameterized.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Dependency" : {
          "file" : "lib/Bread/Board/Dependency.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Dumper" : {
          "file" : "lib/Bread/Board/Dumper.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::LifeCycle" : {
          "file" : "lib/Bread/Board/LifeCycle.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::LifeCycle::Singleton" : {
          "file" : "lib/Bread/Board/LifeCycle/Singleton.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::LifeCycle::Singleton::WithParameters" : {
          "file" : "lib/Bread/Board/LifeCycle/Singleton/WithParameters.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Literal" : {
          "file" : "lib/Bread/Board/Literal.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service" : {
          "file" : "lib/Bread/Board/Service.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::Alias" : {
          "file" : "lib/Bread/Board/Service/Alias.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::Deferred" : {
          "file" : "lib/Bread/Board/Service/Deferred.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::Deferred::Thunk" : {
          "file" : "lib/Bread/Board/Service/Deferred/Thunk.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::Inferred" : {
          "file" : "lib/Bread/Board/Service/Inferred.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::WithClass" : {
          "file" : "lib/Bread/Board/Service/WithClass.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::WithConstructor" : {
          "file" : "lib/Bread/Board/Service/WithConstructor.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::WithDependencies" : {
          "file" : "lib/Bread/Board/Service/WithDependencies.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Service::WithParameters" : {
          "file" : "lib/Bread/Board/Service/WithParameters.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::SetterInjection" : {
          "file" : "lib/Bread/Board/SetterInjection.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Traversable" : {
          "file" : "lib/Bread/Board/Traversable.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Bread::Board::Types" : {
          "file" : "lib/Bread/Board/Types.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       }
    },
    "release_status" : "stable",
@@ -171,7 +171,7 @@
          "web" : "https://github.com/stevan/BreadBoard"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_authority" : "cpan:STEVAN",
    "x_contributors" : [
       "Alex Balhatchet <kaoru@slackwise.net>",
@@ -190,6 +190,7 @@
       "Jesse Luehrs <doy@tozt.net>",
       "Jonathan Rockway <jon@jrock.us>",
       "Kip Hampton <khampton@totalcinema.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Neil Bowers <neil@bowers.com>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
       "Sterling Hanenkamp <hanenkamp@cpan.org>",

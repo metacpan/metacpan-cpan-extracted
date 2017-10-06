@@ -1,0 +1,9 @@
+package Short {
+  
+  enum {
+    MIN_VALUE = -32768s,
+    MAX_VALUE = 32767s,
+    BYTES = 2,
+    SIZE = 8,
+  }
+}

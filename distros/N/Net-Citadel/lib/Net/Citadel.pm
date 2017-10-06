@@ -21,11 +21,11 @@ Net::Citadel - Citadel.org protocol coverage
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 
@@ -860,7 +860,7 @@ Robert James Clay, E<lt>jame@rocasa.usE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2008 by Robert Barta
-Copyright (C) 2012-2016 by Robert James Clay
+Copyright (C) 2012-2017 by Robert James Clay
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

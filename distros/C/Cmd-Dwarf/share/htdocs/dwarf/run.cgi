@@ -5,7 +5,7 @@ PATH=/usr/local/bin:/bin:/usr/bin
 # Put local $PATH setting in this file.
 # "run.cgi.env" file should not be committed in repository.
 if [ -r run.cgi.env ]; then
-    . run.cgi.env
+    . ./run.cgi.env
 fi
 
 if [ "$USE_SPEEDY" != "" ]; then
@@ -22,7 +22,6 @@ use strict;
 use warnings;
 use FindBin;
 use lib ($FindBin::Bin . '/../../app/local/lib/perl5', $FindBin::Bin . '/../../app/lib');
-BEGIN { eval "require Sys::Proctitle" if $^O eq 'linux'; };
 use Plack::Loader;
 my $app = Plack::Util::load_psgi($FindBin::Bin . '/../../app/app.psgi');
 Plack::Loader->auto->run($app);

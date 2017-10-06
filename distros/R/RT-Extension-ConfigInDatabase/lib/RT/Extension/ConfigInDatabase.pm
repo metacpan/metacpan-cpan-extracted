@@ -5,7 +5,7 @@ use RT::DatabaseSetting;
 use RT::DatabaseSettings;
 use Storable;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 RT->AddStyleSheets("config-in-database.css");
 

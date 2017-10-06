@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,11 +35,11 @@ requires:
   FindBin: '0'
   Getopt::Long: '0'
   LWP::Simple: '0'
-  PFT: v1.2.0
+  PFT: v1.2.1
   Pod::Find: '0'
   Pod::Usage: '0'
   Template::Alloy: '0'
   URI: '0'
   perl: '5.006'
-version: v1.2.1
+version: v1.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

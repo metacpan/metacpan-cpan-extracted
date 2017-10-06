@@ -25,6 +25,7 @@ my @files = (
     't/13to-doc-read.t',
     't/14ignore_xpath.t',
     't/15ignore_multi.t',
+    't/16zero_to_empty_str_cmp.t',
     't/style-trailing-space.t'
 );
 

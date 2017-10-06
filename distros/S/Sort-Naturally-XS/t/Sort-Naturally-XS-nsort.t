@@ -4,11 +4,11 @@ use Test::More;
 use Encode;
 use Sort::Naturally::XS;
 
-my $ar_wo_digit = [reverse(map $_ x 2, ('a'..'z'))];
+my $ar_wo_digit = [reverse(map {$_ x 2} ('a'..'z'))];
 my $ar_wo_digit__expected = [reverse(@{$ar_wo_digit})];
 ok(eq_array($ar_wo_digit__expected, [nsort(@{$ar_wo_digit})]), 'Char only sort');
 
-my $ar_digit = [reverse(map $_ x 2, (1..10))];
+my $ar_digit = [reverse(map {$_ x 2} (1..10))];
 my $ar_digit__expected = [reverse(@{$ar_digit})];
 ok(eq_array($ar_digit__expected, [nsort(@{$ar_digit})]), 'Digit only sort');
 
@@ -44,8 +44,9 @@ my $ar_mixed_utf8__expected = [qw/Ка-8 Ка-10 Ка-15 Ка-18 Ка-22 Ка-25
     Ми-8 Ми-10 Ми-14 Ми-20 Ми-24 Ми-26 Ми-30 Ми-171 Як-24 Як-60 Як-100/];
 ok(eq_array($ar_mixed_utf8__expected, [nsort(@{$ar_mixed_utf8})]), 'UTF-8 test');
 
-my $ar_mixed_cp1251 = [map {Encode::from_to($_, 'utf8', 'cp1251'); $_;} @{$ar_mixed_utf8}];
-my $ar_mixed_cp1251__expected = [map {Encode::from_to($_, 'utf8', 'cp1251'); $_;} @{$ar_mixed_utf8__expected}];
+my $ar_mixed_cp1251 = [map {Encode::encode('cp1251', Encode::decode('utf8', $_))} @{$ar_mixed_utf8}];
+my $ar_mixed_cp1251__expected =
+    [map {Encode::encode('cp1251', Encode::decode('utf8', $_))} @{$ar_mixed_utf8__expected}];
 ok(eq_array($ar_mixed_cp1251__expected, [nsort(@{$ar_mixed_cp1251})]), 'WINDOWS-1251 test');
 
 done_testing();

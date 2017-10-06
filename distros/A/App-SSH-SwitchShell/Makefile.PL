@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::TempDir::Tiny" => 0,
     "autodie" => 0,
+    "lib" => 0,
     "subs" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::TempDir::Tiny" => 0,
   "autodie" => 0,
+  "lib" => 0,
   "strict" => 0,
   "subs" => 0,
   "warnings" => 0

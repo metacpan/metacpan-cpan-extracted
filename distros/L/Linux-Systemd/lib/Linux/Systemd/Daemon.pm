@@ -1,5 +1,5 @@
-package Linux::Systemd::Daemon;
-$Linux::Systemd::Daemon::VERSION = '1.162700';
+package Linux::Systemd::Daemon 1.172760;
+
 # ABSTRACT: Systemd daemon API
 
 use v5.16;
@@ -70,7 +70,7 @@ Linux::Systemd::Daemon - Systemd daemon API
 
 =head1 VERSION
 
-version 1.162700
+version 1.172760
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Ioan Rogers.
+This software is Copyright (c) 2017 by Ioan Rogers.
 
 This is free software, licensed under:
 

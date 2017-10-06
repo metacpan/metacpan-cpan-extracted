@@ -3,7 +3,7 @@ augeas-box/etc/ssh/sshd_config
 Build.PL
 ChangeLog
 lib/Config/Model/Backend/Augeas.pm
-lib/Config/Model/models/Itself/ConfigWR.d/augeas-backend.pl
+lib/Config/Model/models/Itself/ConfigReadWrite.d/augeas-backend.pl
 MANIFEST			This list of files
 META.json
 META.yml

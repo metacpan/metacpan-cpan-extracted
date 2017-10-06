@@ -16,14 +16,16 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar';
+    has _bar => ();
 
-    sub bar ($self) { $self->{bar} }
+    sub BUILDARGS : init_args( bar? => _bar );
 
-    sub has_bar   ($self)     { defined $self->{bar} }
-    sub set_bar   ($self, $b) { $self->{bar} = $b    }
-    sub init_bar  ($self)     { $self->{bar} = 200   }
-    sub clear_bar ($self)     { undef $self->{bar}   }
+    sub bar ($self) { _bar }
+
+    sub has_bar   ($self)     { defined _bar }
+    sub set_bar   ($self, $b) { _bar = $b    }
+    sub init_bar  ($self)     { _bar = 200   }
+    sub clear_bar ($self)     { undef _bar   }
 }
 
 package Foo::Auto {
@@ -31,14 +33,16 @@ package Foo::Auto {
 
     extends 'Moxie::Object';
 
-    has 'bar';
+    has _bar => ();
 
-    sub bar       : ro;
-    sub set_bar   : wo;
-    sub has_bar   : predicate;
-    sub clear_bar : clearer;
+    sub BUILDARGS : init_args( bar? => _bar );
 
-    sub init_bar ($self) { $self->{bar} = 200 }
+    sub bar       : ro(_bar);
+    sub set_bar   : wo(_bar);
+    sub has_bar   : predicate(_bar);
+    sub clear_bar : clearer(_bar);
+
+    sub init_bar ($self) { $self->{_bar} = 200 }
 }
 
 foreach my $foo ( Foo->new, Foo::Auto->new ) {

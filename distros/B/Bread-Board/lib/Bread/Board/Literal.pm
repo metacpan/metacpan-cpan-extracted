@@ -1,7 +1,7 @@
 package Bread::Board::Literal;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service providing a literal value
-$Bread::Board::Literal::VERSION = '0.35';
+$Bread::Board::Literal::VERSION = '0.36';
 use Moose;
 
 with 'Bread::Board::Service';
@@ -33,7 +33,7 @@ Bread::Board::Literal - service providing a literal value
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -89,8 +89,6 @@ Required attribute with read/write accessor. This is the value that
 L</get> will return.
 
 =head1 METHODS
-
-=over 4
 
 =head2 C<get>
 

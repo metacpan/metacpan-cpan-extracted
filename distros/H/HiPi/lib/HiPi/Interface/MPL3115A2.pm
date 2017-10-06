@@ -17,7 +17,7 @@ use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw( osdelay backend ) );
 
@@ -37,6 +37,10 @@ sub new {
     # get user params
     foreach my $key( keys (%userparams) ) {
         $params{$key} = $userparams{$key};
+    }
+    
+    if( $params{busmode} ) {
+        $params{backend} = $params{busmode};
     }
     
     unless( defined($params{device}) ) {
@@ -220,7 +224,7 @@ sub delay_from_oversample {
 
 sub raw {
     my($self, $newval) = @_;
-    my ( $curreg ) = $self->device->i2c_read_register_rs(MPL_REG_CTRL_REG1, 1);
+    my ( $curreg ) = $self->device->bus_read(MPL_REG_CTRL_REG1, 1);
     my $currentval = $curreg & MPL_CTRL_REG1_RAW;
     if(defined($newval)) {
         $newval &= MPL_CTRL_REG1_RAW;
@@ -228,8 +232,8 @@ sub raw {
             if( $curreg & MPL_CTRL_REG1_SBYB ) {
                 croak('cannot set raw mode while system is active');
             }
-            $self->device->i2c_write(MPL_REG_CTRL_REG1, $curreg | $newval );
-            ( $curreg ) = $self->device->i2c_read_register_rs(MPL_REG_CTRL_REG1, 1);
+            $self->device->bus_write(MPL_REG_CTRL_REG1, $curreg | $newval );
+            ( $curreg ) = $self->device->bus_read(MPL_REG_CTRL_REG1, 1);
             $currentval = $curreg & MPL_CTRL_REG1_RAW;
         }
     }

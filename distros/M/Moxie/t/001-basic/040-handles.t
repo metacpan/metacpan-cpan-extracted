@@ -11,9 +11,9 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar' => sub { 'FOO::BAR' };
+    has _bar => sub { 'FOO::BAR' };
 
-    sub bar : ro;
+    sub bar : ro(_bar);
 }
 
 package Bar {
@@ -21,10 +21,12 @@ package Bar {
 
     extends 'Moxie::Object';
 
-    has 'foo' => sub { Foo->new };
+    has _foo => sub { Foo->new };
 
-    sub foo    : ro;
-    sub foobar : handles('foo->bar');
+    sub BUILDARGS : init_args( foo? => _foo );
+
+    sub foo    : ro(_foo);
+    sub foobar : handles('_foo->bar');
 }
 
 {

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.110';
+$Config::Model::Value::VERSION = '2.112';
 use 5.10.1;
 
 use Mouse;
@@ -536,8 +536,17 @@ sub set_properties {
     }
 
     map { $self->{$_} = delete $args{$_} if defined $args{$_} }
-        qw/min max mandatory replace warn replace_follow assert warn_if warn_unless
+        qw/min max mandatory warn replace_follow assert warn_if warn_unless
         write_as/;
+
+    if ($args{replace}) {
+        $self->{replace} = delete $args{replace};
+        my $old = $self->_fetch_no_check;
+        if (defined $old) {
+            my $new = $self->apply_replace($old);
+            $self->_store_value($new);
+        }
+    }
 
     $self->set_help( \%args );
     $self->set_value_type( \%args );
@@ -1058,14 +1067,19 @@ sub _store_fix {
             "fix change: '" . ( $old // '<undef>' ) . "' -> '" . ( $new // '<undef>' ) . "'" );
     }
 
-    my %args = (
-        old => $old // $self->_fetch_std,
-        new => $new // $self->_fetch_std,
-        note => 'applied fix'. ( $msg ? ' for :'. $msg : ''),
-    ) ;
+    my $new_v = $new // $self->_fetch_std ;
+    my $old_v => $old // $self->_fetch_std;
+
     no warnings "uninitialized";
     # in case $old is the default value and $new is undef
-    $self->notify_change( %args ) if $args{old} ne $args{new};
+    if ($old_v ne $new_v) {
+        $self->notify_change(
+            old => $old_v,
+            new => $new_v,
+            note => 'applied fix'. ( $msg ? ' for :'. $msg : '')
+        );
+        $self->trigger_warp($new_v) if defined $new_v and $self->has_warped_slaves;
+    }
 }
 
 # read checks should be blocking
@@ -1324,22 +1338,9 @@ sub transform_value {
     $value = $self->{convert_sub}($value)
         if ( defined $self->{convert_sub} and defined $value );
 
-    if ( defined $self->{replace} ) {
-        if ( defined $self->{replace}{$value} ) {
-            $logger->debug("store replacing value $value with $self->{replace}{$value}");
-            $value = $self->{replace}{$value};
-        }
-        else {
-            foreach my $k ( keys %{ $self->{replace} } ) {
-                if ( $value =~ /^$k$/ ) {
-                    $logger->debug(
-                        "store replacing value $value (matched /$k/) with $self->{replace}{$k}");
-                    $value = $self->{replace}{$k};
-                    last;
-                }
-            }
-        }
-    }
+    # apply replace on store *before* check is done, so a bad value
+    # can be replaced with a good one
+    $value = $self->apply_replace($value) if ($self->{replace} and defined $value);
 
     # using default or computed value is normally done on fetch. Except that an undefined
     # value cannot be stored in a mandatory value. Storing undef is used when resetting a
@@ -1350,6 +1351,26 @@ sub transform_value {
         $value = $self->_fetch_no_check;
     }
 
+    return $value;
+}
+
+sub apply_replace {
+    my ($self, $value) = @_;
+
+    if ( defined $self->{replace}{$value} ) {
+        $logger->debug("store replacing value $value with $self->{replace}{$value}");
+        $value = $self->{replace}{$value};
+    }
+    else {
+        foreach my $k ( keys %{ $self->{replace} } ) {
+            if ( $value =~ /^$k$/ ) {
+                $logger->debug(
+                    "store replacing value $value (matched /$k/) with $self->{replace}{$k}");
+                $value = $self->{replace}{$k};
+                last;
+            }
+        }
+    }
     return $value;
 }
 
@@ -1654,6 +1675,7 @@ sub fetch {
 
         # store replaced value to trigger notify_change
         if ( defined $rep and $rep ne $value ) {
+            $logger->debug( "fetch replace_follow $value with $rep from ".$self->{replace_follow});
             $value = $self->_store_value($rep);
         }
     }
@@ -1809,7 +1831,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Digest-FarmHash
 
+0.02 2017-09-24T12:40:08Z
+    - Update farmhash
+    - Support >= Perl 5.26.0 (@INC problem)
+
 0.01 2016-08-26T16:14:39Z
 
     - original version

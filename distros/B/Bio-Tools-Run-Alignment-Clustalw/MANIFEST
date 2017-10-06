@@ -19,4 +19,3 @@ t/data/cysprot.fa
 t/data/cysprot1a.msf
 t/data/cysprot1b.fa
 t/data/cysprot1b.msf
-t/requires_external.t

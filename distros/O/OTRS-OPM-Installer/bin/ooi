@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+# PODNAME: ooi
+
+use strict;
+use warnings;
+
+use OTRS::OPM::Installer;
+use Getopt::Long;
+
+GetOptions(
+    'p=s'  => \my $package,
+    'h'    => \my $help,
+    'r=s'  => \my @repositories,
+    'v=s'  => \my $version,
+    'vv'   => \my $verbose,
+    'sudo' => \my $sudo,
+);
+
+$package ||= $ARGV[0];
+
+if( $help || !$package ) {
+    print_usage();
+    exit;
+}
+
+my %opts;
+$opts{repositories} = \@repositories if @repositories;
+$opts{version}      = $version       if $version;
+
+my %class_opts;
+$class_opts{verbose} = 1             if $verbose;
+$class_opts{sudo}    = 1             if $sudo;
+
+my $installer = OTRS::OPM::Installer->new( %class_opts );
+$installer->install(
+    package => $package,
+    %opts,
+);
+
+sub print_usage {
+    print qq~$0 -p <package> [-h] [-r <repository>] [-v <version>] [vv]
+    
+    package:    path or url to opm file
+    version:    exact version of otrs package to be installed
+    repository: repository for OTRSM packages
+    help:       show this screen
+    vv:         be verbose
+~;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ooi
+
+=head1 VERSION
+
+version 0.02
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

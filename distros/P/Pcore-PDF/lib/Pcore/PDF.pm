@@ -1,8 +1,9 @@
-package Pcore::PDF v0.3.7;
+package Pcore::PDF v0.4.2;
 
 use Pcore -dist, -class, -const, -result;
 use Config;
 use Pcore::Util::Data qw[to_json from_json];
+use Pcore::Util::Scalar qw[is_plain_scalarref];
 
 const our $PAGE_SIZE => {
     A0        => '841 x 1189 mm',
@@ -37,7 +38,7 @@ const our $PAGE_SIZE => {
     Tabloid   => '279.4 x 431.8 mm',
 };
 
-has prince => ( is => 'lazy', isa => Str );
+has bin => ( is => 'lazy', isa => Str );
 has max_threads => ( is => 'ro', isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
 has page_size => ( is => 'ro', isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
 
@@ -94,8 +95,55 @@ has _queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => 
 #     'job-resource-count' => 1,
 # };
 
-sub _build_prince ($self) {
-    my $path = '/bin/princexml' . ( $MSWIN ? '-win' : '-linux' ) . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . "-v@{[$ENV->dist('Pcore-PDF')->cfg->{princexml_ver}]}/" . ( $MSWIN ? 'bin/prince.exe' : 'bin/prince' );
+# TODO MSWIN support
+sub update_all ( $self, $cb = undef ) {
+    die qq[MSWIN is not supported] if $MSWIN;
+
+    my $blocking_cv = defined wantarray ? AE::cv : undef;
+
+    my $princexml_ver = $ENV->dist('Pcore-PDF')->cfg->{princexml_ver};
+
+    my $url = "https://www.princexml.com/download/prince-$princexml_ver" . ( $MSWIN ? '-win64.zip' : '-linux-generic-x86_64.tar.gz' );
+
+    P->http->get(
+        $url,
+        buf_size    => 1,
+        on_progress => 1,
+        sub ($res) {
+            my $success;
+
+            if ($res) {
+                $success = eval {
+                    if ($MSWIN) {
+
+                        # TODO
+                    }
+                    else {
+                        P->file->untar( $res->body->path, $ENV->share->get_lib('Pcore-PDF') . "bin/princexml-linux-generic-x64-$princexml_ver/", strip_component => 1 );
+                    }
+
+                    1;
+                };
+            }
+
+            $cb->($success) if $cb;
+
+            $blocking_cv->($success) if $blocking_cv;
+
+            return;
+        }
+    );
+
+    return $blocking_cv ? $blocking_cv->recv : ();
+}
+
+# TODO MSWIN support
+sub _build_bin ($self) {
+    my $princexml_ver = $ENV->dist('Pcore-PDF')->cfg->{princexml_ver};
+
+    my $path = '/bin/princexml-linux-generic' . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . "-$princexml_ver/lib/prince/bin/prince";
+
+    say $path;
 
     return $ENV->share->get($path);
 }
@@ -146,7 +194,7 @@ sub _generate_mswin ( $self ) {
     $self->{_threads}++;
 
     P->pm->run_proc(
-        [ $self->prince, '-' ],
+        [ $self->bin, '-' ],
         stdin    => 1,
         stdout   => 1,
         on_ready => sub ($proc) {
@@ -209,7 +257,7 @@ sub _get_proc ( $self, $cb ) {
     $self->{_threads}++;
 
     P->pm->run_proc(
-        [ $self->prince, '--control' ],
+        [ $self->bin, '--control' ],
         stdin    => 1,
         stdout   => 1,
         stderr   => 1,
@@ -263,7 +311,7 @@ sub _run_task ( $self, $proc, $task ) {
 
     my ( $job, $resources );
 
-    if ( ref $task->[0] ) {
+    if ( is_plain_scalarref $task->[0] ) {
         $job->{input}->{src} = 'job-resource:0';
 
         push $resources->@*, $task->[0];
@@ -373,10 +421,12 @@ sub _run_task ( $self, $proc, $task ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
+## |    3 | 100                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 384                  | * Link L<Pcore::Util::Result> on line 441 does not specify text                                                |
-## |      | 384                  | * Link L<Pcore::Util::Result> on line 451 does not specify text                                                |
-## |      | 384                  | * Link L<Pcore> on line 449 does not specify text                                                              |
+## |      | 434                  | * Link L<Pcore::Util::Result> on line 491 does not specify text                                                |
+## |      | 434                  | * Link L<Pcore::Util::Result> on line 501 does not specify text                                                |
+## |      | 434                  | * Link L<Pcore> on line 499 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -394,7 +444,7 @@ Pcore::PDF - non-blocking HTML to PDF converter
     use Pcore::PDF;
 
     my $pdf = Pcore::PDF->new({
-        prince      => 'path-to-princexml-executable',
+        bin         => 'path-to-princexml-executable',
         max_threads => 4,
     });
 
@@ -422,7 +472,7 @@ Generate PDF from HTML templates, using princexml.
 
 =over
 
-=item prince
+=item bin
 
 Path to F<princexml> executable. Mandatory attribute.
 

@@ -21,7 +21,6 @@ WriteMakefile(
                           'bin/cisco-intf.pl',
                           'bin/cisco-line.pl',
                           'bin/cisco-memory.pl',
-                          'bin/cisco-pass.pl',
                           'bin/cisco-ping.pl',
                           'bin/cisco-system.pl'],
     PREREQ_PM         => {Test::Simple => 0, 

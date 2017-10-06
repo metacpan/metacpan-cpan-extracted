@@ -17,11 +17,11 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             homepage =>
-                'https://github.com/dr-co/libmojolicious-plugin-check-perl',
+                'https://github.com/dr-co/Mojolicious-Plugin-Check',
             repository =>
-                'https://github.com/dr-co/libmojolicious-plugin-check-perl',
+                'https://github.com/dr-co/Mojolicious-Plugin-Check',
             bugtracker =>
-                'https://github.com/dr-co/libmojolicious-plugin-check-perl/issues',
+                'https://github.com/dr-co/Mojolicious-Plugin-Check/issues',
         }
    },
 );

@@ -17,12 +17,12 @@ Image::PNG::Cairo - extract PNG data from a Cairo::ImageSurface
     # Now can use the methods of Image::PNG::Libpng on the PNG,
     # e.g. write to file.
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-PNG-Cairo-0.08/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Cairo-0.09/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents Image::PNG::Cairo version 0.08
-corresponding to git commit L<6dac994ae861f911552dff8628656eb29629697d|https://github.com/benkasminbullock/image-png-cairo/commit/6dac994ae861f911552dff8628656eb29629697d> released on Fri Feb 3 13:56:41 2017 +0900.
+This documents Image::PNG::Cairo version 0.09
+corresponding to git commit L<615fa499479dd235024385a5f4d09f558e3d1ec8|https://github.com/benkasminbullock/image-png-cairo/commit/615fa499479dd235024385a5f4d09f558e3d1ec8> released on Thu Oct 5 13:15:48 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -134,7 +134,7 @@ image in the PNG.
         return $r;
     } 
 
-(This example is included as L<F<captcha.pl>|https://api.metacpan.org/source/BKB/Image-PNG-Cairo-0.08/examples/captcha.pl> in the distribution.)
+(This example is included as L<F<captcha.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Cairo-0.09/examples/captcha.pl> in the distribution.)
 
 Please do not use this example program in the stead of a real captcha.
 

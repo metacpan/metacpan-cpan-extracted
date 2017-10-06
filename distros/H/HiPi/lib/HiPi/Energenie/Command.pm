@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use feature 'say';
 use parent qw( HiPi::Class );
-use HiPi qw( :openthings :energenie );
+use HiPi qw( :openthings :energenie :rpi );
 use HiPi::Energenie;
 use HiPi::Utils::Config;
 use Getopt::Long qw( GetOptionsFromArray );
@@ -22,7 +22,7 @@ use JSON;
 use Try::Tiny;
 use HiPi::RF::OpenThings::Message;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw( config result mode display options pretty user console_display_message) );
 
@@ -37,6 +37,7 @@ use constant {
     
     ERROR_CONFIG_INVALID_BOARD  => 'ERROR_CONFIG_INVALID_BOARD',
     ERROR_CONFIG_INVALID_DEVICE => 'ERROR_CONFIG_INVALID_DEVICE',
+    ERROR_CONFIG_INVALID_GPIO  => 'ERROR_CONFIG_INVALID_GPIO',
     
     ERROR_GROUP_INVALID_OPTIONS => 'ERROR_GROUP_INVALID_OPTIONS',
     ERROR_GROUP_EXISTING_GROUP => 'ERROR_GROUP_EXISTING_GROUP',
@@ -87,8 +88,8 @@ my $commandopts = {
         defaults => {},
     },
     config  => {
-        template => [ 'help|h!', 'list|l!', 'device|d:s', 'board|b:s' ],
-        defaults => { help => 0, list => 0, device => undef, board => undef,  },
+        template => [ 'help|h!', 'list|l!', 'device|d:s', 'board|b:s', 'reset|r:s' ],
+        defaults => { help => 0, list => 0, device => undef, board => undef, reset => undef },
     },
     group   => {
         template => [ 'help|h!', 'create|c:s', 'delete|d:s', 'rename|r:s', 'group|g:o', 'newname|n:s', 'list|l!',],
@@ -150,6 +151,9 @@ sub new {
             version    => $VERSION,
             board      => 'ENER314_RT',
             spi_device => '/dev/spidev0.1',
+            reset_gpio => RPI_PIN_22,
+            led_red_gpio => 0,
+            led_green_gpio => 0,
             groups     => {},
             adapters   => {},
             monitors   => {},
@@ -171,11 +175,19 @@ sub valid_command {
     
 sub handle_command {
     my $self = shift;
+    my @commandargs = @ARGV;
+    
+    $self->handle_command_arguments( @commandargs );
+}
+
+sub handle_command_arguments {
+    my ($self, @inputargs) = @_;
+    
     my @commandargs = ();
     
     my $result = try {
     
-        for my $arg ( @ARGV ) {
+        for my $arg ( @inputargs ) {
             if( lc($arg) eq '--json' ) {
                 $self->mode('json');
             } elsif( lc($arg) eq '--pretty' ) {
@@ -262,6 +274,7 @@ sub return_result {
             $output .= qq(  Receiver         :  $data->{can_rx}\n) if $data->{can_rx};
             $output .= qq(  Uses SPI         :  $data->{uses_spi}\n) if $data->{uses_spi};
             $output .= qq(  SPI Device       :  $data->{spi_device}\n) if $data->{spi_device} && $data->{can_rx} eq 'YES';
+            $output .= qq(  Reset GPIO       :  $data->{reset_gpio}\n) if $data->{spi_device} && $data->{can_rx} eq 'YES';
             $output .= qq(  Config Saved     :  $timestamp\n);
         }
         return $output;
@@ -326,7 +339,8 @@ sub return_result {
         
         for my $monitor ( sort keys %{ $self->result->{data}->{$listname} } ) {
             my $data = $self->result->{data}->{$listname}->{$monitor};
-            my $switch = ( exists( $self->result->{data}->{adapters}->{$monitor}) ) ? 'YES' : ' NO';
+            my $switch = HiPi::RF::OpenThings->product_can_switch( $data->{manufacturer_id}, $data->{product_id} ) ? 'YES' : ' NO';
+            # my $switch = ( exists( $self->result->{data}->{adapters}->{$monitor}) ) ? 'YES' : ' NO';
             $output .= sprintf(qq(  %-20s %-28s 0x%06X      %s\n),
                 $monitor, $data->{product_name}, $data->{sensor_id}, $switch
             );
@@ -429,7 +443,7 @@ sub command_config {
         $self->list_configuration('list');
         return;
     } else {
-        my( $newdevice, $newboard );
+        my( $newdevice, $newboard, $newreset );
     
         if ( $self->options->{device} ) {
             if( my ($devicename) = ( $self->options->{device} =~ /^(\/dev\/spidev\d\.\d)$/i ) ) {
@@ -457,6 +471,20 @@ sub command_config {
             }
         }
         
+        if( defined($self->options->{reset}) ) {
+            # reset should be a number greater than 0
+            if( $self->options->{reset} && $self->options->{reset} =~ /^\d+$/ ) {
+                $newreset = $self->options->{reset};
+            } else {
+                $self->set_result_error(
+                    ERROR_CONFIG_INVALID_GPIO,
+                    sprintf(q(Invalid Reset GPIO %s specified), $self->options->{reset}),
+                    'update',
+                );
+                return;
+            }
+        }
+                
         my $coption = 'update';
         
         if( $newdevice ) {
@@ -466,6 +494,11 @@ sub command_config {
         
         if( $newboard ) {
             $self->conf->{board} = $newboard;
+            $coption = 'refresh';
+        }
+        
+        if( $newreset ) {
+            $self->conf->{reset_gpio} = $newreset;
             $coption = 'refresh';
         }
         
@@ -691,6 +724,7 @@ sub command_pair {
         my $handler = HiPi::Energenie->new(
             board => $self->conf->{board},
             devicename => $self->conf->{spi_device},
+            reset_gpio => $self->conf->{reset_gpio},
         );
         
         $handler->pair_socket( $group, $switch, 5 );
@@ -815,6 +849,7 @@ sub command_switch {
         my $handler = HiPi::Energenie->new(
             board => $self->conf->{board},
             devicename => $self->conf->{spi_device},
+            reset_gpio => $self->conf->{reset_gpio},
         );
         
         $handler->switch_socket( $group, $switch, $state );
@@ -1033,6 +1068,7 @@ sub command_join {
         my $handler = HiPi::Energenie->new(
             board => $self->conf->{board},
             devicename => $self->conf->{spi_device},
+            reset_gpio => $self->conf->{reset_gpio},
         );
         
         return $handler->process_request(
@@ -1164,6 +1200,7 @@ sub command_adapter {
         my $handler = HiPi::Energenie->new(
             board => $self->conf->{board},
             devicename => $self->conf->{spi_device},
+            reset_gpio => $self->conf->{reset_gpio},
         );
     
         my $val = $handler->process_request(
@@ -1252,6 +1289,7 @@ sub do_monitor_query {
         my $handler = HiPi::Energenie->new(
             board => $self->conf->{board},
             devicename => $self->conf->{spi_device},
+            reset_gpio => $self->conf->{reset_gpio},
         );
     
         my $val = $handler->process_request(
@@ -1289,6 +1327,7 @@ sub list_configuration {
         'version'    => $self->conf->{version},
         'board'      => $self->conf->{board},
         'spi_device' => $self->conf->{spi_device},
+        'reset_gpio' => $self->conf->{reset_gpio},
         'uses_spi'   => ( $self->receiver ) ? 'YES' : 'NO',
         'can_rx'     => ( $self->receiver ) ? 'YES' : 'NO',
         'epoch'      => $self->conf->{epoch} || 1,
@@ -1396,6 +1435,7 @@ sub get_command_usage {
     config      Configure the board type ( ENER314_RT or ENER314 )
     group       Manage groups for use with sockets
     pair        Pair a socket or switch
+    alias       Rename or name a socket or switch
     switch      Switch a socket or switch on or off
     join        Configure a monitor or adaptor
     adapter     Switch an adapter device on or off
@@ -1422,6 +1462,10 @@ sub get_command_usage {
 
     --device      -d  < devicename > Set the SPI device used by the
                       ENER314_RT board. Default is '/dev/spidev0.1'
+    
+    --reset       -r  < gpio > Specify the GPIO pin connected to
+                      the reset pin on the ENER314_RT board.
+                      Default is 25 ( RPI_PIN_22 )
     
     --json            The command results will be output as a JSON
                       string. This can be used when you want to parse
@@ -1524,7 +1568,9 @@ sub get_command_usage {
 
   options :
     --help        -h  Display this message
-    
+
+    --list        -l  List the currently configured switches
+
     --name        -n  <switchname> An alias for the groupname / switch pair
     
     --groupname   -g  <groupname> If you don't provide a name you can specify
@@ -1538,11 +1584,12 @@ sub get_command_usage {
                       number of the switch or socket you want to switch.
                       Specifying 0 switches all members of the group.
                       
-    --on          -1  switch the socket on
+    --on          -1  Switch the socket on
 
-    --off         -0  switch the socket off
+    --off         -0  Switch the socket off
     
-    --all             switch all sockets in the group off
+    --all             Switch all sockets in the group. The same as specifying
+                      --switch 0
 
     --json            The command results will be output as a JSON
                       string. This can be used when you want to parse

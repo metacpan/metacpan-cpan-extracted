@@ -1,0 +1,77 @@
+{
+   "abstract" : "DBIx::Class interface for Dancer2 applications",
+   "author" : [
+      "Naveed Massjouni <naveed@vt.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-DBIC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBIx::Class::Schema::Loader" : "0.07002"
+         },
+         "requires" : {
+            "DBICx::Sugar" : "0.0200",
+            "Dancer2" : "0.153002",
+            "Dancer2::Plugin" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "DBIx::Class::Schema::Loader" : "0",
+            "Dancer2" : "0.153002",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::DBIC" : {
+         "file" : "lib/Dancer2/Plugin/DBIC.pm",
+         "version" : "0.0100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ironcamel/Dancer2-Plugin-DBIC/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ironcamel/Dancer2-Plugin-DBIC.git",
+         "web" : "https://github.com/ironcamel/Dancer2-Plugin-DBIC"
+      }
+   },
+   "version" : "0.0100"
+}
+

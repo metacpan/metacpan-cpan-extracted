@@ -1,3 +1,8 @@
+1.00 2017-09-25
+    * Add support for punycode conversion functions added in LibIDN 2.0
+    * Fix compiler warnings
+    * Bump version of Devel::CheckLib to 1.11 (compile time only)
+    * Change contact info
 0.03 2013-01-25
 	* doc changes
 	* include Devel::CheckLib to check for GNU LibIDN dependency

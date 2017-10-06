@@ -59,7 +59,6 @@ define ([
             'aclProfile': 'admin',
             'entries': [entries.ePnick, entries.ePsec_id, entries.ePfullname,
                         entries.ePemail, entries.ePremark],
-            'hook': coreLib.holdObject,
             'miniMenu': {
                 entries: ['ldapSync', 'empProfileEdit', 'masqEmployee']
             }
@@ -77,7 +76,6 @@ define ([
                         entries.sDtue, entries.sDwed, entries.sDthu,
                         entries.sDfri, entries.sDsat, entries.sDsun,
                         coreLib.emptyLineEntry, entries.ePremark],
-            'hook': coreLib.holdObject,
             'miniMenu': {
                 entries: ['schedEditFromBrowser', 'schedDeleteFromBrowser']
             }

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Unit ;
-$Config::Model::Backend::Systemd::Unit::VERSION = '0.234.1';
+$Config::Model::Backend::Systemd::Unit::VERSION = '0.234.2';
 use strict;
 use warnings;
 use 5.010;
@@ -239,19 +239,17 @@ Config::Model::Backend::Systemd::Unit - R/W backend for systemd unit files
 
 =head1 VERSION
 
-version 0.234.1
+version 0.234.2
 
 =head1 SYNOPSIS
 
  # in systemd service or socket model
- read_config => [
-   {
+ rw_config => {
      'auto_create' => '1',
      'auto_delete' => '1',
      'backend' => 'Systemd::Unit',
      'file' => '&index.service'
-   }
- ]
+ }
 
 =head1 DESCRIPTION
 

@@ -6,9 +6,9 @@ no warnings "experimental";
 use File::Find::Wanted qw(find_wanted);
 use Spp::Builtin qw(read_file write_file to_json clean_ast);
 use Mylisp qw(mylisp_to_ast);
-use Mylisp::Core qw(change_sufix);
+use Mylisp::Core qw(change_sufix is_update);
 use Mylisp::ToPerl qw(ast_to_perl tidy_perl);
-use Mylisp::Stable;
+use Mylisp::Lint;
 
 my $action = $ARGV[0];
 my $file   = $ARGV[1];
@@ -16,9 +16,9 @@ given ($action) {
    when ('--repl')   { Mylisp::repl() }
    when ('--update') { Mylisp::update() }
    when ('--json')   { ast_to_json($file) }
-   when ('--perl')   { to_perl($file) }
+   when ('--perl')   { to_perl() }
    when ('--lint')   { lint_dir($file) }
-   when ('--tidy'  ) { tidy_dir($file) }
+   when ('--tidy')   { tidy_dir($file) }
    default {
       say "
       ## REPL mode
@@ -59,34 +59,35 @@ sub lint_file {
    my $file = shift;
    my $text = read_file($file);
    my $ast  = mylisp_to_ast($text);
-   my $stable = Mylisp::Stable->new($text);
-   $stable->lint_ast($ast);   
-   ast_to_perl(clean_ast($ast));
+   my $linter = Mylisp::Lint->new($text);
+   $linter->lint_ast($ast);   
+   #ast_to_perl(clean_ast($ast));
 }
 
 sub to_perl {
-   my $dir = shift;
-   if (-d $dir) {
-      my @files = find_wanted(sub {/\.spp$/}, $dir);
-      for my $file (@files) {
-         print "mylisp to perl .. ";
-         file_to_perl($file);
+  my @files = qw(
+  Cpan\Spp.spp
+  Cpan\Spp\Cursor.spp
+  Cpan\Spp\LintAst.spp
+  Cpan\Spp\MatchRule.spp
+  Cpan\Spp\OptAst.spp
+  Cpan\Spp\Tools.spp
+  Cpan\Spp\ToSpp.spp);
+  for my $file (@files) {
+    my $perl_file = change_sufix($file,'spp','pm');
+    if (-e $file) {
+      if (-e $perl_file) {
+        next if is_update($file, $perl_file);
       }
-   } elsif (-e $file) {
-      file_to_perl($file)
-   }
-}      
-
-sub file_to_perl {
-   my $file = shift;
-   my $text = read_file($file);
-   my $ast  = mylisp_to_ast($text);
-   my $stable = Mylisp::Stable->new($text);
-   $stable->lint_ast($ast);
-   $ast = clean_ast($ast);
-   my $perl_str = ast_to_perl($ast);
-   my $perl_file = change_sufix($file,'spp','spp.pm');
-   write_file($perl_file, $perl_str);
+      my $text = read_file($file);
+      my $ast  = mylisp_to_ast($text);
+      my $linter = Mylisp::Lint->new($text);
+      $linter->lint_ast($ast);
+      $ast = clean_ast($ast);
+      my $perl_str = ast_to_perl($ast);
+      write_file($perl_file, $perl_str);
+    }
+  }
 }
 
 sub tidy_dir {

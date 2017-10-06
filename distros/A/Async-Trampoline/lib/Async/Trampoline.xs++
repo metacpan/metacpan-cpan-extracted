@@ -1,15 +1,16 @@
-#define PERL_NO_GET_CONTEXT
+#include "Async.h"
 
 #include "ConvertErrorsXS.h"
 
 extern "C" {
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
 }
 
-#include "Async.h"
+#define UNUSED(x) static_cast<void>(x)
 
 static void* copy_sv_ref(void* sv);
 static void destroy_sv_ref(void* sv);
@@ -25,6 +26,8 @@ static Destructible_Vtable sv_vtable {
 
 static void* copy_sv_ref(void* sv)
 {
+    dTHX;
+
     ASYNC_LOG_DEBUG("copy_sv_ref: " DESTRUCTIBLE_FORMAT "\n",
             DESTRUCTIBLE_FORMAT_ARGS_BORROWED(&sv_vtable, sv));
     if (sv)
@@ -34,6 +37,8 @@ static void* copy_sv_ref(void* sv)
 
 static void destroy_sv_ref(void* sv)
 {
+    dTHX;
+
     ASYNC_LOG_DEBUG("destroy_sv_ref: " DESTRUCTIBLE_FORMAT "\n",
             DESTRUCTIBLE_FORMAT_ARGS_BORROWED(&sv_vtable, sv));
     if (sv)
@@ -42,12 +47,16 @@ static void destroy_sv_ref(void* sv)
 
 static size_t get_refcount_sv(void* sv)
 {
+    dTHX;
+
     assert(sv);
     return SvREFCNT((SV*) sv);
 }
 
 static const char* get_stringification_sv(void* sv)
 {
+    dTHX;
+
     assert(sv);
     if (!SvOK((SV*) sv))
         return "<undef>";
@@ -58,6 +67,8 @@ static
 AsyncRef
 invoke_cv(CV* callback, DestructibleTuple const& args)
 {
+    dTHX;
+
     assert(callback);
 
     if (ASYNC_TRAMPOLINE_DEBUG)
@@ -86,7 +97,7 @@ invoke_cv(CV* callback, DestructibleTuple const& args)
     PUSHMARK(SP);
     if (args.size)
     {
-        EXTEND(SP, args.size);
+        EXTEND(SP, static_cast<ssize_t>(args.size));
         for (auto arg : args)
         {
             ASYNC_LOG_DEBUG("  - arg %p refs=%zu content=%s\n",
@@ -104,6 +115,7 @@ invoke_cv(CV* callback, DestructibleTuple const& args)
     }
 
     int count = call_sv((SV*) callback, G_SCALAR|G_EVAL);
+    UNUSED(count);
 
     SPAGAIN;
 
@@ -141,7 +153,8 @@ class InvokeCV
 public:
     explicit InvokeCV(Destructible context) : context{std::move(context)} {}
 
-    InvokeCV(CV* callback) : InvokeCV{{callback, &sv_vtable}}
+    explicit InvokeCV(pTHX_ CV* callback) :
+        InvokeCV{Destructible {callback, &sv_vtable}}
     { SvREFCNT_inc(callback); }
 
     auto operator() (DestructibleTuple const& args) const -> AsyncRef
@@ -151,7 +164,7 @@ public:
     }
 };
 
-static AsyncRef async_from_sv(SV* sv)
+static AsyncRef async_from_sv(pTHX_ SV* sv)
 {
     if (sv_isa(sv, "Async::Trampoline"))
         return (Async*) SvIV(SvRV(sv));
@@ -170,7 +183,7 @@ static DestructibleTuple destructible_tuple_tail(
     return result;
 }
 
-static AsyncRef make_async_yield(AsyncRef&& continuation, AsyncRef&& value)
+static AsyncRef make_async_yield(pTHX_ AsyncRef&& continuation, AsyncRef&& value)
 {
     // wrap continuation as SV
     DestructibleTuple continuation_tuple { &sv_vtable, 1 };
@@ -192,7 +205,7 @@ static AsyncRef make_async_yield(AsyncRef&& continuation, AsyncRef&& value)
     return yield;
 }
 
-static AsyncRef make_gen_foreach(AsyncRef&& gen, InvokeCV&& body)
+static AsyncRef make_gen_foreach(pTHX_ AsyncRef&& gen, InvokeCV&& body)
 {
     struct GenForeachThunk
     {
@@ -200,9 +213,11 @@ static AsyncRef make_gen_foreach(AsyncRef&& gen, InvokeCV&& body)
 
         auto operator()(DestructibleTuple const& data) -> AsyncRef
         {
+            dTHX;
+
             AsyncRef continuation {};
             if (data.size > 0)
-                continuation = async_from_sv((SV*) data.at(0));
+                continuation = async_from_sv(aTHX_ (SV*) data.at(0));
 
             if (!continuation)
                 throw std::runtime_error(
@@ -213,7 +228,8 @@ static AsyncRef make_gen_foreach(AsyncRef&& gen, InvokeCV&& body)
             AsyncRef ok_then = Async::alloc();
 
             AsyncRef next_foreach = make_gen_foreach(
-                    std::move(continuation), InvokeCV { body });
+                    aTHX_
+                    std::move(continuation), InvokeCV(body));
 
             AsyncRef ok = body(body_args);
 
@@ -243,7 +259,7 @@ static AsyncRef make_gen_foreach(AsyncRef&& gen, InvokeCV&& body)
     return finished;
 }
 
-static AsyncRef make_gen_map(AsyncRef&& gen, InvokeCV&& body)
+static AsyncRef make_gen_map(pTHX_ AsyncRef&& gen, InvokeCV&& body)
 {
     struct GenMapThunk
     {
@@ -251,22 +267,25 @@ static AsyncRef make_gen_map(AsyncRef&& gen, InvokeCV&& body)
 
         auto operator()(DestructibleTuple const& data) -> AsyncRef
         {
+            dTHX;
+
             AsyncRef continuation {};
             if (data.size > 0)
-                continuation = async_from_sv((SV*) data.at(0));
+                continuation = async_from_sv(aTHX_ (SV*) data.at(0));
 
             if (!continuation)
                 throw std::runtime_error(
                         "generator Async must have Async as first value");
 
             AsyncRef next_map = make_gen_map(
-                    std::move(continuation), InvokeCV { body });
+                    aTHX_
+                    std::move(continuation), InvokeCV(body));
 
             DestructibleTuple body_args = destructible_tuple_tail(1, data);
 
             AsyncRef result = body(body_args);
 
-            return make_async_yield(std::move(next_map), std::move(result));
+            return make_async_yield(aTHX_ std::move(next_map), std::move(result));
         }
     } gen_map_thunk { std::move(body) };
 
@@ -275,20 +294,20 @@ static AsyncRef make_gen_map(AsyncRef&& gen, InvokeCV&& body)
     return await;
 }
 
-static AsyncRef concat_fold_right(ssize_t i, AV* array)
+static AsyncRef concat_fold_right(pTHX_ ssize_t i, AV* array)
 {
     if (i > av_len(array))
         return nullptr;
 
     AsyncRef left;
     if (SV** left_sv = av_fetch(array, i, 0))
-        left = async_from_sv(*left_sv);
+        left = async_from_sv(aTHX_ *left_sv);
 
     if (!left)
         throw std::runtime_error(
                 "all dependencies must be Asyncs");
 
-    AsyncRef right = concat_fold_right(i + 1, array);
+    AsyncRef right = concat_fold_right(aTHX_ i + 1, array);
 
     if (!right)
         return left;
@@ -338,7 +357,7 @@ Async::run_until_completion()
 
             DestructibleTuple& values = result.as_value;
             XSprePUSH;  // to fix weird XS+PPCODE argument handling
-            EXTEND(SP, values.size);
+            EXTEND(SP, static_cast<ssize_t>(values.size));
             for (auto value : values)
             {
                 ASYNC_LOG_DEBUG("  - " DESTRUCTIBLE_FORMAT "\n",
@@ -375,7 +394,7 @@ async(body)
     CODE:
     {
         AsyncRef self = Async::alloc();
-        self->set_to_Thunk(InvokeCV{body}, nullptr);
+        self->set_to_Thunk(InvokeCV{aTHX_ body}, nullptr);
         RETVAL = std::move(self).ptr_with_ownership();
     }
     OUTPUT: RETVAL
@@ -404,14 +423,14 @@ await(deps, body)
             return (AV*) sv;
         };
 
-        AsyncRef dep = async_from_sv(deps);
+        AsyncRef dep = async_from_sv(aTHX_ deps);
         if (dep)
         {
             // ok
         }
         else if (AV* deps_av = get_arrayref(deps))
         {
-            dep = concat_fold_right(0, deps_av);
+            dep = concat_fold_right(aTHX_ 0, deps_av);
         }
         else
         {
@@ -420,7 +439,7 @@ await(deps, body)
         }
 
         AsyncRef self = Async::alloc();
-        self->set_to_Thunk(InvokeCV{body}, std::move(dep));
+        self->set_to_Thunk(InvokeCV{aTHX_ body}, std::move(dep));
         RETVAL = std::move(self).ptr_with_ownership();
     }
     OUTPUT: RETVAL
@@ -434,8 +453,8 @@ async_value(...)
         CXX_TRY
     CODE:
     {
-        DestructibleTuple values{&sv_vtable, (size_t) items};
-        for (size_t i = 0; i < items; i++)
+        DestructibleTuple values{&sv_vtable, static_cast<size_t>(items)};
+        for (ssize_t i = 0; i < items; i++)
             values.set(i, Destructible { newSVsv(ST(i)), &sv_vtable });
 
         AsyncRef self = Async::alloc();
@@ -488,9 +507,9 @@ async_yield(async, callback)
     CODE:
     {
         AsyncRef continuation = Async::alloc();
-        continuation->set_to_Thunk(InvokeCV{callback}, nullptr);
+        continuation->set_to_Thunk(InvokeCV{aTHX_ callback}, nullptr);
 
-        AsyncRef yield = make_async_yield(std::move(continuation), async);
+        AsyncRef yield = make_async_yield(aTHX_ std::move(continuation), async);
         RETVAL = std::move(yield).ptr_with_ownership();
     }
     OUTPUT: RETVAL
@@ -605,7 +624,9 @@ Async::gen_map(body)
         CXX_TRY
     CODE:
     {
-        RETVAL = make_gen_map(THIS, body).ptr_with_ownership();
+        RETVAL =
+            make_gen_map(aTHX_ THIS, InvokeCV(aTHX_ body))
+            .ptr_with_ownership();
     }
     OUTPUT: RETVAL
     CLEANUP:
@@ -618,8 +639,15 @@ Async::gen_foreach(body)
         CXX_TRY
     CODE:
     {
-        RETVAL = make_gen_foreach(THIS, body).ptr_with_ownership();
+        RETVAL = make_gen_foreach(aTHX_ THIS, InvokeCV{ aTHX_ body }).ptr_with_ownership();
     }
     OUTPUT: RETVAL
     CLEANUP:
         CXX_CATCH
+
+    /*  The boot function is declared as extern "C" twice.
+     *   Boot is always the last function so that it will see all xsubs
+     */
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wduplicate-decl-specifier"
+#endif

@@ -1,6 +1,6 @@
 package App::calendr;
 
-$App::calendr::VERSION   = '0.21';
+$App::calendr::VERSION   = '0.23';
 $App::calendr::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr - Application to display supported Calendar.
 
 =head1 VERSION
 
-Version 0.21
+Version 0.23
 
 =cut
 
@@ -26,10 +26,12 @@ use Moo;
 use namespace::clean;
 
 our $DEFAULT_CALENDAR = 'Gregorian';
+our $FAILED_CALENDARS = {};
 
 use Types::Standard -all;
 use MooX::Options;
 with 'App::calendr::Option';
+
 
 =head1 DESCRIPTION
 
@@ -115,9 +117,21 @@ sub BUILD {
 
     my $plugins = [ plugins ];
     foreach my $plugin (@$plugins) {
-        my $name = _load_calendar($plugin);
-        if (defined $name) {
-            $self->{calendars}->{uc($name)} = $plugin->new;
+        my $cal = _load_calendar($plugin);
+        if (defined $cal) {
+            my $inst_ver = ${plugin}->VERSION;
+            my $min_ver  = $cal->{min_ver};
+            my $cal_name = $cal->{name};
+            if ($inst_ver >= $min_ver) {
+                $self->{calendars}->{$cal_name} = $plugin->new;
+            }
+            else {
+                $FAILED_CALENDARS->{$cal_name} = {
+                    cal_name => $cal_name,
+                    min_ver  => $min_ver,
+                    inst_ver => $inst_ver,
+                };
+            }
         }
     }
 }
@@ -144,62 +158,75 @@ sub run {
     my $name  = $self->name || $DEFAULT_CALENDAR;
 
     my $supported_calendars = _supported_calendars();
-    die "ERROR: Unsupported calendar [$name] received.\n"
-        unless (exists $supported_calendars->{uc($name)});
+    my $supported_cal = $supported_calendars->{uc($name)};
+    die "ERROR: Unsupported calendar [$name] received.\n" unless defined $supported_cal;
 
     my $calendar = $self->get_calendar($name);
-    if (defined $calendar) {
-        if (defined $month || defined $year) {
-            if (defined $month) {
-                die "ERROR: Missing year.\n" unless defined $year;
-            }
-            else {
-                die "ERROR: Missing month.\n" if defined $year;
-            }
-
-            if (defined $month) {
-                $calendar->date->validate_month($month);
-                if ($month =~ /^[A-Z]+$/i) {
-                    $month = $calendar->date->get_month_number($month);
-                }
-                $calendar->month($month);
-            }
-
-            if (defined $year) {
-                $calendar->date->validate_year($year);
-                $calendar->year($year);
-            }
-        }
-        elsif (defined $self->gdate) {
-            my $gdate = $self->gdate;
-            die "ERROR: Invalid gregorian date '$gdate'.\n"
-                unless ($gdate =~ /^\d{4}\-\d{2}\-\d{2}$/);
-
-            my ($year, $month, $day) = split /\-/, $gdate, 3;
-            print $calendar->from_gregorian($year, $month, $day) and return;
-        }
-        elsif (defined $self->jday) {
-            my $julian_day = $self->jday;
-            die "ERROR: Invalid julian day '$julian_day'.\n"
-                unless ($julian_day =~ /^\d+\.?\d?$/);
-
-            print $calendar->from_julian($julian_day) and return;
-        }
-        elsif (defined $self->list_month_names) {
-            my $month_names = $calendar->date->months;
-            shift @$month_names; # Remove empty entry.
-            print join("\n", @$month_names), "\n" and return;
+    # Is supported calendar installed?
+    if (!defined $calendar) {
+        # Is the calendar failed version pass min ver?
+        if (exists $FAILED_CALENDARS->{$supported_cal->{name}}) {
+            my $min_ver  = $FAILED_CALENDARS->{$supported_cal->{name}}->{min_ver};
+            my $inst_ver = $FAILED_CALENDARS->{$supported_cal->{name}}->{inst_ver};
+            my $cal_name = $FAILED_CALENDARS->{$supported_cal->{name}}->{cal_name};
+            die sprintf("ERROR: Found %s v%s but required v%s.\n", $cal_name, $inst_ver, $min_ver);
         }
 
-        if (defined $self->as_svg) {
-            print $calendar->as_svg, "\n";
+        die "ERROR: Calendar [$name] is not installed.\n";
+    }
+
+    if (defined $month || defined $year) {
+        if (defined $month) {
+            die "ERROR: Missing year.\n" unless defined $year;
         }
         else {
-            print $calendar, "\n";
+            die "ERROR: Missing month.\n" if defined $year;
+        }
+
+        if (defined $month) {
+            if (ref($calendar) eq 'Calendar::Hebrew') {
+                $calendar->date->validate_hebrew_month($month, $year);
+            }
+            else {
+                $calendar->date->validate_month($month, $year);
+            }
+            if ($month =~ /^[A-Z]+$/i) {
+                $month = $calendar->date->get_month_number($month);
+            }
+            $calendar->month($month);
+        }
+
+        if (defined $year) {
+            $calendar->date->validate_year($year);
+            $calendar->year($year);
         }
     }
+    elsif (defined $self->gdate) {
+        my $gdate = $self->gdate;
+        die "ERROR: Invalid gregorian date '$gdate'.\n"
+            unless ($gdate =~ /^\d{4}\-\d{2}\-\d{2}$/);
+
+        my ($year, $month, $day) = split /\-/, $gdate, 3;
+        print $calendar->from_gregorian($year, $month, $day) and return;
+    }
+    elsif (defined $self->jday) {
+        my $julian_day = $self->jday;
+        die "ERROR: Invalid julian day '$julian_day'.\n"
+            unless ($julian_day =~ /^\d+\.?\d?$/);
+
+        print $calendar->from_julian($julian_day) and return;
+    }
+    elsif (defined $self->list_month_names) {
+        my $month_names = $calendar->date->months;
+        shift @$month_names; # Remove empty entry.
+        print join("\n", @$month_names), "\n" and return;
+    }
+
+    if (defined $self->as_svg) {
+        print $calendar->as_svg, "\n";
+    }
     else {
-        die "ERROR: Calendar [$name] is not installed.\n";
+        print $calendar, "\n";
     }
 }
 
@@ -207,7 +234,9 @@ sub get_calendar {
     my ($self, $name) = @_;
 
     return unless defined $name;
-    return $self->{calendars}->{uc($name)} if exists $self->{calendars}->{uc($name)};
+    my $supported_cals = _supported_calendars();
+    my $cal_pkg = $supported_cals->{uc($name)}->{name};
+    return $self->{calendars}->{$cal_pkg} if exists $self->{calendars}->{$cal_pkg};
     return;
 }
 
@@ -220,8 +249,8 @@ sub _load_calendar {
     return unless defined $plugin;
 
     my $calendars = _supported_calendars();
-    foreach my $name (keys %$calendars) {
-        return $name if ($calendars->{$name} eq $plugin);
+    foreach my $key (keys %$calendars) {
+        return $calendars->{$key} if ($calendars->{$key}->{name} eq $plugin);
     }
     return;
 }
@@ -229,13 +258,13 @@ sub _load_calendar {
 sub _supported_calendars {
 
     return {
-        'BAHAI'     => 'Calendar::Bahai',
-        'GREGORIAN' => 'Calendar::Gregorian',
-        'HEBREW'    => 'Calendar::Hebrew',
-        'HIJRI'     => 'Calendar::Hijri',
-        'JULIAN'    => 'Calendar::Julian',
-        'PERSIAN'   => 'Calendar::Persian',
-        'SAKA'      => 'Calendar::Saka',
+        'BAHAI'     => { name => 'Calendar::Bahai',     min_ver => 0.46 },
+        'GREGORIAN' => { name => 'Calendar::Gregorian', min_ver => 0.15 },
+        'HEBREW'    => { name => 'Calendar::Hebrew',    min_ver => 0.03 },
+        'HIJRI'     => { name => 'Calendar::Hijri',     min_ver => 0.33 },
+        'JULIAN'    => { name => 'Calendar::Julian',    min_ver => 0.01 },
+        'PERSIAN'   => { name => 'Calendar::Persian',   min_ver => 0.35 },
+        'SAKA'      => { name => 'Calendar::Saka',      min_ver => 1.34 },
     };
 }
 

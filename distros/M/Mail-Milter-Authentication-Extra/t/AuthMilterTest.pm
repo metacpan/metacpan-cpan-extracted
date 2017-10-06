@@ -2,14 +2,16 @@ package AuthMilterTest;
 
 use strict;
 use warnings;
+use Net::DNS::Resolver::Mock;
 use Test::More;
 use Test::File::Contents;
 
 use Cwd qw{ cwd };
 use IO::Socket::INET;
 use IO::Socket::UNIX;
+use JSON;
 use Module::Load;
-        
+
 use Mail::Milter::Authentication;
 use Mail::Milter::Authentication::Client;
 use Mail::Milter::Authentication::Config;
@@ -31,15 +33,19 @@ our $MASTER_PROCESS_PID = $$;
         if ( ! -e $prefix . '/authentication_milter.json' ) {
             die "Could not find config";
         }
-    
+
         system "cp $prefix/mail-dmarc.ini .";
-        
+
         $milter_pid = fork();
         die "unable to fork: $!" unless defined($milter_pid);
         if (!$milter_pid) {
             $Mail::Milter::Authentication::Config::PREFIX = $prefix;
+            $Mail::Milter::Authentication::Config::IDENT  = 'test_authentication_milter_test';
+            my $Resolver = Net::DNS::Resolver::Mock->new();
+            $Resolver->zonefile_read( 'zonefile' );
+            $Mail::Milter::Authentication::Handler::TestResolver = $Resolver,
             Mail::Milter::Authentication::start({
-               'pid_file'   => 'tmp/authentication_milter.pid',
+                'pid_file'   => 'tmp/authentication_milter.pid',
                 'daemon'     => 0,
             });
             die;
@@ -70,6 +76,78 @@ our $MASTER_PROCESS_PID = $$;
     }
 }
 
+sub get_metrics {
+    my ( $path ) = @_;
+
+    my $sock = IO::Socket::UNIX->new(
+        'Peer' => $path,
+    );
+
+    print $sock "GET /metrics HTTP/1.0\n\n";
+
+    my $data = {};
+
+    while ( my $line = <$sock> ) {
+        chomp $line;
+        last if $line eq q{};
+    }
+    while ( my $line = <$sock> ) {
+        chomp $line;
+        next if $line =~ /^#/;
+        $line =~ /^(.*)\{(.*)\} (.*)$/;
+        my $count_id = $1;
+        my $labels = $2;
+        my $count = $3;
+        $data->{ $count_id . '{' . $labels . '}' } = $count;
+    }
+
+    return $data;
+}
+
+sub test_metrics {
+    my ( $expected ) = @_;
+
+    # Sleep for 5 to allow server to catch up on metrics
+    sleep 5;
+
+    subtest $expected => sub {
+
+        my $metrics =  get_metrics( 'tmp/authentication_milter_test_metrics.sock' );
+        my $j = JSON->new();
+
+        if ( -e $expected ) {
+
+            open my $InF, '<', $expected;
+            my @content = <$InF>;
+            close $InF;
+            my $data = $j->decode( join( q{}, @content ) );
+
+            plan tests => scalar keys %$data;
+
+            foreach my $key ( sort keys %$data ) {
+                if ( $key =~ /seconds_total/ ) {
+                    is( $metrics->{ $key } > 0, $data->{ $key } > 0, "Metrics $key" );
+                }
+                else {
+                    is( $metrics->{ $key }, $data->{ $key }, "Metrics $key" );
+                }
+            }
+
+        }
+        else {
+            #fail( 'Metrics data does not exist' );
+            # Uncomment to write out new json file
+            open my $OutF, '>', $expected;
+            $j->pretty();
+            print $OutF $j->encode( $metrics );
+            close $OutF;
+        }
+
+    };
+
+    return;
+}
+
 sub smtp_process {
     my ( $args ) = @_;
 
@@ -87,10 +165,13 @@ sub smtp_process {
         'output'    => 'tmp/result/' . $args->{'dest'},
     };
     unlink 'tmp/authentication_milter_smtp_out.sock';
-    my $cat_pid = smtpcat( $catargs );
-    sleep 2;
+    my $cat_pid;
+    if ( ! $args->{'no_cat'} ) {
+        $cat_pid = smtpcat( $catargs );
+        sleep 2;
+    }
 
-    smtpput({
+    my $return = smtpput({
         'sock_type'    => 'unix',
         'sock_path'    => 'tmp/authentication_milter_test.sock',
         'mailer_name'  => 'test.module',
@@ -100,74 +181,16 @@ sub smtp_process {
         'mail_from'    => [ $args->{'from'} ],
         'rcpt_to'      => [ $args->{'to'} ],
         'mail_file'    => [ 'data/source/' . $args->{'source'} ],
+        'eom_expect'   => $args->{'eom_expect'},
     });
 
-    waitpid( $cat_pid,0 );
-
-    files_eq( 'data/example/' . $args->{'dest'}, 'tmp/result/' . $args->{'dest'}, 'smtp ' . $args->{'desc'} );
-
-    return;
-}
-
-sub smtp_process_multi {
-    my ( $args ) = @_;
-
-    if ( ! -e $args->{'prefix'} . '/authentication_milter.json' ) {
-        die "Could not find config";
+    if ( ! $args->{'no_cat'} ) {
+        waitpid( $cat_pid,0 );
+        files_eq( 'data/example/' . $args->{'dest'}, 'tmp/result/' . $args->{'dest'}, 'smtp ' . $args->{'desc'} );
     }
-
-    # Hardcoded lines to remove in subsequent messages
-    # If you change the source email then change the awk
-    # numbers here too.
-    # This could be better!
-
-    my $catargs = {
-        'sock_type' => 'unix',
-        'sock_path' => 'tmp/authentication_milter_smtp_out.sock',
-        'remove'    => $args->{'filter'},
-        'output'    => 'tmp/result/' . $args->{'dest'},
-    };
-    unlink 'tmp/authentication_milter_smtp_out.sock';
-    my $cat_pid = smtpcat( $catargs );
-    sleep 2;
-    
-    my $putargs = {
-        'sock_type'    => 'unix',
-        'sock_path'    => 'tmp/authentication_milter_test.sock',
-        'mailer_name'  => 'test.module',
-        'connect_ip'   => [],
-        'connect_name' => [],
-        'helo_host'    => [],
-        'mail_from'    => [],
-        'rcpt_to'      => [],
-        'mail_file'    => [],
-    };
-
-    foreach my $item ( @{$args->{'ip'}} ) {
-        push @{$putargs->{'connect_ip'}}, $item;
+    else {
+        is( $return, 1, 'SMTP Put Returned ok' );
     }
-    foreach my $item ( @{$args->{'name'}} ) {
-        push @{$putargs->{'connect_name'}}, $item;
-    }
-    foreach my $item ( @{$args->{'name'}} ) {
-        push @{$putargs->{'helo_host'}}, $item;
-    }
-    foreach my $item ( @{$args->{'from'}} ) {
-        push @{$putargs->{'mail_from'}}, $item;
-    }
-    foreach my $item ( @{$args->{'to'}} ) {
-        push @{$putargs->{'rcpt_to'}}, $item;
-    }
-    foreach my $item ( @{$args->{'source'}} ) {
-        push @{$putargs->{'mail_file'}}, 'data/source/' . $item;
-    }
-    #warn 'Testing ' . $args->{'source'} . ' > ' . $args->{'dest'} . "\n";
-
-    smtpput( $putargs );
-
-    waitpid( $cat_pid,0 );
-
-    files_eq( 'data/example/' . $args->{'dest'}, 'tmp/result/' . $args->{'dest'}, 'smtp ' . $args->{'desc'} );
 
     return;
 }
@@ -225,6 +248,7 @@ sub run_milter_processing_spam {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/milter_spam.json' );
     stop_milter();
 
     return;
@@ -256,6 +280,7 @@ sub run_smtp_processing_spam {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/smap_spam.json' );
     stop_milter();
 
     return;
@@ -287,6 +312,7 @@ sub run_milter_processing_clamav {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/milter_clam.json' );
     stop_milter();
 
     return;
@@ -318,6 +344,7 @@ sub run_smtp_processing_clamav {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/smtp_clam.json' );
     stop_milter();
 
     return;
@@ -349,6 +376,7 @@ sub run_milter_processing_rspamd {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/milter_rspamd.json' );
     stop_milter();
 
     return;
@@ -380,6 +408,7 @@ sub run_smtp_processing_rspamd {
         'to'     => 'recipient2@example.net',
     });
 
+    test_metrics( 'data/metrics/smtp_rspamd.json' );
     stop_milter();
 
     return;
@@ -389,19 +418,19 @@ sub smtpput {
     my ( $args ) = @_;
 
     my $mailer_name  = $args->{'mailer_name'};
-    
+
     my $mail_file_a  = $args->{'mail_file'};
     my $mail_from_a  = $args->{'mail_from'};
     my $rcpt_to_a    = $args->{'rcpt_to'};
     my $x_name_a     = $args->{'connect_name'};
     my $x_addr_a     = $args->{'connect_ip'};
     my $x_helo_a     = $args->{'helo_host'};
-    
+
     my $sock_type    = $args->{'sock_type'};
     my $sock_path    = $args->{'sock_path'};
     my $sock_host    = $args->{'sock_host'};
     my $sock_port    = $args->{'sock_port'};
-    
+
     my $sock;
     if ( $sock_type eq 'inet' ) {
        $sock = IO::Socket::INET->new(
@@ -415,20 +444,20 @@ sub smtpput {
             'Peer' => $sock_path,
         ) || die "could not open outbound SMTP socket: $!";
     }
-    
+
     my $line = <$sock>;
-    
+
     if ( ! $line =~ /250/ ) {
         die "Unexpected SMTP response $line";
         return 0;
     }
-    
+
     send_smtp_packet( $sock, 'EHLO ' . $mailer_name,       '250' ) || die;
-    
+
     my $first_time = 1;
-   
+
     while ( @$mail_from_a ) {
-    
+
         if ( ! $first_time ) {
             if ( ! send_smtp_packet( $sock, 'RSET', '250' ) ) {
                 $sock->close();
@@ -436,16 +465,16 @@ sub smtpput {
             };
         }
         $first_time = 0;
-    
+
         my $mail_file = shift @$mail_file_a;
-        my $mail_from = shift @$mail_from_a; 
+        my $mail_from = shift @$mail_from_a;
         my $rcpt_to   = shift @$rcpt_to_a;
         my $x_name    = shift @$x_name_a;
         my $x_addr    = shift @$x_addr_a;
         my $x_helo    = shift @$x_helo_a;
-        
+
         my $mail_data = q{};
-        
+
         if ( $mail_file eq '-' ) {
             while ( my $l = <> ) {
                 $mail_data .= $l;
@@ -460,26 +489,26 @@ sub smtpput {
             $mail_data = join( q{}, @all );
             close $inf;
         }
-        
+
         $mail_data =~ s/\015?\012/\015\012/g;
         # Handle transparency
         $mail_data =~ s/\015\012\./\015\012\.\./g;
-        
+
         send_smtp_packet( $sock, 'XFORWARD NAME=' . $x_name,   '250' ) || die;
         send_smtp_packet( $sock, 'XFORWARD ADDR=' . $x_addr,   '250' ) || die;
         send_smtp_packet( $sock, 'XFORWARD HELO=' . $x_helo,   '250' ) || die;
-        
+
         send_smtp_packet( $sock, 'MAIL FROM:' . $mail_from, '250' ) || die;
         send_smtp_packet( $sock, 'RCPT TO:' .   $rcpt_to,   '250' ) || die;
         send_smtp_packet( $sock, 'DATA',                    '354' ) || die;
-        
+
         print $sock $mail_data;
         print $sock "\r\n";
-        
+
         send_smtp_packet( $sock, '.',    '250' ) || return;
-    
+
     }
-        
+
     send_smtp_packet( $sock, 'QUIT', '221' ) || return;
     $sock->close();
 
@@ -504,19 +533,19 @@ sub send_smtp_packet {
 
 sub smtpcat {
     my ( $args ) = @_;
-    
+
     my $cat_pid = fork();
     die "unable to fork: $!" unless defined($cat_pid);
-    return $cat_pid if $cat_pid; 
-    
+    return $cat_pid if $cat_pid;
+
     my $sock_type = $args->{'sock_type'};
     my $sock_path = $args->{'sock_path'};
     my $sock_host = $args->{'sock_host'};
     my $sock_port = $args->{'sock_port'};
-    
+
     my $remove = $args->{'remove'};
     my $output = $args->{'output'};
-   
+
     my @out_lines;
 
     my $sock;
@@ -534,19 +563,19 @@ sub smtpcat {
             'Local' => $sock_path,
         ) || die "could not open socket: $!";
     }
-    
+
     my $accept = $sock->accept();
-    
+
     print $accept "220 smtp.cat ESMTP Test\r\n";
-    
+
     local $SIG{'ALRM'} = sub{ die "Timeout\n" };
     alarm( 60 );
-    
+
     my $quit = 0;
     while ( ! $quit ) {
         my $command = <$accept> || { $quit = 1 };
         alarm( 60 );
-    
+
         if ( $command =~ /^HELO/ ) {
             push @out_lines, $command;
             print $accept "250 HELO Ok\r\n";

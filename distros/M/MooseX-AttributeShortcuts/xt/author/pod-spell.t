@@ -15,6 +15,7 @@ AFAICT
 Alders
 Attribute
 AttributeShortcuts
+Builder
 Chris
 David
 Etheridge
@@ -22,8 +23,10 @@ Formattable
 Graham
 Gratipay
 HasAnonBuilder
+HasDefinitionContext
 Karen
 Knop
+Method
 MooseX
 Olaf
 PayPal

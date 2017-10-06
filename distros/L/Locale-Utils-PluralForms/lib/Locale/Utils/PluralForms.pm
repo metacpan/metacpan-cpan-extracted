@@ -1,17 +1,16 @@
-package Locale::Utils::PluralForms;
+package Locale::Utils::PluralForms; ## no critic (TidyCode)
 
 use Moose;
 use MooseX::StrictConstructor;
 
 use namespace::autoclean;
-use syntax qw(method);
 
 use English qw(-no_match_vars $EVAL_ERROR);
 use HTML::Entities qw(decode_entities);
 require LWP::UserAgent;
 require Safe;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has language => (
     is       => 'rw',
@@ -22,7 +21,7 @@ has language => (
 has _all_plural_forms_url => (
     is       => 'rw',
     isa      => 'Str',
-    default  => 'http://translate.sourceforge.net/wiki/l10n/pluralforms',
+    default  => 'http://docs.translatehouse.org/projects/localization-guide/en/latest/l10n/pluralforms.html',
 );
 
 has _all_plural_forms_html => (
@@ -66,7 +65,9 @@ has plural_code => (
     writer   => '_plural_code',
 );
 
-method _get_all_plural_forms_html () {
+sub _get_all_plural_forms_html {
+    my $self = shift;
+
     my $url = $self->_all_plural_forms_url;
     my $ua  = LWP::UserAgent->new;
     $ua->env_proxy;
@@ -77,18 +78,26 @@ method _get_all_plural_forms_html () {
     return $response->decoded_content;
 }
 
-method _get_all_plural_forms () {
-    my @match = $self->_all_plural_forms_html =~ m{ # no critic(ComplexRegexes)
-        .*?
-        <td \s+ class="col0"> \s* ( [^<]+? ) \s* <
-        .*?
-        <td \s+ class="col1"> \s* ( [^<]+? ) \s* <
-        .*?
-        <td \s+ class="col2 [^"]* "> \s* ( [^<]+? ) \s* <
+sub _get_all_plural_forms {
+    my $self = shift;
+
+    ## no critic (ComplexRegexes)
+    my @match = $self->_all_plural_forms_html =~ m{
+        <tr \s+ class="row- (?: even | odd ) ">
+        \s*
+        <td> ( [^<>]+ ) </td>
+        \s*
+        <td> ( [^<>]+ ) .*? </td>
+        \s*
+        <td> ( nplurals [^<>]+? ) [;]? </td>
+        \s*
+        </tr>
     }xmsg;
+    ## use critic(ComplexRegexes)
     $self->clear_all_plural_forms_html;
     my %all_plural_forms;
     while ( my ($iso, $english_name, $plural_forms) = splice @match, 0, 3 ) { ## no critic (MagicNumbers)
+        $english_name =~ s{ \s+ \z }{}xms;
         $all_plural_forms{ decode_entities($iso) } = {
             english_name => decode_entities($english_name),
             plural_forms => decode_entities($plural_forms),
@@ -98,7 +107,9 @@ method _get_all_plural_forms () {
     return \%all_plural_forms;
 }
 
-method _language ($language) {
+sub _language {
+    my ($self, $language) = @_;
+
     my $all_plural_forms = $self->all_plural_forms;
     if ( exists $all_plural_forms->{$language} ) {
         return $self->plural_forms(
@@ -116,7 +127,9 @@ method _language ($language) {
         "Missing plural forms for language $language in all_plural_forms";
 }
 
-method _calculate_plural_forms () {
+sub _calculate_plural_forms {
+    my $self = shift;
+
     my $plural_forms = $self->plural_forms;
     $plural_forms =~ s{\b ( nplurals | plural | n ) \b}{\$$1}xmsg;
     my $safe = Safe->new;
@@ -163,7 +176,7 @@ $HeadURL: https://perl-gettext-oo.svn.sourceforge.net/svnroot/perl-gettext-oo/Lo
 
 =head1 VERSION
 
-0.001
+0.002
 
 =head1 SYNOPSIS
 
@@ -328,8 +341,6 @@ L<MooseX::StrictConstructor|MooseX::StrictConstructor>
 
 L<namespace::autoclean|namespace::autoclean>
 
-L<syntax|syntax>
-
 L<English|English>
 
 L<HTML::Entities|HTML::Entities>
@@ -350,7 +361,7 @@ not known
 
 L<http://en.wikipedia.org/wiki/Gettext>
 
-L<http://translate.sourceforge.net/wiki/l10n/pluralforms>
+L<http://docs.translatehouse.org/projects/localization-guide/en/latest/l10n/pluralforms.html>
 
 L<Locele::TextDomain|Locele::TextDomain>
 
@@ -360,7 +371,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.
@@ -368,5 +379,3 @@ All rights reserved.
 This module is free software;
 you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-=cut

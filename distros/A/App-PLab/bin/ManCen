@@ -422,11 +422,13 @@ sub on_create
    $self-> {dataExt} = 'cen';
 
    $self-> win_pointerchanged();
+   my $scale = $::application-> uiScaling;
+   $scale = 1 if $scale < 1;
 
    my $tb  = $self-> ToolBar;
    my $cck = $tb-> insert( Label =>
-      origin      => [ 120, 1],
-      size        => [ $tb-> width - 138, 36],
+      origin      => [ 120 * $scale, 1],
+      size        => [ $tb-> width - 138 * $scale, 36 * $scale],
       name        => 'PointRef',
       text        => '0:0',
       growMode    => gm::Client,
@@ -437,8 +439,8 @@ sub on_create
       font        => { style => fs::Bold },
    );
    $tb-> insert( Widget =>
-      origin      => [ $tb-> width - 18, 1],
-      size        => [ 16, 36],
+      origin      => [ $tb-> width - 18 * $scale, 1],
+      size        => [ 16 * $scale, 36 * $scale],
       transparent => 1,
       growMode    => gm::Right,
       name        => 'Lookup',

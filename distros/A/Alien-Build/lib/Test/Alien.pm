@@ -19,7 +19,7 @@ use Alien::Build::Util qw( _dump );
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 our @aliens;
@@ -203,7 +203,7 @@ sub xs_ok
   }
   else
   {
-    $xs->{c_ext} = 'c';
+    $xs->{c_ext} ||= 'c';
   }
 
   my $verbose = $xs->{verbose} || 0;
@@ -282,9 +282,15 @@ sub xs_ok
 
     my %compile_options = (
       source               => $c_filename,
-      extra_compiler_flags => [shellwords map { _flags $_, 'cflags' } @aliens],
       %{ $xs->{cbuilder_compile} },
     );
+    
+    if(defined $compile_options{extra_compiler_flags} && ref($compile_options{extra_compiler_flags}) eq '')
+    {
+      $compile_options{extra_compiler_flags} = [ shellwords $compile_options{extra_compiler_flags} ];
+    }
+    
+    push @{ $compile_options{extra_compiler_flags} }, shellwords map { _flags $_, 'cflags' } @aliens;
 
     my($out, $obj, $err) = capture_merged {
       my $obj = eval {
@@ -316,9 +322,15 @@ sub xs_ok
       my %link_options = (
         objects            => [$obj],
         module_name        => $module,
-        extra_linker_flags => [shellwords map { _flags $_, 'libs' } @aliens],
         %{ $xs->{cbuilder_link} },
       );
+
+      if(defined $link_options{extra_linker_flags} && ref($link_options{extra_linker_flags}) eq '')
+      {
+        $link_options{extra_linker_flags} = [ shellwords $link_options{extra_linker_flags} ];
+      }
+      
+      push @{ $link_options{extra_linker_flags} }, shellwords map { _flags $_, 'libs' } @aliens;
 
       my($out, $lib, $err) = capture_merged {
         my $lib = eval { 
@@ -643,7 +655,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -1014,6 +1026,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

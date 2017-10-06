@@ -6,6 +6,8 @@ use 5.010;
 
 use Carp qw( confess );
 
+require Net::IPAddress::Util;
+
 sub new {
   my $class = shift;
   $class = ref($class) || $class;
@@ -81,15 +83,18 @@ sub SPLICE {
 
 sub _checktype {
   my ($v) = @_;
-  return $v if ref $v eq 'Net::IPAddress::Util::Range';
-  if (ref $v eq 'HASH') {
-    $v = Net::IPAddress::Util::Range->new($v);
+  return $v if ref($v) eq 'Net::IPAddress::Util::Range';
+  if (ref($v) eq 'HASH') {
+    eval { $v = Net::IPAddress::Util::Range->new($v) };
   }
-  if (ref $v eq 'Net::IPAddress::Util') {
+  if (!ref($v) or ref($v) eq 'ARRAY') {
+    eval { $v = Net::IPAddress::Util->new($v) };
+  }
+  if (ref($v) eq 'Net::IPAddress::Util') {
     $v = Net::IPAddress::Util::Range->new({ ip => $v });
   }
-  if (!defined $v or ref $v ne 'Net::IPAddress::Util::Range') {
-    my $disp = defined $v ? ref $v ? ref $v : 'bare scalar' : 'undef()';
+  if (!defined($v) or ref($v) ne 'Net::IPAddress::Util::Range') {
+    my $disp = defined($v) ? (ref($v) || 'bare scalar') : 'undef()';
     confess("Invalid data type ($disp)");
   }
   return $v;
@@ -105,8 +110,12 @@ Net::IPAddress::Util::Collection::Tie - These aren't the droids you're looking f
 
 =head1 METHODS
 
-=head2 new
+=over
+
+=item new
 
 No, seriously. You should not be poking around back here. You are likely to be eaten by a grue.
+
+=back
 
 =cut

@@ -20,8 +20,6 @@ Command Line Interface:
     epubcheck ebook.epub
     epubcheck -out output.xml ebook.epub # Extracting information from an EPUB file
 
-
-
 # DESCRIPTION
 
 EBook::EPUB::Check checks whether your EPUB files are valid.

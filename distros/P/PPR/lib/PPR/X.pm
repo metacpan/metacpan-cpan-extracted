@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 use utf8;
 
 # Class for $PPR::X::ERROR objects...
@@ -63,6 +63,7 @@ use utf8;
 # Define the grammar...
 our $GRAMMAR = qr{
 (?(DEFINE)
+
     (?<PerlDocument>   (?<PerlStdDocument>
         \x{FEFF}?+      # Optional BOM marker
         (?>(?&PerlOWS))
@@ -157,9 +158,9 @@ our $GRAMMAR = qr{
            sub \b                             (?>(?&PerlOWS))
            (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
        |
-           AUTOLOAD
+           AUTOLOAD                              (?&PerlOWS)
        |
-           DESTROY
+           DESTROY                               (?&PerlOWS)
        )
        (?:
            (?>
@@ -983,12 +984,12 @@ our $GRAMMAR = qr{
         |
             (?>(?&PerlOWS))
             (?>
-                "  (?<_heredoc_terminator>  [^"\\]*+  (?: \\. [^"\\]*+ )*+  )  "
+                "  (?<_heredoc_terminator>  [^"\\]*+  (?: \\. [^"\\]*+ )*+  )  "  #"
             |
                 (?<PPR_X_HD_nointerp> ' )
-                   (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '
+                   (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '  #'
             |
-                `  (?<_heredoc_terminator>  [^`\\]*+  (?: \\. [^`\\]*+ )*+  )  `
+                `  (?<_heredoc_terminator>  [^`\\]*+  (?: \\. [^`\\]*+ )*+  )  `  #`
             )
         |
                    (?<_heredoc_terminator>                                  )
@@ -1059,7 +1060,7 @@ our $GRAMMAR = qr{
         (?>
             '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
         |
-            q \b
+            \b q \b
             (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
             (?&PPR_X_quotelike_body)
         )
@@ -1069,7 +1070,7 @@ our $GRAMMAR = qr{
         (?>
             "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
         |
-            qq \b
+            \b qq \b
             (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
             (?&PPR_X_quotelike_body_interpolated)
         )
@@ -1743,7 +1744,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000012
+This document describes PPR::X version 0.000013
 
 
 =head1 SYNOPSIS
@@ -2420,6 +2421,9 @@ specifier:
        $PPR::X::GRAMMAR
     /x
 
+Note that the saeme limitations apply to other constructs that
+match heredocs, such a C<< (?&PerlQuotelike) >> or C<< (?&PerlString) >>.
+
 
 =head3 C<< (?&PerlQuotelikeQ) >>
 
@@ -2893,6 +2897,10 @@ happening, and explain why it's happening so slowly.
 The only remedy at present is to use an older or newer version
 of Perl.
 
+For all the gory details, see:
+L<https://rt.perl.org/Public/Bug/Display.html?id=122283>
+L<https://rt.perl.org/Public/Bug/Display.html?id=122890>
+
 =back
 
 The module has no other diagnostics, apart from those Perl
@@ -2944,7 +2952,8 @@ slower in more modern versions of Perl; such is the price of full
 re-entrancy and safe lexical scoping).
 
 There are also constructs in Perl 5 which cannot be parsed without
-actually executing some code.
+actually executing some code...which the regex does not attempt to
+do, for obvious reasons.
 
 =head1 BUGS
 

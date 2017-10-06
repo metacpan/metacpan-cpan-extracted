@@ -1,7 +1,7 @@
 package Bread::Board::Types;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: types and coercions for Bread::Board
-$Bread::Board::Types::VERSION = '0.35';
+$Bread::Board::Types::VERSION = '0.36';
 use Moose::Util::TypeConstraints;
 
 use Scalar::Util qw(blessed);
@@ -115,7 +115,7 @@ Bread::Board::Types - types and coercions for Bread::Board
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

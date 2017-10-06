@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2016-09-19 00:00:00 +0000 to present.
+Changes from 2016-09-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2017-09-19 07:03:30 +0000
+version 0.005 at 2017-09-30 18:10:14 +0000
 ------------------------------------------
+
+  Change: fc4d6fa8df830010ab9fe4dda4b6cfa03436306d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:27:44 +0000
+
+    move sub into base class 
+
+------------------------------------------
+version 0.004 at 2017-09-19 07:04:15 +0000
+------------------------------------------
+
+  Change: 56e2a7e09af98f6114a74d1296e06f22130e9b92
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-19 10:04:15 +0000
+
+    Version 0.004 
 
   Change: 3bf583664293174ec84c43618482940a6073e4d2
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>

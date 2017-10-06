@@ -45,7 +45,57 @@ has [ qw/
 );
 
 
-# TODO: finish
+=head1 Operations on a mandate
+
+=head2 cancel
+
+    $Mandate->cancel;
+
+=head2 update
+
+    $Mandate->update( %params );
+
+note that you can only update the metadata on a mandate, so you must pass the params
+hash as something that looks like:
+
+    %params = ( metadata => { ... } );
+
+=cut
+
+sub cancel { shift->_operation( undef,'api_post',undef,'actions/cancel' ); }
+
+sub update {
+    my ( $self,%params ) = @_;
+
+    return $self->client->api_put(
+        sprintf( $self->endpoint,$self->id ),
+        { mandates => { %params } },
+    );
+}
+
+=head1 Status checks on a mandate
+
+    pending_customer_approval
+    pending_submission
+    submitted
+    active
+    failed
+    cancelled
+    expired
+
+    if ( $Mandate->failed ) {
+        ...
+    }
+
+=cut
+
+sub pending_customer_approval { return shift->status eq 'pending_customer_approval' }
+sub pending_submission        { return shift->status eq 'pending_submission' }
+sub submitted                 { return shift->status eq 'submitted' }
+sub active                    { return shift->status eq 'active' }
+sub failed                    { return shift->status eq 'failed' }
+sub cancelled                 { return shift->status eq 'cancelled' }
+sub expired                   { return shift->status eq 'expired' }
 
 =head1 AUTHOR
 

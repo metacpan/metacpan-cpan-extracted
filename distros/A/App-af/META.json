@@ -46,7 +46,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.038",
-            "Alien::Build" : "0.18",
+            "Alien::Build" : "1.17",
             "Capture::Tiny" : "0",
             "File::Copy::Recursive" : "0",
             "File::chdir" : "0",
@@ -54,6 +54,7 @@
             "MooseX::Types::Path::Tiny" : "0",
             "Path::Tiny" : "0",
             "Shell::Perl" : "0.003",
+            "Test2::Mock" : "0.000060",
             "Text::Table" : "0",
             "YAML" : "0",
             "namespace::autoclean" : "0",
@@ -83,11 +84,11 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

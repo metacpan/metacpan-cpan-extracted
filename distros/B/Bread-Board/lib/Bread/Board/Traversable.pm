@@ -1,7 +1,7 @@
 package Bread::Board::Traversable;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: role for traversing a container service tree
-$Bread::Board::Traversable::VERSION = '0.35';
+$Bread::Board::Traversable::VERSION = '0.36';
 use Moose::Role;
 
 with 'MooseX::Clone' => { -version => 0.05 };
@@ -119,7 +119,7 @@ Bread::Board::Traversable - role for traversing a container service tree
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

@@ -39,9 +39,11 @@ package Bar {
 
     extends 'Moxie::Object';
 
-    has 'foo';
+    has _foo => ();
 
-    sub foo { $_[0]->{foo} }
+    sub BUILDARGS : init_args( foo? => _foo );
+
+    sub foo { _foo }
 }
 
 {
@@ -61,30 +63,5 @@ package Bar {
     isa_ok($bar, 'Bar');
     is($bar->foo, 10, '... keyword args to new work');
 }
-
-package Baz {
-    use Moxie;
-
-    extends 'Moxie::Object';
-
-    has 'bar';
-
-    sub new ($class, $x) {
-        # NOTE:
-        # this is how we do argument mangling
-        # - SL
-        $class->next::method( bar => $x )
-    }
-
-    sub bar { $_[0]->{bar} }
-}
-
-{
-    my $baz = Baz->new( 10 );
-    isa_ok($baz, 'Baz');
-    is($baz->bar, 10, '... overriding new works');
-}
-
-
 
 done_testing;

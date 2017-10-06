@@ -128,13 +128,54 @@ use DateTime;
 }
 
 {
+    note "SelfArg";
+
+    my $mock = Test::Mock::One->new(
+        'X-Mock-SelfArg'   => 1,
+        'X-Mock-Stringify' => sub {
+            my $self = shift;
+            if ($self->foo eq 'bar') {
+                return $self->foo;
+            }
+            return "not bar";
+        },
+        'X-Mock-ISA' => sub {
+            my $self = shift;
+            if ($self->foo eq 'bar') {
+                return 0;
+            }
+            return 1;
+        },
+        code => sub {
+            my $self  = shift;
+            my $key   = shift;
+            my $value = shift;
+            $self->{$key} = $value;
+        },
+    );
+
+    $mock->code('foo', "bar");
+    is($mock->foo . "", 'bar', "self->{foo} has been set to bar");
+    ok(!$mock->isa("Foo"), "We aren't Foo because self->foo eq 'bar'");
+    is($mock . "", "bar", "We stringify to 'bar'");
+
+    $mock->code('foo', "baz");
+    is($mock->foo, 'baz', "self->{foo} has been set to bar");
+    isa_ok($mock, "Foo", "We are Foo because self->foo eq 'baz'");
+    is($mock . "", "not bar", "We stringify to 'not bar'");
+
+}
+
+{
     note "Copy X-Mock-XXX attributes";
 
     my $mock = Test::Mock::One->new(
-        strict          => { foo => { bar => 'baz' }, bar => [qw(sup lo)], },
-        'X-Mock-Strict' => 1,
+        strict             => { foo => { bar => 'baz' }, bar => [qw(sup lo)], },
+
+        'X-Mock-Strict'    => 1,
         'X-Mock-Stringify' => 'Foo',
         'X-Mock-ISA'       => 'X-Copy',
+        'X-Mock-SelfArg'   => 1,
     );
 
     throws_ok(
@@ -152,6 +193,8 @@ use DateTime;
 
     isa_ok($mock->strict->bar->sup, "X-Copy", "X-Mock-ISA copy works on arrayrefs");
     ok(!$mock->strict->bar->sup->isa("Foo"), "X-Mock-ISA copy works on arrayrefs isa()");
+
+    is($mock->strict->foo->{'X-Mock-SelfArg'}, 1, "X-Mock-SelfArg is present");
 
 }
 

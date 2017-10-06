@@ -16,7 +16,7 @@ use Crypt::OpenSSL::Bignum;
 use utf8;
 use base qw(Lemonldap::NG::Portal::_Browser);
 
-our $VERSION = '1.9.12';
+our $VERSION = '1.9.13';
 our $oidcCache;
 
 BEGIN {
@@ -647,7 +647,7 @@ sub decodeJSON {
     my ( $self, $json ) = @_;
     my $json_hash;
 
-    eval { $json_hash = from_json $json; };
+    eval { $json_hash = from_json( $json, { allow_nonref => 1 } ); };
 
     if ($@) {
         $json_hash->{error} = "parse_error";
@@ -1378,7 +1378,8 @@ sub getJWTJSONData {
     my ( $self, $jwt ) = @_;
 
     my $jwt_parts = $self->extractJWT($jwt);
-    return from_json( decode_base64url( $jwt_parts->[1] ) );
+    return from_json( decode_base64url( $jwt_parts->[1] ),
+        { allow_nonref => 1 } );
 }
 
 ## @method HashRef key2jwks(String key)

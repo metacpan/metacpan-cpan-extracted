@@ -238,10 +238,24 @@ static void do_gpio_write(unsigned gpio, unsigned level)
     }
 }
 
+// set bits
+
+static void do_gpio_set_bits( uint32_t offset, uint32_t value, uint32_t mask )
+{
+    uint32_t val = *(gpio_register + offset);
+    val = (val & ~mask) | (value & mask);
+    *(gpio_register + offset) = val;
+}
+
 // edge detection register settings
 static void do_gpio_set_egdereg_pin_bit(unsigned gpio, unsigned reg)
 {
-    *(gpio_register + reg + BANK) = BIT;
+    
+    uint32_t value   = BIT;
+    uint32_t mask    = BIT;
+    uint32_t offset  = reg + BANK;
+    
+    do_gpio_set_bits( offset, value, mask );
 }
 
 static int do_gpio_get_egdereg_pin_bit(unsigned gpio, unsigned reg)
@@ -256,7 +270,11 @@ static int do_gpio_get_egdereg_pin_bit(unsigned gpio, unsigned reg)
 
 static void do_gpio_clear_edgereg_pin_bit(unsigned gpio, unsigned reg)
 {
-    *(gpio_register + reg + BANK) = 0;
+    
+    uint32_t value   = 0;
+    uint32_t mask    = BIT;
+    uint32_t offset  = reg + BANK;
+    do_gpio_set_bits( offset, value, mask );
 }
 
 static int do_gpio_get_eds(unsigned gpio)

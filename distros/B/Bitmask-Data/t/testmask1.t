@@ -7,6 +7,7 @@ use Test::NoWarnings;
 
 use strict;
 use warnings;
+no if $] >= 5.017004, warnings => qw(experimental::smartmatch);
 
 use Math::BigInt;
 

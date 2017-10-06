@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Inrefs;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use List::Util qw( pairmap pairs );
 
@@ -63,6 +63,8 @@ sub patch_inrefs
       $progress->( sprintf "Patching refs in %d of %d (%.2f%%)",
          $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 2000) == 0
    }
+
+   $progress->() if $progress;
 
    foreach ( pairs $df->_roots ) {
       my ( $name, $sv ) = @$_;

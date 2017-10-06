@@ -1,15 +1,10 @@
 #!/usr/bin/perl
-
-# Copyright    : Copyright (c) 2017 Mark Dootson
-# License      : This is free software; you can redistribute it and/or modify it under
-#                the same terms as the Perl 5 programming language system itself.
-
 use strict;
 use warnings;
 use HiPi qw( :pca9685 );
 use HiPi::Interface::PCA9685;
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 use Getopt::Long;
 
@@ -21,7 +16,7 @@ my $options = {
     pan         => undef,
     tilt        => undef,
     postion     => 0,
-    delay       => 1000,
+    delay       => 5000,
     centre      => 0,
     address     => 0x40,
     'external-clock' => 0,
@@ -45,13 +40,14 @@ GetOptions ( $options,
 my $pwm = HiPi::Interface::PCA9685->new(
     address        => $options->{address},
     external_clock => $options->{'external-clock'},
+    backend => 'smbus',
 );
 
 # same as inbuilt type PCA_9685_SERVOTYPE_SG90
 my $servotype = $pwm->register_servotype(
     pulse_min         => 550,
     pulse_max         => 2350,
-    degree_range      => 160,
+    degree_range      => 150,
     degree_min        => 15,
     degree_max        => 165,
 );
@@ -100,6 +96,12 @@ if($options->{position}) {
     $tpos = $pwm->get_servo_degrees($tchan, $servotype);
     $ppos = $pwm->get_servo_degrees($pchan, $servotype);
     print qq(PCA9685 registers read: tilt $tpos, pan $ppos\n);
+    
+    # print out the calculated pulse widths 
+    
+    my $tpulse = $pwm->get_servo_pulse( $tchan );
+    my $ppulse = $pwm->get_servo_pulse( $pchan );
+    print qq(Pulse Values : tilt $tpulse, pan $ppulse\n);
 }
 
 sub do_pan {

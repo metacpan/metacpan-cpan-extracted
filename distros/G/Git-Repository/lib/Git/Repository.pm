@@ -1,5 +1,5 @@
 package Git::Repository;
-$Git::Repository::VERSION = '1.320';
+$Git::Repository::VERSION = '1.321';
 use warnings;
 use strict;
 use 5.006;
@@ -384,7 +384,7 @@ pointing to it, simply do it in two steps:
     # run a clone or init command without an instance,
     # using options like cwd
     Git::Repository->run( ... );
-    
+
     # obtain a Git::Repository instance
     # on the resulting repository
     $r = Git::Repository->new( ... );

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.96 2017-09-30
+
+ - Font importing improvement
+
 0.95 2017-08-20
 
  - Improved style for HTML and EPUB

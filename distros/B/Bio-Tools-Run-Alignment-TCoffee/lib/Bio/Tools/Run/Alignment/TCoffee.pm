@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Alignment::TCoffee;
-$Bio::Tools::Run::Alignment::TCoffee::VERSION = '1.7.2';
+$Bio::Tools::Run::Alignment::TCoffee::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -496,7 +496,7 @@ Bio::Tools::Run::Alignment::TCoffee - Object for the calculation of a multiple s
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

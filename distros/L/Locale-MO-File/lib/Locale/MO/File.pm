@@ -7,14 +7,14 @@ use namespace::autoclean;
 use Carp qw(confess);
 use Const::Fast qw(const);
 use Encode qw(find_encoding);
-use English qw(-no_match_vars $INPUT_RECORD_SEPARATOR);
+use English qw(-no_match_vars $INPUT_RECORD_SEPARATOR $OS_ERROR);
 require IO::File;
 use Moo;
 use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Bool Str ArrayRef FileHandle);
 use Params::Validate qw(validate_with SCALAR ARRAYREF);
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 const my $INTEGER_LENGTH     => length pack 'N', 0;
 const my $REVISION_OFFSET    => $INTEGER_LENGTH;
@@ -158,26 +158,30 @@ sub _unpack_message {
     my %message;
 
     # split original
-    my @string = split $CONTEXT_SEPARATOR, $msgid;
-    if ( @string > 1 ) {
-        ( $message{msgctxt}, $msgid ) = @string;
+    my @strings = split m{ \Q$CONTEXT_SEPARATOR\E }xms, $msgid;
+    if ( @strings > 1 ) {
+        ( $message{msgctxt}, $msgid ) = @strings;
     }
-    my @plural = split $PLURAL_SEPARATOR, $msgid;
-    my $is_plural = @plural > 1;
+    my @plurals = split m{ \Q$PLURAL_SEPARATOR\E }xms, $msgid;
+    my $is_plural = @plurals > 1;
     if ( $is_plural ) {
-        @message{qw(msgid msgid_plural)} = @plural;
+        @message{qw(msgid msgid_plural)} = @plurals;
     }
     else {
         $message{msgid} = $msgid;
     }
 
     # split translation
-    @plural = split $PLURAL_SEPARATOR, $msgstr;
+    @plurals = split
+        m{ \Q$PLURAL_SEPARATOR\E }xms,
+        $msgstr,
+        # get back also all hanging empty stings
+        1 + do { my @separators = $msgstr =~ m{ \Q$PLURAL_SEPARATOR\E }xmsg };
     if ( $is_plural ) {
-        $message{msgstr_plural} = \@plural;
+        $message{msgstr_plural} = \@plurals;
     }
     else {
-        $message{msgstr} = $plural[0];
+        $message{msgstr} = $plurals[0];
     }
 
     return \%message;
@@ -315,12 +319,12 @@ sub write_file {
     my $file_handle
         = $self->get_file_handle
         || IO::File->new($filename, '> :raw')
-        || confess "Can not open mo file $filename";
+        || confess "Can not open mo file $filename $OS_ERROR";
     $file_handle->print($content)
-        or confess "Can not write mo file $filename";
+        or confess "Can not write mo file $filename $OS_ERROR";
     if ( ! $self->get_file_handle ) {
         $file_handle->close
-            or confess "Can not close mo file $filename";
+            or confess "Can not close mo file $filename $OS_ERROR";
     }
 
     return $self;
@@ -335,7 +339,7 @@ sub read_file {
     my $file_handle
         = $self->get_file_handle
         || IO::File->new($filename, '< :raw')
-        || confess "Can not open mo file $filename";
+        || confess "Can not open mo file $filename $OS_ERROR";
     my $content = do {
         local $INPUT_RECORD_SEPARATOR = ();
         <$file_handle>;
@@ -398,13 +402,13 @@ __END__
 
 Locale::MO::File - Write/read gettext MO files
 
-$Id: File.pm 633 2014-08-31 18:38:06Z steffenw $
+$Id: File.pm 638 2017-10-01 19:05:33Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/dbd-po/code/Locale-MO-File/trunk/lib/Locale/MO/File.pm $
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 SYNOPSIS
 
@@ -590,7 +594,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 - 2015,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

@@ -4,7 +4,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 use Plack::Util;
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 # ABSTRACT: Plack::Middleware which sets removes body for HTTP response if it's not required
 
@@ -39,7 +39,7 @@ Plack::Middleware::RemoveRedundantBody - Plack::Middleware which sets removes bo
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Upasana <me@upasana.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Upasana.
+This software is copyright (c) 2017 by Upasana.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,135 @@
+
+[![Build Status](https://travis-ci.org/Corion/image-ccv.svg?branch=master)](https://github.com/Corion/image-ccv)
+
+# NAME
+
+Image::CCV - Crazy-cool Computer Vision bindings for Perl
+
+# SYNOPSIS
+
+    use Image::CCV qw(detect_faces);
+
+    my $scene = "image-with-faces.png";
+
+    my @coords = detect_faces( $scene );
+    print "@$_\n" for @coords;
+
+# ALPHA WARNING
+
+This code is very, very rough. It leaks memory left and right
+and the API is very much in flux. But as I got easy results using
+this code already, I am releasing it as is and will improve it and
+the API as I go along.
+
+See also [http://libccv.org](http://libccv.org) for the `libccv` website.
+
+# FUNCTIONS
+
+## `default_sift_params(%options)`
+
+Sets up the parameter block for `sift()` and related routines. Valid
+keys for `%options` are:
+
+- noctaves - number of octaves
+- nlevels - number of levels
+- up2x - boolean, whether to upscale
+- edge\_threshold - edge threshold
+- norm\_threshold - norm threshold
+- peak\_threshold - peak threshold
+
+## `get_sift_descriptor( $image, $parameters );`
+
+    my $desc = get_sift_descriptor('image.png');
+    print for @{ $desc->{keypoints} };
+
+**Not yet implemented**
+
+## `sift( $object, $scene, $params )`
+
+    my @common_features = sift( 'object.png', 'sample.png' );
+
+Returns a list of 4-element arrayrefs. The elements are:
+
+    object-x
+    object-y
+    scene-x
+    scene-y
+
+The parameters get decoded by `get_default_params`.
+
+## `detect_faces( $png_file )`
+
+    my @faces = detect_faces('sample.png');
+
+Returns a list of 5-element arrayrefs. The elements are:
+
+    x
+    y
+    width
+    height
+    confidence
+
+# LIMITATIONS
+
+Due to the early development stages, there are several limitations.
+
+## Limited data transfer
+
+Currently, the only mechanism to pass in image data to `ccv` is by loading
+grayscale PNG or JPEG images from disk. The plan is to also be able to pass
+in image data as scalars or [Imager](https://metacpan.org/pod/Imager) objects.
+
+## Limited result storage
+
+Currently, there is no implemented way to store the results of applying
+the SIFT algorithm to an image. This makes searching several images for the
+same object slow and inconvenient.
+
+## Limited memory management
+
+Memory currently is only allocated. Rarely is memory deallocated.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/image-ccv](https://github.com/Corion/image-ccv).
+
+The upstream repository of `libccv` is at
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+The support for `libccv` can be found at [http://libccv.org](http://libccv.org).
+
+# TALKS
+
+I've given one lightning talk about this module at Perl conferences:
+
+[German Perl Workshop, German](https://corion.net/talks/Image-CCV-lightning-talk/image-ccv-lightning-talk.de.html)
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Image-CCV](https://rt.cpan.org/Public/Dist/Display.html?Name=Image-CCV)
+or via mail to [image-ccv-Bugs@rt.cpan.org](https://metacpan.org/pod/image-ccv-Bugs@rt.cpan.org).
+
+# INSTALL
+
+Compilation requires -dev header libraries, so make sure you have (at the time of writing, on \*nix)
+_libjpeg8-dev_ and _libpng12-dev_ installed.
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2012-2017 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself. The CCV library
+distributed with it comes with its own license(s). Please study these
+before redistributing.

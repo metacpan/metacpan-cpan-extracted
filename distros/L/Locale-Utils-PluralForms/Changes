@@ -1,4 +1,8 @@
 Revision history for Perl extension Locale::Utils::PluralForms.
 
+0.002  Fri Sep 29 09:49:40 2017
+- removed makefile dependency Module::Build
+- changed external url
+
 0.001  Sun Nov 13 15:00:00 2011
 - first version

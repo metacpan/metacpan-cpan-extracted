@@ -1,3 +1,32 @@
+0.0276 2017-10-05
+  - rename back to_array to get_elements
+0.0275 2017-10-04
+  - fix Math.spvm loading bug
+0.0274 2017-10-04
+  - add package name check
+  - fix enum call bug
+0.0273 2017-10-03
+  - support octal literal
+  - support binary literal
+0.0272 2017-09-27
+  - add Math::tan function
+  - add Math::asin function
+  - add Math::acos function
+  - add Math::atan function
+  - add Math::to_radians function
+  - add Byte package
+  - add Short package
+  - add Integer package
+  - add Long package
+  - add Float package
+  - add Double package
+  - fix call native long function bug
+  - change byte constatant specifier b to y
+    124b -> 124y
+  - a, b, c, d, e, f become hex character.
+0.0271 2017-09-23
+  - add Math::cos function
+  - add Math::sin function
 0.0270 2017-09-22
   - fix 0 length string bug
 0.0269 2017-09-21

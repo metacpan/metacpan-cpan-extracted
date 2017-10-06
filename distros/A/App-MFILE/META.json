@@ -4,7 +4,7 @@
       "Smithfarm <presnypreklad@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "bsd"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "App::CELL" : "0.196",
+            "App::CELL" : "0.222",
             "Params::Validate" : "1.06",
             "Test::Fatal" : "0"
          }
@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CELL" : "0.196",
+            "App::CELL" : "0.222",
             "HTTP::Request::Common" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
@@ -41,22 +41,22 @@
    "provides" : {
       "App::MFILE" : {
          "file" : "lib/App/MFILE.pm",
-         "version" : "0.181"
+         "version" : "0.182"
       },
       "App::MFILE::HTTP" : {
-         "file" : "lib/App/MFILE/HTTP.pm"
+         "file" : "lib/App/MFILE/HTTP.pm",
+         "version" : 0
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://sourceforge.net/projects/mfile/",
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
          "url" : "https://sourceforge.net/p/mfile/code/"
       }
    },
-   "version" : "0.181",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.182"
 }

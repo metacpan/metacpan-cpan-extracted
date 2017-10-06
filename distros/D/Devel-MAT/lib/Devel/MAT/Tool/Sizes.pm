@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Sizes;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use constant FOR_UI => 1;
 
@@ -178,6 +178,152 @@ sub Devel::MAT::SV::owned_size
 {
    my $sv = shift;
    return $sv->{tool_sizes_owned} //= sum0 map { $_->size } $sv->owned_set;
+}
+
+=head1 COMMANDS
+
+=cut
+
+package # hide
+   Devel::MAT::Tool::Sizes::_largest;
+use base qw( Devel::MAT::Tool );
+
+=head2 largest
+
+   pmat> largest -owned
+   STASH(61) at 0x55e4317dfe10: 54.2 KiB: of which
+    |   GLOB(%*) at 0x55e43180be60: 16.9 KiB: of which
+    |    |   STASH(40) at 0x55e43180bdd0: 16.7 KiB
+    |    |   GLOB(&*) at 0x55e4318ad330: 2.8 KiB
+    |    |   others: 15.0 KiB
+    |   GLOB(%*) at 0x55e4317fdf28: 4.1 KiB: of which
+    |    |   STASH(34) at 0x55e4317fdf40: 4.0 KiB bytes
+   ...
+
+Finds and prints the largest SVs by size. The 5 largest SVs are shown.
+
+If counting sizes in a way that includes referred SVs, a tree is printed
+showing the 3 largest SVs within these, and of those the 2 largest referred
+SVs again. This should help identify large memory occupiers.
+
+Takes the following named options:
+
+=over 4
+
+=item --struct
+
+Count SVs using the structural size.
+
+=item --owned
+
+Count SVs using the owned size.
+
+=back
+
+By default, only the individual SV size is counted.
+
+=cut
+
+use constant CMD => "largest";
+
+use Getopt::Long qw( GetOptionsFromArray );
+use List::UtilsBy qw( max_by );
+
+my %seen;
+
+sub bytes2size
+{
+   my ( $bytes ) = @_;
+
+   if( $bytes < 1024 ) {
+      return sprintf "%d bytes", $bytes;
+   }
+   if( $bytes < 1024**2 ) {
+      return sprintf "%.1f KiB", $bytes / 1024;
+   }
+   if( $bytes < 1024**3 ) {
+      return sprintf "%.1f MiB", $bytes / 1024**2;
+   }
+   if( $bytes < 1024**4 ) {
+      return sprintf "%.1f GiB", $bytes / 1024**3;
+   }
+   return sprintf "%.1f TiB", $bytes / 1024**4;
+}
+
+sub list_largest_svs
+{
+   my ( $svlist, $metric, $indent, @counts ) = @_;
+
+   my $method = $metric ? "${metric}_size" : "size";
+
+   my $count = shift @counts;
+   while( $count-- ) {
+      my $largest = max_by { $_->$method } grep { !$seen{$_->addr} } @$svlist;
+      defined $largest or last;
+
+      $seen{$largest->addr}++;
+
+      Devel::MAT::Cmd->printf( $indent );
+      Devel::MAT::Cmd->print_sv( $largest );
+
+      Devel::MAT::Cmd->printf( ": %s", bytes2size $largest->$method );
+
+      if( !defined $metric or !@counts ) {
+         Devel::MAT::Cmd->printf( "\n" );
+         next;
+      }
+
+      my $set_method = "${metric}_set";
+      my @set = $largest->$set_method;
+      shift @set; # SV itself is always first
+
+      if( !@set ) {
+         Devel::MAT::Cmd->printf( "\n" );
+         next;
+      }
+
+      Devel::MAT::Cmd->printf( ": of which\n" );
+      list_largest_svs( \@set, $metric, "${indent} |   ", @counts );
+
+      $seen{$_->addr}++ for @set;
+   }
+
+   my $others = 0;
+   $others += $_->size for grep { !$seen{$_->addr} } @$svlist;
+
+   if( $others ) {
+      Devel::MAT::Cmd->printf( $indent );
+      Devel::MAT::Cmd->print_note( "others" );
+      Devel::MAT::Cmd->printf( ": %s\n", bytes2size $others );
+   }
+}
+
+sub run_cmd
+{
+   my $self = shift;
+   my $df = $self->df;
+
+   my $METRIC;
+
+   GetOptionsFromArray( \@_,
+      'struct' => sub { $METRIC = "structure" },
+      'owned'  => sub { $METRIC = "owned" },
+   ) or return;
+
+   my @svs = $df->heap;
+
+   my $method = $METRIC ? "${METRIC}_size" : "size";
+
+   my $count = 0;
+   foreach my $sv ( @svs ) {
+      $count++;
+      $self->report_progress( sprintf "Calculating sizes (%d of %d)", $count, scalar @svs ) if $count % 1000 == 0;
+      $sv->$method;
+   }
+   $self->report_progress();
+
+   undef %seen;
+   list_largest_svs( \@svs, $METRIC, "", 5, 3, 2 );
 }
 
 =head1 AUTHOR

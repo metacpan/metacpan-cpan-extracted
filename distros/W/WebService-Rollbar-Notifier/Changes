@@ -1,5 +1,8 @@
 Revision history for WebService-Rollbar-Notifier
 
+1.002009 2017-09-22
+    - Allow custom 'title' in messages
+
 1.002008 2016-08-16
     - No functional changes since 1.002007-TRIAL
 

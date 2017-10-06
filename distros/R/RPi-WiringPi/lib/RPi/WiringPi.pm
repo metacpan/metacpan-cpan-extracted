@@ -3,7 +3,7 @@ package RPi::WiringPi;
 use strict;
 use warnings;
 
-use parent 'RPi::WiringPi::Util';
+use parent 'RPi::WiringPi::Core';
 
 use GPSD::Parse;
 use RPi::ADC::ADS;
@@ -17,16 +17,16 @@ use RPi::LCD;
 use RPi::Pin;
 use RPi::Serial;
 use RPi::SPI;
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 
-our $VERSION = '2.3620';
+our $VERSION = '2.3621';
 
 my $fatal_exit = 1;
 
 BEGIN {
     sub _error {
         my $err = shift;
-        RPi::WiringPi::Util::cleanup();
+        RPi::WiringPi::Core::cleanup();
         print "\ncleaned up, exiting...\n";
         print "\noriginal error: $err\n";
         exit if $fatal_exit;
@@ -38,30 +38,6 @@ BEGIN {
 
 # core
 
-sub servo {
-    my ($self, $pin_num) = @_;
-
-    if ($> != 0){
-        die "\n\nat this time, servo() requires PWM functionality, and PWM " .
-            "requires your script to be run as the 'root' user (sudo)\n\n";
-    }
-
-    $self->_pwm_in_use(1);
-
-    my $servo = $self->pin($pin_num);
-    $servo->mode(PWM_OUT);
-    
-    $self->pwm_mode(PWM_MODE_MS);
-    $self->pwm_clock(192);
-    $self->pwm_range(2000);
-
-    return $servo;
-}
-sub _pwm_in_use {
-    my $self = shift;
-    $ENV{PWM_IN_USE} = 1 if @_;
-    return $self->{pwm_in_use};
-}
 sub new {
     my ($self, %args) = @_;
     $self = bless {%args}, $self;
@@ -125,22 +101,19 @@ sub adc {
     return $adc;
 }
 sub bmp {
-    my ($self, $base) = @_;
-    return RPi::BMP180->new($base);
+    return RPi::BMP180->new($_[1]);
 }
 sub dac {
     my ($self, %args) = @_;
-    # we don't use the pin objects; we generate them simply for registration
-    my $cs_pin = $self->pin($args{cs});
-    my $shdn_pin = $self->pin($args{shdn}) if defined $args{shdn};
+    $self->pin($args{cs});
+    $self->pin($args{shdn}) if defined $args{shdn};
     $args{model} = 'MCP4922' if ! defined $args{model};
     my $dac = RPi::DAC::MCP4922->new(%args);
     return $dac;
 }
 sub dpot {
     my ($self, $cs, $channel) = @_;
-    # we don't use the pin objects; we generate them simply for registration
-    my $cs_pin = $self->pin($cs);
+    $self->pin($cs);
     my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $channel);
     return $dpot;
 }
@@ -151,9 +124,8 @@ sub gps {
 }
 sub hcsr04 {
     my ($self, $t, $e) = @_;
-    # we don't use the pin objects; we generate them simply for registration
-    my $trig_pin = $self->pin($t);
-    my $echo_pin = $self->pin($e);
+    $self->pin($t);
+    $self->pin($e);
     return RPi::HCSR04->new($t, $e);
 }
 sub hygrometer {
@@ -177,7 +149,7 @@ sub lcd {
             die "lcd() requires pin configuration within a hash\n";
         }
         next if $args{$_} == 0;
-        my $pin = $self->pin($args{$_});
+        $self->pin($args{$_});
     }
 
     my $lcd = RPi::LCD->new;
@@ -187,9 +159,7 @@ sub lcd {
 sub pin {
     my ($self, $pin_num) = @_;
 
-    # we don't use the pin objects; we generate them simply for registration
-
-    my $pins_in_use = $self->registered_pins;
+    $self->registered_pins;
     my $gpio = $self->pin_to_gpio($pin_num);
 
     if (grep {$gpio == $_} @{ $self->registered_pins }){
@@ -203,6 +173,25 @@ sub pin {
 sub serial {
     my ($self, $device, $baud) = @_;
     return RPi::Serial->new($device, $baud);
+}
+sub servo {
+    my ($self, $pin_num) = @_;
+
+    if ($> != 0){
+        die "\n\nat this time, servo() requires PWM functionality, and PWM " .
+            "requires your script to be run as the 'root' user (sudo)\n\n";
+    }
+
+    $self->_pwm_in_use(1);
+
+    my $servo = $self->pin($pin_num);
+    $servo->mode(PWM_OUT);
+
+    $self->pwm_mode(PWM_MODE_MS);
+    $self->pwm_clock(192);
+    $self->pwm_range(2000);
+
+    return $servo;
 }
 sub shift_register {
     my ($self, $base, $num_pins, $data, $clk, $latch) = @_;
@@ -229,11 +218,16 @@ sub _fatal_exit {
     $fatal_exit = $self->{fatal_exit} if defined $self->{fatal_exit};
     return $self->{fatal_exit};
 }
+sub _pwm_in_use {
+    my $self = shift;
+    $ENV{PWM_IN_USE} = 1 if @_;
+    return $self->{pwm_in_use};
+}
 sub _setup {
     return $_[0]->{setup};
 }
 
-sub _vim{1;};
+sub _vim{};
 1;
 __END__
 
@@ -245,7 +239,7 @@ various items
 =head1 SYNOPSIS
 
     use RPi::WiringPi;
-    use RPi::WiringPi::Constant qw(:all);
+    use RPi::Const qw(:all);
 
     my $pi = RPi::WiringPi->new;
 
@@ -485,7 +479,7 @@ crash, we can reset the Pi back to default settings, so components are not left
 in an inconsistent state. Component modules do none of these things.
 
 There are a basic set of constants that can be imported. See
-L<RPi::WiringPi::Constant>.
+L<RPi::Const>.
 
 It's handy to have access to a pin mapping conversion chart. There's an
 excellent pin scheme map for reference at
@@ -495,8 +489,8 @@ command.
 
 =head1 METHODS
 
-See L<RPi::WiringPi::Util> for utility/helper methods that are imported into
-an C<RPi::WiringPi> object.
+See L<RPi::WiringPi::Core> for utility/helper/hardware-specific methods that are
+imported into an C<RPi::WiringPi> object.
 
 =head2 new([%args])
 
@@ -513,49 +507,69 @@ call to C<die()> is trapped, by default, we clean up, and then C<exit()>. Set
 C<fatal_exit> to false (C<0>) to perform the cleanup, and then continue running
 your script. This is for unit testing purposes only.
 
-=head2 pin($pin_num)
+=head2 adc()
 
-Returns a L<RPi::Pin> object, mapped to a specified GPIO pin, which
-you can then perform operations on. See that documentation for full usage
-details.
+There are two different ADCs that you can select from. The default is the
+ADS1x15 series:
+
+=head3 ADS1115
+
+Returns a L<RPi::ADC::ADS> object, which allows you to read the four analog
+input channels on an Adafruit ADS1xxx analog to digital converter.
 
 Parameters:
 
-    $pin_num
+The default (no parameters) is almost always enough, but please do review
+the documentation in the link above for further information, and have a
+look at the
+L<ADC tutorial section|RPi::WiringPi::FAQ/ANALOG TO DIGITAL CONVERTERS> in
+this distribution.
 
-Mandatory, Integer: The pin number to attach to.
+=head3 MCP3008
 
-=head2 lcd(...)
+You can also use an L<RPi::ADC::MCP3008> ADC.
 
-Returns a L<RPi::LCD> object, which allows you to fully manipulate
-LCD displays connected to your Raspberry Pi.
+Parameters:
 
-Please see the linked documentation for information regarding the parameters
-required.
+    model => 'MCP3008'
 
-=head2 i2c($addr, [$device])
+Mandatory, String. The exact quoted string above.
 
-Creates a new L<RPi::I2C> device object which allows you to communicate with
-the devices on an I2C bus.
+    channel => $channel
 
-See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+Mandatory, Integer. C<0> or C<1> for the Pi's onboard hardware CS/SS CE0 and CE1
+pins, or any GPIO number above C<1> in order to use an arbitrary GPIO pin for
+the CS pin, and we'll do the bit-banging of the SPI bus automatically.
 
-=head2 serial($device, $baud)
+=head2 bmp()
 
-Creates a new L<RPi::Serial> object which allows basic read/write access to a
-serial bus.
+Returns a L<RPi::BMP180> object, which allows you to return the
+current temperature in farenheit or celcius, along with the ability to retrieve
+the barometric pressure in kPa.
 
-See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+=head2 dac(model => 'MCP4922')
 
-=head2 spi($channel, $speed)
+Returns a L<RPi::DAC::MCP4922> object (supports all 49x2 series DACs). These
+chips provide analog output signals from the Pi's digital output. Please
+see the documentation of that module for further information on both the
+configuration and use of the DAC object.
 
-Creates a new L<RPi::SPI> object which allows you to communicate on the Serial
-Peripheral Interface (SPI) bus with attached devices.
+Parameters:
 
-See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+    model => 'MCP4922'
+
+Optional, String. The model of the DAC you're using. Defaults to C<MCP4922>.
+
+    channel => 0|1
+
+Mandatory, Bool. The SPI channel to use.
+
+    cs => Integer
+
+Mandatory, Integer. A valid GPIO pin that the DAC's Chip Select is connected to.
+
+There are a handful of other parameters that aren't required. For those, please
+refer to the L<RPi::DAC::MCP4922> documentation.
 
 =head2 dpot($cs, $channel)
 
@@ -572,6 +586,83 @@ Returns a L<GPSD::Parse> object, allowing you to track your location.
 The GPS distribution requires C<gpsd> to be installed and running. All
 parameters for the GPS can be sent in here and we'll pass them along. Please see
 the link above for the full documentation on that module.
+
+=head2 hcsr04($trig, $echo)
+
+Returns a L<RPi::HCSR04> ultrasonic distance measurement sensor object, allowing
+you to retrieve the distance from the sensor in inches, centimetres or raw data.
+
+Parameters:
+
+    $trig
+
+The trigger pin number, in GPIO numbering scheme.
+
+    $echo
+
+The echo pin number, in GPIO numbering scheme.
+
+=head2 hygrometer($pin)
+
+Returns a L<RPi::DHT11> temperature/humidity sensor object, allows you to fetch
+the temperature (celcius or farenheit) as well as the current humidity level.
+
+=head2 i2c($addr, [$device])
+
+Creates a new L<RPi::I2C> device object which allows you to communicate with
+the devices on an I2C bus.
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+=head2 lcd(...)
+
+Returns a L<RPi::LCD> object, which allows you to fully manipulate
+LCD displays connected to your Raspberry Pi.
+
+Please see the linked documentation for information regarding the parameters
+required.
+
+=head2 pin($pin_num)
+
+Returns a L<RPi::Pin> object, mapped to a specified GPIO pin, which
+you can then perform operations on. See that documentation for full usage
+details.
+
+Parameters:
+
+    $pin_num
+
+Mandatory, Integer: The pin number to attach to.
+
+=head2 serial($device, $baud)
+
+Creates a new L<RPi::Serial> object which allows basic read/write access to a
+serial bus.
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+=head2 servo($pin_num)
+
+This method configures PWM clock and divisor to operate a typical 50Hz servo,
+and returns a special L<RPi::Pin> object. These servos have a C<left> pulse of
+C<50>, a C<centre> pulse of C<150> and a C<right> pulse of C<250>. On exit of
+the program (or a crash), we automatically clean everything up properly.
+
+Parameters:
+
+    $pin_num
+
+Mandatory, Integer: The pin number (technically, this *must* be C<18> on the
+Raspberry Pi 3, as that's the only hardware PWM pin.
+
+Example:
+
+    my $servo = $pi->servo(18);
+
+    $servo->pwm(50);  # all the way left
+    $servo->pwm(250); # all the way right
 
 =head2 shift_register($base, $num_pins, $data, $clk, $latch)
 
@@ -609,97 +700,13 @@ shift register.
 Mandatory: Integer, the GPIO pin number attached to the C<STCP> pin (12) on the
 shift register.
 
-=head2 adc()
+=head2 spi($channel, $speed)
 
-There are two different ADCs that you can select from. The default is the
-ADS1x15 series:
+Creates a new L<RPi::SPI> object which allows you to communicate on the Serial
+Peripheral Interface (SPI) bus with attached devices.
 
-=head3 ADS1115
-
-Returns a L<RPi::ADC::ADS> object, which allows you to read the four analog
-input channels on an Adafruit ADS1xxx analog to digital converter.
-
-Parameters:
-
-The default (no parameters) is almost always enough, but please do review
-the documentation in the link above for further information, and have a
-look at the 
-L<ADC tutorial section|RPi::WiringPi::FAQ/ANALOG TO DIGITAL CONVERTERS> in
-this distribution.
-
-=head3 MCP3008
-
-You can also use an L<RPi::ADC::MCP3008> ADC.
-
-Parameters:
-
-    model => 'MCP3008'
-
-Mandatory, String. The exact quoted string above.
-
-    channel => $channel
-
-Mandatory, Integer. C<0> or C<1> for the Pi's onboard hardware CS/SS CE0 and CE1
-pins, or any GPIO number above C<1> in order to use an arbitrary GPIO pin for
-the CS pin, and we'll do the bit-banging of the SPI bus automatically.
-
-=head2 dac(model => 'MCP4922')
-
-Returns a L<RPi::DAC::MCP4922> object (supports all 49x2 series DACs). These
-chips provide analog output signals from the Pi's digital output. Please
-see the documentation of that module for further information on both the
-configuration and use of the DAC object.
-
-Note that if the C<model> parameter is not sent in, we default to C<MCP4922>.
-
-=head2 bmp()
-
-Returns a L<RPi::BMP180> object, which allows you to return the
-current temperature in farenheit or celcius, along with the ability to retrieve
-the barometric pressure in kPa.
-
-=head2 hygrometer($pin)
-
-Returns a L<RPi::DHT11> temperature/humidity sensor object, allows you to fetch
-the temperature (celcius or farenheit) as well as the current humidity level.
-
-=head2 hcsr04($trig, $echo)
-
-Returns a L<RPi::HCSR04> ultrasonic distance measurement sensor object, allowing
-you to retrieve the distance from the sensor in inches, centimetres or raw data.
-
-Parameters:
-
-    $trig
-
-The trigger pin number, in GPIO numbering scheme.
-
-    $echo
-
-The echo pin number, in GPIO numbering scheme.
-
-=head2 servo($pin_num)
-
-This method configures PWM clock and divisor to operate a typical 50Hz servo,
-and returns a special L<RPi::Pin> object. These servos have a C<left> pulse of
-C<50>, a C<centre> pulse of C<150> and a C<right> pulse of C<250>. On exit of
-the program (or a crash), we automatically clean everything up properly.
-
-Parameters:
-
-    $pin_num
-
-Mandatory, Integer: The pin number (technically, this *must* be C<18> on the
-Raspberry Pi 3, as that's the only hardware PWM pin.
-
-Example:
-
-    my $servo = $pi->servo(18);
-
-    $servo->pwm(50);  # all the way left
-    $servo->pwm(250); # all the way right
-
-=head1 INTERNAL PUBLIC METHODS
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
 
 =head1 RUNNING TESTS
 

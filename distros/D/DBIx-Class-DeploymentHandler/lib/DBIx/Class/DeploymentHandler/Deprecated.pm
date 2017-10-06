@@ -1,9 +1,11 @@
 package DBIx::Class::DeploymentHandler::Deprecated;
-$DBIx::Class::DeploymentHandler::Deprecated::VERSION = '0.002220';
+$DBIx::Class::DeploymentHandler::Deprecated::VERSION = '0.002221';
 # ABSTRACT: (DEPRECATED) Use this if you are stuck in the past
 
 use Moose;
 use Moose::Util 'apply_all_roles';
+
+sub initial_version { return $_[0]->database_version }
 
 extends 'DBIx::Class::DeploymentHandler::Dad';
 # a single with would be better, but we can't do that

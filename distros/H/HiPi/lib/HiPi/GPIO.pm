@@ -17,7 +17,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( );
 
@@ -35,6 +35,7 @@ use constant {
     GPAREN0  => 31,
     GPAFEN0  => 34,
 };
+
 
 my @_alt_function_names = (
     [qw( I2C0_SDA      SA5          ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 0
@@ -78,7 +79,6 @@ my @_alt_function_names = (
     [qw( ALT0          SA2          PCM_DOUT UART0_RTS   ALT4 UART1_RTS ) ], # GPIO 31
     
 );
-
 
 sub error_report {
     my ( $error ) = @_;
@@ -132,6 +132,36 @@ sub set_pin_pud {
     return xs_gpio_set_pud( $gpio, $pud);
 }
 
+sub set_pin_activelow {
+    my($class, $gpio, $alow ) = @_;
+    warn q(HiPi::GPIO does not support active_low);
+    return undef;
+}
+
+sub get_pin_activelow {
+    my($class, $gpio ) = @_;
+    warn q(HiPi::GPIO does not support active_low);
+    return undef;
+}
+
+sub get_pin_interrupt_filepath {
+    my($class, $gpio ) = @_;
+    warn q(HiPi::GPIO does not support interrupts);
+    return undef;
+}
+
+sub set_pin_interrupt {
+    my($class, $gpio, $newedge ) = @_;
+    warn q(HiPi::GPIO does not support interrupts);
+    return undef;
+}
+
+sub get_pin_interrupt {
+    my($class, $gpio ) = @_;
+    warn q(HiPi::GPIO does not support interrupts);
+    return undef;
+}
+
 sub get_pin_function {
     my($class, $gpio) = @_;
     my $mode = $class->get_pin_mode( $gpio );
@@ -168,81 +198,83 @@ sub get_pin_function {
     return ( wantarray ) ? ( $funcname, $altnum ) : $funcname;
 }
 
-sub get_pin_edge_detect {
-    my( $self, $gpio ) = @_;
-    return xs_gpio_read_edge_detect( $gpio );
-}
+## edge detect functions conflict with system
 
-sub clear_pin_edge_detect {
-    my( $self, $gpio ) = @_;
-    return xs_gpio_clear_edge_detect( $gpio );
-}
-
-sub set_rising_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPREN0(), $val);
-}
-
-sub get_rising_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPREN0());
-}
-
-sub set_falling_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPFEN0(), $val);
-}
-
-sub get_falling_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPFEN0());
-}
-
-sub set_high_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPHEN0(), $val);
-}
-
-sub get_high_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPHEN0());
-}
-
-sub set_low_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPLEN0(), $val);
-}
-
-sub get_low_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPLEN0());
-}
-
-sub set_async_rising_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPAREN0(), $val);
-}
-
-sub get_async_rising_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPAREN0());
-}
-
-sub set_async_falling_edge_detect {
-    my($class, $gpio, $val) = @_;
-    $val //= 0;
-    return xs_gpio_set_edge_detect( $gpio, GPAFEN0(), $val);
-}
-
-sub get_async_falling_edge_detect {
-    my($class, $gpio) = @_;
-    return xs_gpio_get_edge_detect( $gpio, GPAFEN0());
-}
+#sub get_pin_edge_detect {
+#    my( $self, $gpio ) = @_;
+#    return xs_gpio_read_edge_detect( $gpio );
+#}
+#
+#sub clear_pin_edge_detect {
+#    my( $self, $gpio ) = @_;
+#    return xs_gpio_clear_edge_detect( $gpio );
+#}
+#
+#sub set_rising_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPREN0(), $val);
+#}
+#
+#sub get_rising_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPREN0());
+#}
+#
+#sub set_falling_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPFEN0(), $val);
+#}
+#
+#sub get_falling_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPFEN0());
+#}
+#
+#sub set_high_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPHEN0(), $val);
+#}
+#
+#sub get_high_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPHEN0());
+#}
+#
+#sub set_low_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPLEN0(), $val);
+#}
+#
+#sub get_low_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPLEN0());
+#}
+#
+#sub set_async_rising_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPAREN0(), $val);
+#}
+#
+#sub get_async_rising_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPAREN0());
+#}
+#
+#sub set_async_falling_edge_detect {
+#    my($class, $gpio, $val) = @_;
+#    $val //= 0;
+#    return xs_gpio_set_edge_detect( $gpio, GPAFEN0(), $val);
+#}
+#
+#sub get_async_falling_edge_detect {
+#    my($class, $gpio) = @_;
+#    return xs_gpio_get_edge_detect( $gpio, GPAFEN0());
+#}
 
 # Aliases
 

@@ -5,19 +5,20 @@ use warnings;
 use Scalar::Util qw/reftype blessed/;
 use MooX::ReturnModifiers qw/return_modifiers/;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
-use constant ro       => 'ro';
-use constant is_ro    => ( is => ro );
-use constant rw       => 'rw';
-use constant is_rw    => ( is => rw );
-use constant nan      => undef;
-use constant lzy      => ( lazy => 1 );
-use constant bld      => ( builder => 1 );
-use constant lzy_bld  => ( lazy_build => 1 );
-use constant trg      => ( trigger => 1 );
-use constant clr      => ( clearer => 1 );
-use constant req      => ( required => 1 );
+use constant ro => 'ro';
+use constant is_ro => ( is => ro );
+use constant rw => 'rw';
+use constant is_rw => ( is => rw );
+use constant nan => undef;
+use constant lzy => ( lazy => 1 );
+use constant bld => ( builder => 1 );
+use constant lzy_bld => ( lazy_build => 1 );
+use constant trg => ( trigger => 1 );
+use constant clr => ( clearer => 1 );
+use constant req => ( required => 1 );
+use constant coe => ( coerce => 1 );
 use constant lzy_hash => ( lazy => 1, default => sub { {} });
 use constant lzy_array => ( lazy => 1, default => sub { [] });
 
@@ -44,7 +45,7 @@ sub import {
     { 
         no strict 'refs'; 
         ${"${target}::"}{$_} = ${"${package}::"}{$_}
-          foreach (scalar @export ? @export : qw/ro is_ro rw is_rw nan lzy bld lzy_bld trg clr req lzy_hash lzy_array/);
+          foreach (scalar @export ? @export : qw/ro is_ro rw is_rw nan lzy bld lzy_bld trg clr req coe lzy_hash lzy_array/);
         *{"${target}::attributes"} = $attributes; 
     }
 
@@ -94,7 +95,7 @@ MooX::LazierAttributes - Lazier Attributes.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -301,6 +302,10 @@ undef
 =head3 req
 
 ( required => 1 ),
+
+=head3 coe
+
+( coerce => 1 ),
 
 =head3 lzy_hash
 

@@ -18,6 +18,9 @@ t/sqlite.tests/create.html-table
 t/sqlite.tests/create.markdown-record
 t/sqlite.tests/create.markdown-table
 t/sqlite.tests/create.sql
+t/sqlite.tests/numbers.markdown-record
+t/sqlite.tests/numbers.markdown-table
+t/sqlite.tests/numbers.sql
 t/sqlite.tests/select.html-record
 t/sqlite.tests/select.html-table
 t/sqlite.tests/select.markdown-record

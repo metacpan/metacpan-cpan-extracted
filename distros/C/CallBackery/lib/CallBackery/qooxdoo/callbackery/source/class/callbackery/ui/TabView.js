@@ -14,16 +14,20 @@ qx.Class.define("callbackery.ui.TabView", {
 
     construct : function() {
         this.base(arguments);
-        var baseCfg = callbackery.data.Config.getInstance().getBaseConfig();       
-        var userCfg = callbackery.data.Config.getInstance().getUserConfig();
+        var cfg = callbackery.data.Config.getInstance();
+        var baseCfg = cfg.getBaseConfig();
+        var userCfg = cfg.getUserConfig();
+        var urlCfg = cfg.getUrlConfig();
         var tabMap = this.__tabMap = {};
         userCfg.plugins.map(function(cfg){
-            var page = tabMap[cfg.name] 
+            var page = tabMap[cfg.name]
                 = new callbackery.ui.Page(cfg);
             this.add(page);
         },this);
         var initialPlugin = tabMap[baseCfg.initial_plugin];
- 
+        if (urlCfg.app){
+            initialPlugin = tabMap[urlCfg.app];
+        }
         if (initialPlugin){
             initialPlugin.getChildControl('button').execute();
         }

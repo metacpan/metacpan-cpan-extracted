@@ -38,12 +38,43 @@ for my $k (keys %EXPORT_TAGS) {
 
 our @EXPORT_OK = keys %EXPORT_OK;
 
-$EXPORT_TAGS{ all } = [@EXPORT_OK];
+$EXPORT_TAGS{ all } = [ @EXPORT_OK ];
 
 our $DIE_ON_ERROR = 0;
 our $PROMOTE_N32 = 1;
+our $REPAIR_V3_FORMAT = 0;
+our $WARN_ON_REPAIR = 1;
 
-our $VERSION = '4.000';
+our $VERSION = '4.004';
+
+our $fourish = qr/^(?:::ffff:0+:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/io;
+our $broken_fourish = qr/^::ffff:(\d+)\.(\d+)\.(\d+)\.(\d+)$/io;
+our $numberish = qr/^\d+$/o;
+our $normalish = qr/^([0-9a-f]{32})$/io;
+our $sixish = qr/^([0-9a-f:]+)(?:\%.*)?$/io;
+
+sub _repair_v3_format {
+  my ($old) = @_;
+  if (
+    !(grep { $_ } @$old[ 0 .. 9 ])
+    && $old->[ 10 ] == 0xff
+    && $old->[ 11 ] == 0xff
+  ) {
+    if ($WARN_ON_REPAIR > 1) {
+      local $Carp::Internal{ (__PACKAGE__) };
+      cluck('Repairing v3.x module data to v4.x data');
+    }
+    elsif ($WARN_ON_REPAIR) {
+      local $Carp::Internal{ (__PACKAGE__) };
+      carp('Repairing v3.x module data to v4.x data');
+    }
+    $old->[ 8 ] = 0xff;
+    $old->[ 9 ] = 0xff;
+    $old->[ 10 ] = 0;
+    $old->[ 11 ] = 0;
+  }
+  return $old;
+}
 
 sub IP {
   return Net::IPAddress::Util->new($_[0]);
@@ -62,13 +93,12 @@ sub new {
   }
   elsif (ref($address) eq 'ARRAY' && @$address == 4) {
     # FIXME Principal of least surprise here? Should feeding in 4 values make an IPv4?
-    # TODO At least document what it's doing, to reduce the surprise.
     $normal = [ unpack 'C16', pack 'N4', @$address ];
   }
   elsif (ref $address and eval { $address->isa(__PACKAGE__) }) {
-    return bless { address => $address->{ address } } => $class;
+    $normal = [ unpack 'C16', $address->{ address } ];
   }
-  elsif ($address =~ /^(?:::ffff:0:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/o) {
+  elsif ($address =~ $fourish) {
     $normal = [
       0, 0, 0, 0,
       0, 0, 0, 0,
@@ -76,7 +106,23 @@ sub new {
       $1, $2, $3, $4
     ];
   }
-  elsif ($PROMOTE_N32 and $address =~ /^\d+$/o and $address >= 0 and $address <= (2 ** 32) - 1) {
+  elsif ($REPAIR_V3_FORMAT && $address =~ $broken_fourish) {
+    if ($WARN_ON_REPAIR > 1) {
+      local $Carp::Internal{ (__PACKAGE__) };
+      cluck('Repairing v3.x module data to v4.x data');
+    }
+    elsif ($WARN_ON_REPAIR) {
+      local $Carp::Internal{ (__PACKAGE__) };
+      carp('Repairing v3.x module data to v4.x data');
+    }
+    $normal = [
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0xff, 0xff, 0, 0,
+      $1, $2, $3, $4
+    ];
+  }
+  elsif ($PROMOTE_N32 and $address =~ $numberish and $address >= 0 and $address <= (2 ** 32) - 1) {
     $normal = [
       0, 0, 0, 0,
       0, 0, 0, 0,
@@ -84,7 +130,7 @@ sub new {
       unpack('C4', pack('N', $address))
     ];
   }
-  elsif ("$address" =~ /^([0-9a-f]{32})$/smio) {
+  elsif ("$address" =~ $normalish) {
     my $fresh = $1;
     eval "require Math::BigInt" or return ERROR("Could not load Math::BigInt: $@");
     my $raw = Math::BigInt->from_hex("$fresh");
@@ -98,7 +144,7 @@ sub new {
     }
     eval "no Math::BigInt";
   }
-  elsif ($address =~ /^\d+$/o) {
+  elsif ($address =~ $numberish) {
     eval "require Math::BigInt" or return ERROR("Could not load Math::BigInt: $@");
     my $raw = Math::BigInt->new("$address");
     while ($raw > 0) {
@@ -112,11 +158,11 @@ sub new {
     eval "no Math::BigInt";
   }
   elsif (
-    (
+    $address =~ $sixish
+    and (
       scalar(grep { /::/o } split(/[[:alnum:]]+/, $address)) == 1
       or scalar(grep { /[[:alnum:]]+/ } split(/:/, $address)) == 8
     )
-    and $address =~ /^([0-9a-f:]+)(?:\%.*)?$/msoi
   ) {
     # new() from IPv6 address, accepting and ignoring the Scope ID
     $address = $1;
@@ -133,10 +179,13 @@ sub new {
     }
   }
   elsif (length($address) == 16) {
-    return bless { address => $address } => $class;
+    $normal = [ unpack('C16', $address) ];
   }
   else {
     return ERROR("Invalid argument `$address', a(n) " . (ref($address) || 'bare scalar') . ' provided');
+  }
+  if ($REPAIR_V3_FORMAT) {
+    $normal = _repair_v3_format($normal);
   }
   return bless { address => pack('C16', @$normal) } => $class;
 }
@@ -532,22 +581,22 @@ Net::IPAddress::Util - Version-agnostic representation of an IP address
 
 =head1 VERSION
 
-Version 4.000
+Version 4.004
 
 =head1 SYNOPSIS
 
   use Net::IPAddress::Util qw( IP );
 
   my $ipv4  = IP('192.168.0.1');
-  my $ipv46 = IP('::ffff:192.168.0.1');
+  my $ipv46 = IP('::ffff:0:192.168.0.1');
   my $ipv6  = IP('fe80::1234:5678:90ab');
 
   print "$ipv4\n";  # 192.168.0.1
   print "$ipv46\n"; # 192.168.0.1
   print "$ipv6\n";  # fe80::1234:5678:90ab
 
-  print $ipv4->normal_form()  . "\n"; # 00000000000000000000ffffc0a80001
-  print $ipv46->normal_form() . "\n"; # 00000000000000000000ffffc0a80001
+  print $ipv4->normal_form()  . "\n"; # 0000000000000000ffff0000c0a80001
+  print $ipv46->normal_form() . "\n"; # 0000000000000000ffff0000c0a80001
   print $ipv6->normal_form()  . "\n"; # fe8000000000000000001234567890ab
 
   for (my $ip = IP('192.168.0.0'); $ip <= IP('192.168.0.255'); $ip++) {
@@ -560,8 +609,8 @@ The goal of the Net::IPAddress::Util modules is to make IP addresses easy to
 deal with, regardless of whether they're IPv4 or IPv6, and regardless of the
 source (and destination) of the data being manipulated. The module
 Net::IPAddress::Util is for working with individual addresses,
-Net::IPAddress::Util::Range is for working with individual ranges of
-addresses, and Net::IPAddress::Util::Collection is for working with
+L<Net::IPAddress::Util::Range> is for working with individual ranges of
+addresses, and L<Net::IPAddress::Util::Collection> is for working with
 collections of addresses and/or ranges.
 
 =head1 GLOBAL VARIABLES
@@ -579,42 +628,82 @@ accordingly (i.e. to do implicitly what n32_to_ipv4() does). Set to a false
 value to make new() treat all bare numbers as 128-bit numbers representing
 IPv6 addresses. Defaults to false.
 
+=head2 $Net::IPAddress::Util::REPAIR_V3_FORMAT
+
+Set to a true value to make new() accept its argument in the "broken" format
+used by module versions prior to v4.000, and automatically "repair" them to the
+format used by v4.x of this module. Defaults to false.
+
+=head2 $Net::IPAddress::Util::WARN_ON_REPAIR
+
+Set to a true value to make any "repairs" undertaken by new() issue a warning
+using the L<Carp> module. Specifically, if set to the number 2 (or higher), then
+new() will cluck() whenever it performs a repair, and if set to any other true
+value, then new() will carp() whenever it performs a repair. If set to a false
+value, then repairs (if any) will occur silently. Defaults to 1.
+
 =head1 EXPORTABLE FUNCTIONS
 
-=head2 explode_ip
+=over
 
-=head2 implode_ip
+=item explode_ip
+
+=item implode_ip
 
 Transform an IP address to and from an array of 128 bits, MSB-first.
 
-=head2 common_prefix
+=back
+
+=over
+
+=item common_prefix
 
 Given two bit arrays (as provided by C<explode_ip>), return the truncated
 bit array of the prefix bits those two arrays have in common.
 
-=head2 prefix_mask
+=back
+
+=over
+
+=item prefix_mask
 
 Given two bit arrays (as provided by C<explode_ip>), return a truncated bit
 array of ones of the same length as the shared C<common_prefix> of the two
 arrays.
 
-=head2 ip_pad_prefix
+=back
+
+=over
+
+=item ip_pad_prefix
 
 Take a truncated bit array, and right-pad it with zeroes to the appropriate
 length.
 
-=head2 ipv4_mask
+=back
+
+=over
+
+=item ipv4_mask
 
 Returns a bitmask that can be ANDed against an IP to pull out only
 the IPv4-relevant bits, that is the N32 portion with the 0xffff appended to its
 front.
 
-=head2 ipv4_flag
+=back
+
+=over
+
+=item ipv4_flag
 
 Returns a bitmask that can be ORed onto an N32 to make it a proper "IPv4
 stored as IPv6" N128.
 
-=head2 radix_sort
+=back
+
+=over
+
+=item radix_sort
 
 Given an array of objects, sorts them in ascending order, faster than Perl's
 built-in sort command.
@@ -625,17 +714,21 @@ duplicates, so ymmv. B<There are also (rare) corner cases> in which radix_sort()
 can chew up so much RAM that it causes paging / swapping, which I<will> slow
 down the process I<dramatically>.
 
+=back
+
 =head1 COMPATIBILITY API
 
-=head2 ip2num
+=over
 
-=head2 num2ip
+=item ip2num
 
-=head2 validaddr
+=item num2ip
 
-=head2 mask
+=item validaddr
 
-=head2 fqdn
+=item mask
+
+=item fqdn
 
 These functions are exportable to provide a functionally-identical API
 to that provided by L<Net::IPAddress>. They will cause warnings to be issued
@@ -643,6 +736,8 @@ if they are called, to help you in your transition to Net::IPAddress::Util,
 if indeed that's what you're doing -- and I can't readily imagine any other
 reason you'd want to export them from here (as opposed to from Net::IPAddress)
 unless that's indeed what you're doing.
+
+=back
 
 =head1 EXPORT TAGS
 
@@ -659,7 +754,7 @@ Net::IPAddress::Util::Range or Net::IPAddress::Util::Collection modules.
 
 =head2 :sort
 
-Exports radix_sort(). You only need this if you're dealing with very large
+Exports C<radix_sort()>. You only need this if you're dealing with large
 arrays of Net::IPAddress::Util objects, and runtime is of critical concern.
 
 =head2 :compat
@@ -694,11 +789,11 @@ Creates an IPv6 object from 4 unsigned 32-bit network-order integers, supplied i
 
 =item An existing Net::IPAddress::Util object (equivalently, call as an object method)
 
-Creates a non-distructive clone of the object.
+Creates a non-destructive clone of the object.
 
-=item A well-formed IPv4 or IPv6 string (including "IPv4 in IPv6" notation)
+=item A well-formed IPv4 or IPv6 string (including SIIT "IPv4 in IPv6" notation)
 
-Examples are C<1.2.3.4>, C<::ffff:1.2.3.4>, C<1:2::3:4>. Note that for IPv6
+Examples are C<1.2.3.4>, C<::ffff:0:1.2.3.4>, C<1:2::3:4>. Note that for IPv6
 flavor strings, the scope ID (if any) is silently discarded. Note also that this
 behavior is subject to change. If you feel strongly, go to CPAN RT and file a
 ticket.
@@ -752,7 +847,11 @@ object representing the same IPv4 address.
 =head1 OVERLOADS
 
 This module overloads a number of operators (cmp, E<lt>=E<gt>, &, |, ~,
-+, -, E<lt>E<lt>, E<gt>E<gt>) in hopefully obvious ways.
++, -, E<lt>E<lt>, E<gt>E<gt>) in hopefully obvious ways. One perhaps non-obvious
+overload is that cmp performs apparently "numeric" order comparison (the same as
+E<lt>=E<gt>) instead of strict string comparison. To understand why, picture it
+as comparing the C<normal_form> of the addresses stringwise (rather than the
+C<as_str> form).
 
 =head1 OBJECT METHODS
 
@@ -789,7 +888,7 @@ not "CPU free".
 =head2 ipv6
 
 Returns the canonical IPv6 string representation of this object, for
-instance 'fe80::1234:5678:90ab' or '::ffff:192.168.0.1'.
+instance 'fe80::1234:5678:90ab' or '::ffff:0:192.168.0.1'.
 
 =head2 ipv6_expanded
 
@@ -816,10 +915,19 @@ else it stringifies to the result of C<ipv6>.
 
 =head1 INTERNAL FUNCTIONS
 
-=head2 ERROR
+=over
+
+=item ERROR
 
 Either confess()es or cluck()s the passed string based on the value of
 $Net::IPAddress::Util::DIE_ON_ERROR, and if possible returns undef.
+
+=back
+
+=head1 TODO
+
+What is the correct thing to do when C<new> is given a flat 16-character string
+with its Unicode flag set?
 
 =head1 LICENSE
 

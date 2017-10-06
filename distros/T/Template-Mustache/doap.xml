@@ -46,6 +46,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>karupanerura</foaf:name>
+      <foaf:mbox rdf:resource="mailto:karupa@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Paul Cochrane</foaf:name>
       <foaf:mbox rdf:resource="mailto:paul@liekut.de" />
     </foaf:Person>
@@ -147,6 +153,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.3</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-08-30</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.4</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-09-02</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

@@ -9,11 +9,13 @@ builder/MarkdownMaker.pm
 builder/MyBuilder.pm
 lib/Cmd/Dwarf.pm
 minil.toml
+share/README.md
 share/app/Makefile
 share/app/app.psgi
 share/app/cli.psgi
 share/app/cpanfile
 share/app/lib/App.pm
+share/app/lib/App/Config/DevDocker.pm
 share/app/lib/App/Config/DevYoshizu.pm
 share/app/lib/App/Config/Development.pm
 share/app/lib/App/Config/Production.pm
@@ -67,11 +69,13 @@ share/app/lib/Dwarf/Plugin/HTTP/Session.pm
 share/app/lib/Dwarf/Plugin/JSON.pm
 share/app/lib/Dwarf/Plugin/Log/Dispatch.pm
 share/app/lib/Dwarf/Plugin/Log/Dispatch/FileRotate.pm
+share/app/lib/Dwarf/Plugin/MouseX/Types/Common.pm
 share/app/lib/Dwarf/Plugin/MultiConfig.pm
 share/app/lib/Dwarf/Plugin/Now.pm
 share/app/lib/Dwarf/Plugin/PHP/HTTP/Session.pm
 share/app/lib/Dwarf/Plugin/PHP/Session.pm
 share/app/lib/Dwarf/Plugin/PHP/Session/Memcached.pm
+share/app/lib/Dwarf/Plugin/Proctitle.pm
 share/app/lib/Dwarf/Plugin/Runtime.pm
 share/app/lib/Dwarf/Plugin/Teng.pm
 share/app/lib/Dwarf/Plugin/Text/CSV_XS.pm
@@ -106,6 +110,7 @@ share/app/script/load_schema.sh
 share/app/script/start_server.sh
 share/app/sql/00_drop_tables.sql
 share/app/sql/01_sessions.sql
+share/app/sql/999_init.sql
 share/app/t/00_dwarf/01_compile.t
 share/app/t/00_dwarf/02_dwarf.t
 share/app/t/00_dwarf/03_pragma.t
@@ -144,6 +149,9 @@ share/app/tmpl/400.html
 share/app/tmpl/404.html
 share/app/tmpl/500.html
 share/app/tmpl/index.html
+share/docker-compose.yml
+share/docker/db/Dockerfile
+share/docker/web/Dockerfile
 share/htdocs/apple-touch-icon-114x114.png
 share/htdocs/apple-touch-icon-120x120.png
 share/htdocs/apple-touch-icon-144x144.png

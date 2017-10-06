@@ -7,9 +7,10 @@ use Moo;
 use MooX::StrictConstructor;
 use namespace::autoclean;
 
-our $VERSION = '1.026';
+our $VERSION = '1.031';
 
 with qw(
+    Locale::TextDomain::OO::Role::Logger
     MooX::Singleton
 );
 
@@ -31,29 +32,6 @@ has data => (
     },
 );
 
-sub move_lexicon {
-    my ( $self, $from, $to ) = @_;
-
-    defined $from
-        or confess 'Undef is not a lexicon name to move from';
-    exists $self->data->{$from}
-        or confess qq{Missing lexicon "$from" to move from};
-    defined $to
-        or confess 'Undef is not a lexicon name to move to';
-    ( my $data_to, $self->data->{$to} ) = delete @{ $self->data }{ $to, $from };
-
-    return $data_to;
-}
-
-sub delete_lexicon {
-    my ( $self, $name ) = @_;
-
-    defined $name
-        or confess 'Undef is not a lexicon name to delete';
-
-    return delete $self->data->{$name};
-}
-
 sub merge_lexicon {
     my ( $self, $from1, $from2, $to ) = @_;
     defined $from1
@@ -71,8 +49,82 @@ sub merge_lexicon {
         %{ $self->data->{$from1} },
         %{ $self->data->{$from2} },
     };
+    $self->logger and $self->logger->(
+        qq{Lexicon "$from1", "$from2" merged to "$to".},
+        {
+            object => $self,
+            type   => 'debug',
+            event  => 'lexicon,merge',
+        },
+    );
 
     return $self;
+}
+
+sub copy_lexicon {
+    my ( $self, $from, $to ) = @_;
+
+    defined $from
+        or confess 'Undef is not a lexicon name to copy from';
+    exists $self->data->{$from}
+        or confess qq{Missing lexicon "$from" to copy from};
+    defined $to
+        or confess 'Undef is not a lexicon name to copy to';
+
+    $self->data->{$to} = {
+        %{ $self->data->{$from} },
+    };
+    $self->logger and $self->logger->(
+        qq{Lexicon "$from" copied to "$to".},
+        {
+            object => $self,
+            type   => 'debug',
+            event  => 'lexicon,copy',
+        },
+    );
+
+    return $self;
+
+}
+
+sub move_lexicon {
+    my ( $self, $from, $to ) = @_;
+
+    defined $from
+        or confess 'Undef is not a lexicon name to move from';
+    exists $self->data->{$from}
+        or confess qq{Missing lexicon "$from" to move from};
+    defined $to
+        or confess 'Undef is not a lexicon name to move to';
+    $self->data->{$to} = delete $self->data->{$from};
+    $self->logger and $self->logger->(
+        qq{Lexicon "$from" moved to "$to".},
+        {
+            object => $self,
+            type   => 'debug',
+            event  => 'lexicon,move',
+        },
+    );
+
+    return $self;
+}
+
+sub delete_lexicon {
+    my ( $self, $name ) = @_;
+
+    defined $name
+        or confess 'Undef is not a lexicon name to delete';
+    my $deleted = delete $self->data->{$name};
+    $self->logger and $self->logger->(
+        qq{Lexicon "$name" deleted.},
+        {
+            object => $self,
+            type   => 'debug',
+            event  => 'lexicon,delete',
+        },
+    );
+
+    return $deleted;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -85,13 +137,13 @@ __END__
 
 Locale::TextDomain::OO::Singleton::Lexicon - Provides singleton lexicon access
 
-$Id: Lexicon.pm 647 2017-02-25 08:22:10Z steffenw $
+$Id: Lexicon.pm 698 2017-09-28 05:21:05Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Singleton/Lexicon.pm $
 
 =head1 VERSION
 
-1.026
+1.031
 
 =head1 DESCRIPTION
 
@@ -128,26 +180,67 @@ to fill the lexicon or to read from lexicon.
 Merge ist mostly used to join data of a language
 to create data for a region with some region different data.
 
+The example means:
+Take 'de::' and overwrite with specials of 'de-at::' and store as 'de-at::'.
+
     $instance->merge_lexicon('de::', 'de-at::', 'de-at::');
+
+Maybe more clear writing:
+
+    $instance->merge_lexicon('de::', 'de-at::' => 'de-at::');
+
+=head2 method copy_lexicon
+
+Copy a lexicon is a special case.
+It is like merge without the 2nd parameter.
+
+    $instance->copy_lexicon('i-default::', 'i-default:LC_MESSAGES:domain');
+
+Maybe more clear writing:
+
+    $instance->copy_lexicon('i-default::' => 'i-default:LC_MESSAGES:domain');
 
 =head2 method move_lexicon
 
 Move is typical used to move the "i-default::" lexicon
 into your domain and category.
-With that lexicon without messages you are able to translate
+Using a lexicon without messages you are able to translate
 because the header with plural forms is set.
 With no lexicon you would get a missing "plural forms"-error during translation.
 
-    $deleted_lexicon = $instance->move_lexicon(
-        'i-default::',
-        'i-default:LC_MESSAGES:domain',
-    );
+    $instance->move_lexicon('i-default::', 'i-default:LC_MESSAGES:domain');
+
+Maybe more clear writing:
+
+    $instance->move_lexicon('i-default::' => 'i-default:LC_MESSAGES:domain');
 
 =head2 method delete_lexicon
 
 Delete a lexicon from data.
 
     $deleted_lexicon = $instance->delete_lexicon('de::');
+
+=head2 method logger
+
+Set the logger and get back them
+
+    $lexicon_hash->logger(
+        sub {
+            my ($message, $arg_ref) = @_;
+            my $type = $arg_ref->{type};
+            $log->$type($message);
+            return;
+        },
+    );
+    $logger = $lexicon_hash->logger;
+
+$arg_ref contains
+
+    object => $lexicon_hash, # the object itself
+    type   => 'debug',
+    event  => 'lexicon,merge', # or 'lexicon,copy'
+                               # or 'lexicon,move'
+                               # or 'lexicon,delete'
 
 =head1 EXAMPLE
 
@@ -172,6 +265,8 @@ L<MooX::StrictConstructor|MooX::StrictConstructor>
 
 L<namespace::autoclean|namespace::autoclean>
 
+L<Locale::TextDomain::OO::Role::Logger|Locale::TextDomain::OO::Role::Logger>
+
 L<MooX::Singleton|MooX::Singleton>
 
 =head1 INCOMPATIBILITIES
@@ -192,7 +287,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2015,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

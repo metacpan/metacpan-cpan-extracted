@@ -27,8 +27,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {
@@ -66,8 +65,8 @@ do { my $x = {
                                    'Cwd' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test2::Bundle::Extended' => '0',
                                    'Test2::Plugin::NoWarnings' => '0.06',
+                                   'Test2::V0' => '0',
                                    'Test::Class::Moose' => '0',
                                    'Test::Class::Moose::CLI' => '0',
                                    'Test::More' => '1.302015'

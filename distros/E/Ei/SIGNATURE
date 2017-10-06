@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e33bd128c2d2226559eef2638767f23718cc495 INSTALL
+SHA1 eaafeda9eb6adf04deeb255efa50089a90a1ce50 LICENSE
+SHA1 1b701cdeba7fbbed2dcf024d4636d1493fd9847f MANIFEST
+SHA1 5fded63d1063fff44934794e93359018e3d877c0 META.json
+SHA1 2dd28cf32d96c8b9dbed17588b5782f9b6e6ff57 META.yml
+SHA1 7720c4287e6da49aa45bda8d446282c684607628 Makefile.PL
+SHA1 127a38acaa07a1ed2007d61fde8b6ab38ba443f7 README
+SHA1 386f362248c45c8a9b4d77584981a847ff34c7f2 bin/ei
+SHA1 9ba9a719de757842854e822eb8e5ede1b86fa7c0 bin/ei.bak
+SHA1 443b26fe4104f2e77163afed169b36c6017a91cc bin/eifo
+SHA1 31c5c406c63a33c68cf19e3b44c2e6bf30290050 dist.ini
+SHA1 c0b1168a199f41cf17557b793897c9bb51c8b099 example.conf
+SHA1 d7676771aede2b3397fec3456ba52d6b61dd6439 example/all.ei
+SHA1 cd144f507e5735f88654a931adc806e95d35266b example/computers.ei
+SHA1 a4d0966ff09789e437649cad78479c34ca7a8627 example/fields.ei
+SHA1 5506d247d6b9ce8af3392da27b8ccb0927328def example/kitchen.ei
+SHA1 aa400f409cd67cd81625c4ec27815ca9f2b3bdef lib/Ei.pm
+SHA1 ceb709de28f0be96710c10f974345443334363ba lib/Ei.pm~
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlnQ2+wACgkQ9IHYOgPo3G0bUwCfZCjDIhBToliZeLlLiBr9RN9K
+WpcAnRAqMa9KdDeRg2ArI2Czg7IgC/Mg
+=ADRl
+-----END PGP SIGNATURE-----

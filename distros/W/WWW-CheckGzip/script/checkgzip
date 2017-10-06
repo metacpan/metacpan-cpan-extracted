@@ -6,9 +6,10 @@ use FindBin '$Bin';
 use WWW::CheckGzip;
 use Data::Validate::URI 'is_web_uri';
 my $url;
-my $wc = WWW::CheckGzip->new (\& check);
-for $url (@ARGV) {
-    if (is_web_uri ($url)) {
+my $wc = WWW::CheckGzip->new (\& checkgzip);
+for (@ARGV) {
+    if (is_web_uri ($_)) {
+	$url = $_;
 	$wc->check ($url);
     }
     else {
@@ -18,11 +19,11 @@ for $url (@ARGV) {
 
 exit;
 
-sub check
+sub checkgzip
 {
     my ($ok, $message) = @_;
     if (! $ok) {
-	print "$url: not ok $message\n";
+	print "$url: failed test '$message'\n";
     }
 }
 

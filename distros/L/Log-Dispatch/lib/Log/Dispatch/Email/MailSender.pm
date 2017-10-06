@@ -8,7 +8,7 @@ package Log::Dispatch::Email::MailSender;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Log::Dispatch::Types;
 use Mail::Sender ();
@@ -114,7 +114,7 @@ Log::Dispatch::Email::MailSender - Subclass of Log::Dispatch::Email that uses th
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

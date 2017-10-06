@@ -1,5 +1,9 @@
 Revision history for Rapi::Blog
 
+1.0101 2017-10-01
+    - Add [AutoPrereqs] to dist.ini (VANSTYN)
+    - Require RapidApp 1.3004 (runtime, dist.ini and cpanfile) (VANSTYN)
+
 1.0100 2017-09-17
     - Added new feature/tamonomy CATEGORIES (VANSTYN)
     - Second publically released version of the schema (VANSTYN)

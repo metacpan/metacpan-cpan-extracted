@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Text;
 
 # ABSTRACT: Output text to window
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 
@@ -15,6 +15,10 @@ use Graphics::Raylib::XS qw(:all);
 
 Graphics::Raylib::Text - Output text to window
 
+
+=head1 VERSION
+
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -37,7 +41,7 @@ Graphics::Raylib::Text - Output text to window
         Graphics::Raylib::draw {
             $g->clear(Graphics::Raylib::Color::BLACK);
 
-            $text->{text} = "Generation " . ($i++);
+            $text->text = "Generation " . ($i++);
             $text->draw;
         };
     }
@@ -53,16 +57,16 @@ Constructs a new Graphics::Raylib::Text instance. Position defaults to C<[0,0]> 
 =cut
 
 sub new {
-	my $class = shift;
-    
+    my $class = shift;
+
     my $self = {
         pos => [0,0],
         size => 10,
         @_
     };
 
-	bless $self, $class;
-	return $self;
+    bless $self, $class;
+    return $self;
 }
 
 =item new( text => $text, color => $color, pos => [$x, $y], size => [$width, $height], font => $font, spacing => $spacing )
@@ -84,6 +88,18 @@ sub draw {
     } else {
         DrawText($self->{text}, @{$self->{pos}}, $self->{size}, $self->{color});
     }
+}
+
+=item new( text => $text, color => $color, pos => [$x, $y], size => [$width, $height], font => $font, spacing => $spacing )
+
+Constructs a new Graphics::Raylib::Text instance. Position defaults to C<[0,0]> and size to C<10>.
+
+=cut
+
+sub text : lvalue {
+    my $self = shift;
+
+    $self->{text};
 }
 
 =back

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Splunk HTTP Event Collector (HEC) Client",
+   "author" : [
+      "Ezra Forbus <eforbus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Splunk-HEC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.070",
+            "JSON::XS" : "2.27103",
+            "Pod::Simple" : "3.09",
+            "Time::Local" : "1.2",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/eforbus/perl-splunk-hec/issues"
+      },
+      "homepage" : "https://github.com/eforbus/perl-splunk-hec",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eforbus/perl-splunk-hec.git",
+         "web" : "https://github.com/eforbus/perl-splunk-hec.git"
+      }
+   },
+   "version" : "1.02"
+}

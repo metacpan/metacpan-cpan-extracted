@@ -1,5 +1,5 @@
 package HackaMol::Angle;
-$HackaMol::Angle::VERSION = '0.044';
+$HackaMol::Angle::VERSION = '0.045';
 #ABSTRACT: Angle class for HackaMol
 use 5.008;
 use Moose;
@@ -93,7 +93,7 @@ HackaMol::Angle - Angle class for HackaMol
 
 =head1 VERSION
 
-version 0.044
+version 0.045
 
 =head1 SYNOPSIS
 

@@ -4,14 +4,13 @@
 Changes
 Changes-ver_2
 contrib.bat
-dist.ini
+DEPRECATED
+dist.ini.old
 examples.bat
 KNOWN_INCOMP
 LICENSE
 Makefile.PL
 MANIFEST
-META.json
-META.yml
 PATENTS
 README
 SUPPORT
@@ -27,6 +26,7 @@ examples/012_pages
 examples/020_corefonts
 examples/020_textrise
 examples/020_textunderline
+examples/021_psfonts
 examples/021_synfonts
 examples/022_truefonts
 examples/022_truefonts_diacrits_utf8
@@ -34,7 +34,6 @@ examples/023_cjkfonts
 examples/024_bdffonts
 examples/025_unifonts
 examples/026_unifont2
-examples/027_winfont
 examples/030_colorspecs
 examples/031_color_hsv
 examples/032_separation
@@ -46,6 +45,8 @@ examples/Content.pl
 examples/ContentText.pl
 examples/examples.output
 examples/README
+examples/Windows/027_winfont
+examples/Windows/Win32.pm
 lib/PDF/Builder.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCII85Decode.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCIIHexDecode.pm
@@ -161,7 +162,6 @@ lib/PDF/Builder/Page.pm
 lib/PDF/Builder/Resource.pm
 lib/PDF/Builder/UniWrap.pm
 lib/PDF/Builder/Util.pm
-lib/PDF/Builder/Win32.pm
 t/resources/1x1.gif
 t/resources/1x1.jpg
 t/resources/1x1.pbm
@@ -179,6 +179,7 @@ t/annotate.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/barcode.t
+t/circular-references.t
 t/cmap.t
 t/content.t
 t/cs-webcolor.t
@@ -209,3 +210,5 @@ t/string.t
 t/text.t
 t/tiff.t
 t/viewer-preferences.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

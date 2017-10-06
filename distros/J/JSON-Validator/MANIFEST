@@ -62,6 +62,7 @@ t/invalid-ref.t
 t/issue-22-duplicate-error-messages.t
 t/issue-27-yaml-syck-false.t
 t/issue-42-cache-control.t
+t/issue-71-additionalproperties.t
 t/jv-allof.t
 t/jv-anyof.t
 t/jv-array.t

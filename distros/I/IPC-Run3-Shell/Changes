@@ -1,6 +1,11 @@
 Revision history for Perl extension IPC::Run3::Shell.
 
-0.54	Sat, May 23 2015
+0.56	Tue, Oct  3 2017
+	- Added :AUTOLOAD and :FATAL export tags
+	- Improved tests, fixed an incorrect test failure on older Perls
+	- Fixed two minor issues on older Perls
+
+0.54	Sat, May 23 2015	commit b1500e8041665e63c28032750ccb0dcda3bba978
 	- Objects that stringify no longer warn when used as arguments.
 	- Using "undef" in the argument list now causes an "uninitialized"
 	  warning instead of the custom warnings category.

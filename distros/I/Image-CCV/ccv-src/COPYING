@@ -1,3 +1,5 @@
+Files in directories ./doc, ./samples and ./site are licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.
+
 Copyright (c) 2010, Liu Liu
 All rights reserved.
 
@@ -75,4 +77,28 @@ Based on node-formidable by Felix Geisendörfer
 Igor Afonov - afonov@gmail.com - 2012
 MIT License - http://www.opensource.org/licenses/mit-license.php
 
-sha1: TODO
+siphash:
+
+Copyright (c) 2012-2014 Jean-Philippe Aumasson
+<jeanphilippe.aumasson@gmail.com>
+Copyright (c) 2012-2014 Daniel J. Bernstein <djb@cr.yp.to>
+
+To the extent possible under law, the author(s) have dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide. This software is distributed without any warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication along
+with
+this software. If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+
+sqlite3:
+
+2001 September 15
+
+The author disclaims copyright to this source code.  In place of
+a legal notice, here is a blessing:
+
+    May you do good and not evil.
+    May you find forgiveness for yourself and forgive others.
+    May you share freely, never taking more than you give.

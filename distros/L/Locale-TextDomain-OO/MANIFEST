@@ -2,6 +2,7 @@ Changes
 example/02_filter.pl
 example/03_language_of_languages.pl
 example/04_lexicon_store_JSON_utf-8.pl
+example/04_merge_move_copy_delete_lexicon_utf-8.pl
 example/05_expand_gettext_modifier.pl
 example/06_expand_maketext_formatter_code.pl
 example/11_gettext_hash.pl
@@ -77,6 +78,7 @@ t/01_translate.t
 t/02_filter.t
 t/03_language_of_languages.t
 t/04_lexicon_store_JSON.t
+t/04_merge_move_copy_delete_lexicon_utf-8.t
 t/05_expand_gettext_modifier.t
 t/06_expand_maketext_formatter_code.t
 t/07_expand_babel_fish_modifier.t

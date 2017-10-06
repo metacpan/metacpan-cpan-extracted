@@ -2,13 +2,14 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Scalar::Util qw/blessed/;
-use List::Util qw/shuffle/;
+use List::Util qw/shuffle first/;
 use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 use Test2::Util qw/IS_WIN32/;
+use Time::HiRes;
 
 use File::Spec();
 
@@ -33,6 +34,7 @@ use Test2::Util::HashBase qw{
     -ecount
     -job_colors
     -active_files
+    -_active_disp
 };
 
 sub TAG_WIDTH() { 8 }
@@ -127,6 +129,7 @@ sub DEFAULT_COLOR() {
 sub init {
     my $self = shift;
 
+    $self->{+_ACTIVE_DISP} = '';
 
     $self->{+VERBOSE} = 1 unless defined $self->{+VERBOSE};
 
@@ -196,11 +199,13 @@ sub write {
     if ($f->{harness_job_launch}) {
         my $job = $f->{harness_job};
         $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($job->{file})} = $job->{job_id};
+        $self->_update_active_disp;
     }
 
     if ($f->{harness_job_end}) {
         my $file = $f->{harness_job_end}->{file};
         delete $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($file)};
+        $self->_update_active_disp;
     }
 
     $self->{+ECOUNT}++;
@@ -214,8 +219,7 @@ sub write {
     my $lines;
     if (!$self->{+VERBOSE}) {
         unless ($depth) {
-            my $tree = $self->render_tree($f,);
-            $lines = $self->render_quiet($f, $tree);
+            $lines = $self->render_quiet($f);
         }
 
         $lines ||= [];
@@ -233,7 +237,17 @@ sub write {
     push @{$self->{+JOB_COLORS}->{free}} => delete $self->{+JOB_COLORS}->{used}->{$job_id}
         if $job_id && $f->{harness_job_end};
 
-    return unless ($lines && @$lines) || !$self->{+VERBOSE};
+    my $should_show = $lines && @$lines;
+
+    unless ($should_show || $self->{+VERBOSE}) {
+        if (my $last = $self->{last_rendered}) {
+            $self->{last_rendered} = time;
+            return if time - $last < 0.2;
+        }
+        else {
+            $self->{last_rendered} = time;
+        }
+    }
 
     my $io = $self->{+IO};
     if ($self->{+_BUFFERED}) {
@@ -255,26 +269,32 @@ sub write {
     else {
         print $io $_, "\n" for @$lines;
     }
+}
 
-    $io->flush;
+sub _update_active_disp {
+    my $self = shift;
+
+    my $active = $self->{+ACTIVE_FILES};
+
+    return $self->{+_ACTIVE_DISP} = '' unless $active && keys %$active;
+
+    my $str .= " (";
+    {
+        no warnings 'numeric';
+        $str .= join('  ' => map { m{([^/]+)$}; "$active->{$_}:$1" || "$active->{$_}:$_" } sort { ($active->{$a} || 0) <=> ($active->{$b} || 0) or $a cmp $b } keys %$active);
+    }
+    $str .= ")";
+
+    $self->{+_ACTIVE_DISP} = $str;
 }
 
 sub render_ecount {
     my $self = shift;
 
-    my $active = $self->{+ACTIVE_FILES};
+    my $str = "Events seen: $self->{+ECOUNT} $self->{+_ACTIVE_DISP}";
 
-    my $str = "Events seen: " . $self->{+ECOUNT};
-
-    if ($active && keys %$active) {
-        $str .= " (";
-        $str .= join(', ' => sort { ($active->{$a} || 0) <=> ($active->{$b} || 0) or $a cmp $b } keys %$active);
-        $str .= ")";
-
-        my $max = term_size() || 80;
-        $str = substr($str, 0, $max - 8) . " ...)" if length($str) > $max;
-    }
-
+    my $max = term_size() || 80;
+    $str = substr($str, 0, $max - 8) . " ...)" if length($str) > $max;
 
     return $str;
 }
@@ -316,32 +336,33 @@ sub render_event {
     push @out => $self->render_times($f, $tree) if $f->{times};
 
     push @out => $self->render_about($f, $tree)
-        if $f->{about} && !(@out || grep { $f->{$_} } qw/stop plan info nest assert/);
+        if $f->{about} && !(@out || first { $f->{$_} } qw/stop plan info nest assert/);
 
     return \@out;
 }
 
 sub render_quiet {
     my $self = shift;
-    my ($f, $tree) = @_;
+    my ($f) = @_;
 
     my @out;
 
-    push @out => $self->render_halt($f, $tree) if $f->{control}->{halt};
+    my $tree;
+    push @out => $self->render_halt($f, $tree ||= $self->render_tree($f,)) if $f->{control}->{halt};
 
     if ($f->{assert} && !$f->{assert}->{pass} && !$f->{amnesty}) {
-        push @out => $self->render_assert($f, $tree);
-        push @out => $self->render_debug($f, $tree) unless $f->{assert}->{pass} || $f->{assert}->{no_debug};
-        push @out => $self->render_amnesty($f, $tree) if $f->{amnesty} && ! $f->{assert}->{pass};
+        push @out => $self->render_assert($f, $tree ||= $self->render_tree($f,));
+        push @out => $self->render_debug($f, $tree ||= $self->render_tree($f,)) unless $f->{assert}->{pass} || $f->{assert}->{no_debug};
+        push @out => $self->render_amnesty($f, $tree ||= $self->render_tree($f,)) if $f->{amnesty} && ! $f->{assert}->{pass};
     }
 
     if ($f->{info}) {
         my $if = { %$f, info => [grep { $_->{debug} || $_->{important} } @{$f->{info}}] };
-        push @out => $self->render_info($if, $tree) if @{$if->{info}};
+        push @out => $self->render_info($if, $tree ||= $self->render_tree($f,)) if @{$if->{info}};
     }
 
-    push @out => $self->render_errors($f, $tree) if $f->{errors};
-    push @out => $self->render_parent($f, $tree, quiet => 1) if $f->{parent} && !$f->{amnesty};
+    push @out => $self->render_errors($f, $tree ||= $self->render_tree($f,)) if $f->{errors};
+    push @out => $self->render_parent($f, $tree ||= $self->render_tree($f,), quiet => 1) if $f->{parent} && !$f->{amnesty};
 
     return \@out;
 }
@@ -389,7 +410,7 @@ sub build_line {
 
     substr($tree, -2, 1, '+') if $facet eq 'assert';
 
-    my $max = term_size() || 80;
+    my $max = $self->{+TTY} ? (term_size() || 80) : undef;
     my $color = $self->{+COLOR};
     my $reset = $color ? $color->{reset} || '' : '';
     my $tcolor = $color ? $color->{TAGS}->{$tag} || $color->{FACETS}->{$facet} || '' : '';
@@ -432,7 +453,7 @@ sub build_line {
 
     my @out;
     for my $line (@lines) {
-        if( length("$ps$tag$pe  $tree$line") > $max) {
+        if($max && length("$ps$tag$pe  $tree$line") > $max) {
             @out = ();
             last;
         }

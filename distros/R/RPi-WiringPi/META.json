@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -34,19 +34,19 @@
          "requires" : {
             "GPSD::Parse" : "1.01",
             "JSON" : "0",
-            "RPi::ADC::ADS" : "1.01",
+            "RPi::ADC::ADS" : "1.02",
             "RPi::ADC::MCP3008" : "2.3604",
             "RPi::BMP180" : "2.3604",
+            "RPi::Const" : "1.02",
             "RPi::DAC::MCP4922" : "2.3605",
             "RPi::DHT11" : "1.03",
             "RPi::DigiPot::MCP4XXXX" : "2.3604",
-            "RPi::HCSR04" : "2.3601",
+            "RPi::HCSR04" : "2.3604",
             "RPi::I2C" : "2.3604",
             "RPi::LCD" : "2.3603",
             "RPi::Pin" : "2.3604",
             "RPi::SPI" : "2.3607",
             "RPi::Serial" : "2.3602",
-            "RPi::WiringPi::Constant" : "1.01",
             "WiringPi::API" : "2.3614",
             "parent" : "0",
             "perl" : "5.006"
@@ -64,6 +64,6 @@
          "web" : "https://github.com/stevieb9/rpi-wiringpi"
       }
    },
-   "version" : "2.3620",
+   "version" : "2.3621",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

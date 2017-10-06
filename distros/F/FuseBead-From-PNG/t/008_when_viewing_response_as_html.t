@@ -52,6 +52,8 @@ sub should_return_properly_formatted_HTML {
 
     my $color_info = $object->bead_colors->{ $color };
 
+    my $rows        = $width / $unit_size;
+    my $cols        = $height / $unit_size;
     my $plan_length = $width / $unit_size * FuseBead::From::PNG::Const->BEAD_DIAMETER;
     my $plan_height = $height / $unit_size * FuseBead::From::PNG::Const->BEAD_DIAMETER;
     my $plan_length_in = $plan_length * FuseBead::From::PNG::Const->MILLIMETER_TO_INCH;
@@ -72,12 +74,10 @@ my $expected = <<"HTML";
 <section class="info">
 <h2>Info</h2>
 <table><tbody>
-<tr><td>Length:</td><td>$plan_length mm</td></tr>
-<tr><td>Height:</td><td>$plan_height mm</td></tr>
-</tbody></table>
-<table><tbody>
-<tr><td>Length:</td><td>$plan_length_in in.</td></tr>
-<tr><td>Height:</td><td>$plan_height_in in.</td></tr>
+<tr><td>Rows:</td><td>$rows</td></tr>
+<tr><td>Cols:</td><td>$cols</td></tr>
+<tr><td>Length:</td><td>$plan_length mm ($plan_length_in in.)</td></tr>
+<tr><td>Height:</td><td>$plan_height mm ($plan_height_in in.)</td></tr>
 </tbody></table>
 </section>
 

@@ -20,15 +20,15 @@ no_index:
 provides:
   Crypt::Trifid:
     file: lib/Crypt/Trifid.pm
-    version: '0.08'
+    version: '0.09'
   Crypt::Trifid::Utils:
     file: lib/Crypt/Trifid/Utils.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Moo: '2.000000'
   namespace::clean: '0.24'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Crypt-Trifid.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

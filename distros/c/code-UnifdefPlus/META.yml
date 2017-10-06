@@ -1,22 +1,22 @@
 ---
-abstract: 'processes conditional parts of makefiles, c/c++ and kconfig files'
+abstract: unknown
 author:
-  - 'John Ulvr <perldev@ulvr.com>'
-build_requires: {}
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: '0.42'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: code-UnifdefPlus
-provides:
-  code::UnifdefPlus:
-    file: lib/UnifdefPlus.pm
-    version: v0.3.0
-resources:
-  license: http://dev.perl.org/licenses/
-version: v0.005.004
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,49 @@
+Type::TinyX::Facets
+
+Type::TinyX::Facets make it easy to create parameterized types with
+facets.
+
+"Type::Tiny" allows definition of types which can accept parameters:
+
+  use Types::Standard -types;
+
+  my $t1 = Array[Int];
+  my $t2 = Tuple[Int, HashRef];
+
+This defines $t1 as an array of integers. and $t2 as a tuple of two
+elements, an integer and a hash.
+
+Parameters are passed as a list to the parameterized constraint
+generation machinery, and there is great freedom in how they may be
+interpreted.
+
+This module makes it easy to create a parameterized type which takes
+*name - value* pairs or,facets
+<https://en.wikipedia.org/wiki/Faceted_classification>. (The terminology
+is taken from Types::XSD::Lite, to which this module owes its
+existence.)
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

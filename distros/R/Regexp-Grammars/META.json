@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Regexp-Grammars",
    "no_index" : {
@@ -38,5 +38,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.045"
+   "version" : "1.048"
 }

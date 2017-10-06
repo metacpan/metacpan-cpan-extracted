@@ -12,7 +12,7 @@
                           
 
 
-This is the README for Image::PNG::Cairo version 0.08.
+This is the README for Image::PNG::Cairo version 0.09.
 
 Image::PNG::Cairo is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -68,11 +68,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::PNG::Cairo
 
-To install the module from the source file, Image-PNG-Cairo-0.08.tar.gz,
+To install the module from the source file, Image-PNG-Cairo-0.09.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-PNG-Cairo-0.08.tar.gz
-    cd Image-PNG-Cairo-0.08
+    tar xfz Image-PNG-Cairo-0.09.tar.gz
+    cd Image-PNG-Cairo-0.09
     perl Makefile.PL
     make
     make install
@@ -97,6 +97,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Feb  3 13:57:52 2017.
+This README was written on Thu Oct  5 13:18:29 2017.
 
 -----------------------------------------------------------------------------

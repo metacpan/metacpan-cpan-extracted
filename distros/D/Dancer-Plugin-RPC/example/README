@@ -18,7 +18,7 @@ This installs all dependencies in the example/local directory.
 Start the Example daemon (simple way):
 
     $ cd example
-    $ carton exec -- perl -Ilib -I../lib bin/app.psgi
+    $ carton exec -- bin/example.pl start
 
 * Testing Example app
 Testing the daemon (with example/bin/do-rpc):
@@ -43,3 +43,8 @@ Any of:
     $ carton exec -- bin/do-rpc -t jsonrpc -u http://localhost:3000/rpc/metacpan -c search query Dancer::Plugin::RPC
     $ carton exec -- bin/do-rpc -t restrpc -u http://localhost:3000/rest/metacpan/search query Dancer::Plugin::RPC
 
+* Stop Example app
+Stop the Example daemon (simple way):
+
+    $ cd example
+    $ carton exec -- bin/example.pl stop

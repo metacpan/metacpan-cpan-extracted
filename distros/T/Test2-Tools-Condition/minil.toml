@@ -1,0 +1,6 @@
+name = "Test2-Tools-Condition"
+badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+

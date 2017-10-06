@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.024     2017-10-01 22:01:52Z
+          - always display warning message (unless environment variable used
+            to silence it), and dump the errors resulting from loading
+            configure-requires prereqs
+          - no longer block parent class's register_prereqs method, so
+            configure-require prereqs used in Makefile.PL are added to the
+            distribution (overcomes issue when File::ShareDir::Install is
+            needed by Makefile.PL but not Module::Build::Tiny, which uses its
+            own mechanism)
+
 0.023     2016-06-22 05:07:29Z
           - display more diagnostics if 'perl Build.PL' failed to properly
             execute in tests

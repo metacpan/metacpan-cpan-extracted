@@ -16,7 +16,4 @@ _build/
 ^svn-commit.tmp$
 \.c$
 \.o$
-^examples/mihome.pl$
-
-
-
+^runtest$

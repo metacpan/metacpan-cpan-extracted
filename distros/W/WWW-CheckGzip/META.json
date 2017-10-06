@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "Gzip::Faster" : "0.20",
-            "LWP::UserAgent" : "6.26",
+            "HTTP::Tiny" : "0.070",
             "perl" : "5.006001"
          }
       }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/benkasminbullock/www-checkgzip"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

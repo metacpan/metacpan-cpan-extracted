@@ -1,5 +1,12 @@
 Revision history for MooseX-AttributeShortcuts
 
+0.035     2017-09-22 19:54:38 CDT-0500
+	* Rebrand "anonymous builders" as "inline builders"
+	* Flavor the method metaclass with a trait that provides for definition
+	  context, and install inline builders using it.  This will make it easier
+	  to use the method metaclasses to see where the builder methods came from
+	  (if you're in to that sort of thing).
+
 0.034     2017-07-25 19:18:32 CDT-0500
 	* Make optional requirements optional.  Thanks @ppisar!  Closes #19
 

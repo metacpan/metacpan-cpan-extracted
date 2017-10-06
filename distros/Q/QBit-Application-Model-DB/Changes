@@ -1,10 +1,77 @@
 ==================================================
-Changes from 2016-09-19 00:00:00 +0000 to present.
+Changes from 2016-09-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.020 at 2017-09-19 07:16:39 +0000
+version 0.022 at 2017-09-30 17:47:03 +0000
 ------------------------------------------
+
+  Change: 6cc3801666dcc87e3c4e35dfa4a9ddeeda20b068
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:46:21 +0000
+
+    Merge pull request #24 from Madskill/move_after_group_by
+
+    Move after group by 
+
+  Change: d12faea9dae981137b25ca1bff44a4cec84efd29
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:45:35 +0000
+
+    Merge remote-tracking branch 'upstream/master' into
+    move_after_group_by 
+
+  Change: 863d82959e659720594b0e2c471eb1aa67d0fae5
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:42:22 +0000
+
+    move _after_group_by 
+
+------------------------------------------
+version 0.021 at 2017-09-30 17:23:20 +0000
+------------------------------------------
+
+  Change: aa311c76ed92eecde67fda43dbad36c55e678502
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:23:20 +0000
+
+    Version 0.021 
+
+  Change: 43a9cdca89c8d0491535420d1468e488933bac66
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:22:10 +0000
+
+    Merge pull request #23 from Madskill/having
+
+    Having 
+
+  Change: 1f1f7e5995a0831f502e90dd5618bb94d21f8188
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:17:01 +0000
+
+    support having in Table 
+
+  Change: e288d3e8b7526664ca895cbf5e5024ea36939857
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:14:43 +0000
+
+    Merge branch 'drop_table' into having 
+
+  Change: d02a21d8cd1ab534099ee31eba3d294d6c469b10
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:13:01 +0000
+
+    having 
+
+------------------------------------------
+version 0.020 at 2017-09-19 07:17:00 +0000
+------------------------------------------
+
+  Change: e240f76639a06e47be3dfa1dce321386be86845d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-19 10:17:00 +0000
+
+    Version 0.020 
 
   Change: 646eb35a6ee584d12f18cd1517abce31d0628db5
   Author: Igor <igor-sverdlov@mail.ru>
@@ -279,5 +346,5 @@ version 0.010 at 2016-10-08 19:58:21 +0000
     t_lib -> t/lib 
 
 ================================================
-Plus 9 releases after 2016-09-19 00:00:00 +0000.
+Plus 9 releases after 2016-09-30 00:00:00 +0000.
 ================================================

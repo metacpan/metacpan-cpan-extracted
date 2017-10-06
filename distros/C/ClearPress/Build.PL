@@ -62,6 +62,7 @@ my $builder = Module::Build->new(
                                                          'bareword::filehandles' => '0.003',
 							 'JSON'                  => '2.12',
 							 'Test::More'            => '0.8',
+                                                         'Test::Number::Delta'   => '1.06',
 							 'Test::Trap'            => '0',
 							 'XML::LibXML'           => '1.66',
 							 'XML::Simple'           => '2.18',

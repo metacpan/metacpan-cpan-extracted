@@ -21,8 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Config::Model" : "2.076",
-            "Config::Model::Itself" : "2.005",
+            "Config::Model" : "2.111",
+            "Config::Model::Itself" : "2.012",
             "Getopt::Long" : "0",
             "Module::Build" : "0.34",
             "Path::Tiny" : "0"
@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Config::Model" : "2.043",
+            "Config::Model" : "2.111",
             "perl" : "5.010"
          }
       },
@@ -53,7 +53,7 @@
          "web" : "http://github.com/dod38fr/config-model-lcdproc"
       }
    },
-   "version" : "2.051",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "2.052",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

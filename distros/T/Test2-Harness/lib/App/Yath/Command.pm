@@ -2,17 +2,9 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-BEGIN {
-    my $old = select STDOUT;
-    $| = 1;
-    select STDERR;
-    $| = 1;
-    select $old;
-}
+our $VERSION = '0.001016';
 
-our $VERSION = '0.001015';
-
-use Carp qw/croak/;
+use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
 use Getopt::Long qw/GetOptionsFromArray/;
 use File::Path qw/remove_tree/;
@@ -25,15 +17,15 @@ use File::Spec;
 
 use App::Yath::Util qw/read_config/;
 use Test2::Harness::Util qw/read_file open_file fqmod/;
-use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 
 use Test2::Harness;
 use Test2::Harness::Run;
 
-use Test2::Harness::Util::HashBase qw/-settings -my_opts -signal -args -plugins/;
+use Test2::Harness::Util::HashBase qw/-settings -_my_opts -signal -args -plugins/;
 
 sub handle_list_args { }
 sub feeder           { }
+sub cli_args         { }
 sub internal_only    { 0 }
 sub has_jobs         { 0 }
 sub has_runner       { 0 }
@@ -41,11 +33,40 @@ sub has_logger       { 0 }
 sub has_display      { 0 }
 sub show_bench       { 1 }
 sub always_keep_dir  { 0 }
-sub manage_runner    { 1 }
-sub summary          { "No Summary" }
 sub name             { $_[0] =~ m/([^:=]+)(?:=.*)?$/; $1 || $_[0] }
+sub summary          { "No Summary" }
+sub description      { "No Description" }
+sub group            { "ZZZZZZ" }
+sub run_command      { confess "Not Implemented" }
 
-sub group { "ZZZZZZ" }
+sub my_opts {
+    my $in = shift;
+    my %params = @_;
+
+    my $ref = ref($in);
+
+    return $in->{+_MY_OPTS} if $ref && $in->{+_MY_OPTS} && !$params{plugin_options};
+
+    my $settings = $ref ? $in->{+SETTINGS} ||= {} : {};
+
+    my @options = $in->options();
+    push @options => @{$params{plugin_options}} if $params{plugin_options};
+
+    my @have;
+    push @have => 'jobs'    if $in->has_jobs;
+    push @have => 'runner'  if $in->has_runner;
+    push @have => 'logger'  if $in->has_logger;
+    push @have => 'display' if $in->has_display;
+    my $out = [
+        grep {
+            my $u = $_->{used_by};
+            $u->{all} || grep { $u->{$_} } @have
+        } @options
+    ];
+
+    return $in->{+_MY_OPTS} = $out if $ref;
+    return $out;
+}
 
 sub init {
     my $self = shift;
@@ -53,20 +74,70 @@ sub init {
     my $settings = $self->{+SETTINGS} ||= {};
 
     unshift @{$self->{+ARGS}} => read_config($self->name);
-
     my $list = $self->parse_args($self->{+ARGS});
 
-    for my $opt (@{$self->{+MY_OPTS}}) {
-        my $field   = $opt->{field};
-        my $default = $opt->{default};
+    $self->normalize_settings();
+
+    die "You cannot select both bzip2 and gzip for the log.\n"
+        if $settings->{bzip2_log} && $settings->{gzip_log};
+
+    die "You cannot use preloads with --cover"
+        if $settings->{cover} && $settings->{preload} && @{$settings->{preload}};
+
+    die "You cannot use forking with --cover"
+        if $settings->{cover} && $settings->{use_fork};
+
+    $self->handle_list_args($list);
+
+    if ($settings->{dir}) {
+        remove_tree($settings->{dir}, {safe => 1, keep_root => 1})
+            if $settings->{clear_dir} && -d $settings->{dir};
+
+        opendir(my $DH, $settings->{dir}) or die "Could not open directory '$settings->{dir}': $!";
+        die "Work directory is not empty (use -C to clear it)" if first { !m/^\.+$/ } readdir($DH);
+        closedir($DH);
+    }
+
+    for my $plugin (@{$self->{+PLUGINS}}) {
+        $plugin->post_init($self, $settings);
+    }
+
+    return;
+}
+
+sub normalize_settings {
+    my $self = shift;
+
+    my $settings = $self->{+SETTINGS} ||= {};
+
+    for my $opt (@{$self->my_opts}) {
+        my $field     = $opt->{field};
+        my $default   = $opt->{default};
+        my $action    = $opt->{action};
+        my $normalize = $opt->{normalize};
+
+        unless($field) {
+            die "You cannot specify 'default' without 'field' for option '$opt->{spec}'" if defined $default;
+            die "You cannot specify 'normalize' without 'field' for option '$opt->{spec}'" if defined $normalize;
+            next;
+        }
 
         # Set the default
-        $settings->{$field} = ref($default) ? $self->$default($settings, $field) : $default
-            if defined($default) && !defined($settings->{$field});
+        if (defined($default) && !defined($settings->{$field})) {
+            my $val = ref($default) ? $self->$default($settings, $field) : $default;
+
+            if ($action) {
+                $self->$action($settings, $field, $val);
+            }
+            else {
+                $settings->{$field} = $val;
+            }
+        }
+
+        next unless $normalize && defined $settings->{$field};
 
         # normalize the value
-        $settings->{$field} = $opt->{normalize}->($settings->{$field})
-            if $opt->{normalize} && defined $settings->{$field};
+        $settings->{$field} = $self->$normalize($settings, $field, $settings->{$field});
     }
 
     if (my $libs = $settings->{libs}) {
@@ -95,39 +166,22 @@ sub init {
         push @$libs => map { File::Spec->rel2abs($_) } split /\Q$sep\E/, $p5lib;
     }
 
-    die "You cannot select both bzip2 and gzip for the log.\n"
-        if $settings->{bzip2_log} && $settings->{gzip_log};
-
-    $self->handle_list_args($list);
-
     if (my $s = $ENV{HARNESS_PERL_SWITCHES}) {
         push @{$settings->{switches}} => split /\s+/, $s;
     }
 
-    $settings->{env_vars}->{HARNESS_IS_VERBOSE}    = $settings->{verbose};
-    $settings->{env_vars}->{T2_HARNESS_IS_VERBOSE} = $settings->{verbose};
-
-    if ($settings->{dir}) {
-        remove_tree($settings->{dir}, {safe => 1, keep_root => 1})
-            if $settings->{clear_dir} && -d $settings->{dir};
-
-        opendir(my $DH, $settings->{dir}) or die "Could not open directory";
-        die "Work directory is not empty (use -C to clear it)" if first { !m/^\.+$/ } readdir($DH);
-        closedir($DH);
-    }
-
-    for my $plugin (@{$self->{+PLUGINS}}) {
-        $plugin->post_init($self, $settings);
-    }
-
-    return;
+    $settings->{env_vars}->{HARNESS_IS_VERBOSE}    = $settings->{verbose} ? 1 : 0;
+    $settings->{env_vars}->{T2_HARNESS_IS_VERBOSE} = $settings->{verbose} ? 1 : 0;
 }
 
 sub run {
     my $self = shift;
 
-    $self->pre_run();
-    $self->run_command();
+    my $exit = $self->pre_run();
+    return $exit if defined $exit;
+
+    $exit = $self->run_command();
+    return $exit;
 }
 
 sub pre_run {
@@ -136,8 +190,9 @@ sub pre_run {
     my $settings = $self->{+SETTINGS};
 
     if ($settings->{help}) {
-        print $self->usage;
-        exit 0;
+        delete $settings->{quiet};
+        $self->paint($self->usage);
+        return 0;
     }
 
     if ($settings->{show_opts}) {
@@ -146,121 +201,23 @@ sub pre_run {
         $settings->{input} = '<TRUNCATED>'
             if $settings->{input} && (length($settings->{input}) > 80 || $settings->{input} =~ m/\n/);
 
-        print Test2::Harness::Util::JSON::encode_pretty_json($settings);
+        my $out = Test2::Harness::Util::JSON::encode_pretty_json($settings);
+        delete $settings->{quiet};
+        $self->paint($out);
 
-        exit 0;
+        return 0;
     }
 
     $self->inject_signal_handlers();
+
+    return;
 }
 
-sub run_command {
+
+sub paint {
     my $self = shift;
-
-    my $settings = $self->{+SETTINGS};
-
-    my $renderers = $self->renderers;
-    my $loggers   = $self->loggers;
-
-    my ($feeder, $runner, $pid, $stat);
-    my $ok = eval {
-        ($feeder, $runner, $pid) = $self->feeder or die "No feeder!";
-
-        my $harness = Test2::Harness->new(
-            run_id            => $settings->{run_id},
-            live              => $pid ? 1 : 0,
-            feeder            => $feeder,
-            loggers           => $loggers,
-            renderers         => $renderers,
-            event_timeout     => $settings->{event_timeout},
-            post_exit_timeout => $settings->{post_exit_timeout},
-            jobs              => $settings->{jobs},
-        );
-
-        $stat = $harness->run();
-
-        1;
-    };
-    my $err = $@;
-    warn $err unless $ok;
-
-    my $exit = 0;
-
-    if ($self->manage_runner) {
-        unless ($ok) {
-            if ($pid) {
-                print STDERR "Killing runner\n";
-                kill($self->{+SIGNAL} || 'TERM', $pid);
-            }
-        }
-
-        if ($runner && $runner->pid) {
-            $runner->wait;
-            $exit = $runner->exit;
-        }
-    }
-
-    if (-t STDOUT) {
-        print STDOUT Term::ANSIColor::color('reset') if USE_ANSI_COLOR;
-        print STDOUT "\r\e[K";
-    }
-
-    if (-t STDERR) {
-        print STDERR Term::ANSIColor::color('reset') if USE_ANSI_COLOR;
-        print STDERR "\r\e[K";
-    }
-
-    print "\n", '=' x 80, "\n";
-    print "\nRun ID: $settings->{run_id}\n";
-
-    my $bad = $stat ? $stat->{fail} : [];
-
-    # Possible failure causes
-    my $fail = $exit || !defined($exit) || !$ok || !$stat;
-
-    if (@$bad) {
-        print "\nThe following test jobs failed:\n";
-        print "  [", $_->{job_id}, '] ', File::Spec->abs2rel($_->file), "\n" for sort {
-            my $an = $a->{job_id};
-            $an =~ s/\D+//g;
-            my $bn = $b->{job_id};
-            $bn =~ s/\D+//g;
-
-            # Sort numeric if possible, otherwise string
-            int($an) <=> int($bn) || $a->{job_id} cmp $b->{job_id}
-        } @$bad;
-        print "\n";
-        $exit += @$bad;
-    }
-
-    if ($fail) {
-        my $sig = $self->{+SIGNAL};
-
-        print "\n";
-
-        print "Test runner exited badly: $exit\n" if $exit;
-        print "Test runner exited badly: ?\n" unless defined $exit;
-        print "An exception was cought\n" if !$ok && !$sig;
-        print "Received SIG$sig\n" if $sig;
-
-        print "\n";
-
-        $exit ||= 255;
-    }
-
-    if (!@$bad && !$fail) {
-        print "\nAll tests were successful!\n\n";
-    }
-
-    print "Keeping work dir: $settings->{dir}\n" if $settings->{keep_dir};
-
-    print "Wrote " . ($ok ? '' : '(Potentially Corrupt) ') . "log file: $settings->{log_file}\n"
-        if $settings->{log};
-
-    $exit = 255 unless defined $exit;
-    $exit = 255 if $exit > 255;
-
-    return $exit;
+    return if $self->{+SETTINGS}->{quiet};
+    print @_;
 }
 
 sub make_run_from_settings {
@@ -281,7 +238,6 @@ sub make_run_from_settings {
         load_import => $settings->{load_import},
         args        => $settings->{pass},
         input       => $settings->{input},
-        chdir       => $settings->{chdir},
         search      => $settings->{search},
         unsafe_inc  => $settings->{unsafe_inc},
         env_vars    => $settings->{env_vars},
@@ -290,7 +246,10 @@ sub make_run_from_settings {
         times       => $settings->{times},
         verbose     => $settings->{verbose},
         no_long     => $settings->{no_long},
-        plugins     => $settings->{plugins},
+        dummy       => $settings->{dummy},
+        cover       => $settings->{cover},
+
+        plugins => $self->{+PLUGINS} ? [@{$self->{+PLUGINS}}] : undef,
 
         exclude_patterns => $settings->{exclude_patterns},
         exclude_files    => {map { (File::Spec->rel2abs($_) => 1) } @{$settings->{exclude_files}}},
@@ -312,7 +271,6 @@ sub section_order {
 # {{{
 sub options {
     my $self = shift;
-    my ($settings) = @_;
 
     return (
         {
@@ -341,12 +299,12 @@ sub options {
             usage     => ['-I path/lib',                           '--include lib/'],
             summary   => ['Add a directory to your include paths', 'This can be used multiple times'],
             normalize => sub {
-                [map { File::Spec->rel2abs($_) } @{$_[0] || []}];
+                [map { File::Spec->rel2abs($_) } @{$_[3] || []}];
             },
         },
 
         {
-            spec      => 'T|times',
+            spec      => 'T|times!',
             field     => 'times',
             used_by   => {jobs => 1, runner => 1},
             section   => 'Job Options',
@@ -386,15 +344,6 @@ sub options {
         },
 
         {
-            spec    => 'chdir=s',
-            field   => 'chdir',
-            used_by => {jobs => 1, runner => 1},
-            section => 'Job Options',
-            usage   => ['--chdir path/'],
-            summary => ['Change to the specified directory before starting'],
-        },
-
-        {
             spec    => 'input=s',
             field   => 'input',
             used_by => {jobs => 1, runner => 1},
@@ -404,7 +353,7 @@ sub options {
         },
 
         {
-            spec      => 'k|keep-dir',
+            spec      => 'k|keep-dir!',
             field     => 'keep_dir',
             used_by   => {jobs => 1, runner => 1},
             section   => 'Job Options',
@@ -415,11 +364,15 @@ sub options {
         },
 
         {
-            spec    => 'A|author-testing',
-            action  => sub { $settings->{env_vars}->{AUTHOR_TESTING} = 1 },
+            spec    => 'A|author-testing!',
+            action  => sub {
+                my $self = shift;
+                my ($settings, $field, $val) = @_;
+                $settings->{env_vars}->{AUTHOR_TESTING} = $val;
+            },
             used_by => {jobs => 1, runner => 1},
             section => 'Job Options',
-            usage     => ['-A', '--author-testing'],
+            usage     => ['-A', '--author-testing', '--no-author-testing'],
             summary   => ['This will set the AUTHOR_TESTING environment to true'],
             long_desc => 'Many cpan modules have tests that are only run if the AUTHOR_TESTING environment variable is set. This will cause those tests to run.',
         },
@@ -427,7 +380,7 @@ sub options {
         {
             spec    => 'tap',
             field   => 'use_stream',
-            action  => sub { $settings->{use_stream} = 0 },
+            action  => sub { $_[1]->{use_stream} = 0 },
             used_by => {jobs => 1, runner => 1},
         },
 
@@ -438,17 +391,37 @@ sub options {
             section => 'Job Options',
             usage     => ['--stream',                                          '--no-stream',       '--TAP  --tap'],
             summary   => ["Use 'stream' instead of TAP (Default: use stream)", "Do not use stream", "Use TAP"],
-            long_desc => "The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to recieve test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.",
+            long_desc => "The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.",
+            default   => 1,
         },
 
         {
-            spec        => 'fork!',
-                field   => 'use_fork',
-                used_by => {jobs => 1, runner => 1},
-                section => 'Job Options',
-                usage     => ['--fork',                            '--no-fork'],
-                summary   => ['(Default: on) fork to start tests', 'Do not fork to start tests'],
-                long_desc => 'Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.',
+            spec    => 'fork!',
+            field   => 'use_fork',
+            used_by => {jobs => 1, runner => 1},
+            section => 'Job Options',
+            usage     => ['--fork',                            '--no-fork'],
+            summary   => ['(Default: on) fork to start tests', 'Do not fork to start tests'],
+            long_desc => 'Test2::Harness normally forks to start a test. Forking can break some select tests, this option will allow such tests to pass. This is not compatible with the "preload" option. This is also significantly slower. You can also add the "# HARNESS-NO-PRELOAD" comment to the top of the test file to enable this on a per-test basis.',
+            default   => 1,
+        },
+
+        {
+            spec => 'cover',
+            field => 'cover',
+            used_by => {jobs => 1, runner => 1},
+            section => 'Job Options',
+            usage => ['--cover'],
+            summary => ['use Devel::Cover to calculate test coverage'],
+            action => sub {
+                my $self = shift;
+                my ($settings) = @_;
+                eval { require Devel::Cover; 1 } or die "Cannot use --cover without Devel::Cover: $@";
+                $settings->{cover} = 1;
+                $settings->{use_fork} = 0;
+                push @{$settings->{load_import} ||= []} => 'Devel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl';
+            },
+            long_desc => "This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.",
         },
 
         {
@@ -463,7 +436,7 @@ sub options {
                 return $ENV{PERL_USE_UNSAFE_INC} if defined $ENV{PERL_USE_UNSAFE_INC};
                 return 1;
             },
-            normalize => sub { $_[0] ? 1 : 0 },
+            normalize => sub { $_[3] ? 1 : 0 },
         },
 
         {
@@ -472,7 +445,8 @@ sub options {
             used_by => {jobs => 1, runner => 1},
             section => 'Job Options',
             action  => sub {
-                my ($opt, $arg) = @_;
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
                 die "Input file not found: $arg\n" unless -f $arg;
                 warn "Input file is overriding another source of input.\n" if $settings->{input};
                 $settings->{input} = read_file($arg);
@@ -487,7 +461,8 @@ sub options {
             used_by => {jobs => 1, runner => 1},
             section => 'Job Options',
             action  => sub {
-                my ($opt, $arg) = @_;
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
                 my ($key, $val) = split /=/, $arg, 2;
                 $settings->{env_vars}->{$key} = $val;
             },
@@ -502,7 +477,8 @@ sub options {
             used_by => {jobs => 1, runner => 1},
             section => 'Job Options',
             action  => sub {
-                my ($opt, $arg) = @_;
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
                 my ($switch, $val) = split /=/, $arg, 2;
                 push @{$settings->{switches}} => $switch;
                 push @{$settings->{switches}} => $val if defined $val;
@@ -513,12 +489,22 @@ sub options {
         },
 
         {
-            spec    => 'C|clear',
+            spec    => 'C|clear!',
             field   => 'clear_dir',
             used_by => {runner => 1},
             section => 'Harness Options',
             usage   => ['-C  --clear'],
             summary => ['Clear the work directory if it is not already empty'],
+        },
+
+        {
+            spec => 'shm!',
+            field => 'use_shm',
+            used_by => {runner => 1},
+            section => 'Harness Options',
+            usage => ['--shm', '--no-shm'],
+            summary => ["Use shm for tempdir if possible (Default: on)", "Do not use shm."],
+            default => 1,
         },
 
         {
@@ -530,8 +516,21 @@ sub options {
             summary => ['Use a specific temp directory', '(Default: use system temp dir)'],
             default => sub {
                 my ($self, $settings, $field) = @_;
+                if ($settings->{use_shm}) {
+                    $settings->{tmp_dir} = first { -d $_ } map { File::Spec->canonpath($_) } '/dev/shm', '/run/shm';
+                }
                 return $settings->{tmp_dir} ||= $ENV{TMPDIR} || $ENV{TEMPDIR} || File::Spec->tmpdir;
             },
+        },
+
+        {
+            spec => 'D|dummy',
+            field   => 'dummy',
+            used_by => {runner => 1},
+            section => 'Harness Options',
+            usage   => ['-D', '--dummy'],
+            summary => ['Dummy run, do not actually execute tests'],
+            default => $ENV{T2_HARNESS_DUMMY} || 0,
         },
 
         {
@@ -543,11 +542,10 @@ sub options {
             summary => ['Set the work directory', '(Default: new temp directory)'],
             default => sub {
                 my ($self, $settings, $field) = @_;
-                return unless $self->has_runner;
                 return $ENV{T2_WORKDIR} if $ENV{T2_WORKDIR};
                 return tempdir("yath-test-$$-XXXXXXXX", CLEANUP => !($settings->{keep_dir} || $self->always_keep_dir), DIR => $settings->{tmp_dir});
             },
-            normalize => sub { File::Spec->rel2abs($_[0]) },
+            normalize => sub { File::Spec->rel2abs($_[3]) },
         },
 
         {
@@ -609,12 +607,38 @@ sub options {
         },
 
         {
-            spec => 'p|plugin=s@',
-            field => 'plugins',
+            spec => 'no-preloads',
+            field => 'preload',
+            used_by => { runner => 1 },
+            section => 'Harness Options',
+            usage => ['--no-preload'],
+            summary => ['cancel any preloads listed until now'],
+            long_desc => "This can be used to negate preloads specified in .yath.rc or similar",
+            action => sub {
+                my $self = shift;
+                my ($settings, $field, $arg, $opt) = @_;
+                return unless $settings->{preload};
+                @{$settings->{preload}} = ();
+            },
+        },
+
+        {
+            spec    => 'p|plugin=s@',
             used_by => { all => 1},
             section => 'Plugins',
-            usage => ['-pPlugin', '-p+My::Plugin', '--plugin Plugin'],
+            usage   => ['-pPlugin', '-p+My::Plugin', '--plugin Plugin'],
             summary => ['Load a plugin', 'can be specified multiple times'],
+            action  => sub {},
+        },
+
+        {
+            spec      => 'no-plugins',
+            used_by   => { all => 1 },
+            section   => 'Plugins',
+            usage     => ['--no-plugins'],
+            summary   => ['cancel any plugins listed until now'],
+            long_desc => "This can be used to negate plugins specified in .yath.rc or similar",
+            action    => sub {},
         },
 
         {
@@ -639,10 +663,10 @@ sub options {
         {
             spec      => 'et|event_timeout=i',
             field     => 'event_timeout',
-            used_by   => {runner => 1},
+            used_by   => {jobs => 1},
             section   => 'Harness Options',
             usage     => ['--et SECONDS', '--event_timeout #'],
-            summary   => ['Kill test if no events recieved in timeout period', '(Default: 60 seconds)'],
+            summary   => ['Kill test if no events received in timeout period', '(Default: 60 seconds)'],
             long_desc => 'This is used to prevent the harness for waiting forever for a hung test. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.',
             default   => 60,
         },
@@ -650,11 +674,11 @@ sub options {
         {
             spec      => 'pet|post-exit-timeout=i',
             field     => 'post_exit_timeout',
-            used_by   => {runner => 1},
+            used_by   => {jobs => 1},
             section   => 'Harness Options',
             usage     => ['--pet SECONDS', '--post-exit-timeout #'],
             summary   => ['Stop waiting post-exit after the timeout period', '(Default: 15 seconds)'],
-            long_desc => 'Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exists it will monitor for mor events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.',
+            long_desc => 'Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exists it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.',
             default   => 15,
         },
 
@@ -665,7 +689,7 @@ sub options {
             section => 'Logging Options',
             usage   => ['-F file.jsonl', '--log-file FILE'],
             summary => ['Specify the name of the log file', 'This option implies -L', "(Default: event_log-RUN_ID.jsonl)"],
-            normalize => sub { File::Spec->rel2abs($_[0]) },
+            normalize => sub { File::Spec->rel2abs($_[3]) },
             default   => sub {
                 my ($self, $settings, $field) = @_;
 
@@ -720,6 +744,16 @@ sub options {
             usage   => ['--color', '--no-color'],
             summary => ["Turn color on (Default: on)", "Turn color off"],
             default => 1,
+        },
+
+        {
+            spec    => 'q|quiet!',
+            field   => 'quiet',
+            used_by => {display => 1},
+            section => 'Display Options',
+            usage   => ['-q', '--quiet'],
+            summary => ["Be very quiet"],
+            default => 0,
         },
 
         {
@@ -810,14 +844,16 @@ sub options {
 }
 # }}}
 
-sub parse_args {
-    my $self = shift;
+sub pre_parse_args {
+    my $class = shift;
     my ($args) = @_;
 
-    my (@opts, @list, @pass, @plugins);
+    my (@opts, @list, @pass, @plugins, @inc);
+
+    my %lib = (lib => 1, blib => 1, tlib => 0);
 
     my $last_mark = '';
-    for my $arg (@{$self->args}) {
+    for my $arg (@$args) {
         if ($last_mark eq '::') {
             push @pass => $arg;
         }
@@ -828,9 +864,14 @@ sub parse_args {
             }
             push @list => $arg;
         }
-        elsif ($last_mark eq '-p' || $last_mark eq '--plugin') {
+        elsif ($last_mark eq 'plugin') {
             $last_mark = '';
             push @plugins => $arg;
+        }
+        elsif ($last_mark eq 'inc') {
+            $last_mark = '';
+            push @inc => $arg;
+            push @opts => $arg;
         }
         else {
             if ($arg eq '--' || $arg eq '::') {
@@ -838,77 +879,167 @@ sub parse_args {
                 next;
             }
             if ($arg eq '-p' || $arg eq '--plugin') {
-                $last_mark = $arg;
+                $last_mark = 'plugin';
                 next;
             }
             if ($arg =~ m/^(?:-p=?|--plugin=)(.*)$/) {
                 push @plugins => $1;
                 next;
             }
+            if ($arg eq '--no-plugins') {
+                # clear plugins
+                @plugins = ();
+                next;
+            }
+
+            if ($arg eq '-I' || $arg eq '--include') {
+                $last_mark = 'inc';
+                # No 'next' here.
+            }
+            elsif ($arg =~ m/^(-I|--include)=(.*)$/) {
+                push @inc => $1;
+                # No 'next' here.
+            }
+            elsif ($arg =~ m/^--(no-)?(lib|blib|tlib)$/) {
+                $lib{$2} = $1 ? 0 : 1;
+            }
+
             push @opts => $arg;
         }
     }
 
+    push @inc => File::Spec->rel2abs('lib') if $lib{lib};
+    if ($lib{blib}) {
+        push @inc => File::Spec->rel2abs('blib/lib');
+        push @inc => File::Spec->rel2abs('blib/arch');
+    }
+    push @inc => File::Spec->rel2abs('tlib') if $lib{tlib};
+
+    return (\@opts, \@list, \@pass, \@plugins, \@inc);
+}
+
+sub parse_args {
+    my $self = shift;
+    my ($args) = @_;
+
+    my ($opts, $list, $pass, $plugins, $inc) = $self->pre_parse_args($args);
+
     my $settings = $self->{+SETTINGS} ||= {};
-    $settings->{pass} = \@pass;
+    $settings->{pass} = $pass;
 
-    my @options = $self->options($settings);
-
-    for my $plugin (@plugins) {
-        local $@;
+    my @plugin_options;
+    for my $plugin (@$plugins) {
+        local @INC = (@$inc, @INC);
         $plugin = fqmod('App::Yath::Plugin', $plugin);
         my $file = pkg_to_file($plugin);
         eval { require $file; 1 } or die "Could not load plugin '$plugin': $@";
 
-        push @options => $plugin->options($self, $settings);
+        $plugin = $plugin->new if $plugin->can('new');
+
+        push @plugin_options => $plugin->options($self, $settings);
         $plugin->pre_init($self, $settings);
     }
 
-    $self->{+PLUGINS} = \@plugins;
-
-    my @have;
-    push @have => 'jobs'    if $self->has_jobs;
-    push @have => 'runner'  if $self->has_runner;
-    push @have => 'logger'  if $self->has_logger;
-    push @have => 'display' if $self->has_display;
-    $self->{+MY_OPTS} = [
-        grep {
-            my $u = $_->{used_by};
-            $u->{all} || grep { $u->{$_} } @have
-        } @options
-    ];
+    $self->{+PLUGINS} = $plugins;
 
     my @opt_map = map {
         my $spec  = $_->{spec};
         my $action = $_->{action};
         my $field = $_->{field};
-        $action ||= \($settings->{$field}) if $field;
+        if ($action) {
+            my $inner = $action;
+
+            $action = sub {
+                my ($opt, $val) = @_;
+                return $self->$inner($settings, $field, $val, $opt)
+            };
+        }
+        elsif ($field) {
+            $action = \($settings->{$field});
+        }
 
         ($spec => $action)
-    } @{$self->{+MY_OPTS}};
+    } @{$self->my_opts(plugin_options => \@plugin_options)};
 
     Getopt::Long::Configure("bundling");
-    my $args_ok = GetOptionsFromArray(\@opts => @opt_map)
+    my $args_ok = GetOptionsFromArray($opts => @opt_map)
         or die "Could not parse the command line options given.\n";
 
-    return [grep { defined($_) && length($_) } @list, @opts];
+    return [grep { defined($_) && length($_) } @$opts, @$list];
+}
+
+sub usage_opt_order {
+    my $self = shift;
+
+    my $idx = 1;
+    my %lookup = map {($_ => $idx++)} $self->section_order;
+
+    #<<< no-tidy
+    return sort {
+          ($lookup{$a->{section}} || 99) <=> ($lookup{$b->{section}} || 99)  # Sort by section first
+            or ($a->{long_desc} ? 2 : 1) <=> ($b->{long_desc} ? 2 : 1)       # Things with long desc go to bottom
+            or      lc($a->{usage}->[0]) cmp lc($b->{usage}->[0])            # Alphabetical by first usage example
+            or       ($a->{field} || '') cmp ($b->{field} || '')             # By field if present
+    } grep { $_->{section} } @{$self->my_opts};
+    #>>>
+}
+
+sub usage_pod {
+    my $in = shift;
+    my $name = $in->name;
+
+    my @list = $in->usage_opt_order;
+
+    my $out = "";
+
+    my @cli_args = $in->cli_args;
+    @cli_args = ('') unless @cli_args;
+
+    for my $args (@cli_args) {
+        $out .= "\n    \$ yath $name [options]";
+        $out .= " $args" if $args;
+        $out .= "\n";
+    }
+
+    my $section = '';
+    for my $opt (@list) {
+        my $sec = $opt->{section};
+        if ($sec ne $section) {
+            $out .= "\n=back\n" if $section;
+            $section = $sec;
+            $out .= "\n=head2 $section\n";
+            $out .= "\n=over 4\n";
+        }
+
+        for my $way (@{$opt->{usage}}) {
+            my @parts = split /\s+-/, $way;
+            my $count = 0;
+            for my $part (@parts) {
+                $part = "-$part" if $count++;
+                $out .= "\n=item $part\n"
+            }
+        }
+
+        for my $sum (@{$opt->{summary}}) {
+            $out .= "\n$sum\n";
+        }
+
+        if (my $desc = $opt->{long_desc}) {
+            chomp($desc);
+            $out .= "\n$desc\n";
+        }
+    }
+
+    $out .= "\n=back\n";
+
+    return $out;
 }
 
 sub usage {
     my $self = shift;
     my $name = $self->name;
 
-    my $idx = 1;
-    my %lookup = map {($_ => $idx++)} $self->section_order;
-
-    #<<< no-tidy
-    my @list = sort {
-          ($lookup{$a->{section}} || 99) <=> ($lookup{$b->{section}} || 99)  # Sort by section first
-            or ($a->{long_desc} ? 2 : 1) <=> ($b->{long_desc} ? 2 : 1)       # Things with long desc go to bottom
-            or      lc($a->{usage}->[0]) cmp lc($b->{usage}->[0])            # Alphabetical by first usage example
-            or       ($a->{field} || '') cmp ($b->{field} || '')             # By field if present
-    } grep { $_->{section} } @{$self->{+MY_OPTS}};
-    #>>>
+    my @list = $self->usage_opt_order;
 
     # Get the longest 'usage' item's length
     my $ul = max(map { length($_) } map { @{$_->{usage}} } @list);
@@ -1043,6 +1174,8 @@ sub renderers {
     my $self      = shift;
     my $settings  = $self->{+SETTINGS};
     my $renderers = [];
+
+    return $renderers if $settings->{quiet};
 
     my $r = $settings->{renderer} or return $renderers;
 

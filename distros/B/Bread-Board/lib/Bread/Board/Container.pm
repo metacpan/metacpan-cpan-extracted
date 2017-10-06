@@ -1,7 +1,7 @@
 package Bread::Board::Container;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: A container for services and other containers
-$Bread::Board::Container::VERSION = '0.35';
+$Bread::Board::Container::VERSION = '0.36';
 use Moose;
 use Moose::Util::TypeConstraints 'find_type_constraint';
 use MooseX::Params::Validate 0.14;
@@ -196,7 +196,7 @@ Bread::Board::Container - A container for services and other containers
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

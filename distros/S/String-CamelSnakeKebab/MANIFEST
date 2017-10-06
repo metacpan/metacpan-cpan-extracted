@@ -10,6 +10,6 @@ minil.toml
 t/convert_case.t
 t/http_header_case.t
 t/issues/issue_02.t
-t/word_separator.t
+t/word_split.t
 META.yml
 MANIFEST

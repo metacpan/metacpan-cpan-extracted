@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.99'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,12 @@ no_index:
 provides:
   Lingua::JA::KanjiTable:
     file: lib/Lingua/JA/KanjiTable.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Exporter: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/pawa-/Lingua-JA-KanjiTable/issues
   homepage: https://github.com/pawa-/Lingua-JA-KanjiTable
-  repository: git://github.com/pawa-/Lingua-JA-KanjiTable
-version: '0.13'
+  repository: git://github.com/pawa-/Lingua-JA-KanjiTable.git
+version: '0.14'

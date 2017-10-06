@@ -9,7 +9,7 @@ use warnings;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = q[476.4.2];
+our $VERSION = q[477.1.2];
 
 sub new {
   my ($class, $ref) = @_;

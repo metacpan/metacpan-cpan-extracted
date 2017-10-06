@@ -1,0 +1,95 @@
+Changelog for MarpaX-ESLIF-URI
+
+0.002 2017-09-23T03:26:07
+ [Jean-Damien Durand]
+ - xtest and trusted POD coverage [ci skip]
+ - ea protection, cosmetic code and POD fixes [ci skip]
+ - URI::mailto POD fix
+
+0.001 2017-08-03T02:46:45Z
+ [Jean-Damien Durand]
+ - xtest
+ - base POD
+ - perlcritic
+ - Import
+ - mailto dev+
+ - and ? added hfname and hfvalue
+ - hfname and hfvalue restrictions
+ - <atext pct encoded> fix
+ - case insensitive explicit pct encoded characters
+ - mailto t+
+ - Accept bare "%" before Zone Id
+ - Added a comment in ip POD
+ - Fix bug in test itself
+ - http t+
+ - jttp t+
+ - Fix logging
+ - Logging t+
+ - Removal of is_localpath
+ - Sort tests and add more verbose
+ - dist.ini fix
+ - URI::file::is_localpath dev+
+ - Added VERSION, AUTHORITY and ABSTRACT
+ - t/file.t: fix logging
+ - dist
+ - Missing rank and action on URI::file
+ - mailto header and pct-encoded
+ - mailto: atext pct encoded dev+
+ - mailto revisit as per RFC6068 dev+
+ - use MarpaX::ESLIF::URI
+ - Back to new($uri)
+ - URI/file.pm: fixed path and segments
+ - Default port fix and POD
+ - Cosmetic removal of a trailing space
+ - drive method fix
+ - ->normalized and ->decoded changes, removed non-needed blank lines
+ - ftp noramlization
+ - use Net::servent qw/getservbyname/ and port authority normalize fix
+ - Compile once some regexes
+ - Print decoded and normalized outputs
+ - URI::mailto
+ - Removed non needed around modifier symbol injection
+ - URI::ftp
+ - Removed non-needed opaque sub-rules
+ - opaque removal dev+
+ - https scheme
+ - http scheme
+ - Cosmetic change
+ - Removed uric, finally, and fixed a comment
+ - uric from old spec RFC2396
+ - URI::file::drive normalization
+ - Mention section 5.3 Component Recomposition if RFC3986
+ - resolve() method, renamed canonical to normalized
+ - typo
+ - _remove_dot_segments fix
+ - use eq instead of cmp, too general
+ - _remove_dot_segments
+ - dev+
+ - zone fix
+ - t+
+ - Back to Class::Tiny::Antlers, use instances as grammar action provider
+ - Removed non-needed absolute and relative methods
+ - In valuation do the original and decode at the same time
+ - POD
+ - Grammar singleton fix bis
+ - Fix bug with grammar singleton
+ - Add stringification test
+ - string, relative, absolute, opaque methods
+ - URI/_generic.pm: POD fix
+ - Added ip ipv4 ipv6 ipvx and zone in generic values
+ - use Class::Method::Modifiers in generic valuator
+ - URI::file grammar ambiguity
+ - AUTOLOAD little optim
+ - use AUTOLOAD trick in value interface
+ - URI::file
+ - clone() method protection dev+
+ - attrs ro dev+
+ - Simplified version dev+
+ - Use original input for strinfication
+ - base dev+
+ - .gitignore
+ - clone dev+
+ - path action dev+
+ - Generic
+ - MarpaX::ESLIF::URI::Generic::Scheme
+ - dev+ - removal of Moo - not needed

@@ -11,7 +11,7 @@ use base 'Exporter';
 no overloading '%{}', '${}';
 
 our @EXPORT = qw(patronize getProxies);
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 BEGIN { *CORE::GLOBAL::ref = \&Patro::ref };
 
@@ -19,11 +19,10 @@ sub import {
     my ($class, @args) = @_;
     my @tags = grep /^:/, @args;
     @args = grep !/^:/, @args;
-    $Patro::SECURE = 1;
     foreach my $tag (@tags) {
 	if ($tag eq ':test') {
-	    require Patro::Archy;
-	    Patro::Archy->TEST_MODE;
+	    require Patro::Server;
+	    Patro::Server->TEST_MODE;
 
 	    # a poor man's Data::Dumper, but works for Patro::N objects.
 	    *xjoin = sub {
@@ -37,7 +36,8 @@ sub import {
 	    push @EXPORT, 'xjoin';
 	}
 	if ($tag eq ':insecure') {
-	    $Patro::SECURE = 0;
+	    $Patro::Server::OPTS{secure_filehandles} = 0;
+	    $Patro::Server::OPTS{steal_lock_ok} = 1;
 	}
     }
 
@@ -47,11 +47,11 @@ sub import {
     }		
     eval "use threads;1";
     eval "use threadsx::shared";
-    $Patro::Archy::threads_avail = $threads::threads;
+    $Patro::Server::threads_avail = $threads::threads;
     if (!defined &threads::tid) {
 	*threads::tid = sub { 0 };
     }
-    if ($ENV{PATRO_THREADS} && !$Patro::Archy::threads_avail) {
+    if ($ENV{PATRO_THREADS} && !$Patro::Server::threads_avail) {
 	warn "Threaded Patro server was requested but was not available\n";
     }
     Patro->export_to_level(1, 'Patro', @args, @EXPORT);
@@ -62,8 +62,8 @@ sub nize { goto &patronize }
 
 sub patronize {
     croak 'usage: Patro::patronize(@refs)' if @_ == 0;
-    require Patro::Archy;
-    my $server = Patro::Archy->new({}, @_);
+    require Patro::Server;
+    my $server = Patro::Server->new({}, @_);
     return $server->{config};
 }
 
@@ -113,6 +113,108 @@ sub main::xdiag {
 	print STDERR "xdiag $pid $lt: @msg\n";
     }
 }
+
+# proxy synchronization
+
+sub synchronize ($&;$$) {
+    no overloading '%{}';
+    my ($proxy, $block, $timeout, $steal) = @_;
+    my $status = Patro::lock($proxy, $timeout, $steal);
+    my @r = eval {
+	if (wantarray) {
+	    $block->();
+	} elsif (defined wantarray) {
+	    scalar $block->();
+	} else {
+	    $block->();
+	    0;
+	}
+    };
+    my $error = $@;
+    $status = Patro::unlock($proxy);
+    if ($error) {
+	carp "Exception in synchronized block: $error";
+	return;
+    }
+    if (!$status) {
+	# does not warn if status was "0 but true"
+	carp "Patro::unlock: unlock on proxy failed: $!";
+    }
+    return wantarray ? @r : @r ? $r[-1] : undef;
+}
+
+sub lock {
+    my ($proxy, $timeout, $steal) = @_;
+    my $handle = Patro::LeumJelly::handle($proxy);
+    if (!$handle) {
+	carp "Patro::lock: not a proxy";
+	return;
+    }
+    my $status = Patro::LeumJelly::proxy_request(
+	$handle,
+	{ topic => 'SYNC',
+	  command => 'lock', context => 1,
+	  id => $handle->{id},
+	  has_args => defined($timeout),
+	  args => [ $timeout, $steal ] } );
+    if (!$status) {
+	carp "Patro::lock: lock on proxy $handle->{id} was not acquired";
+	return;
+    }
+    return $status;
+}
+
+sub unlock {
+    my ($proxy, $count) = @_;
+    $count ||= 1;
+    my $handle = Patro::LeumJelly::handle($proxy);
+    if (!$handle) {
+	carp "Patro::unlock: not a proxy";
+    }
+    my $status = Patro::LeumJelly::proxy_request(
+	$handle,
+	{ topic => 'SYNC', command => 'unlock', context => 1,
+	  id => $handle->{id},
+	  has_args => 1, args => [ $count ] });
+    if (!$status) {
+	# does not warn if status was "0 but true"
+	carp "Patro::unlock: unlock operation on $handle->{id} failed";
+    }
+    return $status;
+}
+
+sub wait {
+    my ($proxy,$timeout) = @_;
+    no overloading '%{}';
+    my $handle = Patro::LeumJelly::handle($proxy);
+    my $status = Patro::LeumJelly::proxy_request(
+	$handle, { topic => 'SYNC', command => 'wait', context => 1,
+		   has_args => defined($timeout), args => [$timeout] });
+    return $status;		   
+}
+
+sub notify {
+    my ($proxy, $count) = @_;
+    no overloading '%{}';
+    my $handle = Patro::LeumJelly::handle($proxy);
+    my $status = Patro::LeumJelly::proxy_request(
+	$handle, { topic => 'SYNC', command => 'notify', context => 1,
+		   has_args => defined($count), args => [ $count ] } );
+    return $status;
+}
+
+sub lock_state {
+    my ($proxy) = @_;
+    no overloading '%{}';
+    my $handle = Patro::LeumJelly::handle($proxy);
+    my $state = Patro::LeumJelly::proxy_request( 
+	$handle, { topic => 'SYNC', command => 'state', context => 1,
+		   id => $handle->{id}, has_args => 0 } );
+    my ($num,$str) = split /,/, $state;
+    return Scalar::Util::dualvar($num,$str);
+}
+
+
 
 # Patro OO-interface
 
@@ -182,7 +284,7 @@ Patro - proxy access to remote objects
 
 =head1 VERSION
 
-0.15
+0.16
 
 
 =head1 SYNOPSIS
@@ -325,6 +427,7 @@ server's user id. Or worse, a client could open a pipe through the handle
 to run an arbitrary command on the server. C<open> and C<close> operations
 on proxy filehandles will not be allowed unless the process running the
 Patro server imports C<Patro> with the C<:insecure> tag.
+See L<Patro::Server/"SERVER OPTIONS"> for more information.
 
 =back
 
@@ -385,6 +488,9 @@ Returns the IPC client object used by the given proxy to communicate
 with the remote object server. The client object contains information
 about how to communicate with the server and other connection 
 configuration.
+
+Also see the functions related to remote resource synchronization
+in the L<"SYNCHRONIZATION"> section below.
 
 
 =head1 PROXIES
@@ -497,6 +603,197 @@ and inspect the members of your objects through the proxies, but the
 client cannot see the source code.
 
 
+=head1 SYNCHRONIZATION
+
+A C<Patro> server may make the same reference available to more
+than one client. If the server is running in "threads" mode, each
+client will have an instance of the reference in a different thread,
+and the reference will be L<shared|threads::shared> between
+threads. For thread safety, we will want threads and processes
+to have exclusive access to the reference. This also applies to client
+processes that have a proxy to a remote resource.
+
+C<Patro> provides a few functions to request and manage exclusive
+access to remote references. Like most such "locks" in Perl, these
+locks are "advisory", meaning clients that do not use this
+synchronization scheme may still manipulate remote references 
+that are locked with this scheme by other clients.
+
+=head2 synchronize
+
+=head2 @list = Patro::synchronize $proxy, BLOCK [, options]
+
+=head2 $list = Patro::synchronize $proxy, BLOCK [, options]
+
+Requests exclusive access to the underlying remote object
+that the C<$proxy> refers to. When access is granted,
+executes the given C<BLOCK> in either list or scalar context.
+When the code C<BLOCK> is finished, relinquish control of
+the remote resource and return the results of the code.
+
+    use Patro;
+    $proxy = getProxies('config/file');
+    Patro::synchronize $proxy, sub {
+        $proxy->method_call_that_needs_thread_safety()
+    };
+
+C<options> may be a hash or reference to a hash, with these
+two key-value pairs recognized:
+
+=over 4
+
+=item C<< timeout => $seconds >>
+
+Waits at least C<$seconds> seconds until the lock for the
+remote resource is available, and gives up after that. 
+Using a negative value for C<$seconds> has the semantics of
+a non-blocking lock call. If C<$seconds> is negative and
+the lock is not acquired on the first attempt, the
+C<synchronize> call does not make any further attempts.
+If the lock is not acquired, C<synchronize> will
+return the empty list and set C<$!>.
+
+=item C<< steal => $bool >>
+
+If true, and if allowed by the server, acquires the lock
+for the remote resource even if it is held by another
+process. If C<timeout> is also specified, waits until
+the timeout expires before stealing the lock.
+
+Whether one monitor may steal the lock from another monitor
+is a setting on the server. If stealing is not allowed
+and if this call can not acquire the lock conventionally,
+the C<synchronize> call returns the empty list and
+sets C<$!>.
+
+=back
+
+=head2 lock
+
+=head2 unlock
+
+=head2 $status = Patro::lock($proxy [, $timeout [, $steal]])
+
+=head2 $status = Patro::unlock($proxy [,$count])
+
+An alternative to the C<Patro::synchronize($proxy, $code)>
+syntax is to use C<Patro::lock> and C<Patro::unlock>
+explicitly.
+
+C<Patro::lock> attempts to acquire an exclusive (but advisory)
+lock on the remote resource referred to by the C<$proxy>.
+It returns true if the lock was successfully acquired, and
+returns false and sets C<$!> if there was an issue acquiring the
+lock. As in the options to C<Patro::synchronize>, you may
+specify a timeout -- a maximum number of seconds to wait to
+acquire the lock, and/or set the steal flag, which will always
+acquire the lock even if it is held by another monitor (if the
+server allows stealing).
+
+C<Patro::lock> may be called on a proxy that already possesses
+the lock on its remote resource. Successive C<lock> calls "stack"
+so that you must call C<Patro::unlock> on the proxy the same
+number of times that you call C<Patro::lock> (or provide a
+C<$count> argument to C<Patro::unlock>, see below) before the lock on
+the remote resource will be released.
+
+C<Patro::unlock> release the (a) lock on the remote resource
+referred to by the C<$proxy>. Returns true if the lock was
+successfully removed. A false return value generally means that
+the given C<$proxy> was not in possession of the remote resource's
+lock at the time the function was called.
+
+Since lock calls "stack", a proxy may hold the lock on a remote
+resource more than one time. If a C<$count> argument is provided
+to C<Patro::unlock>, more than one of those stacked locks can
+be released. If C<$count> is positive, C<Patro::unlock> will release
+up to C<$count> locks held by the proxy. If C<$count> is negative,
+all locks will be released and the lock on the remote resource
+will become available.
+
+=head2 wait
+
+=head2 $status = Patro::wait($proxy [, $timeout])
+
+For a C<$proxy> that possesses the lock on its remote resource,
+releases the lock and puts the resource monitor into a "wait"
+state. The monitor will remain in that state until another
+monitor on the same resource issues a C<notify> call
+(see L<"notify"> below). After the monitor receives a "notify"
+call, it will attempt to reacquire the lock before resuming
+execution. Returns true if the monitor successfully releases
+the lock, waits for a notify call, and reacquires the lock.
+
+If a C<$timeout> is specified, the C<Patro::wait> call
+will return after C<$timeout> seconds whether or not the
+monitor has been notified and the lock has been reacquired.
+C<Patro::wait> will also return false if C<$proxy> is not
+currently in possession of its remote resource's lock.
+
+=head2 notify
+
+=head2 $status = Patro::notify($proxy [,$count])
+
+For a C<$proxy> that possess the lock on its remote resource,
+move one or more other monitors on the resource that are
+currently in a "wait" state into a "notify" state, so that
+those other monitor will attempt to acquire the lock to the
+remote resource. If C<$count> is provided and is positive,
+this function will notify up to C<$count> other monitors.
+If C<$count> is negative, this function will notify all
+waiting monitors.
+
+Returns false if the C<$proxy> is not in possession of the
+lock on the remote resource when the function call is made.
+Otherwise, returns the number of monitors notified, or
+"0 but true" if there were no monitors to notify.
+
+Note that a C<Patro::notify> call does not release the
+remote resource. The notified monitors would still have to
+wait for the monitor that called C<notify> to release the
+lock on the remote resource.
+
+=head2 lock_state
+
+=head2 $state = lock_state($proxy)
+
+Returns a code indicating the status of the proxy's
+monitor on the lock of its remote resource. The return values
+will be one of
+
+    0 - NULL - the monitor does not possess the lock
+    1 - WAIT - the monitor has received a wait call since it
+               last possessed the lock
+    2 - NOTIFY - the monitor has received a notify call since
+               it last possessed the lock
+    3 - STOLEN - the monitor possessed the lock, but it was
+               stolen by another monitor
+  >=4 - LOCK - the monitor possesses the lock. Values larger than
+               4 indicate that the monitor has stacked lock calls
+
+
+C<Patro> does not export these synchronization functions because
+C<lock> and C<wait> are also names for important Perl builtins.
+
+As of v0.16, these synchronization features require that the
+server be run on a system that has the C</dev/shm> shared
+memory virtual filesystem.
+
+
+=head1 EXPORTS
+
+C<Patro> exports the L<"patronize"> function, to be used by a server,
+and L<"getProxies">, to be used by a client.
+
+The C<:insecure> tag configures the server to allow insecure
+operations through a proxy. As of v0.16, this includes calling
+C<open> and C<close> on a proxy filehandle, and stealing a lock
+(see L<"lock">, above) on a remote reference from another thread.
+This tag only affects programs that are serving remote objects.
+You can not disable this security, such as it as, in the server
+by applying the C<:insecure> tag in a client program.
+
+
 =head1 ENVIRONMENT
 
 C<Patro> pays attention to the following environment variables.
@@ -523,6 +820,10 @@ manipulating the copy of the reference running in a different process
 than the remote server. So you will not observe a change in the
 reference on the server (unless you use a class that does not save
 state in local memory, like L<Forks::Queue>).
+
+The synchronization functions L<Patro::wait|/"wait"> and
+L<Patro::notify|/"notify"> seem to require at least version
+2.45 of the L<Storable> module.
 
 
 =head1 DOCUMENTATION AND SUPPORT

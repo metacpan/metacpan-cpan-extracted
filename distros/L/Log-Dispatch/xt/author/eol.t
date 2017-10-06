@@ -35,6 +35,7 @@ my @files = (
     't/email-exit-helper.pl',
     't/email-exit.t',
     't/file-locked.t',
+    't/lazy-open.t',
     't/lib/Log/Dispatch/TestUtil.pm',
     't/screen-helper.pl',
     't/screen.t',

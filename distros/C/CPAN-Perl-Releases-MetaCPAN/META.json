@@ -1,0 +1,67 @@
+{
+   "abstract" : "Mapping Perl releases on CPAN to the location of the tarballs via MetaCPAN API",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Perl-Releases-MetaCPAN",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.055",
+            "HTTP::Tinyish" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN/issues"
+      },
+      "homepage" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN.git",
+         "web" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN"
+      }
+   },
+   "version" : "0.003",
+   "x_contributors" : [
+      "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
+      "Shoichi Kaji <skaji@outlook.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_static_install" : 1
+}
+

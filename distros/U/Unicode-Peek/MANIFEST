@@ -1,0 +1,22 @@
+Changes
+lib/Unicode/Peek.pm
+Makefile.PL
+MANIFEST
+pod.pl
+README
+t/01_UCS-2.t
+t/02_UCS-2BE.t
+t/03_UCS-2LE.t
+t/04_UCS-4.t
+t/05_UTF-7.t
+t/06_UTF-8.t
+t/07_UTF-8-strict.t
+t/08_UTF-16.t
+t/09_UTF-16BE.t
+t/10_UTF-16LE.t
+t/11_UTF-32.t
+t/12_UTF-32BE.t
+t/13_UTF-32LE.t
+t/14_UTF8.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

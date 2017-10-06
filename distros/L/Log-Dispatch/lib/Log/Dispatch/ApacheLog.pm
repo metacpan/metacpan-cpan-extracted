@@ -3,7 +3,7 @@ package Log::Dispatch::ApacheLog;
 use strict;
 use warnings;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 use Log::Dispatch::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -71,7 +71,7 @@ Log::Dispatch::ApacheLog - Object for logging to Apache::Log objects
 
 =head1 VERSION
 
-version 2.66
+version 2.67
 
 =head1 SYNOPSIS
 

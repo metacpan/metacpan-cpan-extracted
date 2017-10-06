@@ -1,1110 +1,540 @@
+# patronite is a vanadium sulfide mineral, but it could also be
+# the brand name of a heavy-duty padlock, so it is a fitting
+# name for the class to manage synchronization of proxy objects
+
 package Patro::Archy;
-use strict;
-use warnings;
+use Fcntl qw(:flock :seek);
+use File::Temp;
+use Scalar::Util 'refaddr';
+use Time::HiRes qw(time sleep);
 use Carp;
-eval "use Sys::HostAddr";
-use Socket ();
-use Scalar::Util 'reftype';
-use POSIX ':sys_wait_h';
-require overload;
+use base 'Exporter';
+our @EXPORT_OK = (qw(plock punlock pwait pnotify
+		  FAIL_EXPIRED FAIL_INVALID_WO_LOCK FAIL_DEEP_RECURSION));
+our %EXPORT_TAGS = (
+    'all' => [qw(plock punlock pwait pnotify)],
+    'errno' => [qw(FAIL_EXPIRED FAIL_INVALID_WO_LOCK FAIL_DEEP_RECURSION)]
+    );
 
-our $threads_avail;
-*sxdiag = sub {};
-if ($ENV{PATRO_SERVER_DEBUG}) {
-    *sxdiag = *::xdiag;
-    our $DEBUG = 1;
-}
-our $VERSION = '0.15';
-our @SERVERS :shared;
-our %OPTS = ( # XXX - needs documentation
-    keep_alive => 30,
-    idle_timeout => 30,
-    fincheck_freq => 5,
-);
+use constant {
+    STATE_NULL => 0,
+    STATE_WAIT => 1,
+    STATE_NOTIFY => 2,
+    STATE_STOLEN => 3,
+    STATE_LOCK => 4,
+    STATE_LOCK_MAX => 254,
 
-sub new {
-    my $pkg = shift;
-    my $opts = shift;
+    FAIL_EXPIRED => 1001,
+    FAIL_INVALID_WO_LOCK => 1002,
+    FAIL_DURING_RELOCK => 1004,
+    FAIL_DEEP_RECURSION => 1111,
+};
+our $VERSION = '0.16';
+our $DEBUG;
 
-    my $host = $ENV{HOSTNAME} // qx(hostname) // "localhost";
-    if ($INC{'Sys/HostAddr.pm'}) {
-	my $host2 = Sys::HostAddr->new->main_ip;
-	$host = $host2 if $host2;
+my $DIR;
+$DIR //= do {
+    my $d = "/dev/shm/patro-resources-$$";
+#    if ($^O eq 'MSWin32') {
+#	$d = "C:/Temp/resource-$$";
+    #    }
+    if (! -d "/dev/shm" && -d "/tmp") {
+	$d = "/tmp/patro-resources-$$";
     }
-    chomp($host);
+    my $pid = $$;
+    # !!! need to clean up resource dir when program exits
+    $d;
+};
+mkdir $DIR,0755 unless -d $DIR;
+die "Patro::Archy requires a system with /dev/shm" unless -d $DIR;
 
-    socket(my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(),
-	   getprotobyname("tcp")) || croak __PACKAGE__, " socket: $!";
-    setsockopt($socket, Socket::SOL_SOCKET(), Socket::SO_REUSEADDR(),
-	       pack("l",1)) || croak __PACKAGE__, " setsockopt: $!";
-    my $sockaddr = Socket::pack_sockaddr_in(0, Socket::inet_aton($host));
-    bind($socket, $sockaddr) || croak __PACKAGE__, " bind: $!";
-    listen($socket, Socket::SOMAXCONN()) || croak __PACKAGE__, " listen: $!";
-    $sockaddr = getsockname($socket);
-    my ($port,$addr) = Socket::unpack_sockaddr_in($sockaddr);
+my %lookup;
 
-    my $meta = {
-	sockaddr => $sockaddr,
-	socket => $socket,
-	host => $host,
-	host2 => Socket::inet_aton($addr),
-	port => $port,
+sub _unlocked { $_[0] !~ qr/[^\000-\002]/ }
 
-	creator_pid => $$,
-	creator_tid => $threads_avail && threads->tid,
-	style => $threads_avail ? 'threaded' : 'forked',
-
-	keep_alive => $OPTS{keep_alive},
-	idle_timeout => $OPTS{idle_timeout},
-	version => $Patro::Archy::VERSION,
+sub _lookup {
+    my ($id) = @_;
+    $id =~ s/^\s+//;
+    $id =~ s/\s+$//;
+    croak "invalid monitor id '$id': id is too long" if length($id) > 20;
+    open my $lock, '>>', "$DIR/.lock";
+    flock $lock, LOCK_EX;
+    $lookup{$id} //= do {
+        my $lu;
+        my $maxlu = -1;
+        if (open my $fh, '<', "$DIR/.index") {
+            my $data;
+            while (read $fh, $data, 24) {
+                my $i = substr($data,0,20);
+		$i =~ s/^\s+//;
+                my $val = 0 + substr($data,20,4);
+                if ($val > $maxlu) {
+                    $maxlu = $val;
+                }
+		if ($i eq $id) {
+                    $lu = $val;
+                    close $fh;
+                    last;
+                }
+            }
+        }
+        if (!defined $lu) {
+            $lu = $maxlu + 1;
+            open my $fh, '>>', "$DIR/.index";
+            printf $fh "%-20s%04d", $id, $lu;
+            close $fh;
+        }
+        $lu;
     };
-
-    $Patro::SERVER_VERSION = $Patro::Archy::VERSION;
-
-    my $obj = {};
-    my @store;
-
-    if ($threads_avail) {
-	for (@_) {
-	    local $threads::shared::clone_warn = undef;
-	    eval { $_ = threads::shared::shared_clone($_) };
-	    if ($@ =~ /CODE|GLOB/) {
-		require Patro::LeumJelly;
-		warn $@;
-		$threads::shared::clone_warn = 0;
-		$_ = threads::shared::shared_clone($_);
-	    }
-	}
-    }
-    foreach my $o (@_) {
-	my ($num,$str);
-	{
-	    no overloading;
-	    no warnings 'portable';
-	    $str = "$o";
-	    ($num) = $str =~ /x(\w+)/;
-	    $num = hex($num);
-	}
-	$obj->{$num} = $o;
-	my $reftype = Scalar::Util::reftype($o);
-	my $ref = CORE::ref($o);
-	if ($ref eq 'threadsx::shared::code') {
-	    $ref = $reftype = 'CODE*';
-	} elsif ($ref eq 'threadsx::shared::glob') {
-	    $ref = $reftype = 'GLOB';
-	}
-	my $store = {
-	    ref => $ref,
-	    reftype => $reftype,
-	    id => $num
-	};
-	if (overload::Overloaded($o)) {
-	    if ($ref ne 'CODE' && $ref ne 'CODE*' && $ref ne 'GLOB') {
-		$store->{overload} = _overloads($o);
-	    }
-	}
-	push @store, $store;
-    }
-    my $self = bless {
-	meta => $meta,
-	store => \@store,
-	obj => $obj
-    }, __PACKAGE__;
-    $self->{config} = $self->config;
-    $self->start_server;
-    eval { push @SERVERS, $self };
-    warn $@ if $@;
-    if (@SERVERS == 1) {
-	eval q~END {
-            if ($Patro::Archy::threads_avail) {
-                $_->detach for threads->list(threads::running);
-	    }
-	}~;
-    }
-    return $self;
+    close $lock;
+    return $lookup{$id};
 }
 
 
-sub start_server {
-    my $self = shift;
-    my $meta = $self->{meta};
-    if ($meta->{style} eq 'threaded') {
-	my $server_thread;
-	$server_thread = threads->create(
-	    sub {
-		$SIG{KILL} = sub { exit };
-		$SIG{CHLD} = sub { $self->watch_for_finishers(@_) };
-		$SIG{ALRM} = sub { $self->watch_for_finishers(@_) };
-		if ($self->{meta}{pid_file}) {
-		    open my $fh, '>>', $self->{meta}{pid_file};
-		    flock $fh, 2;
-		    seek $fh, 0, 2;
-		    print {$fh} "$$-", threads->tid, "\n";
-		    close $fh;
-		}
-		$self->accept_clients;
-		return;
-	    } );
-	$self->{meta}{server_thread} = $server_thread;
-	$self->{meta}{server_pid} = $$;
-	$self->{meta}{server_tid} = $server_thread->tid;
-	#$server_thread->detach;
-    } else {
-	my $pid = CORE::fork();
-	if (!defined($pid)) {
-	    croak __PACKAGE__, " fork: $!";
-	}
-	if ($pid == 0) {
-	    if ($self->{meta}{pid_file}) {
-		open my $fh, '>>', $self->{meta}{pid_file};
-		flock $fh, 2;
-		seek $fh, 0, 2;
-		print {$fh} "$$\n";
-		close $fh;
-	    }
-	    $self->accept_clients;
-	    exit;
-	}
-	$self->{meta}{server_pid} = $pid;
-    }
-}
-
-# return list of operators that are overloaded on the given object
-my @oplist;
-sub _overloads {
+sub _addr {
+    use B;
     my $obj = shift;
-    return unless overload::Overloaded($obj);
-    if (!@oplist) {
-	@oplist = split ' ',join(' ',values %overload::ops);
-    }
-
-    my %ops = map { $_ => 1 } grep { overload::Method($obj,$_) } @oplist;
-
-    # we also need to account for the operations that are *implicitly*
-    # overloaded.
-
-    # Many ops can be generated out of 0+, "", or bool
-    if ($ops{"0+"} || $ops{'""'} || $ops{bool}) {
-	$ops{$_}++ for qw(0+ "" bool int ! qr . x .= x= <> -X);
-    }
-
-    # assignment ops can be generated from binary ops
-    foreach my $binop (qw(. x + - * / ** % & | ^ << >> &. |. ^.)) {
-	$ops{$binop . "="}++ if $ops{$binop};
-    }
-
-    # all comparison ops can be generated from <=> and cmp
-    @ops{qw{< <= > >= == !=}} = (1) x 6 if $ops{"<=>"};
-    @ops{qw(le lt ge gt eq ne)} = (1) x 6 if $ops{cmp};
-
-    $ops{neg}++ if $ops{"-"};
-    $ops{"--"}++ if $ops{"-="};
-    $ops{abs}++ if $ops{"<"} && $ops{neg};
-    $ops{"++"}++ if $ops{"+="};
-
-    # all ops are overloaded if there is a 'nomethod' specified
-    @ops{@oplist} = (1) x @oplist if $ops{nomethod};
-    return [keys %ops];
+    my $addr = B::svref_2object($obj)->MAGIC;
+    $addr ? $addr->OBJ->RV->IV : refaddr($obj);
 }
 
-sub config {
-    my $self = shift;
-    my $config_data = {
-	host => $self->{meta}{host},
-	port => $self->{meta}{port},
-	store => $self->{store},
-	style => $self->{meta}{style},
-	version => $Patro::Archy::VERSION
-    };
-    return bless $config_data, 'Patro::Config';
-}
+sub plock {
+    my ($obj, $id, $timeout, $steal) = @_;
+    my $lu = _lookup($id);
+    my $addr = _addr($obj);
 
-########################################
-
-sub Patro::Config::to_string {
-    my ($self) = @_;
-    return Patro::LeumJelly::serialize({%$self});
-}
-
-sub Patro::Config::to_file {
-    my ($self,$file) = @_;
-    if (!$file) {
-	# TODO: select a temp filename
-    }
+    my $expire = $timeout && $timeout > 0 ? time + $timeout : 9E19;
     my $fh;
-    if (!open($fh, '>', $file)) {
-	croak "Patro::Config::to_file: could not write cfga file '$file': $!";
-    }
-    print {$fh} $self->to_string;
-    close $fh;
-    return $file;
-}
+    open($fh,'+<',"$DIR/$addr") || open($fh,'+>', "$DIR/$addr") || die;
+    binmode $fh;
+    flock $fh, LOCK_EX;
 
-sub Patro::Config::from_string {
-    my ($self, $string) = @_;
-    my $cfg = Patro::LeumJelly::deserialize($string);
-    return bless $cfg, 'Patro::Config';
-}
+    $DEBUG && print STDERR "Archy: checking state for $DIR/$addr\@$lu\n";
 
-sub Patro::Config::from_file {
-    my ($self, $file) = @_;
-    if (!defined($file) && !CORE::ref($self) && $self ne 'Patro::Config') {
-	$file = $self;
-    }
-    my $fh;
-    if (CORE::ref($file) eq 'GLOB') {
-	$fh = $file;
-    } elsif (!open $fh, '<' ,$file) {
-	croak "Patro::Config::fron_file: could not read cfg file '$file': $!";
-    }
-    my $data = <$fh>;
-    close $fh;
-    return Patro::Config->from_string($data);
-}
-
-########################################
-
-sub accept_clients {
-    # accept connection from client
-    # spin off connection to separate thread or process
-    # perform request_response_loop on the client connection
-    my $self = shift;
-    my $meta = $self->{meta};
-
-    $meta->{last_connection} = time;
-    $meta->{finished} = 0;
-
-    while (!$meta->{finished}) {
-	$SIG{CHLD} = sub { $self->watch_for_finishers(@_) };
-	$SIG{ALRM} = sub { $self->watch_for_finishers(@_) };
-	alarm ($OPTS{fincheck_freq} || 5);
-	my $client;
-	my $server = $meta->{socket};
-	my $paddr = accept($client,$server);
-	if (!$paddr) {
-	    next if $!{EINTR};
-	    next if $!{ECHILD} || $!==10;  # !?! why $!{ECHILD} not suff on Lin?
-	    ::xdiag("accept failure, %errno is",\%!);
-	    croak __PACKAGE__, ": accept ", 0+$!," $!";
-	}
-	$meta->{last_connection} = time;
-
-	$self->start_subserver($client);
-	$self->watch_for_finishers('MAIN');
-    }
-}
-
-sub start_subserver {
-    my ($self,$client) = @_;
-    if ($self->{meta}{style} eq 'forked') {
-	my $pid = CORE::fork();
-	if (!defined($pid)) {
-	    croak __PACKAGE__,": fork after accept $!";
-	}
-	if ($pid != 0) {
-	    if ($self->{meta}{pid_file}) {
-		open my $fh, '>>', $self->{meta}{pid_file};
-		flock $fh, 2;
-		seek $fh, 0, 2;
-		print {$fh} "$pid\n";
-		close $fh;
-	    }
-	    $self->{meta}{pids}{$pid}++;
+    # if we already have the lock, increment the lock counter and return OK
+    my $ch = _readbyte($fh,$lu);
+    if ($ch >= STATE_LOCK) {
+        if ($ch > STATE_LOCK_MAX) {
+	    carp "Patro::Archy: deep recursion on plock for $obj";
+	    $! = FAIL_DEEP_RECURSION;
 	    return;
-	}
-	$self->request_response_loop($client);
-	exit;
-    } else {
-	my $subthread = threads->create(
-	    sub {
-		$self->request_response_loop($client);
-		threads->self->detach;
-		return;
-	    } );
-	if ($self->{meta}{pid_file}) {
-	    open my $fh, '>>', $self->{meta}{pid_file};
-	    flock $fh, 2;
-	    seek $fh, 0, 2;
-	    print {$fh} "$$-", $subthread->tid, "\n";
-	    close $fh;
-	}
-	$self->{meta}{pids}{"$$-" . $subthread->tid}++;
-	push @{$self->{meta}{subthreads}}, $subthread;
-
-	# $subthread->detach ?
-
-	return;
+        }
+	$DEBUG && print STDERR "Archy: already locked \@ $lu\n";
+        _writebyte($fh,$lu,$ch+1);
+        close $fh;
+        return 1;
     }
-}
 
-sub watch_for_finishers {
-    my ($self,$sig) = @_;
-    alarm 0;
-
-    # XXX - how do you know when a thread is finished?
-    # what if it is a detached thread?
-
-    while ((my $pid = waitpid(-1,WNOHANG())) > 0 && WIFEXITED($?)) {
-	delete $self->{meta}{pids}{$pid};
-    }
-    if ($self->{meta}{subthreads}) {
-	my $n = @{$self->{meta}{subthreads}};
-	my $n1 = threads->list(threads::all());
-	my $n2 = threads->list(threads::running());
-	my @joinable = threads->list(threads::joinable());
-	if (@joinable) {
-	    foreach my $subthread  (@joinable) {
-		my ($i) = grep {
-		    $self->{meta}{subthreads}{$_} == $subthread 
-		} 0 .. $n-1;
-		if (!defined($i)) {
-		    warn "subthread $subthread not found on this server!";
-		    next;
-		}
-		$self->{meta}{subthreads}[$i]->join;
-		$self->{meta}{subthreads}[$i] = undef;
-	    }
-	    $self->{meta}{subthreads} =
-		[ grep { defined } @{$self->{meta}{subthreads} } ];
-	}
-    }
-    unless ($self->still_active) {
-	$self->{meta}{finished}++;
-    }
-    $SIG{ALRM} = sub { $self->watch_for_finishers(@_) };
-    $SIG{CHLD} = sub { $self->watch_for_finishers(@_) };
-    alarm ($OPTS{fincheck_freq} || 5);
-}
-
-sub still_active {
-    my $self = shift;
-    my $meta = $self->{meta};
-    if (time <= $meta->{keep_alive}) {
-	return 1;
-    }
-    if (time < $meta->{last_connection} + $meta->{idle_timeout}) {
-	return 1;
-    }
-    if (keys %{$meta->{pids}}) {
-	return 1;
-    }
-    return;
-}
-
-sub request_response_loop {
-    my ($self, $client) = @_;
-
-    local $Patro::Archy::disconnect = 0;
-    my $fh0 = select $client;
-    $| = 1;
-    select $fh0;
-
-    while (my $req = readline($client)) {
-	next unless $req =~ /\S/;
-	sxdiag("server: got request '$req'");
-	my $resp = $self->process_request($req);
-	sxdiag("server: response to request is ",$resp);
-	$resp = $self->serialize_response($resp);
-	sxdiag("server: serialized response to request is ",$resp);
-	print {$client} $resp,"\n";
-	last if $Patro::Archy::disconnect;
-    }
-    close $client;
-    return;
-}
-
-our $SIDES;    # for the server to activate or suppress some
-               # side-effects from the lower levels of the
-               # request handler
-
-sub process_request {
-    my ($self,$request) = @_;
-    croak "process_request: expected scalar request" if ref($request);
-
-    $request = Patro::LeumJelly::deserialize($request);
-    my $topic = $request->{topic};
-    if (!defined($topic)) {
-	return $self->error_response("bad topic in request '$_[1]'");
+    # if no one else has the lock, get the lock
+    if (_unlocked(_readall($fh))) {
+        _writebyte($fh, $lu, STATE_LOCK);
+        close $fh;
+	$DEBUG && print STDERR "Archy: acquired the lock \@ $lu\n";
+        return 1;
     }
     
-    my $has_args = $request->{has_args};
-    my $args = $request->{args};
-    if ($request->{has_args}) {
-	local $@;
-	$args = [ map {
-	    if (CORE::ref($_) eq '.Patroon') {
-		eval { $self->{obj}{$$_} };
-	    } else {
-		$_
-	    } } @{$request->{args}} ];
-	if ($@) {
-	    return $self->error_response($@);
-	}
-    }
-    my $id = $request->{id};
-    my $cmd = $request->{command};
-    my $ctx = $request->{context};
-    my @orig_args = $has_args ? @$args : ();
-    my @orig_refs = $has_args ? \ (@$args) : ();
-    my @orig_dump = map Patro::LeumJelly::serialize([$_]), @$args;
-    local $! = 0;
-    local $? = 0;
-    local $SIDES = {};
-    my @r;
-    our $DEBUG;
-    local $DEBUG = $DEBUG || $request->{_debug} || 0;
-
-    if ($topic eq 'META') {
-	@r = $self->process_request_META($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'HASH') {
-	@r = $self->process_request_HASH($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'ARRAY') {
-	@r = $self->process_request_ARRAY($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'SCALAR') {
-	@r = $self->process_request_SCALAR($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'METHOD') {
-	@r = $self->process_request_METHOD($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'CODE') {
-	@r = $self->process_request_CODE($id,undef,$ctx,$has_args,$args);
-    } elsif ($topic eq 'HANDLE') {
-	@r = $self->process_request_HANDLE($id,$cmd,$ctx,$has_args,$args);
-    } elsif ($topic eq 'OVERLOAD') {
-	my $obj = $self->{obj}{$id};
-	@r = $self->process_request_OVERLOAD($obj,$cmd,$args,$ctx);
-    } elsif ($topic eq 'REF') {
-	@r = $self->process_request_REF($id,$cmd,$ctx,$has_args,$args);
-    } else {
-	@r = ();
-	$@ = __PACKAGE__ . ": unrecognized topic '$topic' in proxy request";
-    }
-    if (@r && CORE::ref($r[0]) eq '.Patroclus') {
-	return $r[0];
-    }
-    my $sides = bless {}, '.Patroclus';
-
-    $sides->{errno} = 0 + $! if $!;
-    $sides->{errno_extended} = $^E if $^E;
-    $sides->{child_error} = $? if $?;
-    $sides->{error} = $@ if $@;
-
-    # how to update elements of @_ that have changes?
-    # three implementations below. Pick one.
-    #   1. "side A" - return all elements of @_. You will have to
-    #      filter out "Modification of a read-only element attempted ..."
-    #      messages
-    #   2. "side B" - do a deep comparison of original and final
-    #      elements of @_, return the ones that mismatch I CHOOSE YOU!
-    #   3. original implementation - do shallow comparison of original
-    #      and final elements of @_. Insufficient for code that updates
-    #      nested data of the inputs
-    my (@out,@outref);
-
-    # "sideB" - do a deep compare for all arguments
-    for (my $j=0; $j<@$args && !$SIDES->{no_out}; $j++) {
-	my $dj = Patro::LeumJelly::serialize([$args->[$j]]);
-	for (my $i=0; $i<@orig_refs; $i++) {
-	    next if $orig_refs[$i] != \$args->[$j];
-	    if ($orig_dump[$i] ne $dj) {
-		push @out, $i, $args->[$j];
+    # if non-blocking, return EXPIRED
+    if ($timeout && $timeout < 0) {
+	if ($steal) {
+	    my @b = split //,_readall($fh);
+	    foreach my $i (0 .. $#b) {
+		my $stolen;
+		if (ord($b[$i]) >= STATE_LOCK && $i != $lu) {
+		    _writebyte($i, STATE_STOLEN);
+		    $stolen = $i;
+		}
 	    }
-	}
-    }
-    $sides->{sideB} = 1;
-
-    $sides->{out} = \@out if @out;
-    $sides->{outref} = \@outref if @outref;
-    if ($ctx >= 2) {
-	return $self->list_response($sides, @r);
-    } elsif ($ctx == 1 && defined $r[0]) {
-	my $y = $self->scalar_response($sides, $r[0]);
-#	if ($topic eq 'REF') { ::xdiag("response:",$y) }
-	return $y;
-    } else {
-	return $self->void_response($sides);
-    }
-}
-
-sub process_request_META {
-    my ($self,$id,$cmd,$ctx,$has_args,$args) = @_;
-    if ($cmd eq 'disconnect') {
-	$Patro::Archy::disconnect = 1;
-	return bless { disconnect_ok => 1 }, '.Patroclus';
-    }
-    my $obj = $self->{obj}{$id};
-    if ($cmd eq 'ref') {
-	return CORE::ref($obj);
-    } elsif ($cmd eq 'reftype') {
-	return Scalar::Util::reftype($obj);
-    } elsif ($cmd eq 'destroy') {
-	delete $self->{obj}{$id};
-	my @ids = keys %{$self->{obj}};
-	if (@ids == 0) {
-	    $Patro::Archy::disconnect = 1;
-	    return bless { disconnect_ok => 1 }, '.Patroclus';
-	} else {
-	    return bless { disconnect_ok => 0,
-		     num_reminaing_objs => 0+@ids }, '.Patroclus';
-	}
-    } else {
-	$@ = "Patro: unsupported meta command '$cmd'";
-	return;
-    }
-}
-
-sub process_request_HASH {
-    my ($self,$id,$cmd,$ctx,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    if (reftype($obj) ne 'HASH') {
-	$@ = "Not a HASH reference";
-	return;
-	# !!! what if '%{}' op is overloaded?
-    }
-    if ($cmd eq 'STORE') {
-	my ($key,$val) = @$args;
-	my $old_val = $obj->{$key};
-	$obj->{$key} = threads::shared::shared_clone($val);
-	return $old_val;
-    } elsif ($cmd eq 'FETCH') {
-	return $obj->{$args->[0]};
-    } elsif ($cmd eq 'DELETE') {
-	return delete $obj->{$args->[0]};
-    } elsif ($cmd eq 'EXISTS') {
-	return exists $obj->{$args->[0]};
-    } elsif ($cmd eq 'CLEAR') {
-	%$obj = ();
-	return;
-    } elsif ($cmd eq 'FIRSTKEY') {
-	keys %$obj;
-	my ($k,$v) = each %$obj;
-	return $k;
-    } elsif ($cmd eq 'NEXTKEY') {
-	my ($k,$v) = each %$obj;
-	return $k;
-    } elsif ($cmd eq 'SCALAR') {
-	return scalar %$obj;
-    } else {
-	$@ = "HASH function '$cmd' not recognized";
-	return;
-    }
-}
-
-sub process_request_ARRAY {
-    my ($self,$id,$cmd,$ctx,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    if (reftype($obj) ne 'ARRAY') {
-	$@ = "Not an ARRAY ref";
-	return;
-    }
-    if ($cmd eq 'STORE') {
-	my ($index,$val) = @$args;
-	my $old_val = $obj->[$index];
-	# ?!!!? does $val have to be shared?
-	eval { $obj->[$index] = threads::shared::shared_clone($val) };
-	return $old_val;
-    } elsif ($cmd eq 'FETCH') {
-	return eval { $obj->[$args->[0]] };
-    } elsif ($cmd eq 'FETCHSIZE') {
-	return scalar @$obj;
-    } elsif ($cmd eq 'STORESIZE' || $cmd eq 'EXTEND') {
-	my $n = $#{$obj} = $args->[0]-1;
-	return $n+1;
-    } elsif ($cmd eq 'SPLICE') {
-	my ($off,$len,@list) = @$args;
-	if ($off < 0) {
-	    $off += @$obj;
-	    if ($off < 0) {
-		$@ = "Modification of non-createable array value attempted, "
-		    . "subscript $off";
-		return;
+	    if (defined($stolen)) {
+		# ??? lookup monitor id for $stolen?
+		carp "lock for $addr stolen by monitor $id";
 	    }
+	    _writebyte($fh, $lu, STATE_LOCK);
+	    close $fh;
+	    return 1;
 	}
-	if (!defined($len) || $len eq 'undef') {
-	    $len = @{$obj} - $off;
-	}
-	if ($len < 0) {
-	    $len += @{$obj} - $off;
-	    if ($len < 0) {
-		$len = 0;
-	    }
-	}
-	my @val = splice @{$obj}, $off, $len, @list;
-	$SIDES->{no_out} = 1; # don't try to update @_
-	# SPLICE is the only ARRAY function that doesn't assume scalar context
-	if ($ctx == 1) {
-	    return @val > 0 ? $val[-1] : undef;
-	} else {
-	    return @val;
-	}
-    } elsif ($cmd eq 'PUSH') {
-	return push @{$obj}, map threads::shared::shared_clone($_), @$args;
-    } elsif ($cmd eq 'UNSHIFT') {
-	return unshift @{$obj}, map threads::shared::shared_clone($_), @$args;
-    } elsif ($cmd eq 'POP') {
-	return pop @{$obj};
-    } elsif ($cmd eq 'SHIFT') {
-	return shift @{$obj};
-    } elsif ($cmd eq 'EXISTS') {
-	return exists $obj->[$args->[0]];
-    } else {
-	$@ = "tied ARRAY function '$cmd' not recognized";
+	close $fh;
+	$! = FAIL_EXPIRED;
+	$DEBUG && print STDERR "Archy: non-blocking, lock not avail \@ $lu\n";
 	return;
     }
-}
+    close $fh;
 
-sub process_request_SCALAR {
-    my ($self,$id,$cmd,$ctx,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    if (reftype($obj) ne 'SCALAR') {
-	$@ = "Not a SCALAR reference";
-	return;
-    }
-    if ($cmd eq 'STORE') {
-	my $val = ${$obj};
-	${$obj} = threads::shared::shared_clone($args->[0]);
-	return $val;	
-    } elsif ($cmd eq 'FETCH') {
-	return ${$obj};
-    } else {
-	$@ = "tied SCALAR function '$cmd' not recognized";
-	return;
-    }
-}
+    # wait until timeout for the lock
+    my $left = $expire - time;
+    while ($left > 0) {
+	$threads::threads ? threads->yield : sleep 1;
 
-sub process_request_METHOD {
-    my ($self,$id,$command,$context,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    if (!$obj) {
-	$@ = "Bad object id '$id' in proxy method call";
-	return;
-    }
-    my @r;
-    if ($command =~ /::/) {
-	no strict 'refs';
-	if ($context < 2) {
-	    @r = scalar eval { $has_args ? &$command($obj,@$args)
-				   : &$command($obj) };
-	} else {
-	    @r = eval { $has_args ? &$command($obj,@$args)
-			          : &$command($obj) };
-	}
-    } elsif ($context < 2) {
-	@r = scalar eval { $has_args ? $obj->$command(@$args)
-			             : $obj->$command };
-    } else {
-	@r = eval { $has_args ? $obj->$command(@$args)
-			      : $obj->$command };
-    }
-    return @r;
-}
+        open $fh, '+<', "$DIR/$addr";
+	binmode $fh;
+        flock $fh, LOCK_EX;
+        $left = $expire - time;
+	$DEBUG && print STDERR "Archy: waiting for lock \@ $lu (up to $left)\n";
 
-sub process_request_HANDLE {
-    my ($self,$id,$command,$context,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    my $fh = CORE::ref($obj) eq 'threadsx::shared::glob' ? $obj->glob : $obj;
-    if ($command eq 'PRINT') {
-	my $z = print {$fh} @$args;
-	return $z;
-    } elsif ($command eq 'PRINTF') {
-	if ($has_args) {
-	    my $template = shift @$args;
-	    my $z = printf {$fh} $template, @$args;
-	    return $z;
-	} else {
-	    # I don't think we can get here through the proxy
-	    my $z = printf {$fh} "";
-	    return $z;
-	}
-    } elsif ($command eq 'WRITE') {
-	if (@$args < 2) {
-	    return $self->error_response("Not enough arguments for syswrite");
-	}
-	return syswrite($fh, $args->[0],
-	                     $args->[1] // undef, $args->[2] // undef);
-    } elsif ($command eq 'READLINE') {
-	my @val;
-	if ($context > 1) {
-	    my @val = readline($fh);
-	    return @val;
-	} else {
-	    my $val = readline($fh);
-	    return $val;
-	}
-    } elsif ($command eq 'GETC') {
-	my $ch = getc($fh);
-	return $ch;
-    } elsif ($command eq 'READ' || $command eq 'READ?' ||
-	     $command eq 'SYSREAD') {
-	local $Patro::read_sysread_flag;  # don't clobber
-	if (@$args < 2) {
-	    # I don't think we can get here through the proxy
-	    $@ = "Not enough arguments for " . lc($command);
-	    return;
-	}
-	my (undef, $len, $off) = @$args;
-	my $z;
-	if ($command eq 'SYSREAD' ||
-	    ($command eq 'READ?' && fileno($fh) >= 0)) {
-	    $z = sysread $fh, $args->[0], $len, $off || 0;
-	} else {
-	    # sysread doesn't work, for example, on file handles opened
-	    # from a reference to a scalar
-	    $z = read $fh, $args->[0], $len, $off || 0;
-	}
-	return $z;
-    } elsif ($command eq 'EOF') {
-	return eof($fh);
-    } elsif ($command eq 'FILENO') {
-	my $z = fileno($fh);
-	return $z;
-    } elsif ($command eq 'SEEK') {
-	if (@$args < 2) {
-	    $@ = "Not enough arguments for seek";
-	    return;
-	} elsif (@$args > 2) {
-	    $@ = "Too many arguments for seek";
-	    return;
-	} else {
-	    my $z = seek $fh, $args->[0], $args->[1];
-	    return $z;
-	}
-    } elsif ($command eq 'TELL') {
-	my $z = tell($fh);
-	return $z;
-    } elsif ($command eq 'BINMODE') {
-	my $z;
-	if (@$args) {
-	    $z = binmode $fh, $args->[0];
-	} else {
-	    $z = binmode $fh;
-	}
-	return $z;
-    } elsif ($command eq 'CLOSE') {
-	if ($Patro::SECURE) {
-	    $@ = "Patro: insecure CLOSE operation on proxy filehandle";
-	    return;
-	}
-	my $z = close $fh;
-	return $z;    
-    } elsif ($command eq 'OPEN') {
-	if ($Patro::SECURE) {
-	    $@ = "Patro: insecure OPEN operation on proxy filehandle";
-	    return;
-	}
-	my $z;
-	my $mode = shift @$args;
-	if (@$args == 0) {
-	    $z = open $fh, $mode;
-	} else {
-	    my $expr = shift @$args;
-	    if (@$args == 0) {
-		$z = open $fh, $mode, $expr;
-	    } else {
-		$z = open $fh, $mode, $expr, @$args;
-	    }
-	}
-
-	# it is hard to set autoflush from the proxy.
-	# Since it is usually what you want, let's do it here.
-	if ($z) {
-	    my $fh_sel = select $fh;
-	    $| = 1;
-	    select $fh_sel;
-	}
-	return $z;
-    }
-    # commands that are not in the tied filehandle 
-    elsif ($command eq 'TRUNCATE') {
-	my $z = truncate $fh, $args->[0];
-	return $z;
-    } elsif ($command eq 'FCNTL') {
-	my $z = fcntl $fh, $args->[0], $args->[1];
-	return $z;
-    } elsif ($command eq 'FLOCK') {
-	my $z = flock $fh, $args->[0];
-	return $z;
-    } elsif ($command eq 'STAT') {
-	if ($context < 2) {
-	    return scalar stat $fh;
-	} else {
-	    return stat $fh;
-	}
-    } elsif ($command eq 'LSTAT') {
-	if ($context < 2) {
-	    return scalar lstat $fh;
-	} else {
-	    return lstat $fh;
-	}
-    } elsif ($command eq '-X') {
-	my $key = $args->[0];
-	return eval "-$key \$fh";
-    } elsif ($command eq 'SYSOPEN') {
-	if ($Patro::SECURE) {
-	    $@ = "Patro: insecure SYSOPEN operation on proxy filehandle";
-	    return;
-	}
-        my $z = @$args <= 2 ? sysopen $fh, $args->[0], $args->[1]
-                      : sysopen $fh, $args->[0], $args->[1], $args->[2];
-        return $z;
-
-    # commands that operate on DIRHANDLEs
-    } elsif ($command eq 'OPENDIR') {
-        if ($Patro::SECURE) {
-            $@ = "Patro: insecure OPENDIR operation on proxy dirhandle";
-            return;
+        if (_unlocked(_readall($fh))) {
+            _writebyte($fh,$lu,STATE_LOCK);
+	    $DEBUG && print STDERR "Archy: acquired lock \@ $lu after wait\n";
+	    close $fh;
+            return 1;
         }
-        return opendir $fh, $args->[0];
-    } elsif ($command eq 'REWINDDIR') {
-        return rewinddir $fh;
-    } elsif ($command eq 'TELLDIR') {
-        return telldir $fh;
-    } elsif ($command eq 'READDIR') {
-        if ($context < 2) {
-            return scalar readdir $fh;
-        } else {
-            my @r = readdir $fh;
-            return @r;
-        }
-    } elsif ($command eq 'SEEKDIR') {
-        return seekdir $fh, $args->[0];
-    } elsif ($command eq 'CLOSEDIR') {
-        return closedir $fh;
-    } elsif ($command eq 'CHDIR') {
-        return chdir $fh;
-	
-    } else {
-	$@ = "tied HANDLE function '$command' not found";
-	return;
+        close $fh;
     }
-}
-
-sub process_request_CODE {
-    my ($self,$id,$command_NOTUSED,$context,$has_args,$args) = @_;
-    my $sub = $self->{obj}{$id};
-    if (CORE::ref($sub) eq 'threadsx::shared::code') {
-	$sub = $sub->code;
+    if ($steal) {
+        open $fh, '+<', "$DIR/$addr";
+	binmode $fh;
+        flock $fh, LOCK_EX;
+	my @b = split //, _readall($fh);
+	foreach my $i (0 .. $#b) {
+	    my $stolen;
+	    if (ord($b[$i]) >= STATE_LOCK && $i != $lu) {
+		_writebyte($i, STATE_STOLEN);
+		$stolen = $i;
+	    }
+	}
+	if (defined($stolen)) {
+	    # ??? lookup monitor id for $stolen?
+	    carp "lock for $addr stolen by monitor $id";
+	}
+	_writebyte($fh, $lu, STATE_LOCK);
+	close $fh;
+	return 1;
     }
-    if ($context < 2) {
-	return scalar eval { $has_args ? $sub->(@$args) : $sub->() };
-    } else {
-	return eval { $has_args ? $sub->(@$args) : $sub->() };
-    }
-}
-
-sub process_request_OVERLOAD {
-    my ($self,$x,$op,$args,$context) = @_;
-    if ($op eq '@{}') {
-	my $z = eval { \@$x };
-	$@ &&= "Not an ARRAY reference";
-	return $z;
-    } elsif ($op eq '%{}') {
-	my $z = eval { \%$x };
-	$@ &&= "Not a HASH reference";
-	return $z;
-    } elsif ($op eq '&{}') {
-	my $z = eval { \&$x };
-	$@ &&= "Not a CODE reference";
-	return $z;
-    } elsif ($op eq '${}') {
-	my $z = eval { \$$x };
-	$@ &&= "Not a SCALAR reference";
-	return $z;
-    } # elsif ($op eq '*{}') { return \*$x; }
-    my ($y,$swap) = @$args;
-    if ($swap) {
-	($x,$y) = ($y,$x);
-    }
-    local $@ = '';
-    my $z;
-    if ($op =~ /[&|~^][.]=?/) {
-        $op =~ s/\.//;
-    }
-    if ($op eq '-X') {
-        $z = eval "-$y \$x";
-    } elsif ($op eq 'neg') {
-        $z = eval { -$x };
-    } elsif ($op eq '!' || $op eq '~' || $op eq '++' || $op eq '--') {
-        $z = eval "$op\$x";
-    } elsif ($op eq 'qr') {
-        $z = eval { qr/$x/ };
-    } elsif ($op eq 'atan2') {
-        $z = eval { atan2($x,$y) };
-    } elsif ($op eq 'cos' || $op eq 'sin' || $op eq 'exp' || $op eq 'abs' ||
-             $op eq 'int' || $op eq 'sqrt' || $op eq 'log') {
-        $z = eval "$op(\$x)";
-    } elsif ($op eq 'bool') {
-        $z = eval { $x ? 1 : 0 };  # this isn't right
-    } elsif ($op eq '0+') {
-        $z = eval "0 + \$x"; # this isn't right, either
-    } elsif ($op eq '""') {
-        $z = eval { "$x" };
-    } elsif ($op eq '<>') {
-        # always scalar context readline
-        $z = eval { readline($x) };
-    } else {  # binary operator
-        $z = eval "\$x $op \$y";
-    }
-    if ($@) {
-	return;
-    }
-    if ($threads_avail) {
-	$z = threads::shared::shared_clone($z);
-    }
-    return $z;
-}
-
-sub process_request_REF {
-    my ($self,$id,$command,$context,$has_args,$args) = @_;
-    my $obj = $self->{obj}{$id};
-    if (reftype($obj) ne 'REF') {
-	$@ = "Not a REF";
-	return;
-    }
-    if ($command eq 'deref') {
-	return $$obj;
-    }
-    $@ = "$command is not an appropriate operation for REF";
+    $! = FAIL_EXPIRED;
+    $DEBUG && print STDERR "Archy: expired waiting for lock \@ $lu\n";
     return;
 }
 
-########################################
+sub punlock {
+    my ($obj, $id, $count) = @_;
+    my $lu = _lookup($id);
+    my $addr = _addr($obj);
+    $count ||= 1;
 
-sub void_response {
-    my $addl = {};
-    if (@_ > 0 && CORE::ref($_[-1]) eq '.Patroclus') {
-	$addl = pop @_;
-    }
-    return +{ context => 0, response => undef, %$addl };
-}
+    my $fh;
+    open($fh,'+<',"$DIR/$addr") || open($fh,'+>', "$DIR/$addr") || die;
+    binmode $fh;
+    flock $fh, LOCK_EX;
 
-sub scalar_response {
-    my ($self,$sides,$val) = @_;
-    return +{
-	context => 1,
-	response => $val,
-	%$sides
-    };
-}
-
-sub list_response {
-    my ($self,$sides,@val) = @_;
-    return +{
-	context => 2,
-	response => \@val,
-	%$sides
-    };
-}
-
-sub error_response {
-    my ($self,@msg) = @_;
-    return { error => join('', @msg) };
-}
-
-########################################
-
-sub serialize_response {
-    my ($self, $resp) = @_;
-    if ($resp->{context}) {
-	if ($resp->{context} == 1) {
-	    $resp->{response} = patrol($self,$resp,$resp->{response});
-	} elsif ($resp->{context} == 2) {
-	    $resp->{response} = [
-		map patrol($self,$resp,$_), @{$resp->{response}} ];
-	}
-    }
-
-    if ($resp->{out}) {
-	$resp->{out} = [ map patrol($self,$resp,$_), @{$resp->{out}} ];
-    }
-
-    sxdiag("Patro::Archy: final response before serialization: ",$resp);
-    $resp = Patro::LeumJelly::serialize($resp);
-    return $resp;
-}
-
-# we should not send any serialized references back to the client.
-# replace any references in the response with an
-# object id.
-sub patrol {
-    my ($self,$resp,$obj) = @_;
-    sxdiag("patrol: called on: ",defined($obj) ? "$obj" : "<undef>");
-    return $obj unless ref($obj);
-
-    if ($threads_avail) {
-	if (CORE::ref($obj) eq 'CODE') {
-	    $obj = threadsx::shared::code->new($obj);
-	    sxdiag("patrol: coderef converted");
-	} elsif (CORE::ref($obj) eq 'GLOB') {
-	    $obj = threadsx::shared::glob->new($obj);
-	    sxdiag("patrol: glob converted");
-	}
-    }
-
-    my $id = do {
-	no overloading;
-	0 + $obj;
-    };
-
-    if (!$self->{obj}{$id}) {
-	$self->{obj}{$id} = $obj;
-	my $ref = CORE::ref($obj);
-	my $reftype;
-	if ($ref eq 'threadsx::shared::code') {
-	    $ref = 'CODE';
-	    $reftype = 'CODE';
-	} elsif ($ref eq 'threadsx::shared::glob') {
-	    $ref = 'GLOB';
-	    $reftype = 'GLOB';
+    # if we already have the lock, decrement the lock counter and return OK
+    $DEBUG && print STDERR "Archy: checking state for unlock \@ $lu\n";
+    $ch = _readbyte($fh,$lu);
+    if ($ch > STATE_LOCK) {
+	if ($count < 0) {
+	    $count = $ch - STATE_LOCK + 1;
+	    $ch = 0;
 	} else {
-	    $reftype = Scalar::Util::reftype($obj);
+	    if ($count > $ch - STATE_LOCK + 1) {
+		carp "punlock: count ($count) exceeded lock count (",
+		    $ch - STATE_LOCK + 1, ")";
+		$count = $ch - STATE_LOCK + 1;
+		$ch = STATE_NULL;
+	    } else {
+		$ch -= $count;
+	    }
 	}
-	sxdiag("patrol: ref types for $id are $ref,$reftype");
-	$resp->{meta}{$id} = {
-	    id => $id, ref => $ref, reftype => $reftype
-	};
-	if (overload::Overloaded($obj)) {
-	    $resp->{meta}{$id}{overload} = _overloads($obj);
+	if ($ch < STATE_LOCK) {
+	    $ch = STATE_NULL;
 	}
-	sxdiag("new response meta: ",$resp->{meta}{$id});
-    } else {
-	sxdiag("id $id has been seen before");
+        _writebyte($fh,$lu,$ch);
+        close $fh;
+	$DEBUG && print STDERR
+	    "Archy: unlock successful \@ $lu. New state $ch\n";
+        return $count;
+    } elsif ($ch == STATE_LOCK) {
+	if ($count > 1) {
+	    carp "punlock: count ($count) exceeded lock count (1)";
+	    $count = 1;
+	}
+        _writebyte($fh,$lu,STATE_NULL);
+        close $fh;
+	$DEBUG && print STDERR
+	    "Archy: unlock successful \@ $lu. New state NULL\n";
+        return 1;
+    } elsif ($ch == STATE_STOLEN) {
+	close $fh;
+	carp "punlock: lock was stolen";
+
+	# we don't know whether it was a single lock or a stack of locks
+	# that was stolen; preserve the STATE_STOLEN byte in case the
+	# monitor wants to call unlock again and again
+	
+	return "0 but true";
     }
-    return bless \$id,'.Patrobras';
+    close $fh;
+    carp "Patro::Archy: punlock called on $obj monitor without lock";
+    $! = FAIL_INVALID_WO_LOCK;
+    return;
 }
 
-sub TEST_MODE {
-    if ($INC{'perl5db.pl'}) {
-	::xdiag("TEST_MODE adjusted for debugging");
-	$OPTS{keep_alive} = 3600;
-	$OPTS{fincheck_freq} = 3500;
-	$OPTS{idle_timeout} = 3600;
-	alarm 9999;
+sub pwait {
+    my ($obj, $id, $timeout) = @_;
+    my $lu = _lookup($id);
+    my $addr = _addr($obj);
+    my $expire = $timeout && $timeout > 0 ? time + $timeout : 9E19;
+
+    my $unlocks = punlock($obj, $id, -1);
+    if (!$unlocks) {
+	$! = FAIL_INVALID_WO_LOCK;
+        return;
+    } elsif ($unlocks == 0) {
+	# wait called but lock was stolen
+	$! = FAIL_INVALID_WO_LOCK;
 	return;
     }
-    $OPTS{keep_alive} = 2;
-    $OPTS{fincheck_freq} = 2;
-    $OPTS{idle_timeout} = 1;
-    if ($threads_avail) {
-	$OPTS{fincheck_freq} = "0 but true";	    
+    my $fh;
+    open($fh,'+<',"$DIR/$addr") || open($fh,'+>', "$DIR/$addr") || die;
+    binmode $fh;
+    flock $fh, LOCK_EX;
+    _writebyte($fh,$lu,STATE_WAIT);
+    close $fh;
+
+    my $left = $expire - time;
+    while ($left > 0) {
+	$threads::threads ? threads->yield : sleep 1;
+
+        open $fh, '+<', "$DIR/$addr";
+	binmode $fh;
+        flock $fh, LOCK_EX;
+        my $ch = _readbyte($fh,$lu);
+        close $fh;
+        $left = $expire - time;
+
+        if ($ch == STATE_NOTIFY) {    # got notify
+
+	    open $fh, '+<', "$DIR/$addr";
+	    binmode $fh;
+	    flock $fh, LOCK_EX;
+	    _writebyte($fh,$lu,STATE_NULL);
+	    close $fh;
+	    $left = $expire - time;
+	    if ($left <= 0 || ($timeout && $timeout < 0)) {
+		$left = -1;
+	    }
+
+	    # if pwait was called on a stack of locks,
+	    # then we must restack the locks
+	    while ($unlocks > 1 && plock($obj,$id,$left)) {
+		$unlocks--;
+	    }
+	    return if $unlocks != 1;
+            return plock($obj,$id,$left);
+        }
+	last if $timeout && $timeout < 0;
     }
+
+    # !!! what state should the monitor be left in when a
+    # !!! wait call times out?
+    
+    $! = FAIL_EXPIRED;
+    return;
+}
+
+sub pnotify {
+    my ($obj, $id, $count) = @_;
+    $count ||= 1;
+    my $lu = _lookup($id);
+    my $addr = _addr($obj);
+
+    my $fh;
+    open($fh,'+<',"$DIR/$addr") || open($fh,'+>', "$DIR/$addr") || die;
+    binmode $fh;
+    flock $fh, LOCK_EX;
+    seek $fh, 0, SEEK_END;
+    my $sz = tell($fh);
+
+    # assert that this monitor holds the resource
+    my $ch = _readbyte($fh,$lu);
+    if ($ch < STATE_LOCK) {
+	carp "Patro::Archy: pnotify called on $obj monitor without lock";
+	$! = FAIL_INVALID_WO_LOCK;
+	return;
+    }
+
+    my @y1 = (0 .. $sz-1);
+    my @y = splice @y1, int($sz * rand);
+    push @y, @y1;
+    my $notified = 0;
+    foreach my $y (@y) {
+        $ch = _readbyte($fh,$y);
+        if ($ch == STATE_WAIT) {
+            _writebyte($fh,$y,STATE_NOTIFY);
+	    last if ++$notified >= $count && $count > 0;
+        }
+    }
+    close $fh;
+    return $notified || "0 but true";
+}
+
+sub pstate {
+    my ($obj, $id) = @_;
+    my $lu = _lookup($id);
+    my $addr = _addr($obj);
+
+    my $fh;
+    open($fh,'+<',"$DIR/$addr") || return STATE_NULL;
+    binmode $fh;
+    # no need to lock?
+    my $state = _readbyte($fh,$lu);
+    close $fh;
+    return $state;
+}
+
+
+# extract the $n-th byte from filehandle $fh
+sub _readbyte {
+    my ($fh,$n) = @_;
+    my $b = "\n";
+    seek $fh, $n, SEEK_SET;
+    my $p = read $fh, $b, 1;
+    my $ch = $p ? ord($b) : 0;
+    if ($DEBUG) {
+	print STDERR "Archy:     readbyte($n) = $ch\n";
+    }
+    return $ch;
+}
+
+# update the $n-th byte of filehandle $fh with chr($val)
+sub _writebyte {
+    my ($fh,$n,$val) = @_;
+
+    if ($n > -s $fh) {
+	# extend the file so that we can write to byte $n
+	my $newlen = $n - (-s $fh);
+        seek $fh, 0, SEEK_END;
+        print $fh "\0" x $newlen;
+	if ($DEBUG) {
+	    print STDERR "Archy:     extend($newlen)\n";
+	}
+    }
+    seek $fh,0,0;
+    my $z1 = seek $fh, $n, 0;
+    my $z2 = print $fh chr($val);
+    if ($DEBUG) {
+	print STDERR "Archy:     writebyte($n,$val)\n";
+    }
+    $z2;
+}
+
+sub _readall {
+    my ($fh) = @_;
+    my $buffer = '';
+    seek $fh, 0, SEEK_SET;
+    read $fh, $buffer, 32678;
+    if ($DEBUG) {
+	print STDERR "Archy:     readall => [",
+	    join(" ",map ord,split(//,$buffer)), "]\n";
+    }
+    return $buffer;
 }
 
 1;
 
 =head1 NAME
 
-Patro::Archy - remote object server for Patro
+Patro::Archy - establish norms about exclusive access to references
 
-=head1 VERSION
+=cut
 
-0.15
+# This is not necessarily just for Patro-proxy objects
 
 =head1 DESCRIPTION
 
-A server class for making references available to proxy clients
-in the L<Patro> distribution.
-The server handles requests for any references that are being served,
-manipulates references on the server, and returns the results of
-operations to the proxy objects on the clients.
+At times we want threads and processes to have exclusive access to
+some resources, even if they have to wait for it. The C<Patro::Archy>
+provides functions to request exclusive access to a resource and to
+relinquish control of the resource. It also implements an additional
+wait/notify feature.
+
+The functions of C<Patro::Archy> all take the same two first
+arguments: a reference -- the resource that will be used exclusively
+in one thread or process, and an id that uniquely identifies a
+thread or process that seeks exclusive access to a resource.
+
+Like most such locks in Perl,
+the locks from this package are advisory -- they can only
+prevent access to the resource from other threads and processes
+that use the same locking scheme.
+
+
+=head1 FUNCTIONS
+
+=head2 plock
+
+=head2 $status = plock($object, $id [, $timeout])
+
+Attempts to acquire an exclusive (but advisory) lock on the
+reference given by C<$object> for a monitor identified by
+C<$id>. Returns true if the lock was successfully acquired.
+
+The monitor id C<$id> is an arbitrary string that identifies
+the thread or process that seeks to acquire the resource.
+In this function and in the other public functions of
+C<Patro::Archy>, there is an implementation limitation
+that the monitor id be no more than 20 characters.
+
+If a positive C<$timeout> argument is provided, the function
+will give up trying to acquire the lock and return false after
+C<$timeout> seconds. If C<$timeout> is negative, the function
+call will be treated as a I<non-blocking> lock call, and the
+function will return as soon as it can be determined whether
+the lock is available.
+
+It is acceptable to call C<plock> for a monitor that already
+possesses the lock. Successive lock calls "stack", so that you
+must call L<"punlock"> the same number of times that you called
+C<plock> on a reference (or provide a C<$count> argument to
+L<"punlock">) before it will be released.
+
+
+=head2 punlock
+
+=head2 $status = punlock($object, $id[, $count])
+
+Releases the lock on reference C<$object> held by the monitor
+identified by C<$id>. Returns true on success. A false return
+value generally means that the monitor did not have possession
+of the lock at the time of the C<punlock> call.
+
+A positive C<$count> argument, if provided, will apply the
+unlock operation C<$count> times. Since lock calls from the
+same monitor "stack" (see L<"plock">), it may be necessary to
+apply the unlock operation more than once to release control of
+the reference. A negative C<$count> argument will
+release control of the reference unconditionally.
+
+
+=head2 pwait
+
+=head2 $status = pwait($object, $id [, $timeout])
+
+Releases the lock on reference C<$object> and waits for the
+L<"pnotify"> function to be called from another monitor.
+After the L<"pnotify"> call is received by the monitor,
+the monitor will attempt to acquire the lock on the resource
+again. The monitor is only supposed to call this function
+when it is in possession of the lock.
+
+Returns true after the lock has been successfully acquired.
+Returns false if the function is called while the monitor
+does not have the lock on the resource, or if C<$timeout>
+is specified and it takes longer than C<$timeout> seconds
+to acquire the lock.
+
+=head2 pnotify
+
+=head2 $status = pnotify($object, $id [, $count])
+
+Causes one or more (depending whether C<$count> is specified)
+monitors that have previously called L<"pwait"> to wake up and
+attempt to reacquire the lock on the resource. The monitor
+is supposed to call this function while it is in possession
+of the lock. Note that this call does not release the
+resource. Returns true on success.
+
+
+=head2 LIMITATIONS
+
+Currently only works on systems that have a shared-memory
+virtual filesystem in C</dev/shm>.
 
 =head1 LICENSE AND COPYRIGHT
 

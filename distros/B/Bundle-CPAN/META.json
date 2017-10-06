@@ -4,7 +4,7 @@
       "Andreas Koenig"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150002",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "CPAN",
       "module",
@@ -34,17 +34,16 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://github.com/andk/cpanpm/tree/master/related/Bundle-CPAN",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/andk/cpanpm.git"
       }
    },
-   "version" : "1.862"
+   "version" : "1.863",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

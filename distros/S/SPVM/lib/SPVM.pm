@@ -28,7 +28,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0270';
+our $VERSION = '0.0276';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -64,7 +64,7 @@ sub import {
 
 sub _get_dll_file {
   my $package_name = shift;
-  
+
   # DLL file name
   my $dll_base_name = $package_name;
   $dll_base_name =~ s/^.*:://;
@@ -96,6 +96,7 @@ sub search_native_address {
     if ($dll_libref) {
       my $sub_abs_name_c = $sub_abs_name;
       $sub_abs_name_c =~ s/:/_/g;
+      
       $native_address = DynaLoader::dl_find_symbol($dll_libref, $sub_abs_name_c);
     }
     else {
@@ -121,6 +122,7 @@ sub get_sub_native_address {
   
   my $dll_package_name = $package_name;
   my $shared_lib_file = _get_dll_file($dll_package_name);
+
   my $native_address = search_native_address($shared_lib_file, $sub_abs_name);
   
   # Try runtime compile
@@ -137,11 +139,19 @@ sub get_sub_native_address {
     $module_dir =~ s/$module_name_slash$//;
     $module_dir =~ s/\/$//;
     
-    my $shared_lib_file = SPVM::Build::build_shared_lib(
-      module_dir => $module_dir,
-      module_name => "SPVM::$module_name"
-    );
-    if ($shared_lib_file) {
+    my $shared_lib_file;
+    
+    eval {
+      $shared_lib_file = SPVM::Build::build_shared_lib(
+        module_dir => $module_dir,
+        module_name => "SPVM::$module_name"
+      );
+    };
+    
+    if ($@) {
+      return;
+    }
+    else {
       $native_address = search_native_address($shared_lib_file, $sub_abs_name);
     }
   }
@@ -155,7 +165,9 @@ sub bind_native_subs {
     my $native_func_name_spvm = "SPVM::$native_func_name";
     my $native_address = get_sub_native_address($native_func_name_spvm);
     unless ($native_address) {
-      confess "Can't find native address($native_func_name())";
+      my $native_func_name_c = $native_func_name_spvm;
+      $native_func_name_c =~ s/:/_/g;
+      confess "Can't find native address of $native_func_name_spvm(). Native function name must be $native_func_name_c";
     }
     bind_native_sub($native_func_name, $native_address);
   }
@@ -167,7 +179,16 @@ CHECK {
   XSLoader::load('SPVM', $VERSION);
   
   # Load standard library
-  my @dll_file_bases = ('std', 'Math');
+  my @dll_file_bases = qw(
+    std
+    Math
+    Byte
+    Short
+    Integer
+    Long
+    Float
+    Double
+  );
   for my $shared_lib_file_base (@dll_file_bases) {
     my $shared_lib_file_rel = "auto/SPVM/$shared_lib_file_base.native/$shared_lib_file_base.$Config{dlext}";
     for my $module_dir (@INC) {
@@ -496,54 +517,114 @@ sub build_spvm_subs {
 
 =head1 NAME
 
-SPVM - Fast calculation, GC, static typing, VM with perlish syntax
+SPVM - Fast Calculation and Easy C/C++ Binding with perlish syntax and static typing
 
-B<SPVM is under development! I will change implementation and specification without warnings.>
+B<SPVM is before 1.0 under development! I will change implementation and specification without warnings.>
 
 =head1 SYNOPSIS
 
+=head2 Fast Array Operation using SPVM.
+
+SPVM Module:
+
+  # lib/SPVM/MyMath.spvm
+  package MyMath {
+    
+    # Sub Declaration
+    sub sum ($nums : int[]) : int {
+      
+      # Culcurate total
+      my $total = 0;
+      for (my $i = 0; $i < @$nums; $i++) {
+        $total += $nums->[$i];
+      }
+      
+      return $total;
+    }
+  }
+
+Use SPVM Module from Perl
+  
   use FindBin;
   use lib "$FindBin::Bin/lib";
-
-  use SPVM 'MyModule2';
-
-  my $total = SPVM::MyModule2::foo(3, 5);
+  
+  # Use SPVM module
+  use SPVM 'MyMath';
+  
+  # New SPVM int array
+  my $sp_nums = SPVM::new_int_array([3, 6, 8, 9]);
+  
+  # Call SPVM subroutine
+  my $total = SPVM::MyMath::sum($sp_nums);
+  
   print $total . "\n";
 
-Module file
+If you know more SPVM syntax, see L<SPVM::Document::Specification>.
 
-  # lib/SPVM/MyModule1.spvm
-  package MyModule1 {
-    has x : int;
-    has y : int;
+If you know more Functions to convert Perl Data to SPVM Data, see L<SPVM::Document::Functions>.
 
-    sub sum ($x : int, $y : int) : int {
+=head2 C Extension using SPVM
 
-      my $total = $x + $y;
+SPVM Module:
 
-      return $total;
-    }
+  # lib/SPVM/MyMathNative.spvm
+  package MyMathNative {
+    
+    # Sub Declaration
+    sub sum ($nums : int[]) : native int;
   }
 
-  # lib/SPVM/MyModule2.spvm
-  use MyModule1;
-  package MyModule2 {
+C Source File;
 
-    sub foo ($x : int, $y : int) : int {
+  // lib/SPVM/MyMathNative.native/MyMathNative.c
+  #include <spvm_api.h>
 
-      my $total = ($x * $y) + MyModule1::sum(2, 4);
-
-      return $total;
+  int32_t SPVM__MyMathNative__sum(SPVM_API* api, SPVM_API_VALUE* args) {
+    
+    // First argument
+    SPVM_API_OBJECT* sp_nums = args[0].object_value;
+    
+    // Array length
+    int32_t length = api->get_array_length(api, sp_nums);
+    
+    // Elements pointer
+    int32_t* nums = api->get_int_array_elements(api, sp_nums);
+    
+    // Culcurate total
+    int32_t total = 0;
+    {
+      int32_t i;
+      for (i = 0; i < length; i++) {
+        total += nums[i];
+      }
     }
+    
+    return total;
   }
 
-If you want to know more syntax, see C<solo/SPVM/Test.spvm>.
+Use Extension Module from Perl:
 
-If you want to know SPVM language, see C<solo/README.md>
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  
+  # Use SPVM module
+  use SPVM 'MyMathNative';
+  
+  # New SPVM int array
+  my $sp_nums = SPVM::new_int_array([3, 6, 8, 9]);
+  
+  # Call SPVM subroutine
+  my $total = SPVM::MyMathNative::sum($sp_nums);
+  
+  print $total . "\n";
+
+If you know more SPVM Extension, see L<SPVM::Document::Extension>.
+
+If you know the APIs to manipulate SPVM data, see L<SPVM::Document::NativeAPI>.
 
 =head1 DESCRIPTION
 
-Do you need B<faster Perl>? SPVM provides fast calculation to Perl.
+SPVM provide Fast Culcuration and Easy way to Bind C/C++ Language to Perl.
 
 =over 4
 
@@ -653,7 +734,7 @@ And call SPVM subroutine. If SPVM subroutine absolute name is C<MyModule1::sum>,
 
 =head2 SPVM Functions
 
-L<SPVM::Document::Function> - SPVM data convertion function.
+L<SPVM::Document::Functions> - SPVM data convertion functions.
 
 List of SPVM functions:
 
@@ -681,17 +762,21 @@ List of SPVM functions:
 
 =back
 
-If you know Detail of SPVM Function, see L<SPVM::Document::Function>.
+If you know Detail of SPVM Function, see L<SPVM::Document::Functions>.
 
 =head2 SPVM Language Specification
 
-L<SPVM::Document::Spec> - SPVM Language Specification
+L<SPVM::Document::Specification> - SPVM Language Specification
 
 =head2 SPVM Native API
 
 L<SPVM::Document::NativeAPI> - SPVM Native API.
 
 Native API is C level API. You can write programing logic using C language and SPVM Native API.
+
+=head2 SPVM Standard Library
+
+L<SPVM::Document::StandardLibrary> - SPVM Standard Library
 
 =head2 SPVM Cookbook
 

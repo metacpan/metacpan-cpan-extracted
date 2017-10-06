@@ -4,7 +4,7 @@
       "pawa <pawa@pawafuru.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Lingua::JA::KanjiTable" : {
          "file" : "lib/Lingua/JA/KanjiTable.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -65,9 +65,9 @@
       },
       "homepage" : "https://github.com/pawa-/Lingua-JA-KanjiTable",
       "repository" : {
-         "url" : "git://github.com/pawa-/Lingua-JA-KanjiTable",
+         "url" : "git://github.com/pawa-/Lingua-JA-KanjiTable.git",
          "web" : "https://github.com/pawa-/Lingua-JA-KanjiTable"
       }
    },
-   "version" : "0.13"
+   "version" : "0.14"
 }

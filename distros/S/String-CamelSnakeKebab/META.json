@@ -4,7 +4,7 @@
       "Eric Johnson (kablamo)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.2.0",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "unknown"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "String::CamelSnakeKebab" : {
          "file" : "lib/String/CamelSnakeKebab.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -69,11 +69,12 @@
          "web" : "https://github.com/kablamo/perl-string-camelsnakekebab"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Eric Johnson <eric.git@iijo.org>",
+      "Eric Johnson <github@iijo.org>",
       "Lance Wicks <lw@judocoach.com>",
-      "Eric Johnson <github@iijo.org>"
+      "Thomas Sibley <trsibley@uw.edu>"
    ]
 }

@@ -43,8 +43,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojo::Base" : "0",
-            "Mojo::File" : "0"
+            "Mojolicious" : "7.24"
          }
       },
       "test" : {
@@ -56,13 +55,16 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       },
       "Mojo::IOLoop::ReadWriteProcess::Exception" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm"
       },
       "Mojo::IOLoop::ReadWriteProcess::Pool" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Queue" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm"
       }
    },
    "release_status" : "stable",
@@ -76,7 +78,7 @@
          "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.05",
+   "version" : "0.08",
    "x_contributors" : [
       "Ettore Di Giacinto <mudler@gentoo.org>"
    ],

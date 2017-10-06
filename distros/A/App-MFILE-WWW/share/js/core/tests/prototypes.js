@@ -35,19 +35,18 @@
 "use strict";
 
 define ([
+    'QUnit',
     'prototypes'
 ], function (
+    QUnit,
     prototypes 
 ) {
-
-    var prefix = "core: ";
-
     return function () {
 
-        var t = Object.create(prototypes.target),
-            u = Object.create(prototypes.user);
+        QUnit.test('prototypes prototyping', function (assert) {
 
-        test(prefix + 'prototypes prototyping?', function (assert) {
+            var t = Object.create(prototypes.target),
+                u = Object.create(prototypes.user);
 
             // target
             assert.strictEqual(typeof t, 'object', 't is an object');
@@ -64,10 +63,8 @@ define ([
             assert.strictEqual(typeof u, 'object', 'u is an object');
             assert.strictEqual(typeof u.nick, 'string', 'user.nick OK');
             assert.strictEqual(u.nick, '', 'user.nick OK');
-            assert.strictEqual(typeof u.passhash, 'string', 'user.passhash OK');
-            assert.strictEqual(u.passhash, '', 'user.nick OK');
-            assert.strictEqual(typeof u.salt, 'string', 'user.salt OK');
-            assert.strictEqual(u.salt, '', 'user.nick OK');
+            assert.notOk(u.hasOwnProperty('passhash'), 'user prototype has no passhash property');
+            assert.notOk(u.hasOwnProperty('salt'), 'user prototype has no salt property');
 
         });
 

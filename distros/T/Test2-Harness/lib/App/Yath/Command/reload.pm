@@ -2,7 +2,7 @@ package App::Yath::Command::reload;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use POSIX ":sys_wait_h";
 use Cwd qw/realpath/;
@@ -49,6 +49,12 @@ sub run {
 
     my $data = Test2::Harness::Util::File::JSON->new(name => $pfile)->read();
 
+    my $blacklist = File::Spec->catfile($data->{dir}, 'BLACKLIST');
+    if (-e $blacklist) {
+        print "Deleting module blacklist...\n";
+        unlink($blacklist) or warn "Could not delete blacklist file!";
+    }
+
     print "\nSending SIGHUP to $data->{pid}\n\n";
     kill('HUP', $data->{pid}) or die "Could not send signal!\n";
     return 0;
@@ -64,9 +70,53 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::persist
 
 =head1 DESCRIPTION
+
+=head1 SYNOPSIS
+
+=head1 COMMAND LINE USAGE
+
+
+    $ yath reload [options]
+
+=head2 Help
+
+=over 4
+
+=item --show-opts
+
+Exit after showing what yath thinks your options mean
+
+=item -h
+
+=item --help
+
+Exit after showing this help message
+
+=back
+
+=head2 Plugins
+
+=over 4
+
+=item -pPlugin
+
+=item -p+My::Plugin
+
+=item --plugin Plugin
+
+Load a plugin
+
+can be specified multiple times
+
+=item --no-plugins
+
+cancel any plugins listed until now
+
+This can be used to negate plugins specified in .yath.rc or similar
+
+=back
 
 =head1 SOURCE
 

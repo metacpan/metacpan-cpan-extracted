@@ -73,9 +73,10 @@ lib/Math/AnyNum/hypot.pm
 lib/Math/AnyNum/ilog.pm
 lib/Math/AnyNum/inc.pm
 lib/Math/AnyNum/inv.pm
+lib/Math/AnyNum/ipolygonal_root.pm
 lib/Math/AnyNum/irand.pm
-lib/Math/AnyNum/iroot.pm
 lib/Math/AnyNum/is_int.pm
+lib/Math/AnyNum/is_polygonal.pm
 lib/Math/AnyNum/is_power.pm
 lib/Math/AnyNum/LambertW.pm
 lib/Math/AnyNum/lgrt.pm
@@ -86,6 +87,7 @@ lib/Math/AnyNum/ne.pm
 lib/Math/AnyNum/neg.pm
 lib/Math/AnyNum/norm.pm
 lib/Math/AnyNum/numify.pm
+lib/Math/AnyNum/polygonal_root.pm
 lib/Math/AnyNum/pow.pm
 lib/Math/AnyNum/round.pm
 lib/Math/AnyNum/sec.pm

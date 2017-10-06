@@ -1,5 +1,9 @@
 Revision history for Business-GoCardless
 
+0.30     2017-09-27
+        - Add mandate update, cancel, and status methods + test coverage (GH #12)
+        - Fix typos in error reporting when failing to set attribtutes
+
 0.29     2017-09-22
         - Add mandate method to ::Pro and ::RedirectFlow
 

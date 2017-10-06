@@ -6,7 +6,7 @@ use warnings;
 
 use 5.012;
 
-our $VERSION = '1.0005';
+our $VERSION = '1.0006';
 
 use XML::Parser;
 
@@ -347,14 +347,28 @@ sub EndTag {
         $text = $self->char_accumulator()->{$element};
         delete $self->char_accumulator()->{$element};
     }
-    $text ||= 'o';
+    # This isn't the correct thing to do.  If the before or after element
+    # had and 'o' and the other was undef, we would fail to find any differences
+    # Instead, when a value is undef we should be setting the the checksum
+    # to the value for an empty string since undef and empty string for a
+    # element are the same (<element /> vs <element></element>)
+    #$text ||= 'o';
 
 #    warn "text is '$text' \n";
 #    my $ctx = Digest::MD5->new;
 #    $ctx->add("$text");
 #    $self->doc()->{"$test_context"}->{TextChecksum} = $ctx->b64digest;
 
-    $self->doc()->{"$test_context"}->{TextChecksum} = md5_base64(encode_utf8("$text"));
+    # In XML, a null(undef) value and an empty string should be treaded the same.
+    # Therefore, when the element is undef, we should set the TextChecksum to the same
+    # as an empty string.
+    $self->doc()->{"$test_context"}->{TextChecksum} =
+        md5_base64(
+            encode_utf8(
+                (defined $text) ? "$text" : ""
+            )
+        );
+
     if ($self->opts()->{keepdata}) {
         $self->doc()->{"$test_context"}->{CData} = $text;
     }
@@ -383,7 +397,9 @@ sub Text {
     $char =~ s/^\s*//;
     $char =~ s/\s*$//;
     $char =~ s/\s+/ /g;
-    $self->char_accumulator()->{$element} .= $char if $char;
+    # We should add any character that isn't undef, so check
+    # for defined here instead of checking if the value is true
+    $self->char_accumulator()->{$element} .= $char if defined($char);
 
 }
 
@@ -443,7 +459,7 @@ XML::SemanticDiff - Perl extension for comparing XML documents.
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 SYNOPSIS
 
@@ -469,7 +485,7 @@ hashrefs where each hashref describes a single difference between the two docs.
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 METHODS
 
@@ -639,8 +655,9 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff or by
-email to bug-xml-semanticdiff@rt.cpan.org.
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=XML-SemanticDiff> or by
+email to
+L<bug-xml-semanticdiff@rt.cpan.org|mailto:bug-xml-semanticdiff@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

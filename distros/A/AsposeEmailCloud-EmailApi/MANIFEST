@@ -38,7 +38,6 @@ MANIFEST
 META.json
 META.yml
 README
+README.md
+README.MD
 t/01_email_api.t
-t/data/email_test.eml
-t/data/email_test2.eml
-t/data/README.TXT

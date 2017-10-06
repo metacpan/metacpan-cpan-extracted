@@ -33,15 +33,6 @@ register restrpc => sub {
             $publisher = $_;
         }
     }
-
-    my $code_wrapper = $arguments->{code_wrapper}
-        ? $arguments->{code_wrapper}
-        : sub {
-            my $code = shift;
-            my $pkg  = shift;
-            $code->(@_);
-        };
-    my $callback = $arguments->{callback};
     my $dispatcher = $publisher->($arguments->{arguments}, $base_url);
 
     my $lister = Dancer::RPCPlugin::DispatchMethodList->new();
@@ -51,18 +42,31 @@ register restrpc => sub {
         methods  => [ sort keys %{ $dispatcher } ],
     );
 
+    my $code_wrapper = $arguments->{code_wrapper}
+        ? $arguments->{code_wrapper}
+        : sub {
+            my $code = shift;
+            my $pkg  = shift;
+            $code->(@_);
+        };
+    my $callback = $arguments->{callback};
+
+    debug("Starting restrpc-handler build: ", $lister);
     my $handle_call = sub {
         if (request->content_type ne 'application/json') {
             pass();
         }
+        debug("[handle_restrpc_request] Processing: ", request->body);
 
         # method_name should exist
         my ($method_name) = request->path =~ m{$base_url/(\w+)};
         if (! exists $dispatcher->{$method_name}) {
+            warning("$base_url/#$method_name not found, pass()");
             pass();
         }
 
         content_type 'application/json';
+        my $response;
         my $method_args = request->body
             ? from_json(request->body)
             : undef;
@@ -72,7 +76,6 @@ register restrpc => sub {
                 : callback_success();
         };
 
-        my $response;
         if (my $error = $@) {
             $response = Dancer::RPCPlugin::ErrorResponse->new(
                 error_code => 500,
@@ -100,6 +103,7 @@ register restrpc => sub {
                 $code_wrapper->($handler, $package, $method_name, $method_args);
             };
 
+            debug("[handling_jsonrpc_response($method_name)] ", $response);
             if (my $error = $@) {
                 $response = Dancer::RPCPlugin::ErrorResponse->new(
                     error_code => 500,
@@ -117,6 +121,7 @@ register restrpc => sub {
         return to_json($response);
     };
 
+    debug("setting routes (restrpc): $base_url ", $lister);
     for my $call (keys %{ $dispatcher }) {
         my $endpoint = "$base_url/$call";
         post $endpoint, $handle_call;
@@ -124,11 +129,12 @@ register restrpc => sub {
 };
 
 sub build_dispatcher_from_pod {
-    my ($pkgs) = @_;
+    my ($pkgs, $endpoint) = @_;
     debug("[build_dispatcher_from_pod]");
     return dispatch_table_from_pod(
+        plugin   => 'restrpc',
         packages => $pkgs,
-        label    => 'restrpc',
+        endpoint => $endpoint,
     );
 }
 
@@ -137,7 +143,7 @@ sub build_dispatcher_from_config {
     debug("[build_dispatcher_from_config] ");
 
     return dispatch_table_from_config(
-        key      => 'restrpc',
+        plugin   => 'restrpc',
         config   => $config,
         endpoint => $endpoint,
     );

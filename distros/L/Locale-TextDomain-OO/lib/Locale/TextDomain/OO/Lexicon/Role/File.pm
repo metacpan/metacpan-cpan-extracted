@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Base qw(CodeRef);
 use Path::Tiny qw(path);
 use namespace::autoclean;
 
-our $VERSION = '1.023';
+our $VERSION = '1.031';
 
 with qw(
     Locale::TextDomain::OO::Lexicon::Role::GettextToMaketext
@@ -122,40 +122,21 @@ sub _run_extra_commands {
             $next_data_code->(),
         );
         $instance->merge_lexicon( $from1, $from2, $to );
-        $self->logger and $self->logger->(
-            qq{Lexicon "$from1", "$from2" merged to "$to".},
-            {
-                object => $self,
-                type   => 'debug',
-                event  => 'lexicon,merge',
-            },
-        );
+        return 1;
+    }
+    if ( $identifier eq 'copy_lexicon' ) {
+        my ( $from, $to ) = ( $next_data_code->(), $next_data_code->() );
+        $instance->copy_lexicon( $from, $to );
         return 1;
     }
     if ( $identifier eq 'move_lexicon' ) {
         my ( $from, $to ) = ( $next_data_code->(), $next_data_code->() );
         $instance->move_lexicon( $from, $to );
-        $self->logger and $self->logger->(
-            qq{Lexicon "$from" moved to "$to".},
-            {
-                object => $self,
-                type   => 'debug',
-                event  => 'lexicon,move',
-            },
-        );
         return 1;
     }
     if ( $identifier eq 'delete_lexicon' ) {
         my $name = $next_data_code->();
         $instance->delete_lexicon($name);
-        $self->logger and $self->logger->(
-            qq{Lexicon "$name" deleted.},
-            {
-                object => $self,
-                type   => 'debug',
-                event  => 'lexicon,delete',
-            },
-        );
         return 1;
     }
 
@@ -166,6 +147,7 @@ sub lexicon_ref {
     my ($self, $file_lexicon_ref) = @_;
 
     my $instance = Locale::TextDomain::OO::Singleton::Lexicon->instance;
+    $self->logger and $instance->logger( $self->logger );
     my $search_dirs = $file_lexicon_ref->{search_dirs}
         or confess 'Hash key "search_dirs" expected';
     my $header_util = Locale::TextDomain::OO::Util::ExtractHeader->instance;
@@ -242,13 +224,13 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::Role::File - Helper role to add lexicon from file
 
-$Id: File.pm 617 2015-08-22 05:39:27Z steffenw $
+$Id: File.pm 698 2017-09-28 05:21:05Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/Role/File.pm $
 
 =head1 VERSION
 
-1.023
+1.031
 
 =head1 DESCRIPTION
 
@@ -302,6 +284,9 @@ Add a code ref in constructor.
             # and store that as "de-at::" lexicon with all messages now.
             merge_lexicon => 'de::', 'de-at::' => 'de-at::',
 
+            # Copy a lexicon into another domain and/or category:
+            copy_lexicon => 'i-default::' => 'i-default:LC_MESSAGES:domain',
+
             # Move a lexicon into another domain and/or category:
             move_lexicon => 'i-default::' => 'i-default:LC_MESSAGES:domain',
 
@@ -309,6 +294,28 @@ Add a code ref in constructor.
             delete_lexicon => 'i-default::',
         ],
     });
+
+=head2 method logger
+
+Set the logger and get back them
+
+    $lexicon_hash->logger(
+        sub {
+            my ($message, $arg_ref) = @_;
+            my $type = $arg_ref->{type};
+            $log->$type($message);
+            return;
+        },
+    );
+    $logger = $lexicon_hash->logger;
+
+$arg_ref contains
+
+    object => $lexicon_hash, # the object itself
+    type   => 'debug',
+    event  => 'lexicon,load', # The logger will be copied to
+                              # Locale::TextDomain::OO::Singleton::Lexicon
+                              # so more events are possible.
 
 =head1 EXAMPLE
 
@@ -367,7 +374,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2015,
+Copyright (c) 2013 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

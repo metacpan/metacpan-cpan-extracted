@@ -18,13 +18,16 @@ lib/Catalyst/View/Template/Lace/Tutorial.pod
 t/catalyst.t
 t/lib/MyApp.pm
 t/lib/MyApp/Controller/List.pm
+t/lib/MyApp/Controller/Loops.pm
 t/lib/MyApp/Controller/Snips.pm
 t/lib/MyApp/Controller/User.pm
 t/lib/MyApp/View/Author.pm
 t/lib/MyApp/View/Footer.pm
 t/lib/MyApp/View/Form.pm
 t/lib/MyApp/View/Input.pm
+t/lib/MyApp/View/Item.pm
 t/lib/MyApp/View/List.pm
+t/lib/MyApp/View/Loops.pm
 t/lib/MyApp/View/Master.pm
 t/lib/MyApp/View/User.pm
 t/lib/MyApp/View/list.html

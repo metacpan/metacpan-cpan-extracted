@@ -34,8 +34,8 @@ The above is adapted from Larry Wall's 1994 L<email about Shell|Shell/AUTHOR>.
 
  use strict;
  use warnings;             # any problems with system commands are warnings
- use IPC::Run3::Shell;                        # nothing exported by default
- use warnings FATAL=>"IPC::Run3::Shell";      # fatal warnings (optional)
+ use IPC::Run3::Shell                         # nothing exported by default
+                      qw/ :FATAL /;           # fatal warnings (optional)
  
  # ### Basic Usage (Functional Interface)
  use IPC::Run3::Shell qw/ echo cat /;    # these functions call system cmds
@@ -110,7 +110,8 @@ but with several important differences and added features:
 =item *
 
 functions are only exported at the request of the user
-(no L<autoloading|perlsub/Autoloading> in the user's namespace)
+(no L<autoloading|perlsub/Autoloading> in the user's namespace -
+unless you explicitly L<ask|/Autoloading> for it)
 
 =item *
 
@@ -136,7 +137,7 @@ B<Read on for more information and examples!>
 
 =head2 Version
 
-This document describes version 0.54 of IPC::Run3::Shell.
+This document describes version 0.56 of IPC::Run3::Shell.
 
 =head1 Security
 
@@ -186,9 +187,12 @@ which enables all warnings:
  use strict;    # or "use v5.12;" or a newer version
 
 In addition, you can turn the warnings into fatal errors like this
-(see L<perllexwarn>):
+(added in v0.56):
 
- # use the module, then make the module's warnings fatal
+ use IPC::Run3::Shell ':FATAL';
+
+Which is shorthand for this (see L<perllexwarn>):
+
  use IPC::Run3::Shell;
  use warnings FATAL=>"IPC::Run3::Shell";
 
@@ -725,15 +729,17 @@ If you really, really wanted to have L<Shell|Shell>'s
 L<autoloading|perlsub/Autoloading> behavior back,
 with all the possible safety implications
 (such as any typos leading to the execution of system commands!),
-you could do this:
+you can do this (added in v0.56):
 
- BEGIN {
-     require IPC::Run3::Shell;
-     *AUTOLOAD = \&IPC::Run3::Shell::Autoload::AUTOLOAD;
- }
+ use IPC::Run3::Shell ':AUTOLOAD';
  echo("foo","bar");   # calls "echo foo bar" via autoloaded "echo"
 
 =for test cut
+
+=head1 Acknowledgements
+
+Thank you to LanX for suggesting C<:AUTOLOAD>
+and dolmen for a documentation suggestion.
 
 =head1 See Also
 
@@ -755,6 +761,7 @@ also includes easy access to this module!
 
 L<Capture::Tiny> - yet another capturing module.
 Its documentation includes a list of lots more such modules.
+There is also L<System::Sub>, which does something quite similar to this module.
 
 L<Env|Env> - tie environment variables to Perl variables, similar in spirit
 to this module

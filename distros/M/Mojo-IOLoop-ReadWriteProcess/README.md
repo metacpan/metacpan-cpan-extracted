@@ -241,20 +241,6 @@ call `_status()`.
 
 Inspect the codeblock return.
 
-## process()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(process);
-    my $p = process sub { print "Hello\n" };
-    $p->start()->wait_stop;
-
-or even:
-
-    process(sub { print "Hello\n" })->start->wait_stop;
-
-Returns a [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) object that represent a process.
-
-It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess).
-
 ## diag()
 
     use Mojo::IOLoop::ReadWriteProcess qw(process);
@@ -264,28 +250,6 @@ It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacp
 
 Internal function to print information to STDERR if verbose attribute is set or either DEBUG mode enabled.
 You can use it if you wish to display information on the process status.
-
-## parallel()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(parallel);
-    my $pool = parallel sub { print "Hello\n" } => 5;
-    $pool->start();
-    $pool->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
-    $pool->stop();
-
-Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object that represent a group of processes.
-
-It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess), and the last one represent the number of processes to generate.
-
-## batch()
-
-    use Mojo::IOLoop::ReadWriteProcess qw(batch);
-    my $pool = batch;
-    $pool->add(sub { print "Hello\n" });
-    $pool->on(stop => sub { shift->_diag("Done!") })->start->wait_stop;
-
-Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object generated from supplied arguments.
-It accepts as input the same parameter of [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) constructor ( see parallel() ).
 
 ## wait()
 
@@ -433,6 +397,53 @@ Gets all the STDERR output of the process.
     $p->signal(POSIX::SIGKILL);
 
 Send a signal to the process
+
+# EXPORTS
+
+## parallel()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(parallel);
+    my $pool = parallel sub { print "Hello\n" } => 5;
+    $pool->start();
+    $pool->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
+    $pool->stop();
+
+Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object that represent a group of processes.
+
+It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess), and the last one represent the number of processes to generate.
+
+## batch()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(batch);
+    my $pool = batch;
+    $pool->add(sub { print "Hello\n" });
+    $pool->on(stop => sub { shift->_diag("Done!") })->start->wait_stop;
+
+Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object generated from supplied arguments.
+It accepts as input the same parameter of [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) constructor ( see parallel() ).
+
+## process()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+    my $p = process sub { print "Hello\n" };
+    $p->start()->wait_stop;
+
+or even:
+
+    process(sub { print "Hello\n" })->start->wait_stop;
+
+Returns a [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) object that represent a process.
+
+It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess).
+
+## queue()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(queue);
+    my $q = queue;
+    $q->add(sub { return 42 } );
+    $q->consume;
+
+Returns a [Mojo::IOLoop::ReadWriteProcess::Queue](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Queue) object that represent a queue.
 
 # DEBUGGING
 

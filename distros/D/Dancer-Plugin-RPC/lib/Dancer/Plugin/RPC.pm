@@ -2,19 +2,18 @@ package Dancer::Plugin::RPC;
 use warnings;
 use strict;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 1;
 
 =head1 NAME
 
-Dancer::Plugin::RPC - Configure endpoints for XMLRPC and JSONRPC procedures
+Dancer::Plugin::RPC - Configure endpoints for XMLRPC, JSONRPC and RESTRPC procedures
 
 =head1 DESCRIPTION
 
-This module contains two plugins for L<Dancer>: L<Dancer::Plugin::RPC::XMLRPC>
-and L<Dancer::Plugin::RPC::JSONRPC>. They are plugins rather than
-Plack::Middleware.
+This module contains plugins for L<Dancer>: L<Dancer::Plugin::RPC::XMLRPC>,
+L<Dancer::Plugin::RPC::JSONRPC> and L<Dancer::Plugin::RPC::RESTRPC>.
 
 =head2 Dancer::Plugin::RPC::XMLRPC
 
@@ -26,7 +25,12 @@ the endpoint and the arguments to configure the xmlrpc-calls at this endpoint.
 This plugin exposes the new keyword C<jsonrpc> that is followed by 2 arguments:
 the endpoint and the arguments to configure the jsonrpc-calls at this endpoint.
 
-=head2 General arguments to xmlrpc/jsonrpc
+=head2 Dancer::Plugin::RPC::RESTRPC
+
+This plugin exposes the new keyword C<restrpc> that is followed by 2 arguments:
+the endpoint and the arguments to configure the restrpc-calls at this endpoint.
+
+=head2 General arguments to xmlrpc/jsonrpc/restrpc
 
 The dispatch table is build by endpoint.
 
@@ -54,7 +58,8 @@ The B<arguments> argument should be empty for this publishing type.
 
 =item publish => B<pod>
 
-The dispatch table is build by parsing the POD for C<=for xmlrpc> or C<=for jsonrpc>.
+The dispatch table is build by parsing the POD for C<=for xmlrpc>,
+C<=for jsonrpc> or C<=for restrpc>.
 
     =for xmlrpc <method_name> <sub_name>
 

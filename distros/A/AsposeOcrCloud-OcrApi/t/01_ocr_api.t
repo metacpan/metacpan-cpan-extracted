@@ -37,7 +37,7 @@ if (not defined $AsposeOcrCloud::Configuration::api_key or $AsposeOcrCloud::Conf
 	$AsposeStorageCloud::Configuration::api_key = $AsposeOcrCloud::Configuration::api_key;
 }
 
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();

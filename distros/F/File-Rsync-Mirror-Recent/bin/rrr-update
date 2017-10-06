@@ -41,7 +41,7 @@ also slow: it calls aggregate twice with force.
 
 =item B<--help|h>
 
-Prints a brief message and exists.
+Prints a brief message and exits.
 
 =item B<--verbose|v+>
 

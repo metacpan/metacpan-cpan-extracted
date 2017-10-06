@@ -27,8 +27,8 @@ DESCRIPTION
     and honors the Kconfig operator precidence.  (It also handles comments
     properly)
     
-    For Makefile, support is limited to the functions, catination, the 
-    $(or ...) $(and ...) and $(strip ...) functions.
+    For Makefile, support is limited to catination, and the 
+    $(or ...) $(and ...) $(if ...) and $(strip ...) functions.
 
  EXAMPLE
  

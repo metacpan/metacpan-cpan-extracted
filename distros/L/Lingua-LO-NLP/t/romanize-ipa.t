@@ -11,7 +11,7 @@ use Lingua::LO::NLP::Romanize;
 
 my @tests = (
     'ເຄື່ອງກໍາເນີດໄຟຟ້າ' => ['kʰɯ̄ːəŋ kám nɤ̂ːt fáj fâː', 'kʰɯːəŋ kam nɤːt faj faː'],
-    'ສະບາຍດີ'    => ['sá bàːj dìː', 'sa baːj diː'],
+    'ສະບາຍດີ'    => ['sáʔ bàːj dìː', 'saʔ baːj diː'],
     'ດີໆ'        => ['dìː-dìː', 'diː-diː'],
     'ເລື້ອຍໆ'     => ['lɯ̂ːəi-lɯ̂ːəi', 'lɯːəi-lɯːəi' ],
     'ແນວໃດ'     => ['nɛ́ːw dàj', 'nɛːw daj'],    # TODO: nɛ́ːw or nɛ́ːo?

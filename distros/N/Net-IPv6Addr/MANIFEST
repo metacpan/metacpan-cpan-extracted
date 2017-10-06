@@ -1,20 +1,23 @@
 ChangeLog
+Changes
+examples/preferred.pl
 examples/synopsis.pl
 lib/Net/IPv6Addr.pm
 lib/Net/IPv6Addr.pod
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/base85.t
 t/chkip.t
 t/compressed.t
+t/in-network.t
 t/ipv4.t
 t/ipv4comp.t
-t/joacim.t
 t/new.t
 t/parse.t
 t/preferred.t
+t/Regexp-IPv6.t
 t/string.t
 t/synopsis.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

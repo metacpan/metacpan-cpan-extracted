@@ -1,0 +1,38 @@
+
+0.172780  2017-10-05 15:03:05-04:00 EST5EDT
+
+	- added sdy to the list of known date fields
+	- added warning for optical_depth_warning
+	- changed module namespace
+
+0.170480  2017-02-17 16:21:06-05:00 EST5EDT
+
+	- added preserve_detection_limits option
+
+0.162580  2016-09-14 13:33:16EDT-0400 EST5EDT
+
+	- added above_detection_limit support
+
+0.151940  2015-07-13 13:09:12-04:00 EST5EDT
+
+	- removed erroneous Perl 5.18 requirement
+
+0.151910  2015-07-10 16:07:49-04:00 EST5EDT
+
+	- fixed scriptures with respect to [deg] and [gmt] labels
+	- fixed ancillary data detection bugs for location and, possibly, depth
+
+0.142140  2014-08-01 23:33:06-04:00 EST5EDT
+
+	- added functions to manipulate messages
+	- added partial support for below detection limit
+	- silenced module unless strict is used
+	- stopped outputting blank units
+
+0.141180  2014-04-28 12:54:23-04:00 EST5EDT
+
+	- fixed a bug in the fill_ancillary_data code 
+
+0.130250  2013-01-25 13:44:18 EST5EDT
+
+	- the first release

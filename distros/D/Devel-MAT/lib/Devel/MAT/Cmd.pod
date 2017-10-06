@@ -10,6 +10,28 @@ C<Devel::MAT::Cmd> - abstractions for providing commands for C<Devel::MAT>
 
 Behaves like perl's core C<printf()> function.
 
+=head2 print_note
+
+  Devel::MAT::Cmd->print_note( $str, $idx )
+
+A simple C<print>-like function, which may style its output in some way.
+
+Starting from zero, successively higher integer values for C<$idx> may influence
+the style further. Output with the same index value will appear the same. The
+implementation should support at least 3 different styles, but may wrap after
+this.
+
+=head2 print_sv
+
+  Devel::MAT::Cmd->print_sv( $sv )
+
+Prints the address and description of the given SV. This may be stylised in
+some way, subject to user customisation, or made possibly interactive if the
+UI allows for it to be so.
+
+Returns the length in characters of the string it printed, in case the calling
+tool wishes to arrange them in a table.
+
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>

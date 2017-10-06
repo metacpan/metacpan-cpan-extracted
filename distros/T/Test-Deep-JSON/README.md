@@ -40,7 +40,7 @@ motemen <motemen@gmail.com>
 
 # SEE ALSO
 
-[Test::Deep](http://search.cpan.org/perldoc?Test::Deep)
+[Test::Deep](https://metacpan.org/pod/Test::Deep)
 
 # LICENSE
 

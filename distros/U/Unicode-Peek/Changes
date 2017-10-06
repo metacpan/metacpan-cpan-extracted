@@ -1,0 +1,6 @@
+Revision history for Perl extension Unicode::Peek.
+
+0.01  Sat Sep 23 00:41:44 2017
+	- original version; created by h2xs 1.23 with options
+		-AX Unicode::Peek -b 5.13.2
+

@@ -1,5 +1,5 @@
 package Photonic::Geometry;
-$Photonic::Geometry::VERSION = '0.007';
+$Photonic::Geometry::VERSION = '0.009';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -229,7 +229,7 @@ Photonic::Geometry
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 

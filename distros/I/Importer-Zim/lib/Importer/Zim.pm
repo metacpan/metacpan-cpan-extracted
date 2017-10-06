@@ -1,18 +1,25 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.3.0';
+$Importer::Zim::VERSION = '0.6.0';
 # ABSTRACT: Import functions à la Invader Zim
 
-use 5.018;
+use 5.010001;
 use warnings;
 use Module::Runtime ();
 
+use Importer::Zim::Utils 0.8.0 qw(DEBUG carp croak);
+
 sub import {
-    shift->backend(@_)->import(@_);
+    unshift @_, shift->backend(@_);
+    goto &{ $_[0]->can('import') };
 }
 
 my %MIN_VERSION = do {
-    my %v = ( '+Lexical' => '0.5.0', );
+    my %v = (
+        '+Lexical'    => '0.8.0',
+        '+EndOfScope' => '0.2.0',
+        '+Unit'       => '0.3.0'
+    );
     /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
     %v;
 };
@@ -25,11 +32,29 @@ sub backend_class {
 }
 
 sub backend {
-    my $how = ( ref $_[2] ? $_[2]->{-how} : undef ) // '+Lexical';
-    my $backend = backend_class($how);
-    my @version
-      = exists $MIN_VERSION{$backend} ? ( $MIN_VERSION{$backend} ) : ();
-    return &Module::Runtime::use_module( $backend, @version );
+    my @how = split ',',
+      ( ( ref $_[2] eq 'HASH' ? $_[2]->{-how} : undef )
+        // '+Lexical,+EndOfScope,+Unit' );
+    for my $how (@how) {
+        my $backend = backend_class($how);
+        my @version
+          = exists $MIN_VERSION{$backend} ? ( $MIN_VERSION{$backend} ) : ();
+        my $mod = eval { &Module::Runtime::use_module( $backend, @version ) };
+        _trace_backend( $mod, $backend, @version ) if DEBUG;
+        return $mod if $mod;
+    }
+    croak qq{Can't load any backend};
+}
+
+sub _trace_backend {
+    my ( $mod, $backend, $version ) = @_;
+    my $rv = $version ? " $version+" : '';
+    unless ($mod) {
+        carp qq{Failed to load "$backend"$rv backend};
+        return;
+    }
+    my $v = $mod->VERSION // 'NA';
+    carp qq{Loaded "$backend"$rv ($v) backend};
 }
 
 1;
@@ -65,7 +90,32 @@ sub backend {
 #pod By default, L<Importer::Zim> looks at package variables
 #pod C<@EXPORT>, C<@EXPORT_OK> and C<%EXPORT_TAGS> to decide
 #pod what are exportable subroutines. It tries its best to implement
-#pod a behavior akin to L<Exporter> without the corresponding package polution.
+#pod a behavior akin to L<Exporter> without the corresponding namespace pollution.
+#pod
+#pod =head1 BACKENDS
+#pod
+#pod L<Importer::Zim> will try the following backends in order
+#pod until one succeeds to load.
+#pod
+#pod =over 4
+#pod
+#pod =item *
+#pod
+#pod L<Importer::Zim::Lexical> - symbols are imported as lexical subroutines
+#pod
+#pod =item *
+#pod
+#pod L<Importer::Zim::EndOfScope> - symbols are imported to caller namespace
+#pod while surrounding scope is compiled
+#pod
+#pod =item *
+#pod
+#pod L<Importer::Zim::Unit> - symbols are imported to caller namespace
+#pod while current unit is compiled
+#pod
+#pod =back
+#pod
+#pod Read also L<Importer::Zim::Cookbook/WHICH BACKEND?>.
 #pod
 #pod =head1 METHODS
 #pod
@@ -74,9 +124,18 @@ sub backend {
 #pod     Importer::Zim->import($class => @imports);
 #pod     Importer::Zim->import($class => \%opts => @imports);
 #pod
+#pod =head1 DEBUGGING
+#pod
+#pod You can set the C<IMPORTER_ZIM_DEBUG> environment variable
+#pod for get some diagnostics information printed to C<STDERR>.
+#pod
+#pod     IMPORTER_ZIM_DEBUG=1
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<zim>
+#pod
+#pod L<Import::Zim::Cookbook>
 #pod
 #pod L<Importer> and L<Lexical::Importer>
 #pod
@@ -96,7 +155,7 @@ Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.3.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -127,7 +186,32 @@ as soon the lexical scope ends.
 By default, L<Importer::Zim> looks at package variables
 C<@EXPORT>, C<@EXPORT_OK> and C<%EXPORT_TAGS> to decide
 what are exportable subroutines. It tries its best to implement
-a behavior akin to L<Exporter> without the corresponding package polution.
+a behavior akin to L<Exporter> without the corresponding namespace pollution.
+
+=head1 BACKENDS
+
+L<Importer::Zim> will try the following backends in order
+until one succeeds to load.
+
+=over 4
+
+=item *
+
+L<Importer::Zim::Lexical> - symbols are imported as lexical subroutines
+
+=item *
+
+L<Importer::Zim::EndOfScope> - symbols are imported to caller namespace
+while surrounding scope is compiled
+
+=item *
+
+L<Importer::Zim::Unit> - symbols are imported to caller namespace
+while current unit is compiled
+
+=back
+
+Read also L<Importer::Zim::Cookbook/WHICH BACKEND?>.
 
 =head1 METHODS
 
@@ -136,9 +220,18 @@ a behavior akin to L<Exporter> without the corresponding package polution.
     Importer::Zim->import($class => @imports);
     Importer::Zim->import($class => \%opts => @imports);
 
+=head1 DEBUGGING
+
+You can set the C<IMPORTER_ZIM_DEBUG> environment variable
+for get some diagnostics information printed to C<STDERR>.
+
+    IMPORTER_ZIM_DEBUG=1
+
 =head1 SEE ALSO
 
 L<zim>
+
+L<Import::Zim::Cookbook>
 
 L<Importer> and L<Lexical::Importer>
 

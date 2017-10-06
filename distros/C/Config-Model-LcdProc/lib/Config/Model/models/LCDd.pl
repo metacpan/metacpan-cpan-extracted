@@ -948,13 +948,11 @@ Model information was extracted from /etc/LCDd.conf',
     ],
     'license' => 'GPL-2',
     'name' => 'LCDd',
-    'read_config' => [
-      {
-        'backend' => 'IniFile',
-        'config_dir' => '/etc',
-        'file' => 'LCDd.conf'
-      }
-    ]
+    'rw_config' => {
+      'backend' => 'IniFile',
+      'config_dir' => '/etc',
+      'file' => 'LCDd.conf'
+    }
   }
 ]
 ;

@@ -1,0 +1,16 @@
+A perl module to react in some fashion when users root around inside
+your objects instead of using those beautiful accessor methods you
+took all that effort to provide.
+
+Installation proceeds in the usual fashion:
+
+    perl Makefile.PL
+    make
+    make test # Except there are no tests :(
+    make install
+
+Or get it from the CPAN.
+
+This module is licensed under the WTFPL version 2 because licenses are
+for lawyers not engineers. Use this code or don't, it's all the same
+to me.

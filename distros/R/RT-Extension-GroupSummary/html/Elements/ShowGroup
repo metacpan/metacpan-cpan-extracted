@@ -1,0 +1,13 @@
+<%ARGS>
+$Group => undef
+$Link => 1
+</%ARGS>
+<span class="group" <% $Group && $Group->id ? 'data-group-id="'.$Group->id.'"' : "" |n %>>\
+% if ($Link and $Group and $Group->id and $Group->Domain eq 'UserDefined' and $session{CurrentUser}->Privileged) {
+<a href="<% RT->Config->Get("WebPath") %>/Group/Summary.html?id=<% $Group->id %>">\
+<% $Group->Name %>\
+</a>\
+% } else {
+<% $Group->Name %>\
+% }
+</span>\

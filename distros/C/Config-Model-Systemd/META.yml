@@ -20,7 +20,7 @@ recommends:
   App::Cme: '0'
   Config::Model::TkUI: '0'
 requires:
-  Config::Model: '2.104'
+  Config::Model: '2.111'
   Config::Model::Backend::Any: '0'
   Config::Model::Backend::IniFile: '0'
   Log::Log4perl: '0'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-systemd/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-systemd.git
-version: 0.234.1
+version: 0.234.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

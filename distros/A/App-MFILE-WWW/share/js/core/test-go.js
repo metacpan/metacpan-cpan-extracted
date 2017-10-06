@@ -33,7 +33,7 @@
 // test-go.js
 //
 // Unit testing script - calls QUnit to load and start tests that have
-// been defined by previous calls to require
+// been defined by previous calls to require (in test.js)
 //
 "use strict";
 

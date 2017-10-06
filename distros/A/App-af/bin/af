@@ -12,7 +12,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.14 {
+package App::af::download 0.15 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -83,7 +83,7 @@ package App::af::download 0.14 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::probe 0.14 {
+package App::af::probe 0.15 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -134,7 +134,7 @@ package App::af::probe 0.14 {
   }
 }
 
-package App::af::install 0.14 {
+package App::af::install 0.15 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
@@ -349,7 +349,7 @@ package App::af::install 0.14 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires 0.14 {
+package App::af::requires 0.15 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -384,7 +384,7 @@ package App::af::requires 0.14 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing 0.14 {
+package App::af::missing 0.15 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
@@ -394,11 +394,66 @@ package App::af::missing 0.14 {
   with 'App::af::role::phase';
   
   
+  has plugin => (
+    is     => 'ro',
+    isa    => 'Int',
+    traits => ['App::af::opt'],
+  );
+  
+  has precompile => (
+    is     => 'ro',
+    isa    => 'Int',
+    traits => ['App::af::opt'],
+  );
+
   sub main
   {
     my($self) = @_;
     
     $self->check_phase;
+
+    if($self->plugin)
+    {
+      require Alien::Build;
+      require Test2::Mock;
+      
+      my %need;
+      
+      my $mock = Test2::Mock->new(class => 'Alien::Build::Meta');
+      $mock->around('apply_plugin' => sub {
+        my($orig, $self, @args) = @_;
+        local @INC = @INC;
+        push @INC, sub {
+          my(undef, $filename) = @_;
+          my $mod = $filename;
+          $mod =~ s{/}{::}g;
+          $mod =~ s{\.pm$}{};
+          $need{$mod}++;
+        };
+        eval { $orig->($self, @args) };
+      });
+      my(undef, undef, $build) = capture { $self->build };
+      print "$_\n" for sort keys %need;
+      return 0;
+    }
+    
+    if($self->precompile)
+    {
+      my %need;
+    
+      foreach my $line ($self->file->lines)
+      {
+        chomp $line;
+        if($line =~ /^\s*use\s+([A-Za-z_0-9]+(::[A-Za-z_0-9]+)*)/)
+        {
+          my $mod = $1;
+          eval qq{ use $mod () };
+          if($@) { $need{$mod}++ };
+        }
+      }
+      print "$_\n" for sort keys %need;
+      exit 0;
+    }
     
     my(undef,undef, $build) = capture { $self->build };
     
@@ -443,7 +498,7 @@ package App::af::missing 0.14 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop 0.14 {
+package App::af::prop 0.15 {
   use Moose;
   use namespace::autoclean;
 
@@ -545,7 +600,7 @@ package App::af::prop 0.14 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list 0.14 {
+package App::af::list 0.15 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
@@ -639,7 +694,7 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -868,6 +923,7 @@ for the meaning of the various phases.
  af missing
    [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
    [ ( -p | --phase ) ( configure | any | share | system ) ]
+   [ --plugin | --precompile ]
 
 =head3 description
 
@@ -900,6 +956,20 @@ as simply C<curl>.
 
 The phase of the requirement.  Please refer to the L<Alien::Build> 
 documentation for the meaning of the various phases.
+
+=head4 --plugin
+
+Print out missing plugins.  Caveat: to do this, C<af> mocks part of
+L<Alien::Build::Meta>, which may or may not break in the future.
+
+=head2 --precompile
+
+Print out missing modules that are needed before the L<alienfile> is even
+compiled.  These are usually C<configure> time prereqs, but if they are
+C<use>d in the L<alienfile> instead of being declared as a C<requires>, then
+there is no way for L<Alien::Build> to query for them.  Caveat: since
+L<alienfile> is arbitrary Perl code, there may be corner cases not covered
+by this option.
 
 =head2 prop
 

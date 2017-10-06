@@ -1,6 +1,9 @@
 ## Mylisp 
 
-Mylisp is like lisp which could transfer to Ast.
+Mylisp is like lisp which could easily transfer to Ast.
+
+Many programming language in the world, they could tranfer
+eachother.
 
 To install this tool, please install Perl5 in your computer at first.
 
@@ -26,8 +29,39 @@ To install this tool, please install Perl5 in your computer at first.
 
 DESCRIPTION
 
-see Mylisp.pod.
+Mylisp define a language and lanugage Ast that could transfer to other programming language.
 
+    [:module [:ns name]]
+    perl => package name;
+    go   => package name
+ 
+    [:class [:ns name]]
+    perl => package name;
+    go   => package name
+
+    [:use [:ns name]
+          [:slist [:sym :name-one] [:sym :name-two]]]
+    perl => use name qw(name_one name_two);
+    go   => import "name"
+            var name_one func = name.name_one
+            var name_two func = name.name_two
+ 
+    [:func [:call args] <return> exprs]
+    args = <<sym name> <sym name>>
+
+    [:def ...] is same with [:func ...]
+    but it is exportable
+
+    [:given atom [:if ...]+ [:else ...]
+    [:case [:if ...]+ [:else ...]]
+
+    [:ifelse cond-expr exprs :else exprs]
+
+    [:call [name argument]]
+    [:ocall [name argument]]
+    [:onew [name argument]]
+
+    
 SYNTAX
 
     # Module declare

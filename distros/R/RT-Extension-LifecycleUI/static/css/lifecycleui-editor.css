@@ -26,11 +26,19 @@
 
 .lifecycle-ui .inspector .content {
     padding: 1em;
+    border-top: 1px solid black;
 }
 
-.lifecycle-ui .inspector .controls {
-    padding: 1em;
-    background: #EEE;
+.lifecycle-ui .inspector .header .toplevel {
+    padding-top: 1em;
+}
+
+.lifecycle-ui .inspector .header .controls {
+    padding: 0 0 1em 1em;
+}
+
+.lifecycle-ui .inspector input[type=text] {
+    width: 10em;
 }
 
 .lifecycle-ui .inspector .color-control span.current-color {
@@ -40,13 +48,12 @@
 }
 
 .lifecycle-ui .removing {
-    opacity: 0 !important;
+    opacity: 0;
 }
 
 .lifecycle-ui .has-focus .point-handle {
     stroke: black;
     fill: steelblue;
-    r: 5px;
 }
 
 .lifecycle-ui .inspector .actions {
@@ -121,11 +128,11 @@
     left: 175px;
 }
 
-.lifecycle-ui .statuses text.hover {
+.lifecycle-ui .statuses .hover {
     opacity: 1;
 }
 
-.lifecycle-ui .statuses circle.hover,
+.lifecycle-ui .statuses .hover circle,
 .lifecycle-ui .transitions .hover,
 .lifecycle-ui .decorations :not(text).hover {
     opacity: 1;
@@ -134,4 +141,13 @@
 
 .lifecycle-ui.editing .decorations .hover.text-background {
     fill: white;
+}
+
+.lifecycle-ui .inspector button:disabled {
+    background: hsl(222, 20%, 40%);
+    cursor: not-allowed;
+}
+
+.lifecycle-ui .inspector tr.section td {
+    padding-top: 1em;
 }

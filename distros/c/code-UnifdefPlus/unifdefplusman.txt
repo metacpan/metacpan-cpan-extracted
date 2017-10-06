@@ -22,7 +22,7 @@ For C or C++, unifdef+ acts on #if, #ifdef, #ifndef, #elif, #else and #endif lin
 
 For Kconfig files, unifdef+ will process if statements and depends on statements.   For each of these, it will take the expression and attempt to simplify it according to the passed in variables.  For depends-on statements, If the expression resolves to false, it will remove the entire entry.   If the expression resolves to true, it will remove the depends-on line.   For if statements, at the end of a line, it will remove the line if the expression resolves to false, or remove the if if the expression resolves to true.   For if/else/endif directives, it will remove any inactive parts.
 
-For Makefiles, it will attempt to resolve any ifdef, ifeq or ifneq statements.   It attempts to simplify the expression.   It should be noted, that at the time of writing this, unifdef+ only supports the $(or ...), $(and...), $(strip ...) makefile functions.   See limitations at the bottom of this man page.
+For Makefiles, it will attempt to resolve any ifdef, ifeq or ifneq statements.   It attempts to simplify the expression.   It should be noted, that at the time of writing this, unifdef+ only supports the $(or ...), $(and ...), $(if ...), $(strip ...) makefile functions.   See limitations at the bottom of this man page.
 
 The purpose of unifdef+ is to help manage features within code.   If proper conventions are followed, a feature can be removed completely from a tree using the unifdef+ utility.   It can also be used to generate patch files used for porting.
 

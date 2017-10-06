@@ -4,11 +4,11 @@ use strict;
 
 # ABSTRACT: Mock the world with one object
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 our $AUTOLOAD;
 
-use overload '""' => '_stringify';
+use overload '""' => '__x_mock_str';
 
 use List::Util 1.33 qw(any);
 use Scalar::Util qw(blessed);
@@ -16,20 +16,6 @@ use Scalar::Util qw(blessed);
 sub new {
     my $class = shift;
     return bless({@_}, ref($class) || $class);
-}
-
-my @__xattr = qw(Strict ISA Stringify);
-
-sub __copy_xattr {
-    my ($orig) = @_;
-    my %copy;
-    foreach (@__xattr) {
-        my $attr = "X-Mock-$_";
-        if (exists $orig->{$attr}) {
-            $copy{$attr} = $orig->{$attr};
-        }
-    }
-    return %copy;
 }
 
 sub can {
@@ -48,12 +34,15 @@ sub AUTOLOAD {
     if (exists $self->{$call}) {
         my $ref = ref $self->{$call};
         if ($ref eq 'HASH') {
-            return $self->new( __copy_xattr($self), %{ $self->{$call} });
+            return $self->new( __x_mock_copy_x($self), %{ $self->{$call} });
         }
         elsif ($ref eq 'ARRAY') {
-            return $self->new(__copy_xattr($self), map { $_ => $self } @{ $self->{$call} });
+            return $self->new(__x_mock_copy_x($self), map { $_ => $self } @{ $self->{$call} });
         }
         elsif ($ref eq 'CODE') {
+            if ($self->{'X-Mock-SelfArg'}) {
+                return $self->{$call}->($self, @_);
+            }
             return $self->{$call}->(@_);
         }
         elsif ($ref eq 'REF') {
@@ -80,6 +69,9 @@ sub isa {
             return 1 if any { $_ eq $class } @$isas;
         }
         elsif ($ref eq 'CODE') {
+            if ($self->{'X-Mock-SelfArg'}) {
+                return $isas->($self, $class);
+            }
             return $isas->($class);
         }
         elsif ($ref eq "Regexp") {
@@ -93,18 +85,36 @@ sub isa {
     return 1;
 }
 
+# Just an empty method to prevent weird AUTOLOAD loops
+sub DESTROY { }
 
+my @__xattr = qw(Strict ISA Stringify SelfArg);
 
-sub _stringify {
+sub __x_mock_copy_x {
+    my ($orig) = @_;
+    my %copy;
+    foreach (@__xattr) {
+        my $attr = "X-Mock-$_";
+        if (exists $orig->{$attr}) {
+            $copy{$attr} = $orig->{$attr};
+        }
+    }
+    return %copy;
+}
+
+sub __x_mock_str {
     my ($self) = @_;
     if (my $stringify = $self->{'X-Mock-Stringify'}) {
-        return ref $stringify eq 'CODE' ? $stringify->() : $stringify;
+        if (ref $stringify eq 'CODE') {
+            if ($self->{'X-Mock-SelfArg'}) {
+                return $stringify->($self);
+            }
+            return $stringify->();
+        }
+        return $stringify;
     }
     return __PACKAGE__ . " stringified";
 }
-
-# Just an empty method to prevent weird AUTOLOAD loops
-sub DESTROY { }
 
 1;
 
@@ -120,7 +130,7 @@ Test::Mock::One - Mock the world with one object
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -144,22 +154,63 @@ version 0.006
 
     $mock->no->yes->work->it; # works fine
 
-In combination with Sub::Override
+In combination with L<Sub::Override>:
 
     my $override = Sub::Override->new('Foo::Bar::baz', sub { Test::Mock::One(foo => 'bar') });
 
-You now have Foo::Bar::baz that returns an object where the function foo returns bar.
+=head1 DESCRIPTION
 
-Let's say you want to test a function that retrieves a user from a database and checks if it is active
+Be able to mock many things with little code by using AUTOLOAD.
+
+The problem this module tries to solve is to allow testing many things
+without having to write many lines of code. If you want to create mock objects
+you often need to write code like this:
+
+    {
+        no warnings qw(redefine once);
+        local *Foo::thing = sub {
+            return bless({}, 'Baz');
+        };
+        local *Baz::foo = sub { return 1 };
+        local *Baz::bar = sub { return 1 };
+        local *Baz::baz = sub { return 1 };
+        use warnings;
+
+        # Actual test here
+    }
+
+Test::Mock::One allows you to write a simple object that allows you to do the same with
+
+    my $mock = Test::Mock::One->new(foo => 1, bar => 1, baz => 1);
+    # Sub::Override helps too
+    my $override = Sub::Override->new('Foo::thing' => sub { return $mock });
+
+    # Actual test here
+
+You don't actually need to define anything, by default method on a
+Test::Mock::One object will return itself.  You can tweak the behaviour
+by how you instantiate the object. There are several attributes that
+control the object, these are defined as X-Mock attributes: X-Mock-ISA
+to override the isa(), X-Mock-Strict to override the can() and allowed
+methods and X-Mock-Stringify to tell it how to stringify the object.
+
+=head2 Example usage
+
+Let's say you want to test a function that retrieves a user from a
+database and checks if it is active
 
     Package Foo;
     use Moose;
 
-    has schema => ( is => 'ro' );
+    has schema => (is => 'ro');
+
     sub check_user_in_db {
         my ($self, $username) = @_;
-        my $user = $self->schema->resultset('User')->search_rs({username => $username})->first;
-        return $user if $user->is_active;
+        my $user = $self->schema->resultset('User')->search_rs(
+            { username => $username }
+        )->first;
+
+        return $user if $user && $user->is_active;
         die "Unable to find user";
     }
 
@@ -194,19 +245,8 @@ Let's say you want to test a function that retrieves a user from a database and 
 
     # A sunny day scenario would have been:
     my $mock = Foo->new(schema => Test::Mock::One->new());
-    lives_ok(sub { $mock->check_user_in_db('username')}, "We found the user");
-
-=head1 DESCRIPTION
-
-Be able to mock many things with little code by using AUTOLOAD.
-
-The problem this module tries to solve is to allow testing many things
-without having to write a monkey patch kind of solution in your test.
-Test::Mock::One tries to solve this by creating an object that can do
-"everything", and allows you to control specific behaviour. It works
-really well in combination with L<Sub::Override>.
-
-The methods copy the X-Mock attributes from their parent to themselves.
+    lives_ok(sub { $mock->check_user_in_db('username') },
+        "We found the user");
 
 =head1 METHODS
 
@@ -236,6 +276,21 @@ Tell us how to stringify the object
 
     'X-Mock-Stringify' => 'My custom string',
     'X-Mock-Stringify' => sub { return "foo" },
+
+=item X-Mock-SelfArg
+
+Boolean value. Make all the code blocks use $self. This allows you to do things like
+
+    Test::Mock::One->new(
+        'X-Mock-SelfArg' => 1,
+        code             => sub {
+            my $self = shift;
+            die "We have bar" if $self->foo eq 'bar';
+            return "some value";
+        }
+    );
+
+This also impacts C<X-Mock-ISA> and C<X-Mock->Stringify>.
 
 =back
 

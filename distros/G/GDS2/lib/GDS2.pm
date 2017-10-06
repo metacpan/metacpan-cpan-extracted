@@ -1,9 +1,9 @@
 package GDS2;
 {
-require 5.008001;
-$GDS2::VERSION = '3.33';
+require 5.010001;
+$GDS2::VERSION = '3.35';
 ## Note: '@ ( # )' used by the what command  E.g. what GDS2.pm
-$GDS2::revision = '@(#) $Id: GDS2.pm,v $ $Revision: 3.33 $ $Date: 2014-09-15 03:27:57-06 $';
+$GDS2::revision = '@(#) $Id: GDS2.pm,v $ $Revision: 3.35 $ $Date: 2017-10-04 03:27:57-06 $';
 #
 
 =pod
@@ -21,18 +21,20 @@ perl -le '$_=q(Zpbhgnpe@pvnt.uxa);$_=~tr/n-sa-gt-zh-mZ/a-zS/;print;'
 
 =head1 COPYRIGHT
 
-Author: Ken Schumack (c) 1999-2014. All rights reserved.
+Author: Ken Schumack (c) 1999-2017. All rights reserved.
 This module is free software. It may be used, redistributed
 and/or modified under the terms of the Perl Artistic License.
 ( see http://www.perl.com/pub/a/language/misc/Artistic.html )
  Have fun, Ken
 
+Schumack@cpan.org
+
 =head1 DESCRIPTION
 
 GDS2 allows you to read and write GDS2 files record by record in a
 stream fashion which inherently uses little memory. It is capable but
-not fast. If you have large files you may be happier using
-http://sourceforge.net/projects/gds2/
+not fast. If you have large files you may be happier using the C/C++
+http://sourceforge.net/projects/gds2/ which can easily be used by Perl.
 
 =cut
 
@@ -543,7 +545,7 @@ sub new
 
     my $fileHandle = $arg{'-fileHandle'};
     $fileHandle = "" unless (defined $fileHandle);
-    
+
     if ($fileName && $fileHandle)
     {
         die "new expects a gds2 file name -OR- a file handle. Do not give both.";
@@ -1041,13 +1043,13 @@ sub printBoundary
     my($self,%arg) = @_;
     my $resolution = $self -> {'Resolution'};
     my $layer = $arg{'-layer'};
-    $layer=0 unless (defined $layer);
+    $layer = 0 unless (defined $layer);
     my $dataType = $arg{'-dataType'};
     $dataType=0 unless (defined $dataType);
     #### -xyInt most useful if reading and modifying... -xy if creating from scratch
     my $xyInt = $arg{'-xyInt'}; ## $xyInt should be a reference to an array of internal GDS2 format integers
     my $xy = $arg{'-xy'}; ## $xy should be a reference to an array of reals
-    my @xyTmp=(); ##don't pollute array passed in
+    my @xyTmp = (); ##don't pollute array passed in
     unless (defined($xy) || defined($xyInt))
     {
         die "printBoundary expects an xy array reference. Missing -xy => \\\@array $!";
@@ -1132,12 +1134,12 @@ sub printSref
     my $reflect = $arg{'-reflect'};
     if ((! defined $reflect)||($reflect <= 0))
     {
-        $reflect=0;
+        $reflect = 0;
     }
     else
     {
-        $reflect=1;
-        $useSTRANS=TRUE;
+        $reflect = 1;
+        $useSTRANS = TRUE;
     }
     my $mag = $arg{'-mag'};
     if ((! defined $mag)||($mag <= 0))
@@ -1156,12 +1158,12 @@ sub printSref
     }
     else
     {
-        $angle=posAngle($angle);
-        $useSTRANS=TRUE;
+        $angle = posAngle($angle);
+        $useSTRANS = TRUE;
     }
     if ($useSTRANS)
     {
-        my $data=$reflect.'0'x15; ## 16 'bit' string
+        my $data = $reflect.'0'x15; ## 16 'bit' string
         $self -> printGds2Record(-type => 'STRANS',-data => $data);
         $self -> printGds2Record(-type => 'MAG',-data => $mag) if ($mag);
         $self -> printGds2Record(-type => 'ANGLE',-data => $angle) if ($angle >= 0);
@@ -1230,17 +1232,17 @@ sub printAref
     my $reflect = $arg{'-reflect'};
     if ((! defined $reflect)||($reflect <= 0))
     {
-        $reflect=0;
+        $reflect = 0;
     }
     else
     {
-        $reflect=1;
+        $reflect = 1;
         $useSTRANS=TRUE;
     }
     my $mag = $arg{'-mag'};
     if ((! defined $mag)||($mag <= 0))
     {
-        $mag=0;
+        $mag = 0;
     }
     else
     {
@@ -1254,8 +1256,8 @@ sub printAref
     }
     else
     {
-        $angle=posAngle($angle);
-        $useSTRANS=TRUE;
+        $angle = posAngle($angle);
+        $useSTRANS = TRUE;
     }
     if ($useSTRANS)
     {
@@ -1328,7 +1330,7 @@ sub printAref
 sub printText
 {
     my($self,%arg) = @_;
-    my $useSTRANS=FALSE;
+    my $useSTRANS = FALSE;
     my $string = $arg{'-string'};
     unless (defined $string)
     {
@@ -1376,24 +1378,24 @@ sub printText
     else       {$y = int(($y*$resolution)-$G_epsilon);}
 
     my $layer = $arg{'-layer'};
-    $layer=0 unless (defined $layer);
+    $layer = 0 unless (defined $layer);
     my $textType = $arg{'-textType'};
     $textType=0 unless (defined $textType);
     my $reflect = $arg{'-reflect'};
     if ((! defined $reflect)||($reflect <= 0))
     {
-        $reflect=0;
+        $reflect = 0;
     }
     else
     {
-        $reflect=1;
-        $useSTRANS=TRUE;
+        $reflect = 1;
+        $useSTRANS = TRUE;
     }
 
     my $font = $arg{'-font'};
     if ((! defined $font) || ($font < 0) || ($font > 3))
     {
-        $font=0;
+        $font = 0;
     }
     $font = sprintf("%02d",$font);
 
@@ -1479,7 +1481,7 @@ sub printText
 sub saveGds2Record
 {
     my ($self,%arg) = @_;
-    my $record='';
+    my $record = '';
 
     my $type = $arg{'-type'};
     if (! defined $type)
@@ -1491,8 +1493,8 @@ sub saveGds2Record
         $type = uc $type;
     }
 
-    my $saveEnd=$\;
-    $\='';
+    my $saveEnd = $\;
+    $\ = '';
 
     my @data = $arg{'-data'};
     my $dataString = $arg{'-asciiData'};
@@ -1511,7 +1513,7 @@ sub saveGds2Record
         my $scale = $arg{'-scale'};
         if (! defined $scale)
         {
-            $scale=1;
+            $scale = 1;
         }
         if ($scale <= 0)
         {
@@ -1549,23 +1551,23 @@ sub saveGds2Record
         my $recordDataType = $RecordTypeData{$type};
         if (defined $dataString)
         {
-            $dataString=~s|^\s+||; ## clean-up
-            $dataString=~s|\s+$||;
-            $dataString=~s|\s+| |g if ($dataString !~ m|'|); ## don't compress spaces in strings...
-            $dataString=~s|'$||; #'for strings
-            $dataString=~s|^'||; #'for strings
+            $dataString =~ s|^\s+||; ## clean-up
+            $dataString =~ s|\s+$||;
+            $dataString =~ s|\s+| |g if ($dataString !~ m|'|); ## don't compress spaces in strings...
+            $dataString =~ s|'$||; #'for strings
+            $dataString =~ s|^'||; #'for strings
             if (($recordDataType == BIT_ARRAY)||($recordDataType == ACSII_STRING))
             {
                 $data = $dataString;
             }
             else
             {
-                $dataString=~s|\s*[\s,;:/\\]+\s*| |g; ## incase commas etc... (non-std) were added by hand
+                $dataString =~ s|\s*[\s,;:/\\]+\s*| |g; ## incase commas etc... (non-std) were added by hand
                 @data = split(' ',$dataString);
                 $numDataElements = @data;
                 if ($recordDataType == INTEGER_4)
                 {
-                    my @xyTmp=();
+                    my @xyTmp = ();
                     for(my $i=0;$i<$numDataElements;$i++) ## e.g. 3.4 in -> 3400 out
                     {
                         if ($data[$i]>=0) {push @xyTmp,int((($data[$i])*$resolution)+$G_epsilon);}
@@ -1827,7 +1829,7 @@ sub printGds2Record
         my $scale = $arg{'-scale'};
         if (! defined $scale)
         {
-            $scale=1;
+            $scale = 1;
         }
         if ($scale <= 0)
         {
@@ -1931,7 +1933,7 @@ sub printGds2Record
         $recordType = reverse $recordType if ($isLittleEndian);
         print($fh $recordType);
 
-        my $dataType   = pack 'C',$RecordTypeData{$type};
+        my $dataType = pack 'C',$RecordTypeData{$type};
         $dataType = reverse $dataType if ($isLittleEndian);
         print($fh $dataType);
 
@@ -3348,13 +3350,13 @@ sub printStrans
     my $reflect = $arg{'-reflect'};
     if ((! defined $reflect)||($reflect <= 0))
     {
-        $reflect=0;
+        $reflect = 0;
     }
     else
     {
-        $reflect=1;
+        $reflect = 1;
     }
-    my $data=$reflect.'0'x15; ## 16 'bit' string
+    my $data = $reflect.'0'x15; ## 16 'bit' string
     $self -> printGds2Record(-type => 'STRANS',-data => $data);
 }
 ################################################################################
@@ -3567,7 +3569,7 @@ sub printXy
     if (defined $xyInt)
     {
         $xy = $xyInt;
-        $resolution=1;
+        $resolution = 1;
     }
     my @xyTmp=(); ##don't pollute array passed in
     for(my $i=0;$i<=$#$xy;$i++) ## e.g. 3.4 in -> 3400 out
@@ -4516,7 +4518,7 @@ sub getRecordData
 {
     my $self = shift;
     my $dt = $self -> {'DataType'};
-    if ($dt==NO_REC_DATA)
+    if ($dt == NO_REC_DATA)
     {
         return '';
     }
@@ -4526,7 +4528,7 @@ sub getRecordData
         $stuff =~ s|^,||;
         return(split(/,/,$stuff));
     }
-    elsif ($dt==ACSII_STRING)
+    elsif ($dt == ACSII_STRING)
     {
         my $stuff = $self -> {'CurrentDataList'};
         $stuff =~ s|\0||g;
@@ -4596,9 +4598,9 @@ sub scaleNum($$)
 
 sub snapNum($$)
 {
-    my $num=shift;
+    my $num = shift;
     die "1st number passed into snapNum() must be an integer $!" if ($num !~ m|^-?\d+$|);
-    my $snap=shift;
+    my $snap = shift;
     my $snapLength = length("$snap");
     my $lean=1; ##init
     $lean = -1 if($num < 0);

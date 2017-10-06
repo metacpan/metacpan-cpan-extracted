@@ -11,11 +11,16 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'foo' => ( default => sub { 'DFOO' } );
-    has 'bar' => ( required => 1 );
+    has _foo => ( default => sub { 'DFOO' } );
+    has _bar => ( required => 1 );
 
-    sub foo : ro;
-    sub bar : ro;
+    sub BUILDARGS : init_args(
+        foo? => _foo,
+        bar? => _bar,
+    );
+
+    sub foo : ro(_foo);
+    sub bar : ro(_bar);
 }
 
 {
@@ -32,7 +37,7 @@ package Foo {
 
 like(
     exception { Foo->new },
-    qr/^A \`bar\` value is required/,
+    qr/^A \`_bar\` value is required/,
     'missing required slot throws an exception'
 );
 

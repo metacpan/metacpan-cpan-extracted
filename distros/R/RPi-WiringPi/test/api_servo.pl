@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use WiringPi::API qw(:all);
 
 die "need root!\n" if $> !=0;

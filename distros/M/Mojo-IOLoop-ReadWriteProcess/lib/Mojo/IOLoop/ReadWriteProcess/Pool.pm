@@ -1,21 +1,30 @@
 package Mojo::IOLoop::ReadWriteProcess::Pool;
 use Mojo::Base 'Mojo::Collection';
 use constant MAXIMUM_PROCESSES => $ENV{MOJO_PROCESS_MAXIMUM_PROCESSES} // 100;
+use Scalar::Util qw(blessed);
 
-my $maximum_processes = MAXIMUM_PROCESSES;
+my %max_proc;
 
-sub get { my $s = shift; @{$s}[+shift()] }
+sub new {
+  my $s = shift->SUPER::new(@_);
+  $max_proc{$s} = MAXIMUM_PROCESSES;
+  $s;
+}
+
+sub get    { @{$_[0]}[$_[1]] }
+sub remove { delete @{$_[0]}[$_[1]] }
 
 sub add {
-  my $c = shift;
-  push @{$c}, Mojo::IOLoop::ReadWriteProcess->new(@_)
-    if $c->size < $maximum_processes;
+  return undef unless $_[0]->size < $max_proc{$_[0]};
+  my $self = shift;
+  push @{$self},
+    blessed $_[0] ? $_[0] : Mojo::IOLoop::ReadWriteProcess->new(@_);
+  $self->last;
 }
-sub remove { my $s = shift; delete @{$s}[+shift()] }
 
 sub maximum_processes {
-  $maximum_processes = pop() if $_[1];
-  $maximum_processes;
+  $max_proc{$_[0]} = pop() if $_[1];
+  $max_proc{$_[0]};
 }
 
 sub _cmd {
@@ -23,10 +32,7 @@ sub _cmd {
   my $f    = pop;
   my @args = @_;
   my @r;
-  $c->each(
-    sub {
-      push(@r, +shift()->$f(@args));
-    });
+  $c->each(sub { push(@r, +shift()->$f(@args)) });
   wantarray ? @r : $c;
 }
 
@@ -35,7 +41,7 @@ sub AUTOLOAD {
   my $fn = $AUTOLOAD;
   $fn =~ s/.*:://;
   return if $fn eq "DESTROY";
-  +shift()->_cmd(@_, $fn);
+  return eval { shift->_cmd(@_, $fn) };
 }
 
 1;

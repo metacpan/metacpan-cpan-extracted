@@ -8,8 +8,6 @@ use Test::Memory::Cycle;
 use Config::Model;
 use Data::Dumper;
 
-BEGIN { plan tests => 24; }
-
 use strict;
 
 my $arg = shift || '';
@@ -72,6 +70,33 @@ $model->create_config_class(
             @args,
             warp => { follow => '- enum', rules => \@rules },
         },
+        'Standards-Version' => {
+            'default' => '4.1.0',
+            'type' => 'leaf',
+            'value_type' => 'uniline',
+            'warn_unless' => {
+                'current' => {
+                    'code' => '$_ eq $self->_fetch_std;',
+                    'fix' => '$_ = undef; # restore default value',
+                    'msg' => q!Current standards version is '$std_value'!
+                }
+            }
+        },
+        Priority => {
+            'choice' => ['required', 'important', 'standard', 'optional', 'extra'],
+            'default' => 'optional',
+            'type' => 'leaf',
+            'value_type' => 'enum',
+            'warp' => {
+                'follow' => {
+                    'std_ver' => '- Standards-Version'
+                },
+                'rules' => [
+                    q!$std_ver ge '4.0.1'! => {'replace' => {'extra' => 'optional'}}
+                ]
+            }
+        },
+
     ],    # dummy class
 );
 
@@ -158,4 +183,26 @@ is( $w1->fetch, 'A', "set warp master to G and test unset value for w1 ... 2 and
 is( $w2->fetch, 'G', "... and w2 ..." );
 is( $w3->fetch, 'G', "... and w3" );
 
-memory_cycle_ok($model);
+my $stdv = $root->fetch_element('Standards-Version');
+my $prio = $root->fetch_element('Priority');
+$stdv->store('3.9.8');
+$prio->store('extra');
+is($prio->fetch, 'extra', "check value with old std_version");
+
+$stdv->apply_fixes;
+is($prio->fetch, 'optional', "check value with new std_version");
+is($stdv->fetch, '4.1.0', "check std_v default value");
+
+$stdv->store('3.9.8');
+$prio->store('extra');
+is($prio->fetch, 'extra', "check value with old std_version (2)");
+
+$stdv->store('4.0.2');
+is($prio->fetch, 'optional', "check value with new std_version (2)");
+
+$stdv->apply_fixes;
+is($prio->fetch, 'optional', "check value with new std_version (2)");
+
+memory_cycle_ok($model, "check memory cycles");
+
+done_testing;

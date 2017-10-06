@@ -16,6 +16,8 @@ BOOT:
 		SS(PADOFFSET);
 		SS(Optype);
 		SS(ouroboros_stack_t);
+		SS(MAGIC);
+		SS(MGVTBL);
 /* } */
 #undef SS
 	}

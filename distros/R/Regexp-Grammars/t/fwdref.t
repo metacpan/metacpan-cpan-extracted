@@ -5,9 +5,9 @@ use Test::More 'no_plan';
 
 use Regexp::Grammars;
 
-my $delimited         = qr{ <delim=([(/][*]|if|[][(){}<>«»'"`]+)> <content=(.*?)> </delim> }xms;
-my $delimited_cap     = qr{ <delim=([(/][*]|if|[][(){}<>«»'"`]+)> <content=(.*?)> <rdel=/delim> }xms;
-my $delimited_listcap = qr{ <delim=([(/][*]|if|[][(){}<>«»'"`]+)> <content=(.*?)> <[rdel=/delim]> }xms;
+my $delimited         = qr{ <delim=([(/][*]|if|[][(){}<>?'"`]+)> <content=(.*?)> </delim> }xms;
+my $delimited_cap     = qr{ <delim=([(/][*]|if|[][(){}<>?'"`]+)> <content=(.*?)> <rdel=/delim> }xms;
+my $delimited_listcap = qr{ <delim=([(/][*]|if|[][(){}<>?'"`]+)> <content=(.*?)> <[rdel=/delim]> }xms;
 
 no Regexp::Grammars;
 
@@ -52,25 +52,25 @@ __DATA__
 [xxx]         :succeed
 <xxx>         :succeed
 (xxx)         :succeed
-«xxx»         :succeed
+?xxx?         :succeed
 
 [[xxx]]       :succeed
 {{{xxx}}}     :succeed
 ((((xxx))))   :succeed
 <<xxx>>       :succeed
-««xxx»»       :succeed
+??xxx??       :succeed
 
 }xxx{         :succeed
 ]xxx[         :succeed
 )xxx(         :succeed
 >xxx<         :succeed
-»xxx«         :succeed
+?xxx?         :succeed
 
 }}}xxx{{{     :succeed
 ]]xxx[[       :succeed
 ))))xxx((((   :succeed
 >>xxx<<       :succeed
-»»xxx««       :succeed
+??xxx??       :succeed
 
 ({xxx})       :succeed
 (*xxx*)       :succeed
@@ -84,10 +84,8 @@ ifxxxfi       :succeed
 [xxx[         :fail
 <xxx<         :fail
 (xxx(         :fail
-«xxx«         :fail
 
 [[xxx[[       :fail
 {{{xxx{{{     :fail
 ((((xxx((((   :fail
 <<xxx<<       :fail
-««xxx««       :fail

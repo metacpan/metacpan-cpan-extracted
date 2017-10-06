@@ -23,12 +23,10 @@ use Test::More;
 
     extends 'Moxie::Object', 'My::Component';
 
-    has 'foo';
-    has 'bar' => sub { "BAR" };
+    has _foo => ();
+    has _bar => sub { "BAR" };
 
-    my sub _foo : private(foo);
-
-    sub bar : ro;
+    sub bar : ro(_bar);
 
     sub REPR {
         my ($class, $proto) = @_;
@@ -70,12 +68,10 @@ is($app->bar, 'BAR');
 
     extends 'Moxie::Object', 'My::DBI';
 
-    has 'foo';
-    has 'bar' => sub { "BAR" };
+    has _foo => ();
+    has _bar => sub { "BAR" };
 
-    my sub _foo : private(foo);
-
-    sub bar : ro;
+    sub bar : ro(_bar);
 
     sub connect { (shift)->new( dsn => @_ ) }
 

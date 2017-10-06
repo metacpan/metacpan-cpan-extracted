@@ -37,7 +37,117 @@ my $DOUBLE_MIN = POSIX::DBL_MIN();
 my $FLOAT_PRECICE = 16384.5;
 my $DOUBLE_PRECICE = 65536.5;
 
+# Positive infinity(unix like system : inf, Windows : 1.#INF)
+my $POSITIVE_INFINITY = SPVM::POSITIVE_INFINITY();
+
+# Negative infinity(unix like system : -inf, Windows : -1.#INF)
+my $NEGATIVE_INFINITY = SPVM::NEGATIVE_INFINITY();
+
+my $NaN = SPVM::NaN();
+
 use SPVM::std;
+
+use SPVM 'Double';
+use SPVM 'Float';
+
+{
+  like($POSITIVE_INFINITY, qr/inf/i);
+  cmp_ok($POSITIVE_INFINITY, '>', 0);
+  
+  like($NEGATIVE_INFINITY, qr/inf/i);
+  cmp_ok($NEGATIVE_INFINITY, '<', 0);
+  
+  like($NaN, qr/(nan|ind)/i);
+}
+
+# Template
+{
+  ok(SPVM::TestCase::template());
+}
+
+# SPVM::Byte
+{
+  ok(SPVM::TestCase::Byte::constant());
+}
+
+# SPVM::Short
+{
+  ok(SPVM::TestCase::Short::constant());
+}
+
+# SPVM::Integer
+{
+  ok(SPVM::TestCase::Integer::constant());
+}
+
+# SPVM::Long
+{
+  ok(SPVM::TestCase::Long::constant());
+}
+
+# SPVM::Float
+{
+  ok(SPVM::TestCase::Float::pass_positive_infinity($POSITIVE_INFINITY));
+  ok(SPVM::TestCase::Float::pass_negative_infinity($NEGATIVE_INFINITY));
+  ok(SPVM::TestCase::Float::pass_nan($NaN));
+  
+  ok(SPVM::TestCase::Float::constant());
+  ok(SPVM::TestCase::Float::is_infinite());
+  ok(SPVM::TestCase::Float::is_finite());
+  ok(SPVM::TestCase::Float::is_nan());
+  ok(SPVM::TestCase::Float::int_bits_to_float());
+  ok(SPVM::TestCase::Float::int_bits_to_float_nan_first_condition());
+  ok(SPVM::TestCase::Float::int_bits_to_float_nan_first_condition_is_nan());
+  ok(SPVM::TestCase::Float::int_bits_to_float_nan_second_condition());
+  ok(SPVM::TestCase::Float::int_bits_to_float_nan_second_condition_is_nan());
+
+  ok(SPVM::TestCase::Float::float_to_raw_int_bits());
+  ok(SPVM::TestCase::Float::float_to_raw_int_bits_nan());
+  ok(SPVM::TestCase::Float::float_to_int_bits());
+  ok(SPVM::TestCase::Float::float_to_int_bits_nan());
+  
+  is(SPVM::Float::POSITIVE_INFINITY(), $POSITIVE_INFINITY);
+  is(SPVM::Float::NEGATIVE_INFINITY(), $NEGATIVE_INFINITY);
+  
+  cmp_ok(SPVM::Float::NaN(), 'eq', $NaN);
+  
+  # Check not Inf or NaN in Perl value
+  like(SPVM::Float::MAX_VALUE(), qr/[0-9]/);
+  like(SPVM::Float::MIN_VALUE(), qr/[0-9]/);
+  like(SPVM::Float::MIN_NORMAL(), qr/[0-9]/);
+}
+
+# SPVM::Double
+{
+  ok(SPVM::TestCase::Double::pass_positive_infinity($POSITIVE_INFINITY));
+  ok(SPVM::TestCase::Double::pass_negative_infinity($NEGATIVE_INFINITY));
+  ok(SPVM::TestCase::Double::pass_nan($NaN));
+  
+  ok(SPVM::TestCase::Double::constant());
+  ok(SPVM::TestCase::Double::is_infinite());
+  ok(SPVM::TestCase::Double::is_finite());
+  ok(SPVM::TestCase::Double::is_nan());
+  ok(SPVM::TestCase::Double::long_bits_to_double());
+  ok(SPVM::TestCase::Double::long_bits_to_double_nan_first_condition());
+  ok(SPVM::TestCase::Double::long_bits_to_double_nan_first_condition_is_nan());
+  ok(SPVM::TestCase::Double::long_bits_to_double_nan_second_condition());
+  ok(SPVM::TestCase::Double::long_bits_to_double_nan_second_condition_is_nan());
+  
+  ok(SPVM::TestCase::Double::double_to_raw_long_bits());
+  ok(SPVM::TestCase::Double::double_to_raw_long_bits_nan());
+  ok(SPVM::TestCase::Double::double_to_long_bits());
+  ok(SPVM::TestCase::Double::double_to_long_bits_nan());
+  
+  is(SPVM::Double::POSITIVE_INFINITY(), $POSITIVE_INFINITY);
+  is(SPVM::Double::NEGATIVE_INFINITY(), $NEGATIVE_INFINITY);
+  
+  cmp_ok(SPVM::Double::NaN(), 'eq', $NaN);
+  
+  # Check not Inf or NaN in Perl value
+  like(SPVM::Double::MAX_VALUE(), qr/[0-9]/);
+  like(SPVM::Double::MIN_VALUE(), qr/[0-9]/);
+  like(SPVM::Double::MIN_NORMAL(), qr/[0-9]/);
+}
 
 # .
 {
@@ -72,6 +182,8 @@ my $start_objects_count = SPVM::get_objects_count();
 # Call subroutine
 {
   ok(SPVM::TestCase::sin());
+  ok(SPVM::TestCase::cos());
+  ok(SPVM::TestCase::tan());
 }
 
 # Native subroutine
@@ -322,8 +434,9 @@ is_deeply(
   ok(SPVM::TestCase::enum_float());
   ok(SPVM::TestCase::enum_double());
 
+  is(SPVM::TestCase::INT_VALUE(), 127);
+
 =pod
-  is(SPVM::TestCase::BYTE_MAX(), 127);
   is(SPVM::TestCase::BYTE_MIN(), -128);
   is(SPVM::TestCase::SHORT_MAX(), 32767);
   is(SPVM::TestCase::SHORT_MIN(), -32768);
@@ -410,8 +523,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element short array
@@ -426,8 +539,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element int array
@@ -442,8 +555,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element long array
@@ -458,8 +571,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element float array
@@ -474,8 +587,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element double array
@@ -490,8 +603,8 @@ is_deeply(
     my $object1_get = $object_array->get(0);
     my $object2_get = $object_array->get(1);
     
-    is_deeply($object1_get->to_array, [1, 2, 3]);
-    is_deeply($object2_get->to_array, [4, 5, 6]);
+    is_deeply($object1_get->get_elements, [1, 2, 3]);
+    is_deeply($object2_get->get_elements, [4, 5, 6]);
   }
 
   # element object array
@@ -709,70 +822,70 @@ is_deeply(
 
 # SPVM Functions
 {
-  # to_array
+  # get_elements
   {
     {
       my $sp_values = SPVM::new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $BYTE_MAX, $BYTE_MIN]);
     }
     {
       my $sp_values = SPVM::new_short_array([1, $SHORT_MAX, $SHORT_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $SHORT_MAX, $SHORT_MIN]);
     }
     {
       my $sp_values = SPVM::new_int_array([1, $INT_MAX, $INT_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $INT_MAX, $INT_MIN]);
     }
     {
       my $sp_values = SPVM::new_long_array([1, $LONG_MAX, $LONG_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $LONG_MAX, $LONG_MIN]);
     }
     {
       my $sp_values = SPVM::new_float_array([1, $FLOAT_MAX, $FLOAT_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $FLOAT_MAX, $FLOAT_MIN]);
     }
     {
       my $sp_values = SPVM::new_double_array([1, $DOUBLE_MAX, $DOUBLE_MIN]);
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, $DOUBLE_MAX, $DOUBLE_MIN]);
     }
   }
 
-  # to_array_range
+  # get_elements_range
   {
     {
       my $sp_values = SPVM::new_byte_array([1, 2, $BYTE_MAX, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $BYTE_MAX]);
     }
     {
       my $sp_values = SPVM::new_short_array([1, 2, $SHORT_MAX, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $SHORT_MAX]);
     }
     {
       my $sp_values = SPVM::new_int_array([1, 2, $INT_MAX, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $INT_MAX]);
     }
     {
       my $sp_values = SPVM::new_long_array([1, 2, $LONG_MAX, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $LONG_MAX]);
     }
     {
       my $sp_values = SPVM::new_float_array([1, 2, $FLOAT_PRECICE, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $FLOAT_PRECICE]);
     }
     {
       my $sp_values = SPVM::new_double_array([1, 2, $DOUBLE_PRECICE, 4]);
-      my $values = $sp_values->to_array_range(1, 2);
+      my $values = $sp_values->get_elements_range(1, 2);
       is_deeply($values, [2, $DOUBLE_PRECICE]);
     }
   }
@@ -998,7 +1111,7 @@ is_deeply(
       my $sp_values = SPVM::new_byte_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $BYTE_MAX, 4]);
     }
     {
@@ -1006,7 +1119,7 @@ is_deeply(
       my $sp_values = SPVM::new_short_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $SHORT_MAX, 4]);
     }
     {
@@ -1014,7 +1127,7 @@ is_deeply(
       my $sp_values = SPVM::new_int_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $INT_MAX, 4]);
     }
     {
@@ -1022,7 +1135,7 @@ is_deeply(
       my $sp_values = SPVM::new_long_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $LONG_MAX, 4]);
     }
     {
@@ -1030,7 +1143,7 @@ is_deeply(
       my $sp_values = SPVM::new_float_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $FLOAT_PRECICE, 4]);
     }
     {
@@ -1038,7 +1151,7 @@ is_deeply(
       my $sp_values = SPVM::new_double_array([1, 2, 3, 4]);
       $sp_values->set_data_range(1, 2, $data);
       
-      my $values = $sp_values->to_array;
+      my $values = $sp_values->get_elements;
       is_deeply($values, [1, 5, $DOUBLE_PRECICE, 4]);
     }
   }
@@ -1369,6 +1482,18 @@ is_deeply(
   ok(SPVM::TestCase::number_literal_hex_int());
   ok(SPVM::TestCase::number_literal_hex_int_max());
   ok(SPVM::TestCase::number_literal_hex_long_max());
+
+  ok(SPVM::TestCase::number_literal_octal_specifier());
+  ok(SPVM::TestCase::number_literal_octal_all_number());
+  ok(SPVM::TestCase::number_literal_octal_int());
+  ok(SPVM::TestCase::number_literal_octal_int_max());
+  ok(SPVM::TestCase::number_literal_octal_long_max());
+
+  ok(SPVM::TestCase::number_literal_binary_specifier());
+  ok(SPVM::TestCase::number_literal_binary_all_number());
+  ok(SPVM::TestCase::number_literal_binary_int());
+  ok(SPVM::TestCase::number_literal_binary_int_max());
+  ok(SPVM::TestCase::number_literal_binary_long_max());
 }
 
 # Bit shift left

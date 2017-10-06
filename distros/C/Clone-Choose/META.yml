@@ -1,0 +1,31 @@
+---
+abstract: 'Choose appropriate clone utility'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+  - 'Stefan Hermes <hermes@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clone-Choose
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Module::Runtime: '0'
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Clone-Choose
+  homepage: https://metacpan.org/release/Clone-Choose
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:perl5-utils/Clone-Choose.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -168,7 +168,7 @@ sub load_tool_for_command
          $class->can( "CMD" ) and $class->CMD eq $cmd
       } $self->available_tools or die "Unrecognised command '$cmd'\n";
 
-      $self->load_tool( $name );
+      $self->load_tool( $name, %args );
    };
 }
 
@@ -203,8 +203,12 @@ will follow only direct inrefs.
 
 =item elide => BOOL
 
-If true, attempt to neaten up the output by skipping over C<REF()>-type SVs
-which occur a lot in perl data structures.
+If true, attempt to neaten up the output by skipping over certain structures.
+
+C<REF()>-type SVs will be skipped to their referrant.
+
+Members of the symbol table will be printed as being a 'root' element of the
+given symbol name.
 
 =back
 
@@ -217,6 +221,10 @@ sub inref_graph
 
    my $graph = $opts{graph} //= Devel::MAT::Graph->new( $self->dumpfile );
 
+   # TODO: allow separate values for these
+   my $elide_rv  = $opts{elide};
+   my $elide_sym = $opts{elide};
+
    $self->load_tool( "Inrefs" );
 
    if( $sv->immortal ) {
@@ -224,6 +232,13 @@ sub inref_graph
                  $sv->uv              ? "true" :
                                         "false";
       $graph->add_root( $sv, $desc );
+      return $graph->get_sv_node( $sv );
+   }
+
+   my $name;
+   if( $elide_sym and $name = $sv->name and
+         $name !~ m/^&.*::__ANON__$/ ) {
+      $graph->add_root( $sv, "the symbol '$name'" );
       return $graph->get_sv_node( $sv );
    }
 
@@ -242,7 +257,7 @@ sub inref_graph
                 $opts{direct} ? $sv->inrefs_direct :
                                 $sv->inrefs;
 
-   if( $opts{elide} ) {
+   if( $elide_rv ) {
       @inrefs = map { sub {
          return $_ unless $_->sv->type eq "REF" and
                           $_->name eq "the referrant";
@@ -336,8 +351,14 @@ sub find_symbol
 
    $gv = $pmat->find_glob( $name )
 
-Attempts to walk to the symbol table looking for a symbol of the given name,
+Attempts to walk the symbol table looking for a symbol of the given name,
 returning the C<GLOB> object if found.
+
+=head2 find_stash
+
+   $stash = $pmat->find_stash( $name )
+
+Attempts to walk the symbol table looking for a stash of the given name.
 
 =cut
 
@@ -350,8 +371,7 @@ sub find_stashvalue
 
    my $stash;
    if( defined $parent and length $parent ) {
-      my $parentgv = $self->find_glob( $parent . "::" );
-      $stash = $parentgv->hash or croak "$parent has no hash";
+      $stash = $self->find_stash( $parent );
    }
    else {
       $stash = $self->dumpfile->defstash;
@@ -372,6 +392,16 @@ sub find_glob
       croak "$name is not a GLOB";
 
    return $sv;
+}
+
+sub find_stash
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   my $gv = $self->find_glob( $name . "::" );
+   return $gv->hash ||
+      croak "$name has no hash";
 }
 
 =head1 AUTHOR

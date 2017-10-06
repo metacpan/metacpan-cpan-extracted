@@ -9,7 +9,7 @@ use Text::ParseWords qw( shellwords );
 use base qw( Exporter );
 
 # ABSTRACT: Testing tools for Alien modules for projects that use C++
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '0.99'; # VERSION
 
 
 our @EXPORT = @Test::Alien::EXPORT;
@@ -70,7 +70,7 @@ Test::Alien::CPP - Testing tools for Alien modules for projects that use C++
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 

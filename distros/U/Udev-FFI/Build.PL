@@ -4,70 +4,18 @@
 # =========================================================================
 
 use 5.008_001;
-
 use strict;
-use warnings;
-use utf8;
 
-use Module::Build;
-use File::Basename;
-use File::Spec;
+use Module::Build::Tiny 0.035;
 
-my %args = (
-    license              => 'lgpl_2_1',
-    dynamic_config       => 0,
+use FFI::CheckLib;
 
-    configure_requires => {
-        'Module::Build' => '0.4005',
-    },
+die qq{it seems that your system doesn't provide libudev.
+Please install libudeb >= 189.
+Installation failed\n}
+    unless defined(find_lib( lib => 'udev' ));
 
-    requires => {
-        'FFI::CheckLib' => '0',
-        'FFI::Platypus' => '0',
-        'perl' => '5.008001',
-    },
-
-    recommends => {
-        'PkgConfig' => '0.16026',
-    },
-
-    suggests => {
-    },
-
-    build_requires => {
-    },
-
-    test_requires => {
-        'Test::More' => '0.98',
-    },
-
-    name            => 'Udev-FFI',
-    module_name     => 'Udev::FFI',
-    allow_pureperl => 0,
-
-    script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
-    PL_files => {},
-
-    test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
-    recursive_test_files => 1,
+Build_PL();
 
 
-);
-if (-d 'share') {
-    $args{share_dir} = 'share';
-}
-
-my $builder = Module::Build->subclass(
-    class => 'MyBuilder',
-    code => q{
-        sub ACTION_distmeta {
-            die "Do not run distmeta. Install Minilla and `minil install` instead.\n";
-        }
-        sub ACTION_installdeps {
-            die "Do not run installdeps. Run `cpanm --installdeps .` instead.\n";
-        }
-    }
-)->new(%args);
-$builder->create_build_script();
 

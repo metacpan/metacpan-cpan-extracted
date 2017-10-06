@@ -1,0 +1,89 @@
+NAME
+
+    String::Tagged::Terminal - format terminal output using String::Tagged
+
+SYNOPSIS
+
+     use String::Tagged::Terminal;
+    
+     my $st = String::Tagged::Terminal->new
+        ->append( "Hello my name is " )
+        ->append_tagged( $name, bold => 1, fgindex => 4 );
+    
+     print $st->build_terminal . "\n";
+
+DESCRIPTION
+
+    This subclass of String::Tagged provides a method, build_terminal, for
+    outputting the formatting tags embedded in the string as terminal
+    escape sequences, to render the the output in the appropriate style.
+
+TAGS
+
+    The following tag names are recognised:
+
+ bold, under, italic, strike, blink, reverse
+
+    These tags take a boolean value. If the value is true then the
+    corresponding terminal rendering attribute is enabled.
+
+ altfont
+
+    This tag takes an integer value. If defined it uses the "alternate font
+    selection" sequence.
+
+ fgindex, bgindex
+
+    These tags take an integer value in the range 0 to 255. These select
+    the foreground or background colour by using VGA, high-brightness
+    extended 16 colour, or xterm 256 palette mode attributes, depending on
+    the value.
+
+    The ECMA-48-corrected string encoding form of CSI 38:5:nnn m is used to
+    set the 256 palette values.
+
+CONSTRUCTORS
+
+ new_from_formatting
+
+       $st = String::Tagged::Terminal->new_from_formatting( $fmt )
+
+    Returns a new instance by converting String::Tagged::Formatting
+    standard tags.
+
+    Foreground and background colours are converted to their nearest index
+    in the xterm 256 colour palette. The monospace Formatting attribute is
+    rendered by selecting the first alternate font using altfont.
+
+METHODS
+
+    The following methods are provided in addition to those provided by
+    String::Tagged.
+
+ build_terminal
+
+       $str = $st->build_terminal
+
+    Returns a string containing terminal escape sequences mixed with string
+    content to render the string to a terminal.
+
+    As this string will contain literal terminal control escape sequences,
+    care should be taken when passing it around, printing it for debugging
+    purposes, or similar.
+
+ as_formatting
+
+       $fmt = $st->as_formatting
+
+    Returns a new String::Tagged instance tagged with
+    String::Tagged::Formatting standard tags.
+
+TODO
+
+      * Consider a ->parse_terminal constructor method, which would attempt
+      to parse SGR sequences from a given source string.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

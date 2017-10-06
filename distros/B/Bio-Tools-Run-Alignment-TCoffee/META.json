@@ -17,6 +17,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Devel::CheckBin" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -51,13 +52,11 @@
       },
       "test" : {
          "requires" : {
-            "Env::Path" : "0.18",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
             "blib" : "1.01",
             "perl" : "5.006"
          }
@@ -76,7 +75,7 @@
          "web" : "https://github.com/bioperl/bio-tools-run-alignment-tcoffee"
       }
    },
-   "version" : "1.7.2",
+   "version" : "1.7.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -460,7 +459,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "Bio-Tools-Run-Alignment-TCoffee-v1.7.2",
+                  "tag" : "Bio-Tools-Run-Alignment-TCoffee-v1.7.3",
                   "tag_format" : "%N-v%v",
                   "tag_message" : "%N-v%v"
                },
@@ -476,9 +475,16 @@
             "version" : "2.041"
          },
          {
-            "class" : "Dist::Zilla::Plugin::RequiresExternal",
-            "name" : "RequiresExternal",
-            "version" : "1.006"
+            "class" : "Dist::Zilla::Plugin::CheckBin",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckBin" : {
+                  "command" : [
+                     "t_coffee"
+                  ]
+               }
+            },
+            "name" : "CheckBin",
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

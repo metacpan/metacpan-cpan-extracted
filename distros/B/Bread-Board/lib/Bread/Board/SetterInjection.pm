@@ -1,7 +1,7 @@
 package Bread::Board::SetterInjection;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service instantiating objects via setter functions
-$Bread::Board::SetterInjection::VERSION = '0.35';
+$Bread::Board::SetterInjection::VERSION = '0.36';
 use Moose;
 
 use Bread::Board::Types;
@@ -36,7 +36,7 @@ Bread::Board::SetterInjection - service instantiating objects via setter functio
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

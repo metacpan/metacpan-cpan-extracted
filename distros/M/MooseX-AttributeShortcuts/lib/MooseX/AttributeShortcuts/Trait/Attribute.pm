@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.034';
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.035';
 # ABSTRACT: Shortcuts attribute trait proper
 
 use namespace::autoclean;
@@ -17,8 +17,10 @@ use MooseX::Role::Parameterized;
 use Moose::Util::TypeConstraints  ':all';
 use MooseX::Types::Moose          ':all';
 use MooseX::Types::Common::String ':all';
+use MooseX::Util;
 
 use aliased 'MooseX::Meta::TypeConstraint::Mooish' => 'MooishTC';
+use aliased 'MooseX::AttributeShortcuts::Trait::Method::Builder' => 'BuilderTrait';
 
 use List::Util 1.33 'any';
 
@@ -55,7 +57,8 @@ after attach_to_class => sub {
     return unless $self->has_anon_builder && !$self->anon_builder_installed;
 
     ### install our anon builder as a method: $class->name
-    $class->add_method($self->builder => $self->anon_builder);
+    # $class->add_method($self->builder => $self->anon_builder);
+    $class->add_method($self->builder => $self->_builder_method_meta($class));
     $self->_set_anon_builder_installed;
 
     return;
@@ -345,6 +348,13 @@ sub _mxas_constraint {
 }
 
 
+sub builder_method_metaclass {
+    my $self = shift @_;
+
+    return with_traits($self->associated_class->method_metaclass => BuilderTrait);
+}
+
+
 role {
     my $p = shift @_;
 
@@ -368,7 +378,7 @@ MooseX::AttributeShortcuts::Trait::Attribute - Shortcuts attribute trait proper
 
 =head1 VERSION
 
-This document describes version 0.034 of MooseX::AttributeShortcuts::Trait::Attribute - released July 25, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.035 of MooseX::AttributeShortcuts::Trait::Attribute - released September 22, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 
@@ -378,8 +388,8 @@ documentation for information on any of the new attribute options; we're
 mainly going to document the additional attributes, methods, and role
 parameters that this role provides.
 
-All methods we include that chain off of Moose's _process_options() are
-prefixed with '_mxas_' and generally are not documented in the POD; we
+All methods we include that chain off Moose's C<_process_options()> are
+prefixed with C<_mxas_> and generally are not documented in the POD; we
 document any internal methods of L<Moose::Meta::Attribute> that we wrap or
 otherwise override we document here as well.
 
@@ -440,6 +450,10 @@ Predicate for the L</original_isa> attribute.
 
 Predicate for the L</trigger_method> attribute.
 
+=head2 builder_method_metaclass()
+
+Returns the metaclass we'll use to install a inline builder.
+
 =head2 canonical_writer_prefix
 
 Returns the writer prefix; this is almost always C<set_>.
@@ -457,15 +471,15 @@ and writers are named.
 
     use MooseX::::AttributeShortcuts -writer_prefix => 'prefix';
 
-The default writer prefix is '_set_'.  If you'd prefer it to be something
-else (say, '_'), this is where you'd do that.
+The default writer prefix is C<_set_>.  If you'd prefer it to be something
+else (say, C<_>), this is where you'd do that.
 
 =head2 -builder_prefix
 
-    use MooseX::::AttributeShortcuts -builder_prefix => 'prefix';
+    use MooseX::AttributeShortcuts -builder_prefix => 'prefix';
 
-The default builder prefix is '_build_', as this is what lazy_build does, and
-what people in general recognize as build methods.
+The default builder prefix is C<_build_>, as this is what L<Moose/lazy_build>
+does, and what people in general recognize as build methods.
 
 =head1 SEE ALSO
 

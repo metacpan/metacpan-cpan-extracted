@@ -192,4 +192,12 @@ BEGIN {
    is( $stderr->ofileno, 2, '$stderr has ofileno 2' );
 }
 
+{ package Inner; sub method {} }
+{
+   my $innerstash = $pmat->find_stash( "Inner" );
+   is( $innerstash->stashname, "Inner", 'Inner stashname' );
+
+   ok( $innerstash->value( "method" ), 'Inner stash has method' );
+}
+
 done_testing;

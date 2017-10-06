@@ -1,0 +1,4 @@
+name = "WebService-Qiita-V2"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

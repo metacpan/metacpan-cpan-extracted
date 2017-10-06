@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License along
 # with PFT.  If not, see <http://www.gnu.org/licenses/>.
 
-package PFT::Map::Index v1.2.0;
+package PFT::Map::Index v1.2.1;
 
 =encoding utf8
 
@@ -133,11 +133,11 @@ C<PFT::Map::Node>. The returned value will be one of the following:
 
 =over
 
-=item A node (i.e. a C<PFT::Map::Node> instance);
+=item A list of nodes (i.e. a C<PFT::Map::Node> instances);
 
-=item A string (e.g. C<http://manpages.org>);
+=item A list of strings (e.g. C<http://manpages.org>);
 
-=item The C<undef> value (meaning: failed resolution).
+=item An empty list (meaning: failed resolution).
 
 =back
 
@@ -163,19 +163,34 @@ sub _resolve_local {
 
     my $map = $self->map;
     my $kwd = $symbol->keyword;
-    if ($kwd eq 'pic') {
-        $map->id_to_node('i:' . join '/', $symbol->args);
-    } elsif ($kwd eq 'attach') {
-        $map->id_to_node('a:' . join '/', $symbol->args);
-    } elsif ($kwd eq 'page') {
-        $map->id_to_node('p:' . PFT::Header::slugify(join ' ', $symbol->args));
-    } elsif ($kwd eq 'blog') {
-        &_resolve_local_blog;
-    } elsif ($kwd eq 'tag') {
-        $map->id_to_node('t:' . PFT::Header::slugify(join ' ', $symbol->args));
-    } else {
-        confess "Unrecognized keyword $kwd";
+
+    if ($kwd eq 'blog') {
+        # Treated as special case since the blog query parametrization can
+        # yield more entries.
+        return &_resolve_local_blog;
     }
+
+    # All the following can yield only one entry. We have to return entries
+    # or an empty list.
+    my $out = do {
+        if ($kwd eq 'pic') {
+            $map->id_to_node('i:' . join '/', $symbol->args);
+        } elsif ($kwd eq 'attach') {
+            $map->id_to_node('a:' . join '/', $symbol->args);
+        } elsif ($kwd eq 'page') {
+            $map->id_to_node(
+                'p:' . PFT::Header::slugify(join ' ', $symbol->args)
+            );
+        } elsif ($kwd eq 'tag') {
+            $map->id_to_node(
+                't:' . PFT::Header::slugify(join ' ', $symbol->args)
+            );
+        } else {
+            confess "Unrecognized keyword $kwd";
+        }
+    };
+
+    defined $out ? $out : ();
 }
 
 sub _resolve_local_blog {
@@ -190,7 +205,7 @@ sub _resolve_local_blog {
         while ($node && $steps-- > 0) {
             $node = $node->prev;
         }
-        $node;
+        defined $node ? $node : ();
     } elsif ($method =~ /^(?:d|date)$/) {
         confess "Incomplete date" if 3 > grep defined, @args;
         push @args, '.*' if 3 == @args;

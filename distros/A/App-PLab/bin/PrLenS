@@ -26,6 +26,7 @@ sub win_inidefaults
    my $w = $_[0];
    return (
       $w-> SUPER::win_inidefaults,
+      PointSize          => 4,
       nLines             => 6,
       autoCrispen        => 0,
       autoStretch        => 0,
@@ -61,6 +62,8 @@ sub on_create
    $self-> {dataExt}            = 'pls';
    
    my $tb  = $self-> ToolBar;
+   my $scale = $::application-> uiScaling;
+   $scale = 1 if $scale < 1;
 
    my %btn_profile = (
      glyphs      => 1,
@@ -68,7 +71,7 @@ sub on_create
      selectable  => 0,
      transparent => 1,
      flat        => 1,
-     size        => [ 36, 36],
+     size        => [ map { $_ * $scale } 36, 36],
      borderWidth => 1,
      enabled     => 0,
    );
@@ -76,7 +79,7 @@ sub on_create
    $tb-> insert(
       [ SpeedButton =>
          name    => "MarkCells",
-         origin  => [120, 1],
+         origin  => [120 * $scale, 1],
          image   => App::PLab::ImageAppGlyphs::icon( bga::cells),
          onClick => sub { $w-> mark_cells },
          hint    => "Mark cells mode",
@@ -84,7 +87,7 @@ sub on_create
       ],
       [ SpeedButton =>
          name    => "MarkProcesses",
-         origin  => [160, 1],
+         origin  => [160 * $scale, 1],
          image   => App::PLab::ImageAppGlyphs::icon( bga::processes),
          onClick => sub { $w-> mark_processes} , 
          hint    => "Mark processes mode",
@@ -92,7 +95,7 @@ sub on_create
       ],
       [ SpeedButton =>
          name    => "DrawProcesses",
-         origin  => [200, 1],
+         origin  => [200 * $scale, 1],
          image   => App::PLab::ImageAppGlyphs::icon( bga::drawprocesses),
          onClick => sub { $w-> draw_processes} ,
          hint    => "Draw processes mode",
@@ -102,8 +105,8 @@ sub on_create
          name => "CellsProcesses",
          font => { size => 10, pitch => fp::Fixed}, 
          color => cl::Red,
-         origin => [ 249, 8],
-	 size   => [ 80, 20],
+         origin => [ 249 * $scale, 8 * $scale],
+	 size   => [ 80 * $scale, 20 * $scale],
          transparent => 1,
          text   => "???:???",
 	 valignment => ta::Middle,
@@ -111,17 +114,17 @@ sub on_create
       [ Widget => 
           name => "MarkStateEx",
           transparent => 1,
-          origin  => [ 336, 8],
-          size    => [ 20, 20],
+          origin  => [ 336 * $scale, 8 * $scale],
+          size    => [ 20 * $scale, 20 * $scale],
           color   => 0,
           onPaint => sub {
              my ( $self, $canvas) = @_;
              my $c = $self-> color;
              return unless $c;
              $canvas-> color( cl::Black);
-             $canvas-> fill_ellipse( 10, 10, 10, 10);
+             $canvas-> fill_ellipse( map { $_ * $scale } 10, 10, 10, 10);
              $canvas-> color( $c);
-             $canvas-> fill_ellipse( 10, 10, 8, 8);
+             $canvas-> fill_ellipse( map { $_ * $scale } 10, 10, 8, 8);
           },
       ], 
       [ Label =>
@@ -130,8 +133,8 @@ sub on_create
          font => { size => 10, pitch => fp::Variable},  
          transparent => 1,
          color => cl::Black,
-         origin => [ 356, 8],
-	 height => 20,
+         origin => [ 356 * $scale, 8 * $scale],
+	 height => 20 * $scale,
 	 valignment => ta::Middle,
          onMouseDown => sub {
             my ( $self, $btn, $mod, $x, $y) = @_;
@@ -232,14 +235,14 @@ sub xmlload
                $attrs{number} =~ /^\d+$/ && $attrs{number} == scalar @data;
 
             # handle current frame
-            if ( $state{record_index} == $w-> {fileNum}) {
+            if ( $state{record_index} == ($w-> {fileNum} // 0)) {
                $w-> {'n' . $uctype} = scalar @data;
                $w-> { $lctype} = [ @data ];
             } elsif ( $state{record_index} == $smin) {
             # handle first frame
                $w-> {'ex' . $uctype} =  [ @data ];
             } 
-	    if ( $state{record_index} == $w-> {fileNum} - 1) {
+	    if ( $state{record_index} == ($w-> {fileNum} // 0 ) - 1) {
             # handle previous frame
                $w-> {'prevex' . $uctype} =  [ @data ];
 	    }
@@ -487,8 +490,11 @@ sub save_info
    my $datestr = scalar(localtime(time));
    my ($ix,$iy) = $w-> IV-> image-> size;
    my @l = @{$w->{layers}};
-   my $sets = join(',', @l[2 .. $#l]);
+   my $sets = join(',', @l[2 .. $#l]) // '';
    my $stats = $w-> generate_statistics_text;
+
+   my $beg = $w->{fileBeg} // '';
+   my $end = $w->{fileEnd} // '';
 
 print F <<HEADER;
 <?xml version="1.0"?>
@@ -497,8 +503,8 @@ print F <<HEADER;
 $stats
 -->
 <prlens_data
-  series         = "$w->{fileBeg}"
-  imageext       = "$w->{fileEnd}"
+  series         = "$beg"
+  imageext       = "$end"
   imagewidth     = "$ix"
   imageheight    = "$iy"
   creator        = "PrLenS"
@@ -507,6 +513,7 @@ $stats
   ycalib         = "$w->{ini}->{YCalibration}"
   filemaskwidth  = "$w->{cypherMask}"
   lines          = "$w->{ini}->{nLines}"
+  pointsize      = "$w->{ini}->{PointSize}"
   datasets       = "$sets"
 HEADER
    printf F "  total%-10s= \"%d\"\n", ucfirst, $w->{'total'.ucfirst} for @l;
@@ -1593,7 +1600,9 @@ sub IV_MouseClick
          $w-> {"n$layer"}++;
          $w-> {"total$layer"}++;
       }
-      ($x1, $x2, $y1, $y2) = map { ($_ - 6, $_ + 6); } ($ax,$ay);
+      my $zp = $self-> zoom * $w->{ini}->{PointSize};
+      $zp = 4 if $zp < 4;
+      ($x1, $x2, $y1, $y2) = map { ($_ - $zp - 2, $_ + $zp + 2); } ($ax,$ay);
       $self-> invalidate_rect( $self-> point2screen( $x1, $y1, $x2, $y2));
    }
    $w-> update_state;
@@ -1638,7 +1647,8 @@ sub IV_Paint
    return unless $image;
    
    my $z  = $self-> zoom;
-   my $zp = ( $z < 1) ? 4 : $z * 4;
+   my $zp = $z * $w->{ini}->{PointSize};
+   $zp = 4 if $zp < 4;
    $canvas-> translate( $self-> point2screen( 0, 0));
    my ($x, $y, $iw, $ih) = ( $self-> size, $image-> size);
    my $dx = sprintf( '%d', $iw / 20);
@@ -1777,6 +1787,17 @@ sub opt_propcreate
        size   => [ 120, 75],
        name   => 'Hyperset',
    ], [ SpinEdit => 
+       origin => [ 190, 220],
+       width  => 120,
+       min    => 4,
+       max    => 20,
+       name   => 'PointSize',
+       hint   => 'Size of point used for cell markings',
+   ], [ Label => 
+       origin => [ 190, 240],
+       autoWidth => 1,
+       text      => 'Point size',
+   ], [ SpinEdit => 
        origin => [ 190, 160],
        width  => 120,
        min    => 2,
@@ -1895,6 +1916,7 @@ sub opt_proppush
    my ( $w, $dlg, $nb, $nbpages) = @_;
    $w-> SUPER::opt_proppush( $dlg, $nb, $nbpages);
    $nbpages-> nLines-> value( $w->{ini}->{nLines});
+   $nbpages-> PointSize-> value( $w->{ini}->{PointSize});
    $nbpages-> Datasets-> value( $w->{ini}->{active_datasets});
    $nbpages-> ShowExtras-> checked( $w-> {ini}-> {ShowExtras});
    $nbpages-> ShowPrevExtras-> checked( $w-> {ini}-> {ShowPrevExtras});
@@ -1921,6 +1943,7 @@ sub opt_proppop
    my $ssl = $nbpages-> StretchSlider;
    if ( $mr) {
       $w->{ini}->{nLines} = $nbpages-> nLines-> value;
+      $w->{ini}->{PointSize} = $nbpages-> PointSize-> value;
       my $ad = $w->{ini}->{active_datasets};
       $w->{ini}->{active_datasets} = $nbpages-> Datasets-> value;
       if ( $ad != $w->{ini}->{active_datasets}) {

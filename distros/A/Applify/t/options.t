@@ -48,4 +48,9 @@ is $script->_calculate_option_spec({name => 'a_b', type => 'num', n_of => '0,3'}
   is $script->_calculate_option_spec({name => 'a_b', type => 'dir'}),  'a-b=s', 'a_b=s';
 }
 
+eval {
+  $script->_calculate_option_spec({name => 'a_b', type => 'uri'});
+};
+like $@, qr/^Usage: option /, 'die on unsupported option type';
+
 done_testing;

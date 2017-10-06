@@ -1,5 +1,8 @@
 Revision history for HTML-Packer
 
+2.06       2017-10-04
+    - Fix GH #8: proper newlines replacement (#9) (thanks to krizhanovsky)
+
 2.05       2017-04-18
     - Makefile.PL moved to ExtUtils::MakeMaker to fix no . in @INC (perl 5.25.11+)
 

@@ -17,6 +17,7 @@ isa_ok(
             app_id      => 'bar',
             app_secret  => 'baz',
             merchant_id => 'boz',
+			api_version => 2,
         ),
     ),
     'Business::GoCardless::Payment'
@@ -69,7 +70,7 @@ ok( ! $Payment->submitted,'submitted' );
 ok( ! $Payment->confirmed,'confirmed' );
 
 $Payment->id( 123 );
-is( $Payment->uri,'https://gocardless.com/api/v1/payments/123','->uri' );
+is( $Payment->uri,'https://api.gocardless.com/payments/123','->uri' );
 
 done_testing();
 

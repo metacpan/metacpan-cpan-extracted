@@ -20,15 +20,16 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _sensOID {
-    return '1.3.6.1.4.1.9.9.91.1.1.1.1'
+    return '1.3.6.1.4.1.9.9.91.1.1.1.1';
 }
 
 sub sensOIDs {
-    return qw(Type Scale Precision Value Status ValueTimeStamp ValueUpdateRate EntityId)
+    return qw(Type Scale Precision Value Status ValueTimeStamp
+      ValueUpdateRate EntityId);
 }
 
 sub sensor_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
@@ -36,32 +37,39 @@ sub sensor_info {
     my %ret;
     my $OIDS;
     my @SENSKEYS = sensOIDs();
+
     # -1 because last key (EntityId) isn't an OID; rather, added
-    for my $oid (0..$#SENSKEYS-1) {
-        ($OIDS, $ret{$SENSKEYS[$oid]}) = Cisco::SNMP::_snmpwalk($session, _sensOID() . '.' . ($oid+1));
-        if (!defined $ret{$SENSKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get sensor `$SENSKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#SENSKEYS - 1 ) {
+        ( $OIDS, $ret{$SENSKEYS[$oid]} )
+          = Cisco::SNMP::_snmpwalk( $session,
+            _sensOID() . '.' . ( $oid + 1 ) );
+        if ( not defined $ret{$SENSKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get sensor `$SENSKEYS[$oid]' info";
+            return undef;
         }
     }
+
     # need to record entity index
-    for (@{$OIDS}) {
+    for ( @{$OIDS} ) {
+
         # split the OID at dots
         my @entId = split /\./, $_;
+
         # take the last value, which is the entity Index equal to value returned
-        push @{$ret{$SENSKEYS[$#SENSKEYS]}}, $entId[$#entId]
+        push @{$ret{$SENSKEYS[$#SENSKEYS]}}, $entId[$#entId];
     }
 
     my %SensType = (
-        1 =>  'other',
-        2 =>  'unknown',
-        3 =>  'voltsAC',
-        4 =>  'voltsDC',
-        5 =>  'amperes',
-        6 =>  'watts',
-        7 =>  'hertz',
-        8 =>  'celsius',
-        9 =>  'percentRH',
+        1  => 'other',
+        2  => 'unknown',
+        3  => 'voltsAC',
+        4  => 'voltsDC',
+        5  => 'amperes',
+        6  => 'watts',
+        7  => 'hertz',
+        8  => 'celsius',
+        9  => 'percentRH',
         10 => 'rpm',
         11 => 'cmm',
         12 => 'truthvalue',
@@ -69,15 +77,15 @@ sub sensor_info {
         14 => 'dBm'
     );
     my %SensScale = (
-        1 => 'yocto',
-        2 => 'zepto',
-        3 => 'atto',
-        4 => 'femto',
-        5 => 'pico',
-        6 => 'nano',
-        7 => 'micro',
-        8 => 'milli',
-        9 => 'units',
+        1  => 'yocto',
+        2  => 'zepto',
+        3  => 'atto',
+        4  => 'femto',
+        5  => 'pico',
+        6  => 'nano',
+        7  => 'micro',
+        8  => 'milli',
+        9  => 'units',
         10 => 'kilo',
         11 => 'mega',
         12 => 'giga',
@@ -93,44 +101,54 @@ sub sensor_info {
         3 => 'nonoperational'
     );
     my %SensInfo;
-    for my $sens (0..$#{$ret{$SENSKEYS[0]}}) {
+    for my $sens ( 0 .. $#{$ret{$SENSKEYS[0]}} ) {
         my %SensInfoHash;
-        for (0..$#SENSKEYS) {
-            if ($_ == 0) {
-                $SensInfoHash{$SENSKEYS[$_]} =  exists($SensType{$ret{$SENSKEYS[$_]}->[$sens]}) ? $SensType{$ret{$SENSKEYS[$_]}->[$sens]} : $ret{$SENSKEYS[$_]}->[$sens]
-            } elsif ($_ == 1) {
-                $SensInfoHash{$SENSKEYS[$_]} =  exists($SensScale{$ret{$SENSKEYS[$_]}->[$sens]}) ? $SensScale{$ret{$SENSKEYS[$_]}->[$sens]} : $ret{$SENSKEYS[$_]}->[$sens]
-            } elsif ($_ == 4) {
-                $SensInfoHash{$SENSKEYS[$_]} =  exists($SensStatus{$ret{$SENSKEYS[$_]}->[$sens]}) ? $SensStatus{$ret{$SENSKEYS[$_]}->[$sens]} : $ret{$SENSKEYS[$_]}->[$sens]
+        for ( 0 .. $#SENSKEYS ) {
+            if ( $_ == 0 ) {
+                $SensInfoHash{$SENSKEYS[$_]}
+                  = exists( $SensType{$ret{$SENSKEYS[$_]}->[$sens]} )
+                  ? $SensType{$ret{$SENSKEYS[$_]}->[$sens]}
+                  : $ret{$SENSKEYS[$_]}->[$sens];
+            } elsif ( $_ == 1 ) {
+                $SensInfoHash{$SENSKEYS[$_]}
+                  = exists( $SensScale{$ret{$SENSKEYS[$_]}->[$sens]} )
+                  ? $SensScale{$ret{$SENSKEYS[$_]}->[$sens]}
+                  : $ret{$SENSKEYS[$_]}->[$sens];
+            } elsif ( $_ == 4 ) {
+                $SensInfoHash{$SENSKEYS[$_]}
+                  = exists( $SensStatus{$ret{$SENSKEYS[$_]}->[$sens]} )
+                  ? $SensStatus{$ret{$SENSKEYS[$_]}->[$sens]}
+                  : $ret{$SENSKEYS[$_]}->[$sens];
             } else {
-                $SensInfoHash{$SENSKEYS[$_]} =  $ret{$SENSKEYS[$_]}->[$sens]
+                $SensInfoHash{$SENSKEYS[$_]} = $ret{$SENSKEYS[$_]}->[$sens];
             }
         }
-        $SensInfo{$ret{$SENSKEYS[$#SENSKEYS]}->[$sens]} = \%SensInfoHash
+        $SensInfo{$ret{$SENSKEYS[$#SENSKEYS]}->[$sens]} = \%SensInfoHash;
     }
-    return bless \%SensInfo, $class
+    return bless \%SensInfo, $class;
 }
 
-for (sensOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_1('sens', $_)
+for ( sensOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_1( 'sens', $_ );
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = sensOIDs();
+
 # -1 because last key (EntityId) isn't an OID; rather, added
-for my $o (0..$#OIDS-1) {
+for my $o ( 0 .. $#OIDS - 1 ) {
     *{"get_sens" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_sensOID() . '.' . ($o+1) . '.' . $val]
-        );
-        return $r->{_sensOID() . '.' . ($o+1) . '.' . $val}
-    }
+            varbindlist => [_sensOID() . '.' . ( $o + 1 ) . '.' . $val] );
+        return $r->{_sensOID() . '.' . ( $o + 1 ) . '.' . $val};
+      }
 }
 
 ##################################################

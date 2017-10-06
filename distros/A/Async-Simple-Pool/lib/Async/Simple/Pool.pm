@@ -193,8 +193,9 @@ use Moose;
 use namespace::autoclean;
 use Class::Load;
 use Clone;
+use JSON::XS;
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 =head2 data
 
@@ -321,6 +322,26 @@ has task_params => (
 );
 
 
+=head2 logger
+
+Something that can write your logs
+It can be one of types: CodeRef, FileHandle, Str, Int
+
+In case of CodeRef, we will call it with one param = 'text to log'
+In case of FileHandle, we will try to write in it
+In case of Str, we try to interprete it as file_name and write into it
+Also you can pass 'stdout' or 'stderr' as string
+
+By default logger is undefined, so nobody writes nothing to nowhere
+
+=cut
+
+has logger => (
+    is       => 'rw',
+    isa      => 'CodeRef | FileHandle | Str',
+);
+
+
 
 # Tasks - ArrayRef of task objects
 has tasks => (
@@ -399,6 +420,9 @@ around BUILDARGS => sub {
 
     my %params = @params;
 
+    # Hack for earlier logginf
+    bless( Clone::clone( \%params ), $class )->log( 'INIT: Received params', \%params );
+
     my ( @new_keys, $keys );
 
     if ( $data ) {
@@ -424,6 +448,9 @@ around BUILDARGS => sub {
 
     my $i = 0;
 
+    # Hack for earlier logginf
+    bless( Clone::clone( \%params ), $class )->log( 'INIT: Parsed params', \%params );
+
     return $class->$orig( %params );
 };
 
@@ -439,15 +466,19 @@ sub BUILD {
 
     my $task_class = $self->task_class;
 
+    $self->log( 'BUILD: task class', $task_class );
+
     Class::Load::load_class( $task_class );
 
     my @bad_task_param_names = grep !$task_class->can($_), keys %{ $self->task_params // {} };
 
     if ( scalar @bad_task_param_names ) {
+        $self->log( 'BUILD: bad_task_param_names', \@bad_task_param_names );
         die 'Unknown params found: (' . join( ', ', @bad_task_param_names ) . ' )';
     };
 
     if ( scalar keys %{ $self->data } ) {
+        $self->log( 'BUILD', '$self->process called' );
         $self->process;
     }
 };
@@ -474,7 +505,11 @@ sub process {
     my ( $self, $new_data ) = @_;
 
     if ( $new_data ) {
+        $self->log( 'PROCESS: new data received', $new_data )  if $self->logger;
+
         my ( $data, $keys ) = _conv_data_to_internal( $self->data, $new_data );
+
+        $self->log( 'PROCESS: new data parsed', $data )  if $self->logger;
 
         $self->data( $data );
         push @{ $self->queue_keys }, @$keys;
@@ -485,21 +520,32 @@ sub process {
     my $break_on_run  = $self->break_on eq 'run';
 
     while( 1 ) {
+        $self->log( 'PROCESS', 'internal cycle unless exit condition' )  if $self->logger;
+
         $self->read_tasks()  if grep $_->has_id, @{ $self->tasks };
         $self->write_tasks();
 
-        last  if $break_on_busy;
+        if ( $break_on_busy ) {
+            $self->log( 'PROCESS', 'internal cycle exit: all threads are busy' )  if $self->logger;
+            last;
+        }
 
         # Has not started data
         next if scalar @{ $self->queue_keys };
 
-        last  if $break_on_run;
+        if ( $break_on_run ) {
+            $self->log( 'PROCESS', 'internal cycle exit: all tasks are started' )  if $self->logger;
+            last;
+        }
 
         # Has unprocessed data
         next if grep $_->has_id, @{ $self->tasks };
 
+        $self->log( 'PROCESS', 'internal cycle exit: all tasks done' )  if $self->logger;
         last;
     };
+
+    $self->log( 'PROCESS: finished', $self->results )  if $self->logger;
 
     return $self->results;
 };
@@ -560,7 +606,10 @@ sub make_tasks {
     my $task_class = $self->task_class;
 
     for( 1 .. $self->tasks_count ) {
-        push @tasks, $task_class->new( %{ $self->task_params } );
+        my $task = $task_class->new( %{ $self->task_params } );
+        push @tasks, $task;
+
+        $self->log( 'NEW THREAD ADDED', { ref $task => {%$task} } )  if $self->logger;
     };
 
     return \@tasks;
@@ -579,13 +628,20 @@ sub read_tasks {
 
     my @busy_tasks = grep $_->has_id, @{ $self->tasks }  or return;
 
+    $self->log( 'READ TASKS', { busy_tasks_found => scalar @busy_tasks } )  if $self->logger;
+
     my $data = $self->data;
 
     for my $task ( @busy_tasks ) {
         $task->clear_answer;
         $task->get();
 
-        next  unless $task->has_answer;
+        unless ( $task->has_answer ) {
+            $self->log( 'READ TASKS NO ANSWER', { id => $task->id } )  if $self->logger;
+            next;
+        };
+
+        $self->log( 'READ TASKS GOT ANSWER', { id => $task->id, answer => $task->answer } )  if $self->logger;
 
         $data->{ $task->id }->{result} = $task->answer;
         $task->clear_id;
@@ -605,6 +661,8 @@ sub write_tasks {
 
     my @free_tasks = grep !$_->has_id, @{ $self->tasks }  or return;
 
+    $self->log( 'WRITE TASKS', { free_tasks_found => scalar @free_tasks } )  if $self->logger;
+
     my $data = $self->data;
 
     for my $task ( @free_tasks ) {
@@ -612,6 +670,8 @@ sub write_tasks {
         my $pointer = shift @{ $self->queue_keys };
 
         return unless defined $pointer;
+
+        $self->log( 'WRITE TASKS: TASK ADDED', { id => $pointer, data => $data->{ $pointer }->{source} } )  if $self->logger;
 
         $task->id( $pointer );
 
@@ -655,5 +715,69 @@ sub _conv_data_to_internal {
     return { %$int_data, %new_data }, \@new_keys;
 };
 
+
+=head2 fmt_log_text
+
+Internal.
+Adding extra data to logging text
+yyyy-mm-dd hh:mm:ss	(Program)[pid]: $text
+
+=cut
+
+sub fmt_log_text {
+    my ( $self, $action, $text ) = @_;
+
+    unless ( defined $text ) {
+        $text   = $action;
+        $action = 'DEFAULT';
+    };
+
+    my ( $ss, $mi, $hh, $dd, $mm, $yyyy ) = localtime();
+    $yyyy += 1900;
+    my $date_time = sprintf '%04d-%02d-%02d %02d:%02d:%02d', $yyyy, $mm, $dd, $hh, $mi, $ss;
+
+    if ( ref $text ) {
+        $text = JSON::XS->new->allow_unknown->allow_blessed->encode( $text );
+    }
+
+    return sprintf "%s\t%s\t%s\t%s\t%s", $date_time, $$, $0, $action, $text;
+}
+
+
+=head2 log
+
+Internal.
+Writes pool log
+
+=cut
+
+sub log {
+    my ( $self, $action, $text ) = @_;
+
+    # No logger - no problems
+    my $logger = $self->logger or return;
+
+    my $log_text = $self->fmt_log_text( $action, $text );
+
+    if ( ref $logger eq 'CODE' ) {
+        $logger->( $log_text );
+    }
+    elsif ( ref $logger eq 'GLOB' ) {
+        die "logger file $logger not found" unless -f $logger;
+        die "logger file $logger not found" unless -w $logger;
+        say $logger $log_text;
+    }
+    elsif ( $logger =~ /^stdout$/ai ) {
+        say STDOUT $log_text;
+    }
+    elsif ( $logger =~ /^stderr$/ai ) {
+        say STDERR $log_text;
+    }
+    else {
+        open ( my $f, '>>', $logger ) or die 'can`t open log file ' . $logger;
+        $self->logger( $f );
+        $self->log( $text );
+    }
+};
 
 __PACKAGE__->meta->make_immutable;

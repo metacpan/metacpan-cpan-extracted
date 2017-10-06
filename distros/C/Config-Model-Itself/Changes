@@ -1,3 +1,17 @@
+2.012 2017-09-24
+
+  The release deals with the modifications done with backend
+  parameter done starting from Config::Model 2.109:
+    * read_config is deprecated for rw_config
+    * migrate old backend spec to new rw_config
+    * allow warn_if_match and similar for enum
+    * require Config::Model 2.111
+    * custom backend is deprecated
+
+  Other modification done for older deprecations:
+    * remove obsolete allow_empty parameter
+    * remove obsolete "syntax" backend parameter
+
 2.011 2017-06-10
 
   New features:

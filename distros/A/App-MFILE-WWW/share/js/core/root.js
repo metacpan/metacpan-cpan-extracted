@@ -44,6 +44,7 @@ define ([
     'current-user',
     'html', 
     'login-dialog',
+    'stack',
     'app/target-init',
     'target'
 ], function (
@@ -52,6 +53,7 @@ define ([
     currentUser,
     html, 
     loginDialog,
+    stack,
     targetInit,
     target
 ) {
@@ -59,20 +61,25 @@ define ([
     return function () {
 
         var dummy = Object.create(null),
-            userObject,
-            userPriv;
+            cu,
+            priv;
+
+        stack.resetStack();
 
         if ( cf('testing') ) {
             $('#qunit-fixture').append(html.body());
         } else {
             $(document.body).html(html.body());
         }
-    
-        userObject = currentUser('obj');
-        userPriv = currentUser('priv');
-        if ( userObject && userPriv ) {
+        cu = currentUser('obj');
+        console.log("root: current user object:", cu);
+        priv = currentUser('priv');
+        console.log("root: current user priv:", priv);
+        if ( cu.eid && priv ) {
+            console.log("Initializing targets");
             targetInit();
         } else {
+            console.log("Initiating login dialog");
             loginDialog();
         }
     

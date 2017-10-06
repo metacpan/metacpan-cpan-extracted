@@ -16,14 +16,16 @@ package Foo {
 
     extends 'Moxie::Object';
 
-    has 'bar';
+    has _bar => ();
 
-    sub init_bar ($self) { $self->{bar} = 200 }
-    sub bar      ($self) { $self->{bar} //= 333 }
+    sub BUILDARGS : init_args( bar? => _bar );
 
-    sub has_bar   : predicate;
-    sub set_bar   : wo;
-    sub clear_bar : clearer;
+    sub init_bar ($self) { _bar = 200 }
+    sub bar      ($self) { _bar //= 333 }
+
+    sub has_bar   : predicate(_bar);
+    sub set_bar   : wo(_bar);
+    sub clear_bar : clearer(_bar);
 }
 
 {

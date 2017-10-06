@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Open3;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use IPC::Open3 qw/open3/;
 use Test2::Harness::Util qw/open_file write_file local_env/;
@@ -38,8 +38,8 @@ sub command {
         (map { "-I$_" } @{$job->libs}, $class->find_inc),
         $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : (),
         @{$job->switches},
-        (map {"-m$_"} @{$job->load || []}),
         (map {"-M$_"} @{$job->load_import || []}),
+        (map {"-m$_"} @{$job->load || []}),
         $job->use_stream ? ("-MTest2::Formatter::Stream=file,$event_file") : (),
         $job->times ? ('-MTest2::Plugin::Times') : (),
         $class->command_file($test),

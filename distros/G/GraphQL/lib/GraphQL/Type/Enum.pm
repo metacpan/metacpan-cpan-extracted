@@ -4,8 +4,11 @@ use 5.014;
 use strict;
 use warnings;
 use Moo;
-use Types::Standard qw(Map Dict Optional Any Str);
-use GraphQL::Type::Library qw(StrNameValid);
+use Types::Standard -all;
+use GraphQL::Type::Library -all;
+use GraphQL::Debug qw(_debug);
+use Function::Parameters;
+use Return::Type;
 extends qw(GraphQL::Type);
 with qw(
   GraphQL::Role::Input
@@ -13,9 +16,12 @@ with qw(
   GraphQL::Role::Leaf
   GraphQL::Role::Nullable
   GraphQL::Role::Named
+  GraphQL::Role::FieldDeprecation
 );
 
 our $VERSION = '0.02';
+
+use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 =head1 NAME
 
@@ -48,7 +54,8 @@ the value. Integers are often useful.
 
 =item deprecation_reason
 
-Reason if deprecated.
+Reason if deprecated. If supplied, the hash for that value will also
+have a key C<is_deprecated> with a true value.
 
 =item description
 
@@ -70,6 +77,63 @@ has values => (
   ],
   required => 1,
 );
+
+=head1 METHODS
+
+=head2 is_valid
+
+True if given Perl entity is valid value for this type. Relies on unique
+stringification of the value.
+
+=cut
+
+has _name2value => (is => 'lazy', isa => Map[StrNameValid, Any]);
+sub _build__name2value {
+  my ($self) = @_;
+  my $v = $self->values;
+  +{ map { ($_ => $v->{$_}{value}) } keys %$v };
+}
+
+has _value2name => (is => 'lazy', isa => Map[Str, StrNameValid]);
+sub _build__value2name {
+  my ($self) = @_;
+  my $n2v = $self->_name2value;
+  DEBUG and _debug('_build__value2name', $self, $n2v);
+  +{ reverse %$n2v };
+}
+
+method is_valid(Any $item) :ReturnType(Bool) {
+  DEBUG and _debug('is_valid', $item, $item.'', $self->_value2name);
+  return 1 if !defined $item;
+  !!$self->_value2name->{$item};
+}
+
+method graphql_to_perl(Str $item) {
+  DEBUG and _debug('graphql_to_perl', $item, $self->_name2value);
+  return undef if !defined $item;
+  $self->_name2value->{$item} // die "Expected type '@{[$self->to_string]}', found $item.\n";
+}
+
+method perl_to_graphql(Any $item) {
+  DEBUG and _debug('graphql_to_perl', $item, $self->_value2name);
+  return undef if !defined $item;
+  $self->_value2name->{$item} // die "Expected a value of type '@{[$self->to_string]}' but received: @{[ref($item)||qq{'$item'}]}.\n";
+}
+
+=head2 BUILD
+
+Internal method.
+
+=cut
+
+sub BUILD {
+  my ($self, $args) = @_;
+  $self->_fields_deprecation_apply('values');
+  my $v = $self->values;
+  for my $name (keys %$v) {
+    $v->{$name}{value} = $name if !exists $v->{$name}{value}; # undef valid
+  }
+}
 
 __PACKAGE__->meta->make_immutable();
 

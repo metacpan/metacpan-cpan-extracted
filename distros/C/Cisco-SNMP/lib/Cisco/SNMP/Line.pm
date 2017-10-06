@@ -20,81 +20,93 @@ our @ISA = qw(Cisco::SNMP);
 ##################################################
 
 sub _trmsrvOID {
-    return '1.3.6.1.4.1.9.2.9'
+    return '1.3.6.1.4.1.9.2.9';
 }
 
 sub _lineOID {
-    return _trmsrvOID . '.2.1'
+    return _trmsrvOID . '.2.1';
 }
 
 sub lineOIDs {
-    return qw(Active Type Autobaud SpeedIn SpeedOut Flow Modem Location Term ScrLen ScrWid Esc Tmo Sestmo Rotary Uses Nses User Noise Number TimeActive)
+    return qw(Active Type Autobaud SpeedIn SpeedOut Flow Modem
+      Location Term ScrLen ScrWid Esc Tmo Sestmo Rotary Uses Nses
+      User Noise Number TimeActive);
 }
 
 sub _sessOID {
-    return _trmsrvOID . '.3.1'
+    return _trmsrvOID . '.3.1';
 }
 
 sub sessOIDs {
-    return qw(Type Direction Address Name Current Idle Line)
+    return qw(Type Direction Address Name Current Idle Line);
 }
 
 sub line_clear {
-    my $self  = shift;
+    my $self = shift;
 
     my $session = $self->{_SESSION_};
 
     my %params;
     my %args;
-    if (@_ == 1) {
-        ($params{lines}) = @_;
-        if (!defined($params{lines} = Cisco::SNMP::_get_range($params{lines}))) {
-            return undef
+    if ( @_ == 1 ) {
+        ( $params{lines} ) = @_;
+        if (not defined(
+                $params{lines} = Cisco::SNMP::_get_range( $params{lines} )
+            )
+          ) {
+            return undef;
         }
     } else {
         %args = @_;
-        for (keys(%args)) {
-            if ((/^-?range$/i) || (/^-?line(?:s)?$/i)) {
-                if (!defined($params{lines} = Cisco::SNMP::_get_range($args{$_}))) {
-                    return undef
+        for ( keys(%args) ) {
+            if ( (/^-?range$/i) || (/^-?line(?:s)?$/i) ) {
+                if (not defined(
+                        $params{lines} = Cisco::SNMP::_get_range( $args{$_} )
+                    )
+                  ) {
+                    return undef;
                 }
             }
         }
     }
 
-    if (!defined $params{lines}) {
-        $params{lines} = Cisco::SNMP::_snmpwalk($session, _lineOID() . '.20');
-        if (!defined $params{lines}) {
+    if ( not defined $params{lines} ) {
+        $params{lines}
+          = Cisco::SNMP::_snmpwalk( $session, _lineOID() . '.20' );
+        if ( not defined $params{lines} ) {
             $Cisco::SNMP::LASTERROR = "Cannot get lines to clear";
-            return undef
+            return undef;
         }
     }
 
     my @lines;
-    for (@{$params{lines}}) {
-        if (defined $session->set_request(_trmsrvOID . '.10.0', INTEGER, $_)) {
-            push @lines, $_
+    for ( @{$params{lines}} ) {
+        if (defined $session->set_request( _trmsrvOID . '.10.0', INTEGER, $_ )
+          ) {
+            push @lines, $_;
         } else {
             $Cisco::SNMP::LASTERROR = "Failed to clear line $_";
-            return undef
+            return undef;
         }
     }
-    return \@lines
+    return \@lines;
 }
 
 sub line_info {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @LINEKEYS = lineOIDs();
-    for my $oid (0..$#LINEKEYS) {
-        $ret{$LINEKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _lineOID() . '.' . ($oid+1));
-        if (!defined $ret{$LINEKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get line `$LINEKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#LINEKEYS ) {
+        $ret{$LINEKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _lineOID() . '.' . ( $oid + 1 ) );
+        if ( not defined $ret{$LINEKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get line `$LINEKEYS[$oid]' info";
+            return undef;
         }
     }
 
@@ -123,54 +135,65 @@ sub line_info {
         8 => 'hw-both'
     );
     my %LineInfo;
-    for my $lines (0..$#{$ret{$LINEKEYS[19]}}) {
+    for my $lines ( 0 .. $#{$ret{$LINEKEYS[19]}} ) {
         my %LineInfoHash;
-        for (0..$#LINEKEYS) {
-            if ($_ == 1) {
-                $LineInfoHash{$LINEKEYS[$_]} = exists $LineTypes{$ret{$LINEKEYS[$_]}->[$lines]} ? $LineTypes{$ret{$LINEKEYS[$_]}->[$lines]} : $ret{$LINEKEYS[$_]}->[$lines]
-            } elsif ($_ == 5) {
-                $LineInfoHash{$LINEKEYS[$_]} = exists $LineFlow{$ret{$LINEKEYS[$_]}->[$lines]} ? $LineFlow{$ret{$LINEKEYS[$_]}->[$lines]} : $ret{$LINEKEYS[$_]}->[$lines]
-            } elsif ($_ == 6) {
-                $LineInfoHash{$LINEKEYS[$_]} = exists $LineModem{$ret{$LINEKEYS[$_]}->[$lines]} ? $LineModem{$ret{$LINEKEYS[$_]}->[$lines]} : $ret{$LINEKEYS[$_]}->[$lines]
+        for ( 0 .. $#LINEKEYS ) {
+            if ( $_ == 1 ) {
+                $LineInfoHash{$LINEKEYS[$_]}
+                  = exists $LineTypes{$ret{$LINEKEYS[$_]}->[$lines]}
+                  ? $LineTypes{$ret{$LINEKEYS[$_]}->[$lines]}
+                  : $ret{$LINEKEYS[$_]}->[$lines];
+            } elsif ( $_ == 5 ) {
+                $LineInfoHash{$LINEKEYS[$_]}
+                  = exists $LineFlow{$ret{$LINEKEYS[$_]}->[$lines]}
+                  ? $LineFlow{$ret{$LINEKEYS[$_]}->[$lines]}
+                  : $ret{$LINEKEYS[$_]}->[$lines];
+            } elsif ( $_ == 6 ) {
+                $LineInfoHash{$LINEKEYS[$_]}
+                  = exists $LineModem{$ret{$LINEKEYS[$_]}->[$lines]}
+                  ? $LineModem{$ret{$LINEKEYS[$_]}->[$lines]}
+                  : $ret{$LINEKEYS[$_]}->[$lines];
             } else {
-                $LineInfoHash{$LINEKEYS[$_]} = $ret{$LINEKEYS[$_]}->[$lines]
+                $LineInfoHash{$LINEKEYS[$_]} = $ret{$LINEKEYS[$_]}->[$lines];
             }
         }
-        $LineInfo{$ret{$LINEKEYS[19]}->[$lines]} = \%LineInfoHash
+        $LineInfo{$ret{$LINEKEYS[19]}->[$lines]} = \%LineInfoHash;
     }
-    return bless \%LineInfo, $class
+    return bless \%LineInfo, $class;
 }
 
-for (lineOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_1('line', $_)
+for ( lineOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_1( 'line', $_ );
 }
 
 sub line_sessions {
-    my $self  = shift;
+    my $self = shift;
     my $class = ref($self) || $self;
 
     my $session = $self->{_SESSION_};
 
     my %ret;
     my @SESSIONKEYS = sessOIDs();
-    for my $oid (0..$#SESSIONKEYS) {
-        $ret{$SESSIONKEYS[$oid]} = Cisco::SNMP::_snmpwalk($session, _sessOID() . '.' . ($oid+1));
-        if (!defined $ret{$SESSIONKEYS[$oid]}) {
-            $Cisco::SNMP::LASTERROR = "Cannot get session `$SESSIONKEYS[$oid]' info";
-            return undef
+    for my $oid ( 0 .. $#SESSIONKEYS ) {
+        $ret{$SESSIONKEYS[$oid]} = Cisco::SNMP::_snmpwalk( $session,
+            _sessOID() . '.' . ( $oid + 1 ) );
+        if ( not defined $ret{$SESSIONKEYS[$oid]} ) {
+            $Cisco::SNMP::LASTERROR
+              = "Cannot get session `$SESSIONKEYS[$oid]' info";
+            return undef;
         }
     }
 
     my %SessionTypes = (
-        1 => 'unknown',
-        2 => 'PAD',
-        3 => 'stream',
-        4 => 'rlogin',
-        5 => 'telnet',
-        6 => 'TCP',
-        7 => 'LAT',
-        8 => 'MOP',
-        9 => 'SLIP',
+        1  => 'unknown',
+        2  => 'PAD',
+        3  => 'stream',
+        4  => 'rlogin',
+        5  => 'telnet',
+        6  => 'TCP',
+        7  => 'LAT',
+        8  => 'MOP',
+        9  => 'SLIP',
         10 => 'XRemote',
         11 => 'rshell'
     );
@@ -180,24 +203,32 @@ sub line_sessions {
         3 => 'OUT'
     );
     my %SessionInfo;
-    for my $sess (0..$#{$ret{$SESSIONKEYS[6]}}) {
+    for my $sess ( 0 .. $#{$ret{$SESSIONKEYS[6]}} ) {
         my %SessionInfoHash;
-        for (0..$#SESSIONKEYS) {
-            if ($_ == 0) {
-                $SessionInfoHash{$SESSIONKEYS[$_]} = exists($SessionTypes{$ret{$SESSIONKEYS[$_]}->[$sess]}) ? $SessionTypes{$ret{$SESSIONKEYS[$_]}->[$sess]} : $ret{$SESSIONKEYS[$_]}->[$sess]
-            } elsif ($_ == 1) {
-                $SessionInfoHash{$SESSIONKEYS[$_]} = exists($SessionDir{$ret{$SESSIONKEYS[$_]}->[$sess]}) ? $SessionDir{$ret{$SESSIONKEYS[$_]}->[$sess]} : $ret{$SESSIONKEYS[$_]}->[$sess]
+        for ( 0 .. $#SESSIONKEYS ) {
+            if ( $_ == 0 ) {
+                $SessionInfoHash{$SESSIONKEYS[$_]}
+                  = exists( $SessionTypes{$ret{$SESSIONKEYS[$_]}->[$sess]} )
+                  ? $SessionTypes{$ret{$SESSIONKEYS[$_]}->[$sess]}
+                  : $ret{$SESSIONKEYS[$_]}->[$sess];
+            } elsif ( $_ == 1 ) {
+                $SessionInfoHash{$SESSIONKEYS[$_]}
+                  = exists( $SessionDir{$ret{$SESSIONKEYS[$_]}->[$sess]} )
+                  ? $SessionDir{$ret{$SESSIONKEYS[$_]}->[$sess]}
+                  : $ret{$SESSIONKEYS[$_]}->[$sess];
             } else {
-                $SessionInfoHash{$SESSIONKEYS[$_]} = $ret{$SESSIONKEYS[$_]}->[$sess]
+                $SessionInfoHash{$SESSIONKEYS[$_]}
+                  = $ret{$SESSIONKEYS[$_]}->[$sess];
             }
         }
-        push @{$SessionInfo{$ret{$SESSIONKEYS[6]}->[$sess]}}, \%SessionInfoHash
+        push @{$SessionInfo{$ret{$SESSIONKEYS[6]}->[$sess]}},
+          \%SessionInfoHash;
     }
-    return bless \%SessionInfo, $class
+    return bless \%SessionInfo, $class;
 }
 
-for (sessOIDs()) {
-    Cisco::SNMP::_mk_accessors_hash_2('line', 'sess', $_)
+for ( sessOIDs() ) {
+    Cisco::SNMP::_mk_accessors_hash_2( 'line', 'sess', $_ );
 }
 
 sub line_message {
@@ -211,16 +242,19 @@ sub line_message {
     );
 
     my %args;
-    if (@_ == 1) {
-        ($params{message}) = @_
+    if ( @_ == 1 ) {
+        ( $params{message} ) = @_;
     } else {
         %args = @_;
-        for (keys(%args)) {
+        for ( keys(%args) ) {
             if (/^-?message$/i) {
-                $params{message} = $args{$_}
+                $params{message} = $args{$_};
             } elsif (/^-?line(?:s)?$/i) {
-                if (!defined($params{lines} = Cisco::SNMP::_get_range($args{$_}))) {
-                    return undef
+                if (not defined(
+                        $params{lines} = Cisco::SNMP::_get_range( $args{$_} )
+                    )
+                  ) {
+                    return undef;
                 }
             }
         }
@@ -228,30 +262,43 @@ sub line_message {
 
     my $response;
     my @lines;
-    for (@{$params{lines}}) {
-          # Lines
-        my $response = $session->set_request(_trmsrvOID() . '.4.0', INTEGER, $_);
-          # Interval (reissue)
-        $response = $session->set_request(_trmsrvOID() . '.5.0', INTEGER, 0);
-          # Duration
-        $response = $session->set_request(_trmsrvOID() . '.6.0', INTEGER, 0);
-          # Text (256 chars)
-        $response = $session->set_request(_trmsrvOID() . '.7.0', OCTET_STRING, $params{message});
-          # Temp Banner (1=no 2=append)
-        $response = $session->set_request(_trmsrvOID() . '.8.0', INTEGER, 1);
-          # Send
-        $response = $session->set_request(_trmsrvOID() . '.9.0', INTEGER, 1);
-        if (defined $response) {
-            push @lines, $_
+    for ( @{$params{lines}} ) {
+
+        # Lines
+        my $response
+          = $session->set_request( _trmsrvOID() . '.4.0', INTEGER, $_ );
+
+        # Interval (reissue)
+        $response
+          = $session->set_request( _trmsrvOID() . '.5.0', INTEGER, 0 );
+
+        # Duration
+        $response
+          = $session->set_request( _trmsrvOID() . '.6.0', INTEGER, 0 );
+
+        # Text (256 chars)
+        $response = $session->set_request( _trmsrvOID() . '.7.0',
+            OCTET_STRING, $params{message} );
+
+        # Temp Banner (1=no 2=append)
+        $response
+          = $session->set_request( _trmsrvOID() . '.8.0', INTEGER, 1 );
+
+        # Send
+        $response
+          = $session->set_request( _trmsrvOID() . '.9.0', INTEGER, 1 );
+        if ( defined $response ) {
+            push @lines, $_;
         } else {
             $Cisco::SNMP::LASTERROR = "Failed to send message to line $_";
-            return undef
+            return undef;
         }
     }
+
     # clear message
-    $session->set_request(_trmsrvOID() . '.7.0', OCTET_STRING, "");
-    if ($lines[0] == -1) { $lines[0] = "ALL" }
-    return \@lines
+    $session->set_request( _trmsrvOID() . '.7.0', OCTET_STRING, "" );
+    if ( $lines[0] == -1 ) { $lines[0] = "ALL" }
+    return \@lines;
 }
 
 sub line_numberof {
@@ -260,45 +307,48 @@ sub line_numberof {
     my $session = $self->{_SESSION_};
 
     my $response;
-    if (!defined($response = $session->get_request( -varbindlist => [_trmsrvOID . '.1.0'] ))) {
+    if (not defined(
+            $response
+              = $session->get_request( -varbindlist => [_trmsrvOID . '.1.0'] )
+        )
+      ) {
         $Cisco::SNMP::LASTERROR = "Cannot get number of lines";
-        return undef
+        return undef;
     } else {
-        return $response->{_trmsrvOID() . '.1.0'}
+        return $response->{_trmsrvOID() . '.1.0'};
     }
 }
 
 no strict 'refs';
+
 # get_ direct
 my @OIDS = lineOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_line" . $OIDS[$o]} = sub {
-        my $self  = shift;
+        my $self = shift;
         my ($val) = @_;
 
-        if (!defined $val) { $val = 0 }
+        if ( not defined $val ) { $val = 0 }
         my $s = $self->session;
         my $r = $s->get_request(
-            varbindlist => [_lineOID() . '.' . ($o+1) . '.' . $val]
-        );
-        return $r->{_lineOID() . '.' . ($o+1) . '.' . $val}
-    }
+            varbindlist => [_lineOID() . '.' . ( $o + 1 ) . '.' . $val] );
+        return $r->{_lineOID() . '.' . ( $o + 1 ) . '.' . $val};
+      }
 }
 
 @OIDS = sessOIDs();
-for my $o (0..$#OIDS) {
+for my $o ( 0 .. $#OIDS ) {
     *{"get_sess" . $OIDS[$o]} = sub {
-        my $self  = shift;
-        my ($val1, $val2) = @_;
+        my $self = shift;
+        my ( $val1, $val2 ) = @_;
 
-        if (!defined $val1) { $val1 = 0 }
-        if (!defined $val2) { $val2 = 0 }
+        if ( not defined $val1 ) { $val1 = 0 }
+        if ( not defined $val2 ) { $val2 = 0 }
         my $s = $self->session;
-        my $r = $s->get_request(
-            varbindlist => [_sessOID() . '.' . ($o+1) . '.' . "$val1.$val2"]
-        );
-        return $r->{_sessOID() . '.' . ($o+1) . '.' . "$val1.$val2"}
-    }
+        my $r = $s->get_request( varbindlist =>
+              [_sessOID() . '.' . ( $o + 1 ) . '.' . "$val1.$val2"] );
+        return $r->{_sessOID() . '.' . ( $o + 1 ) . '.' . "$val1.$val2"};
+      }
 }
 
 ##################################################

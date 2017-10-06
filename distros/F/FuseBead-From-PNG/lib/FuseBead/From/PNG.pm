@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    $FuseBead::From::PNG::VERSION = '0.02';
+    $FuseBead::From::PNG::VERSION = '0.03';
 }
 
 use Image::PNG::Libpng qw(:all);
@@ -430,10 +430,13 @@ sub _plan_info {
 
     for my $type (qw/metric imperial/) {
         $info{$type} = {
-            length => $self->bead_row_length * $self->bead_dimensions->{$type}->{'bead_diameter'},
-            height => $self->bead_col_height * $self->bead_dimensions->{$type}->{'bead_diameter'},
+            length        => $self->bead_row_length * $self->bead_dimensions->{$type}->{'bead_diameter'},
+            height        => $self->bead_col_height * $self->bead_dimensions->{$type}->{'bead_diameter'},
         };
     }
+
+    $info{'rows'} = $self->bead_row_length;
+    $info{'cols'} = $self->bead_col_height;
 
     return \%info;
 }

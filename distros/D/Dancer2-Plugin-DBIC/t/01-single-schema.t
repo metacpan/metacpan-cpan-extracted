@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 
 use Dancer2;
@@ -13,6 +13,8 @@ eval { require DBD::SQLite };
 plan skip_all => 'DBD::SQLite required to run these tests' if $@;
 
 my (undef, $dbfile) = tempfile(SUFFIX => '.db');
+
+my (undef, $dbfile2) = tempfile(SUFFIX => '.db');
 
 set plugins => {
     DBIC => {
@@ -38,6 +40,24 @@ subtest 'schema' => sub {
     is $user->age => '2', 'Found Bob via explicit schema name.';
 };
 
+subtest 'schema with special config' => sub {
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile2");
+    ok $dbh->do(q{
+        create table user (name varchar(100) primary key, age int)
+    }), 'Created another sqlite test db.';
+
+    my @schema_args = (
+        'foo',
+        {
+            'schema_class' => 'Foo',
+            'dsn'          => "dbi:SQLite:dbname=$dbfile2",
+        },
+    );
+
+    my $user = schema(@schema_args)->resultset('User')->find('bob');
+    is( $user, undef, 'Could not find user yet.');
+};
+
 subtest 'resultset' => sub {
     my $user = resultset('User')->find('bob');
     is $user->age => '2', 'Found Bob via resultset.';
@@ -51,3 +71,4 @@ subtest 'invalid schema name' => sub {
 };
 
 unlink $dbfile;
+unlink $dbfile2;

@@ -1,5 +1,14 @@
 Revision history for Perl extension dwarf
 
+1.60 2017-10-05T08:07:27Z
+
+    - reimpl proctitle as plugin
+    - support docker
+    - allow json canonical
+    - fix run.cgi env sourcing
+    - use local path on generate.pl
+    - impl validate_json_body method on APIBase
+
 1.50 2017-06-21T07:04:49Z
 
     - nuke crlf

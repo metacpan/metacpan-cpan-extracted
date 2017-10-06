@@ -50,19 +50,19 @@ sub get_handler {
 
   # TODO should this be in the renderer?
   if($handler->model_class->can('on_component_add')) {
-  my %attrs = ( 
-    $handler->renderer_class
-      ->process_attrs(
-          $handler->model_class,
-          $args->{dom}, # DOM of containing template
-          %{$component_info{attrs}}),
-    content=>$args->{dom}->content,
-    #  model=>$self->model
-  );
+    my $dom_content = $args->{dom}->at("[uuid='$component_info{key}']");
+    my %attrs = ( 
+      $handler->renderer_class
+        ->process_attrs(
+            $handler->model_class,
+            $args->{dom}, # DOM of containing template
+            %{$component_info{attrs}}),
+        content=>$dom_content->content,
+      #  model=>$self->model
+    );
     my $renderer = $handler->create(%attrs);
     $renderer->model->on_component_add($renderer->dom, $args->{dom});
-
-    $args->{dom}->at("[uuid='$component_info{key}']")->replace($renderer->dom);
+    $dom_content->replace($renderer->dom);
   }
 
   return $handler;
@@ -208,7 +208,9 @@ sub setup_css_match_handler {
   } else {
     if(my $content = $css=~s/\:content$//) { # hack to CSS to allow match on content
       return sub { my ($view, $dom) = @_; $dom->at($css)->content };
-    } else {
+    } elsif(my $nodes = $css=~s/\:nodes$//) {
+      return sub { my ($view, $dom) = @_; $dom->at($css)->descendant_nodes };      
+    }else {
       return sub { my ($view, $dom) = @_; $dom->at($css) };
     }
   }

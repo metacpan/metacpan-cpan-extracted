@@ -1,5 +1,15 @@
 Revision history for Devel-MAT
 
+0.27    2017-09-29 19:09:11
+        [CHANGES]
+         * Major reworking of the way command-providing Tools work, and supply
+           output to their containing user interface.
+         * Elide symbol table entries in 'identify' output
+         * Don't accept __ANON__ symbol names as valid roots for inrefs graph
+         * Added command tools for listing the root SVs and the symbol table
+         * General improvements to output format and commandline structure of
+           other tools
+
 0.26    2017/05/09 19:14:57
         [BUGFIXES]
          * Handle perl 5.25.6's moving of OP_PUSHRE to OP_SPLIT

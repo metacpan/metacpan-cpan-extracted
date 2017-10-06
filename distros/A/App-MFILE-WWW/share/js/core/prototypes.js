@@ -50,8 +50,6 @@ define(function () {
         // prototype for users ("employees" in App::Dochazka::WWW)
         user: {
             nick: '',
-            passhash: '',
-            salt: ''
         }
 
     };

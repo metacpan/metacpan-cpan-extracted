@@ -1,5 +1,11 @@
 Revision history for Perl extension Dist::Zilla::Plugin::Test::Map::Tube.
 
+0.21  Tue Oct 03 11:15:00 2017
+      - Opps missed updating Changes file.
+
+0.20  Tue Oct 03 11:10:00 2017
+      - Updated test generator with regard to Test::Map::Tube v0.33.
+
 0.19  Mon Aug 21 12:00:00 2017
       - Updated test generator with regard to Test::Map::Tube v0.32.
 

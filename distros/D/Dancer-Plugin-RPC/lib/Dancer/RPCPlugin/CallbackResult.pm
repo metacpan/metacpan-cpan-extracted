@@ -3,10 +3,11 @@ use v5.10.1;
 use warnings;
 use strict;
 
-use Params::Validate ':all';
-
 use Exporter 'import';
 our @EXPORT = qw/ callback_success callback_fail /;
+
+use Types::Standard qw/ Int Str /;
+use Params::ValidationCompiler qw/ validation_for /;
 
 =head1 NAME
 
@@ -43,7 +44,7 @@ Returns an instantiated L<Dancer::RPCPlugin::CallbackResult::Success> object.
 =cut
 
 sub callback_success {
-    validate_with(params => \@_, spec => {}, allow_extra => 0); # no args!
+    die "callback_success() does not have arguments\n" if @_ > 1;
     return Dancer::RPCPlugin::CallbackResult::Success->new();
 }
 
@@ -64,14 +65,12 @@ Returns an instantiated L<Dancer::RPCPlugin::CallbackResult::Fail> object.
 =cut
 
 sub callback_fail {
-    my %data = validate_with(
-        params => \@_,
-        spec   => {
-            error_code    => {regex => qr/^[+-]?\d+$/, optional => 0},
-            error_message => {optional => 0},
-        },
-        allow_extra => 0,
-    );
+    my %data = validation_for(
+        params => {
+            error_code    => { optional => 0, type => Int },
+            error_message => { optional => 0, type => Str },
+        }
+    )->(@_);
     return Dancer::RPCPlugin::CallbackResult::Fail->new(%data);
 }
 
@@ -97,10 +96,10 @@ Constructor, does not allow any arguments.
 package Dancer::RPCPlugin::CallbackResult::Success;
 our @ISA = ('Dancer::RPCPlugin::CallbackResult');
 use overload '""' => sub { "success" };
-use Params::Validate ':all';
+
 sub new {
     my $class = shift;
-    validate_with(params => \@_, spec => {}, allow_extra => 0); # no args!
+    die "No arguments allowed\n" if @_;
     return bless {success => 1}, $class;
 }
 
@@ -125,17 +124,17 @@ Constructor, allows named arguments:
 package Dancer::RPCPlugin::CallbackResult::Fail;
 our @ISA = ('Dancer::RPCPlugin::CallbackResult');
 use overload '""' => sub { "fail ($_[0]->{error_code} => $_[0]->{error_message})" };
-use Params::Validate ':all';
+use Types::Standard qw/ Int Str /;
+use Params::ValidationCompiler 'validation_for';
+
 sub new {
     my $class = shift;
-    my %data = validate_with(
-        params => \@_,
-        spec   => {
-            error_code    => {regex => qr/^[+-]?\d+$/, optional => 0},
-            error_message => {optional => 0},
+    my %data = validation_for(
+        params => {
+            error_code    => {type => Int, optional => 0},
+            error_message => {type => Str, optional => 0},
         },
-        allow_extra => 0,
-    );
+    )->(@_);
     return bless {success => 0, %data}, $class;
 }
 

@@ -8,7 +8,7 @@ use Moose::Util::TypeConstraints qw(enum subtype where);
 use List::Util qw(uniq any first);
 use namespace::autoclean;
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -53,6 +53,13 @@ has debug => (
     default => sub { $ENV{DZIL_AUTHOR_DEBUG} // $_[0]->payload->{debug} // 0 },
 );
 
+has upload_to => (
+    is => 'ro', isa => enum([qw(cpan pause stratopan local)]),
+    init_arg => undef,
+    lazy => 1,
+    default => sub { $_[0]->payload->{upload_to} // 'cpan' },
+);
+
 around copy_files_from_release => sub {
     my $orig = shift; my $self = shift;
     sort(uniq(
@@ -95,6 +102,7 @@ my @network_plugins = qw(
     CheckPrereqsIndexed
     CheckIssues
     UploadToCPAN
+    UploadToStratopan
     Git::Push
 );
 my %network_plugins;
@@ -111,9 +119,28 @@ sub commit_files_after_release {
 
 my %removed;
 
+sub release_option {
+    my $self = shift;
+    if ($self->fake_release) {
+        _warn_me("Fake release has been set");
+        return 'FakeRelease';
+    }
+    if ($self->upload_to eq 'stratopan') {
+        _warn_me("Stratopan release has been set");
+        my $prefix = 'stratopan';
+        return [
+            'UploadToStratopan' => {
+                repo    => $self->payload->{"$prefix.repo"},
+                stack   => $self->payload->{"$prefix.stack"},
+                recurse => $self->payload->{"$prefix.recurse"},
+            }
+        ],
+    }
+    return 'UploadToCPAN';
+}
+
 sub configure {
     my $self = shift;
-
 
     if ($self->debug) {
         use Data::Dumper;
@@ -147,20 +174,20 @@ sub configure {
 
         [ 'License' => { filename => $self->license } ],
 
-        qw(Readme ExtraTests ExecDir ShareDir MakeMaker Manifest
+        qw(Readme ExecDir ShareDir MakeMaker Manifest
            TestRelease PodWeaver),
 
         [ 'AutoPrereqs' => { skip => [qw(^perl$ ^namespace::autoclean$)]}],
         [ 'Prereqs::AuthorDeps' => { ':version' => '0.006' } ],
         [ 'MinimumPerl'         => { ':version' => '1.006', configure_finder => ':NoFiles' } ],
         ['CPANFile'],
+        #['Test::CPAN::Changes'],
         ['Repository'],
         ['ConfirmRelease'],
 
 #        [ 'PrereqsClean'],
 
-        $self->fake_release ? do { _warn_me('FAKE_RELEASE set - not uploading to CPAN'); 'FakeRelease' }
-           : 'UploadToCPAN',
+        $self->release_option,
 
         # Perhaps do copy files from build first?
         # [ 'CopyFilesFromBuild' => { filename => [ $self->copy_files_from_release ] } ],
@@ -209,6 +236,7 @@ sub configure {
         'NextRelease.time_zone' => 'UTC',
         'NextRelease.format' => '%-' . ($self->changes_version_columns - 2) . 'v  %{yyyy-MM-dd HH:mm:ss\'Z\'}d%{ (TRIAL RELEASE)}T',
     });
+    $self->add_bundle('@TestingMania');
     $self->add_plugins(@plugins);
 
 }
@@ -227,7 +255,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,8 @@ The following functions are exportable:
         Ai Ei Li Li2 LambertW BesselJ BesselY lgrt
         pow sqrt cbrt root exp exp2 exp10 ln log
         log2 log10 mod abs erf erfc sqr norm hypot
-        agm bernreal harmreal
+        agm bernreal harmreal polygonal_root
+        polygonal_root2
 
     :ntheory
         factorial dfactorial mfactorial primorial
@@ -98,7 +99,9 @@ The following functions are exportable:
         iadd isub imul idiv imod ipow ipow2 ipow10
         iroot isqrt icbrt ilog ilog2 ilog10 invmod
         powmod isqrtrem irootrem is_power is_square
-        is_prime is_coprime next_prime rising_factorial
+        is_prime is_coprime next_prime is_polygonal
+        is_polygonal2 faulhaber_sum ipolygonal_root
+        ipolygonal_root2 polygonal rising_factorial
         falling_factorial
 
     :misc
@@ -108,7 +111,7 @@ The following functions are exportable:
         as_oct as_int as_dec as_frac is_pos is_neg is_int
         is_rat is_real is_imag is_complex is_inf is_ninf
         is_nan is_zero is_one is_mone is_even is_odd is_div
-        rat_approx
+        rat_approx acmp
 
 Each function can be exported individually, as:
 
@@ -510,6 +513,27 @@ Cube root of C<x>. Returns a complex number when C<x> is negative.
 
 The C<y> root of C<x>. Equivalent with C<x**(1/y)>.
 
+=head2 polygonal_root
+
+    polygonal_root(n, k)                          #=> Any
+
+Returns the k-gonal root of C<n>. Also defined for complex numbers.
+
+Example:
+
+    say polygonal_root($n, 3);      # triangular root
+    say polygonal_root($n, 5);      # pentagonal root
+
+=head2 polygonal_root2
+
+    polygonal_root2(n, k)                   #=> Any
+
+Returns the second k-gonal root of C<n>. Also defined for complex numbers.
+
+Example:
+
+    say polygonal_root2($n, 5);      # second pentagonal root
+
 =head2 pow
 
     x ** y                                        #=> Any
@@ -534,13 +558,13 @@ Natural exponentiation of C<x> (i.e.: C<e**x>).
 
     exp2(x)                                       #=> Any
 
-Raises 2 to the power of C<x>. (i.e.: C<2**x>)
+Raises 2 to the power C<x>. (i.e.: C<2**x>)
 
 =head2 exp10
 
     exp10(x)                                      #=> Any
 
-Raises 10 to the power of C<x>. (i.e.: C<10**x>)
+Raises 10 to the power C<x>. (i.e.: C<10**x>)
 
 =head2 ln / log
 
@@ -969,6 +993,18 @@ In general, the following statement holds true:
 
 Returns the Kronecker symbol I<(n|m)>, which is a generalization of the Jacobi symbol for all integers I<m>.
 
+=head2 faulhaber_sum
+
+    faulhaber_sum(n, p)                           #=> Int | NaN
+
+Computes the sum C<1**p + 2**p + 3**p +...+ n**p>, using Faulhaber's formula.
+
+C<n> and C<p> must be non-negative integers. Returns NaN otherwise.
+
+Example:
+
+    faulhaber_sum(5, 8) = 1**8 + 2**8 + 3**8 + 4**8 + 5**8
+
 =head2 lucas
 
     lucas(n)                                      #=> Int | NaN
@@ -1111,6 +1147,66 @@ Example:
 
 Returns a true value when C<n> is a perfect square.
 When C<n> is not an integer, a false value is returned.
+
+=head2 polygonal
+
+    polygonal(n, k)                               #=> Int
+
+Returns the nth k-gonal number. When C<n> is negative, it returns the second k-gonal number.
+
+Example:
+
+    say join(' ', map { polygonal( $_, 3) } 1..10);  # triangular numbers
+    say join(' ', map { polygonal( $_, 5) } 1..10);  # pentagonal numbers
+    say join(' ', map { polygonal(-$_, 5) } 1..10);  # second pentagonal numbers
+
+=head2 ipolygonal_root
+
+    ipolygonal_root(n, k)                         #=> Int | NaN
+
+Integer k-gonal root of C<n>. Returns C<NaN> when a real root does not exists.
+
+Example:
+
+    say ipolygonal_root($n, 5);                  # pentagonal root
+    say ipolygonal_root(polygonal(10, 5), 5);    # prints: "10"
+
+=head2 ipolygonal_root2
+
+    ipolygonal_root2(n, k)                  #=> Int | NaN
+
+Second integer k-gonal root of C<n>. Returns C<NaN> when a real root does not exists.
+
+Example:
+
+    say ipolygonal_root2($n, 5);                   # second pentagonal root
+    say ipolygonal_root2(polygonal(-10, 5), 5);    # prints: "-10"
+
+=head2 is_polygonal
+
+    is_polygonal(n, k)                            #=> Bool
+
+Returns a true value when C<n> is a k-gonal number.
+
+The values of C<n> and C<k> can be any arbitrary large integers.
+
+Example:
+
+    say is_polygonal(145, 5);      #=> 1 ("145" is a pentagonal number)
+    say is_polygonal(155, 5);      #=> 0
+
+=head2 is_polygonal2
+
+    is_polygonal2(n, k)                     #=> Bool
+
+Returns a true value when C<n> is a second k-gonal number.
+
+The values of C<n> and C<k> can be any arbitrary large integers.
+
+Example:
+
+    say is_polygonal2(145, 5);      #=> 0
+    say is_polygonal2(155, 5);      #=> 1 ("155" is a second-pentagonal number)
 
 =head1 MISCELLANEOUS
 
@@ -1650,6 +1746,16 @@ Complex numbers are compared as:
     (imag(x) <=> imag(y))
 
 Comparing anything to NaN (including NaN itself), returns C<undef>.
+
+=head2 acmp
+
+    acmp(x, y)
+
+Absolute comparison of C<x> and C<y>.
+
+Defined as:
+
+    acmp(x, y) = abs(x) <=> abs(y)
 
 =head1 PERFORMANCE
 

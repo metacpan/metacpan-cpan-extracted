@@ -5,7 +5,7 @@ use DB_File;
 use Mail::Milter::Authentication::Handler::UserDB::Hash;
 use Sys::Syslog qw{:standard :macros};
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.1');
+use version; our $VERSION = version->declare('v1.1.3');
 
 my $CHECKED_TIME;
 
@@ -14,6 +14,13 @@ sub default_config {
         'add_header' => 1,
         'lookup'     => [ 'hash:/etc/postfix/virtusertable' ],
     };
+}
+
+sub grafana_rows {
+    my ( $self ) = @_;
+    my @rows;
+    push @rows, $self->get_json( 'UserDB_metrics' );
+    return \@rows;
 }
 
 sub register_metrics {
@@ -39,10 +46,11 @@ sub envrcpt_callback {
 sub eoh_callback {
     my ( $self ) = @_;
     my $config = $self->handler_config();
-    return if ! $config->{'add_header'};
     if ( $self->{'local_user'} ) {
-        $self->add_auth_header('x-local-user=pass');
         $self->metric_count( 'userdb_total', { 'result' => 'pass' } );
+        if ( $config->{'add_header'} ) {
+            $self->add_auth_header('x-local-user=pass');
+        }
     }
     else {
         $self->metric_count( 'userdb_total', { 'result' => 'fail' } );
@@ -144,7 +152,7 @@ Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2015
+Copyright 2017
 
 This library is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.

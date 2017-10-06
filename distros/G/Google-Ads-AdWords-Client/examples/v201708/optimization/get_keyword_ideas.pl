@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example gets keywords related to a seed keyword.
+# This example gets keywords related to a list of seed keywords.
 
 use strict;
 use lib "../../../lib";
@@ -27,34 +27,43 @@ use Google::Ads::AdWords::v201708::NetworkSearchParameter;
 use Google::Ads::AdWords::v201708::NetworkSetting;
 use Google::Ads::AdWords::v201708::Paging;
 use Google::Ads::AdWords::v201708::RelatedToQuerySearchParameter;
+use Google::Ads::AdWords::v201708::SeedAdGroupIdSearchParameter;
 use Google::Ads::AdWords::v201708::TargetingIdeaSelector;
 use Google::Ads::Common::MapUtils;
 
 use Cwd qw(abs_path);
 
+# Replace with valid values of your account.
+# If you do not want to use an existing ad group to seed your request, you can
+# set this to undef.
+my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
+
 # Example main subroutine.
 sub get_keyword_ideas {
-  my $client = shift;
+  my ($client, $ad_group_id) = @_;
 
   # Create selector.
   my $selector = Google::Ads::AdWords::v201708::TargetingIdeaSelector->new({
-      requestType => "IDEAS",
-      ideaType    => "KEYWORD",
-      requestedAttributeTypes =>
-        ["KEYWORD_TEXT", "SEARCH_VOLUME", "CATEGORY_PRODUCTS_AND_SERVICES"],
+    requestType => "IDEAS",
+    ideaType    => "KEYWORD"
   });
+  $selector->set_requestedAttributeTypes([
+    "KEYWORD_TEXT", "SEARCH_VOLUME",
+    "AVERAGE_CPC",  "COMPETITION",
+    "CATEGORY_PRODUCTS_AND_SERVICES"
+  ]);
 
-  # Create seed query.
-  my $keyword = "mars cruise";
   # Create related to query search parameter.
+  my @search_parameters = ();
   my $related_to_query_search_parameter =
     Google::Ads::AdWords::v201708::RelatedToQuerySearchParameter->new(
-    {queries => [$keyword],});
+    {queries => ["bakery", "pastries", "birthday cake"]});
+  push @search_parameters, $related_to_query_search_parameter;
 
   # Set selector paging (required for targeting idea service).
   my $paging = Google::Ads::AdWords::v201708::Paging->new({
-      startIndex    => 0,
-      numberResults => 10
+    startIndex    => 0,
+    numberResults => 10
   });
   $selector->set_paging($paging);
 
@@ -66,27 +75,35 @@ sub get_keyword_ideas {
   my $language_search_parameter =
     Google::Ads::AdWords::v201708::LanguageSearchParameter->new(
     {languages => [$language_english]});
+  push @search_parameters, $language_search_parameter;
 
   # Create network search paramter (optional).
   my $network_setting = Google::Ads::AdWords::v201708::NetworkSetting->new({
-      targetGoogleSearch         => 1,
-      targetSearchNetwork        => 0,
-      targetContentNetwork       => 0,
-      targetPartnerSearchNetwork => 0
+    targetGoogleSearch         => 1,
+    targetSearchNetwork        => 0,
+    targetContentNetwork       => 0,
+    targetPartnerSearchNetwork => 0
   });
   my $network_setting_parameter =
     Google::Ads::AdWords::v201708::NetworkSearchParameter->new(
     {networkSetting => $network_setting});
+  push @search_parameters, $network_setting_parameter;
 
-  $selector->set_searchParameters([
-      $related_to_query_search_parameter, $language_search_parameter,
-      $network_setting_parameter
-  ]);
+  # Optional: Use an existing ad group to generate ideas.
+  if ($ad_group_id) {
+    my $seed_ad_group_id_search_parameter =
+      Google::Ads::AdWords::v201708::SeedAdGroupIdSearchParameter->new({
+        adGroupId => $ad_group_id
+      });
+    push @search_parameters, $seed_ad_group_id_search_parameter;
+  }
 
-  # Get related keywords.
+  $selector->set_searchParameters(\@search_parameters);
+
+  # Get keyword ideas.
   my $page = $client->TargetingIdeaService()->get({selector => $selector});
 
-  # Display related keywords.
+  # Display keyword ideas.
   if ($page->get_entries()) {
     foreach my $targeting_idea (@{$page->get_entries()}) {
       my $data =
@@ -100,9 +117,12 @@ sub get_keyword_ideas {
           $data->{"CATEGORY_PRODUCTS_AND_SERVICES"}->get_value()
         ? $data->{"CATEGORY_PRODUCTS_AND_SERVICES"}->get_value()
         : [];
-      printf "Keyword with text \"%s\", monthly search volume \"%s\" and " .
-        "categories \"%s\" was found.\n", $keyword,
-        $search_volume, join(", ", @{$categories});
+      my $average_cpc =
+        $data->{"AVERAGE_CPC"}->get_value()->get_microAmount();
+      my $competition = $data->{"COMPETITION"}->get_value();
+      printf "Keyword with text '%s', monthly search volume %d, average CPC" .
+        " %d, and competition %.2f was found with categories: '%s'\n", $keyword,
+        $search_volume, $average_cpc, $competition, join(", ", @{$categories});
     }
   } else {
     print "No related keywords were found.\n";
@@ -126,4 +146,4 @@ my $client = Google::Ads::AdWords::Client->new({version => "v201708"});
 $client->set_die_on_faults(1);
 
 # Call the example
-get_keyword_ideas($client);
+get_keyword_ideas($client, $ad_group_id);

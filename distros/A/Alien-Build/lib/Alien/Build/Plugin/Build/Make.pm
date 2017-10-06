@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Alien::Build::Plugin;
 
 # ABSTRACT: Make plugin for Alien::Build
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 has '+make_type' => undef;
@@ -79,7 +79,7 @@ Alien::Build::Plugin::Build::Make - Make plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -182,6 +182,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 package Bread::Board::LifeCycle;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: base lifecycle role 
-$Bread::Board::LifeCycle::VERSION = '0.35';
+$Bread::Board::LifeCycle::VERSION = '0.36';
 use Moose::Role;
 
 no Moose::Role; 1;
@@ -18,7 +18,7 @@ Bread::Board::LifeCycle - base lifecycle role
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

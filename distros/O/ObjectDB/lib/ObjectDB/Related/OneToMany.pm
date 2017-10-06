@@ -5,7 +5,7 @@ use warnings;
 
 use base 'ObjectDB::Related';
 
-our $VERSION = '3.23';
+our $VERSION = '3.24';
 
 use Scalar::Util ();
 use Storable qw(dclone);

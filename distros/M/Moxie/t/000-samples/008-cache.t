@@ -15,21 +15,19 @@ package Cache {
 
     extends 'Moxie::Object';
 
-    has '$!fetcher' => ( required => 1 );
-    has '$!data';
+    has '_fetcher' => ( required => 1 );
+    has '_data';
 
-    sub BUILDARGS : init_args( fetcher => $!fetcher );
+    sub BUILDARGS : init_args( fetcher => _fetcher );
 
-    my sub fetcher : private( $!fetcher );
-
-    sub has_data : predicate( $!data );
-    sub clear    : clearer( $!data );
+    sub has_data : predicate(_data);
+    sub clear    : clearer(_data);
 
     sub data ($self) {
-        $self->{'$!data'} //= $self->_fetch_data;
+        _data //= $self->_fetch_data;
     }
 
-    sub _fetch_data ($self) { fetcher->() }
+    sub _fetch_data ($self) { _fetcher->() }
 }
 
 my @data = qw[

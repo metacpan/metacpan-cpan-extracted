@@ -49,7 +49,7 @@ be combined with the other contains_* options to form a logical AND.
 
 =item B<--help|h>
 
-Prints a brief message and exists.
+Prints a brief message and exits.
 
 =item B<--local=s>
 

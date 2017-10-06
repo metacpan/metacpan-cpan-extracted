@@ -16,7 +16,8 @@ use CGI;
 use IO::Capture::Stderr;
 use Data::UUID;
 
-our $VERSION = q[476.4.2];
+our $VERSION = q[477.1.2];
+
 our $DEBUG_UTIL           = 0;
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';

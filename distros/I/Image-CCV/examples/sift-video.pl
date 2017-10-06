@@ -9,7 +9,7 @@ use File::Glob qw(bsd_glob);
 use File::Basename qw(dirname);
 
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =head1 NAME
 

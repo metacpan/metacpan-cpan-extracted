@@ -6,7 +6,7 @@ no warnings 'once';
 
 diag "Patro - Proxy Access To Remote Objects - on $^O $]";
 use_ok( 'Patro' );
-use_ok( 'Patro::Archy' );
+use_ok( 'Patro::Server' );
 diag "Threads avail: ", $threads::threads || 0;
 
 use lib '.';

@@ -1,5 +1,5 @@
 package Exception::DB;
-$Exception::DB::VERSION = '0.020';
+$Exception::DB::VERSION = '0.022';
 use base qw(Exception);
 
 1;

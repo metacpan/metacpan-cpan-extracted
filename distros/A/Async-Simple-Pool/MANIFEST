@@ -13,8 +13,11 @@ t/03-pod.t
 t/04-task.t
 t/05-task-fork.t
 t/06-task-forktmpfile.t
-t/07-pool.t
-t/08-boilerplate.t
+t/07-pool-inits.t
+t/08-pool-full-results.t
+t/09-pool-partial-results-collect.t
+t/10-pool-partial-results-flush.t
+t/11-boilerplate.t
 ignore.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

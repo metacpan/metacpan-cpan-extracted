@@ -18,7 +18,9 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.912';
+our $VERSION = '0.914';
+our $GIT_DESCRIBE;
+our $GIT_URL;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
@@ -59,6 +61,7 @@ sub new {
         with_test => 1,
         with_runtime => 1,
         with_develop => 0,
+        feature => [],
         notest => 1,
         prebuilt => $] >= 5.012 && $ENV{PERL_CPM_PREBUILT} ? 1 : 0,
         %option
@@ -68,17 +71,15 @@ sub new {
 sub parse_options {
     my $self = shift;
     local @ARGV = @_;
-    my (@mirror, @resolver);
+    my (@mirror, @resolver, @feature);
     my $with_option = sub {
         my $n = shift;
         ("with-$n", \$self->{"with_$n"}, "without-$n", sub { $self->{"with_$n"} = 0 });
     };
     GetOptions
         "L|local-lib-contained=s" => \($self->{local_lib}),
-        "V|version" => sub { $self->cmd_version; exit },
         "color!" => \($self->{color}),
         "g|global" => \($self->{global}),
-        "h|help" => sub { $self->cmd_help },
         "mirror=s@" => \@mirror,
         "v|verbose" => \($self->{verbose}),
         "w|workers=i" => \($self->{workers}),
@@ -102,11 +103,13 @@ sub parse_options {
         "reinstall" => \($self->{reinstall}),
         (map $with_option->($_), qw(requires recommends suggests)),
         (map $with_option->($_), qw(configure build test runtime develop)),
+        "feature=s@" => \@feature,
     or exit 1;
 
     $self->{local_lib} = $self->maybe_abs($self->{local_lib}) unless $self->{global};
     $self->{home} = $self->maybe_abs($self->{home});
     $self->{resolver} = \@resolver;
+    $self->{feature} = \@feature if @feature;
     $self->{mirror} = \@mirror if @mirror;
     for my $mirror (@{$self->{mirror}}) {
         $mirror = $self->normalize_mirror($mirror)
@@ -135,7 +138,26 @@ sub parse_options {
     $App::cpm::Logger::COLOR = 1 if $self->{color};
     $App::cpm::Logger::VERBOSE = 1 if $self->{verbose};
     $App::cpm::Logger::SHOW_PROGRESS = 1 if $self->{show_progress};
-    $self->{argv} = \@ARGV;
+
+    if (@ARGV && $ARGV[0] eq "-") {
+        $self->{argv} = $self->read_argv_from_stdin;
+        $self->{cpanfile} = undef;
+    } else {
+        $self->{argv} = \@ARGV;
+    }
+}
+
+sub read_argv_from_stdin {
+    my $self = shift;
+    my @argv;
+    while (my $line = <STDIN>) {
+        next if $line !~ /\S/;
+        next if $line =~ /^\s*#/;
+        $line =~ s/^\s*//;
+        $line =~ s/\s*$//;
+        push @argv, split /\s+/, $line;
+    }
+    return \@argv;
 }
 
 sub _inc {
@@ -198,32 +220,22 @@ sub cmd_help {
 
 sub cmd_version {
     print "cpm $VERSION ($0)\n";
-}
-
-sub cmd_exec {
-    my ($self, @argv) = @_;
-    warn "WARN: exec subcommand is deprecated.\n"
-        ."WARN: Please use `perl -I\$PWD/local/lib/perl5 ...` or `env PERL5LIB=\$PWD/local/lib/perl5 perl ...`.\n";
-    my $local_lib = $self->maybe_abs($self->{local_lib});
-    if (-d "$local_lib/lib/perl5") {
-        $ENV{PERL5LIB} = "$local_lib/lib/perl5"
-                       . ($ENV{PERL5LIB} ? ":$ENV{PERL5LIB}" : "");
+    if ($GIT_DESCRIBE && $GIT_URL) {
+        print "This is a self-contained version, $GIT_DESCRIBE ($GIT_URL)\n";
     }
-    if (-d "$local_lib/bin") {
-        $ENV{PATH} = "$local_lib/bin:$ENV{PATH}";
-    }
-    exec @argv;
-    exit 255;
+    return 0;
 }
 
 sub cmd_install {
     my $self = shift;
-    die "Need arguments or cpanfile.\n" if !@{$self->{argv}} && !-f $self->{cpanfile};
+    die "Need arguments or cpanfile.\n"
+        if !@{$self->{argv}} && (!$self->{cpanfile} || !-f $self->{cpanfile});
 
     File::Path::mkpath($self->{home}) unless -d $self->{home};
     my $logger = App::cpm::Logger::File->new("$self->{home}/build.log.@{[time]}");
     $logger->symlink_to("$self->{home}/build.log");
     $logger->log("Running cpm $VERSION ($0) on perl $Config{version} built for $Config{archname} ($^X)");
+    $logger->log("This is a self-contained version, $GIT_DESCRIBE ($GIT_URL)") if $GIT_DESCRIBE && $GIT_URL;
     $logger->log("Command line arguments are: @ARGV");
 
     my $master = App::cpm::Master->new(
@@ -282,7 +294,8 @@ sub cmd_install {
                 App::cpm::Logger->log(result => "FAIL", type => $type, message => $_) for @{$fail->{$type}};
             }
             print STDERR "\r" if $self->{show_progress};
-            warn sprintf "%d distribution installed.\n", $master->installed_distributions;
+            warn sprintf "%d distribution%s installed.\n",
+                $master->installed_distributions, $master->installed_distributions > 1 ? "s" : "";
             warn "See $self->{home}/build.log for details.\n";
             return 1;
         }
@@ -299,7 +312,8 @@ sub cmd_install {
         }
     }
     print STDERR "\r" if $self->{show_progress};
-    warn sprintf "%d distribution installed.\n", $master->installed_distributions;
+    warn sprintf "%d distribution%s installed.\n",
+        $master->installed_distributions, $master->installed_distributions > 1 ? "s" : "";
     $self->cleanup;
 
     if ($fail) {
@@ -424,7 +438,7 @@ sub load_cpanfile {
     my ($self, $file) = @_;
     require Module::CPANfile;
     my $cpanfile = Module::CPANfile->load($file);
-    my $prereqs = $cpanfile->prereqs_with;
+    my $prereqs = $cpanfile->prereqs_with(@{ $self->{"feature"} });
     my @phase = grep $self->{"with_$_"}, qw(configure build test runtime develop);
     my @type  = grep $self->{"with_$_"}, qw(requires recommends suggests);
     my $requirements = $prereqs->merged_requirements(\@phase, \@type);

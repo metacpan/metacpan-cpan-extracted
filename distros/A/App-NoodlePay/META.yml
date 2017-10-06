@@ -1,0 +1,26 @@
+---
+abstract: 'Convenient way to securely send Bitcoin from cold storage'
+author:
+  - 'Ashish Gulhati <noodlepay at hash.neo.tc>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-NoodlePay
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GD::Barcode::QRcode: '0'
+  Math::Prime::Util: '0'
+  Wx: '0'
+version: '1.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

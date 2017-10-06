@@ -1,0 +1,81 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<h1><% $caption %></h1>
+
+<form method="post" action="<% RT->Config->Get('WebPath') %>/Group/Search.html">
+<input type="hidden" name="GroupField" value="Name" />
+<input type="hidden" name="GroupOp" value="LIKE" />
+<&|/l&>Go to group</&>
+<input type="text" name="GroupString" value="" data-autocomplete="Groups" id="autocomplete-GroupString" />
+<script type="text/javascript">
+jQuery(function(){
+    // Jump directly to the page if a group is chosen
+    jQuery("#autocomplete-GroupString").on("autocompleteselect", function( event, ui ) {
+        document.location = RT.Config.WebPath + "/Group/Summary.html?id=" + ui.item.id;
+    });
+});
+</script>
+</form>
+
+<form method="post" action="<% RT->Config->Get('WebPath') %>/Group/Search.html">
+<&|/l&>Find groups whose</&> <& /Elements/SelectGroups &><br />
+<div align="right"><input type="submit" class="button" value="<&|/l&>Go!</&>" /></div> 
+</form>
+
+% unless ( $Groups->Count ) {
+<em><&|/l&>No groups matching search criteria found.</&></em>
+% } else {
+<p><&|/l&>Select a group</&>:</p>
+
+
+<& /Elements/CollectionList,
+    OrderBy => 'Name',
+    Order => 'ASC',
+    Rows  => $Rows,
+    %ARGS,
+    Format => $Format,
+    Collection => $Groups,
+    AllowSorting => 1,
+    PassArguments => [qw(Format Rows Page Order OrderBy GroupString GroupOp GroupField)],
+&>
+% }
+
+<%INIT>
+my $Groups = RT::Groups->new($session{'CurrentUser'});
+$Groups->LimitToUserDefinedGroups();
+my $title = loc('Group Search');
+my $caption;
+
+if (length $GroupString) {
+    $caption = loc("Groups matching search criteria");
+    if ($GroupField =~ /^CustomField-(\d+)/) {
+        $Groups->LimitCustomField(
+            CUSTOMFIELD => $1,
+            OPERATOR => $GroupOp,
+            VALUE => $GroupString,
+        );
+    }
+    else {
+        $Groups->Limit(
+            FIELD => $GroupField,
+            OPERATOR => $GroupOp,
+            VALUE => $GroupString,
+        );
+    }
+    RT::Interface::Web::Redirect(RT->Config->Get('WebURL')."/Group/Summary.html?id=".$Groups->First->id)
+          if $Groups->Count == 1 and $Groups->First;
+}
+else {
+    $caption = loc("Search a user-defined group");
+}
+
+$Format ||= RT->Config->Get('GroupSearchResultFormat');
+my $Rows = RT->Config->Get('GroupSearchResultRows') || 50;
+
+</%INIT>
+<%ARGS>
+$Format => undef
+$GroupString => ''
+$GroupOp => '='
+$GroupField => 'Name'
+</%ARGS>

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Send a block of data from one process to another on the local machine.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Send-Local",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "20170820",
+            "Socket" : "0",
+            "Test2::Bundle::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Send::Local" : {
+         "file" : "lib/Data/Send/Local.pm",
+         "version" : "20170926"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "20170926"
+}

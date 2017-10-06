@@ -12,7 +12,7 @@
                                          |_|    
 
 
-This is the README for WWW::CheckGzip version 0.03.
+This is the README for WWW::CheckGzip version 0.05.
 
 WWW::CheckGzip is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -107,11 +107,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm WWW::CheckGzip
 
-To install the module from the source file, WWW-CheckGzip-0.03.tar.gz,
+To install the module from the source file, WWW-CheckGzip-0.05.tar.gz,
 follow this sequence of commands:
 
-    tar xfz WWW-CheckGzip-0.03.tar.gz
-    cd WWW-CheckGzip-0.03
+    tar xfz WWW-CheckGzip-0.05.tar.gz
+    cd WWW-CheckGzip-0.05
     perl Makefile.PL
     make
     make install
@@ -136,6 +136,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Aug 17 17:44:19 2017.
+This README was written on Wed Oct  4 11:01:41 2017.
 
 -----------------------------------------------------------------------------

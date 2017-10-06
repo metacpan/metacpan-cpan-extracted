@@ -5,7 +5,7 @@ use utf8;
 use JSON;
 use Lemonldap::NG::Common::Conf::_DBI;
 
-our $VERSION = '1.9.11';
+our $VERSION = '1.9.13';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::_DBI);
 
 sub store {
@@ -49,7 +49,7 @@ sub load {
     }
     my $r;
     if ( $row->[0] =~ /^\s*\{/s ) {
-        eval { $r = from_json( $row->[0] ); };
+        eval { $r = from_json( $row->[0], { allow_nonref => 1 } ); };
     }
     else {    # Old format
         require Storable;

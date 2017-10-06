@@ -4,21 +4,22 @@ use Test::More;
 use Test::Exception;
 use Pegex::Parser;
 use GraphQL::Grammar;
+use GraphQL::Parser;
 use Pegex::Tree::Wrap;
 use Pegex::Input;
 use Data::Dumper;
 
 my $parser = Pegex::Parser->new(
   grammar => GraphQL::Grammar->new,
-  receiver => Pegex::Tree::Wrap->new,
+  receiver => GraphQL::Parser->new,
 );
 open my $fh, '<', 't/kitchen-sink.graphql';
 
 my $got = do_lex(join('', <$fh>));
 my $expected = eval join '', <DATA>;
 local $Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = 1;
-#open $fh, '>', 'tf'; # uncomment these two lines to regenerate
-#print $fh Dumper $got;
+#open $fh, '>', 'tf'; print $fh Dumper $got; # uncomment to regenerate
+
 is_deeply $got, $expected, 'lex big doc correct' or diag Dumper $got;
 
 throws_ok { do_lex("\x{0007}") } qr/Parse document failed for some reason/, 'invalid char';
@@ -86,7 +87,7 @@ done_testing;
 sub number_test {
   my ($text, $type, $label) = @_;
   my $got = do_lex(number_make($text));
-  is query_lookup($got, $type), $text, $label or diag Dumper $got;
+  cmp_ok query_lookup($got, $type), '==', $text, $label or diag Dumper $got;
 }
 
 sub number_make {
@@ -111,7 +112,7 @@ sub string_lookup {
 
 sub query_lookup {
   my ($got, $type) = @_;
-  return $got->{graphql}[0][0]{definition}[0]{operationDefinition}[2]{selectionSet}[0][0]{selection}{field}[1]{arguments}[0][0]{argument}[1]{value}{$type};
+  return $got->[0]{node}{selections}[0]{node}{arguments}{name};
 }
 
 sub do_lex {
@@ -121,791 +122,284 @@ sub do_lex {
 }
 
 __DATA__
-{
-  'graphql' => [
-    [
-      {
-        'definition' => [
-          {
-            'operationDefinition' => [
+[
+  {
+    'kind' => 'operation',
+    'node' => {
+      'name' => 'queryName',
+      'operationType' => 'query',
+      'selections' => [
+        {
+          'kind' => 'field',
+          'node' => {
+            'alias' => 'whoever123is',
+            'arguments' => {
+              'id' => [
+                123,
+                456
+              ]
+            },
+            'name' => 'node',
+            'selections' => [
               {
-                'operationType' => 'query'
-              },
-              {
-                'name' => 'queryName'
-              },
-              {
-                'variableDefinitions' => [
-                  [
-                    {
-                      'variableDefinition' => [
-                        {
-                          'variable' => [
-                            {
-                              'name' => 'foo'
-                            }
-                          ]
-                        },
-                        {
-                          'type' => [
-                            {
-                              'namedType' => {
-                                'name' => 'ComplexType'
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      'variableDefinition' => [
-                        {
-                          'variable' => [
-                            {
-                              'name' => 'site'
-                            }
-                          ]
-                        },
-                        {
-                          'type' => [
-                            {
-                              'namedType' => {
-                                'name' => 'Site'
-                              }
-                            }
-                          ]
-                        },
-                        {
-                          'defaultValue' => [
-                            {
-                              'value_const' => {
-                                'enumValue' => {
-                                  'name' => 'MOBILE'
-                                }
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                ]
-              },
-              {
-                'selectionSet' => [
-                  [
-                    {
-                      'selection' => {
-                        'field' => [
-                          {
-                            'alias' => [
-                              {
-                                'name' => 'whoever123is'
-                              }
-                            ]
-                          },
-                          {
-                            'name' => 'node'
-                          },
-                          {
-                            'arguments' => [
-                              [
-                                {
-                                  'argument' => [
-                                    {
-                                      'name' => 'id'
-                                    },
-                                    {
-                                      'value' => {
-                                        'listValue' => [
-                                          [
-                                            {
-                                              'value' => {
-                                                'int' => '123'
-                                              }
-                                            },
-                                            {
-                                              'value' => {
-                                                'int' => '456'
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'selectionSet' => [
-                              [
-                                {
-                                  'selection' => {
-                                    'field' => [
-                                      {
-                                        'name' => 'id'
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  'selection' => {
-                                    'inlineFragment' => [
-                                      {
-                                        'typeCondition' => [
-                                          {
-                                            'namedType' => {
-                                              'name' => 'User'
-                                            }
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        'directives' => [
-                                          {
-                                            'directive' => [
-                                              {
-                                                'name' => 'defer'
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        'selectionSet' => [
-                                          [
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'field2'
-                                                  },
-                                                  {
-                                                    'selectionSet' => [
-                                                      [
-                                                        {
-                                                          'selection' => {
-                                                            'field' => [
-                                                              {
-                                                                'name' => 'id'
-                                                              }
-                                                            ]
-                                                          }
-                                                        },
-                                                        {
-                                                          'selection' => {
-                                                            'field' => [
-                                                              {
-                                                                'alias' => [
-                                                                  {
-                                                                    'name' => 'alias'
-                                                                  }
-                                                                ]
-                                                              },
-                                                              {
-                                                                'name' => 'field1'
-                                                              },
-                                                              {
-                                                                'arguments' => [
-                                                                  [
-                                                                    {
-                                                                      'argument' => [
-                                                                        {
-                                                                          'name' => 'first'
-                                                                        },
-                                                                        {
-                                                                          'value' => {
-                                                                            'int' => '10'
-                                                                          }
-                                                                        }
-                                                                      ]
-                                                                    },
-                                                                    {
-                                                                      'argument' => [
-                                                                        {
-                                                                          'name' => 'after'
-                                                                        },
-                                                                        {
-                                                                          'value' => {
-                                                                            'variable' => [
-                                                                              {
-                                                                                'name' => 'foo'
-                                                                              }
-                                                                            ]
-                                                                          }
-                                                                        }
-                                                                      ]
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              },
-                                                              {
-                                                                'directives' => [
-                                                                  {
-                                                                    'directive' => [
-                                                                      {
-                                                                        'name' => 'include'
-                                                                      },
-                                                                      {
-                                                                        'arguments' => [
-                                                                          [
-                                                                            {
-                                                                              'argument' => [
-                                                                                {
-                                                                                  'name' => 'if'
-                                                                                },
-                                                                                {
-                                                                                  'value' => {
-                                                                                    'variable' => [
-                                                                                      {
-                                                                                        'name' => 'foo'
-                                                                                      }
-                                                                                    ]
-                                                                                  }
-                                                                                }
-                                                                              ]
-                                                                            }
-                                                                          ]
-                                                                        ]
-                                                                      }
-                                                                    ]
-                                                                  }
-                                                                ]
-                                                              },
-                                                              {
-                                                                'selectionSet' => [
-                                                                  [
-                                                                    {
-                                                                      'selection' => {
-                                                                        'field' => [
-                                                                          {
-                                                                            'name' => 'id'
-                                                                          }
-                                                                        ]
-                                                                      }
-                                                                    },
-                                                                    {
-                                                                      'selection' => {
-                                                                        'fragmentSpread' => [
-                                                                          {
-                                                                            'fragmentName' => {
-                                                                              'name' => 'frag'
-                                                                            }
-                                                                          }
-                                                                        ]
-                                                                      }
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          }
-                                                        }
-                                                      ]
-                                                    ]
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  'selection' => {
-                                    'inlineFragment' => [
-                                      {
-                                        'directives' => [
-                                          {
-                                            'directive' => [
-                                              {
-                                                'name' => 'skip'
-                                              },
-                                              {
-                                                'arguments' => [
-                                                  [
-                                                    {
-                                                      'argument' => [
-                                                        {
-                                                          'name' => 'unless'
-                                                        },
-                                                        {
-                                                          'value' => {
-                                                            'variable' => [
-                                                              {
-                                                                'name' => 'foo'
-                                                              }
-                                                            ]
-                                                          }
-                                                        }
-                                                      ]
-                                                    }
-                                                  ]
-                                                ]
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        'selectionSet' => [
-                                          [
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'id'
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  'selection' => {
-                                    'inlineFragment' => [
-                                      {
-                                        'selectionSet' => [
-                                          [
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'id'
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'operationDefinition' => [
-              {
-                'operationType' => 'mutation'
-              },
-              {
-                'name' => 'likeStory'
-              },
-              {
-                'selectionSet' => [
-                  [
-                    {
-                      'selection' => {
-                        'field' => [
-                          {
-                            'name' => 'like'
-                          },
-                          {
-                            'arguments' => [
-                              [
-                                {
-                                  'argument' => [
-                                    {
-                                      'name' => 'story'
-                                    },
-                                    {
-                                      'value' => {
-                                        'int' => '123'
-                                      }
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'directives' => [
-                              {
-                                'directive' => [
-                                  {
-                                    'name' => 'defer'
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            'selectionSet' => [
-                              [
-                                {
-                                  'selection' => {
-                                    'field' => [
-                                      {
-                                        'name' => 'story'
-                                      },
-                                      {
-                                        'selectionSet' => [
-                                          [
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'id'
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'operationDefinition' => [
-              {
-                'operationType' => 'subscription'
-              },
-              {
-                'name' => 'StoryLikeSubscription'
-              },
-              {
-                'variableDefinitions' => [
-                  [
-                    {
-                      'variableDefinition' => [
-                        {
-                          'variable' => [
-                            {
-                              'name' => 'input'
-                            }
-                          ]
-                        },
-                        {
-                          'type' => [
-                            {
-                              'namedType' => {
-                                'name' => 'StoryLikeSubscribeInput'
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                ]
-              },
-              {
-                'selectionSet' => [
-                  [
-                    {
-                      'selection' => {
-                        'field' => [
-                          {
-                            'name' => 'storyLikeSubscribe'
-                          },
-                          {
-                            'arguments' => [
-                              [
-                                {
-                                  'argument' => [
-                                    {
-                                      'name' => 'input'
-                                    },
-                                    {
-                                      'value' => {
-                                        'variable' => [
-                                          {
-                                            'name' => 'input'
-                                          }
-                                        ]
-                                      }
-                                    }
-                                  ]
-                                }
-                              ]
-                            ]
-                          },
-                          {
-                            'selectionSet' => [
-                              [
-                                {
-                                  'selection' => {
-                                    'field' => [
-                                      {
-                                        'name' => 'story'
-                                      },
-                                      {
-                                        'selectionSet' => [
-                                          [
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'likers'
-                                                  },
-                                                  {
-                                                    'selectionSet' => [
-                                                      [
-                                                        {
-                                                          'selection' => {
-                                                            'field' => [
-                                                              {
-                                                                'name' => 'count'
-                                                              }
-                                                            ]
-                                                          }
-                                                        }
-                                                      ]
-                                                    ]
-                                                  }
-                                                ]
-                                              }
-                                            },
-                                            {
-                                              'selection' => {
-                                                'field' => [
-                                                  {
-                                                    'name' => 'likeSentence'
-                                                  },
-                                                  {
-                                                    'selectionSet' => [
-                                                      [
-                                                        {
-                                                          'selection' => {
-                                                            'field' => [
-                                                              {
-                                                                'name' => 'text'
-                                                              }
-                                                            ]
-                                                          }
-                                                        }
-                                                      ]
-                                                    ]
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                }
-                              ]
-                            ]
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'fragmentDefinition' => [
-              {
-                'fragmentName' => {
-                  'name' => 'frag'
+                'kind' => 'field',
+                'node' => {
+                  'name' => 'id'
                 }
               },
               {
-                'typeCondition' => [
-                  {
-                    'namedType' => {
-                      'name' => 'Friend'
-                    }
-                  }
-                ]
-              },
-              {
-                'selectionSet' => [
-                  [
+                'kind' => 'inline_fragment',
+                'node' => {
+                  'directives' => [
                     {
-                      'selection' => {
-                        'field' => [
+                      'name' => 'defer'
+                    }
+                  ],
+                  'on' => 'User',
+                  'selections' => [
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'field2',
+                        'selections' => [
                           {
-                            'name' => 'foo'
+                            'kind' => 'field',
+                            'node' => {
+                              'name' => 'id'
+                            }
                           },
                           {
-                            'arguments' => [
-                              [
+                            'kind' => 'field',
+                            'node' => {
+                              'alias' => 'alias',
+                              'arguments' => {
+                                'after' => \'foo',
+                                'first' => 10
+                              },
+                              'directives' => [
                                 {
-                                  'argument' => [
-                                    {
-                                      'name' => 'size'
-                                    },
-                                    {
-                                      'value' => {
-                                        'variable' => [
-                                          {
-                                            'name' => 'size'
-                                          }
-                                        ]
-                                      }
-                                    }
-                                  ]
+                                  'arguments' => {
+                                    'if' => \'foo'
+                                  },
+                                  'name' => 'include'
+                                }
+                              ],
+                              'name' => 'field1',
+                              'selections' => [
+                                {
+                                  'kind' => 'field',
+                                  'node' => {
+                                    'name' => 'id'
+                                  }
                                 },
                                 {
-                                  'argument' => [
-                                    {
-                                      'name' => 'bar'
-                                    },
-                                    {
-                                      'value' => {
-                                        'variable' => [
-                                          {
-                                            'name' => 'b'
-                                          }
-                                        ]
-                                      }
-                                    }
-                                  ]
-                                },
-                                {
-                                  'argument' => [
-                                    {
-                                      'name' => 'obj'
-                                    },
-                                    {
-                                      'value' => {
-                                        'objectValue' => [
-                                          [
-                                            {
-                                              'objectField' => [
-                                                {
-                                                  'name' => 'key'
-                                                },
-                                                {
-                                                  'value' => {
-                                                    'string' => 'value'
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          ]
-                                        ]
-                                      }
-                                    }
-                                  ]
+                                  'kind' => 'fragment_spread',
+                                  'node' => {
+                                    'name' => 'frag'
+                                  }
                                 }
                               ]
-                            ]
+                            }
                           }
                         ]
                       }
                     }
                   ]
-                ]
+                }
+              },
+              {
+                'kind' => 'inline_fragment',
+                'node' => {
+                  'directives' => [
+                    {
+                      'arguments' => {
+                        'unless' => \'foo'
+                      },
+                      'name' => 'skip'
+                    }
+                  ],
+                  'selections' => [
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'id'
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                'kind' => 'inline_fragment',
+                'node' => {
+                  'selections' => [
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'id'
+                      }
+                    }
+                  ]
+                }
               }
             ]
           }
-        ]
-      },
-      {
-        'definition' => [
-          {
-            'operationDefinition' => {
-              'selectionSet' => [
-                [
-                  {
-                    'selection' => {
-                      'field' => [
-                        {
-                          'name' => 'unnamed'
-                        },
-                        {
-                          'arguments' => [
-                            [
-                              {
-                                'argument' => [
-                                  {
-                                    'name' => 'truthy'
-                                  },
-                                  {
-                                    'value' => {
-                                      'boolean' => 'true'
-                                    }
-                                  }
-                                ]
-                              },
-                              {
-                                'argument' => [
-                                  {
-                                    'name' => 'falsey'
-                                  },
-                                  {
-                                    'value' => {
-                                      'boolean' => 'false'
-                                    }
-                                  }
-                                ]
-                              },
-                              {
-                                'argument' => [
-                                  {
-                                    'name' => 'nullish'
-                                  }
-                                ]
-                              }
-                            ]
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    'selection' => {
-                      'field' => [
-                        {
-                          'name' => 'query'
-                        }
-                      ]
-                    }
-                  }
-                ]
-              ]
-            }
-          }
-        ]
+        }
+      ],
+      'variables' => {
+        'foo' => {
+          'type' => 'ComplexType'
+        },
+        'site' => {
+          'default_value' => \\'MOBILE',
+          'type' => 'Site'
+        }
       }
-    ]
-  ]
-}
+    }
+  },
+  {
+    'kind' => 'operation',
+    'node' => {
+      'name' => 'likeStory',
+      'operationType' => 'mutation',
+      'selections' => [
+        {
+          'kind' => 'field',
+          'node' => {
+            'arguments' => {
+              'story' => 123
+            },
+            'directives' => [
+              {
+                'name' => 'defer'
+              }
+            ],
+            'name' => 'like',
+            'selections' => [
+              {
+                'kind' => 'field',
+                'node' => {
+                  'name' => 'story',
+                  'selections' => [
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'id'
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    'kind' => 'operation',
+    'node' => {
+      'name' => 'StoryLikeSubscription',
+      'operationType' => 'subscription',
+      'selections' => [
+        {
+          'kind' => 'field',
+          'node' => {
+            'arguments' => {
+              'input' => \'input'
+            },
+            'name' => 'storyLikeSubscribe',
+            'selections' => [
+              {
+                'kind' => 'field',
+                'node' => {
+                  'name' => 'story',
+                  'selections' => [
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'likers',
+                        'selections' => [
+                          {
+                            'kind' => 'field',
+                            'node' => {
+                              'name' => 'count'
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      'kind' => 'field',
+                      'node' => {
+                        'name' => 'likeSentence',
+                        'selections' => [
+                          {
+                            'kind' => 'field',
+                            'node' => {
+                              'name' => 'text'
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      'variables' => {
+        'input' => {
+          'type' => 'StoryLikeSubscribeInput'
+        }
+      }
+    }
+  },
+  {
+    'kind' => 'fragment',
+    'node' => {
+      'name' => 'frag',
+      'on' => 'Friend',
+      'selections' => [
+        {
+          'kind' => 'field',
+          'node' => {
+            'arguments' => {
+              'bar' => \'b',
+              'obj' => {
+                'key' => 'value'
+              },
+              'size' => \'size'
+            },
+            'name' => 'foo'
+          }
+        }
+      ]
+    }
+  },
+  {
+    'kind' => 'operation',
+    'node' => {
+      'selections' => [
+        {
+          'kind' => 'field',
+          'node' => {
+            'arguments' => {
+              'falsey' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
+              'nullish' => undef,
+              'truthy' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' )
+            },
+            'name' => 'unnamed'
+          }
+        },
+        {
+          'kind' => 'field',
+          'node' => {
+            'name' => 'query'
+          }
+        }
+      ]
+    }
+  }
+]

@@ -12,7 +12,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::RunsCommand';
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 sub _build_cmd {'phpcs'}
 
@@ -40,7 +40,7 @@ Code::TidyAll::Plugin::PHPCodeSniffer - Use phpcs with tidyall
 
 =head1 VERSION
 
-version 0.67
+version 0.68
 
 =head1 SYNOPSIS
 

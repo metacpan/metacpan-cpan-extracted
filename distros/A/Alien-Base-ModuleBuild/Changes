@@ -1,5 +1,9 @@
 Revision history for Perl module Alien::Base.
 
+1.00 2017-10-01 06:21:53 -0400
+  - Remove Alien::Base::PkgConfig
+  - Require Alien::Build::PkgConfig 1.20
+
 0.046 2017-09-13 20:54:21 -0400
   - Run alien_install_commands before any Perl tests in t/
 

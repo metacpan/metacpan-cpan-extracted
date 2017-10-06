@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.005'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.007'; # VERSION
+my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -135,6 +135,70 @@ sub encodeByData {
 
     return $self;
 }
+
+=over
+
+=item $font->automap()
+
+This applies to core fonts (C<< $pdf->corefont() >>) and PostScript fonts 
+(C<< $pdf->psfont() >>). These cannot use UTF-8 (or other multibyte character) 
+encoded text; only single byte characters. This limits a font to a maximum of
+256 glyphs (the "standard" single-byte encoding being used). Any other glyphs 
+supplied with the font are inaccessible.
+
+C<automap> splits a font containing more than 256 glyphs into "planes" of single
+byte fonts of up to 256 glyphs, so that all glyphs may be accessed in separate 
+"fonts". An array of new fonts will be returned, with [0] being the standard 
+code page (of the selected encoding). If there are any glyphs beyond xFF on the 
+standard encoding page, they will be returned in one or more additional fonts
+of 223 glyphs each. I<Why 223?> The first 32 are reserved as control characters
+(although they have no glyphs), and number x20 is a space. This, plus 223, 
+gives 256 in total (the last plane may have fewer than 223 glyphs). These 
+"fonts" are temporary (dynamic), though as usable as any other font. 
+
+Note that a plane may be B<empty> (only I<space> at x20 and possibly an unusable
+character at x21) if the previous plane was full. You might want to check if
+any character in the plane has a Unicode value (if not, it's empty).
+
+The I<ordering> of these 223 glyphs in each following plane does I<not> appear 
+to follow any particular official scheme, so be sure to reference something like
+C<examples/020_corefonts> to see what is available, and what code point a glyph 
+is at (e.g., an 'A' in the text stream will print something different if you're 
+not on plane 0). For a given font B<file>, they should be I<consistent>. For 
+instance, in Times-Roman core font, an \x21 or ! in plane[1] should always give 
+an A+macron. Further note that new editions of font files released in the future
+may have changes to the glyph list and the ordering (affecting which plane a
+glyph appears on), so use automap() with caution. It appears that glyphs are 
+sorted by Unicode number, but if a new glyph is inserted, it would bump other 
+glyphs to new positions, and even to the next plane.
+
+An example:
+
+    $fnt = $pdf->corefont('Times-Roman', -encode => 'latin1');
+    @planes = ($fnt, $fnt->automap());  # two planes
+    $text->font($planes[0], 15);  # or just $fnt will work
+    $text->text('!');  # prints !
+    $text->font($planes[1], 15);
+    $text->text('!');  # prints A+macron
+
+If you had used 'latin2' encoding, an \x21 on plane 1 will give an inverted !
+(&iexcl; HTML entity).
+
+Note that C<< $planes[$n]->fontname() >> should always be the desired base
+font (e.g., I<Times-Roman>), while C<< $planes[$n]->name() >> will be the font
+ID (e.g., I<TiRoCBC>) for plane 0, while for other planes there will be a 
+unique suffix added (e.g., I<TiRoCBCam0>).
+
+If you have just an occasional non-plane 0 character (or run of characters),
+it may be tolerable to switch back and forth between planes like this, just as
+typing an HTML entity once in a while when you need a Greek letter on a web page
+is acceptable to most people. However, if you're typing a lot of Greek text, a 
+dedicated keyboard may be better for you. Like that, switching to a TTF font in 
+order to be able to use UTF-8 may be easier.
+
+=back
+
+=cut
 
 sub automap {
     my ($self) = @_;

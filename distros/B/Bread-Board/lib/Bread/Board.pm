@@ -1,6 +1,6 @@
 package Bread::Board;
 our $AUTHORITY = 'cpan:STEVAN';
-$Bread::Board::VERSION = '0.35';
+$Bread::Board::VERSION = '0.36';
 use strict;
 use warnings;
 use Carp qw(confess);
@@ -19,38 +19,21 @@ use Bread::Board::LifeCycle::Singleton;
 use Bread::Board::Service::Inferred;
 use Bread::Board::Service::Alias;
 
-use Exporter qw( import );
-
-our @EXPORT = qw[
-    as
-    container
-    depends_on
-    service
-    alias
-    wire_names
-    include
-    typemap
-    infer
-    literal
-];
-
-# This is a chopped down version of what's in Moose::Exporter. It'd be nice if
-# there was something on CPAN that implemented this without all the additional
-# Moose::Exporter baggage (particularly the enabling of strict & warnings).
-sub unimport {
-    my $package = caller();
-
-    foreach my $name (@EXPORT) {
-        no strict 'refs';
-        next unless defined &{ $package . '::' . $name };
-
-        my $sub = \&{ $package . '::' . $name };
-
-        next unless $sub eq __PACKAGE__->can($name);
-
-        delete ${ $package . '::' }{$name};
-    }
-}
+use Moose::Exporter 2.1200;
+Moose::Exporter->setup_import_methods(
+    as_is => [qw[
+        as
+        container
+        depends_on
+        service
+        alias
+        wire_names
+        include
+        typemap
+        infer
+        literal
+    ]],
+);
 
 sub as (&) { $_[0] }
 
@@ -277,7 +260,7 @@ Bread::Board - A solderless way to wire up your application components
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 

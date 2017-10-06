@@ -2,17 +2,20 @@ package Devel::Cover::Report::Codecov;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use URI;
 use Furl;
 use JSON::XS;
+use Sub::Retry;
 
 use Module::Find;
 useall 'Devel::Cover::Report::Codecov::Service';
 
 
 our $API_ENDPOINT = 'http://codecov.io/upload/v2';
+our $RETRY_TIMES  = 5;
+our $RETRY_DELAY  = 1; # sec
 
 sub report {
     my ($pkg, $db, $options) = @_;
@@ -24,8 +27,7 @@ sub report {
     my $query = get_query($service);
     my $url   = get_request_url($API_ENDPOINT, $query);
     my $json  = get_codecov_json($options->{file}, $db);
-
-    my $res = send_report($url, $json);
+    my $res   = send_report($url, $json);
 
     if ($res->{ok}) {
         print $res->{message} . "\n";
@@ -134,6 +136,23 @@ sub get_query {
 sub send_report {
     my ($url, $json) = @_;
 
+    my $n_times = $RETRY_TIMES > 0 ? $RETRY_TIMES : 1;
+
+    # evaluate in list context
+    my $result;
+    {
+        no warnings 'void';
+        [ retry $n_times, $RETRY_DELAY,
+            sub { $result = send_report_once($url, $json) },
+            sub { $_[0]->{ok} ? 0 : 1 } ];
+    };
+
+    return $result;
+}
+
+sub send_report_once {
+    my ($url, $json) = @_;
+
     my $furl    = Furl->new;
     my $headers = [ 'Accept' => 'application/json' ];
     my $res     = $furl->post($url, $headers, $json);
@@ -201,8 +220,6 @@ You must set CODECOV_TOKEN environment variables if you don't use Travis CI, Cir
 
 =item * L<Semaphore|https://semaphoreci.com/>
 
-=item * L<Snap CI|https://snap-ci.com/>
-
 =item * L<Wercker|http://wercker.com/>
 
 =item * L<GitLab|https://about.gitlab.com/gitlab-ci/>
@@ -223,7 +240,7 @@ There are example Codecov CI settings in L<example-perl|https://github.com/codec
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2016 Pine Mizune
+Copyright (c) 2015-2017 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

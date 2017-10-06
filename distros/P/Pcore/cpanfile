@@ -1,4 +1,4 @@
-requires 'perl', v5.26.0;
+requires 'perl', v5.26.1;
 
 # Pcore::Core
 requires 'multidimensional';
@@ -101,6 +101,7 @@ requires 'Compress::Zlib';
 requires 'URI::Escape::XS';
 requires 'MIME::Base64';
 requires 'Convert::Ascii85';
+requires 'TOML';
 
 # Pcore::Util::Date
 requires 'Time::Moment';

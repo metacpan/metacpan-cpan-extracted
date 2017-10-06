@@ -1,0 +1,18 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'raylib';
+
+share {
+    plugin Download => (
+        url => 'http://github.com/a3f/raylib/archive/master.tar.gz'
+    );
+
+    plugin Extract => 'tar.gz';
+
+    build [
+        '%{make} -C src',
+        '%{make} -C src install PREFIX=%{.install.prefix}',
+    ];
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

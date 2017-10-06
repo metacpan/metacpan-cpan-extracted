@@ -1,12 +1,12 @@
 package CPAN::Recent::Uploads::Retriever;
-$CPAN::Recent::Uploads::Retriever::VERSION = '0.12';
+$CPAN::Recent::Uploads::Retriever::VERSION = '0.14';
 #ABSTRACT: Retrieves recentfiles from a CPAN mirror
 
 use strict;
 use warnings;
 use Carp;
 use URI;
-use LWP::UserAgent;
+use HTTP::Tiny;
 use File::Spec::Unix;
 
 my @times = qw(1h 6h 1d 1W 1M 1Q 1Y);
@@ -30,10 +30,10 @@ sub retrieve {
 sub _fetch {
   my $self = shift;
   open my $fooh, '>', \$self->{foo} or die "$!\n";
-  my $ua = LWP::UserAgent->new();
-  my $resp = $ua->get( $self->{uri}->as_string, ':content_cb' => sub { my $data = shift; print {$fooh} $data; } );
+  my $ua = HTTP::Tiny->new();
+  my $resp = $ua->get( $self->{uri}->as_string, { 'data_callback' => sub { my $data = shift; print {$fooh} $data; } } );
   close $fooh;
-  return $self->{foo} if $resp->is_success;
+  return $self->{foo} if $resp->{success};
 }
 
 q[Woof];
@@ -50,7 +50,7 @@ CPAN::Recent::Uploads::Retriever - Retrieves recentfiles from a CPAN mirror
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

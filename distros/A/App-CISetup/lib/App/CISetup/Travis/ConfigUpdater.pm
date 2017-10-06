@@ -5,7 +5,7 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use App::CISetup::Travis::ConfigFile;
 use App::CISetup::Types qw( Bool Str );
@@ -21,9 +21,15 @@ has email_address => (
 );
 
 has force_threaded_perls => (
-    is      => 'ro',
-    isa     => Bool,
-    default => 0,
+    is        => 'ro',
+    isa       => Bool,
+    predicate => 'has_force_threaded_perls',
+);
+
+has perl_caching => (
+    is        => 'ro',
+    isa       => Bool,
+    predicate => 'has_perl_caching',
 );
 
 has github_user => (
@@ -49,18 +55,14 @@ sub _cli_params {
     my $self = shift;
 
     return (
-        force_threaded_perls => $self->force_threaded_perls,
-        (
-            $self->has_email_address
-            ? ( email_address => $self->email_address )
-            : ()
-        ),
-        (
-            $self->has_github_user
-            ? ( github_user => $self->github_user )
-            : ()
-        ),
-        ( $self->has_slack_key ? ( slack_key => $self->slack_key ) : () ),
+        ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+        map { my $p = 'has_' . $_; $self->$p ? ( $_ => $self->$_ ) : () } qw(
+            force_threaded_perls
+            perl_caching
+            email_address
+            github_user
+            slack_key
+            )
     );
 }
 ## use critic

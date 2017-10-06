@@ -1,0 +1,36 @@
+WebService-Vichan version 0.001
+===============================
+An api client for 4chan.org and imageboards that use vichan
+(such as 8ch.net).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Hash::Inflator
+* JSON::MaybeXS
+
+plus the HTTP::Tiny SSL dependencies:
+
+* IO::Socket::SSL
+* Mozilla::CA
+* Net::SSLeay
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

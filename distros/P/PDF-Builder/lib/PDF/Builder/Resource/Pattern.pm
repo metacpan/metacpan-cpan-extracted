@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '3.007'; # VERSION
 my $LAST_UPDATE = '2.031'; # manually update whenever code is changed
 
 =head1 NAME

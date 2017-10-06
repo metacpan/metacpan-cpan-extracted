@@ -6,7 +6,7 @@ NAME
 SYNOPSIS
 
         use RPi::WiringPi;
-        use RPi::WiringPi::Constant qw(:all);
+        use RPi::Const qw(:all);
     
         my $pi = RPi::WiringPi->new;
     
@@ -247,7 +247,7 @@ DESCRIPTION
     Component modules do none of these things.
 
     There are a basic set of constants that can be imported. See
-    RPi::WiringPi::Constant.
+    RPi::Const.
 
     It's handy to have access to a pin mapping conversion chart. There's an
     excellent pin scheme map for reference at pinout.xyz
@@ -257,8 +257,8 @@ DESCRIPTION
 
 METHODS
 
-    See RPi::WiringPi::Util for utility/helper methods that are imported
-    into an RPi::WiringPi object.
+    See RPi::WiringPi::Core for utility/helper/hardware-specific methods
+    that are imported into an RPi::WiringPi object.
 
  new([%args])
 

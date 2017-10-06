@@ -27,7 +27,7 @@ use constant {
     I2C_BCM2835 => 2,
 };
 
-our $VERSION ='0.65';
+our $VERSION ='0.66';
 
 __PACKAGE__->create_accessors( qw ( fh fno address busmode readmode ) );
 
@@ -60,9 +60,18 @@ sub get_device_list {
 sub get_baudrate {
     my ($class) = @_;
     if ( $modvers == I2C_BCM2835 ) {
-        my $baudrate = qx(xxd -ps /sys/class/i2c-adapter/i2c-1/of_node/clock-frequency);
-        chomp $baudrate;
-        return hex($baudrate);
+        my $sysfile = '/sys/class/i2c-adapter/i2c-1/of_node/clock-frequency';
+        my $sysfile0 = '/sys/class/i2c-adapter/i2c-0/of_node/clock-frequency';
+        if( -e $sysfile0 && !-e $sysfile ) {
+            $sysfile = $sysfile0;
+        }
+        if( -e $sysfile ) {
+            my $baudrate = qx(xxd -ps $sysfile);
+            chomp $baudrate;
+            return hex($baudrate);
+        } else {
+            return 0;
+        }
     } else {
         my $baudrate = qx(/bin/cat $baudrate_param_path);
         if($?) {
@@ -157,6 +166,23 @@ sub reset_ioctl {
     return $result;
 }
 
+sub send_software_reset {
+    my $self = shift;
+    my $devicename = $self->devicename;
+    my $result = -1;
+    try {
+        my $fh = IO::File->new( $devicename, O_RDWR, 0 ) or croak qq(open error on $devicename $!\n);
+        $fh->ioctl( I2C_SLAVE, 0 );
+        my $buffer = pack('C*', 0x06, 0);
+        $result = _i2c_write( $fh->fileno, 0, $buffer, 1 );
+        $fh->close;
+    } catch {
+        warn $_;
+    };
+    
+    return $result;
+}
+
 sub ioctl {
     my ($self, $ioctlconst, $data) = @_;
     $self->fh->ioctl( $ioctlconst, $data );
@@ -235,8 +261,13 @@ sub bus_read {
         
     if( $self->busmode eq 'smbus' ) {       
         @arrayreturn = $self->smbus_read( $cmdval, $numbytes );
-    } else {
+    
+    # i2c modes
+    } elsif( defined($cmdval) ) {
         @arrayreturn = $self->i2c_read_register($cmdval, $numbytes );
+    } else {
+        # read without write
+        @arrayreturn = $self->i2c_read( $numbytes );
     }
     
     $self->set_combined($resetcombined) if $resetcombined;
@@ -450,8 +481,8 @@ sub smbus_read_block_data {
 }
 
 sub smbus_read_i2c_block_data {
-    my($self, $command, $data) = @_;
-    my @result = i2c_smbus_read_i2c_block_data($self->fno, $command, $data);
+    my($self, $command, $numbytes) = @_;
+    my @result = i2c_smbus_read_i2c_block_data($self->fno, $command, $numbytes);
     croak qq(smbus_read_i2c_block_data failed ) unless @result;
     return @result;
 }

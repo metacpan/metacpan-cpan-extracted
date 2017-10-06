@@ -5,7 +5,7 @@ use strict;
 use warnings;
 no autovivification;
 
-use version; our $VERSION = qv('v1.10.0');
+use version; our $VERSION = qv('v1.12.0');
 
 
 use Time::HiRes                              qw( );
@@ -343,8 +343,8 @@ sub _projects {
       'backed_by_friends',  # Boolean
       'picked_by_staff',    # Boolean
       'state',              # 'all' (default), 'live', 'successful'
-      'pledged',            # 'all' (default), '0':<$10k, '1':$10k to $100k, '2':$100k to $1M, '3':>$1M
-      'goal',               # 'all' (default), '0':<$10k, '1':$10k to $100k, '2':$100k to $1M, '3':>$1M
+      'pledged',            # 'all' (default), '0':<=$1k, '1':$1k to $10k, '2':$10k to $100k, '3':$100k to $1M, '4':>$1M
+      'goal',               # 'all' (default), '0':<=$1k, '1':$1k to $10k, '2':$10k to $100k, '3':$100k to $1M, '4':>$1M
       'raised',             # 'all' (default), '0':<75%, '1':75% to 100%, '2':>100%
       'sort',               # 'magic' (default), 'end_date', 'newest', 'launch_date', 'popularity', 'most_funded'
    ) {
@@ -363,10 +363,10 @@ sub _projects {
 
    $form{state} =~ /^(?:all|live|successful)\z/
       or my_croak(400, "Unrecognized value for state. Valid: all, live, successful");
-   $form{pledged} =~ /^(?:all|[0123])\z/
-      or my_croak(400, "Unrecognized value for pledged. Valid: all, 0, 1, 2, 3");
-   $form{goal} =~ /^(?:all|[0123])\z/
-      or my_croak(400, "Unrecognized value for goal. Valid: all, 0, 1, 2, 3");
+   $form{pledged} =~ /^(?:all|[01234])\z/
+      or my_croak(400, "Unrecognized value for pledged. Valid: all, 0, 1, 2, 3, 4");
+   $form{goal} =~ /^(?:all|[01234])\z/
+      or my_croak(400, "Unrecognized value for goal. Valid: all, 0, 1, 2, 3, 4");
    $form{raised} =~ /^(?:all|[012])\z/
       or my_croak(400, "Unrecognized value for raised. Valid: all, 0, 1, 2");
    $form{sort} =~ /^(?:magic|end_date|newest|launch_date|popularity|most_funded)\z/
@@ -557,7 +557,7 @@ WWW::Kickstarter - Retrieve information from Kickstarter
 
 =head1 VERSION
 
-Version 1.10.0
+Version 1.12.0
 
 
 =head1 SYNOPSIS
@@ -783,7 +783,6 @@ Limits the projects returned to those with the specified tag.
 
 The list of tags available changes often. I don't know of an API endpoint that returns a list of available tags, but you can find some of them on L<Kickstarter's Advanced Discover page|https://www.kickstarter.com/discover/advanced>. See L<WWW::Kickstarter::Data::Tags> for the list of tags known to exist at the time of this writing.
 
-
 =item * C<< location => $woe_id >>
 
 Limits the projects returned to those associated with the specified location.
@@ -818,13 +817,15 @@ Limits the projects returned to those which have a goal that falls within the sp
 
 =over
 
-=item * C<0>: E<lt>$10k
+=item * C<0>: E<le>$1k
 
-=item * C<1>: $10k to $100k
+=item * C<1>: E<gt>$1k and E<le>$10k
 
-=item * C<2>: $100k to $1M
+=item * C<2>: E<gt>$10k and E<le>$100k
 
-=item * C<3>: E<gt>$1M
+=item * C<3>: E<gt>$100k and E<le>$1M
+
+=item * C<4>: E<gt>$1M
 
 =back
 
@@ -836,13 +837,15 @@ Limits the projects returned to those to which the amount pledged falls within t
 
 =over
 
-=item * C<0>: E<lt>$10k
+=item * C<0>: E<le>$1k
 
-=item * C<1>: $10k to $100k
+=item * C<1>: E<gt>$1k and E<le>$10k
 
-=item * C<2>: $100k to $1M
+=item * C<2>: E<gt>$10k and E<le>$100k
 
-=item * C<3>: E<gt>$1M
+=item * C<3>: E<gt>$100k and E<le>$1M
+
+=item * C<4>: E<gt>$1M
 
 =back
 
@@ -1018,7 +1021,7 @@ The following issues are known:
 
 =back
 
-Feel free to bug me (C<< <ikegami@adaelis.com> >>) to work on these, or to submit a patch to one of the bug trackers listed below.
+Feel free to bug the L<author|/AUTHOR> to work on these, or to submit a patch to one of the bug trackers listed below.
 
 
 =head1 DOCUMENTATION AND SUPPORT
@@ -1041,11 +1044,11 @@ If you need help, the following are great resources:
 
 =over
 
-=item * L<https://stackoverflow.com/|StackOverflow>
+=item * L<Stack Overflow|https://stackoverflow.com/>
 
-=item * L<http://www.perlmonks.org/|PerlMonks>
+=item * L<PerlMonks|http://www.perlmonks.org/>
 
-=item * You may also contact the author directly.
+=item * You may also contact the L<author|/AUTHOR> directly.
 
 =back
 

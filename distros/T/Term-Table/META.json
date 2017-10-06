@@ -4,7 +4,7 @@
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
          "url" : "http://github.com/exodist/Term-Table/"
       }
    },
-   "version" : "0.008",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.010",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -11,10 +11,11 @@ use Dancer::RPCPlugin::DispatchItem;
 
 {
     my $dispatch = dispatch_table_from_pod(
-        label    => 'jsonrpc',
+        plugin   => 'jsonrpc',
         packages => [qw/
             TestProject::ApiCalls
         /],
+        endpoint => '/testing',
     );
     is_deeply(
         $dispatch,
@@ -30,10 +31,11 @@ use Dancer::RPCPlugin::DispatchItem;
     like(
         exception {
             dispatch_table_from_pod(
-                label    => 'jsonrpc',
+                plugin   => 'jsonrpc',
                 packages => [qw/
                     TestProject::Bogus
                 /],
+                endpoint => '/testing',
             )
         },
         qr/Handler not found for bogus.nonexistent: TestProject::Bogus::nonexistent doesn't seem to exist/,
@@ -41,5 +43,110 @@ use Dancer::RPCPlugin::DispatchItem;
     );
 }
 
-done_testing();
+{
+    my $xmlrpc = dispatch_table_from_pod(
+        plugin => 'xmlrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/system',
+    );
+    my $system_call = dispatch_item(
+        package => 'TestProject::MixedEndpoints',
+        code    => TestProject::MixedEndpoints->can('call_for_system'),
+    );
+    my $any_call = dispatch_item(
+        package => 'TestProject::MixedEndpoints',
+        code    => TestProject::MixedEndpoints->can('call_for_all_endpoints'),
+    );
 
+    is_deeply(
+        $xmlrpc,
+        {
+            'system.call' => $system_call,
+            'any.call'    => $any_call,
+        },
+        "picked the /system call for xmlrpc"
+    );
+
+    my $jsonrpc = dispatch_table_from_pod(
+        plugin => 'jsonrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/system',
+    );
+    is_deeply(
+        $jsonrpc,
+        {
+            'system_call' => $system_call,
+            'any_call'    => $any_call,
+        },
+        "picked the /system call for jsonrpc"
+    );
+
+    my $restrpc = dispatch_table_from_pod(
+        plugin => 'restrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/system',
+    );
+    is_deeply(
+        $restrpc,
+        {
+            'call'     => $system_call,
+            'any-call' => $any_call,
+        },
+        "picked the /system call for restrpc"
+    );
+}
+
+{
+    my $xmlrpc = dispatch_table_from_pod(
+        plugin => 'xmlrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/testing',
+    );
+    my $testing_call = dispatch_item(
+        package => 'TestProject::MixedEndpoints',
+        code    => TestProject::MixedEndpoints->can('call_for_testing'),
+    );
+    my $any_call = dispatch_item(
+        package => 'TestProject::MixedEndpoints',
+        code    => TestProject::MixedEndpoints->can('call_for_all_endpoints'),
+    );
+
+    is_deeply(
+        $xmlrpc,
+        {
+            'testing.call' => $testing_call,
+            'any.call'    => $any_call,
+        },
+        "picked the /testing call for xmlrpc"
+    );
+
+    my $jsonrpc = dispatch_table_from_pod(
+        plugin => 'jsonrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/testing',
+    );
+    is_deeply(
+        $jsonrpc,
+        {
+            'testing_call' => $testing_call,
+            'any_call'    => $any_call,
+        },
+        "picked the /testing call for jsonrpc"
+    );
+
+    my $restrpc = dispatch_table_from_pod(
+        plugin => 'restrpc',
+        packages => [ 'TestProject::MixedEndpoints' ],
+        endpoint => '/testing',
+    );
+    is_deeply(
+        $restrpc,
+        {
+            'call'     => $testing_call,
+            'any-call' => $any_call,
+        },
+        "picked the /testing call for restrpc"
+    );
+}
+
+done_testing();

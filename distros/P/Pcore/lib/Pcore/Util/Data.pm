@@ -8,12 +8,13 @@ use Pcore -const, -export,
     YAML  => [qw[to_yaml from_yaml]],
     XML   => [qw[to_xml from_xml]],
     INI   => [qw[to_ini from_ini]],
+    TOML  => [qw[to_toml from_toml]],
     B64   => [qw[to_b64 to_b64_url from_b64 from_b64_url]],
     B85   => [qw[to_b85 from_b85]],
     URI   => [qw[to_uri from_uri from_uri_query]],
     XOR   => [qw[to_xor from_xor]],
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_ENC_B85 $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
-    TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
+    TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI $DATA_TYPE_TOML]],
   };
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
 use Pcore::Util::List qw[pairs];
@@ -27,6 +28,7 @@ const our $DATA_TYPE_CBOR => 3;
 const our $DATA_TYPE_YAML => 4;
 const our $DATA_TYPE_XML  => 5;
 const our $DATA_TYPE_INI  => 6;
+const our $DATA_TYPE_TOML => 7;
 
 const our $DATA_ENC_B64 => 1;
 const our $DATA_ENC_HEX => 2;
@@ -88,6 +90,9 @@ sub encode_data ( $type, $data, @ ) {
     }
     elsif ( $type == $DATA_TYPE_INI ) {
         $res = to_ini($data);
+    }
+    elsif ( $type == $DATA_TYPE_TOML ) {
+        $res = to_toml($data);
     }
     else {
         die qq[Unknown serializer "$type"];
@@ -264,6 +269,9 @@ sub decode_data ( $type, @ ) {
     }
     elsif ( $type == $DATA_TYPE_INI ) {
         $res = from_ini($data_ref);
+    }
+    elsif ( $type == $DATA_TYPE_TOML ) {
+        $res = from_toml($data_ref);
     }
     else {
         die qq[Unknown serializer "$type"];
@@ -594,6 +602,19 @@ sub from_ini ( $data, @ ) {
     return $cfg;
 }
 
+# TOML
+sub to_toml ( $data, @ ) {
+    state $init = !!require TOML;
+
+    return \TOML::to_toml($data);
+}
+
+sub from_toml ( $data, @ ) {
+    state $init = !!require TOML;
+
+    return TOML::from_toml( $data->$* );
+}
+
 # BASE64
 sub to_b64 {
     state $init = !!require MIME::Base64;
@@ -795,14 +816,16 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 49                   | * Subroutine "encode_data" with high complexity score (27)                                                     |
-## |      | 163                  | * Subroutine "decode_data" with high complexity score (28)                                                     |
+## |      | 51                   | * Subroutine "encode_data" with high complexity score (28)                                                     |
+## |      | 168                  | * Subroutine "decode_data" with high complexity score (29)                                                     |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 76, 255              | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 372, 425             | * Postfix control "for" used                                                                                   |
-## |      | 781                  | * Postfix control "while" used                                                                                 |
+## |      | 380, 433             | * Postfix control "for" used                                                                                   |
+## |      | 802                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 645                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 666                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

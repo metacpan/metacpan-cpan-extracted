@@ -1,0 +1,37 @@
+---
+abstract: 'Mojo::Base + lexical "has"'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+  base: '0'
+  lib: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Bass
+provides:
+  Mojo::Bass:
+    file: lib/Mojo/Bass.pm
+    version: v0.1.1
+requires:
+  Mojo::Base: '0'
+  Sub::Inject: v0.2.0
+  perl: '5.018'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Mojo-Bass/issues
+  homepage: https://github.com/aferreira/cpan-Mojo-Bass
+  repository: https://github.com/aferreira/cpan-Mojo-Bass.git
+version: 0.1.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

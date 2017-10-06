@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use App::CISetup::Travis::ConfigUpdater;
 
@@ -25,7 +25,7 @@ setup-travis-yml.pl - Tool for managing .travis.yml files
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ Here's a step-by-step guide to the generated Travis config and what it does:
 
 By default, C<sudo> will be disabled for the Travis run. This makes Travis
 faster. However, if an existing C<before_install> or C<install> block invokes
-C<sudo>`, then sudo will be enabled.
+C<sudo>, then sudo will be enabled.
 
 When C<sudo> is disabled, the C<addons> block will be updated to include
 C<aspell> and C<aspell-en> for the benefit of L<Test::Spelling>.
@@ -80,8 +80,8 @@ C<perl-travis-helper> (the old name), then these blocks will be left as-is.
 If the travis-perl helpers I<are> referenced, the following updates are done:
 
 If the C<script> block is more than 3 lines long I<and> either the C<install>
-block is longer than 2 line I<or> the C<install> block does not contain a call
-to the travis-perl C<cpan-install>, then the C<before_install> block is
+block is longer than 2 lines I<or> the C<install> block does not contain a
+call to the travis-perl C<cpan-install>, then the C<before_install> block is
 updated to include these lines:
 
     - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
@@ -98,7 +98,7 @@ If the C<script> and C<install> blocks don't match the aforementioned
 conditions, then the C<instal> and C<script> blocks are deleted entirely and
 the C<before_install> block is updated to contain this line:
 
-    - eval $(curl https://travis-perl.github.io/init) --auto
+    - eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules
 
 If there is an existing travis-perl C<eval> line, this will be replaced with
 the line above. Otherwise this line will be inserted at the beginning of the
@@ -114,6 +114,7 @@ Perls, then you get a block like this:
     perl:
       - blead
       - dev
+      - '5.26'
       - '5.24'
       - '5.22'
       - '5.20'
@@ -131,6 +132,8 @@ forms. This will look something like this:
       - blead-thr
       - dev
       - dev-thr
+      - 5.26.0
+      - 5.26.0-thr
       - 5.24.1
       - 5.24.1-thr
       - 5.22.3
@@ -154,7 +157,7 @@ something like this:
         - perl: blead
       include:
         - env: COVERAGE=1
-          perl: '5.24'
+          perl: '5.26'
 
 =head2 C<env.global>
 
@@ -199,6 +202,15 @@ This is required.
 
 Force the inclusion of both threaded and unthreaded Perls in the generated
 config, regardless of whether the distro has XS or not.
+
+=head2 --perl-caching
+
+If this is true, then a C<cache> block will added to cache the C<$HOME/perl5>
+directory. In addition, the travis-perl C<init> call will be updated to add
+C<--always-uprade-modules>.
+
+Caching is enabled for Perl projects by default, but you can disable this by
+passing C<--no-perl-caching>.
 
 =head2 --slack-key
 

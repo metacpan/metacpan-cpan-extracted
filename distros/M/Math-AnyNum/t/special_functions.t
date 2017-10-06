@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 215;
+plan tests => 231;
 
 use Math::AnyNum qw(:special rat float complex);
 
@@ -197,6 +197,63 @@ is(root(125, rat(3)),     5);
 is(root(125, complex(3)), 5);
 is(root(125, rat(3)),     5);
 is(root(125, int(3)),     5);
+
+#<<<
+is(polygonal_root('3599999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999937', Math::AnyNum::ipow(10, 128)), 9);
+is(polygonal_root('7005421398857629823126044593025618425102587271439458285811113043336554134634496', 123), '340282366920938463463374607431768211456');
+#>>>
+
+is(polygonal_root(100,         4),          10);
+is(polygonal_root(55,          complex(3)), 10);
+is(polygonal_root(complex(92), 5),          8);
+
+is(polygonal_root(123,             2), 123);
+is(polygonal_root(complex(123),    2), 123);
+is(polygonal_root(complex('3+4i'), 2), '3+4i');
+
+like(polygonal_root(complex('3+4i'), complex('-12-5i')),
+     qr/^0\.2305746625072866270789735\d*\+0\.573173157878973757546141105581\d*i\z/);
+
+#<<<
+like(polygonal_root( 9, -7), qr/^0\.611111111111+\-1\.27536003147211070575476372733696015\d*i\z/);
+like(polygonal_root(-9, -7), qr/^-0\.9294916248735608277433522242912010263\d*\z/);
+#>>>
+
+is(join(' ', map { polygonal_root2($_,          5) } qw(0 2 7 15 26 40 57 77 100)), '0 -1 -2 -3 -4 -5 -6 -7 -8');
+is(join(' ', map { polygonal_root2(complex($_), 5) } qw(0 2 7 15 26 40 57 77 100)), '0 -1 -2 -3 -4 -5 -6 -7 -8');
+
+#<<<
+is(join(' ', map {
+
+    my $n = $_;
+    my $k = int(rand(1000000000)) + 3;
+
+    polygonal_root(Math::AnyNum::polygonal($n, $k), $k);
+
+} 1..10), join(' ', 1..10));
+#>>>
+
+#<<<
+is(join(' ', map {
+
+    my $n = $_;
+    my $k = int(rand(1000000000)) + 3;
+
+    polygonal_root2(Math::AnyNum::polygonal($n, $k), $k);
+
+} -10..0), join(' ', -10..0));
+#>>>
+
+#<<<
+is(join('', map {
+
+    my $n = int(rand(100));
+    my $k = int(rand(2)) ? $_ : complex($_);
+
+    !!(Math::AnyNum::polygonal(polygonal_root($n, $k), $k) == $n) eq !!Math::AnyNum::is_polygonal($n, $k)
+
+} 0..20), '1' x 21);
+#>>>
 
 like(sqrt(1234),          qr/^35\.128336140500591605870311625356306764540\d*\z/);
 like(sqrt(rat(1234)),     qr/^35\.128336140500591605870311625356306764540\d*\z/);

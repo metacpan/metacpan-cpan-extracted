@@ -1,5 +1,5 @@
 {
-   "abstract" : "Import functions with lexical scope",
+   "abstract" : "Import functions as lexical subroutines",
    "author" : [
       "Adriano Ferreira <ferreira@cpan.org>"
    ],
@@ -34,9 +34,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Importer::Zim::Base" : "v0.5.0",
-            "Sub::Inject" : "0",
-            "constant" : "0",
+            "Importer::Zim::Base" : "v0.8.0",
+            "Importer::Zim::Utils" : "v0.8.0",
+            "Sub::Inject" : "v0.2.0",
             "perl" : "5.018"
          }
       },
@@ -56,7 +56,7 @@
    "provides" : {
       "Importer::Zim::Lexical" : {
          "file" : "lib/Importer/Zim/Lexical.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.8.0"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim-Lexical"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.8.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

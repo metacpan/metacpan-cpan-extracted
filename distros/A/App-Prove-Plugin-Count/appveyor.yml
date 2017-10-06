@@ -1,0 +1,18 @@
+# https://qiita.com/pine613/items/3fdc4e1bd06065cc056d
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - choco install strawberryperl
+  - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+
+  - cpanm --quiet --installdeps --notest .
+
+build: off
+
+test_script:
+  - perl Build.PL && perl Build && perl Build test
+
+shallow_clone: true
+

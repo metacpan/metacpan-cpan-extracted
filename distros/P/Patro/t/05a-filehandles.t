@@ -64,6 +64,7 @@ ok(tell($p1) > 0, 'tell of output proxy filehandle should be >0');
 
 seek $th, tell($p1), 0;   # seek readhandle to writehandle
 
+binmode $th;
 ok(binmode($p1), 'simple binmode ok');
 print $p1 "q\n";
 my $c0 = getc($th) . getc($th);
@@ -80,6 +81,12 @@ ok($!, '$! set on bad binmode call');
 
 
 done_testing;
+
+close $f1;
+close $th;
+#eval { close $p1 };
+
+unlink 't/t-05a.out' unless $ENV{KEEP};
 
 END {
     unlink 't/t-05a.out' unless $ENV{KEEP};

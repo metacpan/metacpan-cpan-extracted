@@ -31,14 +31,15 @@ use FindBin ();
 use lib $FindBin::Bin;
 use File_Replace_Testlib;
 
-use Test::More tests=>9;
+use Test::More tests=>8;
+use File::Temp qw/tempfile/;
 
 ## no critic (RequireCarping)
 
 BEGIN { use_ok 'File::Replace' }
 
 subtest 'basic test' => sub { plan tests=>7;
-	my $fn = spew(newtempfn, "Hello,\n");
+	my $fn = newtempfn("Hello,\n");
 	my $r = File::Replace->new($fn);
 	isa_ok $r, 'File::Replace';
 	my $line = readline($r->in_fh);
@@ -53,15 +54,17 @@ subtest 'basic test' => sub { plan tests=>7;
 };
 
 subtest 'debug' => sub { plan tests=>5;
-	diag "Expect some debug output here:";
-	ok( File::Replace->new(newtempfn, debug=>1)->finish, 'debug' );
-	ok( File::Replace->new(newtempfn,':utf8', debug=>1)->finish, 'debug w/layers' );
+	note "Expect some debug output here:";
+	my $db = Test::More->builder->output;
+	ok( File::Replace->new(newtempfn, debug=>$db)->finish, 'debug' );
+	ok( File::Replace->new(newtempfn,':utf8', debug=>$db)->finish, 'debug w/layers' );
 	ok 2 <= warns { # this "warns" is also just to hide the warning output from the user
 		# author tests make warnings fatal, disable that here
 		no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
-		my $repl1 = File::Replace->new(newtempfn, debug=>1);
+		my $repl1 = File::Replace->new(newtempfn, debug=>$db);
 		ok( $repl1->cancel, 'debug cancel' );
 		ok( !$repl1->cancel, 'debug cancel fail' );
+		local *STDERR = $db;
 		my $repl2 = File::Replace->new(newtempfn, debug=>1);
 		$repl2 = undef;
 		1; # don't return anything from this block
@@ -69,62 +72,25 @@ subtest 'debug' => sub { plan tests=>5;
 };
 
 subtest 'options' => sub { plan tests=>3;
-	my $r = File::Replace->new(spew(newtempfn,""), devnull=>0, perms=>oct('640'));
+	my $r = File::Replace->new(newtempfn(""), create=>'off', perms=>oct('640'));
 	# chmod is a default option that we don't change
-	# devnull is a default option that we do change
+	# create is a default option that we do change
 	# perms is not a default option that we explicitly set
-	my $exp = { chmod=>!$File::Replace::DISABLE_CHMOD, devnull=>0, perms=>oct('640') };
+	my $exp = { chmod=>!$File::Replace::DISABLE_CHMOD, create=>'off', perms=>oct('640') };
 	is_deeply scalar($r->options), $exp, 'scalar opts';
 	is_deeply {$r->options}, $exp, 'list opts';
 	$r->finish;
 	# default options only
-	my $r2 = File::Replace->new(spew(newtempfn,""));
+	my $r2 = File::Replace->new(newtempfn(""));
 	# note this *shouldn't* include perms
 	is_deeply scalar($r2->options), { chmod=>!$File::Replace::DISABLE_CHMOD,
-		devnull=>1 }, 'default opts';
+		create=>'later' }, 'default opts';
 	$r2->finish;
-};
-
-subtest 'nonexistent file' => sub { plan tests=>3;
-	my $fn = newtempfn;
-	my $r = File::Replace->new($fn);
-	ok eof($r->in_fh), 'eof';
-	print {$r->out_fh} "Foo\n", "Bar\n";
-	ok !-e $fn, "doesn't exist before finish";
-	$r->finish;
-	is slurp($fn), "Foo\nBar\n", 'replaced file ok';
-};
-
-subtest 'create / devnull' => sub { plan tests=>8;
-	{
-		my $fn = newtempfn;
-		ok exception { my $r = File::Replace->new($fn, devnull=>0) }, 'fails ok';
-		ok $!{ENOENT}, 'ENOENT'; #TODO Later: will this work on all OSes?
-		ok !-e $fn, "file doesn't exist";
-	}
-	{
-		my $fn = newtempfn;
-		my $r = File::Replace->new($fn, create=>1);
-		ok -e $fn, 'file now exists';
-		print {$r->out_fh} "Something\n";
-		is slurp($fn), "", 'file is empty';
-		$r->finish;
-		is slurp($fn), "Something\n", 'file has content';
-	}
-	{
-		my $fn = newtempfn;
-		# perms option here is just for code coverage, we don't need to check outcome
-		my $r = File::Replace->new($fn, ':utf8', create=>1, perms=>oct('640'));
-		print {$r->out_fh} "Anotherthing\n";
-		is slurp($fn), "", 'file is empty';
-		$r->finish;
-		is slurp($fn), "Anotherthing\n", 'file has content';
-	}
 };
 
 subtest 'layers' => sub { plan tests=>2;
 	{
-		my $fn = spew(newtempfn,"Foo\x{20AC}\n",':utf8');
+		my $fn = newtempfn("Foo\x{20AC}\n",':utf8');
 		my $r = File::Replace->new($fn,':utf8');
 		is ''.readline($r->in_fh), "Foo\x{20AC}\n", 'read utf8';
 		$r->finish;
@@ -139,6 +105,36 @@ subtest 'layers' => sub { plan tests=>2;
 	}
 };
 
+subtest 'in_fh' => sub { plan tests=>7;
+	my ($tfh,$tfn) = tempfile(DIR=>$TEMPDIR,UNLINK=>1);
+	print $tfh "Hello,\nWorld!\n";
+	ok seek($tfh, 0, 0), 'seek';
+	my $repl = File::Replace->new($tfn, in_fh=>$tfh);
+	is readline($repl->in_fh), "Hello,\n", 'readline 1';
+	is readline($repl->in_fh), "World!\n", 'readline 2';
+	ok eof($repl->in_fh), 'eof';
+	print {$repl->out_fh} "Replaced";
+	$repl->finish;
+	is slurp($tfn), "Replaced", 'file contents';
+	# test closed in_fh
+	like exception {
+		my ($tfh2,$tfn2) = tempfile(DIR=>$TEMPDIR,UNLINK=>1);
+		close $tfh2;
+		my $replx = File::Replace->new($tfn2, in_fh=>$tfh2);
+	}, qr/\bin_fh\b.+\bclosed\b/, 'closed in_fh';
+	# test stat failure
+	my $tiedfh = Tie::Handle::FakeFileno->new;
+	like exception {
+		# force chmod to be on in case $DISABLE_CHMOD is set
+		my $repl0 = File::Replace->new($tfn, chmod=>1, in_fh=>$tiedfh);
+	}, qr/\bstat\s+failed\b/, 'stat fails';
+	# these shouldn't fail, since they shouldn't try to stat
+	my $repl1 = File::Replace->new($tfn, in_fh=>$tiedfh, chmod=>0);
+	my $repl2 = File::Replace->new($tfn, in_fh=>$tiedfh, perms=>oct('600'));
+	$repl1->finish;
+	$repl2->finish;
+};
+
 subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 	ok grep( {/\bunclosed file\b.+\bnot replaced\b/i}
 		warns {
@@ -149,7 +145,7 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 		}), 'warning';
 	ok !grep( {/\bunclosed file\b/i} warns {
 		{
-			my $fn = spew(newtempfn, "Alpha\n");
+			my $fn = newtempfn("Alpha\n");
 			my $r = File::Replace->new($fn);
 			print {$r->out_fh} "Beta\n";
 			is slurp($fn), "Alpha\n", 'original unchanged';
@@ -159,7 +155,7 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 			is slurp($fn), "Alpha\n", 'still unchanged';
 		}
 		{
-			my $fn = spew(newtempfn, "Gamma\n");
+			my $fn = newtempfn("Gamma\n");
 			my $r = File::Replace->new($fn, autocancel=>1);
 			print {$r->out_fh} "Delta\n";
 			is slurp($fn), "Gamma\n", 'original unchanged';
@@ -167,7 +163,7 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 			is slurp($fn), "Gamma\n", 'unchanged after autocancel';
 		}
 		{
-			my $fn = spew(newtempfn, "Epsilon\n");
+			my $fn = newtempfn("Epsilon\n");
 			my $r = File::Replace->new($fn, autofinish=>1);
 			print {$r->out_fh} "Zeta\n";
 			is slurp($fn), "Epsilon\n", 'original unchanged';
@@ -175,7 +171,7 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 			is slurp($fn), "Zeta\n", 'original replaced after autofinish';
 		}
 		{
-			my $fn = spew(newtempfn, "Blam\n");
+			my $fn = newtempfn("Blam\n");
 			like exception {
 				my $r = File::Replace->new($fn, autofinish=>1);
 				my $infh = $r->in_fh;
@@ -191,20 +187,6 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 	}), 'no warnings about unclosed files';
 };
 
-{
-	package Tie::Handle::Unclosable;
-	require Tie::Handle::Base;
-	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
-	# just force close to return a false value, since
-	# apparently we can't mock close via "local *CORE::close = sub ...",
-	sub CLOSE { my $self=shift; $self->SUPER::CLOSE(@_); return }
-}
-sub _mockhandle {
-	my ($repl,$which) = @_;
-	$repl->{$which} = Tie::Handle::Unclosable->new($repl->{$which});
-	return $repl;
-}
-
 subtest 'misc failures' => sub { plan tests=>13;
 	like exception { my $r = File::Replace->new() },
 		qr/\bnot enough arguments\b/i, 'not enough args';
@@ -216,19 +198,19 @@ subtest 'misc failures' => sub { plan tests=>13;
 		qr/\bautocancel\b.+\bautofinish\b/, 'autocancel+autofinish fails';
 	
 	like exception {
-			_mockhandle( File::Replace->new(newtempfn), 'ifh' )->finish;
+			Tie::Handle::Unclosable->install( File::Replace->new(newtempfn), 'ifh' )->finish;
 		}, qr/\bcouldn't close input handle\b/, 'finish close input handle failing';
 	like exception {
-			_mockhandle( File::Replace->new(newtempfn), 'ofh' )->finish;
+			Tie::Handle::Unclosable->install( File::Replace->new(newtempfn), 'ofh' )->finish;
 		}, qr/\bcouldn't close output handle\b/, 'finish close output handle failing';
-	ok !_mockhandle( File::Replace->new(newtempfn), 'ifh' )->_cancel(''),
+	ok !Tie::Handle::Unclosable->install( File::Replace->new(newtempfn), 'ifh' )->_cancel(''),
 		'cancel close input handle failing';
-	ok !_mockhandle( File::Replace->new(newtempfn), 'ofh' )->_cancel(''),
+	ok !Tie::Handle::Unclosable->install( File::Replace->new(newtempfn), 'ofh' )->_cancel(''),
 		'cancel close output handle failing';
 	{
 		my $r = File::Replace->new(newtempfn);
 		close $r->in_fh;
-		_mockhandle( $r, 'ifh' );
+		Tie::Handle::Unclosable->install( $r, 'ifh' );
 		ok !$r->cancel, 'cancel close input handle already closed';
 	}
 	

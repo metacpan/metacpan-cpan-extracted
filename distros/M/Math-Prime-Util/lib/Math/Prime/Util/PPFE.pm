@@ -42,7 +42,7 @@ if (CSPRNG_CHACHA) {
 }
 sub srand {
   my($seed) = @_;
-  croak "secure option set, manual seeding disabled" if $Math::Prime::Util::_Config{'secure'};
+  croak "secure option set, manual seeding disabled" if prime_get_config()->{'secure'};
   if (!defined $seed) {
     my $nbytes = (~0 == 4294967295) ? 4 : 8;
     $seed = entropy_bytes( $nbytes );
@@ -54,7 +54,7 @@ sub srand {
 }
 sub csrand {
   my($seed) = @_;
-  croak "secure option set, manual seeding disabled" if $Math::Prime::Util::_Config{'secure'} && defined $seed;
+  croak "secure option set, manual seeding disabled" if defined $seed && prime_get_config()->{'secure'};
   $seed = entropy_bytes( 64 ) unless defined $seed;
   Math::Prime::Util::GMP::seed_csprng(length($seed),$seed)
     if $Math::Prime::Util::_GMPfunc{"seed_csprng"};
@@ -726,12 +726,25 @@ sub is_power {
   $vn = '-'.$vn if $n < 0;
   return Math::Prime::Util::PP::is_power($vn, $a, $refp);
 }
+sub is_square {
+  my($n) = @_;
+  return 0 if defined $n && int($n) < 0;
+  return Math::Prime::Util::PP::is_power($n,2);
+}
 sub is_prime_power {
   my($n, $refp) = @_;
   my $vn = "$n";  $vn =~ s/^-//;
   _validate_positive_integer($vn);
   $vn = '-'.$vn if $n < 0;
   return Math::Prime::Util::PP::is_prime_power($vn, $refp);
+}
+sub is_polygonal {
+  my($x, $s, $refp) = @_;
+  my $vx = "$x";  $vx =~ s/^-//;
+  _validate_positive_integer($vx);
+  _validate_positive_integer($s);
+  $vx = '-'.$vx if $x < 0;
+  return Math::Prime::Util::PP::is_polygonal($vx, $s, $refp);
 }
 sub valuation {
   my($n, $k) = @_;
@@ -756,20 +769,28 @@ sub Pi {
 
 #############################################################################
 
+my $_exitloop = 0;
+sub lastfor { $_exitloop = 1; }
+sub _get_forexit { $_exitloop; }
+sub _set_forexit { $_exitloop = $_[0] ? 1 : 0; }
+
 sub forprimes (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, $beg, $end) = @_;
   if (!defined $end) { $end = $beg; $beg = 2; }
   _validate_num($beg) || _validate_positive_integer($beg);
   _validate_num($end) || _validate_positive_integer($end);
   $beg = 2 if $beg < 2;
+  my $oldexitloop = $_exitloop;  $_exitloop = 0;
   {
     my $pp;
     local *_ = \$pp;
     for (my $p = next_prime($beg-1);  $p <= $end;  $p = next_prime($p)) {
       $pp = $p;
       $sub->();
+      last if $_exitloop;
     }
   }
+  $_exitloop = $oldexitloop;
 }
 
 sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
@@ -779,6 +800,7 @@ sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
   _validate_num($end) || _validate_positive_integer($end);
   $beg = 4 if $beg < 4;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
+  my $oldexitloop = $_exitloop;  $_exitloop = 0;
   {
     my $pp;
     local *_ = \$pp;
@@ -786,9 +808,11 @@ sub forcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
       if (!is_prime($beg)) {
         $pp = $beg;
         $sub->();
+      last if $_exitloop;
       }
     }
   }
+  $_exitloop = $oldexitloop;
 }
 
 sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
@@ -799,6 +823,7 @@ sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
   $beg = 9 if $beg < 9;
   $beg++ unless $beg & 1;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
+  my $oldexitloop = $_exitloop;  $_exitloop = 0;
   {
     my $pp;
     local *_ = \$pp;
@@ -806,23 +831,28 @@ sub foroddcomposites(&$;$) { ## no critic qw(ProhibitSubroutinePrototypes)
       if (!is_prime($beg)) {
         $pp = $beg;
         $sub->();
+        last if $_exitloop;
       }
     }
   }
+  $_exitloop = $oldexitloop;
 }
 
 sub fordivisors (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   my($sub, $n) = @_;
   _validate_num($n) || _validate_positive_integer($n);
   my @divisors = divisors($n);
+  my $oldexitloop = $_exitloop;  $_exitloop = 0;
   {
     my $pp;
     local *_ = \$pp;
     foreach my $d (@divisors) {
       $pp = $d;
       $sub->();
+      last if $_exitloop;
     }
   }
+  $_exitloop = $oldexitloop;
 }
 
 sub forpart (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)

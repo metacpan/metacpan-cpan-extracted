@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.110';
+$Config::Model::Backend::Yaml::VERSION = '2.112';
 use 5.10.1;
 use Carp;
 use strict;
@@ -66,7 +66,13 @@ sub read {
     # convert to perl data
     my $perl_data = Load($yaml) ;
     if ( not defined $perl_data ) {
-        $logger->warn("No data found in YAML file $args{file_path}");
+        my $msg = "No data found in YAML file $args{file_path}";
+        if ($args{auto_create}) {
+            $logger->info($msg);
+        }
+        else {
+            $logger->warn($msg);
+        }
         return 1;
     }
 
@@ -123,7 +129,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

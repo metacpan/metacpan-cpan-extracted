@@ -62,12 +62,6 @@ has [ qw/
     is => 'rw',
 );
 
-sub uri {
-    my ( $self ) = @_;
-    my $endpoint = sprintf( $self->endpoint,$self->id );
-    return join( '/',$self->client->base_url . $endpoint );
-}
-
 =head1 Status checks on a payout
 
     pending

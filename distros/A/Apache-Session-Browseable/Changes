@@ -70,3 +70,9 @@ Revision history for Perl extension Apache::Session::Browseable.
 
 1.2.6
     - Force allow_nonref option (#14)
+
+1.2.7
+    - Force UTF-8
+
+1.2.8
+    - Missing UTF-8 hook

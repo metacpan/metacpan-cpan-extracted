@@ -8,6 +8,7 @@ build_requires:
   Test::More: '0'
   Test::TempDir::Tiny: '0'
   autodie: '0'
+  lib: '0'
   perl: '5.006'
   subs: '0'
 configure_requires:
@@ -29,7 +30,7 @@ no_index:
 provides:
   App::SSH::SwitchShell:
     file: bin/sshss
-    version: '0.003'
+    version: '0.005'
 requires:
   Cwd: '0'
   English: '0'
@@ -41,7 +42,7 @@ resources:
   bugtracker: https://github.com/skirmess/App-SSH-SwitchShell/issues
   homepage: https://github.com/skirmess/App-SSH-SwitchShell
   repository: https://github.com/skirmess/App-SSH-SwitchShell.git
-version: '0.003'
+version: '0.005'
 x_BuiltWith:
   modules:
     Capture::Tiny: '0.46'
@@ -78,6 +79,7 @@ x_BuiltWith:
     Test::TempDir::Tiny: '0.016'
     Test::Version: '2.05'
     autodie: '2.29'
+    lib: '0.63'
     strict: '1.11'
     subs: '1.02'
     warnings: '1.36'
@@ -168,11 +170,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
       name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
-      version: '0.021'
+      version: '0.024'
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
       name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
-      version: '0.021'
+      version: '0.024'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
@@ -194,6 +196,7 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - t/00-load.t
             - xt/author/clean-namespaces.t
             - xt/author/critic.t
             - xt/author/minimum_version.t
@@ -237,7 +240,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
       name: '@Author::SKIRMESS/AutoPrereqs::Perl::Critic'
-      version: '0.003'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Author::SKIRMESS/Authority'
@@ -449,7 +452,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::CopyFilesFromRelease:
           filename: []
           match:
-            - .pm$
+            - \.pm$
             - ^bin/
       name: '@Author::SKIRMESS/CopyFilesFromRelease'
       version: '0.006'
@@ -473,6 +476,7 @@ x_Dist_Zilla:
             - README.md
             - cpanfile
             - dist.ini
+            - t/00-load.t
             - xt/author/clean-namespaces.t
             - xt/author/critic.t
             - xt/author/minimum_version.t
@@ -492,6 +496,7 @@ x_Dist_Zilla:
             - xt/release/meta-yaml.t
           allow_dirty_match:
             - (?^:\.pm$)
+            - (?^:^bin/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
@@ -507,7 +512,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.003'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

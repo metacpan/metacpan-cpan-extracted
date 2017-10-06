@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -39,6 +39,11 @@ sub new
       _path($filename)->absolute->stringify;
     }
   );
+  
+  if($args{meta_prop})
+  {
+    $self->meta->prop->{$_} = $args{meta_prop}->{$_} for keys %{ $args{meta_prop} };
+  }
   
   $self;
 }
@@ -79,9 +84,10 @@ sub _command_prop
       hook    => $self->hook_prop,
       meta    => $self->meta_prop,
     },
-    perl    => {
+    perl => {
       config => \%Config::Config,
     },
+    env => \%ENV,
   };
 }
 
@@ -1082,7 +1088,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -1426,7 +1432,8 @@ Linux and C<gmake> on FreeBSD.
 The name DLL or shared object "name" to use when searching for dynamic
 libraries at runtime.  This is passed into L<FFI::CheckLib>, so if
 your library is something like C<libarchive.so> or C<archive.dll> you
-would set this to C<archive>.
+would set this to C<archive>.  This may be a string or an array of 
+strings.
 
 =item install_type
 
@@ -1879,7 +1886,7 @@ the same license as the rest of the Alien::Build and related tools distributed a
 C<Alien-Build>.  Joel Berger thanked a number of people who helped in in the development
 of L<Alien::Base>, in the documentation for that module.
 
-I would also like to acknowledge the other memebers of the Perl5-Alien github
+I would also like to acknowledge the other members of the Perl5-Alien github
 organization, Zakariyya Mughal (sivoais, ZMUGHAL) and mohawk (ETJ).  Also important
 in the early development of L<Alien::Build> were the early adopters Chase Whitener
 (genio, CAPOEIRAB, author of L<Alien::libuv>), William N. Braswell, Jr (willthechill,
@@ -1929,6 +1936,8 @@ Juan Julián Merelo Guervós (JJ)
 Joel Berger (JBERGER)
 
 Petr Pisar (ppisar)
+
+Lance Wicks (LANCEW)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -9,7 +9,7 @@ use Test::Most;    # plan is down at bottom
 
 my $deeply = \&eq_or_diff;
 
-use Lingua::Awkwords;
+use Lingua::Awkwords qw(weights2str weights_from);
 use Lingua::Awkwords::Subpattern;
 
 my $la = Lingua::Awkwords->new;
@@ -67,4 +67,55 @@ $deeply->(
     is( $la->render, 'zz' );
 }
 
-plan tests => 9;
+# corpus to weight utility routines
+{
+    my $expected = [
+        { d => 1, k => 1, b => 3, m => 1, g => 1 },
+        {   t => 1,
+            a => 2,
+            r => 2,
+            u => 1,
+            b => 1,
+            e => 1,
+            c => 1,
+            k => 1,
+            d => 1,
+            v => 1
+        },
+        { u => 2, o => 3, a => 1, e => 1 },
+        {   e => 2,
+            g => 1,
+            c => 1,
+            k => 2,
+            v => 1,
+            d => 2,
+            r => 2,
+            a => 3,
+            o => 3,
+            t => 1,
+            m => 1,
+            u => 3,
+            b => 4
+        }
+    ];
+
+    my ( $first, $mid, $last, $all ) =
+      Lingua::Awkwords::weights_from("do mutce bo barda gerku bo kavbu");
+    $deeply->( [ $first, $mid, $last, $all ], $expected );
+
+    open my $fh, '<', 't/phrase' or die "t/phrase not found: $!\n";
+    ( $first, $mid, $last, $all ) = Lingua::Awkwords::weights_from($fh);
+    $deeply->( [ $first, $mid, $last, $all ], $expected );
+
+    Lingua::Awkwords::percentize($last);
+    # tape over any floating point differences between platforms
+    for my $v ( values %$last ) {
+        $v = sprintf "%.1f", $v;
+    }
+    $deeply->( $last, { a => 14.3, e => 14.3, o => 42.9, u => 28.6 } );
+
+    is( weights2str( ( weights_from("toki sin li toki pona") )[-1] ),
+        'a*1/i*4/k*2/l*1/n*2/o*3/p*1/s*1/t*2' );
+}
+
+plan tests => 13;

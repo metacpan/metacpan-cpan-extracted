@@ -9,6 +9,7 @@ use Test::File::Contents;
 use Cwd qw{ cwd };
 use IO::Socket::INET;
 use IO::Socket::UNIX;
+use JSON;
 use Module::Load;
 
 use Mail::Milter::Authentication;
@@ -162,11 +163,83 @@ sub tools_pipeline_test {
     }
 }
 
+sub get_metrics {
+    my ( $path ) = @_;
+
+    my $sock = IO::Socket::UNIX->new(
+        'Peer' => $path,
+    );
+
+    print $sock "GET /metrics HTTP/1.0\n\n";
+
+    my $data = {};
+
+    while ( my $line = <$sock> ) {
+        chomp $line;
+        last if $line eq q{};
+    }
+    while ( my $line = <$sock> ) {
+        chomp $line;
+        next if $line =~ /^#/;
+        $line =~ /^(.*)\{(.*)\} (.*)$/;
+        my $count_id = $1;
+        my $labels = $2;
+        my $count = $3;
+        $data->{ $count_id . '{' . $labels . '}' } = $count;
+    }
+
+    return $data;
+}
+
+sub test_metrics {
+    my ( $expected ) = @_;
+
+    # Sleep for 5 to allow server to catch up on metrics
+    sleep 5;
+
+    subtest $expected => sub {
+
+        my $metrics =  get_metrics( 'tmp/authentication_milter_test_metrics.sock' );
+        my $j = JSON->new();
+
+        if ( -e $expected ) {
+
+            open my $InF, '<', $expected;
+            my @content = <$InF>;
+            close $InF;
+            my $data = $j->decode( join( q{}, @content ) );
+
+            plan tests => scalar keys %$data;
+
+            foreach my $key ( sort keys %$data ) {
+                if ( $key =~ /seconds_total/ ) {
+                    is( $metrics->{ $key } > 0, $data->{ $key } > 0, "Metrics $key" );
+                }
+                else {
+                    is( $metrics->{ $key }, $data->{ $key }, "Metrics $key" );
+                }
+            }
+
+        }
+        else {
+            fail( 'Metrics data does not exist' );
+            # Uncomment to write out new json file
+            #open my $OutF, '>', $expected;
+            #$j->pretty();
+            #print $OutF $j->encode( $metrics );
+            #close $OutF;
+        }
+
+    };
+
+    return;
+}
+
 sub smtp_process {
     my ( $args ) = @_;
 
     if ( ! -e $args->{'prefix'} . '/authentication_milter.json' ) {
-        die "Could not find config";
+        die "Could not find config " . $args->{'prefix'};
     }
     if ( ! -e 'data/source/' . $args->{'source'} ) {
         die "Could not find source";
@@ -468,6 +541,8 @@ sub run_milter_processing {
         'to'     => 'marc@fastmail.com',
     });
 
+    test_metrics( 'data/metrics/milter_1.json' );
+
     stop_milter();
 
     start_milter( 'config/dmarc_reject' );
@@ -505,6 +580,8 @@ sub run_milter_processing {
         'to'     => 'marc@fastmail.com',
     });
 
+    test_metrics( 'data/metrics/milter_2.json' );
+
     stop_milter();
 
     start_milter( 'config/dmarc_reject_wl' );
@@ -520,6 +597,8 @@ sub run_milter_processing {
         'to'     => 'marc@fastmail.com',
     });
 
+    test_metrics( 'data/metrics/milter_3.json' );
+
     stop_milter();
 
     start_milter( 'config/dryrun' );
@@ -534,6 +613,8 @@ sub run_milter_processing {
         'from'   => 'marc@marcbradshaw.net',
         'to'     => 'marc@fastmail.com',
     });
+
+    test_metrics( 'data/metrics/milter_4.json' );
 
     stop_milter();
 
@@ -554,6 +635,8 @@ sub run_milter_processing_spam {
         'from'   => 'marc@marcbradshaw.net',
         'to'     => 'marc@fastmail.com',
     });
+
+    test_metrics( 'data/metrics/milter_spam_1.json' );
 
     stop_milter();
 
@@ -807,6 +890,8 @@ sub run_smtp_processing {
         'to'     => 'marc@fastmail.com',
     });
 
+    test_metrics( 'data/metrics/smtp_1.json' );
+
     stop_milter();
 
     start_milter( 'config/dmarc_reject.smtp' );
@@ -846,6 +931,8 @@ sub run_smtp_processing {
         'to'     => 'marc@fastmail.com',
     });
 
+    test_metrics( 'data/metrics/smtp_2.json' );
+
     stop_milter();
 
     start_milter( 'config/dmarc_reject_wl.smtp' );
@@ -860,6 +947,8 @@ sub run_smtp_processing {
         'from'   => 'marc@marcbradshaw.net',
         'to'     => 'marc@fastmail.com',
     });
+
+    test_metrics( 'data/metrics/smtp_3.json' );
 
     stop_milter();
 
@@ -876,25 +965,7 @@ sub run_smtp_processing {
         'to'     => 'marc@fastmail.com',
     });
 
-    stop_milter();
-
-    return;
-}
-
-sub run_smtp_processing_spam {
-
-    start_milter( 'config/spam.smtp' );
-
-    smtp_process({
-        'desc'   => 'Gtube',
-        'prefix' => 'config/normal.smtp',
-        'source' => 'gtube.eml',
-        'dest'   => 'gtube.smtp.eml',
-        'ip'     => '74.125.82.171',
-        'name'   => 'mail-we0-f171.google.com',
-        'from'   => 'marc@marcbradshaw.net',
-        'to'     => 'marc@fastmail.com',
-    });
+    test_metrics( 'data/metrics/smtp_4.json' );
 
     stop_milter();
 

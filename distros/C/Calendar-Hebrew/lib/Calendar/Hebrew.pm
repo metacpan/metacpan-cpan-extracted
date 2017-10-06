@@ -1,6 +1,6 @@
 package Calendar::Hebrew;
 
-$Calendar::Hebrew::VERSION   = '0.02';
+$Calendar::Hebrew::VERSION   = '0.03';
 $Calendar::Hebrew::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Hebrew - Interface to Hebrew Calendar.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -30,8 +30,8 @@ has date  => (is => 'ro', default   => sub { Date::Hebrew::Simple->new });
 sub BUILD {
     my ($self) = @_;
 
-    $self->date->validate_year($self->year)   if $self->has_year;
-    $self->date->validate_month($self->month) if $self->has_month;
+    $self->date->validate_year($self->year) if $self->has_year;
+    $self->date->validate_hebrew_month($self->month, $self->year) if $self->has_month;
 
     unless ($self->has_year && $self->has_month) {
         $self->year($self->date->year);
@@ -112,27 +112,31 @@ by L<App::calendr> v0.16 or above.
     |     4 | Tammuz                                                            |
     |     5 | Av                                                                |
     |     6 | Elul                                                              |
-    |     7 | Tishrel                                                           |
-    |     8 | Heshvan                                                           |
+    |     7 | Tishrei                                                           |
+    |     8 | Cheshvan                                                          |
     |     9 | Kislev                                                            |
     |    10 | Tevet                                                             |
     |    11 | Shevat                                                            |
     |    12 | Adar                                                              |
     +-------+-------------------------------------------------------------------+
 
+In leap years (such as 5774) an additional month, Adar I (30 days) is added after
+Shevat, while the regular Adar is referred to as "Adar II."
+
 =head1 HEBREW DAYS
 
     +-------+---------------+---------------------------------------------------+
     | Index | Hebrew Name   | English Name                                      |
     +-------+---------------+---------------------------------------------------+
-    |     1 | Yom Sheni     | Sunday                                            |
-    |     2 | Yom Shelishi  | Monday                                            |
-    |     3 | Yom Revil     | Tuesday                                           |
-    |     4 | Yom Hamishi   | Wednesday                                         |
-    |     5 | Yom Shishi    | Thursday                                          |
-    |     6 | Shabbat       | Friday                                            |
-    |     0 | Yom Rishon    | Saturday                                          |
+    |     0 | Yom Rishon    | Sunday                                            |
+    |     1 | Yom Sheni     | Monday                                            |
+    |     2 | Yom Shelishi  | Tuesday                                           |
+    |     3 | Yom Revil     | Wednesday                                         |
+    |     4 | Yom Hamishi   | Thursday                                          |
+    |     5 | Yom Shishi    | Friday                                            |
+    |     6 | Shabbat       | Saturday                                          |
     +-------+---------------+---------------------------------------------------+
+
 
 =head1 CONSTRUCTOR
 
@@ -225,6 +229,21 @@ sub as_string {
     my ($self) = @_;
 
     return $self->as_text($self->month, $self->year);
+}
+
+#
+#
+# Override validate_params()
+sub validate_params {
+    my ($self, $month, $year) = @_;
+
+    $month = $self->month unless defined $month;
+    $year  = $self->year  unless defined $year;
+
+    $self->date->validate_year($year);
+    $self->date->validate_hebrew_month($month, $year);
+
+    return ($month, $year);
 }
 
 =head1 AUTHOR

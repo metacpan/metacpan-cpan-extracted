@@ -52,14 +52,14 @@ my $build = $class->new(
     'Module::Build' => '0.34'
   },
   'configure_requires' => {
-    'Config::Model' => '2.076',
-    'Config::Model::Itself' => '2.005',
+    'Config::Model' => '2.111',
+    'Config::Model::Itself' => '2.012',
     'Getopt::Long' => '0',
     'Module::Build' => '0.34',
     'Path::Tiny' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.043',
+    'Config::Model' => '2.111',
     'perl' => '5.010'
   },
 

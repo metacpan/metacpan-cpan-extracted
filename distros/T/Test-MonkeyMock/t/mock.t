@@ -126,4 +126,13 @@ subtest 'throw on unmocked method' => sub {
     like(exception { $mock->foo }, qr/Unmocked method 'foo'/);
 };
 
+subtest 'mock method with aliasing' => sub {
+    my $mock = Test::MonkeyMock->new();
+    $mock->mock(foo => sub { $_[1] = '123' });
+
+    $mock->foo(my $bar);
+
+    is $bar, '123';
+};
+
 done_testing;

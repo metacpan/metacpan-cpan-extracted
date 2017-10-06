@@ -1,9 +1,10 @@
-/**
- * Copyright 2016-present, Yann Collet, Facebook, Inc.
+/*
+ * Copyright (c) 2016-present, Yann Collet, Facebook, Inc.
  * All rights reserved.
  *
- * This source code is licensed under the license found in the
- * LICENSE-examples file in the root directory of this source tree.
+ * This source code is licensed under both the BSD-style license (found in the
+ * LICENSE file in the root directory of this source tree) and the GPLv2 (found
+ * in the COPYING file in the root directory of this source tree).
  */
 
 
@@ -116,7 +117,6 @@ static char* createOutFilename_orDie(const char* filename)
 int main(int argc, const char** argv)
 {
     const char* const exeName = argv[0];
-    const char* const inFilename = argv[1];
 
     if (argc!=2) {
         printf("wrong arguments\n");
@@ -124,6 +124,8 @@ int main(int argc, const char** argv)
         printf("%s FILE\n", exeName);
         return 1;
     }
+
+    const char* const inFilename = argv[1];
 
     char* const outFilename = createOutFilename_orDie(inFilename);
     compress_orDie(inFilename, outFilename);

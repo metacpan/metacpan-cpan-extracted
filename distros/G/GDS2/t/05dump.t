@@ -17,7 +17,7 @@ $loaded = 1;
 ok(1,$loaded,'problem with GDS2 load.');
 
 open(DUMPIN,"TEST.dump") or die "Unable to read TEST.dump because $!";
-my $gds2FileOut = new GDS2(-fileName => ">testdump.gds");
+my $gds2FileOut = new GDS2(-fileName => ">testdump$$.gds");
 my $G_epsilon = $gds2FileOut -> getG_epsilon;
 my $G_fltLen = $gds2FileOut -> getG_fltLen;
 my $isLittleEndian = $gds2FileOut -> endianness;
@@ -44,18 +44,20 @@ while (<DUMPIN>)
 }
 $gds2FileOut -> close;
 close DUMPIN;
+sleep 2;
 
-my $gds2File = new GDS2(-fileName => 'testdump.gds');
-open(DUMPOUT,">dump.out") or die "Unable to create dump.out $!";
+my $gds2File = new GDS2(-fileName => "testdump$$.gds");
+open(DUMPOUT,">dump$$.out") or die "Unable to create dump$$.out $!";
 while ($gds2File -> readGds2RecordHeader)
 {
     $gds2File -> readGds2RecordData();
     print DUMPOUT $gds2File -> returnRecordAsString."\n";
 }
 close DUMPOUT;
+sleep 2;
 
 my $good=1;
-open(DUMPOUT,"dump.out") or die "Unable to read dump.out $!";
+open(DUMPOUT,"dump$$.out") or die "Unable to read dump$$.out $!";
 open(DUMPIN,"TEST.dump") or die "Unable to read TEST.dump because $!";
 my $lineCnt=0;
 while (<DUMPIN>)
@@ -73,10 +75,11 @@ while (<DUMPIN>)
 }
 close DUMPIN;
 close DUMPOUT;
+sleep 2;
 if ($good)
 {
-    unlink"testdump.gds";
-    unlink "dump.out";
+    unlink "testdump$$.gds";
+    unlink "dump$$.out";
 }
 ok(2,$good,'problem with ascii dump 2.');
 0;

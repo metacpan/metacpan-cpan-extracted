@@ -1,5 +1,10 @@
 Revision history for perl module Test::CGI::External
 
+0.23 2017-10-06
+
+- New test_options method tests response to OPTIONS requests
+- In the case of empty input, write from /dev/null to prevent hanging
+
 0.22 2017-03-06
 
 - test_411 method

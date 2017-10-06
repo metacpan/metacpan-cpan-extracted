@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Template::Lace" => "0.015",
     "Test::Most" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }

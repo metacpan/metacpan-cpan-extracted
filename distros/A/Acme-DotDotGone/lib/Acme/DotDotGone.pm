@@ -4,17 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-=head1 NAME
-
-Acme::DotDotGone - The great new Acme::DotDotGone!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our %dots;
 BEGIN {
@@ -76,6 +66,20 @@ sub import {
 	do { eval "$_[2]"; $dots{stderr}($@); } if $_[2];
 }
 
+1;
+
+__END__
+
+=head1 NAME
+
+Acme::DotDotGone - The great new Acme::DotDotGone!
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -84,7 +88,7 @@ Perhaps a little code snippet.
 
 vim worldEnding.pl
 
-    use Acme::DotDotGone dot;
+	use Acme::DotDotGone dot;
 
 	use feature 'say';
 	say 'The world is about to end';
@@ -115,7 +119,7 @@ perl worldEnding.pl
 
 less worldEnding.pl
 
-    use Acme::DotDotGone;
+	use Acme::DotDotGone;
 
 	use feature 'say';
 	say 'The world is about to end';
@@ -136,8 +140,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Acme::DotDotGone
-
+	perldoc Acme::DotDotGone
 
 You can also look for information at:
 
@@ -161,9 +164,7 @@ L<http://search.cpan.org/dist/Acme-DotDotGone/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -205,7 +206,4 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 =cut
-
-1; # End of Acme::DotDotGone

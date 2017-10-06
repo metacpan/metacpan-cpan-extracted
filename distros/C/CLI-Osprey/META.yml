@@ -17,11 +17,12 @@ requires:
   Module::Runtime: '0'
   Moo: '0'
   Moo::Role: '0'
+  Path::Tiny: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-Osprey
   homepage: http://metacpan.org/release/CLI-Osprey
   license: http://dev.perl.org/licenses/
   repository: git://github.com/arodland/CLI-Osprey.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:ARODLAND
 x_serialization_backend: 'YAML::Tiny version 1.70'

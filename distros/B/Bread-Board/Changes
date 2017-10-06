@@ -1,5 +1,17 @@
 Revision history for Bread-Board
 
+0.36 2017-09-25
+  [ BUG FIXES ]
+    - fix pod error. (Mohammad S Anwar, GH#63)
+
+  [ MISC ]
+    - Reverting the changes of #53, as it breaks a few packages that are
+      using `also => 'Bread::Board'` in their import, and the benefit we
+      get from	freeing ourselves from Moose::Exporter isn't that huge.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 40 insertions(+), 44 deletions(-)
+
 0.35 2017-07-31
   [ BUG FIXES ]
     - fixed Bread::Board::Dumper to dump parameterized containers -

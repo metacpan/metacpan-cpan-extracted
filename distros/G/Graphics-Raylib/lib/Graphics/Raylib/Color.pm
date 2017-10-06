@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 package Graphics::Raylib::Color;
-#
+
 # ABSTRACT: Colors for use with Graphics::Raylib
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 
@@ -16,6 +16,10 @@ use Graphics::Raylib::XS qw(:all);
 Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 
+=head1 VERSION
+
+version 0.003
+
 =head1 SYNOPSIS
 
     use Graphics::Raylib::Color;
@@ -27,12 +31,12 @@ Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 
 =head1 DESCRIPTION
-    
+
 Colors you can pass to raylib.
 
 =head1 IMPLEMENTATION
-    
-As a color is basically a 32-bit integer (RGBA) in raylib, the constructors rgba and rgb do little more packing it into an integer and blessing it
+
+As a color is basically a 32-bit integer (RGBA) in raylib, the constructors rgba and rgb do little more packing it into an integer and blessing it. Interpolating a color into a string results in a tuple of the form C<< "(r: %u, g: %u, b: %u, a: %u)" >>.
 
 =head1 METHODS AND ARGUMENTS
 
@@ -47,8 +51,8 @@ Constructs a new Graphics::Raylib::Color instance.
 sub rgba {
     my $self = \pack("C4", @_);
 
-	bless $self, 'Color';
-	return $self;
+    bless $self, 'Color';
+    return $self;
 }
 
 =item rgb($red, $green, $blue)
@@ -62,10 +66,33 @@ sub rgb {
     rgba(@_, 255);
 }
 
+=item ($r, $g, $b, $a) = colors
+
+Returns a list with the red, green, blue and alpha components of the color.
+
+=cut
+{
+package Color;
+
+sub colors {
+    my ($self) = @_;
+
+    return unpack("C4", ${$self});
+}
+
+sub stringify {
+    my ($self) = @_;
+    return sprintf '(r: %u, g: %u, b: %u, a: %u)', $self->colors;
+}
+
+use overload fallback => 1, '""' => 'stringify';
+}
+
 =item rgb($red, $green, $blue)
 
 Constructs a new Graphics::Raylib::Color instance out of an opaque color.
 Calls C<rgba> with C<$alpha = 255>.
+
 
 =back
 
@@ -137,39 +164,23 @@ use constant RAYWHITE  => rgb( 245, 245, 245 );
 
 =over 4
 
-=item Rainbow->new(colors => $color_count)
+=item rainbow(colors => $color_count)
 
-Creates a new Graphics::Raylib::Color::Rainbow instance. C<$color_count> is the total number of colors before bouncing back. Default is C<7>.
-
-=cut
-
-{
-    package Graphics::Raylib::Color::Rainbow;
-
-    sub new {
-        my $class = shift;
-        
-        my $self = {
-            cycle  => 0,
-            colors => 7,
-
-            @_
-        };
-        $self->{freq} = 5 / $self->{colors};
-
-        bless $self, $class;
-        return $self;
-    }
-
-=item Rainbow->cycle()
-
-Returns the next rainbow Graphics::Raylib::Color in sequence. When C<$color_count> is reached, It oscillates back to zero returning the same colors in reverse. At zero, it is back at normal.
+Returns a code reference that cycles through the rainbow colors on each evaluation. C<$color_count> is the total number of colors before bouncing back. Default is C<7>.
 
 =cut
 
-    sub cycle {
-        my $self = shift;
+sub rainbow {
+    my $self = {
+        cycle  => 0,
+        colors => 7,
 
+        @_
+    };
+    $self->{freq} = 5 / $self->{colors};
+    $self->{last} = 0;
+
+    return sub {
         my $r = int(sin($self->{freq} * abs($self->{cycle}) + 0) * (127) + 128);
         my $g = int(sin($self->{freq} * abs($self->{cycle}) + 1) * (127) + 128);
         my $b = int(sin($self->{freq} * abs($self->{cycle}) + 3) * (127) + 128);

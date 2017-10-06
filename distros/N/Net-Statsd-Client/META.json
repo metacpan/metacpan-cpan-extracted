@@ -1,0 +1,67 @@
+{
+   "abstract" : "Send data to StatsD / Graphite",
+   "author" : [
+      "Andrew Rodland <arodland@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Statsd-Client",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Etsy::StatsD" : "1.001",
+            "Moo" : "0",
+            "Sub::Quote" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "IO::Socket" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-Statsd-Client@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Statsd-Client"
+      },
+      "homepage" : "http://metacpan.org/release/Net-Statsd-Client",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arodland/Net-Statsd-Client.git",
+         "web" : "http://github.com/arodland/Net-Statsd-Client"
+      }
+   },
+   "version" : "0.32",
+   "x_authority" : "cpan:ARODLAND",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

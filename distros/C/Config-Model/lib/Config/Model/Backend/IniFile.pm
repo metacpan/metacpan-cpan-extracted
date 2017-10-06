@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.110';
+$Config::Model::Backend::IniFile::VERSION = '2.112';
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -412,7 +412,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,80 +26,80 @@ requires:
   Try::Tiny: '0'
   Type::Params: '0'
   Types::Standard: '0'
-  namespace::sweep: '0'
+  namespace::autoclean: '0'
   parent: '0'
-  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/robn/Authen-U2F/issues
   homepage: https://github.com/robn/Authen-U2F
   repository: https://github.com/robn/Authen-U2F.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/ExtraTests'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/MakeMaker'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - LICENSE
             - Makefile.PL
           exclude_match: []
           follow_symlinks: 0
@@ -108,35 +108,31 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: GatherDir
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
       version: '0.54'
-    -
-      class: Dist::Zilla::Plugin::TravisYML
-      name: TravisYML
-      version: '1.15'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -144,16 +140,16 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - .travis.yml
             - Changes
             - Makefile.PL
             - dist.ini
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.2
           repo_root: .
       name: '@Git/Check'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -162,18 +158,18 @@ x_Dist_Zilla:
           commit_msg: v%v%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - .travis.yml
             - Changes
             - Makefile.PL
             - dist.ini
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -181,15 +177,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -198,62 +195,64 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.14.2
           repo_root: .
       name: '@Git/Push'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: MarkdownInRoot
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: '0.161350'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.005'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.005'
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.005'
+    version: '6.010'
+x_serialization_backend: 'YAML::Tiny version 1.70'

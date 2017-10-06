@@ -2,16 +2,14 @@ package Locale::File::PO::Header; ## no critic (TidyCode)
 
 use Moose;
 use MooseX::StrictConstructor;
-
 use namespace::autoclean;
-use syntax qw(method);
 
 require Locale::File::PO::Header::Item;
 require Locale::File::PO::Header::MailItem;
 require Locale::File::PO::Header::ContentTypeItem;
 require Locale::File::PO::Header::ExtendedItem;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 has _header => (
     is       => 'rw',
@@ -24,7 +22,9 @@ has _header_index => (
     is       => 'ro',
     init_arg => undef,
     lazy     => 1,
-    default  => method {
+    default  => sub {
+        my $self = shift;
+
         my %header_index;
         my $index = 0;
         for my $item ( @{ $self->_header } ) {
@@ -38,7 +38,9 @@ has _header_index => (
     },
 );
 
-method _default_header {
+sub _default_header {
+    my $self = shift;
+
     return [
         Locale::File::PO::Header::Item->new(
             name => 'Project-Id-Version',
@@ -83,14 +85,18 @@ method _default_header {
 }
 
 # get only
-method all_keys {
+sub all_keys {
+    my $self = shift;
+
     return map {
         $_->header_keys;
     } @{ $self->_header };
 }
 
 # set only
-method data ($data) {
+sub data {
+    my ($self, $data) = @_;
+
     ref $data eq 'HASH'
         or confess 'Hash reference expected';
     $self->_header( $self->_default_header );
@@ -107,7 +113,9 @@ method data ($data) {
     return;
 }
 
-method item ($key, $value) {
+sub item {
+    my ($self, $key, $value) = @_;
+
     defined $key
         or confess 'Undefined key';
     my $index = $self->_header_index->{$key};
@@ -124,11 +132,15 @@ method item ($key, $value) {
 }
 
 # get only
-method items (@args) {
+sub items {
+    my ($self, @args) = @_;
+
     return map { $self->item($_) } @args;
 }
 
-method msgstr (@args) {
+sub msgstr {
+    my ($self, @args) = @_;
+
     # set
     if (@args) {
         my $msgstr = defined $args[0] ? $args[0] : q{};
@@ -160,7 +172,7 @@ $HeadURL: https://dbd-po.svn.sourceforge.net/svnroot/dbd-po/Locale-File-PO-Heade
 
 =head1 VERSION
 
-0.003
+0.004
 
 =head1 SYNOPSIS
 
@@ -343,7 +355,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 - 2012,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

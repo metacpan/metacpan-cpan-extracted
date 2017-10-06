@@ -24,13 +24,13 @@ use MIME::Base64 qw(encode_base64);
 use JSON;
 use Readonly;
 
-our $VERSION = q[476.4.2];
+our $VERSION = q[477.1.2];
 
 our $DEBUG_OUTPUT        = 0;
 our $DEBUG_L10N          = 0;
 our $TEMPLATE_CACHE      = {};
 our $LEXICON_CACHE       = {};
-our $TRAP_REDIR_OVERFLOW = 0;
+our $TRAP_REDIR_OVERFLOW = 0; # set to non-zero value to cut-off at that many bytes
 
 __PACKAGE__->mk_accessors(qw(util model action aspect content_type entity_name autoescape charset decorator headers));
 
@@ -767,8 +767,7 @@ sub redirect {
   $self->output_reset();
 
   if($TRAP_REDIR_OVERFLOW) {
-    Readonly::Scalar my $OVERFLOW => 1024;
-    if(length $self->headers->as_string > $OVERFLOW) { # fudge for apparent buffer overflow with apache+mod_perl (ParseHeaders related?)
+    if(length $self->headers->as_string > $TRAP_REDIR_OVERFLOW) { # fudge for apparent buffer overflow with apache+mod_perl (ParseHeaders related?)
       carp q[warning: header block looks long];
       $self->headers->remove_header('Location');
       $self->headers->header('Status', HTTP_OK);
@@ -785,7 +784,7 @@ sub redirect {
   $self->headers->clear();
 
   ########
-  # Note: This ought to correspond to content-type, but doesn't!
+  # Warning: This ought to correspond to content-type, but doesn't!
   #
   return <<"EOT"
    <p>This document has moved <a href="$url">here</a>.</p>
@@ -799,7 +798,7 @@ EOT
 BEGIN {
   no strict 'refs'; ## no critic (ProhibitNoStrict)
   for my $ext (qw(xml ajax json csv)) {
-    for my $method (qw(create list read update delete)) {
+    for my $method (qw(create list read update delete options)) {
       my $ns = sprintf q[%s_%s], $method, $ext;
       *{$ns} = sub { my $self = shift; return $self->$method; };
     }
@@ -1050,6 +1049,14 @@ e.g.
 
 =head2 delete_csv - default passthrough to delete for csv service
 
+=head2 options_ajax - default passthrough to options for customised options calls
+
+=head2 options_csv - default passthrough to options for customised options calls
+
+=head2 options_json - default passthrough to options for customised options calls
+
+=head2 options_xml - default passthrough to options for customised options calls
+
 =head2 init - post-constructor initialisation hook for subclasses
 
 =head2 headers - an HTTP::Headers object for responses
@@ -1125,7 +1132,7 @@ e.g.
 
  Set $ClearPress::view::DEBUG_OUTPUT = 1 to report output buffer operations.
 
- Set $ClearPress::view::TRAP_REDIR_OVERFLOW = 1 to enable experimental redirect header overflow handling
+ Set $ClearPress::view::TRAP_REDIR_OVERFLOW = 1024 to enable experimental redirect header overflow handling after that many bytes
 
 =head1 DEPENDENCIES
 

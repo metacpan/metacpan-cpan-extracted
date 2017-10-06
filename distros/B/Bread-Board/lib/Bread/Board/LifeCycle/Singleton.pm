@@ -1,7 +1,7 @@
 package Bread::Board::LifeCycle::Singleton;
 our $AUTHORITY = 'cpan:STEVAN';
 # ABSTRACT: service role for singleton lifecycle
-$Bread::Board::LifeCycle::Singleton::VERSION = '0.35';
+$Bread::Board::LifeCycle::Singleton::VERSION = '0.36';
 use Moose::Role;
 
 use Try::Tiny;
@@ -71,7 +71,7 @@ Bread::Board::LifeCycle::Singleton - service role for singleton lifecycle
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 

@@ -35,19 +35,18 @@ my $build = Module::Build->new
    configure_requires => { 'Module::Build' => '0.36' },
    requires       => {
 		      'Log::Log4perl'     => '1.11', # for TRACE log level
-		      'Exception::Class'  => 0,
 		      'Config::Augeas'    => '0.303',
-		      'Config::Model'     => '2.034',
+		      'Config::Model'     => '2.111',
 		      'Mouse'             => 0,
-
 		     },
    build_requires => {
-		      'Test::More'        => 0,
-		      'Test::Exception'   => 0,
-		      'Test::Differences' => 0,
-		      'Test::Warn'        => '0.11', # tests fail with 0.08
-		      'version'           => '0.77'
-		     },
+       'Config::Model::Itself' => '2.012', # for t/model_extension.t
+       'Test::More'        => 0,
+       'Test::Exception'   => 0,
+       'Test::Differences' => 0,
+       'Test::Warn'        => '0.11', # tests fail with 0.08
+       'version'           => '0.77'
+   },
 
    # cleanup required by t/augeas_backend.t
    add_to_cleanup => [qw/wr_root r_root/],

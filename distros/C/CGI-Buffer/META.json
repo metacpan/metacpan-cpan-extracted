@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Buffer",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "DateTime" : "0",
-            "Test::Most" : "0",
-            "Test::TempDir::Tiny" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -45,12 +43,19 @@
             "HTML::Packer" : "1",
             "HTTP::Date" : "0",
             "HTTP::Status" : "0",
-            "IO::Compress::Brotli" : "0",
+            "IO::Compress::Brotli" : "0.003",
             "IO::String" : "0",
             "JavaScript::Packer" : "2",
             "Storable" : "0",
             "Time::localtime" : "0",
             "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Test::Most" : "0",
+            "Test::TempDir::Tiny" : "0"
          }
       }
    },
@@ -66,6 +71,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Buffer"
       }
    },
-   "version" : "0.79",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.80",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

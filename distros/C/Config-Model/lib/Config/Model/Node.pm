@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.110';
+$Config::Model::Node::VERSION = '2.112';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -340,14 +340,14 @@ sub init {
     if ( $model->{rw_config} or $model->{read_config} ) {
         # TODO: change to warn
         $self->read_config_data( check => $args{check} // $self->check );
-        say "read_config parameter for backend is deprecated. ",
-            "Please use rw_config to specify both read and write parameters.\n" if $model->{read_config};
+        $logger->info("read_config parameter for backend is deprecated. ",
+            "Please use rw_config to specify both read and write parameters.") if $model->{read_config};
     }
 
     if (defined $model->{write_config}) {
         # TODO: change to warn
-        say "write_config parameter for backend is deprecated. ",
-            "Please use only rw_config to specify both read and write parameters.\n";
+        $logger->info("write_config parameter for backend is deprecated. ",
+            "Please use only rw_config to specify both read and write parameters.");
     }
 
     # use read_config data if write_config is missing
@@ -1215,7 +1215,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

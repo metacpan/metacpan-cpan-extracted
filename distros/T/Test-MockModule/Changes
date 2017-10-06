@@ -1,5 +1,10 @@
 Revision history for Test::MockModule
 
+v0.13
+    - Added the `redefine()` function. It works just like `mock()`, except if the
+      method being mocked doesn't exist, it causes a panic. Many thanks to Felipe
+      Gasper for this feature!
+
 v0.12
     - Added the `noop()` function to make mocking noops easier. Thanks for the PR,
       Ali Zia!

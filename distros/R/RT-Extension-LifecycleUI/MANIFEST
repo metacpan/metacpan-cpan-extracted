@@ -1,3 +1,4 @@
+Changes
 html/Admin/Lifecycles/Create.html
 html/Admin/Lifecycles/index.html
 html/Admin/Lifecycles/Mappings.html
@@ -10,6 +11,7 @@ html/Elements/LifecycleInspector
 html/Elements/LifecycleInspectorAction
 html/Elements/LifecycleInspectorCanvas
 html/Elements/LifecycleInspectorCircle
+html/Elements/LifecycleInspectorHeader
 html/Elements/LifecycleInspectorLine
 html/Elements/LifecycleInspectorPolygon
 html/Elements/LifecycleInspectorStatus

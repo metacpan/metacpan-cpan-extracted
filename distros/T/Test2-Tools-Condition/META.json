@@ -1,0 +1,78 @@
+{
+   "abstract" : "Conditional block with Test2",
+   "author" : [
+      "Takumi Akiyama <t.akiym@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test2-Tools-Condition",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test2" : "0",
+            "Test2::Suite" : "0.000077"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test2::Compare::Condition" : {
+         "file" : "lib/Test2/Compare/Condition.pm"
+      },
+      "Test2::Tools::Condition" : {
+         "file" : "lib/Test2/Tools/Condition.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akiym/Test2-Tool-Condition/issues"
+      },
+      "homepage" : "https://github.com/akiym/Test2-Tool-Condition",
+      "repository" : {
+         "url" : "git://github.com/akiym/Test2-Tool-Condition.git",
+         "web" : "https://github.com/akiym/Test2-Tool-Condition"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AKIYM",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

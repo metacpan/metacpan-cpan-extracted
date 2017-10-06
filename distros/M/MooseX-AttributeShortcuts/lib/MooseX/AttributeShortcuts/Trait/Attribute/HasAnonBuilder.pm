@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.034';
+$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.035';
 # ABSTRACT: Attributes, etc, common to both the role-attribute and attribute traits
 
 use Moose::Role;
@@ -41,6 +41,29 @@ sub _mxas_builder_name {
     return $class->canonical_builder_prefix . $name;
 }
 
+# this is identical between role and class attributes
+
+sub _builder_method_meta {
+    my ($self, $thing) = @_;
+
+    # my $class =
+    my $dc = $self->definition_context;
+
+    $dc->{description}
+        = 'builder ' . $thing->name . '::' . $self->builder
+        . ' of attribute ' . $self->name
+        ;
+
+    return $self->builder_method_metaclass->wrap($self->anon_builder =>
+        associated_attribute => $self,
+        associated_metaclass => $thing,
+        name                 => $self->builder,
+        package_name         => $thing->name,
+        definition_context   => $dc,
+    );
+}
+
+
 !!42;
 
 __END__
@@ -57,7 +80,7 @@ MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - Attributes, etc, 
 
 =head1 VERSION
 
-This document describes version 0.034 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released July 25, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.035 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released September 22, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 
@@ -70,9 +93,9 @@ of L<MooseX::AttributeShortcuts>.
 
 =head2 anon_builder
 
-CodeRef, read-only. Stores the code reference that will become the attribute's
-builder.  This code reference will be installed in the role or class as a
-method, as appropriate.
+CodeRef, read-only.  Stores the code reference that will become the
+attribute's builder.  This code reference will be installed in the role or
+class as a method, as appropriate.
 
 =head2 anon_builder_installed
 

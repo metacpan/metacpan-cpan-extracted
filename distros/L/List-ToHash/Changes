@@ -1,0 +1,10 @@
+Revision history for Perl extension List-ToHash
+
+0.02 2017-10-01T05:28:41Z
+
+    - require Module::Build::Tiny >= 0.036 to add include path for ppport.h
+
+0.01 2017-09-30T11:45:27Z
+
+    - original version
+

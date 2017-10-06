@@ -32,9 +32,9 @@ traits and add others in if we want
 
     extends 'Moxie::Object';
 
-    has foo => sub { 'FOO' };
+    has _foo => sub { 'FOO' };
 
-    sub foo : ro Bar;
+    sub foo : ro(_foo) Bar;
 }
 
 BEGIN {
@@ -54,7 +54,7 @@ BEGIN {
     isa_ok($method, 'MOP::Method');
     is_deeply(
         [ $method->get_code_attributes ],
-        [qw[ ro Bar ]],
+        [qw[ ro(_foo) Bar ]],
         '... got the expected attributes'
     );
 }

@@ -2,7 +2,7 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use Carp qw/croak/;
 
@@ -33,7 +33,7 @@ sub render_event {
     my $self = shift;
     my ($event) = @_;
 
-    my $f = $event->facet_data;
+    my $f = $event->{facet_data}; # Optimization
 
     my $times = $self->{+TIMES} ||= {};
     if($f->{times}) {

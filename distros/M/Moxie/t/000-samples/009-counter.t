@@ -20,9 +20,9 @@ package Counter {
         '--' => 'dec',
     );
 
-    has '$!count' => ( default => sub { 0 } );
+    has _count => ( default => sub { 0 } );
 
-    sub count : ro( $!count );
+    sub count : ro(_count);
 
     # NOTE:
     # so apparently the overload
@@ -31,8 +31,8 @@ package Counter {
     # instance, no idea why though
     # it is mostly just garbage.
     # - SL
-    sub inc ($self, @) { $self->{'$!count'}++ }
-    sub dec ($self, @) { $self->{'$!count'}-- }
+    sub inc ($self, @) { _count++ }
+    sub dec ($self, @) { _count-- }
 }
 
 my $c = Counter->new;

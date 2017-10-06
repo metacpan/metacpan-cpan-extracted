@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Base.pm" => "\$(INST_LIB)/Alien/Base.pm",
     "lib/Alien/Base/Authoring.pod" => "\$(INST_LIB)/Alien/Base/Authoring.pod",
     "lib/Alien/Base/FAQ.pod" => "\$(INST_LIB)/Alien/Base/FAQ.pod",
+    "lib/Alien/Base/PkgConfig.pm" => "\$(INST_LIB)/Alien/Base/PkgConfig.pm",
     "lib/Alien/Base/Wrapper.pm" => "\$(INST_LIB)/Alien/Base/Wrapper.pm",
     "lib/Alien/Build.pm" => "\$(INST_LIB)/Alien/Build.pm",
     "lib/Alien/Build/CommandSequence.pm" => "\$(INST_LIB)/Alien/Build/CommandSequence.pm",
@@ -65,11 +66,13 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Extract/Directory.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Extract/Directory.pm",
     "lib/Alien/Build/Plugin/Extract/Negotiate.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Extract/Negotiate.pm",
     "lib/Alien/Build/Plugin/Fetch.pod" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch.pod",
+    "lib/Alien/Build/Plugin/Fetch/CurlCommand.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/CurlCommand.pm",
     "lib/Alien/Build/Plugin/Fetch/HTTPTiny.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/HTTPTiny.pm",
     "lib/Alien/Build/Plugin/Fetch/LWP.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/LWP.pm",
     "lib/Alien/Build/Plugin/Fetch/Local.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/Local.pm",
     "lib/Alien/Build/Plugin/Fetch/LocalDir.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/LocalDir.pm",
     "lib/Alien/Build/Plugin/Fetch/NetFTP.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/NetFTP.pm",
+    "lib/Alien/Build/Plugin/Fetch/Wget.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/Wget.pm",
     "lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Gather/IsolateDynamic.pm",
     "lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm" => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/CommandLine.pm",
     "lib/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm" => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm",
@@ -83,6 +86,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Probe/CBuilder.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CBuilder.pm",
     "lib/Alien/Build/Plugin/Probe/CommandLine.pm" => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CommandLine.pm",
     "lib/Alien/Build/Util.pm" => "\$(INST_LIB)/Alien/Build/Util.pm",
+    "lib/Alien/Build/Version/Basic.pm" => "\$(INST_LIB)/Alien/Build/Version/Basic.pm",
     "lib/Alien/Role.pm" => "\$(INST_LIB)/Alien/Role.pm",
     "lib/Test/Alien.pm" => "\$(INST_LIB)/Test/Alien.pm",
     "lib/Test/Alien/Build.pm" => "\$(INST_LIB)/Test/Alien/Build.pm",
@@ -111,7 +115,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "1.18",
+  "VERSION" => "1.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -143,11 +147,6 @@ requires('PkgConfig' => '0.14026' ); # for static cflags support
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 if (do { use Config; $^O eq 'solaris' && $Config{ptrsize} == 8 }) {
 requires('PkgConfig' => '0.14026' ); # for using the wrong libraries support
-}
-
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
-if ((!$ENV{ALIEN_BASE_NO_ABMB}) && ($WriteMakefileArgs{VERSION} !~ /_/)) {
-requires('Alien::Base::ModuleBuild' => '0.040');
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

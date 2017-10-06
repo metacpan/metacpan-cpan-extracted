@@ -282,7 +282,7 @@ if ($callback) {
         my $content = $response->decoded_content;
 
         my $json;
-        eval { $json = from_json $content; };
+        eval { $json = from_json( $content, { allow_nonref => 1 } ); };
 
         if ($@) {
             print "<div class=\"alert alert-danger\">";
@@ -337,7 +337,8 @@ if ($callback) {
 
     # TODO check signature
 
-    my $id_token_payload_hash = from_json( decode_base64($id_token_payload) );
+    my $id_token_payload_hash =
+      from_json( decode_base64($id_token_payload), { allow_nonref => 1 } );
 
     print "<div class=\"panel panel-info\">\n";
     print "<div class=\"panel-heading\">\n";
@@ -358,12 +359,15 @@ if ($callback) {
 
     my $content_type = $ui_response->header('Content-Type');
     if ( $content_type =~ /json/ ) {
-        eval { $ui_json = from_json($ui_content); };
+        eval { $ui_json = from_json( $ui_content, { allow_nonref => 1 } ); };
     }
     elsif ( $content_type =~ /jwt/ ) {
         my ( $ui_header, $ui_payload, $ui_signature ) =
           split( /\./, $ui_content );
-        eval { $ui_json = from_json( decode_base64($ui_payload) ); };
+        eval {
+            $ui_json =
+              from_json( decode_base64($ui_payload), { allow_nonref => 1 } );
+        };
     }
 
     print "<div class=\"panel panel-info\">\n";
@@ -435,7 +439,7 @@ elsif ( $cgi->param("test") eq "configuration" ) {
     my $content = $config_response->decoded_content;
 
     my $json;
-    eval { $json = from_json $content; };
+    eval { $json = from_json( $content, { allow_nonref => 1 } ); };
 
     if ($@) {
         print "<div class=\"alert alert-danger\">";
@@ -495,7 +499,7 @@ elsif ( $cgi->param("test") eq "configuration" ) {
         my $jwks_content = $jwks_response->decoded_content;
 
         my $jwks_json;
-        eval { $jwks_json = from_json $jwks_content; };
+        eval { $jwks_json = from_json( $jwks_content, { allow_nonref => 1 } ); };
 
         if ($@) {
             print "<div class=\"alert alert-danger\">";
@@ -590,7 +594,9 @@ elsif ( $cgi->param("test") eq "registration" ) {
     my $register_content = $register_response->decoded_content;
 
     my $register_json;
-    eval { $register_json = from_json $register_content; };
+    eval {
+        $register_json = from_json( $register_content, { allow_nonref => 1 } );
+    };
 
     if ($@) {
         print "<div class=\"alert alert-danger\">";

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::CdsFile;
-$Config::Model::Backend::CdsFile::VERSION = '2.110';
+$Config::Model::Backend::CdsFile::VERSION = '2.112';
 use 5.10.1;
 use Carp;
 use strict;
@@ -81,7 +81,7 @@ Config::Model::Backend::CdsFile - Read and write config as a Cds data structure
 
 =head1 VERSION
 
-version 2.110
+version 2.112
 
 =head1 SYNOPSIS
 

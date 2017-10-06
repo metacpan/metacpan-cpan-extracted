@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use Moose::Role;
 
-use Test2::Bundle::Extended '!meta';
+use Test2::V0 '!meta';
 
 use YAML qw( Load );
 

@@ -94,12 +94,6 @@ sub refunded    { return shift->status eq 'refunded' }
 sub submitted   { return shift->status eq 'submitted' }
 sub confirmed   { return shift->status eq 'confirmed' }
 
-sub uri {
-    my ( $self ) = @_;
-    my $endpoint = sprintf( $self->endpoint,$self->id );
-    return join( '/',$self->client->base_url . $self->client->api_path . $endpoint );
-}
-
 =head1 AUTHOR
 
 Lee Johnson - C<leejo@cpan.org>

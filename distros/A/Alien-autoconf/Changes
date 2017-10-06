@@ -1,5 +1,14 @@
 Revision history for Alien-autoconf
 
+0.11      2017-09-28 06:54:59 -0400
+  - Reverted experimental probe for system introduced in 0.10_01.
+    For rationale, please see new CAVEATS section
+
+0.10_01   2017-08-30 14:50:44 -0400
+  - [EXPERIMENTAL] Probe for system autoconf, so long as it is 2.69 or better
+    due to experimental nature of this feature, it may be removed in the
+    very near future
+
 0.09      2017-08-24 17:24:05 -0400
   - Production release identical to 0.08_01
 

@@ -7,7 +7,9 @@ cpanfile
 examples/block_devices_monitor.pl
 examples/device_get_parent.pl
 examples/device_scalar_n_list.pl
+examples/disable_touchpad_when_usbmouse.pl
 examples/enumerate_scalar_n_list.pl
+examples/find_by_vid_pid.pl
 examples/major_minor_devnum.pl
 examples/net_monitor.pl
 lib/Udev/FFI.pm
