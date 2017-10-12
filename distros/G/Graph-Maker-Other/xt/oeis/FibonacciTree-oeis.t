@@ -21,18 +21,19 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 7;
 
-use lib 't','xt';
+use lib 't';
+use MyOEIS;
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
-use MyOEIS;
 
-use lib
-  'devel/lib';
+use Graph::Maker::FibonacciTree;
+
+use lib 'devel/lib';
 use MyGraphs 'Graph_Wiener_index';
-require Graph::Maker::FibonacciTree;
 
+
+plan tests => 7;
 
 #------------------------------------------------------------------------------
 # series_reduced=>1

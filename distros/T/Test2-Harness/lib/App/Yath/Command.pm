@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -897,7 +897,7 @@ sub pre_parse_args {
                 # No 'next' here.
             }
             elsif ($arg =~ m/^(-I|--include)=(.*)$/) {
-                push @inc => $1;
+                push @inc => $2;
                 # No 'next' here.
             }
             elsif ($arg =~ m/^--(no-)?(lib|blib|tlib)$/) {
@@ -913,7 +913,7 @@ sub pre_parse_args {
         push @inc => File::Spec->rel2abs('blib/lib');
         push @inc => File::Spec->rel2abs('blib/arch');
     }
-    push @inc => File::Spec->rel2abs('tlib') if $lib{tlib};
+    push @inc => File::Spec->rel2abs('t/lib') if $lib{tlib};
 
     return (\@opts, \@list, \@pass, \@plugins, \@inc);
 }

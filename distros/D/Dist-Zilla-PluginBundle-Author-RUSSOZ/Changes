@@ -1,63 +1,26 @@
 Revision History for Dist-Zilla-PluginBundle-Author-RUSSOZ
 ==========================================================
 
-v0.022 2012-08-15
+v0.024 2017-10-09
 -----------------
 
-commit 5a896ca9ae6dad34c916d9a7696da3c0c71b7c21
-Author: Alexei Znamensky <russoz@cpan.org>
+commit 1552c88456274248bc22b91cd832fa0974be33f1
+Author: Alexei Znamensky <russoz@gmail.com>
 
-    added two test modules as dependencies
+    added .idea to .gitignore
 
-v0.020 2012-08-03
+commit aebe55cb2add9417b2c804b2255d93c291b4f818
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    The Dist::Zilla plugin ExtraTests must be by the end of the dist.ini file
+
+v0.023 2017-10-07
 -----------------
 
-commit f1534956f7b7c98086b046f2026ea3209e8e26d9
-Author: Alexei Znamensky <russoz@cpan.org>
+commit ed0d20bc744575b8a16b9702c39245ef347696cc
+Author: Alexei Znamensky <russoz@gmail.com>
 
-    New option report and added dependency
-
-v0.019 2012-06-29
------------------
-
-commit 9ce34a5e0658eca3dca4b23c40b9b4d49196c156
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    adjustments to other modules' updates
-
-v0.018 2012-06-12
------------------
-
-commit 83cd9df3074e3a0bc841d5085c5e72de52c4c481
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    Improved building experience.
-
-v0.017 2012-05-05
------------------
-
-commit bfae4ee8354308ee5d90e54b0f8b954e2ad32d50
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    twitter is off by default now
-
-commit 0bf54f56765c6753871c14c9931c9a195ca24ab9
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    dependency on version 0.102362 of Pod::Elemental
-
-v0.016 2012-04-21
------------------
-
-commit 841a3078939d73e67329b71a4bf55c41563ad497
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    added dependencies to dist.ini, removed from module
-
-commit 394fadfc66dc9405f8a9bca6c819cef8d1048a5f
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    added twitter tags when releasing
+    back from the dead
 
 ===================================
 End of changes in the last 365 days

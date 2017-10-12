@@ -319,7 +319,8 @@ sub holds {
     $res->{items} = [
         map {
             my $item = $self->_result_xlate($_, \%HOLDS_ITEM_XLATE);
-            my $metadata = $self->_item_metadata($_);
+            my $item_id = $item->{id};
+            my $metadata = $self->item_metadata($item_id);
             my $i = {%$item, %$metadata}; # we need my $i, don't ask me why...
         } @$items
     ];
@@ -387,11 +388,12 @@ sub checkouts {
     $res->{items} = [
         map {
             my $item = $self->_checkout_item_xlate($_);
+            my $item_id = $item->{id};
             my $formats = delete ($_->{formats});
             my $actions = delete ($_->{actions});
-            my $metadata = $self->_item_metadata($_);
+            my $metadata = $self->item_metadata($item_id);
             if ($formats) {
-                $formats = $self->_formats_xlate($item->{id}, $formats);
+                $formats = $self->_formats_xlate($item_id, $formats);
             }
             else {
                 $formats = {};

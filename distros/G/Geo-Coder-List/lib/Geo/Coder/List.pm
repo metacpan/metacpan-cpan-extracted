@@ -10,11 +10,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our %locations;
 
 =head1 SYNOPSIS
@@ -113,14 +113,16 @@ sub geocode {
 			return $rc;
 		}
 	}
-	if(wantarray && defined($locations{$location}) && (ref($locations{$location}) eq 'ARRAY') && (my @rc = @{$locations{$location}})) {
+	if(defined($locations{$location}) && (ref($locations{$location}) eq 'ARRAY') && (my @rc = @{$locations{$location}})) {
 		if(scalar(@rc)) {
 			foreach (@rc) {
 				delete $_->{'geocoder'};
 			}
-			return @rc;
+			return (wantarray) ? @rc : $rc[0];
 		}
 	}
+
+	my $error;
 
 	foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
@@ -140,6 +142,7 @@ sub geocode {
 		};
 		if($@) {
 			Carp::carp(ref($geocoder) . " '$location': $@");
+			$error = $@;
 			next;
 		}
 		foreach my $location(@rc) {
@@ -164,10 +167,14 @@ sub geocode {
 						# geocoder.ca
 						$location->{geometry}{location}{lat} = $location->{latt};
 						$location->{geometry}{location}{lng} = $location->{longt};
+					} elsif($location->{latitude}) {
+						# postcodes.io
+						$location->{geometry}{location}{lat} = $location->{latitude};
+						$location->{geometry}{location}{lng} = $location->{longitude};
 					}
 
 					if($location->{'standard'}{'countryname'}) {
-						# XYZ
+						# geocoder.xyz
 						$location->{'address'}{'country'} = $location->{'standard'}{'countryname'};
 					}
 				}
@@ -188,6 +195,9 @@ sub geocode {
 				return $rc[0];
 			}
 		}
+	}
+	if($error) {
+		return { error => $error };
 	}
 	undef;
 }

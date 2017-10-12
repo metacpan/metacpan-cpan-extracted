@@ -24,6 +24,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "DateTime" : "0",
             "File::Temp" : "0",
             "Path::Class" : "0",
             "Pod::Simple::Text" : "0",
@@ -41,6 +42,7 @@
             "Moose" : "0",
             "Moose::Exporter" : "0",
             "MooseX::Aliases" : "0",
+            "Try::Tiny" : "0",
             "XML::LibXML" : "2.01",
             "XML::Tidy" : "0",
             "perl" : "5.01"
@@ -50,15 +52,15 @@
    "provides" : {
       "XML::Chain" : {
          "file" : "lib/XML/Chain.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "XML::Chain::Element" : {
          "file" : "lib/XML/Chain/Element.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "XML::Chain::Selector" : {
          "file" : "lib/XML/Chain/Selector.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -73,6 +75,6 @@
          "url" : "https://github.com/meon/XML-Chain.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

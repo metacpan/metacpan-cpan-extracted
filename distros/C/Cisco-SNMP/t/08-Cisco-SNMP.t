@@ -2,49 +2,53 @@
 
 use strict;
 use warnings;
-use Test::Simple tests => 48;
+use Test::More tests => 48;
 
 use Cisco::SNMP;
 ok(1, "Loading Module"); # If we made it this far, we're ok.
 
-my $ANSWER;
-{
-    local $/;
-    $ANSWER = eval <DATA>;
-}
+SKIP: {
+    skip "developer-only tests - set CISCO_SNMP_DEVELOPER", 47 unless $ENV{CISCO_SNMP_DEVELOPER};
 
-my $ret;
-
-res( 0, '1.1.1.1' );
-res( 1, '1.1.1.1:1024' );
-res( 2, 'localhost' );
-res( 3, 'localhost:1024' );
-res( 4, 'fe80::1' );
-res( 5, 'fe80::1:1024' );
-res( 6, '[fe80::1]' );
-res( 7, '[fe80::1]:1024' );
-
-sub res {
-    my ( $test, $host ) = @_;
-    my $ret = Cisco::SNMP::_resolv( $host );
-    for ( sort (keys ( %{$ret} ) ) ) {
-        ok($ret->{$_} eq $ANSWER->[$test]->{$_}, "$test: $_");
+    my $ANSWER;
+    {
+        local $/;
+        $ANSWER = eval <DATA>;
     }
+
+    my $ret;
+
+    res( 0, '1.1.1.1' );
+    res( 1, '1.1.1.1:1024' );
+    res( 2, 'localhost' );
+    res( 3, 'localhost:1024' );
+    res( 4, 'fe80::1' );
+    res( 5, 'fe80::1:1024' );
+    res( 6, '[fe80::1]' );
+    res( 7, '[fe80::1]:1024' );
+
+    sub res {
+        my ( $test, $host ) = @_;
+        my $ret = Cisco::SNMP::_resolv( $host );
+        for ( sort (keys ( %{$ret} ) ) ) {
+            ok($ret->{$_} eq $ANSWER->[$test]->{$_}, "$test: $_");
+        }
+    }
+
+    ok(Cisco::SNMP->DEFAULT_FAMILY()   == 2,  '->default_family() return');
+    ok(Cisco::SNMP->DEFAULT_FAMILY(2)  == 2,  '->default_family(2) return');
+    ok(Cisco::SNMP->DEFAULT_FAMILY(4)  == 2,  '->default_family(4) return');
+    ok(Cisco::SNMP->DEFAULT_FAMILY(6)  == 2,  '->default_family(6) return');
+    ok(Cisco::SNMP->DEFAULT_FAMILY(23) == 23, '->default_family(23) return');
+    ok(Cisco::SNMP->DEFAULT_FAMILY()   == 23, '->default_family() return');
+
+    ok(Cisco::SNMP::DEFAULT_FAMILY()   == 23, '::default_family() return');
+    ok(Cisco::SNMP::DEFAULT_FAMILY(2)  == 23, '::default_family(2) return');
+    ok(Cisco::SNMP::DEFAULT_FAMILY(4)  == 2, '::default_family(4) return');
+    ok(Cisco::SNMP::DEFAULT_FAMILY(6)  == 2,  '::default_family(6) return');
+    ok(Cisco::SNMP::DEFAULT_FAMILY(23) == 23,  '::default_family(23) return');
+    ok(Cisco::SNMP::DEFAULT_FAMILY()   == 23, '::default_family() return');
 }
-
-ok(Cisco::SNMP->DEFAULT_FAMILY()   == 2,  '->default_family() return');
-ok(Cisco::SNMP->DEFAULT_FAMILY(2)  == 2,  '->default_family(2) return');
-ok(Cisco::SNMP->DEFAULT_FAMILY(4)  == 2,  '->default_family(4) return');
-ok(Cisco::SNMP->DEFAULT_FAMILY(6)  == 2,  '->default_family(6) return');
-ok(Cisco::SNMP->DEFAULT_FAMILY(23) == 23, '->default_family(23) return');
-ok(Cisco::SNMP->DEFAULT_FAMILY()   == 23, '->default_family() return');
-
-ok(Cisco::SNMP::DEFAULT_FAMILY()   == 23, '::default_family() return');
-ok(Cisco::SNMP::DEFAULT_FAMILY(2)  == 23, '::default_family(2) return');
-ok(Cisco::SNMP::DEFAULT_FAMILY(4)  == 2, '::default_family(4) return');
-ok(Cisco::SNMP::DEFAULT_FAMILY(6)  == 2,  '::default_family(6) return');
-ok(Cisco::SNMP::DEFAULT_FAMILY(23) == 23,  '::default_family(23) return');
-ok(Cisco::SNMP::DEFAULT_FAMILY()   == 23, '::default_family() return');
 
 __DATA__
 [

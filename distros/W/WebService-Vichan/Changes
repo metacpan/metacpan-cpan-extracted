@@ -1,4 +1,7 @@
 Revision history for Perl extension WebService::Vichan.
 
+0.001001 2017-10-07T19:51+01:00
+ - Make tests more reliable
+
 0.001 2017-09-30T21:40+03:00
  - Initial release

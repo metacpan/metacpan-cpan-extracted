@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015 Kevin Ryde
+# Copyright 2015, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,10 +19,10 @@
 
 use 5.005;
 use strict;
-use MyGraphs;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
+use MyGraphs;
 use Graph::Maker::BestOf;
 
 # uncomment this to run the ### lines
@@ -76,7 +76,7 @@ use Graph::Maker::BestOf;
     #   print graph6_str_to_canonical($g6_str);
     # }
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
 
   print join(',',@values),"\n";
   exit 0;

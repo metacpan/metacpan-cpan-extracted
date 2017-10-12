@@ -5,11 +5,11 @@ use List::MoreUtils qw(uniq);
 use HTML::SocialMeta::Twitter;
 use HTML::SocialMeta::OpenGraph;
 
-use MooX::LazierAttributes qw/lzy bld/;
+use MooX::LazierAttributes qw/lzy bld coe/;
 use MooX::ValidateSubs;
-use Types::Standard qw/Str Object ArrayRef Split/;
+use Coerce::Types::Standard qw/HTML Str Object StrToArray/;
 
-our $VERSION = '0.73';
+our $VERSION = '0.730002';
 
 our %encode;
 BEGIN {
@@ -19,20 +19,17 @@ BEGIN {
 
 attributes(
     [qw(card_type card site site_name title description image image_alt url creator operatingSystem
-    app_country app_name app_id app_url player player_height player_width fb_app_id)] => [ Str, {lzy, coerce => sub { 
-        $_[0] =~ s/($encode{regex})/$encode{$1}/g;
-		$_[0]; 
-	}} ],
+    app_country app_name app_id app_url player player_height player_width fb_app_id)] => [ HTML->by('encode_entity'), {lzy, coe} ],
     [qw(twitter opengraph)] => [ Object, { lzy, bld } ],
     social => [ sub { [qw/twitter opengraph/] } ],
 );
 
 validate_subs(
     create => {
-        params => [ [ Str, 'card_type' ], [ (ArrayRef[Str])->plus_coercions(Split[qr/\s/]), 'social' ] ], # I expect this to be an arrayref
+        params => [ [ Str, 'card_type' ], [ StrToArray->by('\s'), 'social' ] ], # I expect this to be an arrayref
     },
     required_fields => {
-        params => [ [ Str, 'card_type' ], [ (ArrayRef[Str])->plus_coercions(Split[qr/\s/]), 'social' ] ],
+        params => [ [ Str, 'card_type' ], [ StrToArray->by('\s'), 'social' ] ],
     },
 );
 
@@ -87,7 +84,7 @@ HTML::SocialMeta - Module to generate Social Media Meta Tags,
 
 =head1 VERSION
 
-Version 0.73
+Version 0.730002
 
 =head1 SYNOPSIS
 

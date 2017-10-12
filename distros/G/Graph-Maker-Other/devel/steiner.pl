@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,11 +19,11 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use Math::Complex 'pi';
-use MyGraphs;
 
-use lib 'devel/lib';
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

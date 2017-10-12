@@ -23,11 +23,13 @@ Comment
 Component
 Factory
 FactoryTypes
+Heumann
 Issue
 Item
 Iterator
 JIRA
 LinkType
+Manni
 Melezhik
 Mixins
 Packy
@@ -44,6 +46,7 @@ User
 Version
 Worklog
 alexchorny
+github
 lib
 melezhik
 packy

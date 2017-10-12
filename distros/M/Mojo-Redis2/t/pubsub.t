@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 use Mojo::Redis2;
 use Test::More;
 
-plan skip_all => 'Cannot test on Win32' if $^O eq 'Win32';
+plan skip_all => 'Cannot test on Win32' if $^O eq 'MSWin32';
 plan skip_all => $@ unless eval { Mojo::Redis2::Server->start };
 
 my $redis = Mojo::Redis2->new;

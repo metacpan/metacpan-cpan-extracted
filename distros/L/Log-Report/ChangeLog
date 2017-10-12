@@ -7,6 +7,13 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.22: Thu 12 Oct 12:18:54 CEST 2017
+
+	Improvements:
+	- try() also collects DEBUG info when one of the dispatches wants it.
+	- document that ::Translator::POT does not require charset anymore.
+	- support __p, __px, etc from Locale::TextDomain
+
 version 1.21: Mon  3 Jul 15:31:19 CEST 2017
 
 	Fixes:

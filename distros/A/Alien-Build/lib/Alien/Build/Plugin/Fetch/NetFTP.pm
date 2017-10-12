@@ -8,7 +8,7 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Net::FTP plugin for fetching files
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 has '+url' => '';
@@ -158,7 +158,7 @@ Alien::Build::Plugin::Fetch::NetFTP - Net::FTP plugin for fetching files
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -241,6 +241,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

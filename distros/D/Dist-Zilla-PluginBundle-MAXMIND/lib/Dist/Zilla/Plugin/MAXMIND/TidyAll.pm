@@ -7,12 +7,12 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
-use Path::Class qw( file );
 use Path::Iterator::Rule;
+use Path::Tiny qw( path );
 use Perl::Critic::Freenode 0.021;
 use Perl::Critic::Moose 1.05;
 use Sort::ByExample qw( sbe );
@@ -25,27 +25,16 @@ with qw(
 );
 
 my $perltidyrc = <<'EOF';
--l=78
--i=4
--ci=4
--se
--b
+--blank-lines-before-packages=0
+--iterations=2
+--no-outdent-long-comments
 -bar
 -boc
--vt=0
--vtc=0
--cti=0
--pt=1
--bt=1
--sbt=1
--bbt=1
+-ci=4
+-i=4
+-l=78
 -nolq
--npro
--nsfs
---blank-lines-before-packages=0
---opening-hash-brace-right
---no-outdent-long-comments
---iterations=2
+-se
 -wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
 EOF
 
@@ -70,10 +59,6 @@ severity = 3
 
 [Documentation::RequirePackageMatchesPodName]
 severity = 3
-
-[Documentation::PodSpelling]
-severity = 3
-stop_words_file = .stopwords
 
 [Freenode::WhileDiamondDefaultAssignment]
 set_themes = core
@@ -149,13 +134,12 @@ add_packages = Test::Builder
 
 # "use v5.14" is more readable than "use 5.014"
 [-ValuesAndExpressions::ProhibitVersionStrings]
-
 EOF
 
 sub before_build {
     my $self = shift;
 
-    file('tidyall.ini')->spew( $self->_tidyall_ini_content );
+    path('tidyall.ini')->spew( $self->_tidyall_ini_content );
 
     $self->_maybe_write_file( 'perlcriticrc', $perlcriticrc );
     $self->_maybe_write_file( 'perltidyrc',   $perltidyrc );
@@ -293,7 +277,7 @@ sub _maybe_write_file {
 
     return if -e $file;
 
-    file($file)->spew($content);
+    path($file)->spew($content);
 
     return;
 }
@@ -316,7 +300,7 @@ Dist::Zilla::Plugin::MAXMIND::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =for Pod::Coverage .*
 

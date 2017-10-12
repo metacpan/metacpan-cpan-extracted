@@ -64,5 +64,4 @@ sub thing {
 	return $_[0] || 100;
 }
 
-
 done_testing();

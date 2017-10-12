@@ -1,9 +1,7 @@
 #!/usr/bin/perl
-# Copyright (c) 2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: ramanujan.pl 3 2013-06-01 20:56:06Z demetri $
 
 # This example verifies the Ramanujan 6-10-8 identity in a form written
 # with bivariate polynomials.  This was taken from:

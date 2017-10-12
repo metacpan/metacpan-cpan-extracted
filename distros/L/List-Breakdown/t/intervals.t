@@ -8,7 +8,7 @@ use Test::More tests => 1;
 
 use List::Breakdown 'breakdown';
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 ## no critic (ProhibitMagicNumbers,ProhibitLeadingZeros)
 my @numbers = ( 1, 32, 3718.4, 0x56, 0777, 3.14, -5, 1.2e5 );

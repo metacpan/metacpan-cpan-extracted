@@ -1,9 +1,7 @@
 #!/usr/bin/perl
-# Copyright (c) 2011-2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2011-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: tutte.pl 4 2013-06-01 20:56:56Z demetri $
 
 # This example implements a simple generic algorithm to compute the
 # Tutte polynomial of a small undirected graph.  A number of other
@@ -15,9 +13,10 @@ use strict;
 use warnings;
 use Math::Polynomial::Multivariate;
 
-my $one = Math::Polynomial::Multivariate->const(1);
-my $x   = $one->var('x');
-my $y   = $one->var('y');
+my $one  = Math::Polynomial::Multivariate->const(1);
+my $zero = $one->const(0);
+my $x    = $one->var('x');
+my $y    = $one->var('y');
 
 my @graph = (
     [0, 1], [1, 2],
@@ -28,10 +27,10 @@ my @graph = (
 );
 
 my $T = tutte(\@graph);
-my $P = $T->subst('y', 0);
-my $C = $T->subst('x', 0);
-my $R = $T->subst('x', 1);
-my $S = $R->subst('y', 1);
+my $P = $T->subst('y', $zero);
+my $C = $T->subst('x', $zero);
+my $R = $T->subst('x', $one);
+my $S = $T->evaluate({x => 1, y => 1});
 
 print
     "Tutte:        $T\n",

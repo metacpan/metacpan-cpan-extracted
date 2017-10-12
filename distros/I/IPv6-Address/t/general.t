@@ -241,3 +241,11 @@ ok( @aaa == 256, 'enumerate returns correct number of items' );
 is( $aaa[0],'147.102.1.0' , 'first item of enumeration is correct' );
 is( $aaa[9],'147.102.1.9' , 'item of enumeration is correct' );
 is( $aaa[255],'147.102.1.255' , 'last item of enumeration is correct' );
+
+
+
+#test the between function
+ok( IPv4Subnet::between('147.102.1.1','147.102.1.2','147.102.1.3'), '147.102.1.2 is between 147.102.1.1 and 147.102.1.3' );
+ok( IPv4Subnet::between('147.102.1.1','147.102.1.1','147.102.1.3'), '147.102.1.1 is between 147.102.1.1 and 147.102.1.3' );
+ok( IPv4Subnet::between('147.102.1.1','147.102.1.2','147.102.1.2'), '147.102.1.2 is between 147.102.1.1 and 147.102.1.2' );
+ok( ! IPv4Subnet::between('147.102.1.1','147.102.2.2','147.102.1.3'), '147.102.2.2 is not between 147.102.1.1 and 147.102.1.3' );

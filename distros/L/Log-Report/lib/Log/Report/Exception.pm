@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Exception;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 
 use Log::Report      'log-report';

@@ -1,0 +1,9 @@
+TYPEMAP
+libvlc_instance_t *        T_PTROBJ
+libvlc_event_manager_t*    T_PTROBJ
+libvlc_event_type_t        T_IV
+libvlc_callback_t          T_PTROBJ
+libvlc_event_t*            T_PTROBJ
+libvlc_media_stats_t       T_PTROBJ
+libvlc_state_t             T_PTROBJ
+

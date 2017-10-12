@@ -2,26 +2,47 @@ package Devel::Caller::IgnoreNamespaces;
 
 use strict;
 use warnings;
+no warnings 'redefine';
 
 use vars qw(@NAMESPACES $VERSION);
 
-$VERSION = '1.0';
+$VERSION = '1.1';
 
 sub register { push @NAMESPACES, @_; }
 
+my $orig_global_caller;
+if(defined(&CORE::GLOBAL::caller)) {
+    $orig_global_caller = \&CORE::GLOBAL::caller
+}
+
 *CORE::GLOBAL::caller = sub (;$) {
-  my ($height) = ($_[0]||0);
-  my $i=1;
-  my $name_cache;
-  while (1) {
-    my @caller = CORE::caller($i++) or return;
-    $caller[3] = $name_cache if $name_cache;
-    $name_cache = (grep { $caller[0] eq $_ } @NAMESPACES) # <-- !!!!
-      ? $caller[3]
-      : '';
-    next if $name_cache || $height-- != 0;
-    return wantarray ? @_ ? @caller : @caller[0..2] : $caller[0];
-  }
+    my ($height) = ($_[0]||0);
+    my $i=1;
+    my $name_cache;
+    while (1) {
+        my @caller;
+        # can't just take a reference to &CORE::caller on perl < 5.16 and put
+        # it in $orig_global_caller, hence the hateful repetition here
+        if($orig_global_caller) {
+            @caller = $orig_global_caller->() eq 'DB'
+                ? do { package # break this up so PAUSE etc don't whine
+                       DB; $orig_global_caller->($i++) }
+                : $orig_global_caller->($i++)
+            or return;
+        } else {
+            @caller = CORE::caller() eq 'DB'
+                ? do { package # break this up so PAUSE etc don't whine
+                       DB; CORE::caller($i++) }
+                : CORE::caller($i++)
+            or return;
+        }
+        $caller[3] = $name_cache if $name_cache;
+        $name_cache = (grep { $caller[0] eq $_ } @NAMESPACES) # <-- !!!!
+            ? $caller[3]
+            : '';
+        next if $name_cache || $height-- != 0;
+        return wantarray ? @_ ? @caller : @caller[0..2] : $caller[0];
+    }
 };
 
 1;

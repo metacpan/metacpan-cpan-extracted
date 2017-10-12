@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package Dancer2::Logger::LogReport;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 # ABSTRACT: Dancer2 logger engine for Log::Report
 

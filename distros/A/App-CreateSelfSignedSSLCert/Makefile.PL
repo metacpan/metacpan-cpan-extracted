@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Create self-signed SSL certificate",
+  "ABSTRACT" => "Create self-signed SSL certificate using openssl",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,22 +18,15 @@ my %WriteMakefileArgs = (
     "script/create-ssl-csr"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CreateSelfSignedSSLCert",
   "PREREQ_PM" => {
+    "AppLib::CreateSelfSignedSSLCert" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "Expect" => 0,
-    "IPC::System::Options" => "0.27",
-    "Log::ger" => "0.011",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.75",
+    "Perinci::CmdLine::Base" => "1.79",
     "Perinci::Sub::DepChecker" => 0,
-    "Perinci::Sub::XCompletion::filename" => 0,
-    "Proc::ChildError" => 0,
-    "String::ShellQuote" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Perinci::Sub::XCompletion::filename" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -41,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.150",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,23 +42,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "AppLib::CreateSelfSignedSSLCert" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
-  "Expect" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "IPC::System::Options" => "0.27",
-  "Log::ger" => "0.011",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.75",
+  "Perinci::CmdLine::Base" => "1.79",
   "Perinci::Sub::DepChecker" => 0,
   "Perinci::Sub::XCompletion::filename" => 0,
-  "Proc::ChildError" => 0,
-  "String::ShellQuote" => 0,
-  "Test::More" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

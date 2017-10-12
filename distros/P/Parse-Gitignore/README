@@ -12,11 +12,11 @@
                  |___/                      
 
 
-This is the README for Parse::Gitignore version 0.02.
+This is the README for Parse::Gitignore version 0.04.
 
-Parse::Gitignore is a "module" for the Perl computer programming language, a
-library of computer code to install on a computer.  This document contains four
-sections:
+Parse::Gitignore is a "module" for the Perl computer programming language,
+a library of computer code to install on a computer.  This document
+contains four sections:
 
 1. About - what the module does
 
@@ -30,7 +30,7 @@ sections:
 
 1. ABOUT
 
-Parse::Gitignore - parse a .gitignore file
+Parse::Gitignore - parse .gitignore files
 
 Parse a .gitignore file and check whether a file matches it.
 
@@ -38,15 +38,16 @@ Parse a .gitignore file and check whether a file matches it.
 
 2. DOCUMENTATION
 
-You can read the documentation for the module online at the following websites:
+You can read the documentation for the module online at the following
+websites:
 
     * http://search.cpan.org/perldoc?Parse::Gitignore
     * http://metacpan.org/release/Parse-Gitignore
 
 (These links go to the latest version of the module.)
 
-After installing the module, you can read the documentation on your computer
-using
+After installing the module, you can read the documentation on your
+computer using
 
     perldoc Parse::Gitignore
 
@@ -64,11 +65,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Parse::Gitignore
 
-To install the module from the source file, Parse-Gitignore-0.02.tar.gz, follow
-this sequence of commands:
+To install the module from the source file, Parse-Gitignore-0.04.tar.gz,
+follow this sequence of commands:
 
-    tar xfz Parse-Gitignore-0.02.tar.gz
-    cd Parse-Gitignore-0.02
+    tar xfz Parse-Gitignore-0.04.tar.gz
+    cd Parse-Gitignore-0.04
     perl Makefile.PL
     make
     make install
@@ -81,8 +82,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can report a
-bug at 
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
 
 <https://github.com/benkasminbullock/parse-gitignore/issues>,
 
@@ -93,6 +94,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Feb  4 17:28:01 2016.
+This README was written on Mon Oct  9 14:00:57 2017.
 
 -----------------------------------------------------------------------------

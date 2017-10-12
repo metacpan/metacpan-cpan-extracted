@@ -1,8 +1,6 @@
-# Copyright (c) 2013-2014 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 02_operators.t 17 2014-02-21 12:51:52Z demetri $
 
 # Checking operators.
 
@@ -28,19 +26,19 @@ my $two_x = $two * $x;
 
 my $p = -$two + $x ** 2 + $x * $y - $y ** 3;
 isa_ok($p, MPM);                        # 1
-is("$p", "-2 + x^2 + x*y + -1*y^3");    # 2
+is("$p", "(-2 + x^2 + x*y + -1*y^3)");  # 2
 my $q = ($x + $y) * ($x - $y);
 isa_ok($q, MPM);                        # 3
-is("$q", "x^2 + -1*y^2");               # 4
+is("$q", "(x^2 + -1*y^2)");             # 4
 my $r = $q ** 0;
 isa_ok($r, MPM);                        # 5
-is("$r", "1");                          # 6
+is("$r", "(1)");                        # 6
 my $s = $q - $q;
 isa_ok($s, MPM);                        # 7
-is("$s", "0");                          # 8
+is("$s", "(0)");                        # 8
 my $t = $x + $two_x;
 isa_ok($t, MPM);                        # 9
-is("$t", "3*x");                        # 10
+is("$t", "(3*x)");                      # 10
 
 my $v0 = $s->evaluate({});
 is(ref($v0), q[]);                      # 11
@@ -57,13 +55,13 @@ like($@, qr/^missing variables: x y/);  # 18
 
 my $u = $p->subst('y', $two_x);
 isa_ok($u, MPM);                        # 19
-is("$u", "-2 + 3*x^2 + -8*x^3");        # 20
+is("$u", "(-2 + 3*x^2 + -8*x^3)");      # 20
 my $v = $p->subst('z', $q);
 isa_ok($v, MPM);                        # 21
-is("$v", "-2 + x^2 + x*y + -1*y^3");    # 22
+is("$v", "(-2 + x^2 + x*y + -1*y^3)");  # 22
 my $w = $zero->subst('x', $x);
 isa_ok($w, MPM);                        # 23
-is("$w", '0');                          # 24
+is("$w", '(0)');                        # 24
 
 is($x == $y, q[]);                      # 25
 is($x != $y, 1);                        # 26
@@ -92,19 +90,19 @@ like($@, qr/illegal exponent/);         # 38
 
 $o = $x + 2;
 isa_ok($o, MPM);                        # 39
-is("$o", '2 + x');                      # 40
+is("$o", '(2 + x)');                    # 40
 
 $o = $x - 2;
 isa_ok($o, MPM);                        # 41
-is("$o", '-2 + x');                     # 42
+is("$o", '(-2 + x)');                   # 42
 
 $o = 2 - $x;
 isa_ok($o, MPM);                        # 43
-is("$o", '2 + -1*x');                   # 44
+is("$o", '(2 + -1*x)');                 # 44
 
 $o = $x * 2;
 isa_ok($o, MPM);                        # 45
-is("$o", '2*x');                        # 46
+is("$o", '(2*x)');                      # 46
 
 $o = $x == 1;
 is("$o", !1);                           # 47
@@ -113,10 +111,10 @@ $o = $x != 1;
 is("$o", !0);                           # 48
 
 my $px = $p->partial_derivative('x');
-is("$px", "2*x + y");                   # 49
+is("$px", "(2*x + y)");                 # 49
 my $casted = 0;
 my $py = $p->partial_derivative('y', sub { ++$casted; $_[0] });
-is("$py", "x + -3*y^2");                # 50
+is("$py", "(x + -3*y^2)");              # 50
 is($casted, 2);                         # 51
 
 my @vars = $p->variables;
@@ -136,6 +134,6 @@ $c = $p->coefficient({x => 1, y => 1});
 is($c, 1);                              # 56
 
 my $pp = 2*$x - $x - $x - 2*$y + $y + $y;
-is("$pp", "0");                         # 57
+is("$pp", "(0)");                       # 57
 
 __END__

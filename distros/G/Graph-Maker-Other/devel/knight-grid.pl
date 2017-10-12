@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,8 +19,11 @@
 
 use 5.005;
 use strict;
-use MyGraphs;
 use Graph::Maker::KnightGrid;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -28,6 +31,72 @@ use Graph::Maker::KnightGrid;
 
 
 {
+  # KnightGrid grep
+  # num edges 8*triangular = A033996
+
+  # 2x2 https://hog.grinvin.org/ViewGraphInfo.action?id=52
+  #     4 isolated (graphedron)
+  # 3x2 https://hog.grinvin.org/ViewGraphInfo.action?id=896
+  #     2x path-2 and 2 isolated (graphedron)
+  # 4x2 https://hog.grinvin.org/ViewGraphInfo.action?id=684
+  #     4x path-2
+  # 3x3 is plain grid torus, Paley on 9 vertices
+  #   https://hog.grinvin.org/ViewGraphInfo.action?id=6607
+  # 4x4 is tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
+  # 5x5 canonical X~}CKMFPACgJONHCAaGW...
+  #               X~}CKMFPACgJONHCAaGWbGaO`DH@EWcPOIGXCPHO`DE`GaeAGcj
+
+  # cyclic
+  # 2x2 cycle  *--*
+  #            |  |
+  #            *--*
+  # torus:
+  # k=1 edges 1
+  # @
+  # k=2 edges 4
+  # Cr
+  # k=3 edges 18
+  # H{dQXgj
+  # k=4 edges 32
+  # Os_????@zKIgIgLGHW?r?
+  # k=5 edges 100
+  # X~}CKMFPACgJONHCAaGWbGaO`DH@EWcPOIGXCPHO`DE`GaeAGcj
+
+  my @graphs;
+  my @values;
+  foreach my $w (2 .. 4) {
+    foreach my $h ($w .. 4) {
+      require Graph::Maker::KnightGrid;
+      my $graph = Graph::Maker->new('knight_grid',
+                                    dims => [$w,$h,2,2],
+                                    undirected => 1,
+                                    cyclic => 1,
+                                   );
+      next if MyGraphs::Graph_loopcount($graph);
+      push @graphs, $graph;
+
+      my $num_edges = $graph->edges;
+
+      print "$w,$h edges $num_edges\n";
+      push @values, $num_edges;
+
+      # my $writer = Graph::Writer::Graph6->new;
+      # my $g6_str;
+      # open my $fh, '>', \$g6_str or die;
+      # $writer->write_graph($graph, $fh);
+      # print graph6_str_to_canonical($g6_str);
+    }
+  }
+  # require Math::OEIS::Grep;
+  # Math::OEIS::Grep->search(array => \@values, verbose=>1);
+
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # Grid
+
   # Torus
   # 3x3 Paley https://hog.grinvin.org/ViewGraphInfo.action?id=6607
   # 4x4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
@@ -537,54 +606,4 @@ use Graph::Maker::KnightGrid;
   exit 0;
 }
 
-{
-  # KnightGrid grep
-  # num edges 8*triangular = A033996
-  # 3x3 is plain grid torus, Paley on 9 vertices
-  #   https://hog.grinvin.org/ViewGraphInfo.action?id=6607
-  # 4x4 is tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
-  # 5x5 canonical X~}CKMFPACgJONHCAaGW...
-  #               X~}CKMFPACgJONHCAaGWbGaO`DH@EWcPOIGXCPHO`DE`GaeAGcj
 
-  # 2x2 torus  *--*
-  #            |  |
-  #            *--*
-  # torus:
-  # k=1 edges 1
-  # @
-  # k=2 edges 4
-  # Cr
-  # k=3 edges 18
-  # H{dQXgj
-  # k=4 edges 32
-  # Os_????@zKIgIgLGHW?r?
-  # k=5 edges 100
-  # X~}CKMFPACgJONHCAaGWbGaO`DH@EWcPOIGXCPHO`DE`GaeAGcj
-
-  my @graphs;
-  my @values;
-  foreach my $size (0 .. 8) {
-    require Graph::Maker::KnightGrid;
-    my $graph = Graph::Maker->new('knight_grid',
-                                  dims => [$size,$size],
-                                  undirected => 1,
-                                  cyclic => 1,
-                                 );
-    push @graphs, $graph;
-
-    my $num_edges = $graph->edges;
-
-    print "k=$size edges $num_edges\n";
-    push @values, $num_edges;
-
-    my $writer = Graph::Writer::Graph6->new;
-    my $g6_str;
-    open my $fh, '>', \$g6_str or die;
-    $writer->write_graph($graph, $fh);
-    print graph6_str_to_canonical($g6_str);
-  }
-  require Math::OEIS::Grep;
-  Math::OEIS::Grep->search(array => \@values, verbose=>1);
-  hog_searches_html(@graphs);
-  exit 0;
-}

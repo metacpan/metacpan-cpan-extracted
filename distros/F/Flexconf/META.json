@@ -1,0 +1,81 @@
+{
+   "abstract" : "Configuration files management library and program",
+   "author" : [
+      "Serguei Okladnikov <oklaspec@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Flexconf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Flexconf" : {
+         "file" : "lib/Flexconf.pm",
+         "version" : "0.01"
+      },
+      "Flexconf::Json" : {
+         "file" : "lib/Flexconf/Json.pm"
+      },
+      "Flexconf::Yaml" : {
+         "file" : "lib/Flexconf/Yaml.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oklas/p5-Flexconf/issues"
+      },
+      "homepage" : "https://github.com/oklas/p5-Flexconf",
+      "repository" : {
+         "url" : "git://github.com/oklas/p5-Flexconf.git",
+         "web" : "https://github.com/oklas/p5-Flexconf"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

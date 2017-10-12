@@ -8,7 +8,7 @@ package Devel::MAT::Context;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -116,7 +116,7 @@ sub location
 
 package Devel::MAT::Context::SUB;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 __PACKAGE__->register_type( 1 );
 
 =head1 Devel::MAT::Context::SUB
@@ -203,7 +203,7 @@ sub depth      { return $_[0]->{depth} }
 
 package Devel::MAT::Context::TRY;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 __PACKAGE__->register_type( 2 );
 
 =head1 Devel::MAT::Context::TRY
@@ -218,7 +218,7 @@ sub _load_v0_1 {}
 
 package Devel::MAT::Context::EVAL;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 __PACKAGE__->register_type( 3 );
 
 =head1 Devel::MAT::Context::EVAL

@@ -1,5 +1,8 @@
 # PODNAME: Config::Model::models::Sshd::MatchCondition
 # ABSTRACT:  Configuration class Sshd::MatchCondition
+
+=encoding utf8
+
 =head1 NAME
 
 Config::Model::models::Sshd::MatchCondition - Configuration class Sshd::MatchCondition
@@ -15,19 +18,19 @@ a sshd_config match block.
 
 =head2 User
 
-Define the User criteria of a conditional block. The value of this field is a pattern that is tested against user name.I<< Optional. Type uniline.  >> 
+Define the User criteria of a conditional block. The value of this field is a pattern that is tested against user name. I< Optional. Type uniline.  > 
 
 =head2 Group
 
-Define the Group criteria of a conditional block. The value of this field is a pattern that is tested against group name.I<< Optional. Type uniline.  >> 
+Define the Group criteria of a conditional block. The value of this field is a pattern that is tested against group name. I< Optional. Type uniline.  > 
 
 =head2 Host
 
-Define the Host criteria of a conditional block. The value of this field is a pattern that is tested against host name.I<< Optional. Type uniline.  >> 
+Define the Host criteria of a conditional block. The value of this field is a pattern that is tested against host name. I< Optional. Type uniline.  > 
 
 =head2 Address
 
-Define the Address criteria of a conditional block. The value of this field is a pattern that is tested against the address of the incoming connection.I<< Optional. Type uniline.  >> 
+Define the Address criteria of a conditional block. The value of this field is a pattern that is tested against the address of the incoming connection. I< Optional. Type uniline.  > 
 
 =head1 SEE ALSO
 

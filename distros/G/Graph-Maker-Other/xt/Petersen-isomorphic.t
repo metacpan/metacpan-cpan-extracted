@@ -31,11 +31,10 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Petersen;
 
-use lib
-  'devel/lib';
-use MyGraphs ();
+use lib 'devel/lib';
+use MyGraphs;
 
-plan tests => 2;
+plan tests => 3;
 
 
 #------------------------------------------------------------------------------
@@ -81,6 +80,46 @@ plan tests => 2;
 
   ok (MyGraphs::Graph_is_isomorphic($graph, $petersen))
 }
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('3,1' => 746,
+               '4,1' => 1022,  '4,2' => 588,
+               '5,2' => 660,
+               '7,2' => 28482,
+               '8,3' => 1229,
+               '9,3' => 6700,
+               '10,2' => 1043, '10,3' => 1036,
+               '11,2' => 24052,
+               '12,2' => 27325, '12,5' => 1234,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $N (3 .. 25) {
+    foreach my $K (1 .. $N-1) {
+      my $graph = Graph::Maker->new('Petersen', undirected => 1,
+                                    N => $N, K => $K);
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      next if $seen{$g6_str}++;
+      my $key = "$N,$K";
+      if (my $id = $shown{$key}) {
+        MyGraphs::hog_compare($id, $g6_str);
+      } else {
+        if (MyGraphs::hog_grep($g6_str)) {
+          MyTestHelpers::diag ("HOG $key not shown in POD");
+          MyTestHelpers::diag ($g6_str);
+          MyGraphs::Graph_view($graph);
+          $extras++
+        }
+      }
+    }
+  }
+  ok ($extras, 0);
+}
+
 
 #------------------------------------------------------------------------------
 exit 0;

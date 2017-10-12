@@ -9,7 +9,7 @@ use Specio::Library::String;
 
 use Moo::Role;
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 has ignore => (
     is  => 'ro',
@@ -68,7 +68,7 @@ ignored paths specified in zglob syntax
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 SUPPORT
 

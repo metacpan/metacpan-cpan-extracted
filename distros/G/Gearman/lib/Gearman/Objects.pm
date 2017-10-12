@@ -1,6 +1,6 @@
 package Gearman::Objects;
 use version ();
-$Gearman::Objects::VERSION = version->declare("2.004.008");
+$Gearman::Objects::VERSION = version->declare("2.004.009");
 
 use strict;
 use warnings;
@@ -57,6 +57,11 @@ sub new {
 
 Initialize the list of job servers.
 C<$job_servers>should be array or array reference of hash references or stringified job servers.
+If the port number is not provided, C<4730> is used as the default.
+For example:
+
+    C<< $client->job_servers('127.0.0.1', { host => "192.168.1.100", port => 4730 }); >>
+
 
 B<return> C<[job_servers]>
 
@@ -138,7 +143,7 @@ sub func {
 
 =head2 prefix([$prefix])
 
-getter/setter
+getr/set the namespace / prefix for the function names.
 
 =cut
 

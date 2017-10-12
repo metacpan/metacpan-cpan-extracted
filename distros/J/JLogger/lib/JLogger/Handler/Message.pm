@@ -8,7 +8,10 @@ use base 'JLogger::Handler';
 sub handle {
     my ($self, $node) = @_;
 
-    if (my $body_node = ($node->find_all(['component' => 'body']))[0]) {
+    if (my $body_node = 
+        ($node->find_all(['component' => 'body']))[0]
+        || ($node->find_all(['client' => 'body']))[0]
+    ) {
         my $message = {
             from => $node->attr('from'),
             to   => $node->attr('to'),

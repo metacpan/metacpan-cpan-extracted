@@ -4,9 +4,6 @@
 prompt generic
     match /[\/a-zA-Z0-9._-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
 
-prompt basic
-    match /# ?$/
-
 prompt privileged
     match /> ?$/
 
@@ -20,16 +17,16 @@ prompt pass
     match /Password: ?$/
 
 macro begin_configure
-    send 'configure terminal'
+    send configure terminal
     match /configure terminal/
 
-macro paging
-    send 'skip-page-display'
+macro disable_paging
+    send skip-page-display
+    match generic
+
+macro enable_paging
+		send page-display
+		match generic
 
 macro disconnect
     send exit
-    match generic
-
-# legacy support
-prompt prompt
-    match /[\/a-zA-Z0-9._-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/

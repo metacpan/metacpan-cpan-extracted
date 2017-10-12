@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 
@@ -48,8 +48,6 @@ sub init {
   my $N = delete($params{'N'}) || 0;
   my $graph = _make_graph(\%params);
   $graph->set_graph_attribute (name => "Best-Of $N");
-
-  my $score_to_vertex_name;
 
   # this not documented yet ...
   my $vertex_names = delete($params{'vertex_names'}) || 'integer';

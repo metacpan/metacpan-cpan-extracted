@@ -17,4 +17,4 @@ t/03autoviv.t
 t/comments.t
 t/undef.t
 LICENSE
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.json

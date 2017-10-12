@@ -5,7 +5,7 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'LIEBERT-GP-ENVIRONMENTAL-MIB
   name => 'LIEBERT-GP-ENVIRONMENTAL-MIB',
 };
 
-#$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'LIEBERT-GP-ENVIRONMENTAL-MIB'} = 
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'LIEBERT-GP-ENVIRONMENTAL-MIB'} = '1.3.6.1.4.1.476.1.42.3.4';
 
 $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMENTAL-MIB'} = {
   liebertGlobalProductsEnvironmentalModule => '1.3.6.1.4.1.476.1.42.1.5.1',
@@ -38,11 +38,23 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvDewPointTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.16',
   lgpEnvEnclosureTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.17',
   lgpEnvAdjustedTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.18',
+  lgpEnvExternalSensors => '1.3.6.1.4.1.476.1.42.3.4.1.1.19',
+  lgpEnvExternalAirSensorA => '1.3.6.1.4.1.476.1.42.3.4.1.1.19.1',
+  lgpEnvExternalAirSensorADewPoint => '1.3.6.1.4.1.476.1.42.3.4.1.1.19.2',
+  lgpEnvExternalAirSensorB => '1.3.6.1.4.1.476.1.42.3.4.1.1.19.3',
+  lgpEnvExternalAirSensorBDewPoint => '1.3.6.1.4.1.476.1.42.3.4.1.1.19.4',
+  lgpEnvSupplyFluidTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.20',
+  lgpEnvSupplyRefrigerantTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.21',
+  lgpEnvMinDesiredRoomAirTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.22',
+  lgpEnvDewPointTemperatures => '1.3.6.1.4.1.476.1.42.3.4.1.1.23',
+  lgpEnvInletDewPointTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.23.1',
   lgpEnvTemperatureFahrenheit => '1.3.6.1.4.1.476.1.42.3.4.1.2',
   lgpEnvTemperatureSettingDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.1',
   lgpEnvTemperatureToleranceDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.2',
   lgpEnvTemperatureTableDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3',
   lgpEnvTemperatureEntryDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1',
+  lgpEnvTemperatureDegFTable => '1.3.6.1.4.1.476.1.42.3.4.1.2.3',
+  lgpEnvTemperatureDegFEntry => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1',
   lgpEnvTemperatureIdDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.1',
   lgpEnvTemperatureDescrDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.2',
   lgpEnvTemperatureMeasurementDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.3',
@@ -57,12 +69,21 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvTempDailyLowTimeHourDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.12',
   lgpEnvTempDailyLowTimeMinuteDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.13',
   lgpEnvTempDailyLowTimeSecondDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.14',
+  lgpEnvTemperatureMeasurementTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.50',
+  lgpEnvTemperatureHighThresholdTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.51',
+  lgpEnvTemperatureLowThresholdTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.52',
+  lgpEnvTemperatureSetPointTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.53',
+  lgpEnvTemperatureDeadBandTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.60',
+  lgpEnvTempHeatingPropBandTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.61',
+  lgpEnvTempCoolingPropBandTenthsDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.3.1.62',
   lgpEnvTemperatureDeadbandRangeDegF => '1.3.6.1.4.1.476.1.42.3.4.1.2.4',
   lgpEnvTemperatureCelsius => '1.3.6.1.4.1.476.1.42.3.4.1.3',
   lgpEnvTemperatureSettingDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.1',
   lgpEnvTemperatureToleranceDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.2',
   lgpEnvTemperatureTableDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3',
   lgpEnvTemperatureEntryDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1',
+  lgpEnvTemperatureDegCTable => '1.3.6.1.4.1.476.1.42.3.4.1.3.3',
+  lgpEnvTemperatureDegCEntry => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1',
   lgpEnvTemperatureIdDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.1',
   lgpEnvTemperatureDescrDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.2',
   lgpEnvTemperatureMeasurementDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.3',
@@ -77,6 +98,13 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvTempDailyLowTimeHourDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.12',
   lgpEnvTempDailyLowTimeMinuteDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.13',
   lgpEnvTempDailyLowTimeSecondDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.14',
+  lgpEnvTemperatureMeasurementTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.50',
+  lgpEnvTemperatureHighThresholdTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.51',
+  lgpEnvTemperatureLowThresholdTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.52',
+  lgpEnvTemperatureSetPointTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.53',
+  lgpEnvTemperatureDeadBandTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.60',
+  lgpEnvTempHeatingPropBandTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.61',
+  lgpEnvTempCoolingPropBandTenthsDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.62',
   lgpEnvTemperatureDeadbandRangeDegC => '1.3.6.1.4.1.476.1.42.3.4.1.3.4',
   lgpEnvTemperatureControlMode => '1.3.6.1.4.1.476.1.42.3.4.1.4',
   lgpEnvHumidity => '1.3.6.1.4.1.476.1.42.3.4.2',
@@ -90,6 +118,8 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvHumidityToleranceRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.2',
   lgpEnvHumidityTableRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.3',
   lgpEnvHumidityEntryRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1',
+  lgpEnvHumidityRelTable => '1.3.6.1.4.1.476.1.42.3.4.2.2.3',
+  lgpEnvHumidityRelEntry => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1',
   lgpEnvHumidityIdRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.1',
   lgpEnvHumidityDescrRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.2',
   lgpEnvHumidityMeasurementRel => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.3',
@@ -104,6 +134,12 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvHumidityDailyLowTimeHour => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.12',
   lgpEnvHumidityDailyLowTimeMinute => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.13',
   lgpEnvHumidityDailyLowTimeSecond => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.14',
+  lgpEnvHumidityDeadBand => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.15',
+  lgpEnvHumidifyPropBand => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.16',
+  lgpEnvDehumidifyPropBand => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.17',
+  lgpEnvHumidityMeasurementRelTenths => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.50',
+  lgpEnvHumidityHighThresholdRelTenths => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.51',
+  lgpEnvHumidityLowThresholdRelTenths => '1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.52',
   lgpEnvHumidityDeadbandRange => '1.3.6.1.4.1.476.1.42.3.4.2.2.4',
   lgpEnvState => '1.3.6.1.4.1.476.1.42.3.4.3',
   lgpEnvStateSystem => '1.3.6.1.4.1.476.1.42.3.4.3.1',
@@ -158,6 +194,20 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvStateElectricHeaterDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateElectricHeater',
   lgpEnvStateHotWater => '1.3.6.1.4.1.476.1.42.3.4.3.22',
   lgpEnvStateHotWaterDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHotWater',
+  lgpEnvStateOperatingEfficiency => '1.3.6.1.4.1.476.1.42.3.4.3.23',
+  lgpEnvComponentStateTable => '1.3.6.1.4.1.476.1.42.3.4.3.50',
+  lgpEnvComponentStateEntry => '1.3.6.1.4.1.476.1.42.3.4.3.50.1',
+  lgpEnvComponentStateIndex => '1.3.6.1.4.1.476.1.42.3.4.3.50.1.1',
+  lgpEnvComponentStateDescr => '1.3.6.1.4.1.476.1.42.3.4.3.50.1.2',
+  lgpEnvComponentState => '1.3.6.1.4.1.476.1.42.3.4.3.50.1.3',
+  lgpEnvComponentStateDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvComponentState',
+  lgpEnvValveTable => '1.3.6.1.4.1.476.1.42.3.4.3.70',
+  lgpEnvValveEntry => '1.3.6.1.4.1.476.1.42.3.4.3.70.1',
+  lgpEnvValveIndex => '1.3.6.1.4.1.476.1.42.3.4.3.70.1.1',
+  lgpEnvValveDescr => '1.3.6.1.4.1.476.1.42.3.4.3.70.1.2',
+  lgpEnvValveState => '1.3.6.1.4.1.476.1.42.3.4.3.70.1.3',
+  lgpEnvValveStateDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvValveState',
+  lgpEnvValvePositionTenths => '1.3.6.1.4.1.476.1.42.3.4.3.70.1.20',
   lgpEnvConfig => '1.3.6.1.4.1.476.1.42.3.4.4',
   lgpEnvConfigReheatLockout => '1.3.6.1.4.1.476.1.42.3.4.4.1',
   lgpEnvConfigReheatLockoutDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvConfigReheatLockout',
@@ -220,6 +270,14 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvConfigDisableSensorOffsetDegF => '1.3.6.1.4.1.476.1.42.3.4.4.38',
   lgpEnvConfigCabinetSensorAlarms => '1.3.6.1.4.1.476.1.42.3.4.4.39',
   lgpEnvConfigCabinetSensorAlarmsDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvConfigCabinetSensorAlarms',
+  lgpEnvConfigAirTemperatureControlSensor => '1.3.6.1.4.1.476.1.42.3.4.4.42',
+  lgpEnvConfigAirTemperatureControlSensorDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvConfigAirTemperatureControlSensor',
+  lgpEnvConfigFanSpeedControlSensor => '1.3.6.1.4.1.476.1.42.3.4.4.43',
+  lgpEnvConfigFanSpeedControlSensorDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvConfigFanSpeedControlSensor',
+  lgpEnvConfigMinFanSpeed => '1.3.6.1.4.1.476.1.42.3.4.4.44',
+  lgpEnvConfigMaxFanSpeed => '1.3.6.1.4.1.476.1.42.3.4.4.45',
+  lgpEnvConfigFanSpeedPropBandDegC => '1.3.6.1.4.1.476.1.42.3.4.4.46',
+  lgpEnvConfigFanSpeedPropBandDegF => '1.3.6.1.4.1.476.1.42.3.4.4.47',
   lgpEnvControl => '1.3.6.1.4.1.476.1.42.3.4.5',
   lgpEnvControlShutdownAfterDelay => '1.3.6.1.4.1.476.1.42.3.4.5.1',
   lgpEnvControlStartupAfterDelay => '1.3.6.1.4.1.476.1.42.3.4.5.2',
@@ -266,29 +324,43 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-ENVIRONMEN
   lgpEnvFreeCoolingPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.7',
   lgpEnvHotWaterPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.8',
   lgpEnvHotGasPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.9',
+  lgpEnvBatteryCabinetPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.10',
+  lgpEnvPumpPoints => '1.3.6.1.4.1.476.1.42.3.4.7.1.11',
+  lgpEnvPump1Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.11.1',
+  lgpEnvPump2Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.11.2',
+  lgpEnvCompressorPoints => '1.3.6.1.4.1.476.1.42.3.4.7.1.12',
+  lgpEnvCompressor1Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.1',
+  lgpEnvCompressor1APoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.1.1',
+  lgpEnvCompressor1BPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.1.2',
+  lgpEnvCompressor2Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.2',
+  lgpEnvCompressor2APoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.2.1',
+  lgpEnvCompressor2BPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.12.2.2',
+  lgpEnvValvePoints => '1.3.6.1.4.1.476.1.42.3.4.7.1.13',
+  lgpEnvHotGasValve1Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.13.1',
+  lgpEnvHotGasValve2Point => '1.3.6.1.4.1.476.1.42.3.4.7.1.13.2',
+  lgpEnvRemoteSensorStatisticPoints => '1.3.6.1.4.1.476.1.42.3.4.7.1.14',
+  lgpEnvRemoteSensorMinimumPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.14.1',
+  lgpEnvRemoteSensorMaximumPoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.14.2',
+  lgpEnvRemoteSensorAveragePoint => '1.3.6.1.4.1.476.1.42.3.4.7.1.14.3',
   lgpEnvUnits => '1.3.6.1.4.1.476.1.42.3.4.8',
   lgpEnvWellKnownUnits => '1.3.6.1.4.1.476.1.42.3.4.8.1',
   lgpEnvHours => '1.3.6.1.4.1.476.1.42.3.4.8.1.1',
+  lgpEnvRemoteSensors => '1.3.6.1.4.1.476.1.42.3.4.9',
+  lgpEnvRemoteSensorCalc => '1.3.6.1.4.1.476.1.42.3.4.9.1',
+  lgpEnvRemoteSensorCalcDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvRemoteSensorCalc',
+  lgpEnvRemoteSensorTable => '1.3.6.1.4.1.476.1.42.3.4.9.10',
+  lgpEnvRemoteSensorEntry => '1.3.6.1.4.1.476.1.42.3.4.9.10.1',
+  lgpEnvRemoteSensorIndex => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.1',
+  lgpEnvRemoteSensorId => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.2',
+  lgpEnvRemoteSensorMode => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.3',
+  lgpEnvRemoteSensorModeDefinition => 'LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvRemoteSensorMode',
+  lgpEnvRemoteSensorUsrLabel => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.4',
+  lgpEnvRemoteSensorTempMeasurementDegF => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.5',
+  lgpEnvRemoteSensorTempMeasurementDegC => '1.3.6.1.4.1.476.1.42.3.4.9.10.1.6',
 };
 
 $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTAL-MIB'} = {
-  lgpEnvStateCoolingUnit1 => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvConfigCompressorLockout => {
-    '1' => 'lockedOut',
-    '2' => 'notLockedOut',
-  },
-  lgpEnvStateCoolingUnit3 => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvStateAudibleAlarm => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvConfigReheatLockout => {
+  lgpEnvConfigReheatAndHumidifierLockout => {
     '1' => 'lockedOut',
     '2' => 'notLockedOut',
   },
@@ -296,25 +368,54 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTA
     '1' => 'disabled',
     '2' => 'enabled',
   },
-  lgpEnvStateEconoCycle => {
-    '1' => 'on',
-    '2' => 'off',
+  lgpEnvConfigHumLockout => {
+    '1' => 'lockedOut',
+    '2' => 'notLockedOut',
   },
-  lgpEnvStateHeatingUnit1 => {
-    '1' => 'on',
-    '2' => 'off',
+  lgpEnvConfigAirTemperatureControlSensor => {
+    '1' => 'supply',
+    '2' => 'remote',
+    '3' => 'return',
   },
-  lgpEnvStateCooling => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvConfigCabinetSensorAlarms => {
-    '0' => 'disabled',
-    '1' => 'enabled',
+  lgpEnvConfigSupplyTempLowLimit => {
+    '1' => 'disabled',
+    '2' => 'enabled',
   },
   lgpEnvStateHeating => {
     '1' => 'on',
     '2' => 'off',
+  },
+  lgpEnvStateAudibleAlarm => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvConfigRemoteShutdown => {
+    '1' => 'disabled',
+    '2' => 'enabled',
+  },
+  lgpEnvStateDehumidifying => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvSleepAllDayEnabled => {
+    '1' => 'yes',
+    '2' => 'no',
+  },
+  lgpEnvConfigLocalTemperatureUnit => {
+    '1' => 'degC',
+    '2' => 'degF',
+  },
+  lgpEnvStateCoolingUnit2 => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvConfigSensorEventsStandard => {
+    '1' => 'disabled',
+    '2' => 'enabled',
+  },
+  lgpEnvConfigSleepModeDeadbandRange => {
+    '1' => 'disabled',
+    '2' => 'enabled',
   },
   lgpEnvStateFreeCooling => {
     '1' => 'on',
@@ -322,55 +423,19 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTA
     '3' => 'start',
     '4' => 'unavailable',
   },
-  lgpEnvSleepAllDayEnabled => {
-    '1' => 'yes',
-    '2' => 'no',
-  },
-  lgpEnvConfigSleepMode => {
-    '1' => 'enabled',
-    '2' => 'disabled',
-    '3' => 'auto',
-  },
-  lgpEnvConfigHumLockout => {
-    '1' => 'lockedOut',
-    '2' => 'notLockedOut',
-  },
-  lgpEnvStateOperatingMode => {
-    '1' => 'auto',
-    '2' => 'manual',
-  },
-  lgpEnvStateFan => {
+  lgpEnvStateHeatingUnit3 => {
     '1' => 'on',
     '2' => 'off',
   },
-  lgpEnvSleepDay => {
-    '1' => 'sunday',
-    '2' => 'monday',
-    '3' => 'tuesday',
-    '4' => 'wednesday',
-    '5' => 'thursday',
-    '6' => 'friday',
-    '7' => 'saturday',
+  lgpEnvValveState => {
+    '0' => 'not-specified',
+    '1' => 'open',
+    '2' => 'closed',
   },
-  lgpEnvStateDehumidifying => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvStateHumidifying => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvConfigReheatAndHumidifierLockout => {
-    '1' => 'lockedOut',
-    '2' => 'notLockedOut',
-  },
-  lgpEnvConfigRemoteShutdown => {
+  lgpEnvConfigDeltaGlycolType => {
     '1' => 'disabled',
-    '2' => 'enabled',
-  },
-  lgpEnvStateCoolingUnit4 => {
-    '1' => 'on',
-    '2' => 'off',
+    '2' => 'contact',
+    '3' => 'value',
   },
   lgpEnvStateOperatingReason => {
     '1' => 'none',
@@ -381,18 +446,26 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTA
     '6' => 'externalDevice',
     '7' => 'localDisplay',
   },
-  lgpEnvStateCoolingUnit2 => {
+  lgpEnvSleepDay => {
+    '1' => 'sunday',
+    '2' => 'monday',
+    '3' => 'tuesday',
+    '4' => 'wednesday',
+    '5' => 'thursday',
+    '6' => 'friday',
+    '7' => 'saturday',
+  },
+  lgpEnvConfigFanSpeedMode => {
+    '1' => 'manual',
+    '2' => 'auto',
+  },
+  lgpEnvStateHeatingUnit1 => {
     '1' => 'on',
     '2' => 'off',
   },
-  lgpEnvConfigHumidityControl => {
-    '1' => 'relative',
-    '2' => 'compensated',
-    '3' => 'predictive',
-  },
-  lgpEnvConfigSensorEvents1 => {
-    '1' => 'disabled',
-    '2' => 'enabled',
+  lgpEnvStateElectricHeater => {
+    '1' => 'on',
+    '2' => 'off',
   },
   lgpEnvConfigTempControlAlgorithm => {
     '1' => 'pi',
@@ -404,31 +477,93 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTA
     '1' => 'on',
     '2' => 'off',
   },
+  lgpEnvConfigHumidityControl => {
+    '1' => 'relative',
+    '2' => 'compensated',
+    '3' => 'predictive',
+  },
+  lgpEnvRemoteSensorCalc => {
+    '1' => 'average',
+    '2' => 'maximum',
+  },
+  lgpEnvStateCooling => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvConfigSleepMode => {
+    '1' => 'enabled',
+    '2' => 'disabled',
+    '3' => 'auto',
+  },
+  lgpEnvConfigReheatLockout => {
+    '1' => 'lockedOut',
+    '2' => 'notLockedOut',
+  },
+  lgpEnvConfigFanSpeedControlSensor => {
+    '1' => 'supply',
+    '2' => 'remote',
+    '3' => 'return',
+  },
+  lgpEnvStateFan => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvConfigCompressorLockout => {
+    '1' => 'lockedOut',
+    '2' => 'notLockedOut',
+  },
+  lgpEnvStateCoolingUnit1 => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvStateEconoCycle => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvStateCoolingUnit4 => {
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvConfigCabinetSensorAlarms => {
+    '0' => 'disabled',
+    '1' => 'enabled',
+  },
+  lgpEnvConfigAutoConfiguration => {
+    '1' => 'disabled',
+    '2' => 'enabled',
+  },
+  lgpEnvRemoteSensorMode => {
+    '0' => 'disable',
+    '1' => 'reference',
+    '2' => 'control',
+  },
+  lgpEnvComponentState => {
+    '0' => 'not-specified',
+    '1' => 'on',
+    '2' => 'off',
+  },
+  lgpEnvStateHumidifying => {
+    '1' => 'on',
+    '2' => 'off',
+  },
   lgpEnvStateHeatingUnit2 => {
     '1' => 'on',
     '2' => 'off',
   },
-  lgpEnvConfigLocalTemperatureUnit => {
-    '1' => 'degC',
-    '2' => 'degF',
-  },
-  lgpEnvStateHeatingUnit3 => {
+  lgpEnvStateCoolingUnit3 => {
     '1' => 'on',
     '2' => 'off',
   },
-  lgpEnvConfigFanSpeedMode => {
-    '1' => 'manual',
-    '2' => 'auto',
+  lgpEnvStateOperatingMode => {
+    '1' => 'auto',
+    '2' => 'manual',
   },
-  lgpEnvStateGeneralAlarmOutput => {
+  lgpEnvStateSystem => {
     '1' => 'on',
     '2' => 'off',
+    '3' => 'standby',
   },
-  lgpEnvConfigSupplyTempLowLimit => {
-    '1' => 'disabled',
-    '2' => 'enabled',
-  },
-  lgpEnvConfigSensorEventsStandard => {
+  lgpEnvConfigSensorEvents1 => {
     '1' => 'disabled',
     '2' => 'enabled',
   },
@@ -436,26 +571,8 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-ENVIRONMENTA
     '1' => 'on',
     '2' => 'off',
   },
-  lgpEnvStateSystem => {
+  lgpEnvStateGeneralAlarmOutput => {
     '1' => 'on',
     '2' => 'off',
-    '3' => 'standby',
-  },
-  lgpEnvConfigDeltaGlycolType => {
-    '1' => 'disabled',
-    '2' => 'contact',
-    '3' => 'value',
-  },
-  lgpEnvStateElectricHeater => {
-    '1' => 'on',
-    '2' => 'off',
-  },
-  lgpEnvConfigAutoConfiguration => {
-    '1' => 'disabled',
-    '2' => 'enabled',
-  },
-  lgpEnvConfigSleepModeDeadbandRange => {
-    '1' => 'disabled',
-    '2' => 'enabled',
   },
 };

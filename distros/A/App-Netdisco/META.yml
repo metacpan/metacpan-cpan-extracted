@@ -18,7 +18,7 @@ name: App-Netdisco
 provides:
   App::Netdisco:
     file: lib/App/Netdisco.pm
-    version: '2.036009'
+    version: '2.036011'
   App::Netdisco::AnyEvent::Nbtstat:
     file: lib/App/Netdisco/AnyEvent/Nbtstat.pm
   App::Netdisco::Backend::Job:
@@ -252,6 +252,8 @@ provides:
     file: lib/App/Netdisco/Util/PortMAC.pm
   App::Netdisco::Util::SNMP:
     file: lib/App/Netdisco/Util/SNMP.pm
+  App::Netdisco::Util::Statistics:
+    file: lib/App/Netdisco/Util/Statistics.pm
   App::Netdisco::Util::Web:
     file: lib/App/Netdisco/Util/Web.pm
   App::Netdisco::Web:
@@ -424,11 +426,13 @@ requires:
   Opcode: '1.07'
   Path::Class: '0.32'
   Plack: '1.0023'
+  Plack::Handler::Twiggy: '0'
+  Plack::Middleware::Debug: '0'
   Plack::Middleware::Expires: '0.03'
   Plack::Middleware::ReverseProxy: '0.15'
   Pod::Usage: '0'
   Role::Tiny: '1.002005'
-  SNMP::Info: '3.36'
+  SNMP::Info: '3.37'
   SQL::Translator: '0.11018'
   Sereal: '0'
   Socket6: '0.23'
@@ -452,5 +456,5 @@ resources:
   homepage: http://netdisco.org/
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/netdisco/netdisco
-version: '2.036009'
+version: '2.036011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

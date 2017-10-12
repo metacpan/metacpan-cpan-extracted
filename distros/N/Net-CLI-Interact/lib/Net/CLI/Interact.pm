@@ -1,12 +1,11 @@
 package Net::CLI::Interact;
-{
-  $Net::CLI::Interact::VERSION = '2.200009';
-}
 
 use Moo;
 use Sub::Quote;
 use Class::Load ();
 use MooX::Types::MooseLike::Base qw(InstanceOf Maybe Str HashRef);
+
+our $VERSION = '2.300000';
 
 with 'Net::CLI::Interact::Role::Engine';
 
@@ -108,10 +107,6 @@ sub _build_transport {
 
 1;
 
-# ABSTRACT: Toolkit for CLI Automation
-
-
-__END__
 =pod
 
 =head1 NAME
@@ -337,7 +332,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Oliver Gorwits.
+This software is copyright (c) 2017 by Oliver Gorwits.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

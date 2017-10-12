@@ -1,0 +1,57 @@
+NAME
+    App::HTTPSThis - Export the current directory over HTTPS
+
+VERSION
+    This document describes version 0.001 of App::HTTPSThis (from Perl
+    distribution App-HTTPSThis), released on 2017-10-11.
+
+SYNOPSIS
+     # Not to be used directly, see https_this command
+
+DESCRIPTION
+    This is a fork of App::HTTPThis for HTTPS version instead of HTTP.
+
+    This class implements all the logic of the https_this command.
+
+    Actually, this is just a very thin wrapper around Plack::App::Directory,
+    that is where the magic really is.
+
+METHODS
+  new
+    Creates a new App::HTTPSThis object, parsing the command line arguments
+    into object attribute values.
+
+  run
+    Start the HTTPS server.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-HTTPSThis>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-HTTPSThis>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-HTTPSThis>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::HTTPThis
+
+    https_this, Plack, Plack::App::Directory, and Net::Rendezvous::Publish.
+
+    Starman
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

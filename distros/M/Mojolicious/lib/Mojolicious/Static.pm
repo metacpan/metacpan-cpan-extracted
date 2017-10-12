@@ -43,9 +43,10 @@ sub file {
   my ($self, $rel) = @_;
 
   # Search all paths
+  my @parts = split '/', $rel;
   for my $path (@{$self->paths}) {
-    my $asset = $self->_get_file(path($path, split('/', $rel))->to_string);
-    return $asset if $asset;
+    next unless my $asset = _get_file(path($path, @parts)->to_string);
+    return $asset;
   }
 
   # Search DATA
@@ -53,7 +54,7 @@ sub file {
 
   # Search extra files
   my $extra = $self->extra;
-  return exists $extra->{$rel} ? $self->_get_file($extra->{$rel}) : undef;
+  return exists $extra->{$rel} ? _get_file($extra->{$rel}) : undef;
 }
 
 sub is_fresh {
@@ -142,7 +143,7 @@ sub _get_data_file {
 }
 
 sub _get_file {
-  my ($self, $path) = @_;
+  my $path = shift;
   no warnings 'newline';
   return -f $path && -r _ ? Mojo::Asset::File->new(path => $path) : undef;
 }

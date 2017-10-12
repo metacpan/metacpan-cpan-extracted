@@ -11,7 +11,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 has columns => (
     is  => 'ro',
@@ -49,7 +49,7 @@ Code::TidyAll::Plugin::PodTidy - Use podtidy with tidyall
 
 =head1 VERSION
 
-version 0.68
+version 0.69
 
 =head1 SYNOPSIS
 

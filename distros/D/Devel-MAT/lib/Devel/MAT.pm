@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -210,6 +210,9 @@ C<REF()>-type SVs will be skipped to their referrant.
 Members of the symbol table will be printed as being a 'root' element of the
 given symbol name.
 
+C<PAD>s and C<PADLIST>s will be skipped to their referring C<CODE>, giving
+shorter output for lexical variables.
+
 =back
 
 =cut
@@ -224,6 +227,7 @@ sub inref_graph
    # TODO: allow separate values for these
    my $elide_rv  = $opts{elide};
    my $elide_sym = $opts{elide};
+   my $elide_pad = $opts{elide};
 
    $self->load_tool( "Inrefs" );
 
@@ -238,7 +242,7 @@ sub inref_graph
    my $name;
    if( $elide_sym and $name = $sv->name and
          $name !~ m/^&.*::__ANON__$/ ) {
-      $graph->add_root( $sv, "the symbol '$name'" );
+      $graph->add_root( $sv, "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'" );
       return $graph->get_sv_node( $sv );
    }
 
@@ -269,8 +273,21 @@ sub inref_graph
 
          # Add 'via RV' marker
          return map {
-            Devel::MAT::SV::Reference( "(via RV) " . $_->name, $_->strength, $_->sv )
+            Devel::MAT::SV::Reference( Devel::MAT::Cmd->format_note( "(via RV)" ) . " " . $_->name,
+               $_->strength, $_->sv )
          } @rvrefs;
+      }->() } @inrefs;
+   }
+
+   if( $elide_pad ) {
+      @inrefs = map { sub {
+         return $_ unless $_->sv->type eq "PAD";
+         my $pad = $_->sv;
+         my $cv = $pad->padcv;
+         # Even if the CV isn't active, this might be a state variable so we
+         # must always consider pad(1) at least.
+         my ( $depth ) = grep { $cv->pad( $_ ) == $pad } ( 1 .. ( $cv->depth || 1 ) );
+         return Devel::MAT::SV::Reference( $_->name . " at depth $depth", $_->strength, $cv );
       }->() } @inrefs;
    }
 
@@ -402,6 +419,126 @@ sub find_stash
    my $gv = $self->find_glob( $name . "::" );
    return $gv->hash ||
       croak "$name has no hash";
+}
+
+# Some base implementations of Devel::MAT::Cmd formatters
+
+push @Devel::MAT::Cmd::ISA, qw( Devel::MAT::Cmd::_base );
+
+package
+   Devel::MAT::Cmd::_base;
+
+use B qw( perlstring );
+use List::Util qw( max );
+
+sub print_table
+{
+   my $self = shift;
+   my ( $rows, %opts ) = @_;
+
+   return unless @$rows;
+
+   my $cols = max map { scalar @$_ } @$rows;
+
+   my @colwidths = map {
+      my $colidx = $_;
+      # TODO: consider a unicode/terminal-aware version of length here
+      max map { length $_->[$colidx] } @$rows;
+   } 0 .. $cols-2;
+
+   my $format = join( $opts{sep} // " ",
+      ( map { "%-${_}s" } @colwidths ), "%s\n"
+   );
+
+   foreach my $row ( @$rows ) {
+      $self->printf( $format, @$row );
+   }
+}
+
+sub format_note
+{
+   shift;
+   my ( $str, $idx ) = @_;
+
+   return $str;
+}
+
+sub format_sv
+{
+   shift;
+   my ( $sv ) = @_;
+
+   return $sv->desc_addr;
+}
+
+sub _format_value
+{
+   shift;
+   my ( $val ) = @_;
+
+   return $val;
+}
+
+sub format_value
+{
+   shift;
+   my ( $val, %opts ) = @_;
+
+   my $text;
+   if( $opts{key} ) {
+      my $strval = $val;
+      if( $opts{stash} && $strval =~ m/^([\x00-\x1f])([a-zA-Z0-9_]*)$/ ) {
+         $strval = "^" . chr( 64 + ord $1 ) . $2;
+      }
+      elsif( $strval !~ m/^[a-zA-Z_][a-zA-Z0-9_]*$/ ) {
+         $strval = perlstring( $val );
+      }
+
+      return "{" . Devel::MAT::Cmd->_format_value( $strval ) . "}";
+   }
+   elsif( $opts{index} ) {
+      return "[" . Devel::MAT::Cmd->_format_value( $val+0 ) . "]";
+   }
+   elsif( $opts{pv} ) {
+      my $maxlen = $opts{maxlen} // 64;
+      ( my $truncated = length $val > $maxlen ) and
+         substr( $val, $maxlen ) = "";
+
+      return Devel::MAT::Cmd->_format_value(
+         perlstring( $val ) . ( $truncated ? "..." : "" )
+      );
+   }
+   else {
+      return Devel::MAT::Cmd->_format_value( $val );
+   }
+}
+
+sub format_symbol
+{
+   shift;
+   my ( $name ) = @_;
+
+   return $name;
+}
+
+sub format_bytes
+{
+   shift;
+   my ( $bytes ) = @_;
+
+   if( $bytes < 1024 ) {
+      return sprintf "%d bytes", $bytes;
+   }
+   if( $bytes < 1024**2 ) {
+      return sprintf "%.1f KiB", $bytes / 1024;
+   }
+   if( $bytes < 1024**3 ) {
+      return sprintf "%.1f MiB", $bytes / 1024**2;
+   }
+   if( $bytes < 1024**4 ) {
+      return sprintf "%.1f GiB", $bytes / 1024**3;
+   }
+   return sprintf "%.1f TiB", $bytes / 1024**4;
 }
 
 =head1 AUTHOR

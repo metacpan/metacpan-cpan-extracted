@@ -17,6 +17,7 @@ for my $serializer (
         XML::Simple
         YAML::Tiny
         YAML::XS
+        Data::Dumper
     /
 ) {
     subtest $serializer => sub {

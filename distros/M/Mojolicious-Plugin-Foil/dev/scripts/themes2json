@@ -41,8 +41,8 @@ use File::Basename;
 
 use FindBin;
 use Cwd 'abs_path';
-use File::Slurper 'read_dir';
-use File::Serialize { pretty => 1 };
+use File::Slurper qw(read_dir write_text);
+use JSON::MaybeXS;
 
 #========================================================
 # Subroutines
@@ -134,5 +134,6 @@ MAIN: {
     my $d = ();
     $d->{themes} = find_theme_names($opts);
     my $json_file = $opts->{themedir} . "/themes.json";
-    serialize_file $json_file => $d;
+    my $json_text = encode_json($d);
+    write_text($json_file, $d);
 }

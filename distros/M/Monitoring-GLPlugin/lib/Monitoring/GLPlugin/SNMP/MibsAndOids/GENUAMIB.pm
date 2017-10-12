@@ -1,0 +1,147 @@
+package Monitoring::GLPlugin::SNMP::MibsAndOids::GENUAMIB;
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'GENUA-MIB'} = {
+  url => '',
+  name => 'GENUA-MIB',
+};
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'GENUA-MIB'} =
+  '1.3.6.1.4.1.3717';
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'GENUA-MIB'} = {
+  # genua.os.sensor.system
+  fanTable => '1.3.6.1.4.1.3717.2.1.1.1',
+  fanEntry => '1.3.6.1.4.1.3717.2.1.1.1.1',
+  fanIndex => '1.3.6.1.4.1.3717.2.1.1.1.1.1',
+  fanName => '1.3.6.1.4.1.3717.2.1.1.1.1.2',
+  fanRPMs => '1.3.6.1.4.1.3717.2.1.1.1.1.3',
+  fanState => '1.3.6.1.4.1.3717.2.1.1.1.1.4',
+  fanStateDefinition => 'GENUA-MIB::State',
+  raidTable => '1.3.6.1.4.1.3717.2.1.1.2',
+  raidEntry => '1.3.6.1.4.1.3717.2.1.1.2.1',
+  raidIndex => '1.3.6.1.4.1.3717.2.1.1.2.1.1',
+  raidName => '1.3.6.1.4.1.3717.2.1.1.2.1.2',
+  raidStatus => '1.3.6.1.4.1.3717.2.1.1.2.1.3',
+  raidStatusDefinition => 'GENUA-MIB::State',
+  filesMax => '1.3.6.1.4.1.3717.2.1.1.3.1',
+  filesUsed => '1.3.6.1.4.1.3717.2.1.1.3.2',
+  filesStatus => '1.3.6.1.4.1.3717.2.1.1.3.3',
+  filesStatusDefinition => 'GENUA-MIB::State',
+  swapMax => '1.3.6.1.4.1.3717.2.1.1.4.1',
+  swapUsed => '1.3.6.1.4.1.3717.2.1.1.4.2',
+  swapStatus => '1.3.6.1.4.1.3717.2.1.1.4.3',
+  swapStatusDefinition => 'GENUA-MIB::State',
+  diskpartitionTable => '1.3.6.1.4.1.3717.2.1.1.5',
+  diskpartitionEntry => '1.3.6.1.4.1.3717.2.1.1.5.1',
+  diskpartitionIndex => '1.3.6.1.4.1.3717.2.1.1.5.1.1',
+  diskpartitionName => '1.3.6.1.4.1.3717.2.1.1.5.1.2',
+  diskpartitionSpace => '1.3.6.1.4.1.3717.2.1.1.5.1.3',
+  diskpartitionSpaceMax => '1.3.6.1.4.1.3717.2.1.1.5.1.3.1',
+  diskpartitionSpaceUsed => '1.3.6.1.4.1.3717.2.1.1.5.1.3.2',
+  diskpartitionSpaceStatus => '1.3.6.1.4.1.3717.2.1.1.5.1.3.3',
+  diskpartitionInodes => '1.3.6.1.4.1.3717.2.1.1.5.1.4',
+  diskpartitionInodesMax => '1.3.6.1.4.1.3717.2.1.1.5.1.4.1',
+  diskpartitionInodesUsed => '1.3.6.1.4.1.3717.2.1.1.5.1.4.2',
+  diskpartitionInodesStatus => '1.3.6.1.4.1.3717.2.1.1.5.1.4.3',
+  pfstateMax => '1.3.6.1.4.1.3717.2.1.1.6.1',
+  pfstateUsed => '1.3.6.1.4.1.3717.2.1.1.6.2',
+  pfstateStatus => '1.3.6.1.4.1.3717.2.1.1.6.3',
+  pfstateStatusDefinition => 'GENUA-MIB::State',
+  # genua.os.sensor.system.smartcard
+  smartcardStatus => '1.3.6.1.4.1.3717.2.1.1.7.1',
+  smartcardStatusDefinition => 'GENUA-MIB::State',
+  # genua.os.sensor.system.vpnsum
+  vpnsumExpected => '1.3.6.1.4.1.3717.2.1.1.8.1',
+  vpnsumUp => '1.3.6.1.4.1.3717.2.1.1.8.2',
+  # genua.os.sensor.interfaceTable
+  interfaceTable => '1.3.6.1.4.1.3717.2.1.2',
+  interfaceEntry => '1.3.6.1.4.1.3717.2.1.2.1',
+  interfaceIndex => '1.3.6.1.4.1.3717.2.1.2.1.1',
+  interfaceName => '1.3.6.1.4.1.3717.2.1.2.1.2',
+  interfaceType => '1.3.6.1.4.1.3717.2.1.2.1.3',
+  interfaceTypeDefinition => 'GENUA-MIB::Iftype',
+  interfaceLinkstate => '1.3.6.1.4.1.3717.2.1.2.1.4',
+  interfaceLinkstateDefinition => 'GENUA-MIB::Ifstate',
+  interfaceIerrorsNumber => '1.3.6.1.4.1.3717.2.1.2.1.5.1',
+  interfaceIerrorsStatus => '1.3.6.1.4.1.3717.2.1.2.1.5.2',
+  interfaceIerrorsStatusDefinition => 'GENUA-MIB::State',
+  interfaceOerrorsNumber => '1.3.6.1.4.1.3717.2.1.2.1.6.1',
+  interfaceOerrorsStatus => '1.3.6.1.4.1.3717.2.1.2.1.6.2',
+  interfaceOerrorsStatusDefinition => 'GENUA-MIB::State',
+  interfaceCarpstatus => '1.3.6.1.4.1.3717.2.1.2.1.7',
+  interfaceCarpstatusDefinition => 'GENUA-MIB::Carpstatus',
+  # genua.os.sensor.vpnTable
+  vpnTable => '1.3.6.1.4.1.3717.2.1.3',
+  vpnEntry => '1.3.6.1.4.1.3717.2.1.3.1',
+  vpnIndex => '1.3.6.1.4.1.3717.2.1.3.1.1',
+  vpnPeer => '1.3.6.1.4.1.3717.2.1.3.1.2',
+  vpnPeerip => '1.3.6.1.4.1.3717.2.1.3.1.3',
+  vpnLocal => '1.3.6.1.4.1.3717.2.1.3.1.4',
+  vpnRemote => '1.3.6.1.4.1.3717.2.1.3.1.5',
+  vpnStatus => '1.3.6.1.4.1.3717.2.1.3.1.6',
+  vpnStatusDefinition => 'GENUA-MIB::Ifstate',
+  # genua.os.sensor.pingTable
+  pingTable => '1.3.6.1.4.1.3717.2.1.4',
+  pingEntry => '1.3.6.1.4.1.3717.2.1.4.1',
+  pingIndex => '1.3.6.1.4.1.3717.2.1.4.1.1',
+  pingName => '1.3.6.1.4.1.3717.2.1.4.1.2',
+  pingIp => '1.3.6.1.4.1.3717.2.1.4.1.3',
+  pingStatus => '1.3.6.1.4.1.3717.2.1.4.1.4',
+  pingStatusDefinition => 'GENUA-MIB::Reachabilitystatus',
+  # genua.os.misc
+  miscSeverity => '1.3.6.1.4.1.3717.2.2.1',
+  miscId => '1.3.6.1.4.1.3717.2.2.2',
+  miscMessage => '1.3.6.1.4.1.3717.2.2.2',
+  # genua.os.info
+  infoProduct => '1.3.6.1.4.1.3717.2.3.1',
+  infoSoftwareversion => '1.3.6.1.4.1.3717.2.3.2',
+  infoRelease => '1.3.6.1.4.1.3717.2.3.3',
+  infoPatchlevel => '1.3.6.1.4.1.3717.2.3.4',
+  infoHardwareversion => '1.3.6.1.4.1.3717.2.3.5',
+  infoSerialnumber => '1.3.6.1.4.1.3717.2.3.6',
+  infoLicense => '1.3.6.1.4.1.3717.2.3.7',
+  infoOperating => '1.3.6.1.4.1.3717.2.3.8',
+  # genua.products
+  genugate => '1.3.6.1.4.1.3717.4.1',
+  genubox => '1.3.6.1.4.1.3717.4.2',
+  genulink => '1.3.6.1.4.1.3717.4.3',
+  genuscreen => '1.3.6.1.4.1.3717.4.4',
+  genucrypt => '1.3.6.1.4.1.3717.4.5',
+  genucenter => '1.3.6.1.4.1.3717.4.6',
+  genucard => '1.3.6.1.4.1.3717.4.7',
+};
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'GENUA-MIB'} = {
+  # textual conventions
+  State => {
+      '0' => 'notok',
+      '1' => 'ok',
+      '2' => 'unknown',
+  },
+  Ifstate => {
+      '0' => 'unknown',
+      '1' => 'down',
+      '2' => 'up',
+  },
+  Reachabilitystatus => {
+      '0' => 'unrechable',
+      '1' => 'reachable',
+  },
+  Iftype => {
+      '1' => 'phys',
+      '2' => 'gif',
+      '3' => 'pppoe',
+      '4' => 'vlan',
+      '6' => 'carp',
+      '7' => 'unknown',
+      '8' => 'trunk',
+      '9' => 'modem',
+      '10' => 'gre',
+      '11' => 'mpls',
+  },
+  Carpstatus => {
+      '0' => 'init',
+      '1' => 'backup',
+      '2' => 'master',
+  },
+};

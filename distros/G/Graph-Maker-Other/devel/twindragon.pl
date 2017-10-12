@@ -19,10 +19,10 @@
 
 use 5.005;
 use strict;
-use FindBin;
-use MyGraphs;
 
+use FindBin;
 use lib "$FindBin::Bin/lib";
+use MyGraphs;
 use Graph::Maker::Twindragon;
 
 # uncomment this to run the ### lines

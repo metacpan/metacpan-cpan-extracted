@@ -1,0 +1,6 @@
+name = "Tree-RB"
+# badges = ["travis"]
+authority="cpan:ARUNBEAR"
+
+module_maker="ModuleBuildTiny"
+

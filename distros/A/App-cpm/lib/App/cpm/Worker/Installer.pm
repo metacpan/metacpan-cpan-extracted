@@ -2,10 +2,11 @@ package App::cpm::Worker::Installer;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.914';
+our $VERSION = '0.951';
 
 use App::cpm::Logger::File;
 use App::cpm::Worker::Installer::Menlo;
+use App::cpm::Worker::Installer::Prebuilt;
 use App::cpm::version;
 use CPAN::DistnameInfo;
 use CPAN::Meta;
@@ -20,6 +21,7 @@ use File::Spec;
 use File::Temp ();
 use File::pushd 'pushd';
 use JSON::PP ();
+use Time::HiRes ();
 
 use constant NEED_INJECT_TOOLCHAIN_REQUIREMENTS => $] < 5.016;
 
@@ -97,6 +99,7 @@ sub new {
         $menlo->setup_local_lib($local_lib);
     }
     $menlo->log("--", `$^X -V`, "--");
+    $option{prebuilt} = App::cpm::Worker::Installer::Prebuilt->new if $option{prebuilt};
     bless { %option, menlo => $menlo }, $class;
 }
 
@@ -125,8 +128,9 @@ sub _fetch_git {
 }
 
 sub enable_prebuilt {
-    my ($self, $uri) = @_;
-    $self->{prebuilt} && $TRUSTED_MIRROR->(ref $uri ? $uri->[0] : $uri);
+    my $self = shift;
+    my $uri = ref $_[0] ? $_[0][0] : $_[0];
+    $self->{prebuilt} && !$self->{prebuilt}->skip($uri) && $TRUSTED_MIRROR->($uri);
 }
 
 sub fetch {
@@ -235,7 +239,7 @@ sub find_prebuilt {
     my ($self, $uri) = @_;
     my $info = CPAN::DistnameInfo->new($uri);
     my $dir = File::Spec->catdir($self->{prebuilt_base}, $info->cpanid, $info->distvname);
-    return unless -d $dir;
+    return unless -f File::Spec->catfile($dir, ".prebuilt");
 
     my $guard = pushd $dir;
 
@@ -268,7 +272,10 @@ sub find_prebuilt {
 sub save_prebuilt {
     my ($self, $job) = @_;
     my $dir = File::Spec->catdir($self->{prebuilt_base}, $job->cpanid, $job->distvname);
-    return if -d $dir;
+
+    if (-d $dir and !File::Path::rmtree($dir)) {
+        return;
+    }
 
     my $parent = File::Basename::dirname($dir);
     for (1..3) {
@@ -276,8 +283,13 @@ sub save_prebuilt {
         eval { File::Path::mkpath($parent) };
     }
     return unless -d $parent;
+
     $self->{logger}->log("Saving the build $job->{directory} in $dir");
-    File::Copy::Recursive::dircopy($job->{directory}, $dir) or warn $!;
+    if (File::Copy::Recursive::dircopy($job->{directory}, $dir)) {
+        open my $fh, ">", File::Spec->catfile($dir, ".prebuilt") or die $!;
+    } else {
+        warn "dircopy $job->{directory} $dir: $!";
+    }
 }
 
 sub _inject_toolchain_requirements {
@@ -358,6 +370,7 @@ sub _retry {
     my ($self, $sub) = @_;
     return 1 if $sub->();
     return unless $self->{retry};
+    Time::HiRes::sleep(0.1);
     $self->{logger}->log("! Retrying (you can turn off this behavior by --no-retry)");
     return $sub->();
 }

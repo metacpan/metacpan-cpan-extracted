@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -133,9 +133,9 @@ House of Graphs entries for the graphs here include
 
 =item N=4, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=484>
 
-=item N=5, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=660>  (Petersen, odd 3)
+=item N=5, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=660> (Petersen, odd 3)
 
-=item N=6, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19271>
+=item N=6, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19271>
 
 =back
 

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "URI::URL" => "5.04",
     "WWW::Leech::Parser" => "0.04"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => ""
   }

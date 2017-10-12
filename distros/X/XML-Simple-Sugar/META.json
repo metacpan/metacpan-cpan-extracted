@@ -1,0 +1,66 @@
+{
+   "abstract" : "Sugar sprinkled on XML::Simple",
+   "author" : [
+      "Chris Tijerina"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-Simple-Sugar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "0",
+            "Moops" : "0",
+            "UNIVERSAL::isa" : "0",
+            "XML::Simple" : "0",
+            "overload" : "0",
+            "perl" : "v5.18.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "XML::Simple::Sugar" : {
+         "file" : "lib/XML/Simple/Sugar.pm",
+         "version" : "v1.1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Camspi/XML-Simple-Sugar/issues"
+      },
+      "homepage" : "https://github.com/Camspi/XML-Simple-Sugar",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Camspi/XML-Simple-Sugar.git",
+         "web" : "https://github.com/Camspi/XML-Simple-Sugar"
+      }
+   },
+   "version" : "v1.1.2",
+   "x_contributors" : [
+      "Camspi <amarus18@hotmail.com>",
+      "Chris Tijerina <ctijerina@emortgagelogic.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

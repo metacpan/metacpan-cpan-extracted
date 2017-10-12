@@ -17,7 +17,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 __PACKAGE__->create_accessors( );
 

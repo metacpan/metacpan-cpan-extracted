@@ -77,6 +77,8 @@ corpus/lib/auto/share/dist/Alien-libfoo2/dynamic/libfoo.so
 corpus/lib/auto/share/dist/Alien-libfoo2/dynamic/libfoo.so.2
 corpus/lib/auto/share/dist/Alien-libfoo2/include/foo.h
 corpus/lib/auto/share/dist/Alien-libfoo2/lib/libfoo.a
+corpus/lib/auto/share/dist/Alien-libfoo2/lib/pkgconfig/x1.pc
+corpus/lib/auto/share/dist/Alien-libfoo2/share/pkgconfig/x2.pc
 corpus/lib/pkgconfig/foo.pc
 corpus/lib/pkgconfig/xor-chillout.pc
 corpus/lib/pkgconfig/xor.pc

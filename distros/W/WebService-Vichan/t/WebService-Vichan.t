@@ -43,7 +43,8 @@ for my $url (@URLS) {
 
 	my $catalog3 = $catalog_flat[2];
 	my $catalog3no = $catalog3->no;
-	ok defined $catalog3->com, 'catalog entry has content';
+	my $has_content = defined $catalog3->com || defined $catalog3->filename;
+	ok $has_content, "third entry in catalog of board $boardcode has content";
 
 	my @posts = $chan->thread($board, $catalog3);
 	ok @posts > 0, "thread $catalog3no has posts";

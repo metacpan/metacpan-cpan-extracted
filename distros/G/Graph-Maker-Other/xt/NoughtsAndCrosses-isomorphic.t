@@ -29,15 +29,70 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-
-plan tests => 7;
-
 use Graph::Maker::NoughtsAndCrosses;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs;
 
+plan tests => 8;
+
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ("2" => 27017,
+               "2,rotate=1" => 27020,
+               "2,rotate=1,reflect=1" => 945,
+
+               "2,players=1" => 27032,
+               "2,players=1,reflect=1" => 856,
+               "2,players=1,rotate=1" => 500, # claw
+
+               "2,players=3,rotate=1" => 27025,
+               "2,players=3,rotate=1,reflect=1" => 27048,
+
+               "2,players=4,rotate=1" => 27034,
+               "2,players=4,rotate=1,reflect=1" => 27050,
+
+               "3,players=1,rotate=1,reflect=1" => 27015,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $N (2 .. 2) {
+    foreach my $players (1 .. $N*$N) {
+      foreach my $rotate (0, 1) {
+        foreach my $reflect (0, 1) {
+          my $graph = Graph::Maker->new('noughts_and_crosses', undirected => 1,
+                                        N => $N, players => $players,
+                                        rotate => $rotate, reflect => $reflect,
+                                       );
+          next if $graph->vertices > 64;
+          my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+          $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+          next if $seen{$g6_str}++;
+          my $key = "$N";
+          if ($players != 2) { $key .= ",players=$players"; }
+          if ($rotate) { $key .= ",rotate=$rotate"; }
+          if ($reflect) { $key .= ",reflect=$reflect"; }
+          if (my $id = $shown{$key}) {
+            MyGraphs::hog_compare($id, $g6_str);
+          } else {
+            if (MyGraphs::hog_grep($g6_str)) {
+              my $name = $graph->get_graph_attribute('name');
+              MyTestHelpers::diag ("HOG $key not shown in POD");
+              MyTestHelpers::diag ($name);
+              MyTestHelpers::diag ($g6_str);
+              MyGraphs::Graph_view($graph);
+              $extras++
+            }
+          }
+        }
+      }
+    }
+  }
+  ok ($extras, 0);
+}
 
 #------------------------------------------------------------------------------
 # 2x2

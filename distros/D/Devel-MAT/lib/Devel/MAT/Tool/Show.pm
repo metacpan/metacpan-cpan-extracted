@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Show;
 
@@ -9,13 +9,12 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use List::Util qw( max );
 
 use constant CMD => "show";
-
-use Getopt::Long qw( GetOptionsFromArray );
+use constant CMD_DESC => "Show information about a given SV";
 
 =head1 NAME
 
@@ -43,34 +42,32 @@ applied to.
 
 Prints information about the given SV.
 
-Takes the following named options:
-
-=over 4
-
-=item --count, -c MAX
-
-Show at most this number of elements of ARRAYs or HASHes (default 50).
-
-=back
-
 =cut
 
-sub run_cmd
+use constant CMD_ARGS_SV => 1;
+
+sub run
 {
    my $self = shift;
+   my ( $sv ) = @_;
 
-   my $MAXCOUNT = 50;
+   Devel::MAT::Cmd->printf( "%s with refcount %d\n",
+      Devel::MAT::Cmd->format_sv( $sv ),
+      $sv->refcnt,
+   );
 
-   GetOptionsFromArray( \@_,
-      'count|c=i' => \$MAXCOUNT,
-   ) or return;
-
-   my ( $addr ) = @_;
-   my $sv = $self->get_sv( $addr );
-
-   Devel::MAT::Cmd->print_sv( $sv );
-
-   Devel::MAT::Cmd->printf( " with refcount %d\n", $sv->refcnt );
+   my $size = $sv->size;
+   if( $size < 1024 ) {
+      Devel::MAT::Cmd->printf( "  size %d bytes\n",
+         $size,
+      );
+   }
+   else {
+      Devel::MAT::Cmd->printf( "  size %s (%d bytes)\n",
+         Devel::MAT::Cmd->format_bytes( $size ),
+         $size,
+      );
+   }
 
    if( my $stash = $sv->blessed ) {
       Devel::MAT::Cmd->printf( "  blessed as %s\n", $stash->stashname );
@@ -78,16 +75,18 @@ sub run_cmd
 
    my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
    my $method = "show_$type";
-   $self->$method( $sv, maxcount => $MAXCOUNT );
+   $self->$method( $sv );
 }
 
 sub say_with_sv
 {
-   my ( $str, $sv ) = @_;
+   my ( $str, @args ) = @_;
+   my $sv = pop @args;
 
-   Devel::MAT::Cmd->printf( "%s", $str );
-   Devel::MAT::Cmd->print_sv( $sv );
-   Devel::MAT::Cmd->printf( "\n" );
+   Devel::MAT::Cmd->printf( $str . "%s\n",
+      @args,
+      Devel::MAT::Cmd->format_sv( $sv ),
+   );
 }
 
 sub show_GLOB
@@ -132,62 +131,30 @@ sub show_REF
 sub show_ARRAY
 {
    my $self = shift;
-   my ( $av, %opts ) = @_;
+   my ( $av ) = @_;
 
-   my @elems = $av->elems;
-   foreach my $idx ( 0 .. $#elems ) {
-      if( defined $opts{maxcount} and $idx > $opts{maxcount} ) {
-         Devel::MAT::Cmd->printf( "  ...\n" );
-         last;
-      }
-
-      if( $elems[$idx] ) {
-         say_with_sv( "  [$idx]=", $elems[$idx] );
-      }
-      else {
-         Devel::MAT::Cmd->printf( "  [%d]=NULL\n", $idx );
-      }
-   }
+   Devel::MAT::Cmd->printf( "  %d elements (use 'elems' command to show)\n",
+      $av->n_elems,
+   );
 }
 
 sub show_STASH
 {
    my $self = shift;
-   my ( $hv, %opts ) = @_;
+   my ( $hv ) = @_;
 
    Devel::MAT::Cmd->printf( "  stashname=%s\n", $hv->stashname );
-   $self->show_HASH( $hv, %opts, maxcount => undef );
+   $self->show_HASH( $hv );
 }
 
 sub show_HASH
 {
    my $self = shift;
-   my ( $hv, %opts ) = @_;
+   my ( $hv ) = @_;
 
-   my $count = 0;
-   foreach my $key ( sort $hv->keys ) {
-      if( defined $opts{maxcount} and $count > $opts{maxcount} ) {
-         Devel::MAT::Cmd->printf( "  ...\n" );
-         last;
-      }
-
-      my $strkey = $key;
-      if( $strkey !~ m/^[a-zA-Z_][a-zA-Z0-9_]*$/ ) {
-         $strkey =~ s(([\\"\$\@]))(\\$1)g;
-         $strkey =~ s{([\x00-\x1f])}{sprintf "\\x%02x", ord $1}eg;
-         $strkey = qq("$strkey");
-      }
-
-      my $sv = $hv->value( $key );
-      if( $sv ) {
-         say_with_sv( "  {$strkey}=", $sv );
-      }
-      else {
-         Devel::MAT::Cmd->printf( "  {%s}=NULL\n", $strkey );
-      }
-
-      $count++;
-   }
+   Devel::MAT::Cmd->printf( "  %d values (use 'values' command to show)\n",
+      $hv->n_values,
+   );
 }
 
 sub show_CODE
@@ -224,7 +191,7 @@ sub show_CODE
 
    if( my @globs = $cv->globrefs ) {
       Devel::MAT::Cmd->printf( "Referenced globs:\n  " );
-      Devel::MAT::Cmd->print_sv( $_ ), Devel::MAT::Cmd->printf( ", " ) for @globs;
+      Devel::MAT::Cmd->printf( "%s, ", Devel::MAT::Cmd->format_sv( $_ ) ) for @globs;
       Devel::MAT::Cmd->printf( "\n" );
    }
 }
@@ -256,14 +223,18 @@ sub show_PAD
    foreach my $padix ( 1 .. $#elems ) {
       my $sv = $elems[$padix];
       if( $padnames[$padix] ) {
-         Devel::MAT::Cmd->printf( "  [%3d/%*s]=", $padix, $maxname, $padnames[$padix] );
-         $sv ? Devel::MAT::Cmd->print_sv( $sv ) : Devel::MAT::Cmd->printf( "NULL" );
-         Devel::MAT::Cmd->printf( "\n" );
+         Devel::MAT::Cmd->printf( "  [%3d/%*s]=%s\n",
+            $padix,
+            $maxname, $padnames[$padix],
+            ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
+         );
       }
       else {
-         Devel::MAT::Cmd->printf( "  [%3d %*s]=", $padix, $maxname, $padtype{$padix} // "" );
-         $sv ? Devel::MAT::Cmd->print_sv( $sv ) : Devel::MAT::Cmd->printf( "NULL" );
-         Devel::MAT::Cmd->printf( "\n" );
+         Devel::MAT::Cmd->printf( "  [%3d %*s]=%s\n",
+            $padix,
+            $maxname, $padtype{$padix} // "",
+            ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
+         );
       }
    }
 }
@@ -296,6 +267,176 @@ sub show_IO
 
    Devel::MAT::Cmd->printf( "  ifileno=%d\n", $io->ifileno ) if defined $io->ifileno;
    Devel::MAT::Cmd->printf( "  ofileno=%d\n", $io->ofileno ) if defined $io->ofileno;
+}
+
+package # hide
+   Devel::MAT::Tool::Show::_elems;
+use base qw( Devel::MAT::Tool );
+
+use List::Util qw( min );
+
+use constant CMD => "elems";
+use constant CMD_DESC => "List the elements of an ARRAY SV";
+
+=head2 elems
+
+   pmat> elems endav
+     [0] CODE(PP) at 0x562e93222dc8
+
+Prints elements of an ARRAY SV.
+
+Takes the following named options:
+
+=over 4
+
+=item --count, -c MAX
+
+Show at most this number of elements (default 50).
+
+=back
+
+Takes the following positional arguments:
+
+=over 4
+
+=item *
+
+Optional start index (default 0).
+
+=back
+
+=cut
+
+use constant CMD_OPTS => (
+   count => { help => "maximum count of elements to print",
+              type => "i",
+              alias => "c",
+              default => 50 },
+);
+
+use constant CMD_ARGS_SV => 1;
+use constant CMD_ARGS => (
+   { name => "startidx", help => "starting index" },
+);
+
+sub run
+{
+   my $self = shift;
+   my %opts = %{ +shift };
+   my ( $av, $startidx ) = @_;
+
+   my $type = $av->type;
+   if( $type eq "HASH" or $type eq "STASH" ) {
+      die "Cannot 'elems' of a $type - maybe you wanted 'values'?\n";
+   }
+   elsif( $type ne "ARRAY" ) {
+      die "Cannot 'elems' of a non-ARRAY\n";
+   }
+
+   $startidx //= 0;
+   my $stopidx = min( $startidx + $opts{count}, $av->n_elems );
+
+   my @rows;
+   foreach my $idx ( $startidx .. $stopidx-1 ) {
+      my $sv = $av->elem( $idx );
+      push @rows, [
+         "  " . Devel::MAT::Cmd->format_value( $idx, index => 1 ),
+         $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL",
+      ];
+   }
+
+   Devel::MAT::Cmd->print_table( \@rows );
+
+   my $morecount = $av->n_elems - $stopidx;
+   Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;
+}
+
+package # hide
+   Devel::MAT::Tool::Show::_values;
+use base qw( Devel::MAT::Tool );
+
+use constant CMD => "values";
+use constant CMD_DESC => "List the values of a HASH-like SV";
+
+=head2 values
+
+   pmat> values defstash
+     {"\b"}                GLOB($%*) at 0x562e93114eb8
+     {"\017"}              GLOB($*) at 0x562e9315a428
+     ...
+
+Prints values of a HASH or STASH SV.
+
+Takes the following named options:
+
+=over 4
+
+=item --count, -c MAX
+
+Show at most this number of values (default 50).
+
+=back
+
+Takes the following positional arguments:
+
+=over 4
+
+=item *
+
+Optional skip count (default 0). If present, will skip over this number of
+keys initially to show more of them.
+
+=back
+
+=cut
+
+use constant CMD_OPTS => (
+   count => { help => "maximum count of values to print",
+              type => "i",
+              alias => "c",
+              default => 50 },
+);
+
+use constant CMD_ARGS_SV => 1;
+use constant CMD_ARGS => (
+   { name => "skipcount", help => "skip over this many keys initially" },
+);
+
+sub run
+{
+   my $self = shift;
+   my %opts = %{ +shift };
+   my ( $hv, $skipcount ) = @_;
+
+   my $type = $hv->type;
+   if( $type eq "ARRAY" ) {
+      die "Cannot 'values' of a $type - maybe you wanted 'elems'?\n";
+   }
+   elsif( $type ne "HASH" and $type ne "STASH" ) {
+      die "Cannot 'elems' of a non-HASHlike\n";
+   }
+
+   # TODO: control of sorting, start at, filtering
+   my @keys = sort $hv->keys;
+   splice @keys, 0, $skipcount if $skipcount;
+
+   my @rows;
+   my $count = 0;
+   foreach my $key ( @keys ) {
+      last if $count == $opts{count};
+      my $sv = $hv->value( $key );
+      push @rows, [
+         "  " . Devel::MAT::Cmd->format_value( $key, key => 1,
+               stash => ( $type eq "STASH" ) ),
+         $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL",
+      ];
+      $count++;
+   }
+
+   Devel::MAT::Cmd->print_table( \@rows );
+
+   my $morecount = @keys - $count;
+   Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;
 }
 
 =head1 AUTHOR

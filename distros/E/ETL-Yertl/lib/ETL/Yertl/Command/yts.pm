@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::yts;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Read/Write time series data
 
 #pod =head1 SYNOPSIS
@@ -26,6 +26,8 @@ sub main {
 
     my @args = @_;
     GetOptionsFromArray( \@args, \%opt,
+        'start=s',
+        'end=s',
         'short|s',
         'tags=s%',
     );
@@ -33,10 +35,9 @@ sub main {
     #; say Dumper \@args;
     #; say Dumper \%opt;
 
-    my ( $db_spec, $metric, $field ) = @args;
+    my ( $db_spec, $metric ) = @args;
 
     die "Must give a database\n" unless $db_spec;
-    $field ||= "value";
 
     my ( $db_type ) = $db_spec =~ m{^([^:]+):};
 
@@ -62,7 +63,6 @@ sub main {
                             timestamp => $stamp,
                             metric => $metric,
                             value => $doc->{ $stamp },
-                            field => $field,
                             ( $opt{tags} ? ( tags => $opt{tags} ) : () ),
                         };
                     }
@@ -73,7 +73,6 @@ sub main {
                 }
                 else {
                     $doc->{metric} ||= $metric;
-                    $doc->{field} ||= $field;
                     $doc->{tags} ||= $opt{tags} if $opt{tags};
                     $db->write_ts( $doc );
                     $count++;
@@ -87,7 +86,12 @@ sub main {
     else {
         die "Must give a metric\n" unless $metric;
         my $out_fmt = load_module( format => 'default' )->new;
-        my @points = $db->read_ts( $metric, $field, $opt{tags} );
+        my @points = $db->read_ts( {
+            metric => $metric,
+            tags => $opt{tags},
+            start => $opt{start},
+            end => $opt{end},
+        } );
         if ( $opt{short} ) {
             my %ts = map { $_->{timestamp} => $_->{value} } @points;
             print $out_fmt->write( \%ts );
@@ -112,7 +116,7 @@ ETL::Yertl::Command::yts - Read/Write time series data
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

@@ -112,7 +112,7 @@ sub postscript_view_file {
   my ($filename, %options) = @_;
   require IPC::Run;
   my @command = ('gv',
-                 '--scale=.2',
+                 '--scale=.4',
                  $filename);
   if ($options{'synchronous'}) {
     IPC::Run::run(\@command);
@@ -219,6 +219,16 @@ sub Graph_Easy_print_adjacency_matrix {
 
 #------------------------------------------------------------------------------
 # Graph.pm extras
+
+sub Graph_loopcount {
+  my ($graph) = @_;
+  my $loopcount = 0;
+  foreach my $edge ($graph->edges) {
+    $loopcount += ($edge->[0] eq $edge->[1]);
+  }
+  return $loopcount;
+}
+
 
 sub Graph_branch_reduce {
   my ($graph) = @_;
@@ -615,7 +625,7 @@ sub Graph_xy_print {
     print "\n";
   }
 
-  print "     ";
+  print " ";
   foreach my $x ($x_min .. $x_max) {
     printf "%4d", $x;
   }
@@ -935,13 +945,49 @@ sub edge_aref_degrees_distinct {
 
 #------------------------------------------------------------------------------
 
+use constant::defer hog_filename => sub {
+  return "$ENV{HOME}/HOG/all.g6";
+};
+use constant::defer hog_mmap_ref => sub {
+  require File::Map;
+  my $mmap;
+  File::Map::map_file ($mmap, hog_filename());
+  return \$mmap;
+};
+sub hog_grep {
+  my ($str) = @_;
+  ### hog_grep(): $str
+  $str =~ s/\n$//;
+  my $mmap_ref = hog_mmap_ref();
+  return $$mmap_ref =~ /^\Q$str\E$/m;
+}
+
+sub hog_compare {
+  my ($id, $g6_str) = @_;
+  require File::Slurp;
+  my $filename = "$ENV{HOME}/HOG/$id.g6";
+  my $file_str = File::Slurp::read_file($filename);
+  my $canon_g6_str = graph6_str_to_canonical($g6_str);
+  my $canon_file_str = graph6_str_to_canonical($file_str);
+  if ($g6_str ne $file_str) {
+    print "id=$id wrong\n";
+    print "string $g6_str";
+    print "file   $file_str";
+    print "canon string $canon_g6_str";
+    print "canon file   $canon_file_str";
+    croak "wrong";
+  }
+}
+
 # hog_searches_html($graph,$graph,...)
 # Create a /tmp/hog-searches.html of forms to search hog for each $graph.
 # Each $graph is either Graph.pm or Graph::Easy.
 #
 sub hog_searches_html {
   my @graphs = @_;
+  ### hog_searches_html() ...
 
+  require HTML::Entities;
   my $html_filename = '/tmp/hog-searches.html';
   my $hog_url = 'https://hog.grinvin.org';
   # $hog_url = 'http://localhost:10000';
@@ -956,7 +1002,10 @@ HERE
   foreach my $i (0 .. $#graphs) {
     my $graph = $graphs[$i];
     ### graph: "$graph"
-    if (! blessed($graph)) {
+    if (! ref $graph) {
+      ### convert graph6 string ...
+      $graph = Graph_from_graph6_str($graph);
+    } elsif (! blessed($graph)) {
       ### convert edge_aref ...
       if (ref $graph) {
         $graph = edge_aref_to_Graph_Easy($graph);
@@ -994,13 +1043,21 @@ HERE
     }
     $vertex_name_type //= '';
     $name //= '';
-    my $canonical = graph6_str_to_canonical($graph6_str);
+
+    my $graph6_canonical = graph6_str_to_canonical($graph6_str);
+    my $canonical = $graph6_canonical;
     if (length($canonical) > 30) {
       $canonical = '';
     } else {
-      require HTML::Entities;
       $canonical = "<br> canonical "
         . HTML::Entities::encode_entities($canonical);
+    }
+
+    my $got = '';
+    if (hog_grep($graph6_canonical)) {
+      print "$i HOG got $graph6_canonical";
+      $got = "<br> got in "
+        . HTML::Entities::encode_entities(hog_filename()) . "\n";
     }
 
     print $h <<"HERE";
@@ -1010,7 +1067,7 @@ HERE
   $graph6_size bytes,
   $num_vertices vertices,
   $num_edges edges
-  $name$canonical
+  $name$canonical$got
 HERE
 
     if ($num_vertices == 0) {
@@ -1136,10 +1193,15 @@ sub graph6_str_to_canonical {
     return $g6_str;
   }
 
+  unless ($g6_str =~ /\n$/) { $g6_str .= "\n"; }
+  if ($g6_str =~ /\n.*\n/s) { croak "multiple newlines in g6 string"; }
+
   my $canonical;
   my $err;
   require IPC::Run;
-  if (! IPC::Run::run(['nauty-labelg','-i2'],
+  if (! IPC::Run::run(['nauty-labelg',
+                       # '-i2',
+                      ],
                       '<',\$g6_str,
                       '>',\$canonical,
                       '2>',\$err)) {
@@ -1203,7 +1265,7 @@ sub Graph_from_edge_aref {
 #      a
 #     / \
 #    b---c
-# Return true if it is an even triangle.  For an even triangle every other
+# Return true if this is an even triangle.  For an even triangle every other
 # vertex in the graph has an edge going to an even number of the vertices
 # a,b,c.  This means either no edges to them, or edges to exactly 2 of them.
 #
@@ -1934,6 +1996,8 @@ sub vertex_name_to_tikz {
 sub Graph_print_tikz {
   my ($graph) = @_;
 
+  my $is_xy = $graph->get_graph_attribute('vertex_name_type_xy');
+
   my @vertices = sort $graph->vertices;
   my $flow = 'east';
   my $rows = int(sqrt(scalar(@vertices)));
@@ -1949,7 +2013,8 @@ sub Graph_print_tikz {
     }
     $seen_vn{$vn} = $v;
 
-    print "  \\node ($vn) at ($x,$r) [my box] {$v};\n";
+    my $at = ($is_xy ? $v : "$x,$r");
+    print "  \\node ($vn) at ($at) [my box] {$v};\n";
     $r++;
     if ($r >= $rows) {
       $c++;
@@ -2258,6 +2323,7 @@ sub Graph_is_Hamiltonian {
   }
 
   foreach my $start ($type eq 'path' ? (@vertices) : ($vertices[0])) {
+    if ($options{'verbose'}) { print "try start $start\n"; }
     my @path = ($start);
     my %visited = ($path[0] => 1);
     my @nn = (-1);
@@ -2763,13 +2829,16 @@ sub Graph_diameter_count {
                                my ($t, $u,$v, $n) = @_;
                                my $len = $t->path_length($u,$v);
                                if ($len > $diameter) {
+                                 ### new high path length: $len
                                  $count = 0;
                                  $diameter = $len;
                                }
                                if ($len == $diameter) {
                                  $count++;
+                                 ### equal high path length to count: $count
                                }
                              });
+  ### $diameter
   return ($graph->is_undirected ? $count/2 : $count);
 }
 
@@ -2830,6 +2899,24 @@ sub Graph_tree_indnum {
   return $indnum;
 }
 
+sub Graph_make_most_indomsets {
+  my ($n) = @_;
+  my $graph = Graph->new (undirected=>1);
+  my $v = 0;
+  while ($n > 0) {
+    if ($v) { $graph->add_edge(0,$v) };  # to x
+    my $u = $v;
+    my $size = 3 + (($n%3)!=0);
+    foreach my $i (0 .. $size-1) { # triangle or complete-4
+      foreach my $j (0 .. $i-1) {
+        $graph->add_edge($u+$i, $u+$j);
+      }
+    }
+    $n -= $size;
+    $v += $size;
+  }
+  return $graph;
+}
 
 #------------------------------------------------------------------------------
 # Dominating Sets Count

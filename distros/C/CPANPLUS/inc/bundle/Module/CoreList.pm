@@ -3,7 +3,7 @@ use strict;
 use vars qw/$VERSION %released %version %families %upstream
 	    %bug_tracker %deprecated %delta/;
 use version;
-$VERSION = '5.20170821';
+$VERSION = '5.20170923';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -320,6 +320,9 @@ sub changes_between {
     5.024002 => '2017-07-15',
     5.027002 => '2017-07-20',
     5.027003 => '2017-08-21',
+    5.027004 => '2017-09-20',
+    5.024003 => '2017-09-22',
+    5.026001 => '2017-09-22',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14405,6 +14408,55 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.027004 => {
+        delta_from => 5.027003,
+        changed => {
+            'B::Op_private'         => '5.027004',
+            'Config'                => '5.027004',
+            'File::Glob'            => '1.30',
+            'I18N::Langinfo'        => '0.14',
+            'Module::CoreList'      => '5.20170920',
+            'Module::CoreList::TieHashDelta'=> '5.20170920',
+            'Module::CoreList::Utils'=> '5.20170920',
+            'Term::ReadLine'        => '1.17',
+            'VMS::Stdio'            => '2.42',
+            'XS::APItest'           => '0.92',
+            'attributes'            => '0.31',
+            'sort'                  => '2.03',
+            'threads'               => '2.18',
+        },
+        removed => {
+        }
+    },
+    5.024003 => {
+        delta_from => 5.024002,
+        changed => {
+            'B::Op_private'         => '5.024003',
+            'Config'                => '5.024003',
+            'Module::CoreList'      => '5.20170922_24',
+            'Module::CoreList::TieHashDelta'=> '5.20170922_24',
+            'Module::CoreList::Utils'=> '5.20170922_24',
+            'POSIX'                 => '1.65_01',
+            'Time::HiRes'           => '1.9741',
+        },
+        removed => {
+        }
+    },
+    5.026001 => {
+        delta_from => 5.026000,
+        changed => {
+            'B::Op_private'         => '5.026001',
+            'Config'                => '5.026001',
+            'Module::CoreList'      => '5.20170922_26',
+            'Module::CoreList::TieHashDelta'=> '5.20170922_26',
+            'Module::CoreList::Utils'=> '5.20170922_26',
+            '_charnames'            => '1.45',
+            'base'                  => '2.26',
+            'charnames'             => '1.45',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -15201,6 +15253,27 @@ sub is_core
         delta_from => 5.027002,
         changed => {
             'B::Debug'              => '1',
+        },
+        removed => {
+        }
+    },
+    5.027004 => {
+        delta_from => 5.027003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.024003 => {
+        delta_from => 5.024002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.026001 => {
+        delta_from => 5.026000,
+        changed => {
         },
         removed => {
         }

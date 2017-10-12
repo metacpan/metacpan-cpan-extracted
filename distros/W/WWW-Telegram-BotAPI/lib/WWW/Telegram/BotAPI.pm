@@ -7,7 +7,7 @@ use Encode ();
 use JSON::MaybeXS ();
 use constant DEBUG => $ENV{TELEGRAM_BOTAPI_DEBUG} || 0;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 my $json; # for debugging purposes, only defined when DEBUG = 1
 
 BEGIN {
@@ -218,7 +218,8 @@ sub parse_error
     my $r = { type => "unknown", msg => $_[1] || $@ };
     # The following regexp matches the error code to the first group and the error message to the
     # second.
-    return $r unless $r->{msg} =~ /ERROR: (?:code ([0-9]+): )?(.+?)(?:\s*at .+)?$/m;
+    # Issue #19: match only `at ...` messages separated by at least one space. See t/02-exceptions
+    return $r unless $r->{msg} =~ /ERROR: (?:code ([0-9]+): )?(.+?)(?:\s+at .+)?$/m;
     # Find and save the error code and message.
     $r->{code} = $1 if $1;
     $r->{msg}  = $2;
@@ -518,6 +519,9 @@ The order of the arguments, except of the first one, does not matter:
 
 When sandboxing calls to L<WWW::Telegram::BotAPI> methods using C<eval>, it is useful to parse
 error messages using this method.
+
+B<WARNING:> up until version 0.09, this method incorrectly stopped at the first occurence of C<at>
+in error messages, producing results such as C<missing ch> instead of C<missing chat>.
 
 This method accepts an error message as its first argument, otherwise C<$@> is used.
 

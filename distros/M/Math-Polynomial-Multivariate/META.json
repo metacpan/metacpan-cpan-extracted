@@ -4,13 +4,13 @@
       "Martin Becker <becker-cpan-mp@cozap.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Polynomial-Multivariate",
    "no_index" : {
@@ -36,9 +36,19 @@
             "Carp" : "0",
             "overload" : "0",
             "perl" : "5.008"
+         },
+         "suggests" : {
+            "Math::BigRat" : "0.2613"
          }
       }
    },
+   "provides" : {
+      "Math::Polynomial::Multivariate" : {
+         "file" : "lib/Math/Polynomial/Multivariate.pm",
+         "version" : "0.006"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

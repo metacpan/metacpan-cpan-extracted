@@ -255,7 +255,7 @@ export_key_raw(Crypt::PK::ECC self, char * type)
           RETVAL = newSVpvn((char*)out, out_len);
         }
         else if (strnEQ(type, "public_compressed", 17)) {
-          rv = ecc_export_raw(out, &out_len, PK_PUBLIC_COMPRESSED, &self->key);
+          rv = ecc_export_raw(out, &out_len, PK_PUBLIC|PK_COMPRESSED, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_raw(public_compressed) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
@@ -359,6 +359,7 @@ _verify(Crypt::PK::ECC self, SV * sig, SV * data)
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
 
         RETVAL = 1;
+        stat = 0;
         if (ix == 1) {
           rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }

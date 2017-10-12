@@ -1,5 +1,9 @@
 Revision history for Term::Screen::Lite
 
+0.05  Thu Oct 12 11:15:00 2017
+      - Fixed inconsistent version as reported by CPANTS.
+      - Added $AUTHORITY.
+
 0.04  Mon Sep 11 12:00:00 2017
       - Updated copyright year information.
 

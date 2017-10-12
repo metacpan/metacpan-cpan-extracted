@@ -4,7 +4,7 @@
       "Gerhard Lausser <gerhard.lausser@consol.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -37,5 +37,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.3.7"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lausser/GLPlugin.git",
+         "web" : "https://github.com/lausser/GLPlugin"
+      }
+   },
+   "version" : "v2.4.14.1"
 }

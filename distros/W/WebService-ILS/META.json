@@ -72,7 +72,7 @@
    "provides" : {
       "WebService::ILS" : {
          "file" : "lib/WebService/ILS.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "WebService::ILS::JSON" : {
          "file" : "lib/WebService/ILS/JSON.pm"
@@ -111,6 +111,6 @@
          "url" : "git+ssh://git.catalyst.net.nz/git/private/webservice-ils.git"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

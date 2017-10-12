@@ -20,10 +20,10 @@
 use 5.005;
 use strict;
 use Math::BaseCnv 'cnv';
-use MyGraphs;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

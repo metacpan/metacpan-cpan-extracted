@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -265,15 +265,23 @@ House of Graphs entries for the trees here include
 
 =over
 
-=item order=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+=item n=1 (order=0), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> single vertex
 
-=item order=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+=item n=2 (order=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> path-2
 
-=item order=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+=item n=4 (order=2), L<https://hog.grinvin.org/ViewGraphInfo.action?id=594> path-4
 
-=item order=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
+=item n=5 L<https://hog.grinvin.org/ViewGraphInfo.action?id=30> fork
 
-=item order=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21088>
+=item n=6 L<https://hog.grinvin.org/ViewGraphInfo.action?id=496> E graph
+
+=item n=7 L<https://hog.grinvin.org/ViewGraphInfo.action?id=714>
+
+=item n=8 (order=3), L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
+
+=item n=16 (order=4), L<https://hog.grinvin.org/ViewGraphInfo.action?id=28507>
+
+=item n=32 (order=5), L<https://hog.grinvin.org/ViewGraphInfo.action?id=21088>
 
 =back
 

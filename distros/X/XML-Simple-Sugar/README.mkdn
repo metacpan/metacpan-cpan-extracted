@@ -4,7 +4,7 @@ XML::Simple::Sugar - Sugar sprinkled on XML::Simple
 
 # VERSION
 
-version v1.1.1
+version v1.1.2
 
 # SYNOPSIS
 
@@ -231,7 +231,7 @@ Chris Tijerina
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by eMortgage Logic LLC.
+This software is copyright (c) 2014-2017 by eMortgage Logic LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

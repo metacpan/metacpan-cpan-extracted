@@ -7,7 +7,7 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 has with_pic       => 1;
@@ -92,16 +92,19 @@ sub init
       if(_win)
       {
         my $real_prefix = Path::Tiny->new($build->install_prop->{prefix});
-        my $pkgconf_dir = Path::Tiny->new($ENV{DESTDIR})->child($prefix)->child('lib/pkgconfig');
+        my @pkgconf_dirs;
+        push @pkgconf_dirs, Path::Tiny->new($ENV{DESTDIR})->child($prefix)->child("$_/pkgconfig") for qw(lib share);
       
         # for any pkg-config style .pc files that are dropped, we need
         # to convert the MSYS /C/Foo style paths to C:/Foo
-        if(-d $pkgconf_dir)
-        {
-          foreach my $pc_file ($pkgconf_dir->children)
-          {
-            $pc_file->edit(sub {s/\Q$prefix\E/$real_prefix->stringify/eg;});
-          }
+        for my $pkgconf_dir (@pkgconf_dirs) {
+            if(-d $pkgconf_dir)
+            {
+              foreach my $pc_file ($pkgconf_dir->children)
+              {
+                $pc_file->edit(sub {s/\Q$prefix\E/$real_prefix->stringify/eg;});
+              }
+            }
         }
       }
       
@@ -143,7 +146,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -251,6 +254,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Command line build of an Android apk without gradle or ant.",
+   "abstract" : "Command line build of an Android apk without resorting to ant or gradle.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -34,7 +34,7 @@
    "provides" : {
       "Android::Build" : {
          "file" : "lib/Android/Build.pm",
-         "version" : "20171005"
+         "version" : "20171006"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171005"
+   "version" : "20171006"
 }

@@ -12,7 +12,7 @@ CREATE TABLE `messages` (
     `recipient` INTEGER,
     `recipient_resource` VARCHAR(255) DEFAULT '',
 
-    `id`        VARCHAR(255) DEFAULT NULL,
+    `chat_id`   VARCHAR(255) DEFAULT NULL,
     `type`      VARCHAR(255) DEFAULT NULL,
     `body`      TEXT,
     `thread`    VARCHAR(255) DEFAULT NULL,

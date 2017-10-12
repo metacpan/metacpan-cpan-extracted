@@ -17,7 +17,7 @@ use base qw(Exporter);    ## no critic (ProhibitUseBase)
 our @EXPORT_OK = 'breakdown';
 
 # Specify package version
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 # Dispatch table of functions to handle different ref types for the spec
 # hashref's values
@@ -104,7 +104,7 @@ List::Breakdown - Build sublist structures matching conditions
 
 =head1 VERSION
 
-Version 0.18
+Version 0.20
 
 =head1 SYNOPSIS
 
@@ -197,7 +197,7 @@ imperfect Perl parser:
         "NEW CUSTOMER John O''Connor\r 2017-01-01",
         "RETURNING CUSTOMER\tXah Zhang 2016-01-01",
         "CHECK ACCOUNT Pierre d'Alun 2016-12-01",
-        "RETURNING CUSTOMER Aaron Carter 2016-05-01"
+        "RETURNING CUSTOMER Aaron Carter 2016-05-01",
     );
 
 You could have a bucket structure like this, using the B<pattern syntax>, which
@@ -207,7 +207,7 @@ catches certain error types you've seen before for review:
         bad_whitespace     => qr/ [\r\t] /msx,
         apostrophes        => qr/ ' /msx,
         double_apostrophes => qr/ '' /msx,
-        not_ascii          => qr/ [^[:ascii:]] /msx
+        not_ascii          => qr/ [^[:ascii:]] /msx,
     };
 
 Applying the bucket structure like so:
@@ -219,17 +219,17 @@ The result set would look like this:
     my %expected = (
         bad_whitespace => [
             "NEW CUSTOMER John O''Connor\r 2017-01-01",
-            "RETURNING CUSTOMER\tXah Lee 2016-01-01"
+            "RETURNING CUSTOMER\tXah Lee 2016-01-01",
         ],
         apostrophes => [
             "NEW CUSTOMER John O''Connor\r 2017-01-01",
-            'CHECK ACCOUNT Pierre d\'Alun 2016-12-01'
+            'CHECK ACCOUNT Pierre d\'Alun 2016-12-01',
         ],
         double_apostrophes => [
-            "NEW CUSTOMER John O''Connor\r 2017-01-01"
+            "NEW CUSTOMER John O''Connor\r 2017-01-01",
         ],
         not_ascii => [
-        ]
+        ],
     );
 
 Notice that some of the lines appear in more than one list, and that the
@@ -282,27 +282,27 @@ C<%results>:
         ok => [
             {
                 hostname => 'webserver1',
-                status   => 'OK'
+                status   => 'OK',
             },
             {
                 hostname => 'webserver4',
-                status   => 'OK'
-            }
+                status   => 'OK',
+            },
         ],
         problem => {
             warning => [
                 {
                     hostname => 'webserver3',
-                    status   => 'WARNING'
-                }
+                    status   => 'WARNING',
+                },
             ],
             critical => [
                 {
                     hostname => 'webserver2',
-                    status   => 'CRITICAL'
-                }
+                    status   => 'CRITICAL',
+                },
             ],
-            unknown => []
+            unknown => [],
         }
     )
 
@@ -336,11 +336,11 @@ Applying the bucket structure like so:
 The result set would look like this:
 
     my %expected = (
-        negative => [ -5 ]
+        negative => [ -5 ],
         positive => {
             small  => [ 1, 3.14 ],
             medium => [ 32, 86 ],
-            large  => [ 3_718.4, 511, 120_000 ]
+            large  => [ 3_718.4, 511, 120_000 ],
         },
     );
 

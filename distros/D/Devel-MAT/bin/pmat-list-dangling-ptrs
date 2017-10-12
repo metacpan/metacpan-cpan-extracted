@@ -20,7 +20,7 @@ foreach ( keys %{ $df } ) {
 
    next if $root eq "stack";
 
-   $df->{heap}{$addr} and next;
+   $df->sv_at( $addr ) and next;
 
    printf "DF has no SV at root %s addr 0x%x\n", $root, $addr;
 }
@@ -29,31 +29,37 @@ sub test_ptr
 {
    my ( $sv, $name, $val ) = @_;
 
-   given( ref $val ) {
-      when([ undef, '' ]) {
-         my $addr = $val or return;     # skip NULL
-         $roots{$addr} and return;      # known root
-         $df->{heap}{$addr} and return; # known heap SV
+   my $addr = $val or return;     # skip NULL
+   $roots{$addr} and return;      # known root
+   $df->{heap}{$addr} and return; # known heap SV
 
-         printf "SV %s has no %s SV at addr 0x%x\n", $sv->desc_addr, $name, $addr;
-      }
-      when( "ARRAY" ) {
-         foreach my $idx ( 0 .. $#$val ) {
-            test_ptr( $sv, "$name\[$idx]", $val->[$idx] );
-         }
-      }
-      when( "HASH" ) {
-         foreach my $key ( keys %$val ) {
-            test_ptr( $sv, "$name\{$key}", $val->{$key} );
-         }
-      }
-   }
+   printf "SV %s has no %s SV at addr 0x%x\n", $sv->desc_addr, $name, $addr;
+}
+
+sub methods_of
+{
+   my ( $pkg ) = @_;
+
+   no strict 'refs';
+   my @syms = keys %{"${pkg}::"};
+   return
+      grep { *{"${pkg}::$_"}{CODE} } @syms,
+      map { methods_of( $_ ) } @{"${pkg}::ISA"};
 }
 
 foreach my $sv ( $df->heap ) {
-   foreach ( keys %{ $sv } ) {
-      next unless m/^(.*)_at$/;
+   foreach my $meth ( methods_of ref $sv ) {
+      next unless $meth =~ m/^([^_].*)_at$/;
       my $outref = $1;
-      test_ptr( $sv, $outref, $sv->{$_} );
+
+      if( $outref eq "elem" ) {
+         test_ptr( $sv, "$outref [$_]", $sv->$meth( $_ ) ) for 0 .. $sv->elems-1;
+      }
+      elsif( $outref eq "value" ) {
+         test_ptr( $sv, "$outref {$_}", $sv->$meth( $_ ) ) for $sv->keys;
+      }
+      else {
+         test_ptr( $sv, $outref, $sv->$meth );
+      }
    }
 }

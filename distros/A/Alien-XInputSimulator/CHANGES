@@ -1,0 +1,53 @@
+==================================================
+Changes from 2016-10-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2017-10-07 18:58:48 +0000
+------------------------------------------
+
+  Change: eeb5f820c5258c7bccb35a5b981f4597ae070bcd
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-07 20:58:18 +0000
+
+    s/http/https/ in download URL 
+
+  Change: 95d4af8c5958c993bcf30834b0e107db7e80329e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-03 19:08:06 +0000
+
+    Upgrade to fixed Test::Alien::CPP
+
+    See https://github.com/plicease/Test-Alien-CPP/issues/1
+
+    This still doesn't work on Linux though (RPATH problems?) 
+
+  Change: 1743640a8adc1b7183d69555ba8d84e7dedf8d24
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-03 10:39:10 +0000
+
+    [WIP] Migrate to Dist::Zilla + alienfile 
+
+  Change: 60cc9d6c763b298be88f7eaf4c82ef8c299812d6
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-03 08:42:45 +0000
+
+    Upgrade to fixed Test::Alien::CPP
+
+    See https://github.com/plicease/Test-Alien-CPP/issues/1 
+
+  Change: a092d1ff46cc6eefb0ed5d0504c02c3cc7399ef1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-01 17:26:23 +0000
+
+    Add Alien::Base::Modulebuild implementation 
+
+  Change: f5cd6ac4056ed96577a74508693f80fd6ab28b38
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-01 15:32:42 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

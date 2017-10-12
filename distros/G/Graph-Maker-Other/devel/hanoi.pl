@@ -19,11 +19,12 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use List::Util 'min','max','sum';
 use Math::BaseCnv 'cnv';
-
 use Graph::Maker::Hanoi;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 
 # uncomment this to run the ### lines
@@ -35,6 +36,10 @@ use Smart::Comments;
   #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=21136
   #   discs=3  https://hog.grinvin.org/ViewGraphInfo.action?id=22740
   #   discs=4  hog not
+  #
+  # spindles=3, linear
+  #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=414
+  #            path-9
   #
   # spindles=4, any
   #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=22742
@@ -49,10 +54,10 @@ use Smart::Comments;
   #   discs=2  https://hog.grinvin.org/ViewGraphInfo.action?id=21152
   #
   my @graphs;
-  foreach my $N (0 .. 4) {
+  foreach my $N (2 .. 2) {
     my $graph = Graph::Maker->new('hanoi',
                                   discs => $N,
-                                  spindles => 4,
+                                  spindles => 3,
                                   # adjacency => 'cyclic',
                                   # adjacency => 'star',
                                   adjacency => 'linear',
@@ -61,7 +66,7 @@ use Smart::Comments;
     # Graph_view($graph);
     push @graphs, $graph;
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 

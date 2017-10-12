@@ -21,6 +21,7 @@
 use strict;
 use 5.004;
 use Test;
+
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
 use Graph;
@@ -31,11 +32,10 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Hanoi;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
-plan tests => 61;
+plan tests => 62;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -56,6 +56,46 @@ sub Graph_is_edge_subset {
     }
   }
   return 1;
+}
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('2,3,any' => 1,
+               '2,3,linear' => 1,
+               '3,3,any' => 1,
+               '2,4,any' => 1,
+               '2,4,cyclic' => 1,
+               '2,4,linear' => 1,
+               '2,4,star' => 1,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $discs (2 .. 4) {
+    foreach my $spindles (3 .. 5) {
+      foreach my $adjacency ("any", "cyclic", "linear", "star") {
+        my $graph = Graph::Maker->new('hanoi', undirected => 1,
+                                      discs => $discs,
+                                      spindles => $spindles,
+                                      adjacency => $adjacency);
+        my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+        $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+        next if $seen{$g6_str}++;
+        my $key = "$discs,$spindles,$adjacency";
+        next if $shown{$key};
+        if (MyGraphs::hog_grep($g6_str)) {
+          my $name = $graph->get_graph_attribute('name');
+          MyTestHelpers::diag ("HOG $key not shown in POD");
+          MyTestHelpers::diag ($name);
+          MyTestHelpers::diag ($g6_str);
+          MyGraphs::Graph_view($graph);
+          $extras++;
+        }
+      }
+    }
+  }
+  ok ($extras, 0);
 }
 
 #------------------------------------------------------------------------------

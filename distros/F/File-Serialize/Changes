@@ -1,5 +1,14 @@
 Revision history for File-Serialize
 
+1.2.0 2017-10-10
+  [ ENHANCEMENTS ]
+    - Data::Dumper serializer added. (GH#5)
+    - Remove unused dependency to MooX::ClassAttribute.
+    - Go down to Role::Tiny. (GH#3, Jason Hall)
+
+  [ STATISTICS ]
+    - code churn: 11 files changed, 149 insertions(+), 7 deletions(-)
+
 1.1.1 2016-06-28
   [ BUG FIXES ]
     - Some tests were failing for perls <= 5.16

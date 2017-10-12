@@ -50,7 +50,6 @@ do { my $x = {
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.94',
-                                   'blib' => '1.01',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

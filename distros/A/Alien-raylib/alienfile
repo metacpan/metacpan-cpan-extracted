@@ -4,7 +4,7 @@ plugin 'PkgConfig' => 'raylib';
 
 share {
     plugin Download => (
-        url => 'http://github.com/a3f/raylib/archive/master.tar.gz'
+        url => 'https://github.com/a3f/raylib/archive/master.tar.gz'
     );
 
     plugin Extract => 'tar.gz';

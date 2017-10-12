@@ -1,5 +1,8 @@
 Revision history for File-is
 
+0.04    12 October 2017
+    * author tests moved to xt/
+
 0.03    14 Sep 2010
     * thesame() now also checks device number (thanks to Ronald Fischer)
     * thesame() throws an exception on MSWin32 (thanks to Ronald Fischer)

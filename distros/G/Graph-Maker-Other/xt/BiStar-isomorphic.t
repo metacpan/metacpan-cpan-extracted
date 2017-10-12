@@ -25,18 +25,16 @@ use Test;
 # version number from Storable.pm
 use Graph;
 use Graph::Maker::Star;
+use Graph::Maker::BiStar;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use Graph::Maker::BiStar;
+use lib 'devel/lib';
+use MyGraphs;
 
-use lib
-  'devel/lib';
-use MyGraphs ();
-
-plan tests => 95;
+plan tests => 96;
 
 
 sub make_star {
@@ -171,6 +169,53 @@ sub BiStar_diameter {
       }
     }
   }
+}
+
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('2,2' => 1,
+               '3,2' => 1,
+               '3,3' => 1,
+               '4,2' => 1,
+               '4,3' => 1,
+               '4,4' => 1,
+               '5,2' => 1,
+               '5,4' => 1,
+               '5,5' => 1,
+               '6,2' => 1,
+               '6,5' => 1,
+               '6,6' => 1,
+               '7,2' => 1,
+               '7,6' => 1,
+               '7,7' => 1,
+               '8,2' => 1,
+               '8,7' => 1,
+               '9,2' => 1,
+               '10,2' => 1,
+               '10,6' => 1,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $N (3 .. 25) {
+    foreach my $M (3 .. $N) {
+      my $graph = Graph::Maker->new('bi_star', undirected => 1,
+                                    N => $N, M => $M);
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      next if $seen{$g6_str}++;
+      next if $shown{"$N,$M"};
+      if (MyGraphs::hog_grep($g6_str)) {
+        MyTestHelpers::diag ("HOG N=$N,M=$M not shown in POD");
+        MyTestHelpers::diag ($g6_str);
+        MyGraphs::Graph_view($graph);
+        $extras++
+      }
+    }
+  }
+  ok ($extras, 0);
 }
 
 

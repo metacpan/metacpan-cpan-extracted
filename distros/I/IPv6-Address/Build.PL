@@ -12,14 +12,14 @@ my %module_build_args = (
   },
   "configure_requires" => {
     "Module::Build" => "0.28",
-    "perl" => "5.006"
+    "perl" => "5.010"
   },
   "dist_abstract" => "IPv6 Address Manipulation Library",
   "dist_author" => [
     "Athanasios Douitsis <aduitsis\@cpan.org>"
   ],
   "dist_name" => "IPv6-Address",
-  "dist_version" => "0.207",
+  "dist_version" => "0.208",
   "license" => "artistic_2",
   "module_name" => "IPv6::Address",
   "recursive_test_files" => 1,
@@ -29,13 +29,13 @@ my %module_build_args = (
     "Socket" => 0,
     "Sub::Install" => 0,
     "overload" => 0,
-    "perl" => "5.006",
+    "perl" => "5.010",
     "strict" => 0,
     "warnings" => 0
   },
   "test_requires" => {
     "Test::More" => 0,
-    "perl" => "5.006"
+    "perl" => "5.010"
   }
 );
 
@@ -43,7 +43,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Test::More" => 0,
-  "perl" => "5.006"
+  "perl" => "5.010"
 );
 
 

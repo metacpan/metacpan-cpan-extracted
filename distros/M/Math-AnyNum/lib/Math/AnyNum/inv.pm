@@ -27,8 +27,17 @@ sub __inv__ {
     }
 
   Math_GMPz: {
-        $x = _mpz2mpq($x);
-        goto Math_GMPq;
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($x) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($r, $x);
+        Math::GMPq::Rmpq_inv($r, $r);
+        return $r;
     }
 
   Math_MPC: {

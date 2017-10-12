@@ -1,0 +1,21 @@
+# prompts for "redback networks" (now part of ericsson)
+
+prompt user
+    match /(?:[Ll]ogin|[Uu]sername): ?$/
+
+prompt pass
+    match /[Pp]assword: ?$/
+
+prompt generic
+    match /#$/
+
+macro paging
+    send 'terminal length 0'
+
+macro disconnect
+    send exit
+
+# not used
+macro more_pages
+   match /--more--/
+   send ' '

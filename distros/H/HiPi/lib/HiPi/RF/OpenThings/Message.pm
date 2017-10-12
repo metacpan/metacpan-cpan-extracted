@@ -18,7 +18,7 @@ use HiPi::RF::OpenThings;
 use Try::Tiny;
 use JSON;
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 __PACKAGE__->create_accessors( qw(
     cryptseed
@@ -446,8 +446,6 @@ sub decode_value {
 			$result += $bytes->[$i];
         }
         
-        print qq(unshifted value $result\n);
-        
 		# process any fixed binary points
 		if( $typeid == OPENTHINGS_UINT ) {
             return $result; # no BP adjustment
@@ -513,8 +511,6 @@ sub encode_value {
             $value *= ( 2 ** $self->get_value_type_bits( $typeid ) ); # shifts float into int range using BP
             $value = int($value);   
         }
-        
-        print qq( shifted value $value\n);
         
         my $v = $value;
         unshift(@result, $v & 0xFF );

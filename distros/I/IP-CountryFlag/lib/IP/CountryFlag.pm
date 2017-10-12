@@ -1,6 +1,6 @@
 package IP::CountryFlag;
 
-$IP::CountryFlag::VERSION   = '0.10';
+$IP::CountryFlag::VERSION   = '0.11';
 $IP::CountryFlag::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ IP::CountryFlag - Interface to fetch country flag of an IP.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Transport::Base;
-{
-  $Net::CLI::Interact::Transport::Base::VERSION = '2.143070';
-}
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf);
@@ -31,20 +28,11 @@ has 'logger' => (
 
 1;
 
-# ABSTRACT: Spawns an Interactive CLI Session
-
-
-
-__END__
 =pod
 
 =head1 NAME
 
 Net::CLI::Interact::Transport::Base - Spawns an Interactive CLI Session
-
-=head1 VERSION
-
-version 2.143070
 
 =head1 DESCRIPTION
 
@@ -186,17 +174,6 @@ all the output data in one go.
 B<FIXME>: On Unix, when the Telnet transport is selected but C<IP::Pty> is
 unavailable, C<Net::Telnet> can still be used, but currently C<IPC::Run> is
 used instead.
-
-=head1 AUTHOR
-
-Oliver Gorwits <oliver@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Oliver Gorwits.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
 

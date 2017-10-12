@@ -1,5 +1,5 @@
 #
-# $Id: NeighborAdvertisement.pm 45 2014-04-09 06:32:08Z gomor $
+# $Id: NeighborAdvertisement.pm,v b9194b248a66 2017/10/06 16:26:50 gomor $
 #
 package Net::Frame::Layer::ICMPv6::NeighborAdvertisement;
 use strict; use warnings;
@@ -241,7 +241,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2014, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2017, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

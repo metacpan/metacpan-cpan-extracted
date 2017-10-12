@@ -1,0 +1,12 @@
+prompt user
+    match /[Uu]ser/
+
+prompt generic
+    match /\(Cisco Controller\) >/
+
+macro disable_paging
+    send config paging disable
+
+macro enable_paging
+    send config paging enable
+

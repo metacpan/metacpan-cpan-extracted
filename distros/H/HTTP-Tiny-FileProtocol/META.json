@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -32,10 +32,11 @@
             "File::Basename" : "0",
             "File::Spec" : "0",
             "HTTP::Tiny" : "0",
-            "LWP::MediaTypes" : "0",
+            "LWP::MediaTypes" : "6.02",
             "Pod::Coverage::TrustPod" : "0",
             "Test::LongString" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.010001"
          }
       }
    },
@@ -51,6 +52,7 @@
          "web" : "http://github.com/reneeb/HTTP-Tiny-FileProtocol"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

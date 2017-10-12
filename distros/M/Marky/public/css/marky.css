@@ -1,0 +1,12 @@
+/* 
+ * Common CSS for Marky
+ */
+.dblist {
+    margin-bottom: 0.5em;
+}
+.side nav .dblist ul {
+    list-style: circle inside;
+}
+.side .total {
+    font-style: italic;
+}

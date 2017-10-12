@@ -2,7 +2,7 @@ use 5.18.0;
 use Modern::Perl;
 use Moops;
 
-class XML::Simple::Sugar 1.1.1 {
+class XML::Simple::Sugar 1.1.2 {
     our $AUTOLOAD;
     use XML::Simple;
     use UNIVERSAL::isa;
@@ -299,7 +299,7 @@ XML::Simple::Sugar - Sugar sprinkled on XML::Simple
 
 =head1 VERSION
 
-version v1.1.1
+version v1.1.2
 
 =head1 SYNOPSIS
 
@@ -540,7 +540,7 @@ Chris Tijerina
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by eMortgage Logic LLC.
+This software is copyright (c) 2014-2017 by eMortgage Logic LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

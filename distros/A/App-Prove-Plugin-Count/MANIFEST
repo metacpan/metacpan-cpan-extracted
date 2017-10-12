@@ -9,7 +9,16 @@ lib/App/Prove/Plugin/Count.pm
 minil.toml
 t/00_compile.t
 t/prove.t
+t/spacer.t
 tests/test1.t
+tests/test10.t
 tests/test2.t
+tests/test3.t
+tests/test4.t
+tests/test5.t
+tests/test6.t
+tests/test7.t
+tests/test8.t
+tests/test9.t
 META.yml
 MANIFEST

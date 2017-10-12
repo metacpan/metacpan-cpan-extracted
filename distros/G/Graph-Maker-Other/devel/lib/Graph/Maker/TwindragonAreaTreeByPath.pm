@@ -24,7 +24,7 @@ use Math::PlanePath::ComplexPlus;
 use Math::PlanePath::DragonCurve 117; # v.117 for level_to_n_range()
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -69,8 +69,8 @@ sub _transform_none {
 # Unit squares on $side="left" or "right" of the segments of $path.
 # Vertices numbered by ComplexPlus
 #
-#             1,1              
-#           
+#             1,1
+#
 #       0,0 -------- 1,0
 #
 sub _planepath_area_tree {
@@ -112,7 +112,7 @@ sub _planepath_area_tree {
     #   # Vertex names by mx,my integers
     #   $v = "$mx,$my";
     # }
-    # 
+    #
     # {
     #   # Vertex names by lower left corner of square
     #   $mx = ($mx - ($mx % 2))/2;

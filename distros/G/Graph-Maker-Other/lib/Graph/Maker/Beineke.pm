@@ -25,7 +25,7 @@ use Graph::Maker::Star;
 use Graph::Maker::Wheel;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 
@@ -141,11 +141,11 @@ my @G_data
       [5,6],
      ],
 
-     # G9 wheel    2-----+
-     #            / \    |
-     #           3---1---6
-     #            \ /    |
-     #             4-----5
+     # G9 wheel     2----6
+     #             / \ / |
+     #            3---1  |
+     #             \ / \ |
+     #              4----5
      # https://hog.grinvin.org/ViewGraphInfo.action?id=204
     );
 

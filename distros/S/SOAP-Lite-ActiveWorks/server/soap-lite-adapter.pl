@@ -126,8 +126,8 @@ my ( $self, $requestEvent, $eventDef ) = @_;
 			);
 	}
 	elsif ( my $alt_uri = $safe_events{$request_class} ) {
-		use SOAP::Transport::ACTIVEWORKS;
-		my $c = new SOAP::Transport::ACTIVEWORKS::Client;
+		use SOAP::Transport::ActiveWorks::Lite;
+		my $c = new SOAP::Transport::ActiveWorks::Lite::Client;
 
 		$response = $c->send_receive (
 			envelope => $requestEvent->getStringField ( 'envelope' ),

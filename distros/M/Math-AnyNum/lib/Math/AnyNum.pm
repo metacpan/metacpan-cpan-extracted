@@ -13,7 +13,7 @@ use Math::MPC qw();
 
 use POSIX qw(ULONG_MAX LONG_MIN);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -1662,7 +1662,7 @@ sub iadd ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) <= ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) <= ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
         $y < 0
           ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
@@ -1686,7 +1686,7 @@ sub isub ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) <= ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) <= ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
         $y < 0
           ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
@@ -1714,7 +1714,7 @@ sub imul ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) <= ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) <= ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul_ui($r, $x, CORE::abs($y));
         Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
@@ -3192,7 +3192,7 @@ sub gcd ($$) {
     my $r = Math::GMPz::Rmpz_init();
 
     if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) <= ULONG_MAX) {
-        Math::GMPz::Rmpz_gcd_ui($r, $x, $y);
+        Math::GMPz::Rmpz_gcd_ui($r, $x, CORE::abs($y));
     }
     else {
         $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
@@ -3218,7 +3218,7 @@ sub lcm ($$) {
     my $r = Math::GMPz::Rmpz_init();
 
     if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) <= ULONG_MAX) {
-        Math::GMPz::Rmpz_lcm_ui($r, $x, $y);
+        Math::GMPz::Rmpz_lcm_ui($r, $x, CORE::abs($y));
     }
     else {
         $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
@@ -3661,19 +3661,34 @@ sub polygonal ($$) {
     my ($n, $k) = @_;
 
     $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
-    $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // goto &nan;
 
-    # polygonal(n, k) = n * (k*n - k - 2*n + 4) / 2
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k <= ULONG_MAX) {
+        ## `k` is a native unsigned integer
+    }
+    else {
+        $k = (ref($k) eq __PACKAGE__ ? _any2mpz($$k) : _star2mpz($k)) // goto &nan;
+    }
+
+    #
+    ## polygonal(n, k) = n * (k*n - k - 2*n + 4) / 2
+    #
 
     my $r = Math::GMPz::Rmpz_init();
 
-    Math::GMPz::Rmpz_mul($r, $n, $k);    # r = n*k
-    Math::GMPz::Rmpz_sub($r, $r, $k);    # r = r-k
-    Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
-    Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
-    Math::GMPz::Rmpz_add_ui($r, $r, 4);  # r = r+4
-    Math::GMPz::Rmpz_mul($r, $r, $n);    # r = r*n
-    Math::GMPz::Rmpz_div_2exp($r, $r, 1);    # r = r/2
+    if (!ref($k)) {    # `k` is a native unsigned integer
+        Math::GMPz::Rmpz_mul_ui($r, $n, $k);    # r = n*k
+        Math::GMPz::Rmpz_sub_ui($r, $r, $k);    # r = r-k
+    }
+    else {
+        Math::GMPz::Rmpz_mul($r, $n, $k);       # r = n*k
+        Math::GMPz::Rmpz_sub($r, $r, $k);       # r = r-k
+    }
+
+    Math::GMPz::Rmpz_sub($r, $r, $n);           # r = r-n
+    Math::GMPz::Rmpz_sub($r, $r, $n);           # r = r-n
+    Math::GMPz::Rmpz_add_ui($r, $r, 4);         # r = r+4
+    Math::GMPz::Rmpz_mul($r, $r, $n);           # r = r*n
+    Math::GMPz::Rmpz_div_2exp($r, $r, 1);       # r = r/2
 
     bless \$r;
 }
@@ -3803,7 +3818,7 @@ sub faulhaber_sum ($$) {
     else {
         $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // goto &nan;
 
-        # Try to unbox `n` when it fits inside a native unsinged integer
+        # Try to unbox `n` when it fits inside a native unsigned integer
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
             $native_n = 1;
             $n        = Math::GMPz::Rmpz_get_ui($n);
@@ -3845,7 +3860,7 @@ sub faulhaber_sum ($$) {
 
         # Bernoulli(j) = 1 for j=0
         if (!$j) {
-            Math::GMPz::Rmpz_addmul($numerator, $denominator, $t);    # numerator  += denominator * t
+            Math::GMPz::Rmpz_add($numerator, $numerator, $t);    # numerator = numerator + t
         }
         else {
 #<<<

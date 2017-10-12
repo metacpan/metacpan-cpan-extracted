@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::IO;
 
@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use constant CMD => "io";
+use constant CMD_DESC => "Commands working with IO SVs";
 
 =head1 NAME
 
@@ -27,12 +28,33 @@ This C<Devel::MAT> tool operates on IO handle SVs.
 
 =cut
 
-sub run_cmd
+use constant CMD_SUBS => qw(
+   list
+   find
+);
+
+sub _print_ios
 {
-   my $self = shift;
-   @_ or @_ = 'list';
-   $self->_dispatch_sub( @_ );
+   shift;
+   my @svs = @_;
+
+   Devel::MAT::Cmd->print_table(
+      [
+         [ "Addr", "ifileno", "ofileno" ],
+         map { my $sv = $_; [
+            Devel::MAT::Cmd->format_sv( $sv ),
+            $sv->ifileno // "-",
+            $sv->ofileno // "-",
+         ] } @svs
+      ],
+   );
 }
+
+package # hide
+   Devel::MAT::Tool::IO::list;
+use base qw( Devel::MAT::Tool );
+
+use constant CMD_DESC => "List all the IO SVs in the heap";
 
 =head2 io list
 
@@ -54,11 +76,9 @@ sub _by_fileno
    return $ai <=> $bi || $ao <=> $bo;
 }
 
-sub run_cmd_list
+sub run
 {
    my $self = shift;
-
-   Devel::MAT::Cmd->printf( "%-30s %-8s %-8s\n", "Addr", "ifileno", "ofileno" );
 
    my %ios;
 
@@ -71,13 +91,14 @@ sub run_cmd_list
       $ios{"$ifileno/$ofileno"} = $sv;
    }
 
-   foreach ( sort _by_fileno keys %ios ) {
-      my $sv = $ios{$_};
-
-      my $len = Devel::MAT::Cmd->print_sv( $sv );
-      Devel::MAT::Cmd->printf( "%s %-8s %-8s\n", " " x ( 30 - $len ), $sv->ifileno // "-", $sv->ofileno // "-" );
-   }
+   Devel::MAT::Tool::IO->_print_ios( map { $ios{$_} } sort _by_fileno keys %ios );
 }
+
+package # hide
+   Devel::MAT::Tool::IO::find;
+use base qw( Devel::MAT::Tool );
+
+use constant CMD_DESC => "Find an IO SV having a given fileno";
 
 =head2 io find
 
@@ -89,21 +110,25 @@ Searches for an IO handle that is associated with the given filenumber.
 
 =cut
 
-sub run_cmd_find
+use constant CMD_ARGS => (
+   { name => "fileno", help => "the file number" }
+);
+
+sub run
 {
    my $self = shift;
    my ( $num ) = @_;
 
-   Devel::MAT::Cmd->printf( "%-30s %-8s %-8s\n", "Addr", "ifileno", "ofileno" );
+   my @svs;
 
    foreach my $sv ( $self->df->heap ) {
       next unless $sv->type eq "IO";
-
       next unless $sv->ifileno == $num or $sv->ofileno == $num;
 
-      my $len = Devel::MAT::Cmd->print_sv( $sv );
-      Devel::MAT::Cmd->printf( "%s %-8s %-8s\n", " " x ( 30 - $len ), $sv->ifileno // "-", $sv->ofileno // "-" );
+      push @svs, $sv;
    }
+
+   Devel::MAT::Tool::IO->_print_ios( @svs );
 }
 
 =head1 AUTHOR

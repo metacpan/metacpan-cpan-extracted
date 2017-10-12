@@ -5,7 +5,7 @@ use warnings;
 use base 'Test2::Require';
 
 # ABSTRACT: Skip a test file unless FFI::Platypus is available
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 sub skip
@@ -27,7 +27,7 @@ Test::Alien::CanPlatypus - Skip a test file unless FFI::Platypus is available
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

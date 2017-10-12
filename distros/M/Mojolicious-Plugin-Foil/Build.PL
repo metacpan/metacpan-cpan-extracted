@@ -18,17 +18,17 @@ my %module_build_args = (
     "Kathryn Andersen <perlkat\@katspace.org>"
   ],
   "dist_name" => "Mojolicious-Plugin-Foil",
-  "dist_version" => "0.005",
+  "dist_version" => "0.006",
   "license" => "perl",
   "module_name" => "Mojolicious::Plugin::Foil",
   "recursive_test_files" => 1,
   "requires" => {
     "Config::Context" => 0,
-    "File::Serialize" => 0,
     "File::ShareDir" => 0,
     "File::Slurper" => 0,
     "HTML::LinkList" => 0,
     "Image::Size" => 0,
+    "JSON::MaybeXS" => 0,
     "Mojo::Base" => 0,
     "Path::Tiny" => 0,
     "common::sense" => 0

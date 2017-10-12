@@ -8,7 +8,7 @@ use Import::Export;
 
 use base qw/Import::Export/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our %EX = (
 	entropy => [qw/all/]
@@ -25,7 +25,7 @@ Shannon::Entropy - Calculate the Shannon entropy H of a given input string.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -48,15 +48,11 @@ Please report any bugs or feature requests to C<bug-shannon-entropy at rt.cpan.o
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Shannon-Entropy>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Shannon::Entropy
-
 
 You can also look for information at:
 
@@ -80,9 +76,7 @@ L<http://search.cpan.org/dist/Shannon-Entropy/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -123,7 +117,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

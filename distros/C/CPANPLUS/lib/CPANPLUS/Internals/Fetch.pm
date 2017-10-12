@@ -13,7 +13,7 @@ use Params::Check               qw[check];
 use Module::Load::Conditional   qw[can_load];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 use vars qw[$VERSION];
-$VERSION = "0.9170";
+$VERSION = "0.9172";
 
 $Params::Check::VERBOSE = 1;
 
@@ -237,13 +237,13 @@ sub _fetch {
             ### use ' to combat it!
 
             ### set up some flags for File::Fetch ###
-            local $File'Fetch::BLACKLIST    = $conf->_get_fetch('blacklist');
-            local $File'Fetch::TIMEOUT      = $conf->get_conf('timeout');
-            local $File'Fetch::DEBUG        = $conf->get_conf('debug');
-            local $File'Fetch::FTP_PASSIVE  = $conf->get_conf('passive');
-            local $File'Fetch::FROM_EMAIL   = $conf->get_conf('email');
-            local $File'Fetch::PREFER_BIN   = $conf->get_conf('prefer_bin');
-            local $File'Fetch::WARN         = $verbose;
+            local $File::Fetch::BLACKLIST    = $conf->_get_fetch('blacklist');
+            local $File::Fetch::TIMEOUT      = $conf->get_conf('timeout');
+            local $File::Fetch::DEBUG        = $conf->get_conf('debug');
+            local $File::Fetch::FTP_PASSIVE  = $conf->get_conf('passive');
+            local $File::Fetch::FROM_EMAIL   = $conf->get_conf('email');
+            local $File::Fetch::PREFER_BIN   = $conf->get_conf('prefer_bin');
+            local $File::Fetch::WARN         = $verbose;
 
 
             ### loop over all hosts we have ###

@@ -6,7 +6,3 @@ prompt privileged
 
 macro paging
     send set length %s
-
-# legacy support
-prompt prompt
-    match /[\/a-zA-Z0-9._-]+ ?[#>] ?(?:\(enable[^)]*\))? ?$/

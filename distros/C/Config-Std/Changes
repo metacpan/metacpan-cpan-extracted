@@ -1,5 +1,10 @@
 Revision history for Config-Std
 
+0.903 Fri Oct 6, 2017
+   -  general Kwallitee cleanup
+   -  warnings cleanup
+   -  limitations noted re sequential tests only and repeated re-reading.
+
 0.902 Thu Oct 5, 2017
     - Fix test for RT 114342  (Literal '{' in RE fatal in 5.25+)
 

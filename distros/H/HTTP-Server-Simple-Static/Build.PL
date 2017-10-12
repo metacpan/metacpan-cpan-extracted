@@ -10,6 +10,7 @@ Module::Build->new
       license     => 'perl',
       create_makefile_pl => 'traditional',
       requires    => {
+          'Cwd'                   => 0,
 	  'CGI'                   => '3.46',
           'Exporter'              => 0,
           'File::LibMagic'        => 0,

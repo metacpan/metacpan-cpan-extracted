@@ -29,6 +29,9 @@ WriteMakefile(
     clean => { FILES => 'Date-Hebrew-Simple-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Date::Hebrew::Simple' => { file => 'lib/Date/Hebrew/Simple.pm', version => '0.05' },
+        },
         resources => {
             repository => {
                 type => 'git',

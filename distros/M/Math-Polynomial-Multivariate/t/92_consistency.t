@@ -1,8 +1,6 @@
-# Copyright (c) 2008-2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 92_consistency.t 16 2013-05-31 16:53:11Z demetri $
 
 # Checking package consistency (version numbers, file names, ...).
 # These are tests for the distribution maintainer.
@@ -18,18 +16,23 @@ use Test::MyUtils;
 BEGIN {
     use_or_bail('File::Spec');
     use_or_bail('File::Basename', undef, [qw(basename dirname)]);
+    use_or_bail('YAML', undef, []);
 }
 
+my $test_plan  = 0;
 my $test_count = 0;
+my $test_fail  = 0;
 
 sub plan {
     my ($n) = @_;
+    $test_plan = $n;
     print "1..$n\n";
 }
 
 sub test {
     my ($ok, $comment) = @_;
     ++$test_count;
+    ++$test_fail if !$ok;
     print
         !$ok && 'not ', "ok $test_count",
         defined($comment) && " - $comment", "\n";
@@ -40,8 +43,49 @@ sub skip {
     while (0 < $tests) {
         ++$test_count;
         --$tests;
-        print "ok $test_count # SKIP $reason\n";
+        print "ok $test_count # skip $reason\n";
     }
+}
+
+sub conclude {
+    my $code = 0;
+    if ($test_plan != $test_count) {
+        if ($test_count) {
+            my $s = 1 == $test_plan? q[]: q[s];
+            print
+                "# Looks like you planned $test_plan test$s ",
+                "but ran $test_count.\n";
+        }
+        else {
+            print "# No tests run!\n";
+        }
+        $code = -1;
+    }
+    if ($test_fail) {
+        my $s = 1 == $test_fail? q[]: q[s];
+        my $r = $test_plan == $test_count? q[]: q[ run];
+        print
+            "# Looks like you failed $test_fail test$s ",
+            "out of $test_count$r.\n";
+        $code ||= $test_fail <= 255? $test_fail: 255;
+    }
+    exit $code;
+}
+
+sub hoh_equal {
+    my ($this, $that) = @_;
+    my @these = sort keys %{$this};
+    my @those = sort keys %{$that};
+    return 0
+        if @these != @those || grep {$these[$_] ne $those[$_]} 0 .. $#these;
+    foreach my $ktop (@these) {
+        my ($h1, $h2) = ($this->{$ktop}, $that->{$ktop});
+        return 0 if grep { 'HASH' ne ref $_ } $h1, $h2;
+        my @k1 = sort keys %{$h1};
+        my @k2 = sort keys %{$h2};
+        return 0 if "@k1" ne "@k2" || "@{$h1}{@k1}" ne "@{$h2}{@k2}";
+    }
+    return 1;
 }
 
 $| = 1;
@@ -49,17 +93,20 @@ undef $/;
 
 maintainer_only();
 
-plan 32;
+plan 42;
 
 my $MAKEFILE_PL            = 'Makefile.PL';
 my $README                 = 'README';
 my $META_YML               = 'META.yml';
+my $AGENDA_YML             = 't/data/AGENDA.yml';
 my $MANIFEST               = 'MANIFEST';
 my $CHANGES                = 'Changes';
 my ($modname, $authormail) = info_from_makefile_pl();
+my ($ambox, $amhost)       = split /\@/, $authormail;
 (my $distname              = $modname) =~ s{::}{-}g;
 (my $modfilename           = $modname) =~ s{::}{/}g;
 $modfilename .= '.pm';
+my $items_to_provide       = undef;
 
 my %ignore_copyright = map {($_ => 1)} qw(
     Changes
@@ -69,12 +116,14 @@ my %ignore_copyright = map {($_ => 1)} qw(
     MYMETA.json
     MYMETA.yml
     SIGNATURE
+    t/data/AGENDA.yml
     t/data/KNOWN_VERSIONS
 );
 
 my %pattern = (
     'binary_file'      => qr{\.(?i:png|jpg|gif)\z},
     'perl_code'        => qr{\.(?i:pm|pl|t|pod)\z},
+    'library_module'   => qr{^lib/.*\.pm\z},
     'copyright_info'   => qr{\bCopyright \(c\) (?:\d{4}-)?(\d{4})?\b},
     'revision_id'      => qr{^\s*#\s+\$Id[\:\$]},
     'revision_info'    =>
@@ -101,13 +150,17 @@ my %pattern = (
         qr{^(\d+\.\d\S*)\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b},
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
-    'authormail_code' => qr[\QE<lt>${authormail}E<gt>\E],
+    'authormail_code' => qr[\QE<lt>$ambox\E(?:\@|E<64>)\Q${amhost}E<gt>\E],
+    'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
+    'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
+    'version' => qr/^'([\d._]+)';\z/,
 );
 
 # part 1: names and version numbers in various places
 
 require $modfilename;
 my $mod_version = $modname->VERSION;
+my $meta_provides = undef;
 
 print "# dist name is $distname\n";
 print "# module version is $mod_version\n";
@@ -134,8 +187,9 @@ if (open FILE, '<', $README) {
     if ($found) {
         my ($readme_distname, $readme_version) = ($1, $2);
         print "# $README refers to $readme_distname version $readme_version\n";
-        test $readme_distname eq $distname || $readme_distname eq $modname;
-        test $readme_version eq $mod_version;
+        test $readme_distname eq $distname || $readme_distname eq $modname,
+            "distro name in $README matches";
+        test $readme_version eq $mod_version, "version in $README matches";
     }
     else {
         skip 2, "unknown $README version";
@@ -149,24 +203,62 @@ if (open FILE, '<', $META_YML) {
     my $metayml = <FILE>;
     close FILE;
     my $found_dist = $metayml =~ /^name:\s+(\S+)$/mi;
-    test $found_dist;
+    test $found_dist, "found distro name in $META_YML";
     if ($found_dist) {
         test $1 eq $distname, "$META_YML has matching distro name";
     }
     else {
         skip 1, "unknown $META_YML dist name";
     }
-    my $found_vers = $metayml =~ /^version:\s+(\S+)$/mi;
-    test $found_vers;
-    if ($found_dist) {
-        test $1 eq $mod_version, "$META_YML has matching version";
+    my $found_vers = $metayml =~ /^version:\s+('?)([^\s']+)\1$/mi;
+    test $found_vers, "found version in $META_YML";
+    if ($found_vers) {
+        test $2 eq $mod_version, "$META_YML has matching version";
     }
     else {
-        skip 1, "unknown $META_YML dist name";
+        skip 1, "module version not found in $META_YML";
+    }
+    my $meta = YAML::Load($metayml);
+    my $meta_is_hash = 'HASH' eq ref($meta);
+    test $meta_is_hash, "YAML can parse $META_YML as hash";
+    if ($meta_is_hash) {
+        $meta_provides = $meta->{'provides'};
+        test defined($meta_provides), "$META_YML contains a provides section";
+    }
+    else {
+        skip 1, "$META_YML not understood";
     }
 }
 else {
-    skip 4, "cannot open $META_YML file";
+    skip 6, "cannot open $META_YML file";
+}
+
+my $agenda       = undef;
+my %agenda_fixme = ();
+my %agenda_todo  = ();
+my %agenda_debug = ();
+if (open FILE, '<', $AGENDA_YML) {
+    my $agendayml = <FILE>;
+    close FILE;
+    $agenda = eval { YAML::Load($agendayml) || {} };
+    my $agenda_is_ok =
+        defined($agenda) &&
+        'HASH' eq ref($agenda) &&
+        !grep { 'ARRAY' ne ref $_ } values %{$agenda};
+    test $agenda_is_ok, "$AGENDA_YML is syntactically correct";
+    $agenda = {} if !$agenda_is_ok;
+}
+else {
+    $agenda = {};
+    test 1, "$AGENDA_YML is not present";
+}
+foreach my $ca (
+    [fixme => \%agenda_fixme],
+    [todo  => \%agenda_todo ],
+    [debug => \%agenda_debug],
+) {
+    my ($cat, $ag) = @{$ca};
+    @{$ag}{@{$agenda->{$cat}}} = () if exists $agenda->{$cat};
 }
 
 my $changes_version = undef;
@@ -244,8 +336,12 @@ my @lacking_revision_id = ();
 my @lacking_author_pod  = ();
 my @bogus_author_pod    = ();
 my @stale_copyright     = ();
+my @mtime_copyright     = ();
 my @uncommited_files    = ();
 my @all_distfiles       = ();
+my @bad_package_versions= ();
+my %provided_items      = ();
+my $having_revision_id  = 0;
 my $manifest_open = open MANIFEST, '<', $MANIFEST;
 test $manifest_open, "$MANIFEST is present";
 if ($manifest_open) {
@@ -258,6 +354,7 @@ if ($manifest_open) {
     foreach my $file (@all_distfiles) {
         if (open FILE, '<', $file) {
             my $is_perlcode = $file =~ /$pattern{'perl_code'}/o;
+            my $is_module   = $file =~ /$pattern{'library_module'}/o;
             my $has_pod = 0;
             if ($file !~ /$pattern{'binary_file'}/o) {
                 my $seen_copyright   = 0;
@@ -268,10 +365,12 @@ if ($manifest_open) {
                 my $seen_badchar     = 0;
                 my $seen_hardtab     = 0;
                 my $in_signature     = 0;
+                my $before_end       = 1;
                 my $in_author        = 0;
                 my $copyright_year   = undef;
                 my $checkin_filename = undef;
                 my $checkin_year     = undef;
+                my $package          = undef;
                 my @authors          = ();
                 while (<FILE>) {
                     if (/$pattern{'copyright_info'}/o) {
@@ -314,6 +413,30 @@ if ($manifest_open) {
                     elsif ($in_author && /^\s*(\S.*\S)/) {
                         push @authors, $1;
                     }
+                    next if !$is_module;
+                    if (/^__END__$/) {
+                        $before_end = 0;
+                    }
+                    if ($before_end && /$pattern{'package_line'}/o) {
+                        $package = $1;
+                        $provided_items{$package} ||= { file => $file };
+                    }
+                    elsif (
+                        $before_end &&
+                        defined($package) &&
+                        exists($provided_items{$package}) &&
+                        !exists($provided_items{$package}->{'version'}) &&
+                        /$pattern{'version_line'}/o
+                    ) {
+                        my $raw_version = $1;
+                        if ($raw_version =~ /$pattern{'version'}/o) {
+                            $provided_items{$package}->{'version'} ||= $1;
+                        }
+                        else {
+                            push @bad_package_versions,
+                                [$file, $package, $raw_version];
+                        }
+                    }
                 }
                 if (!$seen_copyright && !exists $ignore_copyright{$file}) {
                     push @lacking_copyright, $file;
@@ -352,6 +475,16 @@ if ($manifest_open) {
                         }
                     }
                 }
+                else {
+                    my $mtime = (stat FILE)[9];
+                    my $myear = (localtime $mtime)[5] + 1900;
+                    if (
+                        defined($copyright_year) &&
+                        $copyright_year ne $myear
+                    ) {
+                        push @mtime_copyright, $file;
+                    }
+                }
                 if ($has_pod) {
                     if (@authors) {
                         grep { /$pattern{'authormail_code'}/o } @authors or
@@ -361,6 +494,7 @@ if ($manifest_open) {
                         push @lacking_author_pod, $file;
                     }
                 }
+                ++$having_revision_id if $seen_revision_id;
             }
             close FILE;
         }
@@ -372,18 +506,67 @@ if ($manifest_open) {
         print qq{# missing file: "$file"\n};
     }
     test !@missing_distfiles, 'distribution complete';
+
+    my (@fixme_a, @fixme_u) = ();
     foreach my $file (@fixme_distfiles) {
-        print "# file with FIX", "ME tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_fixme{$file}) {
+            $in_a = ' (in agenda)';
+            push @fixme_a, $file;
+            delete $agenda_fixme{$file};
+        }
+        else {
+            push @fixme_u, $file;
+        }
+        print "# file with FIX", "ME tag: $file$in_a\n";
     }
-    test !@fixme_distfiles, 'no files flagged as needing fix';
+    test !@fixme_u, 'no files flagged as needing fix';
+    my @fixme_x = sort keys %agenda_fixme;
+    foreach my $file (@fixme_x) {
+        print "# extra file in fixme agenda: $file\n";
+    }
+    test !@fixme_x, 'no extra files in fixme agenda';
+
+    my (@todo_a, @todo_u) = ();
     foreach my $file (@todo_distfiles) {
-        print "# file with TO", "DO tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_todo{$file}) {
+            $in_a = ' (in agenda)';
+            push @todo_a, $file;
+            delete $agenda_todo{$file};
+        }
+        else {
+            push @todo_u, $file;
+        }
+        print "# file with TO", "DO tag: $file$in_a\n";
     }
-    test !@todo_distfiles, 'no files flagged as needing more work';
+    test !@todo_u, 'no files flagged as needing more work';
+    my @todo_x = sort keys %agenda_todo;
+    foreach my $file (@todo_x) {
+        print "# extra file in todo agenda: $file\n";
+    }
+    test !@todo_x, 'no extra files in todo agenda';
+
+    my (@debug_a, @debug_u) = ();
     foreach my $file (@debug_distfiles) {
-        print "# file with DE", "BUG tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_debug{$file}) {
+            $in_a = ' (in agenda)';
+            push @debug_a, $file;
+            delete $agenda_debug{$file};
+        }
+        else {
+            push @debug_u, $file;
+        }
+        print "# file with DE", "BUG tag: $file$in_a\n";
     }
     test !@debug_distfiles, 'no files with temporary debugging aids';
+    my @debug_x = sort keys %agenda_debug;
+    foreach my $file (@debug_x) {
+        print "# extra file in debug agenda: $file\n";
+    }
+    test !@debug_x, 'no extra files in debug agenda';
+
     foreach my $file (@badchar_distfiles) {
         print "# file with strange characters: $file\n";
     }
@@ -408,18 +591,52 @@ if ($manifest_open) {
         print "# copyright year != checkin year: $file\n";
     }
     test !@stale_copyright, 'copyright years match checkin dates';
-    foreach my $file (@lacking_revision_id) {
-        print "# file lacking revision ID: $file\n";
+    foreach my $file (@mtime_copyright) {
+        print "# copyright year != year of last file modification: $file\n";
     }
-    test !@lacking_revision_id, 'revision ID present in perl source code';
-    foreach my $file (@uncommited_files) {
-        print "# file probably not yet commited: $file\n";
+    test !@mtime_copyright, 'copyright years match file modification times';
+    if ($having_revision_id) {
+        foreach my $file (@lacking_revision_id) {
+            print "# file lacking revision ID: $file\n";
+        }
+        test !@lacking_revision_id, 'revision ID present in perl source code';
+        foreach my $file (@uncommited_files) {
+            print "# file probably not yet commited: $file\n";
+        }
+        test !@uncommited_files, 'revision IDs have date and match filenames';
     }
-    test !@uncommited_files, 'revision IDs have date and match filenames';
+    else {
+        skip 2, 'no revision ids in this distro';
+    }
+    foreach my $pkg (@bad_package_versions) {
+        print "# strange package version: @{$pkg}\n";
+    }
+    test !@bad_package_versions, 'all package versions can be parsed';
+    test scalar(keys %provided_items), 'library files provide packages';
+    if (keys %provided_items) {
+        print
+            "# provides:\n",
+            map {
+                my $h = $provided_items{$_};
+                "#   $_:\n",
+                map {
+                    "#     $_: $h->{$_}\n"
+                } sort keys %{$h}
+            } sort keys %provided_items;
+    }
+    if (defined $meta_provides) {
+        test hoh_equal($meta_provides, \%provided_items),
+            qq{"provides" section in $META_YML matches found packages};
+    }
+    else {
+        skip 1, qq{got no "provides" section from $META_YML};
+    }
 }
 else {
-    skip 12, "cannot open $MANIFEST file";
+    skip 15, "cannot open $MANIFEST file";
 }
+
+conclude();
 
 # prologue: fetching the module name and author mail address
 sub info_from_makefile_pl {

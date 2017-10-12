@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Role::Prompt;
-{
-  $Net::CLI::Interact::Role::Prompt::VERSION = '2.143070';
-}
 
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Str RegexpRef);
@@ -90,6 +87,9 @@ sub find_prompt {
     # make connection on transport if not yet done
     $self->transport->init if not $self->transport->connect_ready;
 
+    # forget the previous prompt; will set new one if successful or bail out if not
+    $self->unset_prompt;
+
     eval {
         my $started_pumping = time;
         PUMPING: while (1) {
@@ -145,10 +145,6 @@ sub find_prompt {
 
 1;
 
-# ABSTRACT: Command-line prompt management
-
-
-__END__
 =pod
 
 =head1 NAME
@@ -255,16 +251,4 @@ Returns the text which was most recently matched and terminated gathering of
 output from the connected CLI, as a quote-escaped regular expression with line
 start and end anchors.
 
-=head1 AUTHOR
-
-Oliver Gorwits <oliver@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Oliver Gorwits.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

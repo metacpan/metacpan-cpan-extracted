@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -454,6 +454,8 @@ House of Graphs entries for graphs here include
 =over
 
 =item discs=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21136>
+
+=item discs=2, linear, L<https://hog.grinvin.org/ViewGraphInfo.action?id=414> (path-9)
 
 =item discs=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22740>
 

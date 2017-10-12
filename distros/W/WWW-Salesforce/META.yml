@@ -33,19 +33,19 @@ no_index:
 provides:
   WWW::Salesforce:
     file: lib/WWW/Salesforce.pm
-    version: '0.302'
+    version: '0.303'
   WWW::Salesforce::Constants:
     file: lib/WWW/Salesforce/Constants.pm
-    version: '0.302'
+    version: '0.303'
   WWW::Salesforce::Deserializer:
     file: lib/WWW/Salesforce/Deserializer.pm
-    version: '0.302'
+    version: '0.303'
   WWW::Salesforce::Serializer:
     file: lib/WWW/Salesforce/Serializer.pm
-    version: '0.302'
+    version: '0.303'
   WWW::Salesforce::Simple:
     file: lib/WWW/Salesforce/Simple.pm
-    version: '0.302'
+    version: '0.303'
 requires:
   DateTime: '0'
   Exporter: '5.57'
@@ -60,7 +60,7 @@ resources:
   bugtracker: https://github.com/p5-salesforce/WWW-Salesforce/issues
   homepage: https://github.com/p5-salesforce/WWW-Salesforce
   repository: https://github.com/p5-salesforce/WWW-Salesforce.git
-version: '0.302'
+version: '0.303'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -297,7 +297,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.302
+          tag: v0.303
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

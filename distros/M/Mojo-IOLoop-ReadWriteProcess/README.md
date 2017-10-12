@@ -150,6 +150,10 @@ Defaults to `5`, is the number of attempts before bailing out.
 It can be used with blocking\_stop, so if the number of attempts are exhausted,
 a SIGKILL and waitpid will be tried at the end.
 
+## serialize
+
+Defaults to `0`, If enabled data returned from forked process will be serialized with Storable.
+
 ## kill\_sleeptime
 
 Defaults to `1`, it's the seconds to wait before attempting SIGKILL when blocking\_stop is setted to 1.

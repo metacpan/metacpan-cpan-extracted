@@ -28,7 +28,7 @@ no_index:
 provides:
   App::Prove::Plugin::Count:
     file: lib/App/Prove/Plugin/Count.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   App::Prove: '0'
   Class::Method::Modifiers: '0'
@@ -38,6 +38,6 @@ resources:
   bugtracker: https://github.com/masiuchi/p5-app-prove-plugin-count/issues
   homepage: https://github.com/masiuchi/p5-app-prove-plugin-count
   repository: git://github.com/masiuchi/p5-app-prove-plugin-count.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:MASIUCHI
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

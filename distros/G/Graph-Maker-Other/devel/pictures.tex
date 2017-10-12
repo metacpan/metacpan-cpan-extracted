@@ -110,6 +110,582 @@ number of runs binary beanstalk A255327=size of subtree, A255056=trunk
 
 
 %------------------------------------------------------------------------------
+\section{Rook Grid 4,4}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=3,
+     my box/.style={draw,circle,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \newcommand\MyW{-.2}
+
+  \node (1) at (0,0) [my box] {1};
+  \node (2) at (1,0-\MyW) [my box] {2};
+  \node (3) at (2,0-\MyW) [my box] {3};
+  \node (4) at (3,0) [my box] {4};
+  \node (5) at (0-\MyW,1) [my box] {5};
+  \node (6) at (1-\MyW, 1-\MyW) [my box] {6};
+  \node (7) at (2+\MyW, 1-\MyW) [my box] {7};
+  \node (8) at (3+\MyW,1) [my box] {8};
+  \node (9) at (0-\MyW,2) [my box] {9};
+  \node (10) at (1-\MyW, 2+\MyW) [my box] {10};
+  \node (11) at (2+\MyW, 2+\MyW) [my box] {11};
+  \node (12) at (3+\MyW,2) [my box] {12};
+  \node (13) at (0,3) [my box] {13};
+  \node (14) at (1,3+\MyW) [my box] {14};
+  \node (15) at (2,3+\MyW) [my box] {15};
+  \node (16) at (3,3) [my box] {16};
+
+  \draw [] (5) to (8);
+  \draw [] (10) to (11);
+  \draw [] (6) to (7);
+  \draw [] (10) to (2);
+  \draw [] (5) to (6);
+  \draw [] (3) to (7);
+  \draw [] (7) to (8);
+  \draw [] (4) to (8);
+  \draw [] (14) to (6);
+  \draw [] (6) to (8);
+  \draw [] (12) to (8);
+  \draw [] (5) to (13);
+  \draw [] (10) to (12);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+  \draw [] (10) to (6);
+  \draw [] (12) to (4);
+  \draw [] (12) to (9);
+  \draw [] (11) to (3);
+  \draw [] (9) to (13);
+  \draw [] (1) to (9);
+  \draw [] (11) to (7);
+  \draw [] (2) to (3);
+  \draw [] (10) to (9);
+  \draw [] (16) to (13);
+  \draw [] (15) to (16);
+  \draw [] (10) to (14);
+  \draw [] (11) to (9);
+  \draw [] (3) to (4);
+  \draw [] (5) to (7);
+  \draw [] (15) to (7);
+  \draw [] (1) to (13);
+  \draw [] (15) to (3);
+  \draw [] (15) to (13);
+  \draw [] (11) to (15);
+  \draw [] (14) to (13);
+  \draw [] (5) to (9);
+  \draw [] (16) to (8);
+  \draw [] (14) to (15);
+  \draw [] (1) to (5);
+  \draw [] (1) to (2);
+  \draw [] (12) to (16);
+  \draw [] (1) to (3);
+  \draw [] (16) to (4);
+  \draw [] (14) to (2);
+  \draw [] (14) to (16);
+  \draw [] (11) to (12);
+  \draw [] (2) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+
+%------------------------------------------------------------------------------
+\section{Regular But Median Size Less than N}
+
+n=8 regular 1 but median size 4 is not all vertices
+\begin{center}
+\begin{tikzpicture}
+    [scale=2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (1.5,.5) [my box] {0};
+  \node (1) at (2, -1) [my box] {1};
+  \node (2) at (.5,0) [my box] {2};
+  \node (3) at (2,1) [my box] {3};
+  \node (4) at (1,-1) [my box] {4};
+  \node (5) at (1.5,-.5) [my box] {5};
+  \node (6) at (2.5,0) [my box] {6};
+  \node (7) at (1,1) [my box] {7};
+
+  \draw [] (0) to (7);
+  \draw [] (4) to (5);
+  \draw [] (0) to (5);
+  \draw [] (1) to (5);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+  \draw [] (2) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (6);
+  \draw [] (3) to (7);
+  \draw [] (3) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+XXXXXXXX
+
+n=8 regular 1 but median size 4 is not all vertices
+\begin{center}
+\begin{tikzpicture}
+    [scale=1,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (0,-2) [my box] {0};
+  \node (1) at (2,1) [my box] {1};
+  \node (2) at (-2,1) [my box] {2};
+  \node (3) at (0,-.7) [my box] {3};
+  \node (4) at (0,2) [my box] {4};
+  \node (5) at (0,.7) [my box] {5};
+  \node (6) at (2,-1) [my box] {6};
+  \node (7) at (-2,-1) [my box] {7};
+
+  \draw [] (2) to (7);
+  \draw [] (0) to (6);
+  \draw [] (0) to (3);
+  \draw [] (2) to (5);
+  \draw [] (4) to (5);
+  \draw [] (1) to (5);
+  \draw [] (1) to (4);
+  \draw [] (2) to (4);
+  \draw [] (0) to (7);
+  \draw [] (3) to (6);
+  \draw [] (3) to (7);
+  \draw [] (1) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+XXXXXXXX
+
+n=9 not regular but median size = 9
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (2.8, 1.9) [my box] {0};
+  \node (1) at (-.8, 1.9) [my box] {1};
+
+  \node (3) at (2, 1.3) [my box] {3};
+  \node (7) at (3,0) [my box] {7};
+  \node (4) at (.2, 1.4) [my box] {4};
+  \node (8) at (-.9, 0) [my box] {8};
+  \node (6) at (1, 2.8) [my box] {6};
+  \node (5) at (1,.5) [my box] {5};
+  \node (2) at (1,-.5) [my box] {2};
+
+  \draw [] (0) to (6);
+  \draw [] (1) to (4);
+  \draw [] (2) to (7);
+  \draw [] (1) to (6);
+  \draw [] (3) to (7);
+  \draw [] (0) to (3);
+  \draw [] (2) to (8);
+  \draw [] (5) to (8);
+  \draw [] (1) to (8);
+  \draw [] (2) to (5);
+  \draw [] (4) to (6);
+  \draw [] (5) to (7);
+  \draw [] (3) to (6);
+  \draw [] (0) to (7);
+  \draw [] (4) to (8);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{n=8 Pseudosimilar which are Line Graph}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (2,1) [my box] {0};
+  \node (1) at (0,1) [my box] {1};
+  \node (2) at (-2,1) [my box] {2};
+  \node (3) at (3,2) [my box] {3};
+  \node (4) at (1,2) [my box] {4};
+  \node (5) at (3,1) [my box] {5};
+  \node (6) at (-1,1) [my box] {6};
+  \node (7) at (1,1) [my box] {7};
+
+  % 9 edges
+  \draw [] (4) to (7);
+  \draw [] (0) to (5);
+  \draw [] (1) to (6);
+  \draw [] (1) to (7);
+  \draw [] (2) to (6);
+
+  \draw [] (0) to (7);
+  \draw [] (3) to (5);
+  \draw [] (1) to (4);
+  \draw [] (0) to (3);
+
+\end{tikzpicture}
+\end{center}
+
+XXXXXXXXXXXXX
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (1,1) [my box] {0};
+  \node (1) at (-1,1) [my box] {1};
+  \node (2) at (-.5,2) [my box] {2};
+  \node (3) at (2,1) [my box] {3};
+  \node (4) at (-2,1) [my box] {4};
+  \node (5) at (1,2) [my box] {5};
+  \node (6) at (-2,2) [my box] {6};
+  \node (7) at (0,1) [my box] {7};
+
+  % 10 edges
+  \draw [] (1) to (6);
+  \draw [] (5) to (7);
+  \draw [] (0) to (5);
+  \draw [] (1) to (7);
+  \draw [] (0) to (3);
+
+  \draw [] (1) to (4);
+  \draw [] (2) to (5);
+  \draw [] (4) to (6);
+  \draw [] (2) to (6);
+  \draw [] (0) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+XXXXXXXXXXXXX
+
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (0,1) [my box] {0};
+  \node (1) at (3,1) [my box] {1};
+  \node (2) at (1,0) [my box] {2};
+  \node (3) at (-1,2) [my box] {3};
+  \node (4) at (2,2) [my box] {4};
+  \node (5) at (2,0) [my box] {5};
+  \node (6) at (-1,0) [my box] {6};
+  \node (7) at (2,1) [my box] {7};
+
+  % 12 edges
+  \draw [] (0) to (7);
+  \draw [] (1) to (4);
+  \draw [] (2) to (5);
+  \draw [] (5) to (7);
+  \draw [] (2) to (7);
+
+  \draw [] (4) to (7);
+  \draw [] (3) to (6);
+  \draw [] (0) to (6);
+  \draw [] (0) to (3);
+  \draw [] (2) to (6);
+
+  \draw [] (1) to (5);
+  \draw [] (0) to (4);
+
+\end{tikzpicture}
+\end{center}
+
+XXXXXXXXXXXXX
+
+\medskip
+
+5,4 pseudosimilar
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,yscale=1.3,xscale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (-2,0) [my box] {0};
+  \node (1) at (300:1) [my box] {1};
+  \node (2) at (60:1) [my box] {2};
+  \node (3) at (240:1) [my box] {3};
+  \node (4) at (120:1) [my box] {4};
+  \node (5) at (1,0) [my box] {5};
+  \node (6) at (-1,0) [my box] {6};
+  \node (7) at (0, 0) [my box] {7};
+
+  % 17 edges
+  \draw [] (0) to (3);
+  \draw [] (2) to (4);
+  \draw [] (3) to (6);
+  \draw [] (0) to (4);
+  \draw [] (2) to (6);
+
+  \draw [] (6) to (7);
+  \draw [] (1) to (3);
+  \draw [] (3) to (5);
+  \draw [] (2) to (5);
+  \draw [] (0) to (6);
+
+  \draw [] (4) to (6);
+  \draw [] (1) to (7);
+  \draw [] (3) to (7);
+  \draw [] (1) to (5);
+  \draw [] (5) to (7);
+
+  \draw [] (4) to (7);
+  \draw [] (2) to (7);
+
+\end{tikzpicture}
+\end{center}
+
+its root graph
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,yscale=1.3,xscale=1.5,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+  \node (0) at (1,0) [my box] {0};
+  \node (1) at (3,1) [my box] {1};
+  \node (2) at (3,0) [my box] {2};
+  \node (3) at (1,1) [my box] {3};
+  \node (4) at (2,0) [my box] {4};
+  \node (5) at (2,1) [my box] {5};
+
+  \draw [] (4) to (1);
+  \draw [] (1) to (5);
+  \draw [] (3) to (5);
+  \draw [] (0) to (5);
+  \draw [] (4) to (5);
+  \draw [] (0) to (4);
+  \draw [] (4) to (2);
+  \draw [] (0) to (3);
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%------------------------------------------------------------------------------
+\section{Crown 4}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (1) at (0,0) [my box] {1};
+  \node (2) at (0,1) [my box] {2};
+  \node (3) at (0,2) [my box] {3};
+  \node (4) at (0,3) [my box] {4};
+
+  \node (5) at (3,0) [my box] {5};
+  \node (6) at (3,1) [my box] {6};
+  \node (7) at (3,2) [my box] {7};
+  \node (8) at (3,3) [my box] {8};
+
+  \draw [] (2) to (5);
+  \draw [] (6) to (3);
+  \draw [] (7) to (4);
+  \draw [] (1) to (6);
+  \draw [] (8) to (3);
+  \draw [] (1) to (7);
+  \draw [] (8) to (2);
+  \draw [] (7) to (2);
+  \draw [] (6) to (4);
+  \draw [] (5) to (3);
+  \draw [] (5) to (4);
+  \draw [] (1) to (8);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+%------------------------------------------------------------------------------
+\section{Most Minimum Dominating Sets}
+
+n=5
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.2,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (0,0) [my box] {0};
+  \node (1) at (2,0) [my box] {1};
+  \node (2) at (1,0) [my box] {2};
+  \node (3) at (1,1) [my box] {3};
+  \node (4) at (1,-1) [my box] {4};
+
+  \draw [] (0) to (4);
+  \draw [] (0) to (2);
+  \draw [] (1) to (3);
+  \draw [] (0) to (3);
+  \draw [] (1) to (2);
+  \draw [] (2) to (4);
+  \draw [] (1) to (4);
+
+\end{tikzpicture}
+\end{center}
+
+n=6 domnum 3 in 15 ways
+
+complete-5 less 3 non-touching edges
+\begin{center}
+\begin{tikzpicture}
+    [scale=1,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (3,2) [my box] {0};
+  \node (1) at (1,0) [my box] {1};
+  \node (2) at (-.5,1) [my box] {2};
+  \node (3) at (4.5,1) [my box] {3};
+  \node (4) at (3,0) [my box] {4};
+  \node (5) at (1,2) [my box] {5};
+
+  \draw [] (0) to (4);
+  \draw [] (3) to (4);
+  \draw [] (1) to (5);
+  \draw [] (0) to (2);
+  \draw [] (0) to (5);
+  \draw [] (0) to (3);
+  \draw [] (2) to (5);
+  \draw [] (2) to (4);
+  \draw [] (3) to (5);
+  \draw [] (1) to (3);
+  \draw [] (1) to (2);
+  \draw [] (1) to (4);
+
+\end{tikzpicture}
+\end{center}
+
+n=7 domnum 3 in 22 ways
+\begin{center}
+\begin{tikzpicture}
+    [scale=1,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     font=\small,
+    ]
+
+  \node (0) at (5,-1) [my box] {0};
+  \node (1) at (1,1) [my box] {1};
+  \node (2) at (1,-1) [my box] {2};
+  \node (3) at (5,1) [my box] {3};
+  \node (4) at (-.5,0) [my box] {4};
+  \node (5) at (3,-1) [my box] {5};
+  \node (6) at (3,1) [my box] {6};
+
+  \draw [] (2) to (6);
+  \draw [] (0) to (3);
+  \draw [] (5) to (6);
+  \draw [] (1) to (5);
+  \draw [] (1) to (6);
+  \draw [] (3) to (6);
+  \draw [] (2) to (4);
+  \draw [] (0) to (5);
+  \draw [] (1) to (4);
+  \draw [] (2) to (5);
+
+\end{tikzpicture}
+\end{center}
+
+\pagebreak
+
+n=8 domnum 3 in 36 ways
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.2em},
+     font=\small,
+    ]
+
+  \node (0) at (0,-2.5) [my box] {0};
+  \node (1) at (2,-1.5) [my box] {1};
+  \node (2) at (2, 1.5) [my box] {2};
+  \node (3) at (4, -2.5) [my box] {3};
+  \node (4) at (1, 0) [my box] {4};
+  \node (5) at (5, 0) [my box] {5};
+  \node (6) at (-1, 0) [my box] {6};
+  \node (7) at (3, 0) [my box] {7};
+
+  \draw [] (2) to (5);
+  \draw [] (0) to (4);
+  \draw [] (2) to (4);
+  \draw [] (4) to (7);
+  \draw [] (1) to (4);
+  \draw [] (3) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (7);
+  \draw [] (1) to (7);
+  \draw [] (3) to (5);
+  \draw [] (1) to (5);
+  \draw [] (0) to (3);
+  \draw [] (2) to (6);
+  \draw [] (0) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.2em},
+     font=\small,
+    ]
+
+  \node (0) at (-3,0) [my box] {0};
+  \node (1) at (-4,2) [my box] {1};
+  \node (2) at (0,2) [my box] {2};
+  \node (3) at (-.5, 0) [my box] {3};
+  \node (4) at (-2,1) [my box] {4};
+  \node (5) at (-4,-2) [my box] {5};
+  \node (6) at (0,-2) [my box] {6};
+  \node (7) at (-2,3) [my box] {7};
+
+  \draw [] (2) to (5);
+  \draw [] (0) to (4);
+  \draw [] (2) to (4);
+  \draw [] (4) to (7);
+  \draw [] (1) to (4);
+  \draw [] (3) to (7);
+  \draw [] (1) to (6);
+  \draw [] (2) to (7);
+  \draw [] (1) to (7);
+  \draw [] (3) to (5);
+  \draw [] (1) to (5);
+  \draw [] (0) to (3);
+  \draw [] (2) to (6);
+  \draw [] (0) to (6);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+\end{document}
+%------------------------------------------------------------------------------
 \section{6 Vertices Mean Distance 2/3 of Diameter}
 
 12 total
@@ -1415,6 +1991,104 @@ Tesseract induced subgraph.
   \draw [] (2-0-3-1) to (0-2-3-1);
   \draw [] (1-3-2-0) to (1-3-0-2);
   \draw [] (3-1-0-2) to (3-0-1-2);
+
+\end{tikzpicture}
+\end{center}
+
+%------------------------------------------------------------------------------
+\section{Petersen Triangle Replaced}
+
+Vertex transitive non-Hamiltonian.
+
+\url{http://mathworld.wolfram.com/NonhamiltonianVertex-TransitiveGraph.html}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.3,
+     my box/.style={circle,draw,minimum size=2em,inner sep=.1em,outer sep=.2em},
+     font=\small,
+     rotate=90
+    ]
+  \newcommand\MyOuter{4}
+  \newcommand\MyInner{2.7}
+  \newcommand\MyTriangle{.9}
+
+  \node (1-1) at ($(0:\MyOuter)+(30:\MyTriangle)$) [my box] {1-1};
+  \node (1-2) at (0:\MyOuter) [my box] {1-2};
+  \node (1-3) at ($(0:\MyOuter)+(-30:\MyTriangle)$) [my box] {1-3};
+  \node (2-1) at ($(72:\MyOuter)+(-30+72:\MyTriangle)$) [my box] {2-1};
+  \node (2-2) at ($(72:\MyOuter)+(30+72:\MyTriangle)$) [my box] {2-2};
+  \node (2-3) at (72:\MyOuter) [my box] {2-3};
+  \node (3-1) at ($(2*72:\MyOuter)+(30+2*72:\MyTriangle)$) [my box] {3-1};
+  \node (3-2) at ($(2*72:\MyOuter)+(-30+2*72:\MyTriangle)$) [my box] {3-2};
+  \node (3-3) at (2*72:\MyOuter) [my box] {3-3};
+  \node (4-1) at ($(3*72:\MyOuter)+(-30+3*72:\MyTriangle)$) [my box] {4-1};
+  \node (4-2) at ($(3*72:\MyOuter)+(30+3*72:\MyTriangle)$) [my box] {4-2};
+  \node (4-3) at (3*72:\MyOuter) [my box] {4-3};
+  \node (5-1) at ($(4*72:\MyOuter)+(30+4*72:\MyTriangle)$) [my box] {5-1};
+  \node (5-2) at (4*72:\MyOuter) [my box] {5-2};
+  \node (5-3) at ($(4*72:\MyOuter)+(-30+4*72:\MyTriangle)$) [my box] {5-3};
+  \node (6-1) at (0*72:\MyInner) [my box] {6-1};
+  \node (6-2) at ($(0*72:\MyInner)+(180-30+0*72:\MyTriangle)$) [my box] {6-2};
+  \node (6-3) at ($(0*72:\MyInner)+(180+30+0*72:\MyTriangle)$) [my box] {6-3};
+  \node (7-1) at ($(1*72:\MyInner)+(180+30+1*72:\MyTriangle)$) [my box] {7-1};
+  \node (7-2) at (1*72:\MyInner) [my box] {7-2};
+  \node (7-3) at ($(1*72:\MyInner)+(180-30+1*72:\MyTriangle)$) [my box] {7-3};
+  \node (8-1) at ($(2*72:\MyInner)+(180-30+2*72:\MyTriangle)$) [my box] {8-1};
+  \node (8-2) at ($(2*72:\MyInner)+(180+30+2*72:\MyTriangle)$) [my box] {8-2};
+  \node (8-3) at (2*72:\MyInner) [my box] {8-3};
+  \node (9-1) at ($(3*72:\MyInner)+(180-30+3*72:\MyTriangle)$) [my box] {9-1};
+  \node (9-2) at ($(3*72:\MyInner)+(180+30+3*72:\MyTriangle)$) [my box] {9-2};
+  \node (9-3) at (3*72:\MyInner) [my box] {9-3};
+  \node (10-1) at ($(4*72:\MyInner)+(180+30+4*72:\MyTriangle)$) [my box] {10-1};
+  \node (10-2) at (4*72:\MyInner) [my box] {10-2};
+  \node (10-3) at ($(4*72:\MyInner)+(180-30+4*72:\MyTriangle)$) [my box] {10-3};
+
+  \draw [] (5-1) to (1-3);
+  \draw [] (7-1) to (10-3);
+  \draw [] (6-1) to (6-3);
+  \draw [] (6-2) to (8-2);
+  \draw [] (5-1) to (5-3);
+  \draw [] (1-1) to (1-2);
+  \draw [] (4-1) to (3-1);
+  \draw [] (4-1) to (4-3);
+  \draw [] (4-1) to (4-2);
+  \draw [] (6-2) to (6-3);
+  \draw [] (1-2) to (1-3);
+  \draw [] (10-1) to (10-3);
+  \draw [] (2-3) to (2-1);
+  \draw [] (2-2) to (3-2);
+  \draw [] (6-1) to (6-2);
+  \draw [] (2-2) to (2-3);
+  \draw [] (6-3) to (9-1);
+  \draw [] (4-2) to (4-3);
+  \draw [] (5-2) to (5-3);
+  \draw [] (7-1) to (7-3);
+  \draw [] (7-1) to (7-2);
+  \draw [] (8-1) to (8-2);
+  \draw [] (6-1) to (1-2);
+  \draw [] (9-2) to (9-3);
+  \draw [] (7-3) to (9-2);
+  \draw [] (7-2) to (7-3);
+  \draw [] (3-3) to (8-3);
+  \draw [] (9-1) to (9-2);
+  \draw [] (5-1) to (5-2);
+  \draw [] (3-1) to (3-2);
+  \draw [] (2-2) to (2-1);
+  \draw [] (10-2) to (10-3);
+  \draw [] (1-1) to (2-1);
+  \draw [] (5-2) to (10-2);
+  \draw [] (8-2) to (8-3);
+  \draw [] (10-1) to (8-1);
+  \draw [] (2-3) to (7-2);
+  \draw [] (9-1) to (9-3);
+  \draw [] (10-1) to (10-2);
+  \draw [] (1-1) to (1-3);
+  \draw [] (3-1) to (3-3);
+  \draw [] (4-3) to (9-3);
+  \draw [] (4-2) to (5-3);
+  \draw [] (8-1) to (8-3);
+  \draw [] (3-2) to (3-3);
 
 \end{tikzpicture}
 \end{center}

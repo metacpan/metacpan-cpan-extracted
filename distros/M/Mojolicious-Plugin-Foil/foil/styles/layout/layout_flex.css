@@ -92,8 +92,11 @@ header nav .current a {
 header nav .selflink:hover,
 header nav em:hover, input[type=submit]:hover,
 header nav a:hover {
-  text-decoration: underline;
   background-image: url(gloss2.png);
+}
+
+header nav a:hover {
+  text-decoration: underline;
 }
 
 .button:active, header nav a:active,
@@ -276,8 +279,8 @@ footer div {
   }
 
   main {
-    margin: 1ex;
-    width: 98%;
+    margin: 0;
+    width: 100%;
     background: white;
     color: black;
     left: 0;

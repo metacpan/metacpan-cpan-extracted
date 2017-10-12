@@ -1,6 +1,13 @@
 Change history for HTTP::Tiny::FileProtocol
 ===========================================
 
+0.05  2017-10-06T13:47:00
+
+      update dist.ini:
+      * define minimum required Perl version
+      * add check of Changes file
+      * set package version
+
 0.04  2017-10-04T10:06:00
 
       update dist.ini

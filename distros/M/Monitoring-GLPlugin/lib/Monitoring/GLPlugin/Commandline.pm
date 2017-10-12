@@ -395,6 +395,18 @@ sub nagios_exit {
       }
     }
   }
+  if ($self->opts->negate) {
+    # negate again: --negate "UNKNOWN - no peers"=ok
+    my $original_code = $code;
+    foreach my $from (keys %{$self->opts->negate}) {
+      if ((uc $self->opts->negate->{$from}) =~ /^(OK|WARNING|CRITICAL|UNKNOWN)$/) {
+        if ($output =~ /$from/) {
+          $code = $ERRORS{uc $self->opts->negate->{$from}};
+          $output =~ s/^.*? -/$STATUS_TEXT{$code} -/;
+        }
+      }
+    }
+  }
   $output =~ s/\|/!/g if $output;
   if (scalar (@{$self->{perfdata}})) {
     $output .= " | ".$self->perfdata_string();
@@ -583,6 +595,15 @@ sub check_thresholds {
         if ($value >= $1 && $value <= $2);
   }
   return $level;
+}
+
+sub strequal {
+  my($self, $str1, $str2) = @_;
+  return 1 if ! defined $str1 && ! defined $str2;
+  return 0 if ! defined $str1 && defined $str2;
+  return 0 if defined $str1 && ! defined $str2;
+  return 1 if $str1 eq $str2;
+  return 0;
 }
 
 1;

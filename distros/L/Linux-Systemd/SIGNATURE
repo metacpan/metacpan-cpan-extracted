@@ -14,13 +14,13 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 3c35f580f2d086a83c22803c85feba78b01f59a9 Build.PL
+SHA1 4d6385292ed334bef44ca77cc63c178b0d500d34 Build.PL
 SHA1 21b111d6326b92bf1b5ac55a5197b3cff33e7f5f CONTRIBUTORS
-SHA1 0fc3a76b7057fa20d78734164e56bc941959aa5a Changes
+SHA1 f02b11b4cf23ece6131d04cb459f4aba27a01e86 Changes
 SHA1 b3e8d1e9e067f617fafc617fcf6432e88b65a224 LICENSE
-SHA1 d962c042f489af7cc18d4aa2d5b2c5e834c7b9f6 MANIFEST
-SHA1 bbd6ee7ba00b3d26572afba839c426f28469c566 META.json
-SHA1 fd4812ad8bbdfeeadbb0cd947152f5e4aead8c11 README.md
+SHA1 ce64840585221845521100291cadf7fe5465edd9 MANIFEST
+SHA1 cb00db0bbb017f07b466bc1c0bbf1dbcb72a9851 META.json
+SHA1 57583285a947814e84361168e2e69a8c3f1debca README.md
 SHA1 307ca2d20778c86ce2aaaa3aaa8903dd86eb67bb dist.ini
 SHA1 2697740b6554ce6ada201cc2e7a791a2d180d4b5 eg/perl-daemon
 SHA1 077dd5f67a4c25c9d887f57e4ec1f15064116bfa eg/perl-daemon.service
@@ -31,17 +31,17 @@ SHA1 0c037dc29d9c5ee0b0202b8928944f83c48e0d2d inc/Devel/AssertOS.pm
 SHA1 2283c48e73b1e81e157b325618605178f8ab11e6 inc/Devel/AssertOS/Android.pm
 SHA1 03930e5fb644ac12321f9db0554a0a7b0a3d7adf inc/Devel/AssertOS/Linux.pm
 SHA1 f7fa8e30ffe07df121ad3ec87af39f2501e8ed6b inc/Devel/CheckOS.pm
-SHA1 5cbc79334175296400aaad9eaf135f81935569c7 inc/My/Builder.pm
-SHA1 a1ea958d4316dea68d942dc298f1f83e82fd042d lib/Linux/Systemd.pm
-SHA1 a303cc7bfb44f5f7a11354640124ffbb4749dc92 lib/Linux/Systemd/Daemon.pm
+SHA1 11a836359bbffbde369a24cd28a4b5b498f57bea inc/My/Builder.pm
+SHA1 1b19ac5c63ebb6cbca8266968b26df6cbd9c2b1b lib/Linux/Systemd.pm
+SHA1 2b1c2c281c81c2ff4ea2f3009e6b572e2d9c496b lib/Linux/Systemd/Daemon.pm
 SHA1 0c79e5a21be2e7b284548ce3f7ed0331be07ad57 lib/Linux/Systemd/Daemon.xs
-SHA1 fd4d1240145387ee5f03b4f36a30b12d96dfd09b lib/Linux/Systemd/Journal/Read.pm
+SHA1 0ffc8a44b30455907f1b3ac1e7566f3224d46aa2 lib/Linux/Systemd/Journal/Read.pm
 SHA1 cd1029be41d67fbf308ed9c2882ce58bc3a91e8a lib/Linux/Systemd/Journal/Read.xs
-SHA1 66481112d162430b2207852d7ce964a48dd65818 lib/Linux/Systemd/Journal/Write.pm
+SHA1 480f1abcd3ebdf12e7becfc6544ef53fa8a5d8fc lib/Linux/Systemd/Journal/Write.pm
 SHA1 ed683ccf1b632bfd39a8d692e7990169da5500d4 lib/Linux/Systemd/Journal/Write.xs
 SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
-SHA1 10a9caf5a54090336db7a784e17b3e72766eec7c t/00-compile.t
-SHA1 f7f83ba43d6cd5de6fab9ce84aaf9c22dce83196 t/00-report-prereqs.dd
+SHA1 2ff5ec0e30fcf8a0a3a1477ad4848e4d5b1086fd t/00-compile.t
+SHA1 51fd15562584506cda1d0eb488502563ac4ac858 t/00-report-prereqs.dd
 SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
 SHA1 6cf1fb1ab6972711a7462e93ef17182c4bcba01a t/daemon.t
 SHA1 3045b0fb7082fd7f946f10f40284c8343fd0d5ac t/journal/read.t
@@ -59,12 +59,12 @@ SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEXZeS3ET2PIAToJ5UFogSkAJbkJQFAlnTCn8ACgkQFogSkAJb
-kJSwsQgAkt4B11udmaDDj+hdoN7BG+zJKhcjSaOv1DncrNigDKsy/3SMZTztQlRw
-rV+O7mQTULCKmHQvZ1AOzSqsD9+klQJ5dMjo1EqLxvcuWzbJfDFus1nK/hNx+eDa
-xalRdaehUx7yq2GKu8iC8tZyeXk0sRgjJYPQxx3O4XBIlFVl6K24dJcQissxkRlY
-MX4aZPLsJ7KH2rpPIQ5SBTlCDBL6L4u7q35Ivgt/w5w6bzUX8M7OiD5mK87qepkb
-sMJUp3fyYAPiZYwWEd2rTz8vQz0d925CLgYay8LETKIalo7dws9+9rAVywq5s5gG
-Wne7rl2g3F5sm7+jKYpwvo1BK7HThQ==
-=DN5Q
+iQEzBAEBCAAdFiEEXZeS3ET2PIAToJ5UFogSkAJbkJQFAlnddhIACgkQFogSkAJb
+kJRn3Qf+K7a0tfB1fD/iDXHmrWuFRwqeCDaX2JzUnAm8aGSbgh+FehFhYlQr04X3
+7i6/dfPJWhfMVSQxdYOs73xcOI4i/CDX9RyWCbfd117Sge608GBPQ0uelerfnT6o
+QQ7Xnwvhwh0bfHG/tJ88V8lMkXXUrBNlixthXHEGtJWU4unCybvhuUdA7FxYKg/G
+XkdUHenwbkmIyPWz7GYFetdkKA+AAyN7bOr9JK6QeqKkidIPakN+nvOvX9+H2sw3
+Vbujjy/ePrXYtmd3P6VFhTFgbx6bVU7U4Hk7//Pfh0LBGdHTAKOxcNNe5frTPJAl
+tvdmaLio6jv2FtwLGIGNgnJFdv4MRA==
+=Dyws
 -----END PGP SIGNATURE-----

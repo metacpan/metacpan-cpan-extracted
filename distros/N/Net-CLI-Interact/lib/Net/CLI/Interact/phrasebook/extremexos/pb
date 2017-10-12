@@ -1,0 +1,28 @@
+# prompts for "extreme networks" extremexos devices,
+# moved to its own category - not inheriting from cisco anymore
+
+prompt user
+    match /(?:[Ll]ogin|[Uu]sername): ?$/
+
+prompt pass
+    match /[Pp]assword: ?$/
+
+prompt generic
+    match / # ?$/
+
+macro disconnect
+    send exit
+
+# macro completion
+#     send ?
+
+macro disconnect
+    send exit
+
+macro paging
+    send disable clipaging
+
+# not used
+macro more_pages
+   match / More /
+   send '\t'

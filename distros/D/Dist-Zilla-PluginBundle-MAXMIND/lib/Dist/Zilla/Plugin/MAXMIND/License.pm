@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use Module::Runtime qw( use_module );
 use String::RewritePrefix;
@@ -61,7 +61,7 @@ Dist::Zilla::Plugin::MAXMIND::License - Sets up default license and copyright ho
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =for Pod::Coverage .*
 

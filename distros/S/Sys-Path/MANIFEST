@@ -9,8 +9,6 @@ META.json
 META.yml
 README
 t/01_Sys-Path.t
-t/distribution.t
-t/fixme.t
 t/libs/v1/Build.PL
 t/libs/v1/lib/TestDR/build.pm
 t/libs/v2/lib/TestDR/makefile.pm
@@ -18,7 +16,9 @@ t/libs/v2/Makefile.PL
 t/libs/v3/lib/TestDR/F/F2/t.pm
 t/libs/v3/MANIFEST
 t/libs/v3/t/.exists
-t/pod-coverage.t
-t/pod-spell.t
-t/pod.t
 varlib/syspath/.exists
+xt/distribution.t
+xt/fixme.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

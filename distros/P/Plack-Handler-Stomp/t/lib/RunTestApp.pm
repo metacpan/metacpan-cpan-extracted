@@ -7,6 +7,7 @@ use BrokerTestApp;
 use Test::More;
 use Moose::Util 'apply_all_roles';
 use File::Temp 'tempdir';
+use Path::Class;
 
 my $mq;
 
@@ -98,12 +99,13 @@ sub _build_child {
     }
     else {
         diag "server started, waiting for spinup...";
-        sleep($ENV{NET_STOMP_DELAY}||5);
+        sleep 1 until dir($trace_dir)->children;
         return $pid;
     }
 }
 
-sub DEMOLISH {
+sub DEMOLISH {}
+after DEMOLISH => sub {
     my ($self) = @_;
 
     return unless $self->has_child;
@@ -112,7 +114,7 @@ sub DEMOLISH {
     kill 'TERM',$child;
     diag "waitpid for child\n";
     waitpid($child,0);
-}
+};
 
 has reply_to => ( is => 'rw' );
 

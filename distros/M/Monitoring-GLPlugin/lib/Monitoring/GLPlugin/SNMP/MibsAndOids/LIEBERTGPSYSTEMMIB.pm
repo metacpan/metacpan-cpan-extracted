@@ -1,13 +1,14 @@
-package Monitoring::GLPlugin::SNMP::MibsAndOids::LIEBERTGPSYSTEM;
+package Monitoring::GLPlugin::SNMP::MibsAndOids::LIEBERTGPSYSTEMMIB;
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'LIEBERT_GP_SYSTEM'} = {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'LIEBERT-GP-SYSTEM-MIB'} = {
   url => '',
-  name => 'LIEBERT_GP_SYSTEM',
+  name => 'LIEBERT-GP-SYSTEM-MIB',
 };
 
-#$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'LIEBERT_GP_SYSTEM'} = 
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'LIEBERT-GP-SYSTEM-MIB'} =
+  '1.3.6.1.4.1.476.1.42.3.7';
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT_GP_SYSTEM'} = {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT-GP-SYSTEM-MIB'} = {
   liebertSystemModule => '1.3.6.1.4.1.476.1.42.1.8.1',
   lgpSysStatistics => '1.3.6.1.4.1.476.1.42.3.7.1',
   lgpSysStatisticsRunHrs => '1.3.6.1.4.1.476.1.42.3.7.1.1',
@@ -21,6 +22,8 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT_GP_SYSTEM'} =
   lgpSysAudibleAlarmDefinition => 'LIEBERT-GP-SYSTEM-MIB::lgpSysAudibleAlarm',
   lgpSysControl => '1.3.6.1.4.1.476.1.42.3.7.4',
   lgpSysSelfTest => '1.3.6.1.4.1.476.1.42.3.7.4.1',
+  lgpSysControlOperationOnOff => '1.3.6.1.4.1.476.1.42.3.7.4.2',
+  lgpSysControlOperationOnOffDefinition => 'LIEBERT-GP-SYSTEM-MIB::lgpSysControlOperationOnOff',
   lgpSysTime => '1.3.6.1.4.1.476.1.42.3.7.5',
   lgpSysTimeEpoch => '1.3.6.1.4.1.476.1.42.3.7.5.1',
   lgpSysMaintenance => '1.3.6.1.4.1.476.1.42.3.7.6',
@@ -42,17 +45,14 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'LIEBERT_GP_SYSTEM'} =
   lgpSysDeviceMaintBypass => '1.3.6.1.4.1.476.1.42.3.7.9.5.7',
 };
 
-$Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT_GP_SYSTEM'} = {
-  lgpSysAudibleAlarm => {
+$Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT-GP-SYSTEM-MIB'} = {
+  lgpSysControlOperationOnOff => {
     '1' => 'on',
     '2' => 'off',
   },
-  lgpSysState => {
-    '1' => 'normalOperation',
-    '2' => 'startUp',
-    '3' => 'normalWithWarning',
-    '4' => 'normalWithAlarm',
-    '5' => 'abnormalOperation',
+  lgpSysAudibleAlarm => {
+    '1' => 'on',
+    '2' => 'off',
   },
   lgpSysSelfTestResult => {
     '1' => 'unknown',
@@ -61,5 +61,12 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'LIEBERT_GP_SYSTEM'} = {
     '4' => 'inProgress',
     '5' => 'sysFailure',
     '6' => 'inhibited',
+  },
+  lgpSysState => {
+    '1' => 'normalOperation',
+    '2' => 'startUp',
+    '3' => 'normalWithWarning',
+    '4' => 'normalWithAlarm',
+    '5' => 'abnormalOperation',
   },
 };

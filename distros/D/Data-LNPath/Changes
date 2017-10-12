@@ -3,3 +3,6 @@ Revision history for Data-LNPath
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.04    08/10/2017
+		Allow for aliasing of exported methods 
+			use Data::LNPath qw/path/, { as => { path => 'lnpath' } }

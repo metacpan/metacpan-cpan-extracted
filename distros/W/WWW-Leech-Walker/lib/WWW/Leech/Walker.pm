@@ -7,7 +7,7 @@ use WWW::Leech::Parser;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.04';
+    $VERSION     = '0.05';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -30,6 +30,14 @@ sub new{
 	if(!$this->{'raw_preprocessor'}){
 		$this->{'raw_preprocessor'} = sub {
 			return shift();
+		}
+	}
+	if(!$this->{'error_handler'}){
+		$this->{'error_handler'} = sub {
+			my $this = shift;
+			my $item = shift;
+			my $err = shift;
+			die $err;
 		}
 	}
 	
@@ -84,10 +92,21 @@ sub leech{
 		
 			$this->log("\tGetting item (".sprintf("%0${ll}d",$i)."/$llength): $_ ");
 
-			my $item = $this->{'parser'}->parse($this->_get($_));
-			$item->{'_url'} = $_->as_string;
+			my $str = $this->_get($_);
 
-			$this->{'processor'}->($item,$this);
+			my $item = {'_url' => $_->as_string };
+
+			# try to parse content
+			eval{
+				$item = $this->{'parser'}->parse($str);
+			};
+
+			if($@){
+				$this->{'error_handler'}->($item,$this,$@);
+			} else {
+				$this->{'processor'}->($item,$this);
+			}
+
 
 			return if($this->{'_stop_flag'});
 		}
@@ -210,6 +229,15 @@ WWW::Leech::Walker - small web content grabbing framework
 
 		# ... process grabbed data
 
+  	},
+
+  	error_handler => sub {
+		my $item = shift;
+		my $walker_obj = shift;
+		my $error_text = shift;
+
+		# ... handle error
+
   	}
   });
 
@@ -273,6 +301,10 @@ This callback is launched after the individual item is parsed and converted to a
 =item raw_preprocessor
 
 This optional callback is launched after any page was retrieved but before parsing started. Walker expects it to return scalar.
+
+=item error_handler
+
+Walker dies with an error message if something goes wrong while parsing. Providing this optional callback allows caller to handle such errors. Skip page with broken html for example.
 
 =item next_page_link_post_process
 

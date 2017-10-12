@@ -8,7 +8,7 @@ sub __polygonal_root__ {
     goto(join('__', ref($n), ref($k)) =~ tr/:/_/rs);
 
     # polygonal_root(n, k)
-    #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
 
   Math_MPFR__Math_MPFR: {
         my $t = Math::MPFR::Rmpfr_init2($PREC);

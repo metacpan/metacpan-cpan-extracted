@@ -21,7 +21,7 @@ use XSLoader;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 our $defaultuser = 'pi';
 
@@ -198,6 +198,23 @@ sub drop_permissions_id {
     $) = $targetgid;
     $( = $targetgid;
 }
+
+sub generate_mac_address {
+    my @bytes = ();
+    for (my $i = 0; $i < 6; $i ++) {
+        push @bytes, int(rand(256));
+    }
+    
+    # make sure bit 0 (broadcast) of first byte is not set,
+    # and bit 1 (local) is set.
+    # i.e. via bitwise AND with 254 and bitwise OR with 2.
+    
+    $bytes[0] &= 254;
+    $bytes[0] |= 2;
+    
+    return sprintf('%02x:%02x:%02x:%02x:%02x:%02x', @bytes);
+}
+
 1;
 
 __END__

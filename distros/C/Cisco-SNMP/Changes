@@ -1,5 +1,9 @@
 Revision history for Perl extension Cisco::SNMP.
 
+1.05  Fri Oct  6 12:30:00 2017
+      - Test::More in t\08... to SKIP all
+        NOTE:  Everyone, IPv6 *is* coming, please plan accordingly!
+
 1.04  Mon Sep 25 12:30:00 2017
       - Update new() to allow re-bless to other C::M::<CLASS>.
       - Update new() to accept hostname:port like Net::SNMP.

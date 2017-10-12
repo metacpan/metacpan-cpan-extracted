@@ -6,6 +6,14 @@ documented here anyway for comprehensiveness' sake. Entries with "No
 important changes" are likely to be trivial things like documentation
 fixes or Perl::Tidy runs.
 
+0.20 2017-10-07
+
+ - Add LICENSE to MANIFEST
+
+0.19 2017-10-07
+
+ - Add metadata to MYMETA.yml and LICENSE, suggested by CPANTS
+
 0.18 2017-10-06
 
  - Refine and correct documentation, particularly formatting

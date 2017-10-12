@@ -16,6 +16,7 @@ bin/yto
 bin/yts
 cpanfile
 lib/ETL/Yertl.pm
+lib/ETL/Yertl/Adapter/graphite.pm
 lib/ETL/Yertl/Adapter/influxdb.pm
 lib/ETL/Yertl/Command/yfrom.pm
 lib/ETL/Yertl/Command/ygrok.pm
@@ -48,6 +49,7 @@ site/blog/2015/11/24/release-v0-026/index.markdown
 site/blog/2015/11/28/release-v0-027/index.markdown
 site/blog/2016/10/09/release-v0-028/index.markdown
 site/blog/2017/08/16/release-v0-029/index.markdown
+site/blog/2017/08/25/release-v0-032/index.markdown
 site/index.markdown
 site/release-blog.pl
 site/theme/blog/index.atom.ep
@@ -75,6 +77,7 @@ site/theme/site/style.html
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/adapter/graphite.t
 t/adapter/influxdb.t
 t/bin/yfrom.t
 t/bin/ygrok.t

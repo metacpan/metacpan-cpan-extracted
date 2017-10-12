@@ -1,0 +1,28 @@
+---
+abstract: 'Convert between braille character sets.'
+author:
+  - 'Lars BjÃ¸rndal'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Brl2Brl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Getopt::Long: '0'
+  open: '0'
+  perl: '5.008004'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

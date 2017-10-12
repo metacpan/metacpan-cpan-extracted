@@ -1,5 +1,8 @@
 #!/usr/local/bin/perl
 
+use strict;
+use warnings;
+
 use Geo::IP;
 
 my $gi = Geo::IP->open(

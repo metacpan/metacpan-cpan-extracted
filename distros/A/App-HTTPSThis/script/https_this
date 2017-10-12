@@ -1,0 +1,125 @@
+#!perl
+
+our $DATE = '2017-10-11'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+use App::HTTPSThis;
+
+App::HTTPSThis->new->run;
+
+# ABSTRACT: Export the current directory over HTTPS
+# PODNAME: https_this
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+https_this - Export the current directory over HTTPS
+
+=head1 VERSION
+
+This document describes version 0.001 of https_this (from Perl distribution App-HTTPSThis), released on 2017-10-11.
+
+=head1 SYNOPSIS
+
+ ## Export the current directory with HTTPS
+ $ https_this
+
+ ## Export the dir_name directory with HTTPS, specify SSL certificate and key
+ $ https_this dir_name --ssl-cert server.crt --ssl-key server.key
+
+ ## Start the server on a specific port
+ $ https_this --port 9443
+
+ ## Announces the HTTPS server via Bonjour with the specified name
+ $ https_this --name "My cool webserver"
+
+ ## Show documentation about our options
+ $ https_this --help
+
+ ## Show the entire man page
+ $ https_this --man
+
+=head1 DESCRIPTION
+
+Like L<http_this> but uses HTTPS instead of HTTP. Will create a self-signed SSL
+certificate if SSL certificate/key is not specified.
+
+TODO: Merge with L<App::HTTPThis>.
+
+=head1 ARGUMENTS
+
+The script accepts a single optional argument: the path of the directory
+to export.
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item --port PORT
+
+Start the HTTPS server on a specific C<PORT>. Default is 8443.
+
+=item --name NAME
+
+Announces the server over Bonjour.
+
+This feature requires the L<Net::Rendezvous::Publish> module and the
+appropriate backend for your operating system, both available from
+L<CPAN|http://search.cpan.org/>. If one of them cannot be found, a
+warning message will be displayed.
+
+=item --ssl-cert PATH
+
+Specify SSL certificate file.
+
+=item --ssl-key PATH
+
+Specify SSL key file.
+
+=item --help
+
+Print information about the script usage and its options.
+
+=item --man
+
+Print the entire man page for the command.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-HTTPSThis>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-HTTPSThis>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-HTTPSThis>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

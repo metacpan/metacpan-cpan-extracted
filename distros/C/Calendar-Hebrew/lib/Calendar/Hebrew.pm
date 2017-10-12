@@ -1,6 +1,6 @@
 package Calendar::Hebrew;
 
-$Calendar::Hebrew::VERSION   = '0.03';
+$Calendar::Hebrew::VERSION   = '0.04';
 $Calendar::Hebrew::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Hebrew - Interface to Hebrew Calendar.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -39,12 +39,10 @@ sub BUILD {
     }
 }
 
-=head1 NOTE
+=head1 DESCRIPTION
 
 The C<Calendar::Hebrew> was released on Sunday 23rd July 2017 to mark the completion
 of L<1000th consecutive days of releasing to CPAN|http://blogs.perl.org/users/mohammad_s_anwar/2017/07/1000th-consecutive-days-releasing-to-cpan.html>.
-
-=head1 DESCRIPTION
 
 The Hebrew or Jewish calendar is a lunisolar  calendar  used  today predominantly
 for Jewish religious observances. It determines the dates for Jewish holidays and

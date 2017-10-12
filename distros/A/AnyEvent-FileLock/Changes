@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::FileLock.
 
+0.06  Oct 10, 2017
+        - Flock locks are not reentrant on Windows (bug report by
+          Alexandr Ciornii).
+
 0.05  Oct 5, 2017
         - Fix tests, "close undef" seems to be a fatal error on
           Windows (but report by Alexandr Ciornii).

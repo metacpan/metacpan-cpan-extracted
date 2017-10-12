@@ -15,6 +15,7 @@ t/01_run.t
 t/02_parallel.t
 t/03_func.t
 t/04_queues.t
+t/05_serialize.t
 t/data/process_check.sh
 t/data/term_trap.sh
 tools/tidy

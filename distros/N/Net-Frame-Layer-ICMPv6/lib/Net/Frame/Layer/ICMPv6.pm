@@ -1,10 +1,10 @@
 #
-# $Id: ICMPv6.pm 45 2014-04-09 06:32:08Z gomor $
+# $Id: ICMPv6.pm,v b9194b248a66 2017/10/06 16:26:50 gomor $
 #
 package Net::Frame::Layer::ICMPv6;
 use strict; use warnings;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Net::Frame::Layer qw(:consts :subs);
 use Exporter;
@@ -31,10 +31,14 @@ our %EXPORT_TAGS = (
       NF_ICMPv6_CODE_UNKNOWNOPTION
       NF_ICMPv6_TYPE_ECHO_REQUEST
       NF_ICMPv6_TYPE_ECHO_REPLY
+      NF_ICMPv6_TYPE_MLDQUERY
+      NF_ICMPv6_TYPE_MLDREPORTv1
+      NF_ICMPv6_TYPE_MLDDONE
       NF_ICMPv6_TYPE_ROUTERSOLICITATION
       NF_ICMPv6_TYPE_ROUTERADVERTISEMENT
       NF_ICMPv6_TYPE_NEIGHBORSOLICITATION
       NF_ICMPv6_TYPE_NEIGHBORADVERTISEMENT
+      NF_ICMPv6_TYPE_MLDREPORTv2
       NF_ICMPv6_OPTION_SOURCELINKLAYERADDRESS
       NF_ICMPv6_OPTION_TARGETLINKLAYERADDRESS
       NF_ICMPv6_OPTION_PREFIXINFORMATION
@@ -70,10 +74,14 @@ use constant NF_ICMPv6_CODE_UNKNOWNNEXTHEADER       => 1;
 use constant NF_ICMPv6_CODE_UNKNOWNOPTION           => 2;
 use constant NF_ICMPv6_TYPE_ECHO_REQUEST            => 128;
 use constant NF_ICMPv6_TYPE_ECHO_REPLY              => 129;
+use constant NF_ICMPv6_TYPE_MLDQUERY                => 130;
+use constant NF_ICMPv6_TYPE_MLDREPORTv1             => 131;
+use constant NF_ICMPv6_TYPE_MLDDONE                 => 132;
 use constant NF_ICMPv6_TYPE_ROUTERSOLICITATION      => 133;
 use constant NF_ICMPv6_TYPE_ROUTERADVERTISEMENT     => 134;
 use constant NF_ICMPv6_TYPE_NEIGHBORSOLICITATION    => 135;
 use constant NF_ICMPv6_TYPE_NEIGHBORADVERTISEMENT   => 136;
+use constant NF_ICMPv6_TYPE_MLDREPORTv2             => 143;
 
 use constant NF_ICMPv6_OPTION_SOURCELINKLAYERADDRESS => 0x01;
 use constant NF_ICMPv6_OPTION_TARGETLINKLAYERADDRESS => 0x02;
@@ -134,6 +142,11 @@ sub match {
       &&  $wType eq NF_ICMPv6_TYPE_ROUTERADVERTISEMENT) {
       return 1;
    }
+   elsif  ($sType eq NF_ICMPv6_TYPE_MLDQUERY
+      && (($wType eq NF_ICMPv6_TYPE_MLDREPORTv1)
+      ||  ($wType eq NF_ICMPv6_TYPE_MLDREPORTv2)) ) {
+      return 1;
+   }
    return 0;
 }
 
@@ -168,7 +181,6 @@ sub computeChecksums {
    my $self = shift;
    my ($layers) = @_;
 
-   my $icmpType;
    my $ip;
    my $rh0;
    my $hbh; # Hop-by-hop Ext Hdr
@@ -176,8 +188,10 @@ sub computeChecksums {
    my $mob; # Mobility Ext Hdr
    my $lastNextHeader;
    my $fragmentFlag = 0;
+   my $start   = 0;
+   my $last    = $self;
+   my $payload = '';
    for my $l (@$layers) {
-      if (! $icmpType && $l->layer =~ /ICMPv6::/)          { $icmpType = $l; }
       if (! $ip       && $l->layer eq 'IPv6')              { $ip       = $l; }
       if (! $rh0      && $l->layer eq 'IPv6::Routing')     { $rh0      = $l; }
       if (! $hbh      && $l->layer eq 'IPv6::HopByHop')    { $hbh      = $l; }
@@ -187,6 +201,13 @@ sub computeChecksums {
       if ($l->can('nextHeader')) { $lastNextHeader = $l->nextHeader; }
 
       if ($l->layer eq 'IPv6::Fragment') { $fragmentFlag = 1; }
+
+      $last = $l;
+      if (! $start) {
+         $start++ if $l->layer eq 'ICMPv6';
+         next;
+      }
+      $payload .= $l->pack;
    }
 
    my $lastIpDst       = $ip->dst;
@@ -219,13 +240,20 @@ sub computeChecksums {
    my $nextHeader = Bit::Vector->new_Dec( 8, $lastNextHeader);
    my $v32        = $zero->Concat_List($nextHeader);
 
-   my $packed = $self->SUPER::pack('a*a*NNCCna*',
+   my $packed = $self->SUPER::pack('a*a*NNCCn',
       inet6Aton($ip->src), inet6Aton($lastIpDst), $ipPayloadLength,
-      $v32->to_Dec, $self->type, $self->code, 0, $icmpType->pack,
+      $v32->to_Dec, $self->type, $self->code, 0
    ) or return;
 
-   my $payload = $layers->[-1]->payload || '';
-   $self->checksum(inetChecksum($packed.$payload));
+   if (defined($last->payload) && length($last->payload)) {
+      $payload .= $last->payload;
+   }
+   if (length($payload)) {
+      $packed .= $self->SUPER::pack('a*', $payload)
+         or return;
+   }
+
+   $self->checksum(inetChecksum($packed));
 
    return 1;
 }
@@ -267,6 +295,14 @@ sub encapsulate {
       }
       elsif ($type eq NF_ICMPv6_TYPE_PARAMETERPROBLEM) {
          return 'ICMPv6::ParameterProblem';
+      }
+      elsif ($type eq NF_ICMPv6_TYPE_MLDQUERY
+         ||  $type eq NF_ICMPv6_TYPE_MLDREPORTv1
+         ||  $type eq NF_ICMPv6_TYPE_MLDDONE) {
+         return 'ICMPv6::MLD';
+      }
+      elsif ($type eq NF_ICMPv6_TYPE_MLDREPORTv2) {
+         return 'ICMPv6::MLD::Report';
       }
    }
 
@@ -475,6 +511,12 @@ Various types and codes for ICMPv6 header.
 
 =item B<NF_ICMPv6_TYPE_ECHO_REPLY>
 
+=item B<NF_ICMPv6_TYPE_MLDQUERY>
+
+=item B<NF_ICMPv6_TYPE_MLDREPORTv1>
+
+=item B<NF_ICMPv6_TYPE_MLDDONE>
+
 =item B<NF_ICMPv6_TYPE_ROUTERSOLICITATION>
 
 =item B<NF_ICMPv6_TYPE_ROUTERADVERTISEMENT>
@@ -482,6 +524,8 @@ Various types and codes for ICMPv6 header.
 =item B<NF_ICMPv6_TYPE_NEIGHBORSOLICITATION>
 
 =item B<NF_ICMPv6_TYPE_NEIGHBORADVERTISEMENT>
+
+=item B<NF_ICMPv6_TYPE_MLDREPORTv2>
 
 =item B<NF_ICMPv6_OPTION_SOURCELINKLAYERADDRESS>
 
@@ -533,7 +577,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2006-2014, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2006-2017, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

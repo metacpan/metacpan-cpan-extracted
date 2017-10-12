@@ -1,0 +1,15 @@
+/* CSS for bookmark form */
+.editform .item {
+    margin-bottom: 2px;
+}
+.editform label {
+    font-style: italic;
+    font-size: 0.95em;
+}
+.editform input[type="text"] {
+    display: block;
+    width: 100%;
+}
+.editform textarea {
+    width: 100%;
+}

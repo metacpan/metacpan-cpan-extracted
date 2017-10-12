@@ -281,7 +281,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	DrawTexturePro
 	DrawTextureRec
 	DrawTextureV
-	DrawSOSTexture
 	DrawTriangle
 	DrawTriangleLines
 	EnableCursor
@@ -390,9 +389,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LoadImageEx
 	LoadImageFromRES
 	LoadImageRaw
-	LoadSOSImage
 	LoadImageFromAV
     LoadImageFromAV_uninitialized_mem
+    LoadImageFromAV_transposed
+    LoadImageFromAV_transposed_uninitialized_mem
 	LoadMaterial
 	LoadModel
 	LoadModelEx
@@ -984,7 +984,6 @@ None by default.
                     float rotation, Color tint)
   void DrawTextureRec(Texture2D texture, Rectangle sourceRec, Vector2 position, Color tint)
   void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
-  void DrawSOSTexture(void)
   void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void DrawTriangleLines(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
   void EnableCursor(void)
@@ -1095,9 +1094,10 @@ None by default.
   Image LoadImageEx(Color *pixels, int width, int height)
   Image LoadImageFromRES(const char *rresName, int resId)
   Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
-  Image LoadSOSImage(void)
   Image LoadImageFromAV(SV *array_ref, SV *color_cb, int width, int height)
   Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
+  Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb, int width, int height)
+  Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
   Material LoadMaterial(const char *fileName)
   Model LoadModel(const char *fileName)
   Model LoadModelEx(Mesh data, int dynamic)

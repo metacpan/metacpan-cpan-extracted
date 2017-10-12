@@ -1,5 +1,16 @@
 Revision history for CPANPLUS-Dist-Slackware
 
+1.025  2017-10-08 18:54:06 CEST
+
+  - Support prefixes other than /usr, e.g. /opt/cperl.
+  - Depend on CPANPLUS 0.9166, which provides Autoflush.
+  - Update the Net::Pcap plugin.
+  - Remove the Crypt::SSLeay and GD plugins.
+  - Change into the working directory before the plugins are called.
+  - Move some functions to the new Util module.
+  - Restore compatibility with Perl 5.6.1 for testing purposes.
+    The lowest supported Module::Build version is 0.36.
+
 1.024  2016-09-11 23:37:16 CEST
 
   - The package architecture now defaults to "i586" on x86-based platforms.

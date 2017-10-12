@@ -1,3 +1,16 @@
+4.18.0
+- Added support and examples for v201710.
+- Added a new upload_offline_data.pl example for whitelisted API users
+who upload store sales transactions.
+- Added a new example add_customer_neagtive_criteria.pl, shwoing how
+to add negative criteria at the customer level.
+- Updated the add_conversion_trackers.pl example by removing no longer
+supported fields.
+- Updated examples related to ad disapprovals with the new
+policyTopicHelpCenterUrl and evidenceText fields.
+- Updated examples to configure ad rotations at the ad group level
+instead of the campaign level.
+
 4.17.0
 - Removed examples and support for v201609. For future sunset dates, see
 https://developers.google.com/adwords/api/docs/sunset-dates

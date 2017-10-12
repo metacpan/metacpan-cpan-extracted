@@ -3,7 +3,7 @@ package Pod::Weaver::PluginBundle::MAXMIND;
 use strict;
 use warnings;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use namespace::autoclean -also => ['_exp'];
 
@@ -221,7 +221,7 @@ Pod::Weaver::PluginBundle::MAXMIND - A plugin bundle for pod woven by MAXMIND
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =head1 SYNOPSIS
 

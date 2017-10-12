@@ -1,3 +1,4 @@
+Build.PL
 Changes
 lib/Net/CLI/Interact.pm
 lib/Net/CLI/Interact/Action.pm
@@ -7,8 +8,9 @@ lib/Net/CLI/Interact/Manual/Cookbook.pod
 lib/Net/CLI/Interact/Manual/Phrasebook.pod
 lib/Net/CLI/Interact/Manual/Tutorial.pod
 lib/Net/CLI/Interact/Phrasebook.pm
+lib/Net/CLI/Interact/phrasebook/avaya/pb
+lib/Net/CLI/Interact/phrasebook/cisco/asa/pb
 lib/Net/CLI/Interact/phrasebook/cisco/catos/pb
-lib/Net/CLI/Interact/phrasebook/cisco/extremexos/pb
 lib/Net/CLI/Interact/phrasebook/cisco/foundry/pb
 lib/Net/CLI/Interact/phrasebook/cisco/hp/pb
 lib/Net/CLI/Interact/phrasebook/cisco/ios/pb
@@ -18,10 +20,19 @@ lib/Net/CLI/Interact/phrasebook/cisco/pb
 lib/Net/CLI/Interact/phrasebook/cisco/pixos/fwsm/fwsm3/pb
 lib/Net/CLI/Interact/phrasebook/cisco/pixos/pb
 lib/Net/CLI/Interact/phrasebook/cisco/pixos/pixos7/pb
+lib/Net/CLI/Interact/phrasebook/cisco/wlc/pb
+lib/Net/CLI/Interact/phrasebook/extremexos/pb
+lib/Net/CLI/Interact/phrasebook/f5/f5bigip/pb
+lib/Net/CLI/Interact/phrasebook/fortinet/pb
+lib/Net/CLI/Interact/phrasebook/mikrotik/pb
 lib/Net/CLI/Interact/phrasebook/ovmcli/pb
+lib/Net/CLI/Interact/phrasebook/redback/pb
+lib/Net/CLI/Interact/phrasebook/screenos/pb
 lib/Net/CLI/Interact/phrasebook/unix/bash/pb
 lib/Net/CLI/Interact/phrasebook/unix/csh/pb
 lib/Net/CLI/Interact/phrasebook/unix/csh/sdf/pb
+lib/Net/CLI/Interact/phrasebook/unix/qnap/pb
+lib/Net/CLI/Interact/phrasebook/zyxel/pb
 lib/Net/CLI/Interact/Role/Engine.pm
 lib/Net/CLI/Interact/Role/FindMatch.pm
 lib/Net/CLI/Interact/Role/Iterator.pm
@@ -39,8 +50,8 @@ lib/Net/CLI/Interact/Transport/Telnet.pm
 lib/Net/CLI/Interact/Transport/Wrapper/Base.pm
 lib/Net/CLI/Interact/Transport/Wrapper/IPC_Run.pm
 lib/Net/CLI/Interact/Transport/Wrapper/Net_Telnet.pm
-Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README.md
 t/10_construct.t
@@ -58,4 +69,3 @@ t/release-32_action.t
 t/release-40_transport.t
 t/release-50_cmd.t
 t/release-60_prompt.t
-META.json                                Module JSON meta-data (added by MakeMaker)

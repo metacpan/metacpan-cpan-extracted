@@ -1,5 +1,5 @@
 package HTTP::Tiny::FileProtocol;
-
+$HTTP::Tiny::FileProtocol::VERSION = '0.05';
 # ABSTRACT: Add support for file:// protocol to HTTP::Tiny
 
 use strict;
@@ -9,8 +9,6 @@ use HTTP::Tiny;
 use File::Basename;
 use LWP::MediaTypes;
 use Carp;
-
-our $VERSION = 0.04;
 
 no warnings 'redefine';
 
@@ -144,7 +142,7 @@ HTTP::Tiny::FileProtocol - Add support for file:// protocol to HTTP::Tiny
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

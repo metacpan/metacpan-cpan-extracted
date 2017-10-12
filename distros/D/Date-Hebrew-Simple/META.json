@@ -41,6 +41,12 @@
          }
       }
    },
+   "provides" : {
+      "Date::Hebrew::Simple" : {
+         "file" : "lib/Date/Hebrew/Simple.pm",
+         "version" : "0.05"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -49,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Hebrew-Simple"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

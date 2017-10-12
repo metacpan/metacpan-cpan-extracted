@@ -1,5 +1,8 @@
 Revision history for Tree-RB
 
+0.500006 2017-10-07T13:33:58Z
+    Make "put with non existing key" work as documented.
+
 0.500005  07 January  2014
     Changed version format to not be a dev release.
 

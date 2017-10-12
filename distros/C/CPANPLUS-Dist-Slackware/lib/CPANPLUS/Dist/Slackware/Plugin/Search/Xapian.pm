@@ -3,35 +3,25 @@ package CPANPLUS::Dist::Slackware::Plugin::Search::Xapian;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
-use File::Spec qw();
+use CPANPLUS::Dist::Slackware::Util qw(catfile slurp spurt);
 
 sub available {
     my ( $plugin, $dist ) = @_;
+
     return ( $dist->parent->package_name eq 'Search-Xapian' );
 }
 
 sub pre_prepare {
     my ( $plugin, $dist ) = @_;
 
-    my $module = $dist->parent;
-    my $cb     = $module->parent;
-
-    my $wrksrc = $module->status->extract;
-    return if !$wrksrc;
-
     # See L<http://trac.xapian.org/ticket/692>.
-    my $offending_code = qr/if \(defined \$builddir\)/;
-    my $filename = File::Spec->catfile( $wrksrc, 'Makefile.PL' );
-    if ( -f $filename ) {
-        my $code = $dist->_read_file($filename);
-        if ( $code =~ $offending_code ) {
-            $code
-                =~ s/$offending_code/if (defined \$builddir && \$builddir ne \$srcdir)/;
-            $cb->_move( file => $filename, to => "$filename.orig" ) or return;
-            $dist->_write_file( $filename, $code ) or return;
-        }
+    my $fn = 'Makefile.PL';
+    if ( -f $fn ) {
+        my $code = slurp($fn);
+        $code =~ s/(if \(defined \$builddir)\)/$1 && \$builddir ne \$srcdir)/;
+        spurt( $fn, $code ) or return;
     }
 
     return 1;
@@ -46,7 +36,7 @@ CPANPLUS::Dist::Slackware::Plugin::Search::Xapian - Patch Makefile.PL
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Search::Xapian version 1.024.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Search::Xapian version 1.025.
 
 =head1 SYNOPSIS
 
@@ -82,7 +72,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the module File::Spec.
+None.
 
 =head1 INCOMPATIBILITIES
 
@@ -103,7 +93,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2016 Andreas Voegele
+Copyright 2015-2017 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

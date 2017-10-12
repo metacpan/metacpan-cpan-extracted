@@ -81,7 +81,7 @@ the initial mode for this dispatcher does not need verbose or debug
 information, then those levels will not be accepted.
 
 When the mode equals "NORMAL" (the default) then C<accept>'s default
-is C<NOTICE->.  In case of "VERBOSE"> it will be C<INFO->, C<ASSERT>
+is C<NOTICE->.  In case of "VERBOSE" it will be C<INFO->, C<ASSERT>
 results in C<ASSERT->, and "DEBUG" in C<ALL>.
 
 =item charset => CHARSET
@@ -317,7 +317,7 @@ this message with additional information:
 =back
 
 When the message is a translatable object (L<Log::Report::Message|Log::Report::Message>, for
-instance created with L<Log::Report::__()|Log::Report/"Language Translations">), then the added components
+instance created with L<Log::Report::__()|Log::Report/"Messages (optionally translatable)">), then the added components
 will get translated as well.  Otherwise, all will be in English.
 
 Exactly what will be added depends on the actual mode of the dispatcher
@@ -395,8 +395,8 @@ B<. Example: take all mistakes and warnings serious>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.21,
-built on July 03, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.22,
+built on October 12, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

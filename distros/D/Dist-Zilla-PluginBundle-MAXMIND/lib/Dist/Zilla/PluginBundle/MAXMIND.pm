@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use Dist::Zilla 6.0;
 
@@ -66,6 +66,7 @@ use Dist::Zilla::Plugin::Test::TidyAll 0.04;
 use Dist::Zilla::Plugin::Test::Version;
 use Parse::PMFile;
 use Path::Iterator::Rule;
+use Path::Tiny qw( path );
 
 use Moose;
 
@@ -624,12 +625,7 @@ sub _all_stopwords {
     push @stopwords, @{ $self->stopwords };
 
     if ( $self->_has_stopwords_file ) {
-        open my $fh, '<:encoding(UTF-8)', $self->stopwords_file;
-        while (<$fh>) {
-            chomp;
-            push @stopwords, $_;
-        }
-        close $fh;
+        push @stopwords, path( $self->stopwords_file )->lines_utf8;
     }
 
     return \@stopwords;
@@ -822,7 +818,7 @@ Dist::Zilla::PluginBundle::MAXMIND - MAXMIND's plugin bundle
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =head1 SYNOPSIS
 

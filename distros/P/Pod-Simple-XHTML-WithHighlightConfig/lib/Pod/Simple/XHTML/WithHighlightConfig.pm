@@ -1,55 +1,11 @@
 package Pod::Simple::XHTML::WithHighlightConfig;
 use Moo;
 
-our $VERSION = '0.000001';
-$VERSION = eval $VERSION;
-
-use Pod::Simple::XHTML ();
-BEGIN {
-  *_ENCODE_AS_METHOD = $Pod::Simple::VERSION >= 3.16 ? sub(){1} : sub(){0};
-}
+our $VERSION = '0.000002';
+$VERSION =~ tr/_//d;
 
 extends 'Pod::Simple::XHTML';
-with 'Pod::Simple::Role::WithHighlightConfig';
-
-sub _encode_entities {
-  my ($self, $text) = @_;
-  if (_ENCODE_AS_METHOD) {
-    $self->encode_entities($text);
-  }
-  else {
-    Pod::Simple::XHTML::encode_entities($text);
-  }
-}
-
-around start_highlight => sub {
-  my ($orig, $self, $item, $config) = @_;
-  $self->$orig($item, $config);
-  $config ||= {};
-  my $tag = '<pre';
-  my @classes;
-  if ($config->{line_numbers}) {
-    push @classes, 'line-numbers';
-    if ($config->{start_line}) {
-      $tag .= ' data-start="' . $self->_encode_entities($config->{start_line}) . '"';
-    }
-  }
-  if ($config->{highlight}) {
-    $tag .= ' data-line="' . $self->_encode_entities($config->{highlight}) . '"';
-  }
-  if (@classes) {
-    $tag .= ' class="' . join (' ', @classes) . '"';
-  }
-  $tag .= '><code';
-  if ($config->{language}) {
-    my $lang = lc $config->{language};
-    $lang =~ s/\+/p/g;
-    $lang =~ s/\W//g;
-    $tag .= ' class="language-' . $lang . '"';
-  }
-  $tag .= '>';
-  $self->{scratch} = $tag;
-};
+with 'Pod::Simple::Role::XHTML::WithHighlightConfig';
 
 1;
 __END__

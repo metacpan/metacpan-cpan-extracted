@@ -20,5 +20,5 @@ package version_check;
 # use warnings;
 # use base 'Exporter';
 # our @EXPORT_OK = ('foo');
-our $VERSION = '94';
+our $VERSION = '95';
 # our $VERSION = 61';

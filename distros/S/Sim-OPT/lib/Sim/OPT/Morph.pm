@@ -53,12 +53,12 @@ read_geometry read_geo_constraints apply_geo_constraints vary_controls
 calc_newctl checkfile constrain_controls read_controls read_control_constraints apply_loopcontrol_changes 
 apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints 
 vary_net read_net apply_node_changes readobsfile obs_modify 
-decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3dxyz fixlength purifydata
+decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.63'; # our $VERSION = '';
-$ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations to model descriptions for simulation programs.';
+$VERSION = '0.63.19'; # our $VERSION = '';
+$ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
 
@@ -257,18 +257,11 @@ sub morph
 			my $warp = $vals{$countmorphing}{$countvar}{warp};
 			my @daylightcalc = @{ $vals{$countmorphing}{$countvar}{daylightcalc} };
 			my @change_config = @{ $vals{$countmorphing}{$countvar}{change_config} };
-			my @constrain_geometry = @{ $vals{$countmorphing}{$countvar}{constrain_geometry} }; 
 			my @vary_controls = @{ $vals{$countmorphing}{$countvar}{vary_controls} };
 			my @constrain_controls =  @{ $vals{$countmorphing}{$countvar}{constrain_controls} };
-			my @constrain_obstructions = @{ $vals{$countmorphing}{$countvar}{constrain_obstructions} };
-			my @get_obstructions = @{ $vals{$countmorphing}{$countvar}{get_obstructions} };
 			my $checkfile = $vals{$countmorphing}{$countvar}{checkfile};
-			my @vary_net = @{ $vals{$countmorphing}{$countvar}{vary_net} };
-			my @constrain_net = @{ $vals{$countmorphing}{$countvar}{constrain_net} };
-			my @propagate_constraints = @{ $vals{$countmorphing}{$countvar}{propagate_constraints} };
 			my @change_climate = @{ $vals{$countmorphing}{$countvar}{change_climate} };
 			my $pin_obstructions = $vals{$countmorphing}{$countvar}{pin_obstructions};
-			my $propagate = $vals{$countmorphing}{$countvar}{propagate};
 			my $use_modish = $vals{$countmorphing}{$countvar}{use_modish};  
 			my $export_toradiance = $vals{$countmorphing}{$countvar}{export_toradiance};
 			my $genchange = $vals{$countmorphing}{$countvar}{genchange}; 
@@ -1169,35 +1162,78 @@ sub rotate2d {
 	return ( $x_new, $y_new);
 }
 
-sub rotate3dxyz # CHECK! ZZZ
+sub rotate3d # CHECK! ZZZ
 {
-	my ( $vertices_ref, $angle, $centre_ref, $plantype ) = @_;
-	my @vertices = @$vertices_ref;
-	my @centreverts = @$centre_ref;
-	my ( $centre_x, $centre_y, $centre_z ) = $centreverts[0], $centreverts[1], $centreverts[2];
+	my ( $vertices_ref, $angle, $centre_ref, $plantype, $flatten ) = @_;
+	my @vertices = @$vertices_ref; print "\@vertices: " . Dumper( @vertices ) . "\n";
+	my @centreverts = @$centre_ref; print "centreverts; @centreverts \n";
+	my ( $centre_x, $centre_y, $centre_z ) = @centreverts;
+	print "centre_x; $centre_x \n"; print "centre_y; $centre_y \n"; print "centre_z; $centre_z \n";
+
 	my @newbag;
 	
 	foreach $vertex_ref ( @vertices )
 	{
-		( $x, $y, $z ) = ( $vertex_ref->[0], $vertex_ref->[1], $vertex_ref->[2]);
+		( $x, $y, $z ) = ( $vertex_ref->[0], $vertex_ref->[1], $vertex_ref->[2]); print "x; $x \n"; print "y; $y \n"; print "z; $z \n";
 		if ( $plantype eq "xy" )
 		{
 			my ( $newx, $newy ) = rotate2d( $x, $y, $angle, $centre_x, $centre_y );
-			push ( @newbag, [ $newx, $newy, $z ] );
+			$newx = sprintf( "%.3f", $newx );
+			$newy = sprintf( "%.3f", $newy );
+			if ( $flatten eq "" )
+			{ 
+				push ( @newbag, [ $newx, $newy, $z ] );
+			}
+			elsif ( $flatten eq "x")
+			{
+				push ( @newbag, [ $x, $newy, $z ] );
+			}
+			elsif ( $flatten eq "y")
+			{
+				push ( @newbag, [ $newx, $y, $z ] );
+			}
 		}
 		elsif ( $plantype eq "xz" )
 		{
 			my ( $newx, $newz ) = rotate2d( $x, $z, $angle, $centre_x, $centre_z );
-			push ( @newbag, [ $newx, $y, $newz ] );
+			$newx = sprintf( "%.3f", $newx );
+			$newz = sprintf( "%.3f", $newz );
+			if ( $flatten eq "" )
+			{ 
+				push ( @newbag, [ $newx, $y, $newz ] );
+			}
+			elsif ( $flatten eq "z")
+			{
+				push ( @newbag, [ $newx, $y, $z ] );
+			}
+			elsif ( $flatten eq "x")
+			{
+				push ( @newbag, [ $x, $y, $newz ] );
+			}
 		}
 		elsif ( $plantype eq "yz" )
 		{
 			my ( $newy, $newz ) = rotate2d( $y, $z, $angle, $centre_y, $centre_z );
-			push ( @newbag, [ $x, $newy, $newz ] );
+			$newy = sprintf( "%.3f", $newy );
+			$newz = sprintf( "%.3f", $newz );
+			if ( $flatten eq "" )
+			{ 
+				push ( @newbag, [ $x, $newy, $newz ] );
+			}
+			elsif ( $flatten eq "z")
+			{
+				push ( @newbag, [ $x, $newy, $z  ] );
+			}
+			elsif ( $flatten eq "y")
+			{
+				push ( @newbag, [ $x, $y, $newz  ] );
+			}
 		}
-	return ( @newbag );
 	}
+	return ( \@newbag );
 }
+
+
 
 sub fixlength 
 {
@@ -1386,7 +1422,6 @@ sub translate
 		
 my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1473,7 +1508,6 @@ sub translate_surfaces
 					
 				my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1563,7 +1597,6 @@ $printthis";
 
 				my $printthis = 
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1654,7 +1687,6 @@ sub rotate_surface
 		{
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1828,7 +1860,6 @@ sub translate_vertices
 		
 		my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1909,7 +1940,6 @@ sub shift_vertices
 				
 				my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -1953,7 +1983,6 @@ $printthis";
 			{
 				my $printthis = 
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2039,8 +2068,6 @@ sub rotate    # generic zone rotation
 		
 		my $printthis = 
 "prj $launchline<<YYY
-
-
 m
 c
 a
@@ -2263,7 +2290,6 @@ sub reassign_construction
 		
 		my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2294,7 +2320,7 @@ YYY
 		{ 
 			print `$printthis`;
 		}
-
+        say $tee "$printthis";
 		print $tee "
 #Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
@@ -2308,36 +2334,34 @@ sub change_thickness
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
 	my @applytype = @$applytype_ref; 
-	my $zone_letter = $applytype[$countop][3]; 
 	
 	say "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my @entries_to_change = @{ $$thickness_change[$countop][0] }; 
-	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] }; 
-	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] }; 
-	my $configfile = $$thickness_change[$countop][3]; # OPTIONAL
+	my @entries_to_change = @{ $$thickness_change[$countop][0] }; say $tee "\@entries_to_change: " . dump( @entries_to_change ) ; 
+	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] }; say $tee "\@groups_of_strata_to_change: " . dump( @groups_of_strata_to_change ) ; 
+	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] }; say $tee "\@groups_of_couples_of_min_max_values: " . dump( @groups_of_couples_of_min_max_values ) ; 
 	
 	my $thiscount = 0;
 	my ( $entry_to_change, $countstrata, $stratum_to_change, $min, $max, $change_stratum, $enter_change_entry, $swing, $pace, $thickness );
 	my ( @strata_to_change, @min_max_values , @change_strata, @change_entries, @change_entries_with_thicknesses );
-
 	if ( $stepsvar > 1 )
 	{
-		foreach $entry_to_change (@entries_to_change)
-		{
-			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; 
+		foreach $entry_to_change ( @entries_to_change )
+		{   say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; 
+			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; say $tee "\@strata_to_change: " . dump( @strata_to_change ) ; 
 			$countstrata = 0;
-			foreach $stratum_to_change (@strata_to_change)
-			{
-				@min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; 
-				$min   = $min_max_values[0]; 
-				$max   = $min_max_values[1]; 
-				$swing = $max - $min; 
-				$pace  = ( $swing / ( $stepsvar - 1 ) ); 
-				$thickness = $min + ( $pace * ( $countstep - 1 ) ); 
+			foreach $stratum_to_change ( @strata_to_change )
+			{   say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ; 
+				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; say $tee "\@min_max_values: " . dump( @min_max_values ) ; 
+				my $min   = $min_max_values[0]; say $tee "\$min: " . dump( $min ) ;  
+				my $max   = $min_max_values[1]; say $tee "\$max: " . dump( $max ) ; 
+				my $swing = $max - $min; say $tee "\$swing: " . dump( $swing ) ; 
+				my $pace  = ( $swing / ( $stepsvar - 1 ) ); say $tee "\$pace: " . dump( $pace ) ; 
+				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); say $tee "\$thickness: " . dump( $thickness ) ; 
+				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
-				my $printthis =
-"prj $launchline<<YYY
+
+                my $printthis = "prj $launchline<<YYY		
 b
 e
 a
@@ -2346,26 +2370,26 @@ $stratum_to_change
 n
 $thickness
 -
--
-y
-y
--
-y
+>
 y
 -
 -
 -
--
+y
+y
 -
 YYY
 ";
+
 				unless ($exeonfiles eq "n") 
 				{ 
 					print `$printthis`;
 				}
+				say $tee "$printthis";
+
 				print $tee "
 #Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
-$printthis";
+";
 				$countstrata++;
 			}
 			$thiscount++;
@@ -2536,7 +2560,6 @@ sub obs_modify
 			
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2595,7 +2618,6 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 
 			my $printthis = 
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2635,7 +2657,6 @@ $printthis";
 			my $alternative = $alternatives[ $countstep - 1 ];          
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2677,7 +2698,6 @@ $printthis";
 			
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2758,7 +2778,6 @@ YYY
 
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -2798,8 +2817,6 @@ $printthis";
 												
 			my $printthis = #THIS IS WHAT HAPPEN INSIDE SUB KEEP_SOME_OBSTRUCTIONS
 "prj $launchline<<YYY
-
-
 m
 c
 a
@@ -2855,7 +2872,6 @@ sub recalculateish
 	
 	my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 f
@@ -3427,8 +3443,6 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 			{
 				my $printthis =
 "prj $launchline<<YYY
-
-
 m
 e
 c
@@ -3476,8 +3490,6 @@ $printthis";
 				{
 					my $printthis =
 "prj $launchline<<YYY
-
-
 m
 e
 c
@@ -3528,8 +3540,6 @@ $printthis";
 		{
 			my $printthis =
 "prj $launchline<<YYY
-
-
 m
 e
 c
@@ -3571,8 +3581,6 @@ $printthis";
 		{
 			MY $printthis =
 "prj $launchline<<YYY
-
-
 m
 e
 c
@@ -3684,20 +3692,118 @@ sub apply_constraints
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline ) = @_;
 	
 	my @applytype = @$applytype_ref;
-	my $zone_letter = $applytype[$countop][3];
 	my @apply_constraints = @$apply_constraints_ref; 
 	say "Applying constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @sourcefiles = @{ $apply_constraints[$countop][0] }; #say $tee "\@sourcefiles: " . dump( @sourcefiles );
-	my @configfiles = @{ $apply_constraints[$countop][1] }; #say $tee "\@configfiles: " . dump( @configfiles );
-	my @verts_to_modify = @{ $apply_constraints[$countop][2] }; 
-	my @increments = @{ $apply_constraints[$countop][3] }; #say $tee "\@increments: " . dump( @increments );
-    my ( %ver, %verts );
-
-    say $tee "VERTS_TO_MODIFY: " . dump( @verts_to_modify );
+	my @numberfiles = @{ $apply_constraints[$countop][1] }; #say $tee "\@numberfiles: " . dump( @numberfiles );
+	my @configfiles = @{ $apply_constraints[$countop][2] }; #say $tee "\@configfiles: " . dump( @configfiles );
+	my @incrs = @{ $apply_constraints[$countop][3] }; say $tee "\@incrs: " . dump( @incrs );
+    my ( %ver, %obs, %nod, %comp );
+    say $tee "\$stepsvar: " . dump( $stepsvar );
+    say $tee "\$countstep: " . dump( $countstep );
 	say TOFILE "TO: " . dump( $to );
 
-    my $countfile = 1;
+	my %verts = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "s", 
+	20 => "t", 		21 => "u", 22 => "v", 23 => "w", 24 => "x", 25 => "0\ny", 
+	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\nj", 
+	37 => "0\nk", 38 => "0\nl", 39 => "0\nm", 40 => "0\nn", 41 => "0\no", 
+	42 => "0\np", 43 => "0\nq", 44 => "0\nr", 45 => "0\ns", 46 => "0\nt", 
+	47 => "0\nu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
+	51 => "0\n0\ncy", 52 => "0\n0\ncz", 
+	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\ncc", 56 => "0\n0\ncd", 
+	57 => "0\n0\nce", 58 => "0\n0\ncf", 
+	59 => "0\n0\ncg", 60 => "0\n0\nch", 61 => "0\n0\nci", 
+	62 => "0\n0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\ncl", 
+	65 => "0\n0\nc0\ncm", 66 => "0\n0\nc0\ncn", 
+	67 => "0\n0\nc0\nco", 68 => "0\n0\nc0\ncp", 69 => "0\n0\nc0\ncq", 
+	70 => "0\n0\nc0\ncr", 71 => "0\n0\nc0\ncs", 
+	72 => "0\n0\nc0\nct", 73 => "0\n0\nc0\ncu", 74 => "0\n0\nc0\ncv", 
+	75 => "0\n0\nc0\ncw", 76 => "0\n0\nc0\ncx", 
+	77 => "0\n0\nc0\nc0\ncy", 78 => "0\n0\nc0\nc0\ncz", 79 => "0\n0\nc0\nc0\nca", 
+	80 => "0\n0\nc0\nc0\ncb", 81 => "0\n0\nc0\nc0\ncc", 82 => "0\n0\nc0\nc0\ncd", 
+	83 => "0\n0\nc0\nc0\nce", 84 => "0\n0\nc0\nc0\ncf", 85 => "0\n0\nc0\nc0\ncg", 
+	86 => "0\n0\nc0\nc0\nch", 87 => "0\n0\nc0\nc0\nci", 88 => "0\n0\nc0\nc0\ncj", 
+	89 => "0\n0\nc0\nc0\nck", 90 => "0\n0\nc0\nc0\ncl", 91 => "0\n0\nc0\nc0\ncm", 
+	92 => "0\n0\nc0\nc0\nc0\ncn", 93 => "0\n0\nc0\nc0\nc0\nco", 
+	94 => "0\n0\nc0\nc0\nc0\ncp", 95 => "0\n0\nc0\nc0\nc0\ncq", 
+	96 => "0\n0\nc0\nc0\nc0\ncr", 97 => "0\n0\nc0\nc0\nc0\ncs", 
+	98 => "0\n0\nc0\nc0\nc0\nct", 99 => "0\n0\nc0\nc0\nc0\ncu", 
+	100 => "0\n0\nc0\nc0\nc0\ncv", 101 => "0\n0\nc0\nc0\nc0\ncw", 
+	102 => "0\n0\nc0\nc0\nc0\ncx", 103 => "0\n0\nc0\nc0\nc0\ncy", );
+
+	my %zones = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 
+	17 => "q", 18 => "r", 19 => "0\ns", 20 => "0\nt", 21 => "0\nu", 22 => "0\nv", 
+	23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 26 => "0\nz", 
+	27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
+	47 => "0\n0\nc0\ncu", 48 => "0\n0\nc0\ncv", 49 => "0\n0\nc0\ncw", 50 => "0\n0\nc0\ncx" );
+
+
+	my %obss = ( 1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 
+	8 => "l", 9 => "m", 10 => "n", 11 => "o", 12 => "0\no", 13 => "0\np", 
+	14 => "0\nq", 15 => "0\nr", 16 => "0\ns", 
+	17 => "0\nt", 18 => "0\nu", 19 => "0\nv", 20 => "0\nw", 21 => "0\nx", 22 => "0\ny", 
+	23 => "0\n0\nb\ny", 24 => "0\n0\nb\nz", 25 => "0\n0\nb\na", 26 => "0\n0\nb\nb", 
+	27 => "0\n0\nb\nc", 28 => "0\n0\nb\nd", 29 => "0\n0\nb\ne", 30 => "0\n0\nb\nf", 
+	31 => "0\n0\nb\ng", 32 => "0\n0\nb\nh", 33 => "0\n0\nb\ni",
+	34 => "0\n0\nb\n0\nb\ni", 35 => "0\n0\nb\n0\nb\nj", 36 => "0\n0\nb\n0\nb\nk", 
+	37 => "0\n0\nb\n0\nb\nl", 38 => "0\n0\nb\n0\nb\nm", 39 => "0\n0\nb\n0\nb\nn", 
+	40 => "0\n0\nb\n0\nb\no", 41 => "0\n0\nb\n0\nb\np", 42 => "0\n0\nb\n0\nb\nq", 
+	43 => "0\n0\nb\n0\nb\nr", 44 => "0\n0\nb\n0\nb\ns", 
+	45 => "0\n0\nb\n0\nb\n0\nb\ns", 46 => "0\n0\nb\n0\nb\n0\nb\nt", 47 => "0\n0\nb\n0\nb\n0\nb\nu", 
+	48 => "0\n0\nb\n0\nb\n0\nb\nvs", 49 => "0\n0\nb\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\n0\nb\nx", 
+	51 => "0\n0\nb\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\n0\nb\nz", 53 => "0\n0\nb\n0\nb\n0\nb\na", 
+	54 => "0\n0\nb\n0\nb\n0\nb\nb", 55 => "0\n0\nb\n0\nb\n0\nb\nc" );
+
+	my %nodes = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns", 
+	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
+	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
+	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
+	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz", 
+	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd", 
+	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf", 
+	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci", 
+	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl", 
+	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn", 
+	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq", 
+	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs", 
+	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv", 
+	75 => "0\n0\nc0\nc0\ncw", 76 => "0\n0\nc0\nc0\ncx" );
+
+	my %components = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns", 
+	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
+	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
+	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
+	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz", 
+	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd", 
+	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf", 
+	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci", 
+	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl", 
+	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn", 
+	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq", 
+	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs", 
+	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv", 
+	75 => "0\n0\nc0\nc0\ncw", 76 => "0\n0\nc0\nc0\ncx" );
+
+    my $countfile = 0;
 	foreach my $sourcefile ( @sourcefiles )
     {
 
@@ -3709,39 +3815,101 @@ sub apply_constraints
 			
 		my $countlines = 0;
 
-		%verts = ( a => 1, b => 2, c => 3, d => 4, e => 5, f => 6, g => 7, h => 8, i => 9, j => 10, k => 11, l => 12, 
-		m => 13, n => 14, o => 15, p => 16, 
-		"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
-		"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
-		"0\n0\ncf" => 32, "0\n0\ncg" => 33, "0\n0\nch" => 34, "0\n0\nci" => 35, "0\n0\ncj" => 36, "0\n0\nck" => 37, "0\n0\ncl" => 38, 
-		"0\n0\ncm" => 39, "0\n0\ncn" => 40, "0\n0\nco" => 41, "0\n0\ncp" => 42, "0\n0\ncq" => 43, "0\n0\ncr" => 44, "0\n0\ncs" => 45, 
-		"0\n0\nct" => 46, 
-		"0\n0\nc0\ncu" => 47, "0\n0\nc0\ncv" => 48, "0\n0\nc0\ncw" => 49, "0\n0\nc0\ncx" => 50, "0\n0\nc0\ncy" => 51, "0\n0\nc0\ncz" => 52, 
-		"0\n0\nc0\nca" => 53, "0\n0\nc0\ncb" => 54, "0\n0\nc0\ncc" => 55, "0\n0\nc0\ncd" => 56, "0\n0\nc0\nce" => 57, "0\n0\nc0\ncf" => 58, 
-		"0\n0\nc0\ncg" => 59, "0\n0\nc0\nch" => 60, "0\n0\nc0\nci" => 61, 
-		"0\n0\nc0\nc0\ncj" => 62, "0\n0\nc0\nc0\nck" => 63, "0\n0\nc0\nc0\ncl" => 64, "0\n0\nc0\nc0\ncm" => 65, "0\n0\nc0\nc0\ncn" => 66, 
-		"0\n0\nc0\nc0\nco" => 67, "0\n0\nc0\nc0\ncp" => 68, "0\n0\nc0\nc0\ncq" => 69, "0\n0\nc0\nc0\ncr" => 70, "0\n0\nc0\nc0\ncs" => 71, 
-		"0\n0\nc0\nc0\nct" => 72, "0\n0\nc0\nc0\ncu" => 73, "0\n0\nc0\nc0\ncv" => 74, "0\n0\nc0\nc0\ncw" => 75, "0\n0\nc0\nc0\ncx" => 76, 
-		"0\n0\nc0\nc0\nc0\ncy" => 77, "0\n0\nc0\nc0\nc0\ncz" => 78, "0\n0\nc0\nc0\nc0\nca" => 79, "0\n0\nc0\nc0\nc0\ncb" => 80, 
-		"0\n0\nc0\nc0\nc0\ncc" => 81, "0\n0\nc0\nc0\nc0\ncd" => 82, "0\n0\nc0\nc0\nc0\nce" => 83, "0\n0\nc0\nc0\nc0\ncf" => 84, 
-		"0\n0\nc0\nc0\nc0\ncg" => 85, "0\n0\nc0\nc0\nc0\nch" => 86, "0\n0\nc0\nc0\nc0\nci" => 87, "0\n0\nc0\nc0\nc0\ncj" => 88, 
-		"0\n0\nc0\nc0\nc0\nck" => 89, "0\n0\nc0\nc0\nc0\ncl" => 90, "0\n0\nc0\nc0\nc0\ncm" => 91, 
-		"0\n0\nc0\nc0\nc0\nc0\ncn" => 92, "0\n0\nc0\nc0\nc0\nc0\nco" => 93, "0\n0\nc0\nc0\nc0\nc0\ncp" => 94, "0\n0\nc0\nc0\nc0\nc0\ncq" => 95, 
-		"0\n0\nc0\nc0\nc0\nc0\ncr" => 96, "0\n0\nc0\nc0\nc0\nc0\ncs" => 97, "0\n0\nc0\nc0\nc0\nc0\nct" => 98, "0\n0\nc0\nc0\nc0\nc0\ncu" => 99, 
-		"0\n0\nc0\nc0\nc0\nc0\ncv" => 100, "0\n0\nc0\nc0\nc0\nc0\ncw" => 101, "0\n0\nc0\nc0\nc0\nc0\ncx" => 102, "0\n0\nc0\nc0\nc0\nc0\ncy" => 103, 
-		"0\n0\nc0\nc0\nc0\nc0\ncz" => 104 );   #say $tee "\%verts: " . dump( %verts );
-
-
 		foreach my $line ( @lines )
 		{
 			$line =~ s/^\s+//; 
 			my @rowelts = split(/\s+|,/, $line);
-			if   ($rowelts[0] eq "*vertex" ) 
+			if ( $sourcefile =~ /\.geo$/ )
 			{
-				my $vertnum = $rowelts[5];
-				$ver{$countfile}{$vertnum}{x} = $rowelts[1];
-				$ver{$countfile}{$vertnum}{y} = $rowelts[2];
-				$ver{$countfile}{$vertnum}{z} = $rowelts[3];
+
+				if   ($rowelts[0] eq "*vertex" ) 
+				{
+					my $vertnum = $rowelts[5];
+					@{ $ver{$numberfiles[$countfile]}{$vertnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3] );
+				}
+	            
+	            if   ($rowelts[0] eq "*obs" ) 
+				{
+					my $obsnum = $rowelts[13];
+					@{ $obs{$numberfiles[$countfile]}{$obsnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3], 
+	                $rowelts[4], $rowelts[5], $rowelts[6], $rowelts[7], $rowelts[8], $rowelts[9], $rowelts[10] ) ;
+				}
+			}
+			elsif ( $sourcefile =~ /\.afn$/ )
+			{
+
+
+				my $countlines = 0;
+				my $countnode = -1;
+				my $countcomponent = -1;
+				my $countcomp = 0;
+				my $semaphore_node = "no";
+				my $semaphore_component = "no";
+				my $semaphore_connection = "no";
+				my ($component_letter, $type, $data_1, $data_2, $data_3, $data_4);
+				foreach my $line (@lines)
+				{
+					if ( $line =~ m/Fld. Type/ )
+					{
+						$semaphore_node = "yes";
+					}
+					if ( $semaphore_node eq "yes" )
+					{
+						$countnode++;
+					}
+					if ( $line =~ m/Type C\+ L\+/ )
+					{
+						$semaphore_component = "yes";
+						$semaphore_node = "no";
+					}
+
+					if ( ($semaphore_node eq "yes") and ( $semaphore_component eq "no" ) and ( $countnode >= 0))
+					{
+						my $node_letter = $nodes[$countnode];
+						my $fluid = $row[1];
+						my $type = $row[2];
+						my $height = $row[3];
+						my $data_2 = $row[6]; # volume or azimuth
+						my $data_1 = $row[5]; #surface
+						@{ $nod{$countnode} } = ( $node_letter, $fluid, $type, $height, $data_2, $data_1 ); # PLURAL
+					}
+
+					if ( $semaphore_component eq "yes" )
+					{
+						$countcomponent++;
+					}
+
+					if ( $line =~ m/\+Node/ )
+					{
+						$semaphore_connection = "yes";
+						$semaphore_component = "no";
+						$semaphore_node = "no";
+					}
+
+					if ( ($semaphore_component eq "yes") and ( $semaphore_connection eq "no" ) and ( $countcomponent > 0))
+					{
+						if ($countcomponent % 2 == 1) # $number is odd 
+						{ 
+							$component_letter = $components[$countnode];
+							$fluid = $row[0];
+							$type = $row[1];
+							if ($type eq "110") { $type = "k";}
+							if ($type eq "120") { $type = "l";}
+							if ($type eq "130") { $type = "m";}
+							$countcomp++;
+						}
+						else # $number is even 
+						{ 
+							$data_1 = $row[1];
+							$data_2 = $row[2];
+							$data_3 = $row[3];
+							$data_4 = $row[4];
+							@{ $comp{$countcomp} } = ( $component_letter, $fluid, $type, $data_1, $data_2, $data_3, $data_4 ); # PLURAL
+						}
+					}
+					$countlines++;
+				}
+
 			}
 		}
 
@@ -3750,16 +3918,59 @@ sub apply_constraints
 	}
 
 	say $tee "\%ver BEFORE: " . dump( %ver );
+	say $tee "\%obs BEFORE: " . dump( %obs );
+	say $tee "\%nod BEFORE: " . dump( %nod );
+	say $tee "\%comp BEFORE: " . dump( %comp );
+ 
+ 	my ( $swing, $base, $pace, $val );
+ 	my $count = 0;
+    foreach $incr ( @incrs )
+    {
+		if ( ref ( $incr ) )
+		{
+			my $min = $incr->[0]; 
+			my $max = $incr->[0]; 
+			$swing->[$count] = ( $max - $min );
+			$base->[$count] = ( 0 - $min );
+		}
+		else
+		{
+			$swing->[$count] = ( 2 * $incr ); 
+			$base->[$count] = ( 0 - $incr );
+		} say $tee "\$swing->[$count]: " . dump( $swing->[$count] );
+		
+		$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) ); say $tee "\$pace->[$count]: " . dump( $pace->[$count] );
+		$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); say $tee "\$val->[$count]: " . dump( $val->[$count] ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
+		$count++;
+	}
+    say $tee "\$swing : " . dump( $swing ); say $tee "\$base : " . dump( $base ); say $tee "\$pace : " . dump( $pace ); say $tee "\$val : " . dump( $val );
 
+    
+    my @tooutputs;
+    #my $tooutput = "( " ; 
+    #$tooutput =~ s/\\// ; say $tee "\$tooutput: " . dump( $tooutput ); 
     foreach my $configfile ( @configfiles )
     {
-    	my $configaddress = "$to$configfile"; #say $tee "\$configaddress: " . dump( $configaddress );
+    	my $configaddress = "$to$configfile"; say $tee "\$configaddress: " . dump( $configaddress );
 	    if ( defined ( $configaddress ) )
 		{
 			if ( -e $configaddress )
 			{  
 				eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
-			} 
+
+				#open( CONFIGFILE, $configaddress ) or die;
+				#my @readlines = <CONFIGFILE>;
+				#close(CONFIGFILE);
+                #foreach my $readline ( @readlines )
+                #{   
+	            #    if ( $readline =~ /^(.+)=/ )
+	            #    {
+	            #    	$1 =~ s/my// ;
+	            #    	$tooutput = $tooutput . " $1, ";
+	            #    }
+	            #}
+	            #$tooutput = $tooutput . " )";
+			}
 			else 
 			{
 				say $tee "\$configaddress does not exist. Exiting." and die;
@@ -3768,22 +3979,35 @@ sub apply_constraints
 	}
 
 	say $tee "\%ver AFTER: " . dump( %ver );
-    say $tee "ver{1}{1}{y}: " . dump( $ver{1}{1}{y} );
-        
-    foreach my $vertexletter ( @verts_to_modify )
-    {   say $tee "\$vertexletter : " . dump( $vertexletter );
-    	my $vnum = $verts{$vertexletter}; say $tee "\$vnum : " . dump( $vnum );
+	say $tee "\%obs AFTER: " . dump( %obs );
+	say $tee "\%nod AFTER: " . dump( %nod );
+	say $tee "\%comp AFTER: " . dump( %comp );
+    #$tooutput =~ s/\\//g ;
+    #$tooutput =~ s/\@{ //g ;
+    #$tooutput =~ s/} }/}/g ; say $tee "\$tooutput: " . dump( $tooutput );
+    #$tooutput =~ s/\$//g ; say $tee "\$tooutput: " . dump( $tooutput );
+    #my @tooutputs = eval( $tooutput ) ; say $tee "\@tooutputs: " . dump( @tooutputs );
+            
+    foreach my $output ( @tooutputs )
+    {   
+        if ( $output =~ /^ver/ )
+        {
+        	$output =~ /ver{(.+)}{(.+)}/; say $tee "DING. \$output : " . dump( $output );
+        	my $zone_number = $1; say $tee "\$zone_number : " . dump( $zone_number );
+        	my $zone_letter = $zones{$zone_number}; say $tee "\$zone_letter : " . dump( $zone_letter );
+        	my $vnum = $2; say $tee "\$vnum : " . dump( $vnum );
+        	my $vertex_letter = $verts{$vnum}; say $tee "\$vertex_letter : " . dump( $vertex_letter );
+        	my ( $x, $y, $z ) = ( $ver{$zone_number}{$vnum}->[0], $ver{$zone_number}{$vnum}->[1], $ver{$zone_number}{$vnum}->[2] );
 	
-		my $printthis =
+			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
 $zone_letter
 d
-$vertexletter
-$ver{1}{$vnum}{x} $ver{1}{$vnum}{y} $ver{1}{$vnum}{z} 
+$vertex_letter
+$x $y $z 
 -
 -
 y
@@ -3799,22 +4023,297 @@ c
 -
 YYY
 ";
-		unless ($exeonfiles eq "n") 
-		{ 
-			print `$printthis`;
+			unless ($exeonfiles eq "n") 
+			{ 
+				print `$printthis`;
+			}
+			say $tee "$printthis";
 		}
- say $tee "\$ver{1}{\$vertnum}{x} : " . dump( $ver{1}{$vertnum}{x} );
- say $tee "\$ver{1}{\$vertnum}{y} : " . dump( $ver{1}{$vertnum}{y} );
- say $tee "\$ver{1}{\$vertnum}{z} : " . dump( $ver{1}{$vertnum}{z} );
+		elsif ( $output =~ /^obs/ )
+        {
+        	$output =~ /\$obs\{(.+)\}\{(.+)\}/; say $tee "\$output : " . dump( $output );
+        	my $zone_number = $1; say $tee "\$zone_number : " . dump( $zone_number );
+        	my $obs_letter = $zones{$zone_number}; say $tee "\$obs_letter : " . dump( $obs_letter );
+        	my $obsnum = $2; say $tee "\$obsnum : " . dump( $obsnum );
+        	my $obs_letter = $obss{$obsnum}; say $tee "\$obs_letter : " . dump( $obs_letter );
+
+    		my @ob = @{ $obs{$zone_number}{$obsnum} }; say $tee "\@ob : " . dump( @ob );
+    		my $x = $ob_->[1]; say $tee "\$x : " . dump( $x );
+			my $y = $ob_->[2]; say $tee "\$y : " . dump( $y );
+			my $z = $ob_->[3]; say $tee "\$z : " . dump( $z );
+			my $width = $ob_->[4]; say $tee "\$width : " . dump( $width );
+			my $depth = $ob_->[5]; say $tee "\$depth : " . dump( $depth );
+			my $height = $ob_->[6]; say $tee "\$height : " . dump( $height );
+			my $y_rotation = $ob_->[7]; say $tee "\$y_rotation : " . dump( $y_rotation );
+			my $tilt = $ob_->[8]; say $tee "\$tilt : " . dump( $tilt );
+			my $opacity = $ob_->[9]; say $tee "\$opacity : " . dump( $opacity );
+			my $name = $ob_->[10]; say $tee "\$name : " . dump( $name );
+			my $material = $ob_->[11]; say $tee "\$material : " . dump( $material );
+	
+			my $printthis =
+"prj $launchline<<YYY
+m
+c
+a
+$zone_letter
+h
+a
+$obs_letter
+a
+a
+$x $y $z
+b
+$width $depth $height
+c
+$y_rotation
+d
+$tilt
+e
+h
+$opacity
+-
+-
+c
+-
+c
+-
+-
+-
+-
+YYY
+
+prj $launchline<<YYY
+m
+c
+a
+$zone_letter
+h
+a
+$obs_letter
+g
+$material
+-
+-
+-
+c
+-
+c
+-
+-
+-
+-
+YYY
+";
+			unless ($exeonfiles eq "n") 
+			{ 
+				print `$printthis`;
+			}
+			say $tee "$printthis";
+		}
+		elsif ( $output =~ /^nod/ )
+        {
+        	$output =~ /nod{(.+)}/; say $tee "DING. \$output : " . dump( $output );
+        	my $nodnum = $2; say $tee "\$nodnum : " . dump( $nodnum );
+        	my $node_letter = $nodes{$nodnum}; say $tee "\$node_letter : " . dump( $node_letter );
+            my @nods = @{ $nod{$nodnum} }; say $tee "\@nods : " . dump( @nods );
+    		
+            my $new_node_letter = $nods[0];
+			my $new_fluid = $nods[1];
+			my $new_type = $nods[2];
+			my $new_zone = $nods[3];
+			my $new_height = $nods[4];
+			my $new_data_2 = $nods[5];
+			my $new_surface = $nods[6];
+			my $new_cp = $node_[7];
+
+
+			if ($new_type eq "a" ) # IF NODES ARE INTERNAL
+			{
+				my $printthis =
+"prj -file $to/cfg/$fileconfig -mode script<<YYY
+m
+e
+c
+
+n
+c
+$new_node_letter
+
+$new_fluid
+$new_type
+y
+$new_zone
+$new_data_2
+$new_height
+a
+
+-
+-
+y
+
+y
+-
+-
+YYY
+";
+				unless ($exeonfiles eq "n") 
+				{
+					print `$printthis`;
+				}
+				say $tee "$printthis";
+			}
+
+			if ($new_type eq "e" ) # IF NODES ARE BOUNDARY ONES, WIND-INDUCED
+			{
+				my $printthis =
+"prj -file $to/cfg/$fileconfig -mode script<<YYY
+m
+e
+c
+
+n
+c
+$new_node_letter
+
+$new_fluid
+$new_type
+$new_zone
+$new_surface
+$new_cp
+y
+$new_data_2
+$new_height
+-
+-
+y
+
+y
+-
+-
+YYY
+";
+				unless ($exeonfiles eq "n") 
+				{
+					print `$printthis`;
+				}
+				say $tee "$printthis";
+			}
+        }
+        
+        elsif ( $output =~ /^comp/ )
+        {
+        	$output =~ /comp{(.+)}/; say $tee "DING. \$output : " . dump( $output );
+        	my $compnum = $2; say $tee "\$compnum : " . dump( $compnum );
+        	my $comp_letter = $components{$compnum}; say $tee "\$comp_letter : " . dump( $comp_letter );
+            my @comps = @{ $comp{$compnum} }; say $tee "\@comps : " . dump( @comps );
+
+            my $new_component_letter = $comps[0];
+			my $new_fluid = $comps[1];
+			my $new_type = $comps[2];
+			my $new_data_1 = $comps[3];
+			my $new_data_2 = $comps[4];
+			my $new_data_3 = $comps[5];
+			my $new_data_4 = $comps[6];
+
+			if ($new_type eq "k" ) # IF THE COMPONENT IS A GENERIC OPENING
+			{
+				my $printthis =
+"prj -file $to/cfg/$fileconfig -mode script<<YYY
+m
+e
+c
+
+n
+d
+$new_component_letter
+$new_fluid
+$new_type
+-
+$new_data_1
+-
+-
+y
+
+y
+-
+-
+YYY
+";
+				unless ($exeonfiles eq "n") 
+				{
+					print `$printthis`;
+				}
+				say $tee "$printthis";
+			}
+
+			if ($new_type eq "l" ) # IF THE COMPONENT IS A CRACK
+			{
+				my $printthis =
+"prj -file $to/cfg/$fileconfig -mode script<<YYY
+m
+e
+c
+
+n
+d
+$new_component_letter
+$new_fluid
+$new_type
+-
+$new_data_1 $new_data_2
+-
+-
+y
+
+y
+-
+-
+YYY
+";
+				unless ($exeonfiles eq "n") 
+				{
+					print `$printthis`;
+				}
+				say $tee "$printthis";
+			}
+
+			if ($new_type eq "m" ) # IF THE COMPONENT IS A DOOR
+			{
+				my $printthis =
+"prj -file $to/cfg/$fileconfig -mode script<<YYY
+m
+e
+c
+
+n
+d
+$new_component_letter
+$new_fluid
+$new_type
+-
+$new_data_1 $new_data_2 $new_data_3 $new_data_4
+-
+-
+y
+
+y
+-
+-
+YYY
+";
+				unless ($exeonfiles eq "n") 
+				{
+					print `$printthis`;
+				}
+				say $tee "$printthis";
+			}
+		}
 
 		print $tee "
 #Propagating constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.      
 $printthis";
 	}
 } # END SUB APPLY_CONSTRAINTS
-
-
-
 
 
 
@@ -3939,7 +4438,6 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 						{
 							my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -4032,7 +4530,6 @@ sub warp #
 		{
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -4131,7 +4628,6 @@ $printthis";
 
 			my $printthis =
 "prj $launchline<<YYY
-
 m
 c
 a
@@ -5014,7 +5510,6 @@ sub change_groundreflectance
 	
 	my $printthis =
 "prj $launchline<<YYY
-
 m
 b
 d
@@ -5036,1084 +5531,6 @@ $printthis
 	#no strict; 
 	#no warnings;
 }
-
-##############################################################################
-# SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING GEOMETRY
-
-sub constrain_geometry # IT APPLIES CONSTRAINTS TO ZONE GEOMETRY
-{
-	# IT CONSTRAINS GEOMETRY FILES.
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $constrain_geometry_ref, $countvar, $fileconfig, $v_ref, $countmorphing, $exeonfiles, $v__ref, $todo, $launchline ) = @_;
-	say $tee "Constraining geometry for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @applytype = @$applytype_ref; 
-	my $zone_letter = $applytype[$countop][3]; 
-	
-	
-	my @constrain_geometry = @{ $constrain_geometry_ref->[$countop] }; 
-	
-	my @v = @$v_ref; 
-	my @v_ = @v__ref;
-	
-	my @vertexletters = (
-	"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p", 
-	"0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\na", "0\nb",  "0\nc",  "0\nd",  "0\ne",
-	"0\n0\nb\ne", "0\n0\nb\nf", "0\n0\nb\ng", "0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", 
-	"0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", "0\n0\nb\ns", "0\n0\nb\nt", 
-	"0\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", 
-	"0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", 
-	"0\n0\nb\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\n0\nb\nj", "0\n0\nb\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\n0\nb\np", 
-	"0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx"
-	);
-
-	say $tee "Propagating constraints on geometry for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	my $countopplus1 = ( $countop + 1 ); 
-
-	my $countelm = 0;
-	foreach my $elm ( @constrain_geometry )
-	{
-		
-		my $countelmplus1 = ( $countelm + 1 ); 
-		my @group = @{ $elm }; 
-		my $zone_letter = $group[0]; 
-		my $sourcefile = $group[1]; 
-		my $targetfile = $group[2]; 
-		my $configfile = $group[3]; 
-		my @work_letters = @{$group[4]};  
-		my @swings__ = @{ $group[5] }; 
-		my $askop = $group[6]; 
-		unless ( $askop ) { $askop = 0; } 
-		
-		my $sourceaddress = "$to$sourcefile"; 
-		my $targetaddress = "$to$targetfile"; 
-		
-		my $configaddress;
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-		{
-			$configaddress = "$mypath/$configfile"; 
-		}
-		else
-		{
-			$configaddress = "$mypath\\$configfile"; 
-		}
-		
-		
-		my ( @work_items, @swings, @paces );
-		
-		foreach ( @swings__ )
-		{
-			if ( ref ( $_ ) )
-			{
-				$_ = ( $_->[0] - $_->[1] );
-			}
-			else
-			{
-				$_ = ( $_ * 2 );
-			}
-			push ( @swings, $_ );
-		} say $tee "\@swings : " . dump( @swings );
-		
-		foreach ( @swings )
-		{
-			my $pace = ( $_ / ( $stepsvar - 1 ) );
-			push ( @paces, $pace );
-		} 
-		
-		if ( $todo eq "read_geo")
-		{
-			checkfile( $sourceaddress, $targetaddress );
-			@v = read_geometry( $sourceaddress, $countopplus1, $countelmplus1, $zone_letter, $sourceaddress, $targetaddress, $launchline );
-			@v_  = read_geo_constraints( $to, $fileconfig, $stepsvar, $countopplus1, $countstep, $configaddress, 
-							\@v, $countvar, \@swings, \@paces, $zone_letter, $sourceaddress, $targetaddress, 
-							$countmorphing, $countelmplus1, $launchline );
-		}
-
-		if ($todo eq "write_geo")
-		{
-			apply_geo_constraints( \@v, \@v_, \@vertexletters, \@work_letters, $exeonfiles, $zone_letter, $sourceaddress, 
-						$targetaddress, $countopplus1, $countelmplus1, $askop, $to, $launchline );
-		} 
-		$countelm++;
-	}  
-	return ( \@v, \@v_ );
-} # END SUB constrain_geometry
-
-
-sub read_geometry # THIS READS GEOMETRY FILES TO GET THE VERTICES.
-{
-	my ( $sourceaddress, $countopplus1, $countelmplus1, $zone_letter, $sourceaddress, $targetaddress, $launchline ) = @_;
-	say $tee "Reading geometry for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-		
-	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourcefile 2: $!\n";
-	my @lines = <SOURCEFILE>;
-	close SOURCEFILE;
-
-	my $countlines = 0;
-	my $countvert = 1;
-	
-	foreach my $line (@lines)
-	{
-		$line =~ s/^\s+//; 
-
-		my @rowelements = split(/\s+|,/, $line); 
-		if   ( $rowelements[0] eq "*vertex" ) 
-		{
-			$v[ $countopplus1 ][ $countelmplus1 ][ $countvert ] = [ $rowelements[1], $rowelements[2], $rowelements[3] ];
-			$countvert++; 
-		}
-		$v[ $countopplus1 ][ $countelmplus1 ][ 0 ] = "source: $sourceaddress zone: $zone_letter sourceaddress: $sourceaddress targetaddress: $targetaddress ";
-		$countlines++;
-	}
-	
-	return( @v );
-} # END SUB read_geometry
-
-
-sub read_geo_constraints # THIS READ GEOMETRY CONSTRAINTS.
-{  
-	# THIS MAKES THE vertices IN THE GEOMETRY FILES AVAILABLE TO THE USER FOR MANIPULATION, IN THE FOLLOWING FORM:
-	# $v_[sequence_of_operation_numbers][operations_number][x_variable_number][$x], $v_[sequence_of_operation_numbers][operations_number][y_variable_number][$y],
-	# $v_[operations_number][z_variable_number][$z]. 
-	# EXAMPLE: $v_[1][1][4][\$x] = 1. OR: @v_[1][2][4][\$x] = @v_[1][2][4][\$y]. OR: @v_[1][1][4][\$x] = @v_[1][2][3][\$z].
-	# sequence_of_operation_numbers and operation_numbers number mutations in parallel.
-	# PROPAGATION OF CONSTRAINTS ALLOWS TO IMPOSE EQUALITY CONSTRAINTS TO VARIABLES. 
-	# BESIDES THE VARIABLES FOR THE VERTICES, THE FOLLOWING VARIABLES ARE ALWAYS AVAILABLE: 
-	# $stepsvar, WHICH TELLS THE PROGRAM HOW MANY ITERATION STEPS IT HAS TO DO IN THE CURRENT MORPHING PHASE.
-	# $countstep, WHICH TELLS THE PROGRAM WHAT THE CURRENT ITERATION STEP IS.
-	# $countvar, WHICH TELLS THE PROGRAM WHAT NUMBER OF DESIGN PARAMETER THE PROGRAM IS WORKING AT.
-	my ( $to, $fileconfig, $stepsvar, $countopplus1, $countstep, $configaddress, 
-		$v_ref, $countvar, $swings_ref, $paces_ref, $zone_letter, $sourceaddress, $targetaddress, $countmorphing, $countelmplus1, $launchline ) = @_;
-	say $tee "Reading geometric constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @v = @$v_ref; 
-	my $v_ = dclone($v_ref); 
-	my @v_ = @$v_; 
-	 
-	my @swings = @$swings_ref; 
-	my @paces = @$paces_ref; 
-	my @truev;
-
-	$x = 0;
-	$y = 1;
-	$z = 2;
-
-	if ( defined ( $configaddress ) )
-	{
-		if ( -e $configaddress )
-		{  
-			eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
-		} 
-		else 
-		{
-			say $tee "\$configaddress does not exist. Exiting." and die;
-		}
-	}
-	
-	
-	$v_[ $countopplus1 ][ $countelmplus1 ] = purifydata( \@{ $v[ $countopplus1 ][ $countelmplus1 ] } , \@{ $v_[ $countopplus1 ][ $countelmplus1 ] } );
-	
-	return ( @v_ );
-} # END SUB read_geo_constraints
-
-
-sub apply_geo_constraints
-{
-	my ( $v_ref, $v__ref, $vertexletters_ref, $work_letters_ref, $exeonfiles, $zone_letter, $sourceaddress, 
-						$targetaddress, $countopplus1, $countelmplus1, $askop, $to, $launchline ) = @_;
-	
-	
-	my @v = @$v_ref; 
-	my @v_ = @$v__ref; 
-	
-	my @vertexletters = @$vertexletters_ref; 
-	my @work_letters = @$work_letters_ref; 
-
-	
-	
-	
-	
-	my $countvertex = 0; 
-	foreach my $v_ ( @{ $v_[ $countopplus1 ][ $countelmplus1 ] } )
-	{  
-		my $v = $v[ $countopplus1 ][ $countelmplus1 ][ $countvertex ];
-		my $vertexletter = $vertexletters[$countvertex];
-		
-		my $countv = 0;
-		my $diffq = 0;
-		foreach ( @$v )
-		{  
-			if ( ( $v_->[$countv] != $v->[$countv]  ) and ( $v_->[$countv] ne $v->[$countv] ) )
-			{  
-				$v_->[$countv] = fixlength( $v->[$countv] , $v_->[$countv] );
-				$diffq++;
-			}
-			$countv++;
-		}
-		
-		if ( ( ( @work_letters eq "" ) or ( $vertexletter  ~~ @work_letters ) or ( not ( scalar( @work_letters ) > 0 ) ) ) and ( ( not ( $v_ =~ /^target/ ) ) or ( not ( $v_ =~ /^source/ ) ) ) and ( $diffq > 0 ) ) 
-		{ 
-			my $printthis =
-"prj $launchline<<YYY
-
-m
-c
-a
-$zone_letter
-d
-$vertexletter
-$v_->[0] $v_->[1] $v_->[2]
--
-y
--
-y
-c
--
--
--
--
--
--
--
--
--
-YYY
-";
-			unless ($exeonfiles eq "n") 
-			{
-				print `$printthis`;
-			}
-
-			print $tee $printthis;
-		}
-		$countvertex++;
-	}
-
-} # END SUB apply_geo_constraints
-# END OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING GEOMETRY
-##############################################################################
-
-
-##############################################################################
-# BEGINNING OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING OBSTRUCTIONS
-sub constrain_obstructions # IT APPLIES CONSTRAINTS TO OBSTRUCTIONS
-{
-	# THIS CONSTRAINS OBSTRUCTION FILES. IT HAS TO BE CALLED FROM THE MAIN FILE WITH:
-	# constrain_obstruction($to, $fileconfig, $stepsvar, $countop, $countstep, $exeonfiles, \@applytype, \@constrain_obstructions);
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $constrain_obstructions_ref, $countvar, $fileconfig, 
-		$countmorphing, $exeonfiles, $obs_ref, $obs__ref, $todo, $launchline ) = @_;
-	
-	my @applytype = @$applytype_ref;
-	my @obs = @$obs_ref;
-	my @obs_ = @$obs__ref;
-	my $zone_letter = $applytype[$countop][3]; 
-	
-	
-	my @constrain_obstructions = @{ $constrain_obstructions_ref->[ $countop ] }; 
-	
-	say $tee "Propagating constraints on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my ( @work_letters );
-	
-	my $countopplus1 = ( $countop + 1 ); 
-	my $countelm = 0;
-	foreach my $elm (@constrain_obstructions)
-	{
-		my $countelmplus1 = ( $countelm + 1 ); 
-		my @group = @{$elm}; 
-		my $zone_letter = $group[0]; 
-		my $sourcefile = $group[1]; 
-		my $targetfile = $group[2]; 
-		my $configfile = $group[3]; 
-		my @work_letters = @{$group[4]};  
-		my @swings__ = @{ $group[5] }; 
-		my $actonmaterials = $group[6]; 
-		my @matobs_letters = @{$group[7]}; 
-		my ( @swings, @paces ); 
-		
-		my $sourceaddress = "$to$sourcefile"; 
-		my $targetaddress = "$to$targetfile"; 
-		
-		my $configaddress;
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-		{    
-			$configaddress = "$mypath/$configfile"; 
-		}
-		else
-		{    
-			$configaddress = "$mypath\\$configfile"; 
-		}
-		
-		my @obs_letters = (
-		"e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", 
-		"0\no", "0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", 
-		"0\n0\nb\ny", "0\n0\nb\nz", "0\n0\nb\na", "0\n0\nb\nb", "0\n0\nb\nc", "0\n0\nb\nd", "0\n0\nb\ne", "0\n0\nb\nf", "0\n0\nb\ng", "0\n0\nb\nh", "0\n0\nb\ni",
-		"0\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\nj", "0\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\nn", 
-		"0\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\np", "0\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\ns", 
-		"0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nvs", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx", 
-		"0\n0\nb\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\n0\nb\nc", 
-		);
-		
-		foreach ( @swings__ )
-		{
-			if ( ref ( $_ ) )
-			{
-				$_ = ( $_->[0] - $_->[1] );
-			}
-			else
-			{
-				$_ = ( $_ * 2 );
-			}
-			push ( @swings, $_ );
-		} 
-		
-		foreach ( @swings )
-		{
-			my $pace = ( $_ / ( $stepsvar - 1 ) );
-			push ( @paces, $pace );
-		} 
-		
-		if ($todo eq "read_obs")
-		{
-			
-			checkfile( $sourceaddress, $targetaddress );
-			@obs = read_obstructions( $to, $sourceaddress, $targetaddress, $countopplus1, $countelmplus1, $zone_letter, $configaddress, 
-							\@work_letters, $actonmaterials, $countvar, \@obs_letters, $countmorphing, $launchline );
-			@obs_ = read_obs_constraints( $to, $stepsvar, $countop, $countstep, $configaddress, $actonmaterials, $countvar, $fileconfig, $countmorphing,
-				$countopplus1, \@obs, \@swings, \@paces, $zone_letter, $sourceaddress, $targetaddress, $countelmplus1, $launchline ); # IT WORKS ON THE VARIABLE @obs, WHICH IS globsAL.
-		}
-
-		if ($todo eq "write_obs")
-		{
-			
-			apply_obs_constraints( \@obs, \@obs_, \@obs_letters, \@work_letters, $zone_letter, $actonmaterials, \@vertexletters, 
-						$exeonfiles,  $sourceaddress, $targetaddress, $countopplus1, $countelmplus1, $to, $launchline );
-		} 
-		$countelm++;
-	} 
-	return ( \@obs, \@obs_ );
-} # END SUB constrain_obstructions
-
-
-sub read_obstructions
-{
-	# THIS READS GEOMETRY FILES. # IT HAS TO BE CALLED WITH:
-	# read_obstructions($to, $sourcefile, $targetfile, $configfiles, \@work_letters, $actonmaterials, $countvar);
-	my ( $to, $sourceaddress, $targetaddress, $countopplus1, $countelmplus1, $zone_letter, $configaddress, $work_letters_ref, 
-		$actonmaterials, $countvar, $obs_letters_ref, $countmorphing, $launchline ) = @_;
-	say $tee "Reading obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	my @work_letters = @$work_letters_ref;
-				
-	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress: $!\n";
-	my @lines = <SOURCEFILE>;
-	close SOURCEFILE;
-
-	my $countobs = 0;
-	foreach my $line (@lines)
-	{
-		$line =~ s/^\s+//; 
-		my @rowelts = split(/\s+|,/, $line); 
-		if  ( $rowelts[0] eq "*obs" ) 
-		{
-			$obs[ $countopplus1 ][ $countelmplus1 ][ $countobs ] = [ "*obs", $rowelts[1], $rowelts[2], $rowelts[3] , $rowelts[4], $rowelts[5], $rowelts[6], $rowelts[7], 
-			$rowelts[8], $rowelts[9], $rowelts[10], "#", "block", $rowelts[13] ];
-			$countobs++;
-		}
-		$obs[ $countopplus1 ][ $countelmplus1 ][ 0 ] = "source: $sourceaddress zone: $zone_letter sourceaddress: $sourceaddress targetaddress: $targetaddress ";
-	}
-	
-	return( @obs );
-} # END SUB read_obstructions
-
-
-sub read_obs_constraints
-{  
-	# THE VARIABLE @obs REGARDS OBSTRUCTION USER-IMPOSED CONSTRAINTS
-	# THIS CONSTRAINT CONFIGURATION FILE MAKES AVAILABLE TO THE USER THE FOLLOWING VARIABLES:
-	# $obs[$countop][$countelm][$obs_number][$x], $obs[$countop][$obs_number][$y], $obs[$countop][$obs_number][$z]
-	# $obs[$countop][$countelm][$obs_number][$width], $obs[$countop][$obs_number][$depth], $obs[$countop][$obs_number][$height]
-	# $obs[$countop][$countelm][$obs_number][$z_rotation], $obs[$countop][$obs_number][$y_rotation], 
-	# $obs[$countop][$countelm][$obs_number][$tilt], $obs[$countop][$obs_number][$opacity], $obs[$countop][$obs_number][$material], 
-	# EXAMPLE: $obs[0][1][2][$x] = 2. 
-	# OTHER EXAMPLE: $obs[0][1][2][$x] = $obs[2][2][2][$y].
-	# THE MATERIAL TO BE SPECIFIED IS A MATERIAL LETTER, BETWEEN QUOTES. EXAMPLE: $obs[1][$material] = "a".
-	# sequence_of_operation_numbers and operation_numbers number mutations in parallel.
-	# PROPAGATION OF CONSTRAINTS ALLOWS TO IMPOSE EQUALITY CONSTRAINTS TO VARIABLES. 
-	# BESIDES THE VARIABLES FOR THE VERTICES, THE FOLLOWING VARIABLES ARE ALWAYS AVAILABLE:
-	# $stepsvar, WHICH TELLS THE PROGRAM HOW MANY ITERATION STEPS IT HAS TO DO IN THE CURRENT MORPHING PHASE.
-	# $countstep, WHICH TELLS THE PROGRAM WHAT THE CURRENT ITERATION STEP IS.
-	# $countvar, WHICH TELLS THE PROGRAM WHAT NUMBER OF DESIGN PARAMETER THE PROGRAM IS WORKING AT.
-	
-	my ( $to, $stepsvar, $countop, $countstep, $configaddress, $actonmaterials, $countvar, $fileconfig, $countmorphing,
-		$countopplus1, $obs_ref, $swings_ref, $paces_ref, $zone_letter, $sourceaddress, $targetaddress, $countelmplus1, $launchline ) = @_;
-	my @obs = @$obs_ref;
-	my $obs__ref = dclone( $obs_ref );  
-	my @obs_ = @$obs__ref;
-	my @swings = @$swings_ref;
-	my @paces = @$paces_ref;
-	
-	say $tee "Reading geometric constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my $x = 1;
-	my $y = 2;
-	my $z = 3;
-	my $width = 4;
-	my $depth = 5;
-	my $height = 6;
-	my $zrotation = 7;
-	my $yrotation = 8;
-	my $tilt = 9; # UNUSED
-	my $opacity = 10;
-	my $name = 11; # NOT TO BE CHANGED
-	my $material = 12;
-	my $number = 15;
- 
-	if ( defined ( $configaddress ) )
-	{
-		if (-e $configaddress)
-		{    
-			eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
-		}
-		else 
-		{
-			say $tee "\$configaddress does not exist. Exiting." and die;
-		}
-	}
-	
-	
-	$obs_[ $countopplus1 ][ $countelmplus1 ] = purifydata( \@{ $obs[ $countopplus1 ][ $countelmplus1 ] } , \@{ $obs_[ $countopplus1 ][ $countelmplus1 ] } );
-	
-	return ( @obs_ );
-} # END SUB read_geo_constraints
-
-
-sub apply_obs_constraints
-{
-	my ( $obs_ref, $obs__ref, $obs_letters_ref, $work_letters_ref, $zone_letter, $actonmaterials, $vertexletters_ref, 
-		$exeonfiles,  $sourceaddress, $targetaddress, $countopplus1, $countelmplus1, $to, $launchline ) = @_;
-	say $tee "Constraining obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	
-	my @obs = @$obs_ref; 
-	my @obs_ = @$obs__ref; 
-	my @obs_letters = @$obs_letters_ref; 
-	my @work_letters = @$work_letters_ref; 
-	
-	
-	
-	my $countobs = 0;
-	foreach my $ob_ ( @{ $obs_[ $countopplus1 ][ $countelmplus1 ] } )
-	{
-		
-		my $ob = $obs[ $countopplus1 ][ $countelmplus1 ][ $countobs ]; 
-		my $obs_letter = $obs_letters[ $countobs ]; 
-		
-		my $diffq = 0;
-		my $countelt = 0;
-		foreach ( @$ob_ )
-		{
-			if ( ( $ob_->[ $countelt ] != $ob->[ $countelt ] ) and ( $ob_->[ $countelt ] ne $ob->[ $countelt ] ) )
-			{
-				$ob_->[ $countelt ] = fixlength( $ob->[ $countelt ], $ob_->[ $countelt ] ); 
-				$diffq++;
-			}
-			$countelt++;
-		} 
-		if ( ( ( @work_letters eq "" ) or ( $obs_letter  ~~ @work_letters ) or ( not ( scalar( @work_letters ) > 0 ) ) ) and ( ( not ( $v_ =~ /^target/ ) ) or ( not ( $v_ =~ /^source/ ) ) )  and ( $diffq > 0 ) )
-		{  
-			my $x = $ob_->[1];
-			my $y = $ob_->[2];
-			my $z = $ob_->[3];
-			my $width = $ob_->[4];
-			my $depth = $ob_->[5];
-			my $height = $ob_->[6];
-			my $z_rotation = $ob_->[7];
-			my $y_rotation = $ob_->[8];
-			my $opacity = $ob_->[9];
-			my $name = $ob_->[10];
-			my $material = $ob_->[11];
-			my $number = $ob_->[14];
-			my $printthis =
-"prj $launchline<<YYY
-
-m
-c
-a
-$zone_letter
-h
-a
-$obs_letter
-a
-a
-$x $y $z
-b
-$width $depth $height
-c
-$z_rotation
-d
-$y_rotation
-e
-h
-$opacity
--
--
-c
--
-c
--
--
--
--
-YYY
-";
-			unless ($exeonfiles eq "n") 
-			{
-				print `$printthis`;
-			}
-
-			print $tee $printthis;
-
-			if ($actonmaterials eq "y")
-			{  my $thismaterial = $material->[ $countstep -1 ];
-				my $printthis =
-"prj $launchline<<YYY
-
-m
-c
-a
-$zone_letter
-h
-a
-$obs_letter
-g
-$material
--
--
--
-c
--
-c
--
--
--
--
-YYY
-";    
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-
-				print $tee $printthis;
-			}
-		}
-		$countobs++;
-	}
-} # END SUB apply_obs_constraints
-##############################################################################
-# END OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING OBSTRUCTIONS
-
-
-##############################################################################
-# BEGINNING OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING THE MASS-FLOW NETWORKS
-sub read_net # MAINTAIN ZZZ
-{
-	say "Reading networks for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my ( $sourceaddress, $targetaddress, $node_letters_ref, $component_letters_ref, $countvar, $countmorphing, $launchline ) = @_;
-	
-	# checkfile($sourceaddress, $targetaddress); # THIS HAS TO BE _FIXED!_
-	my @node_letters = @$node_letters_ref;
-	my @component_letters = @$component_letters_ref;
-
-	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourcefile : $!\n";
-	my @lines = <SOURCEFILE>;
-	close SOURCEFILE;
-	my $countlines = 0;
-	my $countnode = -1;
-	my $countcomponent = -1;
-	my $countcomp = 0;
-	my $semaphore_node = "no";
-	my $semaphore_component = "no";
-	my $semaphore_connection = "no";
-	my ($component_letter, $type, $data_1, $data_2, $data_3, $data_4);
-	foreach my $line (@lines)
-	{
-		if ( $line =~ m/Fld. Type/ )
-		{
-			$semaphore_node = "yes";
-		}
-		if ( $semaphore_node eq "yes" )
-		{
-			$countnode++;
-		}
-		if ( $line =~ m/Type C\+ L\+/ )
-		{
-			$semaphore_component = "yes";
-			$semaphore_node = "no";
-		}
-
-		if ( ($semaphore_node eq "yes") and ( $semaphore_component eq "no" ) and ( $countnode >= 0))
-		{
-			$line =~ s/^\s+//; 
-			my @row = split(/\s+/, $line);
-			my $node_letter = $node_letters[$countnode];
-			my $fluid = $row[1];
-			my $type = $row[2];
-			my $height = $row[3];
-			my $data_2 = $row[6]; # volume or azimuth
-			my $data_1 = $row[5]; #surface
-			push( @node, [ $node_letter, $fluid, $type, $height, $data_2, $data_1 ] ); # PLURAL
-		}
-
-		if ( $semaphore_component eq "yes" )
-		{
-			$countcomponent++;
-		}
-
-		if ( $line =~ m/\+Node/ )
-		{
-			$semaphore_connection = "yes";
-			$semaphore_component = "no";
-			$semaphore_node = "no";
-		}
-
-		if ( ($semaphore_component eq "yes") and ( $semaphore_connection eq "no" ) and ( $countcomponent > 0))
-		{
-			$line =~ s/^\s+//; 
-			my @row = split(/\s+/, $line);
-			if ($countcomponent % 2 == 1) # $number is odd 
-			{ 
-				$component_letter = $component_letters[$countcomp];
-				$fluid = $row[0];
-				$type = $row[1];
-				if ($type eq "110") { $type = "k";}
-				if ($type eq "120") { $type = "l";}
-				if ($type eq "130") { $type = "m";}
-				$countcomp++;
-			}
-			else # $number is even 
-			{ 
-				$data_1 = $row[1];
-				$data_2 = $row[2];
-				$data_3 = $row[3];
-				$data_4 = $row[4];
-				push( @component, [ $component_letter, $fluid, $type, $data_1, $data_2, $data_3, $data_4 ] ); # PLURAL
-			}
-		}
-		$countlines++;
-	}
-	return ( \@node, \@component );
-} # END SUB read_controls.
-
-
-sub apply_node_changes
-{   # TO BE CALLED WITH: apply_node_changes($exeonfiles, \@new_nodes);
-	# THIS APPLIES CHANGES TO NODES IN NETS
-	my ( $swap, $swap2, $countvar ) = @_;
-	say "Applying changes to network nodes for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @new_nodes = @$swap;
-	my @tempnodes = @$swap2;
-
-	my $countnode = 0;
-	foreach my $elm (@new_nodes)
-	{
-		my @node_ = @{$elm};
-		my $new_node_letter = $node_[0];
-		my $new_fluid = $node_[1];
-		my $new_type = $node_[2];
-		my $new_zone = $node_[3];
-		my $new_height = $node_[4];
-		my $new_data_2 = $node_[5];
-		my $new_surface = $node_[6];
-		my $new_cp = $node_[7];
-
-		unless ( @{$new_nodes[$countnode]} ~~ @{$tempnodes[$countnode]} )
-		{
-			if ($new_type eq "a" ) # IF NODES ARE INTERNAL
-			{
-				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-
-m
-e
-c
-
-n
-c
-$new_node_letter
-
-$new_fluid
-$new_type
-y
-$new_zone
-$new_data_2
-$new_height
-a
-
--
--
-y
-
-y
--
--
-YYY
-";
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-				print $tee $printthis;
-			}
-
-			if ($new_type eq "e" ) # IF NODES ARE BOUNDARY ONES, WIND-INDUCED
-			{
-				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-
-m
-e
-c
-
-n
-c
-$new_node_letter
-
-$new_fluid
-$new_type
-$new_zone
-$new_surface
-$new_cp
-y
-$new_data_2
-$new_height
--
--
-y
-
-y
--
--
-YYY
-";
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-				print $tee $printthis;
-			}
-		}
-		$countnode++;
-	}
-} # END SUB apply_node_changes;
-
-
-sub apply_component_changes
-{   # TO BE CALLED WITH: apply_component_changes($exeonfiles, \@new_components);
-	# THIS APPLIES CHANGES TO COMPONENTS IN NETS
-	my ( $swap, $swap2, $countvar ) = @_;
-	say "Applying changes to network components for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @new_components = @$swap; # [ $new_component_letter, $new_type, $new_data_1, $new_data_2, $new_data_3, $new_data_4 ]
-	my @tempcomponents = @$swap2;
-
-	my $countcomponent = 0;
-	foreach my $elm (@new_components)
-	{
-		my @component_ = @{$elm};
-		my $new_component_letter = $component_[0];
-		my $new_fluid = $component_[1];
-		my $new_type = $component_[2];
-		my $new_data_1 = $component_[3];
-		my $new_data_2 = $component_[4];
-		my $new_data_3 = $component_[5];
-		my $new_data_4 = $component_[6];
-
-		unless
-		( @{$new_components[$countcomponents]} ~~ @{$tempcomponents[$countcomponents]} )
-		{
-			if ($new_type eq "k" ) # IF THE COMPONENT IS A GENERIC OPENING
-			{
-				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-
-m
-e
-c
-
-n
-d
-$new_component_letter
-$new_fluid
-$new_type
--
-$new_data_1
--
--
-y
-
-y
--
--
-YYY
-";
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-				print $tee $printthis;
-			}
-
-			if ($new_type eq "l" ) # IF THE COMPONENT IS A CRACK
-			{
-				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-
-m
-e
-c
-
-n
-d
-$new_component_letter
-$new_fluid
-$new_type
--
-$new_data_1 $new_data_2
--
--
-y
-
-y
--
--
-YYY
-";
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-				print $tee $printthis;
-			}
-
-			if ($new_type eq "m" ) # IF THE COMPONENT IS A DOOR
-			{
-				my $printthis =
-"prj -file $to/cfg/$fileconfig -mode script<<YYY
-
-m
-e
-c
-
-n
-d
-$new_component_letter
-$new_fluid
-$new_type
--
-$new_data_1 $new_data_2 $new_data_3 $new_data_4
--
--
-y
-
-y
--
--
-YYY
-";
-				unless ($exeonfiles eq "n") 
-				{
-					print `$printthis`;
-				}
-				print $tee "$printthis";
-			}
-		}
-		$countcomponent++;
-	}
-} # END SUB apply_component_changes;
-
-
-sub constrain_net 
-{  # IT ALLOWS TO MANIPULATE USER-IMPOSED CONSTRAINTS REGARDING NETS
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $constrain_net_ref, $countvar, $fileconfig, $countmorphing, $todo, 
-		$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline  ) = @_;
-	say "Constraining network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-
-	my @applytype = @$applytype_ref;
-	my @node = @$node_ref;
-	my @component = @$component_ref;
-	my @donode = @$donode_ref;
-	my @docomponent = @$docomponent_ref;
-											
-	my $zone_letter = $applytype[$countop][3];
-	my @constrain_net = @{ $constrain_net_ref[ $countop ] };
-	
-	my $elm = $constrain_net[$countop];
-	
-	my @node_letters = ( 
-	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", 
-	"0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\nz", "0\na", "0\nb", "0\nc", "0\nd", "0\ne", "0\nf",  "0\ng", "0\nh", 
-	"0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", "0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", 
-	"0\n0\nb\ns", "0\n0\nb\nt", "0\n0\nb\nu", "0\n0\nb\nv", "0\n0\nb\nw", "0\n0\nb\nx", "0\n0\nb\ny",
-	"0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\nj", 
-	"0\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\np", 
-	"0\n0\nb\n0\nb\n0\nb\np", "0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\n0\nb\nb", 
-	"0\n0\nb\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\n0\nb\ng"
-	); # RE-CHECK
-	
-	my @component_letters = (
-	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", 
-	"0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\nz", "0\na", "0\nb", "0\nc", "0\nd", "0\ne", "0\nf",  "0\ng", "0\nh", 
-	"0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", "0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", 
-	"0\n0\nb\ns", "0\n0\nb\nt", "0\n0\nb\nu", "0\n0\nb\nv", "0\n0\nb\nw", "0\n0\nb\nx", "0\n0\nb\ny",
-	"0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\nj", 
-	"0\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\np", 
-	"0\n0\nb\n0\nb\n0\nb\np", "0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\n0\nb\nb", 
-	"0\n0\nb\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\n0\nb\ng"
-	); # RE-CHECK
-		
-	my $countopplus1 = ( $countop + 1 );
-	
-	my $countelt = 0;
-	foreach my $elt ( @$elm )
-	{
-		my $counteltplus1 = ( $countelt + 1 );
-		
-		my @group = @$elt;
-		my $sourcefile = $group[0];
-		my $targetfile = $group[1];
-		my $configfile = $group[2];
-		my @nodebulk = @{$group[3]};
-		my @componentbulk = @{$group[4]};
-		my $sourceaddress = "$to$sourcefile"; 
-		my $targetaddress = "$to$targetfile"; 
-		my $configaddress = "$mypath/$configfile"; 
-
-		my $node = 0;
-		my $fluid = 1;
-		my $type = 2;
-		my $height = 3;
-		my $volume = 4;
-		my $volume = 4;
-		my $azimuth = 4;
-		my $component = 0;
-		my $area = 3;
-		my $width = 4;
-		my $length = 5;
-		my $door_width = 4;
-		my $door_height = 5;
-		my $door_nodeheight = 6;
-		my $door_discharge = 7;
-
-		my $activezone = $applytype[$countop][3];
-		my ($semaphore_node, $semaphore_component, $node_letter);
-		my $count_component = -1;
-		my $countline = 0;
-		
-		my $countnode = 0;
-		my $countcomponent = 0;
-
-		#@node; @component; # PLURAL! DON'T PUT "MY" HERE. globAL.
-		#@new_nodes; @new_components; # DON'T PUT "my" HERE. THEY ARE globAL!!!
-
-		if ($todo eq "read_net")
-		{
-			checkfile($sourceaddress, $targetaddress);
-			if ($countstep == 1)
-			{
-				( $node_ref, $component_ref ) = read_net($sourceaddress, $targetaddress, \@node_letters, \@component_letters);
-				( $donode_ref, $docomponent_ref ) = read_net_constraints
-				($to, $stepsvar, $countop, $countstep, $configaddress, \@node, \@component, \@tempnode, \@tempcomponent, $countvar, $fileconfig, $countmorphing  ); # PLURAL
-			}
-		}
-		
-		@node = @$node_ref;
-		@component = @$component_ref;
-		@donode = @$donode_ref;
-		@docomponent = @$docomponent_ref;
-		
-		if ($todo eq "write_net")
-		{
-			apply_node_changes( \@donode, \@tempnode ); #PLURAL
-			apply_component_changes( \@docomponent, \@tempcomponent );
-		}
-		$countelt++;
-	}
-	return ( \@node, \@component, \@donode, \@docomponent );
-} # END SUB constrain_net.
-
-
-sub read_net_constraints
-{
-	my ( $to, $stepsvar, $countop, $countstep, $configaddress, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
-	
-	@node = @$swap; # PLURAL
-	@component = @$swap2;
-	@tempnode = @$swap3;
-	@tempcomponent = @$swap4;
-
-	unshift (@node, []); # PLURAL
-	unshift (@component, []);
-	if (-e $configaddress) # TEST THIS
-	{  # THIS APPLIES CONSTRAINST, THE FLATTEN THE HIERARCHICAL STRUCTURE OF THE RESULTS,
-		# TO BE PREPARED THEN FOR BEING APPLIED TO CHANGE PROCEDURES. IT IS TO BE TESTED.
-
-		push (@node, [@mynode]); #
-		push (@component, [@mycomponent]); #
-
-		eval `cat $configaddress`;  # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS 
-		# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED.
-		# THIS FILE CAN CONTAIN USER-IMPOSED CONSTRAINTS FOR MASS-FLOW NETWORKS TO BE READ BY OPT.
-		# IT MAKES AVAILABLE VARIABLES REGARDING THE SETTING OF NODES IN A NETWORK.
-		# CURRENTLY: INTERNAL UNKNOWN AIR NODES AND BOUNDARY WIND-CONCERNED NODES.
-		# IT MAKES AVAILABLE VARIABLES REGARDING COMPONENTS
-		# CURRENTLY: WINDOWS, CRACKS, DOORS.
-		# ALSO, THIS MAKES AVAILABLE TO THE USER INFORMATIONS ABOUT THE MORPHING STEP OF THE MODELS.
-		# SPECIFICALLY, THE FOLLOWING VARIABLES WHICH REGARD BOTH INTERNAL AND BOUNDARY NODES.
-		# NOTE THAT "node_number" IS THE NUMBER OF THE NODE IN THE ".afn" ESP-r FILE. 
-		# $node[$countop][node_number][$node]. # EXAMPLE: $node[0][3][$node]. THIS IS THE LETTER OF THE THIRD NODE, 
-		# AT THE FIRST CONTERZONE (NUMBERING STARTS FROM 0)
-		# $node[$countop][node_number][$type]
-		# $node[$countop][node_number][$height]. # EXAMPLE: $node[0][3][$node]. THIS IS THE HEIGHT OF THE 3RD NODE AT THE FIRST COUNTERZONE
-		# THEN IT MAKES AVAILABLE THE FOLLOWING VARIABLES REGARDING NODES:
-		# $node[$countop][node_number][$volume] # REGARDING INTERNAL NODES
-		# $node[$countop][node_number][$azimut] # REGARDING BOUNDARY NODES
-		# THEN IT MAKE AVAILABLE THE FOLLOWING VARIABLES REGARDING COMPONENTS:
-		# $node[$countop][node_number][$area] # REGARDING SIMPLE OPENINGS
-		# $node[$countop][node_number][$width] # REGARDING CRACKS
-		# $node[$countop][node_number][$length] # REGARDING CRACKS
-		# $node[$countop][node_number][$door_width] # REGARDING DOORS
-		# $node[$countop][node_number][$door_height] # REGARDING DOORS
-		# $node[$countop][node_number][$door_nodeheight] # REGARDING DOORS
-		# $node[$countop][node_number][$door_discharge] # REGARDING DOORS (DISCHARGE FACTOR)
-		# ALSO, THIS MAKES AVAILABLE TO THE USER INFORMATIONS ABOUT THE MORPHING STEP OF THE MODELS 
-		# AND THE STEPS THE MODEL HAVE TO FOLLOW.
-		# THIS ALLOWS TO IMPOSE EQUALITY CONSTRAINTS TO THESE VARIABLES, 
-		# WHICH COULD ALSO BE COMBINED WITH THE FOLLOWING VARIABLES 
-		# $stepsvar, WHICH TELLS THE PROGRAM HOW MANY ITERATION STEPS IT HAS TO DO IN THE CURRENT MORPHING PHASE.
-		# $countop, WHICH TELLS THE PROGRAM WHAT OPERATION IS BEING EXECUTED IN THE CHAIN OF OPERATIONS 
-		# THAT MAY BE EXECUTES AT EACH MORPHING PHASE. EACH $countop WILL CONTAIN ONE OR MORE ITERATION STEPS.
-		# TYPICALLY, IT WILL BE USED FOR A ZONE, BUT NOTHING PREVENTS THAT SEVERAL OF THEM CHAINED ONE AFTER 
-		# THE OTHER ARE APPLIED TO THE SAME ZONE. THE NUMBER COUNT STARTS FROM 0.
-		# $countstep, WHICH TELLS THE PROGRAM WHAT THE CURRENT ITERATION STEP IS.
-		# $countvar, WHICH TELLS THE PROGRAM WHAT NUMBER OF DESIGN PARAMETER THE PROGRAM IS WORKING AT.
-		# The $countop that is actuated is always the last, the one which is active. 
-		# It would have therefore no sense writing $node[0][3][$node] =  $node[1][3][$node].
-		# Differentent $countops can be referred to the same zone. Different $countops just number mutations in series.
-
-		if (-e $constrain) { eval ( $constrain ); } # HERE THE INSTRUCTION WRITTEN IN THE OPT CONFIGURATION FILE CAN BE SPEFICIED
-		# FOR PROPAGATION OF CONSTRAINTS
-
-		@donode = @{$node[$#node]}; #
-		@docomponent = @{$component[$#component]}; #
-
-		shift ( @donode );
-		shift ( @docomponent );
-	}
-	return( \@donode, \@docomponent );
-} # END SUB read_net_constraints
-##############################################################################
-# END OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING MASS-FLOW NETWORKS
 
 
 sub vary_controls
@@ -6678,7 +6095,6 @@ sub apply_loopcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
-
 m
 j
 
@@ -6748,7 +6164,6 @@ sub apply_flowcontrol_changes
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
-
 m
 l
 

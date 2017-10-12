@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 use Geo::IP;
 
 # here we are using GeoIP ISP

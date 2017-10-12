@@ -1,4 +1,4 @@
-Math-Polynomial-Multivariate version 0.005
+Math-Polynomial-Multivariate version 0.006
 ==========================================
 
 Math::Polynomial::Multivariate is a Perl class representing polynomials
@@ -53,7 +53,7 @@ Recommended modules for increased functionality are:
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2014 by Martin Becker.  All rights reserved.
+Copyright (c) 2011-2017 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

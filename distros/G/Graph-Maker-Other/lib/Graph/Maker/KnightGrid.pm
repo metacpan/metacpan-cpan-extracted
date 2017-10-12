@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -60,8 +60,10 @@ sub init {
 
   my $graph = $graph_maker->(%params);
 
-  $graph->set_graph_attribute(name => "Knight Grid "
-                              . @$dims ? join('x',@$dims) : 'empty');
+  $graph->set_graph_attribute(name =>
+                              "Knight Grid "
+                              . (@$dims ? join('x',@$dims) : 'empty')
+                              . ($cyclic ? " cyclic" : ""));
   unless (_aref_any_nonzero($dims)) {
     ### all dims zero ...
     return $graph;
@@ -163,6 +165,9 @@ but the edges here are steps 2,1.
     |      |      |      |      |          etc
     +------+------+------+------+
 
+For 3 or more dimensions the moves are step by 2 in some coordinate and 1 in
+another different coordinate.
+
 =head2 Cyclic
 
 C<cyclic =E<gt> 1> makes the grid wrap-around at its sides.  For 2
@@ -171,14 +176,15 @@ dimensions this is knight moves on a torus.
 For 1 dimension like C<dims =E<gt> [6]> there are no edges.  A knight move
 2,1 means move 2 in one dimension and 1 in another.  When there is only 1
 dimension there is no second dimension for the second step.  2 dimensions
-like C<dims =E<gt> [6,1]> can be given and in that case the effect is steps
-+/-1 and +/-2 along the row of vertices cycling at the ends.
+like C<dims =E<gt> [6,1]> can be given and in that case the effect with
+C<cyclic> is steps +/-1 and +/-2 along the row of vertices cycling at the
+ends.
 
 For a 1x1 cyclic grid C<dims =E<gt> [1,1]>, or any higher 1x1x1 etc, there
 is a self-loop edge since the knight move wraps around from the single
 vertex to itself.  This is the same as the 1-vertex cyclic case in
-C<Graph::Maker::Grid>.  (It also has a self-loop for 1-dimension C<dims
-=E<gt> [1]> whereas here that is no edges as described above.)
+C<Graph::Maker::Grid>.  (That class also has a self-loop for 1-dimension
+C<dims =E<gt> [1]> whereas here that is no edges as described above.)
 
 =head1 FUNCTIONS
 
@@ -214,11 +220,13 @@ dimensions
 
     max_degree = 4*D*(D-1)  = 0, 8, 24, 48, 80, ...       (A033996)
 
-=for GP-DEFINE  max_degree(D) = 4*D*(D-1);
+=cut
 
-=for GP-Test  max_degree(2) == 8
+# GP-DEFINE  max_degree(D) = 4*D*(D-1);
+# GP-Test  max_degree(2) == 8
+# GP-Test  vector(6,D, max_degree(D)) == 8*[0,1,3,6,10,15]
 
-=for GP-Test  vector(6,D, max_degree(D)) == 8*[0,1,3,6,10,15]
+=pod
 
 =head1 HOUSE OF GRAPHS
 
@@ -226,11 +234,41 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item 3x3, cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607> (Paley 9)
+=item 2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=52>, 4 disconnected
 
-=item 3x4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21067>
+=item 2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=674>, 4-cycle
+
+=item 3x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=896>
+
+=item 3x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>
+
+=item 3x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=126>
+
+=item 3x3 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607>, Paley 9
+
+=item 4x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=684>
+
+=item 4x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>
+
+=item 4x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21067>
+
+=item 4x4 cyclic or 2x2x2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1340>, tesseract
+
+=item 5x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21063>
+
+=item 2x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=68>, 8 disconnected
+
+=item 2x2x2 cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022>, cube
+
+=item 4x2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1082>, four 4-cycles
 
 =back
+
+=cut
+
+# cf 2x2x2 is disconnected 8
+
+=pod
 
 =head1 OEIS
 

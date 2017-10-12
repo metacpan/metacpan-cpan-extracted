@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ymask;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Filter documents through applying a mask
 
 use ETL::Yertl;
@@ -55,7 +55,7 @@ ETL::Yertl::Command::ymask - Filter documents through applying a mask
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 AUTHOR
 

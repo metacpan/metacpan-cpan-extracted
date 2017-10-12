@@ -42,6 +42,7 @@ my $builder = $mb_subclass->new(
         'File::Temp'        => 0,
         'Path::Class'       => 0,
         'Pod::Simple::Text' => 0,
+        'DateTime'          => 0,
     },
     requires => {
         'perl'            => 5.010,
@@ -51,6 +52,7 @@ my $builder = $mb_subclass->new(
         'Moose'           => 0,
         'MooseX::Aliases' => 0,
         'Moose::Exporter' => 0,
+        'Try::Tiny'       => 0,
     },
     script_files => [qw()],
     add_to_cleanup => ['XML-Chain-*'],

@@ -1,5 +1,8 @@
 Revision history for Log-Log4Cli
 
+0.19    2017-10-09
+        use croak instead of die (file:line in $@ fixed)
+
 0.18    2017-08-23
         replace 'notice' (deprecated) loglevel by 'alert'
         pod fixed

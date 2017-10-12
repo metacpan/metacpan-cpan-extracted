@@ -9,7 +9,7 @@ require Exporter;
 *import    = \&Exporter::import;
 @EXPORT_OK = qw[set_color color_of parent_of left_of right_of];
 
-$VERSION = '0.2';
+$VERSION = '0.500006';
 
 my %attribute = (
     key    => _KEY,
@@ -185,7 +185,7 @@ Tree::RB::Node - A node class for implementing Red/Black trees
 
 =head1 VERSION
 
-This document describes Tree::RB::Node version 0.0.1
+This document describes Tree::RB::Node version 0.500006
 
 
 =head1 SYNOPSIS

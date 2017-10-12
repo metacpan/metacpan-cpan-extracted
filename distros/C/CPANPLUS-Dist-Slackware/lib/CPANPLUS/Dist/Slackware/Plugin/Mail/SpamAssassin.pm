@@ -3,12 +3,13 @@ package CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
-use File::Spec qw();
+use CPANPLUS::Dist::Slackware::Util qw(catdir catfile slurp spurt run);
 
 sub available {
     my ( $plugin, $dist ) = @_;
+
     return ( $dist->parent->package_name eq 'Mail-SpamAssassin' );
 }
 
@@ -31,29 +32,24 @@ sub _install_init_script {
 
     my $destdir = $pkgdesc->destdir;
 
-    my $wrksrc = $module->status->extract;
-    return if !$wrksrc;
-
     my $script;
-    my $srcfile
-        = File::Spec->catdir( $wrksrc, 'spamd', 'slackware-rc-script.sh' );
+    my $srcfile = catfile( 'spamd', 'slackware-rc-script.sh' );
     if ( -f $srcfile ) {
-        $script = $dist->_read_file($srcfile);
+        $script = slurp($srcfile);
     }
     if ($script) {
         $script =~ s/^SNAME=rc\.spamassassin/SNAME=rc.spamd/xms;
 
-        my $sysconfdir = File::Spec->catdir( $destdir, 'etc' );
+        my $sysconfdir = catdir( $destdir, 'etc' );
 
-        my $rcdir = File::Spec->catdir( $sysconfdir, 'rc.d' );
+        my $rcdir = catdir( $sysconfdir, 'rc.d' );
         $cb->_mkdir( dir => $rcdir ) or return;
 
-        my $initfile = File::Spec->catfile( $rcdir, 'rc.spamd' );
-        $dist->_write_file( $initfile, $script );
+        my $initfile = catfile( $rcdir, 'rc.spamd' );
+        spurt( $initfile, $script );
 
-        my $conffile
-            = File::Spec->catfile( $sysconfdir, 'spamassassin.conf' );
-        $dist->_write_file( $conffile, "ENABLED=1\n" );
+        my $conffile = catfile( $sysconfdir, 'spamassassin.conf' );
+        spurt( $conffile, "ENABLED=1\n" );
     }
 
     return 1;
@@ -67,14 +63,11 @@ sub _install_docfiles {
     my $cb      = $module->parent;
     my $pkgdesc = $status->_pkgdesc;
 
-    my $wrksrc = $module->status->extract;
-    return if !$wrksrc;
-
-    my $docdir = File::Spec->catdir( $pkgdesc->destdir, $pkgdesc->docdir );
+    my $docdir = catdir( $pkgdesc->destdir, $pkgdesc->docdir );
 
     my $readme = $plugin->_readme_slackware_addendum;
-    my $readmefile = File::Spec->catfile( $docdir, 'README.SLACKWARE' );
-    $dist->_write_file( $readmefile, { append => 1 }, $readme ) or return;
+    my $readmefile = catfile( $docdir, 'README.SLACKWARE' );
+    spurt( $readmefile, { append => 1 }, $readme ) or return;
 
     my @docfiles = qw(
         INSTALL
@@ -92,17 +85,8 @@ sub _install_docfiles {
 
     my $fail = 0;
     for my $docfile (@docfiles) {
-        my $from = File::Spec->catfile( $wrksrc, $docfile );
-        if ( -f $from ) {
-            if ( !$cb->_copy( file => $from, to => $docdir ) ) {
-                ++$fail;
-            }
-        }
-        elsif ( -d $from ) {
-            my $cmd = [ '/bin/cp', '-R', $from, $docdir ];
-            if ( !$dist->_run_command($cmd) ) {
-                ++$fail;
-            }
+        if ( !run( [ '/bin/cp', '-R', $docfile, $docdir ] ) ) {
+            ++$fail;
         }
     }
 
@@ -201,7 +185,7 @@ CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin - Add an init script and d
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin version 1.024.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin version 1.025.
 
 =head1 SYNOPSIS
 
@@ -237,7 +221,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the module File::Spec and the command C<cp>.
+Requires the command C<cp>.
 
 =head1 INCOMPATIBILITIES
 
@@ -260,7 +244,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Andreas Voegele
+Copyright 2012-2017 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

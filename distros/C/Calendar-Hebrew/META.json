@@ -42,6 +42,12 @@
          }
       }
    },
+   "provides" : {
+      "Calendar::Hebrew" : {
+         "file" : "lib/Calendar/Hebrew.pm",
+         "version" : "0.04"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -50,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Hebrew"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

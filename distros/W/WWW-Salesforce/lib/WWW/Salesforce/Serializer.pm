@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use SOAP::Lite;
 
-use base qw( SOAP::Serializer );
+our @ISA = qw( SOAP::Serializer );
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 $VERSION = eval $VERSION;
 
 

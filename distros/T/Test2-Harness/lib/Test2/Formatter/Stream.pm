@@ -2,7 +2,7 @@ package Test2::Formatter::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use Carp qw/croak confess/;
 use Time::HiRes qw/time/;
@@ -105,6 +105,7 @@ sub record {
         $json = ENCODER->encode(
             {
                 stamp        => time,
+                times        => [times],
                 stream_id    => $id,
                 event_id     => "event-$id",
                 facet_data   => $facets,

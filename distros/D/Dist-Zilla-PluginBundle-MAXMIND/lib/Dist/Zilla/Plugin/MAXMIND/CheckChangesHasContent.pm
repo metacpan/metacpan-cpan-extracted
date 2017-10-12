@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use CPAN::Changes;
 
@@ -70,7 +70,7 @@ Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent - Checks Changes for conten
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =for Pod::Coverage .*
 

@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Message;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 
 use Log::Report 'log-report';
@@ -56,6 +56,9 @@ sub new($@)
     bless \%s, $class;
 }
 
+# internal use only: to simplify __*p* functions
+sub _msgctxt($) {$_[0]->{_msgctxt} = $_[1]; $_[0]}
+
 
 sub clone(@)
 {   my $self = shift;
@@ -91,6 +94,7 @@ sub append()  {shift->{_append}}
 sub domain()  {shift->{_domain}}
 sub count()   {shift->{_count}}
 sub context() {shift->{_context}}
+sub msgctxt() {shift->{_msgctxt}}
 
 
 sub classes()

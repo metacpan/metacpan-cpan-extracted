@@ -1,8 +1,15 @@
-prompt generic
-    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
+# phrasebook for hp devices with cli, e.g. hp procurve
 
-prompt basic
-    match /: ?$/
+# hp cli: outputs ansi escapes, before and after the prompt...apparently not possible to disable?
+# privileged and configure prompt cannot be inherited from cisco pb for that reason
+prompt generic
+    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?(?:\x1b\[[0-9;\?]*[A-KSTfhilmnrs])*$/
+
+prompt privileged
+    match /# ?(?:\x1b\[[0-9;\?]*[A-KSTfhilmnrs])*$/
+
+prompt configure
+    match /\(config[^)]*\)# ?(?:\x1b\[[0-9;\?]*[A-KSTfhilmnrs])*$/
 
 prompt user
     match /login as: ?$/
@@ -13,6 +20,3 @@ macro enable_paging
 macro disable_paging
     send no page
 
-# legacy support
-prompt prompt
-    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/

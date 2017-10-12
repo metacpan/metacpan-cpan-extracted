@@ -19,14 +19,105 @@
 
 use 5.005;
 use strict;
-use Graph::Maker::TwindragonAreaTree;
 use List::Util 'min','max','sum';
+use Graph::Maker::TwindragonAreaTree;
+
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
 use MyGraphs;
 $| = 1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
+
+
+{
+  # House of Graphs
+  #  k=0 https://hog.grinvin.org/ViewGraphInfo.action?id=1310    single vertex
+  #  k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
+  #  k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
+  #  k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=700
+  #  k=4 not
+  #  k=5 not
+  my @graphs;
+  foreach my $k (0 .. 4) {
+    my $graph = Graph::Maker->new('twindragon_area_tree', level=>$k,
+                                  undirected=>1);
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # sample picture for POD
+
+  my $level = 6;
+  my $scale_y = 2;
+  my $scale_x = 4;
+
+  require Image::Base::Text;
+  my $image = Image::Base::Text->new (-width => 80, -height => 40);
+  my $offset_x = 50;
+  my $offset_y = 20;
+
+  my $draw_text = sub {
+    my ($x,$y, $str) = @_;
+    $y = -$y;
+    $x *= $scale_x;
+    $y *= $scale_y;
+    $x += $offset_x;
+    $y += $offset_y;
+    $x -= length($str)-1;
+    foreach my $i (0 .. length($str)-1) {
+      $image->xy($x+$i,$y, substr($str,$i,1));
+    }
+  };
+  my $draw_line = sub {
+    my ($x,$y, $x2,$y2) = @_;
+    $y = -$y;
+    $y2 = -$y2;
+    my $dx = $x2-$x; if ($dx) { $dx /= abs($dx); }
+    my $dy = $y2-$y; if ($dy) { $dy /= abs($dy); }
+    my $char = $dx ? '-' : '|';
+    $x *= $scale_x;
+    $y *= $scale_y;
+    $x += $offset_x;
+    $y += $offset_y;
+    $x2 *= $scale_x;
+    $y2 *= $scale_y;
+    $x2 += $offset_x;
+    $y2 += $offset_y;
+    ### line: "$x,$y to $x2,$y2  by $dx,$dy"
+    while ($x != $x2 || $y != $y2) {
+      ### at: "$x,$y"
+      if ($image->xy($x,$y) eq ' ') {
+        $image->xy($x,$y, $char);
+      }
+      $x += $dx;
+      $y += $dy;
+    }
+  };
+
+  require Math::PlanePath::ComplexPlus;
+  my $path = Math::PlanePath::ComplexPlus->new;
+  my $graph = Graph::Maker->new ('twindragon_area_tree', level => $level);
+  foreach my $n ($graph->vertices) {
+    my ($x,$y) = $path->n_to_xy($n);
+    $draw_text->($x,$y, $n);
+  }
+  foreach my $edge ($graph->edges) {
+    my ($v1,$v2) = @$edge;
+    my ($x1,$y1) = $path->n_to_xy($v1);
+    my ($x2,$y2) = $path->n_to_xy($v2);
+    $draw_line->($x1,$y1, $x2,$y2);
+  }
+
+  $image->save('/dev/stdout');
+  exit 0;
+}
 
 {
   # trees symmetric and symmetric halves all the way down
@@ -134,24 +225,6 @@ $| = 1;
                   + (grep {$_->[1] == $v} @$edge_aref));
   }
 }
-
-{
-  # House of Graphs
-  #  k=0 https://hog.grinvin.org/ViewGraphInfo.action?id=1310    single vertex
-  #  k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
-  #  k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
-  #  k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  #  k=4 not
-  #  k=5 not
-  my @graphs;
-  foreach my $k (0 .. 2) {
-    my $graph = Graph::Maker->new('twindragon_area_tree', level=>$k,
-                                  undirected=>1);
-    push @graphs, $graph;
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 {
   # vertices away from PlusOffsetVH vertex
   # eccentricity = JA
@@ -241,74 +314,6 @@ $| = 1;
   exit 0;
 }
 
-
-{
-  # sample picture for POD
-
-  my $level = 6;
-  my $scale_y = 2;
-  my $scale_x = 4;
-
-  require Image::Base::Text;
-  my $image = Image::Base::Text->new (-width => 80, -height => 40);
-  my $offset_x = 50;
-  my $offset_y = 20;
-
-  my $draw_text = sub {
-    my ($x,$y, $str) = @_;
-    $y = -$y;
-    $x *= $scale_x;
-    $y *= $scale_y;
-    $x += $offset_x;
-    $y += $offset_y;
-    $x -= length($str)-1;
-    foreach my $i (0 .. length($str)-1) {
-      $image->xy($x+$i,$y, substr($str,$i,1));
-    }
-  };
-  my $draw_line = sub {
-    my ($x,$y, $x2,$y2) = @_;
-    $y = -$y;
-    $y2 = -$y2;
-    my $dx = $x2-$x; if ($dx) { $dx /= abs($dx); }
-    my $dy = $y2-$y; if ($dy) { $dy /= abs($dy); }
-    my $char = $dx ? '-' : '|';
-    $x *= $scale_x;
-    $y *= $scale_y;
-    $x += $offset_x;
-    $y += $offset_y;
-    $x2 *= $scale_x;
-    $y2 *= $scale_y;
-    $x2 += $offset_x;
-    $y2 += $offset_y;
-    ### line: "$x,$y to $x2,$y2  by $dx,$dy"
-    while ($x != $x2 || $y != $y2) {
-      ### at: "$x,$y"
-      if ($image->xy($x,$y) eq ' ') {
-        $image->xy($x,$y, $char);
-      }
-      $x += $dx;
-      $y += $dy;
-    }
-  };
-
-  require Math::PlanePath::ComplexPlus;
-  my $path = Math::PlanePath::ComplexPlus->new;
-  my $graph = Graph::Maker->new ('twindragon_area_tree', level => $level);
-  foreach my $n ($graph->vertices) {
-    my ($x,$y) = $path->n_to_xy($n);
-    $draw_text->($x,$y, $n);
-  }
-  foreach my $edge ($graph->edges) {
-    my ($v1,$v2) = @$edge;
-    my ($x1,$y1) = $path->n_to_xy($v1);
-    my ($x2,$y2) = $path->n_to_xy($v2);
-    $draw_line->($x1,$y1, $x2,$y2);
-  }
-
-  $image->save('/dev/stdout');
-  exit 0;
-}
 
 {
   # POD sample code

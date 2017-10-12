@@ -1,5 +1,11 @@
 Revision history for Perl extension HTTP::Server::Simple::Static
 
+0.13  Sun, 08 Oct 2017 09:38:00 +0100
+
+        - Reworked file path handling to prevent attacker traversing
+          out of the base directory. Closes:
+	  https://rt.cpan.org/Ticket/Display.html?id=123178
+
 0.12  Thu, 28 Apr 2016 06:30:00 +0100
 
         - Moved POD tests to xt/ directory so they are not run for

@@ -1,0 +1,22 @@
+Revision History for Marky
+==========================
+
+v0.035 2017-10-12
+-----------------
+
+* 2017-10-12 07:40:54 +1100
+  version bump
+* 2017-10-12 07:40:26 +1100
+  commented out NYTProf
+
+v0.034 2017-10-12
+-----------------
+
+* 2017-10-12 06:31:55 +1100
+  Use YAML::Any instead of File::Serializer
+* 2017-10-12 05:40:54 +1100
+  tweaked gitignore
+
+===================================
+End of changes in the last 365 days
+===================================

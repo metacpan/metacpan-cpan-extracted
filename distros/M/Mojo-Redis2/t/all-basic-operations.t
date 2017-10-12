@@ -2,9 +2,10 @@ use Mojo::Base -strict;
 use Mojo::Redis2;
 use Test::More;
 use List::Util 'shuffle';
+use lib '.';
 use t::Util;
 
-plan skip_all => 'Cannot test on Win32' if $^O eq 'Win32';
+plan skip_all => 'Cannot test on Win32' if $^O eq 'MSWin32';
 
 my %ops = t::Util->get_documented_redis_methods;
 my @categories = $ENV{TEST_CATEGORY} || qw( Hashes Keys Lists PubSub Sets SortedSets Strings Connection );
@@ -30,8 +31,10 @@ sub Connection {
 }
 
 sub Hashes {
-  is $redis->hmset($key, foo => 42, bar => 'fourty_two'), 'OK', 'hmset';
-  is $redis->hincrby($key, foo => 3), 45, 'hincrby return new value';
+  is $redis->hmset($key, foo => 39, bar => 'fourty_two'), 'OK', 'hmset';
+  is $redis->hincrby($key, foo => 3), 42, 'hincrby return new value';
+  is $redis->hincrbyfloat($key, foo => 5.75), 47.75, 'hincrbyfloat return new value';
+  is $redis->hincrbyfloat($key, foo => -2.75), 45, 'negative hincrbyfloat return new value';
   is_deeply [sort @{ $redis->hkeys($key) }], [qw( bar foo )], 'hkeys';
 
   my $warning = '';
@@ -64,8 +67,11 @@ sub Keys {
   is $redis->set($key, 42), 'OK', 'set';
   is $redis->type($key), 'string', 'type';
   is $redis->exists($key), 1, 'exists';
+  is $redis->pexpire($key, 10000), 1, 'expire in milliseconds';
+  is $redis->pexpireat($key, (time + 2) * 1000), 1, 'pexpireat a timestamp in milliseconds';
   is $redis->expire($key, 10), 1, 'expire in seconds';
   is $redis->expireat($key, time + 2), 1, 'expireat a timestamp';
+  ok +($_ = $redis->pttl($key)) < 4000, 'pttl' or diag "pttl=$_";
   ok +($_ = $redis->ttl($key)) < 4, 'ttl' or diag "ttl=$_";
   is $redis->persist($key), 1, 'persist';
   is_deeply $redis->keys('does:not:exist*'), [], 'keys';
@@ -130,6 +136,7 @@ sub Sets {
 
 sub SortedSets {
   is $redis->zadd("$key:b" => qw( 1 x 2 two )), 2, 'zadd';
+  is $redis->zadd("$key:c" => qw( 0 a 0 b 0 c 0 d 0 e 0 f 0 g 0 h 0 i)), 9, 'zadd';
   is $redis->zadd($key => 2 => 'two', 3 => 'three', 4 => 'four'), 3, 'zadd';
   is $redis->zcard($key), 3, 'zcard';
   is $redis->zcount($key => 1, 3), 2, 'zcount';
@@ -159,6 +166,14 @@ sub SortedSets {
   is $redis->zremrangebyscore($key => 3, 3), 1, 'zremrangebyscore';
   is $redis->zremrangebyrank($key => 0, 0), 1, 'zremrangebyrank';
   is $redis->zcard($key), 0, 'zcard';
+
+  is $redis->zlexcount("$key:c" => qw( - + )), 9, 'zlexcount all range';
+  is $redis->zlexcount("$key:c" => qw( [b [f )), 5, 'zlexcount specific range';
+
+  is_deeply $redis->zrangebylex("$key:c" => qw( - [c )), [qw( a b c )], 'zrangebylex';
+  is $redis->zremrangebylex("$key:c" => qw( [b [f )), 5, 'zremrangebylex';
+  is_deeply $redis->zrevrangebylex("$key:c" => qw| [h (a |), [qw( h g )], 'zrevrangebylex';
+
 }
 
 sub Strings {
@@ -166,6 +181,9 @@ sub Strings {
   is $redis->append($key => '_append'), length('foo_append'), 'append';
   is $redis->getbit($key, 11), 0, 'getbit';
   is $redis->getbit($key, 10), 1, 'getbit';
+  is $redis->bitcount($key => qw( 1 5 )), 24, 'bitcount';
+  is $redis->bitop('NOT', "$key:inv", $key), 10, 'bitop';
+  is $redis->bitpos("$key:inv" => qw( 0 2 )), 17, 'bitpos';
   is $redis->getrange($key, 3, 7), '_appe', 'getrange';
   is $redis->getset($key, 42), 'foo_append', 'getset';
   is $redis->setrange($key, 3, 'foobarbaz'), 12, 'setrange';
@@ -177,7 +195,10 @@ sub Strings {
 
   is $redis->set($key => 10), 'OK', 'set';
   is $redis->incr($key), 11, 'incr';
-  is $redis->incrby($key, 3), 14, 'incrby';
+  is $redis->incrby($key, 6), 17, 'incrby';
+
+  is $redis->incrbyfloat($key, 3.895421), 20.895421, 'positive incrbyfloat';
+  is $redis->incrbyfloat($key, -6.895421), 14, 'negative incrbyfloat';
 
   is $redis->mset($key => 123, "$key:ex" => 321), 'OK', 'mset';
   is_deeply $redis->mget($key, "$key:nope", "$key:ex"), [123, undef, 321], 'mget';
@@ -193,6 +214,8 @@ sub Strings {
   is $redis->setnx("$key:x", 42), 1, 'setnx';
   is $redis->setex("$key:x", 10, 42), 'OK', 'setex';
   is $redis->setnx("$key:x", 42), 0, 'setnx';
+  is $redis->psetex("$key:x", 1000, 'bar'), 'OK', 'psetex';
+
 }
 
 sub add_recorder {

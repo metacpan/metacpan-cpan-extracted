@@ -9,7 +9,7 @@ use Carp ();
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG} || 0;
 use constant DEFAULT_PORT => 6379;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 my $PROTOCOL_CLASS = do {
   my $class = $ENV{MOJO_REDIS_PROTOCOL}
@@ -84,14 +84,14 @@ sub unsubscribe {
 sub DESTROY { $_[0]->{destroy} = 1; $_[0]->_cleanup; }
 
 sub _basic_operations {
-  'append', 'echo', 'decr', 'decrby', 'del', 'exists', 'expire', 'expireat', 'get', 'getbit', 'getrange', 'getset',
-    'hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hkeys', 'hlen', 'hmget', 'hmset',  'hset',   'hsetnx', 'hvals',
-    'incr', 'incrby',  'keys', 'lindex',  'linsert', 'llen',  'lpop', 'lpush', 'lpushx', 'lrange', 'lrem',   'lset',
-    'ltrim', 'mget', 'move', 'mset', 'msetnx', 'persist', 'ping', 'publish', 'randomkey', 'rename', 'renamenx', 'rpop',
+  'append', 'bitcount', 'bitop', 'bitpos', 'decr', 'decrby', 'del', 'echo', 'exists', 'expire', 'expireat', 'get', 'getbit', 'getrange', 'getset',
+    'hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hset', 'hsetnx', 'hvals',
+    'incr', 'incrby',  'incrbyfloat', 'keys', 'lindex',  'linsert', 'llen',  'lpop', 'lpush', 'lpushx', 'lrange', 'lrem',   'lset',
+    'ltrim', 'mget', 'move', 'mset', 'msetnx', 'persist', 'pexpire', 'pexpireat', 'ping', 'psetex', 'pttl', 'publish', 'randomkey', 'rename', 'renamenx', 'rpop',
     'rpoplpush', 'rpush', 'rpushx', 'sadd', 'scard', 'sdiff', 'sdiffstore', 'set', 'setbit', 'setex', 'setnx',
     'setrange', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'sort', 'spop', 'srandmember', 'srem',
-    'strlen', 'sunion', 'sunionstore', 'ttl', 'type', 'zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zrange',
-    'zrangebyscore', 'zrank', 'zrem', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebyscore',
+    'strlen', 'sunion', 'sunionstore', 'ttl', 'type', 'zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zlexcount', 'zrange', 'zrangebylex',
+    'zrangebyscore', 'zrank', 'zrem', 'zremrangebylex', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebylex', 'zrevrangebyscore',
     'zrevrank', 'zscore', 'zunionstore',;
 }
 
@@ -333,7 +333,7 @@ Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 =head1 VERSION
 
-0.26
+0.27
 
 =head1 DESCRIPTION
 
@@ -528,22 +528,22 @@ in constructor. Examples:
 In addition to the methods listed in this module, you can call these Redis
 methods on C<$self>:
 
-append, echo, decr, decrby,
-del, exists, expire, expireat, get, getbit,
+append, bitcount, bitop, bitpos, decr, decrby,
+del, echo, exists, expire, expireat, get, getbit,
 getrange, getset, hdel, hexists, hget, hgetall,
-hincrby, hkeys, hlen, hmget, hmset, hset,
-hsetnx, hvals, incr, incrby, keys, lindex,
+hincrby, hincrbyfloat, hkeys, hlen, hmget, hmset, hset,
+hsetnx, hvals, incr, incrby, incrbyfloat, keys, lindex,
 linsert, llen, lpop, lpush, lpushx, lrange,
 lrem, lset, ltrim, mget, move, mset,
-msetnx, persist, ping, publish, randomkey, rename,
-renamenx, rpop, rpoplpush, rpush, rpushx, sadd,
-scard, sdiff, sdiffstore, set, setbit, setex,
+msetnx, persist, pexpire, pexpireat, ping, psetex, pttl, publish, 
+randomkey, rename, renamenx, rpop, rpoplpush, rpush, rpushx, 
+sadd, scard, sdiff, sdiffstore, set, setbit, setex,
 setnx, setrange, sinter, sinterstore, sismember, smembers,
 smove, sort, spop, srandmember, srem, strlen,
 sunion, sunionstore, ttl, type, zadd, zcard,
-zcount, zincrby, zinterstore, zrange, zrangebyscore, zrank,
-zrem, zremrangebyrank, zremrangebyscore, zrevrange, zrevrangebyscore, zrevrank,
-zscore and zunionstore.
+zcount, zincrby, zinterstore, zlexcount, zrange, zrangebylex, zrangebyscore,
+zrank, zrem, zremrangebylex, zremrangebyrank, zremrangebyscore, zrevrange, 
+zrevrangebylex, zrevrangebyscore, zrevrank, zscore and zunionstore.
 
 See L<http://redis.io/commands> for details.
 

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package UNIVERSAL::isa; # git description: 1.20140927-9-g397ee12
+package UNIVERSAL::isa; # git description: 1.20150614-11-gdfa589a
 # ABSTRACT: Attempt to recover from people calling UNIVERSAL::isa as a function
 
-our $VERSION = '1.20150614';
+our $VERSION = '1.20171012';
 
 use 5.006002;
 
@@ -13,6 +13,8 @@ use warnings::register; # creates a warnings category for this module
 my ( $orig, $verbose_warning );
 
 BEGIN { $orig = \&UNIVERSAL::isa }
+
+sub original_isa { goto $orig }
 
 sub import
 {
@@ -31,7 +33,7 @@ our $_recursing;
 no warnings 'redefine';
 sub UNIVERSAL::isa
 {
-    goto &$orig if $_recursing;
+    goto &original_isa if $_recursing;
     my $type = _invocant_type(@_);
     $type->(@_);
 }
@@ -69,14 +71,14 @@ sub _object_or_class
     }
 
     _report_warning() if $verbose_warning;
-    goto &$orig;
+    goto &original_isa;
 }
 
 sub _reference
 {
     _report_warning('Did you mean to use Scalar::Util::reftype() instead?')
         if $verbose_warning;
-    goto &$orig;
+    goto &original_isa;
 }
 
 sub _report_warning
@@ -111,7 +113,7 @@ UNIVERSAL::isa - Attempt to recover from people calling UNIVERSAL::isa as a func
 
 =head1 VERSION
 
-version 1.20150614
+version 1.20171012
 
 =head1 SYNOPSIS
 
@@ -139,6 +141,13 @@ In all other cases, the real C<UNIVERSAL::isa> gets called directly.
 
 B<NOTE:> You should use this module only for debugging purposes. It does not
 belong as a dependency in running code.
+
+=head1 FUNCTIONS
+
+=head2 original_isa
+
+This sub contains the definition of the I<original> C<UNIVERSAL::isa>
+definition, in case you need it.
 
 =head1 WARNINGS
 
@@ -174,6 +183,11 @@ C<isa()>.
 Any decent explanation of OO to understand why calling methods as functions is
 a staggeringly bad idea.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=UNIVERSAL-isa>
+(or L<bug-UNIVERSAL-isa@rt.cpan.org|mailto:bug-UNIVERSAL-isa@rt.cpan.org>).
+
 =head1 AUTHORS
 
 =over 4
@@ -194,7 +208,7 @@ chromatic <chromatic@wgz.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Ricardo Signes
+=for stopwords Karen Etheridge Graham Knop Ricardo Signes
 
 =over 4
 
@@ -204,11 +218,15 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Ricardo Signes <rjbs@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2011 by chromatic@wgz.org.
 

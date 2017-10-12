@@ -91,12 +91,6 @@ ok($root_inst,"Read $wr_dir$ssh_path/ssh_config and created instance") ;
 my $root_cfg = $root_inst -> config_root ;
 $root_cfg->init ;
 
-my $ciphers = $root_cfg->grab('Host:"*" Ciphers') ;
-
-eq_or_diff( [ $ciphers->get_checked_list ],
-        [ qw/aes192-cbc aes128-cbc 3des-cbc blowfish-cbc aes256-cbc/],
-        "check cipher list");
-
 my $dump =  $root_cfg->dump_tree ();
 print $dump if $trace ;
 

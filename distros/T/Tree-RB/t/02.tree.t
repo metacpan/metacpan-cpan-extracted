@@ -1,4 +1,4 @@
-use Test::More tests => 37;
+use Test::More tests => 39;
 use strict;
 use warnings;
 use Data::Dumper;
@@ -27,7 +27,8 @@ $tree->put('England' => 'London');
 $tree->put('Hungary' => 'Budapest');
 $tree->put('Ireland' => 'Dublin');
 $tree->put('Egypt'   => 'Cairo');
-$tree->put('Germany' => 'Berlin');
+ok(! defined  $tree->put('Germany' => 'Bonn'), 'put with non existing key');
+is($tree->put('Germany' => 'Berlin'), 'Bonn', 'put with existing key');
 
 ok($tree->size == 6, 'size check after inserts');
 is($tree->min->key, 'Egypt', 'min');

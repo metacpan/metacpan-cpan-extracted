@@ -1,0 +1,23 @@
+Revision history for ZMQ-Raw
+
+0.03      2017-10-10 18:16:04+02:00 Africa/Johannesburg
+
+ - Documentation improvements
+ - Added Message methods:
+    + get()
+    + routing_id()
+ - Linux, FreeBSD, macOS, Solaris and Windows now supported
+
+0.02      2017-10-10 13:56:46+02:00 Africa/Johannesburg
+
+ - Socket->recvmsg() now returns a Message object
+ - Documentation improvements
+ - Added Context methods:
+    + set()
+ - Added Socket methods:
+    + unbind()
+
+0.01      2017-10-10 11:13:56+02:00 Africa/Johannesburg
+
+ - Initial version
+ - Update libzmq to 4.2.2

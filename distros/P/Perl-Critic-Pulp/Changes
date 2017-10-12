@@ -17,8 +17,12 @@ with Perl-Critic-Pulp.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 95, October 2017
+    - RequireFinalSemicolon also sort{} blocks are an expression
+
 Version 94, June 2017
-    - ProhibitUnknownBackslash \N also Perl 5.16
+    - ProhibitUnknownBackslash \N also Perl 5.16, as reported by
+      Ed Davis RT#122064
 
 Version 93, April 2017
     - some doubtfulness in Makefile.PL meta bits

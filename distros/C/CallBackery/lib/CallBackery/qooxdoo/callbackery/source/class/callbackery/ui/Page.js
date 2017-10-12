@@ -12,17 +12,23 @@ qx.Class.define("callbackery.ui.Page", {
     extend : qx.ui.tabview.Page,
     /**
      * create a page for the View Tab with the given title
-     * 
+     *
      * @param vizWidget {Widget} visualization widget to embedd
      */
-    construct : function(cfg) {        
+    construct : function(cfg) {
         /* using syntax trick to not get a warning for translating
            a variable */
         this.base(arguments, this['tr'](cfg.tabName));
         this.setLayout(new qx.ui.layout.Grow());
         this.setPadding([0,0,0,0]);
         var screen = new callbackery.ui.Screen(cfg);
-        this.add(screen);       
+        // track visibility changes in the screen widget
+        screen.addListener('changeVisibility',function(){
+            var visibility = screen.getVisibility();
+            this.setVisibility(visibility);
+            this.getChildControl('button').setVisibility(visibility);
+        },this);
+        this.add(screen);
         screen.addListener('actionResponse',function(e){
             var data = e.getData();
             switch (data.action){

@@ -1,0 +1,20 @@
+#!/bin/bash -x
+
+# This software is copyright (c) 2017 by Graham Ollis.
+# This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+# https://https://metacpan.org/pod/Test::Alien::CPP
+
+
+set -euo pipefail
+IFS=$'\n\t'
+
+rm -rf /tmp/Alien-Build
+
+cpanm -n Dist::Zilla
+
+
+git clone --depth 2 https://github.com/Perl5-Alien/Alien-Build.git /tmp/Alien-Build
+cd /tmp/Alien-Build
+dzil authordeps --missing | cpanm -n
+dzil listdeps   --missing | cpanm -n
+dzil install --install-command 'cpanm -n .'

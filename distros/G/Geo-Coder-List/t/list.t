@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 31;
+use Test::Most tests => 32;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 LIST: {
 	SKIP: {
-		skip 'Test requires Internet access', 29 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 30 unless(-e 't/online.enabled');
 
 		eval {
 			require Test::Number::Delta;
@@ -52,7 +52,7 @@ LIST: {
 		if($@) {
 			diag($@);
 			diag('Not enough geocoders installed - skipping tests');
-			skip 'Not enough geocoders installed', 31;
+			skip 'Not enough geocoders installed', 30;
 		}
 		my $geocoderlist = new_ok('Geo::Coder::List')
 			->push({ regex => qr/(Canada|USA|United States)$/, geocoder => new_ok('Geo::Coder::CA') })
@@ -78,6 +78,7 @@ LIST: {
 		$location = $geocoderlist->geocode('Wokingham, Berkshire, England');
 		delta_within($location->{geometry}{location}{lat}, 51.42, 1e-2);
 		delta_within($location->{geometry}{location}{lng}, -0.83, 1e-2);
+		is(ref($location->{'geocoder'}), 'Geo::Coder::XYZ', 'Verify XYZ encoder is used');
 		sleep(1);	# play nicely
 
 		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');

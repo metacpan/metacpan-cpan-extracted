@@ -21,6 +21,18 @@ WriteMakefile(
         'Carp'     => '0',
         'Exporter' => '0',
     },
+    META_MERGE => {
+        provides => {
+            'List::Breakdown' => {
+                version => '0.20',
+                file => 'lib/List/Breakdown.pm',
+            },
+        },
+        resources => {
+            homepage => 'https://sanctum.geek.nz/cgit/List-Breakdown.git/',
+            repository => 'https://sanctum.geek.nz/code/List-Breakdown.git/',
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'List-Breakdown-*' },
 );

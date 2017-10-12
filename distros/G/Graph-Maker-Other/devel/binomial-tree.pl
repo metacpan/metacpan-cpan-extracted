@@ -19,14 +19,51 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use List::Util 'min','max','sum';
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
 
+{
+  # BinomialTree by n
+
+  # n=0 empty
+  # n=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1310  single vertex
+  # n=2 https://hog.grinvin.org/ViewGraphInfo.action?id=19655  path-2
+  # n=3 hog not  path-3
+  # n=4 https://hog.grinvin.org/ViewGraphInfo.action?id=594    path-4
+  # n=5 https://hog.grinvin.org/ViewGraphInfo.action?id=30     fork
+  # n=6 https://hog.grinvin.org/ViewGraphInfo.action?id=496    E graph
+  # n=7 https://hog.grinvin.org/ViewGraphInfo.action?id=714   (Graphedron)
+  # n=8 https://hog.grinvin.org/ViewGraphInfo.action?id=700
+  # n=9 not
+  # n=10 not
+  # n=11 not
+  # n=12 not
+  # n=13 not
+  # n=14 not
+  # n=15 not
+  # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=28507   order 4
+  # n=32 https://hog.grinvin.org/ViewGraphInfo.action?id=21088   order 5
+
+  require Graph::Maker::BinomialTree;
+  my @graphs;
+  foreach my $N (0 .. 16) {
+    my $graph = Graph::Maker->new('binomial_tree',
+                                  N => $N,
+                                  undirected => 1,
+                                 );
+    print $graph->get_graph_attribute ('name'),"\n";
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # BinomialTree forms ascii prints
 
@@ -66,39 +103,7 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-{
-  # BinomialTree by n
 
-  # n=0 empty
-  # n=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1310  single vertex
-  # n=2 https://hog.grinvin.org/ViewGraphInfo.action?id=19655  path-2
-  # n=3 hog not  path-3
-  # n=4 https://hog.grinvin.org/ViewGraphInfo.action?id=594    path-4
-  # n=5 https://hog.grinvin.org/ViewGraphInfo.action?id=30     fork
-  # n=6 https://hog.grinvin.org/ViewGraphInfo.action?id=496    E graph
-  # n=7 https://hog.grinvin.org/ViewGraphInfo.action?id=714   (Graphedron)
-  # n=8 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  # n=9 not
-  # n=10 not
-  # n=11 not
-  # n=12 not
-  # n=13 not
-  # n=14 not
-  # n=15 not
-
-  require Graph::Maker::BinomialTree;
-  my @graphs;
-  foreach my $N (0 .. 16) {
-    my $graph = Graph::Maker->new('binomial_tree',
-                                  N => $N,
-                                  undirected => 1,
-                                 );
-    print $graph->get_graph_attribute ('name'),"\n";
-    push @graphs, $graph;
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 {
   foreach my $i (1 .. 31) {
     my $mask = $i ^ ($i-1);

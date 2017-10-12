@@ -11,7 +11,7 @@ Lab::Zhinst - Perl bindings to the LabOne API of Zurich Instruments
  # LabOne's "Getting Started" example in Perl:
 
  # Create connection object
- my ($rv, $connection) = Lab::Zhinst->new();
+ my ($rv, $connection) = Lab::Zhinst->Init();
  if ($rv) {
      # handle error ...
  }
@@ -99,7 +99,7 @@ The API provided by this module is basically a one-one mapping of the LabOne
 C API to Perl5.
 
 For full semantics of the various library functions, we refer to the
-L<LabOne manual|https://www.zhinst.com/sites/default/files/LabOneProgrammingManual_42388_0.pdf>.
+L<LabOne manual|https://www.zhinst.com/manuals/programming>.
 
 =head2 Object orientation
 
@@ -345,7 +345,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(

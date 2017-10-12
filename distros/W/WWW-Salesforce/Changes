@@ -1,5 +1,11 @@
 Revision history for Perl extension WWW-Salesforce
 
+0.303     2017-10-07
+    - Fix dependency issue due to subclass with 'base'.
+      Both SOAP::Lite and SOAP define SOAP::Serializer and SOAP seems to win the
+      battle over SOAP::Lite in this scenario which isn't what we want or
+      expect. (Thanks, Mohammad S Anwar!)
+
 0.302     2017-10-03
     - Fix licensing and authors to ensure everyone's credited properly.
     - Add LWP::Protocol::https to the prerequisites.

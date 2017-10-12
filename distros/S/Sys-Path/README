@@ -1,11 +1,13 @@
 NAME
+
     Sys::Path - supply autoconf style installation directories
 
 SYNOPSIS
+
     Paths for basic Unix installation when Perl is in /usr/bin:
 
         use Sys::Path;
-
+    
         print Sys::Path->sysconfdir, "\n";
         # /etc
         print Sys::Path->datadir, "\n";
@@ -38,34 +40,38 @@ SYNOPSIS
         # C:\Strawberry\lib
 
 DESCRIPTION
+
     The goal is that Sys::Path provides autoconf style system paths.
 
     The default paths for file locations are based on
-    http://www.pathname.com/fhs/ (Filesystem Hierarchy Standard) if the Perl
-    was installed in /usr. For all other non-standard Perl installations or
-    systems the default prefix is the prefix of Perl it self. Still those
-    are just defaults and can be changed during `perl Build.PL' prompting.
-    After Sys::Path is configured and installed all programs using it can
-    just read/use the paths.
+    http://www.pathname.com/fhs/ (Filesystem Hierarchy Standard) if the
+    Perl was installed in /usr. For all other non-standard Perl
+    installations or systems the default prefix is the prefix of Perl it
+    self. Still those are just defaults and can be changed during perl
+    Build.PL prompting. After Sys::Path is configured and installed all
+    programs using it can just read/use the paths.
 
     In addition Sys::Path includes some functions that are related to
-    modules build or installation. For now there is only Module::Build based
-    Module::Build::SysPath that uses Sys::Path.
+    modules build or installation. For now there is only Module::Build
+    based Module::Build::SysPath that uses Sys::Path.
 
 BUILD TIME CONFIGURATION
+
         PERL_MM_USE_DEFAULT=1 perl Build.PL \
             --sp-prefix=/usr/local \
             --sp-sysconfdir=/usr/local/etc \
             --sp-localstatedir=/var/local
 
 NOTE
+
     This is an experiment and lot of questions and concerns can come out
     about the paths configuration. Distributions build systems integration
     and the naming. And as this is early version things may change. For
     these purposes there is a mailing list
     http://lists.meon.sk/mailman/listinfo/sys-path.
 
-  WHY?
+ WHY?
+
     The filesystem standard has been designed to be used by Unix
     distribution developers, package developers, and system implementors.
     However, it is primarily intended to be a reference and is not a
@@ -74,106 +80,122 @@ NOTE
     Sys::Path follows this standard when it is possible. Or when Perl
     follows. Perl can be installed in many places. Most Linux distributions
     place Perl in /usr/bin/perl where FHS suggest. In this case the FHS
-    folders are suggested in prompt when doing ``perl Build.PL'`. In other
-    cases for other folders or home-folder Perl distributions Sys::Path will
-    suggest folders under Perl install prefix. (ex. c:\strawerry\ for the
-    ones using Windows).
+    folders are suggested in prompt when doing `perl Build.PL`. In other
+    cases for other folders or home-folder Perl distributions Sys::Path
+    will suggest folders under Perl install prefix. (ex. c:\strawerry\ for
+    the ones using Windows).
 
-  PATHS
-    Here is the list of paths. First the default FHS path, then (to compare)
-    a suggested path when Perl is not installed in /usr.
+ PATHS
 
-    prefix
-    /usr - `$Config::Config{'prefix'}'
+    Here is the list of paths. First the default FHS path, then (to
+    compare) a suggested path when Perl is not installed in /usr.
 
-    Is a helper function and should not be used directly.
+  prefix
 
-    localstatedir
-    /var - `$Config::Config{'prefix'}'
+    /usr - $Config::Config{'prefix'}
 
     Is a helper function and should not be used directly.
 
-    sysconfdir
+  localstatedir
+
+    /var - $Config::Config{'prefix'}
+
+    Is a helper function and should not be used directly.
+
+  sysconfdir
+
     /etc - $prefix/etc
 
     The /etc hierarchy contains configuration files. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#ETCHOSTSPECIFICSYSTEMCONFIG
-    URATION.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#ETCHOSTSPECIFICSYSTEMCONFI
+    GURATION.
 
-    datadir
+  datadir
+
     /usr/share - $prefix/share
 
     The /usr/share hierarchy is for all read-only architecture independent
     data files. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSHAREARCHITECTUREINDEPEN
-    DENTDATA.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#USRSHAREARCHITECTUREINDEPE
+    NDENTDATA.
 
-    docdir
+  docdir
+
     /usr/share/doc - $prefix/share/doc
 
-    See datadir
+    See "datadir"
 
-    localedir
+  localedir
+
     /usr/share/locale - $prefix/share/locale
 
-    See datadir
+    See "datadir"
 
-    cachedir
+  cachedir
+
     /var/cache - $localstatedir/cache
 
     /var/cache is intended for cached data from applications. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARCACHEAPPLICATIONCACHEDAT
-    A.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARCACHEAPPLICATIONCACHEDA
+    TA.
 
-    logdir
+  logdir
+
     /var/log - $localstatedir/logdir
 
     This directory contains miscellaneous log files. Most logs must be
     written to this directory or an appropriate subdirectory. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARLOGLOGFILESANDDIRECTORIE
-    S.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARLOGLOGFILESANDDIRECTORI
+    ES.
 
-    spooldir
+  spooldir
+
     /var/spool - $localstatedir/spool
 
     Contains data which is awaiting some kind of later processing. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARSPOOLAPPLICATIONSPOOLDAT
-    A.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARSPOOLAPPLICATIONSPOOLDA
+    TA.
 
-    rundir
+  rundir
+
     /var/run - $localstatedir/rundir
 
     This directory contains system information data describing the system
     since it was booted. See
     http://www.pathname.com/fhs/pub/fhs-2.3.html#VARRUNRUNTIMEVARIABLEDATA.
 
-    lockdir
+  lockdir
+
     /var/lock - $localstatedir/lock
 
     Lock files folder. See
     http://www.pathname.com/fhs/pub/fhs-2.3.html#VARLOCKLOCKFILES.
 
-    sharedstatedir
+  sharedstatedir
+
     /var/lib - $localstatedir/lib
 
     The directory for installing modifiable architecture-independent data.
     See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARLIBVARIABLESTATEINFORMAT
-    ION.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#VARLIBVARIABLESTATEINFORMA
+    TION.
 
-    srvdir
+  srvdir
+
     /srv - $prefix/srv
 
     Data for services provided by system. See
-    http://www.pathname.com/fhs/pub/fhs-2.3.html#SRVDATAFORSERVICESPROVIDEDB
-    YSYSTEM.
+    http://www.pathname.com/fhs/pub/fhs-2.3.html#SRVDATAFORSERVICESPROVIDED
+    BYSYSTEM.
 
-    webdir
+  webdir
+
     /var/www - $localstatedir/www
 
     Directory where distribution put static web files.
 
-  HOW IT WORKS
+ HOW IT WORKS
+
     The heart of Sys::Path is just:
 
         use Config;
@@ -181,12 +203,13 @@ NOTE
 
     The idea is that if the Perl was installed to /usr it is FHS type
     installation and all path defaults are made based on FHS. For the rest
-    of the installations `prefix' and `localstatedir' is set exactly to
-    `$Config::Config{'prefix'}' which is the prefix of Perl that was used to
-    install. In this case `sysconfdir' is set to `prefix+'etc''. See
+    of the installations prefix and localstatedir is set exactly to
+    $Config::Config{'prefix'} which is the prefix of Perl that was used to
+    install. In this case sysconfdir is set to prefix+'etc'. See
     Sys::Path::SPc for the implementation.
 
 METHODS
+
         prefix
         localstatedir
         sysconfdir
@@ -203,28 +226,36 @@ METHODS
         srvdir
 
 BUILDERS/INSTALLERS helper methods
-  find_distribution_root(__PACKAGE__)
+
+ find_distribution_root(__PACKAGE__)
+
     Find the root folder of a modules distribution by going up the folder
     structure.
 
-  prompt_cfg_file_changed($src_file, $dst_file, $prompt_function)
-    Will prompt if to overwrite `$dst_file' with `$src_file'. Returns true
-    for "yes" and false for "no".
+ prompt_cfg_file_changed($src_file, $dst_file, $prompt_function)
 
-  changed_since_install($dest_file, $file)
-    Return if `$dest_file' changed since install. If optional `$file' is set
-    then this one is compared against install `$dest_file' checksum.
+    Will prompt if to overwrite $dst_file with $src_file. Returns true for
+    "yes" and false for "no".
 
-  install_checksums(%filenames_with_checksums)
+ changed_since_install($dest_file, $file)
+
+    Return if $dest_file changed since install. If optional $file is set
+    then this one is compared against install $dest_file checksum.
+
+ install_checksums(%filenames_with_checksums)
+
     Getter and setter for files checksums recording.
 
 SEE ALSO
+
     Module::Build::SysPath
 
 AUTHOR
-    Jozef Kutej, `<jkutej at cpan.org>'
+
+    Jozef Kutej, <jkutej at cpan.org>
 
 CONTRIBUTORS
+
     The following people have contributed to the Sys::Path by committing
     their code, sending patches, reporting bugs, asking questions,
     suggesting useful advises, nitpicking, chatting on IRC or commenting on
@@ -236,6 +267,7 @@ CONTRIBUTORS
         Daniel Perrett
 
 COPYRIGHT & LICENSE
+
     Copyright 2009 Jozef Kutej, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it

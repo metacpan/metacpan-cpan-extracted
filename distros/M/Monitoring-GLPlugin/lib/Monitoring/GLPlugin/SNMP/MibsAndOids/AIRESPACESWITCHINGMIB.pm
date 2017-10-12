@@ -5,6 +5,9 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'AIRESPACE-SWITCHING-MIB'} = 
   name => 'AIRESPACE-SWITCHING-MIB',
 };
 
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'AIRESPACE-SWITCHING-MIB'} =
+  '1.3.6.1.4.1.14179.1';
+
 $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'AIRESPACE-SWITCHING-MIB'} = {
   'bsnSwitching' => '1.3.6.1.4.1.14179.1',
   'agentInfoGroup' => '1.3.6.1.4.1.14179.1.1',

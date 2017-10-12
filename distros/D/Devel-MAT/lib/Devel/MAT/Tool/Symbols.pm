@@ -9,11 +9,10 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use constant CMD => "symbols";
-
-use Getopt::Long qw( GetOptionsFromArray );
+use constant CMD_DESC => "Display a list of the symbol table";
 
 =head1 NAME
 
@@ -78,21 +77,27 @@ sub _show_symbol
 {
    my ( $name, $sv ) = @_;
 
-   Devel::MAT::Cmd->printf( "%s at ", $name );
-   Devel::MAT::Cmd->print_sv( $sv );
-   Devel::MAT::Cmd->printf( "\n" );
+   Devel::MAT::Cmd->printf( "%s at %s\n",
+      $name,
+      Devel::MAT::Cmd->format_sv( $sv ),
+   );
 }
 
-sub run_cmd
+use constant CMD_OPTS => (
+   recurse => { help => "recursively show inner symbols",
+                alias => "R" },
+);
+
+use constant CMD_ARGS => (
+   { name => "start", help => "show symbols within this symbol, rather than %main::" },
+);
+
+sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
+
    my $df = $self->df;
-
-   my $RECURSE;
-
-   GetOptionsFromArray( \@_,
-      'recurse|R' => sub { $RECURSE = 1 },
-   ) or return;
 
    my @queue;
 
@@ -120,7 +125,7 @@ sub run_cmd
 
          unshift @queue, [ $gv->hash, $name ] if $gv->hash;
       }
-      elsif( $RECURSE and $_->[0]->isa( "Devel::MAT::SV::STASH" ) ) {
+      elsif( $opts{recurse} and $_->[0]->isa( "Devel::MAT::SV::STASH" ) ) {
          my ( $stash, $prefix ) = @$_;
          unshift @queue, extract_symbols( $stash, $prefix );
       }

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -78,7 +78,7 @@ my $build = $class->new
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.050',
+    'Config::Model' => '2.111',
     'Config::Model::Backend::Any' => '0',
     'File::Copy' => '0',
     'File::HomeDir' => '0',

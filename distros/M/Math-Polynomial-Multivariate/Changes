@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Polynomial::Multivariate.
 
+0.006 Mon, 09 Oct 2017 07:36:22 +0200
+        Added enclosing parentheses to string representation.
+        Added flatten and extract methods.
+
 0.005 Fri, 21 Feb 2014 16:04:58 +0100
         Refactored data representation to improve runtime efficiency.
 

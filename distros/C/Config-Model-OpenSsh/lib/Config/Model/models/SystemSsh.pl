@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,28 +9,28 @@
 #
 [
   {
-    'class_description' => 'Configuration class used by L<Config::Model> to edit or 
-validate /etc/ssh/ssh_config (as root)
-',
-    'name' => 'SystemSsh',
-    'include' => [
-      'Ssh'
-    ],
-    'copyright' => [
-      '2013 Dominique Dumont'
-    ],
     'author' => [
       'Dominique Dumont'
     ],
+    'class_description' => 'Configuration class used by L<Config::Model> to edit or 
+validate /etc/ssh/ssh_config (as root)
+',
+    'copyright' => [
+      '2013 Dominique Dumont'
+    ],
+    'include' => [
+      'Ssh'
+    ],
     'license' => 'LGPL2',
-    'read_config' => [
-      {
-        'backend' => 'OpenSsh::Ssh',
-        'config_dir' => '/etc/ssh',
-        'file' => 'ssh_config',
-	'os_config_dir' => { 'darwin' => '/etc' },
+    'name' => 'SystemSsh',
+    'rw_config' => {
+      'backend' => 'OpenSsh::Ssh',
+      'config_dir' => '/etc/ssh',
+      'file' => 'ssh_config',
+      'os_config_dir' => {
+        'darwin' => '/etc'
       }
-    ]
+    }
   }
 ]
 ;

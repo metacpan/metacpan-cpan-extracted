@@ -2,7 +2,10 @@ package HTTP::Server::Simple::Static;
 use strict;
 use warnings;
 
-use File::Spec::Functions qw(canonpath);
+use v5.10;
+
+use Cwd ();
+use File::Spec::Functions qw(catfile);
 use HTTP::Date ();
 use IO::File     ();
 use URI::Escape  ();
@@ -10,7 +13,7 @@ use URI::Escape  ();
 use base qw(Exporter);
 our @EXPORT = qw(serve_static);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $line_end = "\015\012";
 
@@ -42,6 +45,8 @@ sub get_mimetype {
 
 sub serve_static {
     my ( $self, $cgi, $base ) = @_;
+    $base //= q{.};
+
     my $path = $cgi->url( -absolute => 1, -path_info => 1 );
 
     # Internet Explorer provides the full URI in the GET section
@@ -49,12 +54,26 @@ sub serve_static {
     # and port if they exist.
     $path =~ s{^https?://([^/:]+)(:\d+)?/}{/};
 
+    $path = URI::Escape::uri_unescape($path);
+
+    # The splitting of the URL path and then concatenating with the
+    # base ensures the correct directory separators are used for the
+    # file path.
+
+    my @parts = split q{/+}, $path;
+    my $fullpath = catfile( $base, @parts );
+
     # Sanitize the path and try it.
-    $path = $base . canonpath( URI::Escape::uri_unescape($path) );
+
+    my $realpath = Cwd::realpath($fullpath);
+    if ( !$realpath || $realpath !~ m/^\Q$base\E/ ) {
+        # directory traversal attack!
+        return 0;
+    }
 
     my $fh = IO::File->new();
-    if ( -f $path && $fh->open($path) ) {
-        my $mtime = ( stat $path )[9];
+    if ( -f $realpath && $fh->open($realpath) ) {
+        my $mtime = ( stat $realpath )[9];
         my $now = time;
 
         # RFC-2616 Section 14.25 "If-Modified-Since":
@@ -98,7 +117,7 @@ sub serve_static {
 
 	# Find MIME type
 
-        my $mimetype = get_mimetype($path);
+        my $mimetype = get_mimetype($realpath);
 
         # RFC-2616 Section 14.29 "Last-Modified":
         #
@@ -140,7 +159,7 @@ HTTP::Server::Simple::Static - Serve static files with HTTP::Server::Simple
 
 =head1 VERSION
 
-This documentation refers to HTTP::Server::Simple::Static version 0.07
+This documentation refers to HTTP::Server::Simple::Static version 0.13
 
 =head1 SYNOPSIS
 
@@ -219,7 +238,7 @@ initial implementation.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2006 - 2013. Stephen Quinney C<sjq-perl@jadevine.org.uk>
+Copyright 2006 - 2017. Stephen Quinney C<sjq-perl@jadevine.org.uk>
 
 You may distribute this code under the same terms as Perl itself.
 

@@ -2,11 +2,12 @@ package Datahub::Factory;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.71';
+our $VERSION = '1.72';
 
 use Datahub::Factory::Env;
 use Datahub::Factory::Config;
 use Datahub::Factory::Pipeline;
+use File::Spec;
 use Sub::Exporter::Util qw(curry_method);
 use Sub::Exporter -setup => {
     exports => [
@@ -16,6 +17,7 @@ use Sub::Exporter -setup => {
         fixer            => curry_method,
         store            => curry_method,
         exporter         => curry_method,
+        indexer          => curry_method,
         pipeline         => curry_method,
         module           => curry_method,
     ],
@@ -48,7 +50,38 @@ sub _env {
     state $loaded_env;
     $loaded_env = $env if defined $env;
     $loaded_env
-        ||= Datahub::Factory::Env->new();
+        ||= Datahub::Factory::Env->new(load_paths => $class->default_load_path);
+}
+
+sub default_load_path {    # TODO move to Catmandu::Env
+    my ($class, $path) = @_;
+    state $default_path;
+    $default_path = $path if defined $path;
+    $default_path //= do {
+        my $script = File::Spec->rel2abs($0);
+        my ($script_vol, $script_path, $script_name)
+            = File::Spec->splitpath($script);
+        my @dirs = grep length, File::Spec->splitdir($script_path);
+        if ($dirs[-1] eq 'bin') {
+            pop @dirs;
+            File::Spec->catdir(File::Spec->rootdir, @dirs);
+        }
+        else {
+            $script_path;
+        }
+    };
+}
+
+sub config {
+    my ($class, $config) = @_;
+
+    if ($config) {
+        my $env = Datahub::Factory::Env->new(load_paths => $class->_env->load_paths);
+        $env->_set_config($config);
+        $class->_env($env);
+    }
+
+    $class->_env->config;
 }
 
 sub importer {
@@ -64,6 +97,11 @@ sub fixer {
 sub exporter {
     my $class = shift;
     $class->_env->exporter(@_);
+}
+
+sub indexer {
+    my $class = shift;
+    $class->_env->indexer(@_);
 }
 
 sub log {

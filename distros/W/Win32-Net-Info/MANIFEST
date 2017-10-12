@@ -1,0 +1,12 @@
+Changes
+lib/Win32/Net/Info.pm
+Makefile.PL
+MANIFEST
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-subs.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

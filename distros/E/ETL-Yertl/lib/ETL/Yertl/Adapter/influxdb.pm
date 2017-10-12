@@ -1,6 +1,40 @@
 package ETL::Yertl::Adapter::influxdb;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Adapter to read/write from InfluxDB time series database
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
+#pod     my @points = $db->read_ts( { metric => 'db.cpu_load.1m' } );
+#pod     $db->write_ts( { metric => 'db.cpu_load.1m', value => 1.23 } );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class allows Yertl to read and write time series from L<the InfluxDB
+#pod time series database|https://www.influxdata.com>.
+#pod
+#pod This adapter is used by the L<yts> command.
+#pod
+#pod =head2 Metric Name Format
+#pod
+#pod InfluxDB has databases, metrics, and fields. In Yertl, the time series
+#pod is identified by joining the database, metric, and field with periods (C<.>).
+#pod The field is optional, and defaults to C<value>.
+#pod
+#pod     # Database "foo", metric "bar", field "baz"
+#pod     yts influxdb://localhost foo.bar.baz
+#pod
+#pod     # Database "foo", metric "bar", field "value"
+#pod     yts influxdb://localhost foo.bar
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<ETL::Yertl>, L<yts>,
+#pod L<Reading data from InfluxDB|https://docs.influxdata.com/influxdb/v1.3/guides/querying_data/>,
+#pod L<Writing data to InfluxDB|https://docs.influxdata.com/influxdb/v1.3/guides/writing_data/>,
+#pod L<InfluxDB Query language|https://docs.influxdata.com/influxdb/v1.3/query_language/data_exploration/>
+#pod
+#pod =cut
 
 use ETL::Yertl 'Class';
 use Net::Async::HTTP;
@@ -12,7 +46,6 @@ use IO::Async::Loop;
 
 has host => ( is => 'ro', required => 1 );
 has port => ( is => 'ro', default => 8086 );
-has db => ( is => 'ro', required => 1 );
 
 has _loop => (
     is => 'ro',
@@ -40,12 +73,22 @@ has dt_fmt => (
     },
 );
 
+#pod =method new
+#pod
+#pod     my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost' );
+#pod     my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
+#pod
+#pod Construct a new InfluxDB adapter for the database on the given host and port.
+#pod Port is optional and defaults to C<8086>.
+#pod
+#pod =cut
+
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my %args;
     if ( @args == 1 ) {
-        if ( $args[0] =~ m{://([^:]+)(?::([^/]+))?/(.+)} ) {
-            @args{qw( host port db )} = ( $1, $2, $3 );
+        if ( $args[0] =~ m{://([^:]+)(?::([^/]+))?} ) {
+            @args{qw( host port )} = ( $1, $2 );
             delete $args{port} if !$args{port};
         }
     }
@@ -55,19 +98,63 @@ sub BUILDARGS {
     return \%args;
 }
 
+#pod =method read_ts
+#pod
+#pod     my @points = $db->read_ts( $query );
+#pod
+#pod Read a time series from the database. C<$query> is a hash reference
+#pod with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item metric
+#pod
+#pod The time series to read. For InfluxDB, this is the database, metric, and
+#pod field separated by dots (C<.>). Field defaults to C<value>.
+#pod
+#pod =item start
+#pod
+#pod An ISO8601 date/time for the start of the series points to return,
+#pod inclusive.
+#pod
+#pod =item end
+#pod
+#pod An ISO8601 date/time for the end of the series points to return,
+#pod inclusive.
+#pod
+#pod =item tags
+#pod
+#pod An optional hashref of tags. If specified, only points matching all of
+#pod these tags will be returned.
+#pod
+#pod =back
+#pod
+#pod =cut
+
 sub read_ts {
-    my ( $self, $metric, $field, $tags ) = @_;
+    my ( $self, $query ) = @_;
+    my $metric = $query->{ metric };
+    ( my $db, $metric, my $field ) = split /\./, $metric;
     $field ||= "value";
 
     my $q = sprintf 'SELECT "%s" FROM "%s"', $field, $metric;
+    my @where;
+    my $tags = $query->{ tags };
     if ( $tags && keys %$tags ) {
-        $q .= ' WHERE '
-            . join " AND ",
-                map { sprintf q{"%s"='%s'}, $_, $tags->{ $_ } }
-                keys %$tags;
+        push @where, map { sprintf q{"%s"='%s'}, $_, $tags->{ $_ } } keys %$tags;
     }
+    if ( my $start = $query->{start} ) {
+        push @where, qq{time >= '$start'};
+    }
+    if ( my $end = $query->{end} ) {
+        push @where, qq{time <= '$end'};
+    }
+    if ( @where ) {
+        $q .= ' WHERE ' . join " AND ", @where;
+    }
+
     my $url = URI->new( sprintf 'http://%s:%s/query', $self->host, $self->port );
-    $url->query_form( db => $self->db, q => $q );
+    $url->query_form( db => $db, q => $q );
 
     #; say "Fetching $url";
     my $res = $self->client->GET( $url )->get;
@@ -85,10 +172,9 @@ sub read_ts {
 
         push @points, map {
             +{
-                metric => $series->{name},
+                metric => join( ".", $db, $series->{name}, ( $field ne 'value' ? ( $field ) : () ) ),
                 timestamp => $_->[ $time_i ],
                 value => $_->[ $value_i ],
-                ( $field ne 'value' ? ( field => $field ) : () ),
             }
         } @{ $series->{values} };
     }
@@ -96,11 +182,39 @@ sub read_ts {
     return @points;
 }
 
+#pod =method write_ts
+#pod
+#pod     $db->write_ts( @points );
+#pod
+#pod Write time series points to the database. C<@points> is an array
+#pod of hashrefs with the following keys:
+#pod
+#pod =over
+#pod
+#pod =item metric
+#pod
+#pod The metric to write. For InfluxDB, this is the database, metric,
+#pod and field separated by dots (C<.>). Field defaults to C<value>.
+#pod
+#pod =item timestamp
+#pod
+#pod An ISO8601 timestamp. Optional. Defaults to the current time on the
+#pod InfluxDB server.
+#pod
+#pod =item value
+#pod
+#pod The metric value.
+#pod
+#pod =back
+#pod
+#pod =cut
+
 sub write_ts {
     my ( $self, @points ) = @_;
 
-    my @lines;
+    my %db_lines;
     for my $point ( @points ) {
+        my ( $db, $metric, $field ) = split /\./, $point->{metric};
         my $tags = '';
         if ( $point->{tags} ) {
             $tags = join ",", '', map { join "=", $_, $point->{tags}{$_} } keys %{ $point->{tags} };
@@ -113,17 +227,20 @@ sub write_ts {
             );
         }
 
-        push @lines, sprintf '%s%s %s=%s%s',
-            $point->{metric}, $tags, $point->{field} || "value",
+        push @{ $db_lines{ $db } }, sprintf '%s%s %s=%s%s',
+            $metric, $tags, $field || "value",
             $point->{value}, $ts;
     }
-    my $body = join "\n", @lines;
 
-    my $url = URI->new( sprintf 'http://%s:%s/write?db=%s', $self->host, $self->port, $self->db );
-    my $res = $self->client->POST( $url, $body, content_type => 'text/plain' )->get;
-    if ( $res->is_error ) {
-        my $result = decode_json( $res->decoded_content );
-        die "Error writing metric '%s': $result->{error}\n";
+    for my $db ( keys %db_lines ) {
+        my @lines = @{ $db_lines{ $db } };
+        my $body = join "\n", @lines;
+        my $url = URI->new( sprintf 'http://%s:%s/write?db=%s', $self->host, $self->port, $db );
+        my $res = $self->client->POST( $url, $body, content_type => 'text/plain' )->get;
+        if ( $res->is_error ) {
+            my $result = decode_json( $res->decoded_content );
+            die "Error writing metric '%s': $result->{error}\n";
+        }
     }
 
     return;
@@ -141,7 +258,105 @@ ETL::Yertl::Adapter::influxdb - Adapter to read/write from InfluxDB time series 
 
 =head1 VERSION
 
-version 0.032
+version 0.033
+
+=head1 SYNOPSIS
+
+    my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
+    my @points = $db->read_ts( { metric => 'db.cpu_load.1m' } );
+    $db->write_ts( { metric => 'db.cpu_load.1m', value => 1.23 } );
+
+=head1 DESCRIPTION
+
+This class allows Yertl to read and write time series from L<the InfluxDB
+time series database|https://www.influxdata.com>.
+
+This adapter is used by the L<yts> command.
+
+=head2 Metric Name Format
+
+InfluxDB has databases, metrics, and fields. In Yertl, the time series
+is identified by joining the database, metric, and field with periods (C<.>).
+The field is optional, and defaults to C<value>.
+
+    # Database "foo", metric "bar", field "baz"
+    yts influxdb://localhost foo.bar.baz
+
+    # Database "foo", metric "bar", field "value"
+    yts influxdb://localhost foo.bar
+
+=head1 METHODS
+
+=head2 new
+
+    my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost' );
+    my $db = ETL::Yertl::Adapter::influxdb->new( 'influxdb://localhost:8086' );
+
+Construct a new InfluxDB adapter for the database on the given host and port.
+Port is optional and defaults to C<8086>.
+
+=head2 read_ts
+
+    my @points = $db->read_ts( $query );
+
+Read a time series from the database. C<$query> is a hash reference
+with the following keys:
+
+=over
+
+=item metric
+
+The time series to read. For InfluxDB, this is the database, metric, and
+field separated by dots (C<.>). Field defaults to C<value>.
+
+=item start
+
+An ISO8601 date/time for the start of the series points to return,
+inclusive.
+
+=item end
+
+An ISO8601 date/time for the end of the series points to return,
+inclusive.
+
+=item tags
+
+An optional hashref of tags. If specified, only points matching all of
+these tags will be returned.
+
+=back
+
+=head2 write_ts
+
+    $db->write_ts( @points );
+
+Write time series points to the database. C<@points> is an array
+of hashrefs with the following keys:
+
+=over
+
+=item metric
+
+The metric to write. For InfluxDB, this is the database, metric,
+and field separated by dots (C<.>). Field defaults to C<value>.
+
+=item timestamp
+
+An ISO8601 timestamp. Optional. Defaults to the current time on the
+InfluxDB server.
+
+=item value
+
+The metric value.
+
+=back
+
+=head1 SEE ALSO
+
+L<ETL::Yertl>, L<yts>,
+L<Reading data from InfluxDB|https://docs.influxdata.com/influxdb/v1.3/guides/querying_data/>,
+L<Writing data to InfluxDB|https://docs.influxdata.com/influxdb/v1.3/guides/writing_data/>,
+L<InfluxDB Query language|https://docs.influxdata.com/influxdb/v1.3/query_language/data_exploration/>
 
 =head1 AUTHOR
 

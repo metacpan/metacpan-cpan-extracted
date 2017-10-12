@@ -2,7 +2,7 @@ package Test2::Harness::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use Carp qw/confess/;
 use Time::HiRes qw/time/;
@@ -29,6 +29,7 @@ use Test2::Harness::Util::HashBase qw{
     -run_id
     -job_id
     -stamp
+    -times
 };
 
 sub trace     { $_[0]->{+FACET_DATA}->{trace} }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -41,7 +41,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik isAssigneeTypeValid
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Heumann Manni Melezhik
+isAssigneeTypeValid
 
 =head1 NAME
 
@@ -49,7 +50,7 @@ JIRA::REST::Class::Project::Component - A helper class for L<JIRA::REST::Class|J
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 READ-ONLY ACCESSORS
 

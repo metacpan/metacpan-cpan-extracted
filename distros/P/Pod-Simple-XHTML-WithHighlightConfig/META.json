@@ -4,13 +4,13 @@
       "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-Simple-XHTML-WithHighlightConfig",
    "no_index" : {
@@ -56,5 +56,6 @@
          "web" : "http://github.com/haarg/Pod-Simple-XHTML-WithHighlightConfig"
       }
    },
-   "version" : "0.000001"
+   "version" : "0.000002",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

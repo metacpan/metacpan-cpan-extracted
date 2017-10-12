@@ -1,3 +1,10 @@
+2.300000 2017-10-11
+
+  * #25 cisco/hp/pb login failure on hp procurve (A. Zanger)
+  * #27 find_prompt doesn't bail out on failure to find a prompt (A. Zanger)
+  * new phrasebooks for many platforms (A. Zanger)
+  * new phrasebooks for Cisco WLC and fsck IOS command (Jv Ingen)
+
 2.200009 2017-07-25
 
   * [#22] remove ANSI terminal codes from CLI response

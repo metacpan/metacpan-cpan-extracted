@@ -19,11 +19,11 @@
 
 use 5.005;
 use strict;
-use MyGraphs;
+use Graph::Maker::Beineke;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Graph::Maker::Beineke;
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

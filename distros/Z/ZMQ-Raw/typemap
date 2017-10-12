@@ -1,0 +1,18 @@
+Context                 T_ZMQ_REF
+Socket                  T_ZMQ_REF
+
+OUTPUT
+T_ZMQ_REF
+	sv_setref_pv ($arg, \"ZMQ::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\", (void *) $var);
+
+INPUT
+T_ZMQ_REF
+	if (sv_isobject ($arg) && sv_derived_from h($arg, \"ZMQ::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\"))
+	{
+		$var = INT2PTR ($type, SvIV ((SV *) SvRV ($arg)));
+	}
+	else
+	{
+		$var = NULL;
+		croak_usage (\"$var is not of type ZMQ::Raw::${(my $ntt = $ntype) =~ s/_/::/g;\$ntt}\");
+	}

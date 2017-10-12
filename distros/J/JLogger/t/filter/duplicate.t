@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use_ok 'JLogger::Filter::Duplicate';
 
@@ -24,5 +24,10 @@ $message->{to} = 'rec@server.com/resource2';
 ok $filter->filter($message);
 
 $message->{id}++;
+
+ok !$filter->filter($message);
+
+$message->{body} = 'body text2';
+$message->{id} = undef;
 
 ok !$filter->filter($message);

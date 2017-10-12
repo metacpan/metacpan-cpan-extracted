@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -341,6 +341,7 @@ not.
 The key/value parameters are
 
     N        => integer, default 3, board size NxN
+    players  => integer >= 1
     rotate   => boolean, default false, rotated boards equivalent
     reflect  => boolean, default false, mirror image equivalent
     graph_maker => subr(key=>value) constructor, default Graph->new
@@ -351,6 +352,36 @@ C<Graph-E<gt>new()>.
 If the graph is directed (the default) then edges are directed from old
 board state to new board state.  The one predecessorless vertex is the empty
 board.  Option C<undirected =E<gt> 1> creates an undirected graph.
+
+=back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for graphs here include
+
+=over
+
+=item N=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27017>
+
+=item N=2, rotate, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27020>
+
+=item N=2, rotate, reflect L<https://hog.grinvin.org/ViewGraphInfo.action?id=945>
+
+=item N=2, 1 player, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27032>
+
+=item N=2, 1 player, reflect, L<https://hog.grinvin.org/ViewGraphInfo.action?id=856>
+
+=item N=2, 1 player, rotate, L<https://hog.grinvin.org/ViewGraphInfo.action?id=500>  (claw)>
+
+=item N=2, 3 players, rotate, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27025>
+
+=item N=2, 3 players, rotate, reflect, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27048>
+
+=item N=2, 4 players, rotate, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27034>
+
+=item N=2, 4 players, rotate, reflect, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27050>
+
+=item N=3, 1 player, rotate, reflect L<https://hog.grinvin.org/ViewGraphInfo.action?id=27015>
 
 =back
 

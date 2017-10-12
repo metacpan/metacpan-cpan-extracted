@@ -1,0 +1,12 @@
+Changes
+Engine.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/11-load.t
+t/12-get_version.t
+t/13-get_meta.t
+lib/Vlc/Engine.pm
+examples/play_one_file.pl
+examples/play_list.pl

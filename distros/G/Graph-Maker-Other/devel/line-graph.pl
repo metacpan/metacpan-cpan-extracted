@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,17 +19,74 @@
 
 use strict;
 use 5.010;
-use FindBin;
 use File::Slurp;
 use List::Util 'min','max';
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 
+{
+  my $g6_str = "E|FG\n";
+  my $graph = MyGraphs::Graph_from_graph6_str($g6_str);
+  my $l1 = Graph_is_line_graph_by_van_Rooij_Wilf($graph);
+  my $l2 = MyGraphs::Graph_is_line_graph_by_Beineke($graph);
+  print "$l1, $l2\n";
 
+  my @B = MyGraphs::Graph_Beineke_graphs();
+  foreach my $i (0 .. $#B) {
+    if (MyGraphs::Graph_is_induced_subgraph($graph, $B[$i])) {
+      my $num = $i+1;
+      print "G$num is induced subgraph\n";
+    }
+    if (MyGraphs::Graph_is_isomorphic($graph, $B[$i])) {
+      print "  is equal\n";
+    }
+  }
+  exit 0;
+}
+{
+  # line graphs by nauty-linegraphg and uniq
+  #
+  # count
+  # A003089 1,2,5,12,30,79,227,710,2322
 
+  my $target = 'GHdu\{';
+
+  require List::Util;
+  require IPC::Run;
+  require File::Spec;
+  foreach my $e (8) {
+    my $graphs = '';
+    foreach my $n (1 .. $e+1) {
+      IPC::Run::run(['nauty-geng','-c','-q',$n,"$e:$e"],
+                    '>>',\$graphs, '2>',File::Spec->devnull);
+    }
+    print "graphs\n", $graphs;
+
+    my $lines;
+    IPC::Run::run(['nauty-linegraphg','-q'], '<',\$graphs, '>',\$lines);
+    print "lines\n", $lines;
+
+    my @lines = split /\n/, $lines;
+    ### @lines
+    @lines = List::Util::uniq(@lines);
+    ### @lines
+    # print "e=$e\n";
+    print "lines uniqued\n";
+    print join("\n",sort @lines),"\n";
+
+    print "e=$e lines ",scalar(@lines),"\n";
+    # print "\n";
+  }
+  # for i in 1 2 3 4 5 6 7 8; do nauty-geng -c -q $i:$i | nauty-linegraphg | sort -u | wc -l ; done
+  # 0,1,2,6,21,112,853,11117
+  exit 0;
+}
 {
   # graphs count possible claw in N vertices
   # with            0,0,0,1, 7, 62,662,10236
@@ -53,12 +110,12 @@ use MyGraphs;
     # my $iterator_func = make_tree_iterator_edge_aref
     #   (num_vertices => $num_vertices,
     #    connected => 1);
-    my $iterator_func = make_graph_iterator_edge_aref
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
       (num_vertices => $num_vertices,
        connected => 1);
     while (my $edge_aref = $iterator_func->()) {
-      my $graph = Graph_from_edge_aref($edge_aref);
-      if (Graph_has_claw($graph)) {
+      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+      if (MyGraphs::Graph_has_claw($graph)) {
         $count_with++;
       } else {
         $count_without++;
@@ -197,7 +254,7 @@ use MyGraphs;
   sub Graph_is_line_graph_by_van_Rooij_Wilf {
     my ($graph) = @_;
     return (Graph_van_Rooij_Wilf_condition_i($graph)
-            && ! Graph_has_claw($graph)
+            && ! MyGraphs::Graph_has_claw($graph)
             ? 1 : 0);
   }
 
@@ -233,8 +290,8 @@ use MyGraphs;
        pred => sub {
          my ($graph, $a,$b,$c,$d) = @_;
          ### i pred: "$a,$b,$c,$d"
-         if (Graph_triangle_is_even($graph, $a,$b,$c)
-             || Graph_triangle_is_even($graph, $d,$b,$c)) {
+         if (MyGraphs::Graph_triangle_is_even($graph, $a,$b,$c)
+             || MyGraphs::Graph_triangle_is_even($graph, $d,$b,$c)) {
            ### good ...
            $good = 1;
            return 0;  # continue

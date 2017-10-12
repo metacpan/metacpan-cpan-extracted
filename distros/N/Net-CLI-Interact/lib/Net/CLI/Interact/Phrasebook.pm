@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Phrasebook;
-{
-  $Net::CLI::Interact::Phrasebook::VERSION = '2.143070';
-}
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf Str Any HashRef);
@@ -264,19 +261,11 @@ sub _gather_pb_from {
 
 1;
 
-# ABSTRACT: Load command phrasebooks from a Library
-
-
-__END__
 =pod
 
 =head1 NAME
 
 Net::CLI::Interact::Phrasebook - Load command phrasebooks from a Library
-
-=head1 VERSION
-
-version 2.143070
 
 =head1 DESCRIPTION
 
@@ -542,17 +531,6 @@ of C<send>. However this does not prevent the Format Interpolation via
 C<sprintf> as described above (simply use C<"%%"> to get a literal C<"%">).
 
 =back
-
-=head1 AUTHOR
-
-Oliver Gorwits <oliver@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Oliver Gorwits.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package ymask;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Mask a data structure to display only the desired fields
 
 use ETL::Yertl;
@@ -44,7 +44,7 @@ ymask - Mask a data structure to display only the desired fields
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

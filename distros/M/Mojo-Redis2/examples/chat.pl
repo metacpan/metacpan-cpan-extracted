@@ -9,7 +9,7 @@ helper redis => sub { state $r = Mojo::Redis2->new };
 get '/' => 'chat';
 
 websocket '/socket' => sub ($c, $r=$c->redis) {
-  $r->subscribe('chat');
+  $r->subscribe(['chat']);
   my $cb = $r->on(message => sub ($r, $msg, $chan) { $c->send($msg) });
   $c->on(finish => sub { $r->unsubscribe(message => $cb) });
   $c->on(message => sub ($c, $msg) { $r->publish(chat => $msg) });

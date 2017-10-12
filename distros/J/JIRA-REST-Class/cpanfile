@@ -111,5 +111,4 @@ on 'develop' => sub {
   requires "Test::Portability::Files" => "0";
   requires "Test::Spelling" => "0.12";
   requires "Test::Version" => "2.00";
-  requires "blib" => "1.01";
 };

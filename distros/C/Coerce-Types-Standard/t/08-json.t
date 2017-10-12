@@ -24,6 +24,7 @@ BEGIN {
 		valid_decode => [JSON->by(['HashRef', 'decode', ['utf8']]), { coerce => 1 }],
 		encode => [JSON->by('encode'), { coerce => 1 }],
 		valid_encode => [JSON->by(['encode', ['utf8']]), { coerce => 1 }],
+		rep_encode => [JSON->by(['encode', ['utf8']]), { coerce => 1 }],
 	);
 }
 
@@ -41,11 +42,12 @@ my $thing = Have::Fun->new(
 	valid_decode => $valid_utf8_json, 	
 	encode => $decode_hash,
 	valid_encode => $valid_hash,
+	rep_encode => $valid_hash,
 );
 
 is_deeply($thing->decode, $decode_hash);
 is_deeply($thing->valid_decode, $valid_hash);
 is($thing->encode, $encoded_json);
 is($thing->valid_encode, $valid_utf8_json);
-
+is($thing->rep_encode, $valid_utf8_json);
 done_testing();

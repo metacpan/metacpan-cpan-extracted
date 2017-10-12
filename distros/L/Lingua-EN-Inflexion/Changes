@@ -61,3 +61,23 @@ Revision history for Lingua-EN-Inflexion
 
     * Added dependencies on Lingua::EN::Nums2Words and Lingua::EN::Words2Nums
       (thanks Slaven!)
+
+
+0.001002  Wed Aug 16 21:11:08 2017
+
+    * Fixed three egregious documentation errors
+      for cardinal(), ordinal(), and the #w flag
+      (Thanks, Mary!)
+
+
+0.001005  Sun Oct  8 09:29:22 2017
+
+    * Fixed 'expenses' -> 'expense', etc.
+      (Thanks, Dorian)
+
+
+
+
+0.001006  Sun Oct  8 17:38:17 2017
+
+    * Fixed t/wordlist.t by removing 'no_plan'

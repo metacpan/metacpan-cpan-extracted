@@ -7,12 +7,14 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README.mkdn
 SIGNATURE
 bin/transerialize
 cpanfile
 doap.xml
 lib/File/Serialize.pm
 lib/File/Serialize/Serializer.pm
+lib/File/Serialize/Serializer/Data/Dumper.pm
 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
 lib/File/Serialize/Serializer/JSONY.pm
 lib/File/Serialize/Serializer/TOML.pm
@@ -26,6 +28,7 @@ t/add_extension.t
 t/basic.t
 t/corpus/foo.json
 t/corpus/foo.jsony
+t/corpus/foo.pl
 t/corpus/foo.toml
 t/corpus/foo.xml
 t/corpus/foo.yml
@@ -37,5 +40,4 @@ t/precedence.t
 t/serializer.t
 t/transerialize.t
 t/utf8.t
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

@@ -19,10 +19,12 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use List::Util 'min','max','sum';
-use MyGraphs;
 use Graph::Maker::Kneser;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -45,7 +47,7 @@ use Graph::Maker::Kneser;
 
   require Graph::Maker::Kneser;
   my @graphs;
-  foreach my $N (7) {
+  foreach my $N (5) {
     foreach my $K (2 .. int($N/2)) {
       my $graph = Graph::Maker->new('Kneser',
                                     N => $N, K => $K,

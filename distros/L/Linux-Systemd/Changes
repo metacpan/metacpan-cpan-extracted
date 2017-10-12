@@ -1,5 +1,9 @@
 Changelog for Linux-Systemd
 
+1.172840 2017-10-11T01:38:08Z
+ - [closes #3] don't be lazy by using Try::Tiny during configure stage
+ - Fix some POD
+
 1.172760 2017-10-03T03:56:02Z
  - Better caller information
  - Added license and readme

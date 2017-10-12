@@ -15,14 +15,37 @@ qx.Class.define("callbackery.ui.Screen", {
      *
      * @param vizWidget {Widget} visualization widget to embed
      */
-    construct : function(cfg,getParentFormData,extraAction) {
-        /* using syntax trick to not get a warning for translating
-           a variable */
+    construct : function(cfg,getParentFormDataCallBack,extraAction) {
         this.base(arguments,new qx.ui.layout.Grow());
-        var that = this;
-        var rpc = callbackery.data.Server.getInstance();
-        var pluginMap = callbackery.ui.Plugins.getInstance().getPlugins();
-        this.addListenerOnce('appear',function(){
+        this.__cfg = cfg;
+        this.__getParentFormDataCallBack =  getParentFormDataCallBack;
+        this.__extraAction = extraAction;
+        switch (cfg.instanciationMode) {
+            case 'onStartup':
+                this.instanciatePlugin();
+                break;
+            case 'onTabSelection':
+                this.addListenerOnce('appear',this.instanciatePlugin,this);
+                break;
+            default:
+                console.log('ERROR unknown instanciationMode '+cfg.instanciationMode);
+        };
+    },
+
+    events: {
+        actionResponse: 'qx.event.type.Data'
+    },
+    members: {
+        __extraAction: null,
+        __getParentFormDataCallBack: null,
+        __cfg: null,
+        instanciatePlugin: function(){
+            var rpc = callbackery.data.Server.getInstance();
+            var pluginMap = callbackery.ui.Plugins.getInstance().getPlugins();
+            var that = this;
+            var cfg = this.__cfg;
+            var getParentFormDataCallBack = this.__getParentFormDataCallBack;
+            var extraAction = this.__extraAction;
             rpc.callAsyncSmart(function(pluginConfig){
                 if (extraAction && pluginConfig.action){
                     pluginConfig.action.push(extraAction);
@@ -30,21 +53,21 @@ qx.Class.define("callbackery.ui.Screen", {
                 pluginConfig['name'] = cfg.name;
                 var type = pluginConfig.type;
                 if (type in pluginMap) {
-                    var content = pluginMap[type](pluginConfig,getParentFormData);
+                    var content = pluginMap[type](pluginConfig,getParentFormDataCallBack);
                     content.addListener('actionResponse',function(e){
                         that.fireDataEvent('actionResponse',e.getData());
                     });
+                    // track visibility changes in the screen widget
+                    content.addListener('changeVisibility',function(){
+                        this.setVisibility(content.getVisibility());
+                    },that);
                     that.add(content);
                 }
                 else {
                     that.debug('Invalid plugin type:"' + type + '"');
                 }
-            },'getPluginConfig',cfg.name,getParentFormData ? getParentFormData() : null);
-        });
-    },
-
-    events: {
-        actionResponse: 'qx.event.type.Data'
+            },'getPluginConfig',cfg.name,getParentFormDataCallBack ? getParentFormDataCallBack() : null);
+        }
     }
 
 });

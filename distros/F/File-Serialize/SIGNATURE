@@ -15,32 +15,35 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 355902010d557d6f7ecd3ff513074c5717a44b36 AUTHOR_PLEDGE
-SHA1 9f39bed3574d54bbdefe187b453f360e6d8b72d3 CONTRIBUTORS
-SHA1 a65728d84b48c18e869080446d96d0dc7f635330 Changes
+SHA1 b20d6a234a1ec5646f206bc27c5a5a0e4ab47e0f CONTRIBUTORS
+SHA1 5f717483816a8fa1e9d0c250b112daa402b1dfb9 Changes
 SHA1 5f0a62949de55b6c1500348df769e5abab866e85 INSTALL
-SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
-SHA1 03432241425fab1a34e99273bb07339f23e5bbd3 MANIFEST
-SHA1 d63395ed68e8c4c35e890279740f37f98506f7df META.json
-SHA1 0e9ba2cc9e85ce632bd9e2d2d6b0583940248d33 META.yml
-SHA1 e48b1b7fc5bc7325070a3d2261cb10411c6f3aef Makefile.PL
-SHA1 d0f56384c46d8cd2d40aa81a0a7bc7e0a175dc6a bin/transerialize
-SHA1 ae9ff2c0d1c820f6f630f06b267c0aeaa3c77b06 cpanfile
-SHA1 0c4842f6d653bbb7ea845d4cc028c07ead7b2fa2 doap.xml
-SHA1 2de4c4452c83a038bf9feebf2c0b2146a7b477a9 lib/File/Serialize.pm
-SHA1 0e2541be8e36c0b9d1c97dbb4366a3a290bd8b3f lib/File/Serialize/Serializer.pm
-SHA1 d79bd1ee0dd2ce6cad5c8480a88b7ab4dc3c68f0 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
-SHA1 4aa9c7d29c519faac0e205b765e06fb60bc2dec2 lib/File/Serialize/Serializer/JSONY.pm
-SHA1 c91b3959055fd3e7689f500fe5e64217e40ee000 lib/File/Serialize/Serializer/TOML.pm
-SHA1 c4332ec0e7cd68a244ddffbefa794697b321aafc lib/File/Serialize/Serializer/XML/Simple.pm
-SHA1 f1ea8df044938ba41c30af2e56d06281e3890587 lib/File/Serialize/Serializer/YAML/Tiny.pm
-SHA1 541858673f62f902f41e6b393cb5b35e5b473776 lib/File/Serialize/Serializer/YAML/XS.pm
-SHA1 8e82f490a7f0d9e798b383e4c940dbc9af384971 t/00-compile.t
-SHA1 f19b6e0e9b8a8a23740a223862aaa66fdeb886ce t/00-report-prereqs.dd
+SHA1 2038148b02a09f89e92968620c13b0ba7cdd0c49 LICENSE
+SHA1 b74dcbb57889f3b999942d5eaa4efc11295aba3d MANIFEST
+SHA1 6d9119fc5bbbe823f0f9585fcc836dcf5b3104dd META.json
+SHA1 63f987f7d5d45c868ee03cf436ab54893e8d3ae6 META.yml
+SHA1 c108cf77cfa9506bf9c93e578fc534aa1a602533 Makefile.PL
+SHA1 a5cfe809754e875a69f00915b91771b13de591dc README.mkdn
+SHA1 7bb2309ea9e21f93e95c7d44416f4d60dcd90d74 bin/transerialize
+SHA1 e623a91f11f921ea99510fa4356bd8774c0f31fd cpanfile
+SHA1 c2a6f36543742e3d9892d61cba233d8774922933 doap.xml
+SHA1 47b563980984cc0662303e9320407387d35d711d lib/File/Serialize.pm
+SHA1 accd7cbe2c05e8390ebf86f0ca9d7a1dad2f3f88 lib/File/Serialize/Serializer.pm
+SHA1 9ad34b193f8b3b433acfc10c4d69744de4364111 lib/File/Serialize/Serializer/Data/Dumper.pm
+SHA1 af06fc9f8cb37e2768e4e60716b70b90df4c0755 lib/File/Serialize/Serializer/JSON/MaybeXS.pm
+SHA1 4573a9cb5c75a6122d86d6d1416dfdd6300d25c3 lib/File/Serialize/Serializer/JSONY.pm
+SHA1 73086445729446ed49848097d7462380b43a6bbd lib/File/Serialize/Serializer/TOML.pm
+SHA1 87228342f8cd4a5123201028dd297170018da73d lib/File/Serialize/Serializer/XML/Simple.pm
+SHA1 93ecf141a5a726ed3e45528e74920d81ad40ecdb lib/File/Serialize/Serializer/YAML/Tiny.pm
+SHA1 dcb4880133f7bcd214f0f5219879de4bace1d0fa lib/File/Serialize/Serializer/YAML/XS.pm
+SHA1 e4b0f6d032960dc6aaaabe045a3d6298cf802902 t/00-compile.t
+SHA1 5439348701f8ad6af51ff3a99636aefbcd9f03b7 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 a6971022da7835c59e664443d12373e51c124aeb t/add_extension.t
-SHA1 0605fd91275bb68e8b44840e8075b4d2be4db13f t/basic.t
+SHA1 ff95cd6dd3ba00d2c73dd0f8967d9f2062202e43 t/basic.t
 SHA1 61ba339cfa991828f0599dfcbb4bbfbfc1daf5ab t/corpus/foo.json
 SHA1 e8986665b9ddc2cd1f6c63b21eb9163084e25915 t/corpus/foo.jsony
+SHA1 4c3904a3c7b99fce8faa947165bce4121e38ca88 t/corpus/foo.pl
 SHA1 f8d9510f77aefe45cfc1fa640985b431d1aa5b88 t/corpus/foo.toml
 SHA1 e36e3dd914bbf13a2412176fb5d7002dfa09e207 t/corpus/foo.xml
 SHA1 7e109797e472ae8cbd20d7a4d7e231a96324377c t/corpus/foo.yml
@@ -52,12 +55,10 @@ SHA1 d3687e5baaf37b73f1037e77a5523fde0ddfdfcb t/precedence.t
 SHA1 b2a4748f9523bf1ea8fac101a61cc302d8e7e863 t/serializer.t
 SHA1 7bf96c8298e5f230f8f6ffebc4aa765b12d05d5b t/transerialize.t
 SHA1 814eb6a8282c7cea6592f6041334311a8e68509d t/utf8.t
-SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAldyiLsACgkQ34Hwf+GwC4wZLgCg0xpC/H5/4wa2+FbWv8Tcaoqh
-LeYAn1pk+ZB5LEzNzWdBIhMrYQ5FfeE1
-=kXjS
+iEYEARECAAYFAlndQ1QACgkQ34Hwf+GwC4wj8wCglLhlRDXgF5FTKAOw6YrNenpi
+m7kAn2eLoty1TsA2eBLnMLd3kylYj5K8
+=UjsZ
 -----END PGP SIGNATURE-----

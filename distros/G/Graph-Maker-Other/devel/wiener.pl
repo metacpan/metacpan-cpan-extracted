@@ -19,11 +19,14 @@
 
 use strict;
 use 5.010;
-use FindBin;
 use File::Slurp;
 use List::Util 'min','max';
 use POSIX 'ceil';
+
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
 use MyGraphs;
+
 # GP-DEFINE  nearly_equal(x,y,delta=1-e10) = abs(x-y) < delta;
 $|=1;
 

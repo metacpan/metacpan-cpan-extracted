@@ -1,10 +1,12 @@
 package Geo::IP::Record;
 
+use strict;
+
+our $VERSION = 1.51;
+
 use Geo::IP;    #
 
 use vars qw/$pp/;
-
-use strict;
 
 # here are the missing functions if the C API is used
 sub latitude {

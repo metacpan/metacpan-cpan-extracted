@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Role::FindMatch;
-{
-  $Net::CLI::Interact::Role::FindMatch::VERSION = '2.143070';
-}
 
 use Moo::Role;
 
@@ -15,6 +12,5 @@ sub find_match {
     use List::Util 'first';
     return first { $text =~ $_ } @$matches;
 }
-
 
 1;

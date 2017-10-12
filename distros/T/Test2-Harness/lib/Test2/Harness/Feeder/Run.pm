@@ -2,7 +2,7 @@ package Test2::Harness::Feeder::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -65,6 +65,7 @@ sub _harness_event {
         event_id   => 'harness-' . ${$self->{+EVENT_COUNTER_REF}}++,
         run_id     => $run->run_id,
         stamp      => time,
+        times      => [times],
         facet_data => {@_},
     );
 }

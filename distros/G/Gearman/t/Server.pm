@@ -59,9 +59,15 @@ sub _start_server {
             my %args = (
                 "--port"   => $port,
                 "--listen" => $self->host,
-                $ENV{GEARMAND_DEBUG} ? ("--verbose" => "DEBUG") : (),
-                "--log-file" => $ENV{GEARMAND_LOG_FILE} || "/dev/stderr",
             );
+
+            # for Gearman::Server sake. It complains "Unknown option: log-file"
+            if (-B $self->bin()) {
+                $args{"--log-file"} = $ENV{GEARMAND_LOG_FILE} || "/dev/stderr";
+                if ($ENV{GEARMAND_DEBUG}) {
+                    $args{"--verbose"} = "DEBUG";
+                }
+            } ## end if (-B $self->bin())
 
             exec($self->bin(), %args) or do {
                 $ERROR = sprintf "cannot execute %s: $!", $self->bin;

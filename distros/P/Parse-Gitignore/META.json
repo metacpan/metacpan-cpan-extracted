@@ -1,16 +1,16 @@
 {
-   "abstract" : "parse a .gitignore file",
+   "abstract" : "parse .gitignore files",
    "author" : [
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parse-Gitignore",
    "no_index" : {
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Slurper" : "0.010",
             "Path::Tiny" : "0.076",
             "perl" : "5.006001"
          }
@@ -48,6 +49,6 @@
          "web" : "https://github.com/benkasminbullock/parse-gitignore"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

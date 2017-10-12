@@ -2,9 +2,9 @@ package Apache::AwSOAP;
 
 use strict;
 use Apache;
-use SOAP::Transport::ACTIVEWORKS;
+use SOAP::Transport::ActiveWorks::Lite;
 
-my $server = SOAP::Transport::ACTIVEWORKS::Apache
+my $server = SOAP::Transport::ActiveWorks::Lite::Apache
    -> dispatch_to( '' );
 
 

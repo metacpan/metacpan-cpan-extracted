@@ -11,19 +11,20 @@
 
 enum {
    PK_PUBLIC=0,
-   PK_PRIVATE=1,
-   PK_PUBLIC_COMPRESSED=2, /* used only when exporting public ECC key */
-   PK_CURVEOID=4           /* used only when exporting public ECC key */
+   PK_PRIVATE=1
 };
 
 /* Indicates standard output formats that can be read e.g. by OpenSSL or GnuTLS */
 #define PK_STD          0x1000
-
-/* iterations limit for retry-loops */
-#define PK_MAX_RETRIES  20
+/* Indicates compressed public ECC key */
+#define PK_COMPRESSED   0x2000
+/* Indicates ECC key with the curve specified by OID */
+#define PK_CURVEOID     0x4000
 
 int rand_prime(void *N, long len, prng_state *prng, int wprng);
 
+#ifdef LTC_SOURCE
+/* internal helper functions */
 int rand_bn_bits(void *N, int bits, prng_state *prng, int wprng);
 int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 
@@ -33,6 +34,7 @@ enum public_key_algorithms {
    PKA_EC,
    EC_PRIME_FIELD
 };
+#endif /* LTC_SOURCE */
 
 typedef struct Oid {
     unsigned long OID[16];
@@ -200,13 +202,6 @@ int katja_import(const unsigned char *in, unsigned long inlen, katja_key *key);
 #ifdef LTC_MDH
 
 typedef struct {
-  int size;
-  char *name, *base, *prime;
-} ltc_dh_set_type;
-
-extern const ltc_dh_set_type ltc_dh_sets[];
-
-typedef struct {
     int type;
     void *x;
     void *y;
@@ -236,6 +231,13 @@ void dh_free(dh_key *key);
 int dh_export_key(void *out, unsigned long *outlen, int type, dh_key *key);
 
 #ifdef LTC_SOURCE
+typedef struct {
+  int size;
+  const char *name, *base, *prime;
+} ltc_dh_set_type;
+
+extern const ltc_dh_set_type ltc_dh_sets[];
+
 /* internal helper functions */
 int dh_check_pubkey(dh_key *key);
 #endif

@@ -5,8 +5,6 @@ use strict;
 use warnings;
 use Carp;
 
-use IO::Socket::SSL qw(debug4);
-
 use URI;
 use JSON; # imports encode_json, decode_json, to_json and from_json.
 
@@ -16,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = ();
 our @EXPORT = ();
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 my @categories = (
               '',                     '',             '', 'Fraud Orders',  'DDoS Attack', #   0  ...   4
@@ -73,7 +71,12 @@ sub get( $$ )
     }
 
     my $fh;
-    open( $fh, '-|', "/usr/bin/curl -s '$url'" );
+    my $cmd = "/usr/bin/curl -s '$url'";
+    if( $this->{Debug})
+    {
+        print STDERR "CMD:   $cmd\n";
+    }
+    open( $fh, '-|', $cmd );
     unless( $fh ) { croak( "Cannout pipe from curl" ); }
     my $json = '';
     while( <$fh> )
@@ -143,6 +146,73 @@ sub filter( $$@ )
     return( @result );
 }
 
+
+sub report( $$$@ )
+{
+    my $this = shift;
+    my $ip = shift;
+    my $comment = shift;
+    my @catg = ();
+    my $category;
+
+    while( @_ )
+    {
+        $category = shift;
+        unless( $category =~ m{^[0-9]+$})
+        {
+            my $c = $categories{ $category };
+            unless( defined( $c ))
+            {
+                croak( "Unknown category $category" );
+            }
+            $category = $c;
+        }
+        push @catg, $category;
+    }
+    $category = join( ',', @catg );
+
+    my $url = URI->new( "$this->{BaseURL}report/json" );
+    $url->query_form( key => $this->{Key}, category => $category, comment => $comment, ip => $ip );
+
+    if( $this->{BaseURL} eq 'test://' )
+    {
+        if(   $ip eq '192.168.0.3' ) {   return( $url->as_string );  }
+    }
+
+    my $fh;
+    my $cmd = "/usr/bin/curl -s '$url'";
+    if( $this->{Debug})
+    {
+        print STDERR "CMD:   $cmd\n";
+    }
+    open( $fh, '-|', $cmd );
+    unless( $fh ) { croak( "Cannout pipe from curl" ); }
+    my $json = '';
+    while( <$fh> )
+    {
+        $json .= $_;
+    }
+    if ($this->{Debug})
+    {
+        print STDERR "JSON:  $json\n";
+    }
+
+    my $result = from_json( $json );
+    if( $this->{Debug})
+    {
+        require Data::Dumper;
+        print STDERR "RESULT:" . Dumper( $result );
+    }
+
+    if( ref($result) eq 'HASH' )
+    {
+        return( $result );
+    }
+
+    die( "Bad result from server: $json" );
+}
+
+
 1;
 __END__
 
@@ -204,6 +274,17 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
     Return an array of those members in @data that match the given category.
     The format of @data is same as the return array from get() so see above.
     The $category can be either a number, or a printable string.
+
+
+=head2 report( $ip, $comment, @category_list )
+
+    Report an abusive IP address back to the database.
+    The comment can be "" empty string or any other brief comment to explain why
+    you believe this IP has done something wrong.
+    One or more categories must be included, these can be numbers or printable
+    string categories. e.g. :
+
+    $db->report( '111.119.210.10', 'Very annoying IP address', 'Brute-Force', 'Port Scan' );
 
 
 =head1 SEE ALSO

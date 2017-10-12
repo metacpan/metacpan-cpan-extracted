@@ -1,0 +1,8 @@
+/* Muster */
+tr.depends {
+    color: rgba(0, 0, 0, 0.50);
+    background: rgba(230, 230, 230, 0.50);
+}
+tr.depends a {
+    color: rgba(0, 0, 180, 0.50);
+}

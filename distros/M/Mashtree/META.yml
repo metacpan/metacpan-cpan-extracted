@@ -3,31 +3,35 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  Test::More: 0.47
+  Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mashtree
 no_index:
   directory:
     - t
     - inc
 requires:
-  Bio::Matrix::IO: 0
-  Bio::Tree::DistanceFactory: 0
-  Bio::Tree::Statistics: 0
-  DBD::SQLite: 0
-  DBI: 0
-  Data::Dumper: 0
-  Exporter: 0
-  File::Basename: 0
-  List::Util: 0
-  Thread::Queue: 0
-  threads: 0
-  threads::shared: 0
-version: 0.23
+  Bio::Matrix::IO: '0'
+  Bio::Tree::DistanceFactory: '0'
+  Bio::Tree::Statistics: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  List::Util: '0'
+  Thread::Queue: '0'
+  perl: '5.010000'
+  threads: '0'
+  threads::shared: '0'
+resources:
+  repository: git://github.com/lskatz/mashtree.git
+version: '0.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

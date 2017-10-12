@@ -7,7 +7,6 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
@@ -26,9 +25,8 @@ do { my $x = {
                                       'Module::Pluggable' => '0',
                                       'Module::Runtime' => '0',
                                       'Moo' => '0',
-                                      'Moo::Role' => '0',
-                                      'MooX::ClassAttribute' => '0',
                                       'Path::Tiny' => '0',
+                                      'Role::Tiny' => '0',
                                       'feature' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.16.0',

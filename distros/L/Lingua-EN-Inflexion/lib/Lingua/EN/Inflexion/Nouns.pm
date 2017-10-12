@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Nouns;
 use 5.010; use strict; use warnings; use re q{eval};
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20160520.215603;
+our $VERSION = 20171008.084303;
 
 my $modern_plural_of = {
   " ox"                    => " oxen",
@@ -673,8 +673,8 @@ my $modern_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "galla"                  => "gallas",
   "Galla"                  => "Gallas",
+  "galla"                  => "gallas",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglions",
@@ -1288,6 +1288,7 @@ my $modern_plural_of = {
   "nova"                   => "novas",
   "novus homo"             => "novi homines",
   "noxa"                   => "noxae",
+  "nse"                    => "nses",
   "nubecula"               => "nubeculae",
   "nucleolonema"           => "nucleolonemas",
   "nucleolus"              => "nucleoluses",
@@ -1338,8 +1339,8 @@ my $modern_plural_of = {
   "osteoma"                => "osteomata",
   "ostium"                 => "ostia",
   "oto"                    => "otos",
-  "Otomi"                  => "Otomies",
   "otomi"                  => "otomies",
+  "Otomi"                  => "Otomies",
   "ottoman"                => "ottomans",
   "ovarium"                => "ovaria",
   "ovolo"                  => "ovoli",
@@ -1616,8 +1617,8 @@ my $modern_plural_of = {
   "punto blanco"           => "puntos blancos",
   "pupa"                   => "pupae",
   "purlieu"                => "purlieus",
-  "Purum"                  => "Purums",
   "purum"                  => "purums",
+  "Purum"                  => "Purums",
   "putto"                  => "putti",
   "puttony"                => "puttonys",
   "pycnidium"              => "pycnidia",
@@ -2542,13 +2543,13 @@ my $classical_plural_of = {
   "asylum"                 => "asyla",
   "asyndeton"              => "asyndeta",
   "ataman"                 => "atamans",
-  "atlas"                  => "atlantes",
   "Atlas"                  => "Atlantes",
+  "atlas"                  => "atlantes",
   "atman"                  => "atmas",
   "aureus"                 => "aurei",
   "aurora"                 => "aurorae",
-  "Auslese"                => "Auslesen",
   "auslese"                => "auslesen",
+  "Auslese"                => "Auslesen",
   "auspex"                 => "auspices",
   "auto"                   => "autos",
   "auto de fe"             => "autos de fes",
@@ -3077,8 +3078,8 @@ my $classical_plural_of = {
   "furioso"                => "furiosos",
   "fuzz"                   => "fuzzes",
   "Gabunese"               => "Gabunese",
-  "Galla"                  => "Galla",
   "galla"                  => "galla",
+  "Galla"                  => "Galla",
   "gallows"                => "gallows",
   "gametangium"            => "gametangia",
   "ganglion"               => "ganglia",
@@ -3351,8 +3352,8 @@ my $classical_plural_of = {
   "laika"                  => "laiki",
   "lamella"                => "lamellae",
   "lamina"                 => "laminae",
-  "Lapith"                 => "Lapithae",
   "lapith"                 => "lapithae",
+  "Lapith"                 => "Lapithae",
   "Lapponese"              => "Lapponese",
   "lar"                    => "lares",
   "larnax"                 => "larnakes",
@@ -3499,8 +3500,8 @@ my $classical_plural_of = {
   "mare"                   => "maria",
   "maremma"                => "maremme",
   "marquis"                => "marquises",
-  "Mary"                   => "Marys",
   "mary"                   => "maries",
+  "Mary"                   => "Marys",
   "mater lectionis"        => "matres lectionis",
   "math"                   => "maths",
   "matin"                  => "matins",
@@ -3656,8 +3657,8 @@ my $classical_plural_of = {
   "nebula"                 => "nebulae",
   "nectocalyx"             => "nectocalyces",
   "nemathecium"            => "nemathecia",
-  "nenets"                 => "nentsy",
   "Nenets"                 => "Nentsi",
+  "nenets"                 => "nentsy",
   "Nepalese"               => "Nepalese",
   "nephridium"             => "nephridia",
   "nerita"                 => "neritae",
@@ -3692,6 +3693,7 @@ my $classical_plural_of = {
   "nova"                   => "novae",
   "novus homo"             => "novi homines",
   "noxa"                   => "noxae",
+  "nse"                    => "nses",
   "nubecula"               => "nubeculae",
   "nucleolonema"           => "nucleolonemata",
   "nucleolus"              => "nucleoli",
@@ -3742,8 +3744,8 @@ my $classical_plural_of = {
   "osteoma"                => "osteomata",
   "ostium"                 => "ostia",
   "oto"                    => "otos",
-  "otomi"                  => "otomi",
   "Otomi"                  => "Otomi",
+  "otomi"                  => "otomi",
   "ottoman"                => "ottomans",
   "ovarium"                => "ovaria",
   "ovolo"                  => "ovoli",
@@ -3763,8 +3765,8 @@ my $classical_plural_of = {
   "palpus"                 => "palpi",
   "palus"                  => "pali",
   "Panaman"                => "Panamans",
-  "Pangasinan"             => "Pangasinanes",
   "pangasinan"             => "pangasinanes",
+  "Pangasinan"             => "Pangasinanes",
   "panino"                 => "panini",
   "panorpa"                => "panorpae",
   "pant"                   => "pants",
@@ -4985,8 +4987,8 @@ my $singular_of = {
   "aurei"                 => "aureus",
   "aurorae"               => "aurora",
   "auroras"               => "aurora",
-  "auslesen"              => "auslese",
   "Auslesen"              => "Auslese",
+  "auslesen"              => "auslese",
   "ausleses"              => "auslese",
   "auspices"              => "auspex",
   "auto de fes"           => "auto de fe",
@@ -5968,8 +5970,8 @@ my $singular_of = {
   "laminae"               => "lamina",
   "Lapithae"              => "Lapith",
   "lapithae"              => "lapith",
-  "Lapiths"               => "Lapith",
   "lapiths"               => "lapith",
+  "Lapiths"               => "Lapith",
   "Lapponese"             => "Lapponese",
   "lares"                 => "lar",
   "larnakes"              => "larnax",
@@ -6396,6 +6398,7 @@ my $singular_of = {
   "novas"                 => "nova",
   "novi homines"          => "novus homo",
   "noxae"                 => "noxa",
+  "nses"                  => "nse",
   "nubeculae"             => "nubecula",
   "nuclei"                => "nucleus",
   "nucleoli"              => "nucleolus",
@@ -6457,8 +6460,8 @@ my $singular_of = {
   "ostia"                 => "ostium",
   "otomi"                 => "otomi",
   "Otomi"                 => "Otomi",
-  "Otomies"               => "Otomi",
   "otomies"               => "otomi",
+  "Otomies"               => "Otomi",
   "otos"                  => "oto",
   "ottomans"              => "ottoman",
   "ours"                  => "mine",
@@ -6483,10 +6486,10 @@ my $singular_of = {
   "palpebrae"             => "palpebra",
   "palpi"                 => "palpus",
   "Panamans"              => "Panaman",
-  "pangasinanes"          => "pangasinan",
   "Pangasinanes"          => "Pangasinan",
-  "Pangasinans"           => "Pangasinan",
+  "pangasinanes"          => "pangasinan",
   "pangasinans"           => "pangasinan",
+  "Pangasinans"           => "Pangasinan",
   "panini"                => "panino",
   "panorpae"              => "panorpa",
   "pantos"                => "panto",
@@ -7901,7 +7904,8 @@ sub convert_to_modern_plural {
         when (m{\A(.+)ss$}i) { return "${1}sses"; }
         when (m{\A(.+)orse$}i) { return "${1}orses"; }
         when (m{\A(.+[au])orse$}i) { return "${1}orses"; }
-        when (m{\A(.+[^s])sis$}i) { return "${1}ses"; }
+        when (m{\A(.+)nse$}i) { return "${1}nses"; }
+        when (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
         when (m{\A(.+)trix$}i) { return "${1}trixes"; }
         when (m{\A(.+)us$}i) { return "${1}uses"; }
         when (m{\A(.+)x$}i) { return "${1}xes"; }
@@ -8014,7 +8018,8 @@ sub convert_to_classical_plural {
         when (m{\A(.+)ss$}i) { return "${1}sses"; }
         when (m{\A(.+)orse$}i) { return "${1}orses"; }
         when (m{\A(.+[au])orse$}i) { return "${1}orses"; }
-        when (m{\A(.+[^s])sis$}i) { return "${1}ses"; }
+        when (m{\A(.+)nse$}i) { return "${1}nses"; }
+        when (m{\A(.+[^ns])sis$}i) { return "${1}ses"; }
         when (m{\A(.+)trix$}i) { return "${1}trices"; }
         when (m{\A(.+)us$}i) { return "${1}uses"; }
         when (m{\A(.+)x$}i) { return "${1}xes"; }
@@ -8149,7 +8154,8 @@ sub convert_to_singular {
         when (m{\A(.+)sses$}i) { return "${1}ss"; }
         when (m{\A(.+)orses$}i) { return "${1}orse"; }
         when (m{\A(.+[au])orses$}i) { return "${1}orse"; }
-        when (m{\A(.+[^s])ses$}i) { return "${1}sis"; }
+        when (m{\A(.+)nses$}i) { return "${1}nse"; }
+        when (m{\A(.+[^ns])ses$}i) { return "${1}sis"; }
         when (m{\A(.+)trixes$}i) { return "${1}trix"; }
         when (m{\A(.+)trices$}i) { return "${1}trix"; }
         when (m{\A(.+)uses$}i) { return "${1}us"; }
@@ -8282,7 +8288,8 @@ sub is_plural {
         when (m{\A(.+)sses$}i) { return 1 }
         when (m{\A(.+)orses$}i) { return 1 }
         when (m{\A(.+[au])orses$}i) { return 1 }
-        when (m{\A(.+[^s])ses$}i) { return 1 }
+        when (m{\A(.+)nses$}i) { return 1 }
+        when (m{\A(.+[^ns])ses$}i) { return 1 }
         when (m{\A(.+)trixes$}i) { return 1 }
         when (m{\A(.+)trices$}i) { return 1 }
         when (m{\A(.+)uses$}i) { return 1 }
@@ -8392,7 +8399,8 @@ sub is_singular {
         when (m{\A(.+)ss$}i) { return 1 }
         when (m{\A(.+)orse$}i) { return 1 }
         when (m{\A(.+[au])orse$}i) { return 1 }
-        when (m{\A(.+[^s])sis$}i) { return 1 }
+        when (m{\A(.+)nse$}i) { return 1 }
+        when (m{\A(.+[^ns])sis$}i) { return 1 }
         when (m{\A(.+)trix$}i) { return 1 }
         when (m{\A(.+)us$}i) { return 1 }
         when (m{\A(.+)x$}i) { return 1 }

@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.3.9';
+our $VERSION = '0.3.12';
 
 1;
 
@@ -1280,6 +1280,11 @@ minoca
 =item *
 
 ubuntu
+
+
+=item *
+
+funtoo
 
 
 =back

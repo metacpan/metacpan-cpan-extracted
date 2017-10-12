@@ -32,14 +32,14 @@ BEGIN { MyTestHelpers::nowarnings() }
 plan tests => 323;
 
 
-use lib
-  'devel/lib';
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
 require Graph::Maker::Dragon;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Maker::Dragon::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Dragon->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Dragon->VERSION($want_version); 1 }, 1,

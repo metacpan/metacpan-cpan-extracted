@@ -7,12 +7,11 @@ use Fcntl qw/LOCK_EX LOCK_UN SEEK_SET/;
 use Time::HiRes qw/sleep time/;
 use Test2::Util qw/pkg_to_file/;
 use Test2::Harness::Util qw/read_file write_file open_file/;
-use App::Yath::Util qw/find_yath/;
 
 use Test2::Harness::Run::Runner::ProcMan::Persist();
 use Test2::Harness::Util::DepTracer();
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use parent 'Test2::Harness::Run::Runner';
 use Test2::Harness::Util::HashBase qw{
@@ -174,7 +173,7 @@ sub stage_loop {
     STAGE: while ($stage) {
         my $spec = $spawn{$stage} || {};
 
-        $0 = find_yath() . " runner-$stage";
+        $0 = "yath-runner-$stage";
         $self->stage_start($stage);
 
         my $monitor = {};
@@ -190,7 +189,6 @@ sub stage_loop {
                 my $exit = $?;
                 next unless $check;
                 die "$$ ($self->{+STAGE}) waitpid error for stage '$cs': $check (expected $pid)" if $check != $pid;
-                die "$$ ($self->{+STAGE}) Stage '$cs' exited badly: $exit" if $exit;
                 print "$$ ($self->{+STAGE}) Stage '$cs' has exited ($exit)\n";
                 delete $monitor->{$cs};
             }
@@ -255,7 +253,7 @@ sub stage_run_iso {
     my $dtrace = $self->dtrace;
 
     $dtrace->clear_loaded;
-    $0 = find_yath() . " yath runner-iso-$stage";
+    $0 = "yath-runner-iso-$stage";
     $self->stage_start($stage);
     $self->{+STAGE} = $stage;
     $self->watch();

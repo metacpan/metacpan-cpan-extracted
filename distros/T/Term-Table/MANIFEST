@@ -22,3 +22,4 @@ t/Table/Cell.t
 t/Table/CellStack.t
 t/Table/LineBreak.t
 t/bad_blank_line.t
+t/honor_env_in_non_tty.t

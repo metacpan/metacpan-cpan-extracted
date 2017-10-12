@@ -101,6 +101,7 @@ xt/author/Plugin-PodChecker.t
 xt/author/Plugin-PodSpell.t
 xt/author/Plugin-PodTidy.t
 xt/author/Util.t
+xt/author/dependent-modules.t
 xt/author/diff-on-tidy-error.t
 xt/author/mojibake.t
 xt/author/no-tabs.t

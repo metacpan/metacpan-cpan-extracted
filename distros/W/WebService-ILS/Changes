@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-ILS
 
+0.17 2017-10-12T00:43:30Z
+    - Overdrive bugfix: no more _item_metadata(), we switched to item_metadata()
+
 0.16 2017-08-14T04:12:46Z
     - Bugfix: Moved Params::Check::check() to BUILDARGS in 0.15 broke new(%params)
 

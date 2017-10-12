@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Devel::MAT;
+use String::Tagged 0.15;  # sprintf
+use String::Tagged::Terminal;
 
 # Some tools might want to draw pretty graphs with line drawing / similar
 STDOUT->binmode( ":encoding(UTF-8)" );
@@ -32,34 +34,56 @@ sub Devel::MAT::Cmd::printf
    shift;
    my ( $fmt, @args ) = @_;
 
-   printf $fmt, @args;
+   my $str = String::Tagged::Terminal->from_sprintf( $fmt, @args );
+
+   print $str->build_terminal;
+
+   return length $str;
 }
 
-my @STYLE = (
-   "\e[33m", # yellow
-   "\e[36m", # cyan
-   "\e[35m", # magenta
+my @FG = (
+   3, # yellow
+   6, # cyan
+   5, # magenta
 );
-my $STYLE_SV = "\e[1;3m";
 
-my $NORMAL = "\e[m";
-
-sub Devel::MAT::Cmd::print_note
+sub Devel::MAT::Cmd::format_note
 {
    shift;
    my ( $str, $idx ) = @_;
    $idx //= 0;
 
-   print $STYLE[$idx % 3] . $str . $NORMAL;
+   return String::Tagged->new_tagged( $str,
+      bold    => 1,
+      fgindex => $FG[$idx % 3],
+   );
 }
 
-sub Devel::MAT::Cmd::print_sv
+sub Devel::MAT::Cmd::format_sv
 {
    shift;
    my ( $sv ) = @_;
 
-   print $STYLE_SV . ( my $str = $sv->desc_class_addr ) . $NORMAL;
-   return length $str;
+   return String::Tagged->new_tagged( $sv->desc_class_addr,
+      bold   => 1,
+      italic => 1,
+   );
+}
+
+sub Devel::MAT::Cmd::_format_value
+{
+   shift;
+   return String::Tagged->new_tagged( $_[0], fgindex => 5+8 );
+}
+
+sub Devel::MAT::Cmd::format_symbol
+{
+   shift;
+   my ( $name ) = @_;
+
+   return String::Tagged->new_tagged( $name,
+      fgindex => 2,
+   );
 }
 
 if( @ARGV ) {

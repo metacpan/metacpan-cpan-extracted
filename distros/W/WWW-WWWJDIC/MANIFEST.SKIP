@@ -1,8 +1,7 @@
-^WWWJDIC.pm
-^blib
-.*\.tmp
-build.log
-boot\/.*
+^blib/.*$
+^.*\.tmp$
+^build.log$
+^boot\/.*$
 \.~\d+~
 _build\/.*
 MANIFEST.bak
@@ -10,7 +9,7 @@ MANIFEST.bak
 ^tests
 .*\.txt
 ^Build$
-xt/.*\.t
+^xt/.*\.t$
 ^(?:make-pod|clean|build)\.pl$
 examples/.*-out\.txt$
 \.git/.*
@@ -18,3 +17,4 @@ examples/.*-out\.txt$
 pm_to_blib
 MYMETA\..*
 ^Makefile$
+^lib/WWW/WWWJDIC\.pod\.tmpl$

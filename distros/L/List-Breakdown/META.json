@@ -38,7 +38,19 @@
          }
       }
    },
+   "provides" : {
+      "List::Breakdown" : {
+         "file" : "lib/List/Breakdown.pm",
+         "version" : "0.20"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.18",
+   "resources" : {
+      "homepage" : "https://sanctum.geek.nz/cgit/List-Breakdown.git/",
+      "repository" : {
+         "url" : "https://sanctum.geek.nz/code/List-Breakdown.git/"
+      }
+   },
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

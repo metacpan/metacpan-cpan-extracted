@@ -19,7 +19,11 @@
 
 use strict;
 use Graph;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

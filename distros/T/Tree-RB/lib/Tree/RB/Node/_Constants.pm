@@ -4,7 +4,7 @@ use strict;
 use Carp;
 use vars qw( $VERSION @EXPORT );
 
-$VERSION = '0.3';
+$VERSION = '0.500006';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -39,7 +39,7 @@ Tree::RB::Node::_Constants - Tree::RB guts
 
 =head1 VERSION
 
-This document describes Tree::RB::Node::_Constants version 0.1
+This document describes Tree::RB::Node::_Constants version 0.500006
 
 
 =head1 SYNOPSIS

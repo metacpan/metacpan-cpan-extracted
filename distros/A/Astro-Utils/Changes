@@ -1,5 +1,8 @@
 Revision history for Astro::Utils
 
+0.04  Wed Oct 11 11:15:00 2017
+      - Fixed inconsistent version as reported by CPANTS.
+
 0.03  Tue Sep 12 12:00:00 2017
       - Updated copyright year information.
 

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Extract documentation from Java source code.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Java-Doc",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "20171004",
+            "POSIX" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Java::Doc" : {
+         "file" : "lib/Java/Doc.pm",
+         "version" : "20171011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "20171011"
+}

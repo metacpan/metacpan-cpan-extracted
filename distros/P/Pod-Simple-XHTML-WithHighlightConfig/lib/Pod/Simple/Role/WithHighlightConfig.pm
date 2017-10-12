@@ -10,7 +10,6 @@ after BUILD => sub {
 has _highlight_config => (is => 'rw', init_arg => undef);
 has _highlight_config_text => (is => 'rw', clearer => 1, predicate => 1, init_arg => undef);
 
-our $_verbatim_sub;
 around _handle_element_start => sub {
   my $orig = shift;
   my $self = shift;
@@ -20,7 +19,7 @@ around _handle_element_start => sub {
     $self->_highlight_config_text('');
   }
   elsif ($element eq 'Verbatim' && $self->_highlight_config) {
-    local $_verbatim_sub = $orig;
+    local $self->{_verbatim_sub} = $orig;
     return $self->start_highlight($item, $self->_highlight_config);
   }
   else {
@@ -85,13 +84,11 @@ around _handle_element_end => sub {
 };
 
 sub start_highlight {
-    my $self = shift;
-    my $orig = $_verbatim_sub;
-    my ($item, $config) = @_;
-    $self->$orig(my $verb = 'Verbatim', $item, $config);
+  my $self = shift;
+  my $orig = $self->{_verbatim_sub};
+  my ($item, $config) = @_;
+  $self->$orig(my $verb = 'Verbatim', $item, $config);
 }
-
 
 1;
 __END__
-

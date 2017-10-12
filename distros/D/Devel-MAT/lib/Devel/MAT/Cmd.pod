@@ -8,29 +8,102 @@ C<Devel::MAT::Cmd> - abstractions for providing commands for C<Devel::MAT>
 
   Devel::MAT::Cmd->printf( $fmt, @args )
 
-Behaves like perl's core C<printf()> function.
+Behaves like perl's core C<printf()> function. Additionally, any argument for
+a C<%s> conversion may also be the result of one of the following C<format_*>
+methods, which may return a L<String::Tagged> instance.
 
-=head2 print_note
+=head2 print_table
 
-  Devel::MAT::Cmd->print_note( $str, $idx )
+  Devel::MAT::Cmd->print_table( $rows, %opts )
 
-A simple C<print>-like function, which may style its output in some way.
+Given a 2D array-of-arrays containing strings (which may be plain or formatted
+ones returned by the various C<format_*> methods), prints them formatted in a
+table shape, aligning the columns.
+
+The following named C<%ops> may be supplied:
+
+=over 4
+
+=item sep => STRING
+
+Separator string to print between columns. Will default to a single space if
+not supplied. Note that this string is interpolated into a C<sprintf> format
+string, so any C<%> marks it may contain should be doubled.
+
+=back
+
+=head2 format_note
+
+  $str = Devel::MAT::Cmd->format_note( $str, $idx )
+
+Apply some sort of styling to the a given string.
 
 Starting from zero, successively higher integer values for C<$idx> may influence
 the style further. Output with the same index value will appear the same. The
 implementation should support at least 3 different styles, but may wrap after
 this.
 
-=head2 print_sv
+For stylistic consistency, tools should try to stick to the following
+conventions for note indexes:
 
-  Devel::MAT::Cmd->print_sv( $sv )
+  0 - regular notes
+  1 - secondary notes, lexical variable names
+  2 - unusual or erroneous conditions, symbol table names
 
-Prints the address and description of the given SV. This may be stylised in
-some way, subject to user customisation, or made possibly interactive if the
-UI allows for it to be so.
+=head2 format_sv
 
-Returns the length in characters of the string it printed, in case the calling
-tool wishes to arrange them in a table.
+  $str = Devel::MAT::Cmd->format_sv( $sv )
+
+Returns a string encoding the address and description of the given SV,
+possibly stylised in some way, subject to user customisation, or possibly made
+interactive if the UI allows it to be so.
+
+=head2 format_value
+
+  $str = Devel::MAT::Cmd->format_value( $val, %opts )
+
+Returns a string formatting a given plain scalar value (which should either
+be a string or a number) to indicate it's a value from the user program. If
+given a string value, this will be escaped and quoted appropriately.
+
+The following named C<%opts> may be supplied:
+
+=over 4
+
+=item key => BOOL
+
+If true, the value represents a hash key value. Wraps the result in braces
+C<{...}> and removes redundant quote marks if the string is valid as a
+bareword identifier.
+
+=item index => BOOL
+
+If true, the value represents an array index. Wraps the result in square
+brackets C<[...]> and expects the value to be an integer.
+
+=item pv => BOOL
+
+If true, the value represents a string from the user code. Wraps the result
+in quote marks C<"..."> and limits the length to a maximum of 64 characters
+(or as specified by the C<maxlen> argument).
+
+=back
+
+=head2 format_symbol
+
+  $str = Devel::MAT::Cmd->format_symbol( $name, $sv )
+
+Returns a string formatting the given symbol name to indicate that it is a
+symbol name. Optionally, the SV object itself can be passed too, which may
+save the UI having to look it up from the dumpfile in case it wishes to make
+the printed value interactive in some way.
+
+=head2 format_bytes
+
+  $str = Devel::MAT::Cmd->format_bytes( $bytes )
+
+Returns a string showing the given byte count in suitably scaled units. This
+will use base-1024 sizes in C<KiB>, C<MiB>, C<GiB> or C<TiB> if necessary.
 
 =head1 AUTHOR
 

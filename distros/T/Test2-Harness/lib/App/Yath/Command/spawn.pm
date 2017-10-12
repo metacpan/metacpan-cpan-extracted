@@ -2,12 +2,18 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
+use App::Yath::Util qw/find_yath/;
 use Test2::Util qw/pkg_to_file/;
 use File::Spec;
 
-use App::Yath::Util qw/find_yath/;
+# If FindBin is installed, go ahead and load it. We do not care much about
+# success vs failure here.
+BEGIN {
+    local $@;
+    eval { require FindBin; FindBin->import };
+}
 
 use Carp qw/confess/;
 
@@ -40,11 +46,11 @@ sub import {
         POSIX::setsid();
     }
 
-    $0 = find_yath() . ' runner';
+    $0 = 'yath-runner';
 
     my $file = pkg_to_file($runner_class);
     require $file;
-    my $spawn = $runner_class->new(dir => $dir, %args);
+    my $spawn = $runner_class->new(dir => $dir, script => find_yath(), %args);
 
     my $test = $spawn->start;
 

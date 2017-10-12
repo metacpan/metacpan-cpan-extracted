@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,4 +24,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis2/issues
   homepage: https://github.com/jhthorsen/mojo-redis2
   repository: https://github.com/jhthorsen/mojo-redis2.git
-version: '0.26'
+version: '0.27'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

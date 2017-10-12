@@ -1,3 +1,6 @@
+1.2.2 - Disable script test unless developer
+1.2.1 - Add META.json and change script test
+1.2.0 - Add support for deployment scripts
 1.1.1 - Fix SQL placeholders bug
 1.1.0 - ANSI colored output and verification failure dumps
 1.0.8 - Capture patch errors in narrower scope

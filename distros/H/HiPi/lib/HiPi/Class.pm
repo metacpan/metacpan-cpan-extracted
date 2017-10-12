@@ -15,7 +15,7 @@ use strict;
 use warnings;
 use parent qw( Exporter );
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 #-------------------------------------------------------------------
 # Object Constructor

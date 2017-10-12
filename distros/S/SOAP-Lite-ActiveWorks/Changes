@@ -1,5 +1,10 @@
 Revision history for Perl extension SOAP::Transport::ActiveWorks.
 
+Mon Oct  9 07:27:01 EDT 2017
+
+	- ACTIVEWORKS.pm module renamed ActiveWorks/Lite.pm and SOAP::Transport::ACTIVEWORKS becomes
+          SOAP::Transport::ActiveWorks::Lite to avoid conflicts with the SOAP-ActiveWorks package
+          on case independent filesystems as per CPAN maintainer recommendation.
 
 Wed Feb  7 17:59:03 EST 2001
 

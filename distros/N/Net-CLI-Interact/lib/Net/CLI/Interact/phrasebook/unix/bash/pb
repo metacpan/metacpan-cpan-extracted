@@ -2,16 +2,20 @@ prompt user
     match /[Uu]sername: $/
 
 prompt pass
-    match /password(?: for \w+)?: $/
+    match /[Pp]assword( for.*)?:/
 
+# workaround for non-fix of rt.cpan#92376, which makes the pass 'command'
+# match against prompt GENERIC even though we're trying to enter PRIVILEGED
+# mode - then, after generic matches, it continues to check if privileged ALSO matches...
+# line 108 in /usr/share/perl5/Net/Appliance/Session/Engine.pm
 prompt generic
-    match /(?:\[)?\w+@.+(?:\])?\$ $/
+    match /\w+@.+(\$|#) $/
 
 prompt privileged
-    match /^(?:\[)?root@.+(?:\])?# $/
+    match /\[?root@.+# $/
 
 macro begin_privileged
-    send sudo su -
+    send sudo -Hi bash
     match pass or privileged
 
 macro end_privileged
@@ -20,3 +24,11 @@ macro end_privileged
 
 macro disconnect
     send logout
+
+macro enable_paging
+    send export PAGER=less
+		match generic
+
+macro disable_paging
+		send unset PAGER
+		match generic

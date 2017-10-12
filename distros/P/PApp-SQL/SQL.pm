@@ -27,10 +27,10 @@ PApp::SQL - absolutely easy yet fast and powerful sql access.
 
 This module provides you with easy-to-use functions to execute sql
 commands (using DBI). Despite being easy to use, they are also quite
-efficient and allow you to write faster programs in less lines of code. It
-should work with anything from perl-5.004_01 onwards, but I only support
-5.005+. UTF8 handling (the C<sql_u*> family of functions) will only be
-effective with perl version 5.006 and beyond.
+efficient and allow you to write faster programs in fewer lines of
+code. It should work with anything from perl-5.004_01 onwards, but I only
+support 5.005+. UTF8 handling (the C<sql_u*> family of functions) will
+only be effective with perl version 5.006 and beyond.
 
 If the descriptions here seem terse or if you always wanted to know
 what PApp is then have a look at the PApp module which uses this module
@@ -47,7 +47,7 @@ use DBI ();
 BEGIN {
    use base qw(Exporter DynaLoader);
 
-   $VERSION = '2.0';
+   $VERSION = '2.001';
    @EXPORT = qw(
          sql_exec  sql_fetch  sql_fetchall  sql_exists sql_insertid $sql_exec
          sql_uexec sql_ufetch sql_ufetchall sql_uexists
@@ -103,7 +103,7 @@ $PApp::SQL::DBH.
 
 Connect to the database given by C<($dsn,$user,$pass)>, while using the
 flags from C<$flags>. These are just the same arguments as given to
-C<DBI->connect>.
+C<< DBI->connect >>.
 
 The database handle will be cached under the unique id
 C<$id|$dsn|$user|$pass>. If the same id is requested later, the
@@ -185,8 +185,8 @@ these functions.
 
 =end comment
 
-The actual return value from the C<$sth->execute> call is stored in the
-package-global (and exported) variable C<$sql_exec>.
+The actual return value from the C<< $sth->execute >> call is stored in
+the package-global (and exported) variable C<$sql_exec>.
 
 If any error occurs C<sql_exec> will throw an exception.
 

@@ -129,7 +129,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         new_type->op_package = SPVM_HASH_search(compiler->op_package_symtable, type->name, strlen(type->name));
         
         op_type->uv.type = new_type;
-
       }
     }
   }
@@ -1281,11 +1280,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   break;
                 }
-                case SPVM_OP_C_CODE_DIE: {
+                case SPVM_OP_C_CODE_CROAK: {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   
                   if (!first_type || first_type->code != SPVM_TYPE_C_CODE_BYTE_ARRAY) {
-                    SPVM_yyerror_format(compiler, "die argument type must be byte[] at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "croak argument type must be byte[] at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }

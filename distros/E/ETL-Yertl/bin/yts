@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yts;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: Read/write time series data
 
 use ETL::Yertl;
@@ -44,15 +44,16 @@ yts - Read/write time series data
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 
     # Read a time series
-    yts [-s] <db_spec> <metric> [<field>] [--tag <name>=<value>]
+    yts [-s] <db_spec> <metric> [--start <datetime>] [--end <datetime>] \
+        [--tag <name>=<value>]
 
     # Write a time series
-    yts [-s] <db_spec> [<metric> [<field>]] [--tag <name>=<value>]
+    yts [-s] <db_spec> [<metric>] [--tag <name>=<value>]
 
     yts -h|--help|--version
 
@@ -72,16 +73,16 @@ exit with an error message.
 To read a time series, ask for a metric. This will display a set of YAML
 documents describing the values in the series.
 
-    $ yts influx://localhost:8086/mydb cpu_load_1m
+    $ yts influx://localhost:8086 mydb.cpu_load_1m
     ---
     timestamp: 2017-01-01 00:00:00
-    metric: cpu_load_1m
+    metric: mydb.cpu_load_1m
     value: 1.23
     tags:
         server: 10.0.0.1
     ---
     timestamp: 2017-01-01 00:00:00
-    metric: cpu_load_1m
+    metric: mydb.cpu_load_1m
     value: 0.61
     tags:
         server: 10.0.0.2
@@ -89,7 +90,7 @@ documents describing the values in the series.
 To show only the C<timestamp> and C<value> of a single metric, use the
 C<--short> format:
 
-    $ yts -s influx://localhost:8086/mydb cpu_load_1m
+    $ yts -s influx://localhost:8086 mydb.cpu_load_1m
     ---
     '2017-01-01 00:00:00': 1.23
     '2017-01-01 00:00:10': 1.26
@@ -112,18 +113,15 @@ with different tags for each metric. The timestamp can be any ISO8601
 date/time format. The value can be anything the time series database
 accepts.
 
-Any default values can be removed (like C<field> which defaults to
-C<value>).
-
     ---
     timestamp: 2017-01-01 00:00:00
-    metric: cpu_load_1m
+    metric: mydb.cpu_load_1m.value
     value: 1.23
     tags:
         server: 10.0.0.1
     ---
     timestamp: 2017-01-01 00:00:10
-    metric: cpu_load_1m
+    metric: mydb.cpu_load_1m.value
     value: 1.26
     tags:
         server: 10.0.0.1
@@ -143,13 +141,58 @@ accepts.
     '2017-01-01 00:00:10': 1.26
     '2017-01-01 00:00:20': 1.13
 
-This format can only usefully handle one metric. The metric and field
-to write is taken from the command line. Any tags specified on the
-command line will be attached to every point as it is written.
+This format can only usefully handle one metric. The metric to write is
+taken from the command line. Any tags specified on the command line will
+be attached to every point as it is written.
 
 =head1 ARGUMENTS
 
+=head2 C<db_spec>
+
+The database to connect to, in the format C<< <adapter>://<host>:<port> >>.
+
+These adapters come with Yertl:
+
+=over
+
+=item *
+
+L<influxdb|ETL::Yertl::Adapter::influxdb>
+
+=back
+
+=head2 C<metric>
+
+The metric to read/write. Databases may specify metrics in different ways.
+See the adapter documentation for more information.
+
 =head1 OPTIONS
+
+=head2 --start <datetime>
+
+When reading, only get points starting at or after the given date/time.
+Date/time are accepted in any ISO8601 format (C<YYYY-MM-DD>,
+C<YYYY-MM-DDTHH:MM:SS>).
+
+=head2 --end <datetime>
+
+When reading, only get points ending at or before the given date/time.
+Date/time are accepted in any ISO8601 format (C<YYYY-MM-DD>,
+C<YYYY-MM-DDTHH:MM:SS>).
+
+=head2 --tag <name>=<value>
+
+When reading, only read values with the given tag name equal to the
+given value.  When writing, write the given tag name and value to every
+point, unless the point specifies a different value for the tag.
+
+If the time series database does not support tagging of individual values,
+this option will cause C<yts> to exit with an error.
+
+=head2 -s | --short
+
+Read/write the time series in the "short" format. See L</Short Format> for
+more information.
 
 =head2 -h | --help
 

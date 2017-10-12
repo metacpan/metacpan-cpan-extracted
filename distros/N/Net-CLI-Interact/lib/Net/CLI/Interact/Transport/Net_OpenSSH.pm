@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Transport::Net_OpenSSH;
-{
-  $Net::CLI::Interact::Transport::Net_OpenSSH::VERSION = '0.01';
-}
 
 use Moo;
 use Sub::Quote;
@@ -72,10 +69,6 @@ sub runtime_options {
 
 1;
 
-# ABSTRACT: Net_OpenSSH based CLI connection
-
-
-__END__
 =pod
 
 =encoding UTF-8
@@ -83,10 +76,6 @@ __END__
 =head1 NAME
 
 Net::CLI::Interact::Transport::Net_OpenSSH - Net::OpenSSH based CLI connection
-
-=head1 VERSION
-
-Version 0.01
 
 =head1 DESCRIPTION
 

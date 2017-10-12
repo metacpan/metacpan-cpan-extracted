@@ -1,0 +1,231 @@
+# NAME
+
+Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
+
+# VERSION
+
+version 0.0.1
+
+# SYNOPSIS
+
+`bin/app.psgi`:
+
+```perl
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Plack::Builder;
+
+use MyApp;
+
+builder {
+    mount( MyApp->websocket_mount );
+    mount '/' => MyApp->to_app;
+}
+```
+
+`config.yml`:
+
+```
+plugins:
+    WebSocket:
+        # default values
+        serializer: 0
+        mount_path: /ws
+```
+
+`MyApp.pm`:
+
+```perl
+package MyApp;
+
+use Dancer2;
+use Dancer2::Plugin::WebSocket;
+
+websocket_on_message sub {
+  my( $conn, $message ) = @_;
+  $conn->send( $message . ' world!' );
+};
+
+get '/' => sub {
+  my $ws_url = websocket_url;
+  return <<"END";
+    <html>
+      <head><script>
+          var urlMySocket = "$ws_url";
+
+          var mySocket = new WebSocket(urlMySocket);
+
+          mySocket.onmessage = function (evt) {
+            console.log( "Got message " + evt.data );
+          };
+
+          mySocket.onopen = function(evt) {
+            console.log("opening");
+            setTimeout( function() {
+              mySocket.send('hello'); }, 2000 );
+          };
+
+    </script></head>
+    <body><h1>WebSocket client</h1></body>
+  </html>
+END
+};
+
+true;
+```
+
+# DESCRIPTION
+
+`Dancer2::Plugin::WebSocket` provides an interface to [Plack::App::WebSocket](https://metacpan.org/pod/Plack::App::WebSocket)
+and allows to interact with the webSocket connections within the Dancer app.
+
+[Plack::App::WebSocket](https://metacpan.org/pod/Plack::App::WebSocket), and thus this plugin, requires a plack server that
+supports the psgi _streaming_, _nonblocking_ and _io_. [Twiggy](https://metacpan.org/pod/Twiggy) 
+is the most popular server that fits the bill.
+
+# CONFIGURATION
+
+- serializer
+
+    If serializer is set to a `true` value, messages will be assumed to be JSON
+    objects and will be automatically encoded/decoded using a [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
+    serializer.  If the value of `serialier` is a hash, it'll be passed as
+    arguments to the [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) constructor.
+
+    ```
+    plugins:
+        WebSocket:
+            serializer: 
+                utf8:         1
+                allow_nonref: 1
+    ```
+
+- mount\_path
+
+    Path for the websocket mountpoint. Defaults to `/ws`.
+
+# PLUGIN KEYWORDS
+
+In the various callbacks, the connection object that is
+passed is a [Plack::App::WebSocket::Connection](https://metacpan.org/pod/Plack::App::WebSocket::Connection) object 
+augmented with the [Dancer2::Plugin::WebSocket::Connection](https://metacpan.org/pod/Dancer2::Plugin::WebSocket::Connection) role.
+
+## websocket\_on\_open sub { ... }
+
+```perl
+websocket_on_open sub {
+    my( $conn, $env ) = @_;
+    ...;
+};
+```
+
+Code invoked when a new socket is opened. Gets the new 
+connection
+object and the Plack
+`$env` hash as arguments. 
+
+## websocket\_on\_close sub { ... }
+
+```perl
+websocket_on_close sub {
+    my( $conn ) = @_;
+    ...;
+};
+```
+
+Code invoked when a new socket is opened. Gets the 
+connection object as argument.
+
+## websocket\_on\_error sub { ... }
+
+```perl
+websocket_on_error sub {
+    my( $env ) = @_;
+    ...;
+};
+```
+
+Code invoked when an error  is detected. Gets the Plack
+`$env` hash as argument and is expected to return a 
+Plack triplet.
+
+If not explicitly set, defaults to
+
+```perl
+websocket_on_error sub {
+    my $env = shift;
+    return [ 
+        500,
+        ["Content-Type" => "text/plain"],
+        ["Error: " . $env->{"plack.app.websocket.error"}]
+    ];
+};
+```
+
+## websocket\_on\_message sub { ... }
+
+```perl
+websocket_on_error sub {
+    my( $conn, $message ) = @_;
+    ...;
+};
+```
+
+Code invoked when a message is received. Gets the connection
+object and the message as arguments.
+
+## websocket\_url
+
+Returns the full url of the websocket mountpoint.
+
+```perl
+# assuming host is 'localhost:5000'
+# and the mountpoint is '/ws'
+print websocket_url;  # => ws://localhost:5000/ws
+```
+
+## websocket\_mount 
+
+Returns the mountpoint and the Plack app coderef to be
+used for `mount` in `app.psgi`. See the SYNOPSIS.
+
+# GOTCHAS
+
+It seems that the closing the socket causes Google's chrome to burp the
+following to the console:
+
+```
+WebSocket connection to 'ws://...' failed: Received a broken close frame containing a reserved status code.
+```
+
+Firefox seems to be happy, though. The issue is probably somewhere deep in
+[AnyEvent::WebSocket::Server](https://metacpan.org/pod/AnyEvent::WebSocket::Server). Since the socket is being closed anyway, I am
+not overly worried about it.
+
+# SEE ALSO
+
+This plugin is nothing much than a sugar topping atop 
+[Plack::App::WebSocket](https://metacpan.org/pod/Plack::App::WebSocket), which is itself [AnyEvent::WebSocket::Server](https://metacpan.org/pod/AnyEvent::WebSocket::Server)
+wrapped in Plackstic.
+
+Mojolicious also has nice WebSocket-related offerings. See
+[Mojolicious::Plugin::MountPSGI](https://metacpan.org/pod/Mojolicious::Plugin::MountPSGI) or
+[http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Web-server-embedding](http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Web-server-embedding). 
+(hi Joel!)
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

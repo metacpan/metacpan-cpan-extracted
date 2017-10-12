@@ -1,0 +1,19 @@
+# phrase book for F5 Big-IP systems
+
+prompt user
+    match /[Uu]sername: ?$/
+
+prompt pass
+    match /[Pp]assword( for.*)?: ?$/
+
+prompt generic
+    match /\w+@.+(\$|#) $/
+
+prompt privileged
+    match /\[?root@.+# $/
+
+macro disconnect
+    send quit
+
+macro paging
+    send modify cli preference pager disabled

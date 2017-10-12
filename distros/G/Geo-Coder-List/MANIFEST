@@ -26,11 +26,13 @@ t/noplan.t
 t/osm.t
 t/pod-cm.t
 t/pod.t
+t/postcodes.t
 t/snippets.t
 t/spelling.t
 t/unused.t
 t/us.t
 t/used.t
 t/vars.t
+t/xyz.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

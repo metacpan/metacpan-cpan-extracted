@@ -1,13 +1,18 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
+use autodie;
+
 use Geo::IP;
 
 my $gi
-    = Geo::IP->open( "/usr/local/share/GeoIP/GeoIPCity.dat", GEOIP_STANDARD );
+    = Geo::IP->open( '/usr/local/share/GeoIP/GeoIPCity.dat', GEOIP_STANDARD );
 
-while (<DATA>) {
-    chomp;
-    my $r = $gi->record_by_name($_);
+while ( my $host = <DATA> ) {
+    chomp $host;
+    my $r = $gi->record_by_name($host);
     if ($r) {
         print join(
             "\t",

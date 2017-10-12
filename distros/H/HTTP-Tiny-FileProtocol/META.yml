@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,14 @@ requires:
   File::Basename: '0'
   File::Spec: '0'
   HTTP::Tiny: '0'
-  LWP::MediaTypes: '0'
+  LWP::MediaTypes: '6.02'
   Pod::Coverage::TrustPod: '0'
   Test::LongString: '0'
   Test::More: '0'
+  perl: '5.010001'
 resources:
   bugtracker: http://github.com/reneeb/HTTP-Tiny-FileProtocol/issues
   homepage: http://github.com/reneeb/HTTP-Tiny-FileProtocol
   repository: http://github.com/reneeb/HTTP-Tiny-FileProtocol.git
-version: '0.04'
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.69'

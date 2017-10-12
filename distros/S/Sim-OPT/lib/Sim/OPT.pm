@@ -65,7 +65,7 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.72.109';
+$VERSION = '0.73.15';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -105,6 +105,27 @@ sub even
 
 sub _mean_ { return @_ ? sum(@_) / @_ : 0 }
 
+sub rotate2d 
+{ # SELF-EXPLAINING. IT IS HERE TO BE CALLABLE READILY FROM THE OUTSIDE
+    my ( $x, $y, $angle ) = @_;
+
+    sub deg2rad
+    {
+	my $degrees = shift;
+	return ( ( $degrees / 180 ) * 3.14159265358979 );
+    }
+
+    sub rad2deg
+    {
+	my $radians = shift;
+	return ( ( $radians / 3.14159265358979 ) * 180 ) ;
+    }
+
+    $angle = deg2rad( $angle );
+    my $x_new = cos($angle)*$x - sin($angle)*$y;
+    my $y_new = sin($angle)*$x + cos($angle)*$y;
+  return ( $x_new, $y_new);
+}
 
 sub countarray
 {

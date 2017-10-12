@@ -1,81 +1,97 @@
 NAME
+
     File::is - file is older? oldest? is newer? newest? similar? the same?
 
 SYNOPSIS
-        use File::is;
 
+        use File::is;
+    
         # return if F<file1> is newer than F<file2> or F<file3>.
         return
             if File::is->newer('file1', 'file2', 'file3');
-
+    
         # do something if F<path1/file1> is older than F<file2> or F<path3/file3>.
         do_some_work()
             if File::is->older([ 'path1', 'file1'], 'file2', [ 'path3', 'file3' ]);
 
 DESCRIPTION
+
     This module is a result of /me not wanting to write:
 
         if ($(stat('filename'))[9] < $(stat('tmp/other-filename'))[9]) { do_someting(); };
 
     Instead I wrote a module with ~80 lines of code and ~90 lines of tests
-    for it... So how is the module different from the above `if'? Should be
+    for it... So how is the module different from the above if? Should be
     reusable, has more functionality, should be clear from the code it self
     what the condition is doing and was fun to play with it. Another
     advantage is that the file names can be passed as array refs. In this
-    case File::Spec is used to construct the filename. The resulting code
-    is:
+    case "catfile" in File::Spec is used to construct the filename. The
+    resulting code is:
 
         if (File::is->older('filename', [ 'tmp', 'other-filename' ])) { do_something(); };
 
 FUNCTIONS
-  newer($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is newer (has modification
+
+ newer($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is newer (has modification
     time-stamp recent) then any of the rest passed as argument.
 
-  newest($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is newest (has the biggest
+ newest($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is newest (has the biggest
     modification time-stamp) compared to the rest of the passed filenames.
 
-  older($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is older (has the later
+ older($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is older (has the later
     modification time-stamp) then any of the rest passed as argument.
 
-  oldest($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is oldest (has the latest
+ oldest($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is oldest (has the latest
     modification time-stamp) compared to the rest of the passed filenames.
 
-  similar($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' has the same size and
+ similar($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename has the same size and
     modification time-stamp than any of the rest of the passed filenames.
 
-  thesame($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' has the same inode and dev
+ thesame($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename has the same inode and dev
     (is hard link) to any of the rest of the passed filenames.
 
     NOTE: see http://perlmonks.org/?node_id=859612, File::Same
 
-  bigger($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is bigger (has the bigger
+ bigger($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is bigger (has the bigger
     size) then any of the rest passed as argument.
 
-  biggest($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is biggest (has the
-    biggest size) compared to the rest of the passed filenames.
+ biggest($primary_filename, $other_filename, $other_filename2, ...)
 
-  smaller($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is smaller (has the
-    smaller size) then any of the rest passed as argument.
+    Returns true/false if the $primary_filename is biggest (has the biggest
+    size) compared to the rest of the passed filenames.
 
-  smallest($primary_filename, $other_filename, $other_filename2, ...)
-    Returns true/false if the `$primary_filename' is smallest (has the
+ smaller($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is smaller (has the smaller
+    size) then any of the rest passed as argument.
+
+ smallest($primary_filename, $other_filename, $other_filename2, ...)
+
+    Returns true/false if the $primary_filename is smallest (has the
     smallest size) compared to the rest of the passed filenames.
 
 INTERNALS
+
     Call/use at your own risk ;-)
 
-  _construct_filename()
+ _construct_filename()
+
     Accepts one or more arguments. It passes them to
-    `<File::Spec-'catfile()>> dereferencing the array if one argument array
+    <File::Spec-catfile()>> dereferencing the array if one argument array
     ref is passed.
 
     Example:
@@ -87,17 +103,22 @@ INTERNALS
     This function is called on every argument passed to cmp methods (newer,
     smaller, older, ...).
 
-  _cmp_stat($class, $return_value_if_match, $cmp_function, $primary_filename, $other_filename, $other_filename2, ...)
-    This function is called by all of the public `newer()', `smaller()',
-    `older()', ... methods do loop through files and do some cmp on them.
+ _cmp_stat($class, $return_value_if_match, $cmp_function,
+ $primary_filename, $other_filename, $other_filename2, ...)
+
+    This function is called by all of the public newer(), smaller(),
+    older(), ... methods do loop through files and do some cmp on them.
 
 SEE ALSO
+
     http://perldoc.perl.org/functions/stat.html
 
 AUTHOR
-    Jozef Kutej, `<jkutej at cpan.org>'
+
+    Jozef Kutej, <jkutej at cpan.org>
 
 CONTRIBUTORS
+
     The following people have contributed to the File::is by committing
     their code, sending patches, reporting bugs, asking questions,
     suggesting useful advises, nitpicking, chatting on IRC or commenting on
@@ -106,32 +127,39 @@ CONTRIBUTORS
         Ronald Fischer
 
 BUGS
-    Please report any bugs or feature requests to `bug-file-is at
-    rt.cpan.org', or through the web interface at
+
+    Please report any bugs or feature requests to bug-file-is at
+    rt.cpan.org, or through the web interface at
     http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-is. I will be
     notified, and then you'll automatically be notified of progress on your
     bug as I make changes.
 
 SUPPORT
+
     You can find documentation for this module with the perldoc command.
 
         perldoc File::is
 
     You can also look for information at:
 
-    * RT: CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-is
+      * RT: CPAN's request tracker
 
-    * AnnoCPAN: Annotated CPAN documentation
-        http://annocpan.org/dist/File-is
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-is
 
-    * CPAN Ratings
-        http://cpanratings.perl.org/d/File-is
+      * AnnoCPAN: Annotated CPAN documentation
 
-    * Search CPAN
-        http://search.cpan.org/dist/File-is
+      http://annocpan.org/dist/File-is
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/File-is
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/File-is
 
 LICENSE AND COPYRIGHT
+
     Copyright 2010 jkutej@cpan.org
 
     This program is free software; you can redistribute it and/or modify it

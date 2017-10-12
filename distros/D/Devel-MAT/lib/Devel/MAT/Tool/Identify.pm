@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Identify;
 
@@ -10,19 +10,19 @@ use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
-use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( pairs );
 use List::UtilsBy qw( nsort_by );
 
 use constant CMD => "identify";
+use constant CMD_DESC => "Identify an SV by its referrers";
 
 =encoding UTF-8
 
 =head1 NAME
 
-C<Devel::MAT::Tool::Identify> - identify an SV by its ancestry
+C<Devel::MAT::Tool::Identify> - identify an SV by its referrers
 
 =head1 DESCRIPTION
 
@@ -65,13 +65,15 @@ sub walk_graph
       Devel::MAT::Cmd->printf( "$indent└─already found " );
 
       if( defined( my $id = $id_for{$node->addr} ) ) {
-         Devel::MAT::Cmd->printf( "as " );
-         Devel::MAT::Cmd->print_note( "*$id" );
+         Devel::MAT::Cmd->printf( "as %s\n",
+            Devel::MAT::Cmd->format_note( "*$id" ),
+         );
       }
       else {
-         Devel::MAT::Cmd->print_note( "circularly" );
+         Devel::MAT::Cmd->printf( "%s\n",
+            Devel::MAT::Cmd->format_note( "circularly" ),
+         );
       }
-      Devel::MAT::Cmd->printf( "\n" );
       return;
    }
 
@@ -91,21 +93,24 @@ sub walk_graph
       Devel::MAT::Cmd->printf(
          $indent . ( $is_final ? "└─" : "├─" ) );
 
-      Devel::MAT::Cmd->print_note(
-         "[" . $ref->strength . "]", 1 ) if $ref->strength ne "strong";
+      Devel::MAT::Cmd->printf( "%s",
+         Devel::MAT::Cmd->format_note( "[" . $ref->strength . "]", 1 ),
+      ) if $ref->strength ne "strong";
 
       my $ref_id;
       if( $refnode->edges_out > 1 and not $refnode->roots and not $id_for{$refnode->addr} ) {
          $ref_id = $id_for{$refnode->addr} = $next_id++;
       }
 
-      Devel::MAT::Cmd->printf( "%s of ", $ref->name );
-      Devel::MAT::Cmd->print_sv( $refnode->sv );
-      Devel::MAT::Cmd->printf( ", which is" );
+      Devel::MAT::Cmd->printf( "%s of %s, which is",
+         $ref->name,
+         Devel::MAT::Cmd->format_sv( $refnode->sv ),
+      );
 
       if( $ref_id ) {
-         Devel::MAT::Cmd->printf( " " );
-         Devel::MAT::Cmd->print_note( "(*$ref_id)" );
+         Devel::MAT::Cmd->printf( " %s",
+            Devel::MAT::Cmd->format_note( "(*$ref_id)" ),
+         );
       }
 
       Devel::MAT::Cmd->printf( ":\n" );
@@ -170,9 +175,25 @@ to the depth limit.
 
 =cut
 
-sub run_cmd
+use constant CMD_OPTS => (
+   depth    => { help => "maximum depth to recurse",
+                 type => "i",
+                 alias => "d",
+                 default => 10 },
+   weak     => { help => "include weak references" },
+   all      => { help => "include weak and indirect references",
+                 alias => "a" },
+   no_elide => { help => "don't elide REF, PAD and symbol structures",
+                 alias => "n" },
+);
+
+use constant CMD_ARGS_SV => 1;
+
+sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
+   my ( $sv ) = @_;
 
    # reset
    $next_id = "A";
@@ -181,24 +202,19 @@ sub run_cmd
 
    my $STRONG = 1;
    my $DIRECT = 1;
-   my $ELIDE  = 1;
+   my $ELIDE  = !$opts{no_elide};
 
-   GetOptionsFromArray( \@_,
-      'depth|d=i'  => \my $DEPTH,
-      'weak'       => sub { $STRONG = 0 },
-      'all'        => sub { $STRONG = 0; $DIRECT = 0 },
-      'no-elide|n' => sub { $ELIDE = 0; },
-   ) or return;
-
-   my $sv = $self->get_sv( $_[0] );
+   $STRONG = 0              if $opts{weak};
+   $STRONG = 0, $DIRECT = 0 if $opts{all};
 
    $self->pmat->load_tool( "Inrefs", progress => $self->{progress} );
 
-   Devel::MAT::Cmd->print_sv( $sv );
-   Devel::MAT::Cmd->printf( " is:\n" );
+   Devel::MAT::Cmd->printf( "%s is:\n",
+      Devel::MAT::Cmd->format_sv( $sv ),
+   );
 
    walk_graph( $self->pmat->inref_graph( $sv,
-      depth => $DEPTH,
+      depth => $opts{depth},
       strong => $STRONG,
       direct => $DIRECT,
       elide  => $ELIDE,

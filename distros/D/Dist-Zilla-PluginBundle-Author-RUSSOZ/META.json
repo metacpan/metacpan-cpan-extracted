@@ -4,24 +4,45 @@
       "Alexei Znamensky <russoz@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-Author-RUSSOZ",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1",
+            "version" : "0.9901"
          }
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla" : "4.102341",
+            "Dist::Zilla" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::AutoVersion" : "0",
             "Dist::Zilla::Plugin::GitFmtChanges" : "0",
@@ -29,7 +50,7 @@
             "Dist::Zilla::Plugin::InstallGuide" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::OurPkgVersion" : "0",
-            "Dist::Zilla::Plugin::PerlTidy" : "0.11",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::ReadmeFromPod" : "0",
             "Dist::Zilla::Plugin::ReportPhase" : "0",
@@ -38,12 +59,12 @@
             "Dist::Zilla::Plugin::TaskWeaver" : "0",
             "Dist::Zilla::Plugin::Test::Pod::No404s" : "0",
             "Dist::Zilla::Plugin::Test::UseAllModules" : "0",
-            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::Plugin::VersionFromMainModule" : "0",
             "Dist::Zilla::PluginBundle::Git" : "0",
-            "Dist::Zilla::PluginBundle::TestingMania" : "0.012",
+            "Dist::Zilla::PluginBundle::TestingMania" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Moose" : "0.99",
-            "Pod::Elemental" : "0.102362",
+            "Pod::Elemental" : "0",
             "Pod::Elemental::Transformer::List" : "0",
             "Pod::Weaver::Config::Assembler" : "0",
             "Pod::Weaver::Plugin::Encoding" : "0.01",
@@ -63,16 +84,17 @@
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0.88",
-            "Test::UseAllModules" : "0"
+            "Test::UseAllModules" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {},
       "homepage" : "https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ",
       "repository" : {
          "type" : "git",
@@ -80,6 +102,7 @@
          "web" : "https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ"
       }
    },
-   "version" : "0.022"
+   "version" : "0.024",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

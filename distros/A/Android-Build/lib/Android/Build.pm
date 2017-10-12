@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
-# Command line build of an Android apk without gradle or ant
+# Command line build of an Android apk without resorting to ant or gradle
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171005';
+our $VERSION = '20171006';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -25,6 +25,7 @@ my $permissions =                                                               
    [qw(INTERNET ACCESS_WIFI_STATE ACCESS_NETWORK_STATE WRITE_EXTERNAL_STORAGE),
     qw(READ_EXTERNAL_STORAGE RECEIVE_BOOT_COMPLETED)];
 my $version     = strftime('%Y%m%d', localtime);                                # Version number without dots
+my $javaTarget  = 7;                                                            # Java release level to target
 
 #-------------------------------------------------------------------------------
 # Private methods
@@ -157,7 +158,7 @@ sub getAppName                                                                  
 
 sub getTitle                                                                    # Title of app
  {my ($a) = @_;
-  $a->title // $a->getAppNameX;
+  $a->title // $a->getAppName;
  }
 
 sub apkFileName                                                                 # Apk name - shorn of path
@@ -177,7 +178,7 @@ sub getVersion                                                                  
 
 sub buildArea($)                                                                # Build folder name
  {my ($a) = @_;
-  $a->buildFolder // $home.'../tmp/app/'                                        # Either the user supplied build folder name or the default
+  $a->buildFolder // '/tmp/app/'                                                # Either the user supplied build folder name or the default
  }
 
 sub getBinFolder($)     {my ($a) = @_; $a->buildArea.'bin/'}                    # Bin folder name
@@ -434,14 +435,15 @@ sub make
 
     my $J = join ':', $androidJar, @libs;                                       # Jar files for javac
 
-    my $r = xxx("javac -g -source  7 -target 7 -cp $J -d $classes $j");
+    my $r = xxx("javac -g -Xlint:-options -source $javaTarget ".
+                " -target $javaTarget -cp $J -d $classes $j");
     $android->logMessage($r) if $r;
     $r !~ /error/ or confess "Java errors\n";
    }
 
   if (1)                                                                        # Dx
    {my $j = join ' ', @libs;                                                    # Jar files to include in dex
-    my $r = xxx("$dx --dex --force-jumbo --output $classes.dex $classes $j");
+    my $r = xxx("$dx --incremental --dex --force-jumbo --output $classes.dex $classes $j");
     $android->logMessage($r);
    }
 
@@ -503,7 +505,7 @@ sub new()                                                                       
 if (1) {                                                                        # Parameters that can be set by the caller - see the pod at the end of this file for a complete description of what each parameter does
   genLValueScalarMethods(qw(activity));                                         # Activity name, default is B<Activity> this the name of the activity to start on the L<device|/device> is L<package|/package>/L<activity|/activity>
   genLValueScalarMethods(qw(buildTools));                                       # Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
-  genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B<./tmp>
+  genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B</tmp/app/>
   genLValueScalarMethods(qw(classes));                                          # A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against
   genLValueScalarMethods(qw(debug));                                            # Make the app debuggable if this option is true
   genLValueScalarMethods(qw(device));                                           # Device to run on, default is the only emulator or specify '-d', '-e', or '-s SERIAL' per qx(man adb)

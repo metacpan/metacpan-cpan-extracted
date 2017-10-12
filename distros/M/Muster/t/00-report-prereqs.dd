@@ -1,0 +1,78 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Portability::Files' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Const::Fast' => '0',
+                                      'DBI' => '0',
+                                      'Digest::SHA' => '0',
+                                      'Encode' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Find' => '0',
+                                      'File::ShareDir' => '0',
+                                      'File::Slurper' => '0',
+                                      'File::Spec' => '0',
+                                      'File::stat' => '0',
+                                      'HTML::LinkList' => '0',
+                                      'Hash::Merge' => '0',
+                                      'Image::ExifTool' => '0',
+                                      'Image::Magick' => '0',
+                                      'Lingua::EN::Inflexion' => '0',
+                                      'Lingua::EN::Titlecase' => '0',
+                                      'Math::Calc::Parser' => '0',
+                                      'Module::Pluggable' => '0',
+                                      'Mojo::Base' => '0',
+                                      'Mojo::URL' => '0',
+                                      'Mojo::Util' => '0',
+                                      'Mojolicious::Commands' => '0',
+                                      'POSIX' => '0',
+                                      'Path::Tiny' => '0',
+                                      'SQLite::Work' => '0',
+                                      'Search::Query' => '0',
+                                      'Sort::Naturally' => '0',
+                                      'Text::Markdown::Discount' => '0',
+                                      'Text::NeatTemplate' => '0',
+                                      'YAML' => '0',
+                                      'YAML::Any' => '0',
+                                      'YAML::XS' => '0',
+                                      'common::sense' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.006',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -46,7 +46,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MakeMaker::Fallback:
     file: lib/Dist/Zilla/Plugin/MakeMaker/Fallback.pm
-    version: '0.024'
+    version: '0.025'
 requires:
   Dist::Zilla::Plugin::MakeMaker::Awesome: '0.26'
   Dist::Zilla::Role::AfterBuild: '0'
@@ -63,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MakeMaker-Fallback
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-MakeMaker-Fallback
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-MakeMaker-Fallback.git
-version: '0.024'
+version: '0.025'
 x_Dist_Zilla:
   perl:
     version: '5.027004'
@@ -718,7 +718,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.024
+          tag: v0.025
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

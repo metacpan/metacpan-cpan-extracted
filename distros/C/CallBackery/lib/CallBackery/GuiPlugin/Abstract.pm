@@ -65,8 +65,18 @@ What should the tab holding this plugin be called
 
 =cut
 
-has 'tabName' => sub {
+has tabName => sub {
     return shift->config->{'tab-name'};
+};
+
+=head2 instanciationMode
+
+Should the plugin in the webui be instanciated immediately or only when the tab gets selected
+
+=cut
+
+has instanciationMode => sub {
+    return 'onTabSelection'; # or onStartup
 };
 
 =head2 true

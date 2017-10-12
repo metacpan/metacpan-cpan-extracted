@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _mirror _destdir_prefix );
 use JSON::PP ();
 
 # ABSTRACT: Core gather plugin
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 sub init
@@ -29,8 +29,11 @@ sub init
       local $ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH};
       unshift @PATH, Path::Tiny->new('bin')->absolute->stringify
         if -d 'bin';
-      unshift @PKG_CONFIG_PATH, Path::Tiny->new('lib/pkgconfig')->absolute->stringify
-        if -d 'lib/pkgconfig';
+
+      for my $dir (qw(share lib)) {
+          unshift @PKG_CONFIG_PATH, Path::Tiny->new("$dir/pkgconfig")->absolute->stringify
+            if -d "$dir/pkgconfig";
+      }
       
       $orig->($build) 
     }
@@ -142,7 +145,7 @@ Alien::Build::Plugin::Core::Gather - Core gather plugin
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -202,6 +205,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

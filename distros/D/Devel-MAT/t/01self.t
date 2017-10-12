@@ -95,7 +95,10 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
    if( $df->{perlver} <= ( ( 5 << 24 ) | ( 20 << 16 ) | 0xffff ) ) {
       is( $cv->padnames->type, "PADNAMES", 'CV has padnames' );
    }
-   is( $cv->pad(0)->type,   "PAD",      'CV has pad(0)' );
+
+   my $pad0 = $cv->pad(0);
+   is( $pad0->type, "PAD", 'CV has pad(0)' );
+   is( $pad0->padcv, $cv, 'PAD at 0 has padcv' );
 }
 
 BEGIN { our @AofA = ( [] ); }

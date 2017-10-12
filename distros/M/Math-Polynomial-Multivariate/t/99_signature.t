@@ -1,8 +1,6 @@
-# Copyright (c) 2008-2010 Martin Becker.  All rights reserved.
+# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 99_signature.t 2 2010-09-25 21:31:14Z demetri $
 
 # Verify signature file.  This is a test for the distribution maintainer.
 

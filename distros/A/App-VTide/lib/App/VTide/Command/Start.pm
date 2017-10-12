@@ -17,7 +17,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.4');
+our $VERSION = version->new('0.1.5');
 our $NAME    = 'start';
 our $OPTIONS = [
     'windows|w=i',
@@ -41,7 +41,7 @@ sub run {
 
     $self->ctags();
 
-    return $self->tmux( $name );
+    return $self->tmux( $self->vtide->config->data->{title} || $name );
 }
 
 sub ctags {
@@ -123,6 +123,10 @@ sub tmux_window {
          $letter++ if $letter;
     }
 
+    if ( $conf->{tmux} ) {
+        $out .= "$conf->{tmux} \\; ";
+    }
+
     return $out;
 }
 
@@ -150,7 +154,7 @@ App::VTide::Command::Start - Start a session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Start version 0.1.4
+This documentation refers to App::VTide::Command::Start version 0.1.5
 
 =head1 SYNOPSIS
 

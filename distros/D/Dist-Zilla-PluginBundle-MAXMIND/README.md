@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::MAXMIND - MAXMIND's plugin bundle
 
 # VERSION
 
-version 0.81
+version 0.83
 
 # SYNOPSIS
 

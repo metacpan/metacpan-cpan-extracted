@@ -3,25 +3,32 @@ abstract: 'file is older? oldest? is newer? newest? similar? the same?'
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
-  File::Path: 0
-  File::Temp: 0
-  Test::Exception: 0
-  Test::More: 0
+  File::Path: '0'
+  File::Temp: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.3607'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - file
+  - stat
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: File-is
 provides:
   File::is:
     file: lib/File/is.pm
-    version: 0.03
+    version: '0.04'
 requires:
-  Carp: 0
-  File::Spec: 0
+  Carp: '0'
+  File::Spec: '0'
 resources:
+  bugtracker: http://github.com/jozef/File-is/issues
   license: http://dev.perl.org/licenses/
-version: 0.03
+  repository: http://github.com/jozef/File-is
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

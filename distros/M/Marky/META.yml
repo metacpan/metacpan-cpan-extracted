@@ -1,0 +1,48 @@
+---
+abstract: 'web application for bookmark databases'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::Mojo: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Marky
+requires:
+  DBI: '0'
+  File::ShareDir: '0'
+  FindBin: '0'
+  HTML::TagCloud: '0'
+  IPC::System::Simple: '0'
+  Mojo::Base: '0'
+  Mojo::URL: '0'
+  Mojolicious: '0'
+  Mojolicious::Commands: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Search::Query: '0'
+  Sort::Naturally: '0'
+  Text::NeatTemplate: '0'
+  YAML::Any: '0'
+  common::sense: '0'
+  lib: '0'
+resources:
+  homepage: https://github.com/rubykat/Marky
+  repository: https://github.com/rubykat/Marky.git
+version: '0.035'
+x_serialization_backend: 'YAML::Tiny version 1.70'

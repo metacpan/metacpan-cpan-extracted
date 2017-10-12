@@ -3,7 +3,7 @@ package JLogger;
 use strict;
 use warnings;
 use 5.008_001;
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 $VERSION = eval $VERSION;
 
 require Carp;
@@ -152,19 +152,26 @@ captured messages.
 
 =head2 ejabberd
 
-Edit ejabberd.cfg and add this line to the 'modules' section:
+Edit ejabberd.cfg and add this line to the C<modules> section:
 
-    {mod_service_log, [{loggers, ["jlogger.jabber.myserver.com"]}]},
+    mod_service_log:
+        loggers: ["jlogger.example.com"]
 
-Add this to 'listen' section to make ejabberd listen for JLogger connections:
+Add this to the C<listen> section to make ejabberd listen for JLogger connections:
 
-    {5526, ejabberd_service, [
-        {ip, {127, 0, 0, 1}},
-        {access, all}, 
-        {hosts,
-            ["jlogger.jabber.myserver.com"], 
-            [{password, "secret"}]}
-        ]},
+    -
+        port: 5526
+        module: ejabberd_service
+        ip: "127.0.0.1"
+        access: all
+        hosts:
+            "jlogger.example.com":
+                password: "secret"
+
+You may find simple configuration in F<config.yaml.example>.
+To log messages on old ejabberd < 17.04 server please use transport
+C<JLogger::Transport::AnyEvent> instead of
+C<JLogger::Transport::AnyEvent::XEP0297>
 
 =head1 AUTHOR
 
@@ -172,7 +179,7 @@ Sergey Zasenko
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011, Sergey Zasenko.
+Copyright (C) 2011-2017, Sergey Zasenko.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.

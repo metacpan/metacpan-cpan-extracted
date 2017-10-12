@@ -214,7 +214,8 @@ sub getUserConfig {
         push @plugins, {
             tabName => $obj->tabName,
             name => $obj->name,
-        }
+            instanciationMode => $obj->instanciationMode
+        };
     }
     return {
         userInfo => $self->user->userInfo,

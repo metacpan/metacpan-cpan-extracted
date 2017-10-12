@@ -61,6 +61,7 @@ sub check_upnp_and_model {
       my $xpc = XML::LibXML::XPathContext->new( $root );
       $xpc->registerNs('n', 'urn:schemas-upnp-org:device-1-0');
       $self->{productname} = $xpc->findvalue('(//n:device)[position()=1]/n:modelName' );
+      $self->debug(sprintf "igddesc productname is %s", $self->{productname});
       my @services = ();
       my @servicedescs = $xpc->find('(//n:service)')->get_nodelist;
       foreach my $service (@servicedescs) {
@@ -79,6 +80,8 @@ sub check_upnp_and_model {
               controlURL => sprintf('http://%s:%s%s',
                   $self->opts->hostname, $self->opts->port, $controlurl),
           });
+          $self->debug(sprintf "found %s service %s",
+              $servicetype, $serviceid);
         }
       }
       $self->set_variable('services', \@services);
@@ -96,6 +99,7 @@ sub check_upnp_and_model {
           -> GetStatusInfo();
       $self->{uptime} = $som->valueof("//GetStatusInfoResponse/NewUptime");
       $self->{uptime} /= 1.0;
+      $self->debug("WANIPConn1->GetStatusInfo returned uptime");
     };
     if ($@) {
       $self->add_critical("could not get uptime: ".$@);

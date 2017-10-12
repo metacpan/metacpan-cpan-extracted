@@ -5,6 +5,9 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'AIRESPACE-WIRELESS-MIB'} = {
   name => 'AIRESPACE-WIRELESS-MIB',
 };
 
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'AIRESPACE-WIRELESS-MIB'} =
+  '1.3.6.1.4.1.14179.2';
+
 $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'AIRESPACE-WIRELESS-MIB'} = {
   'bsnWireless' => '1.3.6.1.4.1.14179.2',
   'bsnEss' => '1.3.6.1.4.1.14179.2.1',
@@ -319,6 +322,10 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'AIRESPACE-WIRELESS-MI
   'bsnAPCertificateType' => '1.3.6.1.4.1.14179.2.2.1.1.32',
   'bsnAPEthernetMacAddress' => '1.3.6.1.4.1.14179.2.2.1.1.33',
   'bsnAPAdminStatus' => '1.3.6.1.4.1.14179.2.2.1.1.37',
+  'bsnAPAdminStatusDefinition' => {
+    '1' => 'enable',
+    '2' => 'disable',
+  },
   'bsnAPIfTable' => '1.3.6.1.4.1.14179.2.2.2',
   'bsnAPIfEntry' => '1.3.6.1.4.1.14179.2.2.2.1',
   'bsnAPIfSlotId' => '1.3.6.1.4.1.14179.2.2.2.1.1',

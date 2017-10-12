@@ -3,7 +3,7 @@ NAME
     with JIRA issues and their data as objects.
 
 VERSION
-    version 0.11
+    version 0.12
 
 SYNOPSIS
       use JIRA::REST::Class;
@@ -247,14 +247,14 @@ READ-ONLY ACCESSORS
   user_object
     An accessor that returns the user used to connect to the JIRA server as
     a JIRA::REST::Class::User object, even if the username was read from a
-    ".netrc" or Config::Identity file. Works by calling
-    "/rest/api/latest/myself".
+    ".netrc" or Config::Identity file. Works by making the JIRA REST API
+    call /rest/api/latest/myself
+    <https://docs.atlassian.com/jira/REST/cloud/#api/2/myself>.
 
   password
     An accessor that returns the password used to connect to the JIRA
-    server. Currently only works if the password was passed into the class
-    constructor. Work is being done to return the password when the password
-    was read from a ".netrc" or Config::Identity file.
+    server, even if the username was read from a ".netrc" or
+    Config::Identity file.
 
   rest_client_config
     An accessor that returns the "rest_client_config" parameter passed to
@@ -411,6 +411,8 @@ CONTRIBUTORS
     *   Alexandr Ciornii <alexchorny@gmail.com>
 
     *   Alexey Melezhik <melezhik@gmail.com>
+
+    *   Manni Heumann <github@lxxi.org>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2017 by Packy Anderson.

@@ -29,16 +29,53 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib
-  'devel/lib';
-use MyGraphs ();
 use Graph::Maker::HexGrid;
+
+use lib 'devel/lib';
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 284;
+plan tests => 285;
 
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('1,1,1' => 670,
+               '2,2,2' => 28529,
+               '3,3,3' => 28500,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $X (1 .. 4) {
+    foreach my $Y ($X .. 4) {
+      foreach my $Z ($Y .. 4) {
+        my $graph = Graph::Maker->new('hex_grid', undirected => 1,
+                                      dims => [$X,$Y,$Z]);
+        my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+        $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+        next if $seen{$g6_str}++;
+        my $key = "$X,$Y,$Z";
+        if (my $id = $shown{$key}) {
+          MyGraphs::hog_compare($id, $g6_str);
+        } else {
+          if (MyGraphs::hog_grep($g6_str)) {
+            my $name = $graph->get_graph_attribute('name');
+            MyTestHelpers::diag ("HOG $key not shown in POD");
+            MyTestHelpers::diag ($name);
+            MyTestHelpers::diag ($g6_str);
+            MyGraphs::Graph_view($graph);
+            $extras++;
+          }
+        }
+      }
+    }
+  }
+  ok ($extras, 0);
+}
 
 #------------------------------------------------------------------------------
 # hex grid of 1,1 as ladder

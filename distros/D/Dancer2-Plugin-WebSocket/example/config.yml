@@ -1,0 +1,5 @@
+appname: "foo"
+
+plugins:
+    WebSocket:
+        serializer: 1

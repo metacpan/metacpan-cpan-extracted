@@ -4,7 +4,7 @@ App::VTide::Configuration - Description of the vtide configuration files
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Configuration version 0.1.4
+This documentation refers to App::VTide::Configuration version 0.1.5
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,12 @@ but no other expansions are done.
 Bool
 
 If set to a true value the an option to restart will be given
+
+=head2 title
+
+String
+
+This is the text of the terminal title if you want it to be different from the name field.
 
 =head3 wait
 

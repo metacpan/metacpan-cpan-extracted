@@ -17,11 +17,18 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Crypt::Hill:
+    file: lib/Crypt/Hill.pm
+    version: '0.10'
+  Crypt::Hill::Utils:
+    file: lib/Crypt/Hill/Utils.pm
+    version: '0.10'
 requires:
   Moo: '2.000000'
   namespace::clean: '0.24'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Crypt-Hill.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

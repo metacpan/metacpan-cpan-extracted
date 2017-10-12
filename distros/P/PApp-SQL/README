@@ -24,7 +24,7 @@ SYNOPSIS
 DESCRIPTION
     This module provides you with easy-to-use functions to execute sql
     commands (using DBI). Despite being easy to use, they are also quite
-    efficient and allow you to write faster programs in less lines of code.
+    efficient and allow you to write faster programs in fewer lines of code.
     It should work with anything from perl-5.004_01 onwards, but I only
     support 5.005+. UTF8 handling (the "sql_u*" family of functions) will
     only be effective with perl version 5.006 and beyond.
@@ -58,7 +58,7 @@ DESCRIPTION
 
         Connect to the database given by "($dsn,$user,$pass)", while using
         the flags from $flags. These are just the same arguments as given to
-        "DBI-"connect>.
+        "DBI->connect".
 
         The database handle will be cached under the unique id
         "$id|$dsn|$user|$pass". If the same id is requested later, the
@@ -106,7 +106,7 @@ DESCRIPTION
         former versions of PApp::SQL might also look up the global variable
         $DBH in the callers package.
 
-        The actual return value from the "$sth-"execute> call is stored in
+        The actual return value from the "$sth->execute" call is stored in
         the package-global (and exported) variable $sql_exec.
 
         If any error occurs "sql_exec" will throw an exception.

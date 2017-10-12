@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -163,10 +163,10 @@ sub print_table {
     my $self = shift;
     my ( $table_ref, $opt ) = @_;
     croak "print_table: called with " . @_ . " arguments - 1 or 2 arguments expected." if @_ < 1 || @_ > 2;
-    croak "print_table: Required an ARRAY reference as the first argument."            if ref $table_ref  ne 'ARRAY';
-    croak "print_table: Empty table without header row!"                               if ! @$table_ref;
+    croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
+    croak "print_table: empty table without header row!"                               if ! @$table_ref;
     if ( defined $opt ) {
-        croak "print_table: The (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
+        croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
         $self->{backup_opt} = { map{ $_ => $self->{$_} } keys %$opt };
         $self->__validate_options( $opt );
     }
@@ -236,14 +236,16 @@ sub __inner_print_tbl {
     if ( length $self->{prompt} ) {
         @header = ( $self->{prompt} );
     }
-    if ( $self->{keep_header} ) {
-        my $col_names = shift @$list;
-        push @header, $col_names;
-        push @header, $header_sep if $self->{grid};
-    }
-    else {
-        splice( @$list, 1, 0, $header_sep );
-    }
+    #if ( @$list > 1 ) {
+        if ( $self->{keep_header} ) {
+            my $col_names = shift @$list;
+            push @header, $col_names;
+            push @header, $header_sep if $self->{grid};
+        }
+        else {
+            splice( @$list, 1, 0, $header_sep ) if $self->{grid};
+        }
+    #}
     my $prompt = join( "\n", @header );
     my $old_row = 0;
     my $auto_jumped_to_first_row = 2;
@@ -587,7 +589,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.054
+Version 0.055
 
 =cut
 

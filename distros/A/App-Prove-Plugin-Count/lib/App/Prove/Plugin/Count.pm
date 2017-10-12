@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use App::Prove;
 use Class::Method::Modifiers qw( around );
@@ -23,7 +23,9 @@ sub load {
         my $orig = shift;
         my $ret  = $orig->(@_);
         $current_file_count++;
-        return "[$current_file_count/$total_file_count] $ret";
+        my $spacer = " "
+            x ( length($total_file_count) - length($current_file_count) );
+        return "[$spacer$current_file_count/$total_file_count] $ret";
     };
 }
 
@@ -40,8 +42,8 @@ App::Prove::Plugin::Count - A prove plugin to count test files.
 
     $ prove -PCount
 
-    # [1/10] t/test1.t ....... ok
-    # [2/10] t/test2.t ....... ok
+    # [ 1/10] t/test1.t ....... ok
+    # [ 2/10] t/test2.t ....... ok
     # ...
 
 =head1 DESCRIPTION

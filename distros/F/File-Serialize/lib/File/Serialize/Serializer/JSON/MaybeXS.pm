@@ -1,7 +1,7 @@
 package File::Serialize::Serializer::JSON::MaybeXS;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: JSON::MaybeXS serializer for File::Serialize
-$File::Serialize::Serializer::JSON::MaybeXS::VERSION = '1.1.1';
+$File::Serialize::Serializer::JSON::MaybeXS::VERSION = '1.2.0';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ File::Serialize::Serializer::JSON::MaybeXS - JSON::MaybeXS serializer for File::
 
 =head1 VERSION
 
-version 1.1.1
+version 1.2.0
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

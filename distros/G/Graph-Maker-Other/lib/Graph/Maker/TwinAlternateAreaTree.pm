@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -336,8 +336,8 @@ L<http://oeis.org/A053599> (etc)
 
 =back
 
-    A053599    diameter
-    A077866    height
+    A053599    diameter of level
+    A077866    height of level
     A001196    vertices of vertical spine
     A053754    vertices of vertical spine and branches from it,
                  being N binary even length

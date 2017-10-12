@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -300,12 +300,14 @@ sub load_requires
     if(($mod->can('runtime_prop') && $mod->runtime_prop)
     || ($mod->isa('Alien::Base')  && $mod->install_type('share')))
     {
-      my $path = _path($mod->dist_dir)->child('lib/pkgconfig');
-      if(-d $path)
-      {
-        push @{ $self->{pkg_config_path} }, $path->stringify;
+      for my $dir (qw(lib share)) {
+          my $path = _path($mod->dist_dir)->child("$dir/pkgconfig");
+          if(-d $path)
+          {
+            push @{ $self->{pkg_config_path} }, $path->stringify;
+          }
       }
-      $path = _path($mod->dist_dir)->child('share/aclocal');
+      my $path = _path($mod->dist_dir)->child('share/aclocal');
       if(-d $path)
       {
         $path = "$path";
@@ -1088,7 +1090,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -1938,6 +1940,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 transport:
-    JLogger::Transport::AnyEvent:
+    JLogger::Transport::AnyEvent::XEP0297:
         host: logger.server.com
         port: 5526
         secret: secret

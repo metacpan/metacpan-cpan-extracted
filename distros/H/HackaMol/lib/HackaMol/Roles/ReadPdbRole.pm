@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbRole;
-$HackaMol::Roles::ReadPdbRole::VERSION = '0.045';
+$HackaMol::Roles::ReadPdbRole::VERSION = '0.046';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -81,7 +81,7 @@ sub read_pdb_atoms {
             }
             else {
                 #croak condition if atom changes between models
-                if (   $name ne $atoms[$n]->name
+                if ( $n > $#atoms or  $name ne $atoms[$n]->name
                     or $element ne $atoms[$n]->symbol )
                 {
                     my $carp_message =
@@ -132,7 +132,7 @@ HackaMol::Roles::ReadPdbRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 SYNOPSIS
 

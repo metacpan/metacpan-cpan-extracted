@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001006';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -55,7 +55,7 @@ sub wordlist {
     for my $arg (@_) {
         my $argtype = ref($arg);
 
-           if ($argtype eq q{})     { push @words, $arg; $sep = ';' if $arg =~ /,/; } 
+           if ($argtype eq q{})     { push @words, $arg; $sep = ';' if $arg =~ /,/; }
         elsif ($argtype eq q{HASH}) { @opt{keys %$arg} = values %$arg }
         else                        { croak 'Invalid $argtype argument to wordlist' }
     }
@@ -211,7 +211,7 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.001001
+This document describes Lingua::EN::Inflexion version 0.001006
 
 
 =head1 SYNOPSIS
@@ -518,29 +518,27 @@ Thus:
     noun("hours")->indefinite($N);  # "0 hours",  "an hour",  "2 hours"
 
 
-=head3 C<< cardinal($threshold = 10) >>
+=head3 C<< cardinal() >> and C<< cardinal($threshold) >>
 
 Convert the word into the English word for a cardinal number, using the
 Lingua::EN::Nums2Words module (which must be installed or an exception
-is thrown). If the word represents a number greater than C<$threshold>
-(which is set to 10 if no explicit argument is provided), then word is
+is thrown). If the C<$threshold> argument is supplied and the word
+represents a number greater than or equal to that value, then word is
 converted to digits instead.
 
 For example:
 
     noun( 1)->cardinal;      # "one"
     noun(10)->cardinal;      # "ten"
-    noun(11)->cardinal;      # "11"
     noun(11)->cardinal(20);  # "eleven"
     noun(21)->cardinal(20);  # "21"
 
-The word is also converted if it is an English phrase representing 
+The word is also converted if it is an English phrase representing
 a valid number (via the Lingua::EN::Words2Nums module, which must
 be installed or an exception is thrown):
 
     noun("one")->cardinal;                             # "one"
     noun("ten")->cardinal;                             # "ten"
-    noun("eleven")->cardinal;                          # "11"
     noun("eleven")->cardinal(20);                      # "eleven"
     noun("one hundred and twenty-one")->cardinal(20);  # "121"
 
@@ -551,33 +549,31 @@ Words that are ordinal numbers are also correctly converted:
 
 Words that cannot be interpreted as numbers are treated as zero:
 
-    noun("eon")->cardinal;                             # "zero"
-    noun("elven")->cardinal;                           # "zero"
+    noun("eon")->cardinal;    # "zero"
+    noun("elven")->cardinal;  # "zero"
 
 
-=head3 C<< ordinal($threshold = 10) >>
+=head3 C<< ordinal() >> and C<< ordinal($threshold) >>
 
 Convert the word into the English word for an ordinal number, using the
 Lingua::EN::Nums2Words module (which must be installed or an exception
-is thrown). If the word represents a number greater than C<$threshold>
-(which is set to 10 if no explicit argument is provided), then word is
+is thrown). If the C<$threshold> argument is supplied and the word
+represents a number greater than or equal to that value, then word is
 converted to digits instead.
 
 For example:
 
     noun( 1)->ordinal;      # "first"
     noun(10)->ordinal;      # "tenth"
-    noun(11)->ordinal;      # "11th"
     noun(11)->ordinal(20);  # "eleventh"
     noun(21)->ordinal(20);  # "21st"
 
-The word is also converted if it is an English phrase representing 
+The word is also converted if it is an English phrase representing
 a valid number (via the Lingua::EN::Words2Nums module, which must
 be installed or an exception is thrown):
 
     noun("one")->ordinal;                             # "first"
     noun("ten")->ordinal;                             # "tenth"
-    noun("eleven")->ordinal;                          # "11th"
     noun("eleven")->ordinal(20);                      # "eleventh"
     noun("one hundred and twenty-one")->ordinal(20);  # "121st"
 
@@ -590,8 +586,8 @@ Words that are ordinal numbers are also correctly converted:
 
 Words that cannot be interpreted as numbers are treated as zero:
 
-    noun("eon")->ordinal;                             # "zeroth"
-    noun("elven")->ordinal;                           # "zeroth"
+    noun("eon")->ordinal;       # "zeroth"
+    noun("elven")->ordinal;     # "zeroth"
 
 
 =head2 The C<< verb() >> constructor and associated methods
@@ -802,14 +798,14 @@ I<Mnemonic:> C<w> for "wordy" or "written-out".
 
 =item C<w>I<N>
 
-The C<w> option can also be followed by one or more digits, in
-which case if the count is less than or equal to that number,
-the appropriate English word is interpolated instead of the number:
+The C<w> option can also be followed by one or more digits, in which
+case if the count is less than that number, the appropriate English word
+is interpolated instead of the number:
 
     say inflect "<#w20:$count> <N:results>";
-              # "six results"     if $count == 6
-              # "twenty results"  if $count == 20
-              # "21 results"      if $count == 21
+              # "six results"      if $count == 6
+              # "nineteen results" if $count == 19
+              # "20 results"       if $count == 20
 
 In all other respects this variant behaves exactly like a regular C<w>
 option, as described in the previous item.
@@ -1081,7 +1077,7 @@ That's useful because it keeps markup relatively concise:
     say inflect "<#anw:$count> <Nc:$target> <V:were> found";
 
 but it's also a problem because it makes the meaning of each
-markup hard to remember six months later. So C<inflect()> 
+markup hard to remember six months later. So C<inflect()>
 also allows you to specify options with complete words, like so:
 
     say inflect "<#AnNoWords:$count> <NounClassical:$target> <Verb:were> found";

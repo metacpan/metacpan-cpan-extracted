@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 
@@ -66,7 +66,7 @@ sub init {
       }
       if (defined $N && $v >= $N) {
         # stop for N limit
-        $graph->set_graph_attribute (name => "Binary Beanstalk to $N");
+        $graph->set_graph_attribute (name => "Binary Beanstalk $N Vertices");
         last;
       }
 
@@ -211,7 +211,21 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item height=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=502>
+=item height=1 (N=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+
+=item height=2 (N=2), L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+
+=item height=3 (N=4), L<https://hog.grinvin.org/ViewGraphInfo.action?id=500>  (claw)
+
+=item N=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30>  (fork)
+
+=item height=4 (N=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=334>  (H graph)
+
+=item N=7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=714>
+
+=item height=5 (N=8), L<https://hog.grinvin.org/ViewGraphInfo.action?id=502>
+
+=item N=13, L<https://hog.grinvin.org/ViewGraphInfo.action?id=60>
 
 =back
 

@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/vrag86/perl-yandex-disk-api/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/perl-yandex-disk-api
-version: '0.01'
+version: '0.02'

@@ -1,0 +1,19 @@
+prompt generic
+         match /[\/a-zA-Z0-9._\[\]-]+ ?# ?/
+
+prompt privileged
+        match /[\/a-zA-Z0-9._\[\]-]+ ?# ?/
+
+prompt user
+        match /User name: ?$/
+
+prompt pass
+    match /[Pp]assword: ?$/
+
+macro paging
+        send c
+
+#  not used
+macro more_pages
+			match /-- more --, next page: Space, continue: c, quit: ESC/
+      send ' '

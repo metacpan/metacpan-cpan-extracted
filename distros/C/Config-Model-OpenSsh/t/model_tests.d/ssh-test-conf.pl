@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -38,7 +38,7 @@ my @setup = (
             'Host:"*" Port' => '1022',
 
             # user value will completely override layered values
-            'Host:"*" Ciphers' => { qw/mode layered value/, '' },
+            'Host:"*" Ciphers' => { qw/mode layered value/, '3des-cbc' },
             'Host:"*" Ciphers' => { qw/mode user value/,    'aes192-cbc,aes128-cbc' },
             'Host:"*" Ciphers' => 'aes192-cbc,aes128-cbc',
 

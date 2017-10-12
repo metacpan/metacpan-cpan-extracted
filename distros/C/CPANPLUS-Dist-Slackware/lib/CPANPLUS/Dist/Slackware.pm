@@ -3,21 +3,21 @@ package CPANPLUS::Dist::Slackware;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
-use parent qw(CPANPLUS::Dist::Base);
+use base qw(CPANPLUS::Dist::Base);
 
 use English qw( -no_match_vars );
 
 use CPANPLUS::Dist::Slackware::PackageDescription;
+use CPANPLUS::Dist::Slackware::Util
+    qw(can_run run catdir catfile spurt filetype gzip strip);
 use CPANPLUS::Error;
 
+use Config;
 use Cwd qw();
 use ExtUtils::Packlist;
 use File::Find qw();
-use File::Spec qw();
-use IO::Compress::Gzip qw($GzipError);
-use IPC::Cmd qw();
 use Locale::Maketext::Simple ( Style => 'gettext' );
 use Module::Pluggable require => 1;
 use Params::Check qw();
@@ -34,7 +34,7 @@ sub format_available {
     for my $program (
         qw(/sbin/makepkg /sbin/installpkg /sbin/upgradepkg /sbin/removepkg))
     {
-        if ( !IPC::Cmd::can_run($program) ) {
+        if ( !can_run($program) ) {
             error(
                 loc(q{You do not have '%1' -- '%2' not available}, $program,
                     __PACKAGE__
@@ -51,14 +51,9 @@ sub init {
 
     my $status = $dist->status;
 
-    $status->mk_accessors(
-        qw(_pkgdesc _fakeroot_cmd _file_cmd _run_perl_cmd _strip_cmd _plugins)
-    );
+    $status->mk_accessors(qw(_pkgdesc _fakeroot_cmd _plugins));
 
-    $status->_fakeroot_cmd( IPC::Cmd::can_run('fakeroot') );
-    $status->_file_cmd( IPC::Cmd::can_run('file') );
-    $status->_run_perl_cmd( IPC::Cmd::can_run('cpanp-run-perl') );
-    $status->_strip_cmd( IPC::Cmd::can_run('strip') );
+    $status->_fakeroot_cmd( can_run('fakeroot') );
 
     $status->_plugins( [ grep { $_->available($dist) } $dist->plugins ] );
 
@@ -82,8 +77,8 @@ sub prepare {
     {
 
         # CPANPLUS::Dist:MM does not accept multiple options in
-        # makemakerflags.  Thus all options have to be passed via
-        # environment variables.
+        # makemakerflags.  Instead, the options are passed in PERL_MM_OPT.
+        # PERL_MB_OPT requires Module::Build 0.36.
         local $ENV{PERL_MM_OPT}   = $dist->_perl_mm_opt;
         local $ENV{PERL_MB_OPT}   = $dist->_perl_mb_opt;
         local $ENV{MODULEBUILDRC} = 'NONE';
@@ -178,48 +173,56 @@ sub _call_plugins {
     my ( $dist, $method ) = @_;
 
     my $status = $dist->status;
+    my $module = $dist->parent;
+
+    my $orig_dir = Cwd::cwd();
+    chdir $module->status->extract or return;
 
     for my $plugin ( @{ $status->_plugins } ) {
         if ( $plugin->can($method) ) {
             $plugin->$method($dist) or return;
         }
     }
+
+    chdir $orig_dir or return;
+
     return 1;
+}
+
+sub _mandirs {
+    my $dist = shift;
+
+    my %mandir = map {
+        my $dir = $Config{"vendorman${_}direxp"};
+        if ( !$dir ) {
+            $dir = catdir( $Config{'prefix'}, 'man', "man${_}" );
+        }
+        $dir =~ s,/usr/share/man/,/usr/man/,;
+        $_ => $dir
+    } ( 1, 3 );
+    return %mandir;
 }
 
 sub _perl_mm_opt {
     my $dist = shift;
 
-    return << 'END_PERL_MM_OPT';
+    my %mandir = $dist->_mandirs;
+    return << "END_PERL_MM_OPT";
 INSTALLDIRS=vendor
-INSTALLVENDORMAN1DIR=/usr/man/man1
-INSTALLVENDORMAN3DIR=/usr/man/man3
+INSTALLVENDORMAN1DIR=$mandir{1}
+INSTALLVENDORMAN3DIR=$mandir{3}
 END_PERL_MM_OPT
 }
 
 sub _perl_mb_opt {
     my $dist = shift;
 
-    return << 'END_PERL_MB_OPT';
+    my %mandir = $dist->_mandirs;
+    return << "END_PERL_MB_OPT";
 --installdirs vendor
---config installvendorman1dir=/usr/man/man1
---config installvendorman3dir=/usr/man/man3
+--config installvendorman1dir=$mandir{1}
+--config installvendorman3dir=$mandir{3}
 END_PERL_MB_OPT
-}
-
-sub _run_perl {
-    my $dist = shift;
-
-    my $status = $dist->status;
-
-    my $run_perl_cmd = $status->_run_perl_cmd;
-    return $run_perl_cmd if $run_perl_cmd;
-
-    my $perl_wrapper
-        = 'use strict; BEGIN { my $old = select STDERR; $|++;'
-        . ' select $old; $|++; $0 = shift(@ARGV); my $rv = do($0);'
-        . ' die $@ if $@; }';
-    return ( '-e', $perl_wrapper );
 }
 
 sub _fake_install {
@@ -246,10 +249,10 @@ sub _fake_install {
         $cmd = [ $make, 'install', "DESTDIR=$destdir" ];
     }
     elsif ( $installer_type eq 'CPANPLUS::Dist::Build' ) {
-        my $perl     = $param_ref->{perl};
-        my @run_perl = $dist->_run_perl;
+        my $perl = $param_ref->{perl};
         $cmd = [
-            $perl, @run_perl, 'Build', 'install', '--destdir', $destdir,
+            $perl, '-MCPANPLUS::Internals::Utils::Autoflush',
+            'Build', 'install', '--destdir', $destdir,
             split( ' ', $dist->_perl_mb_opt )
         ];
     }
@@ -260,8 +263,7 @@ sub _fake_install {
 
     msg( loc( q{Staging distribution in '%2'}, $destdir ) );
 
-    return $dist->_run_command( $cmd,
-        { dir => $wrksrc, verbose => $verbose } );
+    return run( $cmd, { dir => $wrksrc, verbose => $verbose } );
 }
 
 sub _makepkg {
@@ -302,8 +304,11 @@ sub _makepkg {
     my $orig_uid = $UID;
     my $orig_gid = ( split /\s+/, $GID )[0];
     if ($needs_chown) {
-        my @stat = $dist->_stat($destdir);
-        return if !@stat;
+        my @stat = stat($destdir);
+        if ( !@stat ) {
+            error( loc( q{Could not stat '%1': %2}, $destdir, $OS_ERROR ) );
+            return;
+        }
         $orig_uid = $stat[4];
         $orig_gid = $stat[5];
 
@@ -311,11 +316,7 @@ sub _makepkg {
     }
 
     my $fail = 0;
-    if (!$dist->_run_command(
-            $cmd, { dir => $destdir, verbose => $verbose }
-        )
-        )
-    {
+    if ( !run( $cmd, { dir => $destdir, verbose => $verbose } ) ) {
         ++$fail;
     }
 
@@ -378,7 +379,7 @@ sub _installpkg {
 
     msg( loc( q{Installing package '%1'}, $outputname ) );
 
-    return $dist->_run_command( $cmd, { verbose => $verbose } );
+    return run( $cmd, { verbose => $verbose } );
 }
 
 sub _compress_manual_pages {
@@ -387,39 +388,23 @@ sub _compress_manual_pages {
     my $status  = $dist->status;
     my $pkgdesc = $status->_pkgdesc;
 
-    my $mandir = File::Spec->catdir( $pkgdesc->destdir, 'usr', 'man' );
-    return 1 if !-d $mandir;
+    my %mandir = $dist->_mandirs;
+    my @mandirs = grep { -d $_ }
+        map { catdir( $pkgdesc->destdir, $_ ) } values %mandir;
 
     my $fail   = 0;
     my $wanted = sub {
         my $filename = $_;
-
-        # Skip files that are already compressed.
-        return if $filename =~ /\.gz$/;
-
-        if ( -l $filename ) {
-            my $target = $dist->_readlink($filename);
-            if ($target) {
-                if ( $dist->_symlink( "$target.gz", "$filename.gz" ) ) {
-                    if ( !$dist->_unlink($filename) ) {
-                        ++$fail;
-                    }
-                }
-                else {
-                    ++$fail;
-                }
-            }
-            else {
-                ++$fail;
-            }
-        }
-        elsif ( -f $filename ) {
-            if ( !$dist->_gzip($filename) ) {
+        if ( $filename !~ /\.gz$/ && ( -f $filename || -l $filename ) ) {
+            if ( !( gzip($filename) && unlink $filename ) ) {
+                error( loc( q{Could not compress file '%1'}, $filename ) );
                 ++$fail;
             }
         }
     };
-    File::Find::find( $wanted, $mandir );
+    if (@mandirs) {
+        File::Find::find( $wanted, @mandirs );
+    }
 
     return ( $fail ? 0 : 1 );
 }
@@ -440,67 +425,30 @@ sub _install_docfiles {
 
     my @docfiles = $pkgdesc->docfiles;
 
-    my $docdir = File::Spec->catdir( $pkgdesc->destdir, $pkgdesc->docdir );
+    my $docdir = catdir( $pkgdesc->destdir, $pkgdesc->docdir );
     $cb->_mkdir( dir => $docdir ) or return;
 
     # Create README.SLACKWARE.
     my $readme = $pkgdesc->readme_slackware;
-    my $readmefile = File::Spec->catfile( $docdir, 'README.SLACKWARE' );
-    $dist->_write_file( $readmefile, $readme ) or return;
+    my $readmefile = catfile( $docdir, 'README.SLACKWARE' );
+    spurt( $readmefile, $readme ) or return;
 
     # Create perl-Some-Module.SlackBuild.
-    my $script     = $pkgdesc->build_script;
-    my $scriptfile = File::Spec->catfile( $docdir,
-        $pkgdesc->normalized_name . '.SlackBuild' );
-    $dist->_write_file( $scriptfile, $script ) or return;
+    my $script = $pkgdesc->build_script;
+    my $scriptfile
+        = catfile( $docdir, $pkgdesc->normalized_name . '.SlackBuild' );
+    spurt( $scriptfile, $script ) or return;
 
     # Copy files like README and Changes.
     my $fail = 0;
     for my $docfile (@docfiles) {
-        my $from = File::Spec->catfile( $wrksrc, $docfile );
+        my $from = catfile( $wrksrc, $docfile );
         if ( !$cb->_copy( file => $from, to => $docdir ) ) {
             ++$fail;
         }
     }
 
     return ( $fail ? 0 : 1 );
-}
-
-sub _verify_filename {
-    my ( $dist, $filename ) = @_;
-
-    my $status  = $dist->status;
-    my $pkgdesc = $status->_pkgdesc;
-    my $name    = $pkgdesc->normalized_name;
-
-    my $general_whitelist = qr{ /(?:etc|usr|var|opt)/ }xms;
-
-    my $standard_whitelist = qr{
-        ^(?:
-            /etc/
-            | /usr/$
-            | /usr/(?:bin|doc|man)/
-            | /usr/(?:lib(?:64)?|share)/$
-            | /usr/(?:lib(?:64)?|share)/perl5/
-        )
-    }xms;
-
-    my $command = qr{ /usr/bin/. }xms;
-
-    $filename = substr $filename, 1;    # Remove leading '.'.
-    if ( $filename !~ $general_whitelist ) {
-        error(
-            loc( q{Blacklisted file found in '%1': '%2'}, $name, $filename )
-        );
-        return;
-    }
-    elsif ( $filename =~ $command ) {
-        msg( loc( q{'%1' provides command '%2'}, $name, $filename ) );
-    }
-    elsif ( $filename !~ $standard_whitelist ) {
-        msg( loc( q{'%1' provides extra file '%2'}, $name, $filename ) );
-    }
-    return 1;
 }
 
 sub _process_packlist {
@@ -523,7 +471,7 @@ sub _process_packlist {
             $key =~ s{^\Q$destdir\E}{}xms;
 
             # Add .gz to manual pages.
-            if ( $key =~ m{^/usr/man/}xms ) {
+            if ( $key =~ m{/man/man}xms ) {
                 if ( $key !~ m{\.gz$}xms ) {
                     $key .= '.gz';
                 }
@@ -533,7 +481,7 @@ sub _process_packlist {
                         && defined $value->{from} )
                     {
                         my $from = $value->{from};
-                        if ( $from =~ m{^/usr/man/}xms ) {
+                        if ( $from =~ m{/man/man}xms ) {
                             if ( $from !~ m{\.gz$}xms ) {
                                 $from .= '.gz';
                                 $value->{from} = $from;
@@ -574,17 +522,10 @@ sub _process_installed_files {
 
         return if $filename eq q{.};
 
-        my @stat = $dist->_lstat($filename);
-        return if !@stat;
-
-        # Check whether the distribution tries to install files in
-        # non-standard directories.
-        my $pathname = $File::Find::name;
-        if ( -d _ ) {
-            $pathname .= q{/};
-        }
-        if ( !$dist->_verify_filename($pathname) ) {
-            ++$fail;
+        my @stat = lstat($filename);
+        if ( !@stat ) {
+            error( loc( q{Could not lstat '%1': %2}, $filename, $OS_ERROR ) );
+            return;
         }
 
         # Skip symbolic links.
@@ -592,7 +533,8 @@ sub _process_installed_files {
 
         # Sanitize the file modes.
         my $perm = ( $stat[2] & oct '0755' ) | oct '0200';
-        if ( !$dist->_chmod( $perm, $filename ) ) {
+        if ( !chmod $perm, $filename ) {
+            error( loc( q{Could not chmod '%1': %2}, $filename, $OS_ERROR ) );
             ++$fail;
         }
 
@@ -605,7 +547,12 @@ sub _process_installed_files {
             if ( $filename eq 'perllocal.pod'
                 || ( $filename =~ /\.bs$/ && -z $filename ) )
             {
-                if ( !$dist->_unlink($filename) ) {
+                if ( !unlink $filename ) {
+                    error(
+                        loc(q{Could not unlink '%1': %2}, $filename,
+                            $OS_ERROR
+                        )
+                    );
                     ++$fail;
                 }
             }
@@ -613,9 +560,9 @@ sub _process_installed_files {
                 push @packlists, $File::Find::name;
             }
             else {
-                my $type = $dist->_filetype($filename);
+                my $type = filetype($filename);
                 if ( $type =~ /ELF.+(?:executable|shared object)/s ) {
-                    if ( !$dist->_strip($filename) ) {
+                    if ( !strip($filename) ) {
                         ++$fail;
                     }
                 }
@@ -645,7 +592,7 @@ sub _make_installdir {
     my $cb      = $module->parent;
     my $pkgdesc = $status->_pkgdesc;
 
-    my $installdir = File::Spec->catdir( $pkgdesc->destdir, 'install' );
+    my $installdir = catdir( $pkgdesc->destdir, 'install' );
     return $cb->_mkdir( dir => $installdir );
 }
 
@@ -659,7 +606,7 @@ sub _write_config_files {
 
     my $destdir = $pkgdesc->destdir;
 
-    return 1 if !-d File::Spec->catdir( $destdir, 'etc' );
+    return 1 if !-d catdir( $destdir, 'etc' );
 
     my $orig_dir = Cwd::cwd();
     if ( !$cb->_chdir( dir => $destdir ) ) {
@@ -703,9 +650,9 @@ sub _write_config_files {
         $script .= "config '$conffile.new'\n";
     }
 
-    my $installdir = File::Spec->catdir( $pkgdesc->destdir, 'install' );
-    my $doinstfile = File::Spec->catfile( $installdir, 'doinst.sh' );
-    return $dist->_write_file( $doinstfile, { append => 1 }, $script );
+    my $installdir = catdir( $pkgdesc->destdir, 'install' );
+    my $doinstfile = catfile( $installdir, 'doinst.sh' );
+    return spurt( $doinstfile, { append => 1 }, $script );
 }
 
 sub _append_config_files_to_readme_slackware {
@@ -721,9 +668,9 @@ sub _append_config_files_to_readme_slackware {
         . "This package provides the following configuration files:\n\n"
         . join( "\n", map {"* /$_"} @conffiles ) . "\n";
 
-    my $docdir = File::Spec->catdir( $pkgdesc->destdir, $pkgdesc->docdir );
-    my $readmefile = File::Spec->catfile( $docdir, 'README.SLACKWARE' );
-    return $dist->_write_file( $readmefile, { append => 1 }, $readme );
+    my $docdir = catdir( $pkgdesc->destdir, $pkgdesc->docdir );
+    my $readmefile = catfile( $docdir, 'README.SLACKWARE' );
+    return spurt( $readmefile, { append => 1 }, $readme );
 }
 
 sub _write_slack_desc {
@@ -734,205 +681,10 @@ sub _write_slack_desc {
     my $cb      = $module->parent;
     my $pkgdesc = $status->_pkgdesc;
 
-    my $installdir = File::Spec->catdir( $pkgdesc->destdir, 'install' );
-    my $descfile = File::Spec->catfile( $installdir, 'slack-desc' );
+    my $installdir = catdir( $pkgdesc->destdir, 'install' );
+    my $descfile = catfile( $installdir, 'slack-desc' );
     my $desc = $pkgdesc->slack_desc;
-    return $dist->_write_file( $descfile, $desc );
-}
-
-sub _read_file {
-    my ( $dist, $filename ) = @_;
-
-    my $fh;
-    if ( !open $fh, '<', $filename ) {
-        error( loc( q{Could not open file '%1': %2}, $filename, $OS_ERROR ) );
-        return;
-    }
-
-    my $text = do { local $RS = undef; <$fh> };
-
-    if ( !close $fh ) {
-        error(
-            loc( q{Could not close file '%1': %2}, $filename, $OS_ERROR ) );
-        return;
-    }
-
-    return $text;
-}
-
-sub _write_file {
-    my ( $dist, $filename, @lines ) = @_;
-
-    my $param_ref = ( ref $lines[0] eq 'HASH' ) ? shift @lines : {};
-    my $mode      = ( $param_ref->{append} )    ? '>>'         : '>';
-    my $binmode   = $param_ref->{binmode};
-
-    my $fh;
-    if ( !open $fh, $mode, $filename ) {
-        error(
-            loc( q{Could not create file '%1': %2}, $filename, $OS_ERROR ) );
-        return;
-    }
-
-    if ($binmode) {
-        if ( !binmode $fh, $binmode ) {
-            error(
-                loc(q{Could not set binmode for file '%1' to '%2': %3},
-                    $filename, $binmode, $OS_ERROR
-                )
-            );
-            return;
-        }
-    }
-
-    my $fail = 0;
-    if ( !print {$fh} @lines ) {
-        error(
-            loc( q{Could not write to file '%1': %2}, $filename, $OS_ERROR )
-        );
-        ++$fail;
-    }
-
-    if ( !close $fh ) {
-        error(
-            loc( q{Could not close file '%1': %2}, $filename, $OS_ERROR ) );
-        ++$fail;
-    }
-
-    return ( $fail ? 0 : 1 );
-}
-
-sub _run_command {
-    my ( $dist, $cmd, $param_ref ) = @_;
-
-    my $module = $dist->parent;
-    my $cb     = $module->parent;
-
-    my $dir     = $param_ref->{dir};
-    my $verbose = $param_ref->{verbose};
-    my $buf_ref = $param_ref->{buffer};
-    if ( !$buf_ref ) {
-        my $buf;
-        $buf_ref = \$buf;
-    }
-
-    my $orig_dir;
-    if ($dir) {
-        $orig_dir = Cwd::cwd();
-        if ( !$cb->_chdir( dir => $dir ) ) {
-            return;
-        }
-    }
-
-    my $fail = 0;
-    if (!IPC::Cmd::run(
-            command => $cmd,
-            buffer  => $buf_ref,
-            verbose => $verbose
-        )
-        )
-    {
-        my $cmdline = join q{ }, @{$cmd};
-        error( loc( q{Could not run '%1': %2}, $cmdline, ${$buf_ref} ) );
-        ++$fail;
-    }
-
-    if ($orig_dir) {
-        if ( !$cb->_chdir( dir => $orig_dir ) ) {
-            ++$fail;
-        }
-    }
-
-    return ( $fail ? 0 : 1 );
-}
-
-sub _filetype {
-    my ( $dist, $filename ) = @_;
-
-    my $status = $dist->status;
-
-    my $filetype;
-    my $file_cmd = $status->_file_cmd;
-    if ($file_cmd) {
-        my $cmd = [ $file_cmd, '-b', $filename ];
-        if ( !$dist->_run_command( $cmd, { buffer => \$filetype } ) ) {
-            undef $filetype;
-        }
-    }
-    if ($filetype) {
-        chomp $filetype;
-    }
-    else {
-        $filetype = 'data';
-    }
-    return $filetype;
-}
-
-sub _strip {
-    my ( $dist, @filenames ) = @_;
-
-    my $status = $dist->status;
-
-    my $strip_cmd = $status->_strip_cmd;
-    return 1 if !$strip_cmd;
-
-    my $cmd = [ $strip_cmd, '--strip-unneeded', @filenames ];
-    return $dist->_run_command($cmd);
-}
-
-sub _gzip {
-    my ( $dist, @filenames ) = @_;
-
-    my $fail = 0;
-    for my $filename (@filenames) {
-        if ( IO::Compress::Gzip::gzip( $filename, "$filename.gz" ) ) {
-            if ( !$dist->_unlink($filename) ) {
-                ++$fail;
-            }
-        }
-        else {
-            error(
-                loc(q{Could not compress file '%1': %2}, $filename,
-                    $GzipError
-                )
-            );
-            ++$fail;
-        }
-    }
-    return ( $fail ? 0 : 1 );
-}
-
-sub _stat {
-    my ( $dist, $filename ) = @_;
-
-    my @stat = stat $filename;
-    if ( !@stat ) {
-        error( loc( q{Could not stat '%1': %2}, $filename, $OS_ERROR ) );
-    }
-    return @stat;
-}
-
-sub _lstat {
-    my ( $dist, $filename ) = @_;
-
-    my @stat = lstat $filename;
-    if ( !@stat ) {
-        error( loc( q{Could not lstat '%1': %2}, $filename, $OS_ERROR ) );
-    }
-    return @stat;
-}
-
-sub _chmod {
-    my ( $dist, $mode, @filenames ) = @_;
-
-    my $fail = 0;
-    for my $filename (@filenames) {
-        if ( !chmod $mode, @filenames ) {
-            error( loc( q{Could not chmod '%1': %2}, $filename, $OS_ERROR ) );
-            ++$fail;
-        }
-    }
-    return ( $fail ? 0 : 1 );
+    return spurt( $descfile, $desc );
 }
 
 sub _chown_recursively {
@@ -953,46 +705,7 @@ sub _chown_recursively {
             return;
         }
     }
-    return $dist->_run_command($cmd);
-}
-
-sub _unlink {
-    my ( $dist, @filenames ) = @_;
-
-    my $fail = 0;
-    for my $filename (@filenames) {
-        if ( !unlink $filename ) {
-            error(
-                loc( q{Could not unlink '%1': %2}, $filename, $OS_ERROR ) );
-            ++$fail;
-        }
-    }
-    return ( $fail ? 0 : 1 );
-}
-
-sub _symlink {
-    my ( $dist, $oldfile, $newfile ) = @_;
-
-    my $fail = 0;
-    if ( !symlink $oldfile, $newfile ) {
-        error(
-            loc(q{Could not symlink '%1' to '%2': %3},
-                $oldfile, $newfile, $OS_ERROR
-            )
-        );
-        ++$fail;
-    }
-    return ( $fail ? 0 : 1 );
-}
-
-sub _readlink {
-    my ( $dist, $filename ) = @_;
-
-    my $target = readlink $filename;
-    if ( !$target ) {
-        error( loc( q{Could not readlink '%1': %2}, $filename, $OS_ERROR ) );
-    }
-    return $target;
+    return run($cmd);
 }
 
 1;
@@ -1004,7 +717,7 @@ CPANPLUS::Dist::Slackware - Install Perl distributions on Slackware Linux
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware version 1.024.
+This document describes CPANPLUS::Dist::Slackware version 1.025.
 
 =head1 SYNOPSIS
 
@@ -1200,11 +913,6 @@ You are using CPANPLUS as a non-root user but C<sudo> is not installed.
 
 The Slackware Linux package management tools are not installed.
 
-=item B<< Blacklisted file found... >>
-
-Distributions are not allowed to install files outside of F</etc>, F</usr>,
-F</var> and F</opt>.
-
 =item B<< Could not chdir into DIR >>
 
 CPANPLUS::Dist::Slackware could not change its current directory while
@@ -1299,15 +1007,22 @@ C<xz>, needs to be installed on the machine.
 
 Requires the Slackware Linux package management tools C<makepkg>,
 C<installpkg>, C<updatepkg>, and C<removepkg>.  Other required commands are
-C<chown>, C<file>, C<gcc>, C<make>, and C<strip>.
+C<chown>, C<cp>, C<file>, C<make>, C<strip> and a C compiler.
 
 In order to manage packages as a non-root user, which is highly recommended,
 you must have C<sudo> and, optionally, C<fakeroot>.  You can download a script
 that builds C<fakeroot> from L<http://slackbuilds.org/>.
 
-CPANPLUS::Dist::Slackware requires the modules CPANPLUS, Cwd, File::Find,
-File::Spec, IO::Compress::Gzip, IPC:Cmd, Locale::Maketext::Simple, and
-Params::Check.
+Requires the modules CPANPLUS and Module::Pluggable from CPAN.
+
+The lowest supported Module::Build version is 0.36.
+
+The required modules Cwd, ExtUtils::Packlist, File::Find, File::Spec,
+File::Temp, IO::Compress::Gzip, IPC:Cmd, Locale::Maketext::Simple,
+Module::CoreList 2.32, Params::Check, Pod::Find, Pod::Simple, POSIX,
+Text::Wrap and version 0.77 are distributed with Perl 5.12.3 and above.
+
+If available, the module Parse::CPAN::Meta is used.
 
 =head1 INCOMPATIBILITIES
 
@@ -1335,7 +1050,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Andreas Voegele
+Copyright 2012-2017 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

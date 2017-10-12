@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
     	'Scalar::Util' => '0',
 		'Carp' => '0',
-		'Combine::Keys' => '0.08',	
+		'Combine::Keys' => '0.09',	
 		'Import::Export' => '0.04',
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

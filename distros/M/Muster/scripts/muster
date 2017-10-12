@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: muster - bookmark web application
+# PODNAME: muster
+=head1 NAME
+
+muster - bookmark web application
+
+=head1 VERSION
+
+version 0.62
+
+=head1 SYNOPSIS
+
+muster COMMAND
+
+=head1 DESCRIPTION
+
+Muster is a content management system.
+It uses the Mojolicious framework.
+It understands SQLite databases.
+
+=cut
+
+# Start command line interface for application
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('Muster');

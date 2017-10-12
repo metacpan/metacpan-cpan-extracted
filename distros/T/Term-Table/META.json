@@ -40,7 +40,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Tools::Tiny" : "1.302072",
+            "Test2::Tools::Tiny" : "1.302097",
             "utf8" : "0"
          }
       }
@@ -55,7 +55,7 @@
          "url" : "http://github.com/exodist/Term-Table/"
       }
    },
-   "version" : "0.010",
+   "version" : "0.012",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

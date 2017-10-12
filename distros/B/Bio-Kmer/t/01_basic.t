@@ -6,7 +6,7 @@ use FindBin qw/$RealBin/;
 use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Data::Dumper qw/Dumper/;
 
-use Test::More tests => 43;
+use Test::More tests => 45;
 
 use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
@@ -92,4 +92,14 @@ for(my $i=0;$i<@correctCounts;$i++){
 for my $query(keys(%query)){
   is $query{$query}, $kmer->query($query), "Queried for $query{$query}";
 }
+$kmer->close();
+
+# Test subsampling: a subsample should have fewer kmers than
+# the full set but more than 0.
+my $subsampleKmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,sample=>0.1});
+my $subsampleHist=$kmer->histogram();
+my $subsampleKmerHash=$subsampleKmer->kmers();
+ok(scalar(keys(%$subsampleKmerHash)) > 0, "Subsample kmers more than zero.");
+ok(scalar(keys(%$subsampleKmerHash)) < scalar(keys(%{ $kmer->kmers() })), "Subsample kmers fewer than full count of kmers");
+
 

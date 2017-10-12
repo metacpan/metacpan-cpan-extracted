@@ -6,6 +6,10 @@ requires 'IPC::Cmd';
 
 recommends 'PkgConfig', '0.17026';
 
+on 'configure' => sub {
+    requires 'FFI::CheckLib';
+};
+
 on 'test' => sub {
     requires 'Test::More', '0.98';
 };

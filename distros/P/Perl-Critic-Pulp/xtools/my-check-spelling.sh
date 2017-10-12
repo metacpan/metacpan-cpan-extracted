@@ -35,12 +35,21 @@ set -e
 # | egrep -v '(Makefile|dist-deb)' \
 
 
+#  --color=always
+
 if find . -name my-check-spelling.sh -prune \
           -o -type f -print0 \
-| xargs -0 egrep --color=always -nHi 'withtout|occured|exmaple|weiner|rigth|peroid|Manhatten|occuring|optino|recurrance|nineth|\bon on\b|\bto to\b|tranpose|adjustement|glpyh|rectanglar|availabe|grabing|cusor|refering|writeable|nineth|\bommitt?ed|omited|[$][rd]elf|requrie|noticable|continous|existant|explict|agument|destionation|\bthe the\b|\bfor for\b|\bare have\b|\bare are\b|\bwith with\b|\bin in\b|\b[tw]hen then\b|\bnote sure\b|\bnote yet\b|correspondance|sprial|wholely|satisif|\bteh\b|\btje\b'
+| xargs -0 egrep -nHi '\bint he\b|withtout|occured|exmaple|weiner|rigth|peroid|Manhatten|occuring|optino|recurrance|nineth|\bon on\b|\bto to\b|tranpose|adjustement|glpyh|rectanglar|availabe|grabing|cusor|refering|writeable|nineth|\bommitt?ed|omited|[$][rd]elf|requrie|noticable|continous|existant|explict|agument|destionation|\bthe the\b|\bfor for\b|\bare have\b|\bare are\b|\bwith with\b|\bin in\b|\b[tw]hen then\b|\bnote sure\b|\bnote yet\b|correspondance|sprial|wholely|satisif|\bteh\b|\btje\b'
 then
-  # nothing found
   exit 1
-else
-  exit 0
 fi
+
+
+if find . -name my-check-spelling.sh -prune \
+          -o -type f -print0 \
+| xargs -0 egrep -nH '\bov\b'
+then
+  exit 1
+fi
+
+exit 0

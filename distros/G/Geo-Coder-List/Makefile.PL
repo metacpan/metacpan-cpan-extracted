@@ -29,7 +29,6 @@ if($online_tests) {
 	$test_requires->{'Geo::Coder::Google::V3'} = 0.10;
 	$test_requires->{'Geo::Coder::OSM'} = 0;
 	$test_requires->{'Geo::Coder::CA'} = 0;
-	$test_requires->{'Geo::Coder::US'} = 0;
 	$test_requires->{'Geo::Coder::XYZ'} = 0.06;
 	$test_requires->{'Test::Number::Delta'} = 0;
 	$test_requires->{'Test::LWP::UserAgent'} = 0;

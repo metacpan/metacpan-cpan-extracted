@@ -106,7 +106,7 @@ rm -rf $DISTVNAME
 # lintian .deb and source
 
 lintian -I -i \
-  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file \
+  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa \
   $DEBFILE
 
 TEMP="/tmp/temp-lintian-$DISTVNAME"

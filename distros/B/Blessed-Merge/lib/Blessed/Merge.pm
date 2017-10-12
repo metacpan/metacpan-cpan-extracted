@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Scalar::Util qw/reftype/;
 use Carp qw/croak/;
@@ -13,7 +13,7 @@ use Combine::Keys qw/combine_keys/;
 sub new {
 	my ($pkg, $args) = (shift, $_[0] && reftype $_[0] eq 'HASH' ? $_[0] : {@_});
 	my $self = bless $args, $pkg;
-	$self->{same} = 1 unless exists $self->{same};
+	exists $self->{$_} or do { $self->{$_} = 1 } foreach (qw/same blessed/);
 	exists $self->{$_} or do { $self->{$_} = 0 } foreach(qw/unique_array unique_hash/);
 	return $self;
 }
@@ -26,7 +26,7 @@ sub merge {
 		}
 		$new = $self->_merge($new, $_);
 	} @_;
-	return bless $new, $base_bless;
+	return $self->{blessed} ? bless $new, $base_bless : $new;
 }
 
 sub _merge {
@@ -89,7 +89,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

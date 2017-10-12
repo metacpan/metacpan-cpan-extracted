@@ -6,8 +6,8 @@ App::Prove::Plugin::Count - A prove plugin to count test files.
 
     $ prove -PCount
 
-    # [1/10] t/test1.t ....... ok
-    # [2/10] t/test2.t ....... ok
+    # [ 1/10] t/test1.t ....... ok
+    # [ 2/10] t/test2.t ....... ok
     # ...
 
 # DESCRIPTION

@@ -104,7 +104,7 @@ use SOAP::Lite +autodispatch =>
 
 AwGateway provides a simple means to convert a SOAP request into an ActiveWorks
 event.  AwGateway is also a light weight alternative to the more comprehensive
-SOAP::Transport::ACTIVEWORKS module (which is not required).  The AwGateway
+SOAP::Transport::ActiveWorks::Lite module (which is not required).  The AwGateway
 class provides a single method, B<relay>, which must be passed a HASH reference
 that matches the structure of the ActiveWorks event type specified in the
 required '_event_type' field of the hash:
@@ -132,6 +132,6 @@ Daniel Yacob, L<yacob@rcn.com|mailto:yacob@rcn.com>
 
 =head1 SEE ALSO
 
-S<perl(1). SOAP::Lite(3). SOAP::Transport::ACTIVEWORKS(3).>
+S<perl(1). SOAP::Lite(3). SOAP::Transport::ActiveWorks::Lite(3).>
 
 =cut

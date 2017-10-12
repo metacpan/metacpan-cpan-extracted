@@ -1,3 +1,13 @@
+0.12      2017-10-07 20:03:50-04:00 America/New_York
+
+    Add an examples directory with sample scripts.
+
+    Update POD for user_object() to include link to the Atlassian docs for /rest/api/latest/myself.
+
+    Prevent croaking when JIRA uses a %F-type date. https://github.com/packy/JIRA-REST-Class/pull/8
+
+    Add code to recover the password from the Authorization header if we haven't cached it.
+
 0.11      2017-05-29 08:40:13-04:00 America/New_York
 
     Add support for user_object() that calls /rest/api/latest/myself

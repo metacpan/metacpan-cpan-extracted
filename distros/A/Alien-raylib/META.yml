@@ -32,14 +32,14 @@ no_index:
 provides:
   Alien::raylib:
     file: lib/Alien/raylib.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   perl: '5.008'
 resources:
   bugtracker: https://github.com/athreef/Alien-raylib/issues
   homepage: https://github.com/athreef/Alien-raylib
   repository: https://github.com/athreef/Alien-raylib.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -234,7 +234,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
+          tag: v0.004
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

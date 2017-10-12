@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension JLogger
 
+1.003  11.10.2017 00:00:00
+         - Do not use message id
+
+1.002  11.12.2011 00:00:00
+         - Added id key for messages tables
+
 1.001  19.09.2011 00:00:00
          - use DBIx::Connector for database connection
 

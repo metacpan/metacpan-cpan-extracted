@@ -27,7 +27,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite  testing suite.
 
 This script creates a SOAP client and publishes a 'Calculator' request
 directly to a SOAP server in the standard way.

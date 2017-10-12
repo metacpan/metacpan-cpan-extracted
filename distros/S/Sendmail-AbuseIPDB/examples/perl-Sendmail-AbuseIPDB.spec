@@ -1,6 +1,6 @@
 Summary: Sendmail-AbuseIPDB Perl module
 Name: perl-Sendmail-AbuseIPDB
-Version: 0.07
+Version: 0.10
 Release: 1
 License: GPL or Artistic
 Group: Development/Libraries
@@ -9,10 +9,11 @@ Prefix: /usr
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch: noarch
 BuildRequires: perl(ExtUtils::MakeMaker)
+Requires: curl
 Requires: perl(URI) >= 1.4
 Requires: perl(JSON) >= 2.15
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Source0: Sendmail-AbuseIPDB-0.07.tar.gz
+Source0: Sendmail-AbuseIPDB-0.10.tar.gz
 
 %description
 %{summary}.
@@ -21,7 +22,7 @@ Source0: Sendmail-AbuseIPDB-0.07.tar.gz
 %setup -q -n Sendmail-AbuseIPDB-%{version}
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" %{__perl} Makefile.PL "INSTALL_BASE=%{_prefix}"
+CFLAGS="$RPM_OPT_FLAGS" %{__perl} Makefile.PL INSTALLDIRS=vendor
 make %{?_smp_mflags} OPTIMIZE="$RPM_OPT_FLAGS"
 
 %install
@@ -29,44 +30,23 @@ rm -rf $RPM_BUILD_ROOT
 
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 
-find $RPM_BUILD_ROOT -type f -a \( -name perllocal.pod -o -name .packlist \
-  -o \( -name '*.bs' -a -empty \) \) -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
-
-for brp in %{_prefix}/lib/rpm/%{_build_vendor}/brp-compress \
-  %{_prefix}/lib/rpm/brp-compress
-do
-  [ -x $brp ] && $brp && break
-done
-
-
-find $RPM_BUILD_ROOT -type f \
-| sed "s@^$RPM_BUILD_ROOT@@g" \
-> %{name}-%{version}-%{release}-filelist
-
-eval `%{__perl} -V:archname -V:installsitelib -V:installvendorlib -V:installprivlib`
-for d in $installsitelib $installvendorlib $installprivlib; do
-  [ -z "$d" -o "$d" = "UNKNOWN" -o ! -d "$RPM_BUILD_ROOT$d" ] && continue
-  find $RPM_BUILD_ROOT$d/* -type d \
-  | grep -v "/$archname\(/auto\)\?$" \
-  | sed "s@^$RPM_BUILD_ROOT@%dir @g" \
-  >> %{name}-%{version}-%{release}-filelist
-done
-
-if [ "$(cat %{name}-%{version}-%{release}-filelist)X" = "X" ] ; then
-    echo "ERROR: EMPTY FILE LIST"
-    exit 1
-fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files -f %{name}-%{version}-%{release}-filelist
+
+%files
 %defattr(-,root,root,-)
 %doc Changes README
+%{perl_vendorlib}/Sendmail/AbuseIPDB.pm
+%{_mandir}/man3/Sendmail::AbuseIPDB.3pm.gz
+%exclude /usr/lib/perl5/vendor_perl/auto/Sendmail/AbuseIPDB/.packlist
+
 
 %changelog
+* Fri Sep 29 2017 <ttndy@cpan.org> - 0.10-1
+- Might have finally got the thing to install in the correct directory (documentation is kind of unhelpful).
+
 * Sun Sep 24 2017 <ttndy@cpan.org> - 0.07-1
 - Don't use local, include example
 

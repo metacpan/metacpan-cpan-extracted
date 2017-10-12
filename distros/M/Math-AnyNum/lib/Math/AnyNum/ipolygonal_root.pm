@@ -9,7 +9,7 @@ sub __ipolygonal_root__ {
     my ($n, $k, $second) = @_;
 
     # polygonal_root(n, k)
-    #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();

@@ -1,0 +1,64 @@
+---
+abstract: 'web application for content management'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Muster
+requires:
+  Carp: '0'
+  Const::Fast: '0'
+  DBI: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::ShareDir: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  HTML::LinkList: '0'
+  Hash::Merge: '0'
+  Image::ExifTool: '0'
+  Image::Magick: '0'
+  Lingua::EN::Inflexion: '0'
+  Lingua::EN::Titlecase: '0'
+  Math::Calc::Parser: '0'
+  Module::Pluggable: '0'
+  Mojo::Base: '0'
+  Mojo::URL: '0'
+  Mojo::Util: '0'
+  Mojolicious::Commands: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  SQLite::Work: '0'
+  Search::Query: '0'
+  Sort::Naturally: '0'
+  Text::Markdown::Discount: '0'
+  Text::NeatTemplate: '0'
+  YAML: '0'
+  YAML::Any: '0'
+  YAML::XS: '0'
+  common::sense: '0'
+resources:
+  homepage: https://github.com/rubykat/Muster
+  repository: https://github.com/rubykat/Muster.git
+version: '0.62'
+x_serialization_backend: 'YAML::Tiny version 1.70'

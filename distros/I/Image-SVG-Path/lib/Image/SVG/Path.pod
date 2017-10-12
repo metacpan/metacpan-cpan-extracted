@@ -15,12 +15,12 @@ Image::SVG::Path - read the "d" attribute of an SVG path
 
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents version 0.30 of Image::SVG::Path corresponding to git
-commit 480776a934b033453feec526ab7d0a5931bb44af released on Thu Dec 15 11:32:48 2016 +0900.
+This documents version 0.31 of Image::SVG::Path corresponding to git
+commit e7a4db2cb10fae2fde7d358a92d09280f393dd48 released on Sun Oct 8 14:35:36 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ produces output
     MOVE TO 148 214.
 
 
-(This example is included as L<F<xml-parser.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/xml-parser.pl> in the distribution.)
+(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/xml-parser.pl> in the distribution.)
 
 
 SVG means "scalable vector graphics" and it is a standard of the W3
@@ -156,7 +156,7 @@ produces output
        type -> closepath
 
 
-(This example is included as L<F<extract-path-info.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/extract-path-info.pl> in the distribution.)
+(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/extract-path-info.pl> in the distribution.)
 
 
 The return value is a list of hash references. Each hash reference has
@@ -197,14 +197,18 @@ to the equivalent "C" curve. In this case, the C<position> value of
 each element's hash is C<absolute>, and C<svg_key> is converted to
 upper case.
 
-=item no_shortcuts
+=item no_smooth
 
-If the hash element C<no_shortcuts> is set to a true value then smooth
+If the hash element C<no_smooth> is set to a true value then smooth
 cubic bezier curves, "S" curves, are changed into the equivalent "C"
 curves. This only works in combination with the "absolute" option,
 otherwise it does nothing. It does not work with smooth quadratic
-bezier curves. See L</no_shortcuts does not work with quadratic bezier
+bezier curves. See L</no_smooth does not work with quadratic bezier
 curves>.
+
+In versions of this module up to C<0.30>, C<no_smooth> was erroneously
+named C<no_shortcuts>. The name C<no_shortcuts> is still accepted by
+this function for backward compatibility.
 
 =item verbose
 
@@ -219,9 +223,9 @@ informative messages about what it is doing as it parses the path.
 
 Make an SVG path which is the exact reverse of the input.
 
-This only works for cubic bezier curves with absolute position and no
-shortcuts (C elements only). It doesn't fill in all the information
-correctly.
+This only works for cubic bezier curves with absolute position, and
+not for smooth curves (C elements only). It doesn't fill in all the
+information correctly.
 
     
     use Image::SVG::Path 'reverse_path';
@@ -236,7 +240,7 @@ produces output
     M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
 
 
-(This example is included as L<F<test-reverse.pl>|https://api.metacpan.org/source/BKB/Image-SVG-Path-0.30/examples/test-reverse.pl> in the distribution.)
+(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/test-reverse.pl> in the distribution.)
 
 
 =head2 create_path_string
@@ -246,8 +250,8 @@ produces output
 Given a set of information as created by L</extract_path_info>, turn
 them into an SVG string representing a path.
 
-This only works for elements with C<absolute> position with no
-shortcuts. It does not handle quadratic bezier curves.
+This only works for elements with C<absolute> position and not smooth
+curves. It does not handle quadratic bezier curves.
 
 =head1 SVG path elements
 
@@ -344,23 +348,23 @@ The end point of the curve.
 
 =back
 
-=head2 Shortcut cubic bezier curve elements, S
+=head2 Smooth cubic bezier curve elements, S
 
-If the type is C<shortcut-cubic-bezier>, the hash contains two more
+If the type is C<smooth-cubic-bezier>, the hash contains two more
 fields, C<control2> and C<end>. C<control2> is the second control
 point, and C<end> is the end point. The first control point is got by
 reflecting the second control point of the previous curve around the
 end point of the previous curve (the start point of the current
 curve). 
 
-Use the L</no_shortcuts> option to automatically convert these into
+Use the L</no_smooth> option to automatically convert these into
 cubic bezier curve elements.
 
 =over
 
 =item type
 
-This is C<shortcut-cubic-bezier>.
+This is C<smooth-cubic-bezier>.
 
 =item svg_key
 
@@ -402,7 +406,7 @@ This is the end point.
 
 =back
 
-=head2 Shortcut quadratic Bezier curves, T
+=head2 Smooth quadratic Bezier curves, T
 
 See L<the SVG documentation|/SVG specification> (section 8.3.7) for
 how to calculate the control point.
@@ -411,7 +415,7 @@ how to calculate the control point.
 
 =item type
 
-This is C<shortcut-quadratic-bezier>.
+This is C<smooth-quadratic-bezier>.
 
 =item svg_key
 
@@ -528,18 +532,9 @@ also exists.
 
 =over
 
-=item B<shortcut> should be B<smooth>
+=item no_smooth does not work with quadratic bezier curves
 
-This document and the module both make the error of calling "smooth"
-"shortcut".
-
-
-This is L<bug 20|https://github.com/benkasminbullock/Image-SVG-Path/issues/20> on the issue tracker.
-
-
-=item no_shortcuts does not work with quadratic bezier curves
-
-The L</no_shortcuts> option to L</extract_path_info> does not work
+The L</no_smooth> option to L</extract_path_info> does not work
 with quadratic bezier curves. See also L</HISTORY>.
 
 
@@ -779,7 +774,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2016
+2011-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

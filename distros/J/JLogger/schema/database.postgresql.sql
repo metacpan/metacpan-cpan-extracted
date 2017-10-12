@@ -14,7 +14,6 @@ CREATE TABLE "messages" (
         REFERENCES "identificators"("id"),
     "recipient_resource" VARCHAR(255) DEFAULT '',
 
-    "id"        VARCHAR(255) DEFAULT NULL,
     "type"      VARCHAR(255) DEFAULT NULL,
     "body"      TEXT,
     "thread"    VARCHAR(255) DEFAULT NULL,

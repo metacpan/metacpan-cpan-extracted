@@ -48,4 +48,5 @@ is_deeply($thing->flat, {one => 'two', three => 'four'});
 
 is_deeply($thing->merge, {one => 'two', three => 'four'});
 
+
 done_testing();

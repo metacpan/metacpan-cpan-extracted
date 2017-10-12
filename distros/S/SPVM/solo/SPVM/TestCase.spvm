@@ -43,6 +43,28 @@ package TestCase {
   }
   
   sub main($mvar : int) : int {
+    
+    {
+      my $time = std::time();
+      
+      std::say_long($time);
+    }
+
+    std::say_err("say_err");
+    std::say_err_byte(1y);
+    std::say_err_short(1s);
+    std::say_err_int(1);
+    std::say_err_long(1L);
+    std::say_err_float(0.5f);
+    std::say_err_double(0.5);
+
+    std::print_err("print_err");
+    std::print_err_byte(1y);
+    std::print_err_short(1s);
+    std::print_err_int(1);
+    std::print_err_long(1L);
+    std::print_err_float(0.5f);
+    std::print_err_double(0.5);
 
     # .
     {
@@ -193,7 +215,11 @@ package TestCase {
        $result->[64] = 0;
     }
     
-    my $ppp = [1, 2, 3];
+    my $ppp : int[] = [
+      1,
+      2,
+      3
+    ];
     std::say_float(TestCase->ONE);
     
     # Logical or
@@ -495,7 +521,7 @@ package TestCase {
       
       sum0(3, 4);
       
-      die "Catch error";
+      croak "Catch error";
       
       1;
     };
@@ -936,7 +962,7 @@ package TestCase {
     }
 
     # my $error : byte[] = "Error";
-    # die $error;
+    # croak $error;
     
     return $mvar + 3;
   }
@@ -950,7 +976,7 @@ package TestCase {
     $nums->[0] = 5;
   }
   sub call_void() : int {
-    my $nums = [1];
+    my $nums : int[] = [1];
     
     call_void_sub($nums);
     
@@ -1023,7 +1049,7 @@ package TestCase {
   }
   
   sub sum2 ($num1 : int, $num2 : int) : int {
-    # die "Error";
+    # croak "Error";
     
     my $num3 = sum0($num1, $num2);
     
@@ -1068,7 +1094,7 @@ package TestCase {
       
       my $obj_error1 = "Error1";
       
-      die $obj_error1;
+      croak $obj_error1;
     };
     
     {
@@ -1080,7 +1106,7 @@ package TestCase {
       
       my $obj_error2 = "Error2";
       
-      die $obj_error2;
+      croak $obj_error2;
     }
   }
   sub array_new() : int {
@@ -1116,7 +1142,7 @@ package TestCase {
   }
   
   sub error() : int {
-    die "ERROR";
+    croak "ERROR";
   }
   
   sub error_call_stack() : int {
@@ -1125,7 +1151,7 @@ package TestCase {
 
   sub error_eval() : int {
     eval {
-      die "ERROR";
+      croak "ERROR";
     };
     
     if ($@) {

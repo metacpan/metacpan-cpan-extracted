@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -214,8 +214,14 @@ sub load
 
    # Heap
    $self->{heap} = \my %heap;
+   $self->{protosubs_by_oproot} = \my %protosubs_by_oproot;
    while( my $sv = $self->_read_sv ) {
       $heap{$sv->addr} = $sv;
+
+      # Also identify the protosub of every oproot
+      if( $sv->type eq "CODE" and $sv->oproot and $sv->is_clone ) {
+         $protosubs_by_oproot{$sv->oproot} = $sv;
+      }
 
       my $pos = $fh->IO::Seekable::tell; # fully-qualified method for 5.010
       $progress->( sprintf "Loading file %d of %d (%.2f%%)",
@@ -244,8 +250,6 @@ sub _fixup
 
    my $heap_total = scalar keys %$heap;
 
-   my %protosub_by_oproot;
-
    my $count = 0;
    while( my ( $addr ) = each %$heap ) {
       my $sv = $heap->{$addr} or next;
@@ -254,30 +258,9 @@ sub _fixup
       # PADLISTs. Now we can fix them up
       $sv->_fixup if $sv->can( "_fixup" );
 
-      # Also identify the protosub of every oproot
-      if( $sv->type eq "CODE" and $sv->oproot and $sv->is_clone ) {
-         $protosub_by_oproot{$sv->oproot} = $sv;
-      }
-
       $count++;
       $progress->( sprintf "Fixing %d of %d (%.2f%%)",
-         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 5000) == 0;
-   }
-
-   # Now annotate the protosubs for closures
-   $count = 0;
-   while( my ( $addr ) = each %$heap ) {
-      my $sv = $heap->{$addr} or next;
-
-      if( $sv->type eq "CODE" and $sv->oproot and $sv->is_cloned ) {
-         if( my $protosub = $protosub_by_oproot{$sv->oproot} ) {
-            $sv->_set_protosub_at( $protosub->addr );
-         }
-      }
-
-      $count++;
-      $progress->( sprintf "Setting protosubs %d of %d (%.2f%%)",
-         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 5000) == 0;
+         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 20000) == 0;
    }
 
    # Walk the SUB contexts setting their true depth
@@ -616,6 +599,21 @@ returns the SV at that root:
    registered_mros
 
 =cut
+
+=head2 root_descriptions
+
+   %rootdescs = $df->root_descriptions
+
+Returns a key/value pair list giving the (method) name and description text of
+each of the possible roots.
+
+=cut
+
+sub root_descriptions
+{
+   my $self = shift;
+   return map { $_, substr $ROOTDESC{$_}, 1 } @ROOTS;
+}
 
 =head2 heap
 

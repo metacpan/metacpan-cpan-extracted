@@ -11,8 +11,6 @@ WriteMakefile (
     ABSTRACT_FROM => $pod,
     LICENSE => 'perl',
     PREREQ_PM => {
-	'LWP::UserAgent' => '6.15',
-	'HTML::TreeBuilder' => '5.03',
 	'URI::Escape' => '3.31',
 	'JSON::Parse' => '0.49',
     },

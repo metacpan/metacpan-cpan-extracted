@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Config::Identity;
+use Data::Dumper::Concise;
+use JIRA::REST::Class;
+
+# get the URL, username and password from a $HOME/.jira file
+my %id = Config::Identity->load_check( "jira",
+                                       [qw/url username password/] );
+
+# connect to the server
+my $jira = JIRA::REST::Class->new({
+    url      => $id{url},
+    username => $id{username},
+    password => $id{password}
+});
+
+# The first argument is the transition we're looking for
+my $target = shift @ARGV;
+
+# the remianing arguments are the issues we're transitioning
+my $tasklist = join(',', @ARGV);
+
+# we build q JQL query
+my $jql = "key in ($tasklist)";
+
+# we run the query
+my $query = $jira->query({ jql => $jql });
+
+unless ( $query->issue_count ) {
+    print "No tasks found with keys $tasklist.\n\n";
+    exit;
+}
+
+# and we loop over the results
+ISSUE: foreach my $issue ( $query->issues ) {
+    my $key      = $issue->key;
+    my $assignee = $issue->assignee;
+
+    print "Transitioning $key...\n";
+
+    # save the name of the current status
+    my $orig_status_name = $issue->status->name;
+
+    # make a short way to access the transitions object for this issue
+    my $trans = $issue->transitions;
+
+    # look for the transition we're looking for
+    TRANSITION: foreach my $transition ( $trans->transitions ) {
+        next TRANSITION unless
+          $transition->name     eq $target || # the name of the transition
+          $transition->to->name eq $target;   # the name of the target state
+
+        $transition->go; # perform the transition
+
+        # comment on what we've done
+        $issue->add_comment("Moving staus from '$orig_status_name' ".
+                            q{to '} . $transition->to->name . q{'});
+
+        next ISSUE;
+    }
+
+    # we didn't find the transition or the target state, so let's build
+    # a list of available transitions and what states they move to
+    my @names = map {
+        q{'} . $_->name . q{' => '} . $_->to->name . q{'}
+    } $trans->transitions;
+
+    die sprintf "Unable to find transition '%s'\n"
+        . "  issue status: '%s'\n"
+        . "  transitions:  %s\n",
+        $target,
+        $orig_status_name,
+        join(q{\n                }, sort @names);
+}
+
+print "\n";

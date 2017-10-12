@@ -8,6 +8,7 @@ use HackaMol;
 
 my @attributes = qw(
   selections_cr
+  selection
 );
 my @methods = qw(
   select_group
@@ -18,15 +19,22 @@ my $mol = HackaMol->new->read_file_mol("t/lib/2sic.pdb");
 map has_attribute_ok( $mol, $_ ), @attributes;
 map can_ok( $mol, $_ ), @methods;
 
+SELECTION:{
+  $mol->set_selection('bb' => 'backbone');
+  is ($mol->get_selection('bb'), 'backbone', 'selection attribute');
+}
+
 my $backbone = $mol->select_group('backbone');
 ok(
     $backbone->isa('HackaMol::AtomGroup'),
     'select_group returns HackaMol::AtomGroup'
 );
-is( $backbone->natoms,                   114, 'select_group("backbone")' );
+is( $backbone->natoms,                   152, 'select_group("backbone")' );
 is( $mol->select_group('water')->natoms, 2,   'select_group("water")' );
-is( $mol->select_group("sidechains")->natoms,
-    180, 'select_group("sidechains")' );
+is( $mol->select_group("sidechain")->natoms,
+    142, 'select_group("sidechain")' );
+
+is($mol->select_group("chain 1")->natoms,2, "integer chain no warnings");
 
 foreach my $and (qw(and .and.)){
   is(
@@ -52,6 +60,13 @@ foreach my $and (qw(and .and.)){
   }
 }
 
+is_deeply($mol->select_group("resname ARG+TYR"), 
+          $mol->select_group("(resname ARG) .or. (resname TYR)"), "ARG+TYR ~~ (resname ARG) .or. (resname TYR)");
+
+is_deeply($mol->select_group("resname ARG+TYR .and. (name CA .and. occ 1.0)"), 
+          $mol->select_group("((resname ARG) .or. (resname TYR)) .and. (name CA .and. occ 1.0)"), "more parenthesis");
+
+
 is ($mol->select_group('resname ARG+TYR')->natoms, '58', 'resname ARG+TYR');
 is ($mol->select_group('resid 7+1-5+245-246+252')->natoms, '69', 'resid 7+1-5+245-246+252');
 is ($mol->select_group('chain E-I and resid 7+1-5')->natoms, '45', 'chain E-I and resid 7+1-5');
@@ -71,19 +86,21 @@ is(
 
 # testcase from the docs for selections attr
 $mol->set_selection_cr(
-    "sidechains2" => sub {
+    "sidechain2" => sub {
         grep {
             $_->record_name eq 'ATOM'
               and not( $_->name eq 'N'
                 or $_->name eq 'CA'
-                or $_->name eq 'C' )
+                or $_->name eq 'C' 
+                or $_->name eq 'O' 
+            )
         } @_;
     }
 );
 
 is(
-    $mol->select_group('sidechains2')->natoms,
-    $mol->select_group('sidechains')->natoms,
+    $mol->select_group('sidechain2')->natoms,
+    $mol->select_group('sidechain')->natoms,
     "setting selection through selection attr",
 );
 

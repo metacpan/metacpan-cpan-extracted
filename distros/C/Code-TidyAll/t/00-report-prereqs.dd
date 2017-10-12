@@ -26,6 +26,7 @@ do { my $x = {
                                       'SVN::Look' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::DependentModules' => '0',
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
@@ -97,7 +98,8 @@ do { my $x = {
                                    'Test::More' => '0.96',
                                    'Test::Warnings' => '0',
                                    'autodie' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'lib::relative' => '0'
                                  }
                  }
      };

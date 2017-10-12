@@ -1,4 +1,17 @@
-Version 0.66  - TBR
+Version 0.67  - 08 October 2017
+                Debug print statements left in OpenThings messages.
+
+Version 0.66  - 24 September 2017
+                Updated documentation with installation instructions for
+                downloadable Debian packages and upgrade from prior
+                HiPi versions.
+                The wrapper modules HiPi::BCM2835 and HiPi::Wiring have
+                been removed from the main distribution.
+                A module for directly accessing the GPIO pins has been
+                introduced - HiPi::GPIO - which owes much to Joan's pigpio
+                library.
+                Command line utility hipi-energenie added for controlling
+                Energenie switches and adaptors
 
 Version 0.65  - 26 March 2017
               - Additional I2C methods

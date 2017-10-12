@@ -29,6 +29,8 @@ sub new {
   my ($class, %params) = @_;
   require Monitoring::GLPlugin
       if ! grep /BEGIN/, keys %Monitoring::GLPlugin::;
+  require Monitoring::GLPlugin::SNMP::SysDescPrettify
+      if ! grep /BEGIN/, keys %Monitoring::GLPlugin::SNMP::SysDescPrettify::;
   require Monitoring::GLPlugin::SNMP::MibsAndOids
       if ! grep /BEGIN/, keys %Monitoring::GLPlugin::SNMP::MibsAndOids::;
   require Monitoring::GLPlugin::SNMP::CSF
@@ -48,26 +50,54 @@ sub v2tov3 {
     my $separator = $1;
     my ($authprotocol, $authpassword, $privprotocol, $privpassword,
         $username, $contextengineid, $contextname) = split(/$separator/, $2);
-    $self->override_opt('authprotocol', $authprotocol) 
+    $self->override_opt('authprotocol', $authprotocol)
         if defined($authprotocol) && $authprotocol;
-    $self->override_opt('authpassword', $authpassword) 
+    $self->override_opt('authpassword', $authpassword)
         if defined($authpassword) && $authpassword;
-    $self->override_opt('privprotocol', $privprotocol) 
+    $self->override_opt('privprotocol', $privprotocol)
         if defined($privprotocol) && $privprotocol;
-    $self->override_opt('privpassword', $privpassword) 
+    $self->override_opt('privpassword', $privpassword)
         if defined($privpassword) && $privpassword;
     $self->override_opt('username', $username) 
         if defined($username) && $username;
-    $self->override_opt('contextengineid', $contextengineid) 
+    $self->override_opt('contextengineid', $contextengineid)
         if defined($contextengineid) && $contextengineid;
-    $self->override_opt('contextname', $contextname) 
+    $self->override_opt('contextname', $contextname)
         if defined($contextname) && $contextname;
+    $self->override_opt('community', undef) ;
     $self->override_opt('protocol', '3') ;
   }
   if (($self->opts->authpassword || $self->opts->authprotocol ||
       $self->opts->privpassword || $self->opts->privprotocol) && 
-      ! $self->opts->protocol eq '3') {
+      $self->opts->protocol ne '3') {
     $self->override_opt('protocol', '3') ;
+  }
+  if ($self->opts->community2 && $self->opts->community2 =~ /^snmpv3(.)(.+)/) {
+    my $separator = $1;
+    $self->create_opt('authprotocol2');
+    $self->create_opt('authpassword2');
+    $self->create_opt('privprotocol2');
+    $self->create_opt('privpassword2');
+    $self->create_opt('username2');
+    $self->create_opt('contextengineid2');
+    $self->create_opt('contextname2');
+    my ($authprotocol, $authpassword, $privprotocol, $privpassword,
+        $username, $contextengineid, $contextname) = split(/$separator/, $2);
+    $self->override_opt('authprotocol2', $authprotocol)
+        if defined($authprotocol) && $authprotocol;
+    $self->override_opt('authpassword2', $authpassword)
+        if defined($authpassword) && $authpassword;
+    $self->override_opt('privprotocol2', $privprotocol)
+        if defined($privprotocol) && $privprotocol;
+    $self->override_opt('privpassword2', $privpassword)
+        if defined($privpassword) && $privpassword;
+    $self->override_opt('username2', $username)
+        if defined($username) && $username;
+    $self->override_opt('contextengineid2', $contextengineid)
+        if defined($contextengineid) && $contextengineid;
+    $self->override_opt('contextname2', $contextname)
+        if defined($contextname) && $contextname;
+    $self->override_opt('community2', undef);
   }
 }
 
@@ -97,6 +127,12 @@ sub add_snmp_modes {
       spec => 'supportedmibs',
       alias => undef,
       help => 'Shows the names of the mibs which this devices has implemented (only lausser may run this command)',
+  );
+  $self->add_mode(
+      internal => 'device::supportedoids',
+      spec => 'supportedoids',
+      alias => undef,
+      help => 'Shows the names of the oids which this devices has implemented (only lausser may run this command)',
   );
 }
 
@@ -220,7 +256,7 @@ sub add_snmp_args {
 sub validate_args {
   my ($self) = @_;
   $self->SUPER::validate_args();
-  if ($self->opts->mode =~ /^walk/) {
+  if ($self->opts->mode =~ /^(bulk)*walk/) {
     if ($self->opts->snmpwalk && $self->opts->hostname) {
       if ($self->check_messages == CRITICAL) {
         # gemecker vom super-validierer, der sicherstellt, dass die datei
@@ -239,7 +275,7 @@ sub validate_args {
       $self->create_opt('snmpdump');
       $self->override_opt('snmpdump', $self->opts->snmpwalk);
       $self->override_opt('snmpwalk', undef);
-    } elsif (! $self->opts->snmpwalk && $self->opts->hostname && $self->opts->mode eq 'walk') {   
+    } elsif (! $self->opts->snmpwalk && $self->opts->hostname) {
       # snmp agent wird abgefragt, die ergebnisse landen in einem file, dessen name
       # nicht vorgegeben ist
       $self->create_opt('snmpdump');
@@ -257,7 +293,7 @@ sub validate_args {
 
 sub init {
   my ($self) = @_;
-  if ($self->mode =~ /device::walk/) {
+  if ($self->mode =~ /device::(bulk)*walk/) {
     my @trees = ();
     my $name = $Monitoring::GLPlugin::pluginname;
     $name =~ s/.*\///g;
@@ -342,6 +378,9 @@ sub init {
         value => $self->{uptime} / 60,
         places => 0,
     );
+    if ($self->opts->report ne 'short') {
+      $self->add_ok($self->pretty_sysdesc($self->{productname}));
+    }
     my ($code, $message) = $self->check_messages(join => ', ', join_all => ', ');
     $Monitoring::GLPlugin::plugin->nagios_exit($code, $message);
   } elsif ($self->mode =~ /device::supportedmibs/) {
@@ -777,6 +816,51 @@ sub init {
     $self->add_ok("have fun");
     my ($code, $message) = $self->check_messages(join => ', ', join_all => ', ');
     $Monitoring::GLPlugin::plugin->nagios_exit($code, $message);
+  } elsif ($self->mode =~ /device::supportedoids/) {
+    my $unknowns = {};
+    %{$unknowns} = %{$self->rawdata};
+    my $confirmed = {};
+    foreach my $mib (keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids}) {
+      foreach my $sym (keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}}) {
+        if (my $obj = $self->get_snmp_object($mib, $sym)) {
+          my $oid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$sym};
+          if (exists $unknowns->{$oid}) {
+            $confirmed->{$oid} = sprintf '%s::%s = %s', $mib, $sym, $obj;
+            delete $unknowns->{$oid};
+          } elsif (exists $unknowns->{$oid.'.0'}) {
+            $confirmed->{$oid.'.0'} = sprintf '%s::%s = %s', $mib, $sym, $obj;
+            delete $unknowns->{$oid.'.0'};
+          }
+        }
+        if ($sym =~ /Table$/) {
+          if (my @table = $self->get_snmp_table_objects($mib, $sym)) {
+            my $oid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$sym};
+            $confirmed->{$oid} = sprintf '%s::%s', $mib, $sym;
+            $self->add_rawdata($oid, '--------------------');
+            foreach my $line (@table) {
+              if ($line->{flat_indices}) {
+                foreach my $column (grep !/(flat_indices)|(indices)/, keys %{$line}) {
+                  my $oid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$column};
+                  if (exists $unknowns->{$oid.'.'.$line->{flat_indices}}) {
+                    $confirmed->{$oid.'.'.$line->{flat_indices}} = 
+                        sprintf '%s::%s.%s = %s', $mib, $column, $line->{flat_indices}, $line->{$column};
+                    delete $unknowns->{$oid.'.'.$line->{flat_indices}};
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    my @sortedoids = $self->sort_oids([keys %{$self->rawdata}]);
+    foreach (@sortedoids) {
+      if (exists $confirmed->{$_}) {
+        printf "%s\n", $confirmed->{$_};
+      } else {
+        printf "%s = %s\n", $_, $unknowns->{$_};
+      }
+    }
   }
 }
 
@@ -863,17 +947,56 @@ sub check_snmp_and_model {
   }
   if (! $self->check_messages()) {
     my $tic = time;
+    # Datatype TimeTicks = 1/100s
     my $sysUptime = $self->get_snmp_object('MIB-2-MIB', 'sysUpTime', 0);
+    # Datatype Integer32 = 1s
     my $snmpEngineTime = $self->get_snmp_object('SNMP-FRAMEWORK-MIB', 'snmpEngineTime');
+    # Datatype TimeTicks = 1/100s
+    my $hrSystemUptime = $self->get_snmp_object('HOST-RESOURCES-MIB', 'hrSystemUptime');
     my $sysDescr = $self->get_snmp_object('MIB-2-MIB', 'sysDescr', 0);
     my $tac = time;
-    if (defined $sysUptime && defined $sysDescr) {
+    if (defined $hrSystemUptime && $hrSystemUptime =~ /^\d+$/ && $hrSystemUptime > 0) {
+      $hrSystemUptime = $self->timeticks($hrSystemUptime);
+      $self->debug(sprintf 'hrSystemUptime says: up since: %s / %s',
+          scalar localtime (time -  $hrSystemUptime),
+          $self->human_timeticks($hrSystemUptime));
+    } else {
+      $hrSystemUptime = undef;
+    }
+    if (defined $snmpEngineTime && $snmpEngineTime =~ /^\d+$/ && $snmpEngineTime > 0) {
+      $snmpEngineTime = $snmpEngineTime;
+      $self->debug(sprintf 'snmpEngineTime says: up since: %s / %s',
+          scalar localtime (time - $snmpEngineTime),
+          $self->human_timeticks($snmpEngineTime));
+    } else {
       # drecksschrott asa liefert negative werte
       # und drecksschrott socomec liefert: wrong type (should be INTEGER): NULL
-      if (defined $snmpEngineTime && $snmpEngineTime =~ /^\d+$/ && $snmpEngineTime > 0) {
+      $snmpEngineTime = undef;
+    }
+    if (defined $sysUptime) {
+      $sysUptime = $self->timeticks($sysUptime);
+      $self->debug(sprintf 'sysUptime says:      up since: %s / %s',
+          scalar localtime (time - $sysUptime),
+          $self->human_timeticks($sysUptime));
+    }
+    if (defined $sysUptime && defined $sysDescr) {
+      if ($hrSystemUptime) {
+        # Bei Linux-basierten Geraeten wird snmpEngineTime viel zu haeufig
+        # durchgestartet, also lieber das hier.
+        $self->{uptime} = $hrSystemUptime;
+        # Es sei denn, snmpEngineTime ist tatsaechlich groesser, dann gilt
+        # wiederum dieses. Mag sein, dass der zahlenwert hier manchmal huepft
+        # und ein Performancegraph Zacken bekommt, aber das ist mir egal.
+        # es geht nicht um Graphen in Form einer ansteigenden Geraden, sondern
+        # um das Erkennen von spontanen Reboots und das Vermeiden von
+        # falschen Alarmen.
+        if ($snmpEngineTime && $snmpEngineTime > $hrSystemUptime) {
+          $self->{uptime} = $snmpEngineTime;
+        }
+      } elsif ($snmpEngineTime) {
         $self->{uptime} = $snmpEngineTime;
       } else {
-        $self->{uptime} = $self->timeticks($sysUptime);
+        $self->{uptime} = $sysUptime;
       }
       $self->{productname} = $sysDescr;
       $self->{sysobjectid} = $self->get_snmp_object('MIB-2-MIB', 'sysObjectID', 0);
@@ -893,6 +1016,21 @@ sub check_snmp_and_model {
       $Monitoring::GLPlugin::SNMP::session->close if $Monitoring::GLPlugin::SNMP::session;
     }
   }
+}
+
+sub pretty_sysdesc {
+  my ($self, $sysDesc) = @_;
+  foreach my $vendor (
+      keys %{$Monitoring::GLPlugin::SNMP::SysDescPrettify::vendor_rules}) {
+    if ($sysDesc =~ /$Monitoring::GLPlugin::SNMP::SysDescPrettify::vendor_rules->{$vendor}->{vendor_pattern}/) {
+      foreach my $func (@{$Monitoring::GLPlugin::SNMP::SysDescPrettify::vendor_rules->{$vendor}->{prettifier_funcs}}) {
+        if (my $pretty = $func->($sysDesc, $self->session())) {
+          return $pretty;
+        }
+      }
+    }
+  }
+  return $sysDesc;
 }
 
 sub establish_snmp_session {
@@ -953,7 +1091,8 @@ sub establish_snmp_session {
       $self->debug(Data::Dumper::Dumper(\%params));
     } else {
       my $max_msg_size = $session->max_msg_size();
-      $session->max_msg_size(4 * $max_msg_size);
+      #$session->max_msg_size(4 * $max_msg_size);
+      $Monitoring::GLPlugin::SNMP::max_msg_size = $max_msg_size;
       $Monitoring::GLPlugin::SNMP::session = $session;
     }
   } else {
@@ -970,23 +1109,71 @@ sub session_translate {
 
 sub establish_snmp_secondary_session {
   my ($self) = @_;
-  if ($self->opts->protocol eq '3') {
+  if ($self->opts->protocol eq '3' && (
+      defined $self->opts->authprotocol2 ||
+      defined $self->opts->authpassword2 ||
+      defined $self->opts->privprotocol2 ||
+      defined $self->opts->privpassword2 ||
+      defined $self->opts->username2 ||
+      defined $self->opts->contextengineid2 ||
+      defined $self->opts->contextname2
+  )) {
+    my $relogin = 0;
+    # bei --community2="snmpv3,..." wurde alles in xyz2 per override gesteckt
+    $relogin = 1 if ! $self->strequal($self->opts->authprotocol,
+        $self->opts->authprotocol2);
+    $relogin = 1 if ! $self->strequal($self->opts->authpassword,
+        $self->opts->authpassword2);
+    $relogin = 1 if ! $self->strequal($self->opts->privprotocol,
+        $self->opts->privprotocol2);
+    $relogin = 1 if ! $self->strequal($self->opts->privpassword,
+        $self->opts->privpassword2);
+    $relogin = 1 if ! $self->strequal($self->opts->username,
+        $self->opts->username2);
+    if ($relogin) {
+      $Monitoring::GLPlugin::SNMP::session = undef;
+      $self->opts->override_opt('authprotocol',
+          $self->decode_password($self->opts->authprotocol2));
+      $self->opts->override_opt('authpassword',
+          $self->decode_password($self->opts->authpassword2));
+      $self->opts->override_opt('privprotocol',
+          $self->decode_password($self->opts->privprotocol2));
+      $self->opts->override_opt('privpassword',
+          $self->decode_password($self->opts->privpassword2));
+      $self->opts->override_opt('username',
+          $self->decode_password($self->opts->username2));
+      $self->establish_snmp_session;
+    }
+    $self->opts->override_opt('contextengineid',
+        $self->decode_password($self->opts->contextengineid2));
+    $self->opts->override_opt('contextname',
+        $self->decode_password($self->opts->contextname2));
+    return 1;
   } else {
     if (defined $self->opts->community2 &&
         $self->decode_password($self->opts->community2) ne
         $self->decode_password($self->opts->community)) {
       $Monitoring::GLPlugin::SNMP::session = undef;
       $self->opts->override_opt('community',
-        $self->decode_password($self->opts->community2)) ;
+          $self->decode_password($self->opts->community2)) ;
       $self->establish_snmp_session;
+      return 1;
     }
   }
+  return 0;
+}
+
+sub reset_snmp_max_msg_size {
+  my ($self) = @_;
+  $self->debug(sprintf "reset snmp_max_msg_size to %s",
+      $Monitoring::GLPlugin::SNMP::max_msg_size);
+  $Monitoring::GLPlugin::SNMP::session->max_msg_size($Monitoring::GLPlugin::SNMP::max_msg_size) if $Monitoring::GLPlugin::SNMP::session;
 }
 
 sub mult_snmp_max_msg_size {
   my ($self, $factor) = @_;
   $factor ||= 10;
-  $self->debug(sprintf "raise maxmsgsize %d * %d", 
+  $self->debug(sprintf "raise snmp_max_msg_size %d * %d", 
       $factor, $Monitoring::GLPlugin::SNMP::session->max_msg_size()) if $Monitoring::GLPlugin::SNMP::session;
   $Monitoring::GLPlugin::SNMP::session->max_msg_size($factor * $Monitoring::GLPlugin::SNMP::session->max_msg_size()) if $Monitoring::GLPlugin::SNMP::session;
 }
@@ -1222,45 +1409,68 @@ sub create_interface_cache_file {
 }
 
 sub create_entry_cache_file {
-  my ($self, $mib, $table, $key_attr) = @_;
+  my ($self, $mib, $table, $key_attr_id) = @_;
   return lc sprintf "%s_%s_%s_%s_cache",
       $self->create_interface_cache_file(),
-      $mib, $table, join('#', @{$key_attr});
+      $mib, $table, $key_attr_id;
 }
 
 sub update_entry_cache {
-  my ($self, $force, $mib, $table, $key_attr) = @_;
-  if (ref($key_attr) ne "ARRAY") {
-    $key_attr = [$key_attr];
+  my ($self, $force, $mib, $table, $key_attrs) = @_;
+  my $update_deadline = time - 3600;
+  my $must_update = 0;
+  if (ref($key_attrs) ne "ARRAY") {
+    if ($key_attrs eq 'flat_indices') {
+      # wird nur 1x verwendet bisher, bei OLD-CISCO-INTERFACES-MIB etherstats
+      #my $entry = $table =~ s/Table/Entry/gr; # zu neu fuer centos6
+      my $entry = $table;
+      $entry =~ s/Table/Entry/g;
+      my @sortednames = map {
+          $_->[0]
+      } sort {
+          $a->[1] cmp $b->[1]
+      } map {
+          [$_, join '', map {
+              sprintf("%30d", $_)
+          } split( /\./, $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_})];
+      } grep {
+          $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_} =~ /^$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}\./;
+      } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
+      $key_attrs = $sortednames[0];
+    }
+    $key_attrs = [$key_attrs];
   }
-  my $cache = sprintf "%s_%s_%s_cache", 
-      $mib, $table, join('#', @{$key_attr});
-  my $statefile = $self->create_entry_cache_file($mib, $table, $key_attr);
-  my $update = time - 3600;
-  #my $update = time - 1;
-  if ($force || ! -f $statefile || ((stat $statefile)[9]) < ($update)) {
+  my $key_attr_id = join('#', @{$key_attrs});
+  my $cache = sprintf "%s_%s_%s_cache", $mib, $table, $key_attr_id;
+  my $statefile = $self->create_entry_cache_file($mib, $table, $key_attr_id);
+  if ($force == -1 && -f $statefile) {
+    $must_update = 1;
+    # brauchts unter keinen umstaenden.
+    # z.b. wenn ein vorhergehender update_interfaces_cache keine aenderungen
+    # angezeigt hat, dann spart man sich hier den etherlike-update o.ae.
+    $self->debug(sprintf 'skip update of %s %s %s %s cache',
+        $self->opts->hostname, $self->opts->mode, $mib, $table);
+  } elsif ($force != 0 || ! -f $statefile || ((stat $statefile)[9]) < ($update_deadline)) {
+    $must_update = 1;
     $self->debug(sprintf 'force update of %s %s %s %s cache',
         $self->opts->hostname, $self->opts->mode, $mib, $table);
     $self->{$cache} = {};
-    foreach my $entry ($self->get_snmp_table_objects($mib, $table)) {
-      my $key = join('#', map { $entry->{$_} } @{$key_attr});
+    foreach my $entry ($self->get_snmp_table_objects($mib, $table, undef, $key_attrs)) {
+      my $key = join('#', map { $entry->{$_} } @{$key_attrs});
       my $hash = $key . '-//-' . join('.', @{$entry->{indices}});
       $self->{$cache}->{$hash} = $entry->{indices};
     }
-    $self->save_cache($mib, $table, $key_attr);
+    $self->save_cache($mib, $table, $key_attrs);
   }
-  $self->load_cache($mib, $table, $key_attr);
+  $self->load_cache($mib, $table, $key_attrs);
+  return $must_update;
 }
 
 sub save_cache {
-  my ($self, $mib, $table, $key_attr) = @_;
-  if (ref($key_attr) ne "ARRAY") {
-    $key_attr = [$key_attr];
-  }
-  my $cache = sprintf "%s_%s_%s_cache", 
-      $mib, $table, join('#', @{$key_attr});
+  my ($self, $mib, $table, $key_attrs) = @_;
+  my $cache = sprintf "%s_%s_%s_cache", $mib, $table, join('#', @{$key_attrs});
   $self->create_statefilesdir();
-  my $statefile = $self->create_entry_cache_file($mib, $table, $key_attr);
+  my $statefile = $self->create_entry_cache_file($mib, $table, join('#', @{$key_attrs}));
   open(STATE, ">".$statefile.".".$$);
   printf STATE Data::Dumper::Dumper($self->{$cache});
   close STATE;
@@ -1270,13 +1480,9 @@ sub save_cache {
 }
 
 sub load_cache {
-  my ($self, $mib, $table, $key_attr) = @_;
-  if (ref($key_attr) ne "ARRAY") {
-    $key_attr = [$key_attr];
-  }
-  my $cache = sprintf "%s_%s_%s_cache", 
-      $mib, $table, join('#', @{$key_attr});
-  my $statefile = $self->create_entry_cache_file($mib, $table, $key_attr);
+  my ($self, $mib, $table, $key_attrs) = @_;
+  my $cache = sprintf "%s_%s_%s_cache", $mib, $table, join('#', @{$key_attrs});
+  my $statefile = $self->create_entry_cache_file($mib, $table, join('#', @{$key_attrs}));
   $self->{$cache} = {};
   if ( -f $statefile) {
     our $VAR1;
@@ -1435,12 +1641,12 @@ sub get_snmp_object {
 }
 
 sub get_snmp_table_objects_with_cache {
-  my ($self, $mib, $table, $key_attr) = @_;
-  #return $self->get_snmp_table_objects($mib, $table);
-  $self->update_entry_cache(0, $mib, $table, $key_attr);
+  my ($self, $mib, $table, $key_attr, $rows, $force) = @_;
+  $force ||= 0;
+  $self->update_entry_cache($force, $mib, $table, $key_attr);
   my @indices = $self->get_cache_indices($mib, $table, $key_attr);
   my @entries = ();
-  foreach ($self->get_snmp_table_objects($mib, $table, \@indices)) {
+  foreach ($self->get_snmp_table_objects($mib, $table, \@indices, $rows)) {
     push(@entries, $_);
   }
   return @entries;
@@ -1454,15 +1660,16 @@ sub get_table_row_oids {
   my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
   my $eoidlen = length($eoid);
   my @columns = scalar(@{$rows}) ?
-  map {
+  grep {
+      substr($_, 0, $eoidlen) eq $eoid
+  } map {
       $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
   } @{$rows}
   :
-  map {
+  grep {
+      substr($_, 0, $eoidlen) eq $eoid
+  } map {
       $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-  } grep {
-    substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq
-        $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.'
   } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
   return @columns;
 }
@@ -1483,186 +1690,142 @@ sub get_snmp_table_objects {
   }
   my $entry = $table;
   $entry =~ s/Table/Entry/g;
-  if (exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib} &&
-      exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$table}) {
-    if (scalar(@{$indices}) == 1 && $indices->[0] == -1) {
-      # get mini-version of a table
-      my $result = {};
-      my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-      my $eoidlen = length($eoid);
-      my @columns = map {
-          $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-      } grep {
-        substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq
-            $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.'
-      } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-      my $ifresult = $self->get_entries(
-          -columns => \@columns,
+  if (! exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib} ||
+      ! exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$table}) {
+    return @entries;
+  }
+  if (! exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}) {
+    $self->debug(sprintf "table %s::%s has no entry oid", $mib, $table);
+    return @entries;
+  }
+  my @columns = $self->get_table_row_oids($mib, $table, $rows);
+  my @augmenting_columns = ();
+  if($augmenting_table) {
+    @augmenting_columns = $self->get_table_row_oids($mib, $augmenting_table, $rows);
+  }
+  if (scalar(@{$indices}) == 1 && $indices->[0] == -1) {
+    # get mini-version of a table
+    my $result = $self->get_entries(
+        -columns => \@columns,
+    );
+    if ($augmenting_table) {
+      my $augmenting_result = $self->get_entries(
+          -columns => \@augmenting_columns,
       );
-      map { $result->{$_} = $ifresult->{$_} }
-          keys %{$ifresult};
-      if ($augmenting_table &&
-          exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$augmenting_table}) {
-        my $entry = $augmenting_table;
-        $entry =~ s/Table/Entry/g;
-        my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-        my $eoidlen = length($eoid);
-        my @columns = map {
-            $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-        } grep {
-          substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq $eoid
-        } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-        my $ifresult = $self->get_entries(
-            -columns => \@columns,
-        );
-        map { $result->{$_} = $ifresult->{$_} }
-            keys %{$ifresult};
-      }
-      my @indices = 
-          $self->get_indices(
-              -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
-              -oids => [keys %{$result}]);
-      $self->debug(sprintf "get_snmp_table_objects get_table returns %d indices",
-          scalar(@indices));
-      @entries = $self->make_symbolic($mib, $result, \@indices);
-      @entries = map { $_->{indices} = shift @indices; $_ } @entries;
-    } elsif (scalar(@{$indices}) == 1) {
-      my $result = {};
-      my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-      my $eoidlen = length($eoid);
-      my @columns = map {
-          $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-      } grep {
-        substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq
-            $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.'
-      } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-      my $index = join('.', @{$indices->[0]});
-      my $ifresult = $self->get_entries(
+      map { $result->{$_} = $augmenting_result->{$_} }
+          keys %{$augmenting_result};
+    }
+    my @indices = 
+        $self->get_indices(
+            -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
+            -oids => [keys %{$result}]);
+    @entries = $self->make_symbolic($mib, $result, \@indices);
+    @entries = map { $_->{indices} = shift @indices; $_ } @entries;
+    $self->debug(sprintf "get_snmp_table_objects mini returns %d entries",
+        scalar(@entries));
+  } elsif (scalar(@{$indices}) == 1) {
+    my $index = join('.', @{$indices->[0]});
+    my $result = $self->get_entries(
+        -startindex => $index,
+        -endindex => $index,
+        -columns => \@columns,
+    );
+    if ($augmenting_table) {
+      my $augmenting_result = $self->get_entries(
           -startindex => $index,
           -endindex => $index,
-          -columns => \@columns,
+          -columns => \@augmenting_columns,
       );
-      map { $result->{$_} = $ifresult->{$_} }
-          keys %{$ifresult};
-      if ($augmenting_table &&
-          exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$augmenting_table}) {
-        my $entry = $augmenting_table;
-        $entry =~ s/Table/Entry/g;
-        my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-        my $eoidlen = length($eoid);
-        my @columns = map {
-            $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-        } grep {
-          substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq $eoid
-        } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-        my $ifresult = $self->get_entries(
-            -startindex => $index,
-            -endindex => $index,
-            -columns => \@columns,
-        );
-        map { $result->{$_} = $ifresult->{$_} }
-            keys %{$ifresult};
-      }
-      @entries = $self->make_symbolic($mib, $result, $indices);
-      @entries = map { $_->{indices} = shift @{$indices}; $_ } @entries;
-    } elsif (scalar(@{$indices}) > 1) {
-    # man koennte hier pruefen, ob die indices aufeinanderfolgen
-    # und dann get_entries statt get_table aufrufen
-      my $result = {};
-      my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-      my $eoidlen = length($eoid);
-      my @columns = map {
-          $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-      } grep {
-        substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq $eoid
-      } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-      my @sortedindices = map { $_->[0] }
-          sort { $a->[1] cmp $b->[1] }
-              map { [$_,
-                  join '', map { sprintf("%30d",$_) } split( /\./, $_)
-              ] } map { join('.', @{$_})} @{$indices};
-      my $startindex = $sortedindices[0];
-      my $endindex = $sortedindices[$#sortedindices];
-      if (0) {
-        # holzweg. dicke ciscos liefern unvollstaendiges resultat, d.h.
-        # bei 138,19,157 kommt nur 138..144, dann ist schluss.
-        # maxrepetitions bringt nichts.
-        $result = $self->get_entries(
-            -startindex => $startindex,
-            -endindex => $endindex,
-            -columns => \@columns,
-        );
-      } else {
-        foreach my $ifidx (@sortedindices) {
-          my $ifresult = $self->get_entries(
-              -startindex => $ifidx,
-              -endindex => $ifidx,
-              -columns => \@columns,
-          );
-          map { $result->{$_} = $ifresult->{$_} }
-              keys %{$ifresult};
-        }
-      }
-      if ($augmenting_table &&
-          exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$augmenting_table}) {
-        my $entry = $augmenting_table;
-        $entry =~ s/Table/Entry/g;
-        my $eoid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry}.'.';
-        my $eoidlen = length($eoid);
-        my @columns = map {
-            $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}
-        } grep {
-          substr($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$_}, 0, $eoidlen) eq $eoid
-        } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}};
-        foreach my $ifidx (@sortedindices) {
-          my $ifresult = $self->get_entries(
-              -startindex => $ifidx,
-              -endindex => $ifidx,
-              -columns => \@columns,
-          );
-          map { $result->{$_} = $ifresult->{$_} }
-              keys %{$ifresult};
-        }
-      }
-      # now we have numerical_oid+index => value
-      # needs to become symboic_oid => value
-      #my @indices =
-      # $self->get_indices($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry});
-      @entries = $self->make_symbolic($mib, $result, $indices);
-      @entries = map { $_->{indices} = shift @{$indices}; $_ } @entries;
-    } elsif (scalar(@{$rows})) {
-      my @columns = $self->get_table_row_oids($mib, $table, $rows);
-      my $result = $self->get_entries(
-          -columns => \@columns,
-      );
-      $self->debug(sprintf "get_snmp_table_objects get_table_r returns %d oids",
-          scalar(keys %{$result}));
-      my @indices =
-          $self->get_indices(
-              -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
-              -oids => [keys %{$result}]);
-      $self->debug(sprintf "get_snmp_table_objects get_table_r returns %d indices",
-          scalar(@indices));
-      @entries = $self->make_symbolic($mib, $result, \@indices);
-      @entries = map { $_->{indices} = shift @indices; $_ } @entries;
-    } else {
-      $self->debug(sprintf "get_snmp_table_objects calls get_table %s",
-          $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$table});
-      my $result = $self->get_table(
-          -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$table});
-      $self->debug(sprintf "get_snmp_table_objects get_table returns %d oids",
-          scalar(keys %{$result}));
-      # now we have numerical_oid+index => value
-      # needs to become symboic_oid => value
-      my @indices = 
-          $self->get_indices(
-              -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
-              -oids => [keys %{$result}]);
-      $self->debug(sprintf "get_snmp_table_objects get_table returns %d indices",
-          scalar(@indices));
-      @entries = $self->make_symbolic($mib, $result, \@indices);
-      @entries = map { $_->{indices} = shift @indices; $_ } @entries;
+      map { $result->{$_} = $augmenting_result->{$_} }
+          keys %{$augmenting_result};
     }
+    @entries = $self->make_symbolic($mib, $result, $indices);
+    @entries = map { $_->{indices} = shift @{$indices}; $_ } @entries;
+    $self->debug(sprintf "get_snmp_table_objects single returns %d entries",
+        scalar(@entries));
+  } elsif (scalar(@{$indices}) > 1) {
+    my $result = {};
+    my @sortedindices = $self->sort_indices($indices);
+    my $startindex = $sortedindices[0];
+    my $endindex = $sortedindices[$#sortedindices];
+    if (0) {
+      # holzweg. dicke ciscos liefern unvollstaendiges resultat, d.h.
+      # bei 138,19,157 kommt nur 138..144, dann ist schluss.
+      # maxrepetitions bringt nichts.
+      $result = $self->get_entries(
+          -startindex => $startindex,
+          -endindex => $endindex,
+          -columns => \@columns,
+      );
+    } else {
+      foreach my $idx (@sortedindices) {
+        my $tmp_result = $self->get_entries(
+            -startindex => $idx,
+            -endindex => $idx,
+            -columns => \@columns,
+        );
+        map { $result->{$_} = $tmp_result->{$_} }
+            keys %{$tmp_result};
+      }
+    }
+    if ($augmenting_table) {
+      foreach my $idx (@sortedindices) {
+        my $tmp_result = $self->get_entries(
+            -startindex => $idx,
+            -endindex => $idx,
+            -columns => \@augmenting_columns,
+        );
+        map { $result->{$_} = $tmp_result->{$_} }
+            keys %{$tmp_result};
+      }
+    }
+    # now we have numerical_oid+index => value
+    # needs to become symboic_oid => value
+    #my @indices =
+    # $self->get_indices($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry});
+    @entries = $self->make_symbolic($mib, $result, $indices);
+    @entries = map { $_->{indices} = shift @{$indices}; $_ } @entries;
+    $self->debug(sprintf "get_snmp_table_objects single returns %d entries",
+        scalar(@entries));
+  } elsif (scalar(@{$rows})) {
+    my $result = $self->get_entries(
+        -columns => \@columns,
+    );
+    if ($augmenting_table) {
+      my $augmenting_result = $self->get_entries(
+          -columns => \@augmenting_columns,
+      );
+      map { $result->{$_} = $augmenting_result->{$_} }
+          keys %{$augmenting_result};
+    }
+    my @indices =
+        $self->get_indices(
+            -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
+            -oids => [keys %{$result}]);
+    @entries = $self->make_symbolic($mib, $result, \@indices);
+    @entries = map { $_->{indices} = shift @indices; $_ } @entries;
+    $self->debug(sprintf "get_snmp_table_objects rows returns %d entries",
+        scalar(@entries));
+  } else {
+    my $result = $self->get_table(
+        -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$table});
+    if ($augmenting_table) {
+      my $augmenting_result = $self->get_entries(
+          -columns => \@augmenting_columns,
+      );
+      map { $result->{$_} = $augmenting_result->{$_} }
+          keys %{$augmenting_result};
+    }
+    # now we have numerical_oid+index => value
+    # needs to become symboic_oid => value
+    my @indices = 
+        $self->get_indices(
+            -baseoid => $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$entry},
+            -oids => [keys %{$result}]);
+    @entries = $self->make_symbolic($mib, $result, \@indices);
+    @entries = map { $_->{indices} = shift @indices; $_ } @entries;
+    $self->debug(sprintf "get_snmp_table_objects default returns %d entries",
+        scalar(@entries));
   }
   @entries = map { $_->{flat_indices} = join(".", @{$_->{indices}}); $_ } @entries;
   return @entries;
@@ -1816,7 +1979,13 @@ sub get_entries_get_simple {
       $singleparams{'-varbindlist'} = [$oid.".".$index];
       my $singleresult = $Monitoring::GLPlugin::SNMP::session->get_request(%singleparams);
       foreach my $key (keys %{$singleresult}) {
-        $result->{$key} = $singleresult->{$key};
+        if ($singleresult->{$key} eq "noSuchObject" ||
+            $singleresult->{$key} eq "noSuchInstance" ||
+            $singleresult->{$key} eq "endOfMibView") {
+          $result->{$key} = undef;
+        } else {
+          $result->{$key} = $singleresult->{$key};
+        }
       }
     }
   }
@@ -1828,19 +1997,35 @@ sub get_entries {
   # [-startindex]
   # [-endindex]
   # -columns
+  $params{'-columns'} = [$self->sort_oids($params{'-columns'})];
   my $result = {};
   $self->debug(sprintf "get_entries %s", Data::Dumper::Dumper(\%params));
   if (! $self->opts->snmpwalk) {
-    $result = $self->get_entries_get_bulk(%params);
-    if (! $result) {
-      if (scalar (@{$params{'-columns'}}) < 50 && $params{'-endindex'} && $params{'-startindex'} eq $params{'-endindex'}) {
-        $result = $self->get_entries_get_simple(%params);
-      } else {
-        $result = $self->get_entries_get_next(%params);
+    if (scalar (@{$params{'-columns'}}) < 5 && $params{'-endindex'} && $params{'-startindex'} eq $params{'-endindex'}) {
+      $result = $self->get_entries_get_simple(%params);
+    } else {
+      $result = $self->get_entries_get_bulk(%params);
+      if (! $result) {
+        $self->debug("bulk failed, retry simple");
+        if ($Monitoring::GLPlugin::SNMP::session->error() =~ /The message size exceeded the buffer maxMsgSize of (\d+)/i) {
+          $self->debug(sprintf "buffer exceeded. raise *5 for next try");
+          $self->mult_snmp_max_msg_size(5);
+        } else {
+          $self->debug($Monitoring::GLPlugin::SNMP::session->error());
+        }
+        if (defined $params{'-endindex'} && defined $params{'-startindex'}) {
+          $result = $self->get_entries_get_simple(%params);
+        } else {
+          $result = $self->get_entries_get_next(%params);
+        }
       }
+    }
+    if (! $result) {
+      $result = $self->get_entries_get_next(%params);
       if (! $result && defined $params{'-startindex'} && $params{'-startindex'} !~ /\./) {
         # compound indexes cannot continue, as these two methods iterate numerically
         if ($Monitoring::GLPlugin::SNMP::session->error() =~ /tooBig/i) {
+          $self->debug(sprintf "answer too big");
           $result = $self->get_entries_get_next_1index(%params);
         }
         if (! $result) {
@@ -1888,11 +2073,7 @@ sub get_entries {
     foreach (keys %{$preresult}) {
       $result->{$_} = $preresult->{$_};
     }
-    my @sortedkeys = map { $_->[0] }
-        sort { $a->[1] cmp $b->[1] }
-            map { [$_,
-                    join '', map { sprintf("%30d",$_) } split( /\./, $_)
-                  ] } keys %{$result};
+    my @sortedkeys = $self->sort_oids([keys %{$result}]);
     my @to_del = ();
     if ($params{'-startindex'}) {
       foreach my $resoid (@sortedkeys) {
@@ -1990,15 +2171,35 @@ sub get_table {
     if (scalar(keys %{$result}) == 0) {
       $self->debug(sprintf "get_table error: %s", 
           $Monitoring::GLPlugin::SNMP::session->error());
+      if ($Monitoring::GLPlugin::SNMP::session->error() =~ /The message size exceeded the buffer maxMsgSize of (\d+)/i) {
+        # bei irrsinnigen maxrepetitions
+        $self->debug(sprintf "buffer exceeded");
+        #$self->reset_snmp_max_msg_size();
+        if ($params{'-maxrepetitions'}) {
+          $params{'-maxrepetitions'} = int($params{'-maxrepetitions'} / 2);
+          $self->debug(sprintf "reduce maxrepetitions to %d",
+              $params{'-maxrepetitions'});
+        } else {
+          $self->mult_snmp_max_msg_size(2);
+        }
+      }
       $self->debug("get_table error: try fallback");
-      $params{'-maxrepetitions'} = 1;
       $self->debug(sprintf "get_table %s", Data::Dumper::Dumper(\%params));
       $result = $Monitoring::GLPlugin::SNMP::session->get_table(%params);
       $self->debug(sprintf "get_table returned %d oids", scalar(keys %{$result}));
       if (scalar(keys %{$result}) == 0) {
         $self->debug(sprintf "get_table error: %s", 
             $Monitoring::GLPlugin::SNMP::session->error());
-        $self->debug("get_table error: no more fallbacks. Try --protocol 1");
+        if (exists $params{'-maxrepetitions'} && $params{'-maxrepetitions'} > 1) {
+          $params{'-maxrepetitions'} = 1;
+          $self->debug("get_table error: try getnext fallback");
+          $self->debug(sprintf "get_table %s", Data::Dumper::Dumper(\%params));
+          $result = $Monitoring::GLPlugin::SNMP::session->get_table(%params);
+          $self->debug(sprintf "get_table returned %d oids", scalar(keys %{$result}));
+        }
+        if (scalar(keys %{$result}) == 0) {
+          $self->debug("get_table error: no more fallbacks. Try --protocol 1");
+        }
       }
     }
     # Drecksstinkstiefel Net::SNMP
@@ -2026,12 +2227,12 @@ sub get_table {
 # helper functions
 # 
 sub valid_response {
-  my ($self, $mib, $oid, $index) = @_;
+  my ($self, $mib, $mo, $index) = @_;
   $self->require_mib($mib);
   if (exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib} &&
-      exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$oid}) {
+      exists $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$mo}) {
     # make it numerical
-    my $oid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$oid};
+    my $oid = $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$mo};
     if (defined $index) {
       $oid .= '.'.$index;
     }
@@ -2043,14 +2244,35 @@ sub valid_response {
         $result->{$oid} eq 'noSuchInstance' ||
         $result->{$oid} eq 'noSuchObject' ||
         $result->{$oid} eq 'endOfMibView') {
+      $self->debug(sprintf "GET: %s::%s (%s) : %s", $mib, $mo, $oid, defined $result->{$oid} ? $result->{$oid} : "<undef>");
       return undef;
     } else {
+      $self->debug(sprintf "GET: %s::%s (%s) : %s", $mib, $mo, $oid, defined $result->{$oid} ? $result->{$oid} : "<undef>");
       $self->add_rawdata($oid, $result->{$oid});
       return $result->{$oid};
     }
   } else {
     return undef;
   }
+}
+
+sub get_symbol {
+  my ($self, $mib, $oid) = @_;
+  # "LIEBERT-GP-ENVIRONMENTAL-MIB", "1.3.6.1.4.1.476.1.42.3.4.1.1.4"
+  # dahinter steckt
+  # lgpEnvSupplyAirTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.3'
+  # lgpAmbientTemperature => '1.3.6.1.4.1.476.1.42.3.4.1.1.4'
+  # und als info vom geraet
+  # LgpEnvTemperatureMeasurementDegC = '1.3.6.1.4.1.476.1.42.3.4.1.1.4'
+  # der name des temp. sensor wird ueber die oid mitgeteilt
+  $self->require_mib($mib);
+  foreach my $symoid
+      (keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}}) {
+    if ($oid eq $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$symoid}) {
+      return $symoid;
+    }
+  }
+  return undef;
 }
 
 # make_symbolic
@@ -2093,6 +2315,11 @@ sub make_symbolic {
               }
             } elsif ($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$symoid.'Definition'} =~ /^OID::(.*)/) {
               my $othermib = $1;
+              if (! exists $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{$othermib}) {
+                # may point to another mib's definitions, which hasn't 
+                # been used yet.
+                $self->require_mib($othermib);
+              }
               my $value_which_is_a_oid = $result->{$fulloid};
               $value_which_is_a_oid =~ s/^\.//g;
               my @result = grep { $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$othermib}->{$_} eq $value_which_is_a_oid } keys %{$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$othermib}};
@@ -2104,6 +2331,11 @@ sub make_symbolic {
             } elsif ($Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{$mib}->{$symoid.'Definition'} =~ /^(.*?)::(.*)/) {
               my $mib = $1;
               my $definition = $2;
+              if (! exists $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{$mib}) {
+                # may point to another mib's definitions, which hasn't 
+                # been used yet.
+                $self->require_mib($mib);
+              }
               if  (exists $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{$mib} &&
                   exists $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{$mib}->{$definition} &&
                   ref($Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{$mib}->{$definition}) eq 'CODE') {
@@ -2187,6 +2419,17 @@ sub sort_oids {
                 ] } @{$oids};
   return @sortedkeys;
 }
+
+sub sort_indices {
+  my ($self, $indices) = @_;
+  my @sortedindices = map { $_->[0] } 
+      sort { $a->[1] cmp $b->[1] } 
+          map { [$_, 
+              join '', map { sprintf("%30d",$_) } split( /\./, $_) 
+          ] } map { join('.', @{$_})} @{$indices}; 
+  return @sortedindices;
+}
+
 
 sub get_matching_oids {
   my ($self, %params) = @_;
@@ -2291,6 +2534,12 @@ sub add_oidtrace {
 #  my @indices = $self->get_cache_indices();
 sub get_cache_indices {
   my ($self, $mib, $table, $key_attr) = @_;
+  # get_cache_indices is only used by get_snmp_table_objects_with_cache
+  # so if we dont use --name returning all the indices would result
+  # in a step-by-step get_table_objecs(index 1...n) which could take long
+  # time when used with nexus or f5 pools
+  # returning () forces get_snmp_table_objects to use get_tables
+  return () if ! $self->opts->name;
   if (ref($key_attr) ne "ARRAY") {
     $key_attr = [$key_attr];
   }

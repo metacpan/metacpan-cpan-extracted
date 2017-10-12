@@ -1,5 +1,7 @@
 #!perl
 
 use Datahub::Factory::CLI;
+use Cwd ();
 
-Datahub::Factory::CLI->run;
+Datahub::Factory->default_load_path(Cwd::getcwd);
+Datahub::Factory::CLI->run // exit(2);

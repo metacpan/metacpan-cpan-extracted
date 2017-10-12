@@ -45,6 +45,28 @@ package TestCase {
     FLOAT_PRECICE = 16384.5f,
     DOUBLE_PRECICE = 65536.5,
   }
+
+
+  # Resorved word
+  sub int($obj : TestCase) : int {
+    
+    return 5;
+  }
+  
+  sub use_reserved_word() : int {
+    
+    my $test_case = new TestCase;
+    
+    if (TestCase->int($test_case) == 5) {
+      if (TestCase::int($test_case) == 5) {
+        if ($test_case->int == 5) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
   
   # Package Template
   sub template() : int {
@@ -283,8 +305,8 @@ package TestCase {
   }
 
   sub spvm_extension_add_int_array() : int {
-    my $nums1 = [1, 2, 3];
-    my $nums2 = [4, 5, 6];
+    my $nums1 : int[] = [1, 2, 3];
+    my $nums2 : int[] = [4, 5, 6];
     
     my $nums3 = TestCase::Extension::add_int_array($nums1, $nums2);
     
@@ -322,7 +344,7 @@ package TestCase {
   
   sub exception_eval_call_sub() : int {
     eval {
-      exception_die_return_int();
+      exception_croak_return_int();
     };
     
     if ($@) {
@@ -333,48 +355,57 @@ package TestCase {
   }
   
   sub exception_call_stack() : int {
-    exception_die_return_int();
+    exception_croak_return_int();
   }
   
-  sub exception_die_return_byte() : byte {
-    die "Error";
+  sub exception_croak_return_byte() : byte {
+    croak "Error";
   }
   
-  sub exception_die_return_short() : short {
-    die "Error";
+  sub exception_croak_return_short() : short {
+    croak "Error";
   }
   
-  sub exception_die_return_int() : int {
-    die "Error";
+  sub exception_croak_return_int() : int {
+    croak "Error";
   }
   
-  sub exception_die_return_long() : long {
-    die "Error";
+  sub exception_croak_return_long() : long {
+    croak "Error";
   }
   
-  sub exception_die_return_float() : float {
-    die "Error";
+  sub exception_croak_return_float() : float {
+    croak "Error";
   }
   
-  sub exception_die_return_double() : double {
-    die "Error";
+  sub exception_croak_return_double() : double {
+    croak "Error";
   }
   
-  sub exception_die_return_object() : TestCase::Minimal {
-    die "Error";
+  sub exception_croak_return_object() : TestCase::Minimal {
+    croak "Error";
   }
   
-  sub exception_die_return_void() : void {
-    die "Error";
+  sub exception_croak_return_void() : void {
+    croak "Error";
   }
 
-  sub exception_die_return_int_eval_catch() : int {
+  sub exception_croak_return_int_eval_catch() : int {
     eval {
-      die "Error";
+      croak "Error";
     };
     
     
     if ($@) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_undef($value : TestCase) : int {
+    
+    if ($value == undef) {
       return 1;
     }
     
@@ -705,7 +736,7 @@ package TestCase {
     $nums->[0] = 5;
   }
   sub call_void() : int {
-    my $nums = [1];
+    my $nums : int[] = [1];
     
     call_void_sub($nums);
     
@@ -1166,11 +1197,11 @@ package TestCase {
     return 0;
   }
   sub array_init_byte() : int {
-    my $nums = [1y, 2y, 3y];
+    my $nums : byte[] = [1y, 2y, Byte->MAX_VALUE];
     
     if ($nums->[0] == 1y) {
       if ($nums->[1] == 2y) {
-        if ($nums->[2] == 3y) {
+        if ($nums->[2] == Byte->MAX_VALUE) {
           return 1;
         }
       }
@@ -1178,7 +1209,7 @@ package TestCase {
     return 0;
   }
   sub array_init_short() : int {
-    my $nums = [1s, 2s, 3s];
+    my $nums : short[] = [1s, 2s, 3s];
     
     if ($nums->[0] == 1s) {
       if ($nums->[1] == 2s) {
@@ -1190,7 +1221,7 @@ package TestCase {
     return 0;
   }
   sub array_init_int () : int {
-    my $nums = [1, 2, 3];
+    my $nums : int[] = [1, 2, 3];
     
     if ($nums->[0] == 1) {
       if ($nums->[1] == 2) {
@@ -1202,7 +1233,7 @@ package TestCase {
     return 0;
   }
   sub array_init_long() : int {
-    my $nums = [1L, 2L, 3L];
+    my $nums : long[] = [1L, 2L, 3L];
     
     if ($nums->[0] == 1L) {
       if ($nums->[1] == 2L) {
@@ -1214,7 +1245,7 @@ package TestCase {
     return 0;
   }
   sub array_init_float() : int {
-    my $nums = [1f, 2f, 3f];
+    my $nums : float[] = [1f, 2f, 3f];
     
     if ($nums->[0] == 1f) {
       if ($nums->[1] == 2f) {
@@ -1226,7 +1257,7 @@ package TestCase {
     return 0;
   }
   sub array_init_double() : int {
-    my $nums = [1d, 2d, 3d];
+    my $nums : double[] = [1d, 2d, 3d];
     
     if ($nums->[0] == 1d) {
       if ($nums->[1] == 2d) {
@@ -1237,6 +1268,7 @@ package TestCase {
     }
     return 0;
   }
+
   sub get_object_from_freelist () : int {
     get_object_from_freelist_check();
     
@@ -4395,6 +4427,24 @@ package TestCase {
     return 0;
   }
 
+  sub get_array_length_undef() : int {
+    
+    my $nums : int[] = undef;
+
+    std::say_err("AAAAAAAAAAAA");
+    
+    eval {
+      @$nums;
+    };
+    
+    
+    if ($@) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
   sub array_set_and_get_array_element_first() : int {
     
     my $nums = new int[3];

@@ -8,7 +8,7 @@ use strict;
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 use base 'Exporter';
 
@@ -19,8 +19,8 @@ use Log::Report::Util;
 my $lrm = 'Log::Report::Message';
 
 ### if you change anything here, you also have to change Log::Report::Minimal
-my @make_msg         = qw/__ __x __n __nx __xn N__ N__n N__w/;
-my @functions        = qw/report dispatcher try textdomain/;
+my @make_msg   = qw/__ __x __n __nx __xn N__ N__n N__w __p __px __np __npx/;
+my @functions  = qw/report dispatcher try textdomain/;
 my @reason_functions = qw/trace assert info notice warning
    mistake error fault alert failure panic/;
 
@@ -32,6 +32,7 @@ sub mistake(@); sub error(@); sub fault(@); sub alert(@); sub failure(@);
 sub panic(@);
 sub __($); sub __x($@); sub __n($$$@); sub __nx($$$@); sub __xn($$$@);
 sub N__($); sub N__n($$); sub N__w(@);
+sub __p($$); sub __px($$@); sub __np($$$$); sub __npx($$$$@);
 
 #
 # Some initiations
@@ -51,8 +52,6 @@ require Log::Report::Exception;
 require Log::Report::Dispatcher;
 require Log::Report::Dispatcher::Try;
 
-#eval "require Log::Report::Translator::POT"; panic $@ if $@;
-#, translator => Log::Report::Translator::POT->new(charset => 'utf-8');
 textdomain 'log-report';
 
 my $default_dispatcher = dispatcher PERL => 'default', accept => 'NOTICE-';
@@ -278,6 +277,9 @@ sub try(&@)
       and report {location => [caller 0]}, PANIC =>
           __x"odd length parameter list for try(): forgot the terminating ';'?";
 
+	unshift @_, mode => 'DEBUG'
+        if $reporter->{needs}{TRACE};
+
     my $disp = Log::Report::Dispatcher::Try->new(TRY => 'try', @_);
     push @nested_tries, $disp;
 
@@ -320,6 +322,7 @@ sub alert(@)   {report ALERT   => @_}
 sub failure(@) {report FAILURE => @_}
 sub panic(@)   {report PANIC   => @_}
 
+#-------------
 
 
 sub __($)
@@ -401,6 +404,26 @@ sub N__n($$) {@_}
 
 sub N__w(@) {split " ", $_[0]}
 
+
+#-------------
+
+sub __p($$) { __($_[0])->_msgctxt($_[1]) }
+sub __px($$@)
+{   my ($ctxt, $msgid) = (shift, shift);
+    __x($msgid, @_)->_msgctxt($ctxt);
+}
+
+sub __np($$$$)
+{   my ($ctxt, $msgid, $plural, $count) = @_;
+    __n($msgid, $msgid, $plural, $count)->_msgctxt($ctxt);
+}
+
+sub __npx($$$$@)
+{   my ($ctxt, $msgid, $plural, $count) = splice @_, 0, 4;
+    __nx($msgid, $msgid, $plural, $count, @_)->_msgctxt($ctxt);
+}
+
+#-------------
 
 sub import(@)
 {   my $class = shift;

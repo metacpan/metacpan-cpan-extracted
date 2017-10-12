@@ -9,19 +9,7 @@ use lib "$FindBin::Bin/../lib";
 
 use DBIx::Deployer;
 
-use_dbi_db();
-deployer_patch_table();
-simple_deploy();
-verify_failed();
-dependencies();
-multipatch();
-no_verify();
-missing_verify();
-keep_newlines();
-patch_undefined();
-done_testing();
-
-sub use_dbi_db {
+subtest 'use_dbi_db' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
 
     my $db = DBI->connect('dbi:SQLite:' . $t1->filename);
@@ -41,9 +29,9 @@ sub use_dbi_db {
     
     my $patches = $d->patches;
     ok $d->deploy_all, 'Can deploy with dbi';
-}
+};
 
-sub deployer_patch_table {
+subtest 'deployer_patch_table' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
 
     my $db = DBI->connect('dbi:SQLite:' . $t1->filename);
@@ -65,10 +53,10 @@ sub deployer_patch_table {
     
     my $patches = $d->patches;
     ok $d->deploy_all, 'Can deploy with dbi';
-}
+};
 
-sub simple_deploy {
-   my $t1 = File::Temp->new(EXLOCK => 0);
+subtest 'simple_deploy' => sub {
+    my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
     my $d = DBIx::Deployer->new(
@@ -80,9 +68,9 @@ sub simple_deploy {
     my $patches = $d->patches;
     ok $d->deploy_all, 'Can deploy';
     ok $d->deploy_all, 'Can deploy twice';
-}
+};
 
-sub verify_failed {
+subtest 'verify_failed' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -98,12 +86,12 @@ sub verify_failed {
 
     throws_ok { eval { $insert_row->deploy; }; say $@; die $@; } qr/no such table: foo/, 'Throws no such table';
     $create_table->deploy;
-    throws_ok { eval { $insert_row->deploy; }; say $@; die $@; } qr/insert into foo failed verification/, 'Throws failed verification';
+    throws_ok { eval { $insert_row->deploy; }; say $@; die $@; } qr/failed verification/i, 'Throws failed verification';
     my ($count) = @{ $d->target_db->selectcol_arrayref(q|SELECT count(*) FROM foo|) };
     is $count, 0, 'Changes were rolled back';
-}
+};
 
-sub dependencies {
+subtest 'dependencies' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -119,9 +107,9 @@ sub dependencies {
     $d->deploy($insert_row);
     my ($count) = @{ $d->target_db->selectcol_arrayref(q|SELECT count(*) FROM foo|) };
     is $count, 1, 'Dependencies succeed';
-}
+};
 
-sub multipatch {
+subtest 'multipatch' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -132,9 +120,9 @@ sub multipatch {
     );
     
     ok $d->deploy_all, 'Can deploy multipatch';
-}
+};
 
-sub no_verify {
+subtest 'no_verify' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -145,9 +133,9 @@ sub no_verify {
     );
     
     ok $d->deploy_all, 'Can deploy patch without verification';
-}
+};
 
-sub missing_verify {
+subtest 'missing_verify' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -157,11 +145,11 @@ sub missing_verify {
       deployer_db_file => $t2->filename,
     );
     
-    throws_ok { eval { $d->deploy_all }; say $@; die $@; } qr/missing verification/, 'Patch throws ok when missing verification';
-}
+    throws_ok { eval { $d->deploy_all }; say $@; die $@; } qr/missing verification/i, 'Patch throws ok when missing verification';
+};
 
-sub keep_newlines {
-   my $t1 = File::Temp->new(EXLOCK => 0);
+subtest 'keep_newlines' => sub {
+    my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
     my $d = DBIx::Deployer->new(
@@ -172,9 +160,9 @@ sub keep_newlines {
     
     my $patches = $d->patches;
     ok $d->deploy_all, 'Can deploy newlines';
-}
+};
 
-sub patch_undefined {
+subtest 'patch_undefined' => sub {
     my $t1 = File::Temp->new(EXLOCK => 0);
     my $t2 = File::Temp->new(EXLOCK => 0);
     
@@ -188,4 +176,29 @@ sub patch_undefined {
     my $insert_row = $patches->{'insert into foo'};
 
     throws_ok { eval { $d->deploy($insert_row) }; say $@; die; } qr/Patch "insert into foo" failed: Patch dependency "create table foo" is not defined\..*/, 'Useful error message for undefined dependency';
-}
+};
+
+
+subtest 'script_patch' => sub {
+    plan skip_all => 'Skipping developer tests' unless $ENV{DEVELOPER_TESTS};
+    my $t1 = File::Temp->new(EXLOCK => 0);
+    my $t2 = File::Temp->new(EXLOCK => 0);
+    
+    my $d = DBIx::Deployer->new(
+      target_dsn => "dbi:SQLite:" . $t1->filename,
+      patch_path => "$FindBin::Bin/script_patch",
+      deployer_db_file => $t2->filename,
+    );
+    
+    my $patch = $d->patches->{'create table foo'};
+    $patch->deploy_script_args([$t1->filename]);
+    $patch->deploy;
+    ok $patch->verified, 'Can deploy using scripts';
+
+
+    my $script_fails = $d->patches->{'script fails'};
+    $script_fails->deploy_script_args([$t1->filename]);
+    throws_ok { eval { $script_fails->deploy }; say $@; die; } qr/exited with status \d+/i, 'Returns exit status on non-zero failure';
+};
+
+done_testing;

@@ -1,23 +1,22 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/CreateSelfSignedSSLCert/create_self_signed_ssl_cert
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# Note: This script is a CLI  for Riap function /AppLib/CreateSelfSignedSSLCert/create_self_signed_ssl_cert
+# and generated automatically using Perinci::CmdLine::Gen version 0.482
 
-our $DATE = '2017-07-08'; # DATE
+our $DATE = '2017-10-11'; # DATE
 our $DIST = 'App-CreateSelfSignedSSLCert'; # DIST
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.150'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-BEGIN { no warnings; $ENV{LOG_LEVEL} //= 'info'; }
-
 use Perinci::CmdLine::Any;
 
 Perinci::CmdLine::Any->new(
-    url => "/App/CreateSelfSignedSSLCert/create_self_signed_ssl_cert",
+    url => "/AppLib/CreateSelfSignedSSLCert/create_self_signed_ssl_cert",
     program_name => "create-self-signed-ssl-cert",
+    log_level => "info",
 )->run;
 
 # ABSTRACT: Create self-signed SSL certificate
@@ -35,7 +34,7 @@ create-self-signed-ssl-cert - Create self-signed SSL certificate
 
 =head1 VERSION
 
-This document describes version 0.14 of create-self-signed-ssl-cert (from Perl distribution App-CreateSelfSignedSSLCert), released on 2017-07-08.
+This document describes version 0.150 of create-self-signed-ssl-cert (from Perl distribution App-CreateSelfSignedSSLCert), released on 2017-10-11.
 
 =head1 SYNOPSIS
 

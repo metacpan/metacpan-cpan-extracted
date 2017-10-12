@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use open ':std', ':encoding(utf8)';
+use Getopt::Long qw(:config bundling);
+use App::Brl2Brl qw(parse_dis Conv);
+my $helpme;
+my $table_path = '/usr/share/liblouis/tables/';
+my ($from_table_file, $to_table_file );
+GetOptions( "h|help" =>\$helpme,
+	    "p|path=s" =>\$table_path,
+	    "f|from=s" =>\$from_table_file,
+	    "t|to=s" =>\$to_table_file
+	  )
+  or die "Error in command line arguments. Try --help.";
+if( $helpme ){
+  usage();
+  exit 0;
+}
+sub usage {
+  print "-p | --path - Path to liblouis table files.\n";
+  print "-f | --from - The liblouis display table to convert from.\n";
+  print "-t | --to - The liblouis display table to convert to.\n";
+  print "-h | --help - This help screen.\n";
+}
+
+
+my %from_table = parse_dis( "$table_path/$from_table_file" );
+my %to_table = parse_dis( "$table_path/$to_table_file" );
+while( <> ){
+  my $s = Conv( \%from_table, \%to_table, $_);
+  print "$s";
+}
+
+#is decode_braille('us', "b"), "12", 'b in us encoding should be dot 12';
+
+=head1 NAME
+
+brl2brl - Converts between braille character sets found in liblouis.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 DESCRIPTION
+
+A script to convert between braille character sets. If you for instance have multiple braille printers with different characet set, you can use this script to convert the data you want to print accordingly. The respective display tables have to be present in liblouis.
+
+=head1 SYNOPSIS
+
+  $ brl2brl --from | -f <from_table_file> --to | -t <to_table_file> [--path | -p <path-to-liblouis-tables>] <file-to-convert>
+  $ brl2brl -h | --help
+
+=head1 AUTHOR
+
+Lars Bjørndal
+
+=head1 LICENCE
+
+Artistic
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+  $ cpan App::brl2brl
+
+Manual install:
+
+  $ perl Makefile.pl
+  $ make
+  $ make install
+
+=cut

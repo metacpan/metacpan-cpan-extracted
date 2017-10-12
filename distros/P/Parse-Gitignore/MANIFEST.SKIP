@@ -12,3 +12,7 @@ MYMETA..*
 # Template for building pod file.
 ^lib/Parse/Gitignore.pod.tmpl$
 ^xt/.*$
+^make-pod\.pl$
+^lib/.*\.pod\.tmpl$
+^examples/.*-out\.txt$
+^Todo$

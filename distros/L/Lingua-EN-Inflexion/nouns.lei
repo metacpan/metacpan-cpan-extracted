@@ -2741,7 +2741,8 @@
         -ss       =>  -sses      |
         -orse     =>  -orses     |
         -o[au]rse =>  -o[au]rses |
-        -[^s]sis  =>             |  -[^s]ses
+        -nse      =>             |  -nses
+        -[^ns]sis =>             |  -[^ns]ses
         -trix     =>  -trixes    |  -trices
         -us       =>  -uses      |
         -x        =>  -xes       |

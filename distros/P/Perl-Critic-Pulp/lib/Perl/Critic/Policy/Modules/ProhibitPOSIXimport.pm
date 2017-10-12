@@ -31,7 +31,7 @@ use Perl::Critic::Pulp::Utils;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 94;
+our $VERSION = 95;
 
 use constant _ALLOWED_CALL_COUNT => 15;
 

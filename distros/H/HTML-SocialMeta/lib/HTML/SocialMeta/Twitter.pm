@@ -5,7 +5,7 @@ use Carp;
 
 extends 'HTML::SocialMeta::Base';
 
-our $VERSION = '0.73';
+our $VERSION = '0.730002';
 
 use MooX::LazierAttributes;
 use MooX::ValidateSubs;
@@ -102,7 +102,7 @@ HTML::SocialMeta::Twitter
 
 =head1 VERSION
 
-Version 0.73
+Version 0.730002
 
 =cut
 

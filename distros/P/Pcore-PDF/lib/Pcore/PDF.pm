@@ -1,4 +1,4 @@
-package Pcore::PDF v0.4.2;
+package Pcore::PDF v0.4.4;
 
 use Pcore -dist, -class, -const, -result;
 use Config;
@@ -142,8 +142,6 @@ sub _build_bin ($self) {
     my $princexml_ver = $ENV->dist('Pcore-PDF')->cfg->{princexml_ver};
 
     my $path = '/bin/princexml-linux-generic' . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . "-$princexml_ver/lib/prince/bin/prince";
-
-    say $path;
 
     return $ENV->share->get($path);
 }
@@ -297,7 +295,7 @@ sub _get_proc ( $self, $cb ) {
             return;
         },
         on_finish => sub ($proc) {
-            $self->{_threads}++;
+            $self->{_threads}--;
 
             return;
         }
@@ -424,9 +422,9 @@ sub _run_task ( $self, $proc, $task ) {
 ## |    3 | 100                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 434                  | * Link L<Pcore::Util::Result> on line 491 does not specify text                                                |
-## |      | 434                  | * Link L<Pcore::Util::Result> on line 501 does not specify text                                                |
-## |      | 434                  | * Link L<Pcore> on line 499 does not specify text                                                              |
+## |      | 432                  | * Link L<Pcore::Util::Result> on line 489 does not specify text                                                |
+## |      | 432                  | * Link L<Pcore::Util::Result> on line 499 does not specify text                                                |
+## |      | 432                  | * Link L<Pcore> on line 497 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

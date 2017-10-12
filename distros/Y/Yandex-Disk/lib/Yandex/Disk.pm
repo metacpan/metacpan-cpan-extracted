@@ -13,10 +13,7 @@ use URI::Escape;
 use Encode;
 use IO::Socket::SSL;
 
-###### DELETE #######
-use Data::Printer;
-
-our $VERSION    = '0.01';
+our $VERSION    = '0.02';
 
 my $WAIT_RETRY  = 20;
 my $BUFF_SIZE = 8192;
@@ -329,7 +326,47 @@ __END__
 B<Yandex::Disk> - a simple API for Yandex Disk
 
 =head1 VERSION
- version 0.01
+    version 0.02
+
+=head1 SYNOPSYS
+    
+    use Data::Printer;
+    use Yandex::Disk;
+
+    my $TOKEN = 'aaaabbbbccc'; #Auth token. You can get token from module L<Yandex::OAuth>
+    my $disk = Yandex::Disk->new( -token => $TOKEN ); 
+    
+    #Get info about disk and print
+    my $diskinfo = $disk->getDiskInfo();
+    p $diskinfo;
+
+    #Upload file from local disk to Yandex disk
+    $disk->uploadFile(
+                        -overwrite      => 1,
+                        -file           => 'my_test_upload_file',  # Path to file on local disk
+                        -remote_path    => "/Upload",              # Folder on Yandex Disk
+                        ) or die "Cant upload file";
+
+    #Download file form Yandex Disk to local disk
+    $disk->downloadFile(
+                        -path   => "/Upload/my_test_upload_file",   # Path to file on Yandex Disk
+                        -file   => 'my_test_upload_file',           # Path to save file on local disk
+                        ) or die "Cant download file";
+
+    #Create folder on Yandex Disk
+    $disk->createFolder(
+                            -path       => '/Temp/new_folder',      # Path to new folder on Yandex Disk
+                            -recursive  => 1,                       # Recursive create folder
+
+    #Share file and get public link
+    my $public = $disk->public();
+    $public->publicFile(
+                            -path   => "/Upload/my_test_upload_file",  # Path to file, which need share
+                        ) or die "Cant public file";
+    my $publicUrl = $public->publicUrl() or die "Cant get public url";
+
+
+
 
 =head1 METHODS
 
@@ -338,31 +375,31 @@ B<Yandex::Disk> - a simple API for Yandex Disk
 Return disk info data as hashref
 
     $disk->getDiskInfo();
-Example output:
-    {
-        max_file_size    1073741824,
-        revision         14987326771107,
-        system_folders   {
-            applications    "disk:/Приложения",
-            downloads       "disk:/Загрузки/",
-            facebook        "disk:/Социальные сети/Facebook",
-            google          "disk:/Социальные сети/Google+",
-            instagram       "disk:/Социальные сети/Instagram",
-            mailru          "disk:/Социальные сети/Мой Мир",
-            odnoklassniki   "disk:/Социальные сети/Одноклассники",
-            photostream     "disk:/Фотокамера/",
-            screenshots     "disk:/Скриншоты/",
-            social          "disk:/Социальные сети/",
-            vkontakte       "disk:/Социальные сети/ВКонтакте"
-        },
-        total_space      67645734912,
-        trash_size       0,
-        used_space       19942927435,
-        user             {
-            login   "login",
-            uid     123456
+    Example output:
+        {
+            max_file_size    1073741824,
+            revision         14987326771107,
+            system_folders   {
+                applications    "disk:/Приложения",
+                downloads       "disk:/Загрузки/",
+                facebook        "disk:/Социальные сети/Facebook",
+                google          "disk:/Социальные сети/Google+",
+                instagram       "disk:/Социальные сети/Instagram",
+                mailru          "disk:/Социальные сети/Мой Мир",
+                odnoklassniki   "disk:/Социальные сети/Одноклассники",
+                photostream     "disk:/Фотокамера/",
+                screenshots     "disk:/Скриншоты/",
+                social          "disk:/Социальные сети/",
+                vkontakte       "disk:/Социальные сети/ВКонтакте"
+            },
+            total_space      67645734912,
+            trash_size       0,
+            used_space       19942927435,
+            user             {
+                login   "login",
+                uid     123456
+            }
         }
-    }
 
 =head2 uploadFile(%opt)
 

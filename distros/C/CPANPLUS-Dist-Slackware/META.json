@@ -4,7 +4,7 @@
       "Andreas Voegele <voegelas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -31,8 +31,12 @@
          }
       },
       "runtime" : {
+         "conflicts" : {
+            "Module::Build" : "< 0.36"
+         },
          "requires" : {
-            "CPANPLUS" : "0",
+            "CPANPLUS" : "0.9166",
+            "Config" : "0",
             "Cwd" : "0",
             "ExtUtils::Install" : "0",
             "File::Find" : "0",
@@ -48,8 +52,8 @@
             "Pod::Find" : "0",
             "Pod::Simple" : "0",
             "Text::Wrap" : "0",
-            "parent" : "0",
-            "perl" : "5.012003",
+            "base" : "0",
+            "perl" : "5.006001",
             "version" : "0.77"
          }
       },
@@ -66,7 +70,7 @@
          "url" : "https://github.com/voegelas/CPANPLUS-Dist-Slackware.git"
       }
    },
-   "version" : "1.024",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "1.025",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

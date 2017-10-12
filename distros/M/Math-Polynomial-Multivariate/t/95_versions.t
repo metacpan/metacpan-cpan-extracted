@@ -1,8 +1,6 @@
-# Copyright (c) 2009-2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 95_versions.t 15 2013-05-31 16:52:22Z demetri $
 
 # Checking if $VERSION strings of updated perl modules have been updated.
 # These are tests for the distribution maintainer.
@@ -59,15 +57,15 @@ my $signature = Test::MyUtils::slurp_or_bail('SIGNATURE');
 if (
     $signature =~ m{
         ^-----BEGIN\s+PGP\s+SIGNED\s+MESSAGE-----\n
-        Hash:\s+(\S+)\n
+        Hash:\s+\S+\n
         \n
         (.*)
         ^-----BEGIN\s+PGP\s+SIGNATURE-----\n
     }msx
 ) {
-    my ($hash_type, $checksums_txt) = ($1, $2);
-    while ($checksums_txt =~ m/^\Q$hash_type\E ([a-f\d]+)\s+(.*)$/mgo) {
-        $checksums{$2} = [$hash_type, $1];
+    my $checksums_txt = $1;
+    while ($checksums_txt =~ m/^(\S+)\s+([a-f\d]+)\s+(.*)$/mgo) {
+        $checksums{$3} = [$1, $2];
     }
 }
 else {

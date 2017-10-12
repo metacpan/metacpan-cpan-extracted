@@ -4,13 +4,13 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Eval-WithLexicals",
    "no_index" : {
@@ -54,6 +54,7 @@
          "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Eval-WithLexicals.git"
       }
    },
-   "version" : "1.003005",
-   "x_authority" : "cpan:MSTROUT"
+   "version" : "1.003006",
+   "x_authority" : "cpan:MSTROUT",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

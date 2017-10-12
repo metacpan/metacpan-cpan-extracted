@@ -1,3 +1,25 @@
+0.001019  2017-10-11 10:08:14-07:00 America/Los_Angeles
+
+    - Don't call find_yath() if we already found a yath (Matthew Horsfall)
+    - Minor display optimizations
+
+0.001018  2017-10-10 14:42:16-07:00 America/Los_Angeles
+
+    - Fix a DESTROY typo (Michael McClimon)
+    - Test2::Harness namespace does not use App::Yath namespace
+    - Package delcaration allowed before harness directives
+    - When respawning a stage may exit badly, nobody cares
+    - Fix scheduling properly this time
+    - Record timing data for all events
+    - Stop using expensive canonical JSON for logs
+    - Better $0 handling
+
+0.001017  2017-10-07 16:24:01-07:00 America/Los_Angeles
+
+    - Fix scheduling
+    - Add 'times' tool
+    - Put skip reason on same line as filename
+
 0.001016  2017-10-03 07:14:08-07:00 America/Los_Angeles
 
     - More test coverage

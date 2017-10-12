@@ -2,10 +2,9 @@ package Geo::Coder::Google::V3;
 
 use strict;
 use warnings;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
-use Encode;
 use JSON;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -69,10 +68,6 @@ sub geocode {
 
     my $location = $param{location} 
         or Carp::croak("Usage: geocode(location => \$location)");
-
-    if (Encode::is_utf8($location)) {
-        $location = Encode::encode_utf8($location);
-    }
 
     my $loc_param = $param{reverse} ? 'latlng' : 'address';
 

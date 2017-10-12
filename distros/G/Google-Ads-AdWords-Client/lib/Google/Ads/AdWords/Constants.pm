@@ -24,7 +24,7 @@ use File::HomeDir;
 use File::Spec::Functions;
 
 # Main version number that the rest of the modules pick up off of.
-our $VERSION = qv("4.17.0");
+our $VERSION = qv("4.18.0");
 
 use constant DEFAULT_PROPERTIES_FILE =>
   catfile(File::HomeDir->my_home, "adwords.properties");
@@ -84,6 +84,7 @@ our %SERVICE_TO_GROUP = (
   CustomerExtensionSettingService => "cm",
   CustomerFeedService             => "cm",
   CustomerSyncService             => "ch",
+  CustomerNegativeCriterionService => "cm",
   DataService                     => "cm",
   DraftAsyncErrorService          => "cm",
   DraftService                    => "cm",

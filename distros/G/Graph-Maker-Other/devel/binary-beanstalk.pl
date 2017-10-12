@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016 Kevin Ryde
+# Copyright 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,13 +19,12 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use List::Util 'min','max','sum';
-use MyGraphs;
-
-use lib
-  'devel/lib';
 use Graph::Maker::BinaryBeanstalk;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -40,17 +39,18 @@ use Graph::Maker::BinaryBeanstalk;
   # height=8 hog not
 
   my @graphs;
-  foreach my $height (0 .. 8) {
-    print "height=$height\n";
-    my $graph = Graph::Maker->new('binary_beanstalk',
-                                  height => $height,
-                                  # undirected => 1,
+  # foreach my $height (0 .. 8) {
+  foreach my $N (1 .. 32) {
+    # print "height=$height\n";
+    my $graph = Graph::Maker->new('binary_beanstalk', undirected => 1,
+                                  N => $N,
+                                  # height => $height,
                                  );
-    Graph_tree_print($graph);
+    MyGraphs::Graph_tree_print($graph);
     push @graphs, $graph;
   }
   print "\n";
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 

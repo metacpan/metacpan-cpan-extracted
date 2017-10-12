@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,10 +20,10 @@
 use 5.005;
 use strict;
 use List::Util 'min','max','sum';
-use FindBin;
-use MyGraphs;
 
+use FindBin;
 use lib "$FindBin::Bin/lib";
+use MyGraphs;
 use Graph::Maker::Dragon;
 
 # uncomment this to run the ### lines

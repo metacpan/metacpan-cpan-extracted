@@ -20,9 +20,10 @@
 use 5.005;
 use strict;
 use List::Util 'min','max','sum';
-use MyGraphs;
+
 use FindBin;
 use lib "$FindBin::Bin/lib";
+use MyGraphs;
 use Graph::Maker::TwinAlternateAreaTree;
 
 # uncomment this to run the ### lines

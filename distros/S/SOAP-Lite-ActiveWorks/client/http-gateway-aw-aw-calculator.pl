@@ -35,7 +35,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite  testing suite.
 
 This script uses the SOAP-Lite dispatching mechanism to publish a SOAP request
 to an http server given in the 'proxy' parameter.  The server in turn passes
@@ -51,4 +51,4 @@ AwGateway documentation for details.
 
 The companion 'calc-adapter.pl' script is the intended recipient adapter.
 
-The SOAP::Transport::ACTIVEWORKS module is NOT employed.
+The SOAP::Transport::ActiveWorks::Lite  module is NOT employed.

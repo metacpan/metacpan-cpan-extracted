@@ -2,11 +2,11 @@ package Test2::Harness::Logger::JSONL;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use IO::Handle;
 
-use Test2::Harness::Util::JSON qw/encode_canon_json/;
+use Test2::Harness::Util::JSON qw/encode_json/;
 
 BEGIN { require Test2::Harness::Logger; our @ISA = ('Test2::Harness::Logger') }
 use Test2::Harness::Util::HashBase qw/-fh -prefix/;
@@ -29,7 +29,7 @@ sub log_event {
 
     my $fh = $self->{+FH};
     my $prefix = $self->{+PREFIX};
-    print $fh $prefix, encode_canon_json($event), "\n";
+    print $fh $prefix, encode_json($event), "\n";
 }
 
 1;

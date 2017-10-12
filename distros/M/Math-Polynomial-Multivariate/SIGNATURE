@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 12fe5a739ad965eb63d33b2ed98a7fb84d3406a9 Changes
-SHA1 230d937815189fdb8ebaa71ef36da63b31c78c3f MANIFEST
-SHA1 b13c25e6d72ab411753fba05497fefc682a72446 META.json
-SHA1 3cc80fb5de6026365323cbd6d03741e1ce6f279c META.yml
-SHA1 3a5bdc38afba4d064e9d25a3700cf1fc9d89614b Makefile.PL
-SHA1 394e658da9b0ff0b82cade3508e04b5b920aa8f9 README
-SHA1 7867a038aeeaf5de211a61beb9c0650999297943 examples/ramanujan.pl
-SHA1 8cb58fb5cbd9711f08aa916e0b1a52009d7f0c28 examples/tutte.pl
-SHA1 a0c1d0755b6a0179b312a351d86473fbf1b5ccf7 lib/Math/Polynomial/Multivariate.pm
-SHA1 902b5693fda02755680852960727413bc39e7e59 t/01_basics.t
-SHA1 010e9cfa3c36404bc7188c5094af8a37af551021 t/02_operators.t
-SHA1 4670e0d03715ec54e4e6c9cac85da0bb604f4b8d t/03_bigrat.t
-SHA1 91129b5447f60b259659efc3acc90edd215c9d64 t/04_squaring.t
-SHA1 c58fa085ba1b1c350568a7b691359a7100b75df8 t/10_synopsis.t
-SHA1 12ee5eb7013598c45007b488ade9b94f146d5c7e t/90_pod.t
-SHA1 c28ebf0fa25e9cb7a8fbbbf5ae78dc39952f607a t/91_pod_cover_cp.t
-SHA1 39bee74c1e5d601a788e6975376a7314c39ab803 t/92_consistency.t
-SHA1 690c222221fa956f136f5277ef82ce96eb4b682b t/93_examples.t
-SHA1 1d5d8e199564f6d9baeadfef7ffef02a3b464f48 t/95_versions.t
-SHA1 1496e251e89201034ae1c6519408983a31f2ae5b t/99_signature.t
-SHA1 9744e568804fc24263d76e60ebb04db9f96725d0 t/data/KNOWN_VERSIONS
-SHA1 62d84450dca37b0bba6021987ad5442f7a55b371 t/lib/Test/MyUtils.pm
+SHA256 0f551d55397098fe2925da708550f75461aca3ae1a7390a2b3e60535f25fce21 Changes
+SHA256 a7ddb6f6137faaf66c04888ef28cd9e7147757f33afbed6207d23bfdc3f608f7 MANIFEST
+SHA256 573cba277d9f444e990fcfd49048f94528f465a1f61a137791e443ef0a1687cc META.json
+SHA256 20b8fd2d5d6f62370a30824c299e9c37d2900cfba0e689cca81d5cbe319f16fc META.yml
+SHA256 12b241dedf5504d5a645bc5533b28caa2250c589524a2042310b094e23c354cd Makefile.PL
+SHA256 3f23a2d8903bce4939d9c6df0292435d197614c6edd21e4d4bd1d955d3e6506b README
+SHA256 7dbf0d77f707028d8173525b67c7278782a66b59df1cbe72fa6e4a356e63817b examples/ramanujan.pl
+SHA256 c38edf14cab6224a741215f4c7675d4fd7997e42207e7c12057814e0f4e749b8 examples/tutte.pl
+SHA256 407c25e657ee9394de72c13ef3568844361fd4fa3ee50e4b9470783855ae7e7c lib/Math/Polynomial/Multivariate.pm
+SHA256 375d06a9e15c186f04e981823527bec9e57bfb9a1005bf74149207a68e30f46d t/01_basics.t
+SHA256 7e9bac712f2600b00d7438934e9d3e5219d5c5a22e3aadec502fee65fb1fefda t/02_operators.t
+SHA256 e36a7e31dfefacd2fa875d91c51b9e07c8860dc38c5dd6ad3a0a35cc94b7251e t/03_bigrat.t
+SHA256 15347d4f4aca899e308eeb13bab4823809d1599f0b16ad8eb1877c1c7fc80415 t/04_squaring.t
+SHA256 6246a9aef8ee7a253b44d2fd8225534487b18f4d3dba3c4f37f1de2a5efa3b9b t/10_synopsis.t
+SHA256 f8b752cd3c30a9cc9e05ce9760341692c056d519e2a7ae85495b4da7b1df9cd6 t/90_pod.t
+SHA256 9ca444808e7f1ea9471ccb4fe50fc0b225bab52ecedc543fb0f4fcfb9b72e911 t/91_pod_cover_cp.t
+SHA256 9a3f7a1b966e24c6dd56edfffa437bedc45ab9683caf889d0be73341b239ef17 t/92_consistency.t
+SHA256 cfa25d7d17f4bf2a5c9472aebe69f002a53d4c34ce25784d6378b2dae16cd8b8 t/93_examples.t
+SHA256 9624bcdecf1d2ab8a5a6613d1b82752bb54b061da41d252fc757d54c956540a6 t/95_versions.t
+SHA256 1a6793eced606ba260add45bc18c53c7e31d835694ce1298dd3dd3693ed7ac85 t/99_signature.t
+SHA256 d0386dc149a4b1a0c2c7cac0653737f5a24fd7c3682f8487ad8484ea018163cb t/data/KNOWN_VERSIONS
+SHA256 906dd91cfeb5c6b405ef9b789dd275b8f6fc25d618b2eb6330634900dc7703db t/lib/Test/MyUtils.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.14 (Darwin)
 
-iQEcBAEBAgAGBQJTB2tQAAoJEGH3bZuRPycNm7kH/iaLzCrwnKpmZzsiGczQnufG
-d9bKwulBofZvGVN6AOtkF0ZLg11hFUX/BNRi3AAUS9MwYbi8ha5tqH7XEKYl6axk
-Og59rqepo4yx/Ouwr1YvhNN18SRlYHaNxEulk+9vuJCWO9wvXKJ+3U3bAQ/GL/uc
-+/BFglJD0OwAUcrdg/BafCn4LvLEijMYRaur9LEpw3ckCM9t90kUckVYGMrtZ3RJ
-VgTWgLPsFGa5RVmLjUo9X85jiw8SU/RYRvfjwrNE2mW4qYKYEsGd59gMBK3PTumw
-vr4GRKftAJa4Dt2lcOuk07jYS2/H3oOl7VIuVMgZ0uDZxE8y7pqrDmCdgTVvEUs=
-=aQ+b
+iQEzBAEBCAAdFiEEjUydDHaxELVSK+hYp13NmW8fHSUFAlncBr8ACgkQp13NmW8f
+HSWSUwgApsE+Xxm1ciStdwbMwa7FYaOsX8fvi+SntgZfELHAKXfmbWDG5SVwXk27
+OgDFX0O1OC7hN1UjAO9HYEPc9EvuuEmgxAzWpOh5e65gdF9We4Fs+aRifsxY618O
+06NWrQWw+22Ccy19mIn6lTK0kQ/hVGOtVFG3S46IFyweJBQAeUXoKNIFUgkXv9Ns
+Sm7w+Nvzo8zUlWvugv4/X/rX3JPXb7QfUekpJ0B/2+g9ZYSBO2cVk7e8OchCgGzg
+LovicGThEUiP5yYh6QoI9bYpGf53Orvvcmkb8bKcTbYQdUK8mwF1gvKEeW5790pg
+gwqjUEmRv20u5fAEoD5BarCfxejx5Q==
+=bTd8
 -----END PGP SIGNATURE-----

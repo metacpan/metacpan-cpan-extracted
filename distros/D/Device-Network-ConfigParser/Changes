@@ -1,0 +1,8 @@
+Revision history for Device-CheckPoint-ConfigParse
+
+0.001  2017-09-22
+        First version.
+
+0.002  2017-10-12
+        * Minor bugfix with interface comments
+        * Added initial grammars for most of the commands.

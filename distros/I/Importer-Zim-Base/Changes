@@ -1,7 +1,14 @@
 
 Release history for Importer-Zim-Base
 
-0.8.0     2017-09-29 09:18:31-07:00 America/Los_Angeles
+0.9.0     2017-10-08 12:08:06-07:00 America/Los_Angeles
+
+    - Implement "... EXPORT => {-filter => $sub}..."
+    - Implement "use IMPORTER MODULE => {-filter => $sub}..."
+    - Also support -filter => qr/REGEX/
+    - Add Importer::Zim::Bogus to the distribution
+
+v0.8     2017-09-29 09:12:00-07:00 America/Los_Angeles
 
     - Utils: load Sub::Inject if available
     - Utils: Make sure DEBUG is a constant function

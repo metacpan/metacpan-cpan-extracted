@@ -1,0 +1,25 @@
+---
+abstract: 'Multicast Listener Discovery layer object'
+author:
+  - 'Michael Vincent <vin at vinsworld dot com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Frame-Layer-ICMPv6-MLD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::Frame: '1.17'
+  Net::Frame::Layer::ICMPv6: '1.1'
+  Net::Frame::Layer::IPv6: '1.08'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

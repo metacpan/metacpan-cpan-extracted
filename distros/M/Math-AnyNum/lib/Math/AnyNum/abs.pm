@@ -23,8 +23,8 @@ sub __abs__ {
 
   Math_GMPz: {
         Math::GMPz::Rmpz_sgn($x) >= 0 and return $x;
-        my $r = Math::GMPz::Rmpz_init_set($x);
-        Math::GMPz::Rmpz_abs($r, $r);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_abs($r, $x);
         return $r;
     }
 

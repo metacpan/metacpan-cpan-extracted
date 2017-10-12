@@ -3,15 +3,18 @@ require 5.007003;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
   'PL_FILES' => {},
-  'VERSION_FROM' => 'lib/Config/Std.pm',
   'PREREQ_PM' => {
-                   'version' => 0,
+                   'Test::More' => 0,
                    'Class::Std' => 0,
-                   'Test::More' => 0
+                   'version' => 0
                  },
-  'EXE_FILES' => [],
-  'NAME' => 'Config::Std'
+  'VERSION_FROM' => 'lib/Config/Std.pm',
+  'TEST_REQUIRES' => {
+                'TAP::Harness' => 3.31,  # you can use older but must set HARNESS_OPTIONS=j1 if threaded
+                },
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Config::Std',
+  'EXE_FILES' => []
 )
 ;

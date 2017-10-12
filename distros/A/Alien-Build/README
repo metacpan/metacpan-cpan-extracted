@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.22
+    version 1.25
 
 SYNOPSIS
 
@@ -801,6 +801,8 @@ AUTHOR
     Petr Pisar (ppisar)
 
     Lance Wicks (LANCEW)
+
+    Ahmad Fatoum (a3f, ATHREEF)
 
 COPYRIGHT AND LICENSE
 

@@ -31,12 +31,39 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Johnson;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
-plan tests => 22;
+plan tests => 23;
 
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('4,2' => 1,
+               '5,2' => 1,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $N (3 .. 10) {
+    foreach my $K (2 .. $N-2) {
+      my $graph = Graph::Maker->new('Johnson', undirected => 1,
+                                    N => $N, K => $K);
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      next if $seen{$g6_str}++;
+      next if $shown{"$N,$K"};
+      if (MyGraphs::hog_grep($g6_str)) {
+        MyTestHelpers::diag ("HOG N=$N,K=$K not shown in POD");
+        MyTestHelpers::diag ($g6_str);
+        MyGraphs::Graph_view($graph);
+        $extras++
+      }
+    }
+  }
+  ok ($extras, 0);
+}
 
 #------------------------------------------------------------------------------
 

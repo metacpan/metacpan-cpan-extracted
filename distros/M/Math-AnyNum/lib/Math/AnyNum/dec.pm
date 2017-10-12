@@ -21,8 +21,8 @@ sub __dec__ {
     }
 
   Math_GMPz: {
-        my $r = Math::GMPz::Rmpz_init_set($x);
-        Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $x, 1);
         return $r;
     }
 

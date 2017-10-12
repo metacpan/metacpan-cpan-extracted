@@ -31,7 +31,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite  testing suite.
 
 This script uses the SOAP-Lite dispatching mechanism to publish an
 ActiveWorks event to an ActiveWorks broker given in the 'proxy' parameter.

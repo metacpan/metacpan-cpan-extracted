@@ -1,8 +1,6 @@
-# Copyright (c) 2013-2014 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 01_basics.t 17 2014-02-21 12:51:52Z demetri $
 
 # Checking basic constructors and attribute accessors.
 
@@ -23,51 +21,51 @@ use constant MPM => Math::Polynomial::Multivariate::;
 
 my $one = MPM->const(1);
 isa_ok($one, MPM);                      # 2
-is("$one", '1');                        # 3
+is("$one", '(1)');                      # 3
 
 my $two = $one->const(2);
 isa_ok($two, MPM);                      # 4
-is("$two", '2');                        # 5
+is("$two", '(2)');                      # 5
 
 my $x = MPM->var('x');
 isa_ok($x, MPM);                        # 6
-is("$x", 'x');                          # 7
+is("$x", '(x)');                        # 7
 
 my $y = $one->var('y');
 isa_ok($y, MPM);                        # 8
-is("$y", 'y');                          # 9
+is("$y", '(y)');                        # 9
 
 my $zero = MPM->null;
 isa_ok($zero, MPM);                     # 10
-is("$zero", '0');                       # 11
+is("$zero", '(0)');                     # 11
 
 $zero = $one->const(0);
 isa_ok($zero, MPM);                     # 12
-is("$zero", '0');                       # 13
+is("$zero", '(0)');                     # 13
 
 my $null = $one->null;
 isa_ok($null, MPM);                     # 14
-is("$null", '0');                       # 15
+is("$null", '(0)');                     # 15
 
 my $p = MPM->monomial(3, { 'x' => 1, 'y' => 2 });
 isa_ok($p, MPM);                        # 16
-is("$p", "3*x*y^2");                    # 17
+is("$p", "(3*x*y^2)");                  # 17
 
 my $q = $one->monomial(1, { 'x' => 2 });
 isa_ok($q, MPM);                        # 18
-is("$q", "x^2");                        # 19
+is("$q", "(x^2)");                      # 19
 
 my $qq = $one->monomial(1, { 'x' => 2, 'y' => 0 });
 isa_ok($qq, MPM);                       # 20
-is("$qq", "x^2");                       # 21
+is("$qq", "(x^2)");                     # 21
 
 my $r = $one->monomial(0, { 'z' => 1 });
 isa_ok($r, MPM);                        # 22
-is("$r", '0');                          # 23
+is("$r", '(0)');                        # 23
 
 $r = $one->monomial(2, { 'x' => 0 });
 isa_ok($r, MPM);                        # 24
-is("$r", '2');                          # 25
+is("$r", '(2)');                        # 25
 
 $r = eval { $one->monomial(3, { 'x' => -1 }) };
 is($r, undef);                          # 26
@@ -84,15 +82,15 @@ is("@e", '1');                          # 30
 
 my $f = $p->factor_of('x', 1);
 isa_ok($f, MPM);                        # 31
-is("$f", '3*y^2');                      # 32
+is("$f", '(3*y^2)');                    # 32
 
 my $g = $p->factor_of('y', 1);
 isa_ok($g, MPM);                        # 33
-is("$g", '0');                          # 34
+is("$g", '(0)');                        # 34
 
 my $h = $p->factor_of('z', 0);
 isa_ok($h, MPM);                        # 35
-is("$h", '3*x*y^2');                    # 36
+is("$h", '(3*x*y^2)');                  # 36
 
 is($f->is_null, !1);                    # 37
 is($f->is_not_null, !0);                # 38

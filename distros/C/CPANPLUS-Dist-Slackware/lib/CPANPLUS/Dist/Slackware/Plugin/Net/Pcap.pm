@@ -3,36 +3,25 @@ package CPANPLUS::Dist::Slackware::Plugin::Net::Pcap;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
-use File::Spec qw();
+use CPANPLUS::Dist::Slackware::Util qw(catfile slurp spurt);
 
 sub available {
     my ( $plugin, $dist ) = @_;
+
     return ( $dist->parent->package_name eq 'Net-Pcap' );
 }
 
 sub pre_prepare {
     my ( $plugin, $dist ) = @_;
 
-    my $module = $dist->parent;
-    my $cb     = $module->parent;
-
-    my $wrksrc = $module->status->extract;
-    return if !$wrksrc;
-
-    # See L<https://rt.cpan.org/Ticket/Display.html?id=73335>.
-    my $offending_code = qr/
-        \$options[{]CCFLAGS[}] \s* = \s* ["']-Wall \s+ -Wwrite-strings["'] .*?;
-    /xms;
-    my $filename = File::Spec->catfile( $wrksrc, 'Makefile.PL' );
-    if ( -f $filename ) {
-        my $code = $dist->_read_file($filename);
-        if ( $code =~ $offending_code ) {
-            $code =~ s/$offending_code//;
-            $cb->_move( file => $filename, to => "$filename.orig" ) or return;
-            $dist->_write_file( $filename, $code ) or return;
-        }
+    # See L<https://rt.cpan.org/Ticket/Display.html?id=117831>.
+    my $fn = catfile( 't', '09-error.t' );
+    if ( -f $fn ) {
+        my $code = slurp($fn);
+        $code =~ s/\^(\Q(?:parse|syntax)\E)/$1/xms;
+        spurt( $fn, $code ) or return;
     }
 
     return 1;
@@ -47,7 +36,7 @@ CPANPLUS::Dist::Slackware::Plugin::Net::Pcap - Patch Makefile.PL
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Net::Pcap version 1.024.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Net::Pcap version 1.025.
 
 =head1 SYNOPSIS
 
@@ -56,7 +45,8 @@ This document describes CPANPLUS::Dist::Slackware::Plugin::Net::Pcap version 1.0
 
 =head1 DESCRIPTION
 
-Fix the libpcap detection.  Reported as bug #73335 at L<http://rt.cpan.org/>.
+Adapt a test to libpcap 1.8.0.  See bug #117831 at L<http://rt.cpan.org/> for
+more information.
 
 =head1 SUBROUTINES/METHODS
 
@@ -68,7 +58,7 @@ Returns true if this plugin applies to the given Perl distribution.
 
 =item B<< $plugin->pre_prepare($dist) >>
 
-Patch F<Makefile.PL> if necessary.
+Patch F<t/09-error.t> if necessary.
 
 =back
 
@@ -82,7 +72,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the module File::Spec.
+None.
 
 =head1 INCOMPATIBILITIES
 
@@ -103,7 +93,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Andreas Voegele
+Copyright 2012-2017 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

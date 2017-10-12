@@ -25,13 +25,14 @@ find({wanted => sub { /\.pm$/ and push @files, $File::Find::name }, no_chdir => 
 plan tests => @files * 3 + 4;
 
 my @hidden = qw(
-  append decr decrby del echo exists expire expireat get getbit getrange getset hdel hexists hget hgetall
-  hincrby hkeys hlen hmget hmset hset hsetnx hvals incr incrby keys lindex linsert llen lpop lpush lpushx
-  lrange lrem lset ltrim mget move mset msetnx persist ping publish randomkey rename renamenx rpop rpoplpush
-  rpush rpushx sadd scard sdiff sdiffstore set setbit setex setnx setrange sinter sinterstore sismember
-  smembers smove sort spop srandmember srem strlen sunion sunionstore ttl type zadd zcard zcount zincrby
-  zinterstore zrange zrangebyscore zrank zrem zremrangebyrank zremrangebyscore zrevrange zrevrangebyscore
-  zrevrank zscore zunionstore
+  append bitcount bitop bitpos decr decrby del echo exists expire expireat get getbit getrange getset hdel
+  hexists hget hgetall hincrby hincrbyfloat hkeys hlen hmget hmset hset hsetnx hvals incr incrby
+  incrbyfloat keys lindex linsert llen lpop lpush lpushx lrange lrem lset ltrim mget move mset msetnx
+  persist pexpire pexpireat ping psetex pttl publish randomkey rename renamenx rpop rpoplpush rpush rpushx
+  sadd scard sdiff sdiffstore set setbit setex setnx setrange sinter sinterstore sismember smembers smove
+  sort spop srandmember srem strlen sunion sunionstore ttl type zadd zcard zcount zincrby zinterstore
+  zlexcount zrange zrangebylex zrangebyscore zrank zrem zremrangebylex zremrangebyrank zremrangebyscore
+  zrevrange zrevrangebylex zrevrangebyscore zrevrank zscore zunionstore
 );
 
 for my $file (@files) {

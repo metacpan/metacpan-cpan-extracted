@@ -6,7 +6,7 @@ use Carp;
 use Tree::RB::Node qw[set_color color_of parent_of left_of right_of];
 use Tree::RB::Node::_Constants;
 use vars qw( $VERSION @EXPORT_OK );
-$VERSION = '0.500005';
+$VERSION = '0.500006';
 $VERSION = eval $VERSION;
 
 require Exporter;
@@ -336,6 +336,7 @@ sub put {
     }
     $self->_fix_after_insertion($z);
     $self->[SIZE]++;
+    return;
 }
 
 *STORE = \&put;
@@ -835,7 +836,7 @@ and Damian Ivereigh's libredblack (L<http://libredblack.sourceforge.net/>).
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks for bug reports go to Anton Petrusevich, Wes Thompson, Petre Mierlutiu, Tomer Vromen and Christopher Gurnee.
+Thanks for bug reports go to Anton Petrusevich, Wes Thompson, Petre Mierlutiu, Tomer Vromen, Christopher Gurnee and Ole Bjorn Hessen.
 
 =head1 LICENCE AND COPYRIGHT
 

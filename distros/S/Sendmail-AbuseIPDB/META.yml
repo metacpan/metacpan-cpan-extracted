@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Sendmail-AbuseIPDB
-version:            0.07
+version:            0.10
 abstract:           API access for IP address abuse database
 author:
     - TTNDY <ttndy@cpan.org>

@@ -19,16 +19,20 @@
 
 use strict;
 use Graph;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 
 {
   # Hypercube
-  # N=3 cubical https://hog.grinvin.org/ViewGraphInfo.action?id=1022
+  # N=3 cube      https://hog.grinvin.org/ViewGraphInfo.action?id=1022
   # N=4 tesseract https://hog.grinvin.org/ViewGraphInfo.action?id=1340
-  # N=5 not  32 nodes 80 edges
+  # N=5           https://hog.grinvin.org/ViewGraphInfo.action?id=28533
+  #     32 vertices 80 edges
   require Graph::Maker::Hypercube;
   my @graphs;
-  for (my $k = 2; @graphs < 6; $k++) {
+  for (my $k = 0; @graphs <= 5; $k++) {
     my $graph = Graph::Maker->new('hypercube', N => $k, undirected=>1);
     push @graphs, $graph;
   }

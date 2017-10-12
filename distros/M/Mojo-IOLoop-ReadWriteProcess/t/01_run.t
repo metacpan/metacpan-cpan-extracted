@@ -123,6 +123,9 @@ subtest 'process is_running()' => sub {
 };
 
 subtest 'process execute()' => sub {
+  plan skip_all =>
+    "You do not seem to have bash, which is required (as for now) for this test"
+    unless -e '/bin/bash';
   use Mojo::IOLoop::ReadWriteProcess;
   my $p = Mojo::IOLoop::ReadWriteProcess->new(
     execute => "$FindBin::Bin/data/process_check.sh")->start();

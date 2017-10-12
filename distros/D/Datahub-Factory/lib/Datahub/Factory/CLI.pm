@@ -2,7 +2,7 @@ package Datahub::Factory::CLI;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '1.71';
+our $VERSION = '1.72';
 
 use Datahub::Factory;
 use Log::Any::Adapter;
@@ -19,19 +19,14 @@ sub plugin_search_path {'Datahub::Factory::Command'}
 
 sub global_opt_spec {
     return (
-        ['log_level|L:i', "Log level (1 - 3) with 3 the chattiest."],
-        ['log_output|O:s', "Log output handler: STDERR, STDOUT or the STATISTICS log file."]
+        ['log_level|L:i', "Log level (1 - 3) with 3 the chattiest."]
     );
 }
 
 sub default_log4perl_config {
-    my ($level, $appender) = @_;
-    if (!defined($level)) {
-        $level = 'WARN';
-    }
-    if (!defined($appender)) {
-        $appender = 'STDERR';
-    }
+    my $level    = shift // 'DEBUG';
+    my $appender = shift // 'STDERR';
+
 
     my $date = DateTime->now()->dmy();
     my $import_log_header = sprintf('DATAHUB FACTORY IMPORT LOG FOR %s', DateTime->now()->datetime());
@@ -43,40 +38,66 @@ log4perl.category.datahub=$level,$appender
 log4perl.appender.STDOUT=Log::Log4perl::Appender::Screen
 log4perl.appender.STDOUT.stderr=0
 log4perl.appender.STDOUT.utf8=1
+
 log4perl.appender.STDOUT.layout=PatternLayout
-log4perl.appender.STDOUT.layout.ConversionPattern=%d [%P] - %p : %m%n
+log4perl.appender.STDOUT.layout.ConversionPattern=%d [%P] - %p %l %M time=%r : %m%n
 
 log4perl.appender.STDERR=Log::Log4perl::Appender::Screen
 log4perl.appender.STDERR.stderr=1
 log4perl.appender.STDERR.utf8=1
-log4perl.appender.STDERR.layout=PatternLayout
-log4perl.appender.STDERR.layout.ConversionPattern=%d [%P] - %p %l time=%r : %m%n
 
-log4perl.appender.STATISTICS=Log::Log4perl::Appender::File
-log4perl.appender.STATISTICS.filename=logs/import_$date.log
-log4perl.appender.STATISTICS.utf8=1
-log4perl.appender.STATISTICS.mkpath=1
-log4perl.appender.STATISTICS.header_text=$import_log_header
-log4perl.appender.STATISTICS.layout=PatternLayout
-log4perl.appender.STATISTICS.layout.ConversionPattern=%d [%P] - %p : %m%n
+log4perl.appender.STDERR.layout=PatternLayout
+log4perl.appender.STDERR.layout.ConversionPattern=%d [%P] - %l : %m%n
 
 EOF
     return \$config;
 }
 
 sub setup_logging {
-    my ($logging, $appender) = @_;
     my %LEVELS = (1 => 'WARN', 2 => 'INFO', 3 => 'DEBUG');
+    my $logging = shift;
     my $level  = $LEVELS{$logging};
+    my $load_from = "<none>";
 
-    Log::Log4perl::init(default_log4perl_config($level, $appender));
-    Log::Any::Adapter->set('Log4perl');
+    try {
+        my $log4perl_pkg = Datahub::Factory::Util::require_package('Log::Log4perl');
+        my $logany_adapter = Datahub::Factory::Util::require_package('Log::Any::Adapter::Log4perl');
 
-    if ($level eq 'DEBUG') {
-        Datahub::Factory->log->warn(
-            "Logger activated - level $level"
-        );
-      }
+        my $config = Datahub::Factory->config->{log4perl};
+
+        if (defined ($config)) {
+            if ($config =~ /^\S+$/) {
+                Log::Log4perl::init($config);
+                $load_from = "file: $config";
+            }
+            else {
+                Log::Log4perl::init(\$config);
+                $load_from = "string: <defined in datahubfactory.yml>";
+            }
+        }
+        else {
+            Log::Log4perl::init(default_log4perl_config($level, 'STDERR'));
+            $load_from = "string: <defined in : " . __PACKAGE__ . ">";
+        }
+ 
+        Log::Any::Adapter->set('Log4perl');
+
+    } catch {
+        print STDERR <<EOF;
+
+Oops! Debugging tools not available on this platform.
+
+Try to install Log::Log4perl and Log::Any::Adapter::Log4perl.
+
+Hint: cpan Log::Log4perl Log::Any::Adapter::Log4perl
+EOF
+
+        exit(2);
+    };
+
+    Datahub::Factory->log->warn(
+        "Logger activated - level $level - config loaded from $load_from"
+    );
 }
 
 sub run {
@@ -85,9 +106,8 @@ sub run {
          = $class->_process_args([@ARGV],
          $class->_global_option_processing_params);
 
-    # Setup logging
     if (exists $global_opts->{'log_level'}) {
-        setup_logging($global_opts->{'log_level'}, $global_opts->{'log_output'});
+        setup_logging($global_opts->{'log_level'} // 1);
     }
 
     my $self = ref $class ? $class : $class->new;

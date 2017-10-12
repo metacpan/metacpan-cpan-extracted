@@ -27,7 +27,7 @@ use constant {
     I2C_BCM2835 => 2,
 };
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 __PACKAGE__->create_accessors( qw ( fh fno address busmode readmode ) );
 

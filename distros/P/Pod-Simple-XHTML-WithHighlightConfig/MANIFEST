@@ -1,5 +1,6 @@
 Changes
 lib/Pod/Simple/Role/WithHighlightConfig.pm
+lib/Pod/Simple/Role/XHTML/WithHighlightConfig.pm
 lib/Pod/Simple/XHTML/WithHighlightConfig.pm
 maint/Makefile.PL.include
 Makefile.PL

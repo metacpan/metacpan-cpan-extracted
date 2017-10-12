@@ -6,7 +6,7 @@ use warnings;
 
 use 5.010;
 
-my ($version, $major) = `pg_config --version 2>&1` =~ /PostgreSQL\s+((\d+)\.\d+(?:\.\d+|\w+))\b/i;
+my ($version, $major) = `pg_config --version 2>&1` =~ /PostgreSQL\s+((\d+)\.\d+(?:\.\d+|\w+)?)\b/i;
 unless (defined $major and $major >= 8) {
     die "libpq 8.x.x or later required (" . ($version // 'none') . " found)\n";
 }

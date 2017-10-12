@@ -14,9 +14,11 @@ client/http-gateway-aw-aw-calculator.pl
 client/http-pseudo-aw-aw-calculator.pl
 client/http-pseudo-aw-aw-time.pl
 lib/Apache/AwSOAP.pm
-lib/SOAP/Transport/ACTIVEWORKS.pm
+lib/SOAP/Transport/ActiveWorks/Lite.pm
 server/calc-adapter.pl
 server/soap-lite-adapter.pl
 server/SafeModules/AwGateway.pm
 server/SafeModules/Calculator.pm
 server/broker-config/soap.data
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

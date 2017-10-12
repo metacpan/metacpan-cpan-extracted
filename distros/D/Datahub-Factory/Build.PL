@@ -18,7 +18,7 @@ my %module_build_args = (
     "Matthias Vandermaesen <matthias.vandermaesen\@vlaamsekunstcollectie.be>"
   ],
   "dist_name" => "Datahub-Factory",
-  "dist_version" => "1.71",
+  "dist_version" => "1.72",
   "license" => "gpl",
   "module_name" => "Datahub::Factory",
   "recursive_test_files" => 1,
@@ -32,8 +32,10 @@ my %module_build_args = (
     "Catmandu::Store::Datahub" => 0,
     "Config::Simple" => 0,
     "DateTime" => 0,
+    "HTTP::Request::StreamingUpload" => 0,
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
+    "Log::Any::Adapter::Log4perl" => 0,
     "Log::Log4perl" => 0,
     "Module::Load" => 0,
     "Moo" => 0,
@@ -44,6 +46,7 @@ my %module_build_args = (
     "Sub::Exporter" => 0,
     "Term::ANSIColor" => 0,
     "Try::Tiny" => 0,
+    "URI::URL" => 0,
     "namespace::clean" => 0,
     "perl" => "5.008005"
   },

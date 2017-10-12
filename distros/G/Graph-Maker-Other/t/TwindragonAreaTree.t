@@ -37,7 +37,7 @@ require Graph::Maker::TwindragonAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Maker::TwindragonAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwindragonAreaTree->VERSION,  $want_version,

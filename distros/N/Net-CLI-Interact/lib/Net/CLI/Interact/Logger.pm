@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Logger;
-{
-  $Net::CLI::Interact::Logger::VERSION = '2.143070';
-}
 
 use Moo;
 use Sub::Quote;
@@ -135,19 +132,11 @@ sub log {
 
 1;
 
-# ABSTRACT: Per-instance multi-target logging, with categories
-
-
-__END__
 =pod
 
 =head1 NAME
 
 Net::CLI::Interact::Logger - Per-instance multi-target logging, with categories
-
-=head1 VERSION
-
-version 2.143070
 
 =head1 SYNOPSIS
 
@@ -273,17 +262,6 @@ loaded, in list context.
 Returns True if, according to the current C<log_flags>, the given C<$category>
 is enabled at or above the threshold of C<$level>, otherwise returns False.
 Note that the C<Log::Dispatch> targets maintain their own thresholds as well.
-
-=head1 AUTHOR
-
-Oliver Gorwits <oliver@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Oliver Gorwits.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
 

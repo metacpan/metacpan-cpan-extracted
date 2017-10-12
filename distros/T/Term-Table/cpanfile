@@ -8,7 +8,7 @@ recommends "Unicode::GCString" => "2013.10";
 recommends "Unicode::LineBreak" => "2015.06";
 
 on 'test' => sub {
-  requires "Test2::Tools::Tiny" => "1.302072";
+  requires "Test2::Tools::Tiny" => "1.302097";
   requires "utf8" => "0";
 };
 

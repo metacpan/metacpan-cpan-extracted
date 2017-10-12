@@ -9,7 +9,6 @@ WriteMakefile(
     'PREREQ_PM' => {
         LWP => 5.5,
         JSON => 2.27,
-        Encode => 0,
         URI => 0,
         'HTTP::Request' => 0,
     },

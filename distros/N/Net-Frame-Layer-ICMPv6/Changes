@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Frame::Layer::ICMPv6.
 
+1.10 Fri  6 Oct 18:26:34 CEST 2017
+   - patch: multicast listener discovery extensions by vinsworld.com
+   - update: copyright notice
+
 1.09 Wed Apr  9 08:31:41 CEST 2014
    - bugfix: https://rt.cpan.org/Ticket/Display.html?id=93405
    - update: copyright notice

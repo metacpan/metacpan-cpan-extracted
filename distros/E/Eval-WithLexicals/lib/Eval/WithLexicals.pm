@@ -4,7 +4,7 @@ use Moo;
 use Moo::Role ();
 use Sub::Quote;
 
-our $VERSION = '1.003005'; # 1.3.5
+our $VERSION = '1.003006'; # v1.3.6
 $VERSION = eval $VERSION;
 
 has lexicals => (is => 'rw', default => quote_sub q{ {} });
@@ -131,7 +131,7 @@ sub _eval_do {
 
   sub capture_list {
     my $pad_capture = \&Eval::WithLexicals::Cage::pad_capture;
-    my @names = grep defined && length && $_ ne '&', map $_->PV, grep $_->can('PV'),
+    my @names = grep defined && length > 1, map $_->PV, grep $_->can('PV'),
       svref_2object($pad_capture)->OUTSIDE->PADLIST->ARRAYelt(0)->ARRAY;
     $Eval::WithLexicals::current_code .=
       '+{ '.join(', ', map "'$_' => \\$_", @names).' };'

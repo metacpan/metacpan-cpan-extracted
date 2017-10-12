@@ -4,7 +4,7 @@
 \.gitignore
 ^MYMETA\.(json|yml)$
 ^Makefile$
-^build\.pl$
+^(build|make-pod)\.pl$
 # Old dists, for some reason (??)
 dists
 # Author tests, find on github.

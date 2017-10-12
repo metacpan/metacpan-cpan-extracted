@@ -1,0 +1,27 @@
+---
+abstract: 'Streaming directory scanner'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Directory-Scanner
+requires:
+  Carp: '0'
+  FindBin: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  UNIVERSAL::Object: '0'
+  perl: v5.10.0
+resources:
+  repository: https://github.com/stevan/p5-Directory-Scanner.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,3 @@
+macro paging
+    send pager 0
+

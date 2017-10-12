@@ -14,7 +14,7 @@ Highlights
 Overview
 ========
 
-SOAP::Transport::ACTIVEWORKS module provides a transport layer for sending and
+SOAP::Transport::ActiveWorks::Lite module provides a transport layer for sending and
 receiving SOAP requests to and from an ActiveWorks broker.  Example adapter and
 client scripts are provided.
 
@@ -59,11 +59,11 @@ And restart Apache :-)
 
 Prepare Your Modules
 --------------------
-Before running 'perl Makefile.PL' edit lib/SOAP/Transport/ACTIVEWORKS.pm and
+Before running 'perl Makefile.PL' edit lib/SOAP/Transport/ActiveWorks/Lite.pm and
 update the AW_DEFAULT_* strings for the appropriate broker, host port number
 for your site (editing the default client group is probably a bad idea).
 
-After installing the ACTIVEWORKS module with "make install" add the modules
+After installing the ActiveWorks::Lite module with "make install" add the modules
 in server/SafeModules to where you keep deployed modules for your SOAP servers.
 
 

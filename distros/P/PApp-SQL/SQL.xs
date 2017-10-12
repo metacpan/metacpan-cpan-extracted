@@ -146,7 +146,7 @@ mc_cache (mc_node *mc, SV **method, const char *name)
   *method = (SV *)gv_fetchmethod_autoload (mc->stash, name, 0);
 
   if (!method)
-    croak ("%s: method not found in stash, pelase report.", name);
+    croak ("%s: method not found in stash, please report.", name);
 }
 
 #define mc_cache(mc, method) mc_cache ((mc), &((mc)->method), # method)
@@ -179,7 +179,7 @@ lru_hash (SV *dbh, SV *sql)
 {
   STRLEN i, l;
   char *b = SvPV (sql, l);
-  U32 hash = 2166136261;
+  U32 hash = 2166136261U;
 
   hash = (hash ^ (U32)dbh) * 16777619U;
   hash = (hash ^        l) * 16777619U;
@@ -336,7 +336,7 @@ void
 sql_exec(...)
 	ALIAS:
                 sql_uexec     = 1
-        	sql_fetch     = 2
+		sql_fetch     = 2
                 sql_ufetch    = 3
                 sql_fetchall  = 4
                 sql_ufetchall = 5
@@ -350,7 +350,6 @@ sql_exec(...)
           {
             int i;
             int arg = 0;
-            int first_execution = 0;
             int bind_first, bind_last;
             int count;
             lru_node *lru;
@@ -487,6 +486,7 @@ sql_exec(...)
                     EXTEND (SP, 4);
                     PUSHs (sth);
                     SvIVX (tmp_iv)++;
+                    SvIOK_only (tmp_iv);
                     PUSHs (tmp_iv);
                     PUSHs (sv);
 
@@ -524,7 +524,7 @@ sql_exec(...)
                 while (items > arg)
                   {
                     SV *sv = ST (arg);
-                    PUSHs (ST (arg));
+                    PUSHs (sv);
                     arg++;
                   }
               }
@@ -619,7 +619,7 @@ sql_exec(...)
                           break;
                         case G_SCALAR:
                           /* the first element */
-                          XPUSHs (mortalcopy_and_maybe_force_utf8 (ix & 1, *av_fetch ((AV *)SvRV (row), 0, 1)));
+                          XPUSHs (mortalcopy_and_maybe_force_utf8 (ix & 1, AvARRAY ((AV *)SvRV (row))[0]));
                           count = 1;
                           break;
                         case G_ARRAY:

@@ -1,0 +1,9 @@
+Revision history for Perl extension Directory::Scanner
+
+0.02 2017-10-10
+    - added docs
+    - added META.json (thanks Mohammad S Anwar)
+    - added perl version information to Makefile.PL
+
+0.01 2017-10-09
+    - Initial release to an unsuspecting world

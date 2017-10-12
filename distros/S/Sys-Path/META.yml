@@ -3,16 +3,16 @@ abstract: 'supply autoconf style installation directories'
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
-  Capture::Tiny: 0
-  File::Path: 2.07
-  File::Temp: 0
-  Test::Differences: 0
-  Test::Exception: 0
-  Test::More: 0
+  Capture::Tiny: '0'
+  File::Path: '2.07'
+  File::Temp: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.3607
+  Module::Build: '0.3607'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
 keywords:
   - system
   - paths
@@ -22,24 +22,25 @@ keywords:
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Sys-Path
 provides:
   Sys::Path:
     file: lib/Sys/Path.pm
-    version: 0.14
+    version: '0.15'
   Sys::Path::SPc:
     file: lib/Sys/Path/SPc.pm
-    version: 0.14
+    version: '0.14'
 requires:
-  Cwd: 0
-  Digest::MD5: 0
-  File::Spec: 0
-  JSON::Util: 0
-  List::MoreUtils: 0
-  Text::Diff: 0
+  Cwd: '0'
+  Digest::MD5: '0'
+  File::Spec: '0'
+  JSON::Util: '0'
+  List::MoreUtils: '0'
+  Text::Diff: '0'
 resources:
   bugtracker: http://github.com/jozef/Sys-Path/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jozef/Sys-Path.git
-version: 0.14
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

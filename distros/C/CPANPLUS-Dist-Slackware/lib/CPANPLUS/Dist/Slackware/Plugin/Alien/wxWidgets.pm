@@ -3,10 +3,11 @@ package CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets;
 use strict;
 use warnings;
 
-our $VERSION = '1.024';
+our $VERSION = '1.025';
 
 sub available {
     my ( $plugin, $dist ) = @_;
+
     return ( $dist->parent->package_name eq 'Alien-wxWidgets' );
 }
 
@@ -22,7 +23,9 @@ sub pre_prepare {
 
 sub post_prepare {
     my ( $plugin, $dist ) = @_;
+
     delete $ENV{AWX_URL};
+
     return 1;
 }
 
@@ -35,7 +38,7 @@ CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets - Configure Alien::wxWidgets
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets version 1.024.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets version 1.025.
 
 =head1 SYNOPSIS
 
@@ -49,13 +52,9 @@ Configures Alien::wxWidgets to download and build its own version of the
 wxWidgets library unless C<$ENV{WX_CONFIG}> is set to the full path to
 F<wx-config>.
 
-We default to a custom-built wxWidgets library as Wx currently cannot be built
-with the library provided by the wxGTK and wxGTK3 SlackBuild scripts.
-
-If wxPython is installed you can set C<$ENV{WX_CONFIG}> to
-F</usr/bin/wx-config> and use the wxWidgets library provided by wxPython.  In
-that case you will have to rebuild Alien::wxWidgets and Wx whenever wxPython
-is updated.
+If wxGTK3 or wxPython is installed you can set C<$ENV{WX_CONFIG}> to
+F</usr/bin/wx-config>. You will have to rebuild Alien::wxWidgets and Wx
+whenever wxWidgets is updated, though.
 
 =head1 SUBROUTINES/METHODS
 
@@ -109,7 +108,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 Andreas Voegele
+Copyright 2012-2017 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

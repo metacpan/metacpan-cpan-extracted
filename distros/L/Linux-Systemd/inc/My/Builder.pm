@@ -14,14 +14,14 @@ sub new {
     my $pkg_name = 'libsystemd';
     my %pkg_info;
 
-    try {
+    eval {
         %pkg_info = ExtUtils::PkgConfig->find($pkg_name);
-    }
-    catch {
+    };
+    if ($@) {
         say
           'Do you need to install libsystemd-dev (debian) or systemd-devel (fedora)?';
         exit;
-    };
+    }
 
     say "Found libsystemd-dev version: $pkg_info{modversion}";
 

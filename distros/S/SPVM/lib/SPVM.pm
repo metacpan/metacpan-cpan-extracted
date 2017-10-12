@@ -28,7 +28,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0276';
+our $VERSION = '0.0279';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -188,6 +188,7 @@ CHECK {
     Long
     Float
     Double
+    Arrays
   );
   for my $shared_lib_file_base (@dll_file_bases) {
     my $shared_lib_file_rel = "auto/SPVM/$shared_lib_file_base.native/$shared_lib_file_base.$Config{dlext}";
@@ -230,6 +231,8 @@ sub new_byte_array_len {
 sub new_byte_array {
   my $elements = shift;
   
+  return undef unless defined $elements;
+  
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";
   }
@@ -245,7 +248,9 @@ sub new_byte_array {
 
 sub new_short_array {
   my $elements = shift;
-  
+
+  return undef unless defined $elements;
+
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";
   }
@@ -319,7 +324,9 @@ sub new_int_array_len {
 
 sub new_int_array {
   my $elements = shift;
-  
+
+  return undef unless defined $elements;
+
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";
   }
@@ -361,7 +368,9 @@ sub new_long_array_len {
 
 sub new_long_array {
   my $elements = shift;
-  
+
+  return undef unless defined $elements;
+
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";
   }
@@ -403,7 +412,9 @@ sub new_float_array_len {
 
 sub new_float_array {
   my $elements = shift;
-  
+
+  return undef unless defined $elements;
+
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";
   }
@@ -445,6 +456,8 @@ sub new_double_array_len {
 
 sub new_double_array {
   my $elements = shift;
+  
+  return undef unless defined $elements;
   
   if (ref $elements ne 'ARRAY') {
     confess "Argument must be array reference";

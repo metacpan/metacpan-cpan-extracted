@@ -114,23 +114,22 @@ Mojo::Redis2::Cursor - Cursor iterator for SCAN commands.
   use Mojo::Redis2;
   use Mojo::Redis2::Cursor;
 
-  my $redis = Mojo::Redis2->new();
-  my $cursor
-    = Mojo::Redis2::Cursor->new('SCAN', match => 'mynamespace*')->redis($redis);
+  my $cursor = Mojo::Redis2::Cursor->new(redis => Mojo::Redis2->new)
+                ->command(["SCAN", 0, MATCH => "namespace*"]);
 
   # blocking
   while (my $r = $cursor->next) { say join "\n", @$r }
 
   # or non-blocking
-  use feature 'current_sub';
+  use feature "current_sub";
   $cursor->next(
     sub {
       my ($cur, $err, $r) = @_;
       say join "\n", @$r;
-      return Mojo::IOLoop->stop() unless $cur->next(__SUB__);
+      return Mojo::IOLoop->stop unless $cur->next(__SUB__);
     }
   );
-  Mojo::IOLoop->start();
+  Mojo::IOLoop->start;
 
 
 =head1 DESCRIPTION
@@ -149,7 +148,7 @@ information.
 =head2 redis
 
   my $redus = $cursor->redis;
-  $cursor->redis(Mojo::Redis2->new());
+  $cursor->redis(Mojo::Redis2->new);
 
 Redis object to work with.
 
@@ -160,8 +159,8 @@ the following new ones.
 
 =head2 again
 
-  $cursor->again();
-  my $res = $cursor->again->all();
+  $cursor->again;
+  my $res = $cursor->again->all;
 
 Reset cursor to start iterating from the beginning.
 
@@ -179,32 +178,32 @@ In case of error will return all data fetched so far.
 
 =head2 finished
 
-  my $is_finished = $cursor->finished();
+  my $is_finished = $cursor->finished;
 
 Indicate that full iteration had been made and no additional elements can be
 fetched.
 
 =head2 hgetall
 
-  my $hash = $redis2->scan->hgetall('redis.key');
-  $hash = $cursor->hgetall('redis.key');
-  $cursor->hgetall('redis.key' => sub {...});
+  my $hash = $redis2->scan->hgetall("redis.key");
+  $hash = $cursor->hgetall("redis.key");
+  $cursor->hgetall("redis.key" => sub {...});
 
 Implements standard C<HGETALL> command using C<HSCAN>.
 
 =head2 hkeys
 
-  my $keys = $redis2->scan->hkeys('redis.key');
-  $keys = $cursor->hkeys('redis.key');
-  $cursor->hkeys('redis.key' => sub {...});
+  my $keys = $redis2->scan->hkeys("redis.key");
+  $keys = $cursor->hkeys("redis.key");
+  $cursor->hkeys("redis.key" => sub {...});
 
 Implements standard C<HKEYS> command using C<HSCAN>.
 
 =head2 keys
 
   my $keys = $redis2->scan->keys;
-  $keys = $cursor->keys('*');
-  $cursor->keys('*' => sub {
+  $keys = $cursor->keys("*");
+  $cursor->keys("*" => sub {
     my ($cur, $err, $keys) = @_;
     ...
   });
@@ -214,16 +213,16 @@ Implements standard C<KEYS> command using C<SCAN>.
 =head2 new
 
   my $cursor  = Mojo::Redis2::Cursor->new(
-    command => ['SCAN', 0, MATCH => 'namespace*']);
+    command => ["SCAN", 0, MATCH => "namespace*"]);
   $cursor = Mojo::Redis2::Cursor->new(
-    command => [ZSCAN => 'redis.key', 0, COUNT => 15]);
+    command => [ZSCAN => "redis.key", 0, COUNT => 15]);
 
 Object constructor. Follows same semantics as Redis command.
 
 =head2 next
 
   # blocking
-  my $res = $cursor->next();
+  my $res = $cursor->next;
 
   # non-blocking
   $cursor->next(sub {
@@ -236,7 +235,7 @@ last argument is coderef, will made a non-blocking call. In blocking mode return
 arrayref with fetched elements. If no more items available, will return
 C<undef>, for both blocking and non-blocking, without calling callback.
 
-  my $res = $cursor->next(MATCH => 'namespace*');
+  my $res = $cursor->next(MATCH => "namespace*");
   $cursor->next(COUNT => 100, sub { ... });
 
 Accepts the same optional arguments as original Redis command, which will replace
@@ -244,9 +243,9 @@ old values and will be used for this and next iterations.
 
 =head2 smembers
 
-  my $list = $redis2->scan->smembers('redis.key');
-  $list = $cursor->smembers('redis.key');
-  $cursor->smembers('redis.key' => sub {...});
+  my $list = $redis2->scan->smembers("redis.key");
+  $list = $cursor->smembers("redis.key");
+  $cursor->smembers("redis.key" => sub {...});
 
 Implements standard C<SMEMBERS> command using C<SSCAN>.
 

@@ -3,16 +3,15 @@ package Coerce::Types::Standard;
 use 5.006;
 use strict;
 use warnings;
-use Scalar::Util qw/blessed reftype/;
+use Scalar::Util qw/blessed reftype refaddr/;
 use parent 'Types::Standard';
 
 our @EXPORT_OK = ( Types::Standard->type_names );
 
 our $meta = __PACKAGE__->meta;
+our $VERSION = '0.000004';
 
-our $VERSION = '0.000003';
-
-our (%entity, %recurse, $esc, $unesc, $path);
+our (%entity, %recurse, %compare, $esc, $unesc, $path);
 BEGIN {
 	%entity = ( 
 		encode => {
@@ -39,22 +38,38 @@ BEGIN {
 	$unesc = qr/[0-9A-Fa-f]{2}/;
 	$path = qr|^(([a-z][a-z0-9+\-.]*):(!?\/\/([^\/?#]+))?)?([a-z0-9\-._~%!\$\&'()*+,;=:@\/]*)?(\?[a-z0-9\-._~%!\$\&'()*+,;=:@\/]*)?(#[a-z0-9\-._~%!\$\&'()*+,;=:@\/]*)|;
 	%recurse = (
-		arrayref => sub { return map { recurse($_, $_[1], $_[2]) } @{ $_[0] } },
-		hashref => sub {  do { $_[0]->{$_} = recurse($_[0]->{$_}, $_[1], $_[2]) } for keys %{ $_[0] }; $_[0] },
-		scalarref => sub { ${$_[0]} =~ m/^[0-9.]+$/g ? $_[0] : do { ${$_[0]} =~ s/^(.*)$/recurse(${$_[1]})/e; $_[0]; }; }, 
+		ARRAY => sub { return map { recurse($_, $_[1], $_[2]) } @{ $_[0] } },
+		HASH => sub {  do { $_[0]->{$_} = recurse($_[0]->{$_}, $_[1], $_[2]) } for keys %{ $_[0] }; $_[0] },
+		SCALAR => sub { ${$_[0]} =~ m/^[0-9.]+$/g ? $_[0] : do { ${$_[0]} =~ s/^(.*)$/recurse(${$_[1]})/e; $_[0]; }; }, 
+	);
+	%compare = (
+		ARRAY => sub { 
+			my $recurse = shift;
+			my @length = sort { $a < $b } map { scalar @{ $_ } } (@_);
+			for my $i (0 .. $length[0] - 1) { compare($recurse, map { $_->[$i] } @_) or return 0; }
+			1;
+		},
+		HASH => sub {  
+			my $recurse = shift;
+			for my $k (combine_keys(@_)) {
+				compare($recurse, map { $_->{$k} } @_) or return 0;
+			}
+			1;
+		},
+		SCALAR => sub { compare(shift, map {${$_}} @_) }, 
+		MAGIC => sub { my %t; shift; map { $t{$_}++ } @_; scalar keys %t == 1; },
 	);
 }
-
 {
 	# all powerfull
 	no strict 'refs';
 	my $counter = 0;
 	*{"Type::Tiny::by"} = sub {
-		my ($parent, $hide) = (shift, shift);
-		my $self = do { 
-			# this is going to change to cater for [ ], { } and perhaps \&
-			$_ =~ m/^$parent->name/ && exists $meta->{types}->{$_}->{abuse}
-				&& $meta->{types}->{$_}->{abuse} eq "$hide" 
+		my ($pn, $parent, $hide, $act) = ($_[0]->name, shift, shift);
+		$act = ref $hide ? sub { compare(\%compare, @_) } : sub { $_[0] =~ m/$_[1]/; };
+		my $self = do {
+			$_ =~ m/^$pn/ && exists $meta->{types}->{$_}->{abuse}
+				&& $act->($meta->{types}->{$_}->{abuse}, $hide)
 					and return $meta->{types}->{$_} foreach $meta->type_names; 
 			undef; 
 		} || $meta->add_type({ 
@@ -107,7 +122,7 @@ $meta->add_type({
 
 sub _hash {
 	my $hide = sprintf "array_to_hash_%s", shift;
-	\&$hide;
+	return \&$hide;
 }
 
 # issues with the following is that arrays are not always flat *|o|*  
@@ -172,12 +187,12 @@ sub hash_to_array_flat {
 sub _flat { 
 	my @lazy;
 	my %r = (
-		arrayref => sub { map { recurse($_, $_[1]) } @{ $_[0] } },
-		hashref => sub { do { recurse($_, $_[1]) && recurse($_[0]->{$_}, $_[1]); } for sort keys %{ $_[0] }; },
-		scalarref => sub { recurse(${$_[1]}, $_[1]) }, 
-		scalar => sub { push @lazy, $_[0] },
+		ARRAY => sub { map { recurse($_[0], $_) } @{ $_[1] } },
+		HASH => sub { do { recurse($_[0], $_) && recurse($_[0], $_[1]->{$_}); } for sort keys %{ $_[1] }; },
+		SCALAR => sub { recurse($_[0], ${$_[1]}) }, 
+		MAGIC => sub { push @lazy, $_[1] },
 	);
-	recurse($_[0], \%r);
+	recurse(\%r, $_[0]);
 	return @lazy;
 }
 
@@ -384,23 +399,19 @@ sub _json {
 	return sub {  $json->$type($_[0]) };
 }
 
+sub compare {
+	my ($recurse, %same) = shift;
+	$same{reftype $_ || 'MAGIC'}++ for @_;
+	return 0 if scalar keys %same != 1;
+	return $recurse->{[(keys %same)]->[0]}->($recurse, @_);
+}
+
 sub recurse {
-	my ($yelp, $recurse) = @_;
-    my $ref = reftype($yelp);
-	return $recurse->{scalar}->($_[0]) if !$ref;
-	_deep_recurse($yelp, $recurse, $ref);
+	my ($recurse, $ref) = shift;
+	$ref = reftype($_[0]) || 'MAGIC';
+	$recurse->{$ref}->($recurse, $_[0]) if (exists $recurse->{$ref});
+	$_[0];
 }
-
-sub _deep_recurse {
-	return $_[2] eq 'SCALAR' 
-			? $_[1]->{scalarref}->($_[0], $_[1]) 
-			: $_[2] eq 'ARRAY'
-				? $_[1]->{arrayref}->($_[0], $_[1]) && $_[0] 
-				: $_[2] eq 'HASH' 
-					? $_[1]->{hashref}->($_[0], $_[1]) && $_[0] 
-					: $_[0];
-}
-
 
 # TODO a little documentations
 # TBC .....
@@ -417,7 +428,7 @@ Coerce::Types::Standard - Coercing
 
 =head1 VERSION
 
-Version 0.000003
+Version 0.000004
 
 =cut
 
@@ -430,6 +441,195 @@ Version 0.000003
 	attributes(
 		[qw/sleep/] => [StrToHash->by(' '), {coe}]
 	);
+
+=head1 Exports
+
+Coerce::Types::Standard extends Types::Standard it exports Nothing by default. The following outlines the additional types that can be exported using this module.
+
+=head2 StrToArray
+
+Accepts a string and coerces it into a ArrayRef, You can specify how to split the string by instantiating with *by*.
+
+	StrToArray->by('--')->coerce('mid--flight--documenter');
+	*-*-*-*-*-*-*
+	[qw/mid flight documenter/]
+	
+=head2 StrToHash 
+
+Accepts a string and coerces it into a HashRef, You can specify how to split the string by instantiating with *by*.
+
+	StrToHash->by(", ")->coerce('I, drink, way, too, much, coffee');
+	*-*-*-*-*-*-*
+	{
+		I => 'drink',
+		way => 'too',
+		much => 'coffee',
+	}
+
+=head2 ArrayToHash
+
+Accepts an ArrayRef and coerces it into a HashRef, the default behaviour here is to just dereference the array into a hash.
+
+	ArrayToHash->coerce([qw/north south east west/]);
+	*-*-*-*-*-*-*
+	{
+		north => 'south',
+		east => 'west'
+	}
+
+You can also instantiate this object via *by* and passing in a *mode*, currently the following are your options.
+
+=over
+
+=item odd
+
+Only build my hash out of the odd **index** of the array (1, 3, 5, 7 .....)
+
+	ArrayToHash->by('odd')->coerce([qw/zero one two three/]);
+	*-*-*-*-*-*-*
+	{
+		one => 'three',
+	}
+
+=item even
+
+Only build my hash out of the even **index** of the array (0, 2, 4, 6 .....)
+
+	ArrayToHash->by('even')->coerce([qw/zero one two three/]);
+	*-*-*-*-*-*-*
+	{
+		zero => 'two',
+	}
+
+=item reverse
+
+Reverse the default behavior so keys are values and values are keys.
+	
+	ArrayToHash->by('reverse')->coerce([qw/north south east west/]);
+	*-*-*-*-*-*-*
+	{
+		south => 'north',
+		west => 'east'
+	}
+
+=item flat
+
+Should convert any struct into a one level Hash.
+
+	ArrayToHash->by('flat')->coerce([{ ux => 'ui', analyst => [qw/document support meeting/] }, [qw/sysAdmin backend db deploy/]]);	
+	*-*-*-*-*-*-*
+	{
+		analyst => 'document',
+		ux => 'ui',
+		support => 'meeting',
+		db => 'deploy',
+		sysAdmin => 'backend'
+	}
+
+
+=item merge
+
+Simple single level merge of an array of hash references.
+
+	ArrayToHash->by('merge')->coerce([{ simple => 'merge' }, { simple => 'life' }]);
+	*-*-*-*-*-*-*
+	{
+		simple => 'life'
+	}
+
+=back
+
+=head2 HashToArray
+
+Accepts a HashRef and coerces it into a ArrayRef, the default behaviour here is to just dereference the hash into a array.
+
+	HashToArray->coerce({ 
+		Malaysia => 'KL', 
+		Austrailia => 'Sydney',   
+		Indonesia => 'Bali',
+	});
+	*-*-*-*-*-*-*
+	[qw/Austrailia Sydney Indonesia Bali Malaysia KL/]
+
+You can also instantiate this object via *by* and passing in a *mode*, currently the following are your options.
+
+=over
+
+=item keys
+
+Only coerce the hash references keys into an array refernce.
+
+	HashToArray->by('keys')->coerce({ 
+		Malaysia => 'KL', 
+		Austrailia => 'Sydney',   
+		Indonesia => 'Bali',
+	});
+	*-*-*-*-*-*-*
+	[qw/Austrailia Indonesia Malaysia/]
+
+=item values
+
+Only coerce the hash references values into an array refernce.
+
+	HashToArray->by('values')->coerce({ 
+		Malaysia => 'KL', 
+		Austrailia => 'Sydney',   
+		Indonesia => 'Bali',
+	});
+	*-*-*-*-*-*-*
+	[qw/Bali KL Sydney/]
+
+=item flat
+
+Should convert any struct into a single level Array.
+
+	HashToArray->by('flat')->coerce({ ux => ['ui'], analyst => [qw/document support meeting/] });	
+	*-*-*-*-*-*-*
+	[
+		qw/analyst document ux ui support meeting/
+	]
+
+=back
+
+=head2 HTML
+
+=over
+
+=item encode_entity
+
+=item decode_entity
+
+=back
+
+=head2 URI
+
+=over
+
+=item schema
+
+=item host
+
+=item path
+
+=item query_string
+
+=item query_form
+
+=item fragment
+
+=item params
+
+=item escape
+
+=item unescape
+
+=item 
+
+=back
+
+=head2 Count
+
+=head2 JSON
 
 =head1 AUTHOR
 

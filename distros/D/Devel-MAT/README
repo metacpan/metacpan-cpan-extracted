@@ -99,6 +99,9 @@ METHODS
       Members of the symbol table will be printed as being a 'root' element
       of the given symbol name.
 
+      PADs and PADLISTs will be skipped to their referring CODE, giving
+      shorter output for lexical variables.
+
  find_symbol
 
        $sv = $pmat->find_symbol( $name )

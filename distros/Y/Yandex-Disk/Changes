@@ -3,4 +3,7 @@ Revision history for Perl extension Yandex::Disk.
 0.01  Wed Oct  4 17:01:40 2017
 	- original version; created by h2xs 1.23 with options
 		-b 5.8.1 -XAn Yandex::Disk
+0.02  Tue Oct  10 12:43:00 2017
+	- Delete 'use Data::Printer'
+		-b 5.8.1 -XAn Yandex::Disk
 

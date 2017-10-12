@@ -27,7 +27,7 @@ use Perl::Critic::Pulp::Utils;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 94;
+our $VERSION = 95;
 
 use constant supported_parameters =>
   ({ name           => 'except_same_line',
@@ -118,6 +118,7 @@ my %postfix_loops = (while => 1, until => 1);
 my %prefix_expressions = (do        => 1,
                           map       => 1,
                           grep      => 1,
+                          sort      => 1,
 
                           map { $_ => 1, "List::Util::$_" => 1 }
                           qw(
@@ -152,6 +153,7 @@ my %word_is_block = (sub  => 1,
                      do   => 1,
                      map  => 1,
                      grep => 1,
+                     sort => 1,
 
                      # from Try.pm, TryCatch.pm, Try::Tiny prototypes, etc
                      try     => 1,
@@ -203,7 +205,7 @@ sub _block_is_hash_constructor {
     if ($word_is_block{$prev}) {
       # "sub { ... }"
       # "do { ... }"
-      ### do/sub/map/grep, block is correct ...
+      ### do/sub/map/grep/sort, block is correct ...
       return 0;
     }
 
@@ -315,7 +317,7 @@ sub _block_is_expression {
     }
   }
 
-  ### do, map, grep, etc are expressions ..
+  ### do, map, grep, sort, etc are expressions ..
   my $prev = $elem->sprevious_sibling;
   return ($prev
           && $prev->isa('PPI::Token::Word')
@@ -457,7 +459,7 @@ expression giving a value.
 
 This currently means
 
-    do grep map                              # builtins
+    do grep map sort                         # builtins
 
     reduce any all none notall first         # List::Util
     pairfirst pairgrep pairmap
@@ -495,7 +497,7 @@ same as an C<if> doesn't).
           attempt_something();
       } catch {
           error_recovery();
-      } # ok, no semi required here
+      } # ok, no semi required here for TryCatch
     }
 
 The insides of the C<try> and C<catch> are treated the same as other blocks.
@@ -503,10 +505,11 @@ But the C<try> statement itself doesn't require a semicolon.  (See policy
 C<ValuesAndExpressions::ProhibitNullStatements> to notice one added
 unnecessarily.)
 
-C<PPI> doesn't recognise C<try>/C<catch> specifically, so when they don't
-have a final semicolon the next statement runs together and the nature of
-those parts may be lost.  This is likely to upset things like recognition of
-C<for> loops and could potentially make some perlcritic reports go wrong.
+For reference, C<PPI> doesn't know C<try>/C<catch> specifically, so when
+they don't have a final semicolon the next statement runs together and the
+nature of those parts might be lost.  This could upset things like
+recognition of C<for> loops and could potentially make some perlcritic
+reports go wrong.
 
 The C<try>/C<catch> block exemption here is only for the modules with this
 block syntax.  There are other try modules such as C<Try::Tiny> and friends
@@ -520,7 +523,7 @@ take code blocks).
           attempt_something();
       } catch {
           error_recovery();
-      } # bad, semi required here
+      } # bad, semi required here for Try::Tiny
     }
 
 =head2 Disabling
@@ -555,7 +558,9 @@ expression block, as described under L</Final Value Expression> above.
 
 The statements and functions for this exception are currently hard coded.
 Maybe in the future they could be configurable, though multi-line
-expressions in this sort of thing tends to be unusual anyway.
+expressions in this sort of thing tends to be unusual anyway.  (See policy
+C<BuiltinFunctions::RequireSimpleSortBlock> to demand C<sort> is only one
+line.)
 
 =back
 
@@ -581,9 +586,11 @@ L<Perl::Critic>,
 L<Perl::Critic::Policy::CodeLayout::RequireTrailingCommas>,
 L<Perl::Critic::Policy::CodeLayout::RequireTrailingCommaAtNewline>,
 L<Perl::Critic::Policy::Subroutines::RequireFinalReturn>,
-L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitNullStatements>
+L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitNullStatements>,
+L<Perl::Critic::Policy::BuiltinFunctions::RequireSimpleSortBlock>
 
-L<List::Util>, L<List::Pairwise>
+L<List::Util>, L<List::Pairwise>,
+L<Try>, L<TryCatch>, L<Syntax::Feature::Try>
 
 =head1 HOME PAGE
 

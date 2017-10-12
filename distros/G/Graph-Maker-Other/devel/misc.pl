@@ -19,15 +19,386 @@
 
 use 5.005;
 use strict;
-use FindBin;
-use MyGraphs;
 use List::Util 'min';
 
-use lib 'devel/lib';
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
+use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+
+{
+  # identity graphs, asymmetric
+  MyGraphs::hog_searches_html
+      (# 5-cycle and leaf, 7 edges
+       'ECro',
+
+       # diamond and 2 leaves, 7 edges
+       'ECrg',
+
+       # triangle, leaf, path-2, 6 edges
+       'ECZG',
+
+       # diamond, triangle, leaf, 8 edges
+       'ECzW',
+
+       # square, triangle, leaf, 7 edges
+       # https://hog.grinvin.org/ViewGraphInfo.action?id=25152
+       'EEhW',
+
+       # diamond and square, 8 edges
+       'EEjo',
+
+       # 3 triangles and leaf, 8 edges
+       'EEjW',
+
+       # 3 triangles and square, 9 edges
+       'EEno',
+      );
+  exit 0;
+}
+{
+  # regular not maximum median
+  # GCZJd_
+  # GCXmd_
+
+  foreach my $g6_str ('GCZJd_',  # n=8
+                      'GCXmd_',
+                      'HCOethk',   # n=9
+                     ) {
+    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
+    my $can = MyGraphs::graph6_str_to_canonical($g6_str);
+    print MyGraphs::hog_grep($can)?"HOG":"not", "\n";
+  }
+  exit 0;
+}
+{
+  my $want = "GEhtr{\n";
+  $want = MyGraphs::graph6_str_to_canonical($want);
+  print MyGraphs::hog_grep($want)?"HOG":"not", "\n";
+  my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
+    (num_vertices_min => 1,
+     num_vertices_max => 9,
+     connected => 1,
+    );
+  while (my $edge_aref = $iterator_func->()) {
+    my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+    my $linegraph = MyGraphs::Graph_line_graph($graph);
+    my $got = MyGraphs::graph6_str_to_canonical
+      (MyGraphs::Graph_to_graph6_str($linegraph));
+    if ($got eq $want) {
+      my $graph_g6 = MyGraphs::graph6_str_to_canonical
+        (MyGraphs::Graph_to_graph6_str($graph));
+      print MyGraphs::hog_grep($graph_g6)?"HOG":"not", "\n";
+      # MyGraphs::Graph_print_tikz($graph);
+      # MyGraphs::Graph_view($graph);
+      exit;
+    }
+  }
+  exit 0;
+}
+{
+  # GCQbUG
+  #   linegraph 1
+  # GCQREO
+  #   linegraph 1
+  # GCpddW
+  #   linegraph 1
+  # GEhtr{
+  #   linegraph 1
+
+  foreach my $g6_str ('GCQbUG',
+                      'GCQREO',
+                      'GCpddW',
+                      'GEhtr{') {
+    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($g6_str));
+  }
+  exit 0;
+}
+{
+  # Harary and Palmer two triangles
+  #
+  #    2       3
+  #   / \     / \
+  #  1---5---6---7---4---0
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=30306
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=30308  removal
+
+  my $graph = Graph->new (undirected=>1);
+  print "is linegraph ",MyGraphs::Graph_is_line_graph_by_Beineke($graph),"\n";
+
+  $graph->add_cycle(1,2,5);
+  $graph->add_path(5,6,7,4,0);
+  $graph->add_path(6,3,7);
+  my $u = 5;
+  my $v = 7;
+  my $gu = $graph->copy;
+  my $gv = $graph->copy;
+  $gu->delete_vertex($u);
+  $gv->delete_vertex($v);
+  print "isomorphic ",MyGraphs::Graph_is_isomorphic($gu,$gv),"\n";
+  MyGraphs::Graph_view($gu);
+  MyGraphs::Graph_view($gv);
+
+  MyGraphs::hog_searches_html($graph, $gu);
+  exit 0;
+}
+{
+  # hog_grep()
+  my $graph = Graph->new (undirected=>1);
+  $graph->add_path(0,1);
+  my $g6_str = MyGraphs::graph6_str_to_canonical
+    (MyGraphs::Graph_to_graph6_str($graph));
+  print MyGraphs::hog_grep($g6_str)?"HOG":"not", "\n";
+  exit 0;
+}
+
+{
+  # totdomnum max
+  my @graphs = (
+                # triangle with arms
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=28537
+                '>>graph6<<G?`aeG',
+
+                # tree
+                '>>graph6<<G?`@f?',
+
+                # tree
+                '>>graph6<<G?B@dO',
+               );
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # Harary and Palmer K4-e * 3 pseudosimilar
+
+  # .  0   3---4   7
+  # .  |   | / | / |
+  # .  1---2---5---6
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=30310
+
+  my $graph = Graph->new (undirected=>1);
+  $graph->add_path(0,1,2,3,4,5,6,7,5);
+  $graph->add_path(4,2,5);
+  my $u = 2;
+  my $v = 5;
+  MyGraphs::Graph_view($graph);
+
+  my $gu = $graph->copy;
+  my $gv = $graph->copy;
+  $gu->delete_vertex($u);
+  $gv->delete_vertex($v);
+  print "isomorphic ",MyGraphs::Graph_is_isomorphic($gu,$gv),"\n";
+  MyGraphs::Graph_view($gv);
+
+  MyGraphs::hog_searches_html($graph);
+  exit 0;
+}
+
+{
+  # n=11 no duplicated leaf
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=28553
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=28555
+
+  my $n = 11;
+  my $formula = int((2*$n-1)/3);
+  print "n=$n\n";
+  print "formula $formula\n";
+
+  my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
+    (num_vertices_min => $n,
+     num_vertices_max => $n,
+     connected => 1);
+  my $count = 0;
+  my @graphs;
+  while (my $edge_aref = $iterator_func->()) {
+    my $graph = MyGraphs::Graph_from_edge_aref($edge_aref, num_vertices => $n);
+    next if Graph_has_duplicated_leaf($graph);
+    my $indnum = MyGraphs::Graph_tree_indnum($graph);
+    if ($indnum == $formula) {
+      my $g6_str = MyGraphs::graph6_str_to_canonical
+        (MyGraphs::Graph_to_graph6_str($graph));
+      print "n=$n  ",MyGraphs::hog_grep($g6_str)?"HOG":"not", "\n";
+      # MyGraphs::Graph_view($graph);
+      # sleep 5;
+      $count++;
+      push @graphs, $graph;
+    }
+  }
+  print "count $count\n";
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+
+  sub Graph_has_duplicated_leaf {
+    my ($graph) = @_;
+    my %seen;
+    foreach my $v ($graph->vertices) {
+      if ($graph->vertex_degree($v) == 1) {
+        my ($attachment) = $graph->neighbours($v);
+        if ($seen{$attachment}++) {
+          return 1;
+        }
+      }
+    }
+    return 0;
+  }
+}
+
+{
+  # n=27 minimal_domsets_count max
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=28551
+
+  # non maximum, arms length 4
+  # my $graph = MyGraphs::Graph_from_graph6_str(':Z_`abc`e`g`i`k_mnopmrmtmvmx');
+
+  # maximum, 6,6
+  my $graph = MyGraphs::Graph_from_graph6_str(':Z_`a`c`e`g`i`k_mnmpmrmtmvmx');
+  MyGraphs::Graph_view($graph);
+  print MyGraphs::Graph_tree_minimal_domsets_count($graph),"\n";
+  MyGraphs::hog_searches_html($graph);
+
+  # MyGraphs::Graph_view($graph);
+  foreach (1 .. 20) {
+    my $minimal_domsets_count
+      = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "count $minimal_domsets_count\n";
+  }
+  exit 0;
+}
+{
+  # try Graph_tree_minimal_domsets_count()
+
+  # 81 pairs 19,20  1649265868801
+  # 12161^3      == 1798489329281
+
+  require Graph;
+  require Math::BigInt;
+  Math::BigInt->import(try=>'GMP');
+  require Math::BigFloat;
+  my $base;
+  foreach my $k (1 .. 5) {
+    my $graph = make_T1 (6,6,$k);
+    my $num_vertices = $graph->vertices;
+    # MyGraphs::Graph_view($graph);
+    my $count = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+    print "k=$k  count $count  n=$num_vertices\n";
+
+    if ($k==1) { $base = $count; }
+    else {
+      my $pow = $base ** $k;
+      print "           $pow\n";
+      my $two = Math::BigFloat->new(2)**(($num_vertices)/2);
+      print "   2^(n/2) $two\n";
+    }
+  }
+
+  my $graph = make_T1 (19,20);
+  my $minimal_domsets_count
+    = MyGraphs::Graph_tree_minimal_domsets_count($graph);
+  my $num_vertices = $graph->vertices;
+  print "$num_vertices   count $minimal_domsets_count\n";
+  exit 0;
+}
+
+
+
+{
+  # Jou and Lin, "Independence Numbers in Trees", Open Journal of Discrete
+  # Mathematics, volume 5, 2015, pages 27-31,
+  # http://dx.doi.org/10.4236/ojdm.2015.53003
+
+  # no duplicated leaf
+
+  # GP-Test  my(k=4,n=3*k);   2*k-1 == 7 && n==12
+  # GP-Test  my(k=4,n=3*k+1); 2*k   == 8 && n==13
+  # GP-Test  my(k=4,n=3*k+2); 2*k+1 == 9 && n==14
+
+  # n=15 indnum 9
+
+  foreach my $n (# 12 .. 14,
+                 11,
+                ) {
+    my $graph = make_extremal_nodupicated_leaf_indnum($n);
+    MyGraphs::Graph_view($graph);
+    my $indnum = MyGraphs::Graph_tree_indnum($graph);
+    my $formula = int((2*$n-1)/3);
+    print "n=$n  indnum $indnum formula $formula\n";
+    $graph->vertices == $n or die;
+  }
+  exit 0;
+
+  sub make_extremal_nodupicated_leaf_indnum {
+    my ($n) = @_;
+    my $graph = Graph->new (undirected=>1);
+    $graph->set_graph_attribute (name => "n=$n");
+    my $upto = 1;   # next prospective vertex number
+    $graph->add_vertex($upto++);
+    while ($upto <= $n) {
+      ### $upto
+      my $more = min(3, $n-$upto+1);
+      $graph->add_path(1, $upto .. $upto+$more-1);
+      $upto += $more;
+    }
+    return $graph;
+  }
+}
+
+
+
+{
+  # most indomsets
+
+  # n=6   https://hog.grinvin.org/ViewGraphInfo.action?id=132
+  # n=7   https://hog.grinvin.org/ViewGraphInfo.action?id=698
+  # n=8   https://hog.grinvin.org/ViewGraphInfo.action?id=118
+  # n=9   https://hog.grinvin.org/ViewGraphInfo.action?id=28526
+  # n=10  https://hog.grinvin.org/ViewGraphInfo.action?id=658
+  my @graphs;
+  foreach my $n (6 .. 20) {
+    my $graph = MyGraphs::Graph_make_most_indomsets($n);
+    my $g6_str = MyGraphs::graph6_str_to_canonical
+      (MyGraphs::Graph_to_graph6_str($graph));
+    print "n=$n  ",MyGraphs::hog_grep($g6_str)?"HOG":"not", "\n";
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # most minimum dominating sets
+
+  my @graphs = ('>>graph6<<D]w',  # n=5      got
+                '>>graph6<<E]~o',  # n=6     got
+                '>>graph6<<FCZbg',  # n=7    got
+                '>>graph6<<GCxvBo',  # n=8
+               );
+  foreach my $graph6 (@graphs) {
+    MyGraphs::Graph_print_tikz(MyGraphs::Graph_from_graph6_str($graph6));
+    print "---------\n";
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+{
+  # most maximum independent sets
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=496
+
+  MyGraphs::hog_searches_html('>>graph6<<DQw',  # n=5
+                              '>>graph6<<DUW',  # n=5 cycle
+                              '>>graph6<<EQjO',  # n=6
+                              '>>graph6<<FQhVO',  # n=7
+                              '>>graph6<<GQhTUg',  # n=8
+                              '>>graph6<<HCOcaRc',  # n=9
+                             );
+  exit 0;
+}
+{
+  print MyGraphs::hog_grep("E?CW\n");
+  exit 0;
+}
 
 
 {
@@ -145,46 +516,7 @@ $|=1;
   exit 0;
 }
 
-{
-  # Jou and Lin, "Independence Numbers in Trees", Open Journal of Discrete
-  # Mathematics, volume 5, 2015, pages 27-31,
-  # http://dx.doi.org/10.4236/ojdm.2015.53003
 
-  # no duplicated leaf
-
-  # GP-Test  my(k=4,n=3*k);   2*k-1 == 7 && n==12
-  # GP-Test  my(k=4,n=3*k+1); 2*k   == 8 && n==13
-  # GP-Test  my(k=4,n=3*k+2); 2*k+1 == 9 && n==14
-
-  # n=15 indnum 9
-
-  foreach my $n (# 12 .. 14,
-                 15,
-                ) {
-    my $graph = make_extremal_nodupicated_leaf_indnum($n);
-    MyGraphs::Graph_view($graph);
-    my $indnum = MyGraphs::Graph_tree_indnum($graph);
-    my $formula = int((2*$n-1)/3);
-    print "n=$n  indnum $indnum formula $formula\n";
-    $graph->vertices == $n or die;
-  }
-  exit 0;
-
-  sub make_extremal_nodupicated_leaf_indnum {
-    my ($n) = @_;
-    my $graph = Graph->new (undirected=>1);
-    $graph->set_graph_attribute (name => "n=$n");
-    my $upto = 1;   # next prospective vertex number
-    $graph->add_vertex($upto++);
-    while ($upto <= $n) {
-      ### $upto
-      my $more = min(3, $n-$upto+1);
-      $graph->add_path(1, $upto .. $upto+$more-1);
-      $upto += $more;
-    }
-    return $graph;
-  }
-}
 
 
 {
@@ -233,7 +565,7 @@ $|=1;
   # read("vpar.gp");
   # matrix(5,5,n,m,n++;m++; vpar_claw_count(vpar_make_bistar(n,m)))
 
-  use Graph::Maker::CompleteBipartite;
+  require Graph::Maker::CompleteBipartite;
   foreach my $n (2 .. 8) {
     foreach my $m (2 .. 8) {
       my $graph = Graph::Maker->new('complete_bipartite', N1 => $n, N2 => $m,
@@ -326,57 +658,8 @@ $|=1;
   # Math::OEIS::Grep->search(array => \@values, verbose=>1);
   exit 0;
 }
-{
-  # try Graph_tree_minimal_domsets_count()
 
-  # 81 pairs 19,20  1649265868801
-  # 12161^3      == 1798489329281
 
-  require Graph;
-  require Math::BigInt;
-  Math::BigInt->import(try=>'GMP');
-  require Math::BigFloat;
-  my $base;
-  foreach my $k (1 .. 5) {
-    my $graph = make_T1 (6,6,$k);
-    my $num_vertices = $graph->vertices;
-    # MyGraphs::Graph_view($graph);
-    my $count = MyGraphs::Graph_tree_minimal_domsets_count($graph);
-    print "k=$k  count $count  n=$num_vertices\n";
-
-    if ($k==1) { $base = $count; }
-    else {
-      my $pow = $base ** $k;
-      print "           $pow\n";
-      my $two = Math::BigFloat->new(2)**(($num_vertices)/2);
-      print "   2^(n/2) $two\n";
-    }
-  }
-
-  my $graph = make_T1 (19,20);
-  my $minimal_domsets_count
-    = MyGraphs::Graph_tree_minimal_domsets_count($graph);
-  my $num_vertices = $graph->vertices;
-  print "$num_vertices   count $minimal_domsets_count\n";
-  exit 0;
-}
-{
-  # n=27 minimal_domsets_count max
-
-  # non maximum, arms length 4
-  # my $graph = MyGraphs::Graph_from_graph6_str(':Z_`abc`e`g`i`k_mnopmrmtmvmx');
-
-  # maximum, 6,6
-  my $graph = MyGraphs::Graph_from_graph6_str(':Z_`a`c`e`g`i`k_mnmpmrmtmvmx');
-
-  # MyGraphs::Graph_view($graph);
-  foreach (1 .. 20) {
-    my $minimal_domsets_count
-      = MyGraphs::Graph_tree_minimal_domsets_count($graph);
-    print "count $minimal_domsets_count\n";
-  }
-  exit 0;
-}
 {
   # n=12
 

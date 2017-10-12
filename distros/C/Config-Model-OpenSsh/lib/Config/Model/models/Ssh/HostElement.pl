@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -71,37 +71,43 @@ inside a Host directive of a ssh configuration.',
       },
       'Ciphers',
       {
-        'choice' => [
-          'aes128-cbc',
-          '3des-cbc',
-          'blowfish-cbc',
-          'cast128-cbc',
-          'arcfour128',
-          'arcfour256',
-          'arcfour',
-          'aes192-cbc',
-          'aes256-cbc',
-          'aes128-ctr',
-          'aes192-ctr',
-          'aes256-ctr'
-        ],
-        'description' => 'Specifies the ciphers allowed for protocol version 2 in order of preference. By default, all ciphers are allowed. User cipher list will override system list',
-        'ordered' => '1',
-        'type' => 'check_list',
-        'upstream_default_list' => [
-          '3des-cbc',
-          'aes128-cbc',
-          'aes128-ctr',
-          'aes192-cbc',
-          'aes192-ctr',
-          'aes256-cbc',
-          'aes256-ctr',
-          'arcfour',
-          'arcfour128',
-          'arcfour256',
-          'blowfish-cbc',
-          'cast128-cbc'
-        ]
+        'description' => "Specifies the ciphers allowed for protocol version 2 in order of
+preference.  Multiple ciphers must be comma-separated.  If the
+specified value begins with a \x{2018}+\x{2019} character, then the specified
+ciphers will be appended to the default set instead of replacing them.
+If the specified value begins with a \x{2018}-\x{2019} character, then the specified
+ciphers (including wildcards) will be removed from the default set
+instead of replacing them.
+
+The supported ciphers are:
+
+   3des-cbc
+   aes128-cbc
+   aes192-cbc
+   aes256-cbc
+   aes128-ctr
+   aes192-ctr
+   aes256-ctr
+   aes128-gcm\@openssh.com
+   aes256-gcm\@openssh.com
+   arcfour
+   arcfour128
+   arcfour256
+   blowfish-cbc
+   cast128-cbc
+   chacha20-poly1305\@openssh.com
+
+The default is:
+
+   chacha20-poly1305\@openssh.com,
+   aes128-ctr,aes192-ctr,aes256-ctr,
+   aes128-gcm\@openssh.com,aes256-gcm\@openssh.com,
+   aes128-cbc,aes192-cbc,aes256-cbc
+
+The list of available ciphers may also be obtained using
+C<ssh -Q cipher>",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'ClearAllForwardings',
       {

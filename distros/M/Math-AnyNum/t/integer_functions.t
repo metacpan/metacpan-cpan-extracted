@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 360;    # be careful
+plan tests => 364;    # be careful
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -185,6 +185,9 @@ is(lcm($o->new(13), $o->new(14)), 182);
 is(lcm($o->new(42), "1210923789812382173912783"), '7265542738874293043476698');
 is(lcm(42,          "1210923789812382173912783"), '7265542738874293043476698');
 
+is(lcm(12, -28),          84);
+is(lcm(12, $o->new(-28)), 84);
+
 ok(is_coprime(27,          8));
 ok(is_coprime(8,           27));
 ok(is_coprime($o->new(27), 8));
@@ -201,6 +204,9 @@ is(gcd(20,          12),          4);
 is(gcd($o->new(20), 12),          4);
 is(gcd(20,          $o->new(12)), 4);
 is(gcd($o->new(12), $o->new(20)), 4);
+
+is(gcd(8993, -207),          23);
+is(gcd(8993, $o->new(-207)), 23);
 
 is(gcd($o->new(42), "1210923789812382173912783"), 7);
 is(gcd(42,          "1210923789812382173912783"), 7);
@@ -422,7 +428,7 @@ ok(is_polygonal('359999999999999999999999999999999999999999999999999999999999999
 #>>>
 
 is(polygonal(10, 3), '55');
-is(polygonal(12, 4), '144');
+is(polygonal(12, Math::AnyNum->new(4)), '144');
 
 is(join('', map { is_polygonal2($_, 5) ? 1 : 0 } qw(0 2 7 15 26 40 57 77 100)),   '1' x 9);
 is(join('', map { is_polygonal2($_, 6) ? 1 : 0 } qw(0 3 10 21 36 55 78 105 136)), '1' x 9);

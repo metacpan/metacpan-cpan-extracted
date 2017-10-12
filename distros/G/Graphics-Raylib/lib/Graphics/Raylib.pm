@@ -3,11 +3,25 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
 use Graphics::Raylib::Color;
+
+use Import::Into;
+
+sub import {
+    for (@_) {
+        if ($_ eq '+family') {
+            Graphics::Raylib::Color->import::into(scalar caller, ':all');
+            Graphics::Raylib::Shape->import::into(scalar caller);
+            Graphics::Raylib::Text ->import::into(scalar caller);
+            Graphics::Raylib::Mouse->import::into(scalar caller);
+        }
+    }
+}
+
 
 =pod
 
@@ -19,20 +33,20 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
     use Graphics::Raylib;
     use Graphics::Raylib::Text;
-    use Graphics::Raylib::Color;
+    use Graphics::Raylib::Color ':all';
 
     my $g = Graphics::Raylib->window(120,20);
     $g->fps(5);
 
     my $text = Graphics::Raylib::Text->new(
         text => 'Hello World!',
-        color => Graphics::Raylib::Color::DARKGRAY,
+        color => DARKGRAY,
         size => 20,
     );
 
@@ -73,11 +87,10 @@ Constructs the Graphics::Raylib window. C<$title> is optional and defaults to C<
 sub window {
     my $class = shift;
 
-    my $self = {
-        width => $_[0],
-        height => $_[1],
-    };
-    InitWindow($self->{width}, $self->{height}, $_[2] // $0);
+    my $self = { width => shift, height => shift, title => shift // $0, @_ };
+    InitWindow($self->{width}, $self->{height}, $self->{title});
+    SetTargetFPS($self->{fps}) if defined $self->{fps};
+    ClearBackground($self->{background}) if defined $self->{background};
 
     bless $self, $class;
     return $self;
@@ -139,6 +152,12 @@ sub draw(&) {
     EndDrawing();
 }
 
+sub draws(@) {
+    BeginDrawing();
+    for (@_) { $_->draw }
+    EndDrawing();
+}
+
 sub DESTROY {
     CloseWindow();
 }
@@ -161,10 +180,7 @@ sub DESTROY {
 
     my $CELL_SIZE = 3;
 
-    use Graphics::Raylib;
-    use Graphics::Raylib::Shape;
-    use Graphics::Raylib::Color;
-    use Graphics::Raylib::Text;
+    use Graphics::Raylib '+family'; # one use to rule them all
 
     use PDL;
     use PDL::Matrix;
@@ -184,29 +200,24 @@ sub DESTROY {
 
     $g->fps($HZ);
 
-    my $text = Graphics::Raylib::Text->new(
-        color => Graphics::Raylib::Color::RED,
-        size => 20,
-    );
+    my $text = Graphics::Raylib::Text->new(color => RED, size => 20);
 
     my $bitmap = Graphics::Raylib::Shape->bitmap(
         matrix => unpdl($gen),
-        # color => Graphics::Raylib::Color::RED; # commented-out, we are doing it fancy
+        # color => GOLD; # commented-out, we are doing it fancy
     );
 
     my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
 
-    $g->clear(Graphics::Raylib::Color::BLACK);
+    $g->clear(BLACK);
 
     while (!$g->exiting) {
+        $bitmap->matrix = unpdl($gen);
+        $bitmap->color = $rainbow->();
+        $text->text = "Generation " . ($i++);
+
         Graphics::Raylib::draw {
-            $g->clear(Graphics::Raylib::Color::BLACK);
-
-            $bitmap->matrix = unpdl($gen);
-            $bitmap->color = $rainbow->();
             $bitmap->draw;
-
-            $text->text = "Generation " . ($i++);
             $text->draw;
         };
 

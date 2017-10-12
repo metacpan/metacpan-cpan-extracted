@@ -34,7 +34,7 @@ sub upload_image {
 
   # Create image.
   my $image_data = Google::Ads::Common::MediaUtils::get_base64_data_from_url(
-    "http://goo.gl/HJM3L");
+    "https://goo.gl/3b9Wfh");
   my $image = Google::Ads::AdWords::v201708::Image->new({
       data => $image_data,
       type => "IMAGE"

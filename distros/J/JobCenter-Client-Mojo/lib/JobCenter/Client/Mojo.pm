@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.27'; # VERSION
+our $VERSION = '0.28'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -382,8 +382,10 @@ sub work {
 	}
 
 	my $pt = $self->ping_timeout;
-	my $tmr = Mojo::IOLoop->timer($pt => sub {
+	my $tmr = Mojo::IOLoop->recurring($pt => sub {
 		my $ioloop = shift;
+		$self->log->debug('in ping_timeout timer: lastping: '
+			 . ($self->lastping // 0) . ' limit: ' . (time - $pt) );
 		return if ($self->lastping // 0) > time - $pt;
 		$self->log->error('ping timeout');
 		$ioloop->remove($self->clientid);

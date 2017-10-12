@@ -1,0 +1,158 @@
+/*
+ * Formatting the results of the searches
+ */
+
+.query {
+    margin-bottom: 0.5em;
+}
+.query form {
+    display: inline-block;
+}
+.searchform {
+    background: rgba(0,0,0,0.25);
+}
+.searchform form {
+    margin: 0.5em;
+}
+.searchform .textin {
+    display: inline-block;
+    width: 38%;
+}
+.searchform .textin input[type="text"] {
+    display: inline-block;
+    width: 78%;
+}
+.searchform .textin label {
+    display: inline-block;
+    width: 17%;
+}
+.searchform .searcher .selector,
+.searchform .searcher input[type="submit"] {
+    display: inline-block;
+    min-width: 10%;
+}
+
+.pagination {
+    padding: 0.5em;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid #808080;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.results {
+    padding: 0;
+}
+
+.results>ul {
+    margin: 1em;
+    list-style: none;
+    padding-left: 0;
+}
+
+table.data {
+    border-collapse:collapse;
+    border: 1px solid black;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+table.data td, table.data th {
+    border: 1px solid black;
+    padding: 0.25em;
+}
+
+.results li.private {
+    background: rgba(180,180,180,0.2);
+}
+
+.results li .linktitle {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.results li .linkdescription {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: normal;
+    max-height: 400px;
+    overflow: auto;
+}
+
+.results li .details {
+    font-size: 0.8em;
+}
+.results li .details .status {
+    font-style: italic;
+}
+
+.results .clan {
+    font-style: italic;
+    font-weight: bold;
+}
+.results .family {
+    font-style: italic;
+}
+
+.results li .thumbnail {
+    float: right;
+    margin: 0px 10px 0px 10px;
+}
+
+.results li .thumbnail img {
+    border-radius: 3px;
+    box-shadow: 0.5px 0.5px 0.5px 1px #ddd;
+    height: 150px;
+}
+
+.results li .grouping {
+    font-style: italic;
+}
+
+.results li .linkfile {
+    font-size: 8pt;
+    display: inline-block;
+}
+
+.results li .linkurl {
+    font-size: 9pt;
+    display: inline-block;
+}
+
+.results li .linktaglist {
+    clear: both;
+}
+.results li .linktaglist form {
+    display: inline-block;
+}
+
+.query a.tag,
+.linktaglist input[type=submit],
+.linktaglist a.button {
+    border-radius: 3px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+}
+
+.tag {
+    font-size: 0.9em;
+}
+.tag .remove {
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #808080;
+    padding-left: 5px;
+}
+
+.fanfic .linkdescription {
+    font-style: italic;
+}
+.fanfic .review {
+    font-size: 95%;
+}
+
+#alltags {
+    -moz-column-count: 3;
+    column-count: 3;
+    -moz-column-width: 18em;
+    column-width: 20em;
+}

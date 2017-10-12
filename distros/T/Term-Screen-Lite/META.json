@@ -41,15 +41,15 @@
    "provides" : {
       "Term::Screen::Lite" : {
          "file" : "lib/Term/Screen/Lite.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Term::Screen::Lite::Generic" : {
          "file" : "lib/Term/Screen/Lite/Generic.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Term::Screen::Lite::Win32" : {
          "file" : "lib/Term/Screen/Lite/Win32.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/Manwar/Term-Screen-Lite"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

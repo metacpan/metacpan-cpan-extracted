@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -660,9 +660,15 @@ House of Graphs entries for graphs here include
 
 =over
 
+=item height=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+
+=item height=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=288>
+
 =item height=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21059>
 
-=item height=6, C<series_reduced> L<https://hog.grinvin.org/ViewGraphInfo.action?id=21048>
+=item height=4, series reduced, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25131>
+
+=item height=6, series reduced, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21048>
 
 =back
 

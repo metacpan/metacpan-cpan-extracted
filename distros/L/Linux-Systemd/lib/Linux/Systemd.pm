@@ -1,8 +1,8 @@
-package Linux::Systemd 1.172760;
+package Linux::Systemd 1.172840;
 
 use v5.16;
 
-# ABSTRACT: Use the systemd journal
+# ABSTRACT: Bindings for C<systemd> APIs
 
 1;
 
@@ -16,19 +16,25 @@ __END__
 
 =head1 NAME
 
-Linux::Systemd - Use the systemd journal
+Linux::Systemd - Bindings for C<systemd> APIs
 
 =head1 VERSION
 
-version 1.172760
+version 1.172840
 
 =head1 DESCRIPTION
+
+The following C<systemd> components are wrapped to some to degree.
 
 =head2 Journal
 
 To log to the journal, see L<Linux::Systemd::Journal::Write>.
 
 To read from the journal, see L<Linux::Systemd::Journal::Read>.
+
+=head2 Daemon
+
+To report status and use service watchdogs, see L<Linux::Systemd::Daemon>.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -45,7 +51,7 @@ site near you, or see L<https://metacpan.org/module/Linux::Systemd/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/ioanrogers/Linux-Systemd>
+The development version is on github at L<https://github.com/ioanrogers/Linux-Systemd>
 and may be cloned from L<git://github.com/ioanrogers/Linux-Systemd.git>
 
 =head1 AUTHOR

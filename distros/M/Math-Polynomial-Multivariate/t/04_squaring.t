@@ -1,8 +1,6 @@
-# Copyright (c) 2013-2014 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 04_squaring.t 16 2014-02-21 12:48:34Z demetri $
 
 # Check whether multiplication can handle identical operands
 

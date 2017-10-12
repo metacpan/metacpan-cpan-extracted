@@ -54,7 +54,7 @@ unless ($tpg) {
     plan skip_all => $Test::PostgreSQL::errstr;
 }
 
-plan tests => 18;
+plan tests => 22;
 
 my %ci = (dbname => 'test',
           host   => '127.0.0.1',
@@ -95,6 +95,20 @@ tuples_ok($res, 3, "select prepared");
 
 is_deeply([$res->rows], [[13, 169], [14, 196], [8378, 70190884]], "rows");
 is_deeply([$res->columns], [[13, 14, 8378], [169, 196, 70190884]], "columns");
+
+ok($conn->sendQueryPrepared(sth2 => 12));
+while (1) {
+    $conn->consumeInput;
+    last unless $conn->busy;
+    sleep 1;
+}
+
+$res = $conn->result;
+tuples_ok($res, 3, "select send prepared");
+
+is_deeply([$res->rows], [[13, 169], [14, 196], [8378, 70190884]], "send rows");
+is_deeply([$res->columns], [[13, 14, 8378], [169, 196, 70190884]], "send columns");
+
 
 $res = $conn->exec("listen bar");
 command_ok($res, "listen bar");

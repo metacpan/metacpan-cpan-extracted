@@ -1,5 +1,13 @@
 This is the change log for the perl extension PApp::SQL.
 
+2.001 Sat Oct  7 17:52:36 CEST 2017
+	- protip: avoid postgres, it's an inefficient pile of garbage code.
+	- work around DBD::Pg (and only DBD::Pg) unnecessarily modifying
+          the first argument of bind_param, likely due to some misguided
+          implementation of some unneecessary extensions requiring
+          non-standard syntax for bind_param. bleah.
+        - minor av_fetch optimisation.
+
 2.0   Sat Jul 28 15:50:52 CEST 2012
 	- work around some bugs in DBD drivers (SQLite...) instead of
           crashing.

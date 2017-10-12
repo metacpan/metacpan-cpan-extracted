@@ -1,5 +1,8 @@
 # PODNAME: Config::Model::models::Sshd::MatchBlock
 # ABSTRACT:  Configuration class Sshd::MatchBlock
+
+=encoding utf8
+
 =head1 NAME
 
 Config::Model::models::Sshd::MatchBlock - Configuration class Sshd::MatchBlock
@@ -17,11 +20,11 @@ parameters to apply to the matched items.
 
 =head2 Condition
 
-Specify the condition (User, Group, Host, Address) necessary for this Match block to be applied. I<< Optional. Type node of class L<Sshd::MatchCondition|Config::Model::models::Sshd::MatchCondition> .  >> 
+Specify the condition (User, Group, Host, Address) necessary for this Match block to be applied. I< Optional. Type node of class L<Sshd::MatchCondition|Config::Model::models::Sshd::MatchCondition> .  > 
 
 =head2 Settings
 
-Defines the sshd_config parameters that will override general settings when all defined User, Group, Host and Address patterns match.I<< Optional. Type node of class L<Sshd::MatchElement|Config::Model::models::Sshd::MatchElement> .  >> 
+Defines the sshd_config parameters that will override general settings when all defined User, Group, Host and Address patterns match. I< Optional. Type node of class L<Sshd::MatchElement|Config::Model::models::Sshd::MatchElement> .  > 
 
 =head1 SEE ALSO
 

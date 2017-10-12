@@ -21,6 +21,9 @@ BEGIN { require 5 }
 package MyTestHelpers;
 use strict;
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
 
 # Don't want to load Exporter here since that could hide a problem of a
 # module missing a "use Exporter".  Though Test.pm and Test::More (via

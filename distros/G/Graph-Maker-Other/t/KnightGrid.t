@@ -32,7 +32,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 95;
+plan tests => 96;
 
 
 require Graph::Maker::KnightGrid;
@@ -40,7 +40,7 @@ require Graph::Maker::KnightGrid;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Maker::KnightGrid::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::KnightGrid->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::KnightGrid->VERSION($want_version); 1 }, 1,
@@ -92,6 +92,7 @@ foreach my $undirected (0, 1) {
   ok ($graph->has_edge(1,2)?1:0, 0);
   ok ($graph->vertex_degree(2), 0);
   ok ($graph->vertex_degree(5), 0);
+  ok ($graph->get_graph_attribute('name'), "Knight Grid 2x3");
 }
 
 {

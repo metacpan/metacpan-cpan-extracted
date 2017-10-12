@@ -1,5 +1,8 @@
 Revision history for Crypt::Hill
 
+0.10  Mon Oct 09 11:00:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
 0.09  Mon Sep 25 18:20:00 2017
       - Improved method exporting.
 

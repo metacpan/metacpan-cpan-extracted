@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package Dancer::Logger::LogReport;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 use base 'Dancer::Logger::Abstract', 'Exporter';
 

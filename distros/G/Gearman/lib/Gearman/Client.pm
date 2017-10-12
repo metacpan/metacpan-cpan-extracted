@@ -1,6 +1,6 @@
 package Gearman::Client;
 use version ();
-$Gearman::Client::VERSION = version->declare("2.004.008");
+$Gearman::Client::VERSION = version->declare("2.004.009");
 
 use strict;
 use warnings;
@@ -27,7 +27,10 @@ Gearman::Client - Client for gearman distributed job system
     );
 
     # running a single task
-    my $result_ref = $client->do_task("add", "1+2");
+    my $result_ref = $client->do_task("add", "1+2", {
+      on_fail => sub {...},
+      on_complete => sub {...}
+    });
     print "1 + 2 = $$result_ref\n";
 
     # waiting on a set of tasks in parallel
@@ -63,69 +66,29 @@ settings in I<%options>, which can contain:
 
 =over 4
 
-=item * job_servers
+=item
+
+exceptions
+
+If true, the client sends an L<OPTION_REQ exceptions|http://gearman.org/protocol/> request for each connection to the job server.
+This causes job server to forward WORK_EXCEPTION packets to the client.
+
+=item
+
+job_servers
 
 List of job servers. Value should be an array reference, hash reference
 or scalar.
 
 Calls L<Gearman::Objects> to set I<job_servers>
 
-=item * prefix
+=item
 
-Calls I<prefix> (see below) to set the prefix / namespace.
+prefix
+
+Calls I<prefix> (see L<Gearman::Objects>) to set the prefix / namespace.
 
 =back
-
-=head2 $client->job_servers(@servers)
-
-Initializes the client I<$client> with the list of job servers in I<@servers>.
-I<@servers> should contain a list of IP addresses, with optional port
-numbers. For example:
-
-    $client->job_servers('127.0.0.1', '192.168.1.100:4730');
-
-If the port number is not provided, C<4730> is used as the default.
-
-=head2 $client-E<gt>do_task($task)
-
-=head2 $client-E<gt>do_task($funcname, $arg, \%options)
-
-Dispatches a task and waits on the results.  May either provide a
-L<Gearman::Task> object, or the 3 arguments that the Gearman::Task
-constructor takes.
-
-Returns a scalar reference to the result, or undef on failure.
-
-If you provide on_complete and on_fail handlers, they're ignored, as
-this function currently overrides them.
-
-
-=head2 $taskset = $client-E<gt>new_task_set
-
-Creates and returns a new L<Gearman::Taskset> object.
-
-=head2 $taskset-E<gt>add_task($task)
-
-=head2 $taskset-E<gt>add_task($funcname, $arg, $uniq)
-
-=head2 $taskset-E<gt>add_task($funcname, $arg, \%options)
-
-Adds a task to a taskset.  Three different calling conventions are
-available.
-
-=head2 $taskset-E<gt>wait
-
-Waits for a response from the job server for any of the tasks listed
-in the taskset. Will call the I<on_*> handlers for each of the tasks
-that have been completed, updated, etc.  Doesn't return until
-everything has finished running or failing.
-
-=head2 $client-E<gt>prefix($prefix)
-
-Sets the namespace / prefix for the function names.
-
-See L<Gearman::Worker> for more details.
-
 
 =head1 EXAMPLES
 
@@ -196,7 +159,7 @@ sub new {
 
 =head2 new_task_set()
 
-B<return> Gearman::Taskset
+Creates and returns a new L<Gearman::Taskset> object.
 
 =cut
 
@@ -370,19 +333,21 @@ sub _get_task_from_args {
 
 =head2 do_task($funcname, $arg, \%options)
 
-given a (func, arg_p, opts?)
+Dispatches a task and waits on the results.  May either provide a
+L<Gearman::Task> object, or the 3 arguments that the L<Gearman::Task>
+constructor takes.
 
-B<return> scalarref of WORK_COMPLETE result
+B<return> scalarref of WORK_COMPLETE result, or undef on failure.
 
 =cut
 
 sub do_task {
     my $self = shift;
     my $task = $self->_get_task_from_args(@_);
-    my $ret  = undef;
-
+    my ($ret, $sub) = (undef, $task->{on_complete});
     $task->{on_complete} = sub {
-        $ret = shift;
+        ($ret) = @_;
+        $sub && $sub->(@_);
     };
 
     my $ts = $self->new_task_set;
@@ -455,7 +420,7 @@ sub add_hook {
 
 =head2 get_status($handle)
 
-The Gearman Server will assign a scalar job handle when you request a 
+The Gearman Server will assign a scalar job handle when you request a
 background job with L<dispatch_background>. Save this scalar, and use it later
 in order to request the status of this job.
 

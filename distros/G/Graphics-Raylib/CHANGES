@@ -1,9 +1,67 @@
 ==================================================
-Changes from 2016-10-04 00:00:00 +0000 to present.
+Changes from 2016-10-08 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-10-04 14:49:41 +0000
+version 0.004 at 2017-10-08 00:46:25 +0000
+------------------------------------------
+
+  Change: f7f41fda6c22a50bf96dfd624d961acd70d39fcb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-08 02:46:01 +0000
+
+    Allow bitmap construction to be deferred to drawing stage 
+
+  Change: 21a9c0113dd01ccb3b7c438396641abdbd87391e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-07 13:02:20 +0000
+
+    Move non-drawing action outside of Begin/End-Drawing 
+
+  Change: 2d72ba2a60a704427e73d44064ebe0a865275a1e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-07 12:30:57 +0000
+
+    Fix undefined warning when using Mouse position setter 
+
+  Change: c373f30ad9c65fbd62451edfea8f553f25e9f62b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-07 12:25:31 +0000
+
+    Make Bitmap rotatable. Add Rectangle/Vector Helpers 
+
+  Change: cf347a1e0f3e29e0320548d44481bc55b83870b3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-07 08:54:17 +0000
+
+    Add wrappers for Mouse interaction 
+
+  Change: aacf2a0209b1f5875356ab7ed03b77c6211c85e1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-06 23:48:09 +0000
+
+    Add Graphics::Raylib::import('+family' for importing all modules 
+
+  Change: 27658fc33bcedd3a604f725f602d578fa03abb3f
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-06 23:01:14 +0000
+
+    Add transposed parameter to Shape::Bitmap 
+
+  Change: 9b0d9a1c848abfb36c095e62636db61b955a66c9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-06 19:37:56 +0000
+
+    Fix up miscalculation of Bitmap width/height 
+
+  Change: b1a53fb7e4438c40c7612624d780608f6b8d4f7c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-06 15:07:52 +0000
+
+    Add ':all' tag to Graphics::Raylib::Color 
+
+------------------------------------------
+version 0.003 at 2017-10-04 14:27:50 +0000
 ------------------------------------------
 
   Change: 674c794bd72a2ee07477d859cc522204347bb01f

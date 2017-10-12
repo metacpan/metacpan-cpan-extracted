@@ -1,4 +1,7 @@
 Revision history for Sys-Path
+0.15    12 October 2017
+        - author tests moved to xt/
+
 0.14    6 Feb 2015
         - use File::Spec->canonpath to pass the cwd test on win32 paltforms
         - mantain the same version in all packages (cpants);

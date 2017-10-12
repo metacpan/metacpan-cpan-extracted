@@ -1,0 +1,10 @@
+Revision history for Perl extension Vlc::Engine.
+
+0.001  Sat Oct 07 19:36:43 2017
+	- New blood join this earth
+
+0.002  Sat Oct 07 22:52:43 2017
+	- Add META.yml
+
+0.003  Sat Oct 07 23:06:43 2017
+	- Correcting POD

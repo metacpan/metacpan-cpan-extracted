@@ -85,7 +85,7 @@ is( $obj->sasa ,       0,        'sasa        default' );
     $atom->resname("TRD");
     my $x;
     warning_is { $x = $atom->aa321 }
-    "PDBRole> residue TRD name has no 1 letter code; return X",
+    "PDBRole> residue TRD name has no 1 letter code",
       "warning for unrecognized residue name";
     is( $x, 'X', "aa321 returns X for unrecognized residue name" );
 

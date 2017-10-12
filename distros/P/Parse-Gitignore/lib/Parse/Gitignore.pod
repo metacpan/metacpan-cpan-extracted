@@ -1,13 +1,27 @@
 
+
 =encoding UTF-8
 
 =head1 NAME
 
-Parse::Gitignore - parse a .gitignore file
+Parse::Gitignore - parse .gitignore files
 
 =head1 SYNOPSIS
 
-    use Parse::Gitignore;
+    
+
+
+produces output
+
+    
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Parse-Gitignore-0.04/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Parse::Gitignore version 0.04
+corresponding to git commit L<eef29c685b26d8cd9b28ff74e5e2388e751fd23e|https://github.com/benkasminbullock/parse-gitignore/commit/eef29c685b26d8cd9b28ff74e5e2388e751fd23e> released on Mon Oct 9 14:00:13 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -41,6 +55,14 @@ are accumulated.
 Read an excludesfile which is applied to all directories where .git is
 found.
 
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Path::Tiny>
+
+=back
+
 =head1 HISTORY
 
 I wrote this because I wanted to have a way to ignore generated files
@@ -51,18 +73,10 @@ for a desktop file search application.
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016
+2016-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

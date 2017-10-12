@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
+use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( any );
 
 sub new
@@ -42,22 +43,26 @@ sub report_progress
    $self->{progress}->( @_ ) if $self->{progress};
 }
 
-sub get_sv
+sub get_sv_from_args
 {
    my $self = shift;
-   my ( $arg ) = @_;
+   my ( $args ) = @_;
 
    my $sv = Devel::MAT::UI->can( "current_sv" ) && Devel::MAT::UI->current_sv;
 
-   if( defined $arg ) {
-      my $addr = $_[0];
+   if( @$args ) {
+      my $addr = shift @$args;
 
       # Acccept any root name symbolically
       if( any { $addr eq $_ } Devel::MAT::Dumpfile->ROOTS ) {
          $sv = $self->df->$addr;
       }
       else {
-         $addr = hex $addr if $addr =~ m/^0x/;
+         $addr = do {
+            no warnings 'portable';
+            hex $addr;
+         } if $addr =~ m/^0x/;
+
          do { no warnings 'numeric'; $addr eq $addr+0 } or
             die "Expected numerical SV address\n";
 
@@ -71,19 +76,65 @@ sub get_sv
    return $sv;
 }
 
-sub _dispatch_sub
+# Some empty defaults
+use constant CMD_OPTS => ();
+use constant CMD_ARGS_SV => 0;
+use constant CMD_ARGS => ();
+use constant CMD_SUBS => ();
+
+sub find_subcommand
 {
    my $self = shift;
-   my ( $cmd, @args ) = @_;
+   my ( $subname ) = @_;
 
-   my $meth = (caller 1)[3];
+   # TODO: sanity check
 
-   if( my $code = $self->can( "${meth}_${cmd}" ) ) {
-      return $self->$code( @args );
+   return ( ref($self) . "::" . $subname )->new( $self->pmat,
+      progress => $self->{progress},
+   );
+}
+
+sub run_cmd
+{
+   my $self = shift;
+   my ( @args ) = @_;
+
+   # TODO: consider what happens if parent commands have CMD_OPTS
+   if( my @subs = $self->CMD_SUBS ) {
+      my $subcmd = @args ? shift @args : $subs[0];
+      return $self->find_subcommand( $subcmd )->run_cmd( @args );
    }
-   else {
-      die "$self has no $cmd sub-command\n";
+
+   my %optspec = $self->CMD_OPTS;
+
+   my %opts;
+   my %getopts;
+
+   foreach my $name ( keys %optspec ) {
+      my $spec = $optspec{$name};
+
+      $opts{$name} = $spec->{default};
+
+      my $getopt = $name;
+      $getopt .= join "|", "", $spec->{alias} if defined $spec->{alias};
+
+      $getopt =~ s/_/-/g;
+
+      $getopt .= "=$spec->{type}" if $spec->{type};
+
+      $getopts{$getopt} = \$opts{$name};
    }
+
+   GetOptionsFromArray( \@args, %getopts ) or return;
+
+   if( $self->CMD_ARGS_SV ) {
+      my $sv = $self->get_sv_from_args( \@args );
+      unshift @args, $sv;
+   }
+
+   # TODO: parsing/checking of ARGS?
+
+   $self->run( %optspec ? \%opts : (), @args );
 }
 
 0x55AA;

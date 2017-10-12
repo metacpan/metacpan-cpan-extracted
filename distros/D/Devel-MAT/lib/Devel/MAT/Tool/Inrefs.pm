@@ -1,16 +1,27 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Inrefs;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
-use List::Util qw( pairmap pairs );
+use List::Util qw( pairs );
+
+my %STRENGTH_TO_IDX = (
+   strong   => 0,
+   weak     => 1,
+   indirect => 2,
+   inferred => 3,
+);
+use constant {
+   IDX_ROOTS => 4,
+   IDX_STACK => 5,
+};
 
 =head1 NAME
 
@@ -35,14 +46,6 @@ sub new
    return $class;
 }
 
-my %PREFIX_FROM_STRENGTH = (
-   strong   => "+",
-   weak     => "-",
-   indirect => ";",
-   inferred => ".",
-);
-my %STRENGTH_FROM_PREFIX = reverse %PREFIX_FROM_STRENGTH;
-
 sub patch_inrefs
 {
    my $self = shift;
@@ -53,28 +56,30 @@ sub patch_inrefs
    my $heap_total = scalar $df->heap;
    my $count = 0;
    foreach my $sv ( $df->heap ) {
-      foreach my $ref ( $sv->_outrefs_matching ) {
-         my $refsv = $ref->sv;
-         my $prefixname = $PREFIX_FROM_STRENGTH{$ref->strength} . $ref->name;
-         push @{ $refsv->{tool_inrefs} }, $prefixname, $sv->addr if !$refsv->immortal;
+      foreach ( pairs $sv->outrefs( "NO_DESC" ) ) {
+         my ( $strength, $refsv ) = @$_;
+
+         push @{ $refsv->{tool_inrefs}[ $STRENGTH_TO_IDX{ $strength } ] }, $sv->addr if !$refsv->immortal;
       }
 
       $count++;
       $progress->( sprintf "Patching refs in %d of %d (%.2f%%)",
-         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 2000) == 0
+         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 10000) == 0
    }
 
-   $progress->() if $progress;
-
+   # Most SVs are not roots or on the stack. To save time later on we'll make
+   #   a note of those rare ones that are
    foreach ( pairs $df->_roots ) {
-      my ( $name, $sv ) = @$_;
-      push @{ $sv->{tool_inrefs} }, $name, undef if defined $sv;
+      my ( undef, $sv ) = @$_;
+      $sv->{tool_inrefs}[IDX_ROOTS]++;
    }
 
    foreach my $addr ( @{ $df->{stack_at} } ) { # TODO
       my $sv = $df->sv_at( $addr ) or next;
-      push @{ $sv->{tool_inrefs} }, "a value on the stack", undef;
+      $sv->{tool_inrefs}[IDX_STACK]++;
    }
+
+   $progress->() if $progress;
 }
 
 =head1 SV METHODS
@@ -116,43 +121,69 @@ C<outrefs_*> methods.
 sub Devel::MAT::SV::_inrefs
 {
    my $self = shift;
-   my ( $match ) = @_;
+   my ( @strengths ) = @_;
+
+   # In scalar context we don't need to return SVs or Reference instances,
+   #   just count them. This allows a lot of optimisations.
+   my $just_count = !wantarray;
 
    $self->{tool_inrefs} ||= [];
 
    my $df = $self->df;
    my @inrefs;
-   foreach ( pairs @{ $self->{tool_inrefs} } ) {
-      my ( $name, $addr ) = @$_;
-
-      if( wantarray and $addr and $addr =~ m/^\d+$/ ) {
-         my $sv = $df->sv_at( $addr );
-         if( $sv ) {
-            push @inrefs, $name, $sv if $name =~ $match;
+   foreach my $strength ( @strengths ) {
+      my %seen;
+      foreach my $addr ( @{ $self->{tool_inrefs}[ $STRENGTH_TO_IDX{$strength} ] // [] } ) {
+         if( $just_count ) {
+            push @inrefs, 1;
          }
          else {
-            warn "Unable to find SV at $_ for $sv inref\n";
+            $seen{$addr}++ and next;
+
+            my $sv = $df->sv_at( $addr );
+
+            push @inrefs, Devel::MAT::SV::Reference( $_->name, $_->strength, $sv )
+               for grep { $_->strength eq $strength and $_->sv == $self } $sv->outrefs;
          }
-      }
-      else {
-         push @inrefs, $name => undef if $name =~ $match;
       }
    }
 
-   return @inrefs / 2 if !wantarray;
+   if( $strengths[0] eq "strong" and $self->{tool_inrefs}[IDX_ROOTS] ) {
+      if( $just_count ) {
+         push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_ROOTS];
+      }
+      else {
+         foreach ( pairs $df->_roots ) {
+            my ( $name, $sv ) = @$_;
+            push @inrefs, Devel::MAT::SV::Reference( $name, strong => undef )
+               if defined $sv and $sv == $self;
+         }
+      }
+   }
 
-   return pairmap {
-      my $prefix = substr( $a, 0, 1, "" );
-      Devel::MAT::SV::Reference( $a, $STRENGTH_FROM_PREFIX{$prefix}, $b );
-   } @inrefs;
+   if( $strengths[0] eq "strong" and $self->{tool_inrefs}[IDX_STACK] ) {
+      if( $just_count ) {
+         push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_STACK];
+      }
+      else {
+         foreach my $addr ( @{ $df->{stack_at} } ) { # TODO
+            next unless $addr == $self->addr;
+
+            push @inrefs, Devel::MAT::SV::Reference( "a value on the stack", strong => undef );
+         }
+      }
+   }
+
+   return @inrefs;
 }
 
-sub Devel::MAT::SV::inrefs          { shift->_inrefs( qr/^./    ) }
-sub Devel::MAT::SV::inrefs_strong   { shift->_inrefs( qr/^\+/   ) }
-sub Devel::MAT::SV::inrefs_weak     { shift->_inrefs( qr/^-/    ) }
-sub Devel::MAT::SV::inrefs_direct   { shift->_inrefs( qr/^[+-]/ ) }
-sub Devel::MAT::SV::inrefs_indirect { shift->_inrefs( qr/^;/    ) }
-sub Devel::MAT::SV::inrefs_inferred { shift->_inrefs( qr/^\./   ) }
+# If 'strong' is included in these lists it must be first
+sub Devel::MAT::SV::inrefs          { shift->_inrefs( qw( strong weak indirect inferred )) }
+sub Devel::MAT::SV::inrefs_strong   { shift->_inrefs( qw( strong      )) }
+sub Devel::MAT::SV::inrefs_weak     { shift->_inrefs( qw( weak        )) }
+sub Devel::MAT::SV::inrefs_direct   { shift->_inrefs( qw( strong weak )) }
+sub Devel::MAT::SV::inrefs_indirect { shift->_inrefs( qw( indirect    )) }
+sub Devel::MAT::SV::inrefs_inferred { shift->_inrefs( qw( inferred    )) }
 
 =head1 AUTHOR
 

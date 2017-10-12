@@ -4,20 +4,20 @@ NAME
 
 VERSION
 
-    version 0.003
+    version 0.004
 
 SYNOPSIS
 
         use Graphics::Raylib;
         use Graphics::Raylib::Text;
-        use Graphics::Raylib::Color;
+        use Graphics::Raylib::Color ':all';
     
         my $g = Graphics::Raylib->window(120,20);
         $g->fps(5);
     
         my $text = Graphics::Raylib::Text->new(
             text => 'Hello World!',
-            color => Graphics::Raylib::Color::DARKGRAY,
+            color => DARKGRAY,
             size => 20,
         );
     
@@ -85,10 +85,7 @@ EXAMPLES
       
           my $CELL_SIZE = 3;
       
-          use Graphics::Raylib;
-          use Graphics::Raylib::Shape;
-          use Graphics::Raylib::Color;
-          use Graphics::Raylib::Text;
+          use Graphics::Raylib '+family'; # one use to rule them all
       
           use PDL;
           use PDL::Matrix;
@@ -108,29 +105,24 @@ EXAMPLES
       
           $g->fps($HZ);
       
-          my $text = Graphics::Raylib::Text->new(
-              color => Graphics::Raylib::Color::RED,
-              size => 20,
-          );
+          my $text = Graphics::Raylib::Text->new(color => RED, size => 20);
       
           my $bitmap = Graphics::Raylib::Shape->bitmap(
               matrix => unpdl($gen),
-              # color => Graphics::Raylib::Color::RED; # commented-out, we are doing it fancy
+              # color => GOLD; # commented-out, we are doing it fancy
           );
       
           my $rainbow = Graphics::Raylib::Color::rainbow(colors => 240);
       
-          $g->clear(Graphics::Raylib::Color::BLACK);
+          $g->clear(BLACK);
       
           while (!$g->exiting) {
+              $bitmap->matrix = unpdl($gen);
+              $bitmap->color = $rainbow->();
+              $text->text = "Generation " . ($i++);
+      
               Graphics::Raylib::draw {
-                  $g->clear(Graphics::Raylib::Color::BLACK);
-      
-                  $bitmap->matrix = unpdl($gen);
-                  $bitmap->color = $rainbow->();
                   $bitmap->draw;
-      
-                  $text->text = "Generation " . ($i++);
                   $text->draw;
               };
       

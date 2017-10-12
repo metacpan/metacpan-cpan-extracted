@@ -16,13 +16,20 @@
 # with Graph-Maker-Other.  See the file COPYING.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+
+#
+# For interest, 3x3x3 appears in Emden R. Gansner, Yifan Hu, Stephen
+# G. Kobourov, "On Touching Triangle Graphs", with a drawing by triangles
+# (each vertex is a triangle with sides touching its neighbours).
+
+
 package Graph::Maker::HexGrid;
 use 5.004;
 use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -161,21 +168,25 @@ a hexagonal shape,
 
 C<dims> is the side lengths of the hexagonal shape.  The example above is 4
 hexagons along the bottom left side, then 3 for the bottom right, and 2
-vertically.  The other sides likewise 4,3,2.
+vertically.  The opposite sides the same 4,3,2.
 
 If a side is 1 then the result is a parallelogram of hexagons.
 
-            *---*                 
-           /     \                
-      *---*       *---*           
-     /     \     /     \                     dims => [3,2,1]
-    *       *---*       *---*     
-     \     /     \     /     \    
-      *---*       *---*       *   
-           \     /     \     /    
-            *---*       *---*     
-                 \     /          
-                  *---*           
+                  *---*                       
+                 /     \                      
+            *---*       *---*                 
+           /     \     /     \              dims => [4,3,1]
+      *---*       *---*       *---*           
+     /     \     /     \     /     \          
+    *       *---*       *---*       *---*     
+     \     /     \     /     \     /     \    
+      *---*       *---*       *---*       *   
+           \     /     \     /     \     /    
+            *---*       *---*       *---*     
+                 \     /     \     /          
+                  *---*       *---*           
+                       \     /                
+                        *---*                 
 
 If two sides are 1 then the result is line of hexagons, like a ladder
 (L<Graph::Maker::Ladder>) with every second rung.
@@ -226,9 +237,24 @@ House of Graphs entries for graphs here include
 
 =item 1,1,1 L<https://hog.grinvin.org/ViewGraphInfo.action?id=670> 6-cycle
 
+=item 2,2,2 L<https://hog.grinvin.org/ViewGraphInfo.action?id=28529>
+
 =item 3,3,3 L<https://hog.grinvin.org/ViewGraphInfo.action?id=28500>
 
 =back
+
+=head1 OEIS
+
+Entries in Sloane's Online Encyclopedia of Integer Sequences related to
+this tree include
+
+=over
+
+L<http://oeis.org/A143366> (etc)
+
+=back
+
+    A143366    Wiener index of NxNxN
 
 =head1 SEE ALSO
 

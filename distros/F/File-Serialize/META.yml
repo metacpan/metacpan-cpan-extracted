@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,28 +24,31 @@ name: File-Serialize
 provides:
   File::Serialize:
     file: lib/File/Serialize.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer:
     file: lib/File/Serialize/Serializer.pm
-    version: v1.1.1
+    version: v1.2.0
+  File::Serialize::Serializer::Data::Dumper:
+    file: lib/File/Serialize/Serializer/Data/Dumper.pm
+    version: v1.2.0
   File::Serialize::Serializer::JSON::MaybeXS:
     file: lib/File/Serialize/Serializer/JSON/MaybeXS.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer::JSONY:
     file: lib/File/Serialize/Serializer/JSONY.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer::TOML:
     file: lib/File/Serialize/Serializer/TOML.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer::XML::Simple:
     file: lib/File/Serialize/Serializer/XML/Simple.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer::YAML::Tiny:
     file: lib/File/Serialize/Serializer/YAML/Tiny.pm
-    version: v1.1.1
+    version: v1.2.0
   File::Serialize::Serializer::YAML::XS:
     file: lib/File/Serialize/Serializer/YAML/XS.pm
-    version: v1.1.1
+    version: v1.2.0
 recommends:
   JSON::MaybeXS: '0'
   YAML::Tiny: '0'
@@ -59,9 +62,8 @@ requires:
   Module::Pluggable: '0'
   Module::Runtime: '0'
   Moo: '0'
-  Moo::Role: '0'
-  MooX::ClassAttribute: '0'
   Path::Tiny: '0'
+  Role::Tiny: '0'
   feature: '0'
   parent: '0'
   perl: v5.16.0
@@ -71,9 +73,11 @@ resources:
   bugtracker: https://github.com/yanick/File-Serialize/issues
   homepage: https://github.com/yanick/File-Serialize
   repository: https://github.com/yanick/File-Serialize.git
-version: 1.1.1
+version: 1.2.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
 x_contributors:
+  - 'Jason Hall <jayce@lug-nut.com>'
   - 'John SJ Anderson <genehack@genehack.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

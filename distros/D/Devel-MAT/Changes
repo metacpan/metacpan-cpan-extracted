@@ -1,5 +1,25 @@
 Revision history for Devel-MAT
 
+0.29    2017-10-11 21:16:12
+        [CHANGES]
+         * Slightly more efficient file loading by combining some steps
+         * Further optimisation of Inrefs tool CPU performance
+         * Much improved 'help' command and command system metadata
+         * Neater table formatting of tabular command output
+         * Default --depth 10 to 'identify' command
+
+        [BUGFIXES]
+         * Capture the string values from the shared string table
+
+0.28    2017-10-10 00:55:37
+        [CHANGES]
+         * Further reworking of the way command-providing Tools can format
+           their output
+         * Richer display of detail in many commands, including 'identify'
+         * Have 'show' tool give overall byte-size of the SV
+         * Elide PADs and PADLISTs when identifying lexicals
+         * Make Inrefs tool more efficient in CPU and memory requirements
+
 0.27    2017-09-29 19:09:11
         [CHANGES]
          * Major reworking of the way command-providing Tools work, and supply

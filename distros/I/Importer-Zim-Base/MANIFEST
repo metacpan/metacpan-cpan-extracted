@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 lib/Importer/Zim/Base.pm
+lib/Importer/Zim/Bogus.pm
 lib/Importer/Zim/Utils.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -16,5 +17,6 @@ t/01-load.t
 t/02-basic.t
 t/03-tags.t
 t/04-prefix.t
+t/05-filter.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

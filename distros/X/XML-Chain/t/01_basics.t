@@ -32,6 +32,9 @@ subtest 'xc()' => sub {
 
     my $over_el = xc('overload');
     is("$over_el", '<overload/>', '=head2 as_string; sample');
+
+    my $xml_doc = XML::LibXML->load_xml(string => '<xml-doc><el/></xml-doc>');
+    is(xc($xml_doc)->as_string, '<xml-doc><el/></xml-doc>', 'xc(XML::LibXML::Document->new())');
 };
 
 subtest 'basic creation / removal' => sub {
@@ -182,6 +185,15 @@ subtest 'store' => sub {
 
     isa_ok(xc($tmp_file)->empty->c('div')->t('updated')->store, 'XML::Chain::Element', '->store() returns xc element');
     is($tmp_file->slurp.'', '<body><div>updated</div></body>', 'load & ->store() via file');
+};
+
+subtest 'element attributes' => sub {
+    my $body = xc(\'<body><img/></body>');
+    $body->children->attr('href' => '#', 'title' => '');
+    is($body->as_string, '<body><img href="#" title=""/></body>', '->attr() setter');
+    is($body->children->attr('href'), '#', '->attr() getter');
+    $body->children->attr('title' => undef);
+    is($body->as_string, '<body><img href="#"/></body>', '->attr() remove');
 };
 
 done_testing;

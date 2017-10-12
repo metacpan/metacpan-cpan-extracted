@@ -1,5 +1,5 @@
 package ETL::Yertl::Format::json;
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 # ABSTRACT: JSON read/write support for Yertl
 
 use ETL::Yertl 'Class';
@@ -176,7 +176,7 @@ ETL::Yertl::Format::json - JSON read/write support for Yertl
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 

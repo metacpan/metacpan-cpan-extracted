@@ -23,7 +23,7 @@ __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 use constant {
     MODE1      => 0x00, 

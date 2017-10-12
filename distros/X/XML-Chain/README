@@ -15,10 +15,29 @@ SYNOPSIS
                     ->a( xc('p')->t('of chained XML.') );
         say $div->as_string;
         # <div class="pretty"><h1>hello</h1><p class="intro">world</p><p>of chained XML.</p></div>
+    
+        my $sitemap =
+            xc('urlset', xmlns => 'http://www.sitemaps.org/schemas/sitemap/0.9')
+            ->t("\n")
+            ->c('url')
+                ->a('loc',        '-' => 'https://metacpan.org/pod/XML::Chain::Selector')
+                ->a('lastmod',    '-' => DateTime->from_epoch(epoch => 1507451828)->strftime('%Y-%m-%d'))
+                ->a('changefreq', '-' => 'monthly')
+                ->a('priority',   '-' => '0.6')
+            ->up->t("\n")
+            ->c('url')
+                ->a('loc',        '-' => 'https://metacpan.org/pod/XML::Chain::Element')
+                ->a('lastmod',    '-' => DateTime->from_epoch(epoch => 1507279028)->strftime('%Y-%m-%d'))
+                ->a('changefreq', '-' => 'monthly')
+                ->a('priority',   '-' => '0.5')
+            ->up->t("\n");
+        say $sitemap->as_string;
+        # <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        # <url><loc>https://metacpan.org/pod/XML::Chain::Selector</loc><lastmod>2017-10-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+        # <url><loc>https://metacpan.org/pod/XML::Chain::Element</loc><lastmod>2017-10-06</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+        # </urlset>
 
 DESCRIPTION
-
-    ☢ at this moment XML::Chain is in early prototype phase ☢
 
     This module provides fast and easy way to create and manipulate XML
     elements via set of chained method calls.
@@ -44,6 +63,9 @@ EXPORTS
 
     In case of hash reference passed as argument, key + values will be set
     as attributes, in alphabetical sorted key name order.
+
+    Attribute name "-" is a special case and the value will used for text
+    content inside the element.
 
   xc($xml_libxml_ref)
 
@@ -104,6 +126,7 @@ CONTRIBUTORS & CREDITS
     suggesting useful advice, nitpicking, chatting on IRC or commenting on
     my blog (in no particular order):
 
+        Vienna.pm (for listening to my talk and providing valuable feedback)
         Mohammad S Anwar
         you?
 
@@ -202,8 +225,11 @@ CHAINED METHODS
  find
 
         say $xc->find('//p/b[@class="less"]')->text_content;
+        say $xc->find('//xhtml:div', xhtml => 'http://www.w3.org/1999/xhtml')->count;
 
-    Look-up elements by xpath and set them as current elements.
+    Look-up elements by xpath and set them as current elements. Optional
+    look-up namespace prefixes can be specified. Any global registered
+    namespace prefixes "reg_global_ns" can be used.
 
  children
 
@@ -223,6 +249,21 @@ CHAINED METHODS
         # <body/>
 
     Rename node name(s).
+
+ attr
+
+        my $img = xc('img')->attr('href' => '#', 'title' => 'imaget');
+        # <img href="#" title="imaget"/>
+    
+        say $img->attr('title')
+        # imaget
+    
+        say $img->attr('title' => undef)
+        # <img href="#"/>
+
+    Get or set elements attributes. With one argument returns attribute
+    value otherwise sets them. Setting attribute to undef will remove it
+    from the element.
 
  each
 
@@ -262,7 +303,7 @@ CHAINED METHODS
         # $p->count == 2     # deleted elements are skipped also in old selectors
         # <base><p>1</p><p>2</p><div>3</div></base>
 
-    Deletes current elements and returnes their parent.
+    Deletes current elements and returns their parent.
 
  auto_indent
 
@@ -328,6 +369,13 @@ METHODS
 
     Checks is there is exactly one element in current elements and return
     it as XML::Chain::Element object.
+
+ reg_global_ns
+
+        $sitemap->reg_global_ns('i' => 'http://www.google.com/schemas/sitemap-image/1.1');
+        $sitemap->reg_global_ns('s' => 'http://www.sitemaps.org/schemas/sitemap/0.9');
+        say $sitemap->find('/s:urlset/s:url/i:image')->count
+        # 2
 
 AUTHOR
 

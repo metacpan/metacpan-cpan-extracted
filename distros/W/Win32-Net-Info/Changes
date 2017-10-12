@@ -1,0 +1,28 @@
+Revision history for Perl extension Win32::Net::Info.
+
+1.00  Fri Oct  6 15:33:00 2017
+	- Name change to Win32::Net::Info:
+        http://www.perlmonks.org/?node_id=1199912
+          for CPAN release
+
+0.06  Tue Jan 19 15:33:00 2016
+	- Changed default "Local Area Connection"
+    - perltidy
+
+0.05  Fri Sep 18 15:33:00 2015
+	- Updates
+
+0.04  Fri Apr 19 15:33:00 2013
+	- Changed to 'wmic' for most values instead of parsing 
+      'ipconfig'
+
+0.03  Fri Mar 22 15:33:00 2013
+	- Added device for Net::Pcap device name and kept 
+      adpatername as Windows name {123-234 ...}
+
+0.02  Tue Jan  8 08:33:00 2013
+	- Added method aliases to mimic Net::Frame::Device
+
+0.01  Tue Dec 27 08:33:00 2011
+	- original version; created by h2xs 1.23 with options
+		-b 5.10.1 -v 0.01 -XAn Win32::Interface

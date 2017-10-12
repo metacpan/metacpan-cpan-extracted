@@ -1,0 +1,25 @@
+prompt generic
+    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
+
+prompt privileged
+    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
+
+prompt user
+    match /[Ll]ogin: ?$/
+
+prompt pass
+    match /[Pp]assword: ?$/
+
+macro paging
+        send ' '
+
+macro disconnect
+        send exit
+        match /Do you want to end your session \? \(y\/n\) :/
+        send y
+        match generic
+
+# not used
+macro more_pages
+        match /Press any key to continue \(q : quit\) :/
+        send ' '

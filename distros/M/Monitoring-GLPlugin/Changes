@@ -1,3 +1,134 @@
+* 2017-09-28 2.4.14.1
+  fix a typo in QUANTUM-SNMP-MIB
+* 2017-09-28 2.4.14
+  add QUANTUM-SNMP-MIB
+* 2017-09-28 2.4.13.2
+  bugfix in idrac-mib
+* 2017-09-28 2.4.13.1
+  fix dell mibs
+* 2017-09-26 2.4.13
+  add DELL-RAC-MIB and IDRAC-MIB-SMI2
+* 2017-09-23 2.4.12.2
+  return true on secondary context switch
+* 2017-09-22 2.4.12.1
+  scheissdreck zeugs vergessen
+* 2017-09-22 2.4.12
+  implement a context switch for snmpv3, sponsored by http://www.lidl.de
+  If you like check_nwc_health, go shopping at Lidl or Kaufland,
+  they sponsor a lot of the features.
+* 2017-08-25 2.4.11.2
+  fix a bug in get_entries_get_simple
+* 2017-08-24 2.4.11.1
+  fix SW-MIB
+* 2017-08-24 2.4.11
+  fix a bug in get_snmp_table_objects wo indexes
+* 2017-08-22 2.4.10
+  add FIBRE-CHANNEL-FE-MIB
+* 2017-08-21 2.4.9.1
+  update SW-MIB
+* 2017-08-11 2.4.9
+  add ELTEXMIB
+* 2017-08-02 2.4.8.1
+  implement get_symbol
+* 2017-06-20 2.4.8
+  add LCOS-Mib
+* 2017-06-07 2.4.7.5
+  workaround for unititialized in protect
+* 2017-06-01 2.4.7.4
+  workaround for unititialized in valdiff
+* 2017-05-29 2.4.7.3
+  remove debug stmt from destructor
+* 2017-05-26 2.4.7.2
+  update WebGraph-8xThermometer-MIB
+* 2017-05-15 2.4.7.1
+  fix a bug in make_symbolic, definitions pointing to other mibs
+* 2017-05-09 2.4.7
+  fix entry cache, uptime
+* 2017-04-24 2.4.6.2
+  identify PRONTER-MIB
+  fix package name for HOST-RESOURCE-MIB
+* 2017-04-21 2.4.6.1
+  add PrtSubUnitStatusTC
+* 2017-04-20 2.4.6
+  add LEXMARK-MPS-MIB
+* 2017-04-18 2.4.5
+  add JUNOSBGP4V2MIB (Pull Request #9, dupondje)
+  allow --negate also for conection timeout exits
+  add GENUA-MIB (Pull Request #10, freneticf)
+  add OPENBSD-PF-MIB
+  add OPENBSD-SENSORS-MIB
+  add OPENBSD-MEM-MIB
+  add OPENBSD-CARP-MIB
+* 2017-04-17 2.4.4
+  add PRINTER-MIB
+  add KYOCERA-Private-MIB
+  add BROTHER-MIB
+* 2017-04-14 2.4.3
+  add LEXMARK-PVT-MIB
+* 2017-04-14 2.4.2
+  update FOUNDRY-SN-AGENT-MIB
+* 2017-03-27 2.4.1.2
+  fix a perl trick that was not available in older perl verions.
+* 2017-03-24 2.4.1.1
+  reduce transferred oids in update_entry_cache
+* 2017-03-23 2.4.1
+  add OLD-CISCO-INTERFACES-MIB
+* 2017-03-21 2.4.0.1
+  fix mode bulkwalk
+* 2017-03-19 2.4
+  improve get_entries
+* 2017-03-14 2.3.19
+  add thev1-mib
+* 2017-03-10 2.3.18.2
+  --negate now can modify the exitcode based on a regexp
+* 2017-03-08 2.3.18.1
+  bugfix in get_entries, use get_next if there are no indices
+* 2017-03-08 2.3.18
+  update XUPS-MIB
+* 2017-03-01 2.3.17.1
+  fix packaging error
+* 2017-03-01 2.3.17
+  add STEELHEAD-EX-MIB
+* 2017-02-28 2.3.16
+  add STEELHEAD-MIB
+* 2017-02-23 2.3.15
+  update IF-MIB
+* 2017-02-23 2.3.14
+  some tweaks for get_entries/tables
+* 2017-02-19 2.3.13.1
+  force get_snmp_table_objects to use get_table when there is no --name
+* 2017-02-18 2.3.13
+  add F5-BIGIP-GLOBAL-MIB
+  add HOST-RESOURCES-V2-MIB
+  add NETSCREEN-NSRP-MIB
+  update HOST-RESOURCES-MIB
+  optimize get_entries
+  output sysDesc with uptime
+* 2017-02-07 2.3.12
+  add CISCO-LWAPP-HA-MIB
+  add CISCO-LWAPP-AP-MIB
+  add sysdesc to the output of mode uptime
+* 2017-02-07 2.3.11
+  add sysDesc to more uptime
+* 2017-02-07 2.3.10
+  add EtherLike-MIB
+* 2017-02-07 2.3.9
+  add CISCO-LAG-MIB
+  add CISCO-PORT-CHANNEL-MIB
+  add IEEE8023-LAG-MIB
+* 2017-01-26 2.3.8.4
+  fix definition of bsnAPAdminStatus
+* 2017-01-26 2.3.8.3
+  add mib_id to cisco wireless mibs
+* 2017-01-18 2.3.8.2
+  improve uptime calculation
+* 2017-01-11 2.3.8.1
+  update CHECKPOINT-MIB
+* 2016-12-05 2.3.8
+  add mode supportedoids
+  add LIEBERT-GP-FLEXIBLE-MIB 
+* 2016-12-03 2.3.7.1
+  add LIEBERT-GP-PDU-MIB
 * 2016-11-29 2.3.7
   add JUNIPER-MIB
 * 2016-11-21 2.3.6

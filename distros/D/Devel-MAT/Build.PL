@@ -12,6 +12,8 @@ my $build = Module::Build->new(
       'List::UtilsBy' => 0,   # sort_by
       'Module::Pluggable' => 0,
       'perl' => '5.010',      # various XS failures on 5.8
+      'String::Tagged' => '0.15', # sprintf
+      'String::Tagged::Terminal' => 0,
       'Struct::Dumb' => '0.07',
    },
    test_requires => {

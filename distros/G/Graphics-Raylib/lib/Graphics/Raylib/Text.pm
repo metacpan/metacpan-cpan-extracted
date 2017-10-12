@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Text;
 
 # ABSTRACT: Output text to window
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 
@@ -18,7 +18,7 @@ Graphics::Raylib::Text - Output text to window
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -38,10 +38,10 @@ version 0.003
 
     while (!$g->exiting)
     {
+        $text->text = "Generation " . ($i++);
+
         Graphics::Raylib::draw {
             $g->clear(Graphics::Raylib::Color::BLACK);
-
-            $text->text = "Generation " . ($i++);
             $text->draw;
         };
     }

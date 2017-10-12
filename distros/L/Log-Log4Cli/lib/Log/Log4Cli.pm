@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use parent qw(Exporter);
 
+use Carp qw(croak);
 use Term::ANSIColor qw(colored);
 
-our $VERSION = '0.18'; # Don't forget to change in pod below
+our $VERSION = '0.19'; # Don't forget to change in pod below
 
 our @EXPORT = qw(
     die_fatal
@@ -46,7 +47,7 @@ our $COLOR = -t $FD;     # color on/off switcher
 sub _die($$$$) {
     if ($^S) {
         # inside eval block
-        die defined $_[3] ? "$_[3]. " : "";
+        croak defined $_[3] ? "$_[3]" : "Died";
     } else {
         print $FD $_[2] . (defined $_[3] ? "$_[3]. " : "") .
             "Exit $_[0], ET " . (time - $^T) . "s\n" if ($_[1]);
@@ -92,9 +93,17 @@ __END__
 
 Log::Log4Cli -- Lightweight logger for command line tools
 
+=begin html
+
+<a href="https://travis-ci.org/mr-mixas/Log-Log4Cli.pm"><img src="https://travis-ci.org/mr-mixas/Log-Log4Cli.pm.svg?branch=master" alt="CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/Log-Log4Cli.pm?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/Log-Log4Cli.pm/badge.svg?branch=master' alt='Coverage Status'></a>
+<a href="https://badge.fury.io/pl/Log-Log4Cli"><img src="https://badge.fury.io/pl/Log-Log4Cli.svg" alt="CPAN version"></a>
+
+=end html
+
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =head1 SYNOPSIS
 

@@ -24,12 +24,12 @@ my $bar = bless {}, 'Bar';
     local $SIG{__WARN__} = sub { $warning = shift };
 
     UNIVERSAL::isa( $foo, 'Foo' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         'U::i should warn by default when redirecting to overridden method' );
 
     $warning = '';
     UNIVERSAL::isa( $foo, 'Bar' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         '... even if isa() would return false' );
 
     $warning = '';
@@ -56,12 +56,12 @@ my $bar = bless {}, 'Bar';
     local $SIG{__WARN__} = sub { $warning = shift };
 
     UNIVERSAL::isa( $foo, 'Foo' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         'U::i should warn when verbose when redirecting to overridden method' );
 
     $warning = '';
     UNIVERSAL::isa( $foo, 'Bar' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         '... even if isa() would return false' );
 
     $warning = '';
@@ -70,12 +70,12 @@ my $bar = bless {}, 'Bar';
 
     $warning = '';
     UNIVERSAL::isa( $bar, 'Foo' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         '... and on default isa()' );
 
     $warning = '';
     UNIVERSAL::isa( $bar, 'Bar' );
-    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/,
+    like( $warning, qr/Called UNIVERSAL::isa\(\) as a function.+warnings.t/s,
         '... even when it would return false' );
 
     TODO: {

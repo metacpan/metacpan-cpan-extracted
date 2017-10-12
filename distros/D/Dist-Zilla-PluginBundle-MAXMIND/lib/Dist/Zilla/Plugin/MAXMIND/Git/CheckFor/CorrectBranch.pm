@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.81';
+our $VERSION = '0.83';
 
 use Moose;
 
@@ -39,7 +39,7 @@ Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch - Checks the branch o
 
 =head1 VERSION
 
-version 0.81
+version 0.83
 
 =for Pod::Coverage .*
 

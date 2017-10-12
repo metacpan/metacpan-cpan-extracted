@@ -19,14 +19,56 @@
 
 use 5.005;
 use strict;
-use FindBin;
-use MyGraphs;
-
 use Graph::Maker::Petersen;
+
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
+use MyGraphs;
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+{
+  # Petersen triangle replaced
+  # = cubic vertex-transitive graph "Ct66"
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=28537
+
+  # require Graph::Maker::Cycle;
+  # $graph = Graph::Maker->new('cycle', N=>4, undirected => 1);
+
+  my $graph = Graph::Maker->new('Petersen', undirected => 1);
+  my $line = MyGraphs::Graph_line_graph($graph);
+  my $triangle = Graph_triangle_replacement($graph);
+  print "line and triangle isomorphic ",MyGraphs::Graph_is_isomorphic($line,$triangle)||0,"\n";
+  MyGraphs::Graph_view($triangle);
+  MyGraphs::hog_searches_html($triangle);
+  # MyGraphs::Graph_print_tikz($triangle);
+
+  # slow but runs to completion
+  print "try Hamiltonian\n";
+  print MyGraphs::Graph_is_Hamiltonian($triangle, verbose => 1);
+  exit 0;
+
+  # $graph is an undirected Graph.pm.
+
+  # Return a new Graph.pm which is the given $graph with each vertex
+  # replaced by a triangle.  Existing edges go to different vertices of the
+  # new triangle.  Must have all vertices of the original $graph degree <= 3.
+  #
+  sub Graph_triangle_replacement {
+    my ($graph) = @_;
+    my $new_graph = Graph->new (undirected => 1);
+    foreach my $v ($graph->vertices) {
+      $new_graph->add_cycle($v.'-1', $v.'-2', $v.'-3');
+    }
+    my %upto;
+    foreach my $edge ($graph->edges) {
+      $new_graph->add_edge(map {$_.'-'.++$upto{$_}} @$edge);
+    }
+    $new_graph;
+  }
+}
 {
   # Petersen HOG
   
@@ -47,9 +89,9 @@ use Graph::Maker::Petersen;
   # N=7 K=3 hog not
   # N=8 K=1 hog not
   # N=8 K=2 hog not
-  # N=8 K=3 hog not
-  # N=8 K=4 https://hog.grinvin.org/ViewGraphInfo.action?id=1229
+  # N=8 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=1229
   #         Moebius Kantor Graph
+  # N=8 K=4 hog not
   # N=9 K=1 hog not
   # N=9 K=2 hog not
   # N=9 K=3 https://hog.grinvin.org/ViewGraphInfo.action?id=6700
@@ -60,10 +102,16 @@ use Graph::Maker::Petersen;
   #          Desargues Graph
   # N=10 K=4
   # N=10 K=5
+  # N=11 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=24052
+  # N=12 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=27325
+  # N=12 K=5 https://hog.grinvin.org/ViewGraphInfo.action?id=1234
+  #          Nauru
+  #    http://11011110.livejournal.com/124705.html (gone)
+  #    http://web.archive.org/web/1id_/http://11011110.livejournal.com/124705.html
 
   my @graphs;
   my %seen;
-  foreach my $N (9 .. 10) {
+  foreach my $N (8 .. 9) {
     foreach my $K (1 .. $N-1) {
       my $graph = Graph::Maker->new('Petersen', undirected => 1,
                                     N => $N, K => $K);
@@ -77,6 +125,8 @@ use Graph::Maker::Petersen;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
+
+
 
 {
   # Petersen 7,2
@@ -130,35 +180,7 @@ use Graph::Maker::Petersen;
   exit 0;
 }
 
-{
-  # Petersen triangle replaced
-  # = cubic vertex-transitive graph Ct66 ?
 
-  # require Graph::Maker::Cycle;
-  # $graph = Graph::Maker->new('cycle', N=>4, undirected => 1);
-
-  my $graph = Graph::Maker->new('Petersen', undirected => 1);
-  my $line = MyGraphs::Graph_line_graph($graph);
-  my $triangle = Graph_triangle_replacement($graph);
-  print "is_isomorphic ",MyGraphs::Graph_is_isomorphic($line,$triangle)||0,"\n";
-  MyGraphs::Graph_view($triangle);
-
-  MyGraphs::hog_searches_html($triangle);
-  exit 0;
-
-  sub Graph_triangle_replacement {
-    my ($graph) = @_;
-    my $new_graph = Graph->new (undirected => 1);
-    foreach my $v ($graph->vertices) {
-      $new_graph->add_cycle($v.'.1', $v.'.2', $v.'.3');
-    }
-    my %upto;
-    foreach my $edge ($graph->edges) {
-      $new_graph->add_edge(map {$_.'.'.++$upto{$_}} @$edge);
-    }
-    $new_graph;
-  }
-}
 {
   # Petersen    https://hog.grinvin.org/ViewGraphInfo.action?id=660
   # line graph  hog not

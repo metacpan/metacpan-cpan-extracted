@@ -31,6 +31,12 @@ WriteMakefile(
     clean => { FILES => 'IP-CountryFlag-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'IP::CountryFlag'                       => { file => 'lib/IP/CountryFlag.pm',                     version => '0.11' },
+            'IP::CountryFlag::Params'               => { file => 'lib/IP/CountryFlag/Params.pm',              version => '0.11' },
+            'IP::CountryFlag::UserAgent'            => { file => 'lib/IP/CountryFlag/UserAgent.pm',           version => '0.11' },
+            'IP::CountryFlag::UserAgent::Exception' => { file => 'lib/IP/CountryFlag/UserAgent/Exception.pm', version => '0.11' },
+        },
         resources => {
             repository => {
                 type => 'git',

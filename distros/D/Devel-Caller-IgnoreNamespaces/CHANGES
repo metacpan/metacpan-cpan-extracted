@@ -1,1 +1,5 @@
+1.1    2017-10-11    DTRT if caller() is already over-ridden;
+                     Set @DB::args correctly (see Hook::LexWrap bug
+                       https://rt.cpan.org/Ticket/Display.html?id=103186)
+
 1.0    2009-08-10    First release

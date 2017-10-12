@@ -1,5 +1,8 @@
 #!/usr/bin/perl
+
 use strict;
+use warnings;
+
 our $VERSION = '0.02';
 use LWP::Simple qw/ mirror RC_NOT_MODIFIED RC_OK $ua /;
 use File::Copy qw/ mv /;

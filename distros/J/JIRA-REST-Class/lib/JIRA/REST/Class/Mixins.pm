@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -158,14 +158,6 @@ sub JIRA_REST { ## no critic (Capitalization)
     my $ua   = $rest->getUseragent;
     $ua->ssl_opts( SSL_verify_mode => 0, verify_hostname => 0 )
         if $args->{ssl_verify_none};
-
-    unless ( $args->{username} && $args->{password} ) {
-        if ( my $auth = $rest->{_headers}->{Authorization} ) {
-            my ( undef, $encoded ) = split /\s+/, $auth;
-            ( $args->{username}, $args->{password} ) =  #
-                split /:/, decode_base64 $encoded;
-        }
-    }
 
     return $jira_rest;
 }
@@ -659,12 +651,12 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik jira JRC Atlassian
-GreenHopper ScriptRunner TODO aggregateprogress aggregatetimeestimate
-aggregatetimeoriginalestimate assigneeType avatar avatarUrls completeDate
-displayName duedate emailAddress endDate fieldtype fixVersions fromString
-genericized iconUrl isAssigneeTypeValid issueTypes issuekeys issuelinks
-issuetype jql lastViewed maxResults originalEstimate
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Heumann Manni Melezhik jira JRC
+Atlassian GreenHopper ScriptRunner TODO aggregateprogress
+aggregatetimeestimate aggregatetimeoriginalestimate assigneeType avatar
+avatarUrls completeDate displayName duedate emailAddress endDate fieldtype
+fixVersions fromString genericized iconUrl isAssigneeTypeValid issueTypes
+issuekeys issuelinks issuetype jql lastViewed maxResults originalEstimate
 originalEstimateSeconds parentkey projectId rapidViewId remainingEstimate
 remainingEstimateSeconds resolutiondate sprintlist startDate
 subtaskIssueTypes timeSpent timeSpentSeconds timeestimate
@@ -677,7 +669,7 @@ JIRA::REST::Class::Mixins - An mixin class for L<JIRA::REST::Class|JIRA::REST::C
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 METHODS
 

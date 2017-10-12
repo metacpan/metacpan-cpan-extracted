@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.045';
+$HackaMol::VERSION = '0.046';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -15,11 +15,13 @@ use MooseX::StrictConstructor;
 use Scalar::Util qw(refaddr);
 use Carp;
 
-with 'HackaMol::Roles::NameRole',
-  'HackaMol::Roles::MolReadRole',
-  'HackaMol::Roles::PathRole',
-  'HackaMol::Roles::ExeRole',
-  'HackaMol::Roles::FileFetchRole';
+with 
+  'HackaMol::Roles::NameRole'     ,
+  'HackaMol::Roles::MolReadRole'  ,
+  'HackaMol::Roles::PathRole'     ,
+  'HackaMol::Roles::ExeRole'      ,
+  'HackaMol::Roles::FileFetchRole',
+  'HackaMol::Roles::NERFRole';
 
 sub pdbid_mol {
     my $self   = shift;
@@ -193,11 +195,12 @@ sub group_by_atom_attrs {
 
 sub find_disulfide_bonds {
     my $self = shift;
+
     my @sulf = grep { $_->Z == 16 } @_;
     my @ss   = $self->find_bonds_brute(
         bond_atoms => [@sulf],
         candidates => [@sulf],
-        fudge      => 0.45,
+        fudge      => 0.15, # 0.45 is too large
         max_bonds  => 1,
     );
     return @ss;
@@ -602,7 +605,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 DESCRIPTION
 
@@ -865,7 +868,7 @@ L<VMD|http://www.ks.uiuc.edu/Research/vmd/>
 
 =item * L<HackaMol::Roles::NameRole>
 
-=item * L<HackaMol::Roles::NameRole|HackaMol::Roles::MolReadRole|HackaMol::Roles::PathRole|HackaMol::Roles::ExeRole|HackaMol::Roles::FileFetchRole>
+=item * L<HackaMol::Roles::NameRole|HackaMol::Roles::MolReadRole|HackaMol::Roles::PathRole|HackaMol::Roles::ExeRole|HackaMol::Roles::FileFetchRole|HackaMol::Roles::NERFRole>
 
 =item * L<HackaMol::Roles::PathRole>
 

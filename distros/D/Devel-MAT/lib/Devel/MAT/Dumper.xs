@@ -384,6 +384,11 @@ static int write_hv_header(FILE *fh, const HV *hv, size_t size)
 
 static void write_hv_body_elems(FILE *fh, const HV *hv)
 {
+  // The shared string table (PL_strtab) has shared strings as keys but its
+  // values are not SV pointers; they are refcounts. Pretend these values are
+  // NULL.
+  bool is_strtab = (hv == PL_strtab);
+
   int bucket;
   for(bucket = 0; bucket <= HvMAX(hv); bucket++) {
     HE *he;
@@ -391,7 +396,7 @@ static void write_hv_body_elems(FILE *fh, const HV *hv)
       STRLEN len;
       char *key = HePV(he, len);
       write_strn(fh, key, len);
-      write_svptr(fh, HeVAL(he));
+      write_svptr(fh, is_strtab ? NULL : HeVAL(he));
     }
   }
 }
@@ -401,12 +406,6 @@ static void write_private_hv(FILE *fh, const HV *hv)
   int nkeys = write_hv_header(fh, hv, 0);
 
   // Header
-  //
-  // The shared string table (PL_strtab) has shared strings as keys but its
-  // values are not SV pointers; they are refcounts. Pretend we have 0 keys
-  if(hv == PL_strtab)
-    nkeys = 0;
-
   write_uint(fh, nkeys);
 
   // PTRs
@@ -468,9 +467,8 @@ static void write_private_stash(FILE *fh, const HV *stash)
 
 static void write_private_cv(FILE *fh, const CV *cv)
 {
-  PADLIST *padlist;
-
   bool is_xsub = CvISXSUB(cv);
+  PADLIST *padlist = (is_xsub ? NULL : CvPADLIST(cv));
 
   // TODO: accurate size information on CVs
   write_common_sv(fh, (const SV *)cv, sizeof(XPVCV));
@@ -513,7 +511,12 @@ static void write_private_cv(FILE *fh, const CV *cv)
 #endif
     write_svptr(fh, (SV*)CvGV(cv));
   write_svptr(fh, (SV*)CvOUTSIDE(cv));
-  write_svptr(fh, (SV*)(padlist = (is_xsub ? NULL : CvPADLIST(cv))));
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 20)
+  /* Padlists are no longer heap-allocated on 5.20+ */
+  write_svptr(fh, NULL);
+#else
+  write_svptr(fh, (SV*)(padlist));
+#endif
   if(CvCONST(cv))
     write_svptr(fh, (SV*)CvXSUBANY(cv).any_ptr);
   else

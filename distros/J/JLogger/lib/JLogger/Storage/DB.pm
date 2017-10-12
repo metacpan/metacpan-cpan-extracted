@@ -39,15 +39,15 @@ sub _save_message {
 INSERT
     INTO messages(
         sender, sender_resource, recipient, recipient_resource,
-        id, type, body, thread)
-VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+        type, body, thread)
+VALUES(?, ?, ?, ?, ?, ?, ?)
 SQL
 
     $self->{_connector}->dbh->do(
         $sql,                           undef,
         $self->_get_jid_id($sender),    $sender_resource,
         $self->_get_jid_id($recipient), $recipient_resource,
-        @{$message}{qw/id message_type body thread/}
+        @{$message}{qw/message_type body thread/}
     );
 }
 

@@ -84,8 +84,10 @@ header nav .current a {
 
 .button:hover,
 header nav a:hover {
-    text-decoration: underline;
     background-image: url(gloss2.png);
+}
+header nav a:hover {
+    text-decoration: underline;
 }
 .button:active,
 header nav a:active {
@@ -246,8 +248,8 @@ footer {
     .side { display: none; }
     #inner { display: block; }
     main {
-	margin: 1ex;
-	width: 98%;
+	margin: 0;
+	width: 100%;
 	background: white;
 	color: black;
 	left: 0;

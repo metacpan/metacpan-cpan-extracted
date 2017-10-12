@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,10 +20,12 @@
 use 5.005;
 use strict;
 use Math::BaseCnv 'cnv';
-use MyGraphs;
+use Graph::Maker::Keller;
 
 use FindBin;
-use Graph::Maker::Keller;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
+
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

@@ -49,7 +49,7 @@ my ($f, $b, $g, $x) = map { bless [], $_ } qw( Foo Bar Gorch Baz );
 
     $warning = '';
     ok(  isa( $f, 'Foo'   ), 'foo is a Foo'       );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok( !isa( $b, 'Zlap'  ), 'bar is not Zlap'    );
@@ -57,31 +57,31 @@ my ($f, $b, $g, $x) = map { bless [], $_ } qw( Foo Bar Gorch Baz );
 
     $warning = '';
     ok(  isa( $f, 'Zlap'  ), 'neither is Foo'     );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok(  isa( $g, 'Gorch' ), 'Gorch is itself'    );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok( !isa( $g, 'Zlap'  ), 'gorch is not Zlap'  );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok(  isa( $g, 'Glab'  ), '... it is dung'     );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok(  isa( $x, 'Baz'   ), 'Baz is itself'      );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok( !isa( $x, 'Zlap'  ), 'baz is not Zlap'    );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 
     $warning = '';
     ok(  isa( $x, 'Glab'  ), 'it is dung'         );
-    like( $warning, qr/as a function.+basic.t/, '... warning by default' );
+    like( $warning, qr/as a function.+basic.t/s, '... warning by default' );
 }
 
 {
@@ -126,35 +126,35 @@ my ($f, $b, $g, $x) = map { bless [], $_ } qw( Foo Bar Gorch Baz );
     local $SIG{__WARN__} = sub { $warning = shift };
 
     ok( !isa( undef, 'Foo' ), 'undef isa nothing' );
-    like( $warning, qr/Called.+as a function.+on invalid invocant.+basic.t/,
+    like( $warning, qr/Called.+as a function.+on invalid invocant.+basic.t/s,
         '... warning in verbose mode' );
 
     ok( isa( {},     'HASH' ),      'hash reference isa HASH'     );
-    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/,
+    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/s,
         '... warning in verbose mode' );
 
     $warning = '';
     ok( isa( [],     'ARRAY' ),     'array reference isa ARRAY'   );
-    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/,
+    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/s,
         '... warning in verbose mode' );
 
     $warning = '';
     ok( isa( sub {}, 'CODE' ),      'code reference isa CODE'     );
-    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/,
+    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/s,
         '... warning in verbose mode' );
 
     $warning = '';
     ok( isa( \my $a, 'SCALAR' ),    'scalar reference isa SCALAR' );
-    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/,
+    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/s,
         '... warning in verbose mode' );
 
     $warning = '';
     ok( isa( qr//, 'Regexp' ),      'regexp reference isa Regexp' );
-    like( $warning, qr/Called.+as a functio.+basic.t/,
+    like( $warning, qr/Called.+as a functio.+basic.t/s,
         '... warning in verbose mode' );
 
     $warning = '';
     ok( isa( \local *FOO, 'GLOB' ), 'glob reference isa GLOB'     );
-    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/,
+    like( $warning, qr/Called.+as a function.+reftyp.+basic.t/s,
         '... warning in verbose mode' );
 }

@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::StaticCache;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -9,10 +9,12 @@ sub register {
     $conf->{even_in_dev}   ||= 0;
     $conf->{max_age}       ||= 2592000;
     $conf->{cache_control} ||= "max-age=$conf->{max_age}, must-revalidate";
+    my $mode = $app->mode;
+    my $edev = $conf->{even_in_dev};
 
     $app->hook(after_static => sub {
         my $c = shift;
-        if ($app->mode eq 'production' || $conf->{even_in_dev}) {
+        if ($mode ne 'development' || $edev) {
             $c->res->headers->cache_control($conf->{cache_control});
         }
     });

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moose;
 use MooseX::Aliases;
@@ -91,24 +91,29 @@ sub document_element {
 }
 
 sub find {
-    my ($self, $xpath) = @_;
+    my ($self, $xpath, @namespaces) = @_;
     croak 'need xpath as argument' unless defined($xpath);
 
     my $xpc = XML::LibXML::XPathContext->new();
-    return $self->_new_related(
-        [   $self->_cur_el_iterrate(
-                sub {
-                    my ($el) = @_;
-                    my $lxml_el = $el->{lxml};
-                    return
-                        map {$self->{_xc}->_xc_el_data($_)}
-                        $xpc->findnodes($xpath, $lxml_el);
-                }
-            )
-        ]
-    );
-
-    return $self;
+    while (@namespaces) {
+        $xpc->registerNs(splice(@namespaces, 0, 2))
+    }
+    my $new_self = eval {
+        $self->_new_related(
+            [   $self->_cur_el_iterrate(
+                    sub {
+                        my ($el) = @_;
+                        my $lxml_el = $el->{lxml};
+                        return
+                            map {$self->{_xc}->_xc_el_data($_)}
+                            $xpc->findnodes($xpath, $lxml_el);
+                    }
+                )
+            ]
+        );
+    };
+    croak $@ if $@;
+    return $new_self;
 }
 
 sub children {
@@ -262,6 +267,42 @@ sub remove_and_parent {
     return $parent;
 }
 
+sub attr {
+    my ($self, @attrs) = @_;
+
+    croak 'need new attribute name ' unless @attrs;
+
+    # getter
+    if (@attrs == 1) {
+        my $attr_name = $attrs[0];
+        my @attribute_values;
+        $self->_cur_el_iterrate(
+            sub {
+                my ($el) = @_;
+                push(@attribute_values, $el->{lxml}->getAttribute($attr_name));
+            }
+        );
+        return (@attribute_values == 1 ? $attribute_values[0] : @attribute_values);
+    }
+
+    # setter
+    while (my ($attr_name, $attr_value) = splice(@attrs,0,2)) {
+        $self->_cur_el_iterrate(
+            sub {
+                my ($el) = @_;
+                if (defined($attr_value)) {
+                    $el->{lxml}->setAttribute($attr_name => $attr_value);
+                }
+                else {
+                    $el->{lxml}->removeAttribute($attr_name);
+                }
+            }
+        );
+    }
+
+    return $self;
+}
+
 ### methods
 
 alias toString => 'as_string';
@@ -345,6 +386,12 @@ sub single {
         _xc_el_data => $element,
         _xc         => $self->{_xc},
     );
+}
+
+sub reg_global_ns {
+    my ($self, $ns_prefix, $ns_uri, $activate) = @_;
+    $self->root->as_xml_libxml->setNamespace($ns_uri, $ns_prefix, ($activate // 0));
+    return $self;
 }
 
 ### helpers
@@ -458,8 +505,11 @@ Traverse current elements and replace them by their parents.
 =head2 find
 
     say $xc->find('//p/b[@class="less"]')->text_content;
+    say $xc->find('//xhtml:div', xhtml => 'http://www.w3.org/1999/xhtml')->count;
 
-Look-up elements by xpath and set them as current elements.
+Look-up elements by xpath and set them as current elements. Optional
+look-up namespace prefixes can be specified. Any global registered
+namespace prefixes L</reg_global_ns> can be used.
 
 =head2 children
 
@@ -479,6 +529,21 @@ Removes all child nodes from current elements.
     # <body/>
 
 Rename node name(s).
+
+=head2 attr
+
+    my $img = xc('img')->attr('href' => '#', 'title' => 'imaget');
+    # <img href="#" title="imaget"/>
+
+    say $img->attr('title')
+    # imaget
+
+    say $img->attr('title' => undef)
+    # <img href="#"/>
+
+Get or set elements attributes. With one argument returns attribute value
+otherwise sets them. Setting attribute to C<undef> will remove it from
+the element.
 
 =head2 each
 
@@ -517,7 +582,7 @@ Replaces all selected elements by callback returned elements.
     # $p->count == 2     # deleted elements are skipped also in old selectors
     # <base><p>1</p><p>2</p><div>3</div></base>
 
-Deletes current elements and returnes their parent.
+Deletes current elements and returns their parent.
 
 =head2 auto_indent
 
@@ -584,6 +649,13 @@ Return the number of current elements.
 
 Checks is there is exactly one element in current elements and return it
 as L<XML::Chain::Element> object.
+
+=head2 reg_global_ns
+
+    $sitemap->reg_global_ns('i' => 'http://www.google.com/schemas/sitemap-image/1.1');
+    $sitemap->reg_global_ns('s' => 'http://www.sitemaps.org/schemas/sitemap/0.9');
+    say $sitemap->find('/s:urlset/s:url/i:image')->count
+    # 2
 
 =head1 AUTHOR
 

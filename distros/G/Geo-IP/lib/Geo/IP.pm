@@ -28,7 +28,7 @@ our @EXPORT = qw(
 );
 
 BEGIN {
-    $VERSION = '1.50';
+    $VERSION = '1.51';
     eval {
 
         # PERL_DL_NONLAZY must be false, or any errors in loading will just
@@ -5409,6 +5409,13 @@ sub org_by_name {
 sub org_by_addr {
     my ( $gi, $ip_address ) = @_;
     my $seek_org = $gi->_seek_country( addr_to_num($ip_address) );
+
+    return $gi->_common_org($seek_org);
+}
+
+sub _common_org {
+    my ($gi, $seek_org) = @_;
+
     my $char;
     my $org_buf;
     my $record_pointer;
@@ -5862,6 +5869,20 @@ sub id_by_name_v6 {
     return $gi->_seek_country_v6($addr) - GEOIP_COUNTRY_BEGIN;
 }
 
+sub org_by_addr_v6 {
+    my ( $gi, $ip_address ) = @_;
+
+    my $addr = $gi->get_ip_address_v6($ip_address);
+    return unless $addr;
+
+    my $seek_org = $gi->_seek_country_v6($addr);
+    return $gi->_common_org($seek_org);
+}
+
+*name_by_addr_v6 = \*org_by_addr_v6;
+*name_by_name_v6 = \*org_by_addr_v6;
+*org_by_name_v6 = \*org_by_addr_v6;
+
 sub get_ip_address_v6 {
     my ( $gi, $host ) = @_;
 
@@ -5916,13 +5937,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Geo::IP - Look up location and network information by IP Address
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 SYNOPSIS
 
@@ -6262,6 +6285,10 @@ https://github.com/maxmind/geoip-api-perl
 
 L<GeoIP2> - database reader for the GeoIP2 format.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/geoip-api-perl/issues>.
+
 =head1 AUTHORS
 
 =over 4
@@ -6278,7 +6305,7 @@ Greg Oschwald <goschwald@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords asb-cpan Boris Zentner John SJ Anderson Olaf Alders Philip A. Prindeville shawniverson Thomas J Mather Tina Mueller
+=for stopwords asb-cpan Boris Zentner John SJ Anderson Olaf Alders Philip A. Prindeville shawniverson Thomas J Mather Tina Mueller Will Storey
 
 =over 4
 
@@ -6318,11 +6345,15 @@ Thomas J Mather <tjmather@maxmind.com>
 
 Tina Mueller <TINITA@cpan.org>
 
+=item *
+
+Will Storey <will@summercat.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2002 - 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

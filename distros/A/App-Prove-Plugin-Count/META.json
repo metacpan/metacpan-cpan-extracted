@@ -59,7 +59,7 @@
    "provides" : {
       "App::Prove::Plugin::Count" : {
          "file" : "lib/App/Prove/Plugin/Count.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/masiuchi/p5-app-prove-plugin-count"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:MASIUCHI",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

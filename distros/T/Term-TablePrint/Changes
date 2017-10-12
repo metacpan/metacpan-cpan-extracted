@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.055   2017-10-11
+        - Bugfix: no empty row below header if is `grid` disabled.
+
 0.054   2017-08-09
         - Code refactoring
         - Fix option "grid"

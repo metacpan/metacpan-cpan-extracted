@@ -3,13 +3,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-List/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-List)
 
-# NAME
+# Geo::Coder::List
 
-Geo::Coder::List - Call many geocoders
+Call many geocoders
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 

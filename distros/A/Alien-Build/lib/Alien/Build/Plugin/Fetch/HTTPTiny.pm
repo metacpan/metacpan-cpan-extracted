@@ -7,7 +7,7 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 
 has '+url' => '';
@@ -33,7 +33,7 @@ sub init
   }
   
   $meta->register_hook( fetch => sub {
-    my(undef, $url) = @_;
+    my($build, $url) = @_;
     $url ||= $self->url;
 
     my $ua = HTTP::Tiny->new;
@@ -43,6 +43,28 @@ sub init
     {
       my $status = $res->{status} || '---';
       my $reason = $res->{reason} || 'unknown';
+      
+      $build->log("$status $reason fetching $url");
+      if($status == 599)
+      {
+        $build->log("exception: $_") for split /\n/, $res->{content};
+        
+        my($can_ssl, $why_ssl) = HTTP::Tiny->can_ssl;
+        if(! $can_ssl)
+        {
+          if($res->{redirects}) {
+            foreach my $redirect (@{ $res->{redirects} })
+            {
+              if(defined $redirect->{headers}->{location} && $redirect->{headers}->{location} =~ /^https:/)
+              {
+                $build->log("An attempt at a SSL URL https was made, but your HTTP::Tiny does not appear to be able to use https.");
+                $build->log("Please see: https://metacpan.org/pod/Alien::Build::Manual::FAQ#599-Internal-Exception-errors-downloading-packages-from-the-internet");
+              }
+            }
+          }
+        }
+      }
+      
       die "error fetching $url: $status $reason";
     }
 
@@ -98,7 +120,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 1.22
+version 1.25
 
 =head1 SYNOPSIS
 
@@ -180,6 +202,8 @@ Joel Berger (JBERGER)
 Petr Pisar (ppisar)
 
 Lance Wicks (LANCEW)
+
+Ahmad Fatoum (a3f, ATHREEF)
 
 =head1 COPYRIGHT AND LICENSE
 

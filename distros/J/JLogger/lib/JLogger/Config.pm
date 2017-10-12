@@ -16,7 +16,8 @@ sub load {
 
     $self->_fix_element($config, 'transport');
     $self->_fix_elements($config, 'storages');
-    $self->_fix_elements($config, 'filters');
+    $self->_fix_elements_recursive($config, 'filters');
+    use Data::Dumper; warn Dumper $config;
 
     $config;
 }
@@ -50,6 +51,24 @@ sub _fix_elements {
 
     if (exists $config->{$elements_key}) {
         $_ = $self->_fix_element_value($_) for @{$config->{$elements_key}};
+    }
+}
+
+sub _fix_elements_recursive {
+    my ($self, $config, $elements_key) = @_;
+
+    my $ref = ref $config;
+
+    if ($ref eq 'HASH') {
+        $self->_fix_elements($config, $elements_key);
+
+        foreach my $child (values %$config) {
+            $self->_fix_elements_recursive($child, $elements_key);
+        }
+    } elsif ($ref eq 'ARRAY') {
+        foreach my $child (@$config) {
+            $self->_fix_elements_recursive($child, $elements_key);
+        }
     }
 }
 

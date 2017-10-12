@@ -1,5 +1,5 @@
 package HackaMol::Roles::PdbRole;
-$HackaMol::Roles::PdbRole::VERSION = '0.045';
+$HackaMol::Roles::PdbRole::VERSION = '0.046';
 #ABSTRACT: PdbRole of lazy attributes for HackaMol atoms
 use Moose::Role;
 use Carp;
@@ -13,10 +13,16 @@ my %aa321 = (
 );
 
 sub aa321 {
-  my $resname = uc($_[0]->resname);
+  my $self   = shift;
+  my $x_flag = shift;
+  $x_flag       = 1 unless defined($x_flag);
+
+  my $resname = uc($self->resname);
+  
   unless ( exists($aa321{$resname}) ){
-    carp "PDBRole> residue $resname name has no 1 letter code; return X";
-    return ('X');
+    carp "PDBRole> residue $resname name has no 1 letter code";
+    return ('X') if $x_flag;
+    return ("($resname)");
   }
   return ($aa321{$resname});
 }
@@ -239,7 +245,7 @@ HackaMol::Roles::PdbRole - PdbRole of lazy attributes for HackaMol atoms
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 SYNOPSIS
 

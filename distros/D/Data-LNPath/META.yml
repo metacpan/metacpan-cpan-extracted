@@ -20,5 +20,5 @@ no_index:
 requires:
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

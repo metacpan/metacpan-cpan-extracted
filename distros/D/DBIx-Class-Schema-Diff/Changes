@@ -1,5 +1,9 @@
 Revision history for perl module DBIx::Class::Schema::Diff
 
+1.07 2017-10-11
+    - Tweak tests for upcoming (after 0.082840) DBIx::Class release (VANSTYN)
+    - 1.06 was a broken upload
+    
 1.05 2017-08-20
     - Add 'prune' method to SchemaData object (VANSTYN)
     - Add experimental 'fingerprint' method to SchemaData object (VANSTYN)

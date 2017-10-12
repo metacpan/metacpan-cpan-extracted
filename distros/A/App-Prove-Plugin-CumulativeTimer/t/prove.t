@@ -10,7 +10,7 @@ use App::Prove;
 
 is exception {
     my $app = App::Prove->new;
-    $app->process_args( '--norc', '-PCumulativeTimer', 'tests' );
+    $app->process_args( '--norc', '-j1', '-PCumulativeTimer', 'tests' );
     my ( $stdout_get, $stderr_get ) = capture { $app->run };
 
     my ($test1_time)

@@ -29,7 +29,7 @@ no_index:
 provides:
   App::Prove::Plugin::CumulativeTimer:
     file: lib/App/Prove/Plugin/CumulativeTimer.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   App::Prove: '0'
   Class::Method::Modifiers: '0'
@@ -40,6 +40,6 @@ resources:
   bugtracker: https://github.com/masiuchi/p5-App-Prove-Plugin-CumulativeTimer/issues
   homepage: https://github.com/masiuchi/p5-App-Prove-Plugin-CumulativeTimer
   repository: git://github.com/masiuchi/p5-App-Prove-Plugin-CumulativeTimer.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:MASIUCHI
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

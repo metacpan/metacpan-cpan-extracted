@@ -1,0 +1,14 @@
+prompt user
+    match /[Uu]sername: $/
+
+prompt pass
+    match /[Pp]assword:/
+
+prompt generic
+    match /\w+ #/
+
+macro paging
+    send config
+
+macro disconnect
+    send exit

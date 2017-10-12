@@ -1,5 +1,17 @@
 Revision history for Datahub-Factory
 
+1.72  2017-10-06 15:19:32 CEST
+
+    - Changed: removed conf folder.
+    - Changed: removed documentation folder.
+    - Added: .perltidyrc and .tidyallrc
+    - Changed: flexible configuration based on a local datahubfactory.yml file.
+    - Changed: fixes #48 Log4perl throws forgot to call init() error.
+    - Changed: processing the output of the Solr indexer. Added error handling.
+    - Added: dhconveyor index command with a basic Solr indexer.
+    - Changed: Pipeline configuration is now polymorphic to cater different pipeline formats.
+    - Fixed: missing Log::Any::Adapter::Log4perl dependency.
+
 1.71  2017-09-06 10:54:08 CEST
 
     - Fixed: Licensing via GPv3 on milla release.

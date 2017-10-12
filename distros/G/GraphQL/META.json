@@ -51,7 +51,8 @@
             "perl" : "5.014"
          },
          "suggests" : {
-            "Cpanel::JSON::XS" : "3.0237"
+            "Cpanel::JSON::XS" : "3.0237",
+            "JSON::XS" : "0"
          }
       },
       "test" : {
@@ -75,5 +76,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.10"
+   "version" : "0.12"
 }

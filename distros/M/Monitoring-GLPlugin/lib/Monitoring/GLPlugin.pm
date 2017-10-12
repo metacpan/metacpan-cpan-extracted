@@ -13,7 +13,7 @@ use Digest::MD5 qw(md5_hex);
 use Errno;
 use Data::Dumper;
 our $AUTOLOAD;
-*VERSION = \'2.3.7';
+*VERSION = \'2.4.14.1';
 
 use constant { OK => 0, WARNING => 1, CRITICAL => 2, UNKNOWN => 3 };
 
@@ -255,6 +255,13 @@ sub add_default_args {
       required => 0,
       hidden => 1,
   );
+  $self->add_arg(
+      spec => 'tracefile=s',
+      help => "--tracefile
+   Write debugging-info to this file (if it exists)",
+      required => 0,
+      hidden => 1,
+  );
 }
 
 sub add_modes {
@@ -395,9 +402,10 @@ sub set_timeout_alarm {
   my ($self, $timeout, $handler) = @_;
   $timeout ||= $self->opts->timeout;
   $handler ||= sub {
-    printf "UNKNOWN - %s timed out after %d seconds\n",
-        $Monitoring::GLPlugin::plugin->{name}, $self->opts->timeout;
-    exit 3;
+    $self->nagios_exit(UNKNOWN,
+        sprintf("%s timed out after %d seconds\n",
+            $Monitoring::GLPlugin::plugin->{name}, $self->opts->timeout)
+    );
   };
   use POSIX ':signal_h';
   if ($^O =~ /MSWin/) {
@@ -429,7 +437,9 @@ sub get_variable {
 
 sub debug {
   my ($self, $format, @message) = @_;
-  my $tracefile = "/tmp/".$Monitoring::GLPlugin::pluginname.".trace";
+  my $tracefile = $self->opts->tracefile ?
+      $self->opts->tracefile :
+      "/tmp/".$Monitoring::GLPlugin::pluginname.".trace";
   $self->{trace} = -f $tracefile ? 1 : 0;
   if ($self->get_variable("verbose") &&
       $self->get_variable("verbose") > $self->get_variable("verbosity", 10)) {
@@ -540,21 +550,21 @@ sub accentfree {
 }
 
 sub dump {
-  my ($self) = @_;
+  my ($self, $indent) = @_;
+  $indent = $indent ? " " x $indent : "";
   my $class = ref($self);
   $class =~ s/^.*:://;
   if (exists $self->{flat_indices}) {
-    printf "[%s_%s]\n", uc $class, $self->{flat_indices};
+    printf "%s[%s_%s]\n", $indent, uc $class, $self->{flat_indices};
   } else {
-    printf "[%s]\n", uc $class;
+    printf "%s[%s]\n", $indent, uc $class;
   }
   foreach (grep !/^(info|trace|warning|critical|blacklisted|extendedinfo|flat_indices|indices)$/, sort keys %{$self}) {
-    printf "%s: %s\n", $_, $self->{$_} if defined $self->{$_} && ref($self->{$_}) ne "ARRAY";
+    printf "%s%s: %s\n", $indent, $_, $self->{$_} if defined $self->{$_} && ref($self->{$_}) ne "ARRAY";
   }
   if ($self->{info}) {
-    printf "info: %s\n", $self->{info};
+    printf "%sinfo: %s\n", $indent, $self->{info};
   }
-  printf "\n";
   foreach (grep !/^(info|trace|warning|critical|blacklisted|extendedinfo|flat_indices|indices)$/, sort keys %{$self}) {
     if (defined $self->{$_} && ref($self->{$_}) eq "ARRAY") {
       my $have_flat_indices = 1;
@@ -573,8 +583,11 @@ sub dump {
           $obj->dump() if UNIVERSAL::can($obj, "isa") && $obj->can("dump");
         }
       }
+    } elsif (defined $self->{$_} && ref($self->{$_}) =~ /^Classes::/) {
+      $self->{$_}->dump(2) if UNIVERSAL::can($self->{$_}, "isa") && $self->{$_}->can("dump");
     }
   }
+  printf "\n";
 }
 
 sub table_ascii {
@@ -1215,8 +1228,8 @@ sub valdiff {
       }
     }
     if ($mode eq "normal" || $mode eq "lookback" || $mode eq "lookback_freeze_chill") {
-      if ($self->{$_} =~ /^\d+\.*\d*$/) {
-        $last_values->{$_} = 0 if ! exists $last_values->{$_};
+      if (exists $self->{$_} && defined $self->{$_} && $self->{$_} =~ /^\d+\.*\d*$/) {
+        $last_values->{$_} = 0 if ! (exists $last_values->{$_} && defined $last_values->{$_});
         if ($self->{$_} >= $last_values->{$_}) {
           $self->{'delta_'.$_} = $self->{$_} - $last_values->{$_};
         } elsif ($self->{$_} eq $last_values->{$_}) {
@@ -1263,6 +1276,13 @@ sub valdiff {
         my @lost = grep(!defined $current{$_}, @{$last_values->{$_}});
         $self->{'delta_found_'.$_} = \@found;
         $self->{'delta_lost_'.$_} = \@lost;
+      } else {
+        # nicht ganz sauber, aber das artet aus, wenn man jedem uninitialized hinterherstochert.
+        # wem das nicht passt, der kann gerne ein paar tage debugging beauftragen.
+        # das kostet aber mehr als drei kugeln eis.
+        $last_values->{$_} = 0 if ! (exists $last_values->{$_} && defined $last_values->{$_});
+        $self->{$_} = 0 if ! (exists $self->{$_} && defined $self->{$_});
+        $self->{'delta_'.$_} = 0;
       }
     }
   }
@@ -1363,12 +1383,14 @@ sub protect_value {
   if (ref($validfunc) ne "CODE" && $validfunc eq "percent") {
     $validfunc = sub {
       my $value = shift;
+      return 0 if ! defined $value;
       return 0 if $value !~ /^[-+]?([0-9]+(\.[0-9]+)?|\.[0-9]+)$/;
       return ($value < 0 || $value > 100) ? 0 : 1;
     };
   } elsif (ref($validfunc) ne "CODE" && $validfunc eq "positive") {
     $validfunc = sub {
       my $value = shift;
+      return 0 if ! defined $value;
       return 0 if $value !~ /^[-+]?([0-9]+(\.[0-9]+)?|\.[0-9]+)$/;
       return ($value < 0) ? 0 : 1;
     };
@@ -1610,7 +1632,6 @@ sub compatibility_methods {
   }
 }
 
-
 sub AUTOLOAD {
   my ($self, @params) = @_;
   return if ($AUTOLOAD =~ /DESTROY/);
@@ -1638,7 +1659,7 @@ sub AUTOLOAD {
     $self->{components}->{$subsystem}->check();
     $self->{components}->{$subsystem}->dump()
         if $self->opts->verbose >= 2;
-  } elsif ($AUTOLOAD =~ /^.*::(status_code|check_messages|nagios_exit|html_string|perfdata_string|selected_perfdata|check_thresholds|get_thresholds|opts|pandora_string)$/) {
+  } elsif ($AUTOLOAD =~ /^.*::(status_code|check_messages|nagios_exit|html_string|perfdata_string|selected_perfdata|check_thresholds|get_thresholds|opts|pandora_string|strequal)$/) {
     return $Monitoring::GLPlugin::plugin->$1(@params);
   } elsif ($AUTOLOAD =~ /^.*::(reduce_messages|reduce_messages_short|clear_messages|suppress_messages|add_html|add_perfdata|override_opt|create_opt|set_thresholds|force_thresholds|add_pandora)$/) {
     $Monitoring::GLPlugin::plugin->$1(@params);

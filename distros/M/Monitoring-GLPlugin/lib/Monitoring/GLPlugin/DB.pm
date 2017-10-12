@@ -412,7 +412,6 @@ sub fetchall_array_cached {
 
 sub DESTROY {
   my ($self) = @_;
-  $self->debug("try to clean up command and result files");
   $self->delete_extcmd_files();
 }
 

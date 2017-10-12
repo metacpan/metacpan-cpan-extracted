@@ -1,6 +1,7 @@
 package Term::Screen::Lite::Win32;
 
-$Term::Screen::Lite::Win32::VERSION = '0.04';
+$Term::Screen::Lite::Win32::VERSION   = '0.05';
+$Term::Screen::Lite::Win32::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ Term::Screen::Lite::Win32 - Windows platform interface to terminal screen.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

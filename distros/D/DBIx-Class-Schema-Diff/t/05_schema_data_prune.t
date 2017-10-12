@@ -8,6 +8,14 @@ use lib "$Bin/lib";
 use DBIx::Class::Core ();
 my @Core_ISA = @{ mro::get_linear_isa('DBIx::Class::Core') };
 
+use List::Util;
+
+# Starting with the release of DBIx::Class *after* 0.082840 there is a new package in ISA,
+# DBIx::Class::MethodAttributes, and this causes a different fingerprint (as expected) for
+# diffs which consider ISA. We're now checking for this and testing for the new fingerprint
+# for those cases below (note we're not doing this for the tests which pruned isa)
+my $post840 = (List::Util::first { $_ eq 'DBIx::Class::MethodAttributes' } @Core_ISA) ? 1 : 0;
+
 use Test::More;
 use Test::Exception;
 
@@ -20,6 +28,7 @@ ok(
 );
 
 my $sig = 'schemsum-99a438a6df22065';
+$sig = 'schemsum-187ee3c62707d78' if ($post840); # see comment above
 is(
   $SD1->fingerprint => $sig,
   "Saw expected SchemaData fingerprint ($sig)"
@@ -36,6 +45,7 @@ is_deeply(
 );
 
 $sig = 'schemsum-644d1615709c7d8';
+$sig = 'schemsum-c78b4f6a76d1030' if ($post840); # see comment above
 is(
   $SD2->fingerprint => $sig,
   "Saw expected pruned SchemaData fingerprint ($sig)"

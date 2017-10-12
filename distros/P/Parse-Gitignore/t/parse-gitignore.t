@@ -6,10 +6,12 @@ use Test::More;
 use Parse::Gitignore;
 use FindBin '$Bin';
 chdir "$Bin/test-files" or die "Cannot chdir to test directory: $!";
-my $pg = Parse::Gitignore->new ('test-gitignore');
-ok ($pg->ignored ('monkeyshines'));
-ok ($pg->ignored ('starfruit'));
-ok (! $pg->ignored ('nice'));
+my $pg = Parse::Gitignore->new ('test-gitignore',
+				#verbose => 1,
+			    );
+ok ($pg->ignored ('monkeyshines'), "Ignored glob 'monkey*'");
+ok ($pg->ignored ('starfruit'), "Ignored glob '*fruit'");
+ok (! $pg->ignored ('nice'), "Did not ignore 'nice'");
 
 done_testing ();
 # Local variables:

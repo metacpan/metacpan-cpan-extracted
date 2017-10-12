@@ -1,0 +1,84 @@
+{
+   "abstract" : "Perl implementation of the Red/Black tree, a type of balanced binary search tree. ",
+   "author" : [
+      "Arun Prasad  C<< <arunbear@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tree-RB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "enum" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tree::RB" : {
+         "file" : "lib/Tree/RB.pm",
+         "version" : "0.500006"
+      },
+      "Tree::RB::Node" : {
+         "file" : "lib/Tree/RB/Node.pm",
+         "version" : "0.500006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arunbear/Tree-RB/issues"
+      },
+      "homepage" : "https://github.com/arunbear/Tree-RB",
+      "repository" : {
+         "url" : "git://github.com/arunbear/Tree-RB.git",
+         "web" : "https://github.com/arunbear/Tree-RB"
+      }
+   },
+   "version" : "0.500006",
+   "x_authority" : "cpan:ARUNBEAR",
+   "x_contributors" : [
+      "Arun Prasaad <arun@linux-iods.site>",
+      "Arun Prasaad <arunbear@cpan.org>",
+      "Arun Prasaad <arunbear@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

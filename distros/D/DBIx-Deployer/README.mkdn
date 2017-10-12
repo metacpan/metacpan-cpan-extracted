@@ -4,7 +4,7 @@ DBIx::Deployer - Light-weight database patch utility
 
 # VERSION
 
-version v1.1.1
+version v1.2.2
 
 # SYNOPSIS
 
@@ -131,13 +131,21 @@ The name of the patch must be unique.  It will be used as the primary key for th
 
 Dependencies are listed by name.  Take care not to create circular dependencies as I have no intentions of protecting against them.
 
-### deploy\_sql (Str REQUIRED)
+### deploy\_sql (Str)
 
 Patch files may contain multiple patches, but a single patch within a patch file may not contain more than one SQL statement to deploy.
 
 ### deploy\_sql\_args (ArrayRef)
 
 If using bind parameters in your `deploy_sql` statement, the values in `deploy_sql_args` will be used for those parameters.  See [DBI](https://metacpan.org/pod/DBI) and [http://www.bobby-tables.com](http://www.bobby-tables.com) for more information about bind parameters.
+
+### deploy\_script (Str) \*EXPERIMENTAL\*
+
+The `deploy_script` will be passed as an argument to the `system` command.  Scripts are expected to handle transactions on their own.  A non-zero exit status is reported as a failure.
+
+### deploy\_script\_args (ArrayRef) \*EXPERIMENTAL\*
+
+The `deploy_script_args` are passed to the `system` command with the `deploy_script` in PROGRAM LIST syntax.  It may be useful to manipulate this attribute at runtime to pass environment-specific arguments.
 
 ### verify\_sql (Str)
 
@@ -175,7 +183,7 @@ Chris Tijerina
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by eMortgage Logic LLC.
+This software is copyright (c) 2014-2017 by eMortgage Logic LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

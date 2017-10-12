@@ -49,8 +49,8 @@ Inherited %options C<path> and C<level> are ignored.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.21,
-built on July 03, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.22,
+built on October 12, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

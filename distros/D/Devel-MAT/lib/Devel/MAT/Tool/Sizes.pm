@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Sizes;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use constant FOR_UI => 1;
 
@@ -225,30 +225,11 @@ By default, only the individual SV size is counted.
 =cut
 
 use constant CMD => "largest";
+use constant CMD_DESC => "Find the largest SVs by size";
 
-use Getopt::Long qw( GetOptionsFromArray );
 use List::UtilsBy qw( max_by );
 
 my %seen;
-
-sub bytes2size
-{
-   my ( $bytes ) = @_;
-
-   if( $bytes < 1024 ) {
-      return sprintf "%d bytes", $bytes;
-   }
-   if( $bytes < 1024**2 ) {
-      return sprintf "%.1f KiB", $bytes / 1024;
-   }
-   if( $bytes < 1024**3 ) {
-      return sprintf "%.1f MiB", $bytes / 1024**2;
-   }
-   if( $bytes < 1024**4 ) {
-      return sprintf "%.1f GiB", $bytes / 1024**3;
-   }
-   return sprintf "%.1f TiB", $bytes / 1024**4;
-}
 
 sub list_largest_svs
 {
@@ -263,10 +244,10 @@ sub list_largest_svs
 
       $seen{$largest->addr}++;
 
-      Devel::MAT::Cmd->printf( $indent );
-      Devel::MAT::Cmd->print_sv( $largest );
-
-      Devel::MAT::Cmd->printf( ": %s", bytes2size $largest->$method );
+      Devel::MAT::Cmd->printf( "$indent%s: %s",
+         Devel::MAT::Cmd->format_sv( $largest ),
+         Devel::MAT::Cmd->format_bytes( $largest->$method ),
+      );
 
       if( !defined $metric or !@counts ) {
          Devel::MAT::Cmd->printf( "\n" );
@@ -292,32 +273,39 @@ sub list_largest_svs
    $others += $_->size for grep { !$seen{$_->addr} } @$svlist;
 
    if( $others ) {
-      Devel::MAT::Cmd->printf( $indent );
-      Devel::MAT::Cmd->print_note( "others" );
-      Devel::MAT::Cmd->printf( ": %s\n", bytes2size $others );
+      Devel::MAT::Cmd->printf( "$indent%s: %s\n",
+         Devel::MAT::Cmd->format_note( "others" ),
+         Devel::MAT::Cmd->format_bytes( $others ),
+      );
    }
 }
 
-sub run_cmd
+use constant CMD_OPTS => (
+   struct => { help => "count SVs by structural size" },
+   owned  => { help => "count SVs by owned size" },
+);
+
+sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
+
    my $df = $self->df;
 
    my $METRIC;
-
-   GetOptionsFromArray( \@_,
-      'struct' => sub { $METRIC = "structure" },
-      'owned'  => sub { $METRIC = "owned" },
-   ) or return;
+   $METRIC = "structure" if $opts{struct};
+   $METRIC = "owned"     if $opts{owned};
 
    my @svs = $df->heap;
 
    my $method = $METRIC ? "${METRIC}_size" : "size";
 
+   my $heap_total = scalar @svs;
    my $count = 0;
    foreach my $sv ( @svs ) {
       $count++;
-      $self->report_progress( sprintf "Calculating sizes (%d of %d)", $count, scalar @svs ) if $count % 1000 == 0;
+      $self->report_progress( sprintf "Calculating sizes in %d of %d (%.2f%%)",
+         $count, $heap_total, 100*$count / $heap_total ) if $count % 20000 == 0;
       $sv->$method;
    }
    $self->report_progress();

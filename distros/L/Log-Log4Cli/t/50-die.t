@@ -24,12 +24,12 @@ eval { die_info "evaled die_info test" };
 like($@, qr/^evaled die_info test/);
 
 eval { die_notice "evaled die_notice test" };
-like($@, qr/^evaled die_notice test/);
+like($@, qr#^evaled die_notice test at t/50-die.t#);
 
 $Log::Log4Cli::LEVEL = 0;
 
 eval { die_fatal undef, 1 };
-like($@, qr/^Died at/);
+like($@, qr#^Died at t/50-die.t#);
 
 eval { die_info undef, 1 };
 like($@, qr/^Died at/);

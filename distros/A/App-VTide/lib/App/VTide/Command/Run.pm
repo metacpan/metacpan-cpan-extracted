@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.4');
+our $VERSION = version->new('0.1.5');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -46,6 +46,12 @@ sub run {
 
     @ARGV = ();
     if ( !( $self->first && $params->{watch} && $params->{wait} ) ) {
+
+        if ( $params->{heading} ) {
+            # show terminal heading if desired
+            print $params->{heading}, "\n";
+        }
+
         if ( ! $self->defaults->{test} && $params->{wait} ) {
             print join ' ', @cmd, "\n";
             print "Press enter to start : ";
@@ -69,11 +75,6 @@ sub run {
 
         # run any hooks for run_running
         $self->hooks->run('run_running', \@cmd);
-
-        if ( $params->{heading} ) {
-            # show terminal heading if desired
-            print $params->{heading}, "\n";
-        }
 
         # start the terminal
         $self->runit( @cmd );
@@ -330,7 +331,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.4
+This documentation refers to App::VTide::Command::Run version 0.1.5
 
 =head1 SYNOPSIS
 

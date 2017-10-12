@@ -1,6 +1,6 @@
 package Pg::PQ;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ sub _make_conninfo {
         }
         %opts = @_;
     }
-    push @conninfo, map _escape_opt($_).'='._escape_opt($opts{$_}), keys %opts;
+    push @conninfo, map _escape_opt($_).'='._escape_opt($opts{$_}), grep defined $opts{$_} && $opts{$_} ne '', keys %opts;
     no warnings 'numeric';
     push @conninfo, 'client_encoding=UTF8' if Pg::PQ::libVersion() >= 9;
     # warn "conninfo: >@conninfo<\n";
@@ -681,7 +681,7 @@ connection attempt to detect whether the server demanded a password.
 
 =item $dbc->finish
 
-X<finish>Closes the connection to the server and frees the underlaying
+X<finish>Closes the connection to the server and frees the underlying
 libpq PGconn data structure. This method is automatically called by
 C<DESTROY> so usually there is no need to call it explicitly.
 
@@ -1139,7 +1139,10 @@ present.
 
 =item detail
 
-Detail. An optional secondary error message carrying more detail about the problem. Might run to multiple lines. 
+Detail. An optional secondary error message carrying more detail about
+the problem.
+
+Might run to multiple lines.
 
 =item hint
 
@@ -1553,7 +1556,7 @@ decide whether an excessive amount of time has elapsed. Otherwise,
 C<start> followed by a C<connectPoll> loop is equivalent to
 C<new>.
 
-=head3 Non-blocking quering the database
+=head3 Non-blocking querying the database
 
 A typical non-blocking application will have a main loop that
 uses C<select> or C<poll> to wait for all the conditions that it must
@@ -1659,7 +1662,7 @@ accurate in some aspects than that included here.
 
 =item *
 
-Supoprt binary data transfer.
+Support binary data transfer.
 
 =item *
 
@@ -1694,7 +1697,7 @@ are truncated at the first '\0' character.
 =item *
 
 Currently the utf-8 encoding is hard-coded into the wrapper. In
-theory, this is the *right thing to do* as postgres is able to
+theory, this is the *right thing to do* as PostgreSQL is able to
 convert from/to client utf8 to the server representation.
 
 But anyway, if you find some encoding related problem when connecting
@@ -1706,7 +1709,7 @@ to post a bug report on the module bug tracker!
 =head2 Commercial support
 
 This module was implemented during the development of QVD
-(L<http://theqvd.com>) the Linux VDI platform.
+(L<http://theqvd.com>), the Linux VDI platform.
 
 Commercial support, professional services and custom software
 development services around this module are available from QindelGroup
@@ -1719,7 +1722,7 @@ Salvador FandiE<ntilde>o E<lt>sfandino@yahoo.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2014 by Qindel FormaciE<oacute>n y Servicios S.L.
+Copyright (C) 2011-2014, 2016-2017 by Qindel FormaciE<oacute>n y Servicios S.L.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

@@ -66,7 +66,7 @@ WriteMakefile(
    ABSTRACT => 'MCE extension for sharing data supporting threads and processes',
    AUTHOR   => 'Mario E. Roy <marioeroy AT gmail DOT com>',
    NAME     => 'MCE::Shared',
-   VERSION  => '1.831',
+   VERSION  => '1.832',
 
    NO_META  => 1,
 
@@ -78,7 +78,7 @@ WriteMakefile(
       'strict'       => 0,
       'warnings'     => 0,
       'Carp'         => 0,
-      'MCE'          => 1.830,
+      'MCE'          => 1.831,
       'POSIX'        => 0,
       'Scalar::Util' => 0,
       'Socket'       => 0,
@@ -109,59 +109,59 @@ WriteMakefile(
          'provides' => {
             'MCE::Hobo' => {
                'file'    => 'lib/MCE/Hobo.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared' => {
                'file'    => 'lib/MCE/Shared.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Array' => {
                'file'    => 'lib/MCE/Shared/Array.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Base' => {
                'file'    => 'lib/MCE/Shared/Base.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Cache' => {
                'file'    => 'lib/MCE/Shared/Cache.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Condvar' => {
                'file'    => 'lib/MCE/Shared/Condvar.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Handle' => {
                'file'    => 'lib/MCE/Shared/Handle.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Hash' => {
                'file'    => 'lib/MCE/Shared/Hash.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Minidb' => {
                'file'    => 'lib/MCE/Shared/Minidb.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Ordhash' => {
                'file'    => 'lib/MCE/Shared/Ordhash.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Queue' => {
                'file'    => 'lib/MCE/Shared/Queue.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Scalar' => {
                'file'    => 'lib/MCE/Shared/Scalar.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Sequence' => {
                'file'    => 'lib/MCE/Shared/Sequence.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             },
             'MCE::Shared::Server' => {
                'file'    => 'lib/MCE/Shared/Server.pm',
-               'version' => '1.831'
+               'version' => '1.832'
             }
          },
          'prereqs' => {

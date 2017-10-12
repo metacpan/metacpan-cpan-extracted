@@ -17,6 +17,10 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Date::Hebrew::Simple:
+    file: lib/Date/Hebrew/Simple.pm
+    version: '0.05'
 requires:
   Date::Calc: '6.0'
   Date::Utils: '0.22'
@@ -26,5 +30,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Hebrew-Simple.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

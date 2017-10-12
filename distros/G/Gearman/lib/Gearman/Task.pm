@@ -1,6 +1,6 @@
 package Gearman::Task;
 use version;
-$Gearman::Task::VERSION = version->declare("2.004.008");
+$Gearman::Task::VERSION = version->declare("2.004.009");
 
 use strict;
 use warnings;
@@ -42,7 +42,9 @@ I<%options> can contain:
 
 =over 4
 
-=item * uniq
+=item
+
+uniq
 
 A key which indicates to the server that other tasks with the same
 function name and key will be merged into one.  That is, the task
@@ -52,49 +54,65 @@ will get the response multiplexed back to them.
 Uniq may also contain the magic value "-" (a single hyphen) which
 means the uniq key is the contents of the args.
 
-=item * on_complete
+=item
+
+on_complete
 
 A subroutine reference to be invoked when the task is completed. The
 subroutine will be passed a reference to the return value from the worker
 process.
 
-=item * on_fail
+=item
+
+on_fail
 
 A subroutine reference to be invoked when the task fails (or fails for
 the last time, if retries were specified). The reason could be passed
 to this callback as an argument. This callback won't be called after a
 failure if more retries are still possible.
 
-=item * on_retry
+=item
+
+on_retry
 
 A subroutine reference to be invoked when the task fails, but is about
 to be retried.
 
 Is passed one argument, what retry attempt number this is.  (starts with 1)
 
-=item * on_status
+=item
+
+on_status
 
 A subroutine reference to be invoked if the task emits status updates.
 Arguments passed to the subref are ($numerator, $denominator), where those
 are left up to the client and job to determine.
 
-=item * on_warning
+=item
+
+on_warning
 
 A subroutine reference to be invoked if the task emits status updates.
 Arguments passed to the subref are ($numerator, $denominator), where those
 are left up to the client and job to determine.
 
-=item * retry_count
+=item
+
+retry_count
 
 Number of times job will be retried if there are failures.  Defaults to 0.
 
-=item * high_priority
+=item
+
+high_priority
 
 B<the option high_priority is deprecated>. Use C<< priority => high >> instead.
 Boolean, whether this job should take priority over other jobs already
 enqueued.
 
-=item * priority
+=item
+
+priority
 
 valid value:
 
@@ -114,22 +132,24 @@ low
 
 =back
 
-=item * timeout
+=item
+
+timeout
 
 Automatically fail, calling your on_fail callback, after this many
 seconds have elapsed without an on_fail or on_complete being
 called. Defaults to 0, which means never.  Bypasses any retry_count
 remaining.
 
-=item * try_timeout
+=item
+
+try_timeout
 
 Automatically fail, calling your on_retry callback (or on_fail if out of
 retries), after this many seconds have elapsed. Defaults to 0, which means
 never.
 
 =back
-
-=head1 METHODS
 
 =cut
 
@@ -232,11 +252,13 @@ sub new {
     return $self;
 } ## end sub new
 
-=head2 run_hook($name)
-
-run a hook callback if defined
-
-=cut
+#=head1 METHODS
+#
+#=head2 run_hook($name)
+#
+#run a hook callback if defined
+#
+#=cut
 
 sub run_hook {
     my ($self, $name) = (shift, shift);
@@ -246,11 +268,11 @@ sub run_hook {
     warn "Gearman::Task hook '$name' threw error: $@\n" if $@;
 } ## end sub run_hook
 
-=head2 add_hook($name, $cb)
-
-add a hook
-
-=cut
+#=head2 add_hook($name, $cb)
+#
+#add a hook
+#
+#=cut
 
 sub add_hook {
     my ($self, $name) = (shift, shift);
@@ -264,29 +286,28 @@ sub add_hook {
     }
 } ## end sub add_hook
 
-=head2 is_finished()
-
-
-B<return> bool: whether or not task is totally done (on_failure or
-on_complete callback has been called)
-
-=cut
+#=head2 is_finished()
+#
+#B<return> bool: whether or not task is totally done (on_failure or
+#on_complete callback has been called)
+#
+#=cut
 
 sub is_finished {
     return shift->{is_finished};
 }
 
-=head2 taskset()
-
-getter
-
-=head2 taskset($ts)
-
-setter
-
-B<return> Gearman::Taskset
-
-=cut
+#=head2 taskset()
+#
+#getter
+#
+#=head2 taskset($ts)
+#
+#setter
+#
+#B<return> Gearman::Taskset
+#
+#=cut
 
 sub taskset {
     my $self = shift;
@@ -310,11 +331,11 @@ sub taskset {
     return $self->{taskset};
 } ## end sub taskset
 
-=head2 hash()
-
-B<return> undef on non-uniq packet, or the hash value (0-32767) if uniq
-
-=cut
+#=head2 hash()
+#
+#B<return> undef on non-uniq packet, or the hash value (0-32767) if uniq
+#
+#=cut
 
 sub hash {
     my $self     = shift;
@@ -328,11 +349,11 @@ sub hash {
     }
 } ## end sub hash
 
-=head2 pack_submit_packet([$client])
-
-B<return> Gearman::Util::pack_req_command(mode, func, uniq, argref)
-
-=cut
+#=head2 pack_submit_packet([$client])
+#
+#B<return> Gearman::Util::pack_req_command(mode, func, uniq, argref)
+#
+#=cut
 
 sub pack_submit_packet {
     my ($self, $client) = @_;
@@ -349,9 +370,9 @@ sub pack_submit_packet {
     );
 } ## end sub pack_submit_packet
 
-=head2 fail($reason)
-
-=cut
+#=head2 fail($reason)
+#
+#=cut
 
 sub fail {
     my ($self, $reason) = @_;
@@ -368,28 +389,28 @@ sub fail {
     $self->final_fail($reason);
 } ## end sub fail
 
-=head2 final_fail($reason)
-
-run if !is_finished
-
-=over
-
-=item
-
-on_fail
-
-=item
-
-on_post_hooks
-
-=back
-
-=cut
+#=head2 final_fail($reason)
+#
+#if C<< !is_finished >> runs the hooks
+#
+#=over
+#
+#=item
+#
+#on_fail
+#
+#=item
+#
+#on_post_hooks
+#
+#=back
+#
+#=cut
 
 sub final_fail {
-    my ($self, $reason) = @_;
+  my ($self, $reason) = @_;
 
-    return if $self->{is_finished};
+  return if $self->{is_finished};
     $self->{is_finished} = $reason || 1;
 
     $self->run_hook('final_fail', $self);
@@ -401,15 +422,13 @@ sub final_fail {
     return;
 } ## end sub final_fail
 
-#FIXME obsolete?
-
-=head2 exception($exc_ref)
-
-$exc_ref may be a Storable serialized value
-
-run on_exception if defined
-
-=cut
+#=head2 exception($exc_ref)
+#
+#$exc_ref may be a Storable serialized value
+#
+#run on_exception if defined
+#
+#=cut
 
 sub exception {
     my ($self, $exc_ref) = @_;
@@ -421,11 +440,11 @@ sub exception {
     return;
 } ## end sub exception
 
-=head2 complete($result)
-
-C<$result> a reference profided to on_complete cb
-
-=cut
+#=head2 complete($result)
+#
+#C<$result> a reference profided to on_complete cb
+#
+#=cut
 
 sub complete {
     my ($self, $result_ref) = @_;
@@ -440,9 +459,9 @@ sub complete {
     $self->wipe;
 } ## end sub complete
 
-=head2 status()
-
-=cut
+#=head2 status()
+#
+#=cut
 
 sub status {
     my $self = shift;
@@ -452,11 +471,11 @@ sub status {
     $self->{on_status}->($nu, $de);
 } ## end sub status
 
-=head2 data()
-
-invokes C<on_data> callback if worker sends work_data notification.
-
-=cut
+#=head2 data()
+#
+#invokes C<on_data> callback if worker sends work_data notification.
+#
+#=cut
 
 sub data {
     my $self = shift;
@@ -466,11 +485,11 @@ sub data {
     $self->{on_data}->($result_ref) if $self->{on_data};
 } ## end sub data
 
-=head2 warning($message)
-
-invokes C<on_warning> callback if worker sends work_warning notification.
-
-=cut
+#=head2 warning($message)
+#
+#invokes C<on_warning> callback if worker sends work_warning notification.
+#
+#=cut
 
 sub warning {
     my $self = shift;
@@ -482,17 +501,17 @@ sub warning {
     $self->{on_warning}->($msg);
 } ## end sub warning
 
-=head2 handle()
-
-getter
-
-=head2 handle($handle)
-
-setter for the fully-qualified handle of form "IP:port//shandle" where
-
-shandle is an opaque handle specific to the job server running on IP:port
-
-=cut
+#=head2 handle()
+#
+#getter
+#
+#=head2 handle($handle)
+#
+#setter for the fully-qualified handle of form "IP:port//shandle" where
+#
+#shandle is an opaque handle specific to the job server running on IP:port
+#
+#=cut
 
 sub handle {
     my $self = shift;
@@ -502,50 +521,46 @@ sub handle {
     return $self->{handle};
 } ## end sub handle
 
-#FIXME obsolete?
 
-=head2 set_on_post_hooks($code)
-
-=cut
-
+# Gearman::Client::Async is the only consumer of set_on_post_hooks
 sub set_on_post_hooks {
     my ($self, $code) = @_;
     $self->{on_post_hooks} = $code;
 }
 
-=head2 wipe()
-
-cleanup
-
-=over
-
-=item
-
-on_post_hooks
-
-=item
-
-on_complete
-
-=item
-
-on_fail
-
-=item
-
-on_retry
-
-=item
-
-on_status
-
-=item
-
-hooks
-
-=back
-
-=cut
+#=head2 wipe()
+#
+#cleanup
+#
+#=over
+#
+#=item
+#
+#on_post_hooks
+#
+#=item
+#
+#on_complete
+#
+#=item
+#
+#on_fail
+#
+#=item
+#
+#on_retry
+#
+#=item
+#
+#on_status
+#
+#=item
+#
+#hooks
+#
+#=back
+#
+#=cut
 
 sub wipe {
     my $self = shift;
@@ -563,25 +578,26 @@ sub wipe {
     }
 } ## end sub wipe
 
-=head2 func()
-
-=cut
+#=head2 func()
+#
+#=cut
 
 sub func {
     my $self = shift;
     return $self->{func};
 }
 
-=head2 timeout()
-
-getter
-
-=head2 timeout($t)
-
-setter
-
-B<return> timeout
-=cut
+#=head2 timeout()
+#
+#getter
+#
+#=head2 timeout($t)
+#
+#setter
+#
+#B<return> timeout
+#
+#=cut
 
 sub timeout {
     my $self = shift;
@@ -591,11 +607,11 @@ sub timeout {
     return $self->{timeout};
 } ## end sub timeout
 
-=head2 mode()
-
-B<return> mode in depends of background and priority
-
-=cut
+#=head2 mode()
+#
+#B<return> mode in depends of background and priority
+#
+#=cut
 
 sub mode {
     my $self = shift;

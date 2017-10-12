@@ -9,11 +9,12 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-use List::Util qw( max );
+our $VERSION = '0.29';
 
-our $VERSION = '0.27';
+use List::Util qw( pairs );
 
 use constant CMD => "roots";
+use constant CMD_DESC => "Display a list of the root SVs";
 
 =head1 NAME
 
@@ -38,21 +39,23 @@ Prints a list of every root SV in the heap.
 
 =cut
 
-sub run_cmd
+sub run
 {
    my $self = shift;
+
    my $df = $self->df;
 
-   my %roots = $df->roots;
-   my $namelen = max map { length } keys %roots;
+   Devel::MAT::Cmd->print_table(
+      [ map {
+         my ( $name, $description ) = @$_;
+         my $sv = $df->$name;
 
-   foreach my $name ( sort keys %roots ) {
-      my $sv = $roots{$name} or next;  # Not all root SVs are defined
-
-      Devel::MAT::Cmd->printf( "%-*s: ", $namelen, $name );
-      Devel::MAT::Cmd->print_sv( $sv );
-      Devel::MAT::Cmd->printf( "\n" );
-   }
+         $name = Devel::MAT::Cmd->format_note( $name, 1 );
+         $sv ? [ "$description ($name)", Devel::MAT::Cmd->format_sv( $sv ) ]
+             : ()
+      } pairs $df->root_descriptions ],
+      sep => ": ",
+   );
 }
 
 =head1 AUTHOR

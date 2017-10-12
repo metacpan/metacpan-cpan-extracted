@@ -2,7 +2,6 @@ use strict;
 use utf8;
 use Test::Number::Delta within => 1e-4;
 use Test::More;
-use Encode ();
 use Geo::Coder::Google;
 
 if ($ENV{TEST_GEOCODER_GOOGLE_LIVE}) {

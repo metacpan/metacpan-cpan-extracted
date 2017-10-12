@@ -31,8 +31,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Keller;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs;
 
 plan tests => 11;

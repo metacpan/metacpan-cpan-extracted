@@ -31,8 +31,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Beineke;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs 'Graph_is_isomorphic','Graph_is_subgraph';
 
 plan tests => 25;

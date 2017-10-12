@@ -54,8 +54,10 @@
             "Catmandu::Store::Datahub" : "0",
             "Config::Simple" : "0",
             "DateTime" : "0",
+            "HTTP::Request::StreamingUpload" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Log4perl" : "0",
             "Log::Log4perl" : "0",
             "Module::Load" : "0",
             "Moo" : "0",
@@ -66,6 +68,7 @@
             "Sub::Exporter" : "0",
             "Term::ANSIColor" : "0",
             "Try::Tiny" : "0",
+            "URI::URL" : "0",
             "namespace::clean" : "0",
             "perl" : "5.008005"
          }
@@ -95,7 +98,7 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.71",
+   "version" : "1.72",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",

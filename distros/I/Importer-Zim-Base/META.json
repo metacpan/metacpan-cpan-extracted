@@ -28,7 +28,6 @@
          "requires" : {
             "Test::More" : "0",
             "Test::Pod" : "1.41",
-            "strict" : "0",
             "warnings" : "0"
          }
       },
@@ -36,7 +35,8 @@
          "requires" : {
             "Carp" : "0",
             "Module::Runtime" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.010001",
+            "strict" : "0"
          }
       },
       "test" : {
@@ -46,8 +46,8 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Test::Deep" : "0",
             "Test::More" : "0.96",
-            "strict" : "0",
             "warnings" : "0"
          }
       }
@@ -55,11 +55,15 @@
    "provides" : {
       "Importer::Zim::Base" : {
          "file" : "lib/Importer/Zim/Base.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
+      },
+      "Importer::Zim::Bogus" : {
+         "file" : "lib/Importer/Zim/Bogus.pm",
+         "version" : "v0.9.0"
       },
       "Importer::Zim::Utils" : {
          "file" : "lib/Importer/Zim/Utils.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       }
    },
    "release_status" : "stable",
@@ -74,7 +78,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim-Base"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.9.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

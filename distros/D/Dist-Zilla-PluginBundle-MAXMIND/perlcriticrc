@@ -1,9 +1,14 @@
 severity = 3
 verbose = 11
+
 theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
+
 program-extensions = pl psgi t
 
 exclude = Subroutines::ProhibitCallsToUndeclaredSubs
+
+[BuiltinFunctions::ProhibitComplexMappings]
+max_statements = 3
 
 [BuiltinFunctions::ProhibitStringySplit]
 severity = 3
@@ -14,10 +19,53 @@ severity = 3
 [ControlStructures::ProhibitCStyleForLoops]
 severity = 3
 
-[InputOutput::RequireCheckedSyscalls]
-functions = :builtins
-exclude_functions = sleep
+[Documentation::RequirePackageMatchesPodName]
 severity = 3
+
+[Freenode::WhileDiamondDefaultAssignment]
+set_themes = core
+
+[InputOutput::RequireCheckedClose]
+autodie_modules = Moo Moo::Role Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose
+
+[InputOutput::RequireCheckedOpen]
+autodie_modules = Moo Moo::Role Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose
+
+[InputOutput::RequireCheckedSyscalls]
+autodie_modules = Moo Moo::Role Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose
+functions = :builtins
+exclude_functions = print say sleep
+severity = 3
+
+[Perl::Critic::Policy::Modules::ProhibitEvilModules]
+modules = AnyEvent Coro EV File::Slurp File::Find::Rule JSON::XS MooseX::ConfigFromFile MooseX::Params::Validate Params::Validate Path::Class Readonly Scope::Cleanup Scope::Upper
+
+[Moose::ProhibitDESTROYMethod]
+equivalent_modules = Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose
+
+[Moose::ProhibitMultipleWiths]
+equivalent_modules = Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose
+
+[Moose::ProhibitNewMethod]
+equivalent_modules = Moose Moose::Role MooseX::Role::Parameterized Test::Class::Moose MojoX::ExposeAttributes
+
+[Moose::RequireCleanNamespace]
+modules = Moose Moose::Role MooseX::Role::Parameterized Moose::Util::TypeConstraints
+cleaners = namespace::autoclean Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized
+
+[Moose::RequireMakeImmutable]
+equivalent_modules = Moose MooseX::MojoControllerExposingAttributes Test::Class::Moose
+
+[NamingConventions::Capitalization]
+package_exemptions = [A-Z]\w+|main
+file_lexical_variables = [A-Z]\w+|[^A-Z]+
+global_variables = :starts_with_upper
+scoped_lexical_variables = [A-Z]\w+|[^A-Z]+
+severity = 3
+
+# Given our code base, leaving this at 5 would be a huge pain
+[Subroutines::ProhibitManyArgs]
+max_arguments = 10
 
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 200
@@ -27,6 +75,7 @@ severity = 3
 
 [Subroutines::ProhibitUnusedPrivateSubroutines]
 private_name_regex = _(?!build)\w+
+skip_when_using = Moose::Role MooseX::Role::Parameterized Moo::Role Moose::Role MooseX::Role::Parameterized Role::Tiny Test::Class::Moose::Role
 
 [TestingAndDebugging::ProhibitNoWarnings]
 allow = redefine
@@ -41,30 +90,39 @@ severity = 3
 severity = 3
 
 [Variables::ProhibitPackageVars]
-add_packages = Carp Test::Builder
+add_packages = Test::Builder
 
-[-Subroutines::RequireFinalReturn]
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo Moo::Role Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose Moose::Mojo
 
-# This incorrectly thinks signatures are prototypes.
-[-Subroutines::ProhibitSubroutinePrototypes]
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo Moo::Role Moose Moose::Role MooseX::MojoControllerExposingAttributes MooseX::Role::Parameterized Test::Class::Moose Moose::Mojo
+
+[-ControlStructures::ProhibitCascadingIfElse]
 
 [-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
 
 # No need for /xsm everywhere
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
 
+# by consensus in standup 2015-05-12 we decided to allow return undef
+# this is mainly so bar can be written to return undef so that
+# foo( bar => bar(), bazz => baz() ) won't cause problems
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+# This incorrectly thinks signatures are prototypes.
+[-Subroutines::ProhibitSubroutinePrototypes]
+
 # http://stackoverflow.com/questions/2275317/why-does-perlcritic-dislike-using-shift-to-populate-subroutine-variables
 [-Subroutines::RequireArgUnpacking]
+
+[-Subroutines::RequireFinalReturn]
 
 # "use v5.14" is more readable than "use 5.014"
 [-ValuesAndExpressions::ProhibitVersionStrings]
 
-# Explicitly returning undef is a _good_ thing in many cases, since it
-# prevents very common errors when using a sub in list context to construct a
-# hash and ending up with a missing value or key.
-[-Subroutines::ProhibitExplicitReturnUndef]
-
-# Sometimes I want to write "return unless $x > 4"
-[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]

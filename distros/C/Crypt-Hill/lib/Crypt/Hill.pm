@@ -1,6 +1,6 @@
 package Crypt::Hill;
 
-$Crypt::Hill::VERSION   = '0.09';
+$Crypt::Hill::VERSION   = '0.10';
 $Crypt::Hill::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Hill - Interface to the Hill cipher (2x2).
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 

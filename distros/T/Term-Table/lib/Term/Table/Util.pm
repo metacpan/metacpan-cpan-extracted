@@ -4,7 +4,7 @@ use warnings;
 
 use Config qw/%Config/;
 
-our $VERSION = '0.010';
+our $VERSION = '0.012';
 
 use Importer Importer => 'import';
 our @EXPORT_OK = qw/term_size USE_GCS USE_TERM_READKEY USE_TERM_SIZE_ANY uni_length/;
@@ -26,7 +26,10 @@ $trk &&= Term::ReadKey->can('GetTerminalSize');
 if (!-t *STDOUT) {
     *USE_TERM_READKEY  = sub() { 0 };
     *USE_TERM_SIZE_ANY = sub() { 0 };
-    *term_size         = \&DEFAULT_SIZE;
+    *term_size         = sub {
+        return $ENV{TABLE_TERM_SIZE} if $ENV{TABLE_TERM_SIZE};
+        return DEFAULT_SIZE;
+    };
 }
 elsif ($tsa) {
     *USE_TERM_READKEY  = sub() { 0 };

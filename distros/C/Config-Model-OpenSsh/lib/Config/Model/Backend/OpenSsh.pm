@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-OpenSsh
 #
-# This software is Copyright (c) 2014 by Dominique Dumont.
+# This software is Copyright (c) 2008-2014 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::OpenSsh ;
-$Config::Model::Backend::OpenSsh::VERSION = '1.237';
+$Config::Model::Backend::OpenSsh::VERSION = '1.238';
 use 5.10.1;
 
 use Config::Model 2.050;
@@ -247,7 +247,7 @@ Config::Model::Backend::OpenSsh - Common backend methods for Ssh and Sshd backen
 
 =head1 VERSION
 
-version 1.237
+version 1.238
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Dominique Dumont.
+This software is Copyright (c) 2008-2014 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -95,7 +95,7 @@
      DESCRIPTOR = 276,
      CORETYPE = 277,
      UNDEF = 278,
-     DIE = 279,
+     CROAK = 279,
      SWITCH = 280,
      CASE = 281,
      DEFAULT = 282,
@@ -152,7 +152,7 @@
 #define DESCRIPTOR 276
 #define CORETYPE 277
 #define UNDEF 278
-#define DIE 279
+#define CROAK 279
 #define SWITCH 280
 #define CASE 281
 #define DEFAULT 282
@@ -618,7 +618,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "MY", "HAS", "SUB", "PACKAGE", "IF",
   "ELSIF", "ELSE", "RETURN", "FOR", "WHILE", "USE", "NEW", "LAST", "NEXT",
   "NAME", "VAR", "CONSTANT", "ENUM", "DESCRIPTOR", "CORETYPE", "UNDEF",
-  "DIE", "SWITCH", "CASE", "DEFAULT", "VOID", "EVAL", "EXCEPTION_VAR",
+  "CROAK", "SWITCH", "CASE", "DEFAULT", "VOID", "EVAL", "EXCEPTION_VAR",
   "BYTE", "SHORT", "INT", "LONG", "FLOAT", "DOUBLE", "STRING", "WEAKEN",
   "';'", "SPECIAL_ASSIGN", "ASSIGN", "OR", "AND", "BIT_XOR", "BIT_OR",
   "BIT_AND", "REL", "SHIFT", "'+'", "'-'", "'.'", "REMAINDER", "DIVIDE",
@@ -2232,14 +2232,14 @@ yyreduce:
   case 67:
 #line 395 "yacc/spvm_yacc.y"
     {
-      (yyval.opval) = SPVM_OP_build_die(compiler, (yyvsp[(1) - (1)].opval), NULL);
+      (yyval.opval) = SPVM_OP_build_croak(compiler, (yyvsp[(1) - (1)].opval), NULL);
     ;}
     break;
 
   case 68:
 #line 399 "yacc/spvm_yacc.y"
     {
-      (yyval.opval) = SPVM_OP_build_die(compiler, (yyvsp[(1) - (2)].opval), (yyvsp[(2) - (2)].opval));
+      (yyval.opval) = SPVM_OP_build_croak(compiler, (yyvsp[(1) - (2)].opval), (yyvsp[(2) - (2)].opval));
     ;}
     break;
 

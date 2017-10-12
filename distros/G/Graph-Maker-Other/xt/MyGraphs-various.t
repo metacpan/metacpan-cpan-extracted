@@ -29,8 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs 'make_tree_iterator_edge_aref','edge_aref_to_Graph',
   'Graph_tree_domnum',
   'Graph_is_domset',         'Graph_tree_domsets_count',

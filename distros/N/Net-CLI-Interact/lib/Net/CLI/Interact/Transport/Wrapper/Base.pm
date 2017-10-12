@@ -1,7 +1,4 @@
 package Net::CLI::Interact::Transport::Wrapper::Base;
-{
-  $Net::CLI::Interact::Transport::Wrapper::Base::VERSION = '2.143070';
-}
 
 use Moo;
 use Sub::Quote;

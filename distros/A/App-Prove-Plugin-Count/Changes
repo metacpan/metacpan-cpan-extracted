@@ -1,5 +1,17 @@
 Revision history for Perl extension App-Prove-Plugin-Count
 
+0.03 2017-10-12T09:22:08Z
+
+    - Add spacer to current test count
+
+0.02_02 2017-10-07T08:15:25Z
+
+    - Try to fix failed t/prove.t when --jobs options is set in HARNESS_OPTIONS
+
+0.02_01 2017-10-02T12:50:49Z
+ 
+    - Try to fix failed t/prove.t on some environment
+
 0.02 2017-10-01T01:43:00Z
 
     - Fix failed test when ~/.proverc has --shuffle option

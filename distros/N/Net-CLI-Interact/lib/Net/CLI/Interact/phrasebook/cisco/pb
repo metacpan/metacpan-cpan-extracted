@@ -1,9 +1,6 @@
 prompt generic
     match /[\/a-zA-Z0-9._\[\]-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
 
-prompt basic
-    match /> ?$/
-
 prompt privileged
     match /# ?$/
 
@@ -11,7 +8,7 @@ prompt configure
     match /\(config[^)]*\)# ?$/
 
 prompt user
-    match /[Uu]sername/
+    match /[Uu]sername: ?$/
 
 prompt pass
     match /[Pp]assword: ?$/
@@ -24,7 +21,7 @@ macro begin_privileged
 
 macro end_privileged
     send disable
-    match basic
+    match generic
 
 macro begin_configure
     send configure terminal
@@ -41,6 +38,25 @@ macro disconnect
 # macro completion
 #     send ?
 
-# legacy support
-prompt prompt
-    match /[\/a-zA-Z0-9._\[\]-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/
+# for setting up automated reloading, requires argument N (minutes)
+# note: if done as send-match sequence, then the 'has been modified' part
+# is mandatory - but not all ios versions have that prompt...
+# the follow...with construction on the other hand works with or without
+# that step.
+# note all lines that are matched against prompt or follow are STRIPPED from the response.
+macro reload_in
+    send reload in %s
+#   match /System configuration has been modified. Save\? \[yes\/no\]:/
+#   send no
+    follow /System configuration has been modified. Save\? \[yes\/no\]:/ with  no\n
+    match /Proceed with reload\? \[confirm\]/
+    send ''
+    match privileged
+
+# no arguments. last match is pretty much a dud, the session will be gone.
+macro reload
+    send reload
+    follow /System configuration has been modified. Save\? \[yes\/no\]:/ with  no\n
+    match /Proceed with reload\? \[confirm\]/
+    send ''
+    match privileged

@@ -3,9 +3,21 @@ use warnings;
 package Graphics::Raylib::Color;
 
 # ABSTRACT: Colors for use with Graphics::Raylib
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
+require Exporter;
+our @ISA = qw(Exporter);
+our %EXPORT_TAGS = (colors => [qw( LIGHTGRAY GRAY DARKGRAY LIGHTGREY GREY DARKGREY YELLOW GOLD
+                                   ORANGE PINK RED MAROON GREEN LIME DARKGREEN SKYBLUE BLUE
+                                   DARKBLUE PURPLE VIOLET DARKPURPL BEIGE BROWN DARKBROWN WHITE
+                                   BLACK BLANK MAGENTA RAYWHITE)]
+                   );
+Exporter::export_ok_tags('colors');
+{
+    my %seen;
+    push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
+}
 
 =pod
 
@@ -18,13 +30,16 @@ Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
     use Graphics::Raylib::Color;
-
     my $color   = Graphics::Raylib::Color::BLACK;
+    # alternatively:
+    use Graphics::Raylib::Color qw(:all);
+    my $color2  = MAROON;
+
     my $gray    = Graphics::Raylib::Color::rgb(127,127,127);
     my $rainbow = Graphics::Raylib::Color::rainbow(colors => 100);
     push @colors, $rainbow->cycle for (1..100);
@@ -72,20 +87,24 @@ Returns a list with the red, green, blue and alpha components of the color.
 
 =cut
 {
-package Color;
+    package Color;
 
-sub colors {
-    my ($self) = @_;
+    sub r { return unpack("C",    ${$_[0]}) }
+    sub g { return unpack("xC",   ${$_[0]}) }
+    sub b { return unpack("xxC",  ${$_[0]}) }
+    sub a { return unpack("xxxC", ${$_[0]}) }
+    sub colors {
+        my ($self) = @_;
 
-    return unpack("C4", ${$self});
-}
+        return unpack("C4", ${$self});
+    }
 
-sub stringify {
-    my ($self) = @_;
-    return sprintf '(r: %u, g: %u, b: %u, a: %u)', $self->colors;
-}
+    sub stringify {
+        my ($self) = @_;
+        return sprintf '(r: %u, g: %u, b: %u, a: %u)', $self->colors;
+    }
 
-use overload fallback => 1, '""' => 'stringify';
+    use overload fallback => 1, '""' => 'stringify';
 }
 
 =item rgb($red, $green, $blue)
@@ -93,6 +112,21 @@ use overload fallback => 1, '""' => 'stringify';
 Constructs a new Graphics::Raylib::Color instance out of an opaque color.
 Calls C<rgba> with C<$alpha = 255>.
 
+
+=item color($color_32bit)
+
+Constructs a C<Color> out of a 32 bit integer.
+
+=cut
+
+sub color {
+    return bless \pack("N", shift), 'Color'
+}
+
+{
+    package Color;
+    sub color { return unpack("N", ${$_[0]}); }
+}
 
 =back
 

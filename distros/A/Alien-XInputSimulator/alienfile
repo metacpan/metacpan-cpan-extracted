@@ -1,0 +1,24 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'XInputSimulator';
+
+share {
+    plugin Download => (
+        url => 'https://github.com/a3f/XInputSimulator/archive/master.tar.gz'
+    );
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::CMake';
+
+    build [
+        [ '%{cmake}', -G => '%{cmake_generator}', '-DWITH_PIC=ON', '-DBUILD_MACOS_FATLIB=ON',
+          '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+          '-DBUILD_MANUAL_TEST=OFF', 'XInputSimulator'],
+
+        '%{cmake} --build .',
+        '%{cmake} --build . --target install'
+    ];
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

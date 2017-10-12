@@ -1,3 +1,10 @@
+0.04  2017-10-08
+    - fix xc(XML::LibXML::Document->new()) case
+    - add attr() method
+    - "-" (minus) as attribute name in element constructor means to set text of the element
+    - add reg_global_ns() method
+    - find() accepts extra look-up namespaces
+
 0.03  2017-03-04
     - s/append_and_current/append_and_select/
     - add append() method

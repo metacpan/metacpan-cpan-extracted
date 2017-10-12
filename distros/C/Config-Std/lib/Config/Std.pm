@@ -1,8 +1,10 @@
 package Config::Std;
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
-require v5.7.3; # RT#21184
+use 5.007_003; # Testing with 5.8.1 since that's cpanm minimum :-)
+use strict;
+use warnings;
 
 my %global_def_sep;
 my %global_inter_gap;
@@ -15,6 +17,7 @@ sub import {
     for my $sub_name (qw( read_config write_config )) {
         $opt_ref->{$sub_name} ||= $sub_name;
     }
+    no strict "refs";
     *{$caller.'::'.$opt_ref->{read_config}}  = \&Config::Std::Hash::read_config;
     *{$caller.'::'.$opt_ref->{write_config}} = \&Config::Std::Hash::write_config;
 }
@@ -77,7 +80,7 @@ use Class::Std;
 
         my $serialization = q{};
 
-        for $n (0..$#{$vals}) {
+        for my $n (0..$#{$vals}) {
             my ($val,$sep,$comm) = @{$vals->[$n]}{qw(val sep comm)};
 
             my $val_type = ref $val;
@@ -97,7 +100,7 @@ use Class::Std;
         return $serialization;
     }
 
-    sub update { 
+    sub update {
         my ($self, $hash_ref, $updated_ref) = @_;
         my $ident = ident $self;
 
@@ -108,7 +111,7 @@ use Class::Std;
         }
         else {
             my $val = $hash_ref->{$key};
-            @newvals = ref $val eq 'ARRAY' ? @{$val} : $val;
+            my @newvals = ref $val eq 'ARRAY' ? @{$val} : $val;
             for my $n (0..$#newvals) {
                 $vals_of{$ident}[$n]{val} = $newvals[$n];
             }
@@ -218,7 +221,7 @@ use Class::Std;
         return unless $is_first{ident $self};
 
         my $first = 1;
-	# RT 85956 
+	# RT 85956
         for my $key ( sort grep {!$updated_ref->{$_}} keys %{$hash_ref}) {
             my $value = $hash_ref->{$key};
             my $separate = ref $value || $value =~ m/\n./xms;
@@ -266,7 +269,7 @@ use Class::Std;
             return;
         }
 
-        my $keyval 
+        my $keyval
             = Config::Std::Keyval->new({key=>$key, sep=>$sep, val=>$val, comm=>$comm});
         push @{$components_of{$ident}}, $keyval;
         $seen->{$key} = $keyval;
@@ -315,7 +318,7 @@ use Class::Std;
         for my $block ( @{$array_rep_for{$hash_ref}} ) {
             my $block_name = $block->get_name();
             $block->extend($hash_ref->{$block_name}, $updated{$block_name},
-                           $post_gap, inter_gap
+                           $post_gap, $inter_gap
                           );
         }
 
@@ -485,6 +488,13 @@ use Class::Std;
         return \@config_file;
     }
 
+    sub DEMOLISH {
+        my ($self, $ident) = @_;
+
+        # Do nothing. Defined to suppress use warnings in Class::Std destructor.
+    }
+
+
 }
 
 
@@ -498,7 +508,7 @@ Config::Std - Load and save configuration files in a standard format
 
 =head1 VERSION
 
-This document describes Config::Std version 0.901
+This document describes Config::Std version 0.903
 
 
 =head1 SYNOPSIS
@@ -520,7 +530,7 @@ This document describes Config::Std version 0.901
     # Write the config information to another file as well...
     write_config %config, $other_file_name;
 
-  
+
 =head1 DESCRIPTION
 
 This module implements yet another damn configuration-file system.
@@ -532,13 +542,13 @@ comments, etc.) as possible when a configuration file is updated.
 The whole point of Config::Std is to encourage use of one standard layout
 and syntax in config files. Damian says "I could have gotten away with it, I would have
 only allowed one separator. But it proved impossible to choose between C<:> and C<=>
-(half the people I asked wanted one, half wanted the other)." 
+(half the people I asked wanted one, half wanted the other)."
 Providing round-trip file re-write is the spoonful of sugar to help the medicine go down.
-The supported syntax is within the general INI file family 
+The supported syntax is within the general INI file family
 
-See Chapter 19 of "Perl Best Practices" (O'Reilly, 2005) 
+See Chapter 19 of "Perl Best Practices" (O'Reilly, 2005)
 for more detail on the
-rationale for this approach. 
+rationale for this approach.
 
 =head2 Configuration language
 
@@ -562,7 +572,7 @@ a section label, or in the key or value of a configuration variable:
     ; Valid comment
     key: value  ; Not a comment, just part of the value
 
-NOTE BENE -- that last is a BAD EXAMPLE of what is NOT supported. 
+NOTE BENE -- that last is a BAD EXAMPLE of what is NOT supported.
 This module supports full-line comments only, not on same line with semantic content.
 
 =head3 Sections
@@ -625,15 +635,15 @@ be used as part of a key. Newlines are not allowed in keys either.
 
 When writing out a config file, Config::Std tries to preserve whichever
 separator was used in the original data (if that data was read
-in). New data 
+in). New data
 (created by code not parsed by C<read_config>)
 is written back with a colon as its default separator,
 unless you specify the only other separator value C<'='> when the module is loaded:
 
     use Config::Std { def_sep => '=' };
 
-Note that this does not change read-in parsing, 
-does not change punctuation for values that were parsed, 
+Note that this does not change read-in parsing,
+does not change punctuation for values that were parsed,
 and will not allow values other than C<'='> or C<':'>.
 
 Everything from the first non-whitespace character after the separator,
@@ -666,7 +676,7 @@ You can comment a config var on the preceding or succeeding line:
 
     # Use octothorpe/newline to delimit comments
     comment delims:  # \n
-    
+
 
 =head3 Multi-line configuration values
 
@@ -789,12 +799,12 @@ would be read into a hash whose internal structure looked like this:
     }
 
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 The following subroutines are exported automatically whenever the module is
 loaded...
 
-=over 
+=over
 
 =item C<< read_config($filename => %config_hash) >>
 
@@ -885,10 +895,10 @@ line values when they are first written to a file, by using the
 C<def_gap> option:
 
     # No empty line between single-line config values...
-    use Config::Std { def_gap => 0 }; 
+    use Config::Std { def_gap => 0 };
 
     # An empty line between all single-line config values...
-    use Config::Std { def_gap => 1 }; 
+    use Config::Std { def_gap => 1 };
 
 Regardless of the value passed for C<def_gap>, new multi-line values are
 always written with an empty line above and below them. Likewise, values
@@ -897,12 +907,12 @@ whatever spacing they originally had.
 
 =head1 DIAGNOSTICS
 
-=over 
+=over
 
 =item Can't open config file '%s' (%s)
 
 You tried to read in a configuration file, but the file you specified
-didn't exist. Perhaps the filepath you specified was wrong. Or maybe 
+didn't exist. Perhaps the filepath you specified was wrong. Or maybe
 your application didn't have permission to access the file you specified.
 
 =item Can't read from locked config file '$filename'
@@ -965,7 +975,7 @@ This module requires the Class::Std module (available from the CPAN)
 
 =head1 INCOMPATIBILITIES
 
-Those variants of INI file dialect supporting partial-line comment are incompatible. 
+Those variants of INI file dialect supporting partial-line comment are incompatible.
 (This is the price of keeping comments when re-writing.)
 
 
@@ -973,11 +983,27 @@ Those variants of INI file dialect supporting partial-line comment are incompati
 
 =over
 
+=item Memory leak re-reading
+
+A daemon re-reading its config file has reported a memory leak.
+
+=item Parallel testing not safe
+
+This is a config file module. Tests written before C<TAP> got parallel
+testing are unsafe with parallel testing, surprise!
+Settings are now included to force serial testing (until we refactor all tests
+to use temp dirs?).
+
+If using an older Perl < 5.21.1, and Module.PL, and getting out-of-sequence test failures installing this module, either
+update Test::Harness~'>= 3.31'
+or export HARNESS_OPTIONS=j1
+(or force/no-test, or use Build.PL and/or perl-5.22.0 or newer instead).
+
 =item Loading on demand
 
-If you attempt to load C<read_config()> and C<write_config()> 
+If you attempt to load C<read_config()> and C<write_config()>
 at runtime with C<require>, you can not rely upon the prototype
-to convert a regular hash to a reference. To work around this, 
+to convert a regular hash to a reference. To work around this,
 you must explicitly pass a reference to the config hash.
 
     require Config::Std;
@@ -1003,9 +1029,6 @@ This will be fixed in 1.000.
 
 A comment before the first section is not always retained on write-back, if the '' default section is empty.
 
-=item 00write.t test 5 fails on perl5.8.1 (RT#17425)
-
-Due to an incompatible change in v5.8.1 partially reversed in v5.8.2, hash key randomisation can cause test to fail in that one version of Perl. Workaround is export environment variable PERL_HASH_SEED=0.
 
 =back
 
@@ -1017,14 +1040,14 @@ L<http://rt.cpan.org>.
 =head1 AUTHOR
 
 Damian Conway  C<< <DCONWAY@cpan.org> >>
-Maintainers 
+Maintainers
 Bill Ricker    C<< <BRICKER@cpan.org> >>
 Tom Metro      C<< <tmetro@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2005, Damian Conway C<< <DCONWAY@cpan.org> >>. 
-Copyright (c) 2011, D.Conway, W.Ricker C<< <BRICKER@cpan.org> >> All rights reserved.
+Copyright (c) 2005, Damian Conway C<< <DCONWAY@cpan.org> >>.
+Copyright (c) 2011,2014,2017, D.Conway, W.Ricker C<< <BRICKER@cpan.org> >> All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

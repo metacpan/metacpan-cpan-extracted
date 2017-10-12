@@ -17,8 +17,9 @@ use Carp;
 use HiPi qw( :i2c :si470n :rpi );
 use Time::HiRes qw( usleep );
 use HiPi::GPIO;
+use HiPi::Device::I2C;
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 __PACKAGE__->create_accessors( qw(
     devicename address
@@ -26,7 +27,6 @@ __PACKAGE__->create_accessors( qw(
     _register_name_order _datamap
     sdapin
     resetpin gpiodev sclpin
-    backend
 ) );
 
 use constant {
@@ -57,7 +57,6 @@ sub new {
         devicename   => ( $pi->board_type == RPI_BOARD_TYPE_1 ) ? '/dev/i2c-0' : '/dev/i2c-1',
         address     => 0x10,
         device      => undef,
-        backend     => 'i2c',
         sdapin      => RPI_PIN_3,
         sclpin      => RPI_PIN_5,
     );
@@ -71,33 +70,18 @@ sub new {
         croak qq(you must connect a reset pin to the device and pass the GPIO number to the constructor as param 'resetpin');
     }
     
-    if( $params{backend} eq 'smbus ') {
-        carp qq(busmode smbus not supported - switching to i2c);
-        $params{backend} = 'i2c';
-    }
-    
     $params{gpiodev} = HiPi::GPIO->new;
+    $params{device} ||= HiPi::Device::I2C->new(
+        devicename  => $params{devicename},
+        busmode     => 'i2c',
+    );
     
     my $self = $class->SUPER::new(%params);
-    
+        
     $self->_init();
-    # open device
-    unless( defined($params{device}) ) {
-        if ( $params{backend} eq 'bcm2835' ) {
-            require HiPi::BCM2835::I2C;
-            $params{device} = HiPi::BCM2835::I2C->new(
-                address    => $params{address},
-                peripheral => ( $params{devicename} eq '/dev/i2c-0' ) ? HiPi::BCM2835::I2C::BB_I2C_PERI_0() : HiPi::BCM2835::I2C::BB_I2C_PERI_1(),
-            );
-        } else {
-            require HiPi::Device::I2C;
-            $params{device} = HiPi::Device::I2C->new(
-                devicename  => $params{devicename},
-                address     => $params{address},
-                busmode     => $params{backend},
-            );
-        }
-    }
+    
+    $self->_set_Si4701();
+    
     $self->read_registers();
     return $self;
 }
@@ -237,46 +221,44 @@ sub _init {
     return;
 }
 
-sub reset {
+sub _set_Si4701 {
     my $self = shift;
-    my $rstpin = $self->resetpin;
-    my $sdapin = $self->sdapin;
-    my $sclpin = $self->sclpin;
-    
-    # disconnect from i2c device
-    if( $self->device ) {
+    unless( $self->device->check_address( $self->address ) ) {
+        # disconnect from i2c device
         $self->device->close;
         $self->device( undef );
+
+    
+        # we need to put the module in i2c mode
+        my $rstpin = $self->resetpin;
+        my $sdapin = $self->sdapin;
+        my $sclpin = $self->sclpin;
+        
+        # set reset pin and sda pin as output
+        $self->gpiodev->set_pin_mode( $rstpin, RPI_MODE_OUTPUT );
+        $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_OUTPUT );
+        
+        # set reset and sda pins low
+        $self->gpiodev->set_pin_level( $sdapin, RPI_LOW );
+        $self->gpiodev->set_pin_level( $rstpin, RPI_LOW );
+        $self->sleep_seconds( 1 );
+        $self->gpiodev->set_pin_level( $rstpin, RPI_HIGH );
+        # restore I2C operation
+        $self->sleep_seconds( 1 );
+        $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_ALT0 );
+        $self->sleep_seconds( 0.5 );
+        $self->gpiodev->set_pin_level( $rstpin, RPI_LOW);
+        
+        $self->device(HiPi::Device::I2C->new( address => $self->address, busmode => 'i2c' ) );
+        
     }
-
-    # set reset pin and sda pin as output
-    $self->gpiodev->set_pin_mode( $rstpin, RPI_MODE_OUTPUT );
-    $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_OUTPUT );
     
-    # set reset and sda pins low
-    $self->gpiodev->set_pin_level( $rstpin, RPI_LOW );
-    $self->gpiodev->set_pin_level( $sdapin, RPI_LOW );
-    
-    # delay
-    $self->sleep_seconds( 1.2 );
+    $self->read_registers;
+}
 
-    # set reset high
-    $self->gpiodev->set_pin_level( $rstpin, RPI_HIGH );
-
-    # delay
-    $self->sleep_seconds( 1.2 );
-
-    # restore I2C operation
-    $self->gpiodev->set_pin_mode( $sdapin, RPI_MODE_ALT0 );
-    $self->gpiodev->set_pin_mode( $sclpin, RPI_MODE_ALT0 );
-
-    # open device
-    $self->device( HiPi::Device::I2C->new(
-            devicename  => $self->devicename,
-            address     => $self->address,
-            busmode     => $self->busmode,
-        )
-    );
+sub reset {
+    my $self = shift;
+   
     $self->read_registers;
     $self->set_register(TEST1, 0xC100);
     $self->update_registers( 1.5 );

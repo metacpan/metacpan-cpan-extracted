@@ -1,4 +1,9 @@
 Revision history for Perl extension Geo::Coder::Google
+0.19
+   - non-dev release of 0.18_01
+
+0.18_01
+   - dev release to test not double encoding (RT#122822)
 
 0.18
    - non-dev release of 0.17_01

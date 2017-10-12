@@ -1,6 +1,6 @@
 
 package Importer::Zim::Base;
-$Importer::Zim::Base::VERSION = '0.8.0';
+$Importer::Zim::Base::VERSION = '0.9.0';
 # ABSTRACT: Base module for Importer::Zim backends
 
 use 5.010001;
@@ -26,6 +26,8 @@ sub _prepare_args {
     while (@_) {
         my @symbols = _expand_symbol( $package, shift );
         my $opts = _import_opts( ref $_[0] eq 'HASH' ? shift : {}, $opts );
+        exists $opts->{-filter}
+          and @symbols = grep &{ $opts->{-filter} }, @symbols;
         for my $symbol (@symbols) {
             croak qq{"$symbol" is not exported by "$package"}
               if $can_export && !$can_export->{$symbol};
@@ -53,12 +55,13 @@ sub _prepare_args {
 
 sub _module_opts {
     state $IS_MODULE_OPTION
-      = { map { ; "-$_" => 1 } qw(how map prefix strict version) };
+      = { map { ; "-$_" => 1 } qw(how filter map prefix strict version) };
 
     my %opts = ( -strict => !!1 );
     my $o = $_[0];
     $opts{-strict} = !!$o->{-strict} if exists $o->{-strict};
-    exists $o->{-map} and $opts{-map} = $o->{-map}
+    exists $o->{-filter} and $opts{-filter} = $o->{-filter};
+    exists $o->{-map}    and $opts{-map}    = $o->{-map}
       or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
     if ( my @bad = grep { !$IS_MODULE_OPTION->{$_} } keys %$o ) {
         carp qq{Ignoring unknown module options (@bad)\n};
@@ -68,18 +71,28 @@ sub _module_opts {
 
 # $opts = _import_opts($opts1, $m_opts);
 sub _import_opts {
-    state $IS_IMPORT_OPTION = { map { ; "-$_" => 1 } qw(as map prefix) };
+    state $IS_IMPORT_OPTION
+      = { map { ; "-$_" => 1 } qw(as filter map prefix) };
 
     my %opts;
+    exists $_[1]{-filter}
+      and $opts{-filter} = _expand_filter( $_[1]{-filter} );
     exists $_[1]{-map} and $opts{-map} = $_[1]{-map};
     my $o = $_[0];
     $opts{-as} = $o->{-as} if exists $o->{-as};
-    exists $o->{-map} and $opts{-map} = $o->{-map}
+    exists $o->{-filter} and $opts{-filter} = _expand_filter( $o->{-filter} );
+    exists $o->{-map}    and $opts{-map}    = $o->{-map}
       or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
+
     if ( my @bad = grep { !$IS_IMPORT_OPTION->{$_} } keys %$o ) {
         carp qq{Ignoring unknown symbol options (@bad)\n};
     }
     return \%opts;
+}
+
+sub _expand_filter {
+    my $filter = shift;
+    ref $filter eq 'Regexp' ? sub {/$filter/} : $filter;
 }
 
 sub _expand_symbol {
@@ -148,7 +161,7 @@ Importer::Zim::Base - Base module for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 DESCRIPTION
 

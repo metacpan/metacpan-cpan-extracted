@@ -61,7 +61,7 @@
    "provides" : {
       "App::Prove::Plugin::CumulativeTimer" : {
          "file" : "lib/App/Prove/Plugin/CumulativeTimer.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/masiuchi/p5-App-Prove-Plugin-CumulativeTimer"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:MASIUCHI",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

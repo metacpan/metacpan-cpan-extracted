@@ -31,11 +31,44 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Graph::Maker::Kneser;
 
-use lib
-  'devel/lib';
+use lib 'devel/lib';
 use MyGraphs;
 
-plan tests => 1;
+plan tests => 2;
+
+
+#------------------------------------------------------------------------------
+# POD HOG Shown
+
+{
+  my %shown = ('4,2' => 484,
+               '5,2' => 660,
+               '6,2' => 19271,
+              );
+  my $extras = 0;
+  my %seen;
+  foreach my $N (3 .. 10) {
+    foreach my $K (2 .. int($N/2)) {
+      my $graph = Graph::Maker->new('Kneser', undirected => 1,
+                                    N => $N, K => $K);
+      my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
+      $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
+      next if $seen{$g6_str}++;
+      my $key = "$N,$K";
+      if (my $id = $shown{$key}) {
+        MyGraphs::hog_compare($id, $g6_str);
+      } else {
+        if (MyGraphs::hog_grep($g6_str)) {
+          MyTestHelpers::diag ("HOG $key not shown in POD");
+          MyTestHelpers::diag ($g6_str);
+          MyGraphs::Graph_view($graph);
+          $extras++
+        }
+      }
+    }
+  }
+  ok ($extras, 0);
+}
 
 
 #------------------------------------------------------------------------------

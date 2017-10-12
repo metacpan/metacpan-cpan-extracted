@@ -72,7 +72,7 @@ Log::Report translations with Template::Toolkit (version 1 and 2)
 
 =item Log::Report::Message-E<gt>B<new>(%options)
 
-B<End-users: do not use this method directly>, but use L<Log::Report::__()|Log::Report/"Language Translations">
+B<End-users: do not use this method directly>, but use L<Log::Report::__()|Log::Report/"Messages (optionally translatable)">
 and friends.  The %options is a mixed list of object initiation parameters
 (all with a leading underscore) and variables to be filled in into the
 translated C<_msgid> string.
@@ -88,6 +88,7 @@ translated C<_msgid> string.
   _expand    false
   _join      $" $LIST_SEPARATOR
   _lang      <from locale>
+  _msgctxt   undef
   _msgid     undef
   _plural    undef
   _prepend   undef
@@ -160,6 +161,11 @@ Which STRING to be used then an ARRAY is being filled-in.
 is not configured correctly (yet).  This does not extend to prepended
 or appended translated message object.
 
+=item _msgctxt => STRING
+
+[1.22] Message context in the translation file, the traditional use.  Cannot
+be combined with C<_context> on the same msgids.
+
 =item _msgid => MSGID
 
 The message label, which refers to some translation information.
@@ -219,6 +225,10 @@ alternatives.
 =item $obj-E<gt>B<domain>()
 
 Returns the domain of the first translatable string in the structure.
+
+=item $obj-E<gt>B<msgctxt>()
+
+The message context for the translation table lookup.
 
 =item $obj-E<gt>B<msgid>()
 
@@ -410,12 +420,12 @@ simplify your coding.  The useful names are:
 
 =item _msgid
 
-The MSGID as provided with L<Log::Report::__()|Log::Report/"Language Translations"> and L<Log::Report::__x()|Log::Report/"Language Translations">
+The MSGID as provided with L<Log::Report::__()|Log::Report/"Messages (optionally translatable)"> and L<Log::Report::__x()|Log::Report/"Messages (optionally translatable)">
 
 =item _plural, _count
 
 The PLURAL MSGIDs, respectively the COUNT as used with
-L<Log::Report::__n()|Log::Report/"Language Translations"> and L<Log::Report::__nx()|Log::Report/"Language Translations">
+L<Log::Report::__n()|Log::Report/"Messages (optionally translatable)"> and L<Log::Report::__nx()|Log::Report/"Messages (optionally translatable)">
 
 =item _textdomain
 
@@ -543,8 +553,8 @@ Implemented as L<toString()|Log::Report::Message/"Processing">.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.21,
-built on July 03, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.22,
+built on October 12, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

@@ -2,7 +2,7 @@ package App::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use App::Yath::Util qw/find_pfile/;
 
@@ -28,7 +28,7 @@ sub import {
     my $cmd_class = $class->load_command($cmd_name);
     $cmd_class->import($argv, $runref);
 
-    $$runref ||= sub { $class->run_command($cmd_class, $cmd_name, $argv) };
+    $$runref ||= sub { $class->run_command($cmd_class, $cmd_name, [@$argv]) };
 }
 
 sub info {

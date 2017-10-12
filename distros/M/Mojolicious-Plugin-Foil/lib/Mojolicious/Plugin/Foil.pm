@@ -1,10 +1,10 @@
 package Mojolicious::Plugin::Foil;
-$Mojolicious::Plugin::Foil::VERSION = '0.005';
+$Mojolicious::Plugin::Foil::VERSION = '0.006';
 # ABSTRACT: Mojolicious Plugin for CSS theming
 
 use Mojo::Base 'Mojolicious::Plugin';
 use common::sense;
-use File::Serialize;
+use JSON::MaybeXS;
 use Path::Tiny;
 use File::ShareDir;
 use File::Slurper 'read_binary';
@@ -124,7 +124,8 @@ sub _get_themes {
     {
         die "'$theme_file' not found";
     }
-    $self->{themes} = deserialize_file $theme_file;
+    my $theme_txt = path($theme_file)->slurp;
+    $self->{themes} = decode_json($theme_txt);
     if (!defined $self->{themes})
     {
         die "'$theme_file' not parsed";
@@ -446,7 +447,7 @@ Mojolicious::Plugin::Foil - Mojolicious Plugin for CSS theming
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -464,7 +465,7 @@ Mojolicious::Plugin::Foil - looks for app
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 REGISTER
 

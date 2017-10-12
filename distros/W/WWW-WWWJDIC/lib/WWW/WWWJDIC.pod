@@ -1,65 +1,168 @@
 
-
 =encoding UTF-8
 
 =head1 NAME
 
-WWW::WWWJDIC - Get information from online Japanese dictionary WWWJDIC
+WWW::WWWJDIC - information about online Japanese dictionary WWWJDIC
 
 =head1 SYNOPSIS
 
     
+    use utf8;
     use WWW::WWWJDIC;
-    
+    my $wj = WWW::WWWJDIC->new (mirror => 'usa');
+    print $wj->lookup_url ('日本'), "\n";
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/WWW-WWWJDIC-0.001/examples/synopsis.pl> in the distribution.)
+
+produces output
+
+    http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?QMUJ%E6%97%A5%E6%9C%AC_3
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-WWWJDIC-0.004/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents WWW::WWWJDIC version 0.001
-corresponding to git commit L<6a08a22ea1a128965b8191c3cc13f96338cf9527|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/6a08a22ea1a128965b8191c3cc13f96338cf9527> released on Thu Feb 2 16:07:59 2017 +0900.
+This documents WWW::WWWJDIC version 0.004
+corresponding to git commit L<a7dc49ff9d7d4a793bbe0c03f50e9df190ebd392|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/a7dc49ff9d7d4a793bbe0c03f50e9df190ebd392> released on Tue Oct 10 13:36:27 2017 +0900.
 
 =head1 DESCRIPTION
 
-Scrape the WWWJDIC online dictionaries.
+Get information about the WWWJDIC online Japanese dictionaries.
+
+=head1 FUNCTIONS
+
+=head2 get_mirrors
+
+    my %mirrors = get_mirrors ();
+
+Get a list of mirrors of WWWJDIC. The keys are arbitrary identifiers,
+and the values are the URLs of the mirrors.  As of this version, the
+following sites are available:
+
+=over
+
+=item australia_melb
+
+L<http://nlp.cis.unimelb.edu.au/~jwb/cgi-bin/wwwjdic/wwwjdic>
+
+=item australia_monash
+
+L<http://nihongo.monash.edu/cgi-bin/wwwjdic>
+
+=item canada
+
+L<http://www.ottix.net/cgi-bin/wwwjdic/wwwjdic>
+
+=item germany
+
+L<http://wwwjdic.biz/cgi-bin/wwwjdic>
+
+=item japan
+
+L<http://gengo.com/wwwjdic/cgi-data/wwwjdic>
+
+=item sweden
+
+L<http://wwwjdic.se/cgi-bin/wwwjdic.cgi>
+
+=item usa
+
+L<http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic>
+
+=back
 
 =head1 METHODS
 
 =head2 new
 
-    my $wwwjdic = WWW::WWWJDIC::new (mirror => "japan")
+    my $wwwjdic = WWW::WWWJDIC->new (mirror => "japan")
 
-Create the object which extracts the information from WWWJDIC. Arguments:
+Create the object which extracts the information from WWWJDIC. 
 
-mirror: Mirror site. This can take the values @SCRAPE MIRROR NAMES@.
+The arguments are a hash with the following keys:
+
+=over
+
+=item mirror
+
+Set the mirror site to use for L</lookup_url>. The possible values can
+be obtained from L</get_mirrors>. If you do not specify a mirror, the
+current default value is C<usa>.
+
+Please note that mirrors may change or go out of service, and new
+mirrors may be created. The above mirrors are obtained using the
+script F<boot/scrape-json.pl> in the git repository. This script is
+not part of the CPAN distribution.
+
+=back
 
 =head2 lookup_url
 
-    my $url = $wwwjdic->lookup_url ($key, $search_type);
+    my $url = $wwwjdic->lookup_url ($key);
 
-For example,
+Make a lookup url (the "backdoor URL") which links to a WWWJDIC
+page. As of version 0.004, this URL goes to the combined
+dictionary page.
 
-    my $wwwjdic = WWW::WWWJDIC->new();
-    $wwwjdic->lookup_url ("日本");
+=head1 SEE ALSO
 
-returns a value C<http://>
+=over
 
-Make a lookup url (the "backdoor URL") which links to a WWWJDIC page.
+=item WWWJDIC user guide
 
-=head2 lookup
+L<WWWJDIC Japanese Dictionary Server User Guide|http://nihongo.monash.edu/wwwjdicinf.html>
 
-Look up a word in WWWJDIC.
+=back
 
-=head2 parse_results
+=head1 DEPENDENCIES
 
-    $html = <contents of WWWJDIC page>;
-    my $results = $wwwjdic->parse_results ($html);
-    
+=over
+
+=item L<URI::Escape>
+
+This is used by L</lookup_url> to form the URL.
+
+=item L<JSON::Parse>
+
+This is used to parse the information about WWWJDIC, which is
+internally stored in the JSON format.
+
+=back
+
 =head1 BUGS
 
-The module relies on the structure of the WWWJDIC reply page, which
-seems to change every few months.
+=over
+
+=item *
+
+Mirrors (including the main edrdg one) frequently go out of service.
+
+=item *
+
+The return value of L</lookup_url> may become invalid as WWWJDIC's
+options are often changed so that different letters and numbers are
+used to indicate the various dictionaries.
+
+=item *
+
+There is no way to set the dictionary in L</lookup_url>.
+
+=item *
+
+There is no way to get the URL for the plain text output of WWWJDIC.
+
+=back
+
+=head1 HISTORY
+
+I started this module as a scraper for the WWWJDIC web site in around
+2009. I released it to CPAN in 2017, but with documentation unwritten
+and with scraper code which no longer worked. Currently the only
+active use I have for this module is to get the list of mirrors. In
+version 0.003 I removed the scraper code, leaving only the method
+L</lookup_url> and the function L</get_mirrors>.
 
 
 =head1 AUTHOR

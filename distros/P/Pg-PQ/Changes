@@ -1,5 +1,13 @@
 Revision history for Perl extension Pg::PQ.
 
+0.15  Oct 10, 2017
+        - Fix version libpq version detection for PostgreSQL 10 (bug
+          report and patch by Lee Aylward).
+        - Avoid empty options in connection string (bug report and
+          patch by Ivan Panchenko).
+        - Add more tests.
+        - Minor documentation fixes.
+
 0.14  Oct 28, 2014
         - use Test::PostgreSQL for testing
 

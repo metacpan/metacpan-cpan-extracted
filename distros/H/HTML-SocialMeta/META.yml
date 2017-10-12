@@ -16,7 +16,7 @@ no_index:
     - inc
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/HTML-SocialMeta.git
-version: '0.73'
+version: '0.730002'
 x_contributors:
   - 'Robert Haliday <robh@cpan.org>'
   - 'Jason McIntosh (JMAC) <jmac@jmac.org>'

@@ -1,8 +1,6 @@
-# Copyright (c) 2011-2014 Martin Becker.  All rights reserved.
+# Copyright (c) 2011-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: Multivariate.pm 17 2014-02-21 12:51:52Z demetri $
 
 package Math::Polynomial::Multivariate;
 
@@ -47,7 +45,7 @@ use constant _MINUS_INFINITY => - (~0) ** (~0);
 
 # ----- class data -----
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 # ----- private subroutines -----
 
@@ -80,6 +78,10 @@ sub _keyvc {
         keys %{$vars};
 }
 
+# check if an arbitrary operand is a multivariate polynomial
+
+sub _isa_pol ($) { ref($_[0]) && eval { $_[0]->isa(__PACKAGE__) } }
+
 # ----- private methods -----
 
 # extract coefficient space information from an invocant and some coefficient
@@ -109,6 +111,24 @@ sub _clone {
         ], ref $this;
 }
 
+# multiply a polynomial by variables with exponents
+sub _mul_vars {
+    my ($this, $vars) = @_;
+    return
+        bless [
+            {
+                map {
+                    my %tvars = %{$_->[T_VARS]};
+                    while (my ($var, $exp) = each %{$vars}) {
+                        $tvars{$var} += $exp;
+                    }
+                    _key(\%tvars) => [$_->[T_COEFF], \%tvars]
+                } values %{$this->[F_TERMS]}
+            },
+            @{$this}[F_ZERO, F_ONE]
+        ], ref $this;
+}
+
 # overloaded operators
 
 sub _neg {
@@ -122,7 +142,7 @@ sub _neg {
 
 sub _add {
     my ($this, $that) = @_;
-    $that = $this->const($that) if !ref($that) || !$that->isa(__PACKAGE__);
+    $that = $this->const($that) if !_isa_pol($that);
     my $result = $this->_clone;
     my $rterms = $result->[F_TERMS];
     my $zero   = $this->[F_ZERO];
@@ -141,7 +161,7 @@ sub _add {
 
 sub _sub {
     my ($this, $that, $swap) = @_;
-    $that = $this->const($that) if !ref($that) || !$that->isa(__PACKAGE__);
+    $that = $this->const($that) if !_isa_pol($that);
     ($this, $that) = ($that, $this) if $swap;
     my $result = $this->_clone;
     my $rterms = $result->[F_TERMS];
@@ -162,7 +182,7 @@ sub _sub {
 
 sub _mul {
     my ($this, $that) = @_;
-    $that = $this->const($that) if !ref($that) || !$that->isa(__PACKAGE__);
+    $that = $this->const($that) if !_isa_pol($that);
     my $result = $this->null;
     my $bterms = $that->[F_TERMS];
     my $rterms = $result->[F_TERMS];
@@ -204,7 +224,7 @@ sub _pow {
 
 sub _eq_ne {
     my ($this, $that, $eq) = @_;
-    $that = $this->const($that) if !ref($that) || !$that->isa(__PACKAGE__);
+    $that = $this->const($that) if !_isa_pol($that);
     my $aterms = $this->[F_TERMS];
     my $bterms = $that->[F_TERMS];
     return !$eq if keys(%{$aterms}) != keys(%{$bterms});
@@ -288,6 +308,32 @@ sub partial_derivative {
             $this->monomial($const, { $varname => $exp-1 });
     }
     return $result;
+}
+
+sub flatten {
+    my ($this) = @_;
+    while (_isa_pol(my $aux = $this->[F_ZERO])) {
+        foreach my $term (values %{$this->[F_TERMS]}) {
+            $aux += $term->[T_COEFF]->_mul_vars($term->[T_VARS]);
+        }
+        $this = $aux;
+    }
+    return $this;
+}
+
+sub extract {
+    my ($this, $var) = @_;
+    my %terms =
+        map {
+            my $vars  = { $_? ($var => $_): () };
+            _key($vars) => [$this->factor_of($var, $_), $vars]
+        } $this->exponents_of($var);
+    return
+        bless [
+            \%terms,
+            $this->null,
+            $this->const($this->[F_ONE])
+        ], ref $this;
 }
 
 # inspection methods
@@ -397,6 +443,7 @@ sub as_string {
     my ($this) = @_;
     my $one = $this->[F_ONE];
     return
+        sprintf '(%s)',
         join q[ + ],
         map {
             my ($const, $vars) = @{$_};
@@ -420,7 +467,7 @@ Math::Polynomial::Multivariate - Perl class for multivariate polynomials
 
 =head1 VERSION
 
-This documentation refers to version 0.005 of Math::Polynomial::Multivariate.
+This documentation refers to version 0.006 of Math::Polynomial::Multivariate.
 
 =head1 SYNOPSIS
 
@@ -431,7 +478,7 @@ This documentation refers to version 0.005 of Math::Polynomial::Multivariate.
   my $xy  = Math::Polynomial::Multivariate->
                     monomial(1, {'x' => 1, 'y' => 1});
   my $pol = $x**2 + $xy - $two;
-  print "$pol\n";               # prints: -2 + x^2 + x*y
+  print "$pol\n";               # prints: (-2 + x^2 + x*y)
 
   my @mon = $pol->as_monomials;
   # assigns: ([-2, {}], [1, {x => 2}], [1, {x => 1, y => 1}])
@@ -442,17 +489,17 @@ This documentation refers to version 0.005 of Math::Polynomial::Multivariate.
   my $c   = Math::Polynomial::Multivariate->const($rat);
   my $y   = $c->var('y');
   my $lin = $x - $c;
-  print "$lin\n";               # prints: 1/3 + x
+  print "$lin\n";               # prints: (1/3 + x)
 
   my $zero = $c - $c;           # zero polynomial on rationals
   my $null = $c->null;          # dito
 
   my $p = $c->monomial($rat, { 'a' => 2, 'b' => 1 });
-  print "$p\n";                 # prints: -1/3*a^2*b
+  print "$p\n";                 # prints: (-1/3*a^2*b)
   my $f = $p->coefficient({'a' => 2, 'b' => 1});
   print "$f\n";                 # prints: -1/3
   my $q = $p->subst('a', $c);
-  print "$q\n";                 # prints: -1/27*b
+  print "$q\n";                 # prints: (-1/27*b)
   my $v = $p->evaluate({'a' => 6, 'b' => -1});
   print "$v\n";                 # prints: 12
 
@@ -461,7 +508,7 @@ This documentation refers to version 0.005 of Math::Polynomial::Multivariate.
   my @exp = $pol->exponents_of('x');
   print "@exp\n";               # prints: 0 1 2
   my $r   = $pol->factor_of('x', 1);
-  print "$r\n";                 # prints: y
+  print "$r\n";                 # prints: (y)
   my $d = $pol->degree;
   print "$d\n";                 # prints: 2
   my $z = $zero->degree;
@@ -469,7 +516,13 @@ This documentation refers to version 0.005 of Math::Polynomial::Multivariate.
   # platform-dependent equivalent of minus infinity
 
   my $pd = $pol->partial_derivative('x');
-  print "$pd\n";                # prints: 2*x + y
+  print "$pd\n";                # prints: (2*x + y)
+
+  my $by_x = $pol->extract('x');
+  print "$by_x\n";              # prints: ((-2) + (y)*x + x^2)
+
+  print "yes\n"
+    if $pol == $by_x->flatten;  # prints: yes
 
 =head1 DESCRIPTION
 
@@ -626,6 +679,25 @@ numerical values, C<$cast> could be a reference to a function taking
 a single value and returning a 4E<215>4 diagonal matrix with this
 value.
 
+=item extract
+
+If C<$p> is an arbitrary polynomial and C<$var> is one of its variables,
+C<$p-E<gt>extract($var)> returns the same polynomial as a univariate
+polynomial in only that variable and with coefficients that are
+polynomials themselves, but without that variable.
+
+=item flatten
+
+If C<$p> is a polynomial in hierarchical form, i.e. with coefficients
+that might be polynomials themselves (either flat or hierarchical again),
+C<$p-E<gt>flatten> returns the same polynomial in flat form, i.e. as a
+plain sum of multivariate monomials with non-polynomial coefficients.
+
+Note that I<flatten> and I<extract> are the only methods that will switch
+coefficient spaces.
+
+Note also that, currently, most of this module assumes polynomials being flat.
+
 =back
 
 =head2 Inspection Methods
@@ -781,10 +853,11 @@ are suppressed except for the null polynomial which is represented
 by the constant zero.  Variables are given by their name.  Coefficients
 appear in whatever form they take on in string context.  Values of
 one as a coefficient or as an exponent are omitted where possible.
+The whole expression is surrounded by parentheses.
 
 Example:
 
-  1 + 2*x + x^2 + 2*y + 2*x*y + y^2
+  (1 + 2*x + x^2 + 2*y + 2*x*y + y^2)
 
 =item as_monomials
 
@@ -899,7 +972,7 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Polynomial-Multivariate>
 
 =head1 ROADMAP
 
-As of version 0.004, the module interface is still in beta state.
+As of version 0.006, the module interface is still in beta state.
 While upcoming improvements are intended to be mostly extensions,
 changes breaking backwards compatibility may yet be considered.
 
@@ -925,6 +998,10 @@ Division with remainder.
 
 More string formatting options.
 
+=item *
+
+Resultants and discriminants.
+
 =back
 
 =head1 SEE ALSO
@@ -947,7 +1024,7 @@ Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2014 by Martin Becker.  All rights reserved.
+Copyright (c) 2011-2017 by Martin Becker.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

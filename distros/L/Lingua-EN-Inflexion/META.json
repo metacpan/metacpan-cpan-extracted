@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Inflexion",
    "no_index" : {
@@ -40,5 +40,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.001001"
+   "version" : "0.001006"
 }

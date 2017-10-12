@@ -1,0 +1,10 @@
+/*
+ * Formatting the taglist
+ */
+
+#alltags {
+    -moz-column-count: 3;
+    column-count: 3;
+    -moz-column-width: 18em;
+    column-width: 20em;
+}

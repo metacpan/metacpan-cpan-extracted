@@ -17,6 +17,7 @@ use SPVM 'std'; my $use_std_line = __LINE__;
 
 use SPVM 'TestCase::Extension';
 use SPVM 'TestCase::Extension2';
+use SPVM 'TestCase::Arrays';
 
 use POSIX ();
 
@@ -45,10 +46,66 @@ my $NEGATIVE_INFINITY = SPVM::NEGATIVE_INFINITY();
 
 my $NaN = SPVM::NaN();
 
-use SPVM::std;
-
 use SPVM 'Double';
 use SPVM 'Float';
+use SPVM 'std';
+
+# time
+{
+  cmp_ok(abs(time - SPVM::std::time()), '<', 2);
+}
+
+# Native Exception
+{
+  ok(SPVM::TestCase::Extension::call_void_sub_exception());
+  ok(SPVM::TestCase::Extension::call_byte_sub_exception());
+  ok(SPVM::TestCase::Extension::call_short_sub_exception());
+  ok(SPVM::TestCase::Extension::call_int_sub_exception());
+  ok(SPVM::TestCase::Extension::call_long_sub_exception());
+  ok(SPVM::TestCase::Extension::call_float_sub_exception());
+  ok(SPVM::TestCase::Extension::call_double_sub_exception());
+  ok(SPVM::TestCase::Extension::call_object_sub_exception());
+}
+
+# SPVM::Arrays;
+{
+  ok(SPVM::TestCase::Arrays::copy_of_byte());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_over());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_less());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_short());
+  ok(SPVM::TestCase::Arrays::copy_of_short_over());
+  ok(SPVM::TestCase::Arrays::copy_of_short_less());
+  ok(SPVM::TestCase::Arrays::copy_of_short_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_short_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_int());
+  ok(SPVM::TestCase::Arrays::copy_of_int_over());
+  ok(SPVM::TestCase::Arrays::copy_of_int_less());
+  ok(SPVM::TestCase::Arrays::copy_of_int_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_int_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_long());
+  ok(SPVM::TestCase::Arrays::copy_of_long_over());
+  ok(SPVM::TestCase::Arrays::copy_of_long_less());
+  ok(SPVM::TestCase::Arrays::copy_of_long_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_long_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_float());
+  ok(SPVM::TestCase::Arrays::copy_of_float_over());
+  ok(SPVM::TestCase::Arrays::copy_of_float_less());
+  ok(SPVM::TestCase::Arrays::copy_of_float_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_float_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_double());
+  ok(SPVM::TestCase::Arrays::copy_of_double_over());
+  ok(SPVM::TestCase::Arrays::copy_of_double_less());
+  ok(SPVM::TestCase::Arrays::copy_of_double_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_double_negative());
+  1;
+}
 
 {
   like($POSITIVE_INFINITY, qr/inf/i);
@@ -196,7 +253,9 @@ my $start_objects_count = SPVM::get_objects_count();
 # Call subroutine
 {
   ok(SPVM::TestCase::call_sub_last_camma());
+  ok(SPVM::TestCase::call_sub_undef(undef));
 }
+
 # Destructor
 {
   ok(SPVM::TestCase::destructor());
@@ -287,48 +346,48 @@ my $start_objects_count = SPVM::get_objects_count();
   {
     eval { SPVM::TestCase::exception_call_stack() };
     like($@, qr/Error/);
-    like($@, qr/exception_die_return_int/);
+    like($@, qr/exception_croak_return_int/);
     like($@, qr/exception_call_stack/);
   }
 
   {
-    eval { SPVM::TestCase::exception_die_return_byte() };
+    eval { SPVM::TestCase::exception_croak_return_byte() };
     like($@, qr/Error/);
-    like($@, qr/exception_die_return_byte/);
+    like($@, qr/exception_croak_return_byte/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_short() };
+    eval { SPVM::TestCase::exception_croak_return_short() };
     like($@, qr/Error/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_int() };
+    eval { SPVM::TestCase::exception_croak_return_int() };
     like($@, qr/Error/);
-    like($@, qr/exception_die_return_int/);
+    like($@, qr/exception_croak_return_int/);
     like($@, qr/TestCase\.spvm/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_long() };
+    eval { SPVM::TestCase::exception_croak_return_long() };
     like($@, qr/Error/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_float() };
+    eval { SPVM::TestCase::exception_croak_return_float() };
     like($@, qr/Error/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_double() };
+    eval { SPVM::TestCase::exception_croak_return_double() };
     like($@, qr/Error/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_object() };
+    eval { SPVM::TestCase::exception_croak_return_object() };
     like($@, qr/Error/);
   }
   {
-    eval { SPVM::TestCase::exception_die_return_void() };
+    eval { SPVM::TestCase::exception_croak_return_void() };
     like($@, qr/Error/);
   }
   
   {
-    ok(SPVM::TestCase::exception_die_return_int_eval_catch());
+    ok(SPVM::TestCase::exception_croak_return_int_eval_catch());
   }
 }
 
@@ -1535,6 +1594,7 @@ is_deeply(
   {
     ok(SPVM::TestCase::get_array_length_at());
     ok(SPVM::TestCase::get_array_length_len());
+    # ok(SPVM::TestCase::get_array_length_undef());
   }
 
   # array - set and get array element, first element

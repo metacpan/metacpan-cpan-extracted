@@ -38,6 +38,16 @@
          }
       }
    },
+   "provides" : {
+      "Crypt::Hill" : {
+         "file" : "lib/Crypt/Hill.pm",
+         "version" : "0.10"
+      },
+      "Crypt::Hill::Utils" : {
+         "file" : "lib/Crypt/Hill/Utils.pm",
+         "version" : "0.10"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -46,6 +56,6 @@
          "web" : "https://github.com/manwar/Crypt-Hill"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -19,10 +19,10 @@
 
 use 5.005;
 use strict;
-use FindBin;
 use List::Util 'min','max','sum';
 use Math::BaseCnv 'cnv';
 
+use FindBin;
 use lib "$FindBin::Bin/lib";
 use Graph::Maker::TowerOfLondon;
 use MyGraphs;

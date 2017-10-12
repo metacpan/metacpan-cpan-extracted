@@ -1,8 +1,6 @@
-# Copyright (c) 2013 Martin Becker.  All rights reserved.
+# Copyright (c) 2013-2017 Martin Becker.  All rights reserved.
 # This package is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 03_bigrat.t 4 2013-06-01 20:56:56Z demetri $
 
 # Checking synopsis examples
 
@@ -28,10 +26,10 @@ my $one = Math::BigRat->new('1');
 my $c   = Math::Polynomial::Multivariate->const($one);
 my $x   = $c->var('x');
 my $p   = ($x - $c) * ($x + $c);
-is("$p", '-1 + x^2');                   # 1
+is("$p", '(-1 + x^2)');                 # 1
 
 my $q = ($x + $one) * ($x - $one) * $one - $p;
-is("$q", '0');                          # 2
+is("$q", '(0)');                        # 2
 
 my $b;
 $b = $c == $one;

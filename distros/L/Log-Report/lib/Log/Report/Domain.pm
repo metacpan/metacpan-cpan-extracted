@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Domain;
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 use base 'Log::Report::Minimal::Domain';
 
@@ -154,7 +154,10 @@ sub translate($$)
 	    if index($msgid, '<') == -1;
 
     my $msgctxt;
-    if(my $rules = $self->contextRules)
+    if($msgctxt = $msg->msgctxt)
+    {   # msgctxt in traditional gettext style
+    }
+    elsif(my $rules = $self->contextRules)
     {   ($msgid, $msgctxt)
            = $rules->ctxtFor($msg, $lang, $self->defaultContext);
     }

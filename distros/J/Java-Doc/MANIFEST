@@ -1,0 +1,8 @@
+Build.PL
+examples/documentation.html
+examples/documentation.java
+lib/Java/Doc.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

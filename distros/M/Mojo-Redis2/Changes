@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-Redis2
 
+0.27 2017-10-09T12:50:29+0200
+ - Add new methods: bitcount, bitop bitpos, hincrbyfloat, incrbyfloat, pexpire,
+   pexpireat, psetex, pttl, zlexcount, zrangebylex, zremrangebylex and zrevrangebylex. #25
+   Contributor: Mike Magowan
+
 0.26 2016-06-04T13:09:20+0200
  - Fix missing POD and removed code that is not in use #18
 

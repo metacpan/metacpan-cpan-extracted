@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -37,9 +37,9 @@ Math::AnyNum provides a transparent and easy-to-use interface to L<Math::GMPq>, 
 Math::AnyNum focuses primarily on providing a friendly interface and good performance. In most cases, it can be used as
 a drop-in replacement for the L<bignum> and L<bigrat> pragmas.
 
-The philosophy of Math::AnyNum is that mathematics should just work, therefore the support for complex number is virtually transparent,
-without requiring any explicit conversions. All the needed conversions are done implicitly, using a sophisticated promotion system,
-that tries really hard to do the right thing and as efficiently as possible.
+The philosophy of Math::AnyNum is that mathematics should just work, therefore the support for complex numbers is virtually transparent,
+without requiring any explicit conversions. All the conversions are done implicitly, using a fairly sophisticated promotion system,
+which tries really hard to do the right thing and as efficiently as possible.
 
 In addition, each Math::AnyNum object is B<immutable>.
 
@@ -50,16 +50,16 @@ Based on the internal types, it decides what functions to call on each operation
 
 The promotion rules can be summarized as follows:
 
-    (Integer, Integer)   -> Integer | Rational | Float | Complex
-    (Integer, Rational)  -> Rational | Float | Complex
-    (Integer, Float)     -> Float | Complex
+    (Integer, Integer)   -> Integer  | Rational | Float   | Complex
+    (Integer, Rational)  -> Rational | Float    | Complex
+    (Integer, Float)     -> Float    | Complex
     (Integer, Complex)   -> Complex
 
-    (Rational, Rational) -> Rational | Float | Complex
-    (Rational, Float)    -> Float | Complex
+    (Rational, Rational) -> Rational | Float    | Complex
+    (Rational, Float)    -> Float    | Complex
     (Rational, Complex)  -> Complex
 
-    (Float, Float)       -> Float | Complex
+    (Float, Float)       -> Float    | Complex
     (Float, Complex)     -> Complex
 
     (Complex, Complex)   -> Complex
@@ -233,7 +233,7 @@ Returns a new AnyNum object with the value specified in the first argument,
 which can be a Perl numerical value, a string representing a number in a
 rational form, such as C<"1/2">, a string holding a floating-point number,
 such as C<"0.5">, a string holding an integer, such as C<"255"> or a string
-holding a complex number, such C<"3+4i">.
+holding a complex number, such as C<"3+4i">.
 
     my $z = Math::AnyNum->new('42');        # integer
     my $r = Math::AnyNum->new('3/4');       # rational
@@ -372,7 +372,7 @@ Returns the imaginary unit, which is C<sqrt(-1)>.
 
     Math::AnyNum->e                               #=> Float
 
-Returns the e mathematical constant, which is C<2.718...>.
+Returns the I<e> mathematical constant, which is C<2.718...>.
 
 =head2 pi
 
@@ -526,7 +526,7 @@ Example:
 
 =head2 polygonal_root2
 
-    polygonal_root2(n, k)                   #=> Any
+    polygonal_root2(n, k)                         #=> Any
 
 Returns the second k-gonal root of C<n>. Also defined for complex numbers.
 
@@ -681,7 +681,7 @@ The natural logarithm of the Gamma function on C<x>.
     digamma(x)                                    #=> Float | Inf | NaN
 
 The Digamma function (sometimes called Psi).
-Returns Nan when C<x> is negative, and -Inf when C<x> is 0.
+Returns NaN when C<x> is negative, and -Inf when C<x> is 0.
 
 =head2 beta
 
@@ -759,7 +759,7 @@ Exponential integral of C<x>. Returns -Inf when C<x> is zero, and NaN when C<x> 
     Li(x)                                         #=> Float | Inf | NaN
 
 The logarithmic integral of C<x>, defined as: C<Ei(ln(x))>.
-Returns -Inf when C<x> is 1, and Nan when C<x> is less than or equal to 0.
+Returns -Inf when C<x> is 1, and NaN when C<x> is less than or equal to 0.
 
 =head2 Li2
 
@@ -981,7 +981,7 @@ Returns the number of times C<n> is divisible by C<k>.
 
     remdiv(n, k)                                  #=> Int
 
-Removes all occurrences of the factor C<k> from integer C<n>.
+Removes all occurrences of the divisor C<k> from integer C<n>.
 
 In general, the following statement holds true:
 
@@ -999,7 +999,7 @@ Returns the Kronecker symbol I<(n|m)>, which is a generalization of the Jacobi s
 
 Computes the sum C<1**p + 2**p + 3**p +...+ n**p>, using Faulhaber's formula.
 
-C<n> and C<p> must be non-negative integers. Returns NaN otherwise.
+C<p> must be a non-negative integer. Returns NaN otherwise.
 
 Example:
 
@@ -1168,18 +1168,18 @@ Integer k-gonal root of C<n>. Returns C<NaN> when a real root does not exists.
 
 Example:
 
-    say ipolygonal_root($n, 5);                  # pentagonal root
+    say ipolygonal_root($n, 5);                  # integer pentagonal root
     say ipolygonal_root(polygonal(10, 5), 5);    # prints: "10"
 
 =head2 ipolygonal_root2
 
-    ipolygonal_root2(n, k)                  #=> Int | NaN
+    ipolygonal_root2(n, k)                        #=> Int | NaN
 
 Second integer k-gonal root of C<n>. Returns C<NaN> when a real root does not exists.
 
 Example:
 
-    say ipolygonal_root2($n, 5);                   # second pentagonal root
+    say ipolygonal_root2($n, 5);                   # integer second pentagonal root
     say ipolygonal_root2(polygonal(-10, 5), 5);    # prints: "-10"
 
 =head2 is_polygonal
@@ -1197,7 +1197,7 @@ Example:
 
 =head2 is_polygonal2
 
-    is_polygonal2(n, k)                     #=> Bool
+    is_polygonal2(n, k)                           #=> Bool
 
 Returns a true value when C<n> is a second k-gonal number.
 

@@ -2,7 +2,7 @@ HackaMol
 ========
 Object-oriented Perl 5, Moose library for molecular hacking on multiple scales. 
 
-VERSION 0.039
+VERSION 0.046
 ============
        
 Please see [HackaMol on MetaCPAN](https://metacpan.org/release/HackaMol) for formatted documentation.  The [HackaMol publication] (http://pubs.acs.org/doi/abs/10.1021/ci500359e) has a more complete description of the library ([pdf available from researchgate](http://www.researchgate.net/profile/Demian_Riccardi/publication/273778191_HackaMol_an_object-oriented_Modern_Perl_library_for_molecular_hacking_on_multiple_scales/links/550ebec60cf27526109e6ade.pdf )). 

@@ -1,5 +1,10 @@
 Revision history for perl module Image::SVG::Path
 
+0.31 2017-10-08
+
+* Changed "shortcuts" to "smooth".
+* Mended links in documentation.
+
 0.30 2016-12-15
 
 * Bug in parsing sequence of numbers like 2.4.1.2 fixed.

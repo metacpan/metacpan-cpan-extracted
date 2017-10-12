@@ -20,14 +20,38 @@
 use 5.005;
 use strict;
 use Math::BaseCnv 'cnv';
-use MyGraphs;
-
 use Graph::Maker::HexGrid;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 
+{
+  # POD pictures
+  my $graph = Graph::Maker->new('hex_grid', dims => [4,3,2],
+                                undirected => 1);
+  MyGraphs::Graph_xy_print_triangular($graph);
+
+  $graph = Graph::Maker->new('hex_grid', dims => [4,3,1],
+                             undirected => 1);
+  MyGraphs::Graph_xy_print_triangular($graph);
+
+  $graph = Graph::Maker->new('hex_grid', dims => [3,1,1],
+                             undirected => 1);
+  MyGraphs::Graph_xy_print_triangular($graph);
+  print "\n\n";
+
+  $graph = Graph::Maker->new('hex_grid', dims => [3,3,3],
+                             undirected => 1);
+  MyGraphs::Graph_xy_print_triangular($graph);
+  print scalar($graph->vertices)," vertices ",scalar($graph->edges)," edges\n";
+
+  exit 0;
+}
 {
   # HOG searches
   # 1,1,1 https://hog.grinvin.org/ViewGraphInfo.action?id=670  6-cycle
@@ -57,28 +81,7 @@ use Graph::Maker::HexGrid;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-{
-  # pictures
-  my $graph = Graph::Maker->new('hex_grid', dims => [4,3,2],
-                                undirected => 1);
-  MyGraphs::Graph_xy_print_triangular($graph);
 
-  $graph = Graph::Maker->new('hex_grid', dims => [3,2,1],
-                             undirected => 1);
-  MyGraphs::Graph_xy_print_triangular($graph);
-
-  $graph = Graph::Maker->new('hex_grid', dims => [3,1,1],
-                             undirected => 1);
-  MyGraphs::Graph_xy_print_triangular($graph);
-  print "\n\n";
-
-  $graph = Graph::Maker->new('hex_grid', dims => [3,3,3],
-                             undirected => 1);
-  MyGraphs::Graph_xy_print_triangular($graph);
-  print scalar($graph->vertices)," vertices ",scalar($graph->edges)," edges\n";
-
-  exit 0;
-}
 
 {
   my $graph = Graph::Maker->new('hex_grid', dims => [2,5,8],

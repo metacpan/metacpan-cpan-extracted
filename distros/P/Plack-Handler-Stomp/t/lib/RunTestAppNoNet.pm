@@ -5,6 +5,7 @@ use BrokerTestApp;
 use Test::More;
 use Moose::Util 'apply_all_roles';
 use File::Temp 'tempdir';
+use Path::Class;
 use Net::Stomp::Producer;
 
 has producer => (
@@ -63,18 +64,19 @@ sub _build_child {
     }
     else {
         diag "server started, waiting for spinup...";
-        sleep($ENV{NET_STOMP_DELAY}||5);
+        sleep 1 until dir($trace_dir)->children;
         return $pid;
     }
 }
 
-sub DEMOLISH {
+sub DEMOLISH {}
+after DEMOLISH => sub {
     my ($self) = @_;
     return unless $self->has_child;
     my $child = $self->child;
     kill 'TERM',$child;
     diag "waitpid for child";
     waitpid($child,0);
-}
+};
 
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,17 +19,18 @@
 
 use 5.005;
 use strict;
+
 use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
-use lib 'devel/lib';
+use Graph::Maker::StarOfStars;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 {
-  # BinomialTree forms ascii prints
+  # forms ascii prints
 
-  require Graph::Maker::StarOfStars;
   my @graphs;
   foreach my $level (0 .. 2) {
     my $graph = Graph::Maker->new('star_of_stars',

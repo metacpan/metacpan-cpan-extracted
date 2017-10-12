@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -63,16 +63,20 @@ sub make_object {
 #pod
 #pod Make it easy to get L<DateTime|DateTime> objects from the factory. Parses
 #pod JIRA date strings, which are in a format that can be parsed by the
-#pod L<DateTime::Format::Strptime|DateTime::Format::Strptime> pattern
-#pod C<%FT%T.%N%z>
+#pod L<DateTime::Format::Strptime|DateTime::Format::Strptime> patterns
+#pod C<%FT%T.%N%z> or C<%F>
 #pod
 #pod =cut
 
 sub make_date {
     my ( $self, $date ) = @_;
     return unless $date;
-    my $pattern = '%FT%T.%N%z';
-    state $parser = DateTime::Format::Strptime->new( pattern => $pattern );
+    my $pattern = ( $date =~ m/\dt\d/ ) ? '%FT%T.%N%z' : '%F';
+
+    my $parser = DateTime::Format::Strptime->new(
+        pattern => $pattern,
+        on_error => 'croak',
+    );
     return (
         $parser->parse_datetime( $date )
             or
@@ -102,7 +106,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Heumann Manni Melezhik
 
 =head1 NAME
 
@@ -110,7 +114,7 @@ JIRA::REST::Class::Factory - A factory class for building all the other classes 
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -136,8 +140,8 @@ that calls C<init()> with a copy of the factory.
 
 Make it easy to get L<DateTime|DateTime> objects from the factory. Parses
 JIRA date strings, which are in a format that can be parsed by the
-L<DateTime::Format::Strptime|DateTime::Format::Strptime> pattern
-C<%FT%T.%N%z>
+L<DateTime::Format::Strptime|DateTime::Format::Strptime> patterns
+C<%FT%T.%N%z> or C<%F>
 
 =head2 B<factory_error>
 

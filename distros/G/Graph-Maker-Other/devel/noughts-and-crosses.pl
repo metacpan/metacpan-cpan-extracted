@@ -19,11 +19,12 @@
 
 use 5.005;
 use strict;
-use FindBin;
-use MyGraphs;
 use List::Util 'sum';
+use Graph::Maker::NoughtsAndCrosses;
 
-use lib 'devel/lib';
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
@@ -76,7 +77,6 @@ $|=1;
   #             https://hog.grinvin.org/ViewGraphInfo.action?id=27015
   #   2-player  765 vertices too big
   #
-  require Graph::Maker::NoughtsAndCrosses;
   my @graphs;
   foreach my $N (1 .. 4) {
     my $graph = Graph::Maker->new
@@ -98,7 +98,6 @@ $|=1;
 
 {
   # view
-  require Graph::Maker::NoughtsAndCrosses;
   foreach my $N (2) {
     my $graph = Graph::Maker->new
       ('noughts_and_crosses',
@@ -121,7 +120,6 @@ $|=1;
 {
   # num vertices, num edges
 
-  require Graph::Maker::NoughtsAndCrosses;
   foreach my $players (-1, 1,2,3,4) {
     foreach my $rotate (1,0) {
       foreach my $reflect (1,0) {
@@ -161,7 +159,6 @@ $|=1;
 {
   # 3x3, 1 player, up to rot+ref,  47 vertices
 
-  require Graph::Maker::NoughtsAndCrosses;
   my $graph = Graph::Maker->new
     ('noughts_and_crosses',
      N => 3,
@@ -204,7 +201,6 @@ $|=1;
   # not in OEIS: 1,7,77950    edges
   # vertices 2,10,123310 = A085698
 
-  require Graph::Maker::NoughtsAndCrosses;
   foreach my $N (0..3) {
     my $graph = Graph::Maker->new
       ('noughts_and_crosses',
@@ -244,7 +240,6 @@ $|=1;
   #   vertices 0,2,9,3495
   #   edges    0,1,7,3152
 
-  require Graph::Maker::NoughtsAndCrosses;
   foreach my $N (0,1,2,3,4) {
     my $graph = Graph::Maker->new
       ('noughts_and_crosses',
@@ -266,7 +261,6 @@ $|=1;
 }
 {
   # 2x2 3-player rot+ref
-  require Graph::Maker::NoughtsAndCrosses;
   foreach my $N (3) {
     my $graph = Graph::Maker->new
       ('noughts_and_crosses',

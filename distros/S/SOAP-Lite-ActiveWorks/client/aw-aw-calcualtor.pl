@@ -40,7 +40,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite  testing suite.
 
 This script creates an ActiveWorks client and publishes an
 'AdapterDevKit::calcRequest' event directly to an ActiveWorks broker.

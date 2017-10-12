@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadYAMLRole;
-$HackaMol::Roles::ReadYAMLRole::VERSION = '0.045';
+$HackaMol::Roles::ReadYAMLRole::VERSION = '0.046';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use HackaMol::PeriodicTable qw(%KNOWN_NAMES _trim);
@@ -223,7 +223,7 @@ HackaMol::Roles::ReadYAMLRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 SYNOPSIS
 

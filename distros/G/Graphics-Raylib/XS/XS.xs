@@ -9,47 +9,37 @@
 
 #include "const-c.inc"
 
-#define o WHITE
-#define N BLACK
-    static Color sos[32*32] = { /* For debugging purposes */
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,o,o,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,o,o,o,o,o,o,o,o,
-        o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,
-    };
-#undef o
-#undef N
-
-static ColorEqual(Color a, Color b) {
+static bool ColorEqual(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+}
+typedef Rectangle ImageSet_t(Color*, Rectangle, Color, unsigned, unsigned);
+
+static Rectangle
+TransposedImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned height)
+{ /* FIXME height/width */
+    Rectangle ret = dst_rect;
+    if (width > dst_rect.width-dst_rect.x || height > dst_rect.height-dst_rect.y)
+        return dst_rect;
+
+    if (!ColorEqual(color, BLANK)) {
+        for(unsigned i = 0; i < height; i++) {
+            for(unsigned j = 0; j < width; j++) {
+                Color *pixel = &dst[(j+dst_rect.x)*dst_rect.width + (dst_rect.y+i)];
+                *pixel = color;
+            }
+        }
+    }
+
+    ret.x += width;
+    if (ret.x >= ret.width) {
+        ret.x -= ret.width;
+        ret.y += height;
+    }
+    if (ret.y >= ret.height) {
+        ret.y -= ret.height;
+    }
+
+    return ret;
 }
 
 static Rectangle
@@ -1010,31 +1000,6 @@ LoadImageRaw(fileName, width, height, format, headerSize)
     int    headerSize
 
 Image
-LoadSOSImage()
-  PPCODE:
-    RETVAL = LoadImageEx(sos, 32, 32);
-    ImageResizeNN(&RETVAL, 320, 320);
-    {
-        SV * RETVALSV;
-        RETVALSV = sv_newmortal();
-        sv_setref_pvn(RETVALSV, "Image", (char *)&RETVAL, sizeof(RETVAL));
-        ST(0) = RETVALSV;
-    }
-    XSRETURN(1);
-
-void
-DrawSOSTexture()
-  INIT:
-    Image img;
-    Texture2D texture;
-  CODE:
-    img = LoadImageEx(sos, 32, 32);
-    ImageResizeNN(&img, 320, 320);
-    texture = LoadTextureFromImage(img);
-    DrawTexture(texture, 0, 0, WHITE);
-    UnloadImage(img);
-
-Image
 LoadImageFromAV(array_ref, color_cb, width, height)
     SV *array_ref
     SV *color_cb
@@ -1042,11 +1007,15 @@ LoadImageFromAV(array_ref, color_cb, width, height)
     int height
   ALIAS:
     LoadImageFromAV_uninitialized_mem = 1
+    LoadImageFromAV_transposed = 2
+    LoadImageFromAV_transposed_uninitialized_mem = 3
   INIT:
     AV *av;
     Color *pixels;
     Image img;
+    int currwidth = 0;
     Rectangle where = { 0, 0, 0, 0 };
+    ImageSet_t *my_ImageSet = ImageSet;
   PPCODE:
     if (!SvROK(array_ref) || SvTYPE(SvRV(array_ref)) != SVt_PVAV)
         croak("expected ARRAY ref as first argument");
@@ -1054,30 +1023,31 @@ LoadImageFromAV(array_ref, color_cb, width, height)
         croak("expected CODE ref as second argument");
 
     av = (AV*)SvRV(array_ref);
-    where.height = av_len(av);
-    for (int i = 0; i < height; i++) {
+    where.height = av_len(av) + 1;
+    for (int i = 0; i < where.height; i++) {
         SV** row_sv = av_fetch(av, i, 0);
         if (!row_sv || !SvROK(*row_sv) || SvTYPE(SvRV(*row_sv)) != SVt_PVAV)
             croak("expected ARRAY ref as rows");
-        where.width = av_len((AV*)SvRV(*row_sv));
-        if (height > where.width)
-            where.width = height;
+        currwidth = av_len((AV*)SvRV(*row_sv)) + 1;
+        if (currwidth > where.width)
+            where.width = currwidth;
     }
-    if (ix == 1) /* Looks cool, try it! */
+    if (ix & 1) /* Looks cool, try it! */
         Newx(pixels, where.height * where.width, Color);
     else
         Newxz(pixels, where.height * where.width, Color);
 
+    if (ix & 2)
+        my_ImageSet = TransposedImageSet;
+
     EXTEND(SP, 3);
     for (int i = 0; i < where.height; i++) {
-        AV *row;
-        SV** row_sv = av_fetch(av, i, 0);
-        row = (AV*)SvRV(*row_sv);
+        AV* row = (AV*)SvRV(*av_fetch(av, i, 0));
 
         for (int j = 0; j < where.width; j++) {
             SV** pixel = av_fetch(row, j, 0);
             if (!pixel) {
-                PerlIO_printf(PerlIO_stdout(), "No pixel @ (%d, %d)\n", i,j);
+                /* do something ? */
             }
 
             PUSHMARK(SP);
@@ -1093,12 +1063,12 @@ LoadImageFromAV(array_ref, color_cb, width, height)
             if (sv_isa(ret, "Color"))
                 color = *(Color *)SvPV_nolen(SvRV(ret));
 
-            where = ImageSet(pixels, where, color, 1, 1);
+            where = my_ImageSet(pixels, where, color, 1, 1);
 
         }
     }
     RETVAL = LoadImageEx(pixels, where.width, where.height);
-    ImageResizeNN(&RETVAL, where.width * width, where.height * height);
+    ImageResizeNN(&RETVAL, width, height);
     Safefree(pixels);
     {
         SV * RETVALSV;

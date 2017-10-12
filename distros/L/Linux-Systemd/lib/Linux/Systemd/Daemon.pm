@@ -1,4 +1,4 @@
-package Linux::Systemd::Daemon 1.172760;
+package Linux::Systemd::Daemon 1.172840;
 
 # ABSTRACT: Systemd daemon API
 
@@ -70,7 +70,7 @@ Linux::Systemd::Daemon - Systemd daemon API
 
 =head1 VERSION
 
-version 1.172760
+version 1.172840
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,7 @@ site near you, or see L<https://metacpan.org/module/Linux::Systemd/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/ioanrogers/Linux-Systemd>
+The development version is on github at L<https://github.com/ioanrogers/Linux-Systemd>
 and may be cloned from L<git://github.com/ioanrogers/Linux-Systemd.git>
 
 =head1 AUTHOR

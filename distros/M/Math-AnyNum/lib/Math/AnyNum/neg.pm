@@ -20,8 +20,8 @@ sub __neg__ {
     }
 
   Math_GMPz: {
-        my $r = Math::GMPz::Rmpz_init_set($x);
-        Math::GMPz::Rmpz_neg($r, $r);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_neg($r, $x);
         return $r;
     }
 

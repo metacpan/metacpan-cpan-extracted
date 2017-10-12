@@ -1,3 +1,10 @@
+1.238 2017-10-08
+
+    * udpated models to use new rw_config parameter
+      (requires Config::Model 2.111)
+    * update Ciphers parameter
+    * UseLogin parameter is deprecated
+
 1.237 2016-03-07
 
     * Fix tests broken by Config::Model 2.080 changes (RT #112736)

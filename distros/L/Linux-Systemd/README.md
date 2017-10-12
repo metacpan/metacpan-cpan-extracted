@@ -1,18 +1,24 @@
 # NAME
 
-Linux::Systemd - Use the systemd journal
+Linux::Systemd - Bindings for `systemd` APIs
 
 # VERSION
 
-version 1.172760
+version 1.172840
 
 # DESCRIPTION
+
+The following `systemd` components are wrapped to some to degree.
 
 ## Journal
 
 To log to the journal, see [Linux::Systemd::Journal::Write](https://metacpan.org/pod/Linux::Systemd::Journal::Write).
 
 To read from the journal, see [Linux::Systemd::Journal::Read](https://metacpan.org/pod/Linux::Systemd::Journal::Read).
+
+## Daemon
+
+To report status and use service watchdogs, see [Linux::Systemd::Daemon](https://metacpan.org/pod/Linux::Systemd::Daemon).
 
 # BUGS AND LIMITATIONS
 
@@ -29,7 +35,7 @@ site near you, or see [https://metacpan.org/module/Linux::Systemd/](https://meta
 
 # SOURCE
 
-The development version is on github at [http://github.com/ioanrogers/Linux-Systemd](http://github.com/ioanrogers/Linux-Systemd)
+The development version is on github at [https://github.com/ioanrogers/Linux-Systemd](https://github.com/ioanrogers/Linux-Systemd)
 and may be cloned from [git://github.com/ioanrogers/Linux-Systemd.git](git://github.com/ioanrogers/Linux-Systemd.git)
 
 # AUTHOR

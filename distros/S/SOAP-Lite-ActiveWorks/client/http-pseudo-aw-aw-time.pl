@@ -24,7 +24,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite  testing suite.
 
 This script uses the SOAP-Lite dispatching mechanism to publish an
 SOAP request to an http server given in the 'proxy' parameter.

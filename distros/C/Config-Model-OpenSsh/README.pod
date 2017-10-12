@@ -1,3 +1,10 @@
+=begin html
+
+<a href="https://travis-ci.org/dod38fr/config-model-openssh"> <img
+   src="https://travis-ci.org/dod38fr/config-model-openssh.svg?branch=master">
+   </a>
+
+=end html
 
 =head1 Config::Model::OpenSsh - OpenSSH graphical configuration editor
 
@@ -69,6 +76,12 @@ Likewise, you can edit your C<~/.ssh/config> file with:
 Or to edit C</etc/ssh/ssh_config>, run as root:
 
  $ sudo cme edit system-ssh
+
+More details are given in L<Managing ssh configuration with cme|https://github.com/dod38fr/config-model/wiki/Managing-ssh-configuration-with-cme> wiki page.
+
+=head1 Build from git repository
+
+See L<README-build-from-git|https://github.com/dod38fr/config-model-openssh/blob/master/README-build-from-git.md>.
 
 =head1 More information
 

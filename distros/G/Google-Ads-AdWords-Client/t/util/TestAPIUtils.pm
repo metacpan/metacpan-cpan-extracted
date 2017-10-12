@@ -282,7 +282,7 @@ sub delete_experiment {
 
 sub get_test_image {
   return Google::Ads::Common::MediaUtils::get_base64_data_from_url(
-    "http://goo.gl/HJM3L");
+    "https://goo.gl/3b9Wfh");
 }
 
 sub get_any_child_client_email {

@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 # shortcuts
 #  os and distros
@@ -1625,7 +1625,13 @@ sub mapping {
 
      [cpanmod => 'libsoldout',
       [os_freebsd,
-       [package => 'libsoldout']]],
+       [package => 'libsoldout']],
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie precise trusty)],
+	[package => []], # not available before stretch/xenial
+       ],
+       [package => 'libsoldout1-dev']], # passes with jessie, fails with xenial
+     ],
 
      [cpanmod => 'Lingua::NATools',
       # XXX what about freebsd?
@@ -2107,6 +2113,8 @@ sub mapping {
        [package => 'glfw']],
       [like_debian,
        [package => 'libglfw3-dev']],
+      [os_darwin,
+       [package => 'glfw']],
      ],
 
      [cpanmod => 'OpenGL::Modern',

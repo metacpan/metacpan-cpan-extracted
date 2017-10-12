@@ -4,6 +4,3 @@ prompt generic
 prompt user
     match /Login: ?$/
 
-# legacy support
-prompt prompt
-    match /[\/a-zA-Z0-9._:-]+ ?(?:\(config[^)]*\))? ?[#>] ?$/

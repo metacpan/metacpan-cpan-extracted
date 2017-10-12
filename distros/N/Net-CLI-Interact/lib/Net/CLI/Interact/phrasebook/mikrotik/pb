@@ -1,0 +1,23 @@
+# a preliminary phrasebook for mikrotik routeros devices
+# see http://wiki.mikrotik.com/wiki/Manual:Console_login_process for prompts and quirks
+# version 0
+
+prompt user
+ match /Login: ?$/
+
+prompt pass
+ match /[Pp]assword: ?$/
+
+# note: that only covers prompts in single-line command mode, not safe mode,
+# not hotlock mode, and not line continuation mode either
+prompt generic
+ match  /\] (\/.+)?>\s+$/
+
+macro paging
+ send /
+ 
+prompt privileged
+ match  /\] (\/.+)?>\s+$/
+
+macro disconnect
+ send /quit

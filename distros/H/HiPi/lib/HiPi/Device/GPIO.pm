@@ -18,7 +18,7 @@ use HiPi::Device::GPIO::Pin;
 use Time::HiRes;
 use Fcntl;
 
-our $VERSION ='0.66';
+our $VERSION ='0.67';
 
 my $sysroot = '/sys/class/gpio';
 

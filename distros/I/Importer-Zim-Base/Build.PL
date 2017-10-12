@@ -18,20 +18,21 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim-Base",
-  "dist_version" => "0.8.0",
+  "dist_version" => "0.9.0",
   "license" => "perl",
   "module_name" => "Importer::Zim::Base",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "Module::Runtime" => 0,
-    "perl" => "5.010001"
+    "perl" => "5.010001",
+    "strict" => 0
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Test::Deep" => 0,
     "Test::More" => "0.96",
-    "strict" => 0,
     "warnings" => 0
   }
 );
@@ -41,8 +42,8 @@ my %fallback_build_requires = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Module::Build" => "0.28",
+  "Test::Deep" => 0,
   "Test::More" => "0.96",
-  "strict" => 0,
   "warnings" => 0
 );
 

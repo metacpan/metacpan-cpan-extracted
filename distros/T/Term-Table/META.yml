@@ -3,7 +3,7 @@ abstract: 'Format a header and rows into a table'
 author:
   - 'Chad Granum <exodist@cpan.org>'
 build_requires:
-  Test2::Tools::Tiny: '1.302072'
+  Test2::Tools::Tiny: '1.302097'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: http://github.com/exodist/Term-Table/issues
   repository: http://github.com/exodist/Term-Table/
-version: '0.010'
+version: '0.012'
 x_serialization_backend: 'YAML::Tiny version 1.70'

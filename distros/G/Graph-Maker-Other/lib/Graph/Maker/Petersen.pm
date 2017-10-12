@@ -22,27 +22,32 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
+
+# Usage: $graph = $self->make_graph(key=>value)
+# Create and return a graph with given key/value parameters.
+# Parameter graph_maker is used (and removed) if given, or Graph.pm otherwise.
+sub make_graph {
+  my ($self, %params) = @_;
+  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%params);
+}
 sub _default_graph_maker {
   require Graph;
   return Graph->new(@_);
 }
-sub _make_graph {
-  my ($params) = @_;
-  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
-  return $graph_maker->(%$params);
-}
 
 sub init {
   my ($self, %params) = @_;
-
   my $N = delete($params{'N'}) || 5;
   my $K = delete($params{'K'}) || 2;
 
-  my $graph = _make_graph(\%params);
+  my $graph = $self->make_graph(%params);
   $graph->set_graph_attribute (name => ($N==5 && $K==2 ? "Petersen" : "Petersen $N,$K"));
 
   $graph->add_cycle(1 .. $N);
@@ -149,17 +154,25 @@ House of Graphs entries for graphs here include
 
 =item N=4, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022> (cube)
 
+=item N=4, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=588>
+
 =item N=5, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=660> (Petersen)
 
 =item N=7, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=28482>
 
-=item N=8, K=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1229> (Moebius Kantor)
+=item N=8, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1229> (Moebius Kantor)
 
 =item N=9, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6700>
 
 =item N=10, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1043> (Dodecahedral)
 
 =item N=10, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1036> (Desargues)
+
+=item N=11, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=24052>
+
+=item N=12, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27325>
+
+=item N=12, K=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1234> (Nauru)
 
 =back
 

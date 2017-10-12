@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $SOURCE = 'CPAN';
 ## $SOURCE = 'GitHub';  # COMMENT
 # the line above will be commented out by Dist::Zilla
@@ -743,7 +743,7 @@ sub username {
 #pod An accessor that returns the user used to connect to the JIRA server as a
 #pod L<JIRA::REST::Class::User|JIRA::REST::Class::User> object, even if the username
 #pod was read from a C<.netrc> or L<Config::Identity|Config::Identity> file.  Works
-#pod by calling C</rest/api/latest/myself>.
+#pod by making the JIRA REST API call L</rest/api/latest/myself|https://docs.atlassian.com/jira/REST/cloud/#api/2/myself>.
 #pod
 #pod =cut
 
@@ -760,14 +760,30 @@ sub user_object {
 
 #pod =accessor B<password>
 #pod
-#pod An accessor that returns the password used to connect to the JIRA server.
-#pod Currently only works if the password was passed into the class constructor.
-#pod Work is being done to return the password when the password was read from a
-#pod C<.netrc> or L<Config::Identity|Config::Identity> file.
+#pod An accessor that returns the password used to connect to the JIRA server,
+#pod even if the username was read from a C<.netrc> or
+#pod L<Config::Identity|Config::Identity> file.
 #pod
 #pod =cut
 
-sub password { return shift->args->{password} }
+sub password {
+    my $self = shift;
+
+    unless ( $self->args->{password} ) {
+
+        # we don't have the password cached, so get it from
+        # the Authorization header we're sending to JIRA
+
+        my $rest = $self->JIRA_REST->{rest};
+        if ( my $auth = $rest->{_headers}->{Authorization} ) {
+            my ( undef, $encoded ) = split /\s+/, $auth;
+            ( undef, $self->args->{password} ) =
+              split /:/, decode_base64 $encoded;
+        }
+    }
+
+    return $self->args->{password};
+}
 
 #pod =accessor B<rest_client_config>
 #pod
@@ -872,9 +888,9 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Packy Anderson Alexandr Alexey Ciornii Melezhik gnustavo jira JRC Gustavo
-Leite de Mendonça Chaves Atlassian GreenHopper ScriptRunner TODO
-aggregateprogress aggregatetimeestimate aggregatetimeoriginalestimate
+=for :stopwords Packy Anderson Alexandr Alexey Ciornii Heumann Manni Melezhik gnustavo jira
+JRC Gustavo Leite de Mendonça Chaves Atlassian GreenHopper ScriptRunner
+TODO aggregateprogress aggregatetimeestimate aggregatetimeoriginalestimate
 assigneeType avatar avatarUrls completeDate displayName duedate
 emailAddress endDate fieldtype fixVersions fromString genericized iconUrl
 isAssigneeTypeValid issueTypes issuekeys issuelinks issuetype jql
@@ -890,7 +906,7 @@ JIRA::REST::Class - An OO Class module built atop L<JIRA::REST|JIRA::REST> for d
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -1159,14 +1175,13 @@ L<Config::Identity|Config::Identity> file.
 An accessor that returns the user used to connect to the JIRA server as a
 L<JIRA::REST::Class::User|JIRA::REST::Class::User> object, even if the username
 was read from a C<.netrc> or L<Config::Identity|Config::Identity> file.  Works
-by calling C</rest/api/latest/myself>.
+by making the JIRA REST API call L</rest/api/latest/myself|https://docs.atlassian.com/jira/REST/cloud/#api/2/myself>.
 
 =head2 B<password>
 
-An accessor that returns the password used to connect to the JIRA server.
-Currently only works if the password was passed into the class constructor.
-Work is being done to return the password when the password was read from a
-C<.netrc> or L<Config::Identity|Config::Identity> file.
+An accessor that returns the password used to connect to the JIRA server,
+even if the username was read from a C<.netrc> or
+L<Config::Identity|Config::Identity> file.
 
 =head2 B<rest_client_config>
 
@@ -1659,7 +1674,7 @@ Packy Anderson <packy@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Alexey Melezhik
+=for stopwords Alexandr Ciornii Alexey Melezhik Manni Heumann
 
 =over 4
 
@@ -1670,6 +1685,10 @@ Alexandr Ciornii <alexchorny@gmail.com>
 =item *
 
 Alexey Melezhik <melezhik@gmail.com>
+
+=item *
+
+Manni Heumann <github@lxxi.org>
 
 =back
 

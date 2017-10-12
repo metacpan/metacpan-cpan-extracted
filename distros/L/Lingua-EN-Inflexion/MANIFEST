@@ -35,5 +35,6 @@ t/export_names.t
 t/matching.t
 t/numwords.t
 t/wordlist.t
+t/former_problems.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

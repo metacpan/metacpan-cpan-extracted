@@ -1,0 +1,12 @@
+Changes
+lib/Dancer2/Plugin/GraphQL.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-compile.t
+t/00-report-prereqs.t
+t/ajax.t
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,82 +10,43 @@ dictionary, please consider contributing it back! The phrasebook specification
 is given in L<Net::CLI::Interact::Phrasebook>.
 
 For each supported CLI, there is a name which must be passed in the
-C<personality> option to L<Net::CLI::Interact>'s C<new()> method. After that,
-you can call the included Macros, and the module will use the included Prompt
-to match the current state of the CLI. More information is available in the
-L<Tutorial|Net::CLI::Interact::Manual::Tutorial> and
+C<personality> option to L<Net::CLI::Interact>'s C<new()> method; this is the
+same as the directory containing the phrasebook file.
+
+After that, you can call the included Macros, and the module will use the
+included Prompt to match the current state of the CLI. More information is
+available in the L<Tutorial|Net::CLI::Interact::Manual::Tutorial> and
 L<Cookbook|Net::CLI::Interact::Manual::Cookbook>.
-
-Below is a list of all current bundled CLI dictionaries. Each lists its name,
-the available Prompts, Macros and Continuations, and from which other CLI
-dictionaries it inherits.
-
- IOS       # Cisco IOS
- CatOS     # for older, pre-IOS Cisco devices
- 
- PIXOS     # for PIX OS-based devices
- PIXOS7    # Slightly different commands from other PIXOS versions
- FWSM      # currently the same as 'PIXOS'
- FWSM3     # for FWSM Release 3.x devices (slightly different to FWSM 2.x)
- 
- JunOS     # Juniper JUNOS support
- HP        # HP support
- Nortel    # Nortel support
- ExtremeOS # Extreme Networks support
- Foundry   # Foundry/Brocade device support
- 
- Bash      # GNU Bourne-Again SHell (i.e. most linux systems)
-
- OVMCLI    # Oracle VM Manager CLI
 
 =head1 PERSONALITIES
 
-=head2 Bash
+See the files themselves at the following link for full details:
+L<https://github.com/ollyg/Net-CLI-Interact/tree/master/lib/Net/CLI/Interact/phrasebook>.
 
-This personality goes by the name of C<bash>.
+=over 4
 
-Prompts are C<prompt>, C<privileged>, C<user> and C<pass>. The C<pass>
-prompt works either for an initial SSH connection, or a C<sudo> request.
+=item * ASA
 
-Macros are C<begin_privileged>, C<end_privileged>, and C<disconnect>. The
-C<begin_privileged> macro issues a C<sudo> request to become the root user.
+=item * Avaya
 
-=head2 Cisco
+=item * Bash
 
-This personality goes by the name of C<cisco> and provides a basis for many
-other CLI dictionaries.
+=item * CatOS
 
-Prompts are C<basic>, C<privileged>, C<configure>, C<user>, and C<pass>.
+=item * Cisco (generic)
 
-Macros are C<begin_privileged>, C<end_privileged>, C<begin_configure>,
-C<end_configure>, and C<disconnect>.
+=item * Csh
 
-=head2 CatOS
+=item * ExtremeOS
 
-This personality goes by the name of C<catos> and inherits from the C<cisco>
-dictionary.
+=item * F5
 
-Additionally it provides the C<privileged> Prompt.
+=item * Fortinet
 
-Additionally it also provides the C<paging> Macro to set the terminal page
-size.
+=item * Foundry / Brocade
 
-=head2 ExtremeOS
-
-This personality goes by the name of C<extremeos> and inherits from the
-C<cisco> dictionary.
-
-Additional Prompts are C<basic>, C<privileged>, C<configure>, C<user>, and
-C<pass>.
-
-Additional Macros are C<begin_privileged>, C<end_privileged>, and
-C<disconnect>.
-
-=head2 Foundry / Brocade
-
-This personality goes by the name of C<foundry> and inherits from the C<cisco>
-dictionary. Before connecting to the device you probably want to set the
-output separator to be:
+Before connecting to the device you probably want to set the output separator
+to be:
 
  $nci->transport->ors("\r\n");
 
@@ -93,82 +54,43 @@ For users of L<Net::Appliance::Session> this should be:
 
  $session_obj->nci->transport->ors("\r\n");
 
-=head2 IOS
+=item * FWSM
 
-This personality goes by the name of C<ios> and inherits from the C<cisco>
-dictionary.
+=item * FWSM 3
 
-Additionally it provides the C<paging> Macro to set the terminal page size.
+=item * HP
 
-=head2 HP
+=item * IOS
 
-This personality goes by the name of C<hp> and inherits from the C<cisco>
-dictionary.
+=item * JunOS
 
-Additionally it provides the C<basic> and C<user> Prompts.
+=item * Mikrotik
 
-Additionally it provides C<enable_paging> and C<disable_paging> Macros.
+=item * Nortel
 
-=head2 JunOS
+=item * OVMCLI
 
-This personality goes by the name of C<junos> and inherits from the C<cisco>
-dictionary.
+=item * PIXOS
 
-Additionally it provides the C<privileged>, C<configure>, and C<user> Prompts.
+=item * PIXOS 7
 
-Additionally it also provides the C<begin_configure> and C<paging> Macros.
+=item * Qnap
 
-=head2 Nortel
+=item * RedBack
 
-This personality goes by the name of C<nortel> and inherits from the C<cisco>
-dictionary.
+=item * ScreenOS
 
-Additionally it provides the C<user> Prompt.
+=item * WLC
 
-=head2 PIXOS
+=item * Zyxel
 
-This personality goes by the name of C<pixos> and inherits from the C<cisco>
-dictionary.
-
-Additionally it provides the C<paging> Macro to set the terminal page size.
-
-It can be used in its own right for Cisco PIX firewalls, but is
-also used as a base for other dictionaries.
-
-=head2 PIXOS 7
-
-This personality goes by the name of C<pixos7> and inherits from the C<pixos>
-dictionary.
-
-Additionally it provides the C<paging> Macro to set the terminal page size.
-
-=head2 FWSM
-
-This personality goes by the name of C<fwsm> and inherits from the C<pixos>
-dictionary.
-
-It provides no further functionality, as Cisco FWSM software version 1 and 2
-was the same as the PIX OS.
-
-=head2 FWSM 3
-
-This personality goes by the name of C<fwsm3> and inherits from the C<pixos>
-dictionary.
-
-Additionally it provides the C<paging> Macro to set the terminal page size.
-
-=head2 OVMCLI
-
-This personality goes by the name of C<ovmcli>.
-
-Prompts are C<prompt> and C<privileged>.
-
-There is one macro named C<disconnect>.
+=back
 
 =head1 SUPPORTING A NEW DEVICE
 
-In order to support a new device, particularly for the L<Net::Appliance::Session>
-module, there is a basic set of prompts and macros you must create.
+In order to support a new device, particularly for the
+L<Net::Appliance::Session> module, there is a basic set of prompts and macros
+you must create.
 
 =head2 Required Prompts
 

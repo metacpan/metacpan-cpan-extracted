@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 use constant CMD => "count";
+use constant CMD_DESC => "Count the various kinds of SV";
 
 =head1 NAME
 
@@ -74,17 +75,21 @@ Prints a summary of the count of each type of object.
 
 =cut
 
-sub run_cmd
+sub run
 {
    my $self = shift;
 
-   Devel::MAT::Cmd->printf( "  %-20s %-10s %-10s\n", "Kind", "Count", "(blessed)" );
-
    my ( $kinds, $blessed ) = $self->count_svs( $self->df );
 
-   foreach my $kind ( sort keys %$kinds ) {
-      Devel::MAT::Cmd->printf( "  %-20s %-10s %-10s\n", $kind, $kinds->{$kind}, $blessed->{$kind} // "" );
-   }
+   Devel::MAT::Cmd->print_table(
+      [
+         [ "  Kind", "Count", "(blessed)" ],
+         map {
+            [ "  $_", $kinds->{$_}, $blessed->{$_} // "" ]
+         } sort keys %$kinds
+      ],
+      sep => "    ",
+   );
 }
 
 =head1 AUTHOR

@@ -4,7 +4,7 @@ Geo::IP - Look up location and network information by IP Address
 
 # VERSION
 
-version 1.50
+version 1.51
 
 # SYNOPSIS
 
@@ -332,6 +332,10 @@ https://github.com/maxmind/geoip-api-perl
 
 [GeoIP2](https://metacpan.org/pod/GeoIP2) - database reader for the GeoIP2 format.
 
+# SUPPORT
+
+Bugs may be submitted through [https://github.com/maxmind/geoip-api-perl/issues](https://github.com/maxmind/geoip-api-perl/issues).
+
 # AUTHORS
 
 - Dave Rolsky <drolsky@maxmind.com>
@@ -348,10 +352,11 @@ https://github.com/maxmind/geoip-api-perl
 - shawniverson <shawniverson@gmail.com>
 - Thomas J Mather <tjmather@maxmind.com>
 - Tina Mueller <TINITA@cpan.org>
+- Will Storey <will@summercat.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc.
+This software is copyright (c) 2002 - 2017 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

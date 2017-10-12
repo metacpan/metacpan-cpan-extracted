@@ -1,0 +1,996 @@
+<div style="background-color: #ccFFFF; margin-left: 0">
+<head>
+ <meta charset="UTF-8">
+</head>
+<body>
+<h1>Packages</h1>
+<table border="1" cellspacing="20">
+
+<tr><td><a href="#com.appaapps">com.appaapps</a></tr>
+</table>
+</div>
+
+<a name="com.appaapps"/>
+<div style="background-color: #FFccFF; margin-left: 20">
+<h2>Classes in package: <big>com.appaapps</big></h2>
+<table border="1" cellspacing="20">
+<tr><th>Class<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg">Svg</a>
+    <td>Structured Vector Graphics. Svg elements occupy fractions of the canvas which is assumed to have the approximate aspect ratio specified when creating the Svg. The elements then try to fit themselves into their fractional areas as best they can.
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.AFewChars">Svg.AFewChars</a>
+    <td>Draw a path - typically to show  a few chars for an alphabetic or numbers game
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.AngleTracker">Svg.AngleTracker</a>
+    <td>Track angles
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.CenterToCenter">Svg.CenterToCenter</a>
+    <td>Animation which expands an element its center is over the centre of the canvas
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element">Svg.Element</a>
+    <td>Common features
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Image">Svg.Image</a>
+    <td>Draw a bitmap image - move it around to show it all within the space available
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.LengthTracker">Svg.LengthTracker</a>
+    <td>Track length
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.LowPassFilter">Svg.LowPassFilter</a>
+    <td>Low pass filter
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.OpacityTracker">Svg.OpacityTracker</a>
+    <td>Track opacity
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.RandomStep">Svg.RandomStep</a>
+    <td>Random step function (x=time, y=position) with each step chosen at random between -1 and 1, each step duration chosen at random between 0 and timeScale
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Rectangle">Svg.Rectangle</a>
+    <td>Rectangle
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Text">Svg.Text</a>
+    <td>Text
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Tracker">Svg.Tracker</a>
+    <td>Generates random but smoothly varying numbers between -1  and +1 by filtering random shocks.
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps.Svg"/>
+<h3>Methods in class: <big>Svg</big>, package: com.appaapps</h3>
+<p>Structured Vector Graphics. Svg elements occupy fractions of the canvas which is assumed to have the approximate aspect ratio specified when creating the Svg. The elements then try to fit themselves into their fractional areas as best they can.
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>
+    <td><a href="#com.appaapps.Svg.Svg">Svg</a>
+    <td>void
+    <td>public
+    <td>A default square Svg
+</tr>
+
+<tr><td>
+    <td><a href="#com.appaapps.Svg.Svg">Svg</a>
+    <td>float, float
+    <td>public
+    <td>Create an Svg with the specified aspect ratio.
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.getWidth">getWidth</a>
+    <td>void
+    <td>public
+    <td>The width of the Svg
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.getHeight">getHeight</a>
+    <td>void
+    <td>public
+    <td>The height of the Svg
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.aspectRatio">aspectRatio</a>
+    <td>void
+    <td>public
+    <td>Aspect ratio
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.push">push</a>
+    <td>Element
+    <td>public
+    <td>Add an element to the stack of elements to be displayed
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.onShow">onShow</a>
+    <td>void
+    <td>public
+    <td>Called when this Svg is shown or reshown after some other Svg has been shown
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.draw">draw</a>
+    <td><a href="   (final Canvas canvas)                                                        //P Canvas to draw on">Canvas</a>
+    <td>public
+    <td>Draw the Svg to cover an entire canvas
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.draw">draw</a>
+    <td><a href="   (final Canvas canvas,                                                        //P Canvas  to draw svg on">Canvas</a>, float, float, float, float
+    <td>private
+    <td>Draw the Svg on a canvas at a specified location
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps.Svg.chooseDoubleMode">chooseDoubleMode</a>
+    <td>void
+    <td>
+    <td>Choose either a single or a double gradient
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.chooseStartAngle">chooseStartAngle</a>
+    <td>void
+    <td>
+    <td>Choose a start angle between 0 and 180 degrees
+</tr>
+
+<tr><td>PorterDuffXfermode
+    <td><a href="#com.appaapps.Svg.choosePorterDuffMode">choosePorterDuffMode</a>
+    <td>void
+    <td>
+    <td>Choose Porter=Duff blending method
+</tr>
+
+<tr><td>Rectangle
+    <td><a href="#com.appaapps.Svg.Rectangle">Rectangle</a>
+    <td>float, float, float, float
+    <td>
+    <td>Create and push a rectangle
+</tr>
+
+<tr><td>Text
+    <td><a href="#com.appaapps.Svg.Text">Text</a>
+    <td><a href="   (final String text,                                                          //P The text to  display">String</a>, float, float, float, float, int, int
+    <td>public
+    <td>Create and push a new text element
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Svg"/>
+<h4><b>Svg</b> : </h4>
+<p>A default square Svg</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.Svg"/>
+<h4><b>Svg</b> : </h4>
+<p>Create an Svg with the specified aspect ratio.</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>width<td>float<td>final<td>The width of the Svg</tr>
+<tr><td>height<td>float<td>final<td>The height of the Svg</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.getWidth"/>
+<h4><b>getWidth</b> : float</h4>
+<p>The width of the Svg</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.getHeight"/>
+<h4><b>getHeight</b> : float</h4>
+<p>The height of the Svg</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.aspectRatio"/>
+<h4><b>aspectRatio</b> : float</h4>
+<p>Aspect ratio</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps.Svg.push"/>
+<h4><b>push</b> : void</h4>
+<p>Add an element to the stack of elements to be displayed</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>e<td>Element<td><td>the element to add</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.onShow"/>
+<h4><b>onShow</b> : void</h4>
+<p>Called when this Svg is shown or reshown after some other Svg has been shown</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>Draw the Svg to cover an entire canvas</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="   (final Canvas canvas)                                                        //P Canvas to draw on">Canvas</a><td>final<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>Draw the Svg on a canvas at a specified location</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="   (final Canvas canvas,                                                        //P Canvas  to draw svg on">Canvas</a><td>final<td>Canvas  to draw svg on</tr>
+<tr><td>x<td>float<td>final<td>Left edge</tr>
+<tr><td>y<td>float<td>final<td>Upper edge</tr>
+<tr><td>w<td>float<td>final<td>Width</tr>
+<tr><td>h<td>float<td>final<td>Height</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.chooseDoubleMode"/>
+<h4><b>chooseDoubleMode</b> : boolean</h4>
+<p>Choose either a single or a double gradient</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.chooseStartAngle"/>
+<h4><b>chooseStartAngle</b> : float</h4>
+<p>Choose a start angle between 0 and 180 degrees</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps.Svg.choosePorterDuffMode"/>
+<h4><b>choosePorterDuffMode</b> : PorterDuffXfermode</h4>
+<p>Choose Porter=Duff blending method</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Rectangle"/>
+<h4><b>Rectangle</b> : Rectangle</h4>
+<p>Create and push a rectangle</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>x<td>float<td>final<td>Fractional position - left</tr>
+<tr><td>y<td>float<td>final<td>Fractional position - upper</tr>
+<tr><td>𝘅<td>float<td>final<td>Fractional position - right</tr>
+<tr><td>𝘆<td>float<td>final<td>Fractional position - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.Text"/>
+<h4><b>Text</b> : Text</h4>
+<p>Create and push a new text element</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>text<td><a href="   (final String text,                                                          //P The text to  display">String</a><td>final<td>The text to  display</tr>
+<tr><td>x<td>float<td>final<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>final<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>final<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>final<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>final<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>final<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps.Svg.AFewChars"/>
+<h3>Methods in class: <big>Svg.AFewChars</big>, package: com.appaapps</h3>
+<p>Draw a path - typically to show  a few chars for an alphabetic or numbers game
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps.Svg.AngleTracker"/>
+<h3>Methods in class: <big>Svg.AngleTracker</big>, package: com.appaapps</h3>
+<p>Track angles
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.AngleTracker.angle">angle</a>
+    <td>void
+    <td>
+    <td>Current value in degrees
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.AngleTracker.angle"/>
+<h4><b>angle</b> : float</h4>
+<p>Current value in degrees</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps.Svg.CenterToCenter"/>
+<h3>Methods in class: <big>Svg.CenterToCenter</big>, package: com.appaapps</h3>
+<p>Animation which expands an element its center is over the centre of the canvas
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td>double, double, double
+    <td>public constructor
+    <td>Create a center to center animation
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td>CenterToCenter
+    <td>public constructor
+    <td>Clone a prior animation
+</tr>
+
+<tr><td>Float
+    <td><a href="#com.appaapps.Svg.CenterToCenter.active">active</a>
+    <td>void
+    <td>public
+    <td>Get fraction of animation
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.CenterToCenter.scaleCanvas">scaleCanvas</a>
+    <td><a href="     (Canvas canvas,                                                            //P Canvas to which s calling is to be applied">Canvas</a>, <a href="      RectF drawArea)                                                           //P Drawing area">RectF</a>
+    <td>public
+    <td>Apply scale to the canvas if scaling is active for this element
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.CenterToCenter.scaleRectangle">scaleRectangle</a>
+    <td><a href="     (Canvas canvas,                                                            //P Canvas to be scaled">Canvas</a>, <a href="      RectF drawArea)                                                           //P Apply scale to the canvas if active">RectF</a>
+    <td>public
+    <td>Apply scale to the canvas if the element scale effect is active
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.CenterToCenter.onActivate">onActivate</a>
+    <td>void
+    <td>public
+    <td>Called when this animation becomes active
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.CenterToCenter"/>
+<h4><b>CenterToCenter</b> : <a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a></h4>
+<p>Create a center to center animation</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>delay<td>double<td><td>Delay before animation starts</tr>
+<tr><td>duration<td>double<td><td>Duration of animation</tr>
+<tr><td>startAgain<td>double<td><td>Restart after animation after this time</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.CenterToCenter"/>
+<h4><b>CenterToCenter</b> : <a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a></h4>
+<p>Clone a prior animation</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>clone<td>CenterToCenter<td><td>Animation to clone</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.active"/>
+<h4><b>active</b> : Float</h4>
+<p>Get fraction of animation</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.scaleCanvas"/>
+<h4><b>scaleCanvas</b> : void</h4>
+<p>Apply scale to the canvas if scaling is active for this element</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="     (Canvas canvas,                                                            //P Canvas to which s calling is to be applied">Canvas</a><td><td>Canvas to which s calling is to be applied</tr>
+<tr><td>drawArea<td><a href="      RectF drawArea)                                                           //P Drawing area">RectF</a><td><td>Drawing area</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.scaleRectangle"/>
+<h4><b>scaleRectangle</b> : void</h4>
+<p>Apply scale to the canvas if the element scale effect is active</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="     (Canvas canvas,                                                            //P Canvas to be scaled">Canvas</a><td><td>Canvas to be scaled</tr>
+<tr><td>drawArea<td><a href="      RectF drawArea)                                                           //P Apply scale to the canvas if active">RectF</a><td><td>Apply scale to the canvas if active</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps.Svg.CenterToCenter.onActivate"/>
+<h4><b>onActivate</b> : void</h4>
+<p>Called when this animation becomes active</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps.Svg.Element"/>
+<h3>Methods in class: <big>Svg.Element</big>, package: com.appaapps</h3>
+<p>Common features
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element.Element">Element</a>
+    <td><a href="#com.appaapps.Svg.Element.Element">Element</a>
+    <td>void
+    <td>constructor
+    <td>Add the new element to the stack of elements - which means that elements must be created in draw order and that element grouping within an Svg is unavailable, we could of course have an Svg.Sub that references a sub svg.
+</tr>
+
+<tr><td><a href="    private Paint getGradientPaint                                              //M Return a paint for a gradient">Paint</a>
+    <td><a href="#com.appaapps.Svg.Element.getGradientPaint">getGradientPaint</a>
+    <td>float, float, int, int, float, AngleTracker, LengthTracker, OpacityTracker
+    <td>private
+    <td>Return a paint for a gradient
+</tr>
+
+<tr><td><a href="    private Paint getHorizontalPaint                                            //M Return a paint for the horizontal gradient">Paint</a>
+    <td><a href="#com.appaapps.Svg.Element.getHorizontalPaint">getHorizontalPaint</a>
+    <td>float
+    <td>private
+    <td>Return a paint for the horizontal gradient
+</tr>
+
+<tr><td><a href="    private Paint getVerticalPaint                                              //M Return a paint for the vertical gradient">Paint</a>
+    <td><a href="#com.appaapps.Svg.Element.getVerticalPaint">getVerticalPaint</a>
+    <td>float
+    <td>private
+    <td>Return a paint for the vertical gradient
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.Element.draw">draw</a>
+    <td><a href="     (final Canvas canvas,                                                      //P Canvas on which the element would be drawn">Canvas</a>, <a href="      Paint paint,                                                              //P Paint to draw the element">Paint</a>
+    <td>abstract
+    <td>The element draws itself on the supplied canvas using the supplied paint
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.Element.draw">draw</a>
+    <td><a href="     (final Canvas canvas)                                                      //P Canvas to draw on">Canvas</a>
+    <td>
+    <td>Draw the SVG on a canvas
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps.Svg.Element.contains">contains</a>
+    <td>float, float
+    <td>public
+    <td>Does this element contain the point (x, y)?
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.Element.setCenterToCenter">setCenterToCenter</a>
+    <td>CenterToCenter
+    <td>public
+    <td>Set Center To Center animation for this element
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.Element.Element"/>
+<h4><b>Element</b> : <a href="#com.appaapps.Svg.Element.Element">Element</a></h4>
+<p>Add the new element to the stack of elements - which means that elements must be created in draw order and that element grouping within an Svg is unavailable, we could of course have an Svg.Sub that references a sub svg.</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.Element.getGradientPaint"/>
+<h4><b>getGradientPaint</b> : <a href="    private Paint getGradientPaint                                              //M Return a paint for a gradient">Paint</a></h4>
+<p>Return a paint for a gradient</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>sizeX<td>float<td><td>Size in X of gradient</tr>
+<tr><td>sizeY<td>float<td><td>Size in Y of gradient</tr>
+<tr><td>c1<td>int<td><td>First colour</tr>
+<tr><td>c2<td>int<td><td>Opposing second colour</tr>
+<tr><td>startAngle<td>float<td><td>Start angle</tr>
+<tr><td>angle<td>AngleTracker<td><td>Angle of gradient as time goes by</tr>
+<tr><td>length<td>LengthTracker<td><td>Length of gradient as time goes by</tr>
+<tr><td>opacity<td>OpacityTracker<td><td>Opacity of gradient as time goes by</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.Element.getHorizontalPaint"/>
+<h4><b>getHorizontalPaint</b> : <a href="    private Paint getHorizontalPaint                                            //M Return a paint for the horizontal gradient">Paint</a></h4>
+<p>Return a paint for the horizontal gradient</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>size<td>float<td><td>Size of gradient</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Element.getVerticalPaint"/>
+<h4><b>getVerticalPaint</b> : <a href="    private Paint getVerticalPaint                                              //M Return a paint for the vertical gradient">Paint</a></h4>
+<p>Return a paint for the vertical gradient</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>size<td>float<td><td>Size of gradient</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps.Svg.Element.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>The element draws itself on the supplied canvas using the supplied paint</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="     (final Canvas canvas,                                                      //P Canvas on which the element would be drawn">Canvas</a><td>final<td>Canvas on which the element would be drawn</tr>
+<tr><td>paint<td><a href="      Paint paint,                                                              //P Paint to draw the element">Paint</a><td><td>Paint to draw the element</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Element.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>Draw the SVG on a canvas</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>canvas<td><a href="     (final Canvas canvas)                                                      //P Canvas to draw on">Canvas</a><td>final<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.Element.contains"/>
+<h4><b>contains</b> : boolean</h4>
+<p>Does this element contain the point (x, y)?</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>x<td>float<td><td>Point.X</tr>
+<tr><td>y<td>float<td><td>Point.Y</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.Element.setCenterToCenter"/>
+<h4><b>setCenterToCenter</b> : void</h4>
+<p>Set Center To Center animation for this element</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>c<td>CenterToCenter<td><td>Animation  to use</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps.Svg.Image"/>
+<h3>Methods in class: <big>Svg.Image</big>, package: com.appaapps</h3>
+<p>Draw a bitmap image - move it around to show it all within the space available
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Image.Image">Image</a>
+    <td><a href="#com.appaapps.Svg.Image.Image">Image</a>
+    <td><a href="     (Bitmap bitmap,                                                            //P Bitmap containing image">Bitmap</a>, float, float, float, float
+    <td>public constructor
+    <td>Fraction coordinates of corners of drawing area
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Image.Image"/>
+<h4><b>Image</b> : <a href="#com.appaapps.Svg.Image.Image">Image</a></h4>
+<p>Fraction coordinates of corners of drawing area</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>bitmap<td><a href="     (Bitmap bitmap,                                                            //P Bitmap containing image">Bitmap</a><td><td>Bitmap containing image</tr>
+<tr><td>x<td>float<td><td>Fraction coordinates of left edge</tr>
+<tr><td>y<td>float<td><td>Fraction coordinates of upper edge</tr>
+<tr><td>𝘅<td>float<td><td>Fraction coordinates of right edge</tr>
+<tr><td>𝘆<td>float<td><td>Fraction coordinates of lower edge</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps.Svg.LengthTracker"/>
+<h3>Methods in class: <big>Svg.LengthTracker</big>, package: com.appaapps</h3>
+<p>Track length
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps.Svg.LengthTracker.length">length</a>
+    <td>void
+    <td>
+    <td>Current value in pixels
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.LengthTracker.length"/>
+<h4><b>length</b> : float</h4>
+<p>Current value in pixels</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 40">
+<a name="com.appaapps.Svg.LowPassFilter"/>
+<h3>Methods in class: <big>Svg.LowPassFilter</big>, package: com.appaapps</h3>
+<p>Low pass filter
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a>
+    <td><a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a>
+    <td>double
+    <td>constructor
+    <td>Create a low pass filter
+</tr>
+
+<tr><td>double
+    <td><a href="#com.appaapps.Svg.LowPassFilter.value">value</a>
+    <td>double
+    <td>public
+    <td>Value of applied value after passing through low pass filter
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps.Svg.LowPassFilter.LowPassFilter"/>
+<h4><b>LowPassFilter</b> : <a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a></h4>
+<p>Create a low pass filter</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>timeScale<td>double<td><td>Timescale of filter</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.LowPassFilter.value"/>
+<h4><b>value</b> : double</h4>
+<p>Value of applied value after passing through low pass filter</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>applied<td>double<td><td>Applied signal</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps.Svg.OpacityTracker"/>
+<h3>Methods in class: <big>Svg.OpacityTracker</big>, package: com.appaapps</h3>
+<p>Track opacity
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps.Svg.OpacityTracker.opacity">opacity</a>
+    <td>void
+    <td>public
+    <td>Current value as opacity
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps.Svg.OpacityTracker.opacity"/>
+<h4><b>opacity</b> : int</h4>
+<p>Current value as opacity</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps.Svg.RandomStep"/>
+<h3>Methods in class: <big>Svg.RandomStep</big>, package: com.appaapps</h3>
+<p>Random step function (x=time, y=position) with each step chosen at random between -1 and 1, each step duration chosen at random between 0 and timeScale
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>double
+    <td><a href="#com.appaapps.Svg.RandomStep.value">value</a>
+    <td>void
+    <td>public
+    <td>Value of random step
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.RandomStep.value"/>
+<h4><b>value</b> : double</h4>
+<p>Value of random step</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps.Svg.Rectangle"/>
+<h3>Methods in class: <big>Svg.Rectangle</big>, package: com.appaapps</h3>
+<p>Rectangle
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a>
+    <td><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a>
+    <td>float, float, float, float
+    <td>public constructor
+    <td>Create a rectangle
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.Rectangle.draw">draw</a>
+    <td>void
+    <td>
+    <td>See <a href="#com.appaapps.Svg.Element.draw">Draw the rectangle</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.Rectangle.Rectangle"/>
+<h4><b>Rectangle</b> : <a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a></h4>
+<p>Create a rectangle</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>x<td>float<td>final<td>Fractional position - left</tr>
+<tr><td>y<td>float<td>final<td>Fractional position - upper</tr>
+<tr><td>𝘅<td>float<td>final<td>Fractional position - right</tr>
+<tr><td>𝘆<td>float<td>final<td>Fractional position - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Rectangle.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>See <a href="#com.appaapps.Svg.Element.draw">Draw the rectangle</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps.Svg.Text"/>
+<h3>Methods in class: <big>Svg.Text</big>, package: com.appaapps</h3>
+<p>Text
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Text.Text">Text</a>
+    <td><a href="#com.appaapps.Svg.Text.Text">Text</a>
+    <td><a href="      (final String text,                                                       //P The text to  display">String</a>, float, float, float, float, int, int
+    <td>public constructor
+    <td>Create a text area
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps.Svg.Text.draw">draw</a>
+    <td>void
+    <td>
+    <td>See <a href="#com.appaapps.Svg.Element.draw">Draw the text</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps.Svg.Text.Text"/>
+<h4><b>Text</b> : <a href="#com.appaapps.Svg.Text.Text">Text</a></h4>
+<p>Create a text area</p>
+
+<p>Parameters:
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+
+<tr><td>text<td><a href="      (final String text,                                                       //P The text to  display">String</a><td>final<td>The text to  display</tr>
+<tr><td>x<td>float<td>final<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>final<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>final<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>final<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>final<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>final<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps.Svg.Text.draw"/>
+<h4><b>draw</b> : void</h4>
+<p>See <a href="#com.appaapps.Svg.Element.draw">Draw the text</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps.Svg.Tracker"/>
+<h3>Methods in class: <big>Svg.Tracker</big>, package: com.appaapps</h3>
+<p>Generates random but smoothly varying numbers between -1  and +1 by filtering random shocks.
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+
+<tr><td>double
+    <td><a href="#com.appaapps.Svg.Tracker.value">value</a>
+    <td>void
+    <td>
+    <td>Value of tracker
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps.Svg.Tracker.value"/>
+<h4><b>value</b> : double</h4>
+<p>Value of tracker</p>
+
+</div>
+</body>

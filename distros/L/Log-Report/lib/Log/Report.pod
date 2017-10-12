@@ -14,13 +14,13 @@ Log::Report - report a problem, with exceptions and translation support
  # Invocation with 'mode' to get trace and verbose messages
  use Log::Report mode => 'DEBUG';
 
- # Usually invoked with a domain, which groups packages
+ # Usually invoked with a domain, which groups packages for translation
  use Log::Report 'my-domain', %options;
 
  # Interpolation syntax via String::Print
  # First step to translations, once you need it.
  print __x"my name is {name}", name => $n;  # print, so no exception
- print __"Hello World\n";     # (optional) translation, no interpolation
+ print __"Hello World\n";     # no interpolation, optional translation
  print __x'Hello World';      # SYNTAX ERROR!!  ' is alternative for ::
 
  # Functions replacing die/warn/carp, casting exceptions.
@@ -183,7 +183,7 @@ exception throwing: better use those short names.
 
 The $reason is a string like 'ERROR' (for function C<error()>).
 The $message is a L<Log::Report::Message|Log::Report::Message> object (which are created with
-the special translation syntax like L<__x()|Log::Report/"Language Translations">).  The $message may also
+the special translation syntax like L<__x()|Log::Report/"Messages (optionally translatable)">).  The $message may also
 be a plain string, or an L<Log::Report::Exception|Log::Report::Exception> object. The optional
 first parameter is a HASH which can be used to influence the dispatchers.
 
@@ -363,7 +363,11 @@ Short for C<< report WARNING => $message >>
 
 =back
 
-=head2 Language Translations
+=head2 Messages (optionally translatable)
+
+Even when you do not support translations (yet) you may want to use
+message objects to improve the logging feature. For instance,
+you get very powerful interpolation from L<String::Print|String::Print>.
 
 The language translations are initiate by limited set of functions
 which contain B<two under-scores> (C<__>) in their name.  Most
@@ -401,7 +405,7 @@ no counterpart.
 =item B<N__>($msgid)
 
 Label to indicate that the string is a text which will be translated
-later.  The function itself does nothing.  See also L<N__w()|Log::Report/"Language Translations">.
+later.  The function itself does nothing.  See also L<N__w()|Log::Report/"Messages (optionally translatable)">.
 
 This no-op function is used as label to the xgettext program to build the
 translation tables.
@@ -425,7 +429,7 @@ Label to indicate that the two MSGIDs are related, the first as
 single, the seconds as its plural.  Only used to find the text
 fragments to be translated.  The function itself does nothing.
 
-example: how to use L<N__n()|Log::Report/"Language Translations">
+example: how to use L<N__n()|Log::Report/"Messages (optionally translatable)">
 
  my @save = N__n "save file", "save files";
  my @save = (N__n "save file", "save files");
@@ -438,10 +442,10 @@ example: how to use L<N__n()|Log::Report/"Language Translations">
 =item B<N__w>(STRING)
 
 This extension to the Locale::TextDomain syntax, is a combined
-C<qw> (list of quoted words) and L<N__()|Log::Report/"Language Translations"> into a list of translatable
+C<qw> (list of quoted words) and L<N__()|Log::Report/"Messages (optionally translatable)"> into a list of translatable
 words.
 
-example: of L<N__w()|Log::Report/"Language Translations">
+example: of L<N__w()|Log::Report/"Messages (optionally translatable)">
 
   my @colors = (N__"red", N__"green", N__"blue");
   my @colors = N__w"red green blue";  # same
@@ -455,7 +459,7 @@ is a L<Log::Report::Message|Log::Report::Message> object, which will be used in 
 later.  Translating is invoked when the object gets stringified.  When
 you have no translation tables, the $msgid will be shown untranslated.
 
-If you need options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> then use L<__x()|Log::Report/"Language Translations">;
+If you need options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> then use L<__x()|Log::Report/"Messages (optionally translatable)">;
 the prototype of this function does not permit parameters: it is a
 prefix operator!
 
@@ -500,7 +504,7 @@ example: how to use __n()
 =item B<__nx>($msgid, $plural_msgid, $count, PAIRS)
 
 It depends on the value of $count (and the selected language) which
-text will be displayed.  See details in L<__n()|Log::Report/"Language Translations">.  After translation,
+text will be displayed.  See details in L<__n()|Log::Report/"Messages (optionally translatable)">.  After translation,
 the VARIABLES will be filled-in.
 
 The PAIRS are options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> and variables
@@ -525,7 +529,39 @@ to be filled in.
 
 =item B<__xn>($single_msgid, $plural_msgid, $count, $paurs)
 
-Same as L<__nx()|Log::Report/"Language Translations">, because we have no preferred order for 'x' and 'n'.
+Same as L<__nx()|Log::Report/"Messages (optionally translatable)">, because we have no preferred order for 'x' and 'n'.
+
+=back
+
+=head3 Messages with msgctxt
+
+In Log::Report, the message context (mgsctxt in the PO-files --in the
+translation tables) can be used in a very powerful way.  Read all about
+it in L<Log::Report::Translator::Context|Log::Report::Translator::Context>
+
+The msgctxt versions of the tranditional gettext infrastructure are far
+less useful for Log::Report, because we can easily work with different
+text domains within the same program.  That should avoid most of the
+accidental translation conflicts between components of the code.
+
+Just for compatibility with Locale::TextDomain and completeness, the
+'p' versions of above methods are supported.  See examples for these
+functions in Locale::TextDomain.
+
+B<Warnings:> Functions C<N__p()> and C<N__np()> seem not to be usable in
+reality, hence not implemented.  The script xgettext-perl and
+L<Log::Report::Extract::PerlPPI|Log::Report::Extract::PerlPPI> (both in the L<Log::Report::Lexicon|Log::Report::Lexicon>
+distribution) do not yet support these functions.
+
+=over 4
+
+=item B<__np>($msgctxt, $msgid, $plural, count)
+
+=item B<__npx>($msgctxt, $msgid, $plural, count, PAIRS)
+
+=item B<__p>($msgctxt, $msgid)
+
+=item B<__px>($msgctxt, $msgid, PAIRS)
 
 =back
 
@@ -606,8 +642,7 @@ example: of import
   , mode            => 'VERBOSE'
   , syntax          => 'REPORT' # report ERROR, not error()
   , translator      => Log::Report::Translator::POT->new
-     ( lexicon => '/home/mine/locale'  # bindtextdomain
-     , charset => 'UTF-8'              # codeset
+     ( lexicon => '/home/mine/locale'  # translation tables
      )
   , native_language => 'nl_NL'; # untranslated msgs are Dutch
 
@@ -974,9 +1009,16 @@ See L<Log::Report::Dispatcher::Try|Log::Report::Dispatcher::Try> and L<Log::Repo
 
 =head2 Comparison
 
+Some notes on differences between the Log::Report approach and other
+Perl concepts.
+
 =head3 die/warn/Carp
 
-A typical perl5 program can look like this:
+Perl's built-in exception system is very primitive: "die" and "warn".
+Most programming languages provide a much more detailed exception
+mechanism.
+
+A typical perl program can look like this:
 
  my $dir = '/etc';
 
@@ -1117,8 +1159,8 @@ wishes to return a LIST of objects, not the count of them.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.21,
-built on July 03, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.22,
+built on October 12, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

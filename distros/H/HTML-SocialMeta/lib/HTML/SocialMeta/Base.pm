@@ -2,16 +2,16 @@ package HTML::SocialMeta::Base;
 use Moo;
 use Carp;
 
-our $VERSION = '0.73';
+our $VERSION = '0.730002';
 
 use MooX::LazierAttributes qw/rw ro lzy/;
 use MooX::ValidateSubs;
-use Types::Standard qw/Str HashRef/;
+use Coerce::Types::Standard qw/Str HashRef HTML/;
 
 attributes(
-    [qw(card_type card type name url)] => [ rw, Str, {lzy} ],
+    [qw(card_type card type name url)] => [ rw, HTML->by('encode_entity'), {lzy} ],
     [qw(site fb_app_id site_name title description image creator operatingSystem app_country
-    app_name app_id app_url player player_height player_width)] => [Str],
+    app_name app_id app_url player player_height player_width)] => [HTML->by('encode_entity')],
     [qw(image_alt)] => [ Str, {lzy} ],
     [qw(card_options build_fields)] => [HashRef,{default => sub { {} }}],
     [qw(meta_attribute meta_namespace)] => [ro],
@@ -80,8 +80,8 @@ sub _build_field {
 }
 
 sub _convert_field {
-    $_[1] =~ s/_/:/g;
-    return $_[0]->provider_convert( $_[1] );
+    (my $field = $_[1]) =~ s/_/:/g;
+    return $_[0]->provider_convert( $field );
 }
 
 sub _no_card_type {
@@ -113,7 +113,7 @@ builds and returns the Meta Tags
 
 =head1 VERSION
 
-Version 0.73
+Version 0.730002
 
 =cut
 

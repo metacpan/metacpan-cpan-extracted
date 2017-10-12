@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.036009';
+our $VERSION = '2.036011';
 use App::Netdisco::Configuration;
 
 =head1 NAME
@@ -222,6 +222,7 @@ run for each installation:
  
  # apply database schema updates, update MIBs and Vendor MACs
  ~/bin/netdisco-deploy
+ ~/bin/netdisco-do stats
  
  # restart web service (if you run it)
  ~/bin/netdisco-web restart

@@ -51,6 +51,9 @@ METHODS
                                   than this, ignore the kmer. This 
                                   might help speed analysis if you 
                                   do not care about low-count kmers.
+          sample       1          Retain only a percentage of kmers.
+                                  1 is 100%; 0 is 0%
+                                  Only works with the perl kmer counter.
 
           Examples:
           my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
@@ -69,6 +72,12 @@ METHODS
           Arguments: none
           Returns:   Reference to an array of counts. The index of 
                      the array is the frequency.
+
+    $kmer->kmers
+        Return actual kmers
+
+          Arguments: None
+          Returns:   Reference to a hash of kmers and their counts
 
     $kmer->union($kmer2)
         Finds the union between two sets of kmers

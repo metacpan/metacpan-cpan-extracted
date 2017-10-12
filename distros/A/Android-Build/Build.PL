@@ -4,7 +4,7 @@ use Module::Build;
 my $b = Module::Build->new
  (module_name   => 'Android::Build',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Command line build of an Android apk without gradle or ant.',
+  dist_abstract => 'Command line build of an Android apk without resorting to ant or gradle.',
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,

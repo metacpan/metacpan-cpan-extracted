@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package IPv6::Address;
-$IPv6::Address::VERSION = '0.207';
+$IPv6::Address::VERSION = '0.208';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ IPv6::Address - IPv6 Address Manipulation Library
 
 =head1 VERSION
 
-version 0.207
+version 0.208
 
 =for html
 <a href="https://travis-ci.org/aduitsis/IPv6-Address"><img src="https://travis-ci.org/aduitsis/IPv6-Address.svg?branch=master"></a>
@@ -635,7 +635,7 @@ sub radius_string {
 }
 
 package IPv4Subnet;
-$IPv4Subnet::VERSION = '0.207';
+$IPv4Subnet::VERSION = '0.208';
 use Socket;
 use strict;
 use Carp;
@@ -717,6 +717,17 @@ sub my_aton {
 
 sub my_ntoa {
 	return inet_ntoa(pack('N',$_[0]));
+}
+
+sub between {
+	my $a = shift // die 'missing 1st argument';
+	my $b = shift // die 'missing 2nd argument';
+	my $c = shift // die 'missing 3rd argument';
+	my $d = IPv4Subnet->new( $a.'/32' );
+	my $e = IPv4Subnet->new( $b.'/32' );
+	my $f = IPv4Subnet->new( $c.'/32' );
+
+	return ( $d->get_ip_n <= $e->get_ip_n ) && ( $e->get_ip_n <= $f->get_ip_n )
 }
 
 sub position { 

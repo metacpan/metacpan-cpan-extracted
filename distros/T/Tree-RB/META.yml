@@ -1,27 +1,46 @@
 ---
-abstract: "Perl implementation of the Red/Black tree, a type of balanced binary search tree. \r"
+abstract: 'Perl implementation of the Red/Black tree, a type of balanced binary search tree. '
 author:
-  - "Arun Prasad  C<< <arunbear@cpan.org> >>\r"
+  - 'Arun Prasad  C<< <arunbear@cpan.org> >>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: '6.36'
   Test::More: '0.42'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Tree-RB
 no_index:
   directory:
-    - inc
     - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Tree::RB:
+    file: lib/Tree/RB.pm
+    version: '0.500006'
+  Tree::RB::Node:
+    file: lib/Tree/RB/Node.pm
+    version: '0.500006'
 requires:
-  enum: 0
+  enum: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/arunbear/perl5-red-black-tree
-version: '0.500005'
+  bugtracker: https://github.com/arunbear/Tree-RB/issues
+  homepage: https://github.com/arunbear/Tree-RB
+  repository: git://github.com/arunbear/Tree-RB.git
+version: '0.500006'
+x_authority: cpan:ARUNBEAR
+x_contributors:
+  - 'Arun Prasaad <arun@linux-iods.site>'
+  - 'Arun Prasaad <arunbear@cpan.org>'
+  - 'Arun Prasaad <arunbear@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

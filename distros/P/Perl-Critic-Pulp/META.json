@@ -4,7 +4,7 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -83,6 +83,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "94",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "95",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

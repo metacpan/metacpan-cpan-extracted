@@ -1,6 +1,13 @@
 Revision history for Perl extension Geo::IP.
 
-1.50     2016-07-21
+1.51     2017-10-11
+
+- Added the following missing methods for IPv6 lookups to the pure Perl
+  implementation: name_by_addr_v6, name_by_name_v6, org_by_addr_v6, and
+  org_by_name_v6. Reported by Earl Killian. GitHub #28.
+
+
+1.50 2016-07-21
 
 - MYMETA files are now no longer included in releases.
 - Geo::Mirror is no longer included in this distribution.

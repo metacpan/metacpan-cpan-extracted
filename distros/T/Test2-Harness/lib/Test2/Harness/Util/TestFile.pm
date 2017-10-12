@@ -2,7 +2,7 @@ package Test2::Harness::Util::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001016';
+our $VERSION = '0.001019';
 
 use Carp qw/croak/;
 
@@ -125,7 +125,7 @@ sub _scan {
             }
         }
 
-        next if $line =~ m/^\s*(use|require|BEGIN)\b/;
+        next if $line =~ m/^\s*(use|require|BEGIN|package)\b/;
         last unless $line =~ m/^\s*#\s*HARNESS-(.+)$/;
 
         my ($dir, @args) = split /[-\s]/, lc($1);

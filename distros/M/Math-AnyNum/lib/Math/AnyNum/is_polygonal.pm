@@ -11,7 +11,7 @@ sub __is_polygonal__ {
     Math::GMPz::Rmpz_sgn($n) || return 1;
 
     # polygonal_root(n, k)
-    #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
+    #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();

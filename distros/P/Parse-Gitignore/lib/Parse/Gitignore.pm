@@ -1,41 +1,46 @@
 package Parse::Gitignore;
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw//;
-%EXPORT_TAGS = (
-    all => \@EXPORT_OK,
-);
 use warnings;
 use strict;
 use Carp;
-use Path::Tiny;
-our $VERSION = '0.02';
+#use Path::Tiny;
+use File::Basename;
+use File::Slurper 'read_lines';
+use File::Spec;
+our $VERSION = '0.04';
 
 sub read_gitignore
 {
     my ($obj, $gitignore_file) = @_;
     if (! -f $gitignore_file) {
 	carp ".gitignore file $gitignore_file doesn't exist";
-	return undef;
+	return;
     }
-    my $file = path ($gitignore_file);
-    $obj->{file} = $file;
-    my @lines = $file->lines ();
-    my %ignored;
-    if ($obj->{excludesfile}) {
-	push @lines, @{$obj->{excludesfile}};
+    if ($obj->{verbose}) {
+	print "Reading $gitignore_file.\n";
     }
+    push @{$obj->{files}}, $gitignore_file;
+    my @lines = read_lines ($gitignore_file);
+    my (undef, $dir, undef) = File::Spec->splitpath ($gitignore_file);
+    if ($obj->{verbose}) {
+	print "Directory is $dir.\n";
+    }
+    # Hash of ignored files.
     for my $line (@lines) {
-	if ($line =~ /^\s*#/) {
+	# Skip comment lines and empty lines
+	if ($line =~ /^\s*(#|$)/) {
 	    next;
 	}
-	for my $ignored_file (glob ($line)) {
-	    my $pignored_file = path ($ignored_file);
-	    $ignored{$pignored_file} = 1;
+	if ($obj->{verbose}) {
+	    print "Processing $line in $dir.\n";
 	}
-    }
-    for my $k (keys %ignored) {
-	$obj->{ignored}{$k} = 1;
+	for my $ignored_file (glob ($line)) {
+#	    print "ignore '$ignored_file'\n";
+	    my $pignored_file = File::Spec->rel2abs ($ignored_file);
+	    if ($obj->{verbose}) {
+		print "$dir Ignoring '$pignored_file'.\n";
+	    }
+	    $obj->{ignored}{$pignored_file} = 1;
+	}
     }
 }
 
@@ -46,11 +51,10 @@ sub excludesfile
 	carp "No such excludesfile: $excludesfile";
 	return;
     }
-    my $file = path ($excludesfile);
-    $obj->{file} = $file;
-    my @lines = $file->lines ();
+    my @lines = read_lines ($excludesfile);
     my @oklines;
     for (@lines) {
+	# Skip comments and empty lines.
 	if (/^\s*(#|$)/) {
 	    next;
 	}
@@ -61,10 +65,20 @@ sub excludesfile
 
 sub new
 {
-    my ($class, $gitignore_file) = @_;
-    my $obj = {ignored => {}};
+    my ($class, $gitignore_file, %options) = @_;
+    my $obj = {
+	# The globs which should be ignored.
+	ignored => {},
+	# The .gitignore files we have read so far.
+	file_list => [],
+	#
+	verbose => $options{verbose},
+    };
     bless $obj, $class;
     if ($gitignore_file) {
+	if ($obj->{verbose}) {
+	    print "Reading '$gitignore_file'.\n";
+	}
 	$obj->read_gitignore ($gitignore_file);
     }
     return $obj;
@@ -73,8 +87,8 @@ sub new
 sub ignored
 {
     my ($obj, $file) = @_;
-    my $pfile = path ($file);
-    return $obj->{ignored}{$pfile};
+    $file = File::Spec->rel2abs ($file);
+    return $obj->{ignored}{$file};
 }
 
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,6 +19,9 @@
 
 use 5.005;
 use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 
 {
@@ -91,7 +94,7 @@ use MyGraphs;
     print "edges=$num_edges  <= $num_edges_max\n";
     my @subtree_edge_arefs;
     {
-      my $iterator_func = make_tree_iterator_edge_aref
+      my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
         (num_vertices => $num_edges+1);
       while (my $subtree_edge_aref = $iterator_func->()) {
         push @subtree_edge_arefs, $subtree_edge_aref;
@@ -103,7 +106,7 @@ use MyGraphs;
     }
     my $count = 0;
     $| = 1;
-    my $iterator_func = make_tree_iterator_edge_aref
+    my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
       (num_vertices_min => $num_edges+1,
        num_vertices_max => $num_edges_max+1);
   TREE: while (my $edge_aref = $iterator_func->()) {
@@ -191,7 +194,7 @@ use MyGraphs;
     push @graphs, $edge_aref;
   }
 
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 
@@ -242,7 +245,7 @@ use MyGraphs;
                   ) {
     push @graphs, edge_aref_string_to_edge_aref($str);
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 
   sub edge_aref_string_to_edge_aref {
@@ -363,7 +366,7 @@ use MyGraphs;
     print "edges=$num_edges  <= $num_edges_max\n";
     my @subtree_edge_arefs;
     {
-      my $iterator_func = make_tree_iterator_edge_aref
+      my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
         (num_vertices => $num_edges+1);
       while (my $subtree_edge_aref = $iterator_func->()) {
         push @subtree_edge_arefs, $subtree_edge_aref;
@@ -374,14 +377,15 @@ use MyGraphs;
         foreach my $subtree_edge_aref (@subtree_edge_arefs) {
           print "    ",edge_aref_string($subtree_edge_aref),"\n";
           if ($num_edges == 3) {
-            Graph_Easy_view(edge_aref_to_Graph_Easy($subtree_edge_aref));
+            MyGraphs::Graph_Easy_view
+                (MyGraphs::edge_aref_to_Graph_Easy($subtree_edge_aref));
           }
         }
       }
     }
     my $count = 0;
     $| = 1;
-    my $iterator_func = make_graph_iterator_edge_aref
+    my $iterator_func = MyGraphs::make_graph_iterator_edge_aref
       (num_vertices => $num_edges+1,
        num_edges_min => $num_edges,
        num_edges_max => $num_edges_max);
@@ -389,13 +393,13 @@ use MyGraphs;
       $count++;
       print "$count ($#$edge_aref)\r";
       foreach my $subtree_edge_aref (@subtree_edge_arefs) {
-        if (! edge_aref_is_subgraph($edge_aref, $subtree_edge_aref)) {
+        if (! MyGraphs::edge_aref_is_subgraph($edge_aref, $subtree_edge_aref)) {
           next TREE;
         }
       }
       my $easy = edge_aref_to_Graph_Easy($edge_aref);
       my $num_vertices = $easy->vertices;
-      print "  ",edge_aref_string($edge_aref),"  vertices=$num_vertices\n";
+      print "  ",MyGraphs::edge_aref_string($edge_aref),"  vertices=$num_vertices\n";
       # if ($num_edges == 5) {
       #   Graph_Easy_view(edge_aref_to_Graph_Easy($edge_aref));
       # }
@@ -403,7 +407,7 @@ use MyGraphs;
       push @graphs, $easy;
     }
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
 
@@ -424,7 +428,7 @@ use MyGraphs;
   $easy->add_edge(10,12);
   $easy->add_edge(11,13);$easy->add_edge(11,14);$easy->add_edge(11,15);
   $easy->add_edge(15,16);$easy->add_edge(15,17);
-  hog_searches_html($easy);
+  MyGraphs::hog_searches_html($easy);
   exit 0;
 }
 {
@@ -439,6 +443,6 @@ use MyGraphs;
   $easy->add_edge(6,10);$easy->add_edge(6,11);
   $easy->add_edge(10,12);
   $easy->add_edge(11,13);
-  hog_searches_html($easy);
+  MyGraphs::hog_searches_html($easy);
   exit 0;
 }

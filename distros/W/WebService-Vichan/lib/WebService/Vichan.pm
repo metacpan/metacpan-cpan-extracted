@@ -10,7 +10,7 @@ use Hash::Inflator;
 use JSON::MaybeXS;
 use Time::HiRes qw/time sleep/;
 
-our $VERSION = '0.001';
+our $VERSION = '0.001001';
 
 our %cache;
 our $last_request = 0;

@@ -21,7 +21,6 @@ use FindBin '$Bin';
 use lib "$Bin/../lib";
 use File::Basename;
 use Test::More 'no_plan';
-use Data::Printer;
 
 my $UPLOAD_FILE = File::Spec->catfile($Bin, 'small_file');
 my $TOKEN = 'AQAAAAAMIzNAAASQpMKd0J_8iUSkr4fIYskC880';

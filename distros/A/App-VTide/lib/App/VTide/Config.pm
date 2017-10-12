@@ -15,13 +15,21 @@ use Path::Tiny;
 use YAML::Syck qw/ LoadFile /;
 use Hash::Merge::Simple qw/ merge /;
 
-our $VERSION = version->new('0.1.4');
+our $VERSION = version->new('0.1.5');
 
 has global_config => (
     is      => 'rw',
     default => sub {
         mkdir path $ENV{HOME}, '.vtide' if ! -d path $ENV{HOME}, '.vtide';
         return path $ENV{HOME}, '.vtide/defaults.yml';
+    },
+);
+
+has history_file => (
+    is      => 'rw',
+    default => sub {
+        mkdir path $ENV{HOME}, '.vtide' if ! -d path $ENV{HOME}, '.vtide';
+        return path $ENV{HOME}, '.vtide/history.log';
     },
 );
 
@@ -76,6 +84,13 @@ sub changed {
         || ( $local_time  && $local_orig  < $local_time  );
 }
 
+sub history {
+    my ($self, @command) = @_;
+    my $fh = $self->history_file->opena;
+    print {$fh} '[' . localtime .'] '. (join ' ', map {/[^\w-]/ ? "'$_'" : $_} @command), "\n";
+    return;
+}
+
 1;
 
 __END__
@@ -86,7 +101,7 @@ App::VTide::Config - Manage configuration for VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Config version 0.1.4
+This documentation refers to App::VTide::Config version 0.1.5
 
 =head1 SYNOPSIS
 
@@ -119,6 +134,10 @@ for changes each call so the current values are always returned.
 Returns true if either the C<global_config> or C<local_config> files have
 changed since the last read.
 
+=head2 C<history (@command)>
+
+Store C<@command> in history
+
 =head1 ATTRIBUTES
 
 =head2 global_config
@@ -132,6 +151,10 @@ The name of the current project's configuration file (Defaults to ./.vtide.yml)
 =head2 global_time
 
 Last modified time for the C<global_config> file (Defaults to 0)
+
+=head2 history_file
+
+File to store command history
 
 =head2 local_time
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our (%ERROR, $caller);
 BEGIN {
@@ -18,7 +18,7 @@ BEGIN {
 }
 
 sub import {
-	my ($pkg) = shift;
+	my ($pkg, $sub) = shift;
 	return unless my @export = @_;
 	my $opts = ref $export[scalar @export - 1] ? pop @export : {};
 	%ERROR = (%ERROR, %{ $opts->{errors} }) if $opts->{errors};
@@ -26,7 +26,9 @@ sub import {
 	$caller = scalar caller();
 	{
 		no strict 'refs';
-		do { *{"${caller}::${_}"} = \&{"${pkg}::${_}"} } foreach @export;
+		do { $sub = $pkg->can($_) ? $_ : $opts->{as} && $opts->{as}->{$_} } 
+			&& do { *{"${caller}::${_}"} = \&{"${pkg}::${sub}"} } 
+				foreach @export;
 	}
 }
 
@@ -119,7 +121,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

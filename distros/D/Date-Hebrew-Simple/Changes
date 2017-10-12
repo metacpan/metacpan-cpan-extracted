@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.05  Sun Oct 08 19:30:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
 0.04  Sun Oct 01 12:00:00 2017
       - Fixed method from_julian() giving negative days.
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,49 +14,51 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 99de16ae3d1de19ce2d72240c5e933ca78317d45 Changes
-SHA1 0ab284de2913c225a657099193b5b5d9feb896fc INSTALL
-SHA1 9328a1f4faa7321677d73a89660878d80bec55c0 LICENSE
-SHA1 d10a77db89e54765771405d098aff1ae43863265 MANIFEST
-SHA1 efa82f253ef44fed1ec38b489361d2f905e92011 META.json
-SHA1 76c532490aafed6fcd2f64376f202817f27e0415 META.yml
-SHA1 95e5a76d2eb20553c92df53c07688053a3ea3e8c Makefile.PL
-SHA1 1c46f3ba2b71a285db41e80b0d932648a37550f9 README
-SHA1 1f4493d205c1b01787c33a37037553f711657d8e dist.ini
-SHA1 087f3207e215244622d1b05aa4036f10f1e610ee lib/Dist/Zilla/PluginBundle/Author/RUSSOZ.pm
-SHA1 22ec94f1225dca5e1006efd00686513b7b0860ba lib/Pod/Weaver/PluginBundle/Author/RUSSOZ.pm
-SHA1 3cca57301d17ab1acf7fceec606767419c850425 t/00-compile.t
+SHA1 71a2bf4cb71e4fc864689f8e700c2c590f23cd90 Changes
+SHA1 6c33e10db5d3469973c8ce310e9d50babc920b14 INSTALL
+SHA1 234619a8824abae70cd6b617a87d15459bc8bc83 LICENSE
+SHA1 c348a43b59f88a8a1cbb3d6c30afd9be1a4b67c0 MANIFEST
+SHA1 d20fa5b0d7668e8d796026213ab24975ee15e88e META.json
+SHA1 8b74ccdd28e54e829e00cbd8027f9f932d88e308 META.yml
+SHA1 5afcb0f1666ff069598490a64f914f44660abcc6 Makefile.PL
+SHA1 375382bcd44bc44d50904bd096be17e580552c3e README
+SHA1 50813ee270a61b67564f55ecab0740b67059121f dist.ini
+SHA1 7ac8ddfbe65d45fde63e9644067c48003c1fe891 lib/Dist/Zilla/PluginBundle/Author/RUSSOZ.pm
+SHA1 342c51dc456e4f19c9e706d46adb86cd4f348985 lib/Pod/Weaver/PluginBundle/Author/RUSSOZ.pm
+SHA1 32cd632ebc6ffce5e91e0ab2389eacf50648acb6 t/00-compile.t
 SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
-SHA1 0de890cc55959762796007af95efe836c6b1c6eb t/000-report-versions-tiny.t
-SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
-SHA1 83e76fc461f9ad90ca938fd66da90839c807300b t/author-test-eol.t
-SHA1 48d42cc9f55d5ce8ae812dab536a9d17f1c3f98d t/release-dist-manifest.t
-SHA1 9e4c697537049f3151d38c81d5080be36b600771 t/release-distmeta.t
-SHA1 1a8271cbe0573142d9b8c21b21196d00d1046fe1 t/release-kwalitee.t
-SHA1 d10a4c4f4a6c10595f86bd7acf935ae72354f8d0 t/release-meta-json.t
-SHA1 978fcdcd038d17814e4a2429f19795a77894f1a1 t/release-minimum-version.t
-SHA1 b567cfd8c64cdcda2a465f38a1dc2fd971904ee4 t/release-mojibake.t
-SHA1 a95be7f18c2443b36947e6a2888ff14742899350 t/release-no-tabs.t
-SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
-SHA1 c3bec8aa8475c5ec46a0bad17a20d44d4ea1b1b8 t/release-pod-linkcheck.t
-SHA1 7eb3492f9c47f10f80d4f285e96536e9192026dc t/release-pod-syntax.t
-SHA1 451078f0a380624f2de349bf7b4c72a994427afc t/release-portability.t
-SHA1 97e0048f75aaab9d14ca2a9ad74465874f4d8dbc t/release-test-version.t
-SHA1 731040bf250fd7f91217bde7998666bc60ca8e90 t/release-unused-vars.t
+SHA1 176b33ca8c005d15add4c649fed020d94da422eb t/000-report-versions-tiny.t
+SHA1 20011aeac19a73a69dfa2bb32422ae4648a129de t/author-critic.t
+SHA1 e6b57372de59d184dbd9b388ec42f50160e311c7 t/author-eol.t
+SHA1 ea89f21d866b81da4a4799f50503666e09620ac3 t/author-mojibake.t
+SHA1 040032ea8701a63fa13b3f45e64a20b7f62b6dbe t/author-no-tabs.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 545af31470c3e0784f83ee2c7714af89114f571f t/author-pod-linkcheck.t
+SHA1 5e289d51bbb4bc420711a35bd36e9174fbcb28ff t/author-pod-no404s.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 e8df9a49c884b6c6964329f7902ba94ad0289eb0 t/author-portability.t
+SHA1 60dcfab54478213041dc8be6a2ba88deb9fb6136 t/author-test-version.t
+SHA1 79a549c68bf46de636a4488fdab4c2359d77464d t/placeholder.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+SHA1 ed5bdf51745af3a2ef9d38b08372427c3818c836 t/release-distmeta.t
+SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
+SHA1 e3da53e86c3ac7acf8d81aed228ee28ad3482393 t/release-meta-json.t
+SHA1 da43813fce49be97f1573711728fa277e253395b t/release-minimum-version.t
+SHA1 af52a2c44bef464f8283799f023531c9dd9f020f t/release-unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+Version: GnuPG v1
 
-iQIcBAEBAgAGBQJQLERuAAoJEMZvtcdxyp88c28QALgpJGto0Sz3yLnhERr9n5iP
-I1fwHMCr+OEcuv7JGF5tBKMGt95dK9XJ3i2LPWUlRry9iTDuOBNTLU2Teg7wb1x6
-8LM2vwXKtBJGoeU/3Xj7YOj/8Xb3KTBrQkF0yj5YRKevLxbfwvs+be8jy+RBdi4q
-OugxUKrunusvtMhllNuofkYYxNxNyYwZ9St3svUKgVjlAmbBY5L49ww1t01cTESx
-9I/YYvqdo0YnyVSu365ba7jCDGceIRRjks3isUKY/nFGNQDrIG+DbZz79IuMHgGj
-wnhLbs7h+88YYu6sNSQ0etdjM4yDfiNMPOZyxnpK25kY0dv3Rha08+rGRT8uNjL1
-Ugq6ZjVFiJdbquOPuUflVyWvR0Y8EyulaH8UUd5d6j8JxHbIw1+Ao3HXUSHR0jdB
-SwxehBVRevGD3QH7/W+lHLbjEEGtYoe3Hf/pgpFk1GKAIzhNR7J43n4uHnb/JN6a
-NEglRKgc94eI0MDTxwhFb68LR8SpTb1pCOKnA6q3l2QgV5BOGkKN9NfhDkuHMBye
-DEOVoDddk892ihHfZC4ne2yPVt/2IStyq0fgte+TchKbNI4cv2OH5FPIDgja48IA
-wZrdSRFrLr4H1+HA5oONEfYjfm8AAz09Phiguy46GeJIyM28RsM6nCKUzkwcY0FQ
-SPvMpkl5TO64FNbkc5Ps
-=TBEN
+iQIcBAEBAgAGBQJZ2hJNAAoJEMZvtcdxyp88uZ8P/A0+NIi3tAx/wteyl9ro1OiW
+NHDYPufowxI7lqHEU4zkwYu2JTZG/zs6XjqxaxoMpwY5W2N8ZNAvPXZrI1cbR9lC
+sfpY1BUaitw18x/59pM7gEr29OmLE4cIdADWaevbCM0qstCqX35QM6nV5WV2zX+5
+da4/tbyJ2HkBuA/wvIpFENi8AOTb0M3tWLaI+Kz4zqFq2FCdLydzCvn0xZ144nbT
+Y4BgcSGgy2uckUIkuR2lA2N8JorMt6qTJ4TSX322nCZvmkas8lGcZhMi02mfKTpP
+iXjx+88tLvhQ3fbWEA7DmiQJxWThWy+ZtTh/W989YtXr6yzQjwgdrt3yj84JT2oa
+uMUh4EwEdiRH5IIp4vte7URKpYCsgB3h2Gx89MkMkfC1CsRm+18+vosIucTvf8WV
+keimc9qOyIGydn1Tka7DjT7WX2MpKT4m8CTkAP3/lIn0mkhhZpoVxCxRVpdPmmB5
++rQOVaOEf3zSTRvgm7ZiHHHrZNB1H6lgO6BCtWLuJ696Eq/7/NgAnRAlzFwQvs2K
++kPnnaM6qvFW+SLdvqg8Pth4j8IOwx18p1+r8VEObqa5JXVU83OjTbxjwSPnRwkh
+mP58+DHop6X2laK7VuUSzZ1T+OYCjvrn5QqS1LHxVVKpKIN7nabSZtipy5rMaNST
+0qO9EU2jElT7eIajQjeO
+=wrlD
 -----END PGP SIGNATURE-----

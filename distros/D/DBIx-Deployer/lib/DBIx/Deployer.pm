@@ -3,9 +3,9 @@ use Modern::Perl;
 use Moops;
 
 
-class DBIx::Deployer::Patch 1.1.1 {
+class DBIx::Deployer::Patch 1.2.2 {
     use Digest::MD5;
-    use Term::ANSIColor;
+    use Term::ANSIColor qw(colored);
     use Data::Printer colored => 1;
 
     has deployed => ( is => 'rw', isa => Bool, default => 0 );
@@ -13,8 +13,10 @@ class DBIx::Deployer::Patch 1.1.1 {
     has name => ( is => 'ro', isa => Str, required => true );
     has supports_transactions => ( is => 'ro', isa => Bool, default => true );
     has dependencies => ( is => 'ro', isa => Maybe[ArrayRef] );
-    has deploy_sql => ( is => 'ro', isa => Str, required => true );
+    has deploy_sql => ( is => 'ro', isa => Maybe[Str] );
     has deploy_sql_args => ( is => 'ro', isa => Maybe[ArrayRef] );
+    has deploy_script => ( is => 'ro', isa => Maybe[Str] );
+    has deploy_script_args => ( is => 'rw', isa => Maybe[ArrayRef] );
     has no_verify => ( is => 'ro', isa => Bool, default => false );
     has verify_sql => ( is => 'ro', isa => Str );
     has verify_sql_args => ( is => 'ro', isa => ArrayRef );
@@ -22,18 +24,31 @@ class DBIx::Deployer::Patch 1.1.1 {
     has db => ( is => 'ro', isa => InstanceOf['DBI::db'], required => true );
 
     method deploy {
-        if($self->deploy_sql_args){
-          $self->db->do($self->deploy_sql, {}, @{ $self->deploy_sql_args })
-            or $self->handle_error($self->db->errstr);
+        if($self->deploy_sql && $self->deploy_script) {
+            $self->handle_error('Patch cannot have both deploy_sql and deploy_script.');
         }
-        else{
-          $self->db->do($self->deploy_sql) or $self->handle_error($self->db->errstr);
+        elsif($self->deploy_sql) {
+            if($self->deploy_sql_args){
+              $self->db->do($self->deploy_sql, {}, @{ $self->deploy_sql_args })
+                or $self->handle_error($self->db->errstr);
+            }
+            else{
+              $self->db->do($self->deploy_sql) or $self->handle_error($self->db->errstr);
+            }
+        }
+        elsif($self->deploy_script) {
+            if( my $status = system $self->deploy_script, @{ $self->deploy_script_args || [] } ) {
+                $self->handle_error("Exited with status $status.");
+            } 
+        }
+        else {
+            $self->handle_error('Patch has neither deploy_sql nor deploy_script.');
         }
     }
 
     before deploy {
-        die colored(['red'], $self->name . " is already deployed") if $self->deployed;
-        if($self->supports_transactions){ $self->db->begin_work; }
+        die colored(['red'], 'Patch "' . $self->name . '" is already deployed') if $self->deployed;
+        if($self->supports_transactions && !$self->deploy_script){ $self->db->begin_work; }
     }
 
     after deploy {
@@ -48,7 +63,7 @@ class DBIx::Deployer::Patch 1.1.1 {
         }
 
         unless($self->verify_sql && @{ $self->verify_expects || [] }){
-            $self->handle_error($self->name . " is missing verification attributes");
+            $self->handle_error('Patch is missing verification attributes');
         }
 
         my $result;
@@ -67,22 +82,22 @@ class DBIx::Deployer::Patch 1.1.1 {
 
     after verify {
         if($self->verified){
-            if($self->supports_transactions){
+            if($self->supports_transactions && !$self->deploy_script){
                 $self->db->commit;
             }
-            say Term::ANSIColor::colored(['green'], $self->name . " completed successfully");
+            say colored(['green'], 'Patch "' . $self->name . '" completed successfully');
         }
         else{
-            $self->handle_error($self->name . " failed verification");
+            $self->handle_error('Failed verification');
         }
     }
 
     method handle_error ( Str $error ){
-        if($self->supports_transactions){
+        if($self->supports_transactions && !$self->deploy_script){
             $self->deployed(0);
-            $self->db->rollback or die $self->name . ": " . $self->db->errstr;
+            $self->db->rollback or die $self->name . ': ' . $self->db->errstr;
         }
-        die colored(['red'], $self->name . ": " . $error);
+        die colored(['red'], 'Patch "' . $self->name . '" failed: ' . $error);
     }
  
     method _check_signature ( ArrayRef $result ){
@@ -123,7 +138,7 @@ class DBIx::Deployer::Patch 1.1.1 {
     }
 }
 
-class DBIx::Deployer 1.1.1 {
+class DBIx::Deployer 1.2.2 {
     use DBI;
     use DBD::SQLite;
     use JSON::XS;
@@ -278,7 +293,7 @@ DBIx::Deployer - Light-weight database patch utility
 
 =head1 VERSION
 
-version v1.1.1
+version v1.2.2
 
 =head1 SYNOPSIS
 
@@ -423,13 +438,21 @@ The name of the patch must be unique.  It will be used as the primary key for th
 
 Dependencies are listed by name.  Take care not to create circular dependencies as I have no intentions of protecting against them.
 
-=head3 deploy_sql (Str REQUIRED)
+=head3 deploy_sql (Str)
 
 Patch files may contain multiple patches, but a single patch within a patch file may not contain more than one SQL statement to deploy.
 
 =head3 deploy_sql_args (ArrayRef)
 
 If using bind parameters in your C<deploy_sql> statement, the values in C<deploy_sql_args> will be used for those parameters.  See L<DBI> and L<http://www.bobby-tables.com> for more information about bind parameters.
+
+=head3 deploy_script (Str) *EXPERIMENTAL*
+
+The C<deploy_script> will be passed as an argument to the C<system> command.  Scripts are expected to handle transactions on their own.  A non-zero exit status is reported as a failure.
+
+=head3 deploy_script_args (ArrayRef) *EXPERIMENTAL*
+
+The C<deploy_script_args> are passed to the C<system> command with the C<deploy_script> in PROGRAM LIST syntax.  It may be useful to manipulate this attribute at runtime to pass environment-specific arguments.
 
 =head3 verify_sql (Str)
 
@@ -481,7 +504,7 @@ Chris Tijerina
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by eMortgage Logic LLC.
+This software is copyright (c) 2014-2017 by eMortgage Logic LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

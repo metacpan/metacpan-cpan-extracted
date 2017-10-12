@@ -6,15 +6,18 @@ build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+conflicts:
+  Module::Build: '< 0.36'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: CPANPLUS-Dist-Slackware
 requires:
-  CPANPLUS: '0'
+  CPANPLUS: '0.9166'
+  Config: '0'
   Cwd: '0'
   ExtUtils::Install: '0'
   File::Find: '0'
@@ -30,10 +33,10 @@ requires:
   Pod::Find: '0'
   Pod::Simple: '0'
   Text::Wrap: '0'
-  parent: '0'
-  perl: '5.012003'
+  base: '0'
+  perl: '5.006001'
   version: '0.77'
 resources:
   repository: https://github.com/voegelas/CPANPLUS-Dist-Slackware.git
-version: '1.024'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.025'
+x_serialization_backend: 'YAML::Tiny version 1.70'

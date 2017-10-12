@@ -79,7 +79,9 @@ OSM: {
 		# Check list context finds both Portland, ME and Portland, OR
 		my @locations = $geocoderlist->geocode('Portland, USA');
 
-		ok(scalar(@locations) > 1);
+		my $count = scalar(@locations);
+
+		ok($count > 1);
 		is(ref($locations[0]->{'geocoder'}), 'Geo::Coder::OSM', 'Verify OSM encoder is used');
 
 		my ($maine, $oregon);
@@ -97,7 +99,7 @@ OSM: {
 
 		@locations = $geocoderlist->geocode('Portland, USA');
 
-		ok(scalar(@locations) > 1);
+		ok(scalar(@locations) == $count);
 		is($locations[0]->{'geocoder'}, undef, 'Verify subsequent reads are cached');
 	}
 }

@@ -15,6 +15,7 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Path::Tiny' => '0.076',
+	'File::Slurper' => '0.010',
     },
     META_MERGE => {
 	'meta-spec' => {

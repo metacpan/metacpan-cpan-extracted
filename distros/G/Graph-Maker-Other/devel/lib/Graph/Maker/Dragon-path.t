@@ -31,8 +31,8 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 plan tests => 257;
 
-use lib
-  'devel/lib';
+use FindBin;
+use lib "$FindBin::Bin/../devel/lib";
 require Graph::Maker::Dragon;
 
 

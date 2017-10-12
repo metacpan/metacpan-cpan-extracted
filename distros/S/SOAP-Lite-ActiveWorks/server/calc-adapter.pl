@@ -78,7 +78,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This script is part of the SOAP::Transport::ACTIVEWORKS testing suite.
+This script is part of the SOAP::Transport::ActiveWorks::Lite testing suite.
 
 This script is an ActiveWorks adapter that subscribes to and handles
 'AdapterDevekit::calcRequest' events.  The summation of all digits

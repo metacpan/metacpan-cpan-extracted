@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 7;
+$VERSION = 8;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -142,6 +142,7 @@ sub init {
 
 Graph::Maker->add_factory_type('dragon' => __PACKAGE__);
 1;
+
 __END__
 
 =for stopwords Ryde

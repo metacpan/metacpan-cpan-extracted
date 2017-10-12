@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.914';
+our $VERSION = '0.951';
 our $GIT_DESCRIBE;
 our $GIT_URL;
 
@@ -41,6 +41,7 @@ sub determine_home { # taken from Menlo
 
 sub new {
     my ($class, %option) = @_;
+    my $prebuilt = exists $ENV{PERL_CPM_PREBUILT} && !$ENV{PERL_CPM_PREBUILT} ? 0 : 1;
     bless {
         home => $class->determine_home,
         workers => WIN32 ? 1 : 5,
@@ -63,7 +64,7 @@ sub new {
         with_develop => 0,
         feature => [],
         notest => 1,
-        prebuilt => $] >= 5.012 && $ENV{PERL_CPM_PREBUILT} ? 1 : 0,
+        prebuilt => $] >= 5.012 && $prebuilt,
         %option
     }, $class;
 }
@@ -131,7 +132,7 @@ sub parse_options {
     if ($self->{sudo}) {
         !system "sudo", $^X, "-e1" or exit 1;
     }
-    if ($self->{sudo} or !$self->{notest} or $] < 5.012) {
+    if ($self->{sudo} or $] < 5.012) {
         $self->{prebuilt} = 0;
     }
 
@@ -572,9 +573,9 @@ App::cpm - a fast CPAN module installer
 
 cpm is a fast CPAN module installer, which uses L<Menlo> in parallel.
 
-Moreover if C<--prebuilt> option is enabled, cpm keeps the each builds of distributions in your home directory.
-Then, C<cpm install --prebuilt> will use these prebuilt distributions.
-That is, if prebuilts are available, cpm never build distributions again, just copy the prebuilts into an appropriate directory.
+Moreover cpm keeps the each builds of distributions in your home directory,
+and reuses them later.
+That is, if prebuilts are available, cpm never builds distributions again, just copies the prebuilts into an appropriate directory.
 This is (of course!) inspired by L<Carmel>.
 
 For tutorial, check out L<App::cpm::Tutorial>.
